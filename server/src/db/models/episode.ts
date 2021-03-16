@@ -1,6 +1,6 @@
-import mongoose, { Document } from "mongoose";
+import mongoose from "mongoose";
 
-interface Episode extends Document {
+export interface Episode {
     id: string;
     title: string;
     path: string;
@@ -11,15 +11,16 @@ interface Episode extends Document {
     duration?: number;
 }
 
-const NAME = "Episode";
 const schema = new mongoose.Schema({
     id: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     path: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     title: {
         type: String
@@ -41,5 +42,4 @@ const schema = new mongoose.Schema({
     }
 });
 
-const model = mongoose.model<Episode>(NAME, schema);
-export { schema as EpisodeSchema, Episode, model as EpisodeModel };
+export { schema as EpisodeSchema };

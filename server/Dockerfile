@@ -1,8 +1,5 @@
-#  Dockerfile for Node Express Backend api (development)
-
 FROM node:current-alpine
 
-# ARG NODE_ENV=development
 
 # Create App Directory
 RUN mkdir -p /usr/src/app
@@ -18,5 +15,7 @@ COPY . .
 
 # Exports
 EXPOSE 8080
+
+CMD ["npm","i"]
 
 CMD ["npm","start"]

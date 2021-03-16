@@ -1,5 +1,5 @@
-import { Episode } from "./db/models/episode.model";
-import { History } from "./db/models/history.model";
+import { Episode } from "./db/models/episode";
+import { History } from "./db/models/history";
 import { Serie } from "./db/models/serie.model";
 import { Stream } from "./db/models/stream.model";
 import { WeightWrapper, wrap } from "./randompicker/pickers/WeightPicker";

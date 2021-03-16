@@ -1,7 +1,8 @@
 import mongoose, { Document } from "mongoose";
-import { Episode } from "./episode.model";
-import { getDateNow, History, HistoryModel, HistorySchema } from "./history.model";
-import { SerieModel } from "./serie.model";
+import { getDateNow } from "./date";
+import { Episode } from "./episode";
+import { History, HistorySchema } from "./history";
+import { getById as getSerieById } from "./serie.model";
 
 enum Mode {
     SEQUENTIAL = "SEQUENTIAL",
@@ -45,37 +46,37 @@ const model = mongoose.model<Stream>(NAME, schema);
 export async function getById(id: string): Promise<Stream | null> {
     const streams = await model.find({ id }, { _id: 0 });
     let stream: Stream | undefined | null = streams[0];
-    if (!stream) {
+    if (!stream)
         stream = await createFromSerie(id);
-    }
 
     return stream;
 }
 
 export async function addToHistory(stream: Stream, episode: Episode) {
-    const newEntry: History = await HistoryModel.create({
+    const newEntry: History = {
         date: getDateNow(),
         episodeId: episode.id
-    });
+    };
     stream.history.push(newEntry);
     const saved = await model.findOneAndUpdate({ id: stream.id }, stream);
 }
 
 export async function createFromSerie(serieId: string): Promise<Stream | null> {
-    const serie = await SerieModel.find({ id: serieId });
-    if (serie && serie.length > 0) {
-        const newStream: Stream = new model({
-            id: serieId,
-            group: `series/${serieId}`,
-            mode: Mode.SEQUENTIAL,
-            maxHistorySize: 1,
-            history: [
-            ]
-        });
-        newStream.save();
-        return newStream;
-    } else
+    const serie = await getSerieById(serieId);
+
+    if (!serie)
         return null;
+
+    const newStream: Stream = new model({
+        id: serieId,
+        group: `series/${serieId}`,
+        mode: Mode.SEQUENTIAL,
+        maxHistorySize: 1,
+        history: [
+        ]
+    });
+    newStream.save();
+    return newStream;
 }
 
 export { schema as SteamSchema, Mode, Stream, model as StreamModel };

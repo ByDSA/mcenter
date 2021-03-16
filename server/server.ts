@@ -7,6 +7,8 @@ import { connect } from "./src/db/database";
 import asyncCalculateNextEpisodeByIdStream from "./src/EpisodePicker";
 const app = express();
 
+app.disable('x-powered-by');
+
 const PORT = 8080;
 
 connect();

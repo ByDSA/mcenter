@@ -5,7 +5,7 @@ services:
       build:
         context: .
         dockerfile: Dockerfile
-      image: myapp-server-img
+      image: mcenter-server
       container_name: multimedia-server
       volumes:
        - .:/usr/src/app
@@ -21,6 +21,6 @@ services:
         - MONGO_DB=$MONGO_DB
     mongo:
       image: mongo
-      container_name: multimedia-db
+      container_name: mcenter-db
       ports:
         - "27017:27017"

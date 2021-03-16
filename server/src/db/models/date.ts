@@ -1,19 +1,13 @@
-import mongoose, { Document } from "mongoose";
+import mongoose from "mongoose";
 
-interface History extends Document {
-    date: Date;
-    episodeId: string;
-}
-
-interface Date {
+export interface DateType {
     year: number;
     month: number;
     day: number;
     timestamp: number;
 }
 
-const NAME = "History";
-const dateSchema = new mongoose.Schema({
+const schema = new mongoose.Schema({
     year: {
         type: Number,
         required: true
@@ -30,18 +24,8 @@ const dateSchema = new mongoose.Schema({
         type: Number
     }
 });
-const schema = new mongoose.Schema({
-    date: {
-        type: dateSchema,
-        required: true
-    },
-    episodeId: {
-        type: String,
-        required: true
-    }
-});
 
-export function getDateNow(): Date {
+export function getDateNow(): DateType {
     const now = new Date();
     const year = now.getUTCFullYear();
     const month = now.getUTCMonth() + 1;
@@ -56,5 +40,4 @@ export function getDateNow(): Date {
     }
 }
 
-const model = mongoose.model<History>(NAME, schema);
-export { schema as HistorySchema, History, model as HistoryModel, Date };
+export { schema as DateSchema };

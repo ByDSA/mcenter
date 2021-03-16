@@ -5,9 +5,9 @@ export default async function (req: Request, res: Response) {
     const { id } = getParams(req, res);
 
     getById(id).then(stream => {
-        if (stream)
+        if (stream) {
             res.send(stream);
-        else
+        } else
             res.sendStatus(404);
     });
 }

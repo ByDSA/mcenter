@@ -1,7 +1,7 @@
 import { exec, execSync } from "child_process";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
-import { Episode } from "../db/models/episode.model";
+import { Episode } from "../db/models/episode";
 import { addToHistory, getById, Stream } from "../db/models/stream.model";
 import { calculateNextEpisode } from "../EpisodePicker";
 import { MediaElement } from "../m3u/MediaElement";
@@ -40,7 +40,7 @@ async function play(episodes: Episode[], openNewInstance: boolean) {
 
     const elements: MediaElement[] = episodes.map(e => {
         return {
-            path: MEDIA_PATH + e.path,
+            path: `${MEDIA_PATH}/${e.path}`,
             title: e.title,
             startTime: e.start,
             stopTime: e.end,

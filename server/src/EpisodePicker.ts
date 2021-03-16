@@ -1,6 +1,6 @@
 import { WeightPicker, wrap } from "../src/randompicker/pickers/WeightPicker";
-import { Episode } from "./db/models/episode.model";
-import { History } from "./db/models/history.model";
+import { Episode } from "./db/models/episode";
+import { History } from "./db/models/history";
 import { getFromGroupId, Serie } from "./db/models/serie.model";
 import { getById, Mode, Stream } from "./db/models/stream.model";
 import { filter, fixWeight } from "./EpisodePickerMiddleware";
@@ -36,7 +36,7 @@ export async function calculateNextEpisode(stream: Stream) {
     const groupId: string = stream.group;
     const serie = await getFromGroupId(groupId);
     if (!serie)
-        throw new Error();
+        throw new Error(`Cannot get serie frop group '${groupId}'`);
 
     let nextEpisodeFunc: FuncGenerator;
     switch (stream.mode) {

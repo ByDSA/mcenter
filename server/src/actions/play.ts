@@ -12,7 +12,7 @@ export default function (req: Request, res: Response) {
 };
 
 function getParams(req: Request, res: Response) {
-    const forceStr = req.param("force");
+    const forceStr = req.query.force;
     const force = !!forceStr;
     const { id, type } = req.params;
 
