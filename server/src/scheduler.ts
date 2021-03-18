@@ -14,6 +14,7 @@ const job = schedule.scheduleJob('* * * * * *', async function (fireDate: Date) 
         s(fireDate);
         delete require.cache[require.resolve(path)];
     } catch (e) {
+        console.log(e);
         console.log(`File not found: ${path}`);
         fs.writeFile(filename, sampleScheduleJs, function (err) {
             if (err) throw err;

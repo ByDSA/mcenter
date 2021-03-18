@@ -81,7 +81,6 @@ function removeWeightLowerOrEqualThan(num: number) {
 function preventRepeatInDays(minDays: number) {
     return ({ self, picker, stream }: Params): boolean => {
         const daysFromLastTime = getDaysFrom(self, picker, stream.history);
-        console.log(self.id + " " + daysFromLastTime);
         return daysFromLastTime >= minDays;
     }
 }
