@@ -1,4 +1,4 @@
-import { WeightPicker, wrap } from "../src/randompicker/pickers/WeightPicker";
+import { newPicker } from "rand-picker";
 import { Episode } from "./db/models/episode";
 import { History } from "./db/models/history";
 import { getFromGroupId, Serie } from "./db/models/serie.model";
@@ -69,12 +69,10 @@ function getNextEpisodeSequential(serie: Serie, lastEp: Episode | null): Episode
 function getNextEpisodeRandom(serie: Serie, lastEp: Episode | null, stream: Stream): Episode {
     const episodes = serie.episodes;
 
-    let weightEpisodes = episodes.map(e => wrap(e));
+    const picker = newPicker(episodes);
+    filter(picker, serie, lastEp, stream);
+    fixWeight(picker, serie, lastEp, stream);
 
-    weightEpisodes = filter(weightEpisodes, serie, lastEp, stream);
-    fixWeight(weightEpisodes, serie, lastEp, stream);
-
-    const picker = new WeightPicker(weightEpisodes);
 
     const ret = picker.pickOne();
 

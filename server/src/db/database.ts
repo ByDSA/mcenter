@@ -25,6 +25,7 @@ const dbConnectionURL = {
 };
 
 function connect() {
+    console.log(`Connecting to ${dbConnectionURL.LOCALURL}...`);
     mongoose.connect(dbConnectionURL.LOCALURL, options);
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Mongodb Connection Error:' + dbConnectionURL.LOCALURL));

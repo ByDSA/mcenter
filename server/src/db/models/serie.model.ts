@@ -68,11 +68,12 @@ export async function generateFromFiles(id: string): Promise<Serie | null> {
 async function getSerieTree(uri: string): Promise<Episode[] | null> {
     if (uri.startsWith("http")) {
         const nginxTree = await getSerieTreeRemote(uri, { maxLevel: 2 });
+        if (!nginxTree)
+            return null;
         return getEpisodesFromTree(nginxTree);
     } else
         return getSerieTreeLocal(uri);
 }
-
 
 async function getEpisodesFromTree(tree: FileNode[], episodes: Episode[] = []): Promise<Episode[]> {
     for (const fn of tree) {

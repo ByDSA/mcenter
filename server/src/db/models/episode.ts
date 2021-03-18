@@ -9,6 +9,7 @@ export interface Episode {
     end: number;
     tags?: string[];
     duration?: number;
+    disabled?: boolean
 }
 
 const schema = new mongoose.Schema({
@@ -39,6 +40,9 @@ const schema = new mongoose.Schema({
     },
     tags: {
         type: [String]
+    },
+    disabled: {
+        type: Boolean
     }
 });
 

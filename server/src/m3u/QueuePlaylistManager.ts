@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import { MediaElement } from "./MediaElement";
 import { Playlist } from "./Playlist";
 
@@ -51,7 +52,7 @@ export class QueuePlaylistManager {
     }
 
     private getFullPathByNum(num: number): string {
-        return this.folder + "/" + generateName(num);
+        return path.join(this.folder, generateName(num));
     }
 }
 

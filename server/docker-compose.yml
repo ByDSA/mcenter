@@ -6,7 +6,7 @@ services:
         context: .
         dockerfile: Dockerfile
       image: mcenter-server
-      container_name: multimedia-server
+      container_name: mcenter-server
       volumes:
        - .:/usr/src/app
        - /usr/src/app/node_modules

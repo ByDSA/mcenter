@@ -21,18 +21,23 @@ type Params = {
     options: Options;
 }
 
-export async function getSerieTreeRemote(uri: string, options: Options = { maxLevel: 0 }): Promise<FileNode[]> {
+export async function getSerieTreeRemote(uri: string, options: Options = { maxLevel: 0 }): Promise<FileNode[] | null> {
     if (!uri.endsWith("/"))
         uri = uri + "/";
     const promises: Promise<FileNode[]>[] = [];
-    const nodes = await getPageElements({ uri, relativeUri: "", level: 1, promises, options });
+    try {
+        const nodes = await getPageElements({ uri, relativeUri: "", level: 1, promises, options });
 
-    await Promise.all(promises);
+        await Promise.all(promises);
 
-    return nodes;
+        return nodes;
+    } catch (e) {
+        return null;
+    }
 }
 
 async function getPageElements({ uri, relativeUri, promises, level, options }: Params): Promise<FileNode[]> {
+    console.log("Requesting " + uri);
     const response = await axios.get(uri);
     const data: string = await response.data;
     const dom = new JSDOM(data);

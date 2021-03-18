@@ -51,7 +51,11 @@ async function play(episodes: Episode[], openNewInstance: boolean) {
 
     if (openNewInstance) {
         const file = queue.firstFile;
-        openVLC(file);
+        const process = openVLC(file);
+        process.on("exit", (code: number) => {
+            if (code === 0)
+                queue.clear();
+        })
     }
 }
 
@@ -65,8 +69,9 @@ async function closeVLC() {
     }
 }
 
-async function openVLC(file: string) {
+function openVLC(file: string): any {
     const p2 = exec(`"vlc" ${file} --play-and-exit --no-video-title-show --aspect-ratio 16:9 -f --qt-minimal-view --no-repeat --no-loop --one-instance`);
+    return p2;
 }
 
 async function pickAndAddHistory(stream: Stream, n: number): Promise<Episode[]> {

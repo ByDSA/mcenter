@@ -5,6 +5,8 @@ import showSerieFunc from "./src/actions/showSerie";
 import showStreamFunc from "./src/actions/showStream";
 import { connect } from "./src/db/database";
 import asyncCalculateNextEpisodeByIdStream from "./src/EpisodePicker";
+const s = require("./src/scheduler");
+
 const app = express();
 
 app.disable('x-powered-by');
