@@ -68,7 +68,6 @@ function preventRepeatLast({ self, lastEp }: Params) {
 
 function preventDisabled({ self }: Params) {
     const ret = self.disabled === undefined || self.disabled === false;
-    console.log(self.id + " " + ret);
     return ret;
 }
 
