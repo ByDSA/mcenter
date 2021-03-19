@@ -1,6 +1,6 @@
 import { newPicker } from "rand-picker";
+import { getlastEp } from "./actions/playStream";
 import { Episode } from "./db/models/episode";
-import { History } from "./db/models/history";
 import { getFromGroupId, Serie } from "./db/models/serie.model";
 import { getById, Mode, Stream } from "./db/models/stream.model";
 import { filter, fixWeight } from "./EpisodePickerMiddleware";
@@ -18,18 +18,6 @@ export default async function (streamId: string) {
 
     return nextEpisodeId;
 };
-
-async function getlastEp(stream: Stream): Promise<Episode | null> {
-    let lastEp = null;
-    if (stream.history.length > 0) {
-        const lastHistory: History = stream.history[stream.history.length - 1];
-        const lastEpId = lastHistory.episodeId;
-        const serie = await getFromGroupId(stream.group);
-        lastEp = serie?.episodes.find(e => e.id === lastEpId) || null;
-    }
-
-    return lastEp;
-}
 
 type FuncGenerator = (serie: Serie, lastEp: Episode | null, stream: Stream) => Episode;
 export async function calculateNextEpisode(stream: Stream) {
@@ -67,17 +55,22 @@ function getNextEpisodeSequential(serie: Serie, lastEp: Episode | null): Episode
 }
 
 function getNextEpisodeRandom(serie: Serie, lastEp: Episode | null, stream: Stream): Episode {
-    const episodes = serie.episodes;
-
-    const picker = newPicker(episodes);
-    filter(picker, serie, lastEp, stream);
-    fixWeight(picker, serie, lastEp, stream);
-
-
+    const picker = getRandomPicker(serie, lastEp, stream);
     const ret = picker.pickOne();
 
     if (!ret)
         throw new Error();
 
     return ret;
+}
+
+export function getRandomPicker(serie: Serie, lastEp: Episode | null, stream: Stream) {
+    const episodes = serie.episodes;
+    const picker = newPicker(episodes, {
+        weighted: true
+    });
+    filter(picker, serie, lastEp, stream);
+    fixWeight(picker, serie, lastEp, stream);
+
+    return picker;
 }

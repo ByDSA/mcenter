@@ -1,12 +1,13 @@
 import { Picker } from "rand-picker";
+import { DateType } from "./db/models/date";
 import { Episode } from "./db/models/episode";
 import { History } from "./db/models/history";
 import { Serie } from "./db/models/serie.model";
 import { Stream } from "./db/models/stream.model";
-import { daysBetween } from "./TimeUtils";
+import { daysBetween, Month } from "./TimeUtils";
 
 export function filter(picker: Picker<Episode>, serie: Serie, lastEp: Episode | null, stream: Stream): void {
-    picker.data = picker.data.filter((self: Episode) => {
+    const newData = picker.data.filter((self: Episode) => {
         for (const func of filterFunctions) {
             if (!func({ picker, self, serie, lastEp, stream })) {
                 return false;
@@ -15,6 +16,14 @@ export function filter(picker: Picker<Episode>, serie: Serie, lastEp: Episode | 
 
         return true;
     });
+
+    for (let i = 0; i < picker.data.length; i++) {
+        const e_i = picker.data[i];
+        if (!newData.includes(e_i)) {
+            picker.remove(e_i);
+            i--;
+        }
+    }
 
     if (picker.data.length === 0)
         picker.put(serie.episodes[0]);
@@ -33,17 +42,19 @@ type MiddlewareWeightFunction = (params: Params) => number;
 type MiddlewareFilterFunction = (params: Params) => boolean;
 const middlewareWeightFunctions: MiddlewareWeightFunction[] = [
     weightCalculator,
-    weightLimiter
+    weightTag,
+    weightLimiter,
 ];
 const filterFunctions: MiddlewareFilterFunction[] = [
+    dependent,
     preventDisabled,
     preventRepeatLast,
-    preventRepeatInDays(30),
     removeWeightLowerOrEqualThan(-90),
+    preventRepeatInDays(30),
 ];
 
-function weightCalculator({ self, picker, stream }: Params): number {
-    const daysFromLastTime = getDaysFrom(self, picker, stream.history);
+function weightCalculator({ self, stream }: Params): number {
+    const daysFromLastTime = getDaysFrom(self, stream.history);
 
     let reinforcementFactor = 1;
     const weight = self.weight;
@@ -54,7 +65,33 @@ function weightCalculator({ self, picker, stream }: Params): number {
     else
         reinforcementFactor = 1;
 
-    return reinforcementFactor * daysFromLastTime;
+    return reinforcementFactor ** 1.5 * daysFromLastTime;
+}
+
+function weightTag({ self, picker, serie }: Params): number {
+    let weight = self.weight;
+
+    if (!self.tags)
+        return weight;
+    const now = new Date();
+    for (const t of self.tags) {
+        switch (t) {
+            case "halloween":
+                if (now.getMonth() === Month.OCTOBER && now.getDate() >= 24 || now.getMonth() === Month.NOVEMBER && now.getDate() <= 2)
+                    weight *= 1000;
+                else
+                    weight /= 100;
+                break;
+            case "navidad":
+                if (now.getMonth() === Month.DECEMBER && now.getDate() >= 19 || now.getMonth() === Month.JANUARY && now.getDate() <= 6)
+                    weight *= 100;
+                else
+                    weight /= 1000;
+                break;
+        }
+    }
+
+    return weight;
 }
 
 function weightLimiter({ self, picker }: Params): number {
@@ -64,6 +101,21 @@ function weightLimiter({ self, picker }: Params): number {
 
 function preventRepeatLast({ self, lastEp }: Params) {
     return !lastEp || lastEp.id !== self.id;
+}
+
+function dependent({ self, lastEp, serie }: Params) {
+    let ret = true;
+    switch (serie.id) {
+        case "simpsons":
+            ret &&= dependency(lastEp, "6x23", self, "7x01");
+            break;
+    }
+
+    return ret;
+}
+
+function dependency(lastEp: Episode | null, idLast: string, self: Episode, idCurrent: string): boolean {
+    return lastEp?.id === idLast && self.id === idCurrent || lastEp?.id !== idLast;
 }
 
 function preventDisabled({ self }: Params) {
@@ -78,13 +130,13 @@ function removeWeightLowerOrEqualThan(num: number) {
 }
 
 function preventRepeatInDays(minDays: number) {
-    return ({ self, picker, stream }: Params): boolean => {
-        const daysFromLastTime = getDaysFrom(self, picker, stream.history);
+    return ({ self, stream }: Params): boolean => {
+        const daysFromLastTime = getDaysFrom(self, stream.history);
         return daysFromLastTime >= minDays;
     }
 }
 
-function getDaysFrom(self: Episode, picker: Picker<Episode>, history: History[]): number {
+export function getDaysFrom(self: Episode, history: History[]): number {
     let days = Number.MAX_SAFE_INTEGER;
 
     const now = new Date();
@@ -93,13 +145,9 @@ function getDaysFrom(self: Episode, picker: Picker<Episode>, history: History[])
         if (h.episodeId === self.id) {
             let date;
             if (h.date.timestamp)
-                date = new Date(+h.date.timestamp);
-            else {
-                const year = h.date.year;
-                const month = h.date.month + 1;
-                const day = h.date.day;
-                date = new Date(year, month, day);
-            }
+                date = getDateFromTimestampInSec(+h.date.timestamp);
+            else
+                date = getDateFromYearMonthDayHistory(h.date);
 
             const d = daysBetween(date, now);
 
@@ -109,4 +157,17 @@ function getDaysFrom(self: Episode, picker: Picker<Episode>, history: History[])
     }
 
     return days;
+}
+
+function getDateFromTimestampInSec(timestamp: number): Date {
+    let date = new Date();
+    date.setTime(timestamp * 1000);
+    return date;
+}
+
+function getDateFromYearMonthDayHistory(dateIn: DateType) {
+    const year = dateIn.year;
+    const month = dateIn.month - 1;
+    const day = dateIn.day;
+    return new Date(year, month, day);
 }

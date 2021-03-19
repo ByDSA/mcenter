@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import playFunc, { playSerieFunc } from "./src/actions/play";
 import playStreamFunc from "./src/actions/playStream";
+import showPickerFunc from "./src/actions/showPicker";
 import showSerieFunc from "./src/actions/showSerie";
 import showStreamFunc from "./src/actions/showStream";
 import { connect } from "./src/db/database";
@@ -25,6 +26,7 @@ app.get('/api/play/serie/:name/:id', playSerieFunc);
 app.get('/api/play/:type/:id', playFunc);
 
 app.get('/api/crud/series/:id', showSerieFunc);
+app.get('/api/picker/:streamId', showPickerFunc);
 app.get('/api/crud/streams/:id', showStreamFunc);
 
 
