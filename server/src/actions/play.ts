@@ -1,7 +1,7 @@
 import { exec, execSync } from "child_process";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
-import { Episode } from "../db/models/episode";
+import { Episode, episodeToMediaElement } from "../db/models/episode";
 import { getById } from "../db/models/serie.model";
 import { addToHistory, getById as getStreamById, Stream } from "../db/models/stream.model";
 import { calculateNextEpisode } from "../EpisodePicker";
@@ -9,7 +9,7 @@ import { MediaElement } from "../m3u/MediaElement";
 import { QueuePlaylistManager } from "../m3u/QueuePlaylistManager";
 import { isRunning } from "../Utils";
 dotenv.config();
-const { MEDIA_PATH, TMP_PATH } = process.env;
+const { TMP_PATH } = process.env;
 
 export default async function (req: Request, res: Response) {
     const { id, type, force } = getParams(req, res);
@@ -73,24 +73,11 @@ export async function play(episodes: Episode[], openNewInstance: boolean) {
     console.log("Play function: " + episodes[0].id);
     const queue = new QueuePlaylistManager(TMP_PATH || "/");
 
-    if (!await isRunning("vlc"))
-        openNewInstance = true;
-    if (openNewInstance || queue.nextNumber > 0) {
-        if (openNewInstance)
-            await closeVLC();
-        queue.clear();
-        openNewInstance = true;
-    }
+    await closeIfNeeded(openNewInstance, queue);
 
-    const elements: MediaElement[] = episodes.map(e => {
-        return {
-            path: `${MEDIA_PATH}/${e.path}`,
-            title: e.title,
-            startTime: e.start,
-            stopTime: e.end,
-            length: e.duration
-        };
-    });
+    await openIfNeeded(openNewInstance, queue);
+
+    const elements: MediaElement[] = episodes.map(episodeToMediaElement);
     queue.add(...elements);
 
     if (openNewInstance) {
@@ -102,6 +89,20 @@ export async function play(episodes: Episode[], openNewInstance: boolean) {
 
             console.log("Closed VLC")
         })
+    }
+}
+
+async function closeIfNeeded(openNewInstance: boolean, queue: QueuePlaylistManager) {
+    if (openNewInstance || await isRunning("vlc") && queue.nextNumber === 0)
+        await closeVLC();
+}
+
+async function openIfNeeded(openNewInstance: boolean, queue: QueuePlaylistManager) {
+    if (!await isRunning("vlc")) {
+        openNewInstance = true;
+        if (queue.nextNumber > 0) {
+            queue.clear();
+        }
     }
 }
 
