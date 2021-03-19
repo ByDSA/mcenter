@@ -21,13 +21,14 @@ export default async function (req: Request, res: Response) {
             return;
         }
         const picker = getRandomPicker(serie, lastEp, stream);
+        const pickerWeight = picker.weight;
         let weightAcc = 0;
         const ret = picker.data.map(e => {
             const id = e.id;
-            const pickerWeight = picker.weight;
-            const weight = Math.round((picker.getWeight(e) || 1) / pickerWeight * 100 * 100) / 100;
+            const selfWeight = picker.getWeight(e) || 1;
+            const weight = Math.round(selfWeight / pickerWeight * 100 * 100) / 100;
             const days = Math.floor(getDaysFrom(e, stream.history));
-            return [id, weight, days]
+            return [id, weight, selfWeight, days]
         }).sort((a: any, b: any) => {
             return b[1] - a[1];
         }).filter((e, i) => {

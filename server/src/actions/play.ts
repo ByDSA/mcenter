@@ -1,4 +1,3 @@
-import { exec, execSync } from "child_process";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
 import { Episode, episodeToMediaElement } from "../db/models/episode";
@@ -8,6 +7,7 @@ import { calculateNextEpisode } from "../EpisodePicker";
 import { MediaElement } from "../m3u/MediaElement";
 import { QueuePlaylistManager } from "../m3u/QueuePlaylistManager";
 import { isRunning } from "../Utils";
+import { VLC, VLCFlag } from "../vlc/VLC";
 dotenv.config();
 const { TMP_PATH } = process.env;
 
@@ -69,59 +69,73 @@ function getParams(req: Request, res: Response) {
     }
 }
 
-export async function play(episodes: Episode[], openNewInstance: boolean) {
-    console.log("Play function: " + episodes[0].id);
-    const queue = new QueuePlaylistManager(TMP_PATH || "/");
-
-    await closeIfNeeded(openNewInstance, queue);
-
-    await openIfNeeded(openNewInstance, queue);
-
-    const elements: MediaElement[] = episodes.map(episodeToMediaElement);
-    queue.add(...elements);
-
-    if (openNewInstance) {
-        const file = queue.firstFile;
-        const process = openVLC(file);
-        process.on("exit", (code: number) => {
-            if (code === 0)
-                queue.clear();
-
-            console.log("Closed VLC")
-        })
+class PlayProcess {
+    private queue: QueuePlaylistManager;
+    constructor(private episodes: Episode[], private openNewInstance: boolean) {
+        this.queue = new QueuePlaylistManager(TMP_PATH || "/");
     }
-}
 
-async function closeIfNeeded(openNewInstance: boolean, queue: QueuePlaylistManager) {
-    if (openNewInstance || await isRunning("vlc") && queue.nextNumber === 0)
-        await closeVLC();
-}
+    async closeIfNeeded() {
+        if (this.openNewInstance || await isRunning("vlc") && this.queue.nextNumber === 0)
+            await closeVLC();
+    }
 
-async function openIfNeeded(openNewInstance: boolean, queue: QueuePlaylistManager) {
-    if (!await isRunning("vlc")) {
-        openNewInstance = true;
-        if (queue.nextNumber > 0) {
-            queue.clear();
+    async openIfNeeded() {
+        if (!await isRunning("vlc")) {
+            this.openNewInstance = true;
+            if (this.queue.nextNumber > 0) {
+                this.queue.clear();
+            }
         }
     }
+
+    async do() {
+        console.log("Play function: " + this.episodes[0].id);
+
+        await this.closeIfNeeded();
+
+        await this.openIfNeeded();
+
+        const elements: MediaElement[] = this.episodes.map(episodeToMediaElement);
+        this.queue.add(...elements);
+
+        if (this.openNewInstance) {
+            const file = this.queue.firstFile;
+            const process = await openVLC(file);
+            process.on("exit", (code: number) => {
+                if (code === 0)
+                    this.queue.clear();
+
+                console.log("Closed VLC")
+            })
+        }
+    }
+}
+
+export async function play(episodes: Episode[], openNewInstance: boolean) {
+    await new PlayProcess(episodes, openNewInstance).do();
 }
 
 async function closeVLC() {
-    while (await isRunning("vlc")) {
-        try {
-            console.log("Closing VLC...");
-            execSync("killall vlc");
-        } catch (e) {
-            console.log("Error closing VLC");
-            break;
-        }
-    }
+    await VLC.closeAll();
 }
 
-function openVLC(file: string): any {
-    console.log("Open VLC: " + file);
-    const p2 = exec(`"vlc" ${file} --play-and-exit --no-video-title-show --aspect-ratio 16:9 -f --qt-minimal-view --no-repeat --no-loop --one-instance`);
-    return p2;
+const vlcConfig = [
+    VLCFlag.PLAY_AND_EXIT,
+    VLCFlag.NO_VIDEO_TITLE,
+    VLCFlag.ASPECT_RATIO, "16:9",
+    VLCFlag.FULLSCREEN,
+    VLCFlag.MINIMAL_VIEW,
+    VLCFlag.NO_REPEAT,
+    VLCFlag.NO_LOOP,
+    VLCFlag.ONE_INSTANCE];
+
+async function openVLC(file: string): Promise<VLC> {
+    const vlc = new VLC();
+    vlc.config(...vlcConfig);
+    await vlc.open(file);
+
+    return vlc;
 }
 
 export async function pickAndAddHistory(stream: Stream, n: number): Promise<Episode[]> {
