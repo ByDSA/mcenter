@@ -70,10 +70,14 @@ function getParams(req: Request, res: Response) {
 }
 
 export async function play(episodes: Episode[], openNewInstance: boolean) {
+    console.log("Play function: " + episodes[0].id);
     const queue = new QueuePlaylistManager(TMP_PATH || "/");
 
-    if (openNewInstance || !await isRunning("vlc") && queue.nextNumber > 0) {
-        await closeVLC();
+    if (!await isRunning("vlc"))
+        openNewInstance = true;
+    if (openNewInstance || queue.nextNumber > 0) {
+        if (openNewInstance)
+            await closeVLC();
         queue.clear();
         openNewInstance = true;
     }
@@ -95,6 +99,8 @@ export async function play(episodes: Episode[], openNewInstance: boolean) {
         process.on("exit", (code: number) => {
             if (code === 0)
                 queue.clear();
+
+            console.log("Closed VLC")
         })
     }
 }
@@ -102,14 +108,17 @@ export async function play(episodes: Episode[], openNewInstance: boolean) {
 async function closeVLC() {
     while (await isRunning("vlc")) {
         try {
+            console.log("Closing VLC...");
             execSync("killall vlc");
         } catch (e) {
+            console.log("Error closing VLC");
             break;
         }
     }
 }
 
 function openVLC(file: string): any {
+    console.log("Open VLC: " + file);
     const p2 = exec(`"vlc" ${file} --play-and-exit --no-video-title-show --aspect-ratio 16:9 -f --qt-minimal-view --no-repeat --no-loop --one-instance`);
     return p2;
 }

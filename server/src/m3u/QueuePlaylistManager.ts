@@ -49,6 +49,7 @@ export class QueuePlaylistManager {
         }
 
         this.currentNumber = 0;
+        console.log("Queue cleared!");
     }
 
     private getFullPathByNum(num: number): string {
