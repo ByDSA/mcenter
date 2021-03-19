@@ -1,15 +1,6 @@
-import { exec, execSync } from "child_process";
-import dotenv from "dotenv";
 import { Request, Response } from "express";
-import { Episode } from "../db/models/episode";
-import { addToHistory, getById, Stream } from "../db/models/stream.model";
-import { calculateNextEpisode } from "../EpisodePicker";
-import { MediaElement } from "../m3u/MediaElement";
-import { QueuePlaylistManager } from "../m3u/QueuePlaylistManager";
-import { isRunning } from "../Utils";
-
-dotenv.config();
-const { MEDIA_PATH, TMP_PATH } = process.env;
+import { getById } from "../db/models/stream.model";
+import { pickAndAddHistory, play } from "./play";
 
 export default async function (req: Request, res: Response) {
     const { id, number, force } = getParams(req, res);
@@ -28,62 +19,6 @@ export default async function (req: Request, res: Response) {
 
     res.send(episodes);
 };
-
-async function play(episodes: Episode[], openNewInstance: boolean) {
-    const queue = new QueuePlaylistManager(TMP_PATH || "/");
-    if (queue.nextNumber === 0)
-        openNewInstance = true;
-    else if (openNewInstance) {
-        await closeVLC();
-        queue.clear();
-    }
-
-    const elements: MediaElement[] = episodes.map(e => {
-        return {
-            path: `${MEDIA_PATH}/${e.path}`,
-            title: e.title,
-            startTime: e.start,
-            stopTime: e.end,
-            length: e.duration
-        };
-    });
-    queue.add(...elements);
-
-    if (openNewInstance) {
-        const file = queue.firstFile;
-        const process = openVLC(file);
-        process.on("exit", (code: number) => {
-            if (code === 0)
-                queue.clear();
-        })
-    }
-}
-
-async function closeVLC() {
-    while (await isRunning("vlc")) {
-        try {
-            execSync("killall vlc");
-        } catch (e) {
-            break;
-        }
-    }
-}
-
-function openVLC(file: string): any {
-    const p2 = exec(`"vlc" ${file} --play-and-exit --no-video-title-show --aspect-ratio 16:9 -f --qt-minimal-view --no-repeat --no-loop --one-instance`);
-    return p2;
-}
-
-async function pickAndAddHistory(stream: Stream, n: number): Promise<Episode[]> {
-    const episodes = [];
-    for (let i = 0; i < +n; i++) {
-        const episode = await calculateNextEpisode(stream);
-        await addToHistory(stream, episode);
-        episodes.push(episode);
-    }
-
-    return episodes;
-}
 
 function getParams(req: Request, res: Response) {
     const forceStr = req.query.force;

@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import playFunc from "./src/actions/play";
+import playFunc, { playSerieFunc } from "./src/actions/play";
 import playStreamFunc from "./src/actions/playStream";
 import showSerieFunc from "./src/actions/showSerie";
 import showStreamFunc from "./src/actions/showStream";
@@ -21,6 +21,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.get('/api/play/stream/:id/:number?', playStreamFunc);
 
+app.get('/api/play/serie/:name/:id', playSerieFunc);
 app.get('/api/play/:type/:id', playFunc);
 
 app.get('/api/crud/series/:id', showSerieFunc);
