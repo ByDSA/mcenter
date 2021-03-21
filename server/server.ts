@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import fs from "fs";
 import playFunc, { playSerieFunc } from "./src/actions/play";
 import playStreamFunc from "./src/actions/playStream";
 import showPickerFunc from "./src/actions/showPicker";
@@ -31,12 +32,18 @@ app.get('/api/crud/streams/:id', showStreamFunc);
 
 
 app.get('/api/stop', (req: Request, res: Response) => {
-    res.send("Stop");
+    fs.writeFileSync(".stop", "");
+    res.send("stop");
 });
 
-app.get('/api/schedule', (req: Request, res: Response) => {
-    res.send("Play");
+app.get('/api/resume', (req: Request, res: Response) => {
+    if (fs.existsSync(".stop")) {
+        fs.unlinkSync(".stop");
+        res.send("resume");
+    } else
+        res.send("Already resumed");
 });
+
 
 app.get('/api/test/picker/:idstream', async (req: Request, res: Response) => {
     const { idstream } = req.params;
