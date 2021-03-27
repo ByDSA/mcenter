@@ -71,7 +71,15 @@ export function isSpecialNight(date = new Date()) {
 
 export function isFestivo(date = new Date()) {
     const { month, day } = destructDate(date);
-    if (month == 12 && (day == 6 || day == 8 || day == 25) || month == 1 && (day == 1 || day == 6))
+    if (
+        month == 12 && (day == 6 || day == 8 || day == 25)
+        || month == 1 && (day == 1 || day == 6)
+        || month == 3 && (day == 19)
+        || month == 8 && (day == 15)
+        || month == 10 && (day == 9 || day == 12)
+        || month == 11 && (day == 1)
+    )
+        // TODO: calcular semana santa
         return true;
     else
         return false;
@@ -118,4 +126,19 @@ export function daysBetween(startDate: Date, endDate: Date): number {
     const timeStartDate = utcToLocal(startDate).getTime()
     const timeEndDate = utcToLocal(endDate).getTime()
     return (timeEndDate - timeStartDate) / millisecondsPerDay;
+}
+
+export function getNowTimestamp() {
+    const date = new Date();
+    return getTimestamp(date);
+}
+
+export function getTimestamp(date: Date) {
+    const year = date.getFullYear().toString().padStart(4, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hour = date.getHours().toString().padStart(2, "0");
+    const min = date.getMinutes().toString().padStart(2, "0");
+    const sec = date.getSeconds().toString().padStart(2, "0");
+    return "" + year + month + day + hour + min + sec;
 }

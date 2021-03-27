@@ -1,4 +1,4 @@
-import { Day, daysBetween, destructDate, destructDateUTC, isLaborable, isTomorrowLaborable, Month, utcToLocal } from "./TimeUtils";
+import { Day, daysBetween, destructDate, destructDateUTC, getTimestamp, isLaborable, isTomorrowLaborable, Month, utcToLocal } from "./TimeUtils";
 
 it('month enum', () => {
     expect(Month.JANUARY).toBe(0);
@@ -107,3 +107,10 @@ it('daysBetween', () => {
     const expected = 2;
     expect(actual).toBe(expected);
 });
+
+it("getTimestamp", () => {
+    const actual = getTimestamp(testDate);
+    const expected = "19930521083400";
+
+    expect(actual).toBe(expected);
+})
