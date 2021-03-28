@@ -2,7 +2,7 @@ import { Day, daysBetween, destructDate, destructDateUTC, getTimestamp, isLabora
 
 it('month enum', () => {
     expect(Month.JANUARY).toBe(0);
-    expect(Month.FEBRARY).toBe(1);
+    expect(Month.FEBRUARY).toBe(1);
     expect(Month.MARCH).toBe(2);
     expect(Month.APRIL).toBe(3);
     expect(Month.MAY).toBe(4);
