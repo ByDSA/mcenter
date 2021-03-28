@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "test": "jest",
-    "start": "[ ! -d dist ] && npm run build && node dist/server.js || node dist/server.js",
+    "start": "([ ! -d dist ] && npm run build || true) && node dist/server.js",
     "dev": "nodemon --watch '**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' server.ts",
     "prebuild": "npm run clean",
     "build": "tsc",
