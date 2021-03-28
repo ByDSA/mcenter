@@ -88,6 +88,18 @@ function weightTag({ self, picker, serie }: Params): number {
                 else
                     weight /= 1000;
                 break;
+            case "sanvalentin":
+                if (now.getMonth() === Month.FEBRUARY && now.getDate() >= 12 || now.getMonth() === Month.FEBRUARY && now.getDate() <= 14)
+                    weight *= 100;
+                else
+                    weight /= 1000;
+                break;
+            case "acciondegracias":
+                if (now.getMonth() === Month.NOVEMBER && now.getDate() >= 12 || now.getMonth() === Month.NOVEMBER && now.getDate() <= 30)
+                    weight *= 100;
+                else
+                    weight /= 1000;
+                break;
         }
     }
 
@@ -108,6 +120,9 @@ function dependent({ self, lastEp, serie }: Params) {
     switch (serie.id) {
         case "simpsons":
             ret &&= dependency(lastEp, "6x23", self, "7x01");
+            break;
+        case "fguy":
+            ret &&= dependency(lastEp, "6x04", self, "6x05");
             break;
     }
 
