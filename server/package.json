@@ -9,7 +9,7 @@
     "dev": "nodemon --watch '**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' server.ts",
     "prebuild": "npm run clean",
     "build": "tsc",
-    "postbuild": "cp .env dist/.env",
+    "postbuild": "ln -s ../.env dist/.env",
     "clean": "rm -rf dist"
   },
   "author": "",
