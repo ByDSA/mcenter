@@ -7,7 +7,7 @@ import showSerieFunc from "./src/actions/showSerie";
 import showStreamFunc from "./src/actions/showStream";
 import { backup } from './src/backup/backupStuff';
 import { connect } from "./src/db/database";
-import asyncCalculateNextEpisodeByIdStream from "./src/EpisodePicker";
+import asyncCalculateNextEpisodeByIdStream from "./src/EpisodePicker/EpisodePicker";
 const s = require("./src/scheduler");
 
 const app = express();

@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { Episode, episodeToMediaElement } from "../db/models/episode";
 import { getById } from "../db/models/serie.model";
 import { addToHistory, getById as getStreamById, Stream } from "../db/models/stream.model";
-import { calculateNextEpisode } from "../EpisodePicker";
+import { calculateNextEpisode } from "../EpisodePicker/EpisodePicker";
 import { MediaElement } from "../m3u/MediaElement";
 import { QueuePlaylistManager } from "../m3u/QueuePlaylistManager";
 import { isRunning } from "../Utils";

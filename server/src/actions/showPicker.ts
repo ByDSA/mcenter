@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { getFromGroupId } from "../db/models/serie.model";
 import { getById } from "../db/models/stream.model";
-import { getRandomPicker } from "../EpisodePicker";
-import { getDaysFrom } from "../EpisodePickerMiddleware";
+import { getDaysFrom } from "../EpisodePicker/EpisodeFilter";
+import { getRandomPicker } from "../EpisodePicker/EpisodePicker";
 import { getlastEp } from "./playStream";
 
 export default async function (req: Request, res: Response) {

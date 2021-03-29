@@ -1,9 +1,10 @@
-import { newPicker } from "rand-picker";
-import { getlastEp } from "./actions/playStream";
-import { Episode } from "./db/models/episode";
-import { getFromGroupId, Serie } from "./db/models/serie.model";
-import { getById, Mode, Stream } from "./db/models/stream.model";
-import { filter, fixWeight } from "./EpisodePickerMiddleware";
+import { newPicker, Picker } from "rand-picker";
+import { getlastEp } from "../actions/playStream";
+import { Episode } from "../db/models/episode";
+import { getFromGroupId, Serie } from "../db/models/serie.model";
+import { getById, Mode, Stream } from "../db/models/stream.model";
+import { filter } from "./EpisodeFilter";
+import { fixWeight } from "./EpisodeWeight";
 
 export default async function (streamId: string) {
     const stream = await getById(streamId);
@@ -74,3 +75,5 @@ export function getRandomPicker(serie: Serie, lastEp: Episode | null, stream: St
 
     return picker;
 }
+
+export type Params = { picker: Picker<Episode>, self: Episode, serie: Serie, lastEp: Episode | null, stream: Stream };
