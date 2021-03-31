@@ -5,51 +5,54 @@ import { getFromGroupId } from "../db/models/serie.model";
 import { getById, Stream } from "../db/models/stream.model";
 import { pickAndAddHistory, play } from "./play";
 
-export default async function (req: Request, res: Response) {
-    const { id, number, force } = getParams(req, res);
+export default async function f(req: Request, res: Response) {
+  console.log("playStream");
+  const { id, number, force } = getParams(req, res);
+  const stream = await getById(id);
 
-    const stream = await getById(id);
+  if (!stream) {
+    res.sendStatus(404);
 
-    if (!stream) {
-        res.sendStatus(404);
-        return;
-    }
+    return;
+  }
 
-    const episodes = await pickAndAddHistory(stream, +number);
+  const episodes = await pickAndAddHistory(stream, +number);
+  const forceBoolean: boolean = !!+force;
 
-    let forceBoolean: boolean = !!+force;
-    await play(episodes, forceBoolean);
+  await play(episodes, forceBoolean);
 
-    res.send(episodes);
-};
+  res.send(episodes);
+}
 
 export async function getlastEp(stream: Stream): Promise<Episode | null> {
-    let lastEp = null;
-    if (stream.history.length > 0) {
-        const lastHistory: History = stream.history[stream.history.length - 1];
-        const lastEpId = lastHistory.episodeId;
-        const serie = await getFromGroupId(stream.group);
-        lastEp = serie?.episodes.find(e => e.id === lastEpId) || null;
-    }
+  let lastEp = null;
 
-    return lastEp;
+  if (stream.history.length > 0) {
+    const lastHistory: History = stream.history[stream.history.length - 1];
+    const lastEpId = lastHistory.episodeId;
+    const serie = await getFromGroupId(stream.group);
+
+    lastEp = serie?.episodes.find((e) => e.id === lastEpId) || null;
+  }
+
+  return lastEp;
 }
 
 function getParams(req: Request, res: Response) {
-    const forceStr = req.query.force;
-    const force = !!forceStr;
-    let { id, number } = req.params;
+  const forceStr = req.query.force;
+  const force = !!forceStr;
+  const { id } = req.params;
+  let { number } = req.params;
 
-    if (!id) {
-        res.sendStatus(400);
-    }
+  if (!id)
+    res.sendStatus(400);
 
-    if (!number)
-        number = "1";
+  if (!number)
+    number = "1";
 
-    return {
-        id,
-        number,
-        force
-    }
+  return {
+    id,
+    number,
+    force,
+  };
 }

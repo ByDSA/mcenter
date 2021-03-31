@@ -1,5 +1,6 @@
+/* eslint-disable import/prefer-default-export */
 import dotenv from "dotenv";
-import { dynamicLoad } from "../DynamicLoad";
+import { dynamicExecScript } from "../DynamicLoad";
 import { Backup, BackupPropsOptional } from "./Backup";
 
 export async function backup() {
@@ -13,16 +14,18 @@ export async function backup() {
   const props: BackupPropsOptional = {
     tempFolder: BACKUP_TMP,
     outFolder: BACKUP_TARGET_FOLDER,
-  }
-
-  const backup = new Backup(props);
-
-  const ret = await dynamicLoad({ file: BACKUP_FILE, sample: sampleBackup, args: [backup] });
+  };
+  const bckp = new Backup(props);
+  const ret = await dynamicExecScript( {
+    file: BACKUP_FILE,
+    sample: sampleBackup,
+    args: [bckp],
+  } );
 
   if (!ret)
     return;
 
-  await backup.make();
+  await bckp.make();
 }
 
 const sampleBackup = `module.exports = function (backup) {

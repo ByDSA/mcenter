@@ -8,143 +8,149 @@ import { MediaElement } from "../m3u/MediaElement";
 import { QueuePlaylistManager } from "../m3u/QueuePlaylistManager";
 import { isRunning } from "../Utils";
 import { VLC, VLCFlag } from "../vlc/VLC";
+
 dotenv.config();
 const { TMP_PATH } = process.env;
 
 export default async function (req: Request, res: Response) {
-    const { id, type, force } = getParams(req, res);
-
-};
+  const { id, type, force } = getParams(req, res);
+}
 
 export async function playSerieFunc(req: Request, res: Response) {
-    const forceStr = req.query.force;
-    const force = !!forceStr;
-    const { id, name } = req.params;
+  const forceStr = req.query.force;
+  const force = !!forceStr;
+  const { id, name } = req.params;
+  const serie = await getById(name);
 
-    const serie = await getById(name);
+  if (!serie) {
+    res.sendStatus(404);
 
-    if (!serie) {
-        res.sendStatus(404);
-        return;
-    }
+    return;
+  }
 
-    const episode = serie.episodes.find(e => e.id === id);
+  const episode = serie.episodes.find((e) => e.id === id);
 
-    getStreamById(name).then(stream => {
-        if (stream && episode)
-            addToHistory(stream, episode);
-    });
+  getStreamById(name).then((stream) => {
+    if (stream && episode)
+      addToHistory(stream, episode);
+  } );
 
-    if (episode)
-        play([episode], force);
+  if (episode)
+    play([episode], force);
 
-    res.send(episode);
-};
+  res.send(episode);
+}
 
 function getParams(req: Request, res: Response) {
-    const forceStr = req.query.force;
-    const force = !!forceStr;
-    const { id, type } = req.params;
+  const forceStr = req.query.force;
+  const force = !!forceStr;
+  const { id, type } = req.params;
 
-    if (!id || !type) {
-        res.status(400);
-        res.send("No ID nor TYPE.");
-        res.end();
-    }
+  if (!id || !type) {
+    res.status(400);
+    res.send("No ID nor TYPE.");
+    res.end();
+  }
 
-    switch (type) {
-        case "serie":
-        case "peli":
-            break;
-        default:
-            res.status(400);
-            res.send(`Type '${type}' is invalid.`);
-            res.end();
-    }
+  switch (type) {
+    case "serie":
+    case "peli":
+      break;
+    default:
+      res.status(400);
+      res.send(`Type '${type}' is invalid.`);
+      res.end();
+  }
 
-    return {
-        id,
-        type,
-        force
-    }
+  return {
+    id,
+    type,
+    force,
+  };
 }
 
 class PlayProcess {
     private queue: QueuePlaylistManager;
+
     constructor(private episodes: Episode[], private openNewInstance: boolean) {
-        this.queue = new QueuePlaylistManager(TMP_PATH || "/");
+      this.queue = new QueuePlaylistManager(TMP_PATH || "/");
     }
 
     async closeIfNeeded() {
-        if (this.openNewInstance || await isRunning("vlc") && this.queue.nextNumber === 0)
-            await closeVLC();
+      if (this.openNewInstance || await isRunning("vlc") && this.queue.nextNumber === 0)
+        await closeVLC();
     }
 
     async openIfNeeded() {
-        if (!await isRunning("vlc")) {
-            this.openNewInstance = true;
-            if (this.queue.nextNumber > 0) {
-                this.queue.clear();
-            }
-        }
+      if (!await isRunning("vlc")) {
+        this.openNewInstance = true;
+
+        if (this.queue.nextNumber > 0)
+          this.queue.clear();
+      }
     }
 
     async do() {
-        console.log("Play function: " + this.episodes[0].id);
+      console.log(`Play function: ${this.episodes[0].id}`);
 
-        await this.closeIfNeeded();
+      await this.closeIfNeeded();
 
-        await this.openIfNeeded();
+      await this.openIfNeeded();
 
-        const elements: MediaElement[] = this.episodes.map(episodeToMediaElement);
-        this.queue.add(...elements);
+      const elements: MediaElement[] = this.episodes.map(episodeToMediaElement);
 
-        if (this.openNewInstance) {
-            const file = this.queue.firstFile;
-            const process = await openVLC(file);
-            process.on("exit", (code: number) => {
-                if (code === 0)
-                    this.queue.clear();
+      this.queue.add(...elements);
 
-                console.log("Closed VLC")
-            })
-        }
+      if (this.openNewInstance) {
+        const file = this.queue.firstFile;
+        const process = await openVLC(file);
+
+        process.on("exit", (code: number) => {
+          if (code === 0)
+            this.queue.clear();
+
+          console.log("Closed VLC");
+        } );
+      }
     }
 }
 
 export async function play(episodes: Episode[], openNewInstance: boolean) {
-    await new PlayProcess(episodes, openNewInstance).do();
+  await new PlayProcess(episodes, openNewInstance).do();
 }
 
 async function closeVLC() {
-    await VLC.closeAll();
+  await VLC.closeAll();
 }
 
 const vlcConfig = [
-    VLCFlag.PLAY_AND_EXIT,
-    VLCFlag.NO_VIDEO_TITLE,
-    VLCFlag.ASPECT_RATIO, "16:9",
-    VLCFlag.FULLSCREEN,
-    VLCFlag.MINIMAL_VIEW,
-    VLCFlag.NO_REPEAT,
-    VLCFlag.NO_LOOP,
-    VLCFlag.ONE_INSTANCE];
+  VLCFlag.PLAY_AND_EXIT,
+  VLCFlag.NO_VIDEO_TITLE,
+  VLCFlag.ASPECT_RATIO, "16:9",
+  VLCFlag.FULLSCREEN,
+  VLCFlag.MINIMAL_VIEW,
+  VLCFlag.NO_REPEAT,
+  VLCFlag.NO_LOOP,
+  VLCFlag.ONE_INSTANCE];
 
 async function openVLC(file: string): Promise<VLC> {
-    const vlc = new VLC();
-    vlc.config(...vlcConfig);
-    await vlc.open(file);
+  const vlc = new VLC();
 
-    return vlc;
+  vlc.config(...vlcConfig);
+  await vlc.open(file);
+
+  return vlc;
 }
 
 export async function pickAndAddHistory(stream: Stream, n: number): Promise<Episode[]> {
-    const episodes = [];
-    for (let i = 0; i < +n; i++) {
-        const episode = await calculateNextEpisode(stream);
-        await addToHistory(stream, episode);
-        episodes.push(episode);
-    }
+  const episodes = [];
 
-    return episodes;
+  for (let i = 0; i < +n; i++) {
+    const episode = await calculateNextEpisode(stream);
+
+    await addToHistory(stream, episode);
+    episodes.push(episode);
+  }
+
+  return episodes;
 }

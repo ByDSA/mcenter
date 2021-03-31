@@ -1,5 +1,7 @@
-import { getNowTimestamp } from "../TimeUtils";
-import { compress, copyFile, deleteFolder, makeDir, makeDirIfNotExits, moveFile, pgDump } from "../Utils";
+/* eslint-disable import/no-cycle */
+import { DateTime } from "luxon";
+import { compress, deleteFolder, makeDir, makeDirIfNotExits, moveFile, pgDump } from "../Utils";
+import Process from "./Process";
 
 export type BackupProps = {
   tempFolder: string;
@@ -14,7 +16,7 @@ export type BackupPropsOptional = {
 const defaultProps: BackupProps = {
   tempFolder: "./backupTmp",
   outFolder: "/",
-}
+};
 
 export type FileInfo = {
   file: string;
@@ -43,14 +45,17 @@ type PGDBOptions = {
   subfolder: string;
 };
 
-
 export class Backup {
   props: BackupProps;
+
   files: FileInfo[];
-  funcs: (() => Promise<any>)[];
+
+  funcs: (()=> Promise<any>)[];
 
   constructor(props: BackupPropsOptional) {
-    this.props = { ...defaultProps };
+    this.props = {
+      ...defaultProps,
+    };
     this.props.outFolder = props.outFolder || defaultProps.outFolder;
     this.props.tempFolder = props.tempFolder || defaultProps.tempFolder;
     this.files = [];
@@ -59,8 +64,9 @@ export class Backup {
 
   private async createTmpFolder() {
     const { tempFolder } = this.props;
-    console.log("Creating temp folder at " + tempFolder + "...");
-    await makeDir(tempFolder).catch(async p => {
+
+    console.log(`Creating temp folder at ${tempFolder}...`);
+    await makeDir(tempFolder).catch(async (p) => {
       try {
         await deleteFolder(tempFolder);
         await makeDir(tempFolder);
@@ -69,7 +75,7 @@ export class Backup {
       }
 
       return p;
-    });
+    } );
   }
 
   async make() {
@@ -77,13 +83,15 @@ export class Backup {
     await new Process(this).make();
 
     const { tempFolder } = this.props;
-    const compressedFile = "backup-" + getNowTimestamp() + ".tar.gz";
-    const outFile = tempFolder + "/../" + compressedFile;
+    const date = DateTime.now();
+    const timestamp = `${date.year}${date.month + 1}${date.day}${date.hour}${date.minute}${date.second}`;
+    const compressedFile = `backup-${timestamp}.tar.gz`;
+    const outFile = `${tempFolder}/../${compressedFile}`;
 
     await this.compress(outFile);
 
     console.log("Moving file...");
-    await moveFile(outFile, this.props.outFolder + "/");
+    await moveFile(outFile, `${this.props.outFolder}/`);
 
     await this.deleteTmpFolder();
 
@@ -95,80 +103,52 @@ export class Backup {
     await deleteFolder(this.props.tempFolder);
   }
 
-  addFile({ file, required = true, subFolder = "." }: AddFileProps) {
-    this.files.push({ file, required, subFolder });
+  addFile( { file, required = true, subFolder = "." }: AddFileProps) {
+    this.files.push( {
+      file,
+      required,
+      subFolder,
+    } );
   }
 
-  addFunc(f: () => Promise<any>) {
+  addFunc(f: ()=> Promise<any>) {
     this.funcs.push(f);
   }
 
-  addFiles({ files, required = true, subFolder = "." }: AddFilesProps) {
-    for (const file of files)
-      this.addFile({ file, required, subFolder });
+  addFiles( { files, required = true, subFolder = "." }: AddFilesProps) {
+    for (const file of files) {
+      this.addFile( {
+        file,
+        required,
+        subFolder,
+      } );
+    }
   }
 
-  addPGDB({ host, pass, user, db, file, subfolder = "." }: PGDBOptions) {
+  addPGDB( { host, pass, user, db, file, subfolder = "." }: PGDBOptions) {
     this.addFunc(() => {
-      const folder = this.props.tempFolder + "/" + subfolder;
+      const folder = `${this.props.tempFolder}/${subfolder}`;
+
       makeDirIfNotExits(folder);
 
-      const path = folder + "/" + file;
+      const path = `${folder}/${file}`;
 
-      return pgDump({ host, pass, user, db, file: path });
-    });
+      return pgDump( {
+        host,
+        pass,
+        user,
+        db,
+        file: path,
+      } );
+    } );
   }
 
-  private async compress(outFile: string) {
+  private compress(outFile: string) {
     console.log("Compressing...");
-    return await compress({
+
+    return compress( {
       outFile,
-      folder: this.props.tempFolder
-    });
-  }
-}
-
-class Process {
-  private promises: Promise<any>[];
-  constructor(private backup: Backup) {
-    this.promises = [];
-  }
-
-  async make() {
-    for (const fi of this.backup.files) {
-      this.addFile(fi.file, fi.subFolder)
-        .catch(e => {
-          if (fi.required)
-            throw e;
-        });
-    }
-
-    for (const f of this.backup.funcs) {
-      let p = f();
-      this.promises.push(p);
-    }
-
-    await this.waitPromises();
-  }
-
-  private async waitPromises() {
-    await Promise.all(this.promises)
-      .catch((e) => {
-        throw e;
-      })
-  }
-
-  private async addFile(file: string, subFolder: string) {
-    const target = this.backup.props.tempFolder + "/" + subFolder + "/";
-    await makeDirIfNotExits(target);
-    const p = copyFile(file, target).then(a => {
-      console.log(file + " backuped! In: " + target);
-
-      return a;
-    });
-
-    this.promises.push(p);
-
-    return p;
+      folder: this.props.tempFolder,
+    } );
   }
 }

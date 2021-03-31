@@ -1,21 +1,20 @@
 import dotenv from "dotenv";
+import { DateTime } from "luxon";
 import schedule from "node-schedule";
-import { dynamicLoad } from "./DynamicLoad";
-import { destructDate } from "./TimeUtils";
+import { dynamicLoadScriptFromEnvVar } from "./DynamicLoad";
+
 dotenv.config();
 
-const job = schedule.scheduleJob('* * * * * *', async function (fireDate: Date) {
-    const { seconds } = destructDate(fireDate);
-    if (seconds !== 0)
-        return;
+schedule.scheduleJob("* * * * * *", async (dateArg: Date) => {
+  const date = DateTime.fromJSDate(dateArg);
+  const { second } = date;
 
-    const { SCHEDULE_FILE } = process.env;
-    if (!SCHEDULE_FILE)
-        throw new Error("No SCHEDULE_FILE env found");
+  if (second !== 0)
+    return;
 
-    await dynamicLoad({ file: SCHEDULE_FILE, sample: sampleScheduleJs, args: [fireDate] });
-});
+  const calendarFunc = await dynamicLoadScriptFromEnvVar("CALENDAR_FILE");
+  const calendar = calendarFunc();
+  const scheduleFunc = await dynamicLoadScriptFromEnvVar("SCHEDULE_FILE");
 
-const sampleScheduleJs = `module.exports = function (fireDate) {
-    console.log(\`Date: \${fireDate}\`)
-}`;
+  scheduleFunc(date, calendar);
+} );
