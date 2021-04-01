@@ -77,7 +77,7 @@ function dependent( { self, lastEp, serie }: Params) {
       ["12x07", "12x08"],
     ],
   };
-  const dependencies = obj[serie.id];
+  const dependencies = obj[serie.id] || [];
 
   for (const d of dependencies)
     ret &&= dependency(lastEp, d[0], self, d[1]);
