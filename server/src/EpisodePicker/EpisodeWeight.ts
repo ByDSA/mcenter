@@ -51,7 +51,7 @@ async function weightCalculator( { self, stream }: Params): Promise<number> {
   else
     reinforcementFactor = 1;
 
-  return reinforcementFactor ** 1.5 * daysFromLastTime;
+  return reinforcementFactor ** 1.2 * daysFromLastTime;
 }
 
 async function weightTag( { self }: Params): Promise<number> {
