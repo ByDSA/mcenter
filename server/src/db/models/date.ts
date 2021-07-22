@@ -7,37 +7,39 @@ export interface DateType {
     timestamp: number;
 }
 
-const schema = new mongoose.Schema({
-    year: {
-        type: Number,
-        required: true
-    },
-    month: {
-        type: Number,
-        required: true
-    },
-    day: {
-        type: Number,
-        required: true
-    },
-    timestamp: {
-        type: Number
-    }
-});
+const schema = new mongoose.Schema( {
+  year: {
+    type: Number,
+    required: true,
+  },
+  month: {
+    type: Number,
+    required: true,
+  },
+  day: {
+    type: Number,
+    required: true,
+  },
+  timestamp: {
+    type: Number,
+  },
+} );
 
 export function getDateNow(): DateType {
-    const now = new Date();
-    const year = now.getUTCFullYear();
-    const month = now.getUTCMonth() + 1;
-    const day = now.getUTCDate();
-    const timestamp = Math.floor(Date.now() / 1000);
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth() + 1;
+  const day = now.getUTCDate();
+  const timestamp = Math.floor(Date.now() / 1000);
 
-    return {
-        year,
-        month,
-        day,
-        timestamp
-    }
+  return {
+    year,
+    month,
+    day,
+    timestamp,
+  };
 }
 
-export { schema as DateSchema };
+export {
+  schema as DateSchema,
+};
