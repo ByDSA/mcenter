@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import Music from "./music.document";
-import MusicSchema from "./music.schema";
+import Music from "./document";
+import MusicSchema from "./schema";
 
 const NAME = "Music";
 

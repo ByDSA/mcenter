@@ -1,9 +1,9 @@
-import { createFromPath, createFromPathAndSave } from "./music.create";
-import { deleteAll } from "./music.delete";
-import Music from "./music.document";
-import { findAll, findByHash, findByPath, findByUrl } from "./music.find";
-import MusicModel from "./music.model";
-import MusicSchema from "./music.schema";
+import { createFromPath, createFromPathAndSave } from "./create";
+import { deleteAll } from "./delete";
+import Music from "./document";
+import { findAll, findByHash, findByPath, findByUrl } from "./find";
+import MusicModel from "./model";
+import MusicSchema from "./schema";
 
 export {
   MusicSchema,

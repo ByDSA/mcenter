@@ -1,12 +1,17 @@
-import mongoose from "mongoose";
-
-export default new mongoose.Schema( {
-  hash: {
+export const RESOURCE = {
+  url: {
     type: String,
     required: true,
     unique: true,
   },
-  url: {
+  name: {
+    type: String,
+  },
+};
+
+export const LOCAL_RESOURCE = {
+  ...RESOURCE,
+  hash: {
     type: String,
     required: true,
     unique: true,
@@ -16,17 +21,12 @@ export default new mongoose.Schema( {
     required: true,
     unique: true,
   },
+};
+
+export const MULTIMEDIA_LOCAL_RESOURCE = {
+  ...LOCAL_RESOURCE,
   weight: {
     type: Number,
-  },
-  title: {
-    type: String,
-  },
-  artist: {
-    type: String,
-  },
-  album: {
-    type: String,
   },
   duration: {
     type: Number,
@@ -37,4 +37,4 @@ export default new mongoose.Schema( {
   disabled: {
     type: Boolean,
   },
-} );
+};

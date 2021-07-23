@@ -1,5 +1,5 @@
-import Music from "./music.document";
-import MusicModel from "./music.model";
+import Music from "./document";
+import MusicModel from "./model";
 
 export async function findByHash(hash: string): Promise<Music | null> {
   const music: Music | null = await MusicModel.findOne( {

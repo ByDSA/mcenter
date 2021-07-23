@@ -25,7 +25,7 @@ const schema = new mongoose.Schema( {
   },
 } );
 
-export function getDateNow(): DateType {
+export function getDateTypeNow(): DateType {
   const now = new Date();
   const year = now.getUTCFullYear();
   const month = now.getUTCMonth() + 1;

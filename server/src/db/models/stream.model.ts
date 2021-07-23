@@ -1,8 +1,8 @@
 import mongoose, { Document } from "mongoose";
-import { getDateNow } from "./date";
-import { Episode } from "./episode";
+import { getDateTypeNow } from "./date";
+import { getById as getSerieById } from "./group/model";
 import { History, HistorySchema } from "./history";
-import { getById as getSerieById } from "./serie.model";
+import { Episode } from "./video";
 
 enum Mode {
     SEQUENTIAL = "SEQUENTIAL",
@@ -61,7 +61,7 @@ export async function getById(id: string): Promise<Stream | null> {
 
 export async function addToHistory(stream: Stream, episode: Episode) {
   const newEntry: History = {
-    date: getDateNow(),
+    date: getDateTypeNow(),
     episodeId: episode.id,
   };
 

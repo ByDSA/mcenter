@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { findOrCreateAndSaveFromYoutube } from "../../db/models/music/music.create";
+import { findOrCreateAndSaveFromYoutube } from "../../db/models/music/create";
 import { ROUTE_CREATE_YT, ROUTE_FIX_ALL, ROUTE_FIX_ONE, ROUTE_GET_ALL, ROUTE_GET_RANDOM, ROUTE_RAW } from "../routes.api.config";
 import { fixAll, fixOne } from "./routes.fix";
 import getAll from "./routes.get-all";

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getById, Serie } from "../../db/models/serie.model";
+import { getById, Serie } from "../../db/models/group/model";
 
 export default async function showSerie(req: Request, res: Response) {
   const { id } = getParams(req, res);

@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import App from ".";
-import { clearMock, initializeMock } from "../db/models/music/music.mock";
+import { clearMock, initializeMock } from "../db/models/music/mock";
 
 export class TestingApp1 extends App {
   async run() {

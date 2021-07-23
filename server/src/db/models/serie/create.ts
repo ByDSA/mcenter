@@ -1,75 +1,29 @@
+/* eslint-disable import/prefer-default-export */
 import dotenv from "dotenv";
-import mongoose, { Document, Schema } from "mongoose";
-import { FileNode, getSerieTreeRemote } from "../../routes/series/nginxTree";
-import { Episode, EpisodeSchema } from "./episode";
+import { FileNode, getSerieTreeRemote } from "../../../routes/series/nginxTree";
+import { Group } from "../group";
+import GroupModel from "../group/model";
+import { Video } from "../video";
 
 dotenv.config();
 
 const { MEDIA_PATH } = process.env;
 
-interface Serie extends Document {
-    id: string;
-    name: string;
-    episodes: Episode[];
-}
-
-const NAME = "Serie";
-const schema = new Schema( {
-  id: {
-    type: String,
-    required: true,
-  },
-  name: {
-    type: String,
-  },
-  episodes: {
-    type: [EpisodeSchema],
-  },
-} );
-const model = mongoose.model<Serie>(NAME, schema);
-
-export async function getFromGroupId(groupId: string): Promise<Serie | null> {
-  const groupSplit = groupId.split("/");
-  const serieId = groupSplit[groupSplit.length - 1];
-  const serie = await getById(serieId);
-
-  return serie;
-}
-
-export async function getById(id: string): Promise<Serie | null> {
-  let [serie]: Serie[] = await model.find( {
-    id,
-  }, {
-    _id: 0,
-  } );
-
-  if (!serie) {
-    const generatedSerie = await generateFromFiles(id);
-
-    if (!generatedSerie)
-      return null;
-
-    serie = generatedSerie;
-  }
-
-  return serie;
-}
-
-export async function generateFromFiles(id: string): Promise<Serie | null> {
+export async function generateFromFiles(id: string): Promise<Group | null> {
   const folder = `${MEDIA_PATH}/series/${id}`;
-  const episodes: Episode[] | null = await getSerieTree(folder);
+  const episodes: Video[] | null = await getSerieTree(folder);
 
   if (!episodes)
     return null;
 
-  return model.create( {
+  return GroupModel.create( {
     id,
     name: id,
     episodes,
   } ).then((serie) => serie.save());
 }
 
-async function getSerieTree(uri: string): Promise<Episode[] | null> {
+async function getSerieTree(uri: string): Promise<Video[] | null> {
   if (uri.startsWith("http")) {
     const nginxTree = await getSerieTreeRemote(uri, {
       maxLevel: 2,
@@ -84,7 +38,7 @@ async function getSerieTree(uri: string): Promise<Episode[] | null> {
   return getSerieTreeLocal(uri);
 }
 
-async function getEpisodesFromTree(tree: FileNode[], episodes: Episode[] = []): Promise<Episode[]> {
+async function getEpisodesFromTree(tree: FileNode[], episodes: Video[] = []): Promise<Video[]> {
   for (const fn of tree) {
     if (fn.type !== "[VID]" && fn.type !== "[DIR]")
       continue;
@@ -104,7 +58,7 @@ async function getEpisodesFromTree(tree: FileNode[], episodes: Episode[] = []): 
   return episodes;
 }
 
-async function fileNode2Episode(fn: FileNode): Promise<Episode> {
+async function fileNode2Episode(fn: FileNode): Promise<Video> {
   const path = getPathFromFn(fn);
   const id = getIdFromFn(fn);
 
@@ -141,11 +95,7 @@ function getPathFromFn(fn: FileNode): string {
   return `series/${serieId}/${fn.relativeUri}`;
 }
 
-async function getSerieTreeLocal(path: string): Promise<Episode[]> {
+async function getSerieTreeLocal(path: string): Promise<Video[]> {
   // fs.readdirSync(folder);
   return [];
 }
-
-export {
-  schema as SerieSchema, model as SerieModel, Serie,
-};

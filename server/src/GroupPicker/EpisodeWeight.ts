@@ -1,12 +1,10 @@
 /* eslint-disable require-await */
 import { Picker } from "rand-picker";
-import { Episode } from "../db/models/episode";
-import { Serie } from "../db/models/serie.model";
 import { Stream } from "../db/models/stream.model";
 import { dynamicLoadScriptFromEnvVar } from "../DynamicLoad";
 import { getDaysFrom } from "./EpisodeFilter";
 // eslint-disable-next-line import/no-cycle
-import { Params } from "./EpisodePicker";
+import { Params } from "./GroupPicker";
 
 type MiddlewareWeightFunction = (params: Params)=> Promise<number>;
 const middlewareWeightFunctions: MiddlewareWeightFunction[] = [

@@ -3,11 +3,11 @@ import { daysBetween } from "date-ops";
 import { DateTime } from "luxon";
 import { Picker } from "rand-picker";
 import { DateType } from "../db/models/date";
-import { Episode } from "../db/models/episode";
+import { Serie } from "../db/models/group/model";
 import { History } from "../db/models/history";
-import { Serie } from "../db/models/serie.model";
 import { Stream } from "../db/models/stream.model";
-import { Params } from "./EpisodePicker";
+import { Episode } from "../db/models/video";
+import { Params } from "./GroupPicker";
 
 const { PICKER_MIN_WEIGHT, PICKER_MIN_DAYS } = process.env;
 
@@ -52,7 +52,7 @@ export function filter(
   }
 
   if (picker.data.length === 0)
-    picker.put(serie.episodes[0]);
+    picker.put(serie.content[0]);
 }
 
 function preventRepeatLast( { self, lastEp }: Params) {

@@ -1,6 +1,6 @@
 import { Express, Request, Response } from "express";
 import fs from "fs";
-import asyncCalculateNextEpisodeByIdStream from "../../EpisodePicker/EpisodePicker";
+import asyncCalculateNextEpisodeByIdStream from "../../GroupPicker/GroupPicker";
 import playFunc, { playSerieFunc } from "./play";
 import playStreamFunc from "./playStream";
 import showPickerFunc from "./showPicker";

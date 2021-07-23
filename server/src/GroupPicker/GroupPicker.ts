@@ -1,10 +1,9 @@
 /* eslint-disable require-await */
 /* eslint-disable import/no-cycle */
 import { newPicker, Picker } from "rand-picker";
-import { getlastEp } from "../actions/playStream";
-import { Episode } from "../db/models/episode";
-import { getFromGroupId, Serie } from "../db/models/serie.model";
+import { getFromGroupId, Serie } from "../db/models/group/model";
 import { getById, Mode, Stream } from "../db/models/stream.model";
+import { getlastEp } from "../routes/series/playStream";
 import { filter } from "./EpisodeFilter";
 import fixWeight from "./EpisodeWeight";
 
@@ -52,7 +51,7 @@ export async function calculateNextEpisode(stream: Stream) {
 }
 
 async function getNextEpisodeSequential(serie: Serie, lastEp: Episode | null): Promise<Episode> {
-  const { episodes } = serie;
+  const { content: episodes } = serie;
   let i = 0;
 
   if (lastEp) {
@@ -67,7 +66,7 @@ async function getNextEpisodeSequential(serie: Serie, lastEp: Episode | null): P
 
 export async function getRandomPicker(serie: Serie, lastEp: Episode | null, stream: Stream) {
   console.log("Getting random picker...");
-  const { episodes } = serie;
+  const { content: episodes } = serie;
   const picker = newPicker(episodes, {
     weighted: true,
   } );

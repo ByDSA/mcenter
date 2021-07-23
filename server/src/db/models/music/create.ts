@@ -4,9 +4,9 @@ import { getFullPathMusic } from "../../../env";
 import { calcHashFromFile } from "../../../files";
 import { AUDIO_EXTENSIONS } from "../../../files/files.music";
 import { download } from "../../../music/youtube";
-import Music from "./music.document";
-import { findByPath } from "./music.find";
-import MusicModel from "./music.model";
+import Music from "./document";
+import { findByPath } from "./find";
+import MusicModel from "./model";
 
 export function createFromPath(relativePath: string): Promise<Music> {
   const fullPath = getFullPathMusic(relativePath);
