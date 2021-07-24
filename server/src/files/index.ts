@@ -1,4 +1,8 @@
 export {
+  findAllValidMusicFiles,
+} from "../db/models/music/files";
+
+export {
   findFiles, FindOptions, fixHashFile,
 } from "./files.find";
 
@@ -7,5 +11,5 @@ export {
 } from "./files.hash";
 
 export {
-  findAllValidMusicFiles,
-} from "./files.music";
+  getTitleFromFilename, getValidUrl,
+} from "./misc";

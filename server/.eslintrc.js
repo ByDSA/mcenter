@@ -117,6 +117,8 @@ module.exports = {
     "newline-before-return": "error",
     "nonblock-statement-body-position": ["error", "below"],
     "padded-blocks": ["error", "never"],
+    semi: "off",
+    "@typescript-eslint/semi": ["error"],
 
     "no-use-before-define": ["error", {
       functions: false,

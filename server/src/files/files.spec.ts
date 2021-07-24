@@ -1,30 +1,4 @@
-import { calcHashFromFile, findFiles, FindOptions, fixHashFile } from ".";
-
-describe("getHashFromFile", () => {
-  it("existing path", () => {
-    const expected = "eacf40b68de85b759524e3bd0bea1b4393360f682db3a7f3ec25ff46b1d01872";
-    const path = "tests/files/music/dk.mp3";
-    const actual = calcHashFromFile(path);
-
-    expect(actual).toBe(expected);
-  } );
-
-  it("existing path folder", () => {
-    const path = "tests/files/";
-
-    expect(() => {
-      calcHashFromFile(path);
-    } ).toThrow("EISDIR: illegal operation on a directory, read");
-  } );
-
-  it("unexisting path", () => {
-    const path = "unexisting/path/";
-
-    expect(() => {
-      calcHashFromFile(path);
-    } ).toThrow(`ENOENT: no such file or directory, open '${path}'`);
-  } );
-} );
+import { findFiles, FindOptions, fixHashFile } from ".";
 
 describe("findFiles", () => {
   it("tests/files folder", () => {

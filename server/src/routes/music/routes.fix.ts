@@ -3,12 +3,12 @@
 /* eslint-disable no-restricted-syntax */
 import express from "express";
 import fs from "fs";
-import { createFromPath, findAll, findByHash, findByPath, findByUrl, Music } from "../../db/models/music";
-import { getFullPathMusic, loadEnv } from "../../env";
+import { createMusicFromPath, findAllMusics, findMusicByHash, findMusicByPath, findMusicByUrl, getFullPathMusic, Music } from "../../db/models/music";
+import { loadEnv } from "../../env";
 import { calcHashFromFile, findAllValidMusicFiles, findFiles } from "../../files";
 
 export async function fixAll(req: express.Request, res: express.Response) {
-  const remoteMusic = await findAll();
+  const remoteMusic = await findAllMusics();
   const localMusic = await fixDataFromLocalFiles();
 
   mainLoop: for (const m of remoteMusic) {
@@ -31,7 +31,7 @@ export async function fixOne(req: express.Request, res: express.Response) {
   let music: Music | null = null;
 
   if (!path && url) {
-    music = await findByUrl(url);
+    music = await findMusicByUrl(url);
 
     if (music)
       path = music.path;
@@ -54,7 +54,7 @@ export async function fixOne(req: express.Request, res: express.Response) {
     const { hash } = music;
 
     loadEnv();
-    const folder = <string>process.env.MEDIA_PATH;
+    const folder = <string>process.env.MUSICS_PATH;
     const files = findFiles( {
       fileHash: hash,
       folder,
@@ -82,7 +82,7 @@ function fixDataFromLocalFiles(): Promise<Music[]> {
 async function fixDataFromLocalFile(relativePath: string) {
   const fullPath = getFullPathMusic(relativePath);
   const hash = calcHashFromFile(fullPath);
-  const musicByHash = await findByHash(hash);
+  const musicByHash = await findMusicByHash(hash);
   let music;
 
   if (musicByHash) {
@@ -93,13 +93,13 @@ async function fixDataFromLocalFile(relativePath: string) {
       music.save();
     }
   } else {
-    const musicByPath = await findByPath(relativePath);
+    const musicByPath = await findMusicByPath(relativePath);
 
     if (musicByPath) {
       musicByPath.hash = hash;
       music = musicByPath;
     } else
-      music = await createFromPath(relativePath);
+      music = await createMusicFromPath(relativePath);
 
     music.save();
   }

@@ -1,5 +1,5 @@
-import { TestingApp1 } from "../../app/TestingApps";
-import { createFromPath, Music } from "../../db/models/music";
+import { TestingApp1 } from "../../../tests/TestingApps";
+import { createMusicFromPath, Music } from "../../db/models/music";
 import { generateView } from "./routes.get-all";
 
 const app = new TestingApp1();
@@ -12,7 +12,7 @@ afterAll(async () => {
   await app.kill();
 } );
 it("generateView", async () => {
-  const musics: Music[] = [await createFromPath("dk.mp3")];
+  const musics: Music[] = [await createMusicFromPath("dk.mp3")];
   const actual = generateView(musics);
   const expectedText = "<ul><li><a href='/raw/dk'>dk</li></ul>";
 

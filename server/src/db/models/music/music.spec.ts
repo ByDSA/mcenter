@@ -1,9 +1,9 @@
-import { findByHash, findByUrl } from ".";
+import { calcHashMusicFile, findMusicByHash, findMusicByUrl } from ".";
+import { TestingApp1 } from "../../../../tests/TestingApps";
 import App from "../../../app";
-import { TestingApp1 } from "../../../app/TestingApps";
 
 describe("all tests", () => {
-  describe("getByHash", () => {
+  describe("findByHash", () => {
     const app: App = new TestingApp1();
 
     beforeAll(async () => {
@@ -15,21 +15,21 @@ describe("all tests", () => {
     } );
 
     it("not found", async () => {
-      const actual = await findByHash("asd");
+      const actual = await findMusicByHash("asd");
 
       expect(actual).toBeNull();
     } );
 
     it("found", async () => {
       const HASH = "eacf40b68de85b759524e3bd0bea1b4393360f682db3a7f3ec25ff46b1d01872";
-      const actual = await findByHash(HASH);
+      const actual = await findMusicByHash(HASH);
 
       expect(actual).not.toBeNull();
       expect(actual?.hash).toBe(HASH);
     } );
   } );
 
-  describe("getByUrl", () => {
+  describe("findByUrl", () => {
     const app: App = new TestingApp1();
 
     beforeAll(async () => {
@@ -42,10 +42,22 @@ describe("all tests", () => {
 
     it("found", async () => {
       const URL = "dk";
-      const actual = await findByUrl(URL);
+      const actual = await findMusicByUrl(URL);
 
       expect(actual).not.toBeNull();
       expect(actual?.url).toBe(URL);
+    } );
+  } );
+
+  describe("files", () => {
+    describe("getHashFile", () => {
+      it("existing path", () => {
+        const expected = "eacf40b68de85b759524e3bd0bea1b4393360f682db3a7f3ec25ff46b1d01872";
+        const path = "dk.mp3";
+        const actual = calcHashMusicFile(path);
+
+        expect(actual).toBe(expected);
+      } );
     } );
   } );
 } );

@@ -1,20 +1,19 @@
 module.exports = {
   moduleDirectories: [
     "node_modules",
-    "src"
+    "src",
   ],
-  roots: ['<rootDir>/src', '<rootDir>/tests'],
+  roots: ["<rootDir>/src", "<rootDir>/tests"],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-    '^.+\\.jsx?$': require.resolve('babel-jest')
+    "^.+\\.tsx?$": "ts-jest",
+    "^.+\\.jsx?$": require.resolve("babel-jest"),
   },
-  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  transformIgnorePatterns: ['<rootDir>/node_modules/?!(@datune)'],
-  setupFilesAfterEnv: ["jest-expect-message"],
+  testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  transformIgnorePatterns: ["<rootDir>/node_modules/?!(@datune)"],
   globals: {
-    'ts-jest': {
+    "ts-jest": {
       isolatedModules: false,
     },
-  }
-}
+  },
+};

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { MULTIMEDIA_LOCAL_RESOURCE } from "../resource";
+import { addRefreshUpdateAtOnSave } from "../timestamp/schema";
 
 export const MUSIC_LOCAL = {
   ...MULTIMEDIA_LOCAL_RESOURCE,
@@ -14,4 +15,7 @@ export const MUSIC_LOCAL = {
   },
 };
 
-export default new mongoose.Schema(MUSIC_LOCAL);
+const schema = new mongoose.Schema(MUSIC_LOCAL);
+
+addRefreshUpdateAtOnSave(schema);
+export default schema;

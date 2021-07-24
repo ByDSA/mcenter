@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import fs from "fs";
-import path from "path";
 
 let alreadyLoaded = false;
 
@@ -31,7 +30,10 @@ export function loadEnv() {
   if (result.error)
     throw result.error;
 
-  checkEnvVar("MEDIA_PATH");
+  checkEnvVar("MUSICS_PATH");
+  checkEnvVar("VIDEOS_PATH");
+  checkEnvVar("SERIES_PATH");
+  checkEnvVar("MOVIES_PATH");
   checkEnvVar("MONGO_DB");
   // checkEnvVar("MONGO_PORT");
   checkEnvVar("MONGO_USER");
@@ -47,18 +49,4 @@ function isTesting() {
 export function checkEnvVar(name: string) {
   if (!process.env[name])
     throw new Error(`Env var ${name} is empty.`);
-}
-
-export function getFullPathSeries(relativePath: string): string {
-  loadEnv();
-  const MEDIA_PATH = <string>process.env.MEDIA_PATH;
-
-  return path.join(MEDIA_PATH, relativePath);
-}
-
-export function getFullPathMusic(relativePath: string): string {
-  loadEnv();
-  const MUSIC_PATH = <string>process.env.MUSIC_PATH;
-
-  return path.join(MUSIC_PATH, relativePath);
 }

@@ -1,14 +1,16 @@
 import { Schema } from "mongoose";
 import { RESOURCE } from "../resource";
 
-const ContentGroupSchema = new Schema( {
+export const ContentGroupSchemaObj = {
   id: {
     type: String,
   },
   url: {
     type: String,
   },
-} );
+};
+
+export const ContentGroupSchema = new Schema(ContentGroupSchemaObj);
 
 export default new Schema( {
   ...RESOURCE,

@@ -1,12 +1,12 @@
-import { LocalResource, MultimediaLocalResource, Resource } from "./resource.document";
-import { LOCAL_RESOURCE, MULTIMEDIA_LOCAL_RESOURCE, RESOURCE } from "./resource.schema";
+import { LocalResourceInterface, MultimediaLocalResourceInterface, ResourceInterface } from "./interface";
+import { LocalResourceSchemaObj, MultimediaLocalResourceSchemaObj, ResourceSchemaObj } from "./schema";
 
 export {
-  RESOURCE,
-  LOCAL_RESOURCE,
-  MULTIMEDIA_LOCAL_RESOURCE,
+  ResourceSchemaObj as RESOURCE,
+  LocalResourceSchemaObj as LOCAL_RESOURCE,
+  MultimediaLocalResourceSchemaObj as MULTIMEDIA_LOCAL_RESOURCE,
 
-  Resource,
-  LocalResource,
-  MultimediaLocalResource,
+  ResourceInterface as Resource,
+  LocalResourceInterface as LocalResource,
+  MultimediaLocalResourceInterface as MultimediaLocalResource,
 };

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import Music from "./document";
-import MusicSchema from "./schema";
+import Doc from "./document";
+import Schema from "./schema";
 
 const NAME = "Music";
 
-export default mongoose.model<Music>(NAME, MusicSchema);
+export default mongoose.model<Doc>(NAME, Schema);

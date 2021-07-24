@@ -1,10 +1,9 @@
 import express from "express";
-import { findByUrl } from "../../db/models/music";
-import { getFullPathMusic } from "../../env";
+import { findMusicByUrl, getFullPathMusic } from "../../db/models/music";
 
 export default async function rawAccess(req: express.Request, res: express.Response) {
   const { name } = req.params;
-  const music = await findByUrl(name);
+  const music = await findMusicByUrl(name);
 
   if (!music) {
     res.sendStatus(404);

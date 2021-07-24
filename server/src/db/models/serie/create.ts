@@ -1,29 +1,30 @@
 /* eslint-disable import/prefer-default-export */
 import dotenv from "dotenv";
+import { calcHashFromFile } from "../../../files";
 import { FileNode, getSerieTreeRemote } from "../../../routes/series/nginxTree";
-import { Group } from "../group";
-import GroupModel from "../group/model";
-import { Video } from "../video";
+import { Video, VideoInterface } from "../video";
+import Doc from "./document";
+import Model from "./model";
 
 dotenv.config();
 
-const { MEDIA_PATH } = process.env;
+const { SERIES_PATH } = process.env;
 
-export async function generateFromFiles(id: string): Promise<Group | null> {
-  const folder = `${MEDIA_PATH}/series/${id}`;
-  const episodes: Video[] | null = await getSerieTree(folder);
+export async function generateFromFiles(id: string): Promise<Doc | null> {
+  const folder = `${SERIES_PATH}/${id}`;
+  const episodes: VideoInterface[] | null = await getSerieTree(folder);
 
   if (!episodes)
     return null;
 
-  return GroupModel.create( {
+  return Model.create( {
     id,
     name: id,
     episodes,
   } ).then((serie) => serie.save());
 }
 
-async function getSerieTree(uri: string): Promise<Video[] | null> {
+async function getSerieTree(uri: string): Promise<VideoInterface[] | null> {
   if (uri.startsWith("http")) {
     const nginxTree = await getSerieTreeRemote(uri, {
       maxLevel: 2,
@@ -38,7 +39,7 @@ async function getSerieTree(uri: string): Promise<Video[] | null> {
   return getSerieTreeLocal(uri);
 }
 
-async function getEpisodesFromTree(tree: FileNode[], episodes: Video[] = []): Promise<Video[]> {
+async function getEpisodesFromTree(tree: FileNode[], episodes: VideoInterface[] = []): Promise<VideoInterface[]> {
   for (const fn of tree) {
     if (fn.type !== "[VID]" && fn.type !== "[DIR]")
       continue;
@@ -58,14 +59,16 @@ async function getEpisodesFromTree(tree: FileNode[], episodes: Video[] = []): Pr
   return episodes;
 }
 
-async function fileNode2Episode(fn: FileNode): Promise<Video> {
+async function fileNode2Episode(fn: FileNode): Promise<VideoInterface> {
   const path = getPathFromFn(fn);
   const id = getIdFromFn(fn);
+  const hash = calcHashFromFile(path);
 
   return {
-    id,
+    url: id,
+    hash,
     path,
-    title: "",
+    name: "",
     weight: 0,
     start: -1,
     end: -1,

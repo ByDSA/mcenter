@@ -1,5 +1,5 @@
 import express from "express";
-import { findAll, Music } from "../../db/models/music";
+import { findAllMusics, Music } from "../../db/models/music";
 
 export default async function getAll(req: express.Request, res: express.Response) {
   const musics = await findAllMusicsAndFilter(req);
@@ -10,7 +10,7 @@ export default async function getAll(req: express.Request, res: express.Response
 }
 
 export async function findAllMusicsAndFilter(req: express.Request): Promise<Music[]> {
-  let musics = await findAll();
+  let musics = await findAllMusics();
   const tagsQuery = <string | undefined>req.query.tags;
   const minWeightQuery = <string | undefined>req.query.minWeight;
   const maxWeightQuery = <string | undefined>req.query.maxWeight;

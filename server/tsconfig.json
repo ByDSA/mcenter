@@ -22,7 +22,7 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
+    "src/**/*.ts", "tests/*.ts",
   ],
   "files": [
     "server.ts"

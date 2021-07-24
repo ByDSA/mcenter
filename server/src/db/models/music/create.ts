@@ -1,77 +1,43 @@
 import NodeID3 from "node-id3";
 import path from "path";
-import { getFullPathMusic } from "../../../env";
-import { calcHashFromFile } from "../../../files";
-import { AUDIO_EXTENSIONS } from "../../../files/files.music";
+import { calcHashFromFile, getValidUrl } from "../../../files";
+import { getTitleFromFilename } from "../../../files/misc";
 import { download } from "../../../music/youtube";
-import Music from "./document";
+import Doc from "./document";
+import { getFullPath } from "./files";
 import { findByPath } from "./find";
-import MusicModel from "./model";
+import Model from "./model";
 
-export function createFromPath(relativePath: string): Promise<Music> {
-  const fullPath = getFullPathMusic(relativePath);
+export function createFromPath(relativePath: string): Promise<Doc> {
+  const fullPath = getFullPath(relativePath);
   const tags = NodeID3.read(fullPath);
   const title = tags.title || getTitleFromFilename(fullPath);
   let baseName = path.basename(fullPath);
 
   baseName = baseName.substr(0, baseName.lastIndexOf("."));
-  const url = getUrl(baseName);
+  const url = getValidUrl(baseName);
   const hash = calcHashFromFile(fullPath);
 
-  return MusicModel.create( {
+  return Model.create( {
     hash,
     path: relativePath,
     title,
     artist: tags.artist,
     album: tags.album,
-    addedAt: Date.now(),
     url,
   } );
 }
 
-export function createFromPathAndSave(relativePath: string): Promise<Music> {
-  return createFromPath(relativePath)
-    .then((music) => music.save());
-}
-
-function getTitleFromFilename(relativePath: string): string {
-  const title = path.basename(relativePath);
-
-  return removeExtension(title);
-}
-
-function removeExtension(str: string): string {
-  for (const ext of AUDIO_EXTENSIONS) {
-    const index = str.lastIndexOf(`.${ext}`);
-
-    if (index >= 0)
-      return str.substr(0, index);
-  }
-
-  return str;
-}
-
-function getUrl(title: string) {
-  const uri = title
-    .toLowerCase()
-    .replace(/(-\s-)/g, "-")
-    .replace(/(\s-)|(-\s)/g, "-")
-    .replace(/\s/g, "-")
-    .replace(/&|\?|\[|\]|:|'|"|#/g, "");
-
-  return uri;
-}
-
-export async function findOrCreateAndSaveFromPath(relativePath: string): Promise<Music> {
+export async function findOrCreateAndSaveFromPath(relativePath: string): Promise<Doc> {
   const read = await findByPath(relativePath);
 
   if (read)
     return read;
 
-  return createFromPathAndSave(relativePath);
+  return createFromPath(relativePath).then((m) => m.save());
 }
 
-export async function findOrCreateAndSaveFromYoutube(strId: string): Promise<Music> {
+export async function findOrCreateAndSaveFromYoutube(strId: string): Promise<Doc> {
   const data = await download(strId);
 
   return findOrCreateAndSaveFromPath(data.file);

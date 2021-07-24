@@ -1,22 +1,38 @@
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import { MediaElement } from "../../../m3u/MediaElement";
-import { MultimediaLocalResource, MULTIMEDIA_LOCAL_RESOURCE } from "../resource";
+import { createFromPath } from "./create";
+import { deleteAll } from "./delete";
+import Document from "./document";
+import { calcHashFile, getFullPath } from "./files";
+import { findByHash, findByPath, findByUrl } from "./find";
+import Interface from "./interface";
+import Model from "./model";
+import Schema from "./schema";
 
-export interface Video extends MultimediaLocalResource {
-}
-
-export const VideoSchema = new mongoose.Schema(MULTIMEDIA_LOCAL_RESOURCE);
-
-export function videoToMediaElement(e: Video): MediaElement {
+function toMediaElement(e: Interface): MediaElement {
   dotenv.config();
-  const { MEDIA_PATH } = process.env;
+  const { VIDEOS_PATH } = process.env;
 
   return {
-    path: `${MEDIA_PATH}/${e.path}`,
-    title: e.title,
+    path: `${VIDEOS_PATH}/${e.path}`,
+    title: e.name,
     startTime: e.start,
     stopTime: e.end,
     length: e.duration,
   };
 }
+
+export {
+  Document as Video,
+  Model as VideoModel,
+  Interface as VideoInterface,
+  Schema as VideoSchema,
+  findByUrl as findVideoByUrl,
+  findByPath as findVideoByPath,
+  findByHash as findVideoByHash,
+  toMediaElement as videoToMediaElement,
+  deleteAll as deleteAllVideos,
+  createFromPath as createVideoFromPath,
+  getFullPath as getFullPathVideo,
+  calcHashFile as calcHashVideoFile,
+};

@@ -1,15 +1,5 @@
-/* eslint-disable semi */
-import { Resource } from "../resource";
+import { Document } from "mongoose";
+import Interface from "./interface";
 
-export type ResourceType = "Music" | "Video";
-
-export type ContentGroup = {
-  type: ResourceType;
-  id: string;
-  url: string;
-}[];
-
-export default interface Group extends Resource {
-    name: string;
-    content: ContentGroup;
+export default interface Group extends Interface, Document {
 }
