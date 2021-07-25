@@ -8,7 +8,7 @@ import { getFullPath } from "./files";
 import { findByPath } from "./find";
 import Model from "./model";
 
-export function createFromPath(relativePath: string): Promise<Doc> {
+export function createFromPath(relativePath: string): Promise<Doc|null> {
   const fullPath = getFullPath(relativePath);
   const tags = NodeID3.read(fullPath);
   const title = tags.title || getTitleFromFilename(fullPath);
@@ -21,23 +21,28 @@ export function createFromPath(relativePath: string): Promise<Doc> {
   return Model.create( {
     hash,
     path: relativePath,
-    title,
+    name: title,
     artist: tags.artist,
     album: tags.album,
     url,
   } );
 }
 
-export async function findOrCreateAndSaveFromPath(relativePath: string): Promise<Doc> {
+export async function findOrCreateAndSaveFromPath(relativePath: string): Promise<Doc|null> {
   const read = await findByPath(relativePath);
 
   if (read)
     return read;
 
-  return createFromPath(relativePath).then((m) => m.save());
+  return createFromPath(relativePath).then((m) => {
+    if (m)
+      return m.save();
+
+    return null;
+  } );
 }
 
-export async function findOrCreateAndSaveFromYoutube(strId: string): Promise<Doc> {
+export async function findOrCreateAndSaveFromYoutube(strId: string): Promise<Doc|null> {
   const data = await download(strId);
 
   return findOrCreateAndSaveFromPath(data.file);

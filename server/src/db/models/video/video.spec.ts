@@ -1,5 +1,5 @@
 import fs from "fs";
-import { calcHashVideoFile, createVideoFromPath, deleteAllVideos, findVideoByHash, findVideoByPath, findVideoByUrl, getFullPathVideo } from ".";
+import { calcVideoHashFile, createVideoFromPath, deleteAllVideos, findVideoByHash, findVideoByPath, findVideoByUrl, findVideoFiles, findVideoFilesAt, getVideoFullPath } from ".";
 import { TestingApp1 } from "../../../../tests/TestingApps";
 import App from "../../../app";
 
@@ -62,17 +62,50 @@ describe("all tests", () => {
         const actual = await findVideoByPath(relativePath);
 
         expect(actual).toBeNull();
-        const fullPath = getFullPathVideo(relativePath);
+        const fullPath = getVideoFullPath(relativePath);
 
         expect(fs.existsSync(fullPath)).toBeTruthy();
       } );
     } );
+    describe("files", () => {
+      it("calcHashFile", () => {
+        const expected = "5e70b96ad27dc8581424be7069ee9de8da9388b716e6fe213d88385f19baf80a";
+        const actual = calcVideoHashFile("sample1.mp4");
 
-    it("calcHashFile", () => {
-      const expected = "5e70b96ad27dc8581424be7069ee9de8da9388b716e6fe213d88385f19baf80a";
-      const actual = calcHashVideoFile("sample1.mp4");
+        expect(actual).toBe(expected);
+      } );
 
-      expect(actual).toBe(expected);
+      describe("findFiles", () => {
+        it("folder", () => {
+          const expected = [
+            "sample1.mp4",
+            "unadded.mp4",
+            "folder/sample2.mp4",
+          ];
+          const actual = findVideoFiles();
+
+          expect(actual.sort()).toEqual(expected.sort());
+        } );
+      } );
+
+      describe("findFilesAt", () => {
+        it("valid folder", () => {
+          const path = "folder";
+          const expected = [
+            "folder/sample2.mp4",
+          ];
+          const actual = findVideoFilesAt(path);
+
+          expect(actual.sort()).toEqual(expected.sort());
+        } );
+        it("unexisting folder", () => {
+          const path = "unexisting/folder";
+          const actual = findVideoFilesAt(path);
+          const expected: string[] = [];
+
+          expect(actual).toStrictEqual(expected);
+        } );
+      } );
     } );
   } );
 
@@ -106,7 +139,9 @@ describe("all tests", () => {
 
       const createdVideo = await createVideoFromPath(relativePath);
 
-      await createdVideo.save();
+      expect(createdVideo).toBeDefined();
+
+      await createdVideo?.save();
 
       const newVideo = await findVideoByPath(relativePath);
 

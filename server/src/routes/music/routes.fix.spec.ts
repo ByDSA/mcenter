@@ -7,11 +7,11 @@ import App from "../../app";
 const app: App = new TestingApp1();
 
 describe("fix", () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     await app.run();
   } );
 
-  afterAll(async () => {
+  afterEach(async () => {
     await app.kill();
   } );
 

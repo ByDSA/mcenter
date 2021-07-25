@@ -35,3 +35,16 @@ export function getValidUrl(title: string) {
 
   return uri;
 }
+
+export function getRelativePath(fullPath: string, base: string): string | null {
+  const index = fullPath.indexOf(base);
+
+  if (index < 0)
+    return null;
+
+  return fullPath.substr(index + base.length + 1);
+}
+
+export function getFullPath(relativePath: string, base: string): string {
+  return path.join(base, relativePath);
+}

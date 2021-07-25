@@ -1,11 +1,6 @@
-export default interface Interface {
-  hash: string;
-  title: string;
-  url: string;
-  path: string;
+import { MultimediaLocalResource } from "../resource";
+
+export default interface Interface extends MultimediaLocalResource {
   weight?: number;
   artist?: string;
-  tags?: string[];
-  duration?: number;
-  disabled?: boolean
 }

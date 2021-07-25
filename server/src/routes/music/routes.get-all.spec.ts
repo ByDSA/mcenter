@@ -12,7 +12,7 @@ afterAll(async () => {
   await app.kill();
 } );
 it("generateView", async () => {
-  const musics: Music[] = [await createMusicFromPath("dk.mp3")];
+  const musics: Music[] = [<Music> await createMusicFromPath("dk.mp3")];
   const actual = generateView(musics);
   const expectedText = "<ul><li><a href='/raw/dk'>dk</li></ul>";
 

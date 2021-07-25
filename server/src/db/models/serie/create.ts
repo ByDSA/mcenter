@@ -1,104 +1,63 @@
 /* eslint-disable import/prefer-default-export */
-import dotenv from "dotenv";
+import path from "path";
 import { calcHashFromFile } from "../../../files";
-import { FileNode, getSerieTreeRemote } from "../../../routes/series/nginxTree";
-import { Video, VideoInterface } from "../video";
+import { getValidUrl, removeExtension } from "../../../files/misc";
+import { VideoInterface } from "../video";
 import Doc from "./document";
+import { findFilesNotRecursivelyAt, getFoldersIn, getFullPath } from "./files";
 import Model from "./model";
 
-dotenv.config();
+export async function createFromPath(relativePath: string): Promise<Doc|null> {
+  const seasons = getFoldersIn(relativePath);
 
-const { SERIES_PATH } = process.env;
-
-export async function generateFromFiles(id: string): Promise<Doc | null> {
-  const folder = `${SERIES_PATH}/${id}`;
-  const episodes: VideoInterface[] | null = await getSerieTree(folder);
-
-  if (!episodes)
+  if (!seasons || seasons.length === 0)
     return null;
 
-  return Model.create( {
-    id,
-    name: id,
+  const serieRelativePathsEpisodes = [];
+
+  for (const season of seasons) {
+    const relativePathSeason = path.join(relativePath, season);
+    // eslint-disable-next-line no-await-in-loop
+    let files = await findFilesNotRecursivelyAt(relativePathSeason);
+
+    files = files.map((f) => f.substr(f.indexOf(relativePath) + relativePath.length + 1));
+
+    serieRelativePathsEpisodes.push(...files);
+  }
+
+  const episodes: VideoInterface[] = serieRelativePathsEpisodes.map((serieRelativePath) => {
+    const url = getEpisodeValidUrl(serieRelativePath);
+    const name = getNameFromPath(serieRelativePath);
+    const relativePathEpisode = path.join(relativePath, serieRelativePath);
+    const fullPath = getFullPath(relativePathEpisode);
+    const hash = calcHashFromFile(fullPath);
+
+    return {
+      path: serieRelativePath,
+      url,
+      name,
+      hash,
+    };
+  } );
+  const serie = new Model( {
+    path: relativePath,
+    name: relativePath,
+    url: getValidUrl(relativePath),
     episodes,
-  } ).then((serie) => serie.save());
+  } );
+
+  return serie;
 }
 
-async function getSerieTree(uri: string): Promise<VideoInterface[] | null> {
-  if (uri.startsWith("http")) {
-    const nginxTree = await getSerieTreeRemote(uri, {
-      maxLevel: 2,
-    } );
+function getEpisodeValidUrl(relativeFilePath: string): string {
+  const season = relativeFilePath.substr(0, relativeFilePath.indexOf("/"));
+  const fileName = getNameFromPath(relativeFilePath).padStart(2, "0");
 
-    if (!nginxTree)
-      return null;
-
-    return getEpisodesFromTree(nginxTree);
-  }
-
-  return getSerieTreeLocal(uri);
+  return `${season}x${fileName}`;
 }
 
-async function getEpisodesFromTree(tree: FileNode[], episodes: VideoInterface[] = []): Promise<VideoInterface[]> {
-  for (const fn of tree) {
-    if (fn.type !== "[VID]" && fn.type !== "[DIR]")
-      continue;
+function getNameFromPath(relativeFilePath: string) {
+  const basename = path.basename(relativeFilePath);
 
-    if (fn.type !== "[DIR]") {
-      const episode = await fileNode2Episode(fn);
-
-      episodes.push(episode);
-    }
-
-    const { children } = fn;
-
-    if (children)
-      await getEpisodesFromTree(children, episodes);
-  }
-
-  return episodes;
-}
-
-async function fileNode2Episode(fn: FileNode): Promise<VideoInterface> {
-  const path = getPathFromFn(fn);
-  const id = getIdFromFn(fn);
-  const hash = calcHashFromFile(path);
-
-  return {
-    url: id,
-    hash,
-    path,
-    name: "",
-    weight: 0,
-    start: -1,
-    end: -1,
-  };
-}
-
-function getIdFromFn(fn: FileNode): string {
-  const season = fn.relativeUri.substr(0, fn.relativeUri.lastIndexOf("/")).split("/");
-  const nameWithoutExt = fn.name.substr(0, fn.name.lastIndexOf("."));
-  let id = season.join("x");
-
-  if (season.length > 0 && season[0] !== undefined)
-    id += "x";
-
-  if (Number.isNaN(+nameWithoutExt))
-    id += nameWithoutExt.padStart(2, "0");
-  else
-    id += nameWithoutExt;
-
-  return id;
-}
-
-function getPathFromFn(fn: FileNode): string {
-  const serieUrl = fn.uri.substr(0, fn.uri.indexOf(fn.relativeUri) - 1);
-  const serieId = serieUrl.split("/").pop();
-
-  return `series/${serieId}/${fn.relativeUri}`;
-}
-
-async function getSerieTreeLocal(path: string): Promise<Video[]> {
-  // fs.readdirSync(folder);
-  return [];
+  return removeExtension(basename);
 }

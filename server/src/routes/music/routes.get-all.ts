@@ -36,7 +36,7 @@ export async function findAllMusicsAndFilter(req: express.Request): Promise<Musi
 function sortMusics(musics: Music[]): Music[] {
   return musics.sort((a: Music, b: Music) => {
     if (!a.artist || !b.artist || a.artist === b.artist)
-      return a.title.localeCompare(b.title);
+      return a.name.localeCompare(b.name);
 
     return a.artist.localeCompare(b.artist);
   } );
@@ -45,7 +45,7 @@ function sortMusics(musics: Music[]): Music[] {
 export function generateView(musics: Music[]): string {
   let ret = "<ul>";
 
-  musics.map((m) => `<li><a href='/raw/${m.url}'>${m.title}</li>`)
+  musics.map((m) => `<li><a href='/raw/${m.url}'>${m.name}</li>`)
     .forEach((line) => { ret += line; } );
   ret += "</ul>";
 

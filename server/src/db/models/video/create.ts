@@ -6,7 +6,7 @@ import Doc from "./document";
 import { getFullPath } from "./files";
 import Model from "./model";
 
-export function createFromPath(relativePath: string): Promise<Doc> {
+export function createFromPath(relativePath: string): Promise<Doc|null> {
   const fullPath = getFullPath(relativePath);
   const tags = NodeID3.read(fullPath);
   const title = tags.title || getTitleFromFilename(fullPath);

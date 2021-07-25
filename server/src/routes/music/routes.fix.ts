@@ -3,9 +3,9 @@
 /* eslint-disable no-restricted-syntax */
 import express from "express";
 import fs from "fs";
-import { createMusicFromPath, findAllMusics, findMusicByHash, findMusicByPath, findMusicByUrl, getFullPathMusic, Music } from "../../db/models/music";
+import { createMusicFromPath, findAllMusics, findMusicByHash, findMusicByPath, findMusicByUrl, findMusicFiles, getMusicFullPath, Music } from "../../db/models/music";
 import { loadEnv } from "../../env";
-import { calcHashFromFile, findAllValidMusicFiles, findFiles } from "../../files";
+import { calcHashFromFile, findFiles } from "../../files";
 
 export async function fixAll(req: express.Request, res: express.Response) {
   const remoteMusic = await findAllMusics();
@@ -13,7 +13,7 @@ export async function fixAll(req: express.Request, res: express.Response) {
 
   mainLoop: for (const m of remoteMusic) {
     for (const ml of localMusic) {
-      if (m.path === ml.path)
+      if (m && ml && m.path === ml.path)
         continue mainLoop;
     }
 
@@ -40,7 +40,7 @@ export async function fixOne(req: express.Request, res: express.Response) {
   let existsPath = false;
 
   if (path)
-    existsPath = fs.existsSync(getFullPathMusic(path));
+    existsPath = fs.existsSync(getMusicFullPath(path));
 
   if (!path || (!music && !existsPath)) {
     res.sendStatus(404);
@@ -72,15 +72,15 @@ export async function fixOne(req: express.Request, res: express.Response) {
   res.sendStatus(200);
 }
 
-function fixDataFromLocalFiles(): Promise<Music[]> {
-  const files = findAllValidMusicFiles();
+function fixDataFromLocalFiles(): Promise<(Music|null)[]> {
+  const files = findMusicFiles();
   const musics = files.map((relativePath) => fixDataFromLocalFile(relativePath));
 
   return Promise.all(musics);
 }
 
 async function fixDataFromLocalFile(relativePath: string) {
-  const fullPath = getFullPathMusic(relativePath);
+  const fullPath = getMusicFullPath(relativePath);
   const hash = calcHashFromFile(fullPath);
   const musicByHash = await findMusicByHash(hash);
   let music;
@@ -101,7 +101,8 @@ async function fixDataFromLocalFile(relativePath: string) {
     } else
       music = await createMusicFromPath(relativePath);
 
-    music.save();
+    if (music)
+      music.save();
   }
 
   return music;

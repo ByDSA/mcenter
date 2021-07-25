@@ -1,21 +1,7 @@
-import { compareHash, findUserByName, hash, User, UserInterface, UserModel } from ".";
+import { checkUser, compareHash, findUserByName, hash, UserInterface, UserModel } from ".";
 import { TestingApp1 } from "../../../../tests/TestingApps";
 import App from "../../../app";
 
-function checkUser(actual: User | null, expected: UserInterface) {
-  expect(actual).toBeDefined();
-  expect(actual).not.toBeNull();
-
-  if (!actual || !actual.createdAt || !actual.updatedAt)
-    throw new Error();
-
-  expect(actual.name).toBe(expected.name);
-  expect(actual.comparePassSync(expected.pass)).toBeTruthy();
-
-  expect(+new Date() - actual.createdAt).toBeLessThanOrEqual(5 * 1000);
-  expect(+new Date() - actual.updatedAt).toBeLessThanOrEqual(5 * 1000);
-  expect(actual.deletedAt).toBeUndefined();
-}
 describe("all tests", () => {
   describe("password", () => {
     it("compare hash function", () => {

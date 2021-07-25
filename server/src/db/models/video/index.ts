@@ -3,7 +3,7 @@ import { MediaElement } from "../../../m3u/MediaElement";
 import { createFromPath } from "./create";
 import { deleteAll } from "./delete";
 import Document from "./document";
-import { calcHashFile, getFullPath } from "./files";
+import { calcHashFile, findFiles, findFilesAt, getFullPath } from "./files";
 import { findByHash, findByPath, findByUrl } from "./find";
 import Interface from "./interface";
 import Model from "./model";
@@ -33,6 +33,8 @@ export {
   toMediaElement as videoToMediaElement,
   deleteAll as deleteAllVideos,
   createFromPath as createVideoFromPath,
-  getFullPath as getFullPathVideo,
-  calcHashFile as calcHashVideoFile,
+  getFullPath as getVideoFullPath,
+  calcHashFile as calcVideoHashFile,
+  findFiles as findVideoFiles,
+  findFilesAt as findVideoFilesAt,
 };

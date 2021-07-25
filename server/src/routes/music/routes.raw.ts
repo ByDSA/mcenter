@@ -1,5 +1,5 @@
 import express from "express";
-import { findMusicByUrl, getFullPathMusic } from "../../db/models/music";
+import { findMusicByUrl, getMusicFullPath } from "../../db/models/music";
 
 export default async function rawAccess(req: express.Request, res: express.Response) {
   const { name } = req.params;
@@ -12,7 +12,7 @@ export default async function rawAccess(req: express.Request, res: express.Respo
   }
 
   const relativePath = music.path;
-  const fullpath = getFullPathMusic(relativePath);
+  const fullpath = getMusicFullPath(relativePath);
 
   res.download(fullpath, (error) => {
     if (error)

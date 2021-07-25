@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 import { LocalResourceSchemaObj } from "../resource/schema";
 import { addRefreshUpdateAtOnSave } from "../timestamp/schema";
+import { VideoSchema } from "../video";
 
 export const SERIE_LOCAL = {
   ...LocalResourceSchemaObj,
-  title: {
-    type: String,
+  episodes: {
+    type: [VideoSchema],
   },
 };
 

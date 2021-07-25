@@ -1,5 +1,7 @@
+import { TimestampSchemaObj } from "../timestamp";
 
 export const ResourceSchemaObj = {
+  ...TimestampSchemaObj,
   url: {
     type: String,
     required: true,

@@ -1,7 +1,10 @@
 import Interface from "./interface";
-import { SchemaObj } from "./schema";
+import { addRefreshUpdateAtOnSave, SchemaObj } from "./schema";
+import { check } from "./testing";
 
 export {
   Interface as TimestampInterface,
   SchemaObj as TimestampSchemaObj,
+  addRefreshUpdateAtOnSave,
+  check as checkTimestamp,
 };

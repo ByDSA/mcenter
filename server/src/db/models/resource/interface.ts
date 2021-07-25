@@ -17,7 +17,6 @@ export interface LocalResourceInterface extends ResourceInterface {
 
 export interface MultimediaLocalResourceInterface
 extends LocalResourceInterface, LocalResourceFileInterface {
-  weight?: number;
   duration?: number;
   start?: number;
   end?: number;

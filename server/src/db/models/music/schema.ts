@@ -1,12 +1,9 @@
 import mongoose from "mongoose";
 import { MULTIMEDIA_LOCAL_RESOURCE } from "../resource";
-import { addRefreshUpdateAtOnSave } from "../timestamp/schema";
+import { addRefreshUpdateAtOnSave } from "../timestamp";
 
 export const MUSIC_LOCAL = {
   ...MULTIMEDIA_LOCAL_RESOURCE,
-  title: {
-    type: String,
-  },
   artist: {
     type: String,
   },

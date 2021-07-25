@@ -1,17 +1,16 @@
-import path from "path";
 import { loadEnv } from "../../../env";
-import { calcHashFromFile } from "../../../files";
+import { generateCommonFilesFunctions } from "../resource";
 
-export function calcHashFile(relativePath: string) {
-  const fullPath = getFullPath(relativePath);
-  const hash = calcHashFromFile(fullPath);
+export const VIDEO_EXTENSIONS = ["mp4", "mkv", "avi", "wmv"];
+loadEnv();
 
-  return hash;
-}
+const generatedFunctions = generateCommonFilesFunctions( {
+  extensions: VIDEO_EXTENSIONS,
+  basePath: <string>process.env.VIDEOS_PATH,
+} );
 
-export function getFullPath(relativePath: string): string {
-  loadEnv();
-  const VIDEOS_PATH = <string>process.env.VIDEOS_PATH;
-
-  return path.join(VIDEOS_PATH, relativePath);
-}
+export const { calcHashFile,
+  getFullPath,
+  getRelativePath,
+  findFiles,
+  findFilesAt } = generatedFunctions;

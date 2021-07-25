@@ -39,7 +39,7 @@ function randomPick(musics: Music[]): Music {
 function generatePlaylist(picked: Music, nextUrl: string): string {
   const SERVER = `http://${HOST}:${PORT}`;
   const ret = `#EXTM3U
-  #EXTINF:317,${picked.title}
+  #EXTINF:317,${picked.name}
   ${SERVER}/${ROUTE_RAW}/${picked.url}
   #EXTINF:-1,NEXT
   ${nextUrl}`;
