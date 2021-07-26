@@ -78,6 +78,13 @@ export class UserMock1 implements Mock {
       name: "user1",
       role: "User",
       pass: "pass",
+      histories: [
+        {
+          name: "music",
+          typeResource: "Music",
+          content: [],
+        },
+      ],
     },
     {
       name: "user2",
@@ -92,7 +99,7 @@ export class UserMock1 implements Mock {
     const promises = [];
 
     for (const uObj of users)
-      promises.push(UserModel.create(uObj).then((u) => u.save()));
+      promises.push(new UserModel(uObj).save());
 
     return Promise.all(promises);
   }

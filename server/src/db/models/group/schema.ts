@@ -12,9 +12,11 @@ export const ContentGroupSchemaObj = {
 
 export const ContentGroupSchema = new Schema(ContentGroupSchemaObj);
 
-export default new Schema( {
+export const GroupSchemaObj = {
   ...RESOURCE,
   content: {
     type: [ContentGroupSchema],
   },
-} );
+};
+
+export default new Schema(GroupSchemaObj);

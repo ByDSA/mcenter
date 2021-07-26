@@ -1,4 +1,4 @@
-export const API = "/api";
+import { API } from "../routes.config";
 
 export const MUSIC = `${API}/music`;
 

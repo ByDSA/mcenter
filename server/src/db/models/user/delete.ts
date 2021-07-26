@@ -1,7 +1,7 @@
-import MusicModel from "./model";
+import Model from "./model";
 
 // eslint-disable-next-line import/prefer-default-export
 export function deleteAll() {
-  return MusicModel.deleteMany( {
+  return Model.deleteMany( {
   } );
 }

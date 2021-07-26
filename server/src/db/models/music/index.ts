@@ -3,6 +3,7 @@ import { deleteAll } from "./delete";
 import Music from "./document";
 import { calcHashFile, findFiles, findFilesAt, getFullPath, getRelativePath } from "./files";
 import { findAll, findByHash, findByPath, findByUrl } from "./find";
+import { fixAll, fixOne } from "./fix";
 import MusicInterface from "./interface";
 import MusicModel from "./model";
 import MusicSchema from "./schema";
@@ -25,4 +26,6 @@ export {
   findFiles as findMusicFiles,
   findFilesAt as findMusicFilesAt,
   check as checkMusic,
+  fixAll as fixAllMusics,
+  fixOne as fixOneMusic,
 };

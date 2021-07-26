@@ -2,7 +2,7 @@ import express, { Express } from "express";
 import http from "http";
 import { connect, disconnect } from "../db/database";
 import { loadEnv } from "../env";
-import apiMusicRoutes from "../routes/music/routes.api";
+import apiMusicRoutes from "../routes/music";
 import { PORT } from "../routes/routes.config";
 
 type OnKillFunc = ()=> void;

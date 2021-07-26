@@ -1,7 +1,9 @@
 /* eslint-disable import/prefer-default-export */
 import TimestampInterface from "./interface";
 
-export function check<R extends TimestampInterface>(actual: R | null, expected: R) {
+export function check<R extends TimestampInterface>(actual: R | null | undefined, expected: R) {
+  expect(actual).toBeDefined();
+
   if (!actual?.createdAt)
     throw new Error("createdAt is null or undefined");
 

@@ -3,7 +3,7 @@
 import { newPicker, Picker } from "rand-picker";
 import { getFromGroupId, Serie } from "../db/models/group/model";
 import { getById, Mode, Stream } from "../db/models/stream.model";
-import { getlastEp } from "../routes/series/playStream";
+import { getlastEp } from "../routes/stream/playStream";
 import { filter } from "./EpisodeFilter";
 import fixWeight from "./EpisodeWeight";
 

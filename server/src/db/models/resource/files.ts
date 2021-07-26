@@ -27,21 +27,48 @@ export function generateCommonFunctions(config: Config) {
     return findFilesAt("");
   }
 
+  function findFileByHash(fileHash: string) {
+    const files = innerFindFilesAt( {
+      fileHash,
+      relativePath: "",
+      onlyFirst: true,
+    } );
+
+    return files[0] || null;
+  }
+
   function findFilesAt(relativePath: string) {
-    return innerFindFilesAt(relativePath, true);
+    return innerFindFilesAt( {
+      relativePath,
+      recursive: true,
+    } );
   }
 
   function findFilesNotRecursivelyAt(relativePath: string) {
-    return innerFindFilesAt(relativePath, false);
+    return innerFindFilesAt( {
+      relativePath,
+      recursive: false,
+    } );
   }
 
-  function innerFindFilesAt(relativePath: string, recursive: boolean) {
+  type Params = {
+    relativePath: string,
+    recursive?: boolean,
+    fileHash?: string,
+    onlyFirst?: boolean
+  };
+  function innerFindFilesAt( { relativePath,
+    recursive = true,
+    fileHash,
+    onlyFirst = false }: Params) {
     const { basePath } = config;
     const folder = path.join(basePath, relativePath);
 
     return _findFiles( {
       folder,
+      fileHash,
       recursive,
+      onlyFirst,
       extensions: config.extensions,
     } ).map((fullPath) => {
       const ret = getRelativePath(fullPath);
@@ -58,6 +85,7 @@ export function generateCommonFunctions(config: Config) {
     getFullPath,
     getRelativePath,
     findFiles,
+    findFileByHash,
     findFilesAt,
     findFilesNotRecursivelyAt,
   };

@@ -3,7 +3,7 @@ import { getFromGroupId } from "../../db/models/group/model";
 import { getById } from "../../db/models/stream.model";
 import { getDaysFrom } from "../../GroupPicker/EpisodeFilter";
 import { getRandomPicker } from "../../GroupPicker/GroupPicker";
-import { getlastEp } from "./playStream";
+import { getlastEp } from "../stream/playStream";
 
 export default async function showPicker(req: Request, res: Response) {
   const { streamId } = getParams(req, res);

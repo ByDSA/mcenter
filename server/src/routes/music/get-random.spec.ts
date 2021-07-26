@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import request from "supertest";
 import { TestingApp1 } from "../../../tests/TestingApps";

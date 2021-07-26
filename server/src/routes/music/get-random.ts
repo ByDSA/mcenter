@@ -1,9 +1,9 @@
 import express from "express";
 import { newPicker } from "rand-picker";
 import { Music } from "../../db/models/music";
-import { ROUTE_RAW } from "../routes.api.config";
 import { HOST, PORT } from "../routes.config";
-import { findAllMusicsAndFilter } from "./routes.get-all";
+import { ROUTE_RAW } from "./config";
+import { findAllMusicsAndFilter } from "./get-all";
 
 export default async function getRandom(req: express.Request, res: express.Response) {
   const musics = await findAllMusicsAndFilter(req);

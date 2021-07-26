@@ -3,7 +3,7 @@ import { Episode } from "../db/models/episode";
 import { History } from "../db/models/history";
 import { getFromGroupId } from "../db/models/serie.model";
 import { getById, Stream } from "../db/models/stream.model";
-import { pickAndAddHistory, play } from "./play";
+import { pickAndAddHistory, play } from "../series/play";
 
 export default async function f(req: Request, res: Response) {
   console.log("playStream");

@@ -12,5 +12,6 @@ const generatedFunctions = generateCommonFilesFunctions( {
 export const { calcHashFile,
   getFullPath,
   getRelativePath,
+  findFileByHash,
   findFiles,
   findFilesAt } = generatedFunctions;
