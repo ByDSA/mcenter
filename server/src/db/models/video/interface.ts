@@ -1,5 +1,5 @@
-import { MultimediaLocalResource } from "../resource";
+import { MultimediaLocalResourceInterface } from "../resource";
 
-export default interface Interface extends MultimediaLocalResource {
+export default interface Interface extends MultimediaLocalResourceInterface {
   weight?: number;
 }

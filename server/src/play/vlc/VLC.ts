@@ -1,5 +1,5 @@
 import { exec, execSync } from "child_process";
-import { isRunning } from "../Utils";
+import { isRunning } from "../../Utils";
 
 export enum VLCFlag {
     PLAY_AND_EXIT = "--play-and-exit",
@@ -14,35 +14,37 @@ export enum VLCFlag {
 
 export class VLC {
     private process: any | undefined;
+
     private flags: string[] = [];
 
     async open(file: string) {
-        const args = this.flags.join(" ");
-        console.log("Open VLC: " + args);
-        this.process = exec(`"vlc" ${file} ${args}`);
+      const args = this.flags.join(" ");
+
+      console.log(`Open VLC: ${args}`);
+      this.process = exec(`"vlc" ${file} ${args}`);
     }
 
     config(...flags: string[]) {
-        this.flags = flags;
+      this.flags = flags;
     }
 
     async close() {
-        // TODO
+      // TODO
     }
 
     static async closeAll() {
-        while (await isRunning("vlc")) {
-            try {
-                console.log("Closing VLC...");
-                execSync("killall vlc");
-            } catch (e) {
-                console.log("Error closing VLC");
-                break;
-            }
+      while (await isRunning("vlc")) {
+        try {
+          console.log("Closing VLC...");
+          execSync("killall vlc");
+        } catch (e) {
+          console.log("Error closing VLC");
+          break;
         }
+      }
     }
 
-    on(name: string, f: (code: number) => void) {
-        this.process.on(name, f);
+    on(name: string, f: (code: number)=> void) {
+      this.process.on(name, f);
     }
 }

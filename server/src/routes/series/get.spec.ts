@@ -12,12 +12,16 @@ beforeAll(async () => {
 afterAll(async () => {
   await app.kill();
 } );
-it("get", async () => {
-  const res = await request(app.expressApp)
+it("get ok", async () => {
+  await request(app.expressApp)
     .get("/api/serie/get/serie-1")
     .expect(200);
+} );
+
+it("get correct data", async () => {
+  const res = await request(app.expressApp)
+    .get("/api/serie/get/serie-1");
   const expected: SerieInterface = {
-    tags: [],
     path: "serie 1",
     name: "serie 1",
     url: "serie-1",

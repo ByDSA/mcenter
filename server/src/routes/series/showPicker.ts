@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getFromGroupId } from "../../db/models/group/model";
 import { getById } from "../../db/models/stream.model";
-import { getDaysFrom } from "../../GroupPicker/EpisodeFilter";
+import { getDaysFrom } from "../../GroupPicker/filter";
 import { getRandomPicker } from "../../GroupPicker/GroupPicker";
 import { getlastEp } from "../stream/playStream";
 

@@ -1,8 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import request from "supertest";
 import { TestingApp1 } from "../../../tests/TestingApps";
-import { checkMusic, createMusicFromPath, Music, MusicInterface } from "../../db/models/music";
-import { generateView } from "./get-all";
+import { checkMusic, MusicInterface } from "../../db/models/music";
 
 const app = new TestingApp1();
 
@@ -13,13 +12,6 @@ beforeAll(async () => {
 afterAll(async () => {
   await app.kill();
 } );
-it("generateView", async () => {
-  const musics: Music[] = [<Music> await createMusicFromPath("dk.mp3")];
-  const actual = generateView(musics);
-  const expectedText = "<ul><li><a href='/raw/dk'>dk</li></ul>";
-
-  expect(actual).toEqual(expectedText);
-}, 60000);
 
 it("get all", async () => {
   const res = await request(app.expressApp)

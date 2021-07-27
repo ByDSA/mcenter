@@ -41,13 +41,3 @@ function sortMusics(musics: Music[]): Music[] {
     return a.artist.localeCompare(b.artist);
   } );
 }
-
-export function generateView(musics: Music[]): string {
-  let ret = "<ul>";
-
-  musics.map((m) => `<li><a href='/raw/${m.url}'>${m.name}</li>`)
-    .forEach((line) => { ret += line; } );
-  ret += "</ul>";
-
-  return ret;
-}

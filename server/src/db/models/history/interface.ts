@@ -1,15 +1,15 @@
+import { Schema } from "mongoose";
+import { TypeResource } from "../resource";
 import { TimestampInterface } from "../timestamp";
 
-export type TypeResource = "Music" | "Video" | { serieId: string };
-
 export type HistoryItem = {
-    idResource: string;
+    idResource: Schema.Types.ObjectId;
+    typeResource: TypeResource;
     date: number;
 };
 
 export default interface Interface extends TimestampInterface {
-    _id?: string;
+    _id?: Schema.Types.ObjectId;
     name: string;
-    typeResource: TypeResource;
     content?: HistoryItem[];
 }

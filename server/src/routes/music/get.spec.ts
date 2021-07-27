@@ -13,14 +13,14 @@ afterAll(async () => {
   await app.kill();
 } );
 
-it("raw not found", async () => {
+it("not found", async () => {
   await request(app.expressApp)
-    .get("/api/music/raw/notfound")
+    .get("/api/music/get/notfound")
     .expect(404);
 } );
 
 it("found", async () => {
   await request(app.expressApp)
-    .get("/api/music/raw/dk")
+    .get("/api/music/get/dk")
     .expect(200);
 } );

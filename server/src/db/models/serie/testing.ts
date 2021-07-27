@@ -10,6 +10,8 @@ export function check(actual: Doc | null, expected: Interface) {
   if (!actual)
     throw new Error();
 
+  expect(actual.episodes?.length).toBe(expected.episodes?.length);
+
   for (let i = 0; i < actual.episodes.length; i++) {
     const actualEpisode: VideoInterface = actual.episodes[i];
     const expectedEpisode = expected?.episodes[i];

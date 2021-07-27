@@ -3,7 +3,7 @@ import { createFromPath } from "./create";
 import { deleteAll } from "./delete";
 import Doc from "./document";
 import { getFoldersIn } from "./files";
-import { findAll, findByPath, findByUrl } from "./find";
+import { findAll, findByName, findByPath, findByUrl } from "./find";
 import Interface from "./interface";
 import Model from "./model";
 import Schema from "./schema";
@@ -16,6 +16,7 @@ export {
   Interface as SerieInterface,
   findByUrl as findSerieByUrl,
   findByPath as findSerieByPath,
+  findByName as findSerieByName,
   findAll as findAllSeries,
   deleteAll as deleteAllSeries,
   createFromPath as createSerieFromPath,

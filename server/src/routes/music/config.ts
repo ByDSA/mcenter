@@ -10,7 +10,7 @@ export const UPDATE = `${MUSIC}/update`;
 
 export const FIX = `${UPDATE}/fix`;
 
-export const ROUTE_RAW = `${MUSIC}/raw`;
+export const ROUTE_GET = `${MUSIC}/get`;
 
 export const ROUTE_GET_ALL = `${MUSIC_GET}/all`;
 

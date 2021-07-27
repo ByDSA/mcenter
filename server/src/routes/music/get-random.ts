@@ -1,14 +1,20 @@
 import express from "express";
 import { newPicker } from "rand-picker";
-import { Music } from "../../db/models/music";
-import { HOST, PORT } from "../routes.config";
-import { ROUTE_RAW } from "./config";
+import { Music, MusicInterface } from "../../db/models/music";
+import { generateLinkedPlaylist } from "../multimedia/misc";
 import { findAllMusicsAndFilter } from "./get-all";
+import { getFullUrl } from "./urls";
 
 export default async function getRandom(req: express.Request, res: express.Response) {
   const musics = await findAllMusicsAndFilter(req);
-  const picked = randomPick(musics);
-  const ret = generatePlaylist(picked, req.url);
+  const resource = randomPick(musics);
+  const { url } = req;
+  const fullUrlFunc = getFullUrl;
+  const ret = generateLinkedPlaylist<MusicInterface>( {
+    resource,
+    nextUrl: url,
+    fullUrlFunc,
+  } );
 
   res.send(ret);
 }
@@ -34,17 +40,6 @@ function randomPick(musics: Music[]): Music {
     [picked] = musics;
 
   return picked;
-}
-
-function generatePlaylist(picked: Music, nextUrl: string): string {
-  const SERVER = `http://${HOST}:${PORT}`;
-  const ret = `#EXTM3U
-  #EXTINF:317,${picked.name}
-  ${SERVER}/${ROUTE_RAW}/${picked.url}
-  #EXTINF:-1,NEXT
-  ${nextUrl}`;
-
-  return ret;
 }
 
 function getFinalWeight(value: number): number {

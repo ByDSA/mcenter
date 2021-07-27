@@ -12,6 +12,8 @@ export const ResourceSchemaObj = {
   },
   tags: {
     type: [String],
+    required: false,
+    default: undefined,
   },
   disabled: {
     type: Boolean,

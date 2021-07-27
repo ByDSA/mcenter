@@ -1,4 +1,4 @@
-import { checkSerie, createSerieFromPath, findAllSeries, findSerieByPath, findSerieByUrl, getFoldersInSerie, SerieInterface } from ".";
+import { checkSerie, createSerieFromPath, findAllSeries, findSerieByName, findSerieByPath, findSerieByUrl, getFoldersInSerie, SerieInterface } from ".";
 import { TestingApp1 } from "../../../../tests/TestingApps";
 import App from "../../../app";
 
@@ -12,6 +12,28 @@ describe("all tests", () => {
 
     afterAll(async () => {
       await app.kill();
+    } );
+
+    it("mock", async () => {
+      const expected = {
+        path: "serie 1",
+        name: "serie 1",
+        url: "serie-1",
+        episodes: [{
+          name: "1",
+          path: "0/1.mp4",
+          url: "0x01",
+          hash: "",
+        }, {
+          name: "1",
+          path: "1/1.mp4",
+          url: "1x01",
+          hash: "",
+        }],
+      };
+      const actual = await findSerieByUrl("serie-1");
+
+      checkSerie(actual, expected);
     } );
 
     describe("find", () => {
@@ -38,6 +60,19 @@ describe("all tests", () => {
 
         it("not found", async () => {
           const actual = await findSerieByPath("serie1");
+
+          expect(actual).toBeNull();
+        } );
+      } );
+      describe("ByName", () => {
+        it("found", async () => {
+          const actual = await findSerieByName("serie 1");
+
+          expect(actual).not.toBeNull();
+        } );
+
+        it("not found", async () => {
+          const actual = await findSerieByName("serie1");
 
           expect(actual).toBeNull();
         } );
@@ -95,7 +130,6 @@ describe("all tests", () => {
                 url: "1x01",
                 name: "1",
                 hash: "5e70b96ad27dc8581424be7069ee9de8da9388b716e6fe213d88385f19baf80a",
-                tags: [],
               },
             ],
           };

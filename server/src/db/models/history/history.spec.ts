@@ -1,4 +1,4 @@
-import { checkHistory, findHistoryInUserByName, HistoryInterface } from ".";
+import { checkHistory, findHistoryByNameAndUsername, HistoryInterface } from ".";
 import { TestingApp1 } from "../../../../tests/TestingApps";
 import App from "../../../app";
 import { findUserByName } from "../user";
@@ -14,13 +14,12 @@ describe("no change db", () => {
     await app.kill();
   } );
   it("findByName", async () => {
-    const { history: actual } = await findHistoryInUserByName( {
+    const { history: actual } = await findHistoryByNameAndUsername( {
       username: "user1",
       name: "music",
     } );
     const expected: HistoryInterface = {
       name: "music",
-      typeResource: "Music",
       content: [],
     };
 
@@ -43,7 +42,6 @@ describe("change db", () => {
     const name = "historyTest";
     const expected: HistoryInterface = {
       name,
-      typeResource: "Music",
       content: [],
     };
     let actualUser = await findUserByName(username);
@@ -68,7 +66,7 @@ describe("change db", () => {
     const name = "music";
 
     async function getUpdatedAt() {
-      const { history, user } = await findHistoryInUserByName( {
+      const { history, user } = await findHistoryByNameAndUsername( {
         username,
         name,
       } );

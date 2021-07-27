@@ -1,13 +1,13 @@
 import { Express } from "express";
 import { findOrCreateAndSaveFromYoutube } from "../../db/models/music/create";
-import { ROUTE_CREATE_YT, ROUTE_FIX_ALL, ROUTE_FIX_ONE, ROUTE_GET_ALL, ROUTE_GET_RANDOM, ROUTE_RAW } from "./config";
+import { ROUTE_CREATE_YT, ROUTE_FIX_ALL, ROUTE_FIX_ONE, ROUTE_GET, ROUTE_GET_ALL, ROUTE_GET_RANDOM } from "./config";
 import { fixAll, fixOne } from "./fix";
+import get from "./get";
 import getAll from "./get-all";
 import getRandom from "./get-random";
-import rawAccess from "./raw";
 
 export default function routes(app: Express) {
-  app.get(`${ROUTE_RAW}/:name`, rawAccess);
+  app.get(`${ROUTE_GET}/:url`, get);
 
   app.get(`${ROUTE_FIX_ALL}`, fixAll);
   app.get(`${ROUTE_FIX_ONE}`, fixOne);

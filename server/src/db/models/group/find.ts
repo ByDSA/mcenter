@@ -5,14 +5,6 @@ import Model from "./model";
 const generatedFunctions = generateCommonFindFunctions<Doc, typeof Model>( {
   model: Model,
 } );
-const { findByUrl,
-  findAll,
-  findByName,
-  findByPath } = generatedFunctions;
 
-export {
-  findByUrl,
-  findAll,
-  findByPath,
-  findByName,
-};
+export const { findByUrl,
+  findAll } = generatedFunctions;

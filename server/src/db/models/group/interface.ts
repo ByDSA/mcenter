@@ -1,24 +1,28 @@
 /* eslint-disable semi */
-import { Resource } from "../resource";
+import { ObjectId } from "mongoose";
+import { ResourceInterface, TypeResource } from "../resource";
 
-export type ResourceType = "Group" | "Music" | "Video";
+export type ItemGroup = {
+  type: TypeResource;
+  id: ObjectId;
+  url?: string;
+  weight: number;
+};
+type FixedContentGroup = ItemGroup[];
 
-export type FixedContentGroup = {
-  type: ResourceType;
-  id: string;
-  url: string;
-}[];
-
-export type QueryContentGroup = {
+type QueryContentGroup = {
   query: string;
   groupId: string;
 };
 
-export type ContentType = "Fixed"|"Query";
+export type ContentType = "fixed" | "query";
 
-export type Content = FixedContentGroup|QueryContentGroup;
+export type Content = FixedContentGroup | QueryContentGroup;
 
-export default interface Interface extends Resource {
+export type Visibility = "hidden" | "private" | "public";
+
+export default interface Interface extends ResourceInterface {
   type: ContentType;
-    content: Content;
+  content: Content;
+  visibility: Visibility;
 }

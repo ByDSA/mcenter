@@ -4,6 +4,7 @@ import { connect, disconnect } from "../db/database";
 import { loadEnv } from "../env";
 import apiMusicRoutes from "../routes/music";
 import { PORT } from "../routes/routes.config";
+import apiSerieRoutes from "../routes/series";
 
 type OnKillFunc = ()=> void;
 type OnRunFunc = ()=> void;
@@ -55,6 +56,7 @@ export default class App {
       this.expressApp.disable("x-powered-by");
 
       apiMusicRoutes(this.expressApp);
+      apiSerieRoutes(this.expressApp);
 
       this.server = this.expressApp.listen(PORT, () => {
         // console.log(`Example app listening at http://localhost:${port}`);

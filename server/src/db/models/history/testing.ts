@@ -8,9 +8,7 @@ export function check(actual: Interface | null | undefined, expected: Interface)
   expect(actual?.name).toBe(expected.name);
   expect(actual?.typeResource).toBe(expected.typeResource);
 
-  if (actual?.content) {
-    const actualArray = Array.from(actual?.content);
+  const actualContentArray = actual?.content ? Array.from(actual?.content) : undefined;
 
-    expect(actualArray.sort()).toStrictEqual(expected.content?.sort());
-  }
+  expect(actualContentArray).toStrictEqual(expected.content);
 }
