@@ -1,6 +1,6 @@
-import { API } from "../routes.config";
+import config from "@app/config";
 
-export const USER = `${API}/user`;
+export const USER = `${config.routes.api}/user`;
 
 export const GET = `${USER}/get/:username`;
 

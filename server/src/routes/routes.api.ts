@@ -1,6 +1,6 @@
 import { Express, Request, Response } from "express";
 import fs from "fs";
-import { backup } from "../backup/backupStuff";
+import { backup } from "../actions/backup/backupStuff";
 
 export default function apiRoutes(app: Express) {
   app.get("/", (req: Request, res: Response) => {

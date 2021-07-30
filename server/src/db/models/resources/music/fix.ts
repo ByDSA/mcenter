@@ -1,6 +1,6 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-restricted-syntax */
-import { loadEnv } from "@app/env";
+import { loadEnv } from "@actions/utils/env";
 import fs from "fs";
 import { createFromPath } from "./create";
 import Doc from "./document";

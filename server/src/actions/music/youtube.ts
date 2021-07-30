@@ -1,5 +1,5 @@
+import { loadEnv } from "@actions/utils/env";
 import YoutubeMp3Downloader from "youtube-mp3-downloader";
-import { loadEnv } from "../env";
 
 loadEnv();
 

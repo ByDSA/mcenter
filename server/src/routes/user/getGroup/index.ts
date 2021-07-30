@@ -1,4 +1,4 @@
-import Mode from "@app/GroupPicker/mode";
+import Mode from "@app/actions/GroupPicker/mode";
 import { Request, Response } from "express";
 import get from "./get";
 import pickFunc from "./pick";

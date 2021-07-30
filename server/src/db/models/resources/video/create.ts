@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { calcHashFromFile, getTitleFromFilename, getValidUrl } from "@app/files";
+import { calcHashFromFile, getTitleFromFilename, getValidUrl } from "@actions/utils/files";
 import NodeID3 from "node-id3";
 import path from "path";
 import Doc from "./document";

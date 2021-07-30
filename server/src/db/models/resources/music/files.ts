@@ -1,4 +1,4 @@
-import { loadEnv } from "@app/env";
+import { loadEnv } from "@actions/utils/env";
 import { generateCommonFilesFunctions } from "../genFuncs";
 
 export const AUDIO_EXTENSIONS = ["mp3", "flac", "wma"];

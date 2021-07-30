@@ -1,4 +1,4 @@
-import { loadEnv } from "@app/env";
+import { loadEnv } from "@actions/utils/env";
 import fs from "fs";
 import { generateCommonFilesFunctions } from "../genFuncs";
 import { VIDEO_EXTENSIONS } from "../video/files";

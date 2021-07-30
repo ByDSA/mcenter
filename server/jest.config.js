@@ -19,6 +19,7 @@ module.exports = {
     "^@app/(.*)$": "<rootDir>/src/$1",
     "^@db/(.*)$": "<rootDir>/src/db/$1",
     "^@routes/(.*)$": "<rootDir>/src/routes/$1",
+    "^@actions/(.*)$": "<rootDir>/src/actions/$1",
     "^@models/(.*)$": "<rootDir>/src/db/models/$1",
     "^@tests/(.*)$": "<rootDir>/tests/$1",
   },

@@ -1,4 +1,4 @@
-import { loadEnv } from "@app/env";
+import { loadEnv } from "@actions/utils/env";
 import mongoose from "mongoose";
 
 loadEnv();
@@ -37,20 +37,16 @@ function generateUrl() {
   return ret;
 }
 
-async function connect() {
+export async function connect() {
   await mongoose.connect(dbConnectionURL, options);
 }
 
-async function disconnect() {
+export async function disconnect() {
   await mongoose.disconnect();
 }
 
-async function connection(f: ()=> void) {
+export async function connection(f: ()=> void) {
   connect();
   await f();
   disconnect();
 }
-
-export {
-  mongoose, connect, disconnect, connection,
-};

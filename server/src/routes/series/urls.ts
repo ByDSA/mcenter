@@ -1,6 +1,6 @@
-import { API } from "../routes.config";
+import config from "@app/config";
 
-export const SERIE = `${API}/serie`;
+export const SERIE = `${config.routes.api}/serie`;
 
 export const SERIE_PLAY = `${SERIE}/play`;
 

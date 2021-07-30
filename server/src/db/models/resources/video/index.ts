@@ -1,4 +1,4 @@
-import { MediaElement } from "@app/m3u/MediaElement";
+import { MediaElement } from "@app/actions/m3u/MediaElement";
 import dotenv from "dotenv";
 import { createFromPath } from "./create";
 import { deleteAll } from "./delete";

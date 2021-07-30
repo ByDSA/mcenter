@@ -1,6 +1,6 @@
-import { calcHashFromFile, getValidUrl } from "@app/files";
-import { getTitleFromFilename } from "@app/files/misc";
-import { download } from "@app/music/youtube";
+import { calcHashFromFile, getValidUrl } from "@actions/utils/files";
+import { getTitleFromFilename } from "@actions/utils/files/misc";
+import { download } from "@app/actions/music/youtube";
 import NodeID3 from "node-id3";
 import path from "path";
 import Doc from "./document";

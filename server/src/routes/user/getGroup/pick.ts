@@ -1,5 +1,5 @@
-import Mode from "@app/GroupPicker/mode";
-import pickNext from "../../../GroupPicker/pickNext";
+import Mode from "@app/actions/GroupPicker/mode";
+import pickNext from "../../../actions/GroupPicker/pickNext";
 import get from "./get";
 
 type Params = {username: string, group: string, mode: Mode};

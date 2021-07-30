@@ -1,11 +1,11 @@
 /* eslint-disable no-await-in-loop */
 import { Request, Response } from "express";
+import pickNext, { PickNextParams } from "../../actions/GroupPicker/pickNext";
+import PlayProcess from "../../actions/play/PlayProcess";
 import { ResourceInterface } from "../../db/models/resources/resource";
 import { findSerieByUrl } from "../../db/models/resources/serie";
 import { findResourceByTypeAndId } from "../../db/models/resources/types";
 import { VideoInterface } from "../../db/models/resources/video";
-import pickNext, { PickNextParams } from "../../GroupPicker/pickNext";
-import PlayProcess from "../../play/PlayProcess";
 
 export async function playEpisode(req: Request, res: Response) {
   const forceStr = req.query.force;

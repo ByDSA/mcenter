@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import { copyFile, makeDirIfNotExits } from "../Utils";
+import { copyFile, makeDirIfNotExits } from "../utils/Utils";
 import { Backup } from "./Backup";
 
 export default class Process {

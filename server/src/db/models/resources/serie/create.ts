@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import { calcHashFromFile } from "@app/files";
-import { getValidUrl, removeExtension } from "@app/files/misc";
+import { calcHashFromFile } from "@actions/utils/files";
+import { getValidUrl, removeExtension } from "@actions/utils/files/misc";
 import { Schema, Types } from "mongoose";
 import path from "path";
 import Doc from "./document";

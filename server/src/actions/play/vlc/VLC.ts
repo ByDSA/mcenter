@@ -1,5 +1,5 @@
 import { exec, execSync } from "child_process";
-import { isRunning } from "../../Utils";
+import { isRunning } from "../../utils/Utils";
 
 export enum VLCFlag {
     PLAY_AND_EXIT = "--play-and-exit",

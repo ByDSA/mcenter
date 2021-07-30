@@ -1,8 +1,8 @@
-import { connect, disconnect } from "@db/database";
+import { connect, disconnect } from "@db/index";
 import apiRoutes from "@routes/index";
 import express, { Express } from "express";
 import http from "http";
-import { loadEnv } from "../env";
+import { loadEnv } from "./actions/utils/env";
 
 type Settings = {
   port: number;
@@ -97,3 +97,7 @@ export default class App {
       setTimeout(() => this.connections.forEach((curr) => curr.destroy()), 5000);
     }
 }
+
+export {
+  loadEnv,
+};

@@ -1,5 +1,5 @@
-import { findResourceByTypeAndId } from "../../db/models/resources/types";
-import { dynamicLoadScriptFromEnvVar } from "../../DynamicLoad";
+import { dynamicLoadScriptFromEnvVar } from "@actions/utils/DynamicLoad";
+import { findResourceByTypeAndId } from "@models/resources/types";
 import { FuncParams } from "../Params";
 
 export default async function weightTag( { self, picker }: FuncParams): Promise<number> {

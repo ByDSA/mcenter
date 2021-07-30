@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
-import { getLastItemFromHistory } from "../../db/models/history";
-import { ItemGroup } from "../../db/models/resources/group/interface";
+import { getLastItemFromHistory } from "../../../db/models/history";
+import { ItemGroup } from "../../../db/models/resources/group/interface";
 import { FuncParams } from "../Params";
 
 type Obj = {

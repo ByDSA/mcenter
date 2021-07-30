@@ -1,5 +1,5 @@
-import { loadEnv } from "@app/env";
-import { connect, disconnect } from "./database";
+import { loadEnv } from "@actions/utils/env";
+import { connect, disconnect } from ".";
 
 describe("connect", () => {
   it("connection", async () => {

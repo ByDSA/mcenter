@@ -64,6 +64,7 @@
   "_moduleAliases": {
     "@db": "dist/src/db",
     "@models": "dist/src/db/models",
+    "@actions": "dist/src/actions",
     "@routes": "dist/src/routes",
     "@app": "dist/src"
   }

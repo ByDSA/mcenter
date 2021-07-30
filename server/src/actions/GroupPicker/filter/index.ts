@@ -1,9 +1,9 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable import/no-cycle */
 import { Picker } from "rand-picker";
-import { HistoryInterface } from "../../db/models/history";
-import { GroupInterface } from "../../db/models/resources/group";
-import { ItemGroup } from "../../db/models/resources/group/interface";
+import { HistoryInterface } from "../../../db/models/history";
+import { GroupInterface } from "../../../db/models/resources/group";
+import { ItemGroup } from "../../../db/models/resources/group/interface";
 import { FuncParams } from "../Params";
 import dependent from "./dependent";
 import preventRepeatInDays from "./minDaysFromLastTime";

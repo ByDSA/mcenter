@@ -1,7 +1,7 @@
 import { PORT } from "@app/routes/routes.config";
 import "module-alias/register";
+import mediaServer from "./src/actions/music/MediaServer";
 import App from "./src/app";
-import mediaServer from "./src/music/MediaServer";
 
 const settings = {
   port: +PORT,

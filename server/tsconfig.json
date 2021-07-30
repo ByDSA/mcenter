@@ -23,6 +23,7 @@
     "baseUrl": ".",
     "paths": {
       "@app/*": ["src/*"],
+      "@actions/*": ["src/actions/*"],
       "@routes/*": ["src/routes/*"],
       "@db/*": ["src/db/*"],
       "@models/*": ["src/db/models/*"],

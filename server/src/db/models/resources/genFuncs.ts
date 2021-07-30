@@ -1,4 +1,4 @@
-import { calcHashFromFile, findFiles as _findFiles, getRelativePath as _getRelativePath } from "@app/files";
+import { calcHashFromFile, findFiles as _findFiles, getRelativePath as _getRelativePath } from "@actions/utils/files";
 import { Document, Model } from "mongoose";
 import path from "path";
 

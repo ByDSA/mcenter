@@ -1,17 +1,17 @@
 /* eslint-disable import/no-cycle */
 import { DateTime } from "luxon";
-import { compress, deleteFolder, makeDir, makeDirIfNotExits, moveFile, pgDump } from "../Utils";
+import { compress, deleteFolder, makeDir, makeDirIfNotExits, moveFile, pgDump } from "../utils/Utils";
 import Process from "./Process";
 
 export type BackupProps = {
   tempFolder: string;
   outFolder: string;
-}
+};
 
 export type BackupPropsOptional = {
   tempFolder?: string;
   outFolder?: string;
-}
+};
 
 const defaultProps: BackupProps = {
   tempFolder: "./backupTmp",
@@ -22,19 +22,19 @@ export type FileInfo = {
   file: string;
   required: boolean;
   subFolder: string;
-}
+};
 
 type AddFileProps = {
   file: string;
   required?: boolean;
   subFolder?: string;
-}
+};
 
 type AddFilesProps = {
   files: string[];
   required?: boolean;
   subFolder?: string;
-}
+};
 
 type PGDBOptions = {
   host: string;

@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import App from "../src/app";
+import App from "@app/app";
 import { Mock } from "./mocks";
 
 export abstract class TestingApp extends App {

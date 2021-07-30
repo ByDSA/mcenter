@@ -1,7 +1,7 @@
 import { VideoInterface, videoToMediaElement } from "@models/resources/video";
 import { MediaElement } from "../m3u/MediaElement";
 import { QueuePlaylistManager } from "../m3u/QueuePlaylistManager";
-import { isRunning } from "../Utils";
+import { isRunning } from "../utils/Utils";
 import { closeVLC, openVLC } from "./vlc";
 
 const TMP_PATH = ".";
