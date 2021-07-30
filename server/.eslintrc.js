@@ -13,6 +13,10 @@ module.exports = {
   },
   plugins: ["import", "jest", "@typescript-eslint"],
   rules: {
+    "key-spacing": ["error", {
+      beforeColon: false,
+      afterColon: true,
+    }],
     "@typescript-eslint/sort-type-union-intersection-members": "error",
     "@typescript-eslint/type-annotation-spacing": ["error", {
       after: true,

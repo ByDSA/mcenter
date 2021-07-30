@@ -16,6 +16,4 @@ COPY . .
 # Exports
 EXPOSE 8080
 
-CMD ["npm","i"]
-
-CMD ["npm","start"]
+CMD npm i && npm start

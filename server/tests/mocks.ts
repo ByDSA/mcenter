@@ -4,11 +4,11 @@
 import { VideoTypeStr } from "@app/db/models/resources/types";
 import { strict as assert } from "assert";
 import { Schema } from "mongoose";
-import { deleteAllGroups, GroupInterface, GroupModel } from "../src/db/models/resources/group";
+import { deleteAllGroups, Group, GroupInterface, GroupModel } from "../src/db/models/resources/group";
 import { createMusicFromPath, deleteAllMusics, findMusicByUrl } from "../src/db/models/resources/music";
-import { createSerieFromPath, deleteAllSeries } from "../src/db/models/resources/serie";
+import { createSerieFromPath, deleteAllSeries, findSerieByUrl } from "../src/db/models/resources/serie";
 import { createVideoFromPath, deleteAllVideos, findVideoByUrl } from "../src/db/models/resources/video";
-import { deleteAllUsers, UserInterface, UserModel } from "../src/db/models/user";
+import { deleteAllUsers, User, UserInterface, UserModel } from "../src/db/models/user";
 
 export interface Mock {
   initialize(): Promise<any[]>;
@@ -74,8 +74,13 @@ export class UserMock1 implements Mock {
 
     const m1 = await findMusicByUrl("dk");
     const m1Id = m1?._id;
+    const s1 = await findSerieByUrl("serie-1");
+    const serieId: Schema.Types.ObjectId = s1?._id;
+    const s1Ep1Id: Schema.Types.ObjectId = s1?.episodes[0]._id;
 
     assert.notEqual(m1Id, null);
+    assert.notEqual(serieId, null);
+    assert.notEqual(s1Ep1Id, null);
     const g1 = new GroupModel( {
       visibility: "public",
       type: "fixed",
@@ -85,6 +90,20 @@ export class UserMock1 implements Mock {
         {
           type: "music",
           id: m1Id,
+        },
+      ],
+    } );
+    const groupSerie1 = new GroupModel( {
+      visibility: "public",
+      type: "fixed",
+      url: "serie#serie-1",
+      name: "serie 1",
+      content: [
+        {
+          type: {
+            serieId,
+          },
+          id: s1Ep1Id,
         },
       ],
     } );
@@ -99,7 +118,7 @@ export class UserMock1 implements Mock {
         },
       ],
       groups: [
-        g1,
+        g1, groupSerie1,
       ],
     },
     {
@@ -112,7 +131,7 @@ export class UserMock1 implements Mock {
       role: "Admin",
       pass: "pass",
     }];
-    const promises = [];
+    const promises: Promise<User>[] = [];
 
     for (const uObj of users)
       promises.push(new UserModel(uObj).save());
@@ -161,7 +180,7 @@ export class GroupMock1 implements Mock {
       ],
     },
     ];
-    const promises = [];
+    const promises: Promise<Group>[] = [];
 
     for (const obj of objs)
       promises.push(new GroupModel(obj).save());

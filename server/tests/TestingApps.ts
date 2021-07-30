@@ -12,6 +12,6 @@ export class TestingApp1 extends TestingApp {
     const serieMock = new SerieMock1();
     const groupMock = new GroupMock1();
 
-    return [musicMock, userMock, videoMock, serieMock, groupMock];
+    return [musicMock, videoMock, serieMock, groupMock, userMock];
   }
 }

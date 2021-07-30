@@ -1,4 +1,5 @@
 import { connect, disconnect } from "@db/index";
+// eslint-disable-next-line import/no-cycle
 import apiRoutes from "@routes/index";
 import express, { Express } from "express";
 import http from "http";
@@ -6,6 +7,7 @@ import { loadEnv } from "./actions/utils/env";
 
 type Settings = {
   port: number;
+  host: string;
 };
 type OnKillFunc = ()=> void;
 type OnRunFunc = ()=> void;
@@ -20,15 +22,28 @@ export default class App {
 
     private onRun: (OnRunFunc)[] = [];
 
-    private privatePort: number;
+    private portNum: number;
+
+    private hostStr: string;
 
     // eslint-disable-next-line accessor-pairs
     get port(): number {
-      return this.privatePort;
+      return this.portNum;
+    }
+
+    // eslint-disable-next-line accessor-pairs
+    get host(): string {
+      return this.hostStr;
+    }
+
+    // eslint-disable-next-line accessor-pairs
+    get baseUrl(): string {
+      return `http://${this.host}:${this.port}`;
     }
 
     constructor(settings: Settings) {
-      this.privatePort = settings.port;
+      this.portNum = settings.port;
+      this.hostStr = settings.host;
     }
 
     async run() {
@@ -67,9 +82,9 @@ export default class App {
 
       this.expressApp.disable("x-powered-by");
 
-      apiRoutes(this.expressApp);
+      apiRoutes(this);
 
-      this.server = this.expressApp.listen(this.privatePort, () => {
+      this.server = this.expressApp.listen(this.portNum, () => {
         // console.log(`Example app listening at http://localhost:${port}`);
       } );
     }

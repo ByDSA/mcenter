@@ -1,7 +1,7 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
+import { TestingApp1 } from "@tests/TestingApps";
 import request from "supertest";
-import { TestingApp1 } from "../../../tests/TestingApps";
-import { checkMusic, MusicInterface } from "../../db/models/resources/music";
+import { VideoObjType } from "../getObj";
 
 const app = new TestingApp1();
 
@@ -13,7 +13,7 @@ afterAll(async () => {
   await app.kill();
 } );
 
-const url = "/api/music/getAll";
+const url = "/api/video/getAll";
 
 it("ok", async () => {
   await request(app.expressApp)
@@ -21,15 +21,14 @@ it("ok", async () => {
     .expect(200);
 } );
 
-it("get all", async () => {
+it("correct data", async () => {
   const res = await request(app.expressApp)
     .get(url);
-  const expectedJson: MusicInterface[] = [
+  const expectedJson: VideoObjType[] = [
     {
-      hash: "eacf40b68de85b759524e3bd0bea1b4393360f682db3a7f3ec25ff46b1d01872",
-      path: "dk.mp3",
-      name: "dk",
-      url: "dk",
+      hash: "5e70b96ad27dc8581424be7069ee9de8da9388b716e6fe213d88385f19baf80a",
+      raw: `${app.baseUrl}/api/video/get/sample1?raw=1`,
+      url: `${app.baseUrl}/api/video/get/sample1`,
     }];
   const actualJson = JSON.parse(res.text);
 
@@ -39,6 +38,6 @@ it("get all", async () => {
     const actual = actualJson[i];
     const expected = expectedJson[i];
 
-    checkMusic(actual, expected);
+    expect(actual).toStrictEqual(expected);
   }
 } );

@@ -3,12 +3,12 @@ import { findUserByName, User } from "../user";
 import Interface, { HistoryItem } from "./interface";
 
 type Params = {username: string; name: string};
-type Ret = { history: Interface|null, user: User|null };
+type Ret = { history: Interface | null, user: User | null };
 export async function findByNameAndUsername(
   { username, name }: Params,
 ): Promise<Ret> {
   const user: User | null = await findUserByName(username);
-  let history = null;
+  let history: Interface | null = null;
 
   if (user) {
     history = getByNameAndUser( {

@@ -1,8 +1,5 @@
-/* eslint-disable no-continue */
-/* eslint-disable no-labels */
-/* eslint-disable no-restricted-syntax */
+import { fixAllMusics, fixOneMusic } from "@models/resources/music";
 import express from "express";
-import { fixAllMusics, fixOneMusic } from "../../db/models/resources/music";
 
 export async function fixAll(req: express.Request, res: express.Response) {
   const fixed = await fixAllMusics();
@@ -10,7 +7,6 @@ export async function fixAll(req: express.Request, res: express.Response) {
   res.send(fixed);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function fixOne(req: express.Request, res: express.Response) {
   const local = <string | undefined>req.query.local;
   const url = <string | undefined>req.query.url;

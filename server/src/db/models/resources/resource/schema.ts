@@ -7,14 +7,12 @@ export const ResourceSchemaObj = {
     required: true,
     unique: true,
   },
-  name: {
-    type: String,
-  },
   tags: {
     type: [String],
     default: undefined,
   },
   disabled: Boolean,
+  name: String,
 };
 
 export const LocalResourceFileSchemaObj = {

@@ -14,7 +14,7 @@ export async function createFromPath(relativePath: string): Promise<Doc | null> 
   if (!seasons || seasons.length === 0)
     return null;
 
-  const serieRelativePathsEpisodes = [];
+  const serieRelativePathsEpisodes: string[] = [];
 
   for (const season of seasons) {
     const relativePathSeason = path.join(relativePath, season);

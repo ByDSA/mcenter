@@ -1,10 +1,15 @@
 /* eslint-disable import/prefer-default-export */
+import App from "@app/app";
 import config from "@app/config";
 import { MusicInterface } from "@models/resources/music";
 import { getFullUrl as _getFullUrl } from "../multimedia/misc";
 
-export function getFullUrl(music: MusicInterface) {
-  return _getFullUrl(music, ROUTE_GET);
+type Params = {
+  music: MusicInterface;
+  app: App;
+};
+export function getFullUrl( { music, app }: Params) {
+  return _getFullUrl(music, ROUTE_GET, app);
 }
 
 export const MUSIC = `${config.routes.api}/music`;

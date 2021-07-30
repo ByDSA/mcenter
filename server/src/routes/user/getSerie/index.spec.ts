@@ -16,13 +16,13 @@ afterAll(async () => {
 describe("get", () => {
   it("not found", async () => {
     await request(app.expressApp)
-      .get("/api/user/get/user1/group/notfound")
+      .get("/api/user/get/user1/serie/notfound")
       .expect(404);
   } );
 
   it("found", async () => {
     await request(app.expressApp)
-      .get("/api/user/get/user1/group/group-1")
+      .get("/api/user/get/user1/serie/serie-1")
       .expect(200);
   } );
 } );
@@ -30,25 +30,25 @@ describe("get", () => {
 describe("pick", () => {
   it("not found", async () => {
     await request(app.expressApp)
-      .get("/api/user/get/user1/group/notfound?pick=1&mode=seq")
+      .get("/api/user/get/user1/serie/notfound?pick=1&mode=seq")
       .expect(404);
   } );
 
   it("no mode", async () => {
     await request(app.expressApp)
-      .get("/api/user/get/user1/group/group-1?pick=1")
+      .get("/api/user/get/user1/serie/serie-1?pick=1")
       .expect(400);
   } );
 
   it("mode rand", async () => {
     await request(app.expressApp)
-      .get("/api/user/get/user1/group/group-1?pick=1&mode=rand")
+      .get("/api/user/get/user1/serie/serie-1?pick=1&mode=rand")
       .expect(200);
   } );
 
   it("mode seq", async () => {
     await request(app.expressApp)
-      .get("/api/user/get/user1/group/group-1?pick=1&mode=seq")
+      .get("/api/user/get/user1/serie/serie-1?pick=1&mode=seq")
       .expect(200);
   } );
 } );

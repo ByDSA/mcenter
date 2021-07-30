@@ -1,10 +1,21 @@
-import { Express } from "express";
+import App from "@app/app";
 import getSerie from "./get";
+import getEpisodeApp, { getEpisodeObj } from "./getEpisode";
 import { playEpisode } from "./play";
-import { SERIE_GET, SERIE_PLAY } from "./urls";
+import { getFullUrlEpisode, SERIE_GET, SERIE_GET_EPISODE, SERIE_PLAY_EPISODE } from "./urls";
 
-export default function apiRoutes(app: Express) {
-  app.get(`${SERIE_PLAY}/:urlSerie/:urlEpisode`, playEpisode);
+export default function apiRoutes(app: App) {
+  const { expressApp } = app;
 
-  app.get(`${SERIE_GET}/:url`, getSerie);
+  if (!expressApp)
+    throw new Error();
+
+  expressApp.get(`${SERIE_PLAY_EPISODE}`, playEpisode);
+  expressApp.get(`${SERIE_GET_EPISODE}`, getEpisodeApp(app));
+  expressApp.get(`${SERIE_GET}/:url`, getSerie);
 }
+
+export {
+  getFullUrlEpisode,
+  getEpisodeObj,
+};

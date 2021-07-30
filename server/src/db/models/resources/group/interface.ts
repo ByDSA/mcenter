@@ -6,6 +6,7 @@ export type ItemGroup = {
   id: ObjectId;
   url?: string;
   weight?: number;
+  tags?: string[];
 };
 
 export type FixedContentGroup = ItemGroup[];

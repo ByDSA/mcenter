@@ -1,7 +1,7 @@
-import App from "@app/app";
+import App, { loadEnv } from "@app/app";
 import { TestingApp1 } from "@tests/TestingApps";
 import { Schema } from "mongoose";
-import { checkSerie, createSerieFromPath, findAllSeries, findSerieByName, findSerieByPath, findSerieByUrl, getFoldersInSerie, Serie, SerieInterface } from ".";
+import { checkSerie, createSerieFromPath, findAllSeries, findSerieByName, findSerieByPath, findSerieByUrl, getEpisodeByUrl, getEpisodeFullPath, getFoldersInSerie, getFullPathSerie, Serie, SerieInterface } from ".";
 
 describe("all tests", () => {
   describe("no modify db", () => {
@@ -37,6 +37,43 @@ describe("all tests", () => {
       };
 
       checkSerie(actual, expected);
+    } );
+
+    it("getFullPathSerie", async () => {
+      loadEnv();
+      const expected = `${process.env.SERIES_PATH}/serie 1`;
+      const serie = await findSerieByUrl("serie-1");
+
+      if (!serie)
+        throw new Error();
+
+      const actual = getFullPathSerie(serie.path);
+
+      expect(actual).toBe(expected);
+    } );
+
+    it("getFullPathEpisode", async () => {
+      loadEnv();
+      const expected = `${process.env.SERIES_PATH}/serie 1/0/1.mp4`;
+      const serie = await findSerieByUrl("serie-1");
+
+      if (!serie)
+        throw new Error();
+
+      const episode = getEpisodeByUrl( {
+        serie,
+        url: "0x01",
+      } );
+
+      if (!episode)
+        throw new Error();
+
+      const actual = getEpisodeFullPath( {
+        episode,
+        serie,
+      } );
+
+      expect(actual).toBe(expected);
     } );
 
     describe("find", () => {

@@ -1,7 +1,7 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
+import { checkSerie, SerieInterface } from "@models/resources/serie";
+import { TestingApp1 } from "@tests/TestingApps";
 import request from "supertest";
-import { TestingApp1 } from "../../../tests/TestingApps";
-import { checkSerie, SerieInterface } from "../../db/models/resources/serie";
 
 const app = new TestingApp1();
 

@@ -1,6 +1,6 @@
 import { deleteAll } from "./delete";
 import User from "./document";
-import { findByName, getGroupById, getGroupByName, getGroupByUrl } from "./find";
+import { findByName, getGroupById, getGroupByName, getGroupByUrl, getSerieByUrl } from "./find";
 import Interface from "./interface";
 import UserModel from "./model";
 import { compareHash, hash } from "./password";
@@ -16,4 +16,5 @@ export {
   getGroupById as getGroupInUserById,
   getGroupByName as getGroupInUserByName,
   getGroupByUrl as getGroupInUserByUrl,
+  getSerieByUrl as getSerieInUserByUrl,
 };

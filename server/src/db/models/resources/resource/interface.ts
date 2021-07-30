@@ -3,9 +3,9 @@ import { TimestampInterface } from "@models/timestamp";
 export interface ResourceInterface extends TimestampInterface {
   _id?: any;
   url: string;
-  name: string;
   tags?: string[];
   disabled?: boolean;
+  name?: string;
 }
 
 export interface LocalResourceInterface extends ResourceInterface {

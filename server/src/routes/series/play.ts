@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import { Request, Response } from "express";
 import pickNext, { PickNextParams } from "../../actions/GroupPicker/pickNext";
-import PlayProcess from "../../actions/play/PlayProcess";
+import PlayProcess from "../../client/play/PlayProcess";
 import { ResourceInterface } from "../../db/models/resources/resource";
 import { findSerieByUrl } from "../../db/models/resources/serie";
 import { findResourceByTypeAndId } from "../../db/models/resources/types";
@@ -37,7 +37,7 @@ export async function pickAndAddHistory(
   groupPicker: PickNextParams,
   n: number,
 ): Promise<ResourceInterface[]> {
-  const episodes = [];
+  const episodes: ResourceInterface[] = [];
 
   for (let i = 0; i < n; i++) {
     const item = await pickNext(groupPicker);

@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
+import { dynamicExecScript } from "@actions/utils/DynamicLoad";
 import dotenv from "dotenv";
-import { dynamicExecScript } from "../DynamicLoad";
 import { Backup, BackupPropsOptional } from "./Backup";
 
 export async function backup() {

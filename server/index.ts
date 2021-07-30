@@ -1,13 +1,16 @@
-import { PORT } from "@app/routes/routes.config";
 import "module-alias/register";
-import mediaServer from "./src/actions/music/MediaServer";
-import App from "./src/app";
+import App, { loadEnv } from "./src/app";
+
+loadEnv();
 
 const settings = {
-  port: +PORT,
+  port: +(process.env.PORT ?? 8081),
+  host: process.env.HOST ?? "localhost",
 };
 const app = new App(settings);
 
-app.run();
+app.run().then(() => {
+  console.info(`Multimedia Center Server started on port: ${app.port}`);
+} );
 
-mediaServer.run();
+// mediaServer.run();

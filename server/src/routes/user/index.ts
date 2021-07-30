@@ -1,10 +1,16 @@
-import { Express } from "express";
+import App from "@app/app";
 import get from "./get";
-import getGroup from "./getGroup";
-import { GET, GET_GROUP } from "./urls";
+import getGroupApp from "./getGroup";
+import getSerie from "./getSerie";
+import { GET, GET_GROUP, GET_SERIE } from "./urls";
 
-export default function routes(app: Express) {
-  app.get(`${GET}`, get);
+export default function routes(app: App) {
+  const { expressApp } = app;
 
-  app.get(`${GET_GROUP}`, getGroup);
+  if (!expressApp)
+    throw new Error();
+
+  expressApp.get(`${GET}`, get);
+  expressApp.get(`${GET_GROUP}`, getGroupApp(app));
+  expressApp.get(`${GET_SERIE}`, getSerie);
 }

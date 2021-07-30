@@ -1,4 +1,4 @@
-import { VLC, VLCFlag } from "./vlc/VLC";
+import VLC, { VLCFlag } from "./vlc/VLC";
 
 export async function closeVLC() {
   await VLC.closeAll();

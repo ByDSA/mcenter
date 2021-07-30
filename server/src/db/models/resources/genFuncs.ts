@@ -1,5 +1,5 @@
 import { calcHashFromFile, findFiles as _findFiles, getRelativePath as _getRelativePath } from "@actions/utils/files";
-import { Document, Model } from "mongoose";
+import { Document, Model, Schema } from "mongoose";
 import path from "path";
 
 export type Config = {
@@ -139,7 +139,14 @@ export function generateCommonFindFunctions<D extends Document, M extends Model<
     return ret;
   }
 
+  async function findById(id: Schema.Types.ObjectId | string): Promise<D | null> {
+    const ret = await model.findById(id.toString());
+
+    return ret;
+  }
+
   return {
+    findById,
     findByHash,
     findByUrl,
     findByPath,

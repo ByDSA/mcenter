@@ -1,4 +1,4 @@
-import { MediaElement, render } from "./MediaElement";
+import MediaElement, { render } from "./MediaElement";
 
 it("render", () => {
   const element: MediaElement = {

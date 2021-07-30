@@ -11,7 +11,7 @@ export type FindOptions = {
   fileHash?: string;
   onlyFile?: boolean;
   onlyFirst?: boolean;
-}
+};
 
 export function findFiles(options?: FindOptions) {
   const opts = initializeFindByHashOptions(options);
@@ -124,7 +124,7 @@ function findByHashRecursive(hash: string, folder: string): string[] {
 }
 
 function matchHashInGroupOfFiles(hash: string, files: string[]): string[] {
-  const ret = [];
+  const ret: string[] = [];
 
   for (const f of files) {
     if (calcHashFromFile(f) === hash)
@@ -137,7 +137,7 @@ function matchHashInGroupOfFiles(hash: string, files: string[]): string[] {
 export type HashFile = {
   hash: string;
   path: string;
-}
+};
 
 export function fixHashFile<T extends HashFile>(
   obj: T,

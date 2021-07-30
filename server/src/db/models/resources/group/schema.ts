@@ -9,7 +9,7 @@ const ContentItemSchemaObj = {
   url: String,
   weight: Number,
   type: {
-    type: String,
+    type: Schema.Types.Mixed,
     required: true,
   },
 };

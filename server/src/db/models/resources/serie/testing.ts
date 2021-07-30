@@ -17,6 +17,10 @@ export function check(actual: Doc | null, expected: Interface) {
 
     // eslint-disable-next-line no-underscore-dangle
     expect(actualEpisode._id).toBe(expectedEpisode._id);
-    checkResource(actualEpisode, expectedEpisode);
+    checkEpisode(actualEpisode, expectedEpisode);
   }
+}
+
+export function checkEpisode(actual: Episode | null, expected: Episode) {
+  return checkResource(actual, expected);
 }

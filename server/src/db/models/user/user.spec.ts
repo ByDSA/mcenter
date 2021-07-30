@@ -154,7 +154,7 @@ describe("all tests", () => {
 
     it("getGroupByName", async () => {
       const actual = await getGroupInUserByName( {
-        name: expected.name,
+        name: <string>expected.name,
         user,
       } );
 

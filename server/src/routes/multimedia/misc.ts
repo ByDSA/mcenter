@@ -1,11 +1,9 @@
+import App from "@app/app";
 import { ResourceInterface } from "../../db/models/resources/resource/interface";
-import { HOST, PORT } from "../routes.config";
 
 /* eslint-disable import/prefer-default-export */
-export function getFullUrl(resource: ResourceInterface, middleUrl: string) {
-  const SERVER = `http://${HOST}:${PORT}`;
-
-  return `${SERVER}/${middleUrl}/${resource.url}`;
+export function getFullUrl(resource: ResourceInterface, middleUrl: string, app: App) {
+  return `${app.baseUrl}${middleUrl}/${resource.url}`;
 }
 
 type Params<R extends ResourceInterface> = {

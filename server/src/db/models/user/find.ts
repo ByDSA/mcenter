@@ -19,7 +19,7 @@ export function getGroupById( { id, user }: Params) {
   if (!groups)
     return null;
 
-  return groups.find((g) => g._id === id) ?? null;
+  return groups.find((g) => g._id.toString() === id.toString()) ?? null;
 }
 
 type Params2 = {name: string, user: Interface};
@@ -40,4 +40,19 @@ export function getGroupByUrl( { url, user }: Params3) {
     return null;
 
   return groups.find((g) => g.url === url) ?? null;
+}
+
+export function getSerieByUrl( { url, user }: Params3) {
+  const { groups } = user;
+
+  if (!groups)
+    return null;
+
+  const fullUrl = getSerieGroupUrl(url);
+
+  return groups.find((g) => g.url === fullUrl) ?? null;
+}
+
+export function getSerieGroupUrl(serieName: string) {
+  return `serie#${serieName}`;
 }

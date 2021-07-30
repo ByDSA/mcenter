@@ -1,10 +1,10 @@
-import { MediaElement } from "@app/actions/m3u/MediaElement";
+import MediaElement from "@app/actions/m3u/MediaElement";
 import dotenv from "dotenv";
 import { createFromPath } from "./create";
 import { deleteAll } from "./delete";
 import Document from "./document";
 import { calcHashFile, findFiles, findFilesAt, getFullPath } from "./files";
-import { findByHash, findByPath, findByUrl } from "./find";
+import { findAll, findByHash, findByPath, findByUrl } from "./find";
 import Interface from "./interface";
 import Model from "./model";
 import Schema from "./schema";
@@ -27,6 +27,7 @@ export {
   Model as VideoModel,
   Interface as VideoInterface,
   Schema as VideoSchema,
+  findAll as findAllVideos,
   findByUrl as findVideoByUrl,
   findByPath as findVideoByPath,
   findByHash as findVideoByHash,

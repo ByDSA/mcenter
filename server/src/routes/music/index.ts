@@ -1,22 +1,32 @@
+import App from "@app/app";
 import { findOrCreateAndSaveFromYoutube } from "@models/resources/music/create";
-import { Express } from "express";
 import { fixAll, fixOne } from "./fix";
-import get from "./get";
-import getAll from "./get-all";
-import { ROUTE_CREATE_YT, ROUTE_FIX_ALL, ROUTE_FIX_ONE, ROUTE_GET, ROUTE_GET_ALL } from "./urls";
+import getApp from "./get";
+import getAllApp from "./getAll";
+import getObj from "./getObj";
+import { getFullUrl, ROUTE_CREATE_YT, ROUTE_FIX_ALL, ROUTE_FIX_ONE, ROUTE_GET, ROUTE_GET_ALL } from "./urls";
 
-export default function routes(app: Express) {
-  app.get(`${ROUTE_GET}/:url`, get);
+export default function routes(app: App) {
+  const { expressApp } = app;
 
-  app.get(`${ROUTE_FIX_ALL}`, fixAll);
-  app.get(`${ROUTE_FIX_ONE}`, fixOne);
+  if (!expressApp)
+    throw new Error();
 
-  app.get(`${ROUTE_GET_ALL}`, getAll);
+  expressApp.get(`${ROUTE_GET}/:url`, getApp(app));
+  expressApp.get(`${ROUTE_GET_ALL}`, getAllApp(app));
 
-  app.get(`${ROUTE_CREATE_YT}/:id`, async (req, res) => {
+  expressApp.get(`${ROUTE_FIX_ALL}`, fixAll);
+  expressApp.get(`${ROUTE_FIX_ONE}`, fixOne);
+
+  expressApp.get(`${ROUTE_CREATE_YT}/:id`, async (req, res) => {
     const { id } = req.params;
     const data = await findOrCreateAndSaveFromYoutube(id);
 
     res.send(data);
   } );
 }
+
+export {
+  getFullUrl as getFullUrlMusic,
+  getObj as getMusicObj,
+};

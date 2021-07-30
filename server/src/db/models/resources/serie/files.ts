@@ -2,6 +2,7 @@ import { loadEnv } from "@actions/utils/env";
 import fs from "fs";
 import { generateCommonFilesFunctions } from "../genFuncs";
 import { VIDEO_EXTENSIONS } from "../video/files";
+import Interface, { Episode } from "./interface";
 
 const basePath = <string>process.env.SERIES_PATH;
 
@@ -35,4 +36,15 @@ export function getFoldersIn(relativePath: string) {
   } catch (err) {
     return null;
   }
+}
+
+type Params = {
+  serie: Interface;
+  episode: Episode;
+};
+export function getEpisodeFullPath( { episode, serie }: Params) {
+  const relativeEpisodePath = episode.path;
+  const relativeSeriePath = serie.path;
+
+  return `${getFullPath(relativeSeriePath)}/${relativeEpisodePath}`;
 }

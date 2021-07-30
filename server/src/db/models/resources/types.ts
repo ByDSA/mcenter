@@ -16,11 +16,16 @@ export type TypeVideo = typeof VideoTypeStr;
 
 export type TypeGroup = {username?: string};
 
-export type TypeSerie = {serieId: Schema.Types.ObjectId};
+export type TypeEpisode = {
+  serieId: Schema.Types.ObjectId
+};
 
-export type ResourceType = TypeGroup | TypeMusic | TypeSerie | TypeVideo;
+export type ResourceType = TypeEpisode | TypeGroup | TypeMusic | TypeVideo;
 
-type Params = {type: ResourceType, id: Schema.Types.ObjectId};
+type Params = {
+  type: ResourceType,
+  id: Schema.Types.ObjectId
+};
 
 export async function findResourceByTypeAndId(
   { type, id }: Params,

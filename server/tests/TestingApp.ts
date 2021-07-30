@@ -7,7 +7,8 @@ export abstract class TestingApp extends App {
 
   constructor() {
     super( {
-      port: 8081 + Math.floor(Math.random() * 1000),
+      port: 8081 + Math.floor(Math.random() * 10000),
+      host: "localhost",
     } );
   }
 
@@ -20,7 +21,7 @@ export abstract class TestingApp extends App {
   }
 
   private clearMocks() {
-    const promises = [];
+    const promises: Promise<void>[] = [];
 
     for (const m of this.mocks)
       promises.push(m.clear());
