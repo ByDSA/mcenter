@@ -1,8 +1,10 @@
-import { VideoInterface } from "../db/models/video";
+import { VideoInterface, videoToMediaElement } from "@models/resources/video";
 import { MediaElement } from "../m3u/MediaElement";
 import { QueuePlaylistManager } from "../m3u/QueuePlaylistManager";
 import { isRunning } from "../Utils";
 import { closeVLC, openVLC } from "./vlc";
+
+const TMP_PATH = ".";
 
 export default class PlayProcess {
   private queue: QueuePlaylistManager;
@@ -12,7 +14,7 @@ export default class PlayProcess {
   }
 
   async closeIfNeeded() {
-    if (this.openNewInstance || await isRunning("vlc") && this.queue.nextNumber === 0)
+    if (this.openNewInstance || (await isRunning("vlc") && this.queue.nextNumber === 0))
       await closeVLC();
   }
 
@@ -26,13 +28,13 @@ export default class PlayProcess {
   }
 
   async do() {
-    console.log(`Play function: ${this.episodes[0].id}`);
+    console.log(`Play function: ${this.episodes[0].url}`);
 
     await this.closeIfNeeded();
 
     await this.openIfNeeded();
 
-    const elements: MediaElement[] = this.episodes.map(episodeToMediaElement);
+    const elements: MediaElement[] = this.episodes.map(videoToMediaElement);
 
     this.queue.add(...elements);
 

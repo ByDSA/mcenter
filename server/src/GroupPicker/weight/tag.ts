@@ -1,10 +1,10 @@
-import { findResourceFromItem } from "../../db/models/resource";
+import { findResourceByTypeAndId } from "../../db/models/resources/types";
 import { dynamicLoadScriptFromEnvVar } from "../../DynamicLoad";
-import { Params } from "../GroupPicker";
+import { FuncParams } from "../Params";
 
-export default async function weightTag( { self, picker }: Params): Promise<number> {
+export default async function weightTag( { self, picker }: FuncParams): Promise<number> {
   let weight = picker.getWeight(self) ?? 1;
-  const resource = await findResourceFromItem( {
+  const resource = await findResourceByTypeAndId( {
     type: self.type,
     id: self.id,
   } );

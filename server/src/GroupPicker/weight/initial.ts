@@ -1,11 +1,11 @@
-import { getDaysFrom } from "../filter";
-import { Params } from "../GroupPicker";
+import { getDaysFrom } from "../date";
+import { FuncParams } from "../Params";
 
 // eslint-disable-next-line require-await
-export default async function weightInitial( { self, history }: Params): Promise<number> {
-  const daysFromLastTime = getDaysFrom(self, history);
+export default async function weightInitial( { self, history }: FuncParams): Promise<number> {
+  const daysFromLastTime = history ? getDaysFrom(self, history) : 1;
   let reinforcementFactor = 1;
-  const { weight } = self;
+  const weight = self.weight ?? 0;
 
   if (weight < -1)
     reinforcementFactor = 1.0 / (-weight);

@@ -1,6 +1,6 @@
+import { TimestampSchemaObj } from "@models/timestamp";
+import { addRefreshUpdateAtOnSave } from "@models/timestamp/schema";
 import { Schema } from "mongoose";
-import { TimestampSchemaObj } from "../timestamp";
-import { addRefreshUpdateAtOnSave } from "../timestamp/schema";
 
 export const ContentItemSchemaObj = {
   idResource: String,

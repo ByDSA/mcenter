@@ -2,7 +2,7 @@
 /* eslint-disable no-labels */
 /* eslint-disable no-restricted-syntax */
 import express from "express";
-import { fixAllMusics, fixOneMusic } from "../../db/models/music";
+import { fixAllMusics, fixOneMusic } from "../../db/models/resources/music";
 
 export async function fixAll(req: express.Request, res: express.Response) {
   const fixed = await fixAllMusics();

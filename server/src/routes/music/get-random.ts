@@ -1,11 +1,11 @@
-import express from "express";
+import { Request, Response } from "express";
 import { newPicker } from "rand-picker";
-import { Music, MusicInterface } from "../../db/models/music";
+import { Music, MusicInterface } from "../../db/models/resources/music";
 import { generateLinkedPlaylist } from "../multimedia/misc";
 import { findAllMusicsAndFilter } from "./get-all";
 import { getFullUrl } from "./urls";
 
-export default async function getRandom(req: express.Request, res: express.Response) {
+export default async function getRandom(req: Request, res: Response) {
   const musics = await findAllMusicsAndFilter(req);
   const resource = randomPick(musics);
   const { url } = req;
@@ -25,7 +25,7 @@ function randomPick(musics: Music[]): Music {
   } );
 
   for (const m of musics) {
-    const initialWeight = m.weight || 0;
+    const initialWeight = 0;
     let finalWeight = getFinalWeight(initialWeight);
 
     if (initialWeight <= -99)

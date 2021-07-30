@@ -1,6 +1,6 @@
+import App from "@app/app";
+import { TestingApp1 } from "@tests/TestingApps";
 import { checkHistory, findHistoryByNameAndUsername, HistoryInterface } from ".";
-import { TestingApp1 } from "../../../../tests/TestingApps";
-import App from "../../../app";
 import { findUserByName } from "../user";
 
 describe("no change db", () => {

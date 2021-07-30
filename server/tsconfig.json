@@ -19,21 +19,25 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/*"],
+      "@routes/*": ["src/routes/*"],
+      "@db/*": ["src/db/*"],
+      "@models/*": ["src/db/models/*"],
+      "@tests/*": ["tests/*"],
+    }
   },
   "include": [
     "src/**/*.ts", "tests/*.ts",
   ],
   "files": [
-    "server.ts"
+    "index.ts"
   ],
   "exclude": [
     "dist",
-    "node_modules",
-    "**/*.spec.ts"
-  ],
-  "filesGlob": [
-    "src/**/*.ts"
+    "node_modules"
   ],
   "types": [
     "node"

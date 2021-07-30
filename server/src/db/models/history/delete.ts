@@ -9,7 +9,7 @@ export async function deleteAllInUser(username: string) {
 
   user.histories = [];
 
-  user.save();
+  await user.save();
 
   return user;
 }

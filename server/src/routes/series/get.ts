@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { findSerieByUrl, Serie } from "../../db/models/serie";
+import { findSerieByUrl, Serie } from "../../db/models/resources/serie";
 
 export default async function get(req: Request, res: Response) {
   const { url } = req.params;

@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { findUserByName, User } from "../user";
-import Interface from "./interface";
+import Interface, { HistoryItem } from "./interface";
 
 type Params = {username: string; name: string};
 type Ret = { history: Interface|null, user: User|null };
@@ -33,4 +33,11 @@ export function getByNameAndUser(
   const [history] = user.histories.filter((h) => h.name === name);
 
   return history;
+}
+
+export function getLastItem(history: Interface) {
+  const content = <HistoryItem[]>history.content;
+  const lastItem = content[content.length - 1];
+
+  return lastItem;
 }

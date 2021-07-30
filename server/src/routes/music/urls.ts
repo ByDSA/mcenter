@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { MusicInterface } from "../../db/models/music";
+import { MusicInterface } from "@models/resources/music";
 import { getFullUrl as _getFullUrl } from "../multimedia/misc";
 import { ROUTE_GET } from "./config";
 

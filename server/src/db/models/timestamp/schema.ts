@@ -1,6 +1,5 @@
-import { Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 
-// eslint-disable-next-line import/prefer-default-export
 export const SchemaObj = {
   updatedAt: {
     type: Number,
@@ -12,13 +11,9 @@ export const SchemaObj = {
     required: true,
     default: Date.now,
   },
-  deletedAt: {
-    type: Number,
-    required: false,
-  },
 };
 
-export function addRefreshUpdateAtOnSave(schema: Schema): void {
+export function addRefreshUpdateAtOnSave<D extends Document>(schema: Schema<D>): void {
   schema.pre("save", function f(next) {
     const user: any = <any> this;
 

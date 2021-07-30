@@ -1,11 +1,14 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable class-methods-use-this */
+import { VideoTypeStr } from "@app/db/models/resources/types";
+import { strict as assert } from "assert";
 import { Schema } from "mongoose";
-import { deleteAllGroups, GroupInterface, GroupModel } from "../src/db/models/group";
-import { createMusicFromPath, deleteAllMusics } from "../src/db/models/music";
-import { createSerieFromPath, deleteAllSeries } from "../src/db/models/serie";
+import { deleteAllGroups, GroupInterface, GroupModel } from "../src/db/models/resources/group";
+import { createMusicFromPath, deleteAllMusics, findMusicByUrl } from "../src/db/models/resources/music";
+import { createSerieFromPath, deleteAllSeries } from "../src/db/models/resources/serie";
+import { createVideoFromPath, deleteAllVideos, findVideoByUrl } from "../src/db/models/resources/video";
 import { deleteAllUsers, UserInterface, UserModel } from "../src/db/models/user";
-import { createVideoFromPath, deleteAllVideos, VideoModel } from "../src/db/models/video";
 
 export interface Mock {
   initialize(): Promise<any[]>;
@@ -16,15 +19,11 @@ export class MusicMock1 implements Mock {
   async initialize() {
     await this.clear();
 
-    return Promise.all([
-      createMusicFromPath("dk.mp3")
-        .then((u) => {
-          if (u)
-            return u.save();
+    const m1 = await createMusicFromPath("dk.mp3");
 
-          return null;
-        } ),
-    ]);
+    m1?.save();
+
+    return [m1];
   }
 
   async clear() {
@@ -36,15 +35,13 @@ export class VideoMock1 implements Mock {
   async initialize() {
     await this.clear();
 
-    return Promise.all([
-      createVideoFromPath("sample1.mp4")
-        .then((u) => {
-          if (u)
-            return u.save();
+    return [createVideoFromPath("sample1.mp4")
+      .then((u) => {
+        if (u)
+          return u.save();
 
-          return null;
-        } ),
-    ]);
+        return null;
+      } )];
   }
 
   async clear() {
@@ -56,15 +53,14 @@ export class SerieMock1 implements Mock {
   async initialize() {
     await this.clear();
 
-    return Promise.all([
-      createSerieFromPath("serie 1")
-        .then((u) => {
-          if (u)
-            return u.save();
+    const serie1 = await createSerieFromPath("serie 1");
 
-          return null;
-        } ),
-    ]);
+    assert.notEqual(serie1, null);
+
+    if (serie1)
+      serie1.save();
+
+    return [serie1];
   }
 
   async clear() {
@@ -76,6 +72,22 @@ export class UserMock1 implements Mock {
   async initialize() {
     await this.clear();
 
+    const m1 = await findMusicByUrl("dk");
+    const m1Id = m1?._id;
+
+    assert.notEqual(m1Id, null);
+    const g1 = new GroupModel( {
+      visibility: "public",
+      type: "fixed",
+      url: "group-1",
+      name: "group 1",
+      content: [
+        {
+          type: "music",
+          id: m1Id,
+        },
+      ],
+    } );
     const users: UserInterface[] = [{
       name: "user1",
       role: "User",
@@ -83,9 +95,11 @@ export class UserMock1 implements Mock {
       histories: [
         {
           name: "music",
-          typeResource: "Music",
           content: [],
         },
+      ],
+      groups: [
+        g1,
       ],
     },
     {
@@ -115,11 +129,11 @@ export class GroupMock1 implements Mock {
   async initialize() {
     await this.clear();
 
-    const video1 = new VideoModel( {
+    const v1 = await findVideoByUrl("sample1");
+    const m1 = await findMusicByUrl("dk");
 
-    } );
-
-    video1.save();
+    assert.notEqual(v1, null);
+    assert.notEqual(m1, null);
 
     const objs: GroupInterface[] = [{
       name: "group 1",
@@ -128,8 +142,21 @@ export class GroupMock1 implements Mock {
       visibility: "public",
       content: [
         {
-          id: new Schema.Types.ObjectId(video1.id),
-          type: "video",
+          id: <Schema.Types.ObjectId>v1?._id,
+          type: VideoTypeStr,
+          weight: 0,
+        },
+      ],
+    },
+    {
+      name: "group 2",
+      url: "group-2",
+      type: "fixed",
+      visibility: "public",
+      content: [
+        {
+          id: <Schema.Types.ObjectId>m1?._id,
+          type: "music",
         },
       ],
     },

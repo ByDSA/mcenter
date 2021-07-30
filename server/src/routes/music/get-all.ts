@@ -1,7 +1,7 @@
-import express from "express";
-import { findAllMusics, Music } from "../../db/models/music";
+import { Request, Response } from "express";
+import { findAllMusics, Music } from "../../db/models/resources/music";
 
-export default async function getAll(req: express.Request, res: express.Response) {
+export default async function getAll(req: Request, res: Response) {
   const musics = await findAllMusicsAndFilter(req);
 
   // const ret = generateView(musics);
@@ -9,23 +9,9 @@ export default async function getAll(req: express.Request, res: express.Response
   res.send(musics);
 }
 
-export async function findAllMusicsAndFilter(req: express.Request): Promise<Music[]> {
+export async function findAllMusicsAndFilter(req: Request): Promise<Music[]> {
   let musics = await findAllMusics();
   const tagsQuery = <string | undefined>req.query.tags;
-  const minWeightQuery = <string | undefined>req.query.minWeight;
-  const maxWeightQuery = <string | undefined>req.query.maxWeight;
-
-  if (minWeightQuery !== undefined) {
-    const minWeight = parseInt(minWeightQuery, 10);
-
-    musics = musics.filter((m) => (m.weight || 0) >= minWeight);
-  }
-
-  if (maxWeightQuery !== undefined) {
-    const maxWeight = parseInt(maxWeightQuery, 10);
-
-    musics = musics.filter((m) => (m.weight || 0) <= maxWeight);
-  }
 
   if (tagsQuery)
     musics = musics.filter((m) => m.tags?.includes(tagsQuery));

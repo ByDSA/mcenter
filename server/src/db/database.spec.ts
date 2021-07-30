@@ -1,4 +1,4 @@
-import { loadEnv } from "../env";
+import { loadEnv } from "@app/env";
 import { connect, disconnect } from "./database";
 
 describe("connect", () => {

@@ -1,4 +1,4 @@
-import { ResourceInterface } from "../../db/models/resource/interface";
+import { ResourceInterface } from "../../db/models/resources/resource/interface";
 import { HOST, PORT } from "../routes.config";
 
 /* eslint-disable import/prefer-default-export */

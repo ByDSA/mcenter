@@ -1,6 +1,6 @@
-import { GroupInterface } from "../group";
-import { HistoryInterface } from "../history";
-import { TimestampInterface } from "../timestamp";
+import { HistoryInterface } from "@models/history";
+import { GroupInterface } from "@models/resources/group";
+import { TimestampInterface } from "@models/timestamp";
 
 export type Role = "Admin" | "Guest" | "User";
 

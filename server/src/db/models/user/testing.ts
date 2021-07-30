@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { checkTimestamp } from "../timestamp";
+import { checkTimestamp } from "@models/timestamp";
 import Doc from "./document";
 import Interface from "./interface";
 

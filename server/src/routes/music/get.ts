@@ -1,7 +1,7 @@
-import express from "express";
-import { findMusicByUrl, getMusicFullPath } from "../../db/models/music";
+import { findMusicByUrl, getMusicFullPath } from "@models/resources/music";
+import { Request, Response } from "express";
 
-export default async function get(req: express.Request, res: express.Response) {
+export default async function get(req: Request, res: Response) {
   const { url } = req.params;
   const music = await findMusicByUrl(url);
 
@@ -16,6 +16,6 @@ export default async function get(req: express.Request, res: express.Response) {
 
   res.download(fullpath, (error) => {
     if (error)
-      res.sendStatus(404);
+      res.sendStatus(500);
   } );
 }

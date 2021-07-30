@@ -1,9 +1,10 @@
 /* eslint-disable no-await-in-loop */
 import { Request, Response } from "express";
-import { findResourceFromItem, ResourceInterface } from "../../db/models/resource";
-import { findSerieByUrl } from "../../db/models/serie";
-import { VideoInterface } from "../../db/models/video";
-import pickNext, { GroupPicker } from "../../GroupPicker/GroupPicker";
+import { ResourceInterface } from "../../db/models/resources/resource";
+import { findSerieByUrl } from "../../db/models/resources/serie";
+import { findResourceByTypeAndId } from "../../db/models/resources/types";
+import { VideoInterface } from "../../db/models/resources/video";
+import pickNext, { PickNextParams } from "../../GroupPicker/pickNext";
 import PlayProcess from "../../play/PlayProcess";
 
 export async function playEpisode(req: Request, res: Response) {
@@ -33,14 +34,14 @@ export async function play(episodes: VideoInterface[], openNewInstance: boolean)
 }
 
 export async function pickAndAddHistory(
-  groupPicker: GroupPicker,
+  groupPicker: PickNextParams,
   n: number,
 ): Promise<ResourceInterface[]> {
   const episodes = [];
 
   for (let i = 0; i < n; i++) {
     const item = await pickNext(groupPicker);
-    const episode = await findResourceFromItem(item);
+    const episode = await findResourceByTypeAndId(item);
 
     if (episode) {
       // TODO: add to history

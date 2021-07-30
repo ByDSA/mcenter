@@ -1,5 +1,5 @@
+import { loadEnv } from "@app/env";
 import mongoose from "mongoose";
-import { loadEnv } from "../env";
 
 loadEnv();
 

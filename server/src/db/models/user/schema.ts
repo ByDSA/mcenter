@@ -1,9 +1,9 @@
 /* eslint-disable no-underscore-dangle */
+import { HistoryInterface, HistorySchemaObj } from "@models/history";
+import { GroupSchemaObj } from "@models/resources/group/schema";
+import { TimestampSchemaObj } from "@models/timestamp";
+import { addRefreshUpdateAtOnSave } from "@models/timestamp/schema";
 import { Schema } from "mongoose";
-import { GroupSchema } from "../group";
-import { HistoryInterface, HistorySchemaObj } from "../history";
-import { TimestampSchemaObj } from "../timestamp";
-import { addRefreshUpdateAtOnSave } from "../timestamp/schema";
 import Doc from "./document";
 import { compareHash, hash } from "./password";
 
@@ -38,7 +38,7 @@ export const SchemaObj = {
     type: String,
   },
   groups: {
-    type: [GroupSchema],
+    type: [GroupSchemaObj],
     required: false,
   },
   histories: {
@@ -123,8 +123,8 @@ function deepEqual(object1: any, object2: any) {
     const areObjects = isObject(val1) && isObject(val2);
 
     if (
-      areObjects && !deepEqual(val1, val2)
-      || !areObjects && val1 !== val2
+      (areObjects && !deepEqual(val1, val2))
+      || (!areObjects && val1 !== val2)
     )
       return false;
   }

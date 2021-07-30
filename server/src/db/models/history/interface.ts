@@ -1,10 +1,10 @@
+import { ResourceType } from "@models/resources/resource";
+import { TimestampInterface } from "@models/timestamp";
 import { Schema } from "mongoose";
-import { TypeResource } from "../resource";
-import { TimestampInterface } from "../timestamp";
 
 export type HistoryItem = {
     idResource: Schema.Types.ObjectId;
-    typeResource: TypeResource;
+    typeResource: ResourceType;
     date: number;
 };
 

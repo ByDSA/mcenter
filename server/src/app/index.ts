@@ -1,11 +1,12 @@
+import { connect, disconnect } from "@db/database";
+import apiRoutes from "@routes/index";
 import express, { Express } from "express";
 import http from "http";
-import { connect, disconnect } from "../db/database";
 import { loadEnv } from "../env";
-import apiMusicRoutes from "../routes/music";
-import { PORT } from "../routes/routes.config";
-import apiSerieRoutes from "../routes/series";
 
+type Settings = {
+  port: number;
+};
 type OnKillFunc = ()=> void;
 type OnRunFunc = ()=> void;
 export default class App {
@@ -18,6 +19,17 @@ export default class App {
     private onKill: (OnKillFunc)[] = [];
 
     private onRun: (OnRunFunc)[] = [];
+
+    private privatePort: number;
+
+    // eslint-disable-next-line accessor-pairs
+    get port(): number {
+      return this.privatePort;
+    }
+
+    constructor(settings: Settings) {
+      this.privatePort = settings.port;
+    }
 
     async run() {
       loadEnv();
@@ -55,10 +67,9 @@ export default class App {
 
       this.expressApp.disable("x-powered-by");
 
-      apiMusicRoutes(this.expressApp);
-      apiSerieRoutes(this.expressApp);
+      apiRoutes(this.expressApp);
 
-      this.server = this.expressApp.listen(PORT, () => {
+      this.server = this.expressApp.listen(this.privatePort, () => {
         // console.log(`Example app listening at http://localhost:${port}`);
       } );
     }

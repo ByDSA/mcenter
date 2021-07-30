@@ -1,7 +1,7 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
+import App from "@app/app";
+import { TestingApp1 } from "@tests/TestingApps";
 import request from "supertest";
-import { TestingApp1 } from "../../../tests/TestingApps";
-import App from "../../app";
 
 const app: App = new TestingApp1();
 
@@ -14,6 +14,6 @@ afterAll(async () => {
 } );
 it("getRandom", async () => {
   await request(app.expressApp)
-    .get("/api/music/get/random")
+    .get("/api/music/getRandom")
     .expect(200);
 } );

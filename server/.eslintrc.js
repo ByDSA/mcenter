@@ -54,6 +54,9 @@ module.exports = {
         ignoreChainWithDepth: 2,
       },
     ],
+    "no-underscore-dangle": ["error", {
+      allow: ["_id"],
+    }],
     indent: [
       "error",
       2,

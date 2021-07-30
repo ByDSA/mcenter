@@ -10,10 +10,16 @@ module.exports = {
   },
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
-  transformIgnorePatterns: ["<rootDir>/node_modules/?!(@datune)"],
   globals: {
     "ts-jest": {
       isolatedModules: false,
     },
+  },
+  moduleNameMapper: {
+    "^@app/(.*)$": "<rootDir>/src/$1",
+    "^@db/(.*)$": "<rootDir>/src/db/$1",
+    "^@routes/(.*)$": "<rootDir>/src/routes/$1",
+    "^@models/(.*)$": "<rootDir>/src/db/models/$1",
+    "^@tests/(.*)$": "<rootDir>/tests/$1",
   },
 };
