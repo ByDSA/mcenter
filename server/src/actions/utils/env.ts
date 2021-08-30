@@ -13,7 +13,7 @@ export function loadEnv() {
   let envPath;
 
   if (isTesting()) {
-    envPath = "files/.env.test";
+    envPath = "files/testing/test.env";
 
     if (!fs.existsSync(envPath))
       throw new Error(`${envPath} file not found`);
