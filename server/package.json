@@ -9,11 +9,11 @@
     "test:actions": "jest --runInBand --watchAll --testPathPattern=src/actions",
     "test:db": "jest --runInBand --watchAll --testPathPattern=src/db",
     "test:routes": "jest --runInBand --watchAll --testPathPattern=src/routes",
-    "start": "([ ! -d dist ] && npm run build || true) && node dist/index.js",
+    "start": "./start.sh",
     "dev": "nodemon --watch '**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' index.ts",
     "prebuild": "npm run clean",
     "build": "tsc",
-    "postbuild": "ln -s ../.env dist/.env",
+    "postbuild": "ln -s ../files dist/files",
     "clean": "rm -rf dist"
   },
   "author": "Daniel Sales Álvarez",

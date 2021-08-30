@@ -47,6 +47,8 @@ export default class App {
     }
 
     async run() {
+      process.chdir('files');
+
       loadEnv();
 
       await connect();
