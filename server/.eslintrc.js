@@ -5,53 +5,29 @@ module.exports = {
     node: true,
     "jest/globals": true,
   },
-  extends: ["airbnb-base"],
+  globals: {
+    "NodeJS": true,
+    "React": true,
+  },
+  extends: ["airbnb-base", "prettier"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["import", "jest", "@typescript-eslint"],
+  plugins: ["@typescript-eslint", "import", "jest", "prettier"],
   rules: {
-    "@typescript-eslint/sort-type-union-intersection-members": "error",
-    "@typescript-eslint/type-annotation-spacing": ["error", {
-      after: true,
-      before: false,
+    "no-invalid-this": ["error", {
+      "capIsConstructor": false,
     }],
-    "@typescript-eslint/space-infix-ops": ["error", {
-      int32Hint: false,
+    "import/no-extraneous-dependencies": ["error", {
+      "devDependencies": true,
     }],
-    "import/extensions": [
-      "error",
-      "ignorePackages",
-      {
-        js: "never",
-        jsx: "never",
-        ts: "never",
-        tsx: "never",
-      },
-    ],
-    curly: ["error", "multi-or-nest"],
-    eqeqeq: "error",
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["error"],
-    "no-shadow": "off",
-    "@typescript-eslint/no-shadow": ["error"],
-    "no-plusplus": ["off"],
-    "import/no-cycle": [
+    "no-useless-constructor": "off",
+    "no-empty-function": [
       "error",
       {
-        maxDepth: 1,
-      },
-    ],
-    "no-multiple-empty-lines": ["error", {
-      max: 1,
-      maxEOF: 0,
-    }],
-    "newline-per-chained-call": [
-      "error",
-      {
-        ignoreChainWithDepth: 2,
+        allow: ["constructors"],
       },
     ],
     indent: [
@@ -59,6 +35,51 @@ module.exports = {
       2,
       {
         SwitchCase: 1,
+      },
+    ],
+    "@typescript-eslint/sort-type-union-intersection-members": "error",
+    "@typescript-eslint/type-annotation-spacing": [
+      "error",
+      {
+        after: true,
+        before: false,
+      },
+    ],
+    "@typescript-eslint/space-infix-ops": [
+      "error",
+      {
+        int32Hint: false,
+      },
+    ],
+    curly: ["error", "multi-or-nest"],
+    eqeqeq: "error",
+    semi: "off",
+    "@typescript-eslint/semi": ["error", "always"],
+    "@typescript-eslint/member-delimiter-style": ["error"],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": ["error"],
+    "no-plusplus": ["off"],
+    "import/no-unresolved": "off",
+    "import/extensions": "off",
+    "import/no-cycle": [
+      "error",
+      {
+        maxDepth: 1,
+      },
+    ],
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        max: 1,
+        maxEOF: 0,
+      },
+    ],
+    "newline-per-chained-call": [
+      "error",
+      {
+        ignoreChainWithDepth: 2,
       },
     ],
     "object-curly-newline": [
@@ -117,13 +138,14 @@ module.exports = {
     "newline-before-return": "error",
     "nonblock-statement-body-position": ["error", "below"],
     "padded-blocks": ["error", "never"],
-
-    "no-use-before-define": ["error", {
-      functions: false,
-      classes: false,
-      variables: false,
-    }],
-
+    "no-use-before-define": [
+      "error",
+      {
+        functions: false,
+        classes: false,
+        variables: false,
+      },
+    ],
     "max-statements-per-line": [
       "error",
       {
@@ -131,9 +153,13 @@ module.exports = {
       },
     ],
     camelcase: "error",
-    "space-in-parens": ["error", "never", {
-      exceptions: ["{}"],
-    }],
+    "space-in-parens": [
+      "error",
+      "never",
+      {
+        exceptions: ["{}"],
+      },
+    ],
     "no-var": "error",
     "dot-location": ["error", "property"],
     "prefer-destructuring": "error",
@@ -144,22 +170,34 @@ module.exports = {
     "no-multi-spaces": "error",
     "rest-spread-spacing": ["error", "never"],
     "default-case-last": "error",
-    "accessor-pairs": ["error", {
-      getWithoutSet: true,
-    }],
+    "accessor-pairs": [
+      "error",
+      {
+        getWithoutSet: true,
+      },
+    ],
+    "no-underscore-dangle": [
+      "error",
+      {
+        allowAfterThis: true,
+      },
+    ],
     "no-restricted-syntax": [
       "error",
       {
         selector: "ForInStatement",
-        message: "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array.",
+        message:
+          "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array.",
       },
       {
         selector: "LabeledStatement",
-        message: "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.",
+        message:
+          "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.",
       },
       {
         selector: "WithStatement",
-        message: "`with` is disallowed in strict mode because it makes code impossible to predict and optimize.",
+        message:
+          "`with` is disallowed in strict mode because it makes code impossible to predict and optimize.",
       },
     ],
     "no-cond-assign": ["error", "always"],
@@ -176,6 +214,7 @@ module.exports = {
         before: true,
       },
     ],
+    "linebreak-style": ["error", "windows"],
   },
   settings: {
     "import/no-cycle": false,
