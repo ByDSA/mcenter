@@ -61,13 +61,14 @@ function preventRepeatLast( { self, lastEp }: Params) {
 
 type Obj = {
   [key: string]: [string, string][];
-}
+};
 
 function dependent( { self, lastEp, serie }: Params) {
   let ret = true;
   const obj: Obj = {
     simpsons: [
-      ["6x23", "6x24"],
+      ["6x25", "7x01"],
+	        ["31x19", "31x20"],
     ],
     fguy: [
       ["6x04", "6x05"],
@@ -118,7 +119,7 @@ export function getDaysFrom(self: Episode, history: History[]): number {
   const now = DateTime.now();
 
   for (const h of history) {
-    if (h.episodeId === self.id) {
+    if (self && h.episodeId === self.id) {
       let date;
 
       if (h.date.timestamp)

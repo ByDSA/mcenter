@@ -42,25 +42,23 @@ export default async function fixWeight(
 async function weightCalculator( { self, stream }: Params): Promise<number> {
   const daysFromLastTime = getDaysFrom(self, stream.history);
   let reinforcementFactor = 1;
-  const { weight } = self;
+  const weight = self && self.weight ? self.weight : 0;
 
   if (weight < -1)
     reinforcementFactor = 1.0 / (-weight);
   else if (weight > 1)
     reinforcementFactor = weight;
-  else
-    reinforcementFactor = 1;
 
-  return reinforcementFactor ** 1.2 * daysFromLastTime;
+  return reinforcementFactor * daysFromLastTime;
 }
 
-async function weightTag( { self }: Params): Promise<number> {
-  let { weight } = self;
+async function weightTag( { self, picker }: Params): Promise<number> {
+  let weight = picker.getWeight(self) ?? 0;
 
-  if (!self.tags)
+  if (self && !self.tags)
     return weight;
 
-  const { tags } = self;
+  const tags = self?.tags || [];
   const calendarFunc = await dynamicLoadScriptFromEnvVar("CALENDAR_FILE");
   const calendar = calendarFunc();
   const tagFuncPromise = dynamicLoadScriptFromEnvVar("TAG_FILE");
