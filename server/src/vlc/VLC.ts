@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable require-await */
 import { exec, execSync } from "child_process";
 import { isRunning } from "../Utils";
 
@@ -13,36 +15,39 @@ export enum VLCFlag {
 }
 
 export class VLC {
-    private process: any | undefined;
-    private flags: string[] = [];
+  private process: any | undefined;
 
-    async open(file: string) {
-        const args = this.flags.join(" ");
-        console.log("Open VLC: " + args);
-        this.process = exec(`"vlc" ${file} ${args}`);
-    }
+  private flags: string[] = [];
 
-    config(...flags: string[]) {
-        this.flags = flags;
-    }
+  async open(file: string) {
+    const args = this.flags.join(" ");
 
-    async close() {
-        // TODO
-    }
+    console.log(`Open VLC: ${ args}`);
+    this.process = exec(`"vlc" ${file} ${args}`);
+  }
 
-    static async closeAll() {
-        while (await isRunning("vlc")) {
-            try {
-                console.log("Closing VLC...");
-                execSync("killall vlc");
-            } catch (e) {
-                console.log("Error closing VLC");
-                break;
-            }
-        }
-    }
+  config(...flags: string[]) {
+    this.flags = flags;
+  }
 
-    on(name: string, f: (code: number) => void) {
-        this.process.on(name, f);
+  // eslint-disable-next-line class-methods-use-this
+  async close() {
+    // TODO
+  }
+
+  static async closeAll() {
+    while (await isRunning("vlc")) {
+      try {
+        console.log("Closing VLC...");
+        execSync("killall vlc");
+      } catch (e) {
+        console.log("Error closing VLC");
+        break;
+      }
     }
+  }
+
+  on(name: string, f: (code: number)=> void) {
+    this.process.on(name, f);
+  }
 }

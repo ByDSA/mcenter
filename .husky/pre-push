@@ -1,0 +1,40 @@
+#!/bin/bash
+set -e
+
+. "$(dirname -- "$0")/_/husky.sh"
+
+fatal_error() {
+  message=${1:-"Error fatal"}
+  echo "\033[1;31mERROR: $message\033[0m"
+  exit 1
+}
+
+guard_current_branch() {
+  local current_branch=$(git rev-parse --abbrev-ref HEAD)
+  echo "Rama actual: $current_branch"
+  case $current_branch in
+  "main" | "pre")
+    fatal_error "No se puede subir diréctamente a la rama $current_branch."
+    ;;
+  esac
+}
+
+guard_current_branch
+
+last_release_commit=$(git log --pretty=format:"%h%x09%s" | grep chore\(release\): | head -1 | awk '{print $1;}')
+
+echo "Último commit de release: $last_release_commit"
+echo "\nCommits nuevos desde el último release:"
+git log $last_release_commit..HEAD --pretty=format:"%s"
+echo "\n"
+
+filter="^(fix|feat)(\((.*)\))?:|BREAKING CHANGE:|^(.*)!:"
+bumping_messages=$(git log $last_release_commit..HEAD --pretty=format:"%s" | grep -E "$filter" | xargs)
+# Nota: la obtencion de mensajes commit está copy pasteada porque no se ha conseguido mantener el formato multilínea al pasarlo a una variable
+
+if [ ! -z "$bumping_messages" ]; then
+  echo "\nCommits nuevos a considerar para el bumping:"
+  git log $last_release_commit..HEAD --pretty=format:"%s" | grep -E "$filter"
+
+  yarn release
+fi

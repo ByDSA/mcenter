@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+changed_files=$(git diff --cached --name-only HEAD --diff-filter=d)
+eslint_files=$(echo "$changed_files" | grep -E "*.(js|ts|jsx|tsx)$" | xargs)
+prettier_files=$(echo "$changed_files" | grep -E "*.(json|jsonc|scss|yml)$" | xargs)
+
+if [ ! -z "$eslint_files" ]; then
+  npx eslint --fix $eslint_files
+  git add $eslint_files
+fi
+if [ ! -z "$prettier_files" ]; then
+  npx prettier --write $prettier_files
+  git add $prettier_files
+fi

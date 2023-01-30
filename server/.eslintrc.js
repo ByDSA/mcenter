@@ -214,7 +214,7 @@ module.exports = {
         before: true,
       },
     ],
-    "linebreak-style": ["error", "windows"],
+    "linebreak-style": ["error", "unix"],
   },
   settings: {
     "import/no-cycle": false,

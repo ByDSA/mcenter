@@ -93,8 +93,8 @@ async function getNextEpisodeRandom(
 }
 
 export type Params = {
-    picker: Picker<Episode>,
-    self: Episode, serie:
-    Serie,
-    lastEp: Episode | null, stream: Stream
+    picker: Picker<Episode>;
+    self: Episode;
+    serie: Serie;
+    lastEp: Episode | null; stream: Stream;
 };

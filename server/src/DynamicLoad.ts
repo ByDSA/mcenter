@@ -4,7 +4,7 @@ export type DynamicLoadProps = {
   file: string;
   sample?: string;
   args?: any[];
-}
+};
 
 export async function dynamicExecScript(
   { file, args = [], sample }: DynamicLoadProps,
