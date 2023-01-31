@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+. "$(dirname -- "$0")/guard_current_branch.sh"
+
 changed_files=$(git diff --cached --name-only HEAD --diff-filter=d)
 eslint_files=$(echo "$changed_files" | grep -E "(.*).(js|ts|jsx|tsx)$" | xargs)
 prettier_files=$(echo "$changed_files" | grep -E "(.*).(json|jsonc|scss|yml)$" | xargs)

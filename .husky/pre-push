@@ -3,22 +3,4 @@ set -e
 
 . "$(dirname -- "$0")/_/husky.sh"
 
-fatal_error() {
-  message=${1:-"Error fatal"}
-  printf "\033[1;31mERROR: %s\033[0m" "$message"
-  exit 1
-}
-
-guard_current_branch() {
-  local current_branch
-  current_branch=$(git rev-parse --abbrev-ref HEAD)
-  echo "Rama actual: $current_branch"
-
-  local match='^((fix)|(feat))(\((.+)\))?\/(.+)$'
-
-  if ! [[ "$current_branch" =~ $match ]]; then
-    echo "No se puede subir diréctamente a la rama $current_branch."
-  fi
-}
-
-guard_current_branch
+. "$(dirname -- "$0")/guard_current_branch.sh"
