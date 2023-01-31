@@ -5,7 +5,7 @@ set -e
 
 fatal_error() {
   message=${1:-"Error fatal"}
-  printf "\033[1;31mERROR: %s\033[0m" "$message"
+  echo "ERROR: $message"
   exit 1
 }
 
