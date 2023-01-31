@@ -1,0 +1,60 @@
+name: Bumping
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Bumping
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Extraer nombre de la rama actual
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: current_branch
+      - name: "Checkout"
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.current_branch.outputs.branch }}
+      # Build steps
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      - name: Node Install
+        run: npm i
+      # Proceso Bumping
+      - name: Proceso de bumping
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "<>"
+
+          commit_release_title="chore\(release\):"
+          last_release_commit=$(git log --pretty=format:"%h%x09%s" | grep "$commit_release_title" | head -1 | awk '{print $1;}')
+
+          [[ -z $last_release_commit ]] && first_release=1 || first_release=0
+
+          if [ $first_release -eq 1 ]; then
+            echo "No se ha encontrado ningún commit de release. Se considera que es la primera release."
+            npm run release -- --first-release
+          else
+            echo "Último commit de release: $last_release_commit"
+            echo "\nCommits nuevos desde el último release:"
+            git log $last_release_commit..HEAD --pretty=format:"%s"
+            echo "\n"
+
+            filter="^(fix|feat)(\((.*)\))?:|BREAKING CHANGE:|^(.*)!:"
+            bumping_messages=$(git log $last_release_commit..HEAD --pretty=format:"%s" | grep -E "$filter" | xargs)
+            # Nota: la obtencion de mensajes commit está copy pasteada porque no se ha conseguido mantener el formato multilínea al pasarlo a una variable
+
+            if [ -n "$bumping_messages" ]; then
+              echo "\nCommits nuevos a considerar para el bumping:"
+              git log $last_release_commit..HEAD --pretty=format:"%s" | grep -E "$filter"
+
+              npm run release
+            fi
+          fi
+
+          git push --no-verify --follow-tags origin ${{ steps.current_branch.outputs.branch }}
