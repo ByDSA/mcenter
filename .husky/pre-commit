@@ -8,10 +8,10 @@ eslint_files=$(echo "$changed_files" | grep -E "(.*).(js|ts|jsx|tsx)$" | xargs)
 prettier_files=$(echo "$changed_files" | grep -E "(.*).(json|jsonc|scss|yml)$" | xargs)
 
 if [ -n "$eslint_files" ]; then
-  npx eslint --fix "$eslint_files"
-  git add "$eslint_files"
+  npx eslint --fix $eslint_files
+  git add $eslint_files
 fi
 if [ -n "$prettier_files" ]; then
-  npx prettier --write "$prettier_files"
-  git add "$prettier_files"
+  npx prettier --write $prettier_files
+  git add $prettier_files
 fi
