@@ -4,8 +4,8 @@
   "description": "",
   "main": "build/server.js",
   "scripts": {
-    "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/server.js",
-    "start:watch": "NODE_ENV=development nodemon -r esm server.ts",
+    "start": "NODE_ENV=production node -r ts-node/register/transpile-only -r tsconfig-paths/register build/server.js",
+    "start:watch": "NODE_ENV=development nodemon",
     "prebuild": "npm run clean:build",
     "build": "npm run build:raw",
     "build:raw": "tsc -p tsconfig-build.json",
