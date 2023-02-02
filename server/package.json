@@ -4,19 +4,18 @@
   "description": "",
   "main": "build/server.js",
   "scripts": {
-    "start": "node build/server.js",
+    "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/server.js",
     "start:watch": "NODE_ENV=development nodemon -r esm server.ts",
-    "prebuild": "npm run clean",
+    "prebuild": "npm run clean:build",
     "build": "npm run build:raw",
     "build:raw": "tsc -p tsconfig-build.json",
     "postbuild": "ln -s ../.env build/.env",
-    "clean": "rm -rf build",
+    "clean:build": "rm -rf build",
+    "clean:modules": "rm -rf node_modules",
     "test": "NODE_ENV=test jest --maxWorkers=1",
     "test:watch": "yarn test -- --watch",
     "test:coverage": "yarn test -- --coverage"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "axios": "0.21.1",
     "date-ops": "2.1.0",
