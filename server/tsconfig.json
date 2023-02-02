@@ -15,11 +15,16 @@
     "target": "es2015",
     "noImplicitAny": true,
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2018", "dom"]
+    "lib": ["es2018", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "#tests/*": ["tests/*"],
+      "#tests": ["tests"],
+      "#utils": ["src/utils"]
+    }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "files": ["server.ts"],
   "exclude": ["node_modules"],
-  "types": ["node"],
-  "typeRoots": ["../node_modules/@types"]
+  "types": ["node"]
 }

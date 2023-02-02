@@ -35,14 +35,15 @@
     "prettier": "2.8.3",
     "sonarqube-scanner": "2.8.2",
     "standard-version": "9.5.0",
-    "ts-jest": "29.0.5"
+    "ts-jest": "29.0.5",
+    "tsconfig-paths": "4.1.2"
   },
   "scripts": {
     "release": "standard-version",
     "install:subprojects": "npm install:back",
     "install:back": "cd server && npm i",
     "prepare": "husky install",
-    "clean": "rm -rf node_modules && rm -rf server/node_modules && cd server && npm clean",
+    "clean:modules": "rm -rf node_modules && cd server && npm clean:modules",
     "lint:eslint": "eslint **/src/*.ts",
     "lint:prettier": "prettier **/src/*.ts",
     "lint:fix": "prettier --write **/src/*.ts && eslint ./src/*.ts --fix"
