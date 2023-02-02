@@ -13,7 +13,7 @@ guard_current_branch() {
   local current_branch
   current_branch=$(git rev-parse --abbrev-ref HEAD)
 
-  local match='^((fix)|(feat))(\((.+)\))?\/(.+)$'
+  local match='^((fix)|(feat)|(chore))(\((.+)\))?\/(.+)$'
 
   if ! (echo "$current_branch" | grep -Eq "$match"); then
     fatal_error "No se puede editar diréctamente la rama $current_branch."
