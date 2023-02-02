@@ -1,5 +1,13 @@
-import fs from "fs";
+import { existsSync, rmdirSync } from "node:fs";
+import { createTmpFolder } from "#tests/utils";
 import { QueuePlaylistManager } from "./QueuePlaylistManager";
+
+const FOLDER = createTmpFolder();
+
+afterAll(() => {
+  if (existsSync(FOLDER))
+    rmdirSync(FOLDER);
+} );
 
 function sampleQueuePlaylistManager(folder: string) {
   const queue = new QueuePlaylistManager(folder);
@@ -20,20 +28,20 @@ function sampleQueuePlaylistManager(folder: string) {
 }
 
 it("create files ", () => {
-  const folder = "/home/daniel/Escritorio";
+  const folder = FOLDER;
 
   sampleQueuePlaylistManager(folder);
 
-  expect(fs.existsSync(`${folder}/next_0.m3u8`)).toBeTruthy();
-  expect(fs.existsSync(`${folder}/next_1.m3u8`)).toBeTruthy();
+  expect(existsSync(`${folder}/next_0.m3u8`)).toBeTruthy();
+  expect(existsSync(`${folder}/next_1.m3u8`)).toBeTruthy();
 } );
 
 it("clear files ", () => {
-  const folder = "/home/daniel/Escritorio";
+  const folder = FOLDER;
   const queue = sampleQueuePlaylistManager(folder);
 
   queue.clear();
 
-  expect(fs.existsSync(`${folder}/next_0.m3u8`)).toBeFalsy();
-  expect(fs.existsSync(`${folder}/next_1.m3u8`)).toBeFalsy();
+  expect(existsSync(`${folder}/next_0.m3u8`)).toBeFalsy();
+  expect(existsSync(`${folder}/next_1.m3u8`)).toBeFalsy();
 } );
