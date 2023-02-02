@@ -15,6 +15,9 @@
   "nohoist": [
     "server"
   ],
+  "dependencies": {
+    "esm": "3.2.25"
+  },
   "devDependencies": {
     "typescript": "4.9.4",
     "@commitlint/cli": "17.1.2",
