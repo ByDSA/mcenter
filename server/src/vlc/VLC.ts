@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable require-await */
-import { exec, execSync } from "child_process";
-import { isRunning } from "../Utils";
+import * as cp from "child_process";
+import { execAndWaitUntilStarted, killAll, killProcessByPid } from "../Utils";
 
 export enum VLCFlag {
     PLAY_AND_EXIT = "--play-and-exit",
@@ -14,40 +14,53 @@ export enum VLCFlag {
     ONE_INSTANCE = "--one-instance"
 }
 
+const PROCESS_NAME = "vlc";
+
 export class VLC {
-  private process: any | undefined;
+  private guardProcess(): cp.ChildProcess {
+    if (!this.process)
+      throw new Error("No hay proceso VLC");
+
+    return this.process;
+  }
+
+  close() {
+    const p = this.guardProcess();
+    const pid = p.pid + 1; // No sé por qué es +1
+
+    return killProcessByPid(pid);
+  }
+
+  private process?: cp.ChildProcess;
 
   private flags: string[] = [];
 
-  async open(file: string) {
+  openFileAsync(file: string) {
+    return this.commonOpenAsync(file);
+  }
+
+  openAsync() {
+    return this.commonOpenAsync();
+  }
+
+  private async commonOpenAsync(file: string = "") {
     const args = this.flags.join(" ");
 
-    console.log(`Open VLC: ${ args}`);
-    this.process = exec(`"vlc" ${file} ${args}`);
+    console.log(`Open VLC: ${args}`);
+    this.process = await execAndWaitUntilStarted(`"${PROCESS_NAME}" ${file} ${args}`);
   }
 
   config(...flags: string[]) {
     this.flags = flags;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async close() {
-    // TODO
-  }
-
-  static async closeAll() {
-    while (await isRunning("vlc")) {
-      try {
-        console.log("Closing VLC...");
-        execSync("killall vlc");
-      } catch (e) {
-        console.log("Error closing VLC");
-        break;
-      }
-    }
+  static async closeAllAsync() {
+    return killAll(PROCESS_NAME);
   }
 
   on(name: string, f: (code: number)=> void) {
-    this.process.on(name, f);
+    const p = this.guardProcess();
+
+    p.on(name, f);
   }
 }
