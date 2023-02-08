@@ -123,7 +123,7 @@ export async function play(episodes: Episode[], openNewInstance: boolean) {
 }
 
 async function closeVLC() {
-  await VLC.closeAll();
+  await VLC.closeAllAsync();
 }
 
 const vlcConfig = [
@@ -140,7 +140,7 @@ async function openVLC(file: string): Promise<VLC> {
   const vlc = new VLC();
 
   vlc.config(...vlcConfig);
-  await vlc.open(file);
+  await vlc.openFileAsync(file);
 
   return vlc;
 }

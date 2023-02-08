@@ -1,26 +1,36 @@
-import { exec } from "child_process";
-import util from "util";
+import find from "find-process";
+import * as cp from "node:child_process";
+import { exec } from "node:child_process";
+import util from "node:util";
 
 export const execPromisify = util.promisify(exec);
 
-export const isRunning = async (query: string): Promise<boolean> => {
-  const { platform } = process;
-  let cmd = "";
+export function execAndWaitUntilStarted(command: string): Promise<cp.ChildProcess> {
+  return new Promise((resolve) => {
+    const process = exec(command);
+    const interval = setInterval(() => {
+      if (process.pid) {
+        clearInterval(interval);
+        resolve(process);
+      }
+    }, 1);
+  } );
+}
 
-  switch (platform) {
-    case "win32": cmd = "tasklist";
-      break;
-    case "darwin": cmd = `ps -ax | grep ${query}`;
-      break;
-    case "linux": cmd = "ps -A";
-      break;
-    default: break;
-  }
+export const isRunning = (query: string): Promise<boolean> =>
+  find("name", query, true).then((list: any[]) => list.length !== 0);
 
-  const { stdout } = await execPromisify(cmd);
+export function killProcessByPid(pid: number) {
+  return exec(`sudo kill ${pid} -9`);
+}
 
-  return stdout.toLowerCase().indexOf(query.toLowerCase()) > -1;
-};
+export async function killAll(query: string) {
+  const list = await find("name", query, true);
+
+  list.forEach((p) => {
+    process.kill(p.pid, 9);
+  } );
+}
 
 export function makeDir(folder: string) {
   return execPromisify(`mkdir ${folder}`);
@@ -43,25 +53,25 @@ export function deleteFolder(folder: string) {
 }
 
 export type CompressParams = {
-    folder: string;
-    outFile: string;
-}
+  folder: string;
+  outFile: string;
+};
 
 export function compress( { folder, outFile }: CompressParams) {
   return execPromisify(`tar -czf ${outFile} -C ${folder} .`)
     .then(() => {
-    //   console.log(`Compressed ${folder} to ${outFile}`);
+      //   console.log(`Compressed ${folder} to ${outFile}`);
     } )
     .catch(() => false);
 }
 
 export type PgDumpParams = {
-    file: string;
-    host: string;
-    pass?: string;
-    user: string;
-    db: string;
-}
+  file: string;
+  host: string;
+  pass?: string;
+  user: string;
+  db: string;
+};
 
 export function pgDump( { host, pass, user, db, file }: PgDumpParams) {
   let cmd = "";
