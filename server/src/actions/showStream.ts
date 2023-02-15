@@ -1,16 +1,17 @@
 import { Request, Response } from "express";
-import { getById } from "../db/models/stream.model";
+import { StreamRepository } from "#modules/stream";
 
 // eslint-disable-next-line func-names, require-await
 export default async function (req: Request, res: Response) {
   const { id } = getParams(req, res);
 
-  getById(id).then(stream => {
-    if (stream)
-      res.send(stream);
-    else
-      res.sendStatus(404);
-  } );
+  StreamRepository.getInstance<StreamRepository>().findOneById(id)
+    .then(stream => {
+      if (stream)
+        res.send(stream);
+      else
+        res.sendStatus(404);
+    } );
 }
 
 function getParams(req: Request, res: Response) {

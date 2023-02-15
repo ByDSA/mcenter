@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { getById, Serie } from "../db/models/serie.model";
+import { Serie, SerieRepository } from "#modules/serie";
 
 export default async function (req: Request, res: Response) {
   const { id } = getParams(req, res);
   const { connect, disconnect } = (await import("../db/database"));
 
   connect();
-  const serie: Serie | null = await getById(id);
+  const serie: Serie | null = await SerieRepository.getInstance<SerieRepository>().findOneById(id);
 
   if (!serie) {
     res.sendStatus(404);

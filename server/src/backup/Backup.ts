@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { DateTime } from "luxon";
-import { compress, deleteFolder, makeDir, makeDirIfNotExits, moveFile, pgDump } from "../Utils";
+import { compress, deleteFolder, makeDir, makeDirIfNotExits, moveFile, pgDump } from "#modules/utils";
 import Process from "./Process";
 
 export type BackupProps = {

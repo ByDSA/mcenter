@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import fs from "fs";
+import { asyncCalculateNextEpisodeByIdStream } from "#modules/episode";
 import playFunc, { playSerieFunc } from "./src/actions/play";
 import playStreamFunc from "./src/actions/playStream";
 import showPickerFunc from "./src/actions/showPicker";
@@ -7,9 +8,9 @@ import showSerieFunc from "./src/actions/showSerie";
 import showStreamFunc from "./src/actions/showStream";
 import { backup } from "./src/backup/backupStuff";
 import { connect } from "./src/db/database";
-import asyncCalculateNextEpisodeByIdStream from "./src/EpisodePicker/EpisodePicker";
 
 const app = express();
+// eslint-disable-next-line import/no-internal-modules, @typescript-eslint/no-unused-vars
 const s = require("./src/scheduler");
 
 app.disable("x-powered-by");

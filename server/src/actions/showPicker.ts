@@ -1,16 +1,15 @@
 import { Request, Response } from "express";
-import { getFromGroupId } from "../db/models/serie.model";
-import { getById } from "../db/models/stream.model";
-import { getDaysFrom } from "../EpisodePicker/EpisodeFilter";
-import { getRandomPicker } from "../EpisodePicker/EpisodePicker";
+import { getDaysFrom, getRandomPicker } from "#modules/episode";
+import { SerieRepository } from "#modules/serie";
+import { StreamRepository } from "#modules/stream";
 import { getlastEp } from "./playStream";
 
-export default async function (req: Request, res: Response) {
+export default async function f(req: Request, res: Response) {
   const { streamId } = getParams(req, res);
-  const stream = await getById(streamId);
+  const stream = await StreamRepository.getInstance<StreamRepository>().findOneById(streamId);
 
   if (stream) {
-    const seriePromise = getFromGroupId(stream.group);
+    const seriePromise = SerieRepository.getInstance<SerieRepository>().findOneFromGroupId(stream.group);
     const lastEpPromise = getlastEp(stream);
 
     await Promise.all([seriePromise, lastEpPromise]);
