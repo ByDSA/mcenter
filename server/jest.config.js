@@ -16,5 +16,6 @@ module.exports = {
   moduleNameMapper: {
     "^#tests($|/.*)$": "<rootDir>/tests/$1",
     "^#utils($|/.*)$": "<rootDir>/src/utils/$1",
+    "^#modules($|/.*)$": "<rootDir>/src/modules/$1",
   },
 };

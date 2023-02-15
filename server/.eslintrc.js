@@ -17,6 +17,9 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "import", "jest", "prettier"],
   rules: {
+    "import/no-internal-modules": ["error", {
+      "allow": ["*modules/*", "**/repository/odm/**", "*modules/utils/**", "*modules/time/*", "**/src/actions/**", "**/src/db/**", "**/src/backup/**"],
+    }],
     "no-invalid-this": ["error", {
       "capIsConstructor": false,
     }],

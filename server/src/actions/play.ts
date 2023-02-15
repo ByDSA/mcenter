@@ -1,14 +1,12 @@
 /* eslint-disable no-await-in-loop */
 import dotenv from "dotenv";
 import { Request, Response } from "express";
-import { Episode, episodeToMediaElement } from "../db/models/episode";
-import { getById } from "../db/models/serie.model";
-import { addToHistory, getById as getStreamById, Stream } from "../db/models/stream.model";
-import { calculateNextEpisode } from "../EpisodePicker/EpisodePicker";
-import { MediaElement } from "../m3u/MediaElement";
-import { QueuePlaylistManager } from "../m3u/QueuePlaylistManager";
-import { isRunning } from "../Utils";
-import { VLC, VLCFlag } from "../vlc/VLC";
+import { calculateNextEpisode, Episode, episodeToMediaElement } from "#modules/episode";
+import { HistoryRepository } from "#modules/history";
+import { MediaElement, QueuePlaylistManager, VLC, VLCFlag } from "#modules/player";
+import { SerieRepository } from "#modules/serie";
+import { Stream, StreamRepository } from "#modules/stream";
+import { isRunning } from "#modules/utils";
 
 dotenv.config();
 const { TMP_PATH } = process.env;
@@ -23,7 +21,7 @@ export async function playSerieFunc(req: Request, res: Response) {
   const forceStr = req.query.force;
   const force = !!forceStr;
   const { id, name } = req.params;
-  const serie = await getById(name);
+  const serie = await SerieRepository.getInstance<SerieRepository>().findOneById(name);
 
   if (!serie) {
     res.sendStatus(404);
@@ -32,11 +30,13 @@ export async function playSerieFunc(req: Request, res: Response) {
   }
 
   const episode = serie.episodes.find((e) => e.id === id);
+  const streamRepo = StreamRepository.getInstance<StreamRepository>();
 
-  getStreamById(name).then((stream) => {
-    if (stream && episode)
-      addToHistory(stream, episode);
-  } );
+  streamRepo.findOneById(name)
+    .then((stream) => {
+      if (stream && episode)
+        HistoryRepository.getInstance<HistoryRepository>().addToHistory(stream, episode);
+    } );
 
   if (episode)
     play([episode], force);
@@ -151,7 +151,7 @@ export async function pickAndAddHistory(stream: Stream, n: number): Promise<Epis
   for (let i = 0; i < +n; i++) {
     const episode = await calculateNextEpisode(stream);
 
-    await addToHistory(stream, episode);
+    await HistoryRepository.getInstance<HistoryRepository>().addToHistory(stream, episode);
     episodes.push(episode);
   }
 

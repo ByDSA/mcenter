@@ -1,7 +1,7 @@
-/* eslint-disable import/prefer-default-export */
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { FileAlreadyExistsError, FileNotFoundError, findRootProjectFolder } from "#utils";
+import { findRootProjectFolder } from "#modules/utils";
+import { FileAlreadyExistsError, FileNotFoundError } from "#modules/utils/fs/errors";
 
 function findTestsProjectFolder() {
   const root = findRootProjectFolder();
