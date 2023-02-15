@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ steps.current_branch.outputs.branch }}
+          fetch-depth: 0
       # Build steps
       - uses: actions/setup-node@v3
         with:
@@ -31,7 +32,11 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "<>"
 
-          commit_release_title="chore\(release\):"
+          echo "Obteniendo el último commit de release..."
+
+          commit_release_title="chore(release):"
+          echo "Filtro: \"$commit_release_title\""
+
           last_release_commit=$(git log --pretty=format:"%h%x09%s" | grep "$commit_release_title" | head -1 | awk '{print $1;}')
 
           [[ -z $last_release_commit ]] && first_release=1 || first_release=0
@@ -41,16 +46,19 @@ jobs:
             npm run release -- --first-release --no-verify
           else
             echo "Último commit de release: $last_release_commit"
-            echo "\nCommits nuevos desde el último release:"
+            echo ""
+            echo "Commits nuevos desde el último release:"
             git log $last_release_commit..HEAD --pretty=format:"%s"
-            echo "\n"
+            echo ""
 
             filter="^(fix|feat)(\((.*)\))?:|BREAKING CHANGE:|^(.*)!:"
             bumping_messages=$(git log $last_release_commit..HEAD --pretty=format:"%s" | grep -E "$filter" | xargs)
             # Nota: la obtencion de mensajes commit está copy pasteada porque no se ha conseguido mantener el formato multilínea al pasarlo a una variable
 
+            echo ""
+
             if [ -n "$bumping_messages" ]; then
-              echo "\nCommits nuevos a considerar para el bumping:"
+              echo "Commits nuevos a considerar para el bumping:"
               git log $last_release_commit..HEAD --pretty=format:"%s" | grep -E "$filter"
 
               npm run release -- --no-verify
