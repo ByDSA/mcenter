@@ -15,7 +15,7 @@
     "target": "es2015",
     "noImplicitAny": true,
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2018", "dom"],
+    "lib": ["es2022", "dom"],
     "baseUrl": ".",
     "paths": {
       "#tests/*": ["tests/*"],

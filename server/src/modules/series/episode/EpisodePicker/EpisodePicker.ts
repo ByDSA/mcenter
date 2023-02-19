@@ -1,10 +1,8 @@
 /* eslint-disable require-await */
-/* eslint-disable import/no-cycle */
-import { newPicker, Picker } from "rand-picker";
-import { Serie, SerieRepository } from "#modules/serie";
+import { newPicker } from "rand-picker";
+import { Serie, SerieRepository } from "#modules/series/serie";
 import { Stream, StreamMode, StreamRepository } from "#modules/stream";
-import { getlastEp } from "../../../actions/playStream";
-import { Episode } from "../model";
+import { Episode, EpisodeRepository } from "../model";
 import { filter } from "./EpisodeFilter";
 import fixWeight from "./EpisodeWeight";
 
@@ -46,7 +44,7 @@ export async function calculateNextEpisode(stream: Stream) {
       throw new Error(`Mode invalid: ${stream.mode}.`);
   }
 
-  const lastEp = await getlastEp(stream);
+  const lastEp = await EpisodeRepository.getInstance<EpisodeRepository>().findLastEpisodeInStream(stream);
 
   return nextEpisodeFunc(serie, lastEp, stream);
 }
@@ -91,11 +89,3 @@ async function getNextEpisodeRandom(
 
   return ret;
 }
-
-export type Params = {
-    picker: Picker<Episode>;
-    self: Episode;
-    serie: Serie;
-    lastEp: Episode | null;
-    stream: Stream;
-};

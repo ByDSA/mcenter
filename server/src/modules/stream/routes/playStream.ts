@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
-import { Episode } from "#modules/episode";
-import { History } from "#modules/history";
-import { SerieRepository } from "#modules/serie";
-import { Stream, StreamRepository } from "#modules/stream";
-import { pickAndAddHistory, play } from "./play";
+import { StreamRepository } from "#modules/stream";
+import { pickAndAddHistory, play } from "../../../actions/play";
 
 export default async function f(req: Request, res: Response) {
   console.log("playStream");
@@ -22,20 +19,6 @@ export default async function f(req: Request, res: Response) {
   await play(episodes, forceBoolean);
 
   res.send(episodes);
-}
-
-export async function getlastEp(stream: Stream): Promise<Episode | null> {
-  let lastEp = null;
-
-  if (stream.history.length > 0) {
-    const lastHistory: History = stream.history[stream.history.length - 1];
-    const lastEpId = lastHistory.episodeId;
-    const serie = await SerieRepository.getInstance<SerieRepository>().findOneFromGroupId(stream.group);
-
-    lastEp = serie?.episodes.find((e) => e.id === lastEpId) || null;
-  }
-
-  return lastEp;
 }
 
 function getParams(req: Request, res: Response) {

@@ -1,3 +1,3 @@
 export {
-  History, HistoryRepository,
+  HistoryEntry as History, HistoryRepository,
 } from "./model";

@@ -1,10 +1,14 @@
-import { SerieId, SerieRepository } from "#modules/serie";
-import Repository from "#modules/utils/base/Repository";
+import { SerieId, SerieRepository } from "#modules/series/serie";
+import { CanFindById, CanUpdateOneById, Repository } from "#modules/utils/base/repository";
 import Stream, { StreamId } from "../stream.entity";
 import { Mode, StreamDocument, StreamModel } from "./odm/stream.odm";
 
 /* eslint-disable class-methods-use-this */
-export default class StreamRepository extends Repository {
+export default class StreamRepository
+  extends Repository
+  implements
+CanFindById<Stream, StreamId>,
+CanUpdateOneById<Stream, StreamId> {
   async createFromSerie(serieId: SerieId): Promise<Stream | null> {
     console.log(`createFromSerie ${serieId}`);
     const serie = await SerieRepository.getInstance<SerieRepository>().findOneById(serieId);
@@ -43,12 +47,11 @@ export default class StreamRepository extends Repository {
     return stream;
   }
 
-  async updateOneById(id: StreamId, stream: Stream): Promise<Stream | null> {
+  async updateOneById(id: StreamId, stream: Stream): Promise<void> {
     const streamDocument = new StreamModel(stream);
-    const retStreamDocument = await StreamModel.findOneAndUpdate( {
+
+    await StreamModel.findOneAndUpdate( {
       id,
     }, streamDocument);
-
-    return retStreamDocument;
   }
 }

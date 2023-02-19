@@ -1,13 +1,14 @@
-/* eslint-disable import/no-cycle */
 import { daysBetween } from "date-ops";
 import { DateTime } from "luxon";
 import { Picker } from "rand-picker";
 import { History } from "#modules/history";
-import { Serie } from "#modules/serie";
+import { Serie } from "#modules/series/serie";
 import { Stream } from "#modules/stream";
+import { Resource } from "#modules/utils/base/resource";
 import { DateType } from "#modules/utils/time/date-type";
 import { Episode } from "../model";
-import { Params } from "./EpisodePicker";
+import { dependent, preventDisabled, preventRepeatInDays, preventRepeatLast, removeWeightLowerOrEqualThan } from "./filters";
+import { Params } from "./utils";
 
 const { PICKER_MIN_WEIGHT, PICKER_MIN_DAYS } = process.env;
 
@@ -21,9 +22,9 @@ const filterFunctions: MiddlewareFilterFunction[] = [
 ];
 
 export function filter(
-  picker: Picker<Episode>,
+  picker: Picker<Resource>,
   serie: Serie,
-  lastEp: Episode | null,
+  lastEp: Resource | null,
   stream: Stream,
 ): void {
   console.log("Filtering...");
@@ -55,66 +56,7 @@ export function filter(
     picker.put(serie.episodes[0]);
 }
 
-function preventRepeatLast( { self, lastEp }: Params) {
-  return !lastEp || lastEp.id !== self.id;
-}
-
-type Obj = {
-  [key: string]: [string, string][];
-};
-
-function dependent( { self, lastEp, serie }: Params) {
-  let ret = true;
-  const obj: Obj = {
-    simpsons: [
-      ["6x25", "7x01"],
-	        ["31x19", "31x20"],
-    ],
-    fguy: [
-      ["6x04", "6x05"],
-      ["4x28", "4x29"],
-      ["4x29", "4x30"],
-      ["12x06", "12x07"],
-      ["12x07", "12x08"],
-    ],
-  };
-  const dependencies = obj[serie.id] || [];
-
-  for (const d of dependencies)
-    ret &&= dependency(lastEp, d[0], self, d[1]);
-
-  return ret;
-}
-
-function dependency(
-  lastEp: Episode | null,
-  idLast: string,
-  self: Episode,
-  idCurrent: string,
-): boolean {
-  return (lastEp?.id === idLast && self.id === idCurrent)
-  || (lastEp?.id !== idLast && self.id !== idCurrent);
-}
-
-function preventDisabled( { self }: Params) {
-  const ret = self.disabled === undefined || self.disabled === false;
-
-  return ret;
-}
-
-function removeWeightLowerOrEqualThan(num: number) {
-  return ( { self }: Params): boolean => self.weight > num;
-}
-
-function preventRepeatInDays(minDays: number) {
-  return ( { self, stream }: Params): boolean => {
-    const daysFromLastTime = getDaysFrom(self, stream.history);
-
-    return daysFromLastTime >= minDays;
-  };
-}
-
-export function getDaysFrom(self: Episode, history: History[]): number {
+export function getDaysFromLastInHistory(self: Episode, history: History[]): number {
   let days = Number.MAX_SAFE_INTEGER;
   const now = DateTime.now();
 

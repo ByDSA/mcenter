@@ -1,12 +1,11 @@
 /* eslint-disable require-await */
 import { Picker } from "rand-picker";
-import { Serie } from "#modules/serie";
+import { Serie } from "#modules/series/serie";
 import { Stream } from "#modules/stream";
-import { dynamicLoadScriptFromEnvVar } from "../../../DynamicLoad";
+import { dynamicLoadScriptFromEnvVar } from "../../../../DynamicLoad";
 import { Episode } from "../model";
-import { getDaysFrom } from "./EpisodeFilter";
-// eslint-disable-next-line import/no-cycle
-import { Params } from "./EpisodePicker";
+import { getDaysFromLastInHistory } from "./EpisodeFilter";
+import { Params } from "./utils";
 
 type MiddlewareWeightFunction = (params: Params)=> Promise<number>;
 const middlewareWeightFunctions: MiddlewareWeightFunction[] = [
@@ -40,7 +39,7 @@ export default async function fixWeight(
 }
 
 async function weightCalculator( { self, stream }: Params): Promise<number> {
-  const daysFromLastTime = getDaysFrom(self, stream.history);
+  const daysFromLastTime = getDaysFromLastInHistory(self, stream.history);
   let reinforcementFactor = 1;
   const weight = self && self.weight ? self.weight : 0;
 

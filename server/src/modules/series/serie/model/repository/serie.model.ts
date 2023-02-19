@@ -1,7 +1,7 @@
 /* eslint-disable require-await */
 /* eslint-disable no-await-in-loop */
 import mongoose, { Document, Schema } from "mongoose";
-import { EpisodeSchema } from "#modules/episode/model/repository/odm/episode";
+import { EpisodeSchema } from "#modules/series/episode/model/repository/odm/episode";
 import Serie from "../serie.entity";
 
 interface SerieDocument extends Document, Serie {

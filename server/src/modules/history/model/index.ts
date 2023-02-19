@@ -1,6 +1,6 @@
 export {
-  default as History,
-} from "./history.entity";
+  default as HistoryEntry,
+} from "./history-entry.entity";
 
 export {
   HistoryRepository,
