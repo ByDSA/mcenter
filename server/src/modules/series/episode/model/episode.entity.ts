@@ -1,16 +1,14 @@
 import dotenv from "dotenv";
-import { MediaElement } from "#modules/player/m3u/MediaElement";
+import { MediaElement } from "#modules/player";
+import { CanDurable, Resource } from "#modules/utils/base/resource";
 
-export default interface Episode {
-  id: string;
-  title: string;
-  path: string;
-  weight: number;
-  start: number;
-  end: number;
-  tags?: string[];
-  duration?: number;
-  disabled?: boolean;
+export type EpisodeId = string;
+
+export default interface Episode
+extends
+Resource,
+CanDurable {
+  id: EpisodeId;
 }
 
 export function episodeToMediaElement(e: Episode): MediaElement {

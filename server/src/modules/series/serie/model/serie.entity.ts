@@ -1,4 +1,4 @@
-import { Episode } from "#modules/episode";
+import { Episode } from "#modules/series/episode";
 
 export type SerieId = string;
 

@@ -3,9 +3,10 @@
 /* eslint-disable require-await */
 /* eslint-disable no-await-in-loop */
 import dotenv from "dotenv";
-import { Episode } from "#modules/episode";
-import Repository from "#modules/utils/base/Repository";
-import { FileNode, getSerieTreeRemote } from "../../../../actions/nginxTree";
+import { Episode, EpisodeRepository } from "#modules/series/episode";
+import { Stream } from "#modules/stream";
+import { Repository } from "#modules/utils/base/repository";
+import { FileNode, getSerieTreeRemote } from "../../../../../actions/nginxTree";
 import Serie from "../serie.entity";
 import { SerieModel } from "./serie.model";
 
@@ -14,9 +15,30 @@ dotenv.config();
 const { MEDIA_PATH } = process.env;
 
 export default class SerieRepository extends Repository {
+  async findLastEpisodeInStream(stream: Stream): Promise<Episode | null> {
+    const episodeId = stream.history.at(-1)?.episodeId;
+
+    if (!episodeId)
+      return null;
+
+    const serie = await this.findOneFromGroupId(stream.group);
+
+    if (!serie)
+      return null;
+
+    return EpisodeRepository.getInstance<EpisodeRepository>().findOneById( {
+      episodeId,
+      serie,
+    } );
+  }
+
   async findOneFromGroupId(groupId: string): Promise<Serie | null> {
     const groupSplit = groupId.split("/");
-    const serieId = groupSplit[groupSplit.length - 1];
+
+    if (groupSplit.length === 0)
+      throw new Error();
+
+    const serieId = groupSplit.at(-1) as string;
     const serie = await this.findOneById(serieId);
 
     return serie;

@@ -1,5 +1,5 @@
 export {
-  getDaysFrom,
+  getDaysFromLastInHistory as getDaysFrom,
 } from "./EpisodeFilter";
 
 export {

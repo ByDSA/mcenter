@@ -1,11 +1,10 @@
 import express, { Request, Response } from "express";
 import fs from "fs";
-import { asyncCalculateNextEpisodeByIdStream } from "#modules/episode";
+import { asyncCalculateNextEpisodeByIdStream } from "#modules/series/episode";
+import { addSerieRoutes } from "#modules/series/serie/routes";
+import { addStreamRoutes } from "#modules/stream/routes";
 import playFunc, { playSerieFunc } from "./src/actions/play";
-import playStreamFunc from "./src/actions/playStream";
 import showPickerFunc from "./src/actions/showPicker";
-import showSerieFunc from "./src/actions/showSerie";
-import showStreamFunc from "./src/actions/showStream";
 import { backup } from "./src/backup/backupStuff";
 import { connect } from "./src/db/database";
 
@@ -23,14 +22,12 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World! ");
 } );
 
-app.get("/api/play/stream/:id/:number?", playStreamFunc);
+addStreamRoutes(app);
+addSerieRoutes(app);
 
 app.get("/api/play/serie/:name/:id", playSerieFunc);
 app.get("/api/play/:type/:id", playFunc);
-
-app.get("/api/crud/series/:id", showSerieFunc);
 app.get("/api/picker/:streamId", showPickerFunc);
-app.get("/api/crud/streams/:id", showStreamFunc);
 
 app.get("/api/stop", (req: Request, res: Response) => {
   fs.writeFileSync(".stop", "");
