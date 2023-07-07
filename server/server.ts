@@ -3,6 +3,7 @@ import fs from "fs";
 import { asyncCalculateNextEpisodeByIdStream } from "#modules/series/episode";
 import { addSerieRoutes } from "#modules/series/serie/routes";
 import { addStreamRoutes } from "#modules/stream/routes";
+import { HELLO_WORLD_HANDLER } from "#modules/utils/base/http/routing/utils";
 import playFunc, { playSerieFunc } from "./src/actions/play";
 import showPickerFunc from "./src/actions/showPicker";
 import { backup } from "./src/backup/backupStuff";
@@ -14,13 +15,11 @@ const s = require("./src/scheduler");
 
 app.disable("x-powered-by");
 
-const PORT = 8081;
+const PORT = 8011;
 
 connect();
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World! ");
-} );
+app.get("/", HELLO_WORLD_HANDLER);
 
 addStreamRoutes(app);
 addSerieRoutes(app);

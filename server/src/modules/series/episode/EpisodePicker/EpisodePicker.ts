@@ -82,6 +82,8 @@ async function getNextEpisodeRandom(
   stream: Stream,
 ): Promise<Episode> {
   const picker = await getRandomPicker(serie, lastEp, stream);
+
+  console.log("Picking one ...");
   const ret = picker.pickOne();
 
   if (!ret)

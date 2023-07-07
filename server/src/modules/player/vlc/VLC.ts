@@ -26,6 +26,10 @@ export class VLC {
 
   close() {
     const p = this.guardProcess();
+
+    if (p.pid === undefined)
+      throw new Error("No hay PID");
+
     const pid = p.pid + 1; // No sé por qué es +1
 
     return killProcessByPid(pid);

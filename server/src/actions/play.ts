@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { Request, Response } from "express";
 import { HistoryRepository } from "#modules/history";
 import { MediaElement, QueuePlaylistManager, VLC, VLCFlag } from "#modules/player";
-import { calculateNextEpisode, Episode, episodeToMediaElement } from "#modules/series/episode";
+import { Episode, calculateNextEpisode, episodeToMediaElement } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { Stream, StreamRepository } from "#modules/stream";
 import { isRunning } from "#modules/utils";
