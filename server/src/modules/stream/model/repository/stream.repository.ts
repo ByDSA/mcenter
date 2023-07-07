@@ -37,21 +37,19 @@ CanUpdateOneById<Stream, StreamId> {
     }, {
       _id: 0,
     } );
-
-    console.log(`Got stream with id: ${streams[0].id}`);
     let stream: Stream | null | undefined = streams[0];
 
     if (!stream)
       stream = await this.createFromSerie(id);
+    else
+      console.log(`Got stream with id=${streams[0].id}`);
 
     return stream;
   }
 
   async updateOneById(id: StreamId, stream: Stream): Promise<void> {
-    const streamDocument = new StreamModel(stream);
-
     await StreamModel.findOneAndUpdate( {
       id,
-    }, streamDocument);
+    }, stream);
   }
 }

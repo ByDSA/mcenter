@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  # server:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   image: mcenter-server
+  #   container_name: mcenter-server
+  #   volumes:
+  #    - .:/usr/src/app
+  #    - /usr/src/app/node_modules
+  #   ports:
+  #     - "8200:8080"
+  #   depends_on:
+  #     - mongo
+  #   env_file: .env
+  #   environment:
+  #     - MONGO_HOSTNAME=$MONGO_HOSTNAME
+  #     - MONGO_PORT=$MONGO_PORT
+  #     - MONGO_DB=$MONGO_DB
+  mcenter-mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    env_file:
+      - .env.db
+
+  mcenter-mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mcenter-mongo:27017/

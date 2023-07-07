@@ -13,6 +13,7 @@ export default class HistoryRepository extends Repository {
 
   // TODO: independizar de stream, que no esté dentro, sino aparte (si no, en cada GET/UPDATE tiene que usarse todo el historial)
   async addToHistory(stream: Stream, episode: Episode) {
+    console.log("Añadiendo al historial ...");
     const newEntry: History = {
       date: getDateNow(),
       episodeId: episode.id,

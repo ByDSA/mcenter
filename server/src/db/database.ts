@@ -17,7 +17,8 @@ const {MONGO_HOSTNAME,
 const dbConnectionURL = generateUrl();
 
 function generateUrl() {
-  let ret = "mongodb+srv://";
+  const isLocal = MONGO_HOSTNAME === "localhost" || MONGO_HOSTNAME === "127.0.0.1";
+  let ret = `${isLocal ? "mongodb" : "mongodb+srv" }://`;
 
   if (MONGO_USER && MONGO_PASSWORD)
     ret += `${MONGO_USER }:${ MONGO_PASSWORD }@`;
@@ -33,12 +34,12 @@ function generateUrl() {
 }
 
 function connect() {
-  console.log(`Connecting to ${dbConnectionURL}...`);
+  console.log(`Connecting to ${dbConnectionURL} ...`);
   mongoose.set("strictQuery", false);
   mongoose.connect(dbConnectionURL, options);
   const db = mongoose.connection;
 
-  db.on("error", console.error.bind(console, `Mongodb Connection Error:${ dbConnectionURL}`));
+  db.on("error", console.error.bind(console, `Mongodb Connection Error: ${dbConnectionURL}\n`));
   db.once("open", () => {
     // we're connected !
     console.log("Mongodb Connection Successful!");
@@ -59,5 +60,5 @@ async function connection(f: ()=> void) {
 }
 
 export {
-  mongoose, connect, disconnect, connection,
+  connect, connection, disconnect, mongoose,
 };

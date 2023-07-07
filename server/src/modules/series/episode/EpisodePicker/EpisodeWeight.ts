@@ -36,6 +36,8 @@ export default async function fixWeight(
       picker.put(self, newWeight);
     }
   }
+
+  console.log("Fixed weight!");
 }
 
 async function weightCalculator( { self, stream }: Params): Promise<number> {
