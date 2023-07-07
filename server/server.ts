@@ -1,12 +1,11 @@
-import express, { Request, Response } from "express";
-import fs from "fs";
 import { asyncCalculateNextEpisodeByIdStream } from "#modules/series/episode";
 import { addSerieRoutes } from "#modules/series/serie/routes";
 import { addStreamRoutes } from "#modules/stream/routes";
 import { HELLO_WORLD_HANDLER } from "#modules/utils/base/http/routing/utils";
+import express, { Request, Response } from "express";
+import fs from "fs";
 import playFunc, { playSerieFunc } from "./src/actions/play";
 import showPickerFunc from "./src/actions/showPicker";
-import { backup } from "./src/backup/backupStuff";
 import { connect } from "./src/db/database";
 
 const app = express();
@@ -46,11 +45,6 @@ app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
   const nextEpisode = await asyncCalculateNextEpisodeByIdStream(idstream);
 
   res.send(nextEpisode);
-} );
-
-app.get("/api/backup", async (req: Request, res: Response) => {
-  await backup();
-  res.send("Done!");
 } );
 
 app.listen(PORT, () => {
