@@ -25,20 +25,8 @@ addSerieRoutes(app);
 
 app.get("/api/play/serie/:name/:id", playSerieFunc);
 app.get("/api/play/:type/:id", playFunc);
+
 app.get("/api/picker/:streamId", showPickerFunc);
-
-app.get("/api/stop", (req: Request, res: Response) => {
-  fs.writeFileSync(".stop", "");
-  res.send("stop");
-} );
-
-app.get("/api/resume", (req: Request, res: Response) => {
-  if (fs.existsSync(".stop")) {
-    fs.unlinkSync(".stop");
-    res.send("resume");
-  } else
-    res.send("Already resumed");
-} );
 
 app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
   const { idstream } = req.params;
@@ -46,6 +34,24 @@ app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
 
   res.send(nextEpisode);
 } );
+
+// Config
+const configRoutes = express.Router();
+
+configRoutes.get("/stop", (req: Request, res: Response) => {
+  fs.writeFileSync(".stop", "");
+  res.send("stop");
+} );
+
+configRoutes.get("/resume", (req: Request, res: Response) => {
+  if (fs.existsSync(".stop")) {
+    fs.unlinkSync(".stop");
+    res.send("resume");
+  } else
+    res.send("Already resumed");
+} );
+
+app.use("/config", configRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server Listening on ${PORT}`);

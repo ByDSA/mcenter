@@ -1,20 +1,18 @@
-import { Request, Response } from "express";
 import { StreamRepository } from "#modules/stream";
+import { Request, Response } from "express";
 
 // eslint-disable-next-line func-names, require-await
 export default async function (req: Request, res: Response) {
-  const { id } = getParams(req, res);
+  const { id } = parseParams(req, res);
+  const stream = await StreamRepository.getInstance<StreamRepository>().findOneById(id);
 
-  StreamRepository.getInstance<StreamRepository>().findOneById(id)
-    .then(stream => {
-      if (stream)
-        res.send(stream);
-      else
-        res.sendStatus(404);
-    } );
+  if (stream)
+    res.send(stream);
+  else
+    res.sendStatus(404);
 }
 
-function getParams(req: Request, res: Response) {
+function parseParams(req: Request, res: Response) {
   const { id } = req.params;
 
   if (!id)

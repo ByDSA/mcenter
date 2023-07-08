@@ -29,10 +29,17 @@ const schema = new mongoose.Schema( {
   },
   tags: {
     type: [String],
+    default: undefined,
   },
   disabled: {
     type: Boolean,
   },
+  lastTimePlayed: {
+    type: Number,
+  },
+}, {
+  _id: false,
+  autoIndex: false,
 } );
 
 export {

@@ -1,12 +1,12 @@
 /* eslint-disable no-await-in-loop */
-import dotenv from "dotenv";
-import { Request, Response } from "express";
 import { HistoryRepository } from "#modules/history";
 import { MediaElement, QueuePlaylistManager, VLC, VLCFlag } from "#modules/player";
 import { Episode, calculateNextEpisode, episodeToMediaElement } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { Stream, StreamRepository } from "#modules/stream";
 import { isRunning } from "#modules/utils";
+import dotenv from "dotenv";
+import { Request, Response } from "express";
 
 dotenv.config();
 const { TMP_PATH } = process.env;
@@ -94,6 +94,9 @@ class PlayProcess {
   }
 
   async do() {
+    if (this.episodes.length === 0)
+      throw new Error("No episodes to play");
+
     console.log(`Play function: ${this.episodes[0].id}`);
 
     await this.closeIfNeeded();
@@ -119,6 +122,9 @@ class PlayProcess {
 }
 
 export async function play(episodes: Episode[], openNewInstance: boolean) {
+  if (episodes.length === 0)
+    throw new Error("No episodes to play");
+
   await new PlayProcess(episodes, openNewInstance).do();
 }
 
@@ -148,7 +154,7 @@ async function openVLC(file: string): Promise<VLC> {
 export async function pickAndAddHistory(stream: Stream, n: number): Promise<Episode[]> {
   const episodes: Episode[] = [];
 
-  for (let i = 0; i < +n; i++) {
+  for (let i = 0; i < n; i++) {
     const episode = await calculateNextEpisode(stream);
 
     await HistoryRepository.getInstance<HistoryRepository>().addToHistory(stream, episode);

@@ -1,4 +1,5 @@
-import { Episode, getDaysFrom } from "#modules/series/episode";
+import { Episode } from "#modules/series/episode";
+import { getDaysFromLastPlayed } from "../../lastPlayed";
 import { Params } from "../utils";
 
 export function preventRepeatLast( { self, lastEp }: Params) {
@@ -53,8 +54,8 @@ export function removeWeightLowerOrEqualThan(num: number) {
 }
 
 export function preventRepeatInDays(minDays: number) {
-  return ( { self, stream }: Params): boolean => {
-    const daysFromLastTime = getDaysFrom(self, stream.history);
+  return ( { self, serie, stream }: Params): boolean => {
+    const daysFromLastTime = getDaysFromLastPlayed(self, serie.id, stream.history);
 
     return daysFromLastTime >= minDays;
   };
