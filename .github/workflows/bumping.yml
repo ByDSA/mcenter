@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+      - master
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -13,56 +17,102 @@ jobs:
     steps:
       - name: Extraer nombre de la rama actual
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
         id: current_branch
+
       - name: "Checkout"
         uses: actions/checkout@v3
         with:
           ref: ${{ steps.current_branch.outputs.branch }}
           fetch-depth: 0
-      # Build steps
-      - uses: actions/setup-node@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: "18"
-      - name: Node Install
-        run: npm i
-      # Proceso Bumping
-      - name: Proceso de bumping
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v2
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: "GitHub config"
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "<>"
 
-          echo "Obteniendo el último commit de release..."
-
+      - name: "Obtener último commit de release"
+        id: last_release_commit
+        run: |
           commit_release_title="chore(release):"
           echo "Filtro: \"$commit_release_title\""
 
           last_release_commit=$(git log --pretty=format:"%h%x09%s" | grep "$commit_release_title" | head -1 | awk '{print $1;}')
 
-          [[ -z $last_release_commit ]] && first_release=1 || first_release=0
+          echo "LAST_RELEASE_COMMIT=$last_release_commit" >> $GITHUB_ENV
+
+      - name: "Comprobar si es la primera release"
+        id: first_release
+        run: |
+          [[ -z "${{ env.LAST_RELEASE_COMMIT }}" ]] && first_release=1 || first_release=0
 
           if [ $first_release -eq 1 ]; then
             echo "No se ha encontrado ningún commit de release. Se considera que es la primera release."
-            npm run release -- --first-release --no-verify
-          else
-            echo "Último commit de release: $last_release_commit"
-            echo ""
-            echo "Commits nuevos desde el último release:"
-            git log $last_release_commit..HEAD --pretty=format:"%s"
-            echo ""
-
-            filter="^(fix|feat)(\((.*)\))?:|BREAKING CHANGE:|^(.*)!:"
-            bumping_messages=$(git log $last_release_commit..HEAD --pretty=format:"%s" | grep -E "$filter" | xargs)
-            # Nota: la obtencion de mensajes commit está copy pasteada porque no se ha conseguido mantener el formato multilínea al pasarlo a una variable
-
-            echo ""
-
-            if [ -n "$bumping_messages" ]; then
-              echo "Commits nuevos a considerar para el bumping:"
-              git log $last_release_commit..HEAD --pretty=format:"%s" | grep -E "$filter"
-
-              npm run release -- --no-verify
-            fi
           fi
 
-          git push --no-verify --follow-tags origin ${{ steps.current_branch.outputs.branch }}
+          echo "first_release=$first_release" >> $GITHUB_OUTPUT
+
+      - name: "Bumping [Primer release]"
+        if: steps.first_release.outputs.first_release == 1
+        run: |
+          pnpm run version:release --first-release --no-verify
+
+      - name: "Bumping [Release normal]"
+        if: steps.first_release.outputs.first_release == 0
+        run: |
+          echo "Último commit de release: ${{ env.LAST_RELEASE_COMMIT }}"
+
+          echo -e "Commits nuevos desde el último release:\n----------\n"
+          commits=$(git log ${{ env.LAST_RELEASE_COMMIT }}..HEAD --pretty=format:"%s")
+          echo "$commits"
+          echo -e "----------"
+
+          filter="^(fix|feat)(\((.*)\))?:|BREAKING CHANGE:|^(.*)!:"
+          bumping_messages=$(echo "$commits" | grep -E "$filter" | xargs)
+
+          if [ -n "$bumping_messages" ]; then
+            echo "\nCommits nuevos a considerar para el bumping:"
+            echo "$bumping_messages"
+
+            pnpm run version:release --no-verify
+          else
+            echo "No se ha encontrado ningún commit nuevo que requiera bumping."
+          fi
+
+      - name: "Subir cambios a GitHub"
+        run: |
+          if [[ $(git log --branches --not --remotes) ]]; then
+            git push --no-verify --follow-tags origin ${{ steps.current_branch.outputs.branch }}
+          else
+            echo "No ha habido ningún cambio en el proyecto en el proceso de bumping."
+            echo "No se ha subido ningún cambio a GitHub."
+          fi
