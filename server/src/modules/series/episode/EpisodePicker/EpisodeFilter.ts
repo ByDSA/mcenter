@@ -1,11 +1,8 @@
-import { daysBetween } from "date-ops";
-import { DateTime } from "luxon";
-import { Picker } from "rand-picker";
-import { History } from "#modules/history";
+/* eslint-disable import/prefer-default-export */
 import { Serie } from "#modules/series/serie";
 import { Stream } from "#modules/stream";
 import { Resource } from "#modules/utils/base/resource";
-import { DateType } from "#modules/utils/time/date-type";
+import { Picker } from "rand-picker";
 import { Episode } from "../model";
 import { dependent, preventDisabled, preventRepeatInDays, preventRepeatLast, removeWeightLowerOrEqualThan } from "./filters";
 import { Params } from "./utils";
@@ -54,44 +51,4 @@ export function filter(
 
   if (picker.data.length === 0)
     picker.put(serie.episodes[0]);
-}
-
-export function getDaysFromLastInHistory(self: Episode, history: History[]): number {
-  let days = Number.MAX_SAFE_INTEGER;
-  const now = DateTime.now();
-
-  for (const h of history) {
-    if (self && h.episodeId === self.id) {
-      let date;
-
-      if (h.date.timestamp)
-        date = getDateFromTimestampInSec(+h.date.timestamp);
-      else
-        date = getDateFromYearMonthDayHistory(h.date);
-
-      const d = daysBetween(date, now);
-
-      if (d < days)
-        days = d;
-    }
-  }
-
-  return days;
-}
-
-function getDateFromTimestampInSec(timestamp: number): DateTime {
-  const date = new Date();
-
-  date.setTime(timestamp * 1000);
-
-  return DateTime.fromJSDate(date);
-}
-
-function getDateFromYearMonthDayHistory(dateIn: DateType) {
-  const { year } = dateIn;
-  const month = dateIn.month - 1;
-  const { day } = dateIn;
-  const date = new Date(year, month, day);
-
-  return DateTime.fromJSDate(date);
 }

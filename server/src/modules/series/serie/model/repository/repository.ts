@@ -2,12 +2,12 @@
 
 /* eslint-disable require-await */
 /* eslint-disable no-await-in-loop */
-import dotenv from "dotenv";
 import { Episode, EpisodeRepository } from "#modules/series/episode";
 import { Stream } from "#modules/stream";
 import { Repository } from "#modules/utils/base/repository";
+import dotenv from "dotenv";
 import { FileNode, getSerieTreeRemote } from "../../../../../actions/nginxTree";
-import Serie from "../serie.entity";
+import Serie, { SerieId } from "../serie.entity";
 import { SerieModel } from "./serie.model";
 
 dotenv.config();
@@ -61,6 +61,14 @@ export default class SerieRepository extends Repository {
     }
 
     return serie;
+  }
+
+  async updateOneById(id: SerieId, serie: Serie): Promise<Serie | null> {
+    return SerieModel.findOneAndUpdate( {
+      id,
+    }, serie, {
+      new: true,
+    } );
   }
 }
 

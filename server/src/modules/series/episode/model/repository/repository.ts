@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { Serie, SerieId, SerieRepository } from "#modules/series/serie";
+import { SerieModel } from "#modules/series/serie/model/repository/serie.model";
 import { Stream } from "#modules/stream";
 import { Repository } from "#modules/utils/base/repository";
 import Episode, { EpisodeId } from "../episode.entity";
@@ -11,6 +12,11 @@ type FindOneParamsSerie = {
 
 type FindOneParamsSerieId = {
   episodeId: EpisodeId;
+  serieId: SerieId;
+};
+
+type UpdateOneParams = {
+  episode: Episode;
   serieId: SerieId;
 };
 
@@ -50,5 +56,27 @@ export default class EpisodeRepository extends Repository {
     }
 
     return this.findEpisodeInSerie(episodeId, serie);
+  }
+
+  async updateOne(params: UpdateOneParams): Promise<Episode | null> {
+    const serie = await SerieRepository.getInstance<SerieRepository>().findOneById(params.serieId);
+
+    if (!serie)
+      return null;
+
+    const index = serie.episodes.findIndex((e) => e.id === params.episode.id);
+
+    if (index === -1)
+      return null;
+
+    await SerieModel.updateOne( {
+      id: serie.id,
+    }, {
+      $set: {
+        [`episodes.${index}`]: params.episode,
+      },
+    } );
+
+    return params.episode;
   }
 }

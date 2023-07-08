@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
-import { getDaysFrom, getRandomPicker } from "#modules/series/episode";
+import { getRandomPicker } from "#modules/series/episode";
+import { getDaysFromLastPlayed } from "#modules/series/episode/lastPlayed";
 import { SerieRepository } from "#modules/series/serie";
 import { StreamRepository } from "#modules/stream";
+import { Request, Response } from "express";
 
 export default async function f(req: Request, res: Response) {
   const { streamId } = getParams(req, res);
@@ -30,7 +31,7 @@ export default async function f(req: Request, res: Response) {
       const { id } = e;
       const selfWeight = picker.getWeight(e) || 1;
       const weight = Math.round((selfWeight / pickerWeight) * 100 * 100) / 100;
-      const days = Math.floor(getDaysFrom(e, stream.history));
+      const days = Math.floor(getDaysFromLastPlayed(e, serie.id, stream.history));
 
       return [id, weight, selfWeight, days];
     } ).sort((a: any, b: any) => b[1] - a[1])

@@ -1,7 +1,7 @@
 /* eslint-disable require-await */
-import { newPicker } from "rand-picker";
 import { Serie, SerieRepository } from "#modules/series/serie";
 import { Stream, StreamMode, StreamRepository } from "#modules/stream";
+import { Picker, newPicker } from "rand-picker";
 import { Episode, EpisodeRepository } from "../model";
 import { filter } from "./EpisodeFilter";
 import fixWeight from "./EpisodeWeight";
@@ -70,10 +70,20 @@ export async function getRandomPicker(serie: Serie, lastEp: Episode | null, stre
     weighted: true,
   } );
 
-  await filter(picker, serie, lastEp, stream);
+  filter(picker, serie, lastEp, stream);
+  assertPickerHasData(picker);
   await fixWeight(picker, serie, lastEp, stream);
 
   return picker;
+}
+
+function assertPickerHasData(picker: Picker<Episode>) {
+  for (const d of picker.data) {
+    if (d)
+      return;
+  }
+
+  throw new Error("Picker has no data");
 }
 
 async function getNextEpisodeRandom(

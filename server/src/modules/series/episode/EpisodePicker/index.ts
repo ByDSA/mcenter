@@ -1,7 +1,3 @@
 export {
-  getDaysFromLastInHistory as getDaysFrom,
-} from "./EpisodeFilter";
-
-export {
-  calculateNextEpisode, default as asyncCalculateNextEpisodeByIdStream, getRandomPicker,
+  default as asyncCalculateNextEpisodeByIdStream, calculateNextEpisode, getRandomPicker,
 } from "./EpisodePicker";
