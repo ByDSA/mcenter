@@ -16,37 +16,38 @@
     "server"
   ],
   "dependencies": {
-    "esm": "3.2.25",
-    "pnpm": "^8.6.6"
+    "esm": "3.2.25"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.1.2",
-    "@commitlint/config-conventional": "17.1.0",
-    "@typescript-eslint/eslint-plugin": "5.49.0",
-    "@typescript-eslint/parser": "5.49.0",
-    "eslint": "8.33.0",
+    "@commitlint/cli": "17.6.6",
+    "@commitlint/config-conventional": "17.6.6",
+    "@typescript-eslint/eslint-plugin": "5.61.0",
+    "@typescript-eslint/parser": "5.61.0",
+    "eslint": "8.44.0",
     "eslint-config-airbnb-base": "15.0.0",
-    "eslint-config-prettier": "8.6.0",
+    "eslint-config-prettier": "8.8.0",
     "eslint-import-resolver-alias": "1.1.2",
-    "eslint-import-resolver-typescript": "3.5.3",
+    "eslint-import-resolver-typescript": "3.5.5",
     "eslint-plugin-import": "2.27.5",
-    "eslint-plugin-jest": "27.2.1",
+    "eslint-plugin-jest": "27.2.2",
     "eslint-plugin-prettier": "4.2.1",
-    "husky": "8.0.1",
-    "prettier": "2.8.3",
-    "sonarqube-scanner": "2.8.2",
+    "husky": "8.0.3",
+    "prettier": "3.0.0",
     "standard-version": "9.5.0",
-    "tsconfig-paths": "4.1.2",
-    "typescript": "4.9.5"
+    "tsconfig-paths": "4.2.0",
+    "typescript": "5.1.6"
   },
   "scripts": {
     "release": "standard-version",
-    "install:subprojects": "npm install:back",
-    "install:back": "cd server && npm i",
     "prepare": "husky install",
     "clean:modules": "rm -rf node_modules && cd server && npm clean:modules",
-    "lint:eslint": "eslint **/src/*.ts",
-    "lint:prettier": "prettier **/src/*.ts",
-    "lint:fix": "prettier --write **/src/*.ts && eslint ./src/*.ts --fix"
+    "lint:eslint": "eslint **/*.{ts,js,tsx,jsx}",
+    "lint:prettier": "prettier **/*.{json,jsonc,scss,yml}",
+    "lint:fix": "pnpm run lint:prettier --write && pnpm run lint:eslint --fix",
+    "version:release": "standard-version",
+    "git:pr": "pnpm git:pr:create && pnpm git:pr:merge-delete",
+    "git:pr:create": "gh pr create --base main --fill",
+    "git:pr:merge": "gh pr merge --auto --rebase",
+    "git:pr:merge-delete": "gh pr merge --auto --rebase --delete-branch"
   }
 }

@@ -13,18 +13,10 @@
     "test": "NODE_ENV=test jest --maxWorkers=1",
     "test:watch": "pnpm run test --watch",
     "test:coverage": "pnpm run test --coverage",
-    "test:coverage:clean": "rm -rf coverage",
-    "lint:eslint": "eslint **/*.{ts,js,tsx,jsx}",
-    "lint:prettier": "prettier **/*.{json,jsonc,scss,yml}",
-    "lint:fix": "pnpm run lint:prettier --write && pnpm run lint:eslint --fix",
-    "version:release": "standard-version",
-    "git:pr": "pnpm git:pr:create && pnpm git:pr:merge-delete",
-    "git:pr:create": "gh pr create --base main --fill",
-    "git:pr:merge": "gh pr merge --auto --rebase",
-    "git:pr:merge-delete": "gh pr merge --auto --rebase --delete-branch"
+    "test:coverage:clean": "rm -rf coverage"
   },
   "dependencies": {
-    "axios": "0.21.4",
+    "axios": "1.4.0",
     "date-ops": "2.2.0",
     "dotenv": "16.3.1",
     "envalid": "7.3.1",
