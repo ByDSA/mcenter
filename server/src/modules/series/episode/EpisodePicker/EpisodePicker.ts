@@ -1,6 +1,10 @@
 /* eslint-disable require-await */
 import { Serie, SerieRepository } from "#modules/series/serie";
 import { Stream, StreamMode, StreamRepository } from "#modules/stream";
+import { assertFound } from "#modules/utils/base/http/asserts";
+import { assertIsDefined } from "#modules/utils/built-in-types/errors";
+import { neverCase } from "#modules/utils/built-in-types/never";
+import { throwErrorPopStack } from "#modules/utils/others";
 import { Picker, newPicker } from "rand-picker";
 import { Episode, EpisodeRepository } from "../model";
 import { filter } from "./EpisodeFilter";
@@ -24,12 +28,14 @@ export default async function f(streamId: string) {
 
 type FuncGenerator = (serie: Serie, lastEp: Episode | null, stream: Stream)=> Promise<Episode>;
 export async function calculateNextEpisode(stream: Stream) {
+  const serieRepository = SerieRepository.getInstance<SerieRepository>();
+  const episodeRepository = EpisodeRepository.getInstance<EpisodeRepository>();
+
   console.log("Calculating next episode...");
   const groupId: string = stream.group;
-  const serie = await SerieRepository.getInstance<SerieRepository>().findOneFromGroupId(groupId);
+  const serie = await serieRepository.findOneFromGroupId(groupId);
 
-  if (!serie)
-    throw new Error(`Cannot get serie frop group '${groupId}'`);
+  assertFound(serie, `Cannot get serie from group '${groupId}'`);
 
   let nextEpisodeFunc: FuncGenerator;
 
@@ -41,10 +47,10 @@ export async function calculateNextEpisode(stream: Stream) {
       nextEpisodeFunc = getNextEpisodeRandom;
       break;
     default:
-      throw new Error(`Mode invalid: ${stream.mode}.`);
+      neverCase(stream.mode);
   }
 
-  const lastEp = await EpisodeRepository.getInstance<EpisodeRepository>().findLastEpisodeInStream(stream);
+  const lastEp = await episodeRepository.findLastEpisodeInStream(stream);
 
   return nextEpisodeFunc(serie, lastEp, stream);
 }
@@ -83,7 +89,7 @@ function assertPickerHasData(picker: Picker<Episode>) {
       return;
   }
 
-  throw new Error("Picker has no data");
+  throwErrorPopStack(new Error("Picker has no data"));
 }
 
 async function getNextEpisodeRandom(
@@ -96,8 +102,7 @@ async function getNextEpisodeRandom(
   console.log("Picking one ...");
   const ret = picker.pickOne();
 
-  if (!ret)
-    throw new Error();
+  assertIsDefined(ret, "Picker has no data");
 
   return ret;
 }

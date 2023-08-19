@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
+import { Picker } from "rand-picker";
 import { Serie } from "#modules/series/serie";
 import { Stream } from "#modules/stream";
 import { Resource } from "#modules/utils/base/resource";
-import { Picker } from "rand-picker";
 import { Episode } from "../model";
 import { dependent, preventDisabled, preventRepeatInDays, preventRepeatLast, removeWeightLowerOrEqualThan } from "./filters";
 import { Params } from "./utils";

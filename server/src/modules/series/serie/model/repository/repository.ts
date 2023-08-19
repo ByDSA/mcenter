@@ -4,6 +4,7 @@
 /* eslint-disable no-await-in-loop */
 import { Episode, EpisodeRepository } from "#modules/series/episode";
 import { Stream } from "#modules/stream";
+import { assertHasItems } from "#modules/utils/base/http/asserts";
 import { Repository } from "#modules/utils/base/repository";
 import dotenv from "dotenv";
 import { FileNode, getSerieTreeRemote } from "../../../../../actions/nginxTree";
@@ -35,8 +36,7 @@ export default class SerieRepository extends Repository {
   async findOneFromGroupId(groupId: string): Promise<Serie | null> {
     const groupSplit = groupId.split("/");
 
-    if (groupSplit.length === 0)
-      throw new Error();
+    assertHasItems(groupSplit);
 
     const serieId = groupSplit.at(-1) as string;
     const serie = await this.findOneById(serieId);

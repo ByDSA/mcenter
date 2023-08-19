@@ -13,7 +13,7 @@ const defaultOptions = {
   levels: 1,
 };
 
-export function throwErrorWithLessStack(error: Error, options?: ResendErrorLessStackOptions) {
+export function throwErrorPopStack(error: Error, options?: ResendErrorLessStackOptions): never {
   const actualOptions = {
     ...defaultOptions,
     ...options,

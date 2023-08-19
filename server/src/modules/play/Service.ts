@@ -1,9 +1,5 @@
-/* eslint-disable class-methods-use-this */
-/* eslint-disable max-classes-per-file */
-/* eslint-disable no-await-in-loop */
-import { HistoryRepository } from "#modules/history";
-import { Episode, calculateNextEpisode, episodeToMediaElement } from "#modules/series/episode";
-import { Stream } from "#modules/stream";
+import { Episode, episodeToMediaElement } from "#modules/series/episode";
+import { assertHasItems } from "#modules/utils/base/http/asserts";
 import VLCService from "./PlayService";
 import { MediaElement } from "./player";
 
@@ -15,8 +11,7 @@ export default class PlayService {
   }
 
   async play(episodes: Episode[], options?: PlayOptions) {
-    if (episodes.length === 0)
-      throw new Error("No episodes to play");
+    assertHasItems(episodes);
 
     const elements: MediaElement[] = episodes.map(episodeToMediaElement);
     const vlcServiceOptions = {
@@ -25,17 +20,4 @@ export default class PlayService {
 
     await this.vlcService.play(elements, vlcServiceOptions);
   }
-}
-
-export async function pickAndAddHistory(stream: Stream, n: number): Promise<Episode[]> {
-  const episodes: Episode[] = [];
-
-  for (let i = 0; i < n; i++) {
-    const episode = await calculateNextEpisode(stream);
-
-    await HistoryRepository.getInstance<HistoryRepository>().addToHistory(stream, episode);
-    episodes.push(episode);
-  }
-
-  return episodes;
 }

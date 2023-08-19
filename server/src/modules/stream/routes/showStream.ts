@@ -1,5 +1,5 @@
-import { StreamRepository } from "#modules/stream";
 import { Request, Response } from "express";
+import { StreamRepository } from "#modules/stream";
 
 // eslint-disable-next-line func-names, require-await
 export default async function (req: Request, res: Response) {

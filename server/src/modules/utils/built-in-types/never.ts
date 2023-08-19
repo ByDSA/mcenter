@@ -1,6 +1,8 @@
+import { throwErrorPopStack } from "../others";
+
 /* eslint-disable import/prefer-default-export */
 export function neverCase(value: never): never {
   const never: never = value;
 
-  throw new Error(`Unknown value: ${never}`);
+  throwErrorPopStack(new Error(`Unknown value: ${never}`));
 }

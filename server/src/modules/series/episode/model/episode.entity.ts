@@ -1,4 +1,4 @@
-import { MediaElement } from "#modules/player";
+import { MediaElement } from "#modules/play/player";
 import { CanDurable, Resource } from "#modules/utils/base/resource";
 import { copyOfResource } from "#modules/utils/base/resource/Resource.entity";
 import dotenv from "dotenv";

@@ -3,22 +3,33 @@ import { asyncCalculateNextEpisodeByIdStream } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { addSerieRoutes } from "#modules/series/serie/routes";
 import { addStreamRoutes } from "#modules/stream/routes";
+import errorHandler from "#modules/utils/base/http/errors/errorHandler";
 import { HELLO_WORLD_HANDLER } from "#modules/utils/base/http/routing/utils";
 import { execSync } from "child_process";
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
-import showPickerFunc from "./src/actions/showPicker";
-import { connect } from "./src/db/database";
+import showPickerFunc from "./actions/showPicker";
+import { connect } from "./db/database";
 
 const app = express();
 // eslint-disable-next-line import/no-internal-modules, @typescript-eslint/no-unused-vars
-const s = require("./src/scheduler");
+const s = require("./scheduler");
 
 app.disable("x-powered-by");
 
 const PORT = 8011;
 
 connect();
+
+const requestLogger = (
+  request: Request,
+  response: Response,
+  next: NextFunction) => {
+  console.log(`${request.method} url:: ${request.url}`);
+  next();
+};
+
+app.use(requestLogger);
 
 app.get("/", HELLO_WORLD_HANDLER);
 
@@ -61,6 +72,8 @@ configRoutes.get("/resume", (req: Request, res: Response) => {
 } );
 
 app.use("/config", configRoutes);
+
+app.use(errorHandler);
 
 killProcessesUsingPort(PORT);
 const listener = app.listen(PORT, () => {

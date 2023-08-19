@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-await-in-loop */
+import { assertHasItems } from "#modules/utils/base/http/asserts";
 import dotenv from "dotenv";
 import { MediaElement, QueuePlaylistManager, VLCFlag, VLCProcess } from "./player";
 
@@ -42,8 +43,7 @@ export default class PlayService {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async play(elements: MediaElement[], options?: Options) {
-    if (elements.length === 0)
-      throw new Error("No elements to play");
+    assertHasItems(elements);
 
     this.#openNewInstance = options?.openNewInstance ?? false;
     this.#isRunningAnyInstance = await VLCProcess.isRunningAsync();

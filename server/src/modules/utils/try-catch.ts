@@ -1,4 +1,4 @@
-import { ResendErrorLessStackOptions, rethrowErrorLessStackOptionsAddLevel, throwErrorWithLessStack } from "./others";
+import { ResendErrorLessStackOptions, rethrowErrorLessStackOptionsAddLevel, throwErrorPopStack } from "./others";
 
 type FunctionToTry<R> = ()=> R;
 export function tryCatchLogError<R>(f: FunctionToTry<R>) {
@@ -35,7 +35,7 @@ export function tryCatchResendErrorWithLessStack<R>(f: FunctionToTry<R>, opts?: 
   let ret;
 
   tryCatch(f, (error: Error) => {
-    ret = throwErrorWithLessStack(error, fixedOpts);
+    ret = throwErrorPopStack(error, fixedOpts);
   } );
 
   return ret;

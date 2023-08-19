@@ -1,4 +1,4 @@
-import { throwErrorWithLessStack } from "../others";
+import { throwErrorPopStack } from "../others";
 
 export type ArrayOneOrMore<T> = Array<T> & {
   0: T;
@@ -10,5 +10,5 @@ export type ArrayTwoOrMore<T> = ArrayOneOrMore<T> & {
 
 export function assertNotEmpty<T>(array: T[]): asserts array is ArrayOneOrMore<T> {
   if (array.length === 0)
-    throwErrorWithLessStack(new Error("Array is empty"));
+    throwErrorPopStack(new Error("Array is empty"));
 }

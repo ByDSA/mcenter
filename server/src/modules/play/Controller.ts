@@ -2,6 +2,7 @@
 import { HistoryRepository } from "#modules/history";
 import { SerieRepository } from "#modules/series/serie";
 import { StreamRepository } from "#modules/stream";
+import { assertFound, assertHasItems } from "#modules/utils/base/http/asserts";
 import { Request, Response, Router } from "express";
 import Service from "./Service";
 
@@ -31,16 +32,11 @@ export default class PlayController {
     const { id, name } = req.params;
     const serie = await this.#serieRepository.findOneById(name);
 
-    if (!serie) {
-      res.sendStatus(404);
-
-      return;
-    }
+    assertFound(serie);
 
     const { episodes } = serie;
 
-    if (!episodes || episodes.length === 0)
-      throw new Error("No episodes");
+    assertHasItems(episodes);
 
     const episode = episodes.find((e) => e.id === id);
     const streamRepo = StreamRepository.getInstance<StreamRepository>();

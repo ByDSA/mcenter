@@ -1,4 +1,4 @@
-import { errorPopStack } from "#modules/utils/others";
+import { throwErrorPopStack } from "#modules/utils/others";
 
 export class NotInitializedError extends Error {
   constructor() {
@@ -8,5 +8,5 @@ export class NotInitializedError extends Error {
 
 export function assertInitialized(initialized: boolean): asserts initialized is true {
   if (!initialized)
-    throw errorPopStack(new NotInitializedError());
+    throwErrorPopStack(new NotInitializedError());
 }

@@ -1,21 +1,25 @@
+import { PlayService, VLCService } from "#modules/play";
 import { StreamRepository } from "#modules/stream";
+import { assertFound, assertHasItems } from "#modules/utils/base/http/asserts";
 import { Request, Response } from "express";
-import { pickAndAddHistory, play } from "../../../actions/play";
+import StreamService from "../StreamService";
 
 export default async function f(req: Request, res: Response) {
   console.log("playStream");
   const { id, number, force } = parseParams(req, res);
-  const stream = await StreamRepository.getInstance<StreamRepository>().findOneById(id);
+  const streamService = new StreamService();
+  const vlcService = new VLCService();
+  const playService = new PlayService(vlcService);
+  const streamRepository = StreamRepository.getInstance<StreamRepository>();
+  const stream = await streamRepository.findOneById(id);
 
-  if (!stream) {
-    res.sendStatus(404);
+  assertFound(stream);
 
-    return;
-  }
+  const episodes = await streamService.pickNextEpisode(stream, number);
 
-  const episodes = await pickAndAddHistory(stream, number);
-
-  await play(episodes, force);
+  await playService.play(episodes, {
+    force,
+  } );
 
   res.send(episodes);
 }
