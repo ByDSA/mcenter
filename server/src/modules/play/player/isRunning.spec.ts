@@ -1,35 +1,32 @@
-import { isRunning } from "#modules/utils";
-import { VLC } from "./VLC";
+import { VLCProcess } from "./VLCProcess";
 
 it("isRunning no devuelve errores", async () => {
-  await isRunning("vlc");
+  await VLCProcess.isRunningAsync();
 } );
 
 it("se paran todas las instancias de VLC y isRunning(vlc) devuelve false", async () => {
-  await VLC.closeAllAsync();
+  await VLCProcess.closeAllAsync();
 
-  const actual = await isRunning("vlc");
+  const actual = await VLCProcess.isRunningAsync();
 
   expect(actual).toBeFalsy();
 } );
 
 it("se abre una instancia de VLC, luego se cierra y isRunning(vlc) devuelve false", async () => {
-  const vlc = new VLC();
+  const vlc = await VLCProcess.builder()
+    .buildAsync();
 
-  await vlc.openAsync();
   vlc.close();
 
-  const actual = await isRunning("vlc");
+  const actual = await VLCProcess.isRunningAsync();
 
   expect(actual).toBeFalsy();
 } );
 
 it("se abre una instancia de VLC y isRunning(vlc) devuelve true", async () => {
-  const vlc = new VLC();
-
-  await vlc.openAsync();
-
-  const actual = await isRunning("vlc");
+  const vlc = await VLCProcess.builder()
+    .buildAsync();
+  const actual = await VLCProcess.isRunningAsync();
 
   expect(actual).toBeTruthy();
 

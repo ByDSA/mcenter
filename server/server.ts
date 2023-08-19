@@ -1,10 +1,12 @@
+import { PlayController, PlayService, VLCService } from "#modules/play";
 import { asyncCalculateNextEpisodeByIdStream } from "#modules/series/episode";
+import { SerieRepository } from "#modules/series/serie";
 import { addSerieRoutes } from "#modules/series/serie/routes";
 import { addStreamRoutes } from "#modules/stream/routes";
 import { HELLO_WORLD_HANDLER } from "#modules/utils/base/http/routing/utils";
+import { execSync } from "child_process";
 import express, { Request, Response } from "express";
 import fs from "fs";
-import playFunc, { playSerieFunc } from "./src/actions/play";
 import showPickerFunc from "./src/actions/showPicker";
 import { connect } from "./src/db/database";
 
@@ -23,8 +25,15 @@ app.get("/", HELLO_WORLD_HANDLER);
 addStreamRoutes(app);
 addSerieRoutes(app);
 
-app.get("/api/play/serie/:name/:id", playSerieFunc);
-app.get("/api/play/:type/:id", playFunc);
+const serieRepository = SerieRepository.getInstance<SerieRepository>();
+const vlcService = new VLCService();
+const playService = new PlayService(vlcService);
+const playController = new PlayController( {
+  serieRepository,
+  service: playService,
+} );
+
+app.use("/api/play", playController.getRouter());
 
 app.get("/api/picker/:streamId", showPickerFunc);
 
@@ -53,6 +62,25 @@ configRoutes.get("/resume", (req: Request, res: Response) => {
 
 app.use("/config", configRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server Listening on ${PORT}`);
+killProcessesUsingPort(PORT);
+const listener = app.listen(PORT, () => {
+  const { port } = listener.address() as { port: number };
+
+  console.log(`Server listening on port ${port}`);
 } );
+
+function killProcessesUsingPort(port: number): void {
+  // kill process which is using port PORT
+  const processes = execSync(`lsof -i :${port} | grep node || true`).toString()
+    .split("\n");
+
+  if (processes.length === 0)
+    return;
+
+  for (const p of processes) {
+    const pId = +p.split(" ")[1];
+
+    if (pId)
+      execSync(`kill -9 ${pId}`);
+  }
+}
