@@ -9,7 +9,7 @@ fatal_error() {
   exit 1
 }
 
-guard_current_branch() {
+main() {
   local current_branch
   current_branch=$(git rev-parse --abbrev-ref HEAD)
 
@@ -20,4 +20,17 @@ guard_current_branch() {
   fi
 }
 
-guard_current_branch
+# check GITHOOKS_NO_CHECK_BRANCH value
+. "$(dirname -- "$0")/../.env"
+
+case "$GITHOOKS_NO_CHECK_BRANCH" in
+0 | false | "")
+  main "$@"
+  ;;
+1 | true)
+  exit 0
+  ;;
+*)
+  fatal_error "GITHOOKS_NO_CHECK_BRANCH tiene un valor no válido: $GITHOOKS_NO_CHECK_BRANCH"
+  ;;
+esac

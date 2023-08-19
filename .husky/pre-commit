@@ -1,17 +1,21 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-. "$(dirname -- "$0")/guard_current_branch.sh"
+. "$(dirname -- "$0")/assert_can_edit_current_brach.sh"
 
-changed_files=$(git diff --cached --name-only HEAD --diff-filter=d)
-eslint_files=$(echo "$changed_files" | grep -E "(.*).(js|ts|jsx|tsx)$" | xargs)
-prettier_files=$(echo "$changed_files" | grep -E "(.*).(json|jsonc|scss|yml)$" | xargs)
+main() {
+  changed_files=$(git diff --cached --name-only HEAD --diff-filter=d)
+  eslint_files=$(echo "$changed_files" | grep -E "(.*).(js|ts|jsx|tsx)$" | xargs)
+  prettier_files=$(echo "$changed_files" | grep -E "(.*).(json|jsonc|scss|yml)$" | xargs)
 
-if [ -n "$eslint_files" ]; then
-  npx eslint --fix $eslint_files
-  git add $eslint_files
-fi
-if [ -n "$prettier_files" ]; then
-  npx prettier --write $prettier_files
-  git add $prettier_files
-fi
+  if [ -n "$eslint_files" ]; then
+    npx eslint --fix "$eslint_files"
+    git add "$eslint_files"
+  fi
+  if [ -n "$prettier_files" ]; then
+    npx prettier --write "$prettier_files"
+    git add "$prettier_files"
+  fi
+}
+
+main
