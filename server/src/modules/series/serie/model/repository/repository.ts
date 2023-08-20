@@ -8,8 +8,8 @@ import { assertHasItems } from "#modules/utils/base/http/asserts";
 import { Repository } from "#modules/utils/base/repository";
 import dotenv from "dotenv";
 import { FileNode, getSerieTreeRemote } from "../../../../../actions/nginxTree";
-import Serie, { SerieId } from "../serie.entity";
-import { SerieModel } from "./serie.model";
+import SerieWithEpisodes, { SerieId } from "../serie.entity";
+import { SerieModel as SerieWithEpisodesModel } from "./serie.model";
 
 dotenv.config();
 
@@ -33,7 +33,7 @@ export default class SerieRepository extends Repository {
     } );
   }
 
-  async findOneFromGroupId(groupId: string): Promise<Serie | null> {
+  async findOneFromGroupId(groupId: string): Promise<SerieWithEpisodes | null> {
     const groupSplit = groupId.split("/");
 
     assertHasItems(groupSplit);
@@ -44,8 +44,8 @@ export default class SerieRepository extends Repository {
     return serie;
   }
 
-  async findOneById(id: string): Promise<Serie | null> {
-    let [serie]: Serie[] = await SerieModel.find( {
+  async findOneById(id: string): Promise<SerieWithEpisodes | null> {
+    let [serie]: SerieWithEpisodes[] = await SerieWithEpisodesModel.find( {
       id,
     }, {
       _id: 0,
@@ -63,8 +63,8 @@ export default class SerieRepository extends Repository {
     return serie;
   }
 
-  async updateOneById(id: SerieId, serie: Serie): Promise<Serie | null> {
-    return SerieModel.findOneAndUpdate( {
+  async updateOneById(id: SerieId, serie: SerieWithEpisodes): Promise<SerieWithEpisodes | null> {
+    return SerieWithEpisodesModel.findOneAndUpdate( {
       id,
     }, serie, {
       new: true,
@@ -72,14 +72,14 @@ export default class SerieRepository extends Repository {
   }
 }
 
-async function generateFromFiles(id: string): Promise<Serie | null> {
+async function generateFromFiles(id: string): Promise<SerieWithEpisodes | null> {
   const folder = `${MEDIA_PATH}/series/${id}`;
   const episodes: Episode[] | null = await getSerieTree(folder);
 
   if (!episodes)
     return null;
 
-  return SerieModel.create( {
+  return SerieWithEpisodesModel.create( {
     id,
     name: id,
     episodes,

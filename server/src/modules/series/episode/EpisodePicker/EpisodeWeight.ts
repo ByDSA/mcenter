@@ -1,5 +1,5 @@
 /* eslint-disable require-await */
-import { Serie } from "#modules/series/serie";
+import { SerieWithEpisodes } from "#modules/series/serie";
 import { Stream } from "#modules/stream";
 import { daysBetween } from "date-ops";
 import { DateTime } from "luxon";
@@ -9,7 +9,7 @@ import { getDaysFromLastPlayed } from "../lastPlayed";
 import { Episode } from "../model";
 import { Params } from "./utils";
 
-type MiddlewareWeightFunction = (params: Params)=> Promise<number>;
+type MiddlewareWeightFunction = (params: Params<Episode>)=> Promise<number>;
 const middlewareWeightFunctions: MiddlewareWeightFunction[] = [
   weightCalculator,
   weightTag,
@@ -18,7 +18,7 @@ const middlewareWeightFunctions: MiddlewareWeightFunction[] = [
 
 export default async function fixWeight(
   picker: Picker<Episode>,
-  serie: Serie,
+  serie: SerieWithEpisodes,
   lastEp: Episode | null,
   stream: Stream,
 ): Promise<void> {
@@ -42,7 +42,7 @@ export default async function fixWeight(
   console.log("Fixed weight!");
 }
 
-async function weightCalculator( { self, stream, serie }: Params): Promise<number> {
+async function weightCalculator( { self, stream, serie }: Params<Episode>): Promise<number> {
   const daysFromLastTime = self.lastTimePlayed
     ? daysBetween(DateTime.now(), DateTime.fromSeconds(self.lastTimePlayed))
     : getDaysFromLastPlayed(self, serie.id, stream.history);
@@ -57,7 +57,7 @@ async function weightCalculator( { self, stream, serie }: Params): Promise<numbe
   return reinforcementFactor * daysFromLastTime;
 }
 
-async function weightTag( { self, picker }: Params): Promise<number> {
+async function weightTag( { self, picker }: Params<Episode>): Promise<number> {
   let weight = picker.getWeight(self) ?? 0;
 
   if (self && !self.tags)
@@ -76,7 +76,7 @@ async function weightTag( { self, picker }: Params): Promise<number> {
   } );
 }
 
-async function weightLimiter( { self, picker }: Params): Promise<number> {
+async function weightLimiter( { self, picker }: Params<Episode>): Promise<number> {
   const weight = picker.getWeight(self) || 1;
 
   return Math.min(weight, Number.MAX_SAFE_INTEGER / picker.data.length);

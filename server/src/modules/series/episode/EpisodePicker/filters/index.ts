@@ -2,7 +2,7 @@ import { Episode } from "#modules/series/episode";
 import { getDaysFromLastPlayed } from "../../lastPlayed";
 import { Params } from "../utils";
 
-export function preventRepeatLast( { self, lastEp }: Params) {
+export function preventRepeatLast( { self, lastEp }: Params<Episode>) {
   return !lastEp || lastEp.id !== self.id;
 }
 
@@ -10,7 +10,7 @@ type Obj = {
   [key: string]: [string, string][];
 };
 
-export function dependent( { self, lastEp, serie }: Params) {
+export function dependent( { self, lastEp, serie }: Params<Episode>) {
   let ret = true;
   const obj: Obj = {
     simpsons: [
@@ -43,18 +43,18 @@ function dependency(
   || (lastEp?.id !== idLast && self.id !== idCurrent);
 }
 
-export function preventDisabled( { self }: Params) {
+export function preventDisabled( { self }: Params<Episode>) {
   const ret = self.disabled === undefined || self.disabled === false;
 
   return ret;
 }
 
 export function removeWeightLowerOrEqualThan(num: number) {
-  return ( { self }: Params): boolean => self.weight > num;
+  return ( { self }: Params<Episode>): boolean => self.weight > num;
 }
 
 export function preventRepeatInDays(minDays: number) {
-  return ( { self, serie, stream }: Params): boolean => {
+  return ( { self, serie, stream }: Params<Episode>): boolean => {
     const daysFromLastTime = getDaysFromLastPlayed(self, serie.id, stream.history);
 
     return daysFromLastTime >= minDays;

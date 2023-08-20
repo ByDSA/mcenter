@@ -2,8 +2,8 @@ import { History } from "#modules/history";
 import { DateType } from "#modules/utils/time/date-type";
 import { DateTime } from "luxon";
 import { SerieId } from "../serie";
-import { Episode, EpisodeRepository } from "./model";
-import { copyOfEpisode } from "./model/episode.entity";
+import { EpisodeRepository } from "./model";
+import { Episode, copyOfEpisode } from "./model/episode.entity";
 
 function getTimestampFromDate(date: DateType): number {
   if (date.timestamp)
@@ -39,7 +39,7 @@ export function getDaysFromLastPlayed(self: Episode, serieId: SerieId, history: 
     lastTimePlayed = getLastTimePlayedFromHistory(self, history);
 
     if (lastTimePlayed) {
-      const selfCopy = {
+      const selfCopy: Episode = {
         ...copyOfEpisode(self),
         lastTimePlayed,
       };

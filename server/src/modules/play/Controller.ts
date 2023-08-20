@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
-import { HistoryRepository } from "#modules/history";
-import { SerieRepository } from "#modules/series/serie";
-import { StreamRepository } from "#modules/stream";
+import { EpisodeWithSerie } from "#modules/series";
+import { copyOfEpisode } from "#modules/series/episode/model/episode.entity";
+import { Serie, SerieRepository } from "#modules/series/serie";
 import { assertFound, assertHasItems } from "#modules/utils/base/http/asserts";
 import { Request, Response, Router } from "express";
 import Service from "./Service";
@@ -39,16 +39,19 @@ export default class PlayController {
     assertHasItems(episodes);
 
     const episode = episodes.find((e) => e.id === id);
-    const streamRepo = StreamRepository.getInstance<StreamRepository>();
 
-    streamRepo.findOneById(name)
-      .then((stream) => {
-        if (stream && episode)
-          HistoryRepository.getInstance<HistoryRepository>().addToHistory(stream, episode);
-      } );
+    if (episode) {
+      const serieWithoutEpisodes: Serie = {
+        id: serie.id,
+        name: serie.name,
+      };
+      const episodeWithSerie: EpisodeWithSerie = {
+        ...copyOfEpisode(episode),
+        serie: serieWithoutEpisodes,
+      };
 
-    if (episode){
-      this.#service.play([episode], {
+      await this.#service.play( {
+        episodes: [episodeWithSerie],
         force,
       } );
     }

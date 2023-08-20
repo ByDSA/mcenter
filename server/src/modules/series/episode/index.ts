@@ -2,5 +2,5 @@ export * from "./EpisodePicker";
 
 export {
   Episode,
-  EpisodeId, EpisodeRepository, episodeToMediaElement,
+  EpisodeId, EpisodeRepository, EpisodeWithSerie,
 } from "./model";

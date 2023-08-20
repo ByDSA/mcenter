@@ -1,3 +1,3 @@
 export {
-  Serie, SerieId, SerieRepository,
+  Serie, SerieId, SerieRepository, SerieWithEpisodes,
 } from "./model";

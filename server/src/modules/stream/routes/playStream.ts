@@ -1,6 +1,8 @@
+import { HistoryRepository } from "#modules/history";
 import { PlayService, VLCService } from "#modules/play";
+import { Serie, SerieRepository } from "#modules/series/serie";
 import { StreamRepository } from "#modules/stream";
-import { assertFound, assertHasItems } from "#modules/utils/base/http/asserts";
+import { assertFound } from "#modules/utils/base/http/asserts";
 import { Request, Response } from "express";
 import StreamService from "../StreamService";
 
@@ -9,15 +11,34 @@ export default async function f(req: Request, res: Response) {
   const { id, number, force } = parseParams(req, res);
   const streamService = new StreamService();
   const vlcService = new VLCService();
-  const playService = new PlayService(vlcService);
   const streamRepository = StreamRepository.getInstance<StreamRepository>();
+  const serieRepository = SerieRepository.getInstance<SerieRepository>();
+  const historyRepository = HistoryRepository.getInstance<HistoryRepository>();
+  const playService = new PlayService( {
+    vlcService,
+    streamRepository,
+    historyRepository,
+  } );
   const stream = await streamRepository.findOneById(id);
 
   assertFound(stream);
 
   const episodes = await streamService.pickNextEpisode(stream, number);
+  const serieWithEpisodes = await serieRepository.findOneById(stream.id);
 
-  await playService.play(episodes, {
+  assertFound(serieWithEpisodes);
+
+  const serie: Serie = {
+    id: serieWithEpisodes.id,
+    name: serieWithEpisodes.name,
+  };
+  const episodeWithSerie = episodes.map((episode) => ( {
+    ...episode,
+    serie,
+  } ));
+
+  await playService.play( {
+    episodes: episodeWithSerie,
     force,
   } );
 

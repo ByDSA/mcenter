@@ -1,12 +1,11 @@
-import { Picker } from "rand-picker";
-import { Serie } from "#modules/series/serie";
+import { SerieWithEpisodes } from "#modules/series/serie";
 import { Stream } from "#modules/stream";
-import { Episode } from "../model";
+import { Picker } from "rand-picker";
 
-export type Params = {
-  picker: Picker<Episode>;
-  self: Episode;
-  serie: Serie;
-  lastEp: Episode | null;
+export type Params<R> = {
+  picker: Picker<R>;
+  self: R;
+  serie: SerieWithEpisodes;
+  lastEp: R | null;
   stream: Stream;
 };

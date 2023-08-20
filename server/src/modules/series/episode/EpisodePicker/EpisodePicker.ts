@@ -1,5 +1,5 @@
 /* eslint-disable require-await */
-import { Serie, SerieRepository } from "#modules/series/serie";
+import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
 import { Stream, StreamMode, StreamRepository } from "#modules/stream";
 import { assertFound } from "#modules/utils/base/http/asserts";
 import { assertIsDefined } from "#modules/utils/built-in-types/errors";
@@ -26,7 +26,7 @@ export default async function f(streamId: string) {
   return nextEpisodeId;
 }
 
-type FuncGenerator = (serie: Serie, lastEp: Episode | null, stream: Stream)=> Promise<Episode>;
+type FuncGenerator = (serie: SerieWithEpisodes, lastEp: Episode | null, stream: Stream)=> Promise<Episode>;
 export async function calculateNextEpisode(stream: Stream) {
   const serieRepository = SerieRepository.getInstance<SerieRepository>();
   const episodeRepository = EpisodeRepository.getInstance<EpisodeRepository>();
@@ -55,7 +55,7 @@ export async function calculateNextEpisode(stream: Stream) {
   return nextEpisodeFunc(serie, lastEp, stream);
 }
 
-async function getNextEpisodeSequential(serie: Serie, lastEp: Episode | null): Promise<Episode> {
+async function getNextEpisodeSequential(serie: SerieWithEpisodes, lastEp: Episode | null): Promise<Episode> {
   const { episodes } = serie;
   let i = 0;
 
@@ -69,10 +69,10 @@ async function getNextEpisodeSequential(serie: Serie, lastEp: Episode | null): P
   return episodes[i];
 }
 
-export async function getRandomPicker(serie: Serie, lastEp: Episode | null, stream: Stream) {
+export async function getRandomPicker(serie: SerieWithEpisodes, lastEp: Episode | null, stream: Stream) {
   console.log("Getting random picker...");
   const { episodes } = serie;
-  const picker = newPicker(episodes, {
+  const picker: Picker<Episode> = newPicker(episodes, {
     weighted: true,
   } );
 
@@ -93,7 +93,7 @@ function assertPickerHasData(picker: Picker<Episode>) {
 }
 
 async function getNextEpisodeRandom(
-  serie: Serie,
+  serie: SerieWithEpisodes,
   lastEp: Episode | null,
   stream: Stream,
 ): Promise<Episode> {

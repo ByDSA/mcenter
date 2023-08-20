@@ -1,5 +1,5 @@
 export * from "./repository";
 
 export {
-  default as Serie, SerieId,
+  SerieWithoutEpisodes as Serie, SerieId, default as SerieWithEpisodes,
 } from "./serie.entity";

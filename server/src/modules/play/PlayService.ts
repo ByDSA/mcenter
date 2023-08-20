@@ -19,17 +19,23 @@ export default class PlayService {
 
   #isRunningAnyInstance: boolean;
 
+  #isClosed: boolean;
+
   constructor() {
     this.#queue = new QueuePlaylistManager(TMP_PATH || "/");
 
     this.#openNewInstance = false;
 
     this.#isRunningAnyInstance = false;
+
+    this.#isClosed = false;
   }
 
-  async #closeIfNeeded() {
+  async #closeIfNeeded(): Promise<boolean> {
     if (this.#openNewInstance || (this.#isRunningAnyInstance && this.#queue.nextNumber === 0))
       await VLCProcess.closeAllAsync();
+
+    return true;
   }
 
   #setAsOpenIfNotRunning() {
@@ -41,12 +47,18 @@ export default class PlayService {
     }
   }
 
+  async #updateIsRunningAnyInstanceAsync() {
+    const isRunning = await VLCProcess.isRunningAsync();
+
+    this.#isRunningAnyInstance = isRunning;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async play(elements: MediaElement[], options?: Options) {
+  async play(elements: MediaElement[], options?: Options): Promise<boolean> {
     assertHasItems(elements);
 
     this.#openNewInstance = options?.openNewInstance ?? false;
-    this.#isRunningAnyInstance = await VLCProcess.isRunningAsync();
+    await this.#updateIsRunningAnyInstanceAsync();
     console.log(`Play function: ${elements[0].path}`);
 
     await this.#closeIfNeeded();
@@ -58,14 +70,29 @@ export default class PlayService {
     if (this.#openNewInstance) {
       const file = this.#queue.firstFile;
       const vlcProcess = await openVLC(file);
+      const okPromise: Promise<boolean> = new Promise((resolve) => {
+        vlcProcess.onExit((code: number) => {
+          if (code === 0)
+            this.#queue.clear();
 
-      vlcProcess.onExit((code: number) => {
-        if (code === 0)
-          this.#queue.clear();
+          console.log("Closed VLC");
+          resolve(false);
+        } );
+        setTimeout(async () => {
+          await this.#updateIsRunningAnyInstanceAsync();
 
-        console.log("Closed VLC");
+          if (this.#isRunningAnyInstance)
+            resolve(true);
+          else
+            resolve(false);
+        }, 1500);
       } );
+      const ok = await okPromise;
+
+      return ok;
     }
+
+    return true;
   }
 }
 

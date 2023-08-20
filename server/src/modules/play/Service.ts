@@ -1,23 +1,50 @@
-import { Episode, episodeToMediaElement } from "#modules/series/episode";
+import { HistoryRepository } from "#modules/history";
+import { EpisodeWithSerie } from "#modules/series/episode";
+import { StreamRepository } from "#modules/stream";
 import { assertHasItems } from "#modules/utils/base/http/asserts";
 import VLCService from "./PlayService";
+import { episodeToMediaElement } from "./adapters";
 import { MediaElement } from "./player";
 
-type PlayOptions = {
+type PlayParams = {
   force?: boolean;
+  episodes: EpisodeWithSerie[];
+};
+type Params = {
+  vlcService: VLCService;
+  streamRepository: StreamRepository;
+  historyRepository: HistoryRepository;
 };
 export default class PlayService {
-  constructor(private vlcService: VLCService) {
+  #vlcService: VLCService;
+
+  #streamRepository: StreamRepository;
+
+  #historyRepository: HistoryRepository;
+
+  constructor( {vlcService, streamRepository, historyRepository}: Params) {
+    this.#vlcService = vlcService;
+    this.#streamRepository = streamRepository;
+    this.#historyRepository = historyRepository;
   }
 
-  async play(episodes: Episode[], options?: PlayOptions) {
+  async play( {episodes, force}: PlayParams): Promise<boolean> {
     assertHasItems(episodes);
 
     const elements: MediaElement[] = episodes.map(episodeToMediaElement);
-    const vlcServiceOptions = {
-      openNewInstance: options?.force ?? false,
-    };
+    const ok = await this.#vlcService.play(elements, {
+      openNewInstance: force ?? false,
+    } );
 
-    await this.vlcService.play(elements, vlcServiceOptions);
+    if (ok) {
+      for (const episode of episodes) {
+        this.#streamRepository.findOneById(episode.serie.id)
+          .then((stream) => {
+            if (stream && episode)
+              this.#historyRepository.addToHistory(stream, episode);
+          } );}
+    }
+
+    return ok;
   }
 }

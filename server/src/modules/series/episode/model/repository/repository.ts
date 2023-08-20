@@ -1,13 +1,13 @@
 /* eslint-disable class-methods-use-this */
-import { Serie, SerieId, SerieRepository } from "#modules/series/serie";
+import { SerieId, SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
 import { SerieModel } from "#modules/series/serie/model/repository/serie.model";
 import { Stream } from "#modules/stream";
 import { Repository } from "#modules/utils/base/repository";
-import Episode, { EpisodeId } from "../episode.entity";
+import { Episode, EpisodeId } from "../episode.entity";
 
 type FindOneParamsSerie = {
   episodeId: EpisodeId;
-  serie: Serie;
+  serie: SerieWithEpisodes;
 };
 
 type FindOneParamsSerieId = {
@@ -37,7 +37,7 @@ export default class EpisodeRepository extends Repository {
     return this.findEpisodeInSerie(episodeId, serie);
   }
 
-  private findEpisodeInSerie(episodeId: EpisodeId, serie: Serie): Episode | null {
+  private findEpisodeInSerie(episodeId: EpisodeId, serie: SerieWithEpisodes): Episode | null {
     return serie.episodes.find((episode: Episode) => episode.id === episodeId) ?? null;
   }
 

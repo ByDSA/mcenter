@@ -1,7 +1,9 @@
+import { HistoryRepository } from "#modules/history";
 import { PlayController, PlayService, VLCService } from "#modules/play";
 import { asyncCalculateNextEpisodeByIdStream } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { addSerieRoutes } from "#modules/series/serie/routes";
+import { StreamRepository } from "#modules/stream";
 import { addStreamRoutes } from "#modules/stream/routes";
 import errorHandler from "#modules/utils/base/http/errors/errorHandler";
 import { HELLO_WORLD_HANDLER } from "#modules/utils/base/http/routing/utils";
@@ -37,8 +39,14 @@ addStreamRoutes(app);
 addSerieRoutes(app);
 
 const serieRepository = SerieRepository.getInstance<SerieRepository>();
+const streamRepository = StreamRepository.getInstance<StreamRepository>();
+const historyRepository = HistoryRepository.getInstance<HistoryRepository>();
 const vlcService = new VLCService();
-const playService = new PlayService(vlcService);
+const playService = new PlayService( {
+  vlcService,
+  streamRepository,
+  historyRepository,
+} );
 const playController = new PlayController( {
   serieRepository,
   service: playService,

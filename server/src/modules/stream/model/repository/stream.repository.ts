@@ -1,4 +1,4 @@
-import { Serie, SerieId, SerieRepository } from "#modules/series/serie";
+import { SerieId, SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
 import { CanFindById, CanUpdateOneById, Repository } from "#modules/utils/base/repository";
 import Stream, { StreamId } from "../stream.entity";
 import { Mode, StreamDocument, StreamModel } from "./odm/stream.odm";
@@ -9,7 +9,7 @@ export default class StreamRepository
   implements
 CanFindById<Stream, StreamId>,
 CanUpdateOneById<Stream, StreamId> {
-  createFromSerie(serie: Serie): Promise<Stream | null> {
+  createFromSerie(serie: SerieWithEpisodes): Promise<Stream | null> {
     const serieId = serie.id as SerieId;
 
     console.log(`createFromSerie ${serieId}`);

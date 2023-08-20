@@ -1,28 +1,19 @@
-import { MediaElement } from "#modules/play/player";
+import { Serie } from "#modules/series/serie";
 import { CanDurable, Resource } from "#modules/utils/base/resource";
 import { copyOfResource } from "#modules/utils/base/resource/Resource.entity";
-import dotenv from "dotenv";
 
 export type EpisodeId = string;
 
-export default interface Episode
+export interface Episode
 extends
 Resource,
 CanDurable {
   id: EpisodeId;
 }
 
-export function episodeToMediaElement(e: Episode): MediaElement {
-  dotenv.config();
-  const { MEDIA_PATH } = process.env;
-
-  return {
-    path: `${MEDIA_PATH}/${e.path}`,
-    title: e.title,
-    startTime: e.start,
-    stopTime: e.end,
-    length: e.duration,
-  };
+export default interface EpisodeWithSerie
+extends Episode {
+  serie: Serie;
 }
 
 export function copyOfEpisode(e: Episode): Episode {

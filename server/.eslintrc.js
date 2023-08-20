@@ -6,8 +6,8 @@ module.exports = {
     "jest/globals": true,
   },
   globals: {
-    "NodeJS": true,
-    "React": true,
+    NodeJS: true,
+    React: true,
   },
   extends: ["airbnb-base", "prettier"],
   parser: "@typescript-eslint/parser",
@@ -17,15 +17,35 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "import", "jest", "prettier"],
   rules: {
-    "import/no-internal-modules": ["error", {
-      "allow": ["*modules/*", "**/repository/odm/**", "*modules/utils/**", "*modules/time/*", "**/src/actions/**", "**/src/db/**", "**/src/backup/**", "*modules/series/*", "*modules/**/routes"],
-    }],
-    "no-invalid-this": ["error", {
-      "capIsConstructor": false,
-    }],
-    "import/no-extraneous-dependencies": ["error", {
-      "devDependencies": true,
-    }],
+    "import/no-internal-modules": [
+      "error",
+      {
+        allow: [
+          "*modules/*",
+          "**/repository/odm/**",
+          "*modules/utils/**",
+          "*utils/**",
+          "*modules/time/*",
+          "**/src/actions/**",
+          "**/src/db/**",
+          "**/src/backup/**",
+          "*modules/series/*",
+          "*modules/**/routes",
+        ],
+      },
+    ],
+    "no-invalid-this": [
+      "error",
+      {
+        capIsConstructor: false,
+      },
+    ],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        devDependencies: true,
+      },
+    ],
     "no-useless-constructor": "off",
     "no-empty-function": [
       "error",
