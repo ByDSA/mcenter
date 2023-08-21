@@ -1,6 +1,5 @@
-/* eslint-disable class-methods-use-this */
 import { EpisodeWithSerie } from "#modules/series";
-import { copyOfEpisode } from "#modules/series/episode/model/episode.entity";
+import { copyOfEpisode } from "#modules/series/episode/model";
 import { Serie, SerieRepository } from "#modules/series/serie";
 import { assertFound, assertHasItems } from "#modules/utils/base/http/asserts";
 import { Request, Response, Router } from "express";
@@ -20,10 +19,9 @@ export default class PlayController {
     this.#service = service;
   }
 
-  // eslint-disable-next-line require-await
   async root(req: Request, res: Response) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, type, force } = this.#getParams(req, res);
+    const { id, type, force } = getParams(req, res);
   }
 
   async playSerieFunc(req: Request, res: Response) {
@@ -38,7 +36,7 @@ export default class PlayController {
 
     assertHasItems(episodes);
 
-    const episode = episodes.find((e) => e.innerId === id);
+    const episode = episodes.find((e) => e.id.innerId === id);
 
     if (episode) {
       const serieWithoutEpisodes: Serie = {
@@ -59,34 +57,6 @@ export default class PlayController {
     res.send(episode);
   }
 
-  #getParams(req: Request, res: Response) {
-    const forceStr = req.query.force;
-    const force = !!forceStr;
-    const { id, type } = req.params;
-
-    if (!id || !type) {
-      res.status(400);
-      res.send("No ID nor TYPE.");
-      res.end();
-    }
-
-    switch (type) {
-      case "serie":
-      case "peli":
-        break;
-      default:
-        res.status(400);
-        res.send(`Type '${type}' is invalid.`);
-        res.end();
-    }
-
-    return {
-      id,
-      type,
-      force,
-    };
-  }
-
   getRouter(): Router {
     const router = Router();
 
@@ -95,4 +65,32 @@ export default class PlayController {
 
     return router;
   }
+}
+
+function getParams(req: Request, res: Response) {
+  const forceStr = req.query.force;
+  const force = !!forceStr;
+  const { id, type } = req.params;
+
+  if (!id || !type) {
+    res.status(400);
+    res.send("No ID nor TYPE.");
+    res.end();
+  }
+
+  switch (type) {
+    case "serie":
+    case "peli":
+      break;
+    default:
+      res.status(400);
+      res.send(`Type '${type}' is invalid.`);
+      res.end();
+  }
+
+  return {
+    id,
+    type,
+    force,
+  };
 }

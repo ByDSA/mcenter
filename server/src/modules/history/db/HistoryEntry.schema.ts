@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { DateSchema } from "#modules/utils/time/date-type";
 import mongoose from "mongoose";
 

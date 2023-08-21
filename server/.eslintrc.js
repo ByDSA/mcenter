@@ -242,7 +242,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["*[s,S]ervice*.ts", "*[r,R]epository*.ts"],
+      files: ["*[s,S]ervice*.ts", "*[r,R]epository*.ts", "*[c,C]ontroller*.ts"],
       rules: {
         "require-await": "off",
         "class-methods-use-this": "off",

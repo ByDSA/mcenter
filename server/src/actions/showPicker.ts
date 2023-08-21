@@ -1,3 +1,4 @@
+import { HistoryRepository } from "#modules/history";
 import { EpisodeRepository, getRandomPicker } from "#modules/series/episode";
 import { getDaysFromLastPlayed } from "#modules/series/episode/lastPlayed";
 import { SerieRepository } from "#modules/series/serie";
@@ -17,6 +18,9 @@ export default async function f(req: Request, res: Response) {
     serieRepository,
     episodeRepository,
   } );
+  const historyRepository = new HistoryRepository( {
+    episodeRepository,
+  } );
   const { streamId } = getParams(req, res);
   const stream = await streamRepository.findOneById(streamId);
 
@@ -28,7 +32,7 @@ export default async function f(req: Request, res: Response) {
     const serie = await seriePromise;
     const lastEp = await lastEpPromise;
 
-    console.log(`Received serie=${serie?.id} and lastEp=${lastEp?.innerId}`);
+    console.log(`Received serie=${serie?.id} and lastEp=${lastEp?.id.innerId}`);
 
     if (!serie) {
       res.sendStatus(404);
@@ -36,14 +40,20 @@ export default async function f(req: Request, res: Response) {
       return;
     }
 
-    const picker = await getRandomPicker(serie, lastEp, stream);
+    const historyList = await historyRepository.findByStream(stream);
+    const picker = await getRandomPicker( {
+      serie,
+      lastEp,
+      stream,
+      historyList,
+    } );
     const pickerWeight = picker.weight;
     let weightAcc = 0;
     const ret = picker.data.map((e) => {
-      const { innerId: id } = e;
+      const id = e.id.innerId;
       const selfWeight = picker.getWeight(e) || 1;
       const weight = Math.round((selfWeight / pickerWeight) * 100 * 100) / 100;
-      const days = Math.floor(getDaysFromLastPlayed(e, serie.id, stream.history));
+      const days = Math.floor(getDaysFromLastPlayed(e, serie.id, historyList));
 
       return [id, weight, selfWeight, days];
     } ).sort((a: any, b: any) => b[1] - a[1])

@@ -1,4 +1,4 @@
-import { HistoryRepository } from "#modules/history";
+import { HistoryRepository, HistoryService } from "#modules/history";
 import { EpisodeWithSerie } from "#modules/series/episode";
 import { StreamRepository } from "#modules/stream";
 import { assertHasItems } from "#modules/utils/base/http/asserts";
@@ -14,17 +14,21 @@ type Params = {
   vlcService: VLCService;
   streamRepository: StreamRepository;
   historyRepository: HistoryRepository;
+  historyService: HistoryService;
 };
 export default class PlayService {
   #vlcService: VLCService;
 
   #streamRepository: StreamRepository;
 
+  #historyService: HistoryService;
+
   #historyRepository: HistoryRepository;
 
-  constructor( {vlcService, streamRepository, historyRepository}: Params) {
+  constructor( {vlcService, streamRepository, historyService, historyRepository}: Params) {
     this.#vlcService = vlcService;
     this.#streamRepository = streamRepository;
+    this.#historyService = historyService;
     this.#historyRepository = historyRepository;
   }
 
@@ -40,14 +44,16 @@ export default class PlayService {
       for (const episode of episodes) {
         this.#streamRepository.findOneByIdOrCreateFromSerie(episode.serie.id)
           .then((stream) => {
-            if (stream && episode)
-            {this.#historyRepository.addEpisodeToHistory( {
-              history: {
-                stream,
-              },
-              episode,
-            } );}
-          } );}
+            if (stream && episode) {
+              this.#historyRepository.findByStream(stream). then((historyList) => {
+                this.#historyService.addEpisodeToHistory( {
+                  historyList,
+                  episode,
+                } );
+              } );
+            }
+          } );
+      }
     }
 
     return ok;

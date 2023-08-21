@@ -1,4 +1,4 @@
-import { HistoryRepository } from "#modules/history";
+import { HistoryRepository, HistoryService } from "#modules/history";
 import { PlayService, VLCService } from "#modules/play";
 import { EpisodeRepository } from "#modules/series";
 import { Serie, SerieRepository } from "#modules/series/serie";
@@ -22,9 +22,14 @@ export default async function f(req: Request, res: Response) {
   const historyRepository = new HistoryRepository( {
     episodeRepository,
   } );
+  const historyService = new HistoryService( {
+    episodeRepository,
+    historyRepository,
+  } );
   const playService = new PlayService( {
     vlcService,
     streamRepository,
+    historyService,
     historyRepository,
   } );
   const stream = await streamRepository.findOneByIdOrCreateFromSerie(id);

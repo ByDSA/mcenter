@@ -3,5 +3,5 @@ export {
 } from "./model";
 
 export {
-  default as Service,
+  default as HistoryService,
 } from "./Service";
