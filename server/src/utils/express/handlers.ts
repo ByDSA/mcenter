@@ -1,5 +1,5 @@
-import { ArrayOneOrMore } from "#modules/utils/built-in-types/arrays";
 import { Handler, Request, Response } from "express";
+import { ArrayOneOrMore } from "src/utils/built-in-types/arrays";
 import HttpMethod from "../base/http/HttpMethod";
 
 export type GeneralRoute = {

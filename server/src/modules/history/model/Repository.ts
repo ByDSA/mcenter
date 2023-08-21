@@ -1,8 +1,8 @@
 import { EpisodeRepository } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { Stream, StreamRepository } from "#modules/stream";
+import { CanUpdateOneById } from "src/utils/base/repository";
 import { assertFound } from "#modules/utils/base/http/asserts";
-import { CanUpdateOneById } from "#modules/utils/base/repository";
 import HistoryList, { HistoryListId } from "./HistoryList";
 
 type Params = {

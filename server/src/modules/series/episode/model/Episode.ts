@@ -1,6 +1,6 @@
 import { Serie, SerieId } from "#modules/series/serie";
-import { CanDurable, Resource } from "#modules/utils/base/resource";
-import { copyOfResource } from "#modules/utils/base/resource/Resource.entity";
+import { CanDurable, Resource } from "src/utils/base/resource";
+import { copyOfResource } from "src/utils/base/resource/Resource.entity";
 
 export type EpisodeInnerId = string;
 

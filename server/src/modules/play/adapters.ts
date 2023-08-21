@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
+import { assertIsDefined } from "../../utils/built-in-types/errors";
 import { Episode } from "../series";
-import { assertIsDefined } from "../utils/built-in-types/errors";
 import { MediaElement } from "./player";
 
 export function episodeToMediaElement(e: Episode): MediaElement {

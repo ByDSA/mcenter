@@ -1,4 +1,4 @@
-import { throwErrorPopStack } from "#modules/utils/others";
+import { throwErrorPopStack } from "src/utils/others";
 
 export class NotDefinedError extends Error {
   constructor(value: null | undefined, msg?: string) {

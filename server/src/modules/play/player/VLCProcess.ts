@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { execAndWaitUntilStarted, isRunning, killAll, killProcessByPid } from "#modules/utils";
+import { execAndWaitUntilStarted, isRunning, killAll, killProcessByPid } from "#utils";
 import * as cp from "child_process";
 
 export enum VLCFlag {

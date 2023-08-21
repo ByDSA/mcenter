@@ -1,6 +1,6 @@
+import { assertNotEmpty } from "src/utils/built-in-types/arrays";
+import { getPortFromServer } from "src/utils/built-in-types/nodejs/http";
 import request from "supertest";
-import { assertNotEmpty } from "#modules/utils/built-in-types/arrays";
-import { getPortFromServer } from "#modules/utils/built-in-types/nodejs/http";
 import App from "./App";
 
 describe("App", () => {

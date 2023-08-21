@@ -1,5 +1,5 @@
-import { neverCase } from "#modules/utils/built-in-types/never";
 import { Application, Router as ExpressRouter } from "express";
+import { neverCase } from "src/utils/built-in-types/never";
 import { mergeDeepSameObjects } from "..";
 import { GeneralRoute } from "../../express/handlers";
 import HttpMethod from "../http/HttpMethod";

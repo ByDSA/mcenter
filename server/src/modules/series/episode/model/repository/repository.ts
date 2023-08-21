@@ -1,6 +1,6 @@
 import HistoryList from "#modules/history/model/HistoryList";
 import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
-import { Repository } from "#modules/utils/base/repository";
+import { Repository } from "src/utils/base/repository";
 import { SerieModel } from "../../../serie/model/repository/serie.model";
 import { Episode, EpisodeId, compareEpisodeId } from "../Episode";
 import { episodeToEpisodeDB } from "./adapters";

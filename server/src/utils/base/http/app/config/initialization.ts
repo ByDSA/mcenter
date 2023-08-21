@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import { assertIsDefined } from "#modules/utils/built-in-types/errors";
-import { FileNotFoundError } from "#modules/utils/fs/errors";
-import { readIfExistsSync } from "#modules/utils/fs/operations";
 import assert from "node:assert";
+import { assertIsDefined } from "src/utils/built-in-types/errors";
+import { FileNotFoundError } from "src/utils/fs/errors";
+import { readIfExistsSync } from "src/utils/fs/operations";
 import { ConfigOptions, NetConfig, SSLMode, TextFile } from "./common";
 
 function initializeSSL(mode: SSLMode): NetConfig["ssl"] {

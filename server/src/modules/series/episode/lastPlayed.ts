@@ -1,6 +1,6 @@
 import HistoryList from "#modules/history/model/HistoryList";
-import { DateType } from "#modules/utils/time/date-type";
 import { DateTime } from "luxon";
+import { DateType } from "src/utils/time/date-type";
 import { SerieId, SerieRepository } from "../serie";
 import { EpisodeRepository } from "./model";
 import { Episode, compareEpisodeId, copyOfEpisode } from "./model/Episode";

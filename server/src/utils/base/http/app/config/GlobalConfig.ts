@@ -1,4 +1,4 @@
-import { assertIsDefined } from "#modules/utils/built-in-types/errors";
+import { assertIsDefined } from "src/utils/built-in-types/errors";
 import { ConfigOptions, NetConfig } from "./common";
 import { getInitializedNetConfig } from "./initialization";
 

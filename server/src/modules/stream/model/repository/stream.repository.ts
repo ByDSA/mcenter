@@ -1,5 +1,5 @@
 import { SerieId, SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
-import { CanFindById, CanUpdateOneById, Repository } from "#modules/utils/base/repository";
+import { CanFindById, CanUpdateOneById, Repository } from "src/utils/base/repository";
 import Stream, { StreamId } from "../stream.entity";
 import { Mode, StreamDocument, StreamModel } from "./odm/stream.odm";
 
