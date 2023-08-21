@@ -1,4 +1,4 @@
-import { HistoryRepository } from "#modules/history";
+import { HistoryRepository, HistoryService } from "#modules/history";
 import { PlayController, PlayService, VLCService } from "#modules/play";
 import { EpisodeRepository, asyncCalculateNextEpisodeByIdStream } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
@@ -48,11 +48,16 @@ const episodeRepository = new EpisodeRepository( {
 const historyRepository = new HistoryRepository( {
   episodeRepository,
 } );
+const historyService = new HistoryService( {
+  episodeRepository,
+  historyRepository,
+} );
 const vlcService = new VLCService();
 const playService = new PlayService( {
   vlcService,
   streamRepository,
   historyRepository,
+  historyService,
 } );
 const playController = new PlayController( {
   serieRepository,
