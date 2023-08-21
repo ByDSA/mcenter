@@ -5,9 +5,12 @@ import { MediaElement } from "./MediaElement";
 import Playlist from "./Playlist";
 
 export default class QueuePlaylistManager {
-  private currentNumber: number;
+  #currentNumber: number;
 
-  constructor(private folder: string) {
+  #folder: string;
+
+  constructor(folder: string) {
+    this.#folder = folder;
     let i;
 
     for (i = 0; true; i++) {
@@ -17,11 +20,11 @@ export default class QueuePlaylistManager {
         break;
     }
 
-    this.currentNumber = i;
+    this.#currentNumber = i;
   }
 
   get nextNumber(): number {
-    return this.currentNumber;
+    return this.#currentNumber;
   }
 
   get firstFile(): string {
@@ -35,15 +38,15 @@ export default class QueuePlaylistManager {
       playlist.addElement(e);
 
     const nextElement: MediaElement = {
-      path: generateName(this.currentNumber + 1),
+      path: generateName(this.#currentNumber + 1),
     };
 
     playlist.addElement(nextElement);
-    const fullpath = this.getFullPathByNum(this.currentNumber);
+    const fullpath = this.getFullPathByNum(this.#currentNumber);
 
     playlist.saveTo(fullpath);
 
-    this.currentNumber++;
+    this.#currentNumber++;
   }
 
   clear() {
@@ -59,12 +62,12 @@ export default class QueuePlaylistManager {
       i++;
     }
 
-    this.currentNumber = 0;
+    this.#currentNumber = 0;
     console.log("Queue cleared!");
   }
 
   private getFullPathByNum(num: number): string {
-    return path.join(this.folder, generateName(num));
+    return path.join(this.#folder, generateName(num));
   }
 }
 

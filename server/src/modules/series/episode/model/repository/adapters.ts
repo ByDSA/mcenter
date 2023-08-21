@@ -1,9 +1,10 @@
 /* eslint-disable import/prefer-default-export */
-import { EpisodeInterface } from "../../db";
+import { SerieId } from "#modules/series/serie";
+import { EpisodeDB } from "../../db";
 import { Episode } from "../Episode";
 
-export function episodeToEpisodeDB(episode: Episode): EpisodeInterface {
-  const objRequired: Required<EpisodeInterface> = {
+export function episodeToEpisodeDB(episode: Episode): EpisodeDB {
+  const objRequired: Required<EpisodeDB> = {
     id: episode.id.innerId,
     path: episode.path,
     end: episode.end,
@@ -15,7 +16,22 @@ export function episodeToEpisodeDB(episode: Episode): EpisodeInterface {
     disabled: episode.disabled!,
     weight: episode.weight,
   };
-  const ret: EpisodeInterface = objRequired;
+  const ret: EpisodeDB = objRequired;
 
   return ret;
+}
+
+export function episodeDBToEpisode(episodeDB: EpisodeDB, serieId: SerieId): Episode {
+  return {
+    id: {
+      innerId: episodeDB.id,
+      serieId,
+    },
+    duration: episodeDB.duration ?? -1,
+    start: episodeDB.start ?? -1,
+    end: episodeDB.end ?? -1,
+    title: episodeDB.title ?? "",
+    weight: episodeDB.weight ?? 0,
+    path: episodeDB.path,
+  };
 }

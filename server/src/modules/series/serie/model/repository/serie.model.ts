@@ -1,9 +1,10 @@
-import { EpisodeSchema } from "#modules/series/episode/db";
+import { EpisodeDB, EpisodeSchemaDB } from "#modules/series/episode/db";
 import mongoose, { Document, Schema } from "mongoose";
-import Serie from "../serie.entity";
 
-interface SerieDocument extends Document, Serie {
+interface SerieDocument extends Document {
   id: string;
+  name: string;
+  episodes: EpisodeDB[];
 }
 
 const NAME = "Serie";
@@ -16,11 +17,11 @@ const schema = new Schema( {
     type: String,
   },
   episodes: {
-    type: [EpisodeSchema],
+    type: [EpisodeSchemaDB],
   },
 } );
 const model = mongoose.model<SerieDocument>(NAME, schema);
 
 export {
-  SerieDocument as Serie, model as SerieModel, schema as SerieSchema,
+  SerieDocument as SerieDB, model as SerieModel, schema as SerieSchema,
 };

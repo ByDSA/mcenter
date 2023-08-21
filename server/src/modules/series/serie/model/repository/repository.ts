@@ -1,17 +1,21 @@
 /* eslint-disable no-await-in-loop */
 import { Episode } from "#modules/series/episode";
+import { EpisodeDB } from "#modules/series/episode/db";
+import { episodeDBToEpisode, episodeToEpisodeDB } from "#modules/series/episode/model/repository/adapters";
 import { assertIsNotEmpty } from "#utils/checking";
-import { CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import { CanCreateOneAndGet, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { FileNode, getSerieTreeRemote } from "../../../../../actions/nginxTree";
-import SerieWithEpisodes, { SerieId } from "../serie.entity";
-import { SerieModel as SerieWithEpisodesModel } from "./serie.model";
+import Serie, { SerieId } from "../serie.entity";
+import { SerieDB, SerieModel as SerieWithEpisodesModel } from "./serie.model";
 
 const { MEDIA_PATH } = process.env;
 
 export default class SerieRepository
-implements CanGetOneById<SerieWithEpisodes, SerieId>,
-CanUpdateOneByIdAndGet<SerieWithEpisodes, SerieId> {
-  async findOneFromGroupId(groupId: string): Promise<SerieWithEpisodes | null> {
+implements CanGetOneById<Serie, SerieId>,
+CanUpdateOneByIdAndGet<Serie, SerieId>,
+CanCreateOneAndGet<Serie>
+{
+  async findOneFromGroupId(groupId: string): Promise<Serie | null> {
     const groupSplit = groupId.split("/");
 
     assertIsNotEmpty(groupSplit);
@@ -22,26 +26,47 @@ CanUpdateOneByIdAndGet<SerieWithEpisodes, SerieId> {
     return serie;
   }
 
-  async getOneById(id: string): Promise<SerieWithEpisodes | null> {
-    let [serie]: SerieWithEpisodes[] = await SerieWithEpisodesModel.find( {
+  async createOneAndGet(serie: Serie): Promise<Serie> {
+    const serieDB = await SerieWithEpisodesModel.create( {
+      id: serie.id,
+      name: serie.id,
+      episodes: serie.episodes.map(episodeToEpisodeDB),
+    } ).then(s => s.save());
+
+    return {
+      id: serieDB.id,
+      name: serieDB.name,
+      episodes: serieDB.episodes.map((episodeDB: EpisodeDB): Episode => episodeDBToEpisode(episodeDB, serieDB.id)),
+    };
+  }
+
+  async getOneById(id: string): Promise<Serie | null> {
+    const [serieDB]: SerieDB[] = await SerieWithEpisodesModel.find( {
       id,
     }, {
       _id: 0,
     } );
+    let serie: Serie;
 
-    if (!serie) {
+    if (!serieDB) {
       const generatedSerie = await generateFromFiles(id);
 
       if (!generatedSerie)
         return null;
 
-      serie = generatedSerie;
+      serie = await this.createOneAndGet(generatedSerie);
+    } else {
+      serie = {
+        id: serieDB.id,
+        name: serieDB.name,
+        episodes: serieDB.episodes.map((episodeDB: EpisodeDB): Episode => episodeDBToEpisode(episodeDB, id)),
+      };
     }
 
     return serie;
   }
 
-  async updateOneByIdAndGet(id: SerieId, serie: SerieWithEpisodes): Promise<SerieWithEpisodes | null> {
+  async updateOneByIdAndGet(id: SerieId, serie: Serie): Promise<Serie | null> {
     return SerieWithEpisodesModel.findOneAndUpdate( {
       id,
     }, serie, {
@@ -50,18 +75,18 @@ CanUpdateOneByIdAndGet<SerieWithEpisodes, SerieId> {
   }
 }
 
-async function generateFromFiles(id: string): Promise<SerieWithEpisodes | null> {
+async function generateFromFiles(id: SerieId): Promise<Serie | null> {
   const folder = `${MEDIA_PATH}/series/${id}`;
   const episodes: Episode[] | null = await getSerieTree(folder);
 
   if (!episodes)
     return null;
 
-  return SerieWithEpisodesModel.create( {
+  return {
     id,
     name: id,
     episodes,
-  } ).then(serie => serie.save());
+  };
 }
 
 async function getSerieTree(uri: string): Promise<Episode[] | null> {

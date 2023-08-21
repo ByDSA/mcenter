@@ -1,7 +1,6 @@
-import { assertIsNotEmpty } from "#utils/checking";
+import { assertIsDefined, assertIsNotEmpty } from "#utils/checking";
+import fs from "node:fs";
 import { MediaElement, QueuePlaylistManager, VLCFlag, VLCProcess } from "./player";
-
-const { TMP_PATH } = process.env;
 
 type Options = {
   openNewInstance?: boolean;
@@ -14,16 +13,19 @@ export default class PlayService {
 
   #isRunningAnyInstance: boolean;
 
-  #isClosed: boolean;
-
   constructor() {
-    this.#queue = new QueuePlaylistManager(TMP_PATH || "/");
+    const { TMP_PATH } = process.env;
+
+    assertIsDefined(TMP_PATH);
+
+    if (!fs.existsSync(TMP_PATH))
+      throw new Error(`TMP_PATH (${TMP_PATH}) does not exist`);
+
+    this.#queue = new QueuePlaylistManager(TMP_PATH ?? "/");
 
     this.#openNewInstance = false;
 
     this.#isRunningAnyInstance = false;
-
-    this.#isClosed = false;
   }
 
   async #closeIfNeeded(): Promise<boolean> {

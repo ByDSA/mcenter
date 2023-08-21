@@ -1,7 +1,7 @@
 export {
-  default as EpisodeSchema,
+  default as EpisodeSchemaDB,
 } from "./Episode.schema";
 
 export {
-  default as EpisodeInterface,
+  default as EpisodeDB,
 } from "./Episode.interface";

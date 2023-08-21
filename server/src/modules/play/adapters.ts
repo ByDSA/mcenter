@@ -8,11 +8,30 @@ export function episodeToMediaElement(e: Episode): MediaElement {
 
   assertIsDefined(MEDIA_PATH);
 
+  const length = calculateLength(e);
+
   return {
     path: `${MEDIA_PATH}/${e.path}`,
     title: e.title,
     startTime: e.start,
     stopTime: e.end,
-    length: e.duration,
+    length,
   };
+}
+
+function calculateLength(e: Episode): number {
+  let length = -1;
+
+  if (e.start !== undefined && e.end !== undefined)
+    length = e.end - e.start;
+  else if (e.duration !== undefined) {
+    if (e.start !== undefined && e.end === undefined)
+      length = e.duration - e.start;
+    else if (e.start === undefined && e.end !== undefined)
+      length = e.end;
+    else
+      length = e.duration;
+  }
+
+  return length;
 }
