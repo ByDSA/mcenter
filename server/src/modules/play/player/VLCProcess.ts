@@ -1,6 +1,4 @@
 /* eslint-disable max-classes-per-file */
-/* eslint-disable no-await-in-loop */
-/* eslint-disable require-await */
 import { execAndWaitUntilStarted, isRunning, killAll, killProcessByPid } from "#modules/utils";
 import * as cp from "child_process";
 
@@ -66,6 +64,7 @@ export class VLCProcess {
     return killProcessByPid(pid);
   }
 
+  // eslint-disable-next-line require-await
   static async closeAllAsync() {
     return killAll(PROCESS_NAME);
   }

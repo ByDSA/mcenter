@@ -3,5 +3,5 @@ export {
 } from "./MediaElement";
 
 export {
-  QueuePlaylistManager,
+  default as QueuePlaylistManager,
 } from "./QueuePlaylistManager";

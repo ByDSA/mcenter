@@ -1,8 +1,7 @@
 import fs from "fs";
 import { MediaElement, render } from "./MediaElement";
 
-// eslint-disable-next-line import/prefer-default-export
-export class Playlist {
+export default class Playlist {
   #elements: MediaElement[] = [];
 
   addElement(element: MediaElement): Playlist {

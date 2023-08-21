@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { EpisodeRepository } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { Stream, StreamRepository } from "#modules/stream";

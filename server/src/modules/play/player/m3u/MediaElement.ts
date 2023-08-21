@@ -1,5 +1,4 @@
 /* eslint-disable no-useless-concat */
-/* eslint-disable prefer-const */
 export type MediaElement = {
     title?: string;
     path: string;
@@ -9,7 +8,8 @@ export type MediaElement = {
 };
 
 export function render(element: MediaElement): string {
-  let { title, path, startTime, stopTime, length } = element;
+  let { title, length } = element;
+  const { path, startTime, stopTime } = element;
 
   if (title === undefined)
     title = "TITLE";

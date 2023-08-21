@@ -1,4 +1,3 @@
-/* eslint-disable require-await */
 import { HistoryRepository } from "#modules/history";
 import HistoryList from "#modules/history/model/HistoryList";
 import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
@@ -80,6 +79,7 @@ export async function calculateNextEpisode(stream: Stream) {
   } );
 }
 
+// eslint-disable-next-line require-await
 async function getNextEpisodeSequential( {serie, lastEp}: FuncGeneratorParams): Promise<Episode> {
   const { episodes } = serie;
   let i = 0;

@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import mongoose from "mongoose";
 import Interface from "./Episode.interface";
 

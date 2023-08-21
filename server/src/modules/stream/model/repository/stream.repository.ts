@@ -6,7 +6,6 @@ import { Mode, StreamDocument, StreamModel } from "./odm/stream.odm";
 type Params = {
   serieRepository: SerieRepository;
 };
-/* eslint-disable class-methods-use-this */
 export default class StreamRepository
 implements Repository,
 CanFindById<Stream, StreamId>,

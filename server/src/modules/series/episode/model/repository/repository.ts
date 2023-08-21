@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import HistoryList from "#modules/history/model/HistoryList";
 import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
 import { Repository } from "#modules/utils/base/repository";
@@ -24,7 +23,6 @@ export default class EpisodeRepository implements Repository {
     this.#serieRepository = serieRepository;
   }
 
-  // eslint-disable-next-line require-await
   async findLastEpisodeInHistoryList(historyList: HistoryList): Promise<Episode | null> {
     const episodeId = historyList.entries.at(-1)?.episodeId;
 

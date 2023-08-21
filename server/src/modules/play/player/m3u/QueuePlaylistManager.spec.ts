@@ -1,6 +1,6 @@
-import { existsSync, rmdirSync } from "node:fs";
 import { createTmpFolder } from "#tests/utils";
-import { QueuePlaylistManager } from "./QueuePlaylistManager";
+import { existsSync, rmdirSync } from "node:fs";
+import QueuePlaylistManager from "./QueuePlaylistManager";
 
 const FOLDER = createTmpFolder();
 

@@ -2,10 +2,9 @@
 import fs from "fs";
 import path from "path";
 import { MediaElement } from "./MediaElement";
-import { Playlist } from "./Playlist";
+import Playlist from "./Playlist";
 
-// eslint-disable-next-line import/prefer-default-export
-export class QueuePlaylistManager {
+export default class QueuePlaylistManager {
   private currentNumber: number;
 
   constructor(private folder: string) {
@@ -51,13 +50,12 @@ export class QueuePlaylistManager {
     let i = 0;
 
     while (true) {
-      // eslint-disable-next-line @typescript-eslint/no-shadow
-      const path = this.getFullPathByNum(i);
+      const p = this.getFullPathByNum(i);
 
-      if (!fs.existsSync(path))
+      if (!fs.existsSync(p))
         break;
 
-      fs.unlinkSync(path);
+      fs.unlinkSync(p);
       i++;
     }
 
