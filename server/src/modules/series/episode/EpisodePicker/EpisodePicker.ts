@@ -1,4 +1,6 @@
 /* eslint-disable require-await */
+import { HistoryRepository } from "#modules/history";
+import HistoryList from "#modules/history/model/HistoryList";
 import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
 import { Stream, StreamMode, StreamRepository } from "#modules/stream";
 import { assertFound } from "#modules/utils/base/http/asserts";
@@ -30,7 +32,13 @@ export default async function f(streamId: string) {
   return nextEpisodeId;
 }
 
-type FuncGenerator = (serie: SerieWithEpisodes, lastEp: Episode | null, stream: Stream)=> Promise<Episode>;
+type FuncGeneratorParams = {
+  serie: SerieWithEpisodes;
+  lastEp: Episode | null;
+  stream: Stream;
+  historyList: HistoryList;
+};
+type FuncGenerator = (params: FuncGeneratorParams)=> Promise<Episode>;
 export async function calculateNextEpisode(stream: Stream) {
   const serieRepository = new SerieRepository();
   const episodeRepository = new EpisodeRepository( {
@@ -56,17 +64,28 @@ export async function calculateNextEpisode(stream: Stream) {
       neverCase(stream.mode);
   }
 
-  const lastEp = await episodeRepository.findLastEpisodeInStream(stream);
+  const historyRepository = new HistoryRepository( {
+    episodeRepository,
+  } );
+  const historyList = await historyRepository.findByStream(stream);
 
-  return nextEpisodeFunc(serie, lastEp, stream);
+  assertFound(historyList, `Cannot get history list from stream '${stream.id}'`);
+  const lastEp = await episodeRepository.findLastEpisodeInHistoryList(historyList);
+
+  return nextEpisodeFunc( {
+    serie,
+    lastEp,
+    stream,
+    historyList,
+  } );
 }
 
-async function getNextEpisodeSequential(serie: SerieWithEpisodes, lastEp: Episode | null): Promise<Episode> {
+async function getNextEpisodeSequential( {serie, lastEp}: FuncGeneratorParams): Promise<Episode> {
   const { episodes } = serie;
   let i = 0;
 
   if (lastEp) {
-    i = episodes.findIndex((e) => e.innerId === lastEp.innerId) + 1;
+    i = episodes.findIndex((e) => e.id.innerId === lastEp.id.innerId) + 1;
 
     if (i >= episodes.length)
       i = 0;
@@ -75,16 +94,16 @@ async function getNextEpisodeSequential(serie: SerieWithEpisodes, lastEp: Episod
   return episodes[i];
 }
 
-export async function getRandomPicker(serie: SerieWithEpisodes, lastEp: Episode | null, stream: Stream) {
+export async function getRandomPicker( {serie, lastEp, stream, historyList}: FuncGeneratorParams) {
   console.log("Getting random picker...");
   const { episodes } = serie;
   const picker: Picker<Episode> = newPicker(episodes, {
     weighted: true,
   } );
 
-  filter(picker, serie, lastEp, stream);
+  filter(picker, serie, lastEp, stream, historyList);
   assertPickerHasData(picker);
-  await fixWeight(picker, serie, lastEp, stream);
+  await fixWeight(picker, serie, lastEp, stream, historyList);
 
   return picker;
 }
@@ -98,12 +117,17 @@ function assertPickerHasData(picker: Picker<Episode>) {
   throwErrorPopStack(new Error("Picker has no data"));
 }
 
-async function getNextEpisodeRandom(
-  serie: SerieWithEpisodes,
-  lastEp: Episode | null,
-  stream: Stream,
+async function getNextEpisodeRandom( {serie,
+  lastEp,
+  stream,
+  historyList}: FuncGeneratorParams,
 ): Promise<Episode> {
-  const picker = await getRandomPicker(serie, lastEp, stream);
+  const picker = await getRandomPicker( {
+    serie,
+    lastEp,
+    stream,
+    historyList,
+  } );
 
   console.log("Picking one ...");
   const ret = picker.pickOne();

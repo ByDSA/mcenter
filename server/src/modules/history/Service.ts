@@ -1,6 +1,5 @@
-/* eslint-disable class-methods-use-this */
 import { EpisodeId, EpisodeRepository } from "#modules/series";
-import { Episode, copyOfEpisode } from "#modules/series/episode/model/episode.entity";
+import { Episode, copyOfEpisode } from "#modules/series/episode/model";
 import { assertFound } from "#modules/utils/base/http/asserts";
 import { getDateNow } from "#modules/utils/time/date-type";
 import { HistoryEntry, HistoryRepository } from "./model";
@@ -29,7 +28,6 @@ export default class Service {
     this.#episodeRepository = episodeRepository;
   }
 
-  // eslint-disable-next-line require-await
   async findLastHistoryEntryForEpisodeId( {historyList, ...params}: HistoryAndEpisodeParams): Promise<HistoryEntry | null> {
     let episodeId: EpisodeId;
 
@@ -57,10 +55,7 @@ export default class Service {
 
     if ("episode" in params) {
       episode = params.episode;
-      episodeId = {
-        innerId: params.episode.innerId,
-        serieId: "", // TODO
-      };
+      episodeId = params.episode.id;
     } else if ("episodeId" in params) {
       episodeId = params.episodeId;
       const episodeOrNull = await this.#episodeRepository.findOneById(episodeId);
@@ -82,7 +77,7 @@ export default class Service {
 
     episodeCopy.lastTimePlayed = newEntry.date.timestamp;
 
-    await this.#episodeRepository.updateOne(episodeCopy);
+    await this.#episodeRepository.updateOneAndGet(episodeCopy);
   }
 
   async removeLastTimeEpisodeFromHistory( {historyList, ...params}: HistoryAndEpisodeParams) {
@@ -131,7 +126,7 @@ export default class Service {
       else
         episodeCopy.lastTimePlayed = lastTimeHistoryEntry.date.timestamp;
 
-      await this.#episodeRepository.updateOne(episodeCopy);
+      await this.#episodeRepository.updateOneAndGet(episodeCopy);
     }
   }
 }

@@ -28,5 +28,6 @@ extends Episode {
 export function copyOfEpisode(e: Episode): Episode {
   return {
     ...copyOfResource(e),
+    id: e.id,
   };
 }

@@ -1,5 +1,4 @@
 export default interface Resource {
-  innerId: string;
   title: string;
   path: string;
   weight: number;
@@ -13,7 +12,6 @@ export default interface Resource {
 
 export function copyOfResource(e: Resource): Resource {
   const ret: Resource = {
-    innerId: e.innerId,
     title: e.title,
     path: e.path,
     weight: e.weight,
@@ -21,16 +19,16 @@ export function copyOfResource(e: Resource): Resource {
     end: e.end,
   };
 
-  if (e.tags && e.tags.length > 0)
+  if (e.tags !== undefined)
     ret.tags = e.tags;
 
-  if (e.duration)
+  if (e.duration !== undefined)
     ret.duration = e.duration;
 
-  if (e.disabled)
+  if (e.disabled !== undefined)
     ret.disabled = e.disabled;
 
-  if (e.lastTimePlayed)
+  if (e.lastTimePlayed !== undefined)
     ret.lastTimePlayed = e.lastTimePlayed;
 
   return ret;

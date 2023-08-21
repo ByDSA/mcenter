@@ -1,6 +1,6 @@
 export {
-  Episode, EpisodeId, default as EpisodeWithSerie,
-} from "./episode.entity";
+  Episode, EpisodeId, default as EpisodeWithSerie, copyOfEpisode,
+} from "./Episode";
 
 export {
   EpisodeRepository,

@@ -3,7 +3,7 @@ import { DateType } from "#modules/utils/time/date-type";
 import { DateTime } from "luxon";
 import { SerieId, SerieRepository } from "../serie";
 import { EpisodeRepository } from "./model";
-import { Episode, compareEpisodeId, copyOfEpisode } from "./model/episode.entity";
+import { Episode, compareEpisodeId, copyOfEpisode } from "./model/Episode";
 
 function getTimestampFromDate(date: DateType): number {
   if (date.timestamp)
@@ -48,10 +48,7 @@ export function getDaysFromLastPlayed(self: Episode, serieId: SerieId, historyLi
         lastTimePlayed,
       };
 
-      episodeRepository.updateOne( {
-        episode:selfCopy,
-        serieId,
-      } );
+      episodeRepository.updateOneAndGet(selfCopy);
     }
   }
 

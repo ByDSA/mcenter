@@ -37,7 +37,10 @@ implements CanUpdateOneById<HistoryList, HistoryListId> {
   }
 
   // eslint-disable-next-line require-await
-  async findByStream(stream: Stream) {
-    return stream.history;
+  async findByStream(stream: Stream): Promise<HistoryList> {
+    return {
+      id: stream.id,
+      entries: stream.history,
+    };
   }
 }

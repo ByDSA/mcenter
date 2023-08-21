@@ -1,14 +1,15 @@
 /* eslint-disable import/prefer-default-export */
+import HistoryList from "#modules/history/model/HistoryList";
 import { SerieWithEpisodes } from "#modules/series/serie";
 import { Stream } from "#modules/stream";
-import { Resource } from "#modules/utils/base/resource";
 import { Picker } from "rand-picker";
+import { Episode } from "../model";
 import { dependent, preventDisabled, preventRepeatInDays, preventRepeatLast, removeWeightLowerOrEqualThan } from "./filters";
 import { Params } from "./utils";
 
 const { PICKER_MIN_WEIGHT, PICKER_MIN_DAYS } = process.env;
 
-type MiddlewareFilterFunction = (params: Params<Resource>)=> boolean;
+export type MiddlewareFilterFunction = (params: Params<Episode>)=> boolean;
 const filterFunctions: MiddlewareFilterFunction[] = [
   dependent,
   preventDisabled,
@@ -18,13 +19,14 @@ const filterFunctions: MiddlewareFilterFunction[] = [
 ];
 
 export function filter(
-  picker: Picker<Resource>,
+  picker: Picker<Episode>,
   serie: SerieWithEpisodes,
-  lastEp: Resource | null,
+  lastEp: Episode | null,
   stream: Stream,
+  historyList: HistoryList,
 ): void {
   console.log("Filtering...");
-  const newData = picker.data.filter((self: Resource) => {
+  const newData = picker.data.filter((self: Episode) => {
     for (const func of filterFunctions) {
       if (!func( {
         picker,
@@ -32,6 +34,7 @@ export function filter(
         serie,
         lastEp,
         stream,
+        historyList,
       } ))
         return false;
     }

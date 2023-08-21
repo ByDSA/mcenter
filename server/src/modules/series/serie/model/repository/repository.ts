@@ -1,6 +1,3 @@
-/* eslint-disable class-methods-use-this */
-
-/* eslint-disable require-await */
 /* eslint-disable no-await-in-loop */
 import { Episode } from "#modules/series/episode";
 import { assertHasItems } from "#modules/utils/base/http/asserts";
@@ -107,15 +104,19 @@ async function getEpisodesFromTree(tree: FileNode[], episodes: Episode[] = []): 
 async function fileNode2Episode(fn: FileNode): Promise<Episode> {
   const path = getPathFromFn(fn);
   const id = getIdFromFn(fn);
-
-  return {
-    innerId: id,
+  const ret: Episode = {
+    id: {
+      innerId: id,
+      serieId: "",
+    },
     path,
     title: "",
     weight: 0,
     start: -1,
     end: -1,
   };
+
+  return ret;
 }
 
 function getIdFromFn(fn: FileNode): string {

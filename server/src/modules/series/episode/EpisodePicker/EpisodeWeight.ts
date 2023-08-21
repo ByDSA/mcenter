@@ -1,4 +1,5 @@
 /* eslint-disable require-await */
+import HistoryList from "#modules/history/model/HistoryList";
 import { SerieWithEpisodes } from "#modules/series/serie";
 import { Stream } from "#modules/stream";
 import { daysBetween } from "date-ops";
@@ -21,6 +22,7 @@ export default async function fixWeight(
   serie: SerieWithEpisodes,
   lastEp: Episode | null,
   stream: Stream,
+  historyList: HistoryList,
 ): Promise<void> {
   console.log("Fixing weight...");
 
@@ -33,6 +35,7 @@ export default async function fixWeight(
         serie,
         lastEp,
         stream,
+        historyList,
       } );
 
       picker.put(self, newWeight);
@@ -42,10 +45,10 @@ export default async function fixWeight(
   console.log("Fixed weight!");
 }
 
-async function weightCalculator( { self, stream, serie }: Params<Episode>): Promise<number> {
+async function weightCalculator( { self, historyList, serie }: Params<Episode>): Promise<number> {
   const daysFromLastTime = self.lastTimePlayed
     ? daysBetween(DateTime.now(), DateTime.fromSeconds(self.lastTimePlayed))
-    : getDaysFromLastPlayed(self, serie.id, stream.history);
+    : getDaysFromLastPlayed(self, serie.id, historyList);
   let reinforcementFactor = 1;
   const weight = self && self.weight ? self.weight : 0;
 

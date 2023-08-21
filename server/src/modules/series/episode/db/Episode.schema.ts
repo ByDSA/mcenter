@@ -1,7 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import mongoose from "mongoose";
+import Interface from "./Episode.interface";
 
-const schema = new mongoose.Schema( {
+const schema = new mongoose.Schema<Interface>( {
   id: {
     type: String,
     required: true,
@@ -42,6 +43,4 @@ const schema = new mongoose.Schema( {
   autoIndex: false,
 } );
 
-export {
-  schema as EpisodeSchema,
-};
+export default schema;

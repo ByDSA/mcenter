@@ -31,6 +31,7 @@ module.exports = {
           "**/src/backup/**",
           "*modules/series/*",
           "*modules/**/routes",
+          "**", // provisional
         ],
       },
     ],
@@ -239,6 +240,15 @@ module.exports = {
     ],
     "linebreak-style": ["error", "unix"],
   },
+  overrides: [
+    {
+      files: ["*[s,S]ervice*.ts", "*[r,R]epository*.ts"],
+      rules: {
+        "require-await": "off",
+        "class-methods-use-this": "off",
+      },
+    },
+  ],
   settings: {
     "import/no-cycle": false,
     "import/parsers": {

@@ -1,7 +1,5 @@
-/* eslint-disable require-await */
-/* eslint-disable no-await-in-loop */
+import { EpisodeSchema } from "#modules/series/episode/db";
 import mongoose, { Document, Schema } from "mongoose";
-import { EpisodeSchema } from "#modules/series/episode/model/repository/odm/episode";
 import Serie from "../serie.entity";
 
 interface SerieDocument extends Document, Serie {
@@ -24,5 +22,5 @@ const schema = new Schema( {
 const model = mongoose.model<SerieDocument>(NAME, schema);
 
 export {
-  schema as SerieSchema, model as SerieModel, SerieDocument as Serie,
+  SerieDocument as Serie, model as SerieModel, schema as SerieSchema,
 };
