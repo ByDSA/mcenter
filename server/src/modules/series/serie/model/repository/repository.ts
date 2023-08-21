@@ -2,8 +2,7 @@
 
 /* eslint-disable require-await */
 /* eslint-disable no-await-in-loop */
-import { Episode, EpisodeRepository } from "#modules/series/episode";
-import { Stream } from "#modules/stream";
+import { Episode } from "#modules/series/episode";
 import { assertHasItems } from "#modules/utils/base/http/asserts";
 import { Repository } from "#modules/utils/base/repository";
 import dotenv from "dotenv";
@@ -15,24 +14,7 @@ dotenv.config();
 
 const { MEDIA_PATH } = process.env;
 
-export default class SerieRepository extends Repository {
-  async findLastEpisodeInStream(stream: Stream): Promise<Episode | null> {
-    const episodeId = stream.history.at(-1)?.episodeId;
-
-    if (!episodeId)
-      return null;
-
-    const serie = await this.findOneFromGroupId(stream.group);
-
-    if (!serie)
-      return null;
-
-    return EpisodeRepository.getInstance<EpisodeRepository>().findOneById( {
-      episodeId,
-      serie,
-    } );
-  }
-
+export default class SerieRepository implements Repository {
   async findOneFromGroupId(groupId: string): Promise<SerieWithEpisodes | null> {
     const groupSplit = groupId.split("/");
 

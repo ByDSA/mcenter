@@ -24,7 +24,7 @@ export function render(element: MediaElement): string {
   if (startTime)
     sb += "\n" + `#EXTVLCOPT:start-time=${startTime}`;
 
-  if (startTime)
+  if (stopTime)
     sb += "\n" + `#EXTVLCOPT:stop-time=${stopTime}`;
 
   sb += `\n${ path }\n`;

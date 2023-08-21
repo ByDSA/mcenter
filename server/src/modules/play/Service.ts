@@ -38,10 +38,15 @@ export default class PlayService {
 
     if (ok) {
       for (const episode of episodes) {
-        this.#streamRepository.findOneById(episode.serie.id)
+        this.#streamRepository.findOneByIdOrCreateFromSerie(episode.serie.id)
           .then((stream) => {
             if (stream && episode)
-              this.#historyRepository.addToHistory(stream, episode);
+            {this.#historyRepository.addEpisodeToHistory( {
+              history: {
+                stream,
+              },
+              episode,
+            } );}
           } );}
     }
 

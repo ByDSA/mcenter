@@ -6,7 +6,8 @@ export default async function (req: Request, res: Response) {
   const { connect, disconnect } = (await import("../../../../db/database"));
 
   connect();
-  const serie: SerieWithEpisodes | null = await SerieRepository.getInstance<SerieRepository>().findOneById(id);
+  const serieRepository = new SerieRepository();
+  const serie: SerieWithEpisodes | null = await serieRepository.findOneById(id);
 
   if (!serie) {
     res.sendStatus(404);

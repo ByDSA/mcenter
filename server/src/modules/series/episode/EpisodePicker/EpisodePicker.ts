@@ -11,7 +11,11 @@ import { filter } from "./EpisodeFilter";
 import fixWeight from "./EpisodeWeight";
 
 export default async function f(streamId: string) {
-  const stream = await StreamRepository.getInstance<StreamRepository>().findOneById(streamId);
+  const serieRepository = new SerieRepository();
+  const streamRepository = new StreamRepository( {
+    serieRepository,
+  } );
+  const stream = await streamRepository.findOneByIdOrCreateFromSerie(streamId);
 
   if (!stream)
     return null;
@@ -28,8 +32,10 @@ export default async function f(streamId: string) {
 
 type FuncGenerator = (serie: SerieWithEpisodes, lastEp: Episode | null, stream: Stream)=> Promise<Episode>;
 export async function calculateNextEpisode(stream: Stream) {
-  const serieRepository = SerieRepository.getInstance<SerieRepository>();
-  const episodeRepository = EpisodeRepository.getInstance<EpisodeRepository>();
+  const serieRepository = new SerieRepository();
+  const episodeRepository = new EpisodeRepository( {
+    serieRepository,
+  } );
 
   console.log("Calculating next episode...");
   const groupId: string = stream.group;

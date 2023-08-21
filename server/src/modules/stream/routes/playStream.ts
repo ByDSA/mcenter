@@ -1,5 +1,6 @@
 import { HistoryRepository } from "#modules/history";
 import { PlayService, VLCService } from "#modules/play";
+import { EpisodeRepository } from "#modules/series";
 import { Serie, SerieRepository } from "#modules/series/serie";
 import { StreamRepository } from "#modules/stream";
 import { assertFound } from "#modules/utils/base/http/asserts";
@@ -11,15 +12,22 @@ export default async function f(req: Request, res: Response) {
   const { id, number, force } = parseParams(req, res);
   const streamService = new StreamService();
   const vlcService = new VLCService();
-  const streamRepository = StreamRepository.getInstance<StreamRepository>();
-  const serieRepository = SerieRepository.getInstance<SerieRepository>();
-  const historyRepository = HistoryRepository.getInstance<HistoryRepository>();
+  const serieRepository = new SerieRepository();
+  const streamRepository = new StreamRepository( {
+    serieRepository,
+  } );
+  const episodeRepository = new EpisodeRepository( {
+    serieRepository,
+  } );
+  const historyRepository = new HistoryRepository( {
+    episodeRepository,
+  } );
   const playService = new PlayService( {
     vlcService,
     streamRepository,
     historyRepository,
   } );
-  const stream = await streamRepository.findOneById(id);
+  const stream = await streamRepository.findOneByIdOrCreateFromSerie(id);
 
   assertFound(stream);
 

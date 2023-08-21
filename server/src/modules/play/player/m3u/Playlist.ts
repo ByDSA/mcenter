@@ -3,10 +3,10 @@ import { MediaElement, render } from "./MediaElement";
 
 // eslint-disable-next-line import/prefer-default-export
 export class Playlist {
-  private _elements: MediaElement[] = [];
+  #elements: MediaElement[] = [];
 
   addElement(element: MediaElement): Playlist {
-    this._elements.push(element);
+    this.#elements.push(element);
 
     return this;
   }
@@ -20,7 +20,7 @@ export class Playlist {
   toString(): string {
     let data = "";
 
-    for (const e of this._elements)
+    for (const e of this.#elements)
       data += render(e);
 
     return data;

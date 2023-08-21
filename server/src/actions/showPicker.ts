@@ -1,16 +1,28 @@
-import { getRandomPicker } from "#modules/series/episode";
+import { EpisodeRepository, getRandomPicker } from "#modules/series/episode";
 import { getDaysFromLastPlayed } from "#modules/series/episode/lastPlayed";
 import { SerieRepository } from "#modules/series/serie";
+import SerieService from "#modules/series/serie/SerieService";
 import { StreamRepository } from "#modules/stream";
 import { Request, Response } from "express";
 
 export default async function f(req: Request, res: Response) {
+  const serieRepository = new SerieRepository();
+  const streamRepository = new StreamRepository( {
+    serieRepository,
+  } );
+  const episodeRepository = new EpisodeRepository( {
+    serieRepository,
+  } );
+  const serieService = new SerieService( {
+    serieRepository,
+    episodeRepository,
+  } );
   const { streamId } = getParams(req, res);
-  const stream = await StreamRepository.getInstance<StreamRepository>().findOneById(streamId);
+  const stream = await streamRepository.findOneById(streamId);
 
   if (stream) {
-    const seriePromise = SerieRepository.getInstance<SerieRepository>().findOneFromGroupId(stream.group);
-    const lastEpPromise = SerieRepository.getInstance<SerieRepository>().findLastEpisodeInStream(stream);
+    const seriePromise = serieRepository.findOneFromGroupId(stream.group);
+    const lastEpPromise = serieService.findLastEpisodeInStream(stream);
 
     await Promise.all([seriePromise, lastEpPromise]);
     const serie = await seriePromise;

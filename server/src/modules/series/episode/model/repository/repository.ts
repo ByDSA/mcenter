@@ -1,8 +1,8 @@
 /* eslint-disable class-methods-use-this */
 import { SerieId, SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
-import { SerieModel } from "#modules/series/serie/model/repository/serie.model";
 import { Stream } from "#modules/stream";
 import { Repository } from "#modules/utils/base/repository";
+import { SerieModel } from "../../../serie/model/repository/serie.model";
 import { Episode, EpisodeId } from "../episode.entity";
 
 type FindOneParamsSerie = {
@@ -22,22 +22,31 @@ type UpdateOneParams = {
 
 type FindOneParams = FindOneParamsSerie | FindOneParamsSerieId;
 
-export default class EpisodeRepository extends Repository {
+type Params = {
+  serieRepository: SerieRepository;
+};
+export default class EpisodeRepository implements Repository {
+  #serieRepository: SerieRepository;
+
+  constructor( {serieRepository}: Params) {
+    this.#serieRepository = serieRepository;
+  }
+
   async findLastEpisodeInStream(stream: Stream): Promise<Episode | null> {
     const episodeId = stream.history.at(-1)?.episodeId;
 
     if (!episodeId)
       return null;
 
-    const serie = await SerieRepository.getInstance<SerieRepository>().findOneFromGroupId(stream.group);
+    const serie = await this.#serieRepository.findOneFromGroupId(stream.group);
 
     if (!serie)
       return null;
 
-    return this.findEpisodeInSerie(episodeId, serie);
+    return this.#findEpisodeInSerie(episodeId, serie);
   }
 
-  private findEpisodeInSerie(episodeId: EpisodeId, serie: SerieWithEpisodes): Episode | null {
+  #findEpisodeInSerie(episodeId: EpisodeId, serie: SerieWithEpisodes): Episode | null {
     return serie.episodes.find((episode: Episode) => episode.id === episodeId) ?? null;
   }
 
@@ -47,7 +56,7 @@ export default class EpisodeRepository extends Repository {
     let {serie} = params as FindOneParamsSerie;
 
     if (!serie) {
-      const gotSerie = await SerieRepository.getInstance<SerieRepository>().findOneById(serieId);
+      const gotSerie = await this.#serieRepository.findOneById(serieId);
 
       if (!gotSerie)
         return null;
@@ -55,11 +64,11 @@ export default class EpisodeRepository extends Repository {
       serie = gotSerie;
     }
 
-    return this.findEpisodeInSerie(episodeId, serie);
+    return this.#findEpisodeInSerie(episodeId, serie);
   }
 
   async updateOne(params: UpdateOneParams): Promise<Episode | null> {
-    const serie = await SerieRepository.getInstance<SerieRepository>().findOneById(params.serieId);
+    const serie = await this.#serieRepository.findOneById(params.serieId);
 
     if (!serie)
       return null;
