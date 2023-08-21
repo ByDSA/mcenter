@@ -1,5 +1,5 @@
+import { HistoryEntrySchema } from "#modules/history/db";
 import mongoose, { Document } from "mongoose";
-import { HistorySchema } from "#modules/history/model/repository/odm/history";
 import Stream, { Mode } from "../../stream.entity";
 
 interface StreamDocument extends Document, Stream {
@@ -26,7 +26,7 @@ const schema = new mongoose.Schema( {
     required: true,
   },
   history: {
-    type: [HistorySchema],
+    type: [HistoryEntrySchema],
   },
 } );
 const Model = mongoose.model<StreamDocument>(NAME, schema);
@@ -42,5 +42,5 @@ function toModel(stream: StreamDocument): Stream {
 }
 
 export {
-  schema as StreamSchema, Mode, StreamDocument, Model as StreamModel, toModel,
+  Mode, StreamDocument, Model as StreamModel, schema as StreamSchema, toModel, 
 };

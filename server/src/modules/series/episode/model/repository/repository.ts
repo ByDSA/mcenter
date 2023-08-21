@@ -3,15 +3,15 @@ import { SerieId, SerieRepository, SerieWithEpisodes } from "#modules/series/ser
 import { Stream } from "#modules/stream";
 import { Repository } from "#modules/utils/base/repository";
 import { SerieModel } from "../../../serie/model/repository/serie.model";
-import { Episode, EpisodeId } from "../episode.entity";
+import { Episode, EpisodeInnerId } from "../episode.entity";
 
 type FindOneParamsSerie = {
-  episodeId: EpisodeId;
+  episodeId: EpisodeInnerId;
   serie: SerieWithEpisodes;
 };
 
 type FindOneParamsSerieId = {
-  episodeId: EpisodeId;
+  episodeId: EpisodeInnerId;
   serieId: SerieId;
 };
 
@@ -46,8 +46,8 @@ export default class EpisodeRepository implements Repository {
     return this.#findEpisodeInSerie(episodeId, serie);
   }
 
-  #findEpisodeInSerie(episodeId: EpisodeId, serie: SerieWithEpisodes): Episode | null {
-    return serie.episodes.find((episode: Episode) => episode.id === episodeId) ?? null;
+  #findEpisodeInSerie(episodeId: EpisodeInnerId, serie: SerieWithEpisodes): Episode | null {
+    return serie.episodes.find((episode: Episode) => episode.innerId === episodeId) ?? null;
   }
 
   async findOneById(params: FindOneParams): Promise<Episode | null> {
@@ -73,7 +73,7 @@ export default class EpisodeRepository implements Repository {
     if (!serie)
       return null;
 
-    const index = serie.episodes.findIndex((e) => e.id === params.episode.id);
+    const index = serie.episodes.findIndex((e) => e.innerId === params.episode.innerId);
 
     if (index === -1)
       return null;

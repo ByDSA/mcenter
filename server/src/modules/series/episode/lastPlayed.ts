@@ -1,9 +1,9 @@
-import { History } from "#modules/history";
+import HistoryList from "#modules/history/model/HistoryList";
 import { DateType } from "#modules/utils/time/date-type";
 import { DateTime } from "luxon";
 import { SerieId, SerieRepository } from "../serie";
 import { EpisodeRepository } from "./model";
-import { Episode, copyOfEpisode } from "./model/episode.entity";
+import { Episode, compareEpisodeId, copyOfEpisode } from "./model/episode.entity";
 
 function getTimestampFromDate(date: DateType): number {
   if (date.timestamp)
@@ -14,12 +14,12 @@ function getTimestampFromDate(date: DateType): number {
   return d.getTime() / 1000;
 }
 
-export function getLastTimePlayedFromHistory(self: Episode, history: History[]): number | null {
+export function getLastTimePlayedFromHistory(self: Episode, historyList: HistoryList): number | null {
   let lastTimePlayed = Number.MAX_SAFE_INTEGER;
 
-  for (const h of history) {
-    if (self && h.episodeId === self.id) {
-      const currentTimestamp = getTimestampFromDate(h.date);
+  for (const historyEntry of historyList.entries) {
+    if (self && compareEpisodeId(historyEntry.episodeId, self.id)) {
+      const currentTimestamp = getTimestampFromDate(historyEntry.date);
 
       if (currentTimestamp < lastTimePlayed)
         lastTimePlayed = currentTimestamp;
@@ -32,7 +32,7 @@ export function getLastTimePlayedFromHistory(self: Episode, history: History[]):
   return lastTimePlayed;
 }
 
-export function getDaysFromLastPlayed(self: Episode, serieId: SerieId, history: History[]): number {
+export function getDaysFromLastPlayed(self: Episode, serieId: SerieId, historyList: HistoryList): number {
   const serieRepository = new SerieRepository();
   const episodeRepository = new EpisodeRepository( {
     serieRepository,
@@ -40,7 +40,7 @@ export function getDaysFromLastPlayed(self: Episode, serieId: SerieId, history: 
   let lastTimePlayed = self.lastTimePlayed ?? null;
 
   if (!lastTimePlayed) {
-    lastTimePlayed = getLastTimePlayedFromHistory(self, history);
+    lastTimePlayed = getLastTimePlayedFromHistory(self, historyList);
 
     if (lastTimePlayed) {
       const selfCopy: Episode = {

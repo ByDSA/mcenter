@@ -1,8 +1,17 @@
-import { Serie } from "#modules/series/serie";
+import { Serie, SerieId } from "#modules/series/serie";
 import { CanDurable, Resource } from "#modules/utils/base/resource";
 import { copyOfResource } from "#modules/utils/base/resource/Resource.entity";
 
-export type EpisodeId = string;
+export type EpisodeInnerId = string;
+
+export type EpisodeId = {
+  innerId: EpisodeInnerId;
+  serieId: SerieId;
+};
+
+export function compareEpisodeId(a: EpisodeId, b: EpisodeId): boolean {
+  return a.innerId === b.innerId; // TODO: && a.serieId === b.serieId;
+}
 
 export interface Episode
 extends

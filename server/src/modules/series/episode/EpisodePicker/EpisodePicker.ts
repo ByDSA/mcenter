@@ -66,7 +66,7 @@ async function getNextEpisodeSequential(serie: SerieWithEpisodes, lastEp: Episod
   let i = 0;
 
   if (lastEp) {
-    i = episodes.findIndex((e) => e.id === lastEp.id) + 1;
+    i = episodes.findIndex((e) => e.innerId === lastEp.innerId) + 1;
 
     if (i >= episodes.length)
       i = 0;

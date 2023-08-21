@@ -38,7 +38,7 @@ export default class PlayController {
 
     assertHasItems(episodes);
 
-    const episode = episodes.find((e) => e.id === id);
+    const episode = episodes.find((e) => e.innerId === id);
 
     if (episode) {
       const serieWithoutEpisodes: Serie = {

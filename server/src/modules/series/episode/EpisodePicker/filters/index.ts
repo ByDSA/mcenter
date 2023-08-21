@@ -3,7 +3,7 @@ import { getDaysFromLastPlayed } from "../../lastPlayed";
 import { Params } from "../utils";
 
 export function preventRepeatLast( { self, lastEp }: Params<Episode>) {
-  return !lastEp || lastEp.id !== self.id;
+  return !lastEp || lastEp.innerId !== self.innerId;
 }
 
 type Obj = {
@@ -39,8 +39,8 @@ function dependency(
   self: Episode,
   idCurrent: string,
 ): boolean {
-  return (lastEp?.id === idLast && self.id === idCurrent)
-  || (lastEp?.id !== idLast && self.id !== idCurrent);
+  return (lastEp?.innerId === idLast && self.innerId === idCurrent)
+  || (lastEp?.innerId !== idLast && self.innerId !== idCurrent);
 }
 
 export function preventDisabled( { self }: Params<Episode>) {

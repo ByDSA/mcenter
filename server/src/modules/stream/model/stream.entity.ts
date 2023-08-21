@@ -1,4 +1,4 @@
-import { History } from "#modules/history";
+import { HistoryEntry } from "#modules/history";
 
 export enum Mode {
   SEQUENTIAL = "SEQUENTIAL",
@@ -12,5 +12,5 @@ export default interface Stream {
   group: string;
   mode: Mode;
   maxHistorySize: number;
-  history: History[];
+  history: HistoryEntry[];
 }

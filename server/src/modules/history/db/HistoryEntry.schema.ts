@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import mongoose from "mongoose";
 import { DateSchema } from "#modules/utils/time/date-type";
+import mongoose from "mongoose";
 
 const schema = new mongoose.Schema( {
   date: {
@@ -13,6 +13,4 @@ const schema = new mongoose.Schema( {
   },
 } );
 
-export {
-  schema as HistorySchema,
-};
+export default schema;

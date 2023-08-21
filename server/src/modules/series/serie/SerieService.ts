@@ -27,9 +27,6 @@ export default class SerieService {
     if (!serie)
       return null;
 
-    return this.#episodeRepository.findOneById( {
-      episodeId,
-      serie,
-    } );
+    return this.#episodeRepository.findOneById(episodeId);
   }
 }
