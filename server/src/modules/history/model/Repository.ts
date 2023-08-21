@@ -1,8 +1,8 @@
 import { EpisodeRepository } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { Stream, StreamRepository } from "#modules/stream";
-import { CanUpdateOneById } from "src/utils/base/repository";
-import { assertFound } from "#modules/utils/base/http/asserts";
+import { assertFound } from "#utils/checking";
+import { CanUpdateOneById } from "#utils/layers/repository";
 import HistoryList, { HistoryListId } from "./HistoryList";
 
 type Params = {
@@ -27,7 +27,7 @@ implements CanUpdateOneById<HistoryList, HistoryListId> {
 
   async updateOneById(id: HistoryListId, list: HistoryList): Promise<void> {
     const streamId = id;
-    const stream = await this.#streamRepository.findOneById(streamId);
+    const stream = await this.#streamRepository.getOneById(streamId);
 
     assertFound(stream);
     stream.history = list.entries;

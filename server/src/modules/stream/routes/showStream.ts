@@ -8,7 +8,7 @@ export default async function f(req: Request, res: Response) {
   const streamRepository = new StreamRepository( {
     serieRepository,
   } );
-  const stream = await streamRepository.findOneByIdOrCreateFromSerie(id);
+  const stream = await streamRepository.getOneByIdOrCreateFromSerie(id);
 
   if (stream)
     res.send(stream);

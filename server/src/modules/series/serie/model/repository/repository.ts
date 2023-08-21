@@ -1,26 +1,28 @@
 /* eslint-disable no-await-in-loop */
 import { Episode } from "#modules/series/episode";
-import { Repository } from "src/utils/base/repository";
-import { assertHasItems } from "#modules/utils/base/http/asserts";
+import { assertIsNotEmpty } from "#utils/checking";
+import { CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { FileNode, getSerieTreeRemote } from "../../../../../actions/nginxTree";
 import SerieWithEpisodes, { SerieId } from "../serie.entity";
 import { SerieModel as SerieWithEpisodesModel } from "./serie.model";
 
 const { MEDIA_PATH } = process.env;
 
-export default class SerieRepository implements Repository {
+export default class SerieRepository
+implements CanGetOneById<SerieWithEpisodes, SerieId>,
+CanUpdateOneByIdAndGet<SerieWithEpisodes, SerieId> {
   async findOneFromGroupId(groupId: string): Promise<SerieWithEpisodes | null> {
     const groupSplit = groupId.split("/");
 
-    assertHasItems(groupSplit);
+    assertIsNotEmpty(groupSplit);
 
     const serieId = groupSplit.at(-1) as string;
-    const serie = await this.findOneById(serieId);
+    const serie = await this.getOneById(serieId);
 
     return serie;
   }
 
-  async findOneById(id: string): Promise<SerieWithEpisodes | null> {
+  async getOneById(id: string): Promise<SerieWithEpisodes | null> {
     let [serie]: SerieWithEpisodes[] = await SerieWithEpisodesModel.find( {
       id,
     }, {
@@ -39,7 +41,7 @@ export default class SerieRepository implements Repository {
     return serie;
   }
 
-  async updateOneById(id: SerieId, serie: SerieWithEpisodes): Promise<SerieWithEpisodes | null> {
+  async updateOneByIdAndGet(id: SerieId, serie: SerieWithEpisodes): Promise<SerieWithEpisodes | null> {
     return SerieWithEpisodesModel.findOneAndUpdate( {
       id,
     }, serie, {

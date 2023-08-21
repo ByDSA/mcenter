@@ -1,7 +1,7 @@
+import { assertIsDefined } from "#utils/checking";
 import express, { Express } from "express";
 import { Server } from "node:http";
 import https from "node:https";
-import { assertIsDefined } from "src/utils/built-in-types/errors";
 import { Components, initializeComponents } from "./components";
 import { GlobalConfig, GlobalConfigOptions } from "./config";
 

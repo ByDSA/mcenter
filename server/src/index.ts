@@ -5,11 +5,11 @@ import { SerieRepository } from "#modules/series/serie";
 import { addSerieRoutes } from "#modules/series/serie/routes";
 import { StreamRepository } from "#modules/stream";
 import { addStreamRoutes } from "#modules/stream/routes";
+import { HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import { execSync } from "child_process";
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
-import { HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import showPickerFunc from "./actions/showPicker";
 import { connect } from "./db/database";
 

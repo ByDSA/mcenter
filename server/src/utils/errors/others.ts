@@ -1,4 +1,4 @@
-import { assertIsDefined } from "src/utils/built-in-types/errors";
+import { assertIsDefined } from "#utils/checking";
 
 export type TestVOParams<T> = {
   fActual: ()=> T;

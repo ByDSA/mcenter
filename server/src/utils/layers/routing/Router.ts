@@ -1,8 +1,8 @@
 import { Application, Router as ExpressRouter } from "express";
-import { neverCase } from "src/utils/built-in-types/never";
+import { neverCase } from "#utils/checking";
 import { mergeDeepSameObjects } from "..";
 import { GeneralRoute } from "../../express/handlers";
-import HttpMethod from "../http/HttpMethod";
+import HttpMethod from "../../http/HttpMethod";
 
 type Params = {
   url: string;

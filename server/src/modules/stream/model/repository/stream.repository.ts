@@ -1,5 +1,5 @@
 import { SerieId, SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
-import { CanFindById, CanUpdateOneById, Repository } from "src/utils/base/repository";
+import { CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import Stream, { StreamId } from "../stream.entity";
 import { Mode, StreamDocument, StreamModel } from "./odm/stream.odm";
 
@@ -7,8 +7,7 @@ type Params = {
   serieRepository: SerieRepository;
 };
 export default class StreamRepository
-implements Repository,
-CanFindById<Stream, StreamId>,
+implements CanGetOneById<Stream, StreamId>,
 CanUpdateOneById<Stream, StreamId> {
   #serieRepository: SerieRepository;
 
@@ -36,7 +35,7 @@ CanUpdateOneById<Stream, StreamId> {
     return newStream.save();
   }
 
-  async findOneById(id: StreamId): Promise<Stream | null> {
+  async getOneById(id: StreamId): Promise<Stream | null> {
     console.log(`getting stream by id=${id}`);
     const streams = await StreamModel.find( {
       id,
@@ -48,12 +47,12 @@ CanUpdateOneById<Stream, StreamId> {
     return stream;
   }
 
-  async findOneByIdOrCreateFromSerie(id: StreamId): Promise<Stream | null> {
-    let stream = await this.findOneById(id);
+  async getOneByIdOrCreateFromSerie(id: StreamId): Promise<Stream | null> {
+    let stream = await this.getOneById(id);
 
     if (!stream) {
       const serieId = id as SerieId;
-      const serie = await this.#serieRepository.findOneById(serieId);
+      const serie = await this.#serieRepository.getOneById(serieId);
 
       if (!serie)
         return null;

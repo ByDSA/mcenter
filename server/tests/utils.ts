@@ -1,7 +1,7 @@
-import { findRootProjectFolder } from "#utils";
+import { findRootProjectFolder } from "#utils/ProjectInfrastructure";
+import { FileAlreadyExistsError, FileNotFoundError } from "#utils/fs/errors";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { FileAlreadyExistsError, FileNotFoundError } from "src/utils/fs/errors";
 
 function findTestsProjectFolder() {
   const root = findRootProjectFolder();

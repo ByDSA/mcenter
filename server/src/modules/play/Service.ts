@@ -1,7 +1,7 @@
 import { HistoryRepository, HistoryService } from "#modules/history";
 import { EpisodeWithSerie } from "#modules/series/episode";
 import { StreamRepository } from "#modules/stream";
-import { assertHasItems } from "#modules/utils/base/http/asserts";
+import { assertIsNotEmpty } from "#utils/checking";
 import VLCService from "./PlayService";
 import { episodeToMediaElement } from "./adapters";
 import { MediaElement } from "./player";
@@ -33,7 +33,7 @@ export default class PlayService {
   }
 
   async play( {episodes, force}: PlayParams): Promise<boolean> {
-    assertHasItems(episodes);
+    assertIsNotEmpty(episodes);
 
     const elements: MediaElement[] = episodes.map(episodeToMediaElement);
     const ok = await this.#vlcService.play(elements, {
@@ -42,7 +42,7 @@ export default class PlayService {
 
     if (ok) {
       for (const episode of episodes) {
-        this.#streamRepository.findOneByIdOrCreateFromSerie(episode.serie.id)
+        this.#streamRepository.getOneByIdOrCreateFromSerie(episode.serie.id)
           .then((stream) => {
             if (stream && episode) {
               this.#historyRepository.findByStream(stream). then((historyList) => {

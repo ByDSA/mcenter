@@ -7,7 +7,7 @@ export default async function (req: Request, res: Response) {
 
   connect();
   const serieRepository = new SerieRepository();
-  const serie: SerieWithEpisodes | null = await serieRepository.findOneById(id);
+  const serie: SerieWithEpisodes | null = await serieRepository.getOneById(id);
 
   if (!serie) {
     res.sendStatus(404);

@@ -1,7 +1,7 @@
 import { EpisodeId, EpisodeRepository } from "#modules/series";
 import { Episode, copyOfEpisode } from "#modules/series/episode/model";
+import { assertFound } from "#utils/checking";
 import { getDateNow } from "src/utils/time/date-type";
-import { assertFound } from "#modules/utils/base/http/asserts";
 import { HistoryEntry, HistoryRepository } from "./model";
 import HistoryList from "./model/HistoryList";
 
@@ -58,7 +58,7 @@ export default class Service {
       episodeId = params.episode.id;
     } else if ("episodeId" in params) {
       episodeId = params.episodeId;
-      const episodeOrNull = await this.#episodeRepository.findOneById(episodeId);
+      const episodeOrNull = await this.#episodeRepository.getOneById(episodeId);
 
       assertFound(episodeOrNull);
       episode = episodeOrNull;
@@ -77,7 +77,7 @@ export default class Service {
 
     episodeCopy.lastTimePlayed = newEntry.date.timestamp;
 
-    await this.#episodeRepository.updateOneAndGet(episodeCopy);
+    await this.#episodeRepository.updateOneByIdAndGet(episodeCopy.id, episodeCopy);
   }
 
   async removeLastTimeEpisodeFromHistory( {historyList, ...params}: HistoryAndEpisodeParams) {
@@ -108,7 +108,7 @@ export default class Service {
     if ("episode" in params)
       episode = params.episode;
     else {
-      const gotEpisode = await this.#episodeRepository.findOneById(episodeId);
+      const gotEpisode = await this.#episodeRepository.getOneById(episodeId);
 
       assertFound(gotEpisode);
       episode = gotEpisode;
@@ -126,7 +126,7 @@ export default class Service {
       else
         episodeCopy.lastTimePlayed = lastTimeHistoryEntry.date.timestamp;
 
-      await this.#episodeRepository.updateOneAndGet(episodeCopy);
+      await this.#episodeRepository.updateOneByIdAndGet(episodeCopy.id, episodeCopy);
     }
   }
 }

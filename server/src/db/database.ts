@@ -5,15 +5,14 @@ const options: ConnectOptions = {
   autoIndex: false,
   maxPoolSize: 10,
 };
-// mongodb environment variables
-const {MONGO_HOSTNAME,
-  MONGO_DB,
-  MONGO_PORT,
-  MONGO_USER,
-  MONGO_PASSWORD} = process.env;
-const dbConnectionURL = generateUrl();
 
 function generateUrl() {
+  // mongodb environment variables
+  const {MONGO_HOSTNAME,
+    MONGO_DB,
+    MONGO_PORT,
+    MONGO_USER,
+    MONGO_PASSWORD} = process.env;
   const isLocal = MONGO_HOSTNAME === "localhost" || MONGO_HOSTNAME === "127.0.0.1";
   let ret = `${isLocal ? "mongodb" : "mongodb+srv" }://`;
 
@@ -31,6 +30,8 @@ function generateUrl() {
 }
 
 function connect() {
+  const dbConnectionURL = generateUrl();
+
   console.log(`Connecting to ${dbConnectionURL} ...`);
   mongoose.set("strictQuery", false);
   mongoose.connect(dbConnectionURL, options);

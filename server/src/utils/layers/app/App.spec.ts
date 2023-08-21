@@ -1,5 +1,5 @@
-import { assertNotEmpty } from "src/utils/built-in-types/arrays";
-import { getPortFromServer } from "src/utils/built-in-types/nodejs/http";
+import { assertIsNotEmpty } from "#utils/checking";
+import { getPortFromServer } from "#utils/nodejs/http";
 import request from "supertest";
 import App from "./App";
 
@@ -32,13 +32,13 @@ describe("App", () => {
         it("el servidor se ha añadido a la lista de servidores de la app", () => {
           const servers = app.getServers();
 
-          assertNotEmpty(servers);
+          assertIsNotEmpty(servers);
         } );
 
         it("tiene un puerto asignado el servidor", () => {
           const servers = app.getServers();
 
-          assertNotEmpty(servers);
+          assertIsNotEmpty(servers);
 
           const port = getPortFromServer(servers[0]);
 

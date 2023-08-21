@@ -1,4 +1,4 @@
-import { throwErrorPopStack } from "../others";
+import { throwErrorPopStack } from "#utils/errors";
 
 /* eslint-disable import/prefer-default-export */
 export function neverCase(value: never): never {

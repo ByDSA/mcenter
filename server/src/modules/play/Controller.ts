@@ -1,7 +1,7 @@
 import { EpisodeWithSerie } from "#modules/series";
 import { copyOfEpisode } from "#modules/series/episode/model";
 import { Serie, SerieRepository } from "#modules/series/serie";
-import { assertFound, assertHasItems } from "#modules/utils/base/http/asserts";
+import { assertFound, assertIsNotEmpty } from "#utils/checking";
 import { Request, Response, Router } from "express";
 import Service from "./Service";
 
@@ -28,13 +28,13 @@ export default class PlayController {
     const forceStr = req.query.force;
     const force = !!forceStr;
     const { id, name } = req.params;
-    const serie = await this.#serieRepository.findOneById(name);
+    const serie = await this.#serieRepository.getOneById(name);
 
     assertFound(serie);
 
     const { episodes } = serie;
 
-    assertHasItems(episodes);
+    assertIsNotEmpty(episodes);
 
     const episode = episodes.find((e) => e.id.innerId === id);
 

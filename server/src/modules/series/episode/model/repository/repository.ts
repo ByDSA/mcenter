@@ -1,22 +1,19 @@
 import HistoryList from "#modules/history/model/HistoryList";
 import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
-import { Repository } from "src/utils/base/repository";
+import { CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { SerieModel } from "../../../serie/model/repository/serie.model";
 import { Episode, EpisodeId, compareEpisodeId } from "../Episode";
 import { episodeToEpisodeDB } from "./adapters";
 
-type FindOneParamsSerie = EpisodeId;
-
-type FindOneParamsSerieId = EpisodeId;
-
 type UpdateOneParams = Episode;
-
-type FindOneParams = FindOneParamsSerie | FindOneParamsSerieId;
 
 type Params = {
   serieRepository: SerieRepository;
 };
-export default class EpisodeRepository implements Repository {
+export default class EpisodeRepository
+implements CanGetOneById<Episode, EpisodeId>,
+CanUpdateOneByIdAndGet<Episode, EpisodeId>
+{
   #serieRepository: SerieRepository;
 
   constructor( {serieRepository}: Params) {
@@ -29,11 +26,11 @@ export default class EpisodeRepository implements Repository {
     if (!episodeId)
       return null;
 
-    return this.findOneById(episodeId);
+    return this.getOneById(episodeId);
   }
 
   async #findSerieOfEpisodeId(episodeId: EpisodeId): Promise<SerieWithEpisodes | null> {
-    const serie = await this.#serieRepository.findOneById(episodeId.serieId);
+    const serie = await this.#serieRepository.getOneById(episodeId.serieId);
 
     if (!serie)
       return null;
@@ -41,8 +38,8 @@ export default class EpisodeRepository implements Repository {
     return serie;
   }
 
-  async findOneById(params: FindOneParams): Promise<Episode | null> {
-    const episodeId = params;
+  async getOneById(id: EpisodeId): Promise<Episode | null> {
+    const episodeId = id;
     const serie = await this.#findSerieOfEpisodeId(episodeId);
 
     if (!serie)
@@ -53,8 +50,8 @@ export default class EpisodeRepository implements Repository {
     return found;
   }
 
-  async updateOneAndGet(episode: UpdateOneParams): Promise<Episode | null> {
-    const serie = await this.#serieRepository.findOneById(episode.id.serieId);
+  async updateOneByIdAndGet(id: EpisodeId, episode: UpdateOneParams): Promise<Episode | null> {
+    const serie = await this.#serieRepository.getOneById(episode.id.serieId);
 
     if (!serie)
       return null;

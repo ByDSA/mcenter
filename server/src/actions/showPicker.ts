@@ -22,7 +22,7 @@ export default async function f(req: Request, res: Response) {
     episodeRepository,
   } );
   const { streamId } = getParams(req, res);
-  const stream = await streamRepository.findOneById(streamId);
+  const stream = await streamRepository.getOneById(streamId);
 
   if (stream) {
     const seriePromise = serieRepository.findOneFromGroupId(stream.group);

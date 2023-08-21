@@ -3,7 +3,7 @@ import { PlayService, VLCService } from "#modules/play";
 import { EpisodeRepository } from "#modules/series";
 import { Serie, SerieRepository } from "#modules/series/serie";
 import { StreamRepository } from "#modules/stream";
-import { assertFound } from "#modules/utils/base/http/asserts";
+import { assertFound } from "#utils/checking";
 import { Request, Response } from "express";
 import StreamService from "../StreamService";
 
@@ -32,12 +32,12 @@ export default async function f(req: Request, res: Response) {
     historyService,
     historyRepository,
   } );
-  const stream = await streamRepository.findOneByIdOrCreateFromSerie(id);
+  const stream = await streamRepository.getOneByIdOrCreateFromSerie(id);
 
   assertFound(stream);
 
   const episodes = await streamService.pickNextEpisode(stream, number);
-  const serieWithEpisodes = await serieRepository.findOneById(stream.id);
+  const serieWithEpisodes = await serieRepository.getOneById(stream.id);
 
   assertFound(serieWithEpisodes);
 

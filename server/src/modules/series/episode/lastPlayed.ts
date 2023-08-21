@@ -48,7 +48,7 @@ export function getDaysFromLastPlayed(self: Episode, serieId: SerieId, historyLi
         lastTimePlayed,
       };
 
-      episodeRepository.updateOneAndGet(selfCopy);
+      episodeRepository.updateOneByIdAndGet(selfCopy.id, selfCopy);
     }
   }
 

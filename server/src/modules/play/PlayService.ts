@@ -1,4 +1,4 @@
-import { assertHasItems } from "#modules/utils/base/http/asserts";
+import { assertIsNotEmpty } from "#utils/checking";
 import { MediaElement, QueuePlaylistManager, VLCFlag, VLCProcess } from "./player";
 
 const { TMP_PATH } = process.env;
@@ -49,7 +49,7 @@ export default class PlayService {
   }
 
   async play(elements: MediaElement[], options?: Options): Promise<boolean> {
-    assertHasItems(elements);
+    assertIsNotEmpty(elements);
 
     this.#openNewInstance = options?.openNewInstance ?? false;
     await this.#updateIsRunningAnyInstanceAsync();

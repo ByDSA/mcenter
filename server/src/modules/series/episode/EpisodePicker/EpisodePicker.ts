@@ -2,11 +2,9 @@ import { HistoryRepository } from "#modules/history";
 import HistoryList from "#modules/history/model/HistoryList";
 import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
 import { Stream, StreamMode, StreamRepository } from "#modules/stream";
+import { assertFound, assertIsDefined, neverCase } from "#utils/checking";
+import { throwErrorPopStack } from "#utils/errors";
 import { Picker, newPicker } from "rand-picker";
-import { assertIsDefined } from "src/utils/built-in-types/errors";
-import { neverCase } from "src/utils/built-in-types/never";
-import { throwErrorPopStack } from "src/utils/others";
-import { assertFound } from "#modules/utils/base/http/asserts";
 import { Episode, EpisodeRepository } from "../model";
 import { filter } from "./EpisodeFilter";
 import fixWeight from "./EpisodeWeight";
@@ -16,7 +14,7 @@ export default async function f(streamId: string) {
   const streamRepository = new StreamRepository( {
     serieRepository,
   } );
-  const stream = await streamRepository.findOneByIdOrCreateFromSerie(streamId);
+  const stream = await streamRepository.getOneByIdOrCreateFromSerie(streamId);
 
   if (!stream)
     return null;

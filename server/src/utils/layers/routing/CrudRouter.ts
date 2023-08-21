@@ -1,8 +1,8 @@
 import { Handler } from "express";
-import { ArrayOneOrMore } from "src/utils/built-in-types/arrays";
+import { ArrayOneOrMore } from "#utils/arrays";
 import { mergeDeepSameObjects } from "..";
 import { NOT_IMPLEMENTED_HANDLER } from "../../express/handlers";
-import HttpMethod from "../http/HttpMethod";
+import HttpMethod from "../../http/HttpMethod";
 import Router from "./Router";
 
 type GeneralRoute = {
