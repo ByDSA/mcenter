@@ -1,6 +1,12 @@
-export default class NotFoundError extends Error {
+
+import StatusCode from "../StatusCode";
+import HttpError from "./HttpError";
+
+export const NotFoundErrorName = "NotFoundError";
+
+export default class NotFoundError extends HttpError {
   constructor(message?: string) {
-    super(message);
-    this.name = "NotFoundError";
+    super(StatusCode.NOT_FOUND, message);
+    this.name = NotFoundErrorName;
   }
 }

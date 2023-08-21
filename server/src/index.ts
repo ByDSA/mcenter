@@ -5,12 +5,12 @@ import { SerieRepository } from "#modules/series/serie";
 import { addSerieRoutes } from "#modules/series/serie/routes";
 import { StreamRepository } from "#modules/stream";
 import { addStreamRoutes } from "#modules/stream/routes";
-import errorHandler from "#modules/utils/base/http/errors/errorHandler";
-import { HELLO_WORLD_HANDLER } from "#modules/utils/base/http/routing/utils";
+import errorHandler from "#modules/utils/base/repository/errors/errorHandler";
 import { execSync } from "child_process";
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
+import { HELLO_WORLD_HANDLER } from "#modules/utils/base/http/routing/utils";
 import showPickerFunc from "./actions/showPicker";
 import { connect } from "./db/database";
 
