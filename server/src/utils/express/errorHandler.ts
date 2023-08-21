@@ -1,5 +1,5 @@
+import { NotFoundError } from "#utils/http/validation";
 import { NextFunction, Request, Response } from "express";
-import NotFoundError from "../http/errors/NotFoundError";
 
 const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof NotFoundError)

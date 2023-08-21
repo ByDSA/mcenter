@@ -1,7 +1,8 @@
 import { EpisodeWithSerie } from "#modules/series";
 import { copyOfEpisode } from "#modules/series/episode/model";
 import { Serie, SerieRepository } from "#modules/series/serie";
-import { assertFound, assertIsNotEmpty } from "#utils/checking";
+import { assertFound } from "#utils/http/validation";
+import { assertIsNotEmpty } from "#utils/validation";
 import { Request, Response, Router } from "express";
 import Service from "./Service";
 

@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
-import { assertIsDefined } from "#utils/checking";
 import { FileNotFoundError } from "#utils/fs/errors";
 import { readIfExistsSync } from "#utils/fs/operations";
+import { assertIsDefined } from "#utils/validation";
 import assert from "node:assert";
 import { ConfigOptions, NetConfig, SSLMode, TextFile } from "./common";
 

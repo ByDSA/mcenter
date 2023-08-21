@@ -1,7 +1,7 @@
 import { EpisodeRepository } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { Stream, StreamRepository } from "#modules/stream";
-import { assertFound } from "#utils/checking";
+import { assertFound } from "#utils/http/validation";
 import { CanUpdateOneById } from "#utils/layers/repository";
 import HistoryList, { HistoryListId } from "./HistoryList";
 

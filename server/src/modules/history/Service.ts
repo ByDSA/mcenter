@@ -1,6 +1,6 @@
 import { EpisodeId, EpisodeRepository } from "#modules/series";
 import { Episode, copyOfEpisode } from "#modules/series/episode/model";
-import { assertFound } from "#utils/checking";
+import { assertFound } from "#utils/http/validation";
 import { getDateNow } from "src/utils/time/date-type";
 import { HistoryEntry, HistoryRepository } from "./model";
 import HistoryList from "./model/HistoryList";

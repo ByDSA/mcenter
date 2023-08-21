@@ -2,8 +2,8 @@
 import { Episode } from "#modules/series/episode";
 import { EpisodeDB } from "#modules/series/episode/db";
 import { episodeDBToEpisode, episodeToEpisodeDB } from "#modules/series/episode/model/repository/adapters";
-import { assertIsNotEmpty } from "#utils/checking";
 import { CanCreateOneAndGet, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import { assertIsNotEmpty } from "#utils/validation";
 import { FileNode, getSerieTreeRemote } from "../../../../../actions/nginxTree";
 import Serie, { SerieId } from "../serie.entity";
 import { SerieDB, SerieModel as SerieWithEpisodesModel } from "./serie.model";

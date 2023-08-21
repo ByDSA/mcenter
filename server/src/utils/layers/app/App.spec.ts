@@ -1,5 +1,5 @@
-import { assertIsNotEmpty } from "#utils/checking";
 import { getPortFromServer } from "#utils/nodejs/http";
+import { assertIsNotEmpty } from "#utils/validation";
 import request from "supertest";
 import App from "./App";
 

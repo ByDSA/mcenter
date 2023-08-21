@@ -3,7 +3,7 @@ import { PlayService, VLCService } from "#modules/play";
 import { EpisodeRepository } from "#modules/series";
 import { Serie, SerieRepository } from "#modules/series/serie";
 import { StreamRepository } from "#modules/stream";
-import { assertFound } from "#utils/checking";
+import { assertFound } from "#utils/http/validation";
 import { Request, Response } from "express";
 import StreamService from "../StreamService";
 

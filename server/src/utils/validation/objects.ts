@@ -11,3 +11,8 @@ export function assertHasAnyKey<T extends Object>(value: T, keys: string[]) {
 
   throw new Error(`TODO must have any key of '${keys.join(", ")}'`);
 }
+
+export function assertIsInstanceOf<T>(value: unknown, clazz: new (...args: any[])=> T): asserts value is T {
+  if (!(value instanceof clazz))
+    throw new Error(`Value must be an instance of '${clazz.name}'`);
+}

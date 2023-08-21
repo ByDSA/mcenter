@@ -1,4 +1,4 @@
-import { assertIsDefined } from "#utils/checking";
+import { assertIsDefined } from "#utils/validation";
 import { ConfigOptions, NetConfig } from "./common";
 import { getInitializedNetConfig } from "./initialization";
 

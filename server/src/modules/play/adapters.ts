@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { assertIsDefined } from "#utils/checking";
+import { assertIsDefined } from "#utils/validation";
 import { Episode } from "../series";
 import { MediaElement } from "./player";
 

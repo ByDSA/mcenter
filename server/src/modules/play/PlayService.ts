@@ -1,4 +1,4 @@
-import { assertIsDefined, assertIsNotEmpty } from "#utils/checking";
+import { assertIsDefined, assertIsNotEmpty } from "#utils/validation";
 import fs from "node:fs";
 import { MediaElement, QueuePlaylistManager, VLCFlag, VLCProcess } from "./player";
 

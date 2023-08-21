@@ -1,4 +1,4 @@
-import NotFoundError from "./NotFoundError";
+import { NotFoundError } from "./found";
 
 export const ModelNotFoundErrorName = "ModelNotFoundError";
 

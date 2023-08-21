@@ -1,7 +1,7 @@
 import { HistoryRepository, HistoryService } from "#modules/history";
 import { EpisodeWithSerie } from "#modules/series/episode";
 import { StreamRepository } from "#modules/stream";
-import { assertIsNotEmpty } from "#utils/checking";
+import { assertIsNotEmpty } from "#utils/validation";
 import VLCService from "./PlayService";
 import { episodeToMediaElement } from "./adapters";
 import { MediaElement } from "./player";
