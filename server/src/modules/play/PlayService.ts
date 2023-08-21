@@ -1,8 +1,6 @@
 import { assertHasItems } from "#modules/utils/base/http/asserts";
-import dotenv from "dotenv";
 import { MediaElement, QueuePlaylistManager, VLCFlag, VLCProcess } from "./player";
 
-dotenv.config();
 const { TMP_PATH } = process.env;
 
 type Options = {

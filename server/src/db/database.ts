@@ -1,7 +1,4 @@
-import dotenv from "dotenv";
 import mongoose, { ConnectOptions } from "mongoose";
-
-dotenv.config();
 
 // mongoose options
 const options: ConnectOptions = {

@@ -23,8 +23,8 @@ describe("Config", () => {
 
           expect(actual).toBeDefined();
         } );
-        it("port=80", () => {
-          expect(config.net.port).toBe(80);
+        it("port=0", () => {
+          expect(config.net.port).toBe(0);
         } );
 
         describe("ssl", () => {

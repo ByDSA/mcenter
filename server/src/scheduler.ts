@@ -1,9 +1,6 @@
-import dotenv from "dotenv";
 import { DateTime } from "luxon";
 import schedule from "node-schedule";
 import { dynamicLoadScriptFromEnvVar } from "./DynamicLoad";
-
-dotenv.config();
 
 schedule.scheduleJob("* * * * * *", async (dateArg: Date) => {
   const date = DateTime.fromJSDate(dateArg);

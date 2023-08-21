@@ -8,18 +8,19 @@ import { addStreamRoutes } from "#modules/stream/routes";
 import errorHandler from "#modules/utils/base/http/errors/errorHandler";
 import { HELLO_WORLD_HANDLER } from "#modules/utils/base/http/routing/utils";
 import { execSync } from "child_process";
+import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
 import showPickerFunc from "./actions/showPicker";
 import { connect } from "./db/database";
 
+dotenv.config();
+const PORT = +(process.env.PORT ?? 8080);
 const app = express();
 // eslint-disable-next-line import/no-internal-modules, @typescript-eslint/no-unused-vars
 const s = require("./scheduler");
 
 app.disable("x-powered-by");
-
-const PORT = 8011;
 
 connect();
 

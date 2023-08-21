@@ -2,12 +2,9 @@
 import { Episode } from "#modules/series/episode";
 import { assertHasItems } from "#modules/utils/base/http/asserts";
 import { Repository } from "#modules/utils/base/repository";
-import dotenv from "dotenv";
 import { FileNode, getSerieTreeRemote } from "../../../../../actions/nginxTree";
 import SerieWithEpisodes, { SerieId } from "../serie.entity";
 import { SerieModel as SerieWithEpisodesModel } from "./serie.model";
-
-dotenv.config();
 
 const { MEDIA_PATH } = process.env;
 

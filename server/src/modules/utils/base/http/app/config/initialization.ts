@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import assert from "node:assert";
 import { assertIsDefined } from "#modules/utils/built-in-types/errors";
 import { FileNotFoundError } from "#modules/utils/fs/errors";
 import { readIfExistsSync } from "#modules/utils/fs/operations";
+import assert from "node:assert";
 import { ConfigOptions, NetConfig, SSLMode, TextFile } from "./common";
 
 function initializeSSL(mode: SSLMode): NetConfig["ssl"] {
@@ -69,15 +69,15 @@ export function getInitializedNetConfig(options?: ConfigOptions["net"]) {
 
 function calcPort(options: ConfigOptions["net"]): number {
   const ENV_NAME = {
-    NODE_PORT: "NODE_PORT",
+    PORT: "PORT",
   } as const;
-  const NODE_PORT = process.env[ENV_NAME.NODE_PORT];
+  const PORT = process.env[ENV_NAME.PORT];
 
   if (options?.port !== undefined)
     return options.port;
 
-  if (NODE_PORT !== undefined)
-    return +NODE_PORT;
+  if (PORT !== undefined)
+    return +PORT;
 
   return 0;
 }
