@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.2](https://github.com/ByDSA/mcenter/compare/v1.1.1...v1.1.2) (2023-08-21)
+
+
+### Bug Fixes
+
+* faltaban añadir dependencias ([a98c039](https://github.com/ByDSA/mcenter/commit/a98c039366474ff8f11ddbafe2b30196b64158c1))
+
 ### [1.1.1](https://github.com/ByDSA/mcenter/compare/v1.1.0...v1.1.1) (2023-08-21)
 
 
