@@ -16,3 +16,7 @@ export function assertIsInstanceOf<T>(value: unknown, clazz: new (...args: any[]
   if (!(value instanceof clazz))
     throw new Error(`Value must be an instance of '${clazz.name}'`);
 }
+
+export function isObject(item: unknown): boolean {
+  return (!!item && typeof item === "object" && !Array.isArray(item));
+}

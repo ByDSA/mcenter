@@ -1,6 +1,6 @@
-import { Handler } from "express";
 import { ArrayOneOrMore } from "#utils/arrays";
-import { mergeDeepSameObjects } from "..";
+import { mergeOpts } from "#utils/objects";
+import { Handler } from "express";
 import { NOT_IMPLEMENTED_HANDLER } from "../../express/handlers";
 import HttpMethod from "../../http/HttpMethod";
 import Router from "./Router";
@@ -83,7 +83,7 @@ const DefaultParams: Params = {
 
 export default class CrudRouter extends Router {
   private constructor(params?: Params) {
-    const realParams: Params = mergeDeepSameObjects(DefaultParams, params);
+    const realParams: Params = mergeOpts(DefaultParams, params);
     const { additionalRoutes } = realParams;
     const { createOne, deleteOneByPk, readMany, readOneByPk, updateOneByPk } = realParams.methods;
     const routes = [...(additionalRoutes ?? []), createOne, deleteOneByPk, readMany, readOneByPk, updateOneByPk].filter(r=>r) as GeneralRoute[];

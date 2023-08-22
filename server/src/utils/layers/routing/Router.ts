@@ -1,6 +1,6 @@
+import { deepMerge } from "#utils/objects";
 import { neverCase } from "#utils/validation";
 import { Application, Router as ExpressRouter } from "express";
-import { mergeDeepSameObjects } from "..";
 import { GeneralRoute } from "../../express/handlers";
 import HttpMethod from "../../http/HttpMethod";
 
@@ -20,7 +20,7 @@ export default class Router {
   private url: string;
 
   protected constructor(params?: Params) {
-    const realParams: Params = mergeDeepSameObjects(DefaultParams, params);
+    const realParams: Params = deepMerge(DefaultParams, params);
 
     this.url = realParams.url;
     this.expressRouter = ExpressRouter();

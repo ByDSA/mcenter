@@ -1,22 +1,6 @@
-/* eslint-disable import/prefer-default-export */
-type MergeParamsParams<T extends {}> = {
-  defaultParams: T;
-  inputParams?: T;
-};
-export function mergeParams<T extends {}>( {defaultParams, inputParams}: MergeParamsParams<T>) {
-  const mergedParams = {
-    ...defaultParams,
-    ...inputParams,
-  };
-
-  return mergeDeepObjects(defaultParams, mergedParams);
-}
+import { isObject } from "#utils/validation";
 
 type MergeDeepObject = Record<string, any>;
-
-export function isObject(item: any): boolean {
-  return (item && typeof item === "object" && !Array.isArray(item));
-}
 
 export function mergeDeepObjects(...sources: (MergeDeepObject | undefined)[]): MergeDeepObject {
   const definedSources = sources.filter((source) => source !== undefined) as MergeDeepObject[];
