@@ -1,7 +1,8 @@
-import { HistoryRepository } from "#modules/history";
 import HistoryList from "#modules/history/model/HistoryList";
-import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
-import { Stream, StreamMode, StreamRepository } from "#modules/stream";
+import { streamWithHistoryListToHistoryList } from "#modules/history/model/adapters";
+import { SerieWithEpisodes, SerieWithEpisodesRepository } from "#modules/series/serie";
+import { StreamMode } from "#modules/stream";
+import { StreamWithHistoryList, StreamWithHistoryListRepository } from "#modules/streamWithHistoryList";
 import { throwErrorPopStack } from "#utils/errors";
 import { assertFound } from "#utils/http/validation";
 import { assertIsDefined, neverCase } from "#utils/validation";
@@ -11,21 +12,13 @@ import { filter } from "./EpisodeFilter";
 import fixWeight from "./EpisodeWeight";
 
 export default async function f(streamId: string) {
-  const serieRepository = new SerieRepository();
-  const streamRepository = new StreamRepository( {
-    serieRepository,
-  } );
-  const stream = await streamRepository.getOneByIdOrCreateFromSerie(streamId);
+  const streamRepository = new StreamWithHistoryListRepository();
+  const stream = await streamRepository.getOneById(streamId);
 
   if (!stream)
     return null;
 
-  //   const lastEp = await getlastEp(stream);
-  //   console.log(`current: ${lastEp}`);
-  //   console.log(`stream: ${stream}`);
   const nextEpisodeId = await calculateNextEpisode(stream);
-
-  //   console.log(`next: ${nextEpisodeId}`);
 
   return nextEpisodeId;
 }
@@ -33,25 +26,25 @@ export default async function f(streamId: string) {
 type FuncGeneratorParams = {
   serie: SerieWithEpisodes;
   lastEp: Episode | null;
-  stream: Stream;
+  stream: StreamWithHistoryList;
   historyList: HistoryList;
 };
 type FuncGenerator = (params: FuncGeneratorParams)=> Promise<Episode>;
-export async function calculateNextEpisode(stream: Stream) {
-  const serieRepository = new SerieRepository();
+export async function calculateNextEpisode(streamWithHistoryList: StreamWithHistoryList) {
+  const serieRepository = new SerieWithEpisodesRepository();
   const episodeRepository = new EpisodeRepository( {
     serieRepository,
   } );
 
   console.log("Calculating next episode...");
-  const groupId: string = stream.group;
+  const groupId: string = streamWithHistoryList.group;
   const serie = await serieRepository.findOneFromGroupId(groupId);
 
   assertFound(serie, `Cannot get serie from group '${groupId}'`);
 
   let nextEpisodeFunc: FuncGenerator;
 
-  switch (stream.mode) {
+  switch (streamWithHistoryList.mode) {
     case StreamMode.SEQUENTIAL:
       nextEpisodeFunc = getNextEpisodeSequential;
       break;
@@ -59,19 +52,18 @@ export async function calculateNextEpisode(stream: Stream) {
       nextEpisodeFunc = getNextEpisodeRandom;
       break;
     default:
-      neverCase(stream.mode);
+      neverCase(streamWithHistoryList.mode);
   }
 
-  const historyRepository = new HistoryRepository();
-  const historyList = await historyRepository.findByStream(stream);
+  const historyList = streamWithHistoryListToHistoryList(streamWithHistoryList);
 
-  assertFound(historyList, `Cannot get history list from stream '${stream.id}'`);
+  assertFound(historyList, `Cannot get history list from stream '${streamWithHistoryList.id}'`);
   const lastEp = await episodeRepository.findLastEpisodeInHistoryList(historyList);
 
   return nextEpisodeFunc( {
     serie,
     lastEp,
-    stream,
+    stream: streamWithHistoryList,
     historyList,
   } );
 }

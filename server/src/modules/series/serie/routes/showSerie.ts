@@ -1,4 +1,4 @@
-import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
+import { SerieWithEpisodes, SerieWithEpisodesRepository } from "#modules/series/serie";
 import { Request, Response } from "express";
 
 export default async function (req: Request, res: Response) {
@@ -6,7 +6,7 @@ export default async function (req: Request, res: Response) {
   const { connect, disconnect } = (await import("../../../../db/database"));
 
   connect();
-  const serieRepository = new SerieRepository();
+  const serieRepository = new SerieWithEpisodesRepository();
   const serie: SerieWithEpisodes | null = await serieRepository.getOneById(id);
 
   if (!serie) {

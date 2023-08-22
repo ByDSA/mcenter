@@ -1,17 +1,15 @@
-import { HistoryRepository } from "#modules/history";
+import { streamWithHistoryListToHistoryList } from "#modules/history/model/adapters";
 import { EpisodeRepository, getRandomPicker } from "#modules/series/episode";
 import { getDaysFromLastPlayed } from "#modules/series/episode/lastPlayed";
-import { SerieRepository } from "#modules/series/serie";
+import { SerieWithEpisodesRepository } from "#modules/series/serie";
 import SerieService from "#modules/series/serie/SerieService";
-import { StreamRepository } from "#modules/stream";
+import { StreamWithHistoryListRepository } from "#modules/streamWithHistoryList";
 import { assertFound } from "#utils/http/validation";
 import { Request, Response } from "express";
 
 export default async function f(req: Request, res: Response) {
-  const serieRepository = new SerieRepository();
-  const streamRepository = new StreamRepository( {
-    serieRepository,
-  } );
+  const serieRepository = new SerieWithEpisodesRepository();
+  const streamWithHistoryListRepository = new StreamWithHistoryListRepository();
   const episodeRepository = new EpisodeRepository( {
     serieRepository,
   } );
@@ -19,13 +17,12 @@ export default async function f(req: Request, res: Response) {
     serieRepository,
     episodeRepository,
   } );
-  const historyRepository = new HistoryRepository();
   const { streamId } = getParams(req, res);
-  const stream = await streamRepository.getOneById(streamId);
+  const streamWithHistoryList = await streamWithHistoryListRepository.getOneById(streamId);
 
-  if (stream) {
-    const seriePromise = serieRepository.findOneFromGroupId(stream.group);
-    const lastEpPromise = serieService.findLastEpisodeInStream(stream);
+  if (streamWithHistoryList) {
+    const seriePromise = serieRepository.findOneFromGroupId(streamWithHistoryList.group);
+    const lastEpPromise = serieService.findLastEpisodeInStreamWithHistoryList(streamWithHistoryList);
 
     await Promise.all([seriePromise, lastEpPromise]);
     const serie = await seriePromise;
@@ -35,11 +32,11 @@ export default async function f(req: Request, res: Response) {
 
     assertFound(serie);
 
-    const historyList = await historyRepository.findByStream(stream);
+    const historyList = streamWithHistoryListToHistoryList(streamWithHistoryList);
     const picker = await getRandomPicker( {
       serie,
       lastEp,
-      stream,
+      stream: streamWithHistoryList,
       historyList,
     } );
     const pickerWeight = picker.weight;

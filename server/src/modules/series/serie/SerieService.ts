@@ -1,28 +1,28 @@
-import { Stream } from "#modules/stream";
+import { StreamWithHistoryList } from "#modules/streamWithHistoryList";
 import { Episode, EpisodeRepository } from "../episode";
-import { SerieRepository } from "./model";
+import { SerieWithEpisodesRepository } from "./model";
 
 type Params = {
   episodeRepository: EpisodeRepository;
-  serieRepository: SerieRepository;
+  serieRepository: SerieWithEpisodesRepository;
 };
 export default class SerieService {
   #episodeRepository: EpisodeRepository;
 
-  #serieRepository: SerieRepository;
+  #serieRepository: SerieWithEpisodesRepository;
 
   constructor( {episodeRepository, serieRepository}: Params) {
     this.#episodeRepository = episodeRepository;
     this.#serieRepository = serieRepository;
   }
 
-  async findLastEpisodeInStream(stream: Stream): Promise<Episode | null> {
-    const episodeId = stream.history.at(-1)?.episodeId;
+  async findLastEpisodeInStreamWithHistoryList(streamWithHistoryList: StreamWithHistoryList): Promise<Episode | null> {
+    const episodeId = streamWithHistoryList.history.at(-1)?.episodeId;
 
     if (!episodeId)
       return null;
 
-    const serie = await this.#serieRepository.findOneFromGroupId(stream.group);
+    const serie = await this.#serieRepository.findOneFromGroupId(streamWithHistoryList.group);
 
     if (!serie)
       return null;

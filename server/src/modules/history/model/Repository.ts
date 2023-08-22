@@ -1,35 +1,45 @@
-import { SerieRepository } from "#modules/series/serie";
-import { Stream, StreamRepository } from "#modules/stream";
+import { StreamWithHistoryListRepository } from "#modules/streamWithHistoryList";
 import { assertFound } from "#utils/http/validation";
-import { CanUpdateOneById } from "#utils/layers/repository";
+import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import HistoryList, { HistoryListId } from "./HistoryList";
+import { historyListToStreamWithHistoryList, streamWithHistoryListToHistoryList } from "./adapters";
 
-export default class HistoryRepository
-implements CanUpdateOneById<HistoryList, HistoryListId> {
-  #streamRepository: StreamRepository;
+export default class HistoryListRepository
+implements CanUpdateOneById<HistoryList, HistoryListId>,
+CanGetOneById<HistoryList, HistoryListId>,
+CanCreateOne<HistoryList> {
+  #streamWithHistoryListRepository: StreamWithHistoryListRepository;
 
   constructor() {
-    const serieRepository = new SerieRepository();
+    this.#streamWithHistoryListRepository = new StreamWithHistoryListRepository();
+  }
 
-    this.#streamRepository = new StreamRepository( {
-      serieRepository,
-    } );
+  async createOne(historyList: HistoryList): Promise<void> {
+    const streamWithHistoryList = await this.#streamWithHistoryListRepository.getOneById(historyList.id);
+
+    if (streamWithHistoryList)
+      return;
+
+    await this.#streamWithHistoryListRepository.createOneAndGet(historyListToStreamWithHistoryList(historyList));
+  }
+
+  async getOneById(id: HistoryListId): Promise<HistoryList | null> {
+    const streamId = id;
+    const stream = await this.#streamWithHistoryListRepository.getOneById(streamId);
+
+    if (!stream)
+      return null;
+
+    return streamWithHistoryListToHistoryList(stream);
   }
 
   async updateOneById(id: HistoryListId, list: HistoryList): Promise<void> {
     const streamId = id;
-    const stream = await this.#streamRepository.getOneById(streamId);
+    const stream = await this.#streamWithHistoryListRepository.getOneById(streamId);
 
     assertFound(stream);
     stream.history = list.entries;
 
-    await this.#streamRepository.updateOneById(streamId, stream);
-  }
-
-  async findByStream(stream: Stream): Promise<HistoryList> {
-    return {
-      id: stream.id,
-      entries: stream.history,
-    };
+    await this.#streamWithHistoryListRepository.updateOneById(streamId, stream);
   }
 }

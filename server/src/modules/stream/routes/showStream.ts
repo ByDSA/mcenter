@@ -1,14 +1,10 @@
-import { SerieRepository } from "#modules/series/serie";
-import { StreamRepository } from "#modules/stream";
+import { StreamWithHistoryListRepository } from "#modules/streamWithHistoryList";
 import { Request, Response } from "express";
 
 export default async function f(req: Request, res: Response) {
   const { id } = parseParams(req, res);
-  const serieRepository = new SerieRepository();
-  const streamRepository = new StreamRepository( {
-    serieRepository,
-  } );
-  const stream = await streamRepository.getOneByIdOrCreateFromSerie(id);
+  const streamRepository = new StreamWithHistoryListRepository();
+  const stream = await streamRepository.getOneById(id);
 
   if (stream)
     res.send(stream);

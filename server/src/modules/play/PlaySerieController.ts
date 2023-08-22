@@ -1,17 +1,17 @@
 import { EpisodeWithSerie } from "#modules/series";
 import { copyOfEpisode } from "#modules/series/episode/model";
-import { Serie, SerieRepository } from "#modules/series/serie";
+import { Serie, SerieWithEpisodesRepository } from "#modules/series/serie";
 import { assertFound } from "#utils/http/validation";
 import { assertIsNotEmpty } from "#utils/validation";
 import { Request, Response, Router } from "express";
 import Service from "./Service";
 
 type Params = {
-  serieRepository: SerieRepository;
+  serieRepository: SerieWithEpisodesRepository;
   playService: Service;
 };
 export default class PlaySerieController {
-  #serieRepository: SerieRepository;
+  #serieRepository: SerieWithEpisodesRepository;
 
   #playService: Service;
 

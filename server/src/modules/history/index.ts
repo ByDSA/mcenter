@@ -1,7 +1,7 @@
 export {
-  HistoryEntry, HistoryRepository,
+  HistoryEntry, HistoryListRepository,
 } from "./model";
 
 export {
-  default as HistoryService,
+  default as HistoryListService,
 } from "./Service";

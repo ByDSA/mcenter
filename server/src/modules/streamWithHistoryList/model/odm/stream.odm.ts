@@ -1,8 +1,9 @@
 import { HistoryEntrySchema } from "#modules/history/db";
+import { StreamMode } from "#modules/stream";
 import mongoose, { Document } from "mongoose";
-import Stream, { Mode } from "../../stream.entity";
+import StreamWithHistoryList from "../StreamWithHistoryList";
 
-interface StreamDocument extends Document, Stream {
+interface StreamDocument extends Document, StreamWithHistoryList {
   id: string;
 }
 
@@ -18,7 +19,7 @@ const schema = new mongoose.Schema( {
   },
   mode: {
     type: String,
-    enum: [Mode.SEQUENTIAL, Mode.RANDOM],
+    enum: [StreamMode.SEQUENTIAL, StreamMode.RANDOM],
     required: true,
   },
   maxHistorySize: {
@@ -31,16 +32,6 @@ const schema = new mongoose.Schema( {
 } );
 const Model = mongoose.model<StreamDocument>(NAME, schema);
 
-function toModel(stream: StreamDocument): Stream {
-  return {
-    id: stream.id,
-    group: stream.group,
-    mode: stream.mode,
-    maxHistorySize: stream.maxHistorySize,
-    history: stream.history,
-  };
-}
-
 export {
-  Mode, StreamDocument, Model as StreamModel, schema as StreamSchema, toModel, 
+  StreamDocument as StreamDB, Model as StreamModel, schema as StreamSchema,
 };

@@ -1,7 +1,7 @@
 export {
-  StreamRepository,
-} from "./repository";
+  default as StreamRepository,
+} from "./Repository";
 
 export {
-  default as Stream, Mode as StreamMode,
-} from "./stream.entity";
+  default as Stream, StreamId, Mode as StreamMode,
+} from "./Stream";

@@ -3,5 +3,5 @@ export {
 } from "./HistoryEntry";
 
 export {
-  default as HistoryRepository,
+  default as HistoryListRepository,
 } from "./Repository";

@@ -1,3 +1,3 @@
 export {
-  Stream, StreamMode, StreamRepository,
+  Stream, StreamId, StreamMode, StreamRepository,
 } from "./model";

@@ -1,5 +1,5 @@
 import HistoryList from "#modules/history/model/HistoryList";
-import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
+import { SerieWithEpisodes, SerieWithEpisodesRepository } from "#modules/series/serie";
 import { CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { SerieModel } from "../../../serie/model/repository/serie.model";
 import Episode, { EpisodeFullId } from "../Episode";
@@ -8,13 +8,13 @@ import { episodeToEpisodeDB } from "./adapters";
 type UpdateOneParams = Episode;
 
 type Params = {
-  serieRepository: SerieRepository;
+  serieRepository: SerieWithEpisodesRepository;
 };
 export default class EpisodeRepository
 implements CanGetOneById<Episode, EpisodeFullId>,
 CanUpdateOneByIdAndGet<Episode, EpisodeFullId>
 {
-  #serieRepository: SerieRepository;
+  #serieRepository: SerieWithEpisodesRepository;
 
   constructor( {serieRepository}: Params) {
     this.#serieRepository = serieRepository;

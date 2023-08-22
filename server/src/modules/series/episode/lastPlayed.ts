@@ -1,7 +1,7 @@
 import HistoryList from "#modules/history/model/HistoryList";
 import { DateTime } from "luxon";
 import { DateType } from "src/utils/time/date-type";
-import { SerieRepository } from "../serie";
+import { SerieWithEpisodesRepository } from "../serie";
 import { EpisodeRepository } from "./model";
 import Episode, { compareEpisodeFullId, copyOfEpisode, episodeFullIdOf } from "./model/Episode";
 
@@ -33,7 +33,7 @@ export function getLastTimePlayedFromHistory(self: Episode, historyList: History
 }
 
 export function getDaysFromLastPlayed(self: Episode, historyList: HistoryList): number {
-  const serieRepository = new SerieRepository();
+  const serieRepository = new SerieWithEpisodesRepository();
   const episodeRepository = new EpisodeRepository( {
     serieRepository,
   } );

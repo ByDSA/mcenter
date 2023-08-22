@@ -1,8 +1,9 @@
 import { EpisodeDB, EpisodeSchemaDB } from "#modules/series/episode/db";
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import { SerieId } from "../Serie";
 
-interface SerieDocument extends Document {
-  id: string;
+interface SerieDB {
+  id: SerieId;
   name: string;
   episodes: EpisodeDB[];
 }
@@ -20,8 +21,8 @@ const schema = new Schema( {
     type: [EpisodeSchemaDB],
   },
 } );
-const model = mongoose.model<SerieDocument>(NAME, schema);
+const model = mongoose.model<SerieDB>(NAME, schema);
 
 export {
-  SerieDocument as SerieDB, model as SerieModel, schema as SerieSchema,
+  SerieDB, model as SerieModel, schema as SerieSchema,
 };

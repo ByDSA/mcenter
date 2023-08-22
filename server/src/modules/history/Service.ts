@@ -3,7 +3,7 @@ import { EpisodeFullId } from "#modules/series/episode";
 import { Episode, compareEpisodeFullId, copyOfEpisode } from "#modules/series/episode/model";
 import { assertFound } from "#utils/http/validation";
 import { getDateNow } from "src/utils/time/date-type";
-import { HistoryEntry, HistoryRepository } from "./model";
+import { HistoryEntry, HistoryListRepository } from "./model";
 import HistoryList from "./model/HistoryList";
 
 type HistoryAndEpisodeParams = {
@@ -16,11 +16,11 @@ type HistoryAndEpisodeParams = {
 
 type Params = {
   episodeRepository: EpisodeRepository;
-  historyRepository: HistoryRepository;
+  historyRepository: HistoryListRepository;
 };
 
 export default class Service {
-  #historyRepository: HistoryRepository;
+  #historyRepository: HistoryListRepository;
 
   #episodeRepository: EpisodeRepository;
 

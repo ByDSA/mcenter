@@ -1,6 +1,7 @@
-import { HistoryRepository, HistoryService } from "#modules/history";
+import { HistoryListService } from "#modules/history";
+import { streamWithHistoryListToHistoryList } from "#modules/history/model/adapters";
 import { EpisodeWithSerie } from "#modules/series/episode";
-import { StreamRepository } from "#modules/stream";
+import { StreamWithHistoryListRepository } from "#modules/streamWithHistoryList";
 import { assertIsNotEmpty } from "#utils/validation";
 import VLCService from "./PlayService";
 import { episodeToMediaElement } from "./adapters";
@@ -12,24 +13,20 @@ type PlayParams = {
 };
 type Params = {
   vlcService: VLCService;
-  streamRepository: StreamRepository;
-  historyRepository: HistoryRepository;
-  historyService: HistoryService;
+  streamWithHistoryListRepository: StreamWithHistoryListRepository;
+  historyListService: HistoryListService;
 };
 export default class PlayService {
   #vlcService: VLCService;
 
-  #streamRepository: StreamRepository;
+  #streamWithHistoryListRepository: StreamWithHistoryListRepository;
 
-  #historyService: HistoryService;
+  #historyService: HistoryListService;
 
-  #historyRepository: HistoryRepository;
-
-  constructor( {vlcService, streamRepository, historyService, historyRepository}: Params) {
+  constructor( {vlcService, streamWithHistoryListRepository, historyListService}: Params) {
     this.#vlcService = vlcService;
-    this.#streamRepository = streamRepository;
-    this.#historyService = historyService;
-    this.#historyRepository = historyRepository;
+    this.#streamWithHistoryListRepository = streamWithHistoryListRepository;
+    this.#historyService = historyListService;
   }
 
   async play( {episodes, force}: PlayParams): Promise<boolean> {
@@ -42,14 +39,12 @@ export default class PlayService {
 
     if (ok) {
       for (const episode of episodes) {
-        this.#streamRepository.getOneByIdOrCreateFromSerie(episode.serieId)
-          .then((stream) => {
-            if (stream && episode) {
-              this.#historyRepository.findByStream(stream).then((historyList) => {
-                this.#historyService.addEpisodeToHistory( {
-                  historyList,
-                  episode,
-                } );
+        this.#streamWithHistoryListRepository.getOneById(episode.serieId)
+          .then((streamWithHistoryList) => {
+            if (streamWithHistoryList && episode) {
+              this.#historyService.addEpisodeToHistory( {
+                historyList: streamWithHistoryListToHistoryList(streamWithHistoryList),
+                episode,
               } );
             }
           } );

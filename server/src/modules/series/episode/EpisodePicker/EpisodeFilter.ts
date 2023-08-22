@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import HistoryList from "#modules/history/model/HistoryList";
 import { SerieWithEpisodes } from "#modules/series/serie";
-import { Stream } from "#modules/stream";
+import { StreamWithHistoryList } from "#modules/streamWithHistoryList";
 import { Picker } from "rand-picker";
 import { Episode } from "../model";
 import { dependent, preventDisabled, preventRepeatInDays, preventRepeatLast, removeWeightLowerOrEqualThan } from "./filters";
@@ -22,7 +22,7 @@ export function filter(
   picker: Picker<Episode>,
   serie: SerieWithEpisodes,
   lastEp: Episode | null,
-  stream: Stream,
+  stream: StreamWithHistoryList,
   historyList: HistoryList,
 ): void {
   console.log("Filtering...");

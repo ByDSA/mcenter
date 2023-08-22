@@ -1,6 +1,5 @@
-import { Serie, SerieRepository, serieWithEpisodesToSerie } from "#modules/series";
-import { StreamRepository } from "#modules/stream";
-import StreamService from "#modules/stream/StreamService";
+import { Serie, SerieWithEpisodesRepository, serieWithEpisodesToSerie } from "#modules/series";
+import { StreamWithHistoryListRepository, StreamWithHistoryListService } from "#modules/streamWithHistoryList";
 import { assertFound } from "#utils/http/validation";
 import { assertIsDefined } from "#utils/validation";
 import { Request, Response, Router } from "express";
@@ -8,34 +7,34 @@ import Service from "./Service";
 
 type Params = {
   playService: Service;
-  streamService: StreamService;
-  streamRepository: StreamRepository;
-  serieRepository: SerieRepository;
+  streamWithHistoryListService: StreamWithHistoryListService;
+  streamWithHistoryListRepository: StreamWithHistoryListRepository;
+  serieWithEpisodesRepository: SerieWithEpisodesRepository;
 };
 export default class PlayController {
-  #streamRepository: StreamRepository;
+  #streamRepository: StreamWithHistoryListRepository;
 
-  #streamService: StreamService;
+  #streamWithHistoryListService: StreamWithHistoryListService;
 
   #playService: Service;
 
-  #serieRepository: SerieRepository;
+  #serieRepository: SerieWithEpisodesRepository;
 
-  constructor( {streamRepository, streamService, playService: service, serieRepository}: Params) {
+  constructor( {streamWithHistoryListRepository: streamRepository, streamWithHistoryListService: streamService, playService: service, serieWithEpisodesRepository: serieRepository}: Params) {
     this.#playService = service;
     this.#streamRepository = streamRepository;
-    this.#streamService = streamService;
+    this.#streamWithHistoryListService = streamService;
     this.#serieRepository = serieRepository;
   }
 
   async playStream(req: Request, res: Response) {
     console.log("playStream");
     const { id, number, force } = validateParams(req);
-    const stream = await this.#streamRepository.getOneByIdOrCreateFromSerie(id);
+    const stream = await this.#streamRepository.getOneById(id);
 
     assertFound(stream);
 
-    const episodes = await this.#streamService.pickNextEpisode(stream, number);
+    const episodes = await this.#streamWithHistoryListService.pickNextEpisode(stream, number);
     const serieWithEpisodes = await this.#serieRepository.getOneById(stream.id);
 
     assertFound(serieWithEpisodes);
