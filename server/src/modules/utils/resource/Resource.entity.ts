@@ -1,4 +1,5 @@
 export default interface Resource {
+  id: string;
   title: string;
   path: string;
   weight: number;
@@ -12,6 +13,7 @@ export default interface Resource {
 
 export function copyOfResource(e: Resource): Resource {
   const ret: Resource = {
+    id: e.id,
     title: e.title,
     path: e.path,
     weight: e.weight,

@@ -4,18 +4,18 @@ import { EpisodeDB } from "#modules/series/episode/db";
 import { episodeDBToEpisode, episodeToEpisodeDB } from "#modules/series/episode/model/repository/adapters";
 import { CanCreateOneAndGet, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { assertIsNotEmpty } from "#utils/validation";
+import { SerieId, SerieWithEpisodes } from "..";
 import { FileNode, getSerieTreeRemote } from "../../../../../actions/nginxTree";
-import Serie, { SerieId } from "../serie.entity";
 import { SerieDB, SerieModel as SerieWithEpisodesModel } from "./serie.model";
 
 const { MEDIA_PATH } = process.env;
 
-export default class SerieRepository
-implements CanGetOneById<Serie, SerieId>,
-CanUpdateOneByIdAndGet<Serie, SerieId>,
-CanCreateOneAndGet<Serie>
+export default class SerieWithEpisodesRepository
+implements CanGetOneById<SerieWithEpisodes, SerieId>,
+CanUpdateOneByIdAndGet<SerieWithEpisodes, SerieId>,
+CanCreateOneAndGet<SerieWithEpisodes>
 {
-  async findOneFromGroupId(groupId: string): Promise<Serie | null> {
+  async findOneFromGroupId(groupId: string): Promise<SerieWithEpisodes | null> {
     const groupSplit = groupId.split("/");
 
     assertIsNotEmpty(groupSplit);
@@ -26,7 +26,7 @@ CanCreateOneAndGet<Serie>
     return serie;
   }
 
-  async createOneAndGet(serie: Serie): Promise<Serie> {
+  async createOneAndGet(serie: SerieWithEpisodes): Promise<SerieWithEpisodes> {
     const serieDB = await SerieWithEpisodesModel.create( {
       id: serie.id,
       name: serie.id,
@@ -40,13 +40,13 @@ CanCreateOneAndGet<Serie>
     };
   }
 
-  async getOneById(id: string): Promise<Serie | null> {
+  async getOneById(id: string): Promise<SerieWithEpisodes | null> {
     const [serieDB]: SerieDB[] = await SerieWithEpisodesModel.find( {
       id,
     }, {
       _id: 0,
     } );
-    let serie: Serie;
+    let serie: SerieWithEpisodes;
 
     if (!serieDB) {
       const generatedSerie = await generateFromFiles(id);
@@ -66,7 +66,7 @@ CanCreateOneAndGet<Serie>
     return serie;
   }
 
-  async updateOneByIdAndGet(id: SerieId, serie: Serie): Promise<Serie | null> {
+  async updateOneByIdAndGet(id: SerieId, serie: SerieWithEpisodes): Promise<SerieWithEpisodes | null> {
     return SerieWithEpisodesModel.findOneAndUpdate( {
       id,
     }, serie, {
@@ -75,7 +75,7 @@ CanCreateOneAndGet<Serie>
   }
 }
 
-async function generateFromFiles(id: SerieId): Promise<Serie | null> {
+async function generateFromFiles(id: SerieId): Promise<SerieWithEpisodes | null> {
   const folder = `${MEDIA_PATH}/series/${id}`;
   const episodes: Episode[] | null = await getSerieTree(folder);
 
@@ -129,10 +129,8 @@ async function fileNode2Episode(fn: FileNode): Promise<Episode> {
   const path = getPathFromFn(fn);
   const id = getIdFromFn(fn);
   const ret: Episode = {
-    id: {
-      innerId: id,
-      serieId: "",
-    },
+    id,
+    serieId: "",
     path,
     title: "",
     weight: 0,

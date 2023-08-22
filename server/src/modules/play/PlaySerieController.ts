@@ -32,7 +32,7 @@ export default class PlaySerieController {
 
     assertIsNotEmpty(episodes);
 
-    const episode = episodes.find((e) => e.id.innerId === id);
+    const episode = episodes.find((e) => e.id === id);
 
     if (episode) {
       const serieWithoutEpisodes: Serie = {

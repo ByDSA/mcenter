@@ -1,4 +1,4 @@
-import { Serie, SerieRepository } from "#modules/series/serie";
+import { Serie, SerieRepository, serieWithEpisodesToSerie } from "#modules/series";
 import { StreamRepository } from "#modules/stream";
 import StreamService from "#modules/stream/StreamService";
 import { assertFound } from "#utils/http/validation";
@@ -40,10 +40,7 @@ export default class PlayController {
 
     assertFound(serieWithEpisodes);
 
-    const serie: Serie = {
-      id: serieWithEpisodes.id,
-      name: serieWithEpisodes.name,
-    };
+    const serie: Serie = serieWithEpisodesToSerie(serieWithEpisodes);
     const episodeWithSerie = episodes.map((episode) => ( {
       ...episode,
       serie,

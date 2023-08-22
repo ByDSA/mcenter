@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { DateType } from "src/utils/time/date-type";
 import { SerieId, SerieRepository } from "../serie";
 import { EpisodeRepository } from "./model";
-import { Episode, compareEpisodeId, copyOfEpisode } from "./model/Episode";
+import Episode, { compareEpisodeFullId, copyOfEpisode } from "./model/repository/Episode";
 
 function getTimestampFromDate(date: DateType): number {
   if (date.timestamp)
@@ -18,7 +18,16 @@ export function getLastTimePlayedFromHistory(self: Episode, historyList: History
   let lastTimePlayed = Number.MAX_SAFE_INTEGER;
 
   for (const historyEntry of historyList.entries) {
-    if (self && compareEpisodeId(historyEntry.episodeId, self.id)) {
+    const historyEntryFullId = {
+      id: historyEntry.episodeId,
+      serieId: historyEntry.serieId,
+    };
+    const selfFullId = {
+      id: self.id,
+      serieId: self.serieId,
+    };
+
+    if (self && compareEpisodeFullId(historyEntryFullId, selfFullId)) {
       const currentTimestamp = getTimestampFromDate(historyEntry.date);
 
       if (currentTimestamp < lastTimePlayed)
@@ -47,8 +56,12 @@ export function getDaysFromLastPlayed(self: Episode, serieId: SerieId, historyLi
         ...copyOfEpisode(self),
         lastTimePlayed,
       };
+      const fullId = {
+        id: self.id,
+        serieId,
+      };
 
-      episodeRepository.updateOneByIdAndGet(selfCopy.id, selfCopy);
+      episodeRepository.updateOneByIdAndGet(fullId, selfCopy);
     }
   }
 

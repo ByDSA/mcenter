@@ -2,7 +2,7 @@ import HistoryList from "#modules/history/model/HistoryList";
 import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
 import { CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { SerieModel } from "../../../serie/model/repository/serie.model";
-import { Episode, EpisodeId, compareEpisodeId } from "../Episode";
+import Episode, { EpisodeFullId } from "./Episode";
 import { episodeToEpisodeDB } from "./adapters";
 
 type UpdateOneParams = Episode;
@@ -11,8 +11,8 @@ type Params = {
   serieRepository: SerieRepository;
 };
 export default class EpisodeRepository
-implements CanGetOneById<Episode, EpisodeId>,
-CanUpdateOneByIdAndGet<Episode, EpisodeId>
+implements CanGetOneById<Episode, EpisodeFullId>,
+CanUpdateOneByIdAndGet<Episode, EpisodeFullId>
 {
   #serieRepository: SerieRepository;
 
@@ -21,16 +21,26 @@ CanUpdateOneByIdAndGet<Episode, EpisodeId>
   }
 
   async findLastEpisodeInHistoryList(historyList: HistoryList): Promise<Episode | null> {
-    const episodeId = historyList.entries.at(-1)?.episodeId;
+    const historyEntry = historyList.entries.at(-1);
 
-    if (!episodeId)
+    if (!historyEntry)
       return null;
 
-    return this.getOneById(episodeId);
+    const {episodeId, serieId} = historyEntry;
+
+    if (!episodeId || !serieId)
+      return null;
+
+    const fullId: EpisodeFullId = {
+      id: episodeId,
+      serieId,
+    };
+
+    return this.getOneById(fullId);
   }
 
-  async #findSerieOfEpisodeId(episodeId: EpisodeId): Promise<SerieWithEpisodes | null> {
-    const serie = await this.#serieRepository.getOneById(episodeId.serieId);
+  async #findSerieOfEpisodeFullId(episodeFullId: EpisodeFullId): Promise<SerieWithEpisodes | null> {
+    const serie = await this.#serieRepository.getOneById(episodeFullId.serieId);
 
     if (!serie)
       return null;
@@ -38,25 +48,25 @@ CanUpdateOneByIdAndGet<Episode, EpisodeId>
     return serie;
   }
 
-  async getOneById(id: EpisodeId): Promise<Episode | null> {
-    const episodeId = id;
-    const serie = await this.#findSerieOfEpisodeId(episodeId);
+  async getOneById(fullId: EpisodeFullId): Promise<Episode | null> {
+    const episodeId = fullId.id;
+    const serie = await this.#findSerieOfEpisodeFullId(fullId);
 
     if (!serie)
       return null;
 
-    const found = serie.episodes.find((episode: Episode) => compareEpisodeId(episode.id, episodeId)) ?? null;
+    const found = serie.episodes.find((episode: Episode) => episode.id === episodeId) ?? null;
 
     return found;
   }
 
-  async updateOneByIdAndGet(id: EpisodeId, episode: UpdateOneParams): Promise<Episode | null> {
-    const serie = await this.#serieRepository.getOneById(episode.id.serieId);
+  async updateOneByIdAndGet(fullId: EpisodeFullId, episode: UpdateOneParams): Promise<Episode | null> {
+    const serie = await this.#serieRepository.getOneById(fullId.serieId);
 
     if (!serie)
       return null;
 
-    const indexOfEpisode = serie.episodes.findIndex((e) => compareEpisodeId(e.id, episode.id));
+    const indexOfEpisode = serie.episodes.findIndex((e) => e.id === episode.id);
 
     if (indexOfEpisode === -1)
       return null;

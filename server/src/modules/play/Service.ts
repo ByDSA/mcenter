@@ -42,10 +42,10 @@ export default class PlayService {
 
     if (ok) {
       for (const episode of episodes) {
-        this.#streamRepository.getOneByIdOrCreateFromSerie(episode.serie.id)
+        this.#streamRepository.getOneByIdOrCreateFromSerie(episode.serieId)
           .then((stream) => {
             if (stream && episode) {
-              this.#historyRepository.findByStream(stream). then((historyList) => {
+              this.#historyRepository.findByStream(stream).then((historyList) => {
                 this.#historyService.addEpisodeToHistory( {
                   historyList,
                   episode,

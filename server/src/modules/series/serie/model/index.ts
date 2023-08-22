@@ -1,5 +1,11 @@
 export * from "./repository";
 
 export {
-  SerieWithoutEpisodes as Serie, SerieId, default as SerieWithEpisodes,
-} from "./serie.entity";
+  default as Serie, SerieId,
+} from "./Serie";
+
+export {
+  default as SerieWithEpisodes,
+} from "./repository/SerieWithEpisodes";
+
+export * from "./adapters";

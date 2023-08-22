@@ -1,13 +1,13 @@
 import { Episode } from "#modules/series/episode";
 import { getDaysFromLastPlayed } from "../../lastPlayed";
-import { compareEpisodeId } from "../../model/Episode";
+import { compareEpisodeFullId } from "../../model/repository/Episode";
 import { Params } from "../utils";
 
 export const preventRepeatLast = ( { self, lastEp }: Params<Episode>) => {
   if (!lastEp)
     return true;
 
-  if (!compareEpisodeId(lastEp.id, self.id))
+  if (!compareEpisodeFullId(lastEp, self))
     return true;
 
   return false;
@@ -46,8 +46,8 @@ function dependency(
   self: Episode,
   idCurrent: string,
 ): boolean {
-  return (lastEp?.id.innerId === idLast && self.id.innerId === idCurrent)
-  || (lastEp?.id.innerId !== idLast && self.id.innerId !== idCurrent);
+  return (lastEp?.id === idLast && self.id === idCurrent)
+  || (lastEp?.id !== idLast && self.id !== idCurrent);
 }
 
 export function preventDisabled( { self }: Params<Episode>) {

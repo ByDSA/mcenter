@@ -1,5 +1,6 @@
-import { EpisodeId, EpisodeRepository } from "#modules/series";
+import { EpisodeId, EpisodeRepository, SerieId } from "#modules/series";
 import { Episode, copyOfEpisode } from "#modules/series/episode/model";
+import { EpisodeFullId, episodeFullIdOf } from "#modules/series/episode/model/repository/Episode";
 import { assertFound } from "#utils/http/validation";
 import { getDateNow } from "src/utils/time/date-type";
 import { HistoryEntry, HistoryRepository } from "./model";
@@ -11,6 +12,7 @@ type HistoryAndEpisodeParams = {
   episode: Episode;
 } | {
   episodeId: EpisodeId;
+  serieId: SerieId;
 } );
 
 type Params = {
@@ -30,16 +32,19 @@ export default class Service {
 
   async findLastHistoryEntryForEpisodeId( {historyList, ...params}: HistoryAndEpisodeParams): Promise<HistoryEntry | null> {
     let episodeId: EpisodeId;
+    let serieId: SerieId;
 
-    if ("episode" in params)
+    if ("episode" in params) {
       episodeId = params.episode.id;
-    else if ("episodeId" in params)
+      serieId = params.episode.serieId;
+    } else if ("episodeId" in params) {
       episodeId = params.episodeId;
-    else
+      serieId = params.serieId;
+    } else
       throw new Error("No se ha especificado el episodio");
 
     // TODO: debería coincidir también la serie. Posteriormente se podrán poner episodios de diferentes series en un mismo historial o stream
-    const historyEntry = historyList.entries.findLast((h) => h.episodeId.innerId === episodeId.innerId);
+    const historyEntry = historyList.entries.findLast((h) => h.episodeId === episodeId && h.serieId === serieId);
 
     if (!historyEntry)
       return null;
@@ -50,15 +55,18 @@ export default class Service {
   async addEpisodeToHistory( {historyList, ...params}: HistoryAndEpisodeParams) {
     console.log("Añadiendo al historial ...");
 
-    let episodeId: EpisodeId;
+    let fullId: EpisodeFullId;
     let episode: Episode;
 
     if ("episode" in params) {
       episode = params.episode;
-      episodeId = params.episode.id;
+      fullId = episodeFullIdOf(episode);
     } else if ("episodeId" in params) {
-      episodeId = params.episodeId;
-      const episodeOrNull = await this.#episodeRepository.getOneById(episodeId);
+      fullId = {
+        id: params.episodeId,
+        serieId: params.serieId,
+      };
+      const episodeOrNull = await this.#episodeRepository.getOneById(fullId);
 
       assertFound(episodeOrNull);
       episode = episodeOrNull;
@@ -67,7 +75,8 @@ export default class Service {
 
     const newEntry: HistoryEntry = {
       date: getDateNow(),
-      episodeId,
+      episodeId: fullId.id,
+      serieId: fullId.serieId,
     };
 
     historyList.entries.push(newEntry);
@@ -77,22 +86,26 @@ export default class Service {
 
     episodeCopy.lastTimePlayed = newEntry.date.timestamp;
 
-    await this.#episodeRepository.updateOneByIdAndGet(episodeCopy.id, episodeCopy);
+    await this.#episodeRepository.updateOneByIdAndGet(fullId, episodeCopy);
   }
 
   async removeLastTimeEpisodeFromHistory( {historyList, ...params}: HistoryAndEpisodeParams) {
     console.log("Eliminando del historial ...");
 
-    let episodeId: EpisodeId;
+    let fullId: EpisodeFullId;
 
     if ("episode" in params)
-      episodeId = params.episode.id;
-    else if ("episodeId" in params)
-      episodeId = params.episodeId;
-    else
+      fullId = episodeFullIdOf(params.episode);
+
+    else if ("episodeId" in params){
+      fullId = {
+        id: params.episodeId,
+        serieId: params.serieId,
+      };
+    } else
       throw new Error("No se ha especificado el episodio");
 
-    const historyEntryIndex = historyList.entries.findLastIndex((h: HistoryEntry) => h.episodeId.innerId === episodeId.innerId);
+    const historyEntryIndex = historyList.entries.findLastIndex((h: HistoryEntry) => h.episodeId === fullId.id && h.serieId === fullId.serieId);
 
     if (historyEntryIndex === -1)
       return;
@@ -108,7 +121,7 @@ export default class Service {
     if ("episode" in params)
       episode = params.episode;
     else {
-      const gotEpisode = await this.#episodeRepository.getOneById(episodeId);
+      const gotEpisode = await this.#episodeRepository.getOneById(fullId);
 
       assertFound(gotEpisode);
       episode = gotEpisode;
@@ -118,7 +131,8 @@ export default class Service {
       const episodeCopy = copyOfEpisode(episode);
       const lastTimeHistoryEntry = await this.findLastHistoryEntryForEpisodeId( {
         historyList,
-        episodeId,
+        episodeId: fullId.id,
+        serieId: fullId.serieId,
       } );
 
       if (!lastTimeHistoryEntry)
@@ -126,7 +140,7 @@ export default class Service {
       else
         episodeCopy.lastTimePlayed = lastTimeHistoryEntry.date.timestamp;
 
-      await this.#episodeRepository.updateOneByIdAndGet(episodeCopy.id, episodeCopy);
+      await this.#episodeRepository.updateOneByIdAndGet(fullId, episodeCopy);
     }
   }
 }

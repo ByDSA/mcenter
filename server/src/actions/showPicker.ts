@@ -32,7 +32,7 @@ export default async function f(req: Request, res: Response) {
     const serie = await seriePromise;
     const lastEp = await lastEpPromise;
 
-    console.log(`Received serie=${serie?.id} and lastEp=${lastEp?.id.innerId}`);
+    console.log(`Received serie=${serie?.id} and lastEp=${lastEp?.id}`);
 
     if (!serie) {
       res.sendStatus(404);
@@ -50,7 +50,7 @@ export default async function f(req: Request, res: Response) {
     const pickerWeight = picker.weight;
     let weightAcc = 0;
     const ret = picker.data.map((e) => {
-      const id = e.id.innerId;
+      const {id} = e;
       const selfWeight = picker.getWeight(e) || 1;
       const weight = Math.round((selfWeight / pickerWeight) * 100 * 100) / 100;
       const days = Math.floor(getDaysFromLastPlayed(e, serie.id, historyList));
