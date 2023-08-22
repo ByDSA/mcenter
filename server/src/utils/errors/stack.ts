@@ -1,9 +1,5 @@
+import { deepMerge } from "#utils/objects";
 import { assertIsDefined } from "#utils/validation";
-
-export type TestVOParams<T> = {
-  fActual: ()=> T;
-  expected: T;
-};
 
 export type ResendErrorLessStackOptions = {
   levels?: number;
@@ -14,10 +10,7 @@ const defaultOptions = {
 };
 
 export function throwErrorPopStack(error: Error, options?: ResendErrorLessStackOptions): never {
-  const actualOptions = {
-    ...defaultOptions,
-    ...options,
-  };
+  const actualOptions = deepMerge(defaultOptions, options);
   const {levels} = actualOptions;
 
   errorPopStack(error, levels);

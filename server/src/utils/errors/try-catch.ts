@@ -1,4 +1,4 @@
-import { ResendErrorLessStackOptions, rethrowErrorLessStackOptionsAddLevel, throwErrorPopStack } from "./others";
+import { ResendErrorLessStackOptions, rethrowErrorLessStackOptionsAddLevel, throwErrorPopStack } from "./stack";
 
 type FunctionToTry<R> = ()=> R;
 export function tryCatchLogError<R>(f: FunctionToTry<R>) {
