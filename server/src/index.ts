@@ -1,9 +1,10 @@
 import { HistoryRepository, HistoryService } from "#modules/history";
-import { PlayController, PlayService, VLCService } from "#modules/play";
+import { PlaySerieController, PlayService, PlayStreamController, VLCService } from "#modules/play";
 import { EpisodeRepository, asyncCalculateNextEpisodeByIdStream } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { addSerieRoutes } from "#modules/series/serie/routes";
 import { StreamRepository } from "#modules/stream";
+import StreamService from "#modules/stream/StreamService";
 import { addStreamRoutes } from "#modules/stream/routes";
 import { HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import { execSync } from "child_process";
@@ -42,6 +43,7 @@ const serieRepository = new SerieRepository();
 const streamRepository = new StreamRepository( {
   serieRepository,
 } );
+const streamService = new StreamService();
 const episodeRepository = new EpisodeRepository( {
   serieRepository,
 } );
@@ -59,12 +61,19 @@ const playService = new PlayService( {
   historyRepository,
   historyService,
 } );
-const playController = new PlayController( {
+const playSerieController = new PlaySerieController( {
   serieRepository,
-  service: playService,
+  playService,
+} );
+const playStreamController = new PlayStreamController( {
+  playService,
+  streamRepository,
+  serieRepository,
+  streamService,
 } );
 
-app.use("/api/play", playController.getRouter());
+app.use("/api/play/serie", playSerieController.getRouter());
+app.use("/api/play/stream", playStreamController.getRouter());
 
 app.get("/api/picker/:streamId", showPickerFunc);
 

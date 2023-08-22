@@ -8,24 +8,19 @@ import Service from "./Service";
 
 type Params = {
   serieRepository: SerieRepository;
-  service: Service;
+  playService: Service;
 };
-export default class PlayController {
+export default class PlaySerieController {
   #serieRepository: SerieRepository;
 
-  #service: Service;
+  #playService: Service;
 
-  constructor( {serieRepository, service}: Params) {
+  constructor( {serieRepository, playService}: Params) {
     this.#serieRepository = serieRepository;
-    this.#service = service;
+    this.#playService = playService;
   }
 
-  async root(req: Request, res: Response) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, type, force } = getParams(req, res);
-  }
-
-  async playSerieFunc(req: Request, res: Response) {
+  async playSerie(req: Request, res: Response) {
     const forceStr = req.query.force;
     const force = !!forceStr;
     const { id, name } = req.params;
@@ -49,7 +44,7 @@ export default class PlayController {
         serie: serieWithoutEpisodes,
       };
 
-      await this.#service.play( {
+      await this.#playService.play( {
         episodes: [episodeWithSerie],
         force,
       } );
@@ -61,37 +56,8 @@ export default class PlayController {
   getRouter(): Router {
     const router = Router();
 
-    router.get("/serie/:name/:id", this.playSerieFunc.bind(this));
-    router.get("/:type/:id", this.root.bind(this));
+    router.get("/:name/:id", this.playSerie.bind(this));
 
     return router;
   }
-}
-
-function getParams(req: Request, res: Response) {
-  const forceStr = req.query.force;
-  const force = !!forceStr;
-  const { id, type } = req.params;
-
-  if (!id || !type) {
-    res.status(400);
-    res.send("No ID nor TYPE.");
-    res.end();
-  }
-
-  switch (type) {
-    case "serie":
-    case "peli":
-      break;
-    default:
-      res.status(400);
-      res.send(`Type '${type}' is invalid.`);
-      res.end();
-  }
-
-  return {
-    id,
-    type,
-    force,
-  };
 }

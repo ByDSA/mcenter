@@ -1,6 +1,10 @@
 export {
-  default as PlayController,
-} from "./Controller";
+  default as PlaySerieController,
+} from "./PlaySerieController";
+
+export {
+  default as PlayStreamController,
+} from "./PlayStreamController";
 
 export {
   default as PlayService,
