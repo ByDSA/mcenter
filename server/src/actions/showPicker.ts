@@ -19,9 +19,7 @@ export default async function f(req: Request, res: Response) {
     serieRepository,
     episodeRepository,
   } );
-  const historyRepository = new HistoryRepository( {
-    episodeRepository,
-  } );
+  const historyRepository = new HistoryRepository();
   const { streamId } = getParams(req, res);
   const stream = await streamRepository.getOneById(streamId);
 

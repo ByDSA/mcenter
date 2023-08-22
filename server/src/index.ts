@@ -47,9 +47,7 @@ const streamService = new StreamService();
 const episodeRepository = new EpisodeRepository( {
   serieRepository,
 } );
-const historyRepository = new HistoryRepository( {
-  episodeRepository,
-} );
+const historyRepository = new HistoryRepository();
 const historyService = new HistoryService( {
   episodeRepository,
   historyRepository,

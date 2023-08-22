@@ -62,9 +62,7 @@ export async function calculateNextEpisode(stream: Stream) {
       neverCase(stream.mode);
   }
 
-  const historyRepository = new HistoryRepository( {
-    episodeRepository,
-  } );
+  const historyRepository = new HistoryRepository();
   const historyList = await historyRepository.findByStream(stream);
 
   assertFound(historyList, `Cannot get history list from stream '${stream.id}'`);

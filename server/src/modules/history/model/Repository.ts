@@ -1,23 +1,14 @@
-import { EpisodeRepository } from "#modules/series/episode";
 import { SerieRepository } from "#modules/series/serie";
 import { Stream, StreamRepository } from "#modules/stream";
 import { assertFound } from "#utils/http/validation";
 import { CanUpdateOneById } from "#utils/layers/repository";
 import HistoryList, { HistoryListId } from "./HistoryList";
 
-type Params = {
-  episodeRepository: EpisodeRepository;
-};
-
 export default class HistoryRepository
 implements CanUpdateOneById<HistoryList, HistoryListId> {
-  #episodeRepository: EpisodeRepository;
-
   #streamRepository: StreamRepository;
 
-  constructor( {episodeRepository}: Params) {
-    this.#episodeRepository = episodeRepository;
-
+  constructor() {
     const serieRepository = new SerieRepository();
 
     this.#streamRepository = new StreamRepository( {
