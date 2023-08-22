@@ -1,40 +1,26 @@
-import { deepMerge } from "#utils/objects";
 import { assertIsDefined } from "#utils/validation";
 
-export type ResendErrorLessStackOptions = {
-  levels?: number;
-};
 const SEPARATOR = "\n    at ";
-const defaultOptions = {
-  levels: 1,
-};
 
-export function throwErrorPopStack(error: Error, options?: ResendErrorLessStackOptions): never {
-  const actualOptions = deepMerge(defaultOptions, options);
-  const {levels} = actualOptions;
-
-  errorPopStack(error, levels);
+export function throwErrorPopStack(error: Error, stackLevels = 1): never {
+  errorPopStack(error, stackLevels);
 
   throw error;
 }
 
-export function errorPopStack(error: Error, n = 1): Error {
+export function errorPopStack(error: Error, stackLevels = 1): Error {
+  return errorSliceStack(error, 1, stackLevels);
+}
+
+export function errorSliceStack(error: Error, stackStartLevel: number, length = 1): Error {
   assertIsDefined(error.stack);
   const stackArray = error.stack.split(SEPARATOR);
 
-  stackArray.splice(1, n);
+  stackArray.splice(stackStartLevel, length);
 
   // Si no se muta el error, la instancia nueva no es del mismo tipo que la original y da problemas
   // eslint-disable-next-line no-param-reassign
   error.stack = `${stackArray.join(SEPARATOR)}`;
 
   return error;
-}
-
-export function rethrowErrorLessStackOptionsAddLevel(options: ResendErrorLessStackOptions, n = 1) {
-  return {
-    ...defaultOptions,
-    ...options,
-    levels: (options?.levels ?? defaultOptions.levels) + n,
-  };
 }

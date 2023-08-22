@@ -1,11 +1,11 @@
-import { ResendErrorLessStackOptions, rethrowErrorLessStackOptionsAddLevel, throwErrorPopStack } from "./stack";
+import { errorSliceStack } from "./stack";
 
 type FunctionToTry<R> = ()=> R;
 export function tryCatchLogError<R>(f: FunctionToTry<R>) {
   return tryCatch(f, (error) => {
     // eslint-disable-next-line no-console
-    console.log(error);
-    throw error;
+    console.error(error);
+    throw errorSliceStack(error, 2, 2);
   } );
 }
 
@@ -15,8 +15,11 @@ export function tryCatch<R>(f: FunctionToTry<R>, errorHandler?: ErrorHandler): R
   try {
     return f();
   } catch (error: unknown) {
-    if (errorHandler && error instanceof Error)
-      errorHandler(error);
+    if (errorHandler && error instanceof Error) {
+      const errorPoped = errorSliceStack(error, 2, 1);
+
+      errorHandler(errorPoped);
+    }
   }
 }
 
@@ -25,26 +28,18 @@ export async function tryCatchAsync<R>(f: FunctionToTry<R>, errorHandler?: Error
   try {
     return await f();
   } catch (error) {
-    if (errorHandler && error instanceof Error)
-      errorHandler(error);
+    if (errorHandler && error instanceof Error) {
+      const errorPoped = errorSliceStack(error, 2, process.env.NODE_ENV === "test" ? 11 : 6);
+
+      errorHandler(errorPoped);
+    }
   }
-}
-
-export function tryCatchResendErrorWithLessStack<R>(f: FunctionToTry<R>, opts?: ResendErrorLessStackOptions) {
-  const fixedOpts = opts ? rethrowErrorLessStackOptionsAddLevel(opts, 3) : opts;
-  let ret;
-
-  tryCatch(f, (error: Error) => {
-    ret = throwErrorPopStack(error, fixedOpts);
-  } );
-
-  return ret;
 }
 
 export function tryCatchLogErrorAsync<R>(f: FunctionToTry<R>): Promise<R | undefined> {
   return tryCatchAsync(f, (error) => {
     // eslint-disable-next-line no-console
-    console.log(error);
-    throw error;
+    console.error(error);
+    throw errorSliceStack(error, 2, 2);
   } );
 }
