@@ -1,5 +1,4 @@
-import { definedEntries, undefinedEntries } from "#tests/utils";
-import { expectErrorStackStartsWithThisFilename } from "#utils/errors/test";
+import { definedEntries, expectErrorStackStartsWithThisFilename, undefinedEntries } from "#utils/tests";
 import { NotDefinedError, assertIsDefined, isDefined } from "./defined";
 
 describe("isDefined", () => {

@@ -7,8 +7,7 @@ describe("tryCatchLogError", () => {
   let error: Error;
 
   beforeAll(() => {
-  // eslint-disable-next-line no-empty-function
-    jest.spyOn(console, "error").mockImplementation(() => { } );
+    jest.clearAllMocks();
     try {
       tryCatchLogError(() => {
         throw new Error(ERROR_MESSAGE);
@@ -135,8 +134,7 @@ describe("tryCatchLogErrorAsync", () => {
   let error: Error;
 
   beforeAll(async () => {
-  // eslint-disable-next-line no-empty-function
-    jest.spyOn(console, "error").mockImplementation(() => { } );
+    jest.clearAllMocks();
     try {
       await tryCatchLogErrorAsync(() => {
         throw new Error(ERROR_MESSAGE);

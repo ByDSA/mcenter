@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   moduleDirectories: ["node_modules", "src"],
   roots: ["<rootDir>/src", "<rootDir>/tests"],
   transform: {
@@ -11,4 +11,9 @@ module.exports = {
     "^#utils($|/.*)$": "<rootDir>/src/utils/$1",
     "^#modules($|/.*)$": "<rootDir>/src/modules/$1",
   },
+  setupFiles: ["./jest.setup.ts"],
+  collectCoverageFrom: ["**/*.(t|j)s"],
+  coverageDirectory: "./coverage",
 };
+
+export default config;

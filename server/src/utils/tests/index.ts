@@ -4,3 +4,7 @@ export {
 } from "./projectFolders";
 
 export * from "./values";
+
+export {
+  expectErrorStackStartsWithThisFilename,
+} from "./errors";

@@ -1,4 +1,4 @@
-import { createTmpFolder } from "#tests/utils";
+import { createTmpFolder } from "#utils/tests";
 import { existsSync, rmdirSync } from "node:fs";
 import QueuePlaylistManager from "./QueuePlaylistManager";
 
