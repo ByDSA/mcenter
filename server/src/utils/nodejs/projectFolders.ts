@@ -1,13 +1,10 @@
 /* eslint-disable import/prefer-default-export */
-import fs from "fs";
+import fs from "node:fs";
 import { join } from "node:path";
 
 let rootPath: string;
 
-export function findRootProjectFolder(p: string = "") {
-  if (rootPath)
-    return join(rootPath, p);
-
+function getRootProjectFolder() {
   let currentPath = __dirname;
   let lastPath = null;
 
@@ -15,7 +12,7 @@ export function findRootProjectFolder(p: string = "") {
     if (fs.existsSync(join(currentPath, "package.json"))) {
       rootPath = currentPath;
 
-      return join(currentPath, p);
+      return currentPath;
     }
 
     lastPath = currentPath;
@@ -25,11 +22,16 @@ export function findRootProjectFolder(p: string = "") {
   return null;
 }
 
-export function findSrcProjectFolder() {
-  const root = findRootProjectFolder();
+export function rootFolder() {
+  if (rootPath)
+    return rootPath;
 
-  if (root)
-    return join(root, "src");
+  const root = getRootProjectFolder();
 
-  return null;
+  if (root === null)
+    throw new Error("Could not find root folder");
+
+  rootPath = root;
+
+  return root;
 }

@@ -19,3 +19,5 @@ export function moveFile(from: string, to: string) {
 export function deleteFolder(folder: string) {
   return execPromisify(`rm -r ${folder}`);
 }
+
+export * from "./errors";
