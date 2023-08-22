@@ -1,9 +1,9 @@
 import HistoryList from "#modules/history/model/HistoryList";
 import { DateTime } from "luxon";
 import { DateType } from "src/utils/time/date-type";
-import { SerieId, SerieRepository } from "../serie";
+import { SerieRepository } from "../serie";
 import { EpisodeRepository } from "./model";
-import Episode, { compareEpisodeFullId, copyOfEpisode } from "./model/repository/Episode";
+import Episode, { compareEpisodeFullId, copyOfEpisode, episodeFullIdOf } from "./model/Episode";
 
 function getTimestampFromDate(date: DateType): number {
   if (date.timestamp)
@@ -18,16 +18,7 @@ export function getLastTimePlayedFromHistory(self: Episode, historyList: History
   let lastTimePlayed = Number.MAX_SAFE_INTEGER;
 
   for (const historyEntry of historyList.entries) {
-    const historyEntryFullId = {
-      id: historyEntry.episodeId,
-      serieId: historyEntry.serieId,
-    };
-    const selfFullId = {
-      id: self.id,
-      serieId: self.serieId,
-    };
-
-    if (self && compareEpisodeFullId(historyEntryFullId, selfFullId)) {
+    if (self && compareEpisodeFullId(historyEntry, self)) {
       const currentTimestamp = getTimestampFromDate(historyEntry.date);
 
       if (currentTimestamp < lastTimePlayed)
@@ -41,7 +32,7 @@ export function getLastTimePlayedFromHistory(self: Episode, historyList: History
   return lastTimePlayed;
 }
 
-export function getDaysFromLastPlayed(self: Episode, serieId: SerieId, historyList: HistoryList): number {
+export function getDaysFromLastPlayed(self: Episode, historyList: HistoryList): number {
   const serieRepository = new SerieRepository();
   const episodeRepository = new EpisodeRepository( {
     serieRepository,
@@ -56,10 +47,7 @@ export function getDaysFromLastPlayed(self: Episode, serieId: SerieId, historyLi
         ...copyOfEpisode(self),
         lastTimePlayed,
       };
-      const fullId = {
-        id: self.id,
-        serieId,
-      };
+      const fullId = episodeFullIdOf(selfCopy);
 
       episodeRepository.updateOneByIdAndGet(fullId, selfCopy);
     }

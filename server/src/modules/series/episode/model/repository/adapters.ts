@@ -1,11 +1,11 @@
 /* eslint-disable import/prefer-default-export */
 import { SerieId } from "#modules/series/serie";
 import { EpisodeDB } from "../../db";
-import Episode from "./Episode";
+import Episode from "../Episode";
 
 export function episodeToEpisodeDB(episode: Episode): EpisodeDB {
   const objRequired: Required<EpisodeDB> = {
-    id: episode.id,
+    id: episode.episodeId,
     path: episode.path,
     end: episode.end,
     start: episode.start,
@@ -23,7 +23,7 @@ export function episodeToEpisodeDB(episode: Episode): EpisodeDB {
 
 export function episodeDBToEpisode(episodeDB: EpisodeDB, serieId: SerieId): Episode {
   return {
-    id: episodeDB.id,
+    episodeId: episodeDB.id,
     serieId,
     duration: episodeDB.duration ?? -1,
     start: episodeDB.start ?? -1,

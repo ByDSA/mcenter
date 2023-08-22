@@ -1,8 +1,6 @@
-import { EpisodeId, SerieId } from "#modules/series";
+import { EpisodeFullId } from "#modules/series/episode";
 import { DateType } from "src/utils/time/date-type";
 
-export default interface HistoryEntry {
+export default interface HistoryEntry extends EpisodeFullId {
   date: DateType;
-  episodeId: EpisodeId;
-  serieId: SerieId;
 }

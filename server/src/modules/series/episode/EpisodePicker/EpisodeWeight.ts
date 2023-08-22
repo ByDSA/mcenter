@@ -45,10 +45,10 @@ export default async function fixWeight(
   console.log("Fixed weight!");
 }
 
-async function weightCalculator( { self, historyList, serie }: Params<Episode>): Promise<number> {
+async function weightCalculator( { self, historyList }: Params<Episode>): Promise<number> {
   const daysFromLastTime = self.lastTimePlayed
     ? daysBetween(DateTime.now(), DateTime.fromSeconds(self.lastTimePlayed))
-    : getDaysFromLastPlayed(self, serie.id, historyList);
+    : getDaysFromLastPlayed(self, historyList);
   let reinforcementFactor = 1;
   const weight = self && self.weight ? self.weight : 0;
 

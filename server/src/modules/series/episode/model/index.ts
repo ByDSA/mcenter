@@ -1,6 +1,8 @@
 export {
-  default as Episode, EpisodeId, copyOfEpisode,
-} from "./repository/Episode";
+  default as Episode,
+} from "./Episode";
+
+export * from "./Episode";
 
 export {
   default as EpisodeWithSerie,

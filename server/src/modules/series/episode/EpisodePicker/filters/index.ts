@@ -1,6 +1,6 @@
 import { Episode } from "#modules/series/episode";
 import { getDaysFromLastPlayed } from "../../lastPlayed";
-import { compareEpisodeFullId } from "../../model/repository/Episode";
+import { EpisodeId, compareEpisodeFullId } from "../../model/Episode";
 import { Params } from "../utils";
 
 export const preventRepeatLast = ( { self, lastEp }: Params<Episode>) => {
@@ -42,12 +42,12 @@ export function dependent( { self, lastEp, serie }: Params<Episode>) {
 
 function dependency(
   lastEp: Episode | null,
-  idLast: string,
+  idLast: EpisodeId,
   self: Episode,
-  idCurrent: string,
+  idCurrent: EpisodeId,
 ): boolean {
-  return (lastEp?.id === idLast && self.id === idCurrent)
-  || (lastEp?.id !== idLast && self.id !== idCurrent);
+  return (lastEp?.episodeId === idLast && self.episodeId === idCurrent)
+  || (lastEp?.episodeId !== idLast && self.episodeId !== idCurrent);
 }
 
 export function preventDisabled( { self }: Params<Episode>) {
@@ -61,8 +61,8 @@ export function removeWeightLowerOrEqualThan(num: number) {
 }
 
 export function preventRepeatInDays(minDays: number) {
-  return ( { self, serie, historyList }: Params<Episode>): boolean => {
-    const daysFromLastTime = getDaysFromLastPlayed(self, serie.id, historyList);
+  return ( { self, historyList }: Params<Episode>): boolean => {
+    const daysFromLastTime = getDaysFromLastPlayed(self, historyList);
 
     return daysFromLastTime >= minDays;
   };

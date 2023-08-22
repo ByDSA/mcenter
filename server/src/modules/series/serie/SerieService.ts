@@ -28,7 +28,7 @@ export default class SerieService {
       return null;
 
     return this.#episodeRepository.getOneById( {
-      id: episodeId,
+      episodeId,
       serieId: serie.id,
     } );
   }

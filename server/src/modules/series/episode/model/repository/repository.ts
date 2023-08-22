@@ -2,7 +2,7 @@ import HistoryList from "#modules/history/model/HistoryList";
 import { SerieRepository, SerieWithEpisodes } from "#modules/series/serie";
 import { CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { SerieModel } from "../../../serie/model/repository/serie.model";
-import Episode, { EpisodeFullId } from "./Episode";
+import Episode, { EpisodeFullId } from "../Episode";
 import { episodeToEpisodeDB } from "./adapters";
 
 type UpdateOneParams = Episode;
@@ -32,7 +32,7 @@ CanUpdateOneByIdAndGet<Episode, EpisodeFullId>
       return null;
 
     const fullId: EpisodeFullId = {
-      id: episodeId,
+      episodeId,
       serieId,
     };
 
@@ -49,13 +49,13 @@ CanUpdateOneByIdAndGet<Episode, EpisodeFullId>
   }
 
   async getOneById(fullId: EpisodeFullId): Promise<Episode | null> {
-    const episodeId = fullId.id;
+    const {episodeId} = fullId;
     const serie = await this.#findSerieOfEpisodeFullId(fullId);
 
     if (!serie)
       return null;
 
-    const found = serie.episodes.find((episode: Episode) => episode.id === episodeId) ?? null;
+    const found = serie.episodes.find((episode: Episode) => episode.episodeId === episodeId) ?? null;
 
     return found;
   }
@@ -66,7 +66,7 @@ CanUpdateOneByIdAndGet<Episode, EpisodeFullId>
     if (!serie)
       return null;
 
-    const indexOfEpisode = serie.episodes.findIndex((e) => e.id === episode.id);
+    const indexOfEpisode = serie.episodes.findIndex((e) => e.episodeId === episode.episodeId);
 
     if (indexOfEpisode === -1)
       return null;

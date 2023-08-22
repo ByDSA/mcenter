@@ -23,25 +23,25 @@ export default class PlaySerieController {
   async playSerie(req: Request, res: Response) {
     const forceStr = req.query.force;
     const force = !!forceStr;
-    const { id, name } = req.params;
-    const serie = await this.#serieRepository.getOneById(name);
+    const { id: episodeId, name: serieId } = req.params;
+    const serieWithEpisodes = await this.#serieRepository.getOneById(serieId);
 
-    assertFound(serie);
+    assertFound(serieWithEpisodes);
 
-    const { episodes } = serie;
+    const { episodes } = serieWithEpisodes;
 
     assertIsNotEmpty(episodes);
 
-    const episode = episodes.find((e) => e.id === id);
+    const episode = episodes.find((e) => e.episodeId === episodeId);
 
     if (episode) {
-      const serieWithoutEpisodes: Serie = {
-        id: serie.id,
-        name: serie.name,
+      const serie: Serie = {
+        id: serieWithEpisodes.id,
+        name: serieWithEpisodes.name,
       };
       const episodeWithSerie: EpisodeWithSerie = {
         ...copyOfEpisode(episode),
-        serie: serieWithoutEpisodes,
+        serie,
       };
 
       await this.#playService.play( {

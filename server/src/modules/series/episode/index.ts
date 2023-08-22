@@ -1,6 +1,5 @@
 export * from "./EpisodePicker";
 
 export {
-  Episode,
-  EpisodeId, EpisodeRepository, EpisodeWithSerie,
+  Episode, EpisodeFullId, EpisodeId, EpisodeRepository, EpisodeWithSerie,
 } from "./model";

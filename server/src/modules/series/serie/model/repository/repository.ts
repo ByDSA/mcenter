@@ -129,7 +129,7 @@ async function fileNode2Episode(fn: FileNode): Promise<Episode> {
   const path = getPathFromFn(fn);
   const id = getIdFromFn(fn);
   const ret: Episode = {
-    id,
+    episodeId: id,
     serieId: "",
     path,
     title: "",
