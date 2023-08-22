@@ -1,5 +1,6 @@
-import { Serie, SerieWithEpisodesRepository, serieWithEpisodesToSerie } from "#modules/series";
-import { StreamWithHistoryListRepository, StreamWithHistoryListService } from "#modules/streamWithHistoryList";
+import { Serie } from "#modules/series";
+import { SerieWithEpisodesRepository, serieWithEpisodesToSerie } from "#modules/seriesWithEpisodes";
+import { StreamWithHistoryListRepository, StreamWithHistoryListService } from "#modules/streamsWithHistoryList";
 import { assertFound } from "#utils/http/validation";
 import { assertIsDefined } from "#utils/validation";
 import { Request, Response, Router } from "express";

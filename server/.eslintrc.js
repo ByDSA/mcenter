@@ -253,6 +253,12 @@ module.exports = {
         "class-methods-use-this": "off",
       },
     },
+    {
+      files: ["index.ts"],
+      rules: {
+        "import/prefer-default-export": "off",
+      },
+    },
   ],
   settings: {
     "import/no-cycle": false,

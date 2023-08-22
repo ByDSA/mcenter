@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { throwErrorPopStack } from "#utils/errors";
 import { isDefined } from "#utils/validation";
 import StatusCode from "../StatusCode";

@@ -1,10 +1,9 @@
-import { HistoryListRepository, HistoryListService } from "#modules/history";
+import { EpisodeRepository, asyncCalculateNextEpisodeByIdStream } from "#modules/episodes";
+import { HistoryListRepository, HistoryListService } from "#modules/historyLists";
 import { PlaySerieController, PlayService, PlayStreamController, VLCService } from "#modules/play";
-import { EpisodeRepository, asyncCalculateNextEpisodeByIdStream } from "#modules/series/episode";
-import { SerieWithEpisodesRepository } from "#modules/series/serie";
-import { addSerieRoutes } from "#modules/series/serie/routes";
-import { addStreamRoutes } from "#modules/stream/routes";
-import { StreamWithHistoryListRepository, StreamWithHistoryListService } from "#modules/streamWithHistoryList";
+import { SerieWithEpisodesRepository, addSerieRoutes } from "#modules/seriesWithEpisodes";
+import { addStreamRoutes } from "#modules/streams/routes";
+import { StreamWithHistoryListRepository, StreamWithHistoryListService } from "#modules/streamsWithHistoryList";
 import { HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import { execSync } from "child_process";
 import dotenv from "dotenv";
@@ -41,9 +40,9 @@ addSerieRoutes(app);
 const streamWithHistoryListRepository = new StreamWithHistoryListRepository();
 const streamWithHistoryListService = new StreamWithHistoryListService();
 const historyListRepository = new HistoryListRepository();
-const serieRepository = new SerieWithEpisodesRepository();
+const serieWithEpisodesRepository = new SerieWithEpisodesRepository();
 const episodeRepository = new EpisodeRepository( {
-  serieRepository,
+  serieWithEpisodesRepository,
 } );
 const historyService = new HistoryListService( {
   episodeRepository,
@@ -56,13 +55,13 @@ const playService = new PlayService( {
   historyListService: historyService,
 } );
 const playSerieController = new PlaySerieController( {
-  serieRepository,
+  serieRepository: serieWithEpisodesRepository,
   playService,
 } );
 const playStreamController = new PlayStreamController( {
   playService,
   streamWithHistoryListRepository,
-  serieWithEpisodesRepository: serieRepository,
+  serieWithEpisodesRepository,
   streamWithHistoryListService,
 } );
 

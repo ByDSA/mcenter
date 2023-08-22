@@ -1,9 +1,9 @@
-import { EpisodeWithSerie } from "#modules/series";
-import { copyOfEpisode } from "#modules/series/episode/model";
-import { Serie, SerieWithEpisodesRepository } from "#modules/series/serie";
+import { EpisodeWithSerie, copyOfEpisode } from "#modules/episodes";
+import { Serie } from "#modules/series";
 import { assertFound } from "#utils/http/validation";
 import { assertIsNotEmpty } from "#utils/validation";
 import { Request, Response, Router } from "express";
+import { SerieWithEpisodesRepository } from "#modules/seriesWithEpisodes";
 import Service from "./Service";
 
 type Params = {

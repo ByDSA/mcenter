@@ -1,27 +1,26 @@
-import { streamWithHistoryListToHistoryList } from "#modules/history/model/adapters";
-import { EpisodeRepository, getRandomPicker } from "#modules/series/episode";
-import { getDaysFromLastPlayed } from "#modules/series/episode/lastPlayed";
-import { SerieWithEpisodesRepository } from "#modules/series/serie";
-import SerieService from "#modules/series/serie/SerieService";
-import { StreamWithHistoryListRepository } from "#modules/streamWithHistoryList";
+import { EpisodeRepository, getRandomPicker } from "#modules/episodes";
+import { getDaysFromLastPlayed } from "#modules/episodes/lastPlayed";
+import { streamWithHistoryListToHistoryList } from "#modules/historyLists/models/adapters";
+import { SerieWithEpisodesRepository, SerieWithEpisodesService } from "#modules/seriesWithEpisodes";
+import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
 import { assertFound } from "#utils/http/validation";
 import { Request, Response } from "express";
 
 export default async function f(req: Request, res: Response) {
-  const serieRepository = new SerieWithEpisodesRepository();
+  const serieWithEpisodesRepository = new SerieWithEpisodesRepository();
   const streamWithHistoryListRepository = new StreamWithHistoryListRepository();
   const episodeRepository = new EpisodeRepository( {
-    serieRepository,
+    serieWithEpisodesRepository,
   } );
-  const serieService = new SerieService( {
-    serieRepository,
+  const serieService = new SerieWithEpisodesService( {
+    serieWithEpisodesRepository,
     episodeRepository,
   } );
   const { streamId } = getParams(req, res);
   const streamWithHistoryList = await streamWithHistoryListRepository.getOneById(streamId);
 
   if (streamWithHistoryList) {
-    const seriePromise = serieRepository.findOneFromGroupId(streamWithHistoryList.group);
+    const seriePromise = serieWithEpisodesRepository.findOneFromGroupId(streamWithHistoryList.group);
     const lastEpPromise = serieService.findLastEpisodeInStreamWithHistoryList(streamWithHistoryList);
 
     await Promise.all([seriePromise, lastEpPromise]);

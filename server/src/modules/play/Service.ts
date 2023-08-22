@@ -1,7 +1,6 @@
-import { HistoryListService } from "#modules/history";
-import { streamWithHistoryListToHistoryList } from "#modules/history/model/adapters";
-import { EpisodeWithSerie } from "#modules/series/episode";
-import { StreamWithHistoryListRepository } from "#modules/streamWithHistoryList";
+import { EpisodeWithSerie } from "#modules/episodes";
+import { HistoryListService, streamWithHistoryListToHistoryList } from "#modules/historyLists";
+import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
 import { assertIsNotEmpty } from "#utils/validation";
 import VLCService from "./PlayService";
 import { episodeToMediaElement } from "./adapters";
