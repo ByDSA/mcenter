@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.4](https://github.com/ByDSA/mcenter/compare/v1.1.3...v1.1.4) (2023-08-22)
+
+
+### Bug Fixes
+
+* remove HistoryRepository dependencies ([b477e38](https://github.com/ByDSA/mcenter/commit/b477e3826d4700d44b3f2f7d6e747c0c29529231))
+
 ### [1.1.3](https://github.com/ByDSA/mcenter/compare/v1.1.2...v1.1.3) (2023-08-21)
 
 
