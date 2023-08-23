@@ -1,7 +1,7 @@
 export * from "./EpisodePicker";
 
 export {
-  Episode, EpisodeFullId, EpisodeId, EpisodeWithSerie, compareEpisodeFullId, copyOfEpisode, episodeFullIdOf,
+  Episode, EpisodeFullId, EpisodeId, compareEpisodeFullId, copyOfEpisode, episodeFullIdOf,
 } from "./models";
 
 export {

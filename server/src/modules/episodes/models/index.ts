@@ -3,7 +3,3 @@ export {
 } from "./Episode";
 
 export * from "./Episode";
-
-export {
-  default as EpisodeWithSerie,
-} from "./EpisodeWithSerie";

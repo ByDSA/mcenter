@@ -1,4 +1,4 @@
-import { EpisodeWithSerie } from "#modules/episodes";
+import { Episode } from "#modules/episodes";
 import { HistoryListService, streamWithHistoryListToHistoryList } from "#modules/historyLists";
 import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
 import { assertIsNotEmpty } from "#utils/validation";
@@ -8,7 +8,7 @@ import { MediaElement } from "./player";
 
 type PlayParams = {
   force?: boolean;
-  episodes: EpisodeWithSerie[];
+  episodes: Episode[];
 };
 type Params = {
   vlcService: VLCService;

@@ -1,9 +1,7 @@
-import { EpisodeWithSerie, copyOfEpisode } from "#modules/episodes";
-import { Serie } from "#modules/series";
+import { SerieWithEpisodesRepository } from "#modules/seriesWithEpisodes";
 import { assertFound } from "#utils/http/validation";
 import { assertIsNotEmpty } from "#utils/validation";
 import { Request, Response, Router } from "express";
-import { SerieWithEpisodesRepository } from "#modules/seriesWithEpisodes";
 import Service from "./Service";
 
 type Params = {
@@ -35,17 +33,8 @@ export default class PlaySerieController {
     const episode = episodes.find((e) => e.episodeId === episodeId);
 
     if (episode) {
-      const serie: Serie = {
-        id: serieWithEpisodes.id,
-        name: serieWithEpisodes.name,
-      };
-      const episodeWithSerie: EpisodeWithSerie = {
-        ...copyOfEpisode(episode),
-        serie,
-      };
-
       await this.#playService.play( {
-        episodes: [episodeWithSerie],
+        episodes: [episode],
         force,
       } );
     }
