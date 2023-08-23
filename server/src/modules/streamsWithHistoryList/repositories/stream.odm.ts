@@ -3,7 +3,7 @@ import { StreamMode } from "#modules/streams";
 import mongoose from "mongoose";
 import { Model } from "../models";
 
-interface DocumentODM extends Model {
+interface DocODM extends Model {
   id: string;
 }
 
@@ -33,5 +33,5 @@ const schema = new mongoose.Schema<Model>( {
 const ModelODM = mongoose.model<Model>(NAME, schema);
 
 export {
-  DocumentODM, ModelODM,
+  DocODM, ModelODM,
 };

@@ -1,15 +1,15 @@
-import { EpisodeDB, EpisodeSchemaDB } from "#modules/episodes/repositories";
+import { EpisodeDocODM, EpisodeSchema } from "#modules/episodes/repositories";
 import mongoose, { Schema } from "mongoose";
 import { ModelId } from "../../series/models/Serie";
 
-interface DocumentODM {
+interface DocODM {
   id: ModelId;
   name: string;
-  episodes: EpisodeDB[];
+  episodes: EpisodeDocODM[];
 }
 
 const NAME = "Serie";
-const schema = new Schema<DocumentODM>( {
+const schema = new Schema<DocODM>( {
   id: {
     type: String,
     required: true,
@@ -18,11 +18,11 @@ const schema = new Schema<DocumentODM>( {
     type: String,
   },
   episodes: {
-    type: [EpisodeSchemaDB],
+    type: [EpisodeSchema],
   },
 } );
-const model = mongoose.model<DocumentODM>(NAME, schema);
+const model = mongoose.model<DocODM>(NAME, schema);
 
 export {
-  DocumentODM, model as ModelODM, schema as SerieSchema,
+  DocODM, model as ModelODM, schema,
 };

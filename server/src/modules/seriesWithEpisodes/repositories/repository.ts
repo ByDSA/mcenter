@@ -6,7 +6,7 @@ import { FileNode, getSerieTreeRemote } from "../../../actions/nginxTree";
 import { ModelId } from "../../series/models/Serie";
 import SerieWithEpisodes from "../models/SerieWithEpisodes";
 import { serieWithEpisodesDBToSerieWithEpisodes, serieWithEpisodesToSerieWithEpisodesDB } from "./adapters";
-import { DocumentODM, ModelODM as SerieWithEpisodesModel } from "./serie.model";
+import { DocODM, ModelODM as SerieWithEpisodesModel } from "./serie.model";
 
 export default class SerieWithEpisodesRepository
 implements CanGetOneById<SerieWithEpisodes, ModelId>,
@@ -51,7 +51,7 @@ CanCreateOneAndGet<SerieWithEpisodes>
   }
 
   async getOneById(id: ModelId): Promise<SerieWithEpisodes | null> {
-    const [serieDB]: DocumentODM[] = await SerieWithEpisodesModel.find( {
+    const [serieDB]: DocODM[] = await SerieWithEpisodesModel.find( {
       id,
     }, {
       _id: 0,

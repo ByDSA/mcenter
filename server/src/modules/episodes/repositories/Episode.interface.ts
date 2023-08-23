@@ -1,4 +1,4 @@
-export default interface Episode {
+export default interface DocODM {
   id: string;
   path: string;
   title?: string;

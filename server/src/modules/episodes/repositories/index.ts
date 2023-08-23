@@ -1,11 +1,11 @@
 export {
-  default as EpisodeSchemaDB,
+  default as EpisodeSchema,
 } from "./Episode.schema";
 
 export * from "./adapters";
 
 export {
-  default as EpisodeDB,
+  default as EpisodeDocODM,
 } from "./Episode.interface";
 
 export {
