@@ -31,5 +31,7 @@ export function episodeDBToEpisode(episodeDB: EpisodeDB, serieId: SerieId): Epis
     title: episodeDB.title ?? "",
     weight: episodeDB.weight ?? 0,
     path: episodeDB.path,
+    disabled: episodeDB.disabled ?? undefined,
+    tags: episodeDB.tags ?? undefined,
   };
 }

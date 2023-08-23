@@ -9,7 +9,7 @@ interface DocumentODM {
 }
 
 const NAME = "Serie";
-const schema = new Schema( {
+const schema = new Schema<DocumentODM>( {
   id: {
     type: String,
     required: true,

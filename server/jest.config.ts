@@ -8,8 +8,7 @@ const config = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   moduleNameMapper: {
     "^#tests($|/.*)$": "<rootDir>/tests/$1",
-    "^#utils($|/.*)$": "<rootDir>/src/utils/$1",
-    "^#modules($|/.*)$": "<rootDir>/src/modules/$1",
+    "^#(.*)$": "<rootDir>/src/$1",
   },
   setupFiles: ["./jest.setup.ts"],
   collectCoverageFrom: ["**/*.(t|j)s"],

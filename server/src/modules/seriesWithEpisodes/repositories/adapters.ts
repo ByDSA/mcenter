@@ -4,7 +4,7 @@ import SerieWithEpisodes from "../models/SerieWithEpisodes";
 import { DocumentODM } from "./serie.model";
 
 /* eslint-disable import/prefer-default-export */
-export function serieDBToSerieWithEpisodes(serieDB: DocumentODM): SerieWithEpisodes {
+export function serieWithEpisodesDBToSerieWithEpisodes(serieDB: DocumentODM): SerieWithEpisodes {
   return {
     id: serieDB.id,
     name: serieDB.name,
@@ -12,7 +12,7 @@ export function serieDBToSerieWithEpisodes(serieDB: DocumentODM): SerieWithEpiso
   };
 }
 
-export function serieWithEpisodesToSerieDB(serieWithEpisodes: SerieWithEpisodes): DocumentODM {
+export function serieWithEpisodesToSerieWithEpisodesDB(serieWithEpisodes: SerieWithEpisodes): DocumentODM {
   return {
     id: serieWithEpisodes.id,
     name: serieWithEpisodes.id,

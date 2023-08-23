@@ -5,3 +5,7 @@ export {
 export {
   default as mergeOpts,
 } from "./mergeOpts";
+
+export {
+  default as deepFreeze,
+} from "./deepFreeze";

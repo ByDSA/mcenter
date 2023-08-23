@@ -4,9 +4,6 @@ import { Repository } from "../repositories";
 
 export default async function (req: Request, res: Response) {
   const { id } = getParams(req, res);
-  const { connect, disconnect } = (await import("../../../db/database"));
-
-  connect();
   const serieRepository = new Repository();
   const serie: Model | null = await serieRepository.getOneById(id);
 
@@ -17,7 +14,6 @@ export default async function (req: Request, res: Response) {
   }
 
   res.send(serie);
-  disconnect();
 }
 
 function getParams(req: Request, res: Response) {

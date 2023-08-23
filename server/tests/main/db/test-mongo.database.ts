@@ -1,17 +1,16 @@
-import RealMongoDatabase, { Options } from "@app/main/db/real-mongo.database";
-import { assertDefined } from "@app/utils";
+import { assertIsDefined } from "#utils/validation";
+import { DatabaseOptions, RealMongoDatabase } from "#main";
 import TestDatabase from "./TestDatabase";
 
 export default class TestMongoDatabase extends RealMongoDatabase implements TestDatabase {
-  constructor(options?: Options) {
+  constructor(options?: DatabaseOptions) {
     super( {
       ...options,
-      envFilePath: "tests/.env",
     } );
   }
 
   async drop() {
-    assertDefined(this.connection);
+    assertIsDefined(this.connection);
     await this.connection.db.dropDatabase();
   }
 }

@@ -20,9 +20,7 @@
     "paths": {
       "#tests/*": ["tests/*"],
       "#tests": ["tests"],
-      "#utils/*": ["src/utils/*"],
-      "#utils": ["src/utils"],
-      "#modules/*": ["src/modules/*"]
+      "#*": ["src/*"]
     }
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"],

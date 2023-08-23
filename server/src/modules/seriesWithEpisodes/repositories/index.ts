@@ -3,5 +3,5 @@ export {
 } from "./repository";
 
 export {
-  ModelODM as SerieWithEpisodesModelODM,
+  DocumentODM as SerieWithEpisodesDocumentODM, ModelODM as SerieWithEpisodesModelODM,
 } from "./serie.model";

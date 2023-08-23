@@ -5,7 +5,7 @@ import { assertIsNotEmpty } from "#utils/validation";
 import { FileNode, getSerieTreeRemote } from "../../../actions/nginxTree";
 import { ModelId } from "../../series/models/Serie";
 import SerieWithEpisodes from "../models/SerieWithEpisodes";
-import { serieDBToSerieWithEpisodes, serieWithEpisodesToSerieDB } from "./adapters";
+import { serieWithEpisodesDBToSerieWithEpisodes, serieWithEpisodesToSerieWithEpisodesDB } from "./adapters";
 import { DocumentODM, ModelODM as SerieWithEpisodesModel } from "./serie.model";
 
 export default class SerieWithEpisodesRepository
@@ -25,9 +25,9 @@ CanCreateOneAndGet<SerieWithEpisodes>
   }
 
   async createOneAndGet(serieWithEpisodes: SerieWithEpisodes): Promise<SerieWithEpisodes> {
-    const serieDB = await SerieWithEpisodesModel.create(serieWithEpisodesToSerieDB(serieWithEpisodes)).then(s => s.save());
+    const serieDB = await SerieWithEpisodesModel.create(serieWithEpisodesToSerieWithEpisodesDB(serieWithEpisodes)).then(s => s.save());
 
-    return serieDBToSerieWithEpisodes(serieDB);
+    return serieWithEpisodesDBToSerieWithEpisodes(serieDB);
   }
 
   private async createFromFiles(id: ModelId): Promise<SerieWithEpisodes | null> {
@@ -60,7 +60,7 @@ CanCreateOneAndGet<SerieWithEpisodes>
     if (!serieDB)
       return null;
 
-    return serieDBToSerieWithEpisodes(serieDB);
+    return serieWithEpisodesDBToSerieWithEpisodes(serieDB);
   }
 
   async updateOneByIdAndGet(id: ModelId, serie: SerieWithEpisodes): Promise<SerieWithEpisodes | null> {

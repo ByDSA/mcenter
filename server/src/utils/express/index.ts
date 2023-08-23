@@ -3,3 +3,7 @@ export {
 } from "./errorHandler";
 
 export * from "./handlers";
+
+export {
+  default as App,
+} from "./App";

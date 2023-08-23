@@ -1,5 +1,5 @@
+import { DateSchema } from "#utils/time";
 import mongoose from "mongoose";
-import { DateSchema } from "src/utils/time/date-type";
 
 const schema = new mongoose.Schema( {
   date: {
