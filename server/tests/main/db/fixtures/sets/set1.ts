@@ -1,10 +1,18 @@
-import { SerieWithEpisodesModelODM } from "#modules/seriesWithEpisodes/repositories";
-import { serieWithEpisodesToSerieWithEpisodesDB } from "#modules/seriesWithEpisodes/repositories/adapters";
-import { seriesWithEpisodesInitFixtures } from "../models";
+import { episodeToDocOdm } from "#modules/episodes";
+import { DocOdm, ModelOdm } from "#modules/episodes/repositories";
+import { SerieDocOdm, SerieModelOdm, serieToDocOdm } from "#modules/series";
+import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "../models";
 
 export default async () => {
-  await SerieWithEpisodesModelODM.deleteMany();
-  const seriesWithEpisodesDB = seriesWithEpisodesInitFixtures.map(serieWithEpisodesToSerieWithEpisodesDB);
+  // Series
+  await SerieModelOdm.deleteMany();
+  const seriesDocOdm: SerieDocOdm[] = [SERIE_SIMPSONS].map(serieToDocOdm);
 
-  await SerieWithEpisodesModelODM.insertMany(seriesWithEpisodesDB);
+  await SerieModelOdm.insertMany(seriesDocOdm);
+
+  // Episodes
+  await ModelOdm.deleteMany();
+  const episodesDocOdm: DocOdm[] = EPISODES_SIMPSONS.map(episodeToDocOdm);
+
+  await ModelOdm.insertMany(episodesDocOdm);
 };

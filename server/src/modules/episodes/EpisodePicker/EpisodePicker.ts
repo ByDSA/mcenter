@@ -1,13 +1,13 @@
 import { streamWithHistoryListToHistoryList } from "#modules/historyLists";
 import HistoryList from "#modules/historyLists/models/HistoryList";
-import { SerieWithEpisodes, SerieWithEpisodesRepository } from "#modules/seriesWithEpisodes";
+import { Serie, SerieRepository } from "#modules/series";
 import { StreamMode } from "#modules/streams";
 import { StreamWithHistoryList, StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
 import { throwErrorPopStack } from "#utils/errors";
 import { assertFound } from "#utils/http/validation";
 import { assertIsDefined, neverCase } from "#utils/validation";
 import { Picker, newPicker } from "rand-picker";
-import { Episode } from "../models";
+import { Model } from "../models";
 import { Repository } from "../repositories";
 import { filter } from "./EpisodeFilter";
 import fixWeight from "./EpisodeWeight";
@@ -25,21 +25,20 @@ export default async function f(streamId: string) {
 }
 
 type FuncGeneratorParams = {
-  serie: SerieWithEpisodes;
-  lastEp: Episode | null;
+  serie: Serie;
+  episodes: Model[];
+  lastEp: Model | null;
   stream: StreamWithHistoryList;
   historyList: HistoryList;
 };
-type FuncGenerator = (params: FuncGeneratorParams)=> Promise<Episode>;
+type FuncGenerator = (params: FuncGeneratorParams)=> Promise<Model>;
 export async function calculateNextEpisode(streamWithHistoryList: StreamWithHistoryList) {
-  const serieWithEpisodesRepository = new SerieWithEpisodesRepository();
-  const episodeRepository = new Repository( {
-    serieWithEpisodesRepository,
-  } );
+  const serieRepository = new SerieRepository();
+  const episodeRepository = new Repository();
 
   console.log("Calculating next episode...");
   const groupId: string = streamWithHistoryList.group;
-  const serie = await serieWithEpisodesRepository.findOneFromGroupId(groupId);
+  const serie = await serieRepository.findOneFromGroupId(groupId);
 
   assertFound(serie, `Cannot get serie from group '${groupId}'`);
 
@@ -60,9 +59,11 @@ export async function calculateNextEpisode(streamWithHistoryList: StreamWithHist
 
   assertFound(historyList, `Cannot get history list from stream '${streamWithHistoryList.id}'`);
   const lastEp = await episodeRepository.findLastEpisodeInHistoryList(historyList);
+  const episodes = await episodeRepository.getManyBySerieId(serie.id);
 
   return nextEpisodeFunc( {
     serie,
+    episodes,
     lastEp,
     stream: streamWithHistoryList,
     historyList,
@@ -70,8 +71,7 @@ export async function calculateNextEpisode(streamWithHistoryList: StreamWithHist
 }
 
 // eslint-disable-next-line require-await
-async function getNextEpisodeSequential( {serie, lastEp}: FuncGeneratorParams): Promise<Episode> {
-  const { episodes } = serie;
+async function getNextEpisodeSequential( {episodes, lastEp}: FuncGeneratorParams): Promise<Model> {
   let i = 0;
 
   if (lastEp) {
@@ -84,21 +84,21 @@ async function getNextEpisodeSequential( {serie, lastEp}: FuncGeneratorParams): 
   return episodes[i];
 }
 
-export async function getRandomPicker( {serie, lastEp, stream, historyList}: FuncGeneratorParams) {
+export async function getRandomPicker( {serie, episodes, lastEp, stream, historyList}: FuncGeneratorParams) {
   console.log("Getting random picker...");
-  const { episodes } = serie;
-  const picker: Picker<Episode> = newPicker(episodes, {
+
+  const picker: Picker<Model> = newPicker(episodes, {
     weighted: true,
   } );
 
-  filter(picker, serie, lastEp, stream, historyList);
+  filter(picker, serie, episodes, lastEp, stream, historyList);
   assertPickerHasData(picker);
-  await fixWeight(picker, serie, lastEp, stream, historyList);
+  await fixWeight(picker, serie, episodes, lastEp, stream, historyList);
 
   return picker;
 }
 
-function assertPickerHasData(picker: Picker<Episode>) {
+function assertPickerHasData(picker: Picker<Model>) {
   for (const d of picker.data) {
     if (d)
       return;
@@ -108,12 +108,14 @@ function assertPickerHasData(picker: Picker<Episode>) {
 }
 
 async function getNextEpisodeRandom( {serie,
+  episodes,
   lastEp,
   stream,
   historyList}: FuncGeneratorParams,
-): Promise<Episode> {
+): Promise<Model> {
   const picker = await getRandomPicker( {
     serie,
+    episodes,
     lastEp,
     stream,
     historyList,

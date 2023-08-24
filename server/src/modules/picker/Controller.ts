@@ -1,26 +1,36 @@
 import { EpisodeRepository, getRandomPicker } from "#modules/episodes";
 import { getDaysFromLastPlayed } from "#modules/episodes/lastPlayed";
-import { streamWithHistoryListToHistoryList } from "#modules/historyLists/models/adapters";
-import { SerieWithEpisodesRepository, SerieWithEpisodesService } from "#modules/seriesWithEpisodes";
+import { streamWithHistoryListToHistoryList } from "#modules/historyLists";
+import { SerieRepository } from "#modules/series";
+import SerieService from "#modules/series/SerieService";
 import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
+import { SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
-import { Request, Response } from "express";
+import express, { Request, Response } from "express";
 
-export default async function f(req: Request, res: Response) {
-  const serieWithEpisodesRepository = new SerieWithEpisodesRepository();
-  const streamWithHistoryListRepository = new StreamWithHistoryListRepository();
-  const episodeRepository = new EpisodeRepository( {
-    serieWithEpisodesRepository,
-  } );
-  const serieService = new SerieWithEpisodesService( {
-    serieWithEpisodesRepository,
-    episodeRepository,
-  } );
-  const { streamId } = getParams(req, res);
-  const streamWithHistoryList = await streamWithHistoryListRepository.getOneById(streamId);
+export default class PickerController {
+  getPickerRouter(): express.Router {
+    const router = SecureRouter();
 
-  if (streamWithHistoryList) {
-    const seriePromise = serieWithEpisodesRepository.findOneFromGroupId(streamWithHistoryList.group);
+    router.get("/:streamId", this.#showPicker.bind(this));
+
+    return router;
+  }
+
+  async #showPicker(req: Request, res: Response) {
+    const serieRepository = new SerieRepository();
+    const streamWithHistoryListRepository = new StreamWithHistoryListRepository();
+    const episodeRepository = new EpisodeRepository();
+    const serieService = new SerieService( {
+      serieRepository,
+      episodeRepository,
+    } );
+    const { streamId } = getParams(req, res);
+    const streamWithHistoryList = await streamWithHistoryListRepository.getOneById(streamId);
+
+    assertFound(streamWithHistoryList);
+
+    const seriePromise = serieRepository.findOneFromGroupId(streamWithHistoryList.group);
     const lastEpPromise = serieService.findLastEpisodeInStreamWithHistoryList(streamWithHistoryList);
 
     await Promise.all([seriePromise, lastEpPromise]);
@@ -31,9 +41,11 @@ export default async function f(req: Request, res: Response) {
 
     assertFound(serie);
 
+    const episodes = await episodeRepository.getManyBySerieId(serie.id);
     const historyList = streamWithHistoryListToHistoryList(streamWithHistoryList);
     const picker = await getRandomPicker( {
       serie,
+      episodes,
       lastEp,
       stream: streamWithHistoryList,
       historyList,
@@ -55,8 +67,7 @@ export default async function f(req: Request, res: Response) {
       } );
 
     res.send(ret);
-  } else
-    res.sendStatus(404);
+  }
 }
 
 function getParams(req: Request, res: Response) {

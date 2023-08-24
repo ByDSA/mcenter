@@ -1,12 +1,8 @@
 export {
-  default as EpisodeSchema,
-} from "./Episode.schema";
+  DocOdm, ModelOdm, Schema,
+} from "./odm";
 
 export * from "./adapters";
-
-export {
-  default as EpisodeDocODM,
-} from "./Episode.interface";
 
 export {
   default as Repository,

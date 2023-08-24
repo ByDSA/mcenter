@@ -1,8 +1,28 @@
 import mongoose from "mongoose";
-import Interface from "./Episode.interface";
 
-const schema = new mongoose.Schema<Interface>( {
-  id: {
+export interface DocOdm {
+  episodeId: string;
+  serieId: string;
+  path: string;
+  title?: string;
+  weight?: number;
+  start?: number;
+  end?: number;
+  duration?: number;
+  tags?: string[];
+  disabled?: boolean;
+  lastTimePlayed?: number;
+}
+
+const NAME = "Episode";
+
+export const Schema = new mongoose.Schema<DocOdm>( {
+  episodeId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  serieId: {
     type: String,
     required: true,
     unique: true,
@@ -42,4 +62,4 @@ const schema = new mongoose.Schema<Interface>( {
   autoIndex: false,
 } );
 
-export default schema;
+export const ModelOdm = mongoose.model<DocOdm>(NAME, Schema);

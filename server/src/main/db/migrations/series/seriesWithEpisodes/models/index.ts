@@ -1,5 +1,5 @@
 export * from "./adapters";
 
 export {
-  default as Model,
+  EpisodeInSerie, default as Model,
 } from "./SerieWithEpisodes";

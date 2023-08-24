@@ -1,9 +1,9 @@
 import { asyncCalculateNextEpisodeByIdStream } from "#modules/episodes";
+import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController } from "#modules/play";
-import { addSerieRoutes } from "#modules/seriesWithEpisodes";
-import { addStreamRoutes } from "#modules/streams/routes";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import { Database } from "#utils/layers/db";
+import { PublicMethodsOf } from "#utils/types";
 import { assertIsDefined } from "#utils/validation";
 import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
@@ -15,10 +15,10 @@ type Dependencies = {
     instance: Database | null | undefined;
   };
   play: {
-    playSerieController: PlaySerieController;
-    playStreamController: PlayStreamController;
+    playSerieController: PublicMethodsOf<PlaySerieController>;
+    playStreamController: PublicMethodsOf<PlayStreamController>;
   };
-  showPickerFunc: (req: Request, res: Response)=> void;
+  pickerController: PublicMethodsOf<PickerController>;
 };
 
 // Necesario para poder replicarla para test
@@ -27,17 +27,17 @@ export default class ExpressApp implements App {
 
   #database: Database | null = null;
 
-  #playSerieController: PlaySerieController;
+  #playSerieController: PublicMethodsOf<PlaySerieController>;
 
-  #playStreamController: PlayStreamController;
+  #playStreamController: PublicMethodsOf<PlayStreamController>;
 
-  #showPickerFunc: (req: Request, res: Response)=> void;
+  #pickerController: PublicMethodsOf<PickerController>;
 
-  constructor( {db, play: {playSerieController, playStreamController}, showPickerFunc}: Dependencies) {
+  constructor( {db, play: {playSerieController, playStreamController}, pickerController}: Dependencies) {
     this.#database = db?.instance ?? null;
     this.#playSerieController = playSerieController;
     this.#playStreamController = playStreamController;
-    this.#showPickerFunc = showPickerFunc;
+    this.#pickerController = pickerController;
   }
 
   async init() {
@@ -68,13 +68,10 @@ export default class ExpressApp implements App {
     if (process.env.NODE_ENV === "development")
       app.get("/", HELLO_WORLD_HANDLER);
 
-    addStreamRoutes(app);
-    addSerieRoutes(app);
-
     app.use("/api/play/serie", this.#playSerieController.getRouter());
     app.use("/api/play/stream", this.#playStreamController.getRouter());
 
-    app.get("/api/picker/:streamId", this.#showPickerFunc);
+    app.use("/api/picker", this.#pickerController.getPickerRouter());
 
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;

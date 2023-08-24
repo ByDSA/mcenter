@@ -1,7 +1,7 @@
 import { StreamId } from "#modules/streams";
 import { CanCreateOneAndGet, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import { Model } from "../models";
-import { ModelODM } from "./stream.odm";
+import { ModelOdm } from "./stream.odm";
 
 /**
  * @deprecated
@@ -11,12 +11,12 @@ implements CanGetOneById<Model, StreamId>,
 CanUpdateOneById<Model, StreamId>,
 CanCreateOneAndGet<Model> {
   async createOneAndGet(model: Model): Promise<Model> {
-    return ModelODM.create(model);
+    return ModelOdm.create(model);
   }
 
   async getOneById(id: StreamId): Promise<Model | null> {
     console.log(`getting stream by id=${id}`);
-    const streams = await ModelODM.find( {
+    const streams = await ModelOdm.find( {
       id,
     }, {
       _id: 0,
@@ -27,7 +27,7 @@ CanCreateOneAndGet<Model> {
   }
 
   async updateOneById(id: StreamId, model: Model): Promise<void> {
-    await ModelODM.findOneAndUpdate( {
+    await ModelOdm.findOneAndUpdate( {
       id,
     }, model);
   }

@@ -1,10 +1,10 @@
 import { EpisodeRepository } from "#modules/episodes";
 import { HistoryListRepository, HistoryListService } from "#modules/historyLists";
+import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, VLCService } from "#modules/play";
-import { SerieWithEpisodesRepository } from "#modules/seriesWithEpisodes";
+import { SerieRepository } from "#modules/series";
 import { StreamWithHistoryListRepository, StreamWithHistoryListService } from "#modules/streamsWithHistoryList";
 import dotenv from "dotenv";
-import showPickerFunc from "./actions/showPicker";
 import { ExpressApp } from "./main";
 import RealDatabase from "./main/db/Database";
 
@@ -14,10 +14,8 @@ import RealDatabase from "./main/db/Database";
   const streamWithHistoryListRepository = new StreamWithHistoryListRepository();
   const streamWithHistoryListService = new StreamWithHistoryListService();
   const historyListRepository = new HistoryListRepository();
-  const serieWithEpisodesRepository = new SerieWithEpisodesRepository();
-  const episodeRepository = new EpisodeRepository( {
-    serieWithEpisodesRepository,
-  } );
+  const serieRepository = new SerieRepository();
+  const episodeRepository = new EpisodeRepository();
   const historyService = new HistoryListService( {
     episodeRepository,
     historyRepository: historyListRepository,
@@ -29,13 +27,14 @@ import RealDatabase from "./main/db/Database";
     historyListService: historyService,
   } );
   const playSerieController = new PlaySerieController( {
-    serieRepository: serieWithEpisodesRepository,
+    serieRepository,
+    episodeRepository,
     playService,
   } );
   const playStreamController = new PlayStreamController( {
     playService,
     streamWithHistoryListRepository,
-    serieWithEpisodesRepository,
+    serieRepository,
     streamWithHistoryListService,
   } );
   const app = new ExpressApp( {
@@ -46,7 +45,7 @@ import RealDatabase from "./main/db/Database";
       playSerieController,
       playStreamController,
     },
-    showPickerFunc,
+    pickerController: new PickerController(),
   } );
 
   await app.init();

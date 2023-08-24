@@ -3,12 +3,12 @@ import { StreamMode } from "#modules/streams";
 import mongoose from "mongoose";
 import { Model } from "../models";
 
-interface DocODM extends Model {
+export interface DocOdm extends Model {
   id: string;
 }
 
 const NAME = "Stream";
-const schema = new mongoose.Schema<Model>( {
+const schema = new mongoose.Schema<DocOdm>( {
   id: {
     type: String,
     required: true,
@@ -30,8 +30,5 @@ const schema = new mongoose.Schema<Model>( {
     type: [HistoryEntrySchema],
   },
 } );
-const ModelODM = mongoose.model<Model>(NAME, schema);
 
-export {
-  DocODM, ModelODM,
-};
+export const ModelOdm = mongoose.model<Model>(NAME, schema);
