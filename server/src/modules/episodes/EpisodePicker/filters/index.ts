@@ -1,13 +1,13 @@
 import { Episode } from "#modules/episodes";
 import { getDaysFromLastPlayed } from "../../lastPlayed";
-import { EpisodeId, compareEpisodeFullId } from "../../models/Episode";
+import { ModelId, compareFullId } from "../../models/Episode";
 import { Params } from "../utils";
 
 export const preventRepeatLast = ( { self, lastEp }: Params<Episode>) => {
   if (!lastEp)
     return true;
 
-  if (!compareEpisodeFullId(lastEp, self))
+  if (!compareFullId(lastEp, self))
     return true;
 
   return false;
@@ -42,9 +42,9 @@ export function dependent( { self, lastEp, serie }: Params<Episode>) {
 
 function dependency(
   lastEp: Episode | null,
-  idLast: EpisodeId,
+  idLast: ModelId,
   self: Episode,
-  idCurrent: EpisodeId,
+  idCurrent: ModelId,
 ): boolean {
   return (lastEp?.episodeId === idLast && self.episodeId === idCurrent)
   || (lastEp?.episodeId !== idLast && self.episodeId !== idCurrent);

@@ -12,7 +12,8 @@
     "test": "NODE_ENV=test jest --maxWorkers=1",
     "test:watch": "pnpm run test --watch",
     "test:coverage": "pnpm run test --coverage",
-    "test:coverage:clean": "rm -rf coverage"
+    "test:coverage:clean": "rm -rf coverage",
+    "migrate": "./src/main/db/migrations/migrate.sh"
   },
   "dependencies": {
     "axios": "1.4.0",

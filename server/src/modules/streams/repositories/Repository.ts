@@ -1,5 +1,5 @@
 import { StreamWithHistoryList, StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
-import { ModelODM as StreamWithHistoryListModelODM } from "#modules/streamsWithHistoryList/repositories/stream.odm";
+import { ModelOdm as StreamWithHistoryListModelOdm } from "#modules/streamsWithHistoryList/repositories/stream.odm";
 import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import Model, { ModelId } from "../models/Stream";
 
@@ -22,7 +22,7 @@ CanCreateOne<Model> {
 
   async getOneById(id: ModelId): Promise<StreamWithHistoryList | null> {
     console.log(`getting stream by id=${id}`);
-    const streams = await StreamWithHistoryListModelODM.find( {
+    const streams = await StreamWithHistoryListModelOdm.find( {
       id,
     }, {
       _id: 0,
@@ -33,7 +33,7 @@ CanCreateOne<Model> {
   }
 
   async updateOneById(id: ModelId, stream: StreamWithHistoryList): Promise<void> {
-    await StreamWithHistoryListModelODM.findOneAndUpdate( {
+    await StreamWithHistoryListModelOdm.findOneAndUpdate( {
       id,
     }, stream);
   }

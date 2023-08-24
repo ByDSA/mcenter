@@ -1,12 +1,13 @@
 import HistoryList from "#modules/historyLists/models/HistoryList";
-import { SerieWithEpisodes } from "#modules/seriesWithEpisodes";
+import { Serie } from "#modules/series";
 import { StreamWithHistoryList } from "#modules/streamsWithHistoryList";
 import { Picker } from "rand-picker";
 
 export type Params<R> = {
   picker: Picker<R>;
   self: R;
-  serie: SerieWithEpisodes;
+  serie: Serie;
+  episodes: R[];
   lastEp: R | null;
   stream: StreamWithHistoryList;
   historyList: HistoryList;

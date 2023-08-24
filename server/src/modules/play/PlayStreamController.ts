@@ -1,5 +1,4 @@
-import { Serie } from "#modules/series";
-import { SerieWithEpisodesRepository, serieWithEpisodesToSerie } from "#modules/seriesWithEpisodes";
+import { SerieRepository } from "#modules/series";
 import { StreamWithHistoryListRepository, StreamWithHistoryListService } from "#modules/streamsWithHistoryList";
 import { assertFound } from "#utils/http/validation";
 import { assertIsDefined } from "#utils/validation";
@@ -10,7 +9,7 @@ type Params = {
   playService: Service;
   streamWithHistoryListService: StreamWithHistoryListService;
   streamWithHistoryListRepository: StreamWithHistoryListRepository;
-  serieWithEpisodesRepository: SerieWithEpisodesRepository;
+  serieRepository: SerieRepository;
 };
 export default class PlayController {
   #streamRepository: StreamWithHistoryListRepository;
@@ -19,9 +18,9 @@ export default class PlayController {
 
   #playService: Service;
 
-  #serieRepository: SerieWithEpisodesRepository;
+  #serieRepository: SerieRepository;
 
-  constructor( {streamWithHistoryListRepository: streamRepository, streamWithHistoryListService: streamService, playService: service, serieWithEpisodesRepository: serieRepository}: Params) {
+  constructor( {streamWithHistoryListRepository: streamRepository, streamWithHistoryListService: streamService, playService: service, serieRepository}: Params) {
     this.#playService = service;
     this.#streamRepository = streamRepository;
     this.#streamWithHistoryListService = streamService;
@@ -36,18 +35,12 @@ export default class PlayController {
     assertFound(stream);
 
     const episodes = await this.#streamWithHistoryListService.pickNextEpisode(stream, number);
-    const serieWithEpisodes = await this.#serieRepository.getOneById(stream.id);
+    const serie = await this.#serieRepository.findOneFromGroupId(stream.group);
 
-    assertFound(serieWithEpisodes);
-
-    const serie: Serie = serieWithEpisodesToSerie(serieWithEpisodes);
-    const episodeWithSerie = episodes.map((episode) => ( {
-      ...episode,
-      serie,
-    } ));
+    assertFound(serie);
 
     await this.#playService.play( {
-      episodes: episodeWithSerie,
+      episodes,
       force,
     } );
 

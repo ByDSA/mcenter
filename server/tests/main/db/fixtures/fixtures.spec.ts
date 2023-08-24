@@ -1,8 +1,10 @@
-import { SerieWithEpisodesDocODM, SerieWithEpisodesModelODM } from "#modules/seriesWithEpisodes/repositories";
-import { serieWithEpisodesDBToSerieWithEpisodes } from "#modules/seriesWithEpisodes/repositories/adapters";
-import { expectSerieWithEpisodes } from "#modules/seriesWithEpisodes/test";
+import { episodeDocOdmToModel } from "#modules/episodes";
+import { expectEpisodes } from "#modules/episodes/models/test";
+import { ModelOdm } from "#modules/episodes/repositories";
+import { SerieDocOdm, SerieModelOdm, serieDocOdmToModel } from "#modules/series";
+import { expectSerie } from "#modules/series/models/test";
 import TestMongoDatabase from "../test-mongo.database";
-import { seriesWithEpisodesInitFixtures } from "./models";
+import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "./models";
 import { loadFixtureSet1 } from "./sets";
 
 let db: TestMongoDatabase;
@@ -17,10 +19,15 @@ beforeAll(async () => {
 it("should load fixture set1", async () => {
   await loadFixtureSet1();
 
-  const seriesDB: SerieWithEpisodesDocODM[] = await SerieWithEpisodesModelODM.find();
-  const serieWithEpisodes = serieWithEpisodesDBToSerieWithEpisodes(seriesDB[0]);
+  const seriesDocOdm: SerieDocOdm[] = await SerieModelOdm.find();
+  const serie = serieDocOdmToModel(seriesDocOdm[0]);
 
-  expectSerieWithEpisodes(serieWithEpisodes, seriesWithEpisodesInitFixtures[0]);
+  expectSerie(serie, SERIE_SIMPSONS);
+
+  const episodesDocOdm = await ModelOdm.find();
+  const episodes = episodesDocOdm.map(episodeDocOdmToModel);
+
+  expectEpisodes(episodes, EPISODES_SIMPSONS);
 } );
 
 afterAll(async () => {

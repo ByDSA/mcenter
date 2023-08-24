@@ -1,8 +1,7 @@
 import { HistoryList } from "#modules/historyLists";
 import { DateType } from "#utils/time";
 import { DateTime } from "luxon";
-import { SerieWithEpisodesRepository } from "../seriesWithEpisodes";
-import Episode, { compareEpisodeFullId, copyOfEpisode, episodeFullIdOf } from "./models/Episode";
+import Model, { compareFullId, copyOf, fullIdOf } from "./models/Episode";
 import { Repository } from "./repositories";
 
 function getTimestampFromDate(date: DateType): number {
@@ -14,11 +13,11 @@ function getTimestampFromDate(date: DateType): number {
   return d.getTime() / 1000;
 }
 
-export function getLastTimePlayedFromHistory(self: Episode, historyList: HistoryList): number | null {
+export function getLastTimePlayedFromHistory(self: Model, historyList: HistoryList): number | null {
   let lastTimePlayed = Number.MAX_SAFE_INTEGER;
 
   for (const historyEntry of historyList.entries) {
-    if (self && compareEpisodeFullId(historyEntry, self)) {
+    if (self && compareFullId(historyEntry, self)) {
       const currentTimestamp = getTimestampFromDate(historyEntry.date);
 
       if (currentTimestamp < lastTimePlayed)
@@ -32,22 +31,19 @@ export function getLastTimePlayedFromHistory(self: Episode, historyList: History
   return lastTimePlayed;
 }
 
-export function getDaysFromLastPlayed(self: Episode, historyList: HistoryList): number {
-  const serieWithEpisodesRepository = new SerieWithEpisodesRepository();
-  const episodeRepository = new Repository( {
-    serieWithEpisodesRepository,
-  } );
+export function getDaysFromLastPlayed(self: Model, historyList: HistoryList): number {
+  const episodeRepository = new Repository();
   let lastTimePlayed = self.lastTimePlayed ?? null;
 
   if (!lastTimePlayed) {
     lastTimePlayed = getLastTimePlayedFromHistory(self, historyList);
 
     if (lastTimePlayed) {
-      const selfCopy: Episode = {
-        ...copyOfEpisode(self),
+      const selfCopy: Model = {
+        ...copyOf(self),
         lastTimePlayed,
       };
-      const fullId = episodeFullIdOf(selfCopy);
+      const fullId = fullIdOf(selfCopy);
 
       episodeRepository.updateOneByIdAndGet(fullId, selfCopy);
     }

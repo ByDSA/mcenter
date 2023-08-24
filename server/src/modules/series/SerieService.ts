@@ -1,15 +1,15 @@
-import { SerieWithEpisodesRepository } from "#modules/seriesWithEpisodes";
 import { StreamWithHistoryList } from "#modules/streamsWithHistoryList";
 import { Episode, EpisodeRepository } from "../episodes";
+import { Repository } from "./repositories";
 
 type Params = {
   episodeRepository: EpisodeRepository;
-  serieRepository: SerieWithEpisodesRepository;
+  serieRepository: Repository;
 };
 export default class SerieService {
   #episodeRepository: EpisodeRepository;
 
-  #serieRepository: SerieWithEpisodesRepository;
+  #serieRepository: Repository;
 
   constructor( {episodeRepository, serieRepository}: Params) {
     this.#episodeRepository = episodeRepository;

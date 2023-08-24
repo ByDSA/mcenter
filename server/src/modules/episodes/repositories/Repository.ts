@@ -1,26 +1,17 @@
 import { HistoryList } from "#modules/historyLists";
-import { CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
-import { SerieWithEpisodes, SerieWithEpisodesRepository } from "#modules/seriesWithEpisodes";
-import { ModelODM } from "#modules/seriesWithEpisodes/repositories/serie.model";
-import Episode, { EpisodeFullId } from "../models/Episode";
-import { episodeToEpisodeDB } from "./adapters";
+import { CanCreateManyAndGet, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import Model, { ModelFullId } from "../models/Episode";
+import { docOdmToModel, modelToDocOdm } from "./adapters";
+import { DocOdm, ModelOdm } from "./odm";
 
-type UpdateOneParams = Episode;
+type UpdateOneParams = Model;
 
-type Params = {
-  serieWithEpisodesRepository: SerieWithEpisodesRepository;
-};
 export default class Repository
-implements CanGetOneById<Episode, EpisodeFullId>,
-CanUpdateOneByIdAndGet<Episode, EpisodeFullId>
+implements CanGetOneById<Model, ModelFullId>,
+CanUpdateOneByIdAndGet<Model, ModelFullId>,
+CanCreateManyAndGet<Model>
 {
-  #serieWithEpisodesRepository: SerieWithEpisodesRepository;
-
-  constructor( {serieWithEpisodesRepository: serieRepository}: Params) {
-    this.#serieWithEpisodesRepository = serieRepository;
-  }
-
-  async findLastEpisodeInHistoryList(historyList: HistoryList): Promise<Episode | null> {
+  async findLastEpisodeInHistoryList(historyList: HistoryList): Promise<Model | null> {
     const historyEntry = historyList.entries.at(-1);
 
     if (!historyEntry)
@@ -31,7 +22,7 @@ CanUpdateOneByIdAndGet<Episode, EpisodeFullId>
     if (!episodeId || !serieId)
       return null;
 
-    const fullId: EpisodeFullId = {
+    const fullId: ModelFullId = {
       episodeId,
       serieId,
     };
@@ -39,48 +30,45 @@ CanUpdateOneByIdAndGet<Episode, EpisodeFullId>
     return this.getOneById(fullId);
   }
 
-  async #findSerieOfEpisodeFullId(episodeFullId: EpisodeFullId): Promise<SerieWithEpisodes | null> {
-    const serie = await this.#serieWithEpisodesRepository.getOneById(episodeFullId.serieId);
-
-    if (!serie)
-      return null;
-
-    return serie;
-  }
-
-  async getOneById(fullId: EpisodeFullId): Promise<Episode | null> {
-    const {episodeId} = fullId;
-    const serie = await this.#findSerieOfEpisodeFullId(fullId);
-
-    if (!serie)
-      return null;
-
-    const found = serie.episodes.find((episode: Episode) => episode.episodeId === episodeId) ?? null;
-
-    return found;
-  }
-
-  async updateOneByIdAndGet(fullId: EpisodeFullId, episode: UpdateOneParams): Promise<Episode | null> {
-    const serie = await this.#serieWithEpisodesRepository.getOneById(fullId.serieId);
-
-    if (!serie)
-      return null;
-
-    const indexOfEpisode = serie.episodes.findIndex((e) => e.episodeId === episode.episodeId);
-
-    if (indexOfEpisode === -1)
-      return null;
-
-    const episodeDto = episodeToEpisodeDB(episode);
-
-    await ModelODM.updateOne( {
-      id: serie.id,
-    }, {
-      $set: {
-        [`episodes.${indexOfEpisode}`]: episodeDto,
-      },
+  async getOneById(fullId: ModelFullId): Promise<Model | null> {
+    const episodeOdm = await ModelOdm.findOne( {
+      serieId: fullId.serieId,
+      episodeId: fullId.episodeId,
     } );
 
-    return episode;
+    if (!episodeOdm)
+      return null;
+
+    return docOdmToModel(episodeOdm);
+  }
+
+  async getManyBySerieId(serieId: string): Promise<Model[]> {
+    const episodesOdm = await ModelOdm.find( {
+      serieId,
+    } );
+
+    if (episodesOdm.length === 0)
+      return [];
+
+    return episodesOdm.map(docOdmToModel);
+  }
+
+  async updateOneByIdAndGet(fullId: ModelFullId, episode: UpdateOneParams): Promise<Model | null> {
+    const modelOdm = modelToDocOdm(episode);
+    const updateResult = await ModelOdm.updateOne(fullId, modelOdm);
+
+    if (updateResult.matchedCount === 0)
+      return null;
+
+    const ret = docOdmToModel(modelOdm);
+
+    return ret;
+  }
+
+  async createManyAndGet(models: Model[]): Promise<Model[]> {
+    const docsOdm: DocOdm[] = models.map(modelToDocOdm);
+    const inserted = await ModelOdm.insertMany(docsOdm);
+
+    return inserted.map(docOdmToModel);
   }
 }

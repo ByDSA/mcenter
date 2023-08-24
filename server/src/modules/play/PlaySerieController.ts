@@ -1,20 +1,24 @@
-import { SerieWithEpisodesRepository } from "#modules/seriesWithEpisodes";
+import { EpisodeRepository } from "#modules/episodes";
+import { SerieRepository } from "#modules/series";
 import { assertFound } from "#utils/http/validation";
-import { assertIsNotEmpty } from "#utils/validation";
 import { Request, Response, Router } from "express";
 import Service from "./Service";
 
 type Params = {
-  serieRepository: SerieWithEpisodesRepository;
+  serieRepository: SerieRepository;
+  episodeRepository: EpisodeRepository;
   playService: Service;
 };
 export default class PlaySerieController {
-  #serieRepository: SerieWithEpisodesRepository;
+  #serieRepository: SerieRepository;
+
+  #episodeRepository: EpisodeRepository;
 
   #playService: Service;
 
-  constructor( {serieRepository, playService}: Params) {
+  constructor( {serieRepository, playService, episodeRepository}: Params) {
     this.#serieRepository = serieRepository;
+    this.#episodeRepository = episodeRepository;
     this.#playService = playService;
   }
 
@@ -26,10 +30,7 @@ export default class PlaySerieController {
 
     assertFound(serieWithEpisodes);
 
-    const { episodes } = serieWithEpisodes;
-
-    assertIsNotEmpty(episodes);
-
+    const episodes = await this.#episodeRepository.getManyBySerieId(serieId);
     const episode = episodes.find((e) => e.episodeId === episodeId);
 
     if (episode) {

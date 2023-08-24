@@ -1,9 +1,9 @@
 /* eslint-disable import/prefer-default-export */
-import Model from "../../series/models/Serie";
+import { Serie } from "#modules/series";
 import SerieWithEpisodes from "./SerieWithEpisodes";
 
-export function serieWithEpisodesToSerie(serieWithEpisodes: SerieWithEpisodes): Model {
-  const serie: Model = {
+export function serieWithEpisodesToSerie(serieWithEpisodes: SerieWithEpisodes): Serie {
+  const serie: Serie = {
     id: serieWithEpisodes.id,
     name: serieWithEpisodes.name,
   };

@@ -1,5 +1,3 @@
 export {
-  default as Episode,
+  default as Model, ModelFullId, ModelId, assertIsModel, compareFullId, copyOf, fullIdOf,
 } from "./Episode";
-
-export * from "./Episode";

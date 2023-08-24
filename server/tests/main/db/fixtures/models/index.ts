@@ -1,3 +1,3 @@
-export {
-  initFixtures as seriesWithEpisodesInitFixtures,
-} from "./seriesWithEpisodes";
+export * from "./episodes";
+
+export * from "./series";
