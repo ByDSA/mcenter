@@ -8,4 +8,4 @@ export {
 
 export {
   historyListToStreamWithHistoryList, streamWithHistoryListToHistoryList,
-} from "./adapters";
+} from "../../streamsWithHistoryList/models/adapters";

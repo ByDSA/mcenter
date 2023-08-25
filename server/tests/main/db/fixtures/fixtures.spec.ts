@@ -6,7 +6,7 @@ import { expectSerie } from "#modules/series/models/test";
 import TestDatabase from "../TestDatabase";
 import TestMongoDatabase from "../TestMongoDatabase";
 import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "./models";
-import { loadFixtureSerieAndEpisodesSimpsons } from "./sets";
+import { loadFixtureSimpsons } from "./sets";
 
 let db: TestDatabase;
 
@@ -17,8 +17,8 @@ beforeAll(async () => {
   await db.connect();
   await db.drop();
 } );
-it("should load fixture set1", async () => {
-  await loadFixtureSerieAndEpisodesSimpsons();
+it("should load fixture simpsons", async () => {
+  await loadFixtureSimpsons();
 
   const seriesDocOdm: SerieDocOdm[] = await SerieModelOdm.find();
   const serie = serieDocOdmToModel(seriesDocOdm[0]);

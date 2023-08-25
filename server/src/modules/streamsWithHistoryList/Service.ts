@@ -1,11 +1,11 @@
 import { Episode, calculateNextEpisode } from "#modules/episodes";
-import { Model } from "./models";
+import { StreamWithHistoryList } from "./models";
 
 /**
  * @deprecated
  */
 export default class Service {
-  async pickNextEpisode(model: Model, n = 1): Promise<Episode[]> {
+  async pickNextEpisode(model: StreamWithHistoryList, n = 1): Promise<Episode[]> {
     const episodes: Episode[] = [];
 
     for (let i = 0; i < n; i++) {
