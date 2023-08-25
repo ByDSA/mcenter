@@ -1,5 +1,4 @@
-import { PlaySerieControllerMock } from "#modules/play/tests";
-import PlayStreamControllerMock from "#modules/play/tests/PlayStreamControllerMock copy";
+import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
 import { TestMongoDatabase } from "#tests/main";
 import TestDatabase from "#tests/main/db/TestDatabase";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
