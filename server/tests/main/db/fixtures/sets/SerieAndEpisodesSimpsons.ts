@@ -5,13 +5,11 @@ import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "../models";
 
 export default async () => {
   // Series
-  await SerieModelOdm.deleteMany();
   const seriesDocOdm: SerieDocOdm[] = [SERIE_SIMPSONS].map(serieToDocOdm);
 
   await SerieModelOdm.insertMany(seriesDocOdm);
 
   // Episodes
-  await ModelOdm.deleteMany();
   const episodesDocOdm: DocOdm[] = EPISODES_SIMPSONS.map(episodeToDocOdm);
 
   await ModelOdm.insertMany(episodesDocOdm);

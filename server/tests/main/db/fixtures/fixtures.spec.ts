@@ -3,9 +3,9 @@ import { expectEpisodes } from "#modules/episodes/models/test";
 import { ModelOdm } from "#modules/episodes/repositories";
 import { SerieDocOdm, SerieModelOdm, serieDocOdmToModel } from "#modules/series";
 import { expectSerie } from "#modules/series/models/test";
-import TestMongoDatabase from "../test-mongo.database";
+import TestMongoDatabase from "../TestMongoDatabase";
 import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "./models";
-import { loadFixtureSet1 } from "./sets";
+import { loadFixtureSerieAndEpisodesSimpsons } from "./sets";
 
 let db: TestMongoDatabase;
 
@@ -17,7 +17,7 @@ beforeAll(async () => {
   await db.drop();
 } );
 it("should load fixture set1", async () => {
-  await loadFixtureSet1();
+  await loadFixtureSerieAndEpisodesSimpsons();
 
   const seriesDocOdm: SerieDocOdm[] = await SerieModelOdm.find();
   const serie = serieDocOdmToModel(seriesDocOdm[0]);

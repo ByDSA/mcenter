@@ -1,3 +1,3 @@
 export {
-  default as loadFixtureSet1,
-} from "./set1";
+  default as loadFixtureSerieAndEpisodesSimpsons,
+} from "./SerieAndEpisodesSimpsons";
