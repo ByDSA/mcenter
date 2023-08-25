@@ -1,7 +1,7 @@
 import { PlaySerieControllerMock } from "#modules/play/tests";
 import PlayStreamControllerMock from "#modules/play/tests/PlayStreamControllerMock copy";
 import { TestMongoDatabase } from "#tests/main";
-import { loadFixtureSet1 } from "#tests/main/db/fixtures/sets";
+import { loadFixtureSerieAndEpisodesSimpsons } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
 import { assertIsDefined } from "#utils/validation";
 import { Application } from "express";
@@ -14,7 +14,7 @@ const pickerController = new PickerController();
 
 async function loadFixtures() {
   await testDatabase.drop();
-  await loadFixtureSet1();
+  await loadFixtureSerieAndEpisodesSimpsons();
 }
 
 describe("showPicker", () => {
