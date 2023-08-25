@@ -8,7 +8,7 @@ export function isDebugging() {
 
   try {
     json = JSON.parse(envValue);
-  } catch (_) {
+  } catch {
     return false;
   }
 

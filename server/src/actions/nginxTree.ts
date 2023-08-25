@@ -42,7 +42,7 @@ export async function getSerieTreeRemote(uri: string, options: Options = {
     await Promise.all(promises);
 
     return nodes;
-  } catch (e) {
+  } catch {
     return null;
   }
 }
