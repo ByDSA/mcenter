@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import { Model } from "../models";
-import { DocOdm } from "./stream.odm";
+import { StreamWithHistoryList } from "../models";
+import { DocOdm } from "./Stream.odm";
 
-export function streamOdmToStreamWithHistoryList(streamOdm: DocOdm): Model {
+export function streamOdmToStreamWithHistoryList(streamOdm: DocOdm): StreamWithHistoryList {
   return {
     id: streamOdm.id,
     group: streamOdm.group,

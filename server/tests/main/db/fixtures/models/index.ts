@@ -1,3 +1,5 @@
-export * from "./episodes";
+export * from "./episode";
 
-export * from "./series";
+export * from "./serie";
+
+export * from "./streamWithHistoryList";

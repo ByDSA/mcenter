@@ -1,8 +1,8 @@
 import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
 import { assertFound } from "#utils/http/validation";
 import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
+import { historyListToHistoryListInStream, historyListToStreamWithHistoryList, streamWithHistoryListToHistoryList } from "../../streamsWithHistoryList/models/adapters";
 import HistoryList, { HistoryListId } from "../models/HistoryList";
-import { historyListToStreamWithHistoryList, streamWithHistoryListToHistoryList } from "../models/adapters";
 
 export default class HistoryListRepository
 implements CanUpdateOneById<HistoryList, HistoryListId>,
@@ -33,12 +33,12 @@ CanCreateOne<HistoryList> {
     return streamWithHistoryListToHistoryList(stream);
   }
 
-  async updateOneById(id: HistoryListId, list: HistoryList): Promise<void> {
+  async updateOneById(id: HistoryListId, historyList: HistoryList): Promise<void> {
     const streamId = id;
     const stream = await this.#streamWithHistoryListRepository.getOneById(streamId);
 
     assertFound(stream);
-    stream.history = list.entries;
+    stream.history = historyListToHistoryListInStream(historyList);
 
     await this.#streamWithHistoryListRepository.updateOneById(streamId, stream);
   }

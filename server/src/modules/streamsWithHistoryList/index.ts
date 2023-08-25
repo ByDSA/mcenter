@@ -1,9 +1,10 @@
 export {
-  Model as StreamWithHistoryList,
+  StreamWithHistoryList,
 } from "./models";
 
 export {
-  Repository as StreamWithHistoryListRepository,
+  DocOdm as StreamWithHistoryListDocOdm,
+  ModelOdm as StreamWithHistoryListModelOdm, Repository as StreamWithHistoryListRepository,
 } from "./repositories";
 
 export {

@@ -1,5 +1,5 @@
 import { StreamWithHistoryList, StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
-import { ModelOdm as StreamWithHistoryListModelOdm } from "#modules/streamsWithHistoryList/repositories/stream.odm";
+import { ModelOdm as StreamWithHistoryListModelOdm } from "#modules/streamsWithHistoryList/repositories";
 import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import Model, { ModelId } from "../models/Stream";
 

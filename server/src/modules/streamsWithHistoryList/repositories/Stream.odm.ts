@@ -1,14 +1,21 @@
-import HistoryEntrySchema from "#modules/historyLists/repositories/HistoryEntry.schema";
 import { StreamMode } from "#modules/streams";
 import mongoose from "mongoose";
-import { Model } from "../models";
+import { StreamWithHistoryList } from "../models";
+import { HistoryEntryInStreamSchema } from "./History.odm";
 
-export interface DocOdm extends Model {
+/**
+ * @deprecated
+ */
+export interface DocOdm extends StreamWithHistoryList {
   id: string;
 }
 
 const NAME = "Stream";
-const schema = new mongoose.Schema<DocOdm>( {
+
+/**
+ * @deprecated
+ */
+export const Schema = new mongoose.Schema<DocOdm>( {
   id: {
     type: String,
     required: true,
@@ -27,8 +34,11 @@ const schema = new mongoose.Schema<DocOdm>( {
     required: true,
   },
   history: {
-    type: [HistoryEntrySchema],
+    type: [HistoryEntryInStreamSchema],
   },
 } );
 
-export const ModelOdm = mongoose.model<Model>(NAME, schema);
+/**
+ * @deprecated
+ */
+export const ModelOdm = mongoose.model<StreamWithHistoryList>(NAME, Schema);
