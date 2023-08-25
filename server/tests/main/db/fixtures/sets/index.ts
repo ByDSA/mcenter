@@ -4,7 +4,7 @@ export {
 
 export {
   default as loadFixtureSimpsons,
-} from "./SerieAndEpisodesSimpsons";
+} from "./Simpsons";
 
 export {
   default as loadFixtureStreamAndHistoryListSimpsons,

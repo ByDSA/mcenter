@@ -4,7 +4,7 @@ import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/rep
 import { historyListToHistoryListInStream, historyListToStreamWithHistoryList, streamWithHistoryListToHistoryList } from "../../streamsWithHistoryList/models/adapters";
 import HistoryList, { HistoryListId } from "../models/HistoryList";
 
-export default class HistoryListRepository
+export default class Repository
 implements CanUpdateOneById<HistoryList, HistoryListId>,
 CanGetOneById<HistoryList, HistoryListId>,
 CanCreateOne<HistoryList> {

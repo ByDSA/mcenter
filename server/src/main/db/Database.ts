@@ -29,6 +29,8 @@ export default class RealDatabase implements Database {
     this.#options = {
       autoIndex: false,
       maxPoolSize: 10,
+      bufferCommands: false, // Para que lance error si no hay una conexión a la DB
+      autoCreate: false, // disable `autoCreate` since `bufferCommands` is false, value)
       ...this.#options,
     };
 

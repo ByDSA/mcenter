@@ -1,9 +1,8 @@
-import { StreamWithHistoryList, StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
-import { ModelOdm as StreamWithHistoryListModelOdm } from "#modules/streamsWithHistoryList/repositories";
+import { StreamWithHistoryList, StreamWithHistoryListModelOdm, StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
 import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import Model, { ModelId } from "../models/Stream";
 
-export default class StreamRepository
+export default class Repository
 implements CanGetOneById<Model, ModelId>,
 CanUpdateOneById<Model, ModelId>,
 CanCreateOne<Model> {

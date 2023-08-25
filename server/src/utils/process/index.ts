@@ -6,12 +6,21 @@ import util from "node:util";
 export const execPromisify = util.promisify(exec);
 
 export function execAndWaitUntilStarted(command: string): Promise<cp.ChildProcess> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const process = exec(command);
+    let times = 0;
+    const maxTimes = 10;
     const interval = setInterval(() => {
       if (process.pid) {
         clearInterval(interval);
         resolve(process);
+      }
+
+      times++;
+
+      if (times > maxTimes) {
+        clearInterval(interval);
+        reject();
       }
     }, 1);
   } );

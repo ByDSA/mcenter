@@ -7,6 +7,7 @@ import { PublicMethodsOf } from "#utils/types";
 import { assertIsDefined } from "#utils/validation";
 import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
+import schedule from "node-schedule";
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 
@@ -105,6 +106,8 @@ export default class ExpressApp implements App {
 
   async close() {
     await this.#database?.disconnect();
+
+    schedule.gracefulShutdown();
   }
 
   listen() {

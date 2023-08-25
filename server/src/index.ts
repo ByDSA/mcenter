@@ -22,7 +22,7 @@ import RealDatabase from "./main/db/Database";
   } );
   const vlcService = new VLCService();
   const playService = new PlayService( {
-    vlcService,
+    playerService: vlcService,
     streamWithHistoryListRepository,
     historyListService: historyService,
   } );

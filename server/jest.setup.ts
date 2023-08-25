@@ -1,8 +1,12 @@
 import * as dotenv from "dotenv";
+import mongoose from "mongoose";
 import { existsSync } from "node:fs";
+import { isDebugging } from "./src/utils/vscode";
 
-global.console.log = jest.fn(); // Mockear console.log
-global.console.error = jest.fn(); // Mockear console.error
+if (!isDebugging()) {
+  global.console.log = jest.fn(); // Mockear console.log
+  global.console.error = jest.fn(); // Mockear console.error
+}
 
 const envFilePath = "tests/.env";
 
@@ -12,3 +16,6 @@ if (!existsSync(envFilePath))
 dotenv.config( {
   path: envFilePath,
 } );
+
+mongoose.set("bufferCommands", false); // Para que lance error si no hay una conexión a la DB
+mongoose.set("autoCreate", false); // disable `autoCreate` since `bufferCommands` is false, value)
