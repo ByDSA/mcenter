@@ -1,7 +1,7 @@
-import express, { Router } from "express";
+import express, { Application, Router } from "express";
 import errorHandler from "../errorHandler";
 
-export function RouterApp(router: Router): Router {
+export function RouterApp(router: Router): Application {
   const app = express();
 
   app.use(router);

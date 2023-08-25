@@ -11,3 +11,7 @@ export {
 export {
   default as SecureRouter,
 } from "./SecureRouter";
+
+export {
+  default as Controller,
+} from "./Controller";

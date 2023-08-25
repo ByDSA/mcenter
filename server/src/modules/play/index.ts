@@ -8,8 +8,8 @@ export {
 
 export {
   default as PlayService,
-} from "./Service";
+} from "./PlayService";
 
 export {
   default as VLCService,
-} from "./PlayService";
+} from "./player/PlayerService";

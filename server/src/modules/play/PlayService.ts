@@ -1,112 +1,55 @@
-import { assertIsDefined, assertIsNotEmpty } from "#utils/validation";
-import fs from "node:fs";
-import { MediaElement, QueuePlaylistManager, VLCFlag, VLCProcess } from "./player";
+import { Episode } from "#modules/episodes";
+import { HistoryListService, streamWithHistoryListToHistoryList } from "#modules/historyLists";
+import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
+import { PublicMethodsOf } from "#utils/types";
+import { assertIsNotEmpty } from "#utils/validation";
+import { episodeToMediaElement } from "./adapters";
+import { MediaElement, PlayerService } from "./player";
 
-type Options = {
-  openNewInstance?: boolean;
+type PlayParams = {
+  force?: boolean;
+  episodes: Episode[];
 };
-
+type Params = {
+  playerService: PublicMethodsOf<PlayerService>;
+  streamWithHistoryListRepository: StreamWithHistoryListRepository;
+  historyListService: HistoryListService;
+};
 export default class PlayService {
-  #queue: QueuePlaylistManager;
+  #playerService: PublicMethodsOf<PlayerService>;
 
-  #openNewInstance: boolean;
+  #streamWithHistoryListRepository: StreamWithHistoryListRepository;
 
-  #isRunningAnyInstance: boolean;
+  #historyService: HistoryListService;
 
-  constructor() {
-    const { TMP_PATH } = process.env;
-
-    assertIsDefined(TMP_PATH);
-
-    if (!fs.existsSync(TMP_PATH))
-      throw new Error(`TMP_PATH (${TMP_PATH}) does not exist`);
-
-    this.#queue = new QueuePlaylistManager(TMP_PATH ?? "/");
-
-    this.#openNewInstance = false;
-
-    this.#isRunningAnyInstance = false;
+  constructor( {playerService, streamWithHistoryListRepository, historyListService}: Params) {
+    this.#playerService = playerService;
+    this.#streamWithHistoryListRepository = streamWithHistoryListRepository;
+    this.#historyService = historyListService;
   }
 
-  async #closeIfNeeded(): Promise<boolean> {
-    if (this.#openNewInstance || (this.#isRunningAnyInstance && this.#queue.nextNumber === 0))
-      await VLCProcess.closeAllAsync();
+  async play( {episodes, force}: PlayParams): Promise<boolean> {
+    assertIsNotEmpty(episodes);
 
-    return true;
-  }
+    const elements: MediaElement[] = episodes.map(episodeToMediaElement);
+    const ok = await this.#playerService.play(elements, {
+      openNewInstance: force ?? false,
+    } );
 
-  #setAsOpenIfNotRunning() {
-    if (!this.#isRunningAnyInstance) {
-      this.#openNewInstance = true;
-
-      if (this.#queue.nextNumber > 0)
-        this.#queue.clear();
-    }
-  }
-
-  async #updateIsRunningAnyInstanceAsync() {
-    const isRunning = await VLCProcess.isRunningAsync();
-
-    this.#isRunningAnyInstance = isRunning;
-  }
-
-  async play(elements: MediaElement[], options?: Options): Promise<boolean> {
-    assertIsNotEmpty(elements);
-
-    this.#openNewInstance = options?.openNewInstance ?? false;
-    await this.#updateIsRunningAnyInstanceAsync();
-    console.log(`Play function: ${elements[0].path}`);
-
-    await this.#closeIfNeeded();
-
-    this.#setAsOpenIfNotRunning();
-
-    this.#queue.add(...elements);
-
-    if (this.#openNewInstance) {
-      const file = this.#queue.firstFile;
-      const vlcProcess = await openVLC(file);
-      const okPromise: Promise<boolean> = new Promise((resolve) => {
-        vlcProcess.onExit((code: number) => {
-          if (code === 0)
-            this.#queue.clear();
-
-          console.log("Closed VLC");
-          resolve(false);
-        } );
-        setTimeout(async () => {
-          await this.#updateIsRunningAnyInstanceAsync();
-
-          if (this.#isRunningAnyInstance)
-            resolve(true);
-          else
-            resolve(false);
-        }, 1500);
-      } );
-      const ok = await okPromise;
-
-      return ok;
+    if (ok) {
+      for (const episode of episodes) {
+        this.#streamWithHistoryListRepository.getOneById(episode.serieId)
+          .then((streamWithHistoryList) => {
+            if (streamWithHistoryList && episode) {
+              this.#historyService.addEpisodeToHistory( {
+                historyList: streamWithHistoryListToHistoryList(streamWithHistoryList),
+                episode,
+              } );
+            }
+          } );
+      }
     }
 
-    return true;
+    return ok;
   }
-}
-
-const vlcConfig = [
-  VLCFlag.PLAY_AND_EXIT,
-  VLCFlag.NO_VIDEO_TITLE,
-  VLCFlag.ASPECT_RATIO, "16:9",
-  VLCFlag.FULLSCREEN,
-  VLCFlag.MINIMAL_VIEW,
-  VLCFlag.NO_REPEAT,
-  VLCFlag.NO_LOOP,
-  VLCFlag.ONE_INSTANCE];
-
-async function openVLC(file: string): Promise<VLCProcess> {
-  const vlc = await VLCProcess.builder()
-    .setFile(file)
-    .addFlags(...vlcConfig)
-    .buildAsync();
-
-  return vlc;
 }

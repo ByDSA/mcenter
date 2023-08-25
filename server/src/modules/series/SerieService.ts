@@ -17,7 +17,7 @@ export default class SerieService {
   }
 
   async findLastEpisodeInStreamWithHistoryList(streamWithHistoryList: StreamWithHistoryList): Promise<Episode | null> {
-    const episodeId = streamWithHistoryList.history.at(-1)?.episodeId;
+    const episodeId = streamWithHistoryList.history.at(-1)?.id;
 
     if (!episodeId)
       return null;

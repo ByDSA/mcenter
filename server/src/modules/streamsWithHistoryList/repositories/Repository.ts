@@ -6,7 +6,7 @@ import { ModelOdm } from "./Stream.odm";
 /**
  * @deprecated
  */
-export default class StreamWithHistoryListRepository
+export default class Repository
 implements CanGetOneById<StreamWithHistoryList, StreamId>,
 CanUpdateOneById<StreamWithHistoryList, StreamId>,
 CanCreateOneAndGet<StreamWithHistoryList> {

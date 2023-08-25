@@ -1,22 +1,23 @@
 import { SerieRepository } from "#modules/series";
 import { StreamWithHistoryListRepository, StreamWithHistoryListService } from "#modules/streamsWithHistoryList";
+import { Controller } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { assertIsDefined } from "#utils/validation";
 import { Request, Response, Router } from "express";
-import Service from "./Service";
+import PlayService from "./PlayService";
 
 type Params = {
-  playService: Service;
+  playService: PlayService;
   streamWithHistoryListService: StreamWithHistoryListService;
   streamWithHistoryListRepository: StreamWithHistoryListRepository;
   serieRepository: SerieRepository;
 };
-export default class PlayController {
+export default class PlayController implements Controller{
   #streamRepository: StreamWithHistoryListRepository;
 
   #streamWithHistoryListService: StreamWithHistoryListService;
 
-  #playService: Service;
+  #playService: PlayService;
 
   #serieRepository: SerieRepository;
 
