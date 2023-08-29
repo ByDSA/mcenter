@@ -1,45 +1,36 @@
-import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
-import { assertFound } from "#utils/http/validation";
 import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
-import { historyListToHistoryListInStream, historyListToStreamWithHistoryList, streamWithHistoryListToHistoryList } from "../../streamsWithHistoryList/models/adapters";
-import HistoryList, { HistoryListId } from "../models/HistoryList";
+import { Model, ModelId } from "../models";
+import { docOdmToModel, modelToDocOdm } from "./adapters";
+import { ModelOdm } from "./odm";
 
 export default class Repository
-implements CanUpdateOneById<HistoryList, HistoryListId>,
-CanGetOneById<HistoryList, HistoryListId>,
-CanCreateOne<HistoryList> {
-  #streamWithHistoryListRepository: StreamWithHistoryListRepository;
+implements CanUpdateOneById<Model, ModelId>,
+CanGetOneById<Model, ModelId>,
+CanCreateOne<Model> {
+  async createOne(historyList: Model): Promise<void> {
+    const docOdm = modelToDocOdm(historyList);
 
-  constructor() {
-    this.#streamWithHistoryListRepository = new StreamWithHistoryListRepository();
+    await ModelOdm.create(docOdm);
   }
 
-  async createOne(historyList: HistoryList): Promise<void> {
-    const streamWithHistoryList = await this.#streamWithHistoryListRepository.getOneById(historyList.id);
+  async getOneById(id: ModelId): Promise<Model | null> {
+    const docOdm = await ModelOdm.findOne( {
+      id,
+    }, {
+      _id: 0,
+    } );
 
-    if (streamWithHistoryList)
-      return;
-
-    await this.#streamWithHistoryListRepository.createOneAndGet(historyListToStreamWithHistoryList(historyList));
-  }
-
-  async getOneById(id: HistoryListId): Promise<HistoryList | null> {
-    const streamId = id;
-    const stream = await this.#streamWithHistoryListRepository.getOneById(streamId);
-
-    if (!stream)
+    if (!docOdm)
       return null;
 
-    return streamWithHistoryListToHistoryList(stream);
+    return docOdmToModel(docOdm);
   }
 
-  async updateOneById(id: HistoryListId, historyList: HistoryList): Promise<void> {
-    const streamId = id;
-    const stream = await this.#streamWithHistoryListRepository.getOneById(streamId);
+  async updateOneById(id: ModelId, historyList: Model): Promise<void> {
+    const docOdm = modelToDocOdm(historyList);
 
-    assertFound(stream);
-    stream.history = historyListToHistoryListInStream(historyList);
-
-    await this.#streamWithHistoryListRepository.updateOneById(streamId, stream);
+    await ModelOdm.findOneAndUpdate( {
+      id,
+    }, docOdm);
   }
 }

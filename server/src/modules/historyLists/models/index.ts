@@ -1,11 +1,8 @@
 export {
-  default as HistoryEntry,
+  default as Entry,
 } from "./HistoryEntry";
 
 export {
-  default as HistoryList,
+  default as Model,
+  ModelId,
 } from "./HistoryList";
-
-export {
-  historyListToStreamWithHistoryList, streamWithHistoryListToHistoryList,
-} from "../../streamsWithHistoryList/models/adapters";

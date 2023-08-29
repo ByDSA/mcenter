@@ -1,7 +1,7 @@
 /* eslint-disable require-await */
 import { HistoryList } from "#modules/historyLists";
 import { Serie } from "#modules/series";
-import { StreamWithHistoryList } from "#modules/streamsWithHistoryList";
+import { Stream } from "#modules/streams";
 import { daysBetween } from "date-ops";
 import { DateTime } from "luxon";
 import { Picker } from "rand-picker";
@@ -22,7 +22,7 @@ export default async function fixWeight(
   serie: Serie,
   episodes: Model[],
   lastEp: Model | null,
-  stream: StreamWithHistoryList,
+  stream: Stream,
   historyList: HistoryList,
 ): Promise<void> {
   console.log("Fixing weight...");

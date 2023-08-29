@@ -2,6 +2,9 @@
 import { StreamWithHistoryList } from "../models";
 import { DocOdm } from "./Stream.odm";
 
+/**
+ * @deprecated
+ */
 export function streamOdmToStreamWithHistoryList(streamOdm: DocOdm): StreamWithHistoryList {
   return {
     id: streamOdm.id,

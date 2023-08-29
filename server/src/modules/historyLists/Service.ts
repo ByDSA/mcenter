@@ -1,11 +1,11 @@
 import { Episode, EpisodeFullId, EpisodeRepository, compareEpisodeFullId, copyOfEpisode } from "#modules/episodes";
 import { assertFound } from "#utils/http/validation";
 import { getDateNow } from "#utils/time";
-import { HistoryEntry, HistoryList } from "./models";
+import { Entry, Model } from "./models";
 import { Repository } from "./repositories";
 
 type HistoryAndEpisodeParams = {
-  historyList: HistoryList;
+  historyList: Model;
 } & ( {
   episode: Episode;
 } | {
@@ -27,7 +27,7 @@ export default class Service {
     this.#episodeRepository = episodeRepository;
   }
 
-  async findLastHistoryEntryForEpisodeId( {historyList, ...params}: HistoryAndEpisodeParams): Promise<HistoryEntry | null> {
+  async findLastHistoryEntryForEpisodeId( {historyList, ...params}: HistoryAndEpisodeParams): Promise<Entry | null> {
     let episodeFullId: EpisodeFullId;
 
     if ("episode" in params)
@@ -61,7 +61,7 @@ export default class Service {
     } else
       throw new Error("No se ha especificado el episodio");
 
-    const newEntry: HistoryEntry = {
+    const newEntry: Entry = {
       date: getDateNow(),
       episodeId: episode.episodeId,
       serieId: episode.serieId,
@@ -90,7 +90,7 @@ export default class Service {
     else
       throw new Error("No se ha especificado el episodio");
 
-    const historyEntryIndex = historyList.entries.findLastIndex((h: HistoryEntry) => compareEpisodeFullId(h, episodeFullId));
+    const historyEntryIndex = historyList.entries.findLastIndex((h: Entry) => compareEpisodeFullId(h, episodeFullId));
 
     if (historyEntryIndex === -1)
       return;

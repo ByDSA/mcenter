@@ -1,4 +1,4 @@
-import { StreamWithHistoryList } from "#modules/streamsWithHistoryList";
+import { HistoryList } from "#modules/historyLists";
 import { Episode, EpisodeRepository } from "../episodes";
 import { Repository } from "./repositories";
 
@@ -16,13 +16,14 @@ export default class SerieService {
     this.#serieRepository = serieRepository;
   }
 
-  async findLastEpisodeInStreamWithHistoryList(streamWithHistoryList: StreamWithHistoryList): Promise<Episode | null> {
-    const episodeId = streamWithHistoryList.history.at(-1)?.id;
+  async findLastEpisodeInHistoryList(historyList: HistoryList): Promise<Episode | null> {
+    const lastEntry = historyList.entries.at(-1);
 
-    if (!episodeId)
+    if (!lastEntry)
       return null;
 
-    const serie = await this.#serieRepository.findOneFromGroupId(streamWithHistoryList.group);
+    const {episodeId} = lastEntry;
+    const serie = await this.#serieRepository.getOneById(lastEntry.serieId);
 
     if (!serie)
       return null;

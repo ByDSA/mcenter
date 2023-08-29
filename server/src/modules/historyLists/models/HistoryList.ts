@@ -1,9 +1,9 @@
-import HistoryEntry from "./HistoryEntry";
+import Entry from "./HistoryEntry";
 
-export type HistoryListId = string;
+export type ModelId = string;
 
-export default interface HistoryList {
-  id: HistoryListId;
-  entries: HistoryEntry[];
+export default interface Model {
+  id: ModelId;
+  entries: Entry[];
   maxSize: number;
 }

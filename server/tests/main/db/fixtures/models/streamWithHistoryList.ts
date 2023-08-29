@@ -1,11 +1,10 @@
-/* eslint-disable import/prefer-default-export */
-import { StreamMode } from "#modules/streams";
-import { StreamWithHistoryList } from "#modules/streamsWithHistoryList";
-import { HistoryEntryInStream } from "#modules/streamsWithHistoryList/models";
+import { HistoryEntry, HistoryList } from "#modules/historyLists";
+import { Stream, StreamMode } from "#modules/streams";
 import { deepFreeze } from "#utils/objects";
 
-const HISTORY_ENTRY_IN_STREAM_SIMPSONS1: HistoryEntryInStream = {
-  id : "1x01",
+const HISTORY_ENTRY_SIMPSONS1: HistoryEntry = {
+  episodeId : "1x01",
+  serieId : "simpsons",
   date : {
     year : 2020,
     day: 1,
@@ -14,13 +13,17 @@ const HISTORY_ENTRY_IN_STREAM_SIMPSONS1: HistoryEntryInStream = {
   },
 };
 
-export const STREAM_WITH_HISTORY_LIST_SIMPSONS: StreamWithHistoryList = deepFreeze( {
+export const STREAM_SIMPSONS: Stream = deepFreeze( {
   id : "simpsons",
   group : "simpsons",
-  maxHistorySize : 99999,
   mode : StreamMode.RANDOM,
-  history : [
-    HISTORY_ENTRY_IN_STREAM_SIMPSONS1,
+} as Stream);
+
+export const HISTORY_LIST_SIMPSONS: HistoryList = deepFreeze( {
+  id : "simpsons",
+  maxSize : 99999,
+  entries : [
+    HISTORY_ENTRY_SIMPSONS1,
   ],
-} as StreamWithHistoryList,
+} as HistoryList,
 );

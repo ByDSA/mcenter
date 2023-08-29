@@ -1,7 +1,6 @@
 import { EpisodeRepository } from "#modules/episodes";
 import { HistoryListRepository, HistoryListService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
-import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
 import { TestMongoDatabase } from "#tests/main";
 import TestDatabase from "#tests/main/db/TestDatabase";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
@@ -33,13 +32,13 @@ describe("PlaySerieController", () => {
       episodeRepository,
       historyRepository: new HistoryListRepository(),
     } );
-    const streamWithHistoryListRepository = new StreamWithHistoryListRepository();
+    const historyListRepository = new HistoryListRepository();
 
     playerServiceMock = new PlayerServiceMock();
     const playService = new PlayService( {
       historyListService,
       playerService: playerServiceMock,
-      streamWithHistoryListRepository,
+      historyListRepository,
 
     } );
 
