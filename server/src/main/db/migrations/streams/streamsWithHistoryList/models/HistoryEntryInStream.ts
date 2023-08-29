@@ -5,6 +5,6 @@ import { DateType } from "#utils/time";
  * @deprecated
  */
 export default interface HistoryEntryInStream {
-  id: EpisodeId;
+  episodeId: EpisodeId;
   date: DateType;
 }

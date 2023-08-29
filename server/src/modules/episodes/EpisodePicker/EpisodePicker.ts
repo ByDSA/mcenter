@@ -42,10 +42,6 @@ export async function calculateNextEpisode( {stream}: CalculateNextEpisodeParams
   const episodeRepository = new Repository();
 
   console.log("Calculating next episode...");
-  const groupId: string = stream.group;
-  const serie = await serieRepository.findOneFromGroupId(groupId);
-
-  assertFound(serie, `Cannot get serie from group '${groupId}'`);
 
   let nextEpisodeFunc: FuncGenerator;
 
@@ -65,6 +61,10 @@ export async function calculateNextEpisode( {stream}: CalculateNextEpisodeParams
 
   assertFound(historyList, `Cannot get history list from stream '${stream.id}'`);
   const lastEp = await episodeRepository.findLastEpisodeInHistoryList(historyList);
+  const serieId: string = stream.group.origins[0].id;
+  const serie = await serieRepository.getOneById(serieId);
+
+  assertFound(serie, `Cannot get serie from id '${serieId}'`);
   const episodes = await episodeRepository.getManyBySerieId(serie.id);
 
   return nextEpisodeFunc( {

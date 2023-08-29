@@ -34,7 +34,7 @@ export default class PickerController {
 
     assertFound(historyList);
 
-    const seriePromise = serieRepository.findOneFromGroupId(stream.group);
+    const seriePromise = serieRepository.getOneById(stream.group.origins[0].id);
     const lastEpPromise = serieService.findLastEpisodeInHistoryList(historyList);
 
     await Promise.all([seriePromise, lastEpPromise]);

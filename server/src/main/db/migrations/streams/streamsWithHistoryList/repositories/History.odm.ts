@@ -10,7 +10,7 @@ export const HistoryEntryInStreamSchema = new mongoose.Schema<HistoryEntryInStre
     type: DateSchema,
     required: true,
   },
-  id: {
+  episodeId: {
     type: String,
     required: true,
   },

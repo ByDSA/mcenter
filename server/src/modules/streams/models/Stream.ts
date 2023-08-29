@@ -5,8 +5,22 @@ export enum Mode {
 
 export type ModelId = string;
 
+export enum OriginType {
+  SERIE = "serie",
+  STREAM = "stream"
+};
+
+export type Origin = {
+  type: OriginType;
+  id: string;
+};
+
+export type Group = {
+  origins: Origin[];
+};
+
 export default interface Model {
   id: ModelId;
-  group: string;
+  group: Group;
   mode: Mode;
 }

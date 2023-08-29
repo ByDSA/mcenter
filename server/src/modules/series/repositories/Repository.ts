@@ -9,18 +9,6 @@ implements CanGetOneById<Model, ModelId>,
 CanUpdateOneByIdAndGet<Model, ModelId>,
 CanCreateOneAndGet<Model>
 {
-  async findOneFromGroupId(groupId: string): Promise<Model | null> {
-    const groupSplit = groupId.split("/");
-    const serieId = groupSplit.at(-1);
-
-    if (!serieId)
-      return null;
-
-    const serie = await this.getOneById(serieId);
-
-    return serie;
-  }
-
   async createOneAndGet(model: Model): Promise<Model> {
     const serieDB: DocOdm = await ModelOdm.create(model).then(s => s.save());
 
