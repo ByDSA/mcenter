@@ -1,5 +1,5 @@
 import { rootFolder } from "#utils";
-import { FileAlreadyExistsError, FileNotFoundError } from "#utils/fs";
+import { FileNotFoundError } from "#utils/fs";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
@@ -33,13 +33,11 @@ export function testsFolder(): string {
   return testsFolderCached;
 }
 
-export function createTmpFolder() {
+export function getOrCreateTmpFolder() {
   const tmp = join(testsFolder(), "tmp");
 
-  if (existsSync(tmp))
-    throw new FileAlreadyExistsError(tmp);
-
-  mkdirSync(tmp);
+  if (!existsSync(tmp))
+    mkdirSync(tmp);
 
   return tmp;
 }

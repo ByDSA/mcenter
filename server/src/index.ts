@@ -34,7 +34,6 @@ import RealDatabase from "./main/db/Database";
   const playStreamController = new PlayStreamController( {
     playService,
     streamRepository,
-    serieRepository,
     streamService,
   } );
   const app = new ExpressApp( {

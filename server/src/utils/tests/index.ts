@@ -1,5 +1,5 @@
 export {
-  createTmpFolder,
+  getOrCreateTmpFolder,
 } from "./projectFolders";
 
 export * from "./values";
