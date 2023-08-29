@@ -1,8 +1,8 @@
-import { createTmpFolder } from "#utils/tests";
+import { getOrCreateTmpFolder } from "#utils/tests";
 import { existsSync, rmdirSync } from "node:fs";
 import QueuePlaylistManager from "./QueuePlaylistManager";
 
-const FOLDER = createTmpFolder();
+const FOLDER = getOrCreateTmpFolder();
 
 afterAll(() => {
   if (existsSync(FOLDER))

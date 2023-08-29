@@ -254,7 +254,7 @@ module.exports = {
       },
     },
     {
-      files: ["index.ts", "*[,.]o[d,r]m.ts"],
+      files: ["index.ts", "*[,.]o[d,r]m.ts", "utils.ts"],
       rules: {
         "import/prefer-default-export": "off",
       },
