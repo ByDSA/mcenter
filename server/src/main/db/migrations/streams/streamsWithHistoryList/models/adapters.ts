@@ -1,10 +1,10 @@
-import { HistoryEntry } from "#modules/historyLists";
-import { SerieId } from "#modules/series";
+import { HistoryEntry, HistoryList as Model, assertIsHistoryList } from "#modules/historyLists";
 import { Stream, StreamMode } from "#modules/streams";
-import { StreamWithHistoryList } from "#modules/streamsWithHistoryList";
-import Model, { ModelId } from "../../historyLists/models/HistoryList";
+import { OriginType } from "#modules/streams/models/Stream";
+import { assertIsDefined } from "#utils/validation";
 import HistoryEntryInStream from "./HistoryEntryInStream";
 import HistoryListInStream from "./HistoryListInStream";
+import StreamWithHistoryList from "./StreamWIthHistoryList";
 
 /**
  *
@@ -13,7 +13,14 @@ import HistoryListInStream from "./HistoryListInStream";
 export function streamWithHistoryListToStream(streamWithHistoryList: StreamWithHistoryList): Stream {
   const ret: Stream = {
     id: streamWithHistoryList.id,
-    group: streamWithHistoryList.group,
+    group: {
+      origins: [
+        {
+          type: OriginType.SERIE,
+          id: streamWithHistoryList.group.split("/").at(-1) ?? streamWithHistoryList.group,
+        },
+      ],
+    },
     mode: streamWithHistoryList.mode,
   };
 
@@ -27,7 +34,7 @@ export function streamWithHistoryListToStream(streamWithHistoryList: StreamWithH
 export function streamToStreamWithHistoryList(stream: Stream): StreamWithHistoryList {
   const ret: StreamWithHistoryList = {
     id: stream.id,
-    group: stream.group,
+    group: stream.group.origins[0].id.split("/").at(-1) ?? stream.group.origins[0].id,
     mode: stream.mode,
     history: [],
     maxHistorySize: -1,
@@ -41,7 +48,31 @@ export function streamToStreamWithHistoryList(stream: Stream): StreamWithHistory
  * @deprecated
  */
 export function streamWithHistoryListToHistoryList(streamWithHistoryList: StreamWithHistoryList): Model {
-  const ret: Model = historyListInStreamToHistoryList(streamWithHistoryList.history, streamWithHistoryList.id, streamWithHistoryList.group);
+  const serieId = streamWithHistoryList.group.split("/").at(-1);
+
+  assertIsDefined(serieId);
+  const ret: Model =
+    {
+      id: streamWithHistoryList.id,
+      entries: streamWithHistoryList.history.map((entry) => {
+        const {episodeId} = entry;
+
+        assertIsDefined(episodeId, `episodeId is not defined in history of serie ${serieId}`);
+        const {date} = entry;
+
+        assertIsDefined(date);
+        const retEntry: HistoryEntry = {
+          episodeId,
+          serieId,
+          date,
+        };
+
+        return retEntry;
+      } ),
+      maxSize: streamWithHistoryList.maxHistorySize,
+    };
+
+  assertIsHistoryList(ret);
 
   return ret;
 }
@@ -50,9 +81,10 @@ export function streamWithHistoryListToHistoryList(streamWithHistoryList: Stream
  * @deprecated
  */
 export function historyListToHistoryListInStream(historyList: Model): HistoryListInStream {
+  assertIsDefined(historyList);
   const ret: HistoryListInStream = historyList.entries.map((entry) => {
     const retEntry: HistoryEntryInStream = {
-      id: entry.episodeId,
+      episodeId: entry.episodeId,
       date: entry.date,
     };
 
@@ -63,31 +95,11 @@ export function historyListToHistoryListInStream(historyList: Model): HistoryLis
 }
 
 /**
- * @deprecated
- */
-export function historyListInStreamToHistoryList(historyListInStream: HistoryListInStream, historyListId: ModelId, serieId: SerieId): Model {
-  const ret: Model = {
-    id: historyListId,
-    entries: historyListInStream.map((entry) => {
-      const retEntry: HistoryEntry = {
-        episodeId: entry.id,
-        serieId,
-        date: entry.date,
-      };
-
-      return retEntry;
-    } ),
-    maxSize: -1,
-  };
-
-  return ret;
-}
-
-/**
  *
  * @deprecated
  */
 export function historyListToStreamWithHistoryList(historyList: Model): StreamWithHistoryList {
+  assertIsHistoryList(historyList);
   const ret: StreamWithHistoryList = {
     id: historyList.id,
     group: historyList.id,

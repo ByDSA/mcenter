@@ -5,7 +5,7 @@ import { DocOdm } from "./Stream.odm";
 /**
  * @deprecated
  */
-export function streamOdmToStreamWithHistoryList(streamOdm: DocOdm): StreamWithHistoryList {
+export function streamWithHistoryListDocOdmToModel(streamOdm: DocOdm): StreamWithHistoryList {
   return {
     id: streamOdm.id,
     group: streamOdm.group,

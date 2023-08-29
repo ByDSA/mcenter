@@ -1,4 +1,4 @@
-import { HistoryList } from "#modules/historyLists";
+import { HistoryList, assertIsHistoryList } from "#modules/historyLists";
 import { Episode, EpisodeRepository } from "../episodes";
 import { Repository } from "./repositories";
 
@@ -17,6 +17,7 @@ export default class SerieService {
   }
 
   async findLastEpisodeInHistoryList(historyList: HistoryList): Promise<Episode | null> {
+    assertIsHistoryList(historyList);
     const lastEntry = historyList.entries.at(-1);
 
     if (!lastEntry)

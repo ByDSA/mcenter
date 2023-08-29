@@ -1,5 +1,7 @@
 export {
   Entry as HistoryEntry, Model as HistoryList,
+  ModelId as HistoryListId,
+  assertIsEntry as assertIsHistoryEntry, assertIsModel as assertIsHistoryList,
 } from "./models";
 
 export {
