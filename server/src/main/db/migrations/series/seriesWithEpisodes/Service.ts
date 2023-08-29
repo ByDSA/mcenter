@@ -1,8 +1,8 @@
 /* eslint-disable no-await-in-loop */
+import { FileNode, getSerieTreeRemote } from "#actions/nginxTree";
 import { Episode, EpisodeRepository } from "#modules/episodes";
 import { Serie, SerieId, SerieRepository } from "#modules/series";
 import { StreamWithHistoryList } from "#modules/streamsWithHistoryList";
-import { FileNode, getSerieTreeRemote } from "#actions/nginxTree";
 
 type SerieAndEpisodes = {
   serie: Serie;
@@ -64,7 +64,7 @@ export default class Service {
   }
 
   async findLastEpisodeInStreamWithHistoryList(streamWithHistoryList: StreamWithHistoryList): Promise<Episode | null> {
-    const episodeId = streamWithHistoryList.history.at(-1)?.episodeId;
+    const episodeId = streamWithHistoryList.history.at(-1)?.id;
 
     if (!episodeId)
       return null;

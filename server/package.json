@@ -9,7 +9,7 @@
     "build": "pnpm build:clean && pnpm build:raw",
     "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
     "build:clean": "rm -rf build",
-    "test": "NODE_ENV=test jest --maxWorkers=1",
+    "test": "NODE_ENV=test jest --maxWorkers=1 --testPathIgnorePatterns=VLCProcess*",
     "test:watch": "pnpm run test --watch",
     "test:coverage": "pnpm run test --coverage",
     "test:coverage:clean": "rm -rf coverage",

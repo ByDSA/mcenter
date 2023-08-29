@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
 import { CanCreateOneAndGet, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
-import { assertIsNotEmpty } from "#utils/validation";
 import { Model, ModelId } from "../models";
 import { docOdmToModel } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
@@ -12,10 +11,11 @@ CanCreateOneAndGet<Model>
 {
   async findOneFromGroupId(groupId: string): Promise<Model | null> {
     const groupSplit = groupId.split("/");
+    const serieId = groupSplit.at(-1);
 
-    assertIsNotEmpty(groupSplit);
+    if (!serieId)
+      return null;
 
-    const serieId = groupSplit.at(-1) as string;
     const serie = await this.getOneById(serieId);
 
     return serie;

@@ -1,5 +1,4 @@
-import { SerieRepository } from "#modules/series";
-import { StreamWithHistoryListRepository, StreamWithHistoryListService } from "#modules/streamsWithHistoryList";
+import { StreamRepository, StreamService } from "#modules/streams";
 import { Controller } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { assertIsDefined } from "#utils/validation";
@@ -8,24 +7,20 @@ import PlayService from "./PlayService";
 
 type Params = {
   playService: PlayService;
-  streamWithHistoryListService: StreamWithHistoryListService;
-  streamWithHistoryListRepository: StreamWithHistoryListRepository;
-  serieRepository: SerieRepository;
+  streamService: StreamService;
+  streamRepository: StreamRepository;
 };
 export default class PlayController implements Controller{
-  #streamRepository: StreamWithHistoryListRepository;
+  #streamRepository: StreamRepository;
 
-  #streamWithHistoryListService: StreamWithHistoryListService;
+  #streamService: StreamService;
 
   #playService: PlayService;
 
-  #serieRepository: SerieRepository;
-
-  constructor( {streamWithHistoryListRepository: streamRepository, streamWithHistoryListService: streamService, playService: service, serieRepository}: Params) {
+  constructor( {streamRepository, streamService, playService: service}: Params) {
     this.#playService = service;
     this.#streamRepository = streamRepository;
-    this.#streamWithHistoryListService = streamService;
-    this.#serieRepository = serieRepository;
+    this.#streamService = streamService;
   }
 
   async playStream(req: Request, res: Response) {
@@ -35,10 +30,7 @@ export default class PlayController implements Controller{
 
     assertFound(stream);
 
-    const episodes = await this.#streamWithHistoryListService.pickNextEpisode(stream, number);
-    const serie = await this.#serieRepository.findOneFromGroupId(stream.group);
-
-    assertFound(serie);
+    const episodes = await this.#streamService.pickNextEpisode(stream, number);
 
     await this.#playService.play( {
       episodes,

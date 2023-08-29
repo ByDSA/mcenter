@@ -4,9 +4,5 @@ export {
 
 export {
   DocOdm as StreamWithHistoryListDocOdm,
-  ModelOdm as StreamWithHistoryListModelOdm, Repository as StreamWithHistoryListRepository,
+  ModelOdm as StreamWithHistoryListModelOdm,
 } from "./repositories";
-
-export {
-  default as StreamWithHistoryListService,
-} from "./Service";

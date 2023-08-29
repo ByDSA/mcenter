@@ -1,7 +1,11 @@
-export * from "./models";
+export {
+  Entry as HistoryEntry, Model as HistoryList,
+} from "./models";
 
 export {
-  Repository as HistoryListRepository,
+  DocOdm as HistoryListDocOdm,
+  ModelOdm as HistoryListModelOdm, Repository as HistoryListRepository, docOdmToModel as historyListDocOdmToModel,
+  modelToDocOdm as historyListToDocOdm,
 } from "./repositories";
 
 export {

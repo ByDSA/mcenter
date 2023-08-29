@@ -3,5 +3,12 @@ export {
 } from "./models";
 
 export {
-  Repository as StreamRepository,
+  DocOdm as StreamDocOdm,
+  ModelOdm as StreamModelOdm, Repository as StreamRepository,
+  docOdmToModel as streamDocOdmToModel,
+  modelToDocOdm as streamToDocOdm,
 } from "./repositories";
+
+export {
+  default as StreamService,
+} from "./Service";

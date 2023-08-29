@@ -1,9 +1,9 @@
-import { EpisodeRepository, getRandomPicker } from "#modules/episodes";
+import { Episode, EpisodeRepository, getRandomPicker } from "#modules/episodes";
 import { getDaysFromLastPlayed } from "#modules/episodes/lastPlayed";
-import { streamWithHistoryListToHistoryList } from "#modules/historyLists";
+import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import SerieService from "#modules/series/SerieService";
-import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
+import { StreamRepository } from "#modules/streams";
 import { SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import express, { Request, Response } from "express";
@@ -19,19 +19,23 @@ export default class PickerController {
 
   async #showPicker(req: Request, res: Response) {
     const serieRepository = new SerieRepository();
-    const streamWithHistoryListRepository = new StreamWithHistoryListRepository();
+    const streamRepository = new StreamRepository();
+    const historyListRepository = new HistoryListRepository();
     const episodeRepository = new EpisodeRepository();
     const serieService = new SerieService( {
       serieRepository,
       episodeRepository,
     } );
     const { streamId } = getParams(req, res);
-    const streamWithHistoryList = await streamWithHistoryListRepository.getOneById(streamId);
+    const stream = await streamRepository.getOneById(streamId);
 
-    assertFound(streamWithHistoryList);
+    assertFound(stream);
+    const historyList = await historyListRepository.getOneById(streamId);
 
-    const seriePromise = serieRepository.findOneFromGroupId(streamWithHistoryList.group);
-    const lastEpPromise = serieService.findLastEpisodeInStreamWithHistoryList(streamWithHistoryList);
+    assertFound(historyList);
+
+    const seriePromise = serieRepository.findOneFromGroupId(stream.group);
+    const lastEpPromise = serieService.findLastEpisodeInHistoryList(historyList);
 
     await Promise.all([seriePromise, lastEpPromise]);
     const serie = await seriePromise;
@@ -41,13 +45,12 @@ export default class PickerController {
 
     assertFound(serie);
 
-    const episodes = await episodeRepository.getManyBySerieId(serie.id);
-    const historyList = streamWithHistoryListToHistoryList(streamWithHistoryList);
+    const episodes: Episode[] = await episodeRepository.getManyBySerieId(serie.id);
     const picker = await getRandomPicker( {
       serie,
       episodes,
       lastEp,
-      stream: streamWithHistoryList,
+      stream,
       historyList,
     } );
     const pickerWeight = picker.weight;

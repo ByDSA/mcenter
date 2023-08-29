@@ -1,6 +1,5 @@
 import { Episode } from "#modules/episodes";
-import { HistoryListService, streamWithHistoryListToHistoryList } from "#modules/historyLists";
-import { StreamWithHistoryListRepository } from "#modules/streamsWithHistoryList";
+import { HistoryList, HistoryListRepository, HistoryListService } from "#modules/historyLists";
 import { PublicMethodsOf } from "#utils/types";
 import { assertIsNotEmpty } from "#utils/validation";
 import { episodeToMediaElement } from "./adapters";
@@ -12,19 +11,19 @@ type PlayParams = {
 };
 type Params = {
   playerService: PublicMethodsOf<PlayerService>;
-  streamWithHistoryListRepository: StreamWithHistoryListRepository;
+  historyListRepository: HistoryListRepository;
   historyListService: HistoryListService;
 };
 export default class PlayService {
   #playerService: PublicMethodsOf<PlayerService>;
 
-  #streamWithHistoryListRepository: StreamWithHistoryListRepository;
+  #historyListRepository: HistoryListRepository;
 
   #historyService: HistoryListService;
 
-  constructor( {playerService, streamWithHistoryListRepository, historyListService}: Params) {
+  constructor( {playerService, historyListRepository, historyListService}: Params) {
     this.#playerService = playerService;
-    this.#streamWithHistoryListRepository = streamWithHistoryListRepository;
+    this.#historyListRepository = historyListRepository;
     this.#historyService = historyListService;
   }
 
@@ -38,14 +37,21 @@ export default class PlayService {
 
     if (ok) {
       for (const episode of episodes) {
-        this.#streamWithHistoryListRepository.getOneById(episode.serieId)
-          .then((streamWithHistoryList) => {
-            if (streamWithHistoryList && episode) {
-              this.#historyService.addEpisodeToHistory( {
-                historyList: streamWithHistoryListToHistoryList(streamWithHistoryList),
-                episode,
-              } );
-            }
+        if (!episode)
+          // eslint-disable-next-line no-continue
+          continue;
+
+        const historyListId = episode.serieId;
+
+        this.#historyListRepository.getOneById(historyListId)
+          .then((historyList: HistoryList | null) => {
+            if (!historyList)
+              return;
+
+            this.#historyService.addEpisodeToHistory( {
+              historyList,
+              episode,
+            } );
           } );
       }
     }
