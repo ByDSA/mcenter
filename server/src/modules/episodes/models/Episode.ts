@@ -1,29 +1,36 @@
-import { SerieId } from "#modules/series";
-import { CanDurable, Resource } from "#modules/utils/resource";
-import { assertIsResource, copyOfResource } from "#modules/utils/resource/Resource.entity";
+import { resourceSchema } from "#modules/utils/resource";
+import { canDurableSchema } from "#modules/utils/resource/CanDurable";
+import { copyOfResource } from "#modules/utils/resource/Resource.entity";
+import { assertZodPopStack } from "#utils/validation/zod";
+import { z } from "zod";
 
 export type ModelId = string;
 
-export type ModelFullId = {
-  episodeId: ModelId;
-  serieId: SerieId;
-};
+export const ModelFullIdSchema = z.object( {
+  episodeId: z.string(),
+  serieId: z.string(),
+} ).strict();
 
-export default interface Model
-extends
-Resource,
-CanDurable, ModelFullId {
-}
+export type ModelFullId = z.infer<typeof ModelFullIdSchema>;
+
+const ModelSchema = resourceSchema.merge(ModelFullIdSchema).merge(canDurableSchema);
+
+type Model = z.infer<typeof ModelSchema>;
+export default Model;
 
 export function compareFullId(a: ModelFullId, b: ModelFullId): boolean {
   return a.episodeId === b.episodeId && a.serieId === b.serieId;
 }
 
 export function fullIdOf(episode: Model): ModelFullId {
-  return {
+  const ret = {
     episodeId: episode.episodeId,
     serieId: episode.serieId,
   };
+
+  ModelFullIdSchema.parse(ret);
+
+  return ret;
 }
 
 export function copyOf(e: Model): Model {
@@ -34,21 +41,6 @@ export function copyOf(e: Model): Model {
   };
 }
 
-export function assertIsModel(model: unknown): asserts model is Model {
-  if (typeof model !== "object" || model === null)
-    throw new Error("model is not an object");
-
-  if (!("episodeId" in model))
-    throw new Error("model has no episodeId");
-
-  if (typeof (model as Model).episodeId !== "string")
-    throw new Error("model.episodeId is not a string");
-
-  if (!("serieId" in model))
-    throw new Error("model has no serieId");
-
-  if (typeof (model as Model).serieId !== "string")
-    throw new Error("model.serieId is not a string");
-
-  assertIsResource(model);
+export function assertIsModel(model: unknown, msg?: string): asserts model is Model {
+  assertZodPopStack(ModelSchema, model, msg);
 }

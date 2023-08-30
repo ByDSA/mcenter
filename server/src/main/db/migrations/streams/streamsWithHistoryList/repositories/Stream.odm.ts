@@ -1,44 +1,22 @@
-import { StreamMode } from "#modules/streams";
-import mongoose from "mongoose";
-import { StreamWithHistoryList } from "../models";
-import { HistoryEntryInStreamSchema } from "./History.odm";
+import { MongoSchema } from "#main/db/migrations/utils";
+import { assertZodPopStack } from "#utils/validation/zod";
+import { z } from "zod";
+import { HistoryEntryInStreamSchema, OldDateTypeSchema } from "../models/HistoryEntryInStream";
+import { StreamWithHistoryListSchema } from "../models/StreamWithHistoryList";
 
-/**
- * @deprecated
- */
-export interface DocOdm extends StreamWithHistoryList {
-  id: string;
-}
-
-const NAME = "Stream";
-
-/**
- * @deprecated
- */
-export const Schema = new mongoose.Schema<DocOdm>( {
-  id: {
-    type: String,
-    required: true,
-  },
-  group: {
-    type: String,
-    required: true,
-  },
-  mode: {
-    type: String,
-    enum: [StreamMode.SEQUENTIAL, StreamMode.RANDOM],
-    required: true,
-  },
-  maxHistorySize: {
-    type: Number,
-    required: true,
-  },
-  history: {
-    type: [HistoryEntryInStreamSchema],
-  },
+const OldDateTypeSchemaDocOdm = OldDateTypeSchema.merge(MongoSchema);
+const HistoryEntryInStreamSchemaDocOdm = HistoryEntryInStreamSchema.merge(MongoSchema).extend( {
+  date: OldDateTypeSchemaDocOdm,
+} );
+const StreamWithHistoryListDocOdmSchema = MongoSchema.merge(StreamWithHistoryListSchema).extend( {
+  history: z.array(HistoryEntryInStreamSchemaDocOdm),
 } );
 
 /**
  * @deprecated
  */
-export const ModelOdm = mongoose.model<StreamWithHistoryList>(NAME, Schema);
+export type DocOdm = z.infer<typeof StreamWithHistoryListDocOdmSchema>;
+
+export function assertIsStreamWithHistoryListDocOdm(model: unknown): asserts model is DocOdm {
+  assertZodPopStack(StreamWithHistoryListDocOdmSchema, model);
+}

@@ -1,16 +1,17 @@
-import { HistoryEntry, HistoryList as Model, assertIsHistoryList } from "#modules/historyLists";
-import { Stream, StreamMode } from "#modules/streams";
+import { HistoryEntry, HistoryList, assertIsHistoryList } from "#modules/historyLists";
+import { Stream, StreamMode, assertIsStream } from "#modules/streams";
 import { OriginType } from "#modules/streams/models/Stream";
 import { assertIsDefined } from "#utils/validation";
 import HistoryEntryInStream from "./HistoryEntryInStream";
 import HistoryListInStream from "./HistoryListInStream";
-import StreamWithHistoryList from "./StreamWIthHistoryList";
+import StreamWithHistoryList, { assertIsStreamWithHistoryList } from "./StreamWithHistoryList";
 
 /**
  *
  * @deprecated
  */
 export function streamWithHistoryListToStream(streamWithHistoryList: StreamWithHistoryList): Stream {
+  assertIsStreamWithHistoryList(streamWithHistoryList);
   const ret: Stream = {
     id: streamWithHistoryList.id,
     group: {
@@ -24,6 +25,8 @@ export function streamWithHistoryListToStream(streamWithHistoryList: StreamWithH
     mode: streamWithHistoryList.mode,
   };
 
+  assertIsStream(ret);
+
   return ret;
 }
 
@@ -32,6 +35,7 @@ export function streamWithHistoryListToStream(streamWithHistoryList: StreamWithH
  *
  */
 export function streamToStreamWithHistoryList(stream: Stream): StreamWithHistoryList {
+  assertIsStream(stream);
   const ret: StreamWithHistoryList = {
     id: stream.id,
     group: stream.group.origins[0].id.split("/").at(-1) ?? stream.group.origins[0].id,
@@ -40,6 +44,8 @@ export function streamToStreamWithHistoryList(stream: Stream): StreamWithHistory
     maxHistorySize: -1,
   };
 
+  assertIsStreamWithHistoryList(ret);
+
   return ret;
 }
 
@@ -47,11 +53,12 @@ export function streamToStreamWithHistoryList(stream: Stream): StreamWithHistory
  *
  * @deprecated
  */
-export function streamWithHistoryListToHistoryList(streamWithHistoryList: StreamWithHistoryList): Model {
+export function streamWithHistoryListToHistoryList(streamWithHistoryList: StreamWithHistoryList): HistoryList {
+  assertIsStreamWithHistoryList(streamWithHistoryList);
   const serieId = streamWithHistoryList.group.split("/").at(-1);
 
   assertIsDefined(serieId);
-  const ret: Model =
+  const ret: HistoryList =
     {
       id: streamWithHistoryList.id,
       entries: streamWithHistoryList.history.map((entry) => {
@@ -64,7 +71,12 @@ export function streamWithHistoryListToHistoryList(streamWithHistoryList: Stream
         const retEntry: HistoryEntry = {
           episodeId,
           serieId,
-          date,
+          date: {
+            year: date.year,
+            month: date.month,
+            day: date.day,
+            timestamp: date.timestamp ?? new Date(date.year, date.month, date.day).getTime() / 1000,
+          },
         };
 
         return retEntry;
@@ -80,7 +92,7 @@ export function streamWithHistoryListToHistoryList(streamWithHistoryList: Stream
 /**
  * @deprecated
  */
-export function historyListToHistoryListInStream(historyList: Model): HistoryListInStream {
+export function historyListToHistoryListInStream(historyList: HistoryList): HistoryListInStream {
   assertIsDefined(historyList);
   const ret: HistoryListInStream = historyList.entries.map((entry) => {
     const retEntry: HistoryEntryInStream = {
@@ -98,7 +110,7 @@ export function historyListToHistoryListInStream(historyList: Model): HistoryLis
  *
  * @deprecated
  */
-export function historyListToStreamWithHistoryList(historyList: Model): StreamWithHistoryList {
+export function historyListToStreamWithHistoryList(historyList: HistoryList): StreamWithHistoryList {
   assertIsHistoryList(historyList);
   const ret: StreamWithHistoryList = {
     id: historyList.id,

@@ -1,3 +1,6 @@
+import { assertZodPopStack } from "#utils/validation/zod";
+import { z } from "zod";
+
 export enum Mode {
   SEQUENTIAL = "SEQUENTIAL",
   RANDOM = "RANDOM"
@@ -10,17 +13,28 @@ export enum OriginType {
   STREAM = "stream"
 };
 
-export type Origin = {
-  type: OriginType;
-  id: string;
-};
+const OriginSchema = z.object( {
+  type: z.nativeEnum(OriginType),
+  id: z.string(),
+} ).strict();
 
-export type Group = {
-  origins: Origin[];
-};
+export type Origin = z.infer<typeof OriginSchema>;
 
-export default interface Model {
-  id: ModelId;
-  group: Group;
-  mode: Mode;
+const GroupSchema = z.object( {
+  origins: z.array(OriginSchema),
+} ).strict();
+
+export type Group = z.infer<typeof GroupSchema>;
+
+const ModelSchema = z.object( {
+  id: z.string(),
+  group: GroupSchema,
+  mode: z.nativeEnum(Mode),
+} ).strict();
+
+type Model = z.infer<typeof ModelSchema>;
+export default Model;
+
+export function assertIsModel(model: unknown): asserts model is Model {
+  assertZodPopStack(ModelSchema, model);
 }

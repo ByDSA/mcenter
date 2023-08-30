@@ -1,16 +1,30 @@
 /* eslint-disable import/prefer-default-export */
 import { StreamWithHistoryList } from "../models";
-import { DocOdm } from "./Stream.odm";
+import { assertIsStreamWithHistoryList } from "../models/StreamWithHistoryList";
+import { DocOdm, assertIsStreamWithHistoryListDocOdm } from "./Stream.odm";
 
 /**
  * @deprecated
  */
-export function streamWithHistoryListDocOdmToModel(streamOdm: DocOdm): StreamWithHistoryList {
-  return {
-    id: streamOdm.id,
-    group: streamOdm.group,
-    mode: streamOdm.mode,
-    maxHistorySize: streamOdm.maxHistorySize,
-    history: streamOdm.history,
+export function streamWithHistoryListDocOdmToModel(streamWithHistoryListDocOdm: DocOdm): StreamWithHistoryList {
+  assertIsStreamWithHistoryListDocOdm(streamWithHistoryListDocOdm);
+  const ret: StreamWithHistoryList = {
+    id: streamWithHistoryListDocOdm.id,
+    group: streamWithHistoryListDocOdm.group,
+    mode: streamWithHistoryListDocOdm.mode,
+    maxHistorySize: streamWithHistoryListDocOdm.maxHistorySize,
+    history: streamWithHistoryListDocOdm.history.map((entry) => ( {
+      episodeId: entry.episodeId,
+      date: {
+        day: entry.date.day,
+        month: entry.date.month,
+        year: entry.date.year,
+        timestamp: entry.date.timestamp,
+      },
+    } )),
   };
+
+  assertIsStreamWithHistoryList(ret);
+
+  return ret;
 }

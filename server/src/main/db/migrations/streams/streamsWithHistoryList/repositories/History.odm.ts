@@ -1,4 +1,4 @@
-import { DateSchema } from "#utils/time";
+import { DateTypeOdmSchema } from "#utils/time";
 import mongoose from "mongoose";
 import HistoryEntryInStream from "../models/HistoryEntryInStream";
 
@@ -7,7 +7,7 @@ import HistoryEntryInStream from "../models/HistoryEntryInStream";
  */
 export const HistoryEntryInStreamSchema = new mongoose.Schema<HistoryEntryInStream>( {
   date: {
-    type: DateSchema,
+    type: DateTypeOdmSchema,
     required: true,
   },
   episodeId: {

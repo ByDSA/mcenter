@@ -1,32 +1,15 @@
-import { EpisodeFullId } from "#modules/episodes";
-import { throwErrorPopStack } from "#utils/errors";
-import { DateType } from "#utils/time";
-import { assertIsDefined } from "#utils/validation";
+import { ModelFullIdSchema as EpisodeFullIdSchema } from "#modules/episodes/models";
+import { DateTypeSchema } from "#utils/time";
+import { assertZodPopStack } from "#utils/validation/zod";
+import { z } from "zod";
 
-export default interface Entry extends EpisodeFullId {
-  date: DateType;
-}
+export const EntrySchema = EpisodeFullIdSchema.extend( {
+  date: DateTypeSchema,
+} ).strict();
 
-export function assertIsEntry(entry: Entry): asserts entry is Entry {
-  try {
-    assertIsDefined(entry);
+type Entry = z.infer<typeof EntrySchema>;
+export default Entry;
 
-    if (typeof entry !== "object")
-      throw new Error("entry is not an object");
-
-    const {episodeId, serieId, date } = entry;
-
-    if (typeof episodeId !== "string")
-      throw new Error("entry.episodeId is not a string");
-
-    if (typeof serieId !== "string")
-      throw new Error("entry.serieId is not a string");
-
-    assertIsDefined(date);
-  } catch (e) {
-    if (e instanceof Error)
-      throwErrorPopStack(e);
-
-    throw e;
-  }
+export function assertIsEntry(model: unknown): asserts model is Entry {
+  assertZodPopStack(EntrySchema, model);
 }
