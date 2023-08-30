@@ -1,7 +1,8 @@
 import { HistoryList } from "#modules/historyLists";
+import { deepCopy } from "#utils/objects";
 import { DateType } from "#utils/time";
 import { DateTime } from "luxon";
-import Model, { compareFullId, copyOf, fullIdOf } from "./models/Episode";
+import Model, { compareFullId, fullIdOf } from "./models/Episode";
 import { Repository } from "./repositories";
 
 function getTimestampFromDate(date: DateType): number {
@@ -40,7 +41,7 @@ export function getDaysFromLastPlayed(self: Model, historyList: HistoryList): nu
 
     if (lastTimePlayed) {
       const selfCopy: Model = {
-        ...copyOf(self),
+        ...deepCopy(self),
         lastTimePlayed,
       };
       const fullId = fullIdOf(selfCopy);
