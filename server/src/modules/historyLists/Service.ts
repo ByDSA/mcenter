@@ -1,5 +1,6 @@
-import { Episode, EpisodeFullId, EpisodeRepository, compareEpisodeFullId, copyOfEpisode } from "#modules/episodes";
+import { Episode, EpisodeFullId, EpisodeRepository, compareEpisodeFullId } from "#modules/episodes";
 import { assertFound } from "#utils/http/validation";
+import { deepCopy } from "#utils/objects";
 import { getDateNow } from "#utils/time";
 import { Entry, Model } from "./models";
 import { Repository } from "./repositories";
@@ -70,7 +71,7 @@ export default class Service {
     historyList.entries.push(newEntry);
     await this.#historyRepository.updateOneById(historyList.id, historyList);
 
-    const episodeCopy = copyOfEpisode(episode);
+    const episodeCopy = deepCopy(episode);
 
     episodeCopy.lastTimePlayed = newEntry.date.timestamp;
 
@@ -113,7 +114,7 @@ export default class Service {
     }
 
     if (deletedHistoryEntry.date.timestamp === episode.lastTimePlayed) {
-      const episodeCopy = copyOfEpisode(episode);
+      const episodeCopy = deepCopy(episode);
       const lastTimeHistoryEntry = await this.findLastHistoryEntryForEpisodeId( {
         historyList,
         episodeFullId,

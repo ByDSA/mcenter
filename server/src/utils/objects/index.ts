@@ -15,3 +15,7 @@ export {
 } from "./removeUndefinedValues";
 
 export * from "./types";
+
+export {
+  deepCopy,
+} from "./deepCopy";

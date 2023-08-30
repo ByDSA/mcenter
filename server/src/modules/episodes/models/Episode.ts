@@ -1,6 +1,5 @@
 import { resourceSchema } from "#modules/utils/resource";
 import { canDurableSchema } from "#modules/utils/resource/CanDurable";
-import { copyOfResource } from "#modules/utils/resource/Resource.entity";
 import { assertZodPopStack } from "#utils/validation/zod";
 import { z } from "zod";
 
@@ -31,14 +30,6 @@ export function fullIdOf(episode: Model): ModelFullId {
   ModelFullIdSchema.parse(ret);
 
   return ret;
-}
-
-export function copyOf(e: Model): Model {
-  return {
-    ...copyOfResource(e),
-    episodeId: e.episodeId,
-    serieId: e.serieId,
-  };
 }
 
 export function assertIsModel(model: unknown, msg?: string): asserts model is Model {

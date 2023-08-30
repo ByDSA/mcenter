@@ -17,30 +17,6 @@ type Model = z.infer<typeof ModelSchema>;
 
 export default Model;
 
-export function copyOfResource(e: Model): Model {
-  const ret: Model = {
-    title: e.title,
-    path: e.path,
-    weight: e.weight,
-    start: e.start,
-    end: e.end,
-  };
-
-  if (e.tags !== undefined)
-    ret.tags = e.tags;
-
-  if (e.duration !== undefined)
-    ret.duration = e.duration;
-
-  if (e.disabled !== undefined)
-    ret.disabled = e.disabled;
-
-  if (e.lastTimePlayed !== undefined)
-    ret.lastTimePlayed = e.lastTimePlayed;
-
-  return ret;
-}
-
 export function assertIsResource(model: unknown): asserts model is Model {
   assertZodPopStack(ModelSchema, model);
 }
