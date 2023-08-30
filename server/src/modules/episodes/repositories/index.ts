@@ -1,5 +1,5 @@
 export {
-  DocOdm, ModelOdm, Schema,
+  DocOdm, ModelOdm, SchemaOdm,
 } from "./odm";
 
 export * from "./adapters";

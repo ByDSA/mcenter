@@ -1,4 +1,4 @@
 export {
   Group, Mode, default as Model, ModelId,
-  Origin, OriginType,
+  Origin, OriginType, assertIsModel,
 } from "./Stream";

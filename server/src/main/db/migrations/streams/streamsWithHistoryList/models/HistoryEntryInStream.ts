@@ -1,10 +1,22 @@
-import { EpisodeId } from "#modules/episodes";
-import { DateType } from "#utils/time";
+import { DateTypeSchema } from "#utils/time";
+import { assertZodPopStack } from "#utils/validation/zod";
+import { z } from "zod";
+
+export const OldDateTypeSchema = DateTypeSchema.extend( {
+  timestamp: z.number().optional(),
+} ).strict();
+
+export const HistoryEntryInStreamSchema = z.object( {
+  episodeId: z.string(),
+  date: OldDateTypeSchema,
+} ).strict();
 
 /**
  * @deprecated
  */
-export default interface HistoryEntryInStream {
-  episodeId: EpisodeId;
-  date: DateType;
+type HistoryEntryInStream = z.infer<typeof HistoryEntryInStreamSchema>;
+export default HistoryEntryInStream;
+
+export function assertIsHistoryEntryInStream(model: unknown): asserts model is HistoryEntryInStream {
+  assertZodPopStack(HistoryEntryInStreamSchema, model);
 }

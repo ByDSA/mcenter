@@ -1,10 +1,10 @@
-import { DateSchema } from "#utils/time";
+import { DateTypeOdmSchema } from "#utils/time";
 import mongoose from "mongoose";
 import { Entry, Model } from "../models";
 
 export const EntrySchema = new mongoose.Schema<Entry>( {
   date: {
-    type: DateSchema,
+    type: DateTypeOdmSchema,
     required: true,
   },
   episodeId: {

@@ -16,7 +16,7 @@ export interface DocOdm {
 
 const NAME = "Episode";
 
-export const Schema = new mongoose.Schema<DocOdm>( {
+export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   episodeId: {
     type: String,
     required: true,
@@ -62,4 +62,4 @@ export const Schema = new mongoose.Schema<DocOdm>( {
   autoIndex: false,
 } );
 
-export const ModelOdm = mongoose.model<DocOdm>(NAME, Schema);
+export const ModelOdm = mongoose.model<DocOdm>(NAME, SchemaOdm);

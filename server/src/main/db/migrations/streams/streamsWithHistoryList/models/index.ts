@@ -1,6 +1,6 @@
 export {
   default as StreamWithHistoryList,
-} from "./StreamWIthHistoryList";
+} from "./StreamWithHistoryList";
 
 export {
   default as HistoryEntryInStream,

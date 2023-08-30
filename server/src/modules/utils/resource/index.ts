@@ -4,4 +4,5 @@ export {
 
 export {
   default as Resource,
+  ModelSchema as resourceSchema,
 } from "./Resource.entity";

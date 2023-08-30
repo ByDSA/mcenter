@@ -1,10 +1,12 @@
 import { HistoryList, HistoryListDocOdm, historyListToDocOdm } from "#modules/historyLists";
+import { Stream } from "#modules/streams";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import Database from "../../Database";
 import { createCollectionIfNotExists } from "../utils";
-import { StreamWithHistoryListDocOdm } from "./streamsWithHistoryList";
+import { StreamWithHistoryList, StreamWithHistoryListDocOdm } from "./streamsWithHistoryList";
 import { streamWithHistoryListToHistoryList, streamWithHistoryListToStream } from "./streamsWithHistoryList/models/adapters";
+import { streamWithHistoryListDocOdmToModel } from "./streamsWithHistoryList/repositories/adapters";
 
 const OLD_COLLECTION = "streamsWithHistoryList";
 const STREAMS_COLLECTION = "streams";
@@ -54,7 +56,11 @@ async function addToStreams(streamsWithHistoryListCollection: StreamWithHistoryL
   console.log(`Adding streams to collection '${ STREAMS_COLLECTION }'...`);
   await createCollectionIfNotExists(STREAMS_COLLECTION);
 
-  const streams = streamsWithHistoryListCollection.map(streamWithHistoryListToStream);
+  console.log("Converting streamsWithHistoryListDocOdm to streamsWithHistoryList");
+  const streamsWithHistoryList: StreamWithHistoryList[] = streamsWithHistoryListCollection.map(streamWithHistoryListDocOdmToModel);
+
+  console.log("Converting streamsWithHistoryList to streams");
+  const streams: Stream[] = streamsWithHistoryList.map(streamWithHistoryListToStream);
 
   for (const stream of streams) {
     // eslint-disable-next-line no-await-in-loop
@@ -72,7 +78,8 @@ async function addToHistoryList(streamsWithHistoryListOdm: StreamWithHistoryList
   console.log(`Adding historyLists to collection '${ HISTORY_LIST_COLLECTION }'...`);
   await createCollectionIfNotExists(HISTORY_LIST_COLLECTION);
 
-  const historyLists: HistoryList[] = streamsWithHistoryListOdm.map(streamWithHistoryListToHistoryList);
+  const streamsWithHistoryList: StreamWithHistoryList[] = streamsWithHistoryListOdm.map(streamWithHistoryListDocOdmToModel);
+  const historyLists: HistoryList[] = streamsWithHistoryList.map(streamWithHistoryListToHistoryList);
 
   for (const historyList of historyLists) {
     const historyListOdm: HistoryListDocOdm = historyListToDocOdm(historyList);

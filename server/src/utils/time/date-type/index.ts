@@ -1,13 +1,26 @@
+import { assertZodPopStack } from "#utils/validation/zod";
 import mongoose from "mongoose";
+import { z } from "zod";
 
-export interface DateType {
-    year: number;
-    month: number;
-    day: number;
-    timestamp: number;
+export const DateTypeSchema = z.object( {
+  year: z.number().min(1970),
+  month: z.number()
+    .min(1)
+    .max(12),
+  day: z.number()
+    .min(1)
+    .max(31),
+  timestamp: z.number()
+    .min(0),
+} ).strict();
+
+export type DateType = z.infer<typeof DateTypeSchema>;
+
+export function assertIsDateType(model: unknown): asserts model is DateType {
+  assertZodPopStack(DateTypeSchema, model);
 }
 
-const schema = new mongoose.Schema( {
+const schemaOdm = new mongoose.Schema<DateType>( {
   year: {
     type: Number,
     required: true,
@@ -41,5 +54,5 @@ export function getDateNow(): DateType {
 }
 
 export {
-  schema as DateSchema,
+  schemaOdm as DateTypeOdmSchema,
 };

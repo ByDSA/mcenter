@@ -1,53 +1,52 @@
-import { Episode } from "#modules/episodes";
+import { Episode, assertIsEpisode } from "#modules/episodes";
 import { SerieId } from "#modules/series";
+import { OnlyWithRequiredKeys, OptionalKeys } from "#utils/objects";
 import { EpisodeInSerie, Model } from "../models";
-import { DocODM, OldDocOdm } from "./serie.model";
+import { assertIsEpisodeInSerie, assertIsSerieWithEpisodes } from "../models/SerieWithEpisodes";
+import { EpisodeInSerieDocOdm, SerieWithEpisodesDocODM, assertIsEpisodeInSerieDocOdm, assertIsSerieWithEpisodesDocOdm } from "./odm";
 
 /**
  *
  * @deprecated
  */
-export function episodeInSerieToOldDocOdm(episode: EpisodeInSerie): OldDocOdm {
-  const objRequired: Required<OldDocOdm> = {
-    id: episode.id,
-    path: episode.path,
-    end: episode.end,
-    start: episode.start,
-    tags: episode.tags!,
-    duration: episode.duration!,
-    title: episode.title!,
-    disabled: episode.disabled!,
-    weight: episode.weight,
+export function episodeInSerieToOldDocOdm(episodeInSerie: EpisodeInSerie): EpisodeInSerieDocOdm {
+  assertIsEpisodeInSerie(episodeInSerie);
+  const ret: EpisodeInSerieDocOdm = {
+    id: episodeInSerie.id,
+    path: episodeInSerie.path,
+    end: episodeInSerie.end,
+    start: episodeInSerie.start,
+    tags: episodeInSerie.tags,
+    duration: episodeInSerie.duration,
+    title: episodeInSerie.title,
+    disabled: episodeInSerie.disabled,
+    weight: episodeInSerie.weight,
   };
-  const ret: OldDocOdm = objRequired;
+
+  assertIsEpisodeInSerieDocOdm(ret);
 
   return ret;
 }
 
-export function episodeInSerieToEpisode(episode: EpisodeInSerie, serieId: SerieId): Episode {
-  const objRequired: Episode = {
-    episodeId: episode.id,
+export function episodeInSerieToEpisode(episodeInSerie: EpisodeInSerie, serieId: SerieId): Episode {
+  assertIsEpisodeInSerie(episodeInSerie);
+  const ret: OnlyWithRequiredKeys<Episode> = {
+    episodeId: episodeInSerie.id,
     serieId,
-    path: episode.path,
-    end: episode.end ?? -1,
-    start: episode.start ?? -1,
-    title: episode.title ?? "",
-    weight: episode.weight ?? 0,
+    path: episodeInSerie.path,
+    end: episodeInSerie.end ?? -1,
+    start: episodeInSerie.start ?? -1,
+    title: episodeInSerie.title ?? `${serieId } ${episodeInSerie.id}`,
+    weight: episodeInSerie.weight ?? 0,
   };
+  const optionalKeys: (OptionalKeys<Episode>)[] = [ "lastTimePlayed", "disabled", "duration", "tags" ];
 
-  if (episode.lastTimePlayed !== undefined)
-    objRequired.lastTimePlayed = episode.lastTimePlayed;
+  for (const key of optionalKeys){
+    if (episodeInSerie[key] !== undefined)
+      (ret as any)[key] = episodeInSerie[key];
+  }
 
-  if (episode.disabled !== undefined)
-    objRequired.disabled = episode.disabled;
-
-  if (episode.duration !== undefined)
-    objRequired.duration = episode.duration;
-
-  if (episode.tags !== undefined)
-    objRequired.tags = episode.tags;
-
-  const ret: Episode = objRequired;
+  assertIsEpisode(ret);
 
   return ret;
 }
@@ -56,44 +55,50 @@ export function episodeInSerieToEpisode(episode: EpisodeInSerie, serieId: SerieI
  *
  * @deprecated
  */
-export function episodeInSerieFromOldDocOdm(episodeDB: OldDocOdm): EpisodeInSerie {
-  const ret: EpisodeInSerie = {
-    id: episodeDB.id,
-    start: episodeDB.start ?? -1,
-    end: episodeDB.end ?? -1,
-    title: episodeDB.title ?? "",
-    weight: episodeDB.weight ?? 0,
-    path: episodeDB.path,
+export function episodeInSerieDocOdmToModel(episodeInSerieDocOdm: EpisodeInSerieDocOdm): EpisodeInSerie {
+  assertIsEpisodeInSerieDocOdm(episodeInSerieDocOdm);
+  const ret: OnlyWithRequiredKeys<EpisodeInSerie> = {
+    id: episodeInSerieDocOdm.id,
+    path: episodeInSerieDocOdm.path,
   };
+  const optionalKeys: (OptionalKeys<EpisodeInSerie>)[] = [ "start", "end", "weight", "title","lastTimePlayed", "disabled", "tags", "duration" ];
 
-  if (episodeDB.disabled !== undefined)
-    ret.disabled = episodeDB.disabled;
+  for (const key of optionalKeys){
+    if (episodeInSerieDocOdm[key] !== undefined)
+      (ret as any)[key] = episodeInSerieDocOdm[key];
+  }
 
-  if (episodeDB.tags !== undefined)
-    ret.tags = episodeDB.tags;
-
-  if (episodeDB.duration !== undefined)
-    ret.duration = episodeDB.duration;
+  assertIsEpisodeInSerie(ret);
 
   return ret;
 }
 
 /* eslint-disable import/prefer-default-export */
-export function serieWithEpisodesDBToSerieWithEpisodes(serieDB: DocODM): Model {
-  const episodesInSerieDocOdm: OldDocOdm[] = serieDB.episodes;
-  const episodesInSerie: EpisodeInSerie[] = episodesInSerieDocOdm.map((episodeDB: OldDocOdm): EpisodeInSerie =>episodeInSerieFromOldDocOdm(episodeDB));
-
-  return {
+export function serieWithEpisodesDocOdmToModel(serieDB: SerieWithEpisodesDocODM): Model {
+  assertIsSerieWithEpisodesDocOdm(serieDB);
+  const episodesInSerieDocOdm: EpisodeInSerieDocOdm[] = serieDB.episodes;
+  const episodesInSerie: EpisodeInSerie[] = episodesInSerieDocOdm.map((episodeDB: EpisodeInSerieDocOdm): EpisodeInSerie =>episodeInSerieDocOdmToModel(episodeDB));
+  const ret: Model = {
     id: serieDB.id,
     name: serieDB.name,
     episodes: episodesInSerie,
   };
+
+  assertIsSerieWithEpisodes(ret);
+
+  return ret;
 }
 
-export function serieWithEpisodesToSerieWithEpisodesDB(serieWithEpisodes: Model): DocODM {
-  return {
+export function serieWithEpisodesToDocOdm(serieWithEpisodes: Model): SerieWithEpisodesDocODM {
+  assertIsSerieWithEpisodes(serieWithEpisodes);
+
+  const ret = {
     id: serieWithEpisodes.id,
     name: serieWithEpisodes.id,
     episodes: serieWithEpisodes.episodes.map(episodeInSerieToOldDocOdm),
   };
+
+  assertIsSerieWithEpisodesDocOdm(ret);
+
+  return ret;
 }
