@@ -112,7 +112,7 @@ export default class ExpressApp implements App {
 
   listen() {
     assertIsDefined(this.#instance);
-    const PORT: number = process.env.NODE_ENV === "development" ? +(process.env.PORT ?? 8080) : 8080;
+    const PORT: number = +(process.env.PORT ?? 8080);
 
     killProcessesUsingPort(PORT);
     const listener = this.#instance.listen(PORT, () => {
