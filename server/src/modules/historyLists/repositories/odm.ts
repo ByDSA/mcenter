@@ -35,6 +35,9 @@ export const Schema = new mongoose.Schema<DocOdm>( {
     type: Number,
     required: true,
   },
+},
+{
+  collection: "historyLists",
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, Schema);
