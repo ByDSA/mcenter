@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/ByDSA/mcenter/compare/v1.2.2...v1.3.0) (2023-09-01)
+
+
+### Features
+
+* acceso estático a recursos desde la propia aplicación ([2c377a6](https://github.com/ByDSA/mcenter/commit/2c377a639d80834add05763f3fef07d2ce850f5d))
+
 ### [1.2.2](https://github.com/ByDSA/mcenter/compare/v1.2.1...v1.2.2) (2023-09-01)
 
 
