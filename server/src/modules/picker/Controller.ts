@@ -1,15 +1,15 @@
 import { Episode, EpisodeRepository, getRandomPicker } from "#modules/episodes";
-import { getDaysFromLastPlayed } from "#modules/episodes/lastPlayed";
+import LastTimePlayedService from "#modules/episodes/LastTimePlayedService.ts";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import SerieService from "#modules/series/SerieService";
 import { StreamRepository } from "#modules/streams";
-import { SecureRouter } from "#utils/express";
+import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import express, { Request, Response } from "express";
 
-export default class PickerController {
-  getPickerRouter(): express.Router {
+export default class PickerController implements Controller {
+  getRouter(): express.Router {
     const router = SecureRouter();
 
     router.get("/:streamId", this.#showPicker.bind(this));
@@ -54,12 +54,13 @@ export default class PickerController {
       historyList,
     } );
     const pickerWeight = picker.weight;
+    const lastTimePlayedService = new LastTimePlayedService();
     let weightAcc = 0;
     const ret = picker.data.map((e) => {
       const id = e.episodeId;
       const selfWeight = picker.getWeight(e) || 1;
       const weight = Math.round((selfWeight / pickerWeight) * 100 * 100) / 100;
-      const days = Math.floor(getDaysFromLastPlayed(e, historyList));
+      const days = Math.floor(lastTimePlayedService.getDaysFromLastPlayed(e, historyList));
 
       return [id, weight, selfWeight, days];
     } ).sort((a: any, b: any) => b[1] - a[1])

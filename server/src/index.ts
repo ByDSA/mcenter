@@ -1,4 +1,7 @@
+import ActionController from "#modules/actions/ActionController";
+import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
 import { EpisodeRepository } from "#modules/episodes";
+import LastTimePlayedService from "#modules/episodes/LastTimePlayedService.ts";
 import { HistoryListRepository, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, VLCService } from "#modules/play";
@@ -45,6 +48,15 @@ import RealDatabase from "./main/db/Database";
       playStreamController,
     },
     pickerController: new PickerController(),
+    actionController: new ActionController( {
+      episodesUpdateLastTimePlayedController: new EpisodesUpdateLastTimePlayedController( {
+        lastTimePlayedService: new LastTimePlayedService(),
+        episodeRepository,
+        historyListRepository,
+        serieRepository,
+        streamRepository,
+      } ),
+    } ),
   } );
 
   await app.init();

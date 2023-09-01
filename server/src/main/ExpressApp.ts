@@ -1,3 +1,4 @@
+import ActionController from "#modules/actions/ActionController";
 import { asyncCalculateNextEpisodeByIdStream } from "#modules/episodes";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController } from "#modules/play";
@@ -20,6 +21,7 @@ type Dependencies = {
     playStreamController: PublicMethodsOf<PlayStreamController>;
   };
   pickerController: PublicMethodsOf<PickerController>;
+  actionController: PublicMethodsOf<ActionController>;
 };
 
 // Necesario para poder replicarla para test
@@ -34,11 +36,14 @@ export default class ExpressApp implements App {
 
   #pickerController: PublicMethodsOf<PickerController>;
 
-  constructor( {db, play: {playSerieController, playStreamController}, pickerController}: Dependencies) {
+  #actionController: PublicMethodsOf<ActionController>;
+
+  constructor( {db, play: {playSerieController, playStreamController}, pickerController, actionController}: Dependencies) {
     this.#database = db?.instance ?? null;
     this.#playSerieController = playSerieController;
     this.#playStreamController = playStreamController;
     this.#pickerController = pickerController;
+    this.#actionController = actionController;
   }
 
   async init() {
@@ -72,7 +77,9 @@ export default class ExpressApp implements App {
     app.use("/api/play/serie", this.#playSerieController.getRouter());
     app.use("/api/play/stream", this.#playStreamController.getRouter());
 
-    app.use("/api/picker", this.#pickerController.getPickerRouter());
+    app.use("/api/picker", this.#pickerController.getRouter());
+
+    app.use("/api/actions", this.#actionController.getRouter());
 
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;

@@ -1,5 +1,5 @@
 import { Episode } from "#modules/episodes";
-import { getDaysFromLastPlayed } from "../../lastPlayed";
+import LastTimePlayedService from "../../LastTimePlayedService.ts";
 import { ModelId, compareFullId } from "../../models/Episode";
 import { Params } from "../utils";
 
@@ -62,7 +62,8 @@ export function removeWeightLowerOrEqualThan(num: number) {
 
 export function preventRepeatInDays(minDays: number) {
   return ( { self, historyList }: Params<Episode>): boolean => {
-    const daysFromLastTime = getDaysFromLastPlayed(self, historyList);
+    const lastTimePlayedService = new LastTimePlayedService();
+    const daysFromLastTime = lastTimePlayedService.getDaysFromLastPlayed(self, historyList);
 
     return daysFromLastTime >= minDays;
   };

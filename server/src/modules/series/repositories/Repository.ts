@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
-import { CanCreateOneAndGet, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+
+import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";
 import { docOdmToModel } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
@@ -7,8 +8,15 @@ import { DocOdm, ModelOdm } from "./odm";
 export default class Repository
 implements CanGetOneById<Model, ModelId>,
 CanUpdateOneByIdAndGet<Model, ModelId>,
-CanCreateOneAndGet<Model>
+CanCreateOneAndGet<Model>,
+CanGetAll<Model>
 {
+  async getAll(): Promise<Model[]> {
+    const seriesDocOdm = await ModelOdm.find();
+
+    return seriesDocOdm.map(docOdmToModel);
+  }
+
   async createOneAndGet(model: Model): Promise<Model> {
     const serieDB: DocOdm = await ModelOdm.create(model).then(s => s.save());
 

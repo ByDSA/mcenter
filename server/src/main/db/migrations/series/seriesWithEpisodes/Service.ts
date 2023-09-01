@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { FileNode, getSerieTreeRemote } from "#actions/nginxTree";
+import { FileNode, getSerieTreeRemote } from "#modules/actions/nginxTree";
 import { StreamWithHistoryList } from "#main/db/migrations/streams/streamsWithHistoryList";
 import { Episode, EpisodeRepository } from "#modules/episodes";
 import { Serie, SerieId, SerieRepository } from "#modules/series";

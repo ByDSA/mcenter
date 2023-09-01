@@ -1,4 +1,5 @@
 import { ExpressApp } from "#main";
+import { ActionControllerMock } from "#modules/actions/test";
 import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
 import { TestMongoDatabase } from "#tests/main";
 import TestDatabase from "#tests/main/db/TestDatabase";
@@ -27,6 +28,7 @@ describe("showPicker", () => {
       playStreamController: new PlayStreamControllerMock(),
     },
     pickerController,
+    actionController: new ActionControllerMock(),
   } );
   let expressApp: Application | null = null;
 
@@ -41,7 +43,7 @@ describe("showPicker", () => {
     await app.close();
   } );
   it("should get", async () => {
-    const routerApp = RouterApp(pickerController.getPickerRouter());
+    const routerApp = RouterApp(pickerController.getRouter());
     const response = await request(routerApp)
       .get("/simpsons")
       .expect(200)

@@ -1,4 +1,5 @@
 import { HistoryList } from "#modules/historyLists";
+import { SerieId } from "#modules/series";
 import { CanCreateManyAndGet, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import Model, { ModelFullId } from "../models/Episode";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
@@ -11,6 +12,17 @@ implements CanGetOneById<Model, ModelFullId>,
 CanUpdateOneByIdAndGet<Model, ModelFullId>,
 CanCreateManyAndGet<Model>
 {
+  async getAllFromSerieId(id: SerieId): Promise<Model[]> {
+    const episodesOdm = await ModelOdm.find( {
+      serieId: id,
+    } );
+
+    if (episodesOdm.length === 0)
+      return [];
+
+    return episodesOdm.map(docOdmToModel);
+  }
+
   async findLastEpisodeInHistoryList(historyList: HistoryList): Promise<Model | null> {
     const historyEntry = historyList.entries.at(-1);
 

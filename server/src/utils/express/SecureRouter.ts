@@ -1,3 +1,4 @@
+import { errorPopStack } from "#utils/errors/stack";
 import { NextFunction, Request, Response, Router } from "express";
 
 const MATCHERS = [
@@ -28,6 +29,9 @@ function tryCatch(fn: Function) {
     try {
       await fn(req, res);
     } catch (e) {
+      if (e instanceof Error)
+        next(errorPopStack(e));
+
       next(e);
     }
   };

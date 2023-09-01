@@ -6,7 +6,7 @@ import { daysBetween } from "date-ops";
 import { DateTime } from "luxon";
 import { Picker } from "rand-picker";
 import { dynamicLoadScriptFromEnvVar } from "../../../DynamicLoad";
-import { getDaysFromLastPlayed } from "../lastPlayed";
+import LastTimePlayed from "../LastTimePlayedService.ts";
 import { Model } from "../models";
 import { Params } from "./utils";
 
@@ -48,9 +48,10 @@ export default async function fixWeight(
 }
 
 async function weightCalculator( { self, historyList }: Params<Model>): Promise<number> {
+  const lastTimePlayedService = new LastTimePlayed();
   const daysFromLastTime = self.lastTimePlayed
     ? daysBetween(DateTime.now(), DateTime.fromSeconds(self.lastTimePlayed))
-    : getDaysFromLastPlayed(self, historyList);
+    : lastTimePlayedService.getDaysFromLastPlayed(self, historyList);
   let reinforcementFactor = 1;
   const weight = self && self.weight ? self.weight : 0;
 
