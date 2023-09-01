@@ -11,6 +11,7 @@ import helmet from "helmet";
 import schedule from "node-schedule";
 import { execSync } from "node:child_process";
 import fs from "node:fs";
+import serveIndex from "serve-index";
 
 type Dependencies = {
   db?: {
@@ -105,6 +106,17 @@ export default class ExpressApp implements App {
     } );
 
     app.use("/config", configRoutes);
+
+    const mediaFolderPath = process.env.MEDIA_FOLDER_PATH;
+
+    assertIsDefined(mediaFolderPath);
+
+    for (const item of ["pelis", "series", "music"]) {
+      app.use(`/raw/${item}/`, express.static(`${mediaFolderPath}/${item}/`), serveIndex(`${mediaFolderPath}/${item}/`, {
+        view: "details",
+        icons: true,
+      } ));
+    }
 
     app.use(errorHandler);
 
