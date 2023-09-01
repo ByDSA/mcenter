@@ -1,5 +1,7 @@
+/* eslint-disable no-await-in-loop */
 import { Episode } from "#modules/episodes";
 import { HistoryList, HistoryListRepository, HistoryListService } from "#modules/historyLists";
+import { assertFound } from "#utils/http/validation";
 import { PublicMethodsOf } from "#utils/types";
 import { assertIsNotEmpty } from "#utils/validation";
 import { episodeToMediaElement } from "./adapters";
@@ -42,17 +44,14 @@ export default class PlayService {
           continue;
 
         const historyListId = episode.serieId;
+        const historyList: HistoryList | null = await this.#historyListRepository.getOneById(historyListId);
 
-        this.#historyListRepository.getOneById(historyListId)
-          .then((historyList: HistoryList | null) => {
-            if (!historyList)
-              return;
+        assertFound(historyList, "History list not found");
 
-            this.#historyService.addEpisodeToHistory( {
-              historyList,
-              episode,
-            } );
-          } );
+        await this.#historyService.addEpisodeToHistory( {
+          historyList,
+          episode,
+        } );
       }
     }
 

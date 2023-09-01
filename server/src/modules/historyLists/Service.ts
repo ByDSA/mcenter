@@ -76,6 +76,7 @@ export default class Service {
     episodeCopy.lastTimePlayed = newEntry.date.timestamp;
 
     await this.#episodeRepository.updateOneByIdAndGet(episodeCopy, episodeCopy);
+    console.log("Añadido al historial!", newEntry);
   }
 
   async removeLastTimeEpisodeFromHistory( {historyList, ...params}: HistoryAndEpisodeParams) {
