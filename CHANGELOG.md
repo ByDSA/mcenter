@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/ByDSA/mcenter/compare/v1.2.0...v1.2.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* quitar .ts sobrante en archivo ([eb695a9](https://github.com/ByDSA/mcenter/commit/eb695a951c5ccb5010a75645f61b614796ddecb1))
+
 ## [1.2.0](https://github.com/ByDSA/mcenter/compare/v1.1.5...v1.2.0) (2023-09-01)
 
 
