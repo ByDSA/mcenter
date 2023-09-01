@@ -1,5 +1,5 @@
 import { Episode, EpisodeRepository, getRandomPicker } from "#modules/episodes";
-import LastTimePlayedService from "#modules/episodes/LastTimePlayedService.ts";
+import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import SerieService from "#modules/series/SerieService";

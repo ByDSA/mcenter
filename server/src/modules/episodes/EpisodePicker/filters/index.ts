@@ -1,5 +1,5 @@
 import { Episode } from "#modules/episodes";
-import LastTimePlayedService from "../../LastTimePlayedService.ts";
+import LastTimePlayedService from "../../LastTimePlayedService";
 import { ModelId, compareFullId } from "../../models/Episode";
 import { Params } from "../utils";
 

@@ -6,7 +6,7 @@ import { daysBetween } from "date-ops";
 import { DateTime } from "luxon";
 import { Picker } from "rand-picker";
 import { dynamicLoadScriptFromEnvVar } from "../../../DynamicLoad";
-import LastTimePlayed from "../LastTimePlayedService.ts";
+import LastTimePlayed from "../LastTimePlayedService";
 import { Model } from "../models";
 import { Params } from "./utils";
 

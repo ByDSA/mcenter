@@ -1,7 +1,7 @@
 import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
 import { EpisodeRepository } from "#modules/episodes";
-import LastTimePlayedService from "#modules/episodes/LastTimePlayedService.ts";
+import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryListRepository, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, VLCService } from "#modules/play";

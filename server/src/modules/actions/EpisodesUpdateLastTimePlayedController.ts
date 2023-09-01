@@ -1,5 +1,5 @@
 import { EpisodeRepository } from "#modules/episodes";
-import LastTimePlayedService from "#modules/episodes/LastTimePlayedService.ts";
+import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryList, HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
