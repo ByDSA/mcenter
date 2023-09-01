@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.5](https://github.com/ByDSA/mcenter/compare/v1.1.4...v1.1.5) (2023-08-31)
+
+
+### Bug Fixes
+
+* db name for HistoryList ([ffed65d](https://github.com/ByDSA/mcenter/commit/ffed65d526081ac060b3f3836d89c0fc7a99ed62))
+* port in prod ([95d47d0](https://github.com/ByDSA/mcenter/commit/95d47d04f08a0658ce5b37510c9e61923428ce1c))
+
 ### [1.1.4](https://github.com/ByDSA/mcenter/compare/v1.1.3...v1.1.4) (2023-08-22)
 
 
