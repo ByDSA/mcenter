@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/ByDSA/mcenter/compare/v1.1.5...v1.2.0) (2023-09-01)
+
+
+### Features
+
+* action episodes/updateLastTimePlayed ([52b272e](https://github.com/ByDSA/mcenter/commit/52b272e6bd706c2a52d4c48c09773d6228348cf9))
+
 ### [1.1.5](https://github.com/ByDSA/mcenter/compare/v1.1.4...v1.1.5) (2023-08-31)
 
 
