@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/ByDSA/mcenter/compare/v1.3.0...v1.3.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* retrasar la comprobación de apertura de VLC ([7b3fa50](https://github.com/ByDSA/mcenter/commit/7b3fa500382039973d90ed49d6e446471260e2aa))
+
 ## [1.3.0](https://github.com/ByDSA/mcenter/compare/v1.2.2...v1.3.0) (2023-09-01)
 
 
