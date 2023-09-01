@@ -82,7 +82,7 @@ export default class PlayerService {
             resolve(true);
           else
             resolve(false);
-        }, 1500);
+        }, 5 * 1000);
       } );
       const ok = await okPromise;
 

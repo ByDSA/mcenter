@@ -53,7 +53,8 @@ export default class PlayService {
           episode,
         } );
       }
-    }
+    } else
+      console.log("PlayService: Could not play");
 
     return ok;
   }
