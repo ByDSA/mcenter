@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.2](https://github.com/ByDSA/mcenter/compare/v1.3.1...v1.3.2) (2023-09-02)
+
+
+### Bug Fixes
+
+* isRunning arreglado ([5b8b06e](https://github.com/ByDSA/mcenter/commit/5b8b06eb1ee803dbe148618e6ed7deca3857f72e))
+
 ### [1.3.1](https://github.com/ByDSA/mcenter/compare/v1.3.0...v1.3.1) (2023-09-01)
 
 
