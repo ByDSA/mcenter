@@ -26,19 +26,17 @@ export function execAndWaitUntilStarted(command: string): Promise<cp.ChildProces
   } );
 }
 
-export const isRunning = (query: string): Promise<boolean> =>
-  find("name", query, true).then((list: any[]) => {
-    const thisUser = process.env.USER;
-    const thisUserList = list.filter((p) => {
-      const user = (execSync(`ps -o user= -p ${p.pid}`)).toString()
-        .trim();
-      const isSameUser = user === thisUser;
+export const isRunning = (query: string): Promise<boolean> => {
+  const cmd = `pgrep ${query} || true`;
+  const pids = execSync(cmd, {
+    stdio: ["ignore", "pipe", "pipe"],
+  } ).toString()
+    .trim()
+    .split("\n")
+    .filter((pid) => pid !== "");
 
-      return isSameUser;
-    } ).map((p) => p.pid);
-
-    return thisUserList.length !== 0;
-  } );
+  return Promise.resolve(pids.length > 0);
+};
 
 export function killProcessByPid(pid: number) {
   return exec(`sudo kill ${pid} -9`);
