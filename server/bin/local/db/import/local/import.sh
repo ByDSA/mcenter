@@ -3,8 +3,9 @@ set -e
 
 # Importar y validar variables de entorno
 folder_name=$(basename $(dirname $(realpath "$0")))
+this_folder=$(dirname $(realpath "$0"))
 set -a
-. ../../../.env."$folder_name"
+. "$this_folder"/../../../.env."$folder_name"
 set +a
 
 # this folder name

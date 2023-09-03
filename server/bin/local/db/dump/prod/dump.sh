@@ -25,8 +25,9 @@ fi
 
 # Importar y validar variables de entorno
 folder_name=$(basename $(dirname $(realpath "$0")))
+this_folder=$(dirname $(realpath "$0"))
 set -a
-. ../../../.env."$folder_name"
+. "$this_folder"/../../../.env."$folder_name"
 set +a
 
 # this folder name
@@ -40,4 +41,5 @@ echo "Dumping database"
 
 # Dumping database
 timestamp=$(date +"%Y%m%d%H%M%S")
-mongodump --uri "$MONGODB_URI" --archive >"./dump-$timestamp.db"
+out_file=${1:-$this_folder/dump-$timestamp.db}
+mongodump --uri "$MONGODB_URI" --archive >"$out_file"
