@@ -8,7 +8,3 @@ export {
   docOdmToModel as streamDocOdmToModel,
   modelToDocOdm as streamToDocOdm,
 } from "./repositories";
-
-export {
-  default as StreamService,
-} from "./Service";

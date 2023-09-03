@@ -1,3 +1,3 @@
 export {
-  default as asyncCalculateNextEpisodeByIdStream, calculateNextEpisode, getRandomPicker,
-} from "./EpisodePicker";
+  default as EpisodePickerService,
+} from "./EpisodePickerService";

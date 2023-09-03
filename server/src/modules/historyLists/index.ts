@@ -1,7 +1,7 @@
 export {
   Entry as HistoryEntry, Model as HistoryList,
   ModelId as HistoryListId,
-  assertIsEntry as assertIsHistoryEntry, assertIsModel as assertIsHistoryList,
+  assertIsEntry as assertIsHistoryEntry, assertIsModel as assertIsHistoryList, createHistoryEntryByEpisodeFullId,
 } from "./models";
 
 export {

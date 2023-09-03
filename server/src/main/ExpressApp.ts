@@ -1,11 +1,15 @@
 import ActionController from "#modules/actions/ActionController";
-import { asyncCalculateNextEpisodeByIdStream } from "#modules/episodes";
+import { EpisodeRepository } from "#modules/episodes";
+import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
+import { HistoryListRepository } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController } from "#modules/play";
+import { SerieRepository } from "#modules/series";
+import { StreamRepository } from "#modules/streams";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import { Database } from "#utils/layers/db";
 import { PublicMethodsOf } from "#utils/types";
-import { assertIsDefined } from "#utils/validation";
+import { assertIsDefined, isDefined } from "#utils/validation";
 import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import schedule from "node-schedule";
@@ -84,7 +88,13 @@ export default class ExpressApp implements App {
 
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;
-      const nextEpisode = await asyncCalculateNextEpisodeByIdStream(idstream);
+      const episodePickerService = new EpisodePickerService( {
+        streamRepository: new StreamRepository(),
+        episodeRepository: new EpisodeRepository(),
+        serieRepository: new SerieRepository(),
+        historyListRepository: new HistoryListRepository(),
+      } );
+      const nextEpisode = await episodePickerService.getByStreamId(idstream);
 
       res.send(nextEpisode);
     } );
@@ -109,14 +119,15 @@ export default class ExpressApp implements App {
 
     const mediaFolderPath = process.env.MEDIA_FOLDER_PATH;
 
-    assertIsDefined(mediaFolderPath);
-
-    for (const item of ["pelis", "series", "music"]) {
-      app.use(`/raw/${item}/`, express.static(`${mediaFolderPath}/${item}/`), serveIndex(`${mediaFolderPath}/${item}/`, {
-        view: "details",
-        icons: true,
-      } ));
-    }
+    if (isDefined(mediaFolderPath)) {
+      for (const item of ["pelis", "series", "music"]) {
+        app.use(`/raw/${item}/`, express.static(`${mediaFolderPath}/${item}/`), serveIndex(`${mediaFolderPath}/${item}/`, {
+          view: "details",
+          icons: true,
+        } ));
+      }
+    } else
+      console.warn("MEDIA_FOLDER_PATH not defined");
 
     app.use(errorHandler);
 

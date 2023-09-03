@@ -1,12 +1,12 @@
 import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
-import { EpisodeRepository } from "#modules/episodes";
+import { EpisodePickerService, EpisodeRepository } from "#modules/episodes";
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryListRepository, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, VLCService } from "#modules/play";
 import { SerieRepository } from "#modules/series";
-import { StreamRepository, StreamService } from "#modules/streams";
+import { StreamRepository } from "#modules/streams";
 import dotenv from "dotenv";
 import { ExpressApp } from "./main";
 import RealDatabase from "./main/db/Database";
@@ -15,7 +15,6 @@ import RealDatabase from "./main/db/Database";
   dotenv.config();
 
   const streamRepository = new StreamRepository();
-  const streamService = new StreamService();
   const historyListRepository = new HistoryListRepository();
   const serieRepository = new SerieRepository();
   const episodeRepository = new EpisodeRepository();
@@ -34,10 +33,16 @@ import RealDatabase from "./main/db/Database";
     episodeRepository,
     playService,
   } );
+  const episodePickerService = new EpisodePickerService( {
+    episodeRepository,
+    historyListRepository,
+    serieRepository,
+    streamRepository,
+  } );
   const playStreamController = new PlayStreamController( {
     playService,
     streamRepository,
-    streamService,
+    episodePickerService,
   } );
   const app = new ExpressApp( {
     db: {

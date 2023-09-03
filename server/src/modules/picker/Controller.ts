@@ -1,13 +1,21 @@
-import { Episode, EpisodeRepository, getRandomPicker } from "#modules/episodes";
+import { Episode, EpisodeRepository } from "#modules/episodes";
+import { genPickerWithData } from "#modules/episodes/EpisodePicker/EpisodePickerRandom";
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
+import { Model } from "#modules/episodes/models";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import SerieService from "#modules/series/SerieService";
 import { StreamRepository } from "#modules/streams";
+import { asyncMap } from "#utils/arrays";
 import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
+import { assertIsDefined } from "#utils/validation";
 import express, { Request, Response } from "express";
 
+type ResultType = Episode & {
+  percentage: number;
+  days: number;
+};
 export default class PickerController implements Controller {
   getRouter(): express.Router {
     const router = SecureRouter();
@@ -46,29 +54,28 @@ export default class PickerController implements Controller {
     assertFound(serie);
 
     const episodes: Episode[] = await episodeRepository.getManyBySerieId(serie.id);
-    const picker = await getRandomPicker( {
+    const picker = await genPickerWithData( {
       serie,
       episodes,
-      lastEp,
+      lastEp: lastEp ?? undefined,
       stream,
       historyList,
     } );
     const pickerWeight = picker.weight;
     const lastTimePlayedService = new LastTimePlayedService();
-    let weightAcc = 0;
-    const ret = picker.data.map((e) => {
-      const id = e.episodeId;
-      const selfWeight = picker.getWeight(e) || 1;
-      const weight = Math.round((selfWeight / pickerWeight) * 100 * 100) / 100;
-      const days = Math.floor(lastTimePlayedService.getDaysFromLastPlayed(e, historyList));
+    const ret = (await asyncMap(picker.data.filter((e) => e.end < 100), async(e: Model) => {
+      const selfWeight = picker.getWeight(e);
 
-      return [id, weight, selfWeight, days];
-    } ).sort((a: any, b: any) => b[1] - a[1])
-      .filter((e) => {
-        weightAcc += +e[1];
+      assertIsDefined(selfWeight);
+      const percentage = (selfWeight * 100) / pickerWeight;
+      const days = Math.floor(await lastTimePlayedService.getDaysFromLastPlayed(e, historyList));
 
-        return weightAcc <= 80;
-      } );
+      return {
+        ...e,
+        percentage,
+        days,
+      } as ResultType;
+    } )).sort((a: ResultType, b: ResultType) => b.percentage - a.percentage);
 
     res.send(ret);
   }

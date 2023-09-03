@@ -8,3 +8,7 @@ export {
   ModelId,
   assertIsModel,
 } from "./HistoryList";
+
+export {
+  createHistoryEntryByEpisodeFullId,
+} from "./utils";

@@ -1,8 +1,7 @@
 import { Episode, EpisodeFullId, EpisodeRepository, compareEpisodeFullId } from "#modules/episodes";
 import { assertFound } from "#utils/http/validation";
 import { deepCopy } from "#utils/objects";
-import { getDateNow } from "#utils/time";
-import { Entry, Model } from "./models";
+import { Entry, Model, createHistoryEntryByEpisodeFullId } from "./models";
 import { Repository } from "./repositories";
 
 type HistoryAndEpisodeParams = {
@@ -62,11 +61,7 @@ export default class Service {
     } else
       throw new Error("No se ha especificado el episodio");
 
-    const newEntry: Entry = {
-      date: getDateNow(),
-      episodeId: episode.episodeId,
-      serieId: episode.serieId,
-    };
+    const newEntry: Entry = createHistoryEntryByEpisodeFullId(episode);
 
     historyList.entries.push(newEntry);
     await this.#historyRepository.updateOneById(historyList.id, historyList);

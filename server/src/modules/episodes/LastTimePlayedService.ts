@@ -83,8 +83,7 @@ export default class lastTimePlayedService {
     return lastTimePlayed;
   }
 
-  // TODO: convertir a async
-  getDaysFromLastPlayed(self: Model, historyList: HistoryList): number {
+  async getDaysFromLastPlayed(self: Model, historyList: HistoryList): Promise<number> {
     let lastTimePlayed = self.lastTimePlayed ?? null;
 
     if (!lastTimePlayed) {
@@ -97,7 +96,7 @@ export default class lastTimePlayedService {
         };
         const fullId = fullIdOf(selfCopy);
 
-        this.#episodeRepository.updateOneByIdAndGet(fullId, selfCopy);
+        await this.#episodeRepository.updateOneByIdAndGet(fullId, selfCopy);
       }
     }
 
