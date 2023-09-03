@@ -26,4 +26,5 @@ echo "DB_HOST: $DB_HOST"
 echo "DB_PORT: $DB_PORT"
 
 container_id=$(sudo docker ps | grep mongo | grep "$DB_PORT/tcp" | awk '{print $1}')
-sudo docker exec -i "$container_id" sh -c 'mongorestore --host="$DB_HOST" --port="$DB_PORT" --username="$DB_USERNAME" --password="$DB_PASSWORD" --authenticationDatabase=admin --archive' <"$1"
+internal_cmd="mongorestore --host=$DB_HOST --port=$DB_PORT --username=$DB_USERNAME --password=$DB_PASSWORD --authenticationDatabase=admin --archive --drop"
+sudo docker exec -i "$container_id" sh -c "$internal_cmd" <"$1"
