@@ -27,7 +27,7 @@ export default function SecureRouter(): Router {
 function tryCatch(fn: Function) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await fn(req, res);
+      await fn(req, res, next);
     } catch (e) {
       if (e instanceof Error)
         next(errorPopStack(e));
