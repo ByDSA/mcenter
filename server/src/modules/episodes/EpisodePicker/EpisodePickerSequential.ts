@@ -16,14 +16,14 @@ export default class SequentialPicker implements EpisodePicker {
   }
 
   // eslint-disable-next-line require-await
-  async pick(n: number): Promise<Model[]> {
+  async pick(n: number = 1): Promise<Model[]> {
     let index = -1;
     const ret: Model[] = [];
 
     if (this.#lastEp)
       index = this.#episodes.findIndex((e) => compareFullId(e, this.#lastEp as Model));
 
-    for (let i = 1; i < n; i++) {
+    for (let i = 0; i < n; i++) {
       index = (index + 1) % this.#episodes.length;
       ret.push(this.#episodes[index]);
     }
