@@ -1,4 +1,4 @@
-const enum StatusCode {
+const enum HttpStatusCode {
     OK = 200,
     CREATED = 201,
     BAD_REQUEST = 400,
@@ -8,4 +8,4 @@ const enum StatusCode {
     CONFLICT = 409,
 }
 
-export default StatusCode;
+export default HttpStatusCode;

@@ -1,6 +1,6 @@
 import { throwErrorPopStack } from "#utils/errors";
 import { isDefined } from "#utils/validation";
-import StatusCode from "../StatusCode";
+import HttpStatusCode from "../StatusCode";
 import HttpError from "./HttpError";
 
 export function assertFound<T>(value: T | null | undefined, msg?: string): asserts value is T {
@@ -10,7 +10,7 @@ export function assertFound<T>(value: T | null | undefined, msg?: string): asser
 
 export class NotFoundError extends HttpError {
   constructor(message?: string) {
-    super(StatusCode.NOT_FOUND, message);
+    super(HttpStatusCode.NOT_FOUND, message);
     this.name = NotFoundError.name;
   }
 }
