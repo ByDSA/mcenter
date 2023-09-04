@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/ByDSA/mcenter/compare/v1.3.2...v1.4.0) (2023-09-04)
+
+
+### Features
+
+* history-list rest endpoint ([407fb58](https://github.com/ByDSA/mcenter/commit/407fb58793c46432963713f61f9118474899cf69))
+
+
+### Bug Fixes
+
+* pasar la función 'next' ([92528ab](https://github.com/ByDSA/mcenter/commit/92528abadc21a55cdebd9bc79989d5f4ca4e6da7))
+
 ### [1.3.2](https://github.com/ByDSA/mcenter/compare/v1.3.1...v1.3.2) (2023-09-02)
 
 
