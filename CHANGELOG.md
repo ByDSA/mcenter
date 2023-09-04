@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://github.com/ByDSA/mcenter/compare/v1.4.0...v1.4.1) (2023-09-04)
+
+
+### Bug Fixes
+
+* picker secuencial ([dad1466](https://github.com/ByDSA/mcenter/commit/dad1466cdcbbbf52a988f5505dd6774a4bce7162))
+
 ## [1.4.0](https://github.com/ByDSA/mcenter/compare/v1.3.2...v1.4.0) (2023-09-04)
 
 
