@@ -259,6 +259,20 @@ module.exports = {
         "import/prefer-default-export": "off",
       },
     },
+    {
+      files: ["*.mjs"],
+      rules: {
+        "no-console": "off",
+        "require-await": "off",
+      },
+      globals: {
+        $: true,
+        argv: true,
+        path: true,
+        fs: true,
+        chalk: true,
+      },
+    },
   ],
   settings: {
     "import/no-cycle": false,
