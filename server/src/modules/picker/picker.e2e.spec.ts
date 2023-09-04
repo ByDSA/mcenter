@@ -1,8 +1,4 @@
-import { ExpressApp } from "#main";
-import { ActionControllerMock } from "#modules/actions/test";
-import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
-import { TestMongoDatabase } from "#tests/main";
-import TestDatabase from "#tests/main/db/TestDatabase";
+import ExpressAppMock from "#tests/main/ExpressAppMock";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
 import { assertIsDefined } from "#utils/validation";
@@ -10,25 +6,17 @@ import { Application } from "express";
 import request from "supertest";
 import PickerController from "./Controller";
 
-const testDatabase: TestDatabase = new TestMongoDatabase();
+let app: ExpressAppMock;
 const pickerController = new PickerController();
 
 async function loadFixtures() {
-  await testDatabase.drop();
+  await app.dropDb();
   await loadFixtureSimpsons();
 }
 
 describe("showPicker", () => {
-  const app = new ExpressApp( {
-    db: {
-      instance: testDatabase,
-    },
-    play: {
-      playSerieController: new PlaySerieControllerMock(),
-      playStreamController: new PlayStreamControllerMock(),
-    },
+  app = new ExpressAppMock( {
     pickerController,
-    actionController: new ActionControllerMock(),
   } );
   let expressApp: Application | null = null;
 

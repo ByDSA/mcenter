@@ -13,3 +13,7 @@ export {
 export {
   default as HistoryListService,
 } from "./Service";
+
+export {
+  RestController as HistoryListRestController,
+} from "./controllers";

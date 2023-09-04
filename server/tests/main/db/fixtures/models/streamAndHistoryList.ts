@@ -3,6 +3,11 @@ import { Stream, StreamMode } from "#modules/streams";
 import { OriginType } from "#modules/streams/models/Stream";
 import { deepFreeze } from "#utils/objects";
 
+export const HISTORY_LIST_WITH_NO_ENTRIES: HistoryList = deepFreeze( {
+  id: "id",
+  maxSize: 10,
+  entries: [],
+} );
 const HISTORY_ENTRY_SIMPSONS1: HistoryEntry = {
   episodeId : "1x01",
   serieId : "simpsons",

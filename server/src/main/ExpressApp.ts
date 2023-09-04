@@ -1,7 +1,7 @@
 import ActionController from "#modules/actions/ActionController";
 import { EpisodeRepository } from "#modules/episodes";
 import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
-import { HistoryListRepository } from "#modules/historyLists";
+import { HistoryListRepository, HistoryListRestController } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController } from "#modules/play";
 import { SerieRepository } from "#modules/series";
@@ -17,9 +17,9 @@ import { execSync } from "node:child_process";
 import fs from "node:fs";
 import serveIndex from "serve-index";
 
-type Dependencies = {
-  db?: {
-    instance: Database | null | undefined;
+export type ExpressAppDependencies = {
+  db: {
+    instance: Database;
   };
   play: {
     playSerieController: PublicMethodsOf<PlaySerieController>;
@@ -27,6 +27,9 @@ type Dependencies = {
   };
   pickerController: PublicMethodsOf<PickerController>;
   actionController: PublicMethodsOf<ActionController>;
+  historyList: {
+    restController: PublicMethodsOf<HistoryListRestController>;
+  };
 };
 
 // Necesario para poder replicarla para test
@@ -43,12 +46,15 @@ export default class ExpressApp implements App {
 
   #actionController: PublicMethodsOf<ActionController>;
 
-  constructor( {db, play: {playSerieController, playStreamController}, pickerController, actionController}: Dependencies) {
+  #historyListRestController: PublicMethodsOf<HistoryListRestController>;
+
+  constructor( {db, play: {playSerieController, playStreamController}, pickerController, actionController, historyList}: ExpressAppDependencies) {
     this.#database = db?.instance ?? null;
     this.#playSerieController = playSerieController;
     this.#playStreamController = playStreamController;
     this.#pickerController = pickerController;
     this.#actionController = actionController;
+    this.#historyListRestController = historyList.restController;
   }
 
   async init() {
@@ -85,6 +91,8 @@ export default class ExpressApp implements App {
     app.use("/api/picker", this.#pickerController.getRouter());
 
     app.use("/api/actions", this.#actionController.getRouter());
+
+    app.use("/api/history-list", this.#historyListRestController.getRouter());
 
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;
