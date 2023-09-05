@@ -1,8 +1,8 @@
 import { HistoryList } from "#modules/historyLists";
 import { SerieId } from "#modules/series";
-import { CanCreateManyAndGet, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import { CanCreateManyAndGet, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import Model, { ModelFullId } from "../models/Episode";
-import { docOdmToModel, modelToDocOdm } from "./adapters";
+import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 
 type UpdateOneParams = Model;
@@ -10,6 +10,7 @@ type UpdateOneParams = Model;
 export default class Repository
 implements CanGetOneById<Model, ModelFullId>,
 CanUpdateOneByIdAndGet<Model, ModelFullId>,
+CanPatchOneByIdAndGet<Model, ModelFullId>,
 CanCreateManyAndGet<Model>
 {
   async getAllFromSerieId(id: SerieId): Promise<Model[]> {
@@ -66,15 +67,23 @@ CanCreateManyAndGet<Model>
   }
 
   async updateOneByIdAndGet(fullId: ModelFullId, episode: UpdateOneParams): Promise<Model | null> {
-    const modelOdm = modelToDocOdm(episode);
-    const updateResult = await ModelOdm.updateOne(fullId, modelOdm);
+    const docOdm: DocOdm = modelToDocOdm(episode);
+    const updateResult = await ModelOdm.updateOne(fullId, docOdm);
 
     if (updateResult.matchedCount === 0)
       return null;
 
-    const ret = docOdmToModel(modelOdm);
+    return this.getOneById(fullId);
+  }
 
-    return ret;
+  async patchOneByIdAndGet(fullId: ModelFullId, episode: Partial<UpdateOneParams>): Promise<Model | null> {
+    const partialDocOdm: Partial<DocOdm> = partialModelToDocOdm(episode);
+    const updateResult = await ModelOdm.updateOne(fullId, partialDocOdm);
+
+    if (updateResult.matchedCount === 0)
+      return null;
+
+    return this.getOneById(fullId);
   }
 
   async createManyAndGet(models: Model[]): Promise<Model[]> {

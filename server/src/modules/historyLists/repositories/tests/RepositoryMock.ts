@@ -7,4 +7,8 @@ export default class RepositoryMock implements PublicMethodsOf<Repository> {
   getOneById = jest.fn();
 
   updateOneById = jest.fn();
+
+  createOneEntry = jest.fn();
+
+  getAll = jest.fn();
 }

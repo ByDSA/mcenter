@@ -5,3 +5,7 @@ export interface CanGetOneById<T, ID> {
 export interface CanGetAll<T> {
   getAll(): Promise<T[]>;
 }
+
+export interface CanGetMany<T, PARTIAL=Partial<T>> {
+  getMany(partial: PARTIAL): Promise<T[]>;
+}

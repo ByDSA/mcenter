@@ -1,34 +1,165 @@
+import { EpisodeRepository } from "#modules/episodes";
+import { SerieRepository } from "#modules/series";
 import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
-import { CanGetOneById } from "#utils/layers/controller";
-import { Response, Router } from "express";
-import { Repository } from "../repositories";
-import { GetOneByIdRequest, getOneByIdValidation } from "./validation";
+import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
+import express, { Request, Response, Router } from "express";
+import { Entry, Model } from "../models";
+import { ListRepository } from "../repositories";
+import { GetManyBySuperIdRequest, GetOneByIdRequest, getManyEntriesBySuperIdValidation, getManyEntriesValidation, getOneByIdValidation } from "./validation";
 
 type Params = {
-  historyListRepository: Repository;
+  historyListRepository: ListRepository;
+  serieRepository: SerieRepository;
+  episodeRepository: EpisodeRepository;
 };
 export default class RestController
-implements Controller, CanGetOneById<GetOneByIdRequest, Response> {
-  #historyListRepository: Repository;
+implements Controller,
+CanGetOneById<GetOneByIdRequest, Response>,
+CanGetAll<Request, Response> {
+  #historyListRepository: ListRepository;
 
-  constructor( {historyListRepository}: Params) {
+  #serieRepository: SerieRepository;
+
+  #episodeRepository: EpisodeRepository;
+
+  constructor( {historyListRepository,episodeRepository, serieRepository}: Params) {
     this.#historyListRepository = historyListRepository;
+    this.#serieRepository = serieRepository;
+    this.#episodeRepository = episodeRepository;
   }
 
-  async getOneById(req: GetOneByIdRequest, res: Response): Promise<void> {
+  async getAll(_: Request, res: Response): Promise<void> {
+    const got = this.#historyListRepository.getAll();
+
+    res.send(got);
+  }
+
+  async #getOneByIdByRequest(req: GetOneByIdRequest): Promise<Model> {
     const {id} = req.params;
     const got = await this.#historyListRepository.getOneById(id);
 
     assertFound(got);
 
+    return got;
+  }
+
+  async getOneById(req: GetOneByIdRequest, res: Response): Promise<void> {
+    const got = await this.#getOneByIdByRequest(req);
+
     res.send(got);
+  }
+
+  async getManyEntriesByHistoryListId(req: GetOneByIdRequest, res: Response): Promise<void> {
+    const got = await this.#getOneByIdByRequest(req);
+
+    res.send(got.entries);
+  }
+
+  async #getEntriesWithCriteriaApplied(entries: Entry[], body: GetManyBySuperIdRequest["body"]) {
+    let newEntries = entries;
+
+    if (body.filter) {
+      newEntries = newEntries.filter(entry => {
+        const {serieId, episodeId} = entry;
+
+        if (body.filter?.serieId && serieId !== body.filter.serieId)
+          return false;
+
+        if (body.filter?.episodeId && episodeId !== body.filter.episodeId)
+          return false;
+
+        return true;
+      } );
+    }
+
+    if (body.sort) {
+      const {timestamp} = body.sort;
+      const descSort = (a: Entry, b: Entry) => b.date.timestamp - a.date.timestamp;
+      const ascSort = (a: Entry, b: Entry) => a.date.timestamp - b.date.timestamp;
+
+      // TODO: cambiar a toSorted en node 20
+      if (timestamp === "asc")
+        newEntries = newEntries.sort(ascSort);
+      else if (timestamp === "desc")
+        newEntries = newEntries.sort(descSort);
+    }
+
+    if (body.offset)
+      newEntries = newEntries.slice(body.offset);
+
+    if (body.limit)
+      newEntries = newEntries.slice(0, body.limit);
+
+    if (body.expand) {
+      if (body.expand.includes("series")) {
+        const promises = newEntries.map(async (entry) => {
+          const {serieId} = entry;
+          const serie = await this.#serieRepository.getOneById(serieId);
+
+          if (serie)
+            // eslint-disable-next-line no-param-reassign
+            entry.serie = serie;
+
+          return entry;
+        } );
+
+        newEntries = await Promise.all(promises);
+      }
+
+      if (body.expand.includes("episodes")) {
+        const promises = newEntries.map(async (entry) => {
+          const {episodeId, serieId} = entry;
+          const episode = await this.#episodeRepository.getOneById( {
+            episodeId,
+            serieId,
+          } );
+
+          if (episode)
+            // eslint-disable-next-line no-param-reassign
+            entry.episode = episode;
+
+          return entry;
+        } );
+
+        newEntries = await Promise.all(promises);
+      }
+    }
+
+    return newEntries;
+  }
+
+  async getManyEntriesByHistoryListIdSearch(req: GetManyBySuperIdRequest, res: Response): Promise<void> {
+    const got = await this.#getOneByIdByRequest(req);
+    let {entries} = got;
+
+    entries = await this.#getEntriesWithCriteriaApplied(entries, req.body);
+
+    res.send(entries);
+  }
+
+  async getManyEntriesBySearch(req: GetManyBySuperIdRequest, res: Response): Promise<void> {
+    const got = await this.#historyListRepository.getAll();
+    let entries: Entry[] = [];
+
+    for (const historyList of got)
+      entries.push(...historyList.entries);
+
+    entries = await this.#getEntriesWithCriteriaApplied(entries, req.body);
+
+    res.send(entries);
   }
 
   getRouter(): Router {
     const router = SecureRouter();
 
+    router.get("/", this.getAll.bind(this));
     router.get("/:id", getOneByIdValidation, this.getOneById.bind(this));
+    router.get("/:id/entries", getOneByIdValidation, this.getManyEntriesByHistoryListId.bind(this));
+
+    router.use(express.json());
+    router.post("/entries/search", getManyEntriesValidation, this.getManyEntriesBySearch.bind(this));
+    router.post("/:id/entries/search", getManyEntriesBySuperIdValidation, this.getManyEntriesByHistoryListIdSearch.bind(this));
 
     return router;
   }

@@ -10,7 +10,7 @@ export function docOdmToModel(docOdm: DocOdm): Model {
   };
 }
 
-function entryDocOdmToModel(entryDocOdm: DocOdm["entries"][0]): Entry {
+export function entryDocOdmToModel(entryDocOdm: DocOdm["entries"][0]): Entry {
   return {
     serieId: entryDocOdm.serieId,
     episodeId: entryDocOdm.episodeId,
@@ -23,7 +23,7 @@ function entryDocOdmToModel(entryDocOdm: DocOdm["entries"][0]): Entry {
   };
 }
 
-function entryToDocOdm(entry: Entry): DocOdm["entries"][0] {
+export function entryToDocOdm(entry: Entry): DocOdm["entries"][0] {
   return {
     serieId: entry.serieId,
     episodeId: entry.episodeId,

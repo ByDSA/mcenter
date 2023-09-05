@@ -1,6 +1,10 @@
 export {
-  default as Repository,
+  default as ListRepository,
 } from "./Repository";
+
+export {
+  default as EntryRepository,
+} from "./EntryRepository";
 
 export * from "./adapters";
 

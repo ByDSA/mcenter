@@ -1,4 +1,4 @@
-import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
+import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 import { ModelOdm } from "./odm";
@@ -6,7 +6,20 @@ import { ModelOdm } from "./odm";
 export default class Repository
 implements CanUpdateOneById<Model, ModelId>,
 CanGetOneById<Model, ModelId>,
-CanCreateOne<Model> {
+CanCreateOne<Model>,
+CanGetAll<Model> {
+  async getAll(): Promise<Model[]> {
+    const docsOdm = await ModelOdm.find( {
+    }, {
+      _id: 0,
+    } );
+
+    if (docsOdm.length === 0)
+      return [];
+
+    return docsOdm.map(docOdmToModel);
+  }
+
   async createOne(historyList: Model): Promise<void> {
     const docOdm = modelToDocOdm(historyList);
 

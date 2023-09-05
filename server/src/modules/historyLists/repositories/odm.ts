@@ -17,8 +17,9 @@ export const EntrySchema = new mongoose.Schema<Entry>( {
   },
 } );
 
-export interface DocOdm extends Model {
-}
+export type EntryDocOdm = Entry;
+
+export type DocOdm = Model;
 
 const NAME = "HistoryList";
 

@@ -5,8 +5,8 @@ export {
 } from "./models";
 
 export {
-  DocOdm as HistoryListDocOdm,
-  ModelOdm as HistoryListModelOdm, Repository as HistoryListRepository, docOdmToModel as historyListDocOdmToModel,
+  EntryRepository as HistoryEntryRepository, DocOdm as HistoryListDocOdm,
+  ModelOdm as HistoryListModelOdm, ListRepository as HistoryListRepository, docOdmToModel as historyListDocOdmToModel,
   modelToDocOdm as historyListToDocOdm,
 } from "./repositories";
 

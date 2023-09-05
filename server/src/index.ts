@@ -66,6 +66,8 @@ import RealDatabase from "./main/db/Database";
     historyList: {
       restController: new HistoryListRestController( {
         historyListRepository,
+        episodeRepository,
+        serieRepository,
       } ),
     },
   } );

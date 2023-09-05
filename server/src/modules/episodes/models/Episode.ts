@@ -12,7 +12,7 @@ export const ModelFullIdSchema = z.object( {
 
 export type ModelFullId = z.infer<typeof ModelFullIdSchema>;
 
-const ModelSchema = resourceSchema.merge(ModelFullIdSchema).merge(canDurableSchema);
+export const ModelSchema = resourceSchema.merge(ModelFullIdSchema).merge(canDurableSchema);
 
 type Model = z.infer<typeof ModelSchema>;
 export default Model;

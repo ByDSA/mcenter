@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export type ModelId = string;
 
-const ModelSchema = z.object( {
+export const ModelSchema = z.object( {
   id: z.string(),
   name: z.string(),
 } ).strict();
