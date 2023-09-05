@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/ByDSA/mcenter/compare/v1.4.1...v1.5.0) (2023-09-05)
+
+
+### Features
+
+* endpoint de history-list para entries con search ([29e7959](https://github.com/ByDSA/mcenter/commit/29e7959864067e2772ac29a5df35d57743c1b8ff))
+
+
+### Bug Fixes
+
+*  arreglado nombre  de historyListId en playStream ([e77ae40](https://github.com/ByDSA/mcenter/commit/e77ae405a2118d0f73b8378f24d47fe1a17a3490))
+
 ### [1.4.1](https://github.com/ByDSA/mcenter/compare/v1.4.0...v1.4.1) (2023-09-04)
 
 
