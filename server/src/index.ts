@@ -2,7 +2,7 @@ import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
 import { EpisodePickerService, EpisodeRepository } from "#modules/episodes";
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
-import { HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
+import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, VLCService } from "#modules/play";
 import { SerieRepository } from "#modules/series";
@@ -18,20 +18,20 @@ import RealDatabase from "./main/db/Database";
   const historyListRepository = new HistoryListRepository();
   const serieRepository = new SerieRepository();
   const episodeRepository = new EpisodeRepository();
-  const historyService = new HistoryListService( {
+  const historyListService = new HistoryListService( {
     episodeRepository,
-    historyRepository: historyListRepository,
+    historyListRepository,
+    historyEntryRepository: new HistoryEntryRepository(),
   } );
   const vlcService = new VLCService();
   const playService = new PlayService( {
     playerService: vlcService,
-    historyListRepository,
-    historyListService: historyService,
   } );
   const playSerieController = new PlaySerieController( {
     serieRepository,
     episodeRepository,
     playService,
+    historyListService,
   } );
   const episodePickerService = new EpisodePickerService( {
     episodeRepository,
@@ -43,6 +43,7 @@ import RealDatabase from "./main/db/Database";
     playService,
     streamRepository,
     episodePickerService,
+    historyListService,
   } );
   const app = new ExpressApp( {
     db: {

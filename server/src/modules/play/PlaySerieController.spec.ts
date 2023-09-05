@@ -1,5 +1,5 @@
 import { EpisodeRepository } from "#modules/episodes";
-import { HistoryListRepository, HistoryListService } from "#modules/historyLists";
+import { HistoryEntryRepository, HistoryListRepository, HistoryListService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { TestMongoDatabase } from "#tests/main";
 import TestDatabase from "#tests/main/db/TestDatabase";
@@ -28,24 +28,23 @@ describe("PlaySerieController", () => {
 
     const episodeRepository = new EpisodeRepository();
     const serieRepository = new SerieRepository();
+    const historyListRepository = new HistoryListRepository();
     const historyListService = new HistoryListService( {
       episodeRepository,
-      historyRepository: new HistoryListRepository(),
+      historyListRepository,
+      historyEntryRepository: new HistoryEntryRepository(),
     } );
-    const historyListRepository = new HistoryListRepository();
 
     playerServiceMock = new PlayerServiceMock();
     const playService = new PlayService( {
-      historyListService,
       playerService: playerServiceMock,
-      historyListRepository,
-
     } );
 
     playSerieController = new PlaySerieController( {
       episodeRepository,
       serieRepository,
       playService,
+      historyListService,
     } );
 
     routerApp = RouterApp(playSerieController.getRouter());
