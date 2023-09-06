@@ -16,7 +16,8 @@
     "server"
   ],
   "dependencies": {
-    "esm": "3.2.25"
+    "esm": "3.2.25",
+    "zod": "3.22.2"
   },
   "devDependencies": {
     "@commitlint/cli": "17.6.6",
