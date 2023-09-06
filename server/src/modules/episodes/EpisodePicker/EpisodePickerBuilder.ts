@@ -1,15 +1,15 @@
 import { HistoryList } from "#modules/historyLists";
 import { Serie } from "#modules/series";
 import { Stream, StreamMode } from "#modules/streams";
-import { neverCase } from "#utils/validation";
-import Episode from "../models/Episode";
+import { neverCase } from "#shared/utils/validation";
+import { Model } from "../models";
 import EpisodePicker from "./EpisodePicker";
 import RandomPicker from "./EpisodePickerRandom";
 import SequentialPicker from "./EpisodePickerSequential";
 
 type Params = {
-  episodes: Episode[];
-  lastEp?: Episode;
+  episodes: Model[];
+  lastEp?: Model;
   mode: StreamMode;
   serie: Serie;
   stream: Stream;

@@ -1,4 +1,4 @@
-import HttpStatusCode from "../StatusCode";
+import HttpStatusCode from "#shared/utils/http/StatusCode";
 import HttpError from "./HttpError";
 
 export const NotUpdatedErrorName = "NotUpdatedError";

@@ -1,5 +1,5 @@
 import { Episode } from "#modules/episodes";
-import { deepFreeze } from "#utils/objects";
+import { deepFreeze } from "#shared/utils/objects";
 
 const ep1x01: Episode = {
   "episodeId" : "1x01",

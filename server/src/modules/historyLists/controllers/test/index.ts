@@ -1,5 +1,5 @@
+import { PublicMethodsOf } from "#shared/utils/types";
 import { getRouterMock } from "#tests/main";
-import { PublicMethodsOf } from "#utils/types";
 import RestController from "../RestController";
 
 export class HistoryListRestControllerMock implements PublicMethodsOf<RestController> {

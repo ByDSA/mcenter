@@ -1,4 +1,4 @@
-import { assertIsModel } from "./models/Serie";
+import { assertIsModel } from "./models";
 
 describe("assertIsModel", () => {
   const VALID_MODEL = {

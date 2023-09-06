@@ -2,7 +2,7 @@
 import { HistoryList } from "#modules/historyLists";
 import { Serie, SerieId } from "#modules/series";
 import { Stream } from "#modules/streams";
-import { asyncFilter } from "#utils/arrays";
+import { asyncFilter } from "#shared/utils/arrays";
 import { Picker } from "rand-picker";
 import LastTimePlayedService from "../../LastTimePlayedService";
 import { Model, ModelFullId, ModelId } from "../../models";

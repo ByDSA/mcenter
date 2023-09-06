@@ -4,9 +4,10 @@ import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
 import express, { Request, Response, Router } from "express";
+import { HistoryListGetManyBySuperIdRequest, HistoryListGetOneByIdRequest } from "#sharedSrc/models/historyLists";
 import { Entry, Model } from "../models";
 import { ListRepository } from "../repositories";
-import { GetManyBySuperIdRequest, GetOneByIdRequest, getManyEntriesBySuperIdValidation, getManyEntriesValidation, getOneByIdValidation } from "./validation";
+import { getManyEntriesBySuperIdValidation, getManyEntriesValidation, getOneByIdValidation } from "./validation";
 
 type Params = {
   historyListRepository: ListRepository;
@@ -15,7 +16,7 @@ type Params = {
 };
 export default class RestController
 implements Controller,
-CanGetOneById<GetOneByIdRequest, Response>,
+CanGetOneById<HistoryListGetOneByIdRequest, Response>,
 CanGetAll<Request, Response> {
   #historyListRepository: ListRepository;
 
@@ -35,7 +36,7 @@ CanGetAll<Request, Response> {
     res.send(got);
   }
 
-  async #getOneByIdByRequest(req: GetOneByIdRequest): Promise<Model> {
+  async #getOneByIdByRequest(req: HistoryListGetOneByIdRequest): Promise<Model> {
     const {id} = req.params;
     const got = await this.#historyListRepository.getOneById(id);
 
@@ -44,19 +45,19 @@ CanGetAll<Request, Response> {
     return got;
   }
 
-  async getOneById(req: GetOneByIdRequest, res: Response): Promise<void> {
+  async getOneById(req: HistoryListGetOneByIdRequest, res: Response): Promise<void> {
     const got = await this.#getOneByIdByRequest(req);
 
     res.send(got);
   }
 
-  async getManyEntriesByHistoryListId(req: GetOneByIdRequest, res: Response): Promise<void> {
+  async getManyEntriesByHistoryListId(req: HistoryListGetOneByIdRequest, res: Response): Promise<void> {
     const got = await this.#getOneByIdByRequest(req);
 
     res.send(got.entries);
   }
 
-  async #getEntriesWithCriteriaApplied(entries: Entry[], body: GetManyBySuperIdRequest["body"]) {
+  async #getEntriesWithCriteriaApplied(entries: Entry[], body: HistoryListGetManyBySuperIdRequest["body"]) {
     let newEntries = entries;
 
     if (body.filter) {
@@ -129,7 +130,7 @@ CanGetAll<Request, Response> {
     return newEntries;
   }
 
-  async getManyEntriesByHistoryListIdSearch(req: GetManyBySuperIdRequest, res: Response): Promise<void> {
+  async getManyEntriesByHistoryListIdSearch(req: HistoryListGetManyBySuperIdRequest, res: Response): Promise<void> {
     const got = await this.#getOneByIdByRequest(req);
     let {entries} = got;
 
@@ -138,7 +139,7 @@ CanGetAll<Request, Response> {
     res.send(entries);
   }
 
-  async getManyEntriesBySearch(req: GetManyBySuperIdRequest, res: Response): Promise<void> {
+  async getManyEntriesBySearch(req: HistoryListGetManyBySuperIdRequest, res: Response): Promise<void> {
     const got = await this.#historyListRepository.getAll();
     let entries: Entry[] = [];
 

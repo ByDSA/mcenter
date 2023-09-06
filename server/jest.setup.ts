@@ -1,7 +1,8 @@
 import * as dotenv from "dotenv";
 import mongoose from "mongoose";
 import { existsSync } from "node:fs";
-import { isDebugging } from "./src/utils/vscode";
+// eslint-disable-next-line import/no-relative-packages
+import { isDebugging } from "../shared/src/utils/vscode";
 
 if (!isDebugging()) {
   global.console.log = jest.fn(); // Mockear console.log

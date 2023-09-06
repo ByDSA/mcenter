@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable require-await */
 import { HistoryList } from "#modules/historyLists";
-import { isDefined } from "#utils/validation";
+import { isDefined } from "#shared/utils/validation";
 import { daysBetween } from "date-ops";
 import { DateTime } from "luxon";
 import LastTimePlayed from "../../LastTimePlayedService";

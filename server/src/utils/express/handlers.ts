@@ -1,6 +1,6 @@
+import { ArrayOneOrMore } from "#shared/utils/arrays";
+import HttpMethod from "#shared/utils/http/HttpMethod";
 import { Handler, Request, Response } from "express";
-import { ArrayOneOrMore } from "#utils/arrays";
-import HttpMethod from "../http/HttpMethod";
 
 export type GeneralRoute = {
   method: HttpMethod;

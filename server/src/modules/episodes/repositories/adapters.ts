@@ -1,9 +1,8 @@
-/* eslint-disable import/prefer-default-export */
-import { Model, assertIsModel } from "../models";
+import { Episode, assertIsEpisode } from "#shared/models/episodes";
 import { DocOdm } from "./odm";
 
-export function docOdmToModel(docOdm: DocOdm): Model {
-  const model: Model = {
+export function docOdmToModel(docOdm: DocOdm): Episode {
+  const model: Episode = {
     episodeId: docOdm.episodeId,
     serieId: docOdm.serieId,
     path: docOdm.path,
@@ -25,13 +24,13 @@ export function docOdmToModel(docOdm: DocOdm): Model {
   if (docOdm.lastTimePlayed !== undefined)
     model.lastTimePlayed = docOdm.lastTimePlayed;
 
-  assertIsModel(model);
+  assertIsEpisode(model);
 
   return model;
 }
 
-export function modelToDocOdm(model: Model): DocOdm {
-  assertIsModel(model);
+export function modelToDocOdm(model: Episode): DocOdm {
+  assertIsEpisode(model);
   const ret: DocOdm = {
     episodeId: model.episodeId,
     serieId: model.serieId,
@@ -57,7 +56,7 @@ export function modelToDocOdm(model: Model): DocOdm {
   return ret;
 }
 
-export function partialModelToDocOdm(model: Partial<Model>): Partial<DocOdm> {
+export function partialModelToDocOdm(model: Partial<Episode>): Partial<DocOdm> {
   const ret: Partial<DocOdm> = {
   };
 

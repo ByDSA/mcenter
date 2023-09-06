@@ -1,9 +1,9 @@
 import { HistoryList, HistoryListRepository } from "#modules/historyLists";
-import { deepCopy } from "#utils/objects";
-import { DateType } from "#utils/time";
-import { isDefined } from "#utils/validation";
+import { deepCopy } from "#shared/utils/objects";
+import { DateType } from "#shared/utils/time";
+import { isDefined } from "#shared/utils/validation";
 import { DateTime } from "luxon";
-import Model, { compareFullId, fullIdOf } from "./models/Episode";
+import { Model, compareFullId, fullIdOf } from "./models";
 import { Repository } from "./repositories";
 
 function getTimestampFromDateType(date: DateType): number {

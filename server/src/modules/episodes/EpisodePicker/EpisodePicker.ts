@@ -1,5 +1,5 @@
-import Episode from "../models/Episode";
+import { Model } from "../models";
 
 export default interface EpisodePicker {
-  pick(n: number): Promise<Episode[]>;
+  pick(n: number): Promise<Model[]>;
 }

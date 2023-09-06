@@ -2,7 +2,7 @@ import { episodeDocOdmToModel } from "#modules/episodes";
 import { expectEpisodes } from "#modules/episodes/models/test";
 import { ModelOdm } from "#modules/episodes/repositories";
 import { SerieDocOdm, SerieModelOdm, serieDocOdmToModel } from "#modules/series";
-import { expectSerie } from "#modules/series/models/test";
+import { expectSerie } from "#sharedSrc/models/series/test";
 import TestDatabase from "../TestDatabase";
 import TestMongoDatabase from "../TestMongoDatabase";
 import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "./models";

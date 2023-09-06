@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { Episode } from "#modules/episodes";
-import { assertIsDefined } from "#utils/validation";
+import { assertIsDefined } from "#shared/utils/validation";
 import { MediaElement } from "./player";
 
 export function episodeToMediaElement(e: Episode): MediaElement {

@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import { Episode } from "#modules/episodes";
-import { PublicMethodsOf } from "#utils/types";
-import { assertIsNotEmpty } from "#utils/validation";
+import { PublicMethodsOf } from "#shared/utils/types";
+import { assertIsNotEmpty } from "#shared/utils/validation";
 import { episodeToMediaElement } from "./adapters";
 import { MediaElement, PlayerService } from "./player";
 

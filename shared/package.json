@@ -1,0 +1,19 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "pnpm build:clean && pnpm build:raw",
+    "build:raw": "tsc -p tsconfig-build.json",
+    "build:clean": "rm -rf build",
+    "test": "NODE_ENV=test jest",
+    "test:watch": "pnpm run test --watch",
+    "test:coverage": "pnpm run test --coverage",
+    "test:coverage:clean": "rm -rf coverage"
+  },
+  "devDependencies": {
+    "@types/node": "18.17.14",
+    "@types/jest": "29.5.4"
+  }
+}

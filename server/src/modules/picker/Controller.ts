@@ -6,10 +6,10 @@ import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import SerieService from "#modules/series/SerieService";
 import { StreamRepository } from "#modules/streams";
-import { asyncMap } from "#utils/arrays";
+import { asyncMap } from "#shared/utils/arrays";
+import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
-import { assertIsDefined } from "#utils/validation";
 import express, { Request, Response } from "express";
 
 type ResultType = Episode & {

@@ -1,5 +1,5 @@
+import { assertIsDefined } from "#shared/utils/validation";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
-import { assertIsDefined } from "#utils/validation";
 import PreventRepeatLastFilter from "./PreventRepeatLastFilter";
 
 const DEFAULT_EPISODE = EPISODES_SIMPSONS[0];

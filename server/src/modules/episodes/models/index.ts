@@ -1,3 +1,3 @@
 export {
-  default as Model, ModelFullId, ModelFullIdSchema, ModelId, ModelSchema, assertIsModel, compareFullId, fullIdOf, 
-} from "./Episode";
+  Episode as Model, EpisodeFullId as ModelFullId, EpisodeFullIdSchema as ModelFullIdSchema, EpisodeId as ModelId, EpisodeSchema as ModelSchema, assertIsEpisode as assertIsModel, compareEpisodeFullId as compareFullId, episodeFullIdOf as fullIdOf,
+} from "#shared/models/episodes";

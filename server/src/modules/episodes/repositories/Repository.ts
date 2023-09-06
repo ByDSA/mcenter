@@ -1,7 +1,7 @@
 import { HistoryList } from "#modules/historyLists";
 import { SerieId } from "#modules/series";
 import { CanCreateManyAndGet, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
-import Model, { ModelFullId } from "../models/Episode";
+import { Model, ModelFullId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 

@@ -1,4 +1,4 @@
-import { errorPopStack } from "#utils/errors/stack";
+import { errorPopStack } from "#shared/utils/errors/stack";
 import { NextFunction, Request, Response, Router } from "express";
 
 const MATCHERS = [

@@ -3,8 +3,8 @@
 import { HistoryList, createHistoryEntryByEpisodeFullId } from "#modules/historyLists";
 import { Serie } from "#modules/series";
 import { Stream } from "#modules/streams";
-import { throwErrorPopStack } from "#utils/errors";
-import { assertIsDefined, isDefined } from "#utils/validation";
+import { throwErrorPopStack } from "#shared/utils/errors";
+import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
 import { Model, compareFullId } from "../models";

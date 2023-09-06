@@ -1,8 +1,8 @@
-import { ArrayOneOrMore } from "#utils/arrays";
-import { mergeOpts } from "#utils/objects";
+import { ArrayOneOrMore } from "#shared/utils/arrays";
+import HttpMethod from "#shared/utils/http/HttpMethod";
+import { mergeOpts } from "#shared/utils/objects";
 import { Handler } from "express";
 import { NOT_IMPLEMENTED_HANDLER } from "../../express/handlers";
-import HttpMethod from "../../http/HttpMethod";
 import Router from "./Router";
 
 type GeneralRoute = {

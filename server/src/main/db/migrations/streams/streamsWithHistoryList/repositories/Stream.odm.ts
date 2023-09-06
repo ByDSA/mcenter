@@ -1,5 +1,5 @@
 import { MongoSchema } from "#main/db/migrations/utils";
-import { assertZodPopStack } from "#utils/validation/zod";
+import { assertZodPopStack } from "#shared/utils/validation/zod";
 import { z } from "zod";
 import { HistoryEntryInStreamSchema, OldDateTypeSchema } from "../models/HistoryEntryInStream";
 import { StreamWithHistoryListSchema } from "../models/StreamWithHistoryList";

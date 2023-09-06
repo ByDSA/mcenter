@@ -1,4 +1,4 @@
-import { Resource } from "#modules/utils/resource";
+import { Resource } from "#shared/models/resource";
 
 type Params<R extends Resource> = {
   resource: R;

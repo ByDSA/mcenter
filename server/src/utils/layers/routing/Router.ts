@@ -1,8 +1,8 @@
-import { deepMerge } from "#utils/objects";
-import { neverCase } from "#utils/validation";
+import HttpMethod from "#shared/utils/http/HttpMethod";
+import { deepMerge } from "#shared/utils/objects";
+import { neverCase } from "#shared/utils/validation";
 import { Application, Router as ExpressRouter } from "express";
 import { GeneralRoute } from "../../express/handlers";
-import HttpMethod from "../../http/HttpMethod";
 
 type Params = {
   url: string;

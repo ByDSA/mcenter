@@ -1,8 +1,8 @@
 import { EpisodeRepositoryMock } from "#modules/episodes/repositories/tests";
 import { SerieRepositoryMock } from "#modules/series/repositories/tests";
+import HttpStatusCode from "#shared/utils/http/StatusCode";
 import { HISTORY_LIST_SIMPSONS, HISTORY_LIST_WITH_NO_ENTRIES } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
-import HttpStatusCode from "#utils/http/StatusCode";
 import { Application } from "express";
 import request from "supertest";
 import { HistoryListRepositoryMock } from "../repositories/tests";

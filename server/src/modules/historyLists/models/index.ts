@@ -1,14 +1,8 @@
 export {
-  default as Entry,
-  assertIsEntry,
-} from "./HistoryEntry";
-
-export {
-  default as Model,
-  ModelId,
-  assertIsModel,
-} from "./HistoryList";
-
-export {
+  HistoryEntry as Entry,
+  HistoryList as Model,
+  HistoryListId as ModelId,
+  assertIsHistoryEntry as assertIsEntry,
+  assertIsHistoryList as assertIsModel,
   createHistoryEntryByEpisodeFullId,
-} from "./utils";
+} from "#shared/models/historyLists";

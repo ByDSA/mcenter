@@ -1,4 +1,4 @@
-import { throwErrorPopStack } from "#utils/errors";
+import { throwErrorPopStack } from "#shared/utils/errors";
 import mongoose from "mongoose";
 import NotConnectedError from "../NotConnectedError";
 

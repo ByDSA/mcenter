@@ -1,4 +1,4 @@
-import { assertIsDefined } from "#utils/validation";
+import { assertIsDefined } from "#shared/utils/validation";
 import express, { Express } from "express";
 import { Server } from "node:http";
 import https from "node:https";

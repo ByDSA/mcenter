@@ -1,4 +1,4 @@
-import { PublicMethodsOf } from "#utils/types";
+import { PublicMethodsOf } from "#shared/utils/types";
 import Repository from "../Repository";
 
 export class SerieRepositoryMock implements PublicMethodsOf<Repository> {

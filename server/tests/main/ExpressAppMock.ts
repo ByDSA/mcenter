@@ -4,7 +4,7 @@ import { ActionControllerMock } from "#modules/actions/test";
 import { HistoryListRestControllerMock } from "#modules/historyLists/controllers/test";
 import { PickerControllerMock } from "#modules/picker/tests";
 import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
-import { deepMerge } from "#utils/objects";
+import { deepMerge } from "#shared/utils/objects";
 import { TestMongoDatabase } from "./db";
 import TestDatabase from "./db/TestDatabase";
 

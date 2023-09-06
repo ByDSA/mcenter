@@ -1,5 +1,5 @@
+import { assertIsDefined } from "#shared/utils/validation";
 import { Database } from "#utils/layers/db";
-import { assertIsDefined } from "#utils/validation";
 import mongoose, { ConnectOptions } from "mongoose";
 
 export type Options = ConnectOptions;

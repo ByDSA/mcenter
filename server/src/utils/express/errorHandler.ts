@@ -1,5 +1,5 @@
+import { isDebugging } from "#shared/utils/vscode";
 import { NotFoundError } from "#utils/http/validation";
-import { isDebugging } from "#utils/vscode";
 import { NextFunction, Request, Response } from "express";
 
 const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {

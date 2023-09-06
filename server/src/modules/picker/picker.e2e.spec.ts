@@ -1,7 +1,7 @@
+import { assertIsDefined } from "#shared/utils/validation";
 import ExpressAppMock from "#tests/main/ExpressAppMock";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
-import { assertIsDefined } from "#utils/validation";
 import { Application } from "express";
 import request from "supertest";
 import PickerController from "./Controller";

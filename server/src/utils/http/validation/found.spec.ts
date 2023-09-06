@@ -1,4 +1,4 @@
-import { definedEntries, expectErrorStackStartsWithThisFilename, undefinedEntries } from "#utils/tests";
+import { definedEntries, expectErrorStackStartsWithThisFilename, undefinedEntries } from "#sharedSrc/utils/tests";
 import { NotFoundError, assertFound } from "./found";
 
 describe("assertFound", () => {

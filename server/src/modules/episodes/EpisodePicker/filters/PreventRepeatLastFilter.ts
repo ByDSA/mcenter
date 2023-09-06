@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { isDefined } from "#utils/validation";
+import { isDefined } from "#shared/utils/validation";
 import { Model, ModelFullId, compareFullId } from "../../models";
 import Filter from "./Filter";
 

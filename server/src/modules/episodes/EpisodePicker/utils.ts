@@ -1,4 +1,4 @@
-import Model from "#modules/historyLists/models/HistoryList";
+import { HistoryList } from "#modules/historyLists";
 import { Serie } from "#modules/series";
 import { Stream } from "#modules/streams";
 import { Picker } from "rand-picker";
@@ -10,5 +10,5 @@ export type Params<R> = {
   episodes: R[];
   lastEp: R | null;
   stream: Stream;
-  historyList: Model;
+  historyList: HistoryList;
 };

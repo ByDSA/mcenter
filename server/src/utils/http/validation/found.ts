@@ -1,6 +1,6 @@
-import { throwErrorPopStack } from "#utils/errors";
-import { isDefined } from "#utils/validation";
-import HttpStatusCode from "../StatusCode";
+import { throwErrorPopStack } from "#shared/utils/errors";
+import HttpStatusCode from "#shared/utils/http/StatusCode";
+import { isDefined } from "#shared/utils/validation";
 import HttpError from "./HttpError";
 
 export function assertFound<T>(value: T | null | undefined, msg?: string): asserts value is T {

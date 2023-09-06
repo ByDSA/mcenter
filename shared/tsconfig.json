@@ -1,0 +1,28 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "outDir": "build",
+    "sourceMap": true,
+    "inlineSources": true,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "noImplicitAny": true,
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2023", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "#tests/*": ["tests/*"],
+      "#tests": ["tests"]
+    }
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules"],
+  "types": ["node"]
+}

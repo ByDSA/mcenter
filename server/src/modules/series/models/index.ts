@@ -1,5 +1,6 @@
 export {
-  default as Model,
-  ModelId,
-  ModelSchema,
-} from "./Serie";
+  Serie as Model,
+  SerieId as ModelId,
+  SerieSchema as ModelSchema,
+  assertIsSerie as assertIsModel,
+} from "#shared/models/series";

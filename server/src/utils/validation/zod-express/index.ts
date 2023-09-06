@@ -1,5 +1,5 @@
+import HttpStatusCode from "#shared/utils/http/StatusCode";
 import { ExpressMiddleware } from "#utils/express";
-import HttpStatusCode from "#utils/http/StatusCode";
 import { NextFunction, Request, Response } from "express";
 import { AnyZodObject } from "zod";
 

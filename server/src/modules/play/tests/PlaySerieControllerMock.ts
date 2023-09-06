@@ -1,4 +1,4 @@
-import { PublicMethodsOf } from "#utils/types";
+import { PublicMethodsOf } from "#shared/utils/types";
 import { Router } from "express";
 import PlaySerieController from "../PlaySerieController";
 

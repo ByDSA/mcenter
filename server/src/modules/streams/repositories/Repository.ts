@@ -1,6 +1,6 @@
 import { SerieId } from "#modules/series";
 import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
-import Model, { ModelId } from "../models/Stream";
+import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 import { ModelOdm } from "./odm";
 

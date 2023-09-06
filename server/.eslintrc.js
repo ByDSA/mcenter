@@ -41,12 +41,7 @@ module.exports = {
         capIsConstructor: false,
       },
     ],
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        devDependencies: true,
-      },
-    ],
+    "import/no-extraneous-dependencies": "off", // Para que no dé problemas importando dependencias del workspace global
     "no-useless-constructor": "off",
     "no-empty-function": [
       "error",
