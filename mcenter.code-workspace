@@ -1,12 +1,21 @@
 {
-	"folders": [
-		{
-			"path": "./shared"
-		},
-		{
-			"path": "./server"
-		},
-	],
-	"settings": {
-	}
+  "folders": [
+    {
+      "path": "./shared"
+    },
+    {
+      "path": "./server"
+    }
+  ],
+  "settings": {
+    "runOnSave.commands": [
+      {
+        "globMatch": "**/shared/**",
+        "command": "cd ${workspaceFolder} && pnpm i && pnpm test && pnpm build",
+        "runIn": "terminal",
+        "runningStatusMessage": "Compiling ${workspaceFolderBasename}...",
+        "finishStatusMessage": "${workspaceFolderBasename} compiled"
+      }
+    ]
+  }
 }
