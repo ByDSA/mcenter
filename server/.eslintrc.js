@@ -265,6 +265,7 @@ module.exports = {
         argv: true,
         path: true,
         fs: true,
+        cd: true,
         chalk: true,
       },
     },
