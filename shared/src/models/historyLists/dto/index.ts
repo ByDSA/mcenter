@@ -4,7 +4,16 @@ export {
 } from "./GetOneByIdRequest";
 
 export {
-  GetManyBySuperIdRequest,
+  GetManyEntriesBySuperIdRequest,
   assertIsGetManyEntriesBySuperIdRequest,
-  assertIsGetManyEntriesRequest,
-} from "./GetManyBySuperIdRequest";
+} from "./GetManyEntriesBySuperIdRequest";
+
+export {
+  GetManyEntriesBySearchRequest,
+  assertIsGetManyEntriesBySearchRequest,
+} from "./GetManyEntriesBySearchRequest";
+
+export {
+  GetManyEntriesBySearchResponse,
+  assertIsGetManyEntriesBySearchResponse,
+} from "./GetManyEntriesBySearchResponse";

@@ -1,13 +1,17 @@
 import { EpisodeRepository } from "#modules/episodes";
 import { SerieRepository } from "#modules/series";
+import {HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
+  HistoryListGetOneByIdRequest} from "#shared/models/historyLists";
 import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
+import cors from "cors";
 import express, { Request, Response, Router } from "express";
-import { HistoryListGetManyBySuperIdRequest, HistoryListGetOneByIdRequest } from "#sharedSrc/models/historyLists";
 import { Entry, Model } from "../models";
 import { ListRepository } from "../repositories";
-import { getManyEntriesBySuperIdValidation, getManyEntriesValidation, getOneByIdValidation } from "./validation";
+import {getManyEntriesBySearchValidation,
+  getManyEntriesBySuperIdValidation,
+  getOneByIdValidation} from "./validation";
 
 type Params = {
   historyListRepository: ListRepository;
@@ -15,16 +19,20 @@ type Params = {
   episodeRepository: EpisodeRepository;
 };
 export default class RestController
-implements Controller,
-CanGetOneById<HistoryListGetOneByIdRequest, Response>,
-CanGetAll<Request, Response> {
+implements
+    Controller,
+    CanGetOneById<HistoryListGetOneByIdRequest, Response>,
+    CanGetAll<Request, Response>
+{
   #historyListRepository: ListRepository;
 
   #serieRepository: SerieRepository;
 
   #episodeRepository: EpisodeRepository;
 
-  constructor( {historyListRepository,episodeRepository, serieRepository}: Params) {
+  constructor( {historyListRepository,
+    episodeRepository,
+    serieRepository}: Params) {
     this.#historyListRepository = historyListRepository;
     this.#serieRepository = serieRepository;
     this.#episodeRepository = episodeRepository;
@@ -36,8 +44,10 @@ CanGetAll<Request, Response> {
     res.send(got);
   }
 
-  async #getOneByIdByRequest(req: HistoryListGetOneByIdRequest): Promise<Model> {
-    const {id} = req.params;
+  async #getOneByIdByRequest(
+    req: HistoryListGetOneByIdRequest,
+  ): Promise<Model> {
+    const { id } = req.params;
     const got = await this.#historyListRepository.getOneById(id);
 
     assertFound(got);
@@ -45,24 +55,33 @@ CanGetAll<Request, Response> {
     return got;
   }
 
-  async getOneById(req: HistoryListGetOneByIdRequest, res: Response): Promise<void> {
+  async getOneById(
+    req: HistoryListGetOneByIdRequest,
+    res: Response,
+  ): Promise<void> {
     const got = await this.#getOneByIdByRequest(req);
 
     res.send(got);
   }
 
-  async getManyEntriesByHistoryListId(req: HistoryListGetOneByIdRequest, res: Response): Promise<void> {
+  async getManyEntriesByHistoryListId(
+    req: HistoryListGetOneByIdRequest,
+    res: Response,
+  ): Promise<void> {
     const got = await this.#getOneByIdByRequest(req);
 
     res.send(got.entries);
   }
 
-  async #getEntriesWithCriteriaApplied(entries: Entry[], body: HistoryListGetManyBySuperIdRequest["body"]) {
+  async #getEntriesWithCriteriaApplied(
+    entries: Entry[],
+    body: HistoryListGetManyEntriesBySuperIdRequest["body"],
+  ) {
     let newEntries = entries;
 
     if (body.filter) {
-      newEntries = newEntries.filter(entry => {
-        const {serieId, episodeId} = entry;
+      newEntries = newEntries.filter((entry) => {
+        const { serieId, episodeId } = entry;
 
         if (body.filter?.serieId && serieId !== body.filter.serieId)
           return false;
@@ -75,9 +94,11 @@ CanGetAll<Request, Response> {
     }
 
     if (body.sort) {
-      const {timestamp} = body.sort;
-      const descSort = (a: Entry, b: Entry) => b.date.timestamp - a.date.timestamp;
-      const ascSort = (a: Entry, b: Entry) => a.date.timestamp - b.date.timestamp;
+      const { timestamp } = body.sort;
+      const descSort = (a: Entry, b: Entry) =>
+        b.date.timestamp - a.date.timestamp;
+      const ascSort = (a: Entry, b: Entry) =>
+        a.date.timestamp - b.date.timestamp;
 
       // TODO: cambiar a toSorted en node 20
       if (timestamp === "asc")
@@ -95,7 +116,7 @@ CanGetAll<Request, Response> {
     if (body.expand) {
       if (body.expand.includes("series")) {
         const promises = newEntries.map(async (entry) => {
-          const {serieId} = entry;
+          const { serieId } = entry;
           const serie = await this.#serieRepository.getOneById(serieId);
 
           if (serie)
@@ -110,7 +131,7 @@ CanGetAll<Request, Response> {
 
       if (body.expand.includes("episodes")) {
         const promises = newEntries.map(async (entry) => {
-          const {episodeId, serieId} = entry;
+          const { episodeId, serieId } = entry;
           const episode = await this.#episodeRepository.getOneById( {
             episodeId,
             serieId,
@@ -130,16 +151,22 @@ CanGetAll<Request, Response> {
     return newEntries;
   }
 
-  async getManyEntriesByHistoryListIdSearch(req: HistoryListGetManyBySuperIdRequest, res: Response): Promise<void> {
+  async getManyEntriesByHistoryListIdSearch(
+    req: HistoryListGetManyEntriesBySuperIdRequest,
+    res: Response,
+  ): Promise<void> {
     const got = await this.#getOneByIdByRequest(req);
-    let {entries} = got;
+    let { entries } = got;
 
     entries = await this.#getEntriesWithCriteriaApplied(entries, req.body);
 
     res.send(entries);
   }
 
-  async getManyEntriesBySearch(req: HistoryListGetManyBySuperIdRequest, res: Response): Promise<void> {
+  async getManyEntriesBySearch(
+    req: HistoryListGetManyEntriesBySearchRequest,
+    res: Response,
+  ): Promise<void> {
     const got = await this.#historyListRepository.getAll();
     let entries: Entry[] = [];
 
@@ -154,13 +181,35 @@ CanGetAll<Request, Response> {
   getRouter(): Router {
     const router = SecureRouter();
 
+    router.use(cors( {
+      origin: "http://localhost:3000",
+    } ));
+
     router.get("/", this.getAll.bind(this));
     router.get("/:id", getOneByIdValidation, this.getOneById.bind(this));
-    router.get("/:id/entries", getOneByIdValidation, this.getManyEntriesByHistoryListId.bind(this));
+    router.get(
+      "/:id/entries",
+      getOneByIdValidation,
+      this.getManyEntriesByHistoryListId.bind(this),
+    );
 
     router.use(express.json());
-    router.post("/entries/search", getManyEntriesValidation, this.getManyEntriesBySearch.bind(this));
-    router.post("/:id/entries/search", getManyEntriesBySuperIdValidation, this.getManyEntriesByHistoryListIdSearch.bind(this));
+    router.post(
+      "/entries/search",
+      getManyEntriesBySearchValidation,
+      this.getManyEntriesBySearch.bind(this),
+    );
+    router.options("/entries/search", (req, res) => {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
+      res.sendStatus(200);
+    } );
+    router.post(
+      "/:id/entries/search",
+      getManyEntriesBySuperIdValidation,
+      this.getManyEntriesByHistoryListIdSearch.bind(this),
+    );
 
     return router;
   }
