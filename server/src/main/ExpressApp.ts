@@ -10,6 +10,7 @@ import { PublicMethodsOf } from "#shared/utils/types";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import { Database } from "#utils/layers/db";
+import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import schedule from "node-schedule";
@@ -81,6 +82,21 @@ export default class ExpressApp implements App {
     };
 
     app.use(requestLogger);
+
+    const {FRONTEND_URL} = process.env;
+
+    assertIsDefined(FRONTEND_URL);
+    const whitelist: string[] = [FRONTEND_URL];
+
+    app.use(cors( {
+      preflightContinue: true,
+      origin(origin, callback) {
+        if (origin && whitelist.includes(origin))
+          callback(null, true);
+        else
+          callback(new Error("Not allowed by CORS"));
+      },
+    } ));
 
     if (process.env.NODE_ENV === "development")
       app.get("/", HELLO_WORLD_HANDLER);

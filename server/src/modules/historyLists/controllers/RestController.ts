@@ -5,7 +5,6 @@ import {HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySup
 import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
-import cors from "cors";
 import express, { Request, Response, Router } from "express";
 import { Entry, Model } from "../models";
 import { ListRepository } from "../repositories";
@@ -180,10 +179,6 @@ implements
 
   getRouter(): Router {
     const router = SecureRouter();
-
-    router.use(cors( {
-      origin: "http://localhost:3000",
-    } ));
 
     router.get("/", this.getAll.bind(this));
     router.get("/:id", getOneByIdValidation, this.getOneById.bind(this));
