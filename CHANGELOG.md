@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.1](https://github.com/ByDSA/mcenter/compare/v2.0.0...v2.0.1) (2023-09-07)
+
+
+### Bug Fixes
+
+* **back:** movido url de cors a variable de entorno ([67bd44b](https://github.com/ByDSA/mcenter/commit/67bd44baab54333d0b5f370793efba02290ce43e))
+* **front:** .eslint con ruta relativa ([5bfd9e8](https://github.com/ByDSA/mcenter/commit/5bfd9e86397195eb7542a6a8b45155c92970e35c))
+* **front:** movido index -> history ([7b129a8](https://github.com/ByDSA/mcenter/commit/7b129a8e58d0bd0d7f10cc86f1d2dd96bfa9ffa8))
+* **front:** usar puerto para producción desde .env ([43f3568](https://github.com/ByDSA/mcenter/commit/43f35689a789aac2ff9028e47aeb5a317162e531))
+
 ## [2.0.0](https://github.com/ByDSA/mcenter/compare/v1.5.0...v2.0.0) (2023-09-07)
 
 
