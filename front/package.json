@@ -3,7 +3,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "start": "next start"
+    "start": "[ -e .env ] && set -a && . ./.env; next start"
   },
   "dependencies": {
     "#shared": "workspace:../shared/build",
