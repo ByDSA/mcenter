@@ -1,5 +1,6 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
+import Page from "./test";
 
 export default function Home() {
   return (
@@ -13,6 +14,8 @@ export default function Home() {
         <h1 className={styles.title}>
           Welcome to <a href="https://mcenter.danisales.es">MCenter!</a>
         </h1>
+
+        <Page />
       </main>
 
       <style jsx>{`

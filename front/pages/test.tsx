@@ -1,9 +1,14 @@
+
 /* eslint-disable require-await */
 import useSWR from "swr";
 // eslint-disable-next-line import/no-relative-packages
+import { assertIsDefined } from "../../shared/build/utils/validation";
+// eslint-disable-next-line import/no-relative-packages
 import { HistoryEntry, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "../../shared/build/models/historyLists";
 
-const URL = "http://localhost:8011/api/history-list/entries/search";
+assertIsDefined(process.env.NEXT_PUBLIC_BACKEND_URL);
+
+const URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/history-list/entries/search`;
 const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
   "filter": {
   },
