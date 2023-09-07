@@ -12,6 +12,9 @@
     "test:coverage": "pnpm run test --coverage",
     "test:coverage:clean": "rm -rf coverage"
   },
+  "dependencies": {
+    "zod": "3.22.2"
+  },
   "devDependencies": {
     "@types/node": "18.17.14",
     "@types/jest": "29.5.4"

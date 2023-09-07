@@ -1,19 +1,18 @@
 export {
   default as HistoryEntry,
-  assertIsEntry as assertIsHistoryEntry
+  assertIsEntry as assertIsHistoryEntry,
 } from "./HistoryEntry";
 
 export {
   default as HistoryList,
   ModelId as HistoryListId,
-  assertIsModel as assertIsHistoryList
+  assertIsModel as assertIsHistoryList,
 } from "./HistoryList";
 
 export {
-  createHistoryEntryByEpisodeFullId
+  createHistoryEntryByEpisodeFullId,
 } from "./utils";
 
 export {
-  GetManyBySuperIdRequest as HistoryListGetManyBySuperIdRequest, GetManyEntriesBySuperIdSchema as HistoryListGetManyEntriesBySuperIdSchema, GetManyEntriesSchema as HistoryListGetManyEntriesSchema, GetOneByIdRequest as HistoryListGetOneByIdRequest, GetOneByIdSchema as HistoryListGetOneByIdSchema
+  GetManyBySuperIdRequest as HistoryListGetManyBySuperIdRequest, GetOneByIdRequest as HistoryListGetOneByIdRequest, GetOneByIdSchema as HistoryListGetOneByIdSchema, assertIsGetManyEntriesBySuperIdRequest as assertIsHistoryListGetManyEntriesBySuperIdRequest, assertIsGetManyEntriesRequest as assertIsHistoryListGetManyEntriesRequest, assertIsGetOneByIdRequest as assertIsHistoryListGetOneByIdRequest,
 } from "./dto";
-

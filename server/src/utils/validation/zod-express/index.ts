@@ -1,13 +1,13 @@
-import HttpStatusCode from "#shared/utils/http/StatusCode";
+import { HttpStatusCode } from "#shared/utils/http";
 import { ExpressMiddleware } from "#utils/express";
 import { NextFunction, Request, Response } from "express";
-import { AnyZodObject } from "zod";
 
-export const validateRequest: (schema: AnyZodObject)=> ExpressMiddleware =
-  (schema: AnyZodObject) =>
-    async (req: Request, res: Response, next: NextFunction) => {
+type AssertFunction = (obj: unknown)=> unknown;
+export const validateRequest: (assertFunc: AssertFunction)=> ExpressMiddleware =
+  (assertFunc: AssertFunction) =>
+    (req: Request, res: Response, next: NextFunction) => {
       try {
-        await schema.parseAsync(req);
+        assertFunc(req);
 
         return next();
       } catch (error) {
