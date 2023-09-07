@@ -1,0 +1,12 @@
+{
+  "runOnSave.commands": [
+    {
+      "globMatch": "**/shared/**",
+      "command": "workspaceFolder=${workspaceFolder} ${workspaceFolder}/bin/on-save.mjs &",
+      "runIn": "terminal",
+      "runningStatusMessage": "Compiling ${workspaceFolderBasename}...",
+      "finishStatusMessage": "${workspaceFolderBasename} compiled",
+      "terminalHideTimeout": 3000
+    }
+  ]
+}
