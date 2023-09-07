@@ -1,0 +1,1 @@
+/home/prog/git/danisales/mcenter/multimedia_actual/recompilado/server/.eslintrc.js
