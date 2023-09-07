@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/ByDSA/mcenter/compare/v1.5.0...v2.0.0) (2023-09-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* añadido front
+
+### Features
+
+* añadido front ([ad924f7](https://github.com/ByDSA/mcenter/commit/ad924f704ea5c359940eec49deee218581f69a61))
+* compatibilidad del endpoint history-lists/entries/search con el front ([ec035c5](https://github.com/ByDSA/mcenter/commit/ec035c509b2f144b4ece0febc1e356531656494f))
+
 ## [1.5.0](https://github.com/ByDSA/mcenter/compare/v1.4.1...v1.5.0) (2023-09-05)
 
 
