@@ -38,8 +38,8 @@ console.log = (...msg) => $.log( {
 
 const thisFolder = __dirname;
 // Importar variables de entorno
-const folderName = thisFolder.split("/").pop();
-const envPath = path.join(thisFolder, "../../../", `.env.${folderName}`);
+const from = process.env.from;
+const envPath = path.join(thisFolder, "..", `.env.${from}`);
 
 await loadEnv(envPath);
 
