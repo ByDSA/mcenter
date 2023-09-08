@@ -3,15 +3,12 @@
 @value background-color: rgba(background-colors, 0.5);
 
 .container {
+  background-color: background-color;
   border: 2px solid border-color;
   border-radius: 10px;
-  background-color: background-color;
   width: 100%;
   margin: 0.25rem;
-}
-
-.container:hover {
-  background-color: rgba(background-colors, 1);
+  overflow: hidden;
 }
 
 .title p {
@@ -44,6 +41,11 @@
 
 .title:hover {
   cursor: pointer;
+  background-color: rgba(background-colors, 1);
+}
+
+.title:has(+ .dropdown) {
+  background-color: rgba(background-colors, 1);
 }
 
 .dropdown {
