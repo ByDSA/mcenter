@@ -1,0 +1,80 @@
+@value border-color: grey;
+@value background-colors: 255, 255, 64;
+@value background-color: rgba(background-colors, 0.5);
+
+.container {
+  border: 2px solid border-color;
+  border-radius: 10px;
+  background-color: background-color;
+  width: 100%;
+  margin: 0.25rem;
+}
+
+.container:hover {
+  background-color: rgba(background-colors, 1);
+}
+
+.title p {
+  margin: 0;
+  padding: 0;
+}
+
+.title {
+  padding: 1.25rem 2rem;
+  display: flex;
+  flex-direction: row;
+
+  .time {
+    display: flex;
+  }
+
+  .name {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .item {
+      margin: 0 1rem;
+      padding: 0;
+    }
+  }
+}
+
+.title:hover {
+  cursor: pointer;
+}
+
+.dropdown {
+  padding: 1rem 2rem;
+  border-top: 2px solid border-color;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.dropdown > span {
+  margin: 0;
+  padding: 0;
+  width: calc(100% / 3);
+  text-align: center;
+}
+
+.dropdown input {
+  width: 4rem;
+  margin: 0 0.25rem;
+}
+
+.dropdown .dropdownTime {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdown .dropdownTime span {
+  display: flex;
+  flex-direction: column;
+}
