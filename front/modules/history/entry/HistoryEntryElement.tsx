@@ -9,30 +9,30 @@ type Props = {
 export default function HistoryEntryElement( {value}: Props) {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [entry, setEntry] = React.useState(value);
-  const [currentWeight, setCurrentWeight] = React.useState(value.episode.weight);
-  const [currentStart, setCurrentStart] = React.useState(value.episode.start);
-  const [currentEnd, setCurrentEnd] = React.useState(value.episode.end);
+  const [currentWeight, setCurrentWeight] = React.useState(value.episode?.weight);
+  const [currentStart, setCurrentStart] = React.useState(value.episode?.start);
+  const [currentEnd, setCurrentEnd] = React.useState(value.episode?.end);
   const [isModified, setIsModified] = React.useState(false);
   const [name, setName] = React.useState("");
 
   useEffect(() => {
     let newName = "";
 
-    if (entry.episode.title.trim() && !entry.episode.title.includes(entry.episodeId))
+    if (entry.episode?.title.trim() && !entry.episode.title.includes(entry.episodeId))
       newName += `${entry.episode.title}`;
 
     setName(newName);
-  }, [entry.episode.title, entry.episodeId]);
+  }, [entry.episode?.title, entry.episodeId]);
 
   useEffect(() => {
-    const v = entry.episode.weight !== currentWeight || entry.episode.start !== currentStart || entry.episode.end !== currentEnd;
+    const v = entry.episode?.weight !== currentWeight || entry.episode?.start !== currentStart || entry.episode?.end !== currentEnd;
 
     setIsModified(v);
   }, [entry, currentWeight, currentStart, currentEnd]);
   const reset = () => {
-    setCurrentWeight(entry.episode.weight);
-    setCurrentStart(entry.episode.start);
-    setCurrentEnd(entry.episode.end);
+    setCurrentWeight(entry.episode?.weight);
+    setCurrentStart(entry.episode?.start);
+    setCurrentEnd(entry.episode?.end);
   };
   const update = () => {
     const partial: Partial<Episode> = {
@@ -41,16 +41,19 @@ export default function HistoryEntryElement( {value}: Props) {
       end: currentEnd,
     };
     const fullId = {
-      serieId: value.serie.id,
+      serieId: value.serieId,
       episodeId: value.episodeId,
     };
 
     fetchSecurePatch(fullId, partial)
-      .then((data: Episode) => {
+      .then((data: Episode | null) => {
+        if (!data)
+          return;
+
         setEntry( {
           ...value,
           episode: data,
-        } );
+        } as HistoryEntry);
       } );
   };
 
@@ -61,7 +64,7 @@ export default function HistoryEntryElement( {value}: Props) {
           <span>{new Date(value.date.timestamp * 1000).toLocaleTimeString()}</span>
         </div>
         <div className={style.name}>
-          <span className={style.item}>{value.serie.name}</span>
+          <span className={style.item}>{value.serie?.name}</span>
           {name && <p className={`${style.item} ${style.title}`}>{name}</p>}
           <span className={style.item}>{value.episodeId}</span>
         </div>
@@ -74,10 +77,10 @@ export default function HistoryEntryElement( {value}: Props) {
         </span>
         <span className={style.break} />
         <span className={`${style.dropdownTime}`}>
-          <span>Start:</span><span><input type="number" value={currentStart} onChange={handleOnChange(setCurrentStart)}/><span> {currentStart > 0 ? secsToMS(currentStart) : "-"}</span></span>
+          <span>Start:</span><span><input type="number" value={currentStart} onChange={handleOnChange(setCurrentStart)}/><span> {currentStart && currentStart > 0 ? secsToMS(currentStart) : "-"}</span></span>
         </span>
         <span className={`${style.dropdownTime}`}>
-          <span>End:</span><span><input type="number" value={currentEnd} onChange={handleOnChange(setCurrentEnd)}/><span> {currentEnd > 0 ? secsToMS(currentEnd) : "-"}</span></span>
+          <span>End:</span><span><input type="number" value={currentEnd} onChange={handleOnChange(setCurrentEnd)}/><span> {currentEnd && currentEnd > 0 ? secsToMS(currentEnd) : "-"}</span></span>
         </span>
         <span className={style.break} />
         <span><a href="#" onClick={() => reset()}>Reset</a></span>
