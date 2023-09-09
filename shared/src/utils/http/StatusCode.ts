@@ -6,6 +6,8 @@ const enum HttpStatusCode {
     INTERNAL_SERVER_ERROR = 500,
     UNPROCESSABLE_ENTITY = 422,
     CONFLICT = 409,
+    METHOD_NOT_ALLOWED = 405,
+    FORBIDDEN = 403,
 }
 
 export default HttpStatusCode;

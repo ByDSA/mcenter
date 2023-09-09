@@ -10,6 +10,7 @@ import { deepFreeze, deepMerge } from "#shared/utils/objects";
 import { OptionalPropsRecursive, PublicMethodsOf } from "#shared/utils/types";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
+import ForbiddenError from "#utils/http/validation/ForbiddenError";
 import { Database } from "#utils/layers/db";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
@@ -96,13 +97,15 @@ export default class ExpressApp implements App {
       app.use(cors( {
         preflightContinue: true,
         origin(origin, callback) {
+          const allowsAnyOrigin = true;
           const originUrl = origin ? new URL(origin) : null;
           const originIsLocal = originUrl && (originUrl.hostname === "localhost" || originUrl.hostname.startsWith("192.168."));
+          const allows = (origin && (whitelist.includes(origin) || originIsLocal)) || allowsAnyOrigin;
 
-          if (origin && (whitelist.includes(origin) || originIsLocal))
+          if (allows)
             callback(null, true);
           else
-            callback(new Error("Not allowed by CORS"));
+            callback(new ForbiddenError("Not allowed by CORS"));
         },
       } ));
     }
