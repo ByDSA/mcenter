@@ -10,10 +10,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main style={{
-        maxWidth: "90vw",
-        minWidth: "600px",
-      }}>
+      <main className={styles.main}>
         <h1 className={styles.title}>
           Historial
         </h1>

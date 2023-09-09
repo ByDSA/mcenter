@@ -11,13 +11,13 @@
   overflow: hidden;
 }
 
-.title p {
+.header p {
   margin: 0;
   padding: 0;
 }
 
-.title {
-  padding: 1.25rem 2rem;
+.header {
+  padding: 1.25rem 1rem;
   display: flex;
   flex-direction: row;
 
@@ -39,34 +39,67 @@
   }
 }
 
-.title:hover {
+.title {
+  display: none;
+}
+
+.header:hover {
   cursor: pointer;
   background-color: rgba(background-colors, 1);
 }
 
-.title:has(+ .dropdown) {
+.header:has(+ .dropdown) {
   background-color: rgba(background-colors, 1);
 }
 
 .dropdown {
-  padding: 1rem 2rem;
+  padding: 2vh 5vw;
   border-top: 2px solid border-color;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: start;
   flex-wrap: wrap;
+
+  .title {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0 0vw;
+    margin-bottom: 2vh;
+  }
+}
+
+.dropdown .weight input {
+  min-width: 50px;
 }
 
 .dropdown > span {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   margin: 0;
   padding: 0;
-  width: calc(100% / 3);
   text-align: center;
+  overflow: visible;
+}
+
+.dropdown > span + span {
+  margin-right: 4vw;
+}
+
+span.break {
+  flex-basis: 100%;
+  height: 0;
+  margin-bottom: 3vh;
 }
 
 .dropdown input {
-  width: 4rem;
+  min-width: 50px;
+  width: 5vw;
   margin: 0 0.25rem;
+  background-color: white;
+  border-width: 1px;
+  border-radius: 2vw;
 }
 
 .dropdown .dropdownTime {
@@ -79,4 +112,23 @@
 .dropdown .dropdownTime span {
   display: flex;
   flex-direction: column;
+  padding: 0 0.5vw;
+}
+
+@media (width >= 640px) {
+  .header {
+    padding: 1.25rem 2rem;
+  }
+
+  .dropdown {
+    padding: 1rem 2rem;
+
+    .title {
+      display: none;
+    }
+  }
+
+  .title {
+    display: block;
+  }
 }

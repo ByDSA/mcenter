@@ -23,27 +23,30 @@ export default function HistoryEntryElement( {value}: Props) {
 
   return (
     <div className={style.container}>
-      <div className={style.title} onClick={()=>setShowDropdown(!showDropdown)}>
+      <div className={style.header} onClick={()=>setShowDropdown(!showDropdown)}>
         <div className={style.time}>
           <span>{new Date(value.date.timestamp * 1000).toLocaleTimeString()}</span>
         </div>
         <div className={style.name}>
           <span className={style.item}>{value.serie.name}</span>
-          {name && <p className={style.item}>{name}</p>}
+          {name && <p className={`${style.item} ${style.title}`}>{name}</p>}
           <span className={style.item}>{value.episodeId}</span>
         </div>
       </div>
       {showDropdown &&
       <div className={style.dropdown}>
-        <span>
+        {name && <p className={`${style.title}`}>Título: {name}</p>}
+        <span className={`${style.weight}`}>
           <span>Weight:</span> <input type="number" value={currentWeight} onChange={handleOnChange(setCurrentWeight)}/>
         </span>
-        <span className={style.dropdownTime}>
+        <span className={style.break} />
+        <span className={`${style.dropdownTime}`}>
           <span>Start:</span><span><input type="number" value={currentStart} onChange={handleOnChange(setCurrentStart)}/><span> {currentStart > 0 ? secsToMS(currentStart) : "-"}</span></span>
         </span>
-        <span className={style.dropdownTime}>
+        <span className={`${style.dropdownTime}`}>
           <span>End:</span><span><input type="number" value={currentEnd} onChange={handleOnChange(setCurrentEnd)}/><span> {currentEnd > 0 ? secsToMS(currentEnd) : "-"}</span></span>
         </span>
+        <span className={style.break} />
         <span><a href="#" onClick={() => reset()}>Reset</a></span>
       </div>
       }

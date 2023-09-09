@@ -5,6 +5,7 @@ import { HistoryEntry, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistor
 import { assertIsDefined } from "#shared/utils/validation";
 import { Fragment } from "react";
 import useSWR from "swr";
+import style from "./style.module.css";
 
 assertIsDefined(process.env.NEXT_PUBLIC_BACKEND_URL);
 
@@ -44,14 +45,15 @@ export default function Page() {
 
   if (isLoading) {
     return <p key="aa" style={{
-      fontSize: "4rem",
+      fontSize: "10vw",
+      textAlign: "center",
     }}>Loading...</p>;
   }
 
   assertIsHistoryListGetManyEntriesBySearchResponse(data);
 
   return (
-    <span className="content">
+    <span className={style.content}>
       {
         data.map((entry: HistoryEntry, i: number) => {
           let dayTitle;
@@ -65,17 +67,6 @@ export default function Page() {
           </Fragment>;
         } )
       }
-
-      <style jsx>{`
-     .content {
-      padding: 2rem 0;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: start;
-      align-items: center;
-    }
-    `}</style>
     </span>
   );
 }
