@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/ByDSA/mcenter/compare/v2.1.0...v2.2.0) (2023-09-09)
+
+
+### Features
+
+* añadido página y links de play stream ([eeff03e](https://github.com/ByDSA/mcenter/commit/eeff03e5b42431b7dfa8662a09511d59574106b7))
+
+
+### Bug Fixes
+
+* cors permite acceso desde cualquier origen ([dff387b](https://github.com/ByDSA/mcenter/commit/dff387bce5c30c67b1af0e4f9ccec1ba4f9f4348))
+
 ## [2.1.0](https://github.com/ByDSA/mcenter/compare/v2.0.1...v2.1.0) (2023-09-09)
 
 
