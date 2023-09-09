@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/ByDSA/mcenter/compare/v2.0.1...v2.1.0) (2023-09-09)
+
+
+### Features
+
+* actualización de episodes desde el front con HistoryEntry ([9653b96](https://github.com/ByDSA/mcenter/commit/9653b96616a1337e3ba89ae6b3b865f3cb0365bd))
+* **front:** posibilidad de editar valores y remodelación del estilo ([c6314f1](https://github.com/ByDSA/mcenter/commit/c6314f156af1b89fcb8b9819501932ef0d0407e1))
+
 ### [2.0.1](https://github.com/ByDSA/mcenter/compare/v2.0.0...v2.0.1) (2023-09-07)
 
 
