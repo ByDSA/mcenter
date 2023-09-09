@@ -16,7 +16,14 @@ async function loadFixtures() {
 
 describe("showPicker", () => {
   app = new ExpressAppMock( {
-    pickerController,
+    modules: {
+      picker: {
+        controller: pickerController,
+      },
+    },
+    controllers: {
+      cors: false,
+    },
   } );
   let expressApp: Application | null = null;
 

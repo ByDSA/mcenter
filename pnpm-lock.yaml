@@ -179,6 +179,9 @@ importers:
       '@types/supertest':
         specifier: 2.0.12
         version: 2.0.12
+      jest:
+        specifier: workspace:../node_modules/jest
+        version: link:../node_modules/jest
       nodemon:
         specifier: 2.0.20
         version: 2.0.20

@@ -1,6 +1,6 @@
 import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
-import { EpisodePickerService, EpisodeRepository } from "#modules/episodes";
+import { EpisodePickerService, EpisodeRepository, EpisodeRestController } from "#modules/episodes";
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
@@ -49,26 +49,38 @@ import RealDatabase from "./main/db/Database";
     db: {
       instance: new RealDatabase(),
     },
-    play: {
-      playSerieController,
-      playStreamController,
+    modules: {
+      play: {
+        playSerieController,
+        playStreamController,
+      },
+      picker: {
+        controller: new PickerController(),
+      },
+      actionController: new ActionController( {
+        episodesUpdateLastTimePlayedController: new EpisodesUpdateLastTimePlayedController( {
+          lastTimePlayedService: new LastTimePlayedService(),
+          episodeRepository,
+          historyListRepository,
+          serieRepository,
+          streamRepository,
+        } ),
+      } ),
+      historyList: {
+        restController: new HistoryListRestController( {
+          historyListRepository,
+          episodeRepository,
+          serieRepository,
+        } ),
+      },
+      episodes: {
+        restController: new EpisodeRestController( {
+          episodeRepository,
+        } ),
+      },
     },
-    pickerController: new PickerController(),
-    actionController: new ActionController( {
-      episodesUpdateLastTimePlayedController: new EpisodesUpdateLastTimePlayedController( {
-        lastTimePlayedService: new LastTimePlayedService(),
-        episodeRepository,
-        historyListRepository,
-        serieRepository,
-        streamRepository,
-      } ),
-    } ),
-    historyList: {
-      restController: new HistoryListRestController( {
-        historyListRepository,
-        episodeRepository,
-        serieRepository,
-      } ),
+    controllers: {
+      cors: true,
     },
   } );
 

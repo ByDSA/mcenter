@@ -1,5 +1,6 @@
-import { HistoryList } from "#modules/historyLists";
 import { SerieId } from "#modules/series";
+import { HistoryList } from "#shared/models/historyLists";
+import { assertFound } from "#utils/http/validation";
 import { CanCreateManyAndGet, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Model, ModelFullId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
@@ -13,7 +14,7 @@ CanUpdateOneByIdAndGet<Model, ModelFullId>,
 CanPatchOneByIdAndGet<Model, ModelFullId>,
 CanCreateManyAndGet<Model>
 {
-  async getAllFromSerieId(id: SerieId): Promise<Model[]> {
+  async getAllBySerieId(id: SerieId): Promise<Model[]> {
     const episodesOdm = await ModelOdm.find( {
       serieId: id,
     } );
@@ -81,7 +82,7 @@ CanCreateManyAndGet<Model>
     const updateResult = await ModelOdm.updateOne(fullId, partialDocOdm);
 
     if (updateResult.matchedCount === 0)
-      return null;
+      assertFound(null);
 
     return this.getOneById(fullId);
   }

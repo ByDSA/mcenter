@@ -1,5 +1,6 @@
+import { Episode, EpisodeFullId, assertIsEpisode } from "#shared/models/episodes";
 import { HistoryEntry } from "#shared/models/historyLists";
-import React from "react";
+import React, { useEffect } from "react";
 import style from "./style.module.css";
 
 type Props = {
@@ -7,18 +8,50 @@ type Props = {
 };
 export default function HistoryEntryElement( {value}: Props) {
   const [showDropdown, setShowDropdown] = React.useState(false);
+  const [entry, setEntry] = React.useState(value);
   const [currentWeight, setCurrentWeight] = React.useState(value.episode.weight);
   const [currentStart, setCurrentStart] = React.useState(value.episode.start);
   const [currentEnd, setCurrentEnd] = React.useState(value.episode.end);
-  let name = "";
+  const [isModified, setIsModified] = React.useState(false);
+  const [name, setName] = React.useState("");
 
-  if (value.episode.title.trim() && !value.episode.title.includes(value.episodeId))
-    name += `${value.episode.title}`;
+  useEffect(() => {
+    let newName = "";
 
+    if (entry.episode.title.trim() && !entry.episode.title.includes(entry.episodeId))
+      newName += `${entry.episode.title}`;
+
+    setName(newName);
+  }, [entry.episode.title, entry.episodeId]);
+
+  useEffect(() => {
+    const v = entry.episode.weight !== currentWeight || entry.episode.start !== currentStart || entry.episode.end !== currentEnd;
+
+    setIsModified(v);
+  }, [entry, currentWeight, currentStart, currentEnd]);
   const reset = () => {
-    setCurrentWeight(value.episode.weight);
-    setCurrentStart(value.episode.start);
-    setCurrentEnd(value.episode.end);
+    setCurrentWeight(entry.episode.weight);
+    setCurrentStart(entry.episode.start);
+    setCurrentEnd(entry.episode.end);
+  };
+  const update = () => {
+    const partial: Partial<Episode> = {
+      weight: currentWeight,
+      start: currentStart,
+      end: currentEnd,
+    };
+    const fullId = {
+      serieId: value.serie.id,
+      episodeId: value.episodeId,
+    };
+
+    fetchSecurePatch(fullId, partial)
+      .then((data: Episode) => {
+        setEntry( {
+          ...value,
+          episode: data,
+        } );
+      } );
   };
 
   return (
@@ -48,6 +81,7 @@ export default function HistoryEntryElement( {value}: Props) {
         </span>
         <span className={style.break} />
         <span><a href="#" onClick={() => reset()}>Reset</a></span>
+        {isModified && <span><a href="#" onClick={() => update()}>Update</a></span>}
       </div>
       }
     </div>
@@ -69,4 +103,26 @@ function handleOnChange(f: React.Dispatch<React.SetStateAction<number>>) {
 
     f(v);
   };
+}
+
+function fetchSecurePatch(id: EpisodeFullId,partial: Partial<Episode>): Promise<Episode | null> {
+  const URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/episodes/${id.serieId}/${id.episodeId}`;
+
+  return fetch(URL, {
+    method: "PATCH",
+    body: JSON.stringify(partial),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  } ).then((response) => response.json())
+    .then((episode: Episode) => {
+      assertIsEpisode(episode);
+
+      return episode;
+    } )
+    .catch((error) => {
+      console.error("Error:", error);
+
+      return null;
+    } );
 }

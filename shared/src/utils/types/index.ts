@@ -19,3 +19,7 @@ export type OptionalPropsRecursive<T> = ExcludeByPropType<{
   ? T[K]
   : never;
 }, never>;
+
+export type PartialRecursive<T> = {
+  [K in keyof T]?: T[K] extends object ? PartialRecursive<T[K]> : Partial<T[K]>;
+};

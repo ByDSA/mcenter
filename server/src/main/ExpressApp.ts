@@ -1,12 +1,13 @@
 import ActionController from "#modules/actions/ActionController";
-import { EpisodeRepository } from "#modules/episodes";
+import { EpisodeRepository, EpisodeRestController } from "#modules/episodes";
 import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
 import { HistoryListRepository, HistoryListRestController } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController } from "#modules/play";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
-import { PublicMethodsOf } from "#shared/utils/types";
+import { deepFreeze, deepMerge } from "#shared/utils/objects";
+import { OptionalPropsRecursive, PublicMethodsOf } from "#shared/utils/types";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import { Database } from "#utils/layers/db";
@@ -22,46 +23,49 @@ export type ExpressAppDependencies = {
   db: {
     instance: Database;
   };
-  play: {
-    playSerieController: PublicMethodsOf<PlaySerieController>;
-    playStreamController: PublicMethodsOf<PlayStreamController>;
+  modules: {
+    play: {
+      playSerieController: PublicMethodsOf<PlaySerieController>;
+      playStreamController: PublicMethodsOf<PlayStreamController>;
+    };
+    picker: {
+      controller: PublicMethodsOf<PickerController>;
+    };
+    actionController: PublicMethodsOf<ActionController>;
+    historyList: {
+      restController: PublicMethodsOf<HistoryListRestController>;
+    };
+    episodes: {
+      restController: PublicMethodsOf<EpisodeRestController>;
+    };
   };
-  pickerController: PublicMethodsOf<PickerController>;
-  actionController: PublicMethodsOf<ActionController>;
-  historyList: {
-    restController: PublicMethodsOf<HistoryListRestController>;
+  controllers: {
+    cors?: boolean;
   };
 };
+
+const DEFAULT_DEPENDENCIES: OptionalPropsRecursive<ExpressAppDependencies> = deepFreeze( {
+  controllers: {
+    cors: true,
+  },
+} );
 
 // Necesario para poder replicarla para test
 export default class ExpressApp implements App {
   #instance: express.Express | null = null;
 
-  #database: Database | null = null;
+  #dependencies: Required<ExpressAppDependencies>;
 
-  #playSerieController: PublicMethodsOf<PlaySerieController>;
-
-  #playStreamController: PublicMethodsOf<PlayStreamController>;
-
-  #pickerController: PublicMethodsOf<PickerController>;
-
-  #actionController: PublicMethodsOf<ActionController>;
-
-  #historyListRestController: PublicMethodsOf<HistoryListRestController>;
-
-  constructor( {db, play: {playSerieController, playStreamController}, pickerController, actionController, historyList}: ExpressAppDependencies) {
-    this.#database = db?.instance ?? null;
-    this.#playSerieController = playSerieController;
-    this.#playStreamController = playStreamController;
-    this.#pickerController = pickerController;
-    this.#actionController = actionController;
-    this.#historyListRestController = historyList.restController;
+  constructor(dependencies: ExpressAppDependencies) {
+    this.#dependencies = deepMerge(DEFAULT_DEPENDENCIES as Required<ExpressAppDependencies>, dependencies);
   }
 
   async init() {
-    if (this.#database) {
-      this.#database.init();
-      await this.#database.connect();
+    const db = this.#dependencies.db.instance;
+
+    if (db) {
+      db.init();
+      await db.connect();
     }
 
     const app = express();
@@ -75,7 +79,7 @@ export default class ExpressApp implements App {
 
     const requestLogger = (
       request: Request,
-      response: Response,
+      _: Response,
       next: NextFunction) => {
       console.log(`${request.method} url:: ${request.url}`);
       next();
@@ -83,32 +87,43 @@ export default class ExpressApp implements App {
 
     app.use(requestLogger);
 
-    const {FRONTEND_URL} = process.env;
+    if (this.#dependencies.controllers.cors) {
+      const {FRONTEND_URL} = process.env;
 
-    assertIsDefined(FRONTEND_URL);
-    const whitelist: string[] = [FRONTEND_URL];
+      assertIsDefined(FRONTEND_URL);
+      const whitelist: string[] = [FRONTEND_URL];
 
-    app.use(cors( {
-      preflightContinue: true,
-      origin(origin, callback) {
-        if (origin && whitelist.includes(origin))
-          callback(null, true);
-        else
-          callback(new Error("Not allowed by CORS"));
-      },
-    } ));
+      app.use(cors( {
+        preflightContinue: true,
+        origin(origin, callback) {
+          const originUrl = origin ? new URL(origin) : null;
+          const originIsLocal = originUrl && (originUrl.hostname === "localhost" || originUrl.hostname.startsWith("192.168."));
+
+          if (origin && (whitelist.includes(origin) || originIsLocal))
+            callback(null, true);
+          else
+            callback(new Error("Not allowed by CORS"));
+        },
+      } ));
+    }
 
     if (process.env.NODE_ENV === "development")
       app.get("/", HELLO_WORLD_HANDLER);
 
-    app.use("/api/play/serie", this.#playSerieController.getRouter());
-    app.use("/api/play/stream", this.#playStreamController.getRouter());
+    const {playSerieController, playStreamController} = this.#dependencies.modules.play;
 
-    app.use("/api/picker", this.#pickerController.getRouter());
+    app.use("/api/play/serie", playSerieController.getRouter());
+    app.use("/api/play/stream", playStreamController.getRouter());
 
-    app.use("/api/actions", this.#actionController.getRouter());
+    const {controller: pickerController} = this.#dependencies.modules.picker;
 
-    app.use("/api/history-list", this.#historyListRestController.getRouter());
+    app.use("/api/picker", pickerController.getRouter());
+
+    app.use("/api/actions", this.#dependencies.modules.actionController.getRouter());
+
+    app.use("/api/history-list", this.#dependencies.modules.historyList.restController.getRouter());
+
+    app.use("/api/episodes", this.#dependencies.modules.episodes.restController.getRouter());
 
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;
@@ -159,7 +174,7 @@ export default class ExpressApp implements App {
   }
 
   async close() {
-    await this.#database?.disconnect();
+    await this.#dependencies.db.instance.disconnect();
 
     schedule.gracefulShutdown();
   }
