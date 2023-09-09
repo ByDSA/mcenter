@@ -1,10 +1,10 @@
-export default function deepFreeze(object: any) {
+export default function deepFreeze<T extends Object>(object: T): T {
   // Retrieve the property names defined on object
   const propNames = Reflect.ownKeys(object);
 
   // Freeze properties before freezing self
   for (const name of propNames) {
-    const value = object[name];
+    const value = (object as any)[name];
 
     if ((value && typeof value === "object") || typeof value === "function")
       deepFreeze(value);
