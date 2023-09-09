@@ -1,10 +1,4 @@
 {
-  "private": true,
-  "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "start": "[ -e .env ] && set -a && . ./.env; next start"
-  },
   "dependencies": {
     "#shared": "workspace:../shared/build",
     "next": "latest",
@@ -12,11 +6,17 @@
     "react-dom": "18.2.0",
     "swr": "^2.2.2"
   },
-  "engines": {
-    "node": ">=18"
-  },
   "devDependencies": {
     "#sharedSrc": "workspace:../shared/src",
     "@types/react": "18.2.21"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "start": "[ -e .env ] && set -a && . ./.env; next start"
   }
 }
