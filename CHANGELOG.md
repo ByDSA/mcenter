@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/ByDSA/mcenter/compare/v2.2.0...v2.3.0) (2023-09-10)
+
+
+### Features
+
+* borrar entradas de historial ([e5b49ea](https://github.com/ByDSA/mcenter/commit/e5b49ea7491c2c8dc8f2fa10dc75ab53b576a72c))
+
 ## [2.2.0](https://github.com/ByDSA/mcenter/compare/v2.1.0...v2.2.0) (2023-09-09)
 
 
