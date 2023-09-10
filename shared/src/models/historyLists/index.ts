@@ -1,6 +1,5 @@
 export {
-  default as HistoryEntry,
-  assertIsEntry as assertIsHistoryEntry,
+  default as HistoryEntry, EntryId as HistoryEntryId, EntryWithId as HistoryEntryWithId, assertIsEntry as assertIsHistoryEntry, assertIsEntryWithId as assertIsHistoryEntryWithId,
 } from "./HistoryEntry";
 
 export {
@@ -14,5 +13,5 @@ export {
 } from "./utils";
 
 export {
-  GetManyEntriesBySearchRequest as HistoryListGetManyEntriesBySearchRequest, GetManyEntriesBySearchResponse as HistoryListGetManyEntriesBySearchResponse, GetManyEntriesBySuperIdRequest as HistoryListGetManyEntriesBySuperIdRequest, GetOneByIdRequest as HistoryListGetOneByIdRequest, GetOneByIdSchema as HistoryListGetOneByIdSchema, assertIsGetManyEntriesBySearchRequest as assertIsHistoryListGetManyEntriesBySearchRequest, assertIsGetManyEntriesBySearchResponse as assertIsHistoryListGetManyEntriesBySearchResponse, assertIsGetManyEntriesBySuperIdRequest as assertIsHistoryListGetManyEntriesBySuperIdRequest, assertIsGetOneByIdRequest as assertIsHistoryListGetOneByIdRequest,
+  DeleteOneEntryByIdRequest as HistoryListDeleteOneEntryByIdRequest, GetManyEntriesBySearchRequest as HistoryListGetManyEntriesBySearchRequest, GetManyEntriesBySearchResponse as HistoryListGetManyEntriesBySearchResponse, GetManyEntriesBySuperIdRequest as HistoryListGetManyEntriesBySuperIdRequest, GetOneByIdRequest as HistoryListGetOneByIdRequest, GetOneByIdSchema as HistoryListGetOneByIdSchema, assertIsDeleteOneEntryByIdRequest as assertIsHistoryListDeleteOneEntryByIdRequest, assertIsGetManyEntriesBySearchRequest as assertIsHistoryListGetManyEntriesBySearchRequest, assertIsGetManyEntriesBySearchResponse as assertIsHistoryListGetManyEntriesBySearchResponse, assertIsGetManyEntriesBySuperIdRequest as assertIsHistoryListGetManyEntriesBySuperIdRequest, assertIsGetOneByIdRequest as assertIsHistoryListGetOneByIdRequest,
 } from "./dto";

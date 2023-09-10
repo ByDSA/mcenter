@@ -1,9 +1,7 @@
 @value border-color: grey;
-@value background-colors: 255, 255, 64;
-@value background-color: rgba(background-colors, 0.5);
 
 .container {
-  background-color: background-color;
+  background-color: var(--color-primary2-light);
   border: 2px solid border-color;
   border-radius: 10px;
   width: 100%;
@@ -45,11 +43,11 @@
 
 .header:hover {
   cursor: pointer;
-  background-color: rgba(background-colors, 1);
+  background-color: var(--color-primary2);
 }
 
 .header:has(+ .dropdown) {
-  background-color: rgba(background-colors, 1);
+  background-color: var(--color-primary2);
 }
 
 .dropdown {

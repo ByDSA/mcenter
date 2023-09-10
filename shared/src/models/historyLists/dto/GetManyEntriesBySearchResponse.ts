@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { EntrySchema } from "../HistoryEntry";
+import { EntryWithIdSchema } from "../HistoryEntry";
 
-export const GetManyEntriesBySearchResponseSchema = z.array(EntrySchema);
+export const GetManyEntriesBySearchResponseSchema = z.array(EntryWithIdSchema);
 
 export type GetManyEntriesBySearchResponse = z.infer<typeof GetManyEntriesBySearchResponseSchema>;
 

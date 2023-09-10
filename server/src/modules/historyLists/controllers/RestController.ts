@@ -1,14 +1,14 @@
 import { EpisodeRepository } from "#modules/episodes";
 import { SerieRepository } from "#modules/series";
-import {HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
+import {HistoryListDeleteOneEntryByIdRequest, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
   HistoryListGetOneByIdRequest} from "#shared/models/historyLists";
 import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
 import express, { Request, Response, Router } from "express";
-import { Entry, Model } from "../models";
+import { Entry, EntryWithId, Model, assertIsEntryWithId } from "../models";
 import { ListRepository } from "../repositories";
-import {getManyEntriesBySearchValidation,
+import {deleteOneEntryByIdValidation, getManyEntriesBySearchValidation,
   getManyEntriesBySuperIdValidation,
   getOneByIdValidation} from "./validation";
 
@@ -73,7 +73,7 @@ implements
   }
 
   async #getEntriesWithCriteriaApplied(
-    entries: Entry[],
+    entries: EntryWithId[],
     body: HistoryListGetManyEntriesBySuperIdRequest["body"],
   ) {
     let newEntries = entries;
@@ -167,7 +167,7 @@ implements
     res: Response,
   ): Promise<void> {
     const got = await this.#historyListRepository.getAll();
-    let entries: Entry[] = [];
+    let entries: EntryWithId[] = [];
 
     for (const historyList of got)
       entries.push(...historyList.entries);
@@ -175,6 +175,28 @@ implements
     entries = await this.#getEntriesWithCriteriaApplied(entries, req.body);
 
     res.send(entries);
+  }
+
+  async deleteOneEntryById(
+    req: HistoryListDeleteOneEntryByIdRequest,
+    res: Response,
+  ): Promise<void> {
+    const {id, entryId} = req.params;
+    const historyList = await this.#historyListRepository.getOneById(id);
+
+    assertFound(historyList);
+
+    const entryIndex = historyList.entries.findIndex((entry: EntryWithId) => entry.id === entryId);
+
+    assertFound(entryIndex !== -1);
+
+    const [deleted] = historyList.entries.splice(entryIndex, 1);
+
+    assertIsEntryWithId(deleted);
+
+    await this.#historyListRepository.updateOneById(historyList.id, historyList);
+
+    res.send(deleted);
   }
 
   getRouter(): Router {
@@ -188,6 +210,12 @@ implements
       this.getManyEntriesByHistoryListId.bind(this),
     );
 
+    router.delete(
+      "/:id/entries/:entryId",
+      deleteOneEntryByIdValidation,
+      this.deleteOneEntryById.bind(this),
+    );
+
     router.use(express.json());
     router.post(
       "/entries/search",
@@ -196,7 +224,7 @@ implements
     );
     router.options("/entries/search", (req, res) => {
       res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Methods", "POST,OPTIONS");
+      res.header("Access-Control-Allow-Methods", "POST,DELETE,OPTIONS");
       res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
       res.sendStatus(200);
     } );

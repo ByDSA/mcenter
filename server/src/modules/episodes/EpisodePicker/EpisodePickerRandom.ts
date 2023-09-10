@@ -3,6 +3,7 @@
 import { HistoryList, createHistoryEntryByEpisodeFullId } from "#modules/historyLists";
 import { Serie } from "#modules/series";
 import { Stream } from "#modules/streams";
+import { HistoryEntryWithId } from "#shared/models/historyLists";
 import { throwErrorPopStack } from "#shared/utils/errors";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { DateTime } from "luxon";
@@ -62,7 +63,14 @@ export default class RandomPicker implements EpisodePicker {
         episode.lastTimePlayed = Math.floor(DateTime.now().toSeconds());
         // replace episode in allEpisodesInSerie
         this.#episodes.splice(this.#episodes.findIndex((e) => compareFullId(e, episode)), 1, episode);
-        this.#historyList.entries.push(createHistoryEntryByEpisodeFullId(episode));
+        const entry = createHistoryEntryByEpisodeFullId(episode);
+        const entryWithId: HistoryEntryWithId = {
+          ...entry,
+          id: "any", // Not used
+          historyListId: this.#historyList.id, // Not used
+        };
+
+        this.#historyList.entries.push(entryWithId);
         this.#lastEp = episode;
       }
 

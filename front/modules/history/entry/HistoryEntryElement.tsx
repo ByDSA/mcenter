@@ -1,12 +1,13 @@
 import { Episode, EpisodeFullId, assertIsEpisode } from "#shared/models/episodes";
-import { HistoryEntry } from "#shared/models/historyLists";
+import { HistoryEntry, HistoryEntryId, HistoryEntryWithId, HistoryListId, assertIsHistoryEntryWithId } from "#shared/models/historyLists";
 import React, { useEffect } from "react";
 import style from "./style.module.css";
 
 type Props = {
-  value: HistoryEntry;
+  value: HistoryEntryWithId;
+  onRemove?: (data: HistoryEntry)=> void;
 };
-export default function HistoryEntryElement( {value}: Props) {
+export default function HistoryEntryElement( {value, onRemove}: Props) {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [entry, setEntry] = React.useState(value);
   const [currentWeight, setCurrentWeight] = React.useState(value.episode?.weight);
@@ -53,7 +54,19 @@ export default function HistoryEntryElement( {value}: Props) {
         setEntry( {
           ...value,
           episode: data,
-        } as HistoryEntry);
+        } as HistoryEntryWithId);
+      } );
+  };
+  const remove = () => {
+    const historyEntryId = value.id;
+    const {historyListId} = value;
+
+    fetchSecureDelete(historyListId, historyEntryId)
+      .then((data: HistoryEntry | null) => {
+        if (!data)
+          return;
+
+        onRemove?.(entry);
       } );
   };
 
@@ -83,8 +96,18 @@ export default function HistoryEntryElement( {value}: Props) {
           <span>End:</span><span><input type="number" value={currentEnd} onChange={handleOnChange(setCurrentEnd)}/><span> {currentEnd && currentEnd > 0 ? secsToMS(currentEnd) : "-"}</span></span>
         </span>
         <span className={style.break} />
-        <span><a href="#" onClick={() => reset()}>Reset</a></span>
+        <span><a onClick={() => reset()}>Reset</a></span>
         {isModified && <span><a href="#" onClick={() => update()}>Update</a></span>}
+        <span className={style.break} />
+        <span><a onClick={()=> {
+          // eslint-disable-next-line no-restricted-globals, no-alert
+          if (confirm(`Borar esta entrada del historial?\n${ JSON.stringify( {
+            serieId: entry.serieId,
+            episodeId: entry.episodeId,
+            date: entry.date,
+          }, null, 2)}`))
+            remove();
+        }}>Borrar</a></span>
       </div>
       }
     </div>
@@ -122,6 +145,24 @@ function fetchSecurePatch(id: EpisodeFullId,partial: Partial<Episode>): Promise<
       assertIsEpisode(episode);
 
       return episode;
+    } )
+    .catch((error) => {
+      console.error("Error:", error);
+
+      return null;
+    } );
+}
+
+function fetchSecureDelete(listId: HistoryListId, entryId: HistoryEntryId): Promise<HistoryEntry | null> {
+  const URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/history-list/${listId}/entries/${entryId}`;
+
+  return fetch(URL, {
+    method: "DELETE",
+  } ).then((response) => response.json())
+    .then((historyEntry: HistoryEntry) => {
+      assertIsHistoryEntryWithId(historyEntry);
+
+      return historyEntry;
     } )
     .catch((error) => {
       console.error("Error:", error);

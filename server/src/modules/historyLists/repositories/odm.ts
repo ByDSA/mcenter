@@ -19,7 +19,9 @@ export const EntrySchema = new mongoose.Schema<Entry>( {
 
 export type EntryDocOdm = Entry;
 
-export type DocOdm = Model;
+export type DocOdm = Omit<Model, "entries"> & {
+  entries: EntryDocOdm[];
+};
 
 const NAME = "HistoryList";
 

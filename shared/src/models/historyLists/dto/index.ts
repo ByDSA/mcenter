@@ -17,3 +17,7 @@ export {
   GetManyEntriesBySearchResponse,
   assertIsGetManyEntriesBySearchResponse,
 } from "./GetManyEntriesBySearchResponse";
+
+export {
+  DeleteOneEntryByIdRequest, assertIsDeleteOneEntryByIdRequest,
+} from "./DeleteOneEntryByIdRequest";

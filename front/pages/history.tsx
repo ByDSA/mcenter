@@ -2,7 +2,7 @@ import Head from "next/head";
 import HistoryList from "../modules/history/HistoryList";
 import styles from "./History.module.css";
 
-export default function Home() {
+export default function History() {
   return (
     <div className={styles.container}>
       <Head>

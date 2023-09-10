@@ -1,3 +1,20 @@
+:root {
+  --color-yellow: rgb(255, 255, 32);
+  --color-yellow-light: rgb(255, 255, 160);
+  --color-yellow-light2: rgb(255, 255, 192);
+  --color-blue: hsl(212, 100%, 50%);
+  --color-blue-light: hsl(212, 100%, 80%);
+  --color-blue-light2: hsl(212, 100%, 90%);
+  --color-blue-darken: hsl(212, 100%, 33%);
+
+  --color-primary-light: var(--color-blue-light);
+  --color-primary: var(--color-blue);
+  --color-primary-darken: var(--color-blue-darken);
+  --color-primary2: var(--color-yellow);
+  --color-primary2-light: var(--color-yellow-light);
+  --color-primary2-light2: var(--color-yellow-light2);
+}
+
 html,
 body {
   padding: 0;
@@ -17,4 +34,19 @@ body {
 }
 * {
   box-sizing: border-box;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus,
+a:active {
+  text-decoration: underline;
+}
+a:hover {
+  color: var(--color-primary-light);
+  cursor: pointer;
 }

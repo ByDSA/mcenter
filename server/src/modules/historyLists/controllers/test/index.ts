@@ -3,6 +3,8 @@ import { getRouterMock } from "#tests/main";
 import RestController from "../RestController";
 
 export class HistoryListRestControllerMock implements PublicMethodsOf<RestController> {
+  deleteOneEntryById = jest.fn();
+
   getOneById = jest.fn();
 
   getRouter = getRouterMock;

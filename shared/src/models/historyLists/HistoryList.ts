@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
-import { EntrySchema } from "./HistoryEntry";
+import { EntryWithIdSchema } from "./HistoryEntry";
 
 const ModelSchema = z.object( {
   id: z.string(),
-  entries: z.array(EntrySchema),
+  entries: z.array(EntryWithIdSchema),
   maxSize: z.number(),
 } ).strict();
 

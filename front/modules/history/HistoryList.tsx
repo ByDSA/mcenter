@@ -1,9 +1,9 @@
 
 /* eslint-disable require-await */
 import HistoryEntryElement from "#modules/history/entry/HistoryEntryElement";
-import { HistoryEntry, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
+import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 import { assertIsDefined } from "#shared/utils/validation";
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import useSWR from "swr";
 import style from "./style.module.css";
 
@@ -39,31 +39,38 @@ export default function Page() {
     URL,
     fetcher,
   );
+  const [list, setList] = React.useState(data);
 
   if (error)
     return <p>Failed to load.</p>;
 
-  if (isLoading) {
+  if (!list && isLoading) {
     return <p key="aa" style={{
-      fontSize: "10vw",
+      fontSize: "8vw",
       textAlign: "center",
     }}>Loading...</p>;
   }
 
-  assertIsHistoryListGetManyEntriesBySearchResponse(data);
+  if (list === undefined) {
+    setList(data);
+
+    assertIsHistoryListGetManyEntriesBySearchResponse(data);
+  }
 
   return (
     <span className={style.content}>
       {
-        data.map((entry: HistoryEntry, i: number) => {
+        list && list.map((entry: HistoryEntryWithId, i: number) => {
           let dayTitle;
 
-          if (i === 0 || !isSameday(data[i - 1].date.timestamp, entry.date.timestamp))
+          if (i === 0 || !isSameday(list[i - 1].date.timestamp, entry.date.timestamp))
             dayTitle = <h2 key={getDateStr(new Date(entry.date.timestamp * 1000))}>{getDateStr(new Date(entry.date.timestamp * 1000))}</h2>;
 
           return <Fragment key={`${entry.serieId} ${entry.episodeId}`}>
             {dayTitle}
-            <HistoryEntryElement value={entry}/>
+            <HistoryEntryElement value={entry} onRemove={() => {
+              setList(list.toSpliced(i, 1));
+            }}/>
           </Fragment>;
         } )
       }

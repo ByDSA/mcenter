@@ -1,5 +1,6 @@
 import { HistoryEntry, HistoryList, assertIsHistoryList } from "#modules/historyLists";
 import { Stream, StreamMode, assertIsStream } from "#modules/streams";
+import { HistoryEntryWithId } from "#shared/models/historyLists";
 import { OriginType } from "#shared/models/streams/Stream";
 import { assertIsDefined } from "#shared/utils/validation";
 import HistoryEntryInStream from "./HistoryEntryInStream";
@@ -78,8 +79,13 @@ export function streamWithHistoryListToHistoryList(streamWithHistoryList: Stream
             timestamp: date.timestamp ?? new Date(date.year, date.month, date.day).getTime() / 1000,
           },
         };
+        const retEntryWithId: HistoryEntryWithId = {
+          ...retEntry,
+          historyListId: streamWithHistoryList.id,
+          id: "any", // Not used
+        };
 
-        return retEntry;
+        return retEntryWithId;
       } ),
       maxSize: streamWithHistoryList.maxHistorySize,
     };
