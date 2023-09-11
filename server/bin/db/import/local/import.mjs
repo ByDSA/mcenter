@@ -4,7 +4,7 @@ import { loadEnv } from "dazx/bash";
 
 const thisPath = __dirname;
 const folderName = thisPath.split("/").pop();
-const envPath = path.join(thisPath, "../../../", `.env.${folderName}`);
+const envPath = path.join(thisPath, "../../", `.env.${folderName}`);
 
 loadEnv(envPath);
 

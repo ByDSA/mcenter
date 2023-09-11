@@ -3,9 +3,9 @@
 const thisPath = __dirname;
 const dumpTmp = path.join(thisPath, "dump.db");
 // Dump prod
-const dumpProd = path.join(thisPath, "../../dump/prod/dump.mjs");
+const dumpProd = path.join(thisPath, "../../dump.mjs");
 
-await $`${dumpProd} ${dumpTmp}`;
+await $`${dumpProd} --from=production ${dumpTmp}`;
 
 // Import local
 const importLocal = path.join(thisPath, "../../import/local/import.mjs");

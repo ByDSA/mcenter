@@ -4,6 +4,7 @@
 import { loadEnv } from "dazx/bash";
 
 const from = getFromArgOrFail();
+const outFile = getOutFileArg();
 const {ENV} = loadProjectEnv();
 const thisFilenameWithoutExt = getFilenameWithoutExtOrFail(import.meta.url);
 const folder = path.join(__dirname, `.${thisFilenameWithoutExt}`);
@@ -14,7 +15,7 @@ const file = findScriptFileByParamsOrFail(candidates,
     env: ENV,
   } );
 
-await $`ENV=${ENV} from=${from} ${path.join(folder, file)}`;
+await $`ENV=${ENV} from=${from} outFile=${outFile} ${path.join(folder, file)}`;
 
 /**
  * @param {string[]} scriptFiles
@@ -82,7 +83,7 @@ function findProjectEnvFileOrFail() {
 
     const gitFolderPath = path.join(folder, ".git");
     const isRootProjectFolder = fs.existsSync(gitFolderPath) && fs.lstatSync(gitFolderPath).isDirectory();
-    const envFilePath = path.join(folder, ".envx");
+    const envFilePath = path.join(folder, ".env");
 
     if (isRootProjectFolder && fs.existsSync(envFilePath) && fs.lstatSync(envFilePath).isFile())
       return envFilePath;
@@ -166,4 +167,33 @@ function getFilenameWithoutExtOrFail(filename) {
     throw new Error("Empty filename");
 
   return ret;
+}
+
+function genTimestamp() {
+  const now = new Date();
+  const timestamp = [
+    [
+      now.getFullYear(),
+      (now.getMonth() + 1).toString().padStart(2, "0"),
+      now.getDate().toString()
+        .padStart(2, "0"),
+    ].join("-"),
+    [
+      now.getHours().toString()
+        .padStart(2, "0"),
+      now.getMinutes().toString()
+        .padStart(2, "0"),
+      now.getSeconds().toString()
+        .padStart(2, "0"),
+    ].join("-"),
+  ].join("-");
+
+  return timestamp;
+}
+
+function getOutFileArg() {
+  const timestamp = genTimestamp();
+  const outFile = argv._[0] ?? `${__dirname}/dump-${timestamp}.db`;
+
+  return outFile;
 }
