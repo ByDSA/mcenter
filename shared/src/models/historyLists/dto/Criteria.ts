@@ -5,6 +5,7 @@ export const SearchSchema = z.object( {
   filter: z.object( {
     serieId: z.string().optional(),
     episodeId: z.string().optional(),
+    timestampMax: z.number().optional(),
   } ).strict()
     .optional(),
   sort: z.object( {

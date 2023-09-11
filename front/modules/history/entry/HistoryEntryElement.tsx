@@ -1,6 +1,7 @@
 import { Episode, EpisodeFullId, assertIsEpisode } from "#shared/models/episodes";
-import { HistoryEntry, HistoryEntryId, HistoryEntryWithId, HistoryListId, assertIsHistoryEntryWithId } from "#shared/models/historyLists";
-import React, { useEffect } from "react";
+import { HistoryEntry, HistoryEntryId, HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, HistoryListId, assertIsHistoryEntryWithId, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
+import React, { Fragment, useEffect, useRef } from "react";
+import { getDateStr } from "../utils";
 import style from "./style.module.css";
 
 type Props = {
@@ -9,12 +10,14 @@ type Props = {
 };
 export default function HistoryEntryElement( {value, onRemove}: Props) {
   const [showDropdown, setShowDropdown] = React.useState(false);
+  const hasDropdownBeenShown = useRef(false);
   const [entry, setEntry] = React.useState(value);
   const [currentWeight, setCurrentWeight] = React.useState(value.episode?.weight);
   const [currentStart, setCurrentStart] = React.useState(value.episode?.start);
   const [currentEnd, setCurrentEnd] = React.useState(value.episode?.end);
   const [isModified, setIsModified] = React.useState(false);
   const [name, setName] = React.useState("");
+  const [lastest, setLastest] = React.useState<HistoryEntryWithId[] | undefined>(undefined);
 
   useEffect(() => {
     let newName = "";
@@ -24,6 +27,25 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
 
     setName(newName);
   }, [entry.episode?.title, entry.episodeId]);
+
+  useEffect(() => {
+    if (showDropdown && !hasDropdownBeenShown.current) {
+      fetchSecureLastestHistoryEntries(value).then((data: HistoryEntryWithId[] | null) => {
+        if (!data)
+          return;
+
+        const onlyTwo = data.slice(0, 2);
+
+        setLastest(onlyTwo);
+      } );
+    }
+  }
+  , [showDropdown]);
+
+  useEffect(() => {
+    if (lastest)
+      hasDropdownBeenShown.current = true;
+  }, [lastest]);
 
   useEffect(() => {
     const v = entry.episode?.weight !== currentWeight || entry.episode?.start !== currentStart || entry.episode?.end !== currentEnd;
@@ -108,10 +130,43 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
           }, null, 2)}`))
             remove();
         }}>Borrar</a></span>
+        <span className={style.break} />
+        {lastestComponent(lastest)}
+
       </div>
       }
     </div>
   );
+}
+
+function lastestComponent(lastest: HistoryEntryWithId[] | undefined) {
+  if (!lastest)
+    return <span>Loading...</span>;
+
+  if (lastest.length === 0)
+    return <span>No se había reproducido antes.</span>;
+
+  return <>
+    <span>Últimas veces:</span>
+    {lastest && lastest.map((e: HistoryEntryWithId) => <Fragment key={`${e.serieId} ${e.episodeId} ${e.date.timestamp}`}>
+      <><span className={style.break} /><span>{dateInLastestComponent(new Date(e.date.timestamp * 1000))}</span></>
+    </Fragment>)}
+  </>;
+}
+
+function dateInLastestComponent(date: Date) {
+  const days = getDaysSince(date);
+  const diasStr = days === 1 ? "día" : "días";
+
+  return `${getDateStr(date)} (hace ${getDaysSince(date)} ${diasStr})`;
+}
+
+function getDaysSince(date: Date) {
+  const today = new Date();
+  const diffTime = Math.abs(today.getTime() - date.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays;
 }
 
 function secsToMS(secs: number) {
@@ -131,7 +186,7 @@ function handleOnChange(f: React.Dispatch<React.SetStateAction<number>>) {
   };
 }
 
-function fetchSecurePatch(id: EpisodeFullId,partial: Partial<Episode>): Promise<Episode | null> {
+function fetchSecurePatch(id: EpisodeFullId, partial: Partial<Episode>): Promise<Episode | null> {
   const URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/episodes/${id.serieId}/${id.episodeId}`;
 
   return fetch(URL, {
@@ -163,6 +218,39 @@ function fetchSecureDelete(listId: HistoryListId, entryId: HistoryEntryId): Prom
       assertIsHistoryEntryWithId(historyEntry);
 
       return historyEntry;
+    } )
+    .catch((error) => {
+      console.error("Error:", error);
+
+      return null;
+    } );
+}
+
+export function fetchSecureLastestHistoryEntries(historyEntry: HistoryEntry): Promise<HistoryEntryWithId[] | null> {
+  const URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/history-list/entries/search`;
+  const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
+    "filter": {
+      "serieId": historyEntry.serieId,
+      "episodeId": historyEntry.episodeId,
+      "timestampMax": historyEntry.date.timestamp - 1,
+    },
+    "sort": {
+      "timestamp": "desc",
+    },
+    "limit": 10,
+  };
+
+  return fetch(URL, {
+    method: "POST",
+    body: JSON.stringify(bodyJson),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  } ).then((response) => response.json())
+    .then((data: HistoryEntryWithId[]) => {
+      assertIsHistoryListGetManyEntriesBySearchResponse(data);
+
+      return data;
     } )
     .catch((error) => {
       console.error("Error:", error);

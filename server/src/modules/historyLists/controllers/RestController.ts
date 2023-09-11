@@ -88,6 +88,9 @@ implements
         if (body.filter?.episodeId && episodeId !== body.filter.episodeId)
           return false;
 
+        if (body.filter?.timestampMax !== undefined && entry.date.timestamp > body.filter.timestampMax)
+          return false;
+
         return true;
       } );
     }
