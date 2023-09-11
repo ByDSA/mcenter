@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/ByDSA/mcenter/compare/v2.3.0...v2.4.0) (2023-09-11)
+
+
+### Features
+
+* ver fechas de anteriores entradas del historial de un capítulo dada una entrada de historial ([86eb012](https://github.com/ByDSA/mcenter/commit/86eb0127141061bb4b911bb8191271d18f250ee0))
+
 ## [2.3.0](https://github.com/ByDSA/mcenter/compare/v2.2.0...v2.3.0) (2023-09-10)
 
 
