@@ -41,7 +41,7 @@ export default class WebSocketsService {
         },
       } );
 
-      console.log("Servidor WebSocker iniciado!");
+      console.log("Servidor WebSocket iniciado!");
 
       this.#io.on(RemotePlayerWebSocketsEvents.CONNECTION, (socket: Socket) => {
         console.log("a user connected");
