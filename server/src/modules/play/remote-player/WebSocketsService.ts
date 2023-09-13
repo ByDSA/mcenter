@@ -85,7 +85,7 @@ export default class WebSocketsService {
       } );
 
       setInterval(async () => {
-        this.#status = await this.#remotePlayerService.getStatus();
+        this.#status = await this.#remotePlayerService.getStatusOrFail();
       } , 500);
 
       setInterval(() => {
@@ -106,7 +106,7 @@ export default class WebSocketsService {
   async onPauseToggle() {
     const res = await this.#remotePlayerService.pauseToggle();
 
-    if (this.#status?.status?.state)
+    if (this.#status?.status?.state && res)
       this.#status.status.state = res.state;
 
     if (isDefined(this.#status))
@@ -126,7 +126,12 @@ export default class WebSocketsService {
   }
 
   async onSeek(val: number | string) {
-    const {time: newTime} = await this.#remotePlayerService.seek(val);
+    const ret = await this.#remotePlayerService.seek(val);
+
+    if (!ret)
+      return;
+
+    const {time: newTime} = ret;
 
     if (this.#status?.status?.time)
       this.#status.status.time = newTime;
@@ -136,6 +141,6 @@ export default class WebSocketsService {
   }
 
   async onPlay(id: number) {
-    await this.#remotePlayerService.play(id);
+    await this.#remotePlayerService.playOrFail(id);
   }
 }

@@ -3,7 +3,6 @@ import { VLCProcess } from "#modules/play/player";
 import { VLCWebInterface } from "#modules/play/remote-player/web-interface";
 import { assertIsRemotePlayerStatusResponse, RemotePlayerPlaylistElement, RemotePlayerStatusResponse } from "#shared/models/player";
 import { assertIsDefined } from "#shared/utils/validation";
-import { ServiceUnavailableError } from "#utils/http/validation";
 import { decode } from "html-entities";
 import PlaylistResponse, { PlaylistELement } from "../web-interface/PlaylistResponse";
 import StatusResponse, { CategoryObject, InfoStatusResponse } from "../web-interface/StatusResponse";
@@ -22,29 +21,25 @@ export default class Service {
     this.#webInterface = webInterface;
   }
 
-  async getStatus(): Promise<RemotePlayerStatusResponse> {
+  async getStatusOrFail(): Promise<RemotePlayerStatusResponse> {
     const isRunning = await VLCProcess.isRunningAsync();
     const status: RemotePlayerStatusResponse = {
       running: isRunning,
     };
     let remoteStatus: StatusResponse | undefined;
     let remotePlaylist: PlaylistResponse | undefined;
-    const promise1 = this.#webInterface.fetchShowStatus().catch(e => {
-      if (!(e instanceof ServiceUnavailableError))
-        console.log(e);
-
-      return undefined;
-    } )
+    const promise1 = this.#webInterface.fetchSecureShowStatus()
       .then((s) => {
+        if (!s)
+          return;
+
         remoteStatus = s;
       } );
-    const promise2 = this.#webInterface.fetchPlaylist().catch(e => {
-      if (!(e instanceof ServiceUnavailableError))
-        console.log(e);
-
-      return undefined;
-    } )
+    const promise2 = this.#webInterface.fetchPlaylistSecure()
       .then(p => {
+        if (!p)
+          return;
+
         remotePlaylist = p;
       } );
 
@@ -89,7 +84,9 @@ export default class Service {
         };
       }
 
-      const transPlaylistElements = remotePlaylist?.node.node[0].leaf?.map((l: PlaylistELement) => {
+      let transPlaylistElements: RemotePlayerPlaylistElement[] = [];
+      const leaf = remotePlaylist?.node.node[0].leaf;
+      const leafElementMap = (l: PlaylistELement) => {
         const ret: RemotePlayerPlaylistElement = {
           id: +l["@_id"],
           name: l["@_name"],
@@ -101,7 +98,13 @@ export default class Service {
           ret.current = true;
 
         return ret;
-      } );
+      };
+
+      if (leaf && Array.isArray(leaf))
+        transPlaylistElements = leaf?.map(leafElementMap);
+      else if (leaf && !Array.isArray(leaf))
+        transPlaylistElements = [leafElementMap(leaf)];
+
       let current;
       let gotCurrent = false;
       const previous = [];
@@ -131,7 +134,10 @@ export default class Service {
   }
 
   async pauseToggle() {
-    const ret = await this.#webInterface.fetchTogglePause();
+    const ret = await this.#webInterface.fetchSecureTogglePause();
+
+    if (!ret)
+      return null;
 
     return {
       state: ret.root.state,
@@ -139,36 +145,39 @@ export default class Service {
   }
 
   async getPlaylist() {
-    const ret = await this.#webInterface.fetchPlaylist();
+    const ret = await this.#webInterface.fetchPlaylistSecure();
 
     return ret;
   }
 
   async next(): Promise<void> {
-    await this.#webInterface.fetchNext();
+    await this.#webInterface.fetchSecureNext();
   }
 
   async previous(): Promise<void> {
-    await this.#webInterface.fetchPrevious();
+    await this.#webInterface.fetchSecurePrevious();
   }
 
   async stop(): Promise<void> {
-    await this.#webInterface.fetchStop();
+    await this.#webInterface.fetchSecureStop();
   }
 
   async toggleFullScreen(): Promise<void> {
-    await this.#webInterface.fetchToggleFullscreen();
+    await this.#webInterface.fetchSecureToggleFullscreen();
   }
 
-  async seek(val: number | string): Promise<TimeRet> {
-    const res = await this.#webInterface.fetchSeek(val);
+  async seek(val: number | string): Promise<TimeRet | null> {
+    const res = await this.#webInterface.fetchSecureSeek(val);
+
+    if (!res)
+      return null;
 
     return {
       time: res.root.time,
     };
   }
 
-  async play(id: number): Promise<void> {
+  async playOrFail(id: number): Promise<void> {
     await this.#webInterface.fetchPlay(id);
   }
 }

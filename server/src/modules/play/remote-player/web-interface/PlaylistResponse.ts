@@ -20,7 +20,8 @@ const PlaylistResponseSchema = z.object( {
     ...element,
     node: z.array(z.object( {
       ...element,
-      leaf: z.array(PlaylistElementSchema).optional(),
+      leaf: z.array(PlaylistElementSchema).or(PlaylistElementSchema)
+        .optional(),
     } ).strict()),
   } ),
 } );

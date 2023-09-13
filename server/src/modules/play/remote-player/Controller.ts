@@ -15,7 +15,7 @@ export default class RemotePlayerController implements Controller {
   }
 
   async getStatus(_: Request, res: Response) {
-    const status = await this.#service.getStatus();
+    const status = await this.#service.getStatusOrFail();
 
     res.send(status);
   }

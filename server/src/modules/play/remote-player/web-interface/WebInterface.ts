@@ -1,4 +1,3 @@
-import ServiceUnavailableError from "#utils/http/validation/ServiceUnavailableError";
 import UnauthorizedError from "#utils/http/validation/UnauthorizedError";
 import UnprocessablEntityError from "#utils/http/validation/UnprocessableEntityError";
 import { XMLParser } from "fast-xml-parser";
@@ -36,29 +35,35 @@ export default class WebInterface {
     } );
   }
 
-  #fetchWithHeadersJson(file: XMLFile, query?: StatusQuery): Promise<unknown> {
+  async #fetchSecureWithHeadersJson(file: XMLFile, query?: StatusQuery): Promise<unknown | null> {
     const queryStr = query ? `?${querystring.stringify(query)}` : "";
-
-    return fetch(`http://${this.#host}:${this.#port}/requests/${file}${queryStr}`, {
+    const url = `http://${this.#host}:${this.#port}/requests/${file}${queryStr}`;
+    const response = await fetch(url, {
       headers: this.#headers,
     } )
       .catch(e => {
-        if (e instanceof TypeError && e.cause instanceof Error && e.cause.toString().includes("ECONNREFUSED"))
-          throw new ServiceUnavailableError("VLC is not running with the web interface enabled");
+        if (e instanceof TypeError && e.cause instanceof Error && e.cause.toString().includes("ECONNREFUSED")) {
+          // console.error(new ServiceUnavailableError(`VLC is not running with the web interface enabled. Trying to fetch: ${url}`));
+
+          return null;
+        }
 
         throw e;
-      } )
-      .then(response => {
-        switch (response.status) {
-          case 200:
-            return response;
-          case 401:
-            throw new UnauthorizedError();
-          default:
-            throw new Error(`Unknown error: ${response.status}`);
-        }
-      } )
-      .then(response => response.text())
+      } );
+
+    if (!response)
+      return null;
+
+    switch (response.status) {
+      case 200:
+        break;
+      case 401:
+        throw new UnauthorizedError();
+      default:
+        throw new Error(`Unknown error: ${response.status}`);
+    }
+
+    return response.text()
       .then(text => text.slice(text.indexOf("\n") + 1)) // quitar línea ?xml
       .then(text => new XMLParser( {
         ignoreAttributes: false,
@@ -66,14 +71,20 @@ export default class WebInterface {
       } ).parse(text));
   }
 
-  async #fetchStatus(query?: StatusQuery): Promise<StatusResponse> {
-    const ret = await this.#fetchWithHeadersJson(XMLFile.status, query) as Promise<StatusResponse>;
+  async #fetchSecureStatus(query?: StatusQuery): Promise<StatusResponse | null> {
+    const ret = await this.#fetchSecureWithHeadersJson(XMLFile.status, query) as Promise<StatusResponse>;
+
+    if (!ret)
+      return null;
 
     try {
       assertIsStatusResponse(ret);
     } catch (e) {
-      if (e instanceof Error)
-        throw new UnprocessablEntityError(e.message);
+      if (e instanceof Error) {
+        console.error(new UnprocessablEntityError(e.message));
+
+        return null;
+      }
 
       throw e;
     }
@@ -81,80 +92,84 @@ export default class WebInterface {
     return ret;
   }
 
-  fetchTogglePause() {
-    return this.#fetchStatus( {
+  fetchSecureTogglePause() {
+    return this.#fetchSecureStatus( {
       command: "pl_pause",
     } );
   }
 
-  fetchStop() {
-    return this.#fetchStatus( {
+  fetchSecureStop() {
+    return this.#fetchSecureStatus( {
       command: "pl_stop",
     } );
   }
 
-  fetchNext() {
-    return this.#fetchStatus( {
+  fetchSecureNext() {
+    return this.#fetchSecureStatus( {
       command: "pl_next",
     } );
   }
 
-  fetchPrevious() {
-    return this.#fetchStatus( {
+  fetchSecurePrevious() {
+    return this.#fetchSecureStatus( {
       command: "pl_previous",
     } );
   }
 
   fetchDelete(id: number) {
-    return this.#fetchStatus( {
+    return this.#fetchSecureStatus( {
       command: "pl_delete",
       id,
     } );
   }
 
   fetchEmpty() {
-    return this.#fetchStatus( {
+    return this.#fetchSecureStatus( {
       command: "pl_empty",
     } );
   }
 
-  fetchToggleFullscreen() {
-    return this.#fetchStatus( {
+  fetchSecureToggleFullscreen() {
+    return this.#fetchSecureStatus( {
       command: "fullscreen",
     } );
   }
 
   fetchVolume(val: number | string) {
-    return this.#fetchStatus( {
+    return this.#fetchSecureStatus( {
       command: "volume",
       val: val.toString(),
     } );
   }
 
-  fetchSeek(val: number | string) {
-    return this.#fetchStatus( {
+  fetchSecureSeek(val: number | string) {
+    return this.#fetchSecureStatus( {
       command: "seek",
       val: val.toString(),
     } );
   }
 
   fetchPlay(id: number) {
-    return this.#fetchStatus( {
+    return this.#fetchSecureStatus( {
       command: "pl_play",
       id,
     } );
   }
 
-  async fetchPlaylist(): Promise<PlaylistResponse> {
-    const ret = await this.#fetchWithHeadersJson(XMLFile.playlist);
+  async fetchPlaylistSecure(): Promise<PlaylistResponse | null> {
+    const ret = await this.#fetchSecureWithHeadersJson(XMLFile.playlist);
+
+    if (!ret)
+      return null;
 
     try {
       assertIsPlaylistResponse(ret);
     } catch (e) {
-      console.log(e);
+      if (e instanceof Error) {
+        console.error(new UnprocessablEntityError(e.message));
 
-      if (e instanceof Error)
-        throw new UnprocessablEntityError(e.message);
+        return null;
+      }
 
       throw e;
     }
@@ -162,7 +177,7 @@ export default class WebInterface {
     return ret;
   }
 
-  fetchShowStatus(): Promise<StatusResponse> {
-    return this.#fetchStatus();
+  fetchSecureShowStatus(): Promise<StatusResponse | null> {
+    return this.#fetchSecureStatus();
   }
 }
