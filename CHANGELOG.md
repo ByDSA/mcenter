@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/ByDSA/mcenter/compare/v2.4.0...v2.5.0) (2023-09-13)
+
+
+### Features
+
+* remote player ([ed0a395](https://github.com/ByDSA/mcenter/commit/ed0a3952c4d9e7a568c5492679315ab5e7f51f5d))
+
 ## [2.4.0](https://github.com/ByDSA/mcenter/compare/v2.3.0...v2.4.0) (2023-09-11)
 
 
