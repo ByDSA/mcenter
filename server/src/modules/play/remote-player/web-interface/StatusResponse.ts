@@ -19,8 +19,8 @@ const StatusResponseSchema = z.object( {
     position: z.number().nonnegative(),
     time: z.number(), // a veces con el seek se pueden poner valores negativos
     audiofilters: z.object( {
-      filter_0: z.string(),
-    } ).strict(),
+      filter_0: z.string(), // puede haber filter_1, filter_2, etc
+    } ),
     rate: z.number().nonnegative(),
     apiversion: z.number().nonnegative(),
     fullscreen: z.number()
