@@ -16,7 +16,7 @@
     "zod": "3.22.2"
   },
   "devDependencies": {
-    "@types/node": "18.17.14",
-    "@types/jest": "29.5.4"
+    "@types/jest": "29.5.4",
+    "@types/node": "18.17.14"
   }
 }

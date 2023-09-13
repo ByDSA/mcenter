@@ -3,7 +3,8 @@ import { EpisodeRepository, EpisodeRestController } from "#modules/episodes";
 import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
 import { HistoryListRepository, HistoryListRestController } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
-import { PlaySerieController, PlayStreamController } from "#modules/play";
+import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
+import { RemotePlayerWebSocketsService } from "#modules/play/remote-player";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
 import { deepFreeze, deepMerge } from "#shared/utils/objects";
@@ -18,6 +19,7 @@ import helmet from "helmet";
 import schedule from "node-schedule";
 import { execSync } from "node:child_process";
 import fs from "node:fs";
+import { Server } from "node:http";
 import serveIndex from "serve-index";
 
 export type ExpressAppDependencies = {
@@ -28,6 +30,10 @@ export type ExpressAppDependencies = {
     play: {
       playSerieController: PublicMethodsOf<PlaySerieController>;
       playStreamController: PublicMethodsOf<PlayStreamController>;
+      remotePlayer: {
+      controller: PublicMethodsOf<RemotePlayerController>;
+      webSocketsService: PublicMethodsOf<RemotePlayerWebSocketsService>;
+      };
     };
     picker: {
       controller: PublicMethodsOf<PickerController>;
@@ -54,6 +60,8 @@ const DEFAULT_DEPENDENCIES: OptionalPropsRecursive<ExpressAppDependencies> = dee
 // Necesario para poder replicarla para test
 export default class ExpressApp implements App {
   #instance: express.Express | null = null;
+
+  httpServer: Server | undefined;
 
   #dependencies: Required<ExpressAppDependencies>;
 
@@ -82,7 +90,7 @@ export default class ExpressApp implements App {
       request: Request,
       _: Response,
       next: NextFunction) => {
-      console.log(`${request.method} url:: ${request.url}`);
+      console.log(`[${request.method}] ${request.url}`);
       next();
     };
 
@@ -113,10 +121,12 @@ export default class ExpressApp implements App {
     if (process.env.NODE_ENV === "development")
       app.get("/", HELLO_WORLD_HANDLER);
 
-    const {playSerieController, playStreamController} = this.#dependencies.modules.play;
+    const {playSerieController, playStreamController, remotePlayer} = this.#dependencies.modules.play;
+    const {controller: remotePlayerController} = remotePlayer;
 
     app.use("/api/play/serie", playSerieController.getRouter());
     app.use("/api/play/stream", playStreamController.getRouter());
+    app.use("/api/player/remote", remotePlayerController.getRouter());
 
     const {controller: pickerController} = this.#dependencies.modules.picker;
 
@@ -187,8 +197,8 @@ export default class ExpressApp implements App {
     const PORT: number = +(process.env.PORT ?? 8080);
 
     killProcessesUsingPort(PORT);
-    const listener = this.#instance.listen(PORT, () => {
-      const address = listener.address();
+    this.httpServer = this.#instance.listen(PORT, () => {
+      const address = (this.httpServer as Server).address();
       let realPort = PORT;
 
       if (address && typeof address !== "string")

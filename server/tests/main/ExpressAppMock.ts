@@ -4,6 +4,7 @@ import { ActionControllerMock } from "#modules/actions/test";
 import { EpisodeRestControllerMock } from "#modules/episodes/controllers/test";
 import { HistoryListRestControllerMock } from "#modules/historyLists/controllers/test";
 import { PickerControllerMock } from "#modules/picker/tests";
+import { PlayStatusControllerMock, WebSocketsServiceMock } from "#modules/play/remote-player/tests";
 import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
 import { deepMerge } from "#shared/utils/objects";
 import { TestMongoDatabase } from "./db";
@@ -22,6 +23,11 @@ export default class ExpressAppMock extends ExpressApp {
         play: {
           playSerieController: new PlaySerieControllerMock(),
           playStreamController: new PlayStreamControllerMock(),
+          remotePlayer:
+          {
+            controller: new PlayStatusControllerMock(),
+            webSocketsService: new WebSocketsServiceMock(),
+          },
         },
         picker: {
           controller: new PickerControllerMock(),

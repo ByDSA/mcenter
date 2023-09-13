@@ -93,17 +93,24 @@ export default class PlayerService {
   }
 }
 
-const vlcConfig = [
-  VLCFlag.PLAY_AND_EXIT,
-  VLCFlag.NO_VIDEO_TITLE,
-  VLCFlag.ASPECT_RATIO, "16:9",
-  VLCFlag.FULLSCREEN,
-  VLCFlag.MINIMAL_VIEW,
-  VLCFlag.NO_REPEAT,
-  VLCFlag.NO_LOOP,
-  VLCFlag.ONE_INSTANCE];
-
 async function openVLC(file: string): Promise<VLCProcess> {
+  const HTTP_PORT = process.env.VLC_HTTP_PORT ?? "8080";
+  const HTTP_PASSWORD = process.env.VLC_HTTP_PASSWORD;
+
+  assertIsDefined(HTTP_PASSWORD, "VLC_HTTP_PASSWORD");
+  const vlcConfig = [
+    VLCFlag.PLAY_AND_EXIT,
+    VLCFlag.NO_VIDEO_TITLE,
+    VLCFlag.ASPECT_RATIO, "16:9",
+    VLCFlag.FULLSCREEN,
+    VLCFlag.MINIMAL_VIEW,
+    VLCFlag.NO_REPEAT,
+    VLCFlag.NO_LOOP,
+    VLCFlag.ONE_INSTANCE,
+    VLCFlag.EXTRAINF, "http",
+    VLCFlag.HTTP_PORT, HTTP_PORT,
+    VLCFlag.HTTP_PASSWORD, HTTP_PASSWORD,
+  ];
   const vlc = await VLCProcess.builder()
     .setFile(file)
     .addFlags(...vlcConfig)

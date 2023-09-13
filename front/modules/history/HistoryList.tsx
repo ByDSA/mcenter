@@ -1,16 +1,13 @@
 
 /* eslint-disable require-await */
 import HistoryEntryElement from "#modules/history/entry/HistoryEntryElement";
+import { getBackendUrl } from "#modules/utils";
 import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
-import { assertIsDefined } from "#shared/utils/validation";
+import Loading from "app/loading";
 import React, { Fragment } from "react";
 import useSWR from "swr";
-import style from "./style.module.css";
 import { getDateStr } from "./utils";
 
-assertIsDefined(process.env.NEXT_PUBLIC_BACKEND_URL);
-
-const URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/history-list/entries/search`;
 const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
   "filter": {
   },
@@ -36,6 +33,7 @@ export const fetcher = async (url: string) => {
 };
 
 export default function Page() {
+  const URL = `${getBackendUrl()}/api/history-list/entries/search`;
   const { data, error, isLoading } = useSWR(
     URL,
     fetcher,
@@ -43,14 +41,14 @@ export default function Page() {
   const [list, setList] = React.useState(data);
 
   if (error)
-    return <p>Failed to load.</p>;
+  {return <>
+    <p>Failed to load.</p>
+    <p>{URL}</p>
+    <p>{JSON.stringify(error, null, 2)}</p>
+  </>;}
 
-  if (!list && isLoading) {
-    return <p key="aa" style={{
-      fontSize: "8vw",
-      textAlign: "center",
-    }}>Loading...</p>;
-  }
+  if (!list && isLoading)
+    return <Loading/>;
 
   if (list === undefined) {
     setList(data);
@@ -59,7 +57,12 @@ export default function Page() {
   }
 
   return (
-    <span className={style.content}>
+    <span style={{
+      flexDirection:"column",
+      display:"flex",
+      alignItems:"center",
+      justifyContent:"center",
+    }}>
       {
         list && list.map((entry: HistoryEntryWithId, i: number) => {
           let dayTitle;

@@ -1,18 +1,22 @@
 :root {
   --color-yellow: rgb(255, 255, 32);
-  --color-yellow-light: rgb(255, 255, 160);
-  --color-yellow-light2: rgb(255, 255, 192);
+  --color-yellow-darker: color-mix(in srgb, var(--color-yellow), #000 15%);
+  --color-yellow-light: color-mix(in srgb, var(--color-yellow), #fff 40%);
+  --color-yellow-light2: color-mix(in srgb, var(--color-yellow), #fff 60%);
   --color-blue: hsl(212, 100%, 50%);
   --color-blue-light: hsl(212, 100%, 80%);
   --color-blue-light2: hsl(212, 100%, 90%);
-  --color-blue-darken: hsl(212, 100%, 33%);
+  --color-blue-darker: hsl(212, 100%, 33%);
+  --color-blue-darkerr: color-mix(in srgb, var(--color-blue), #000 15%);
 
   --color-primary-light: var(--color-blue-light);
   --color-primary: var(--color-blue);
-  --color-primary-darken: var(--color-blue-darken);
+  --color-primary-darker: var(--color-blue-darker);
+  --color-primary2-varname: --color-yellow;
   --color-primary2: var(--color-yellow);
   --color-primary2-light: var(--color-yellow-light);
   --color-primary2-light2: var(--color-yellow-light2);
+  --color-primary2-darker: var(--color-yellow-darker);
 }
 
 html,
@@ -31,6 +35,9 @@ body {
     Droid Sans,
     Helvetica Neue,
     sans-serif;
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
 }
 * {
   box-sizing: border-box;
@@ -49,4 +56,95 @@ a:active {
 a:hover {
   color: var(--color-primary-light);
   cursor: pointer;
+}
+
+/** Layout **/
+.content {
+  padding: 0rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  width: 100vw;
+  padding-bottom: calc(4vh - 2px);
+  min-height: 100%;
+}
+.extra-margin {
+  margin: 0 4vw;
+  width: 100vw;
+  max-width: 100%;
+}
+
+@media (width >= 640px) {
+  .content {
+    padding: 2rem 0;
+  }
+}
+
+.title {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+  font-size: 10vw;
+}
+
+.title {
+  text-align: center;
+}
+
+.main {
+  width: 95vw;
+  height: 100%;
+}
+
+@media (width >= 640px) {
+  .title {
+    font-size: 4em;
+  }
+  .main {
+    width: calc(640px * 0.95);
+  }
+}
+
+/** Menú **/
+nav {
+  width: 100vw;
+  height: 3rem;
+  background-color: var(--color-primary);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+nav :has(a) {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100vw;
+  color: white;
+
+  & a {
+    color: var(--color-primary2);
+  }
+
+  & a:hover {
+    color: var(--color-primary2-darker);
+  }
+}
+
+body {
+  padding-top: 3rem;
 }

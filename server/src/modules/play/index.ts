@@ -13,3 +13,7 @@ export {
 export {
   default as VLCService,
 } from "./player/PlayerService";
+
+export {
+  RemotePlayerController,
+} from "./remote-player";

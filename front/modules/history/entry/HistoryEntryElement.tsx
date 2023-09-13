@@ -1,5 +1,7 @@
+import { getBackendUrl } from "#modules/utils";
 import { Episode, EpisodeFullId, assertIsEpisode } from "#shared/models/episodes";
 import { HistoryEntry, HistoryEntryId, HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, HistoryListId, assertIsHistoryEntryWithId, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
+import Loading from "app/loading";
 import React, { Fragment, useEffect, useRef } from "react";
 import { getDateStr } from "../utils";
 import style from "./style.module.css";
@@ -141,7 +143,7 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
 
 function lastestComponent(lastest: HistoryEntryWithId[] | undefined) {
   if (!lastest)
-    return <span>Loading...</span>;
+    return <Loading/>;
 
   if (lastest.length === 0)
     return <span>No se había reproducido antes.</span>;
@@ -187,7 +189,7 @@ function handleOnChange(f: React.Dispatch<React.SetStateAction<number>>) {
 }
 
 function fetchSecurePatch(id: EpisodeFullId, partial: Partial<Episode>): Promise<Episode | null> {
-  const URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/episodes/${id.serieId}/${id.episodeId}`;
+  const URL = `${getBackendUrl()}/api/episodes/${id.serieId}/${id.episodeId}`;
 
   return fetch(URL, {
     method: "PATCH",
@@ -209,7 +211,7 @@ function fetchSecurePatch(id: EpisodeFullId, partial: Partial<Episode>): Promise
 }
 
 function fetchSecureDelete(listId: HistoryListId, entryId: HistoryEntryId): Promise<HistoryEntry | null> {
-  const URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/history-list/${listId}/entries/${entryId}`;
+  const URL = `${getBackendUrl()}/api/history-list/${listId}/entries/${entryId}`;
 
   return fetch(URL, {
     method: "DELETE",
@@ -227,7 +229,7 @@ function fetchSecureDelete(listId: HistoryListId, entryId: HistoryEntryId): Prom
 }
 
 export function fetchSecureLastestHistoryEntries(historyEntry: HistoryEntry): Promise<HistoryEntryWithId[] | null> {
-  const URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/history-list/entries/search`;
+  const URL = `${getBackendUrl()}/api/history-list/entries/search`;
   const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
     "filter": {
       "serieId": historyEntry.serieId,

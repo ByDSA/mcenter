@@ -16,12 +16,12 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
         if (!line.includes("/"))
           return line;
 
-        const cyanStartIndex = line.indexOf(" /") >= 0 ? line.indexOf(" /") + 1 : line.indexOf("(/") + 1;
+        const cyanStartIndex = getStartIndex(line);
 
         if (cyanStartIndex === -1)
           return line;
 
-        const cyanEndIndex = line.indexOf(":", cyanStartIndex);
+        const cyanEndIndex = getEndIndex(line);
         const cyan = line.slice(cyanStartIndex, cyanEndIndex);
 
         // construct full line with cyan
@@ -38,5 +38,25 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
 
   next();
 } ;
+
+function getStartIndex(line: string) {
+  const starts = [ " /", "(/", "(node:internal/" ];
+
+  for (const start of starts) {
+    const index = line.indexOf(start);
+
+    if (index !== -1)
+      return index + 1;
+  }
+
+  return -1;
+}
+
+function getEndIndex(line: string) {
+  const lastIndex = line.lastIndexOf(":");
+  const preLastIndex = line.lastIndexOf(":", lastIndex - 1);
+
+  return preLastIndex;
+}
 
 export default errorHandler;

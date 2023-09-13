@@ -10,7 +10,10 @@ export enum VLCFlag {
     MINIMAL_VIEW = "--qt-minimal-view",
     NO_REPEAT = "--no-repeat",
     NO_LOOP = "--no-loop",
-    ONE_INSTANCE = "--one-instance"
+    ONE_INSTANCE = "--one-instance",
+    EXTRAINF = "--extraintf",
+    HTTP_PORT = "--http-port",
+    HTTP_PASSWORD = "--http-password"
 }
 
 type OnHandler = (code: number)=> void;

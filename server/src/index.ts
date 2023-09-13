@@ -4,10 +4,14 @@ import { EpisodePickerService, EpisodeRepository, EpisodeRestController } from "
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
-import { PlaySerieController, PlayService, PlayStreamController, VLCService } from "#modules/play";
+import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerController, VLCService } from "#modules/play";
+import { RemotePlayerService, RemotePlayerWebSocketsService } from "#modules/play/remote-player";
+import { VLCWebInterface } from "#modules/play/remote-player/web-interface";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
+import { assertIsDefined } from "#shared/utils/validation";
 import dotenv from "dotenv";
+import { Server } from "http";
 import { ExpressApp } from "./main";
 import RealDatabase from "./main/db/Database";
 
@@ -45,7 +49,8 @@ import RealDatabase from "./main/db/Database";
     episodePickerService,
     historyListService,
   } );
-  const app = new ExpressApp( {
+  const remotePlayerService = genRemotePlayerService();
+  const app: ExpressApp = new ExpressApp( {
     db: {
       instance: new RealDatabase(),
     },
@@ -53,6 +58,16 @@ import RealDatabase from "./main/db/Database";
       play: {
         playSerieController,
         playStreamController,
+        remotePlayer:
+        {
+          controller: new RemotePlayerController( {
+            remotePlayerService,
+          } ),
+          webSocketsService: new RemotePlayerWebSocketsService( {
+            remotePlayerService,
+            getHttpServer: () => app.httpServer as Server,
+          } ),
+        },
       },
       picker: {
         controller: new PickerController(),
@@ -87,3 +102,23 @@ import RealDatabase from "./main/db/Database";
   await app.init();
   app.listen();
 } )();
+
+function genRemotePlayerService() {
+  const password = process.env.VLC_HTTP_PASSWORD;
+  const port = +(process.env.VLC_HTTP_PORT ?? -1);
+
+  assertIsDefined(password, "VLC_HTTP_PASSWORD");
+
+  if (port === -1)
+    throw new Error("VLC_HTTP_PORT is not defined");
+
+  const webInterface = new VLCWebInterface( {
+    password,
+    port,
+  } );
+  const service = new RemotePlayerService( {
+    webInterface,
+  } );
+
+  return service;
+}

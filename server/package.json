@@ -1,20 +1,4 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "build/index.js",
-  "scripts": {
-    "start": "NODE_ENV=production node build/index.js",
-    "start:watch": "NODE_ENV=development nodemon",
-    "build": "pnpm build:clean && pnpm build:raw",
-    "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
-    "build:clean": "rm -rf build",
-    "test": "NODE_ENV=test jest --maxWorkers=1 --testPathIgnorePatterns=VLCProcess*",
-    "test:watch": "pnpm run test --watch",
-    "test:coverage": "pnpm run test --coverage",
-    "test:coverage:clean": "rm -rf coverage",
-    "migrate": "./src/main/db/migrations/migrate.sh"
-  },
   "dependencies": {
     "#shared": "workspace:../shared/build",
     "axios": "1.5.0",
@@ -23,15 +7,19 @@
     "dotenv": "16.3.1",
     "envalid": "7.3.1",
     "express": "4.18.2",
+    "fast-xml-parser": "4.2.7",
     "find-process": "1.4.7",
     "helmet": "7.0.0",
+    "html-entities": "2.4.0",
     "jsdom": "22.1.0",
     "luxon": "3.4.2",
     "mongoose": "7.5.0",
     "node-schedule": "2.1.1",
     "rand-picker": "1.1.0",
-    "serve-index": "1.9.1"
+    "serve-index": "1.9.1",
+    "socket.io": "4.7.2"
   },
+  "description": "",
   "devDependencies": {
     "#sharedSrc": "workspace:../shared/src",
     "@types/cors": "^2.8.14",
@@ -43,11 +31,26 @@
     "@types/node-schedule": "2.1.0",
     "@types/serve-index": "^1.9.1",
     "@types/supertest": "2.0.12",
+    "jest": "workspace:../node_modules/jest",
     "nodemon": "2.0.20",
     "supertest": "6.3.3",
     "ts-node": "10.9.1",
     "tsc-alias": "1.8.7",
-    "zod": "3.22.2",
-    "jest": "workspace:../node_modules/jest"
-  }
+    "zod": "3.22.2"
+  },
+  "main": "build/index.js",
+  "name": "server",
+  "scripts": {
+    "build": "pnpm build:clean && pnpm build:raw",
+    "build:clean": "rm -rf build",
+    "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
+    "migrate": "./src/main/db/migrations/migrate.sh",
+    "start": "NODE_ENV=production node build/index.js",
+    "start:watch": "NODE_ENV=development nodemon",
+    "test": "NODE_ENV=test jest --maxWorkers=1 --testPathIgnorePatterns=VLCProcess*",
+    "test:coverage": "pnpm run test --coverage",
+    "test:coverage:clean": "rm -rf coverage",
+    "test:watch": "pnpm run test --watch"
+  },
+  "version": "1.0.0"
 }
