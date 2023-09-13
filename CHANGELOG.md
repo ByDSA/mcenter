@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.3](https://github.com/ByDSA/mcenter/compare/v2.5.2...v2.5.3) (2023-09-13)
+
+
+### Bug Fixes
+
+* vlc websockets ([11d01a4](https://github.com/ByDSA/mcenter/commit/11d01a41aec7d3b60b847a168f37ac3136d1a25d))
+
 ### [2.5.2](https://github.com/ByDSA/mcenter/compare/v2.5.1...v2.5.2) (2023-09-13)
 
 
