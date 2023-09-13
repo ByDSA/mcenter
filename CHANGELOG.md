@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.1](https://github.com/ByDSA/mcenter/compare/v2.5.0...v2.5.1) (2023-09-13)
+
+
+### Bug Fixes
+
+* inicialización del servidor websocket ([fa75f6b](https://github.com/ByDSA/mcenter/commit/fa75f6b9f08bdfc802bb44b06167778a71f2ffbf))
+
 ## [2.5.0](https://github.com/ByDSA/mcenter/compare/v2.4.0...v2.5.0) (2023-09-13)
 
 
