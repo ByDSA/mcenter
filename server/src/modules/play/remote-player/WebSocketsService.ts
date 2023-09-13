@@ -22,12 +22,16 @@ export default class WebSocketsService {
     this.#getHttpServer = getHttpServer;
     this.#remotePlayerService = remotePlayerService;
 
-    setTimeout(() => {
-      this.startSocket();
-    }, 1000);
+    setTimeout(this.startSocket.bind(this), 0); // Porque sino intenta acceder síncronamente a 'app.httpServer' antes de que se haya creado
   }
 
   startSocket() {
+    if (!this.#getHttpServer()) {
+      setTimeout(this.startSocket.bind(this), 100);
+
+      return;
+    }
+
     if (!this.#io) {
       this.#io = new Server(this.#getHttpServer(), {
         path: "/ws/",
@@ -36,6 +40,8 @@ export default class WebSocketsService {
           methods: ["GET", "POST"],
         },
       } );
+
+      console.log("Servidor WebSocker iniciado!");
 
       this.#io.on(RemotePlayerWebSocketsEvents.CONNECTION, (socket: Socket) => {
         console.log("a user connected");

@@ -10,6 +10,8 @@ export default class WebSocketsServiceMock implements PublicMethodsOf<WebSockets
 
   onStop = jest.fn();
 
+  onPlay = jest.fn();
+
   onSeek = jest.fn();
 
   startSocket = jest.fn();
