@@ -173,11 +173,11 @@ export default class Service {
       return null;
 
     return {
-      time: res.root.time,
+      time: Math.max(res.root.time, 0),
     };
   }
 
-  async playOrFail(id: number): Promise<void> {
+  async play(id: number): Promise<void> {
     await this.#webInterface.fetchPlay(id);
   }
 }

@@ -1,0 +1,166 @@
+.playerBox {
+  border: px solid gray;
+  border-radius: 1em;
+  background-color: var(--color-primary2-light);
+  width: 100%;
+  max-width: 30em;
+  padding: 1em 1em;
+  color: black;
+  box-shadow: 0 0 0.25em gray inset;
+}
+
+@media (width > 600px) {
+  .playerBox {
+    padding: 1.5em 1.5em;
+  }
+}
+
+.playerBox > header {
+  margin-bottom: 1em;
+}
+
+.playerBox > section {
+  user-select: none;
+}
+
+.outContainer {
+  margin: 1em 0em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+@media (width > 600px) {
+  .outContainer {
+    margin: 1em 2em;
+    width: calc(100% - 2 * 2em);
+  }
+}
+
+.controls,
+.controlsVolume {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  color: white;
+}
+.controls {
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+  color: white;
+}
+
+.controls {
+  justify-content: space-between;
+}
+
+.controlsVolume {
+  justify-content: center;
+
+  & :not(.btn) {
+    color: black;
+  }
+}
+
+.controls .btn,
+.controlsVolume > * {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.controls .btn,
+.controlsVolume .btn {
+  border-radius: 50%;
+  background-color: var(--color-primary);
+}
+.controls .btn {
+  height: 3em;
+  min-height: 3em;
+  width: 3em;
+  min-width: 3em;
+}
+
+.controlsVolume .btn {
+  font-weight: bold;
+}
+
+.controlsVolume > * {
+  height: 2em;
+  min-height: 2em;
+  width: 2em;
+  min-width: 2em;
+  font-size: 1em;
+  margin: 0 0.5em;
+  white-space: nowrap;
+}
+
+@media (width > 600px) {
+  .controls {
+    justify-content: space-evenly;
+  }
+}
+
+.controls .btn:hover,
+.controlsVolume .btn:hover {
+  background-color: var(--color-primary-darker);
+  color: var(--color-primary2-light4);
+}
+
+.title {
+  margin: 0;
+  text-align: center;
+}
+
+.artist {
+  margin: 0;
+  margin-top: 0.5em;
+  text-align: center;
+  font-weight: normal;
+}
+
+.timeDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+.time {
+  flex-shrink: 1;
+  min-width: 2.5em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.progressBar {
+  display: flex;
+  width: auto;
+  height: 1em;
+  border: 1px solid var(--color-primary);
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 1em;
+  margin: 1em 0;
+  overflow: hidden;
+  flex-basis: 0;
+  flex-grow: 5;
+  margin: 0 0.5em;
+}
+
+.progressBar > span {
+  background-color: var(--color-primary);
+  opacity: 0.9;
+  display: flex;
+  height: calc(100%+2px);
+  pointer-events: none;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  pointer-events: none; /* Evita que el tooltip interfiera con eventos del ratón */
+}

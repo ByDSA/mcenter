@@ -26,7 +26,7 @@ export default function Player() {
   const [status, setStatus] = React.useState<RemotePlayerStatusResponse | null | undefined>(undefined);
 
   return (
-    <div className="extra-margin">
+    <>
       <h1 className="title">
           Player
       </h1>
@@ -34,7 +34,7 @@ export default function Player() {
       {status === undefined && <Loading/>}
       {status === null && "Error"}
       {status && statusRepresentaton(status)}
-    </div>
+    </>
   );
 }
 
@@ -48,8 +48,8 @@ function statusRepresentaton(status: RemotePlayerStatusResponse) {
       status.running &&
       <>
         <MediaPlayer meta={{
-          title: status?.status?.meta?.title,
-          artist: uri,
+          title: status?.status?.meta?.title ?? "-",
+          artist: uri?.slice(uri.lastIndexOf("/") + 1) ?? "-",
         }} time={{
           current: status?.status?.time,
           length: status.status?.length,
@@ -65,19 +65,21 @@ function statusRepresentaton(status: RemotePlayerStatusResponse) {
         }}/>
       </>
     }
-    {
-      status.status?.playlist && <>
-        <h2>Playlist</h2>
-        <h3>Next</h3>
-        {
-          mapElements(status.status.playlist.next)
-        }
-        <h3>Previous</h3>
-        {
-          mapElements(status.status.playlist.previous.toReversed())
-        }
-      </>
-    }
+    <div className="extra-margin">
+      {
+        status.status?.playlist && <>
+          <h2>Playlist</h2>
+          <h3>Next</h3>
+          {
+            mapElements(status.status.playlist.next)
+          }
+          <h3>Previous</h3>
+          {
+            mapElements(status.status.playlist.previous.toReversed())
+          }
+        </>
+      }
+    </div>
   </>;
 }
 

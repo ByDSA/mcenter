@@ -1,7 +1,7 @@
 @value border-color: grey;
 
 .container {
-  background-color: var(--color-primary2-light);
+  background-color: var(--color-primary2-light2);
   border: 2px solid border-color;
   border-radius: 10px;
   width: 100%;
@@ -41,9 +41,10 @@
   display: none;
 }
 
-.header:hover {
+.header:hover,
+.header:has(+ .dropdown):hover {
   cursor: pointer;
-  background-color: var(--color-primary2);
+  background-color: var(--color-primary2-darker);
 }
 
 .header:has(+ .dropdown) {

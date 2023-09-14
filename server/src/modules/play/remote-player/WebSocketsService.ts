@@ -141,6 +141,6 @@ export default class WebSocketsService {
   }
 
   async onPlay(id: number) {
-    await this.#remotePlayerService.playOrFail(id);
+    await this.#remotePlayerService.play(id);
   }
 }
