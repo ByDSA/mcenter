@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.5](https://github.com/ByDSA/mcenter/compare/v2.5.4...v2.5.5) (2023-09-14)
+
+
+### Bug Fixes
+
+* schema y excepciones ([93afa69](https://github.com/ByDSA/mcenter/commit/93afa69076e1e01468fcd9e104d1e9d53e2c7c09))
+
 ### [2.5.4](https://github.com/ByDSA/mcenter/compare/v2.5.3...v2.5.4) (2023-09-13)
 
 
