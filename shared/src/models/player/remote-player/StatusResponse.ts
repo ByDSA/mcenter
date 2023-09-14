@@ -10,7 +10,7 @@ const StatusResponseSchema = z.object( {
       .step(1)
       .gte(-1),
     state: z.enum([ "playing", "paused", "stopped" ]),
-    volume: z.number().nonnegative(),
+    volume: z.number(), // a veces, cuando no hay ningún medio, es -256
     meta: z.object( {
       title: z.string().optional(),
       filename: z.string().optional(),

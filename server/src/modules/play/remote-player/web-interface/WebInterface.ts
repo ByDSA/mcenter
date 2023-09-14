@@ -80,13 +80,12 @@ export default class WebInterface {
     try {
       assertIsStatusResponse(ret);
     } catch (e) {
-      if (e instanceof Error) {
+      if (e instanceof Error)
         console.error(new UnprocessablEntityError(e.message));
+      else
+        console.log(e);
 
-        return null;
-      }
-
-      throw e;
+      return null;
     }
 
     return ret;
@@ -156,7 +155,7 @@ export default class WebInterface {
     } );
   }
 
-  async fetchPlaylistSecure(): Promise<PlaylistResponse | null> {
+  async fetchSecurePlaylist(): Promise<PlaylistResponse | null> {
     const ret = await this.#fetchSecureWithHeadersJson(XMLFile.playlist);
 
     if (!ret)
@@ -165,13 +164,12 @@ export default class WebInterface {
     try {
       assertIsPlaylistResponse(ret);
     } catch (e) {
-      if (e instanceof Error) {
+      if (e instanceof Error)
         console.error(new UnprocessablEntityError(e.message));
+      else
+        console.log(e);
 
-        return null;
-      }
-
-      throw e;
+      return null;
     }
 
     return ret;

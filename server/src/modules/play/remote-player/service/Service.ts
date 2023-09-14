@@ -35,7 +35,7 @@ export default class Service {
 
         remoteStatus = s;
       } );
-    const promise2 = this.#webInterface.fetchPlaylistSecure()
+    const promise2 = this.#webInterface.fetchSecurePlaylist()
       .then(p => {
         if (!p)
           return;
@@ -145,7 +145,7 @@ export default class Service {
   }
 
   async getPlaylist() {
-    const ret = await this.#webInterface.fetchPlaylistSecure();
+    const ret = await this.#webInterface.fetchSecurePlaylist();
 
     return ret;
   }
