@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.6.1](https://github.com/ByDSA/mcenter/compare/v2.6.0...v2.6.1) (2023-09-27)
+
+
+### Bug Fixes
+
+* createFullResponseSchemaWithData da error de tipos (se ha comentado) ([ac02c45](https://github.com/ByDSA/mcenter/commit/ac02c45b705ffaf725022f43bfe8ff2912cdbcaa))
+
 ## [2.6.0](https://github.com/ByDSA/mcenter/compare/v2.5.5...v2.6.0) (2023-09-27)
 
 
