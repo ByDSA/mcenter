@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.0](https://github.com/ByDSA/mcenter/compare/v2.5.5...v2.6.0) (2023-09-27)
+
+
+### Features
+
+*  actualizar series desde disco ([4c23670](https://github.com/ByDSA/mcenter/commit/4c2367067c9046db073effb3734342e396838d33))
+
 ### [2.5.5](https://github.com/ByDSA/mcenter/compare/v2.5.4...v2.5.5) (2023-09-14)
 
 
