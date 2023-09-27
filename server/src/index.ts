@@ -1,13 +1,14 @@
 import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
-import { EpisodePickerService, EpisodeRepository, EpisodeRestController } from "#modules/episodes";
+import FixerController from "#modules/actions/FixerController";
+import { EpisodeAddNewFileInfosController, EpisodeFileInfoRepository, EpisodePickerService, EpisodeRepository, EpisodeRestController, EpisodeUpdateFileInfoController, SavedSerieTreeService } from "#modules/episodes";
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerController, VLCService } from "#modules/play";
 import { RemotePlayerService, RemotePlayerWebSocketsService } from "#modules/play/remote-player";
 import { VLCWebInterface } from "#modules/play/remote-player/web-interface";
-import { SerieRepository } from "#modules/series";
+import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
 import { assertIsDefined } from "#shared/utils/validation";
 import dotenv from "dotenv";
@@ -20,7 +21,12 @@ import RealDatabase from "./main/db/Database";
 
   const streamRepository = new StreamRepository();
   const historyListRepository = new HistoryListRepository();
-  const serieRepository = new SerieRepository();
+  const serieRelationshipWithStreamFixer = new SerieRelationshipWithStreamFixer( {
+    streamRepository,
+  } );
+  const serieRepository = new SerieRepository( {
+    relationshipWithStreamFixer: serieRelationshipWithStreamFixer,
+  } );
   const episodeRepository = new EpisodeRepository();
   const historyListService = new HistoryListService( {
     episodeRepository,
@@ -50,6 +56,12 @@ import RealDatabase from "./main/db/Database";
     historyListService,
   } );
   const remotePlayerService = genRemotePlayerService();
+  const fixerController = new FixerController( {
+    episodeRepository,
+    serieRepository,
+    streamRepository,
+    serieRelationshipWithStreamFixer,
+  } );
   const app: ExpressApp = new ExpressApp( {
     db: {
       instance: new RealDatabase(),
@@ -80,6 +92,15 @@ import RealDatabase from "./main/db/Database";
           serieRepository,
           streamRepository,
         } ),
+        episodesUpdateFileInfoController: new EpisodeUpdateFileInfoController( {
+          savedSerieTreeService: new SavedSerieTreeService( {
+            episodeRepository,
+            serieRepository,
+          } ),
+          episodeFileRepository: new EpisodeFileInfoRepository(),
+        } ),
+        episodesAddNewFilesController: new EpisodeAddNewFileInfosController(),
+        fixerController,
       } ),
       historyList: {
         restController: new HistoryListRestController( {

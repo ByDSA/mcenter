@@ -49,7 +49,7 @@ export default class EpisodesUpdateLastTimePlayedController implements Controlle
 
         const historyList: HistoryList | null = await this.#historyListRepository.getOneById(stream.id);
 
-        assertFound(historyList, "History list not found");
+        assertFound(historyList, `History list not found for stream ${stream.id}`);
         await this.#episodeRepository.getAllBySerieId(serie.id).then(episodes => {
           for (const episode of episodes) {
             const updatePromise = this.#lastTimePlayedService.updateEpisodeLastTimePlayedAndGetFromHistoryList( {

@@ -5,3 +5,5 @@ export {
 export {
   default as HttpMethod,
 } from "./HttpMethod";
+
+export * from "./responses";

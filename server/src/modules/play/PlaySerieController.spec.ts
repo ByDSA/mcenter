@@ -27,7 +27,9 @@ describe("PlaySerieController", () => {
     await loadFixtureSimpsons();
 
     const episodeRepository = new EpisodeRepository();
-    const serieRepository = new SerieRepository();
+    const serieRepository = new SerieRepository( {
+      relationshipWithStreamFixer: null as any,
+    } );
     const historyListRepository = new HistoryListRepository();
     const historyListService = new HistoryListService( {
       episodeRepository,

@@ -1,6 +1,7 @@
 import { SerieId } from "#modules/series";
+import { Stream, StreamMode } from "#modules/streams";
 import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
-import { Model, ModelId } from "../models";
+import { Model, ModelId, OriginType } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 import { ModelOdm } from "./odm";
 
@@ -20,6 +21,36 @@ CanCreateOne<Model> {
     } );
 
     return docsOdm.map(docOdmToModel);
+  }
+
+  async createDefaultFromSerie(serieId: SerieId): Promise<void> {
+    const stream: Stream = {
+      group: {
+        origins: [
+          {
+            type: OriginType.SERIE,
+            id: serieId,
+          },
+        ],
+      },
+      mode: StreamMode.SEQUENTIAL,
+      id: serieId,
+    };
+
+    await this.createOne(stream);
+  }
+
+  async hasDefaultForSerie(serieId: SerieId): Promise<boolean> {
+    const streamDocOdm = await ModelOdm.findOne( {
+      "group.origins": {
+        $elemMatch: {
+          type: OriginType.SERIE,
+          id: serieId,
+        },
+      },
+    } );
+
+    return !!streamDocOdm;
   }
 
   async createOne(stream: Model): Promise<void> {

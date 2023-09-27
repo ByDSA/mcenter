@@ -13,3 +13,11 @@ export {
 export {
   RestController as EpisodeRestController,
 } from "./controllers";
+
+export {
+  AddNewFileInfosController as EpisodeAddNewFileInfosController, FileInfoRepository as EpisodeFileInfoRepository, UpdateFileInfoController as EpisodeUpdateFileInfoController,
+} from "./file-info";
+
+export {
+  SavedSerieTreeService,
+} from "./saved-serie-tree-service";

@@ -5,7 +5,7 @@ import { HistoryListRepository, HistoryListRestController } from "#modules/histo
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
 import { RemotePlayerWebSocketsService } from "#modules/play/remote-player";
-import { SerieRepository } from "#modules/series";
+import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
 import { deepFreeze, deepMerge } from "#shared/utils/objects";
 import { OptionalPropsRecursive, PublicMethodsOf } from "#shared/utils/types";
@@ -140,10 +140,16 @@ export default class ExpressApp implements App {
 
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;
+      const streamRepository = new StreamRepository();
+      const serieRelationshipWithStreamFixer = new SerieRelationshipWithStreamFixer( {
+        streamRepository,
+      } );
       const episodePickerService = new EpisodePickerService( {
-        streamRepository: new StreamRepository(),
+        streamRepository,
         episodeRepository: new EpisodeRepository(),
-        serieRepository: new SerieRepository(),
+        serieRepository: new SerieRepository( {
+          relationshipWithStreamFixer: serieRelationshipWithStreamFixer,
+        } ),
         historyListRepository: new HistoryListRepository(),
       } );
       const nextEpisode = await episodePickerService.getByStreamId(idstream);

@@ -36,8 +36,10 @@ export default class PlaySerieController implements Controller {
 
     assertFound(serie);
 
-    const episodes = await this.#episodeRepository.getManyBySerieId(serieId);
-    const episode = episodes.find((e) => e.episodeId === episodeId);
+    const episode = await this.#episodeRepository.getOneById( {
+      serieId,
+      episodeId,
+    } );
 
     assertFound(episode);
     const ok = await this.#playService.play( {
@@ -48,7 +50,7 @@ export default class PlaySerieController implements Controller {
     if (ok) {
       await this.#historyListService.addEpisodesToHistory( {
         historyListId: serie.id,
-        episodes,
+        episodes: [episode],
       } );
     } else
       console.log("PlayService: Could not play");

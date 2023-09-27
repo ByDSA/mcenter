@@ -7,7 +7,9 @@ const InfoElementSchema = z.object( {
   "@_name": z.string(),
 } ).strict();
 const CategoryObjectSchema = z.object( {
-  info: z.array(InfoElementSchema).optional(), // cuando está parado, no hay info
+  info: z.array(InfoElementSchema)
+    .or(InfoElementSchema)
+    .optional(), // cuando está parado, no hay info, o cuando solo hay una, a veces es un objeto
   "@_name": z.string(),
 } ).strict();
 const StatusResponseSchema = z.object( {
@@ -76,6 +78,8 @@ export default StatusResponse;
 export type InfoStatusResponse = z.infer<typeof InfoElementSchema>;
 
 export type CategoryObject = z.infer<typeof CategoryObjectSchema>;
+
+export type InfoObject = z.infer<typeof InfoElementSchema>;
 
 export function assertIsStatusResponse(obj: unknown): asserts obj is StatusResponse {
   StatusResponseSchema.parse(obj);

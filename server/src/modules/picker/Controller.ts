@@ -3,7 +3,7 @@ import { genPickerWithData } from "#modules/episodes/EpisodePicker/EpisodePicker
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { Model } from "#modules/episodes/models";
 import { HistoryListRepository } from "#modules/historyLists";
-import { SerieRepository } from "#modules/series";
+import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import SerieService from "#modules/series/SerieService";
 import { StreamRepository } from "#modules/streams";
 import { asyncMap } from "#shared/utils/arrays";
@@ -26,8 +26,13 @@ export default class PickerController implements Controller {
   }
 
   async #showPicker(req: Request, res: Response) {
-    const serieRepository = new SerieRepository();
     const streamRepository = new StreamRepository();
+    const serieRelationshipWithStreamFixer = new SerieRelationshipWithStreamFixer( {
+      streamRepository,
+    } );
+    const serieRepository = new SerieRepository( {
+      relationshipWithStreamFixer: serieRelationshipWithStreamFixer,
+    } );
     const historyListRepository = new HistoryListRepository();
     const episodeRepository = new EpisodeRepository();
     const serieService = new SerieService( {

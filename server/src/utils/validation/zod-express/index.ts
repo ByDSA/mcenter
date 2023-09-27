@@ -11,6 +11,8 @@ export const validateRequest: (assertFunc: AssertFunction)=> ExpressMiddleware =
 
         return next();
       } catch (error) {
-        return res.status(HttpStatusCode.UNPROCESSABLE_ENTITY).json(error);
+        return res.status(HttpStatusCode.UNPROCESSABLE_ENTITY).json( {
+          errors: [error],
+        } );
       }
     };

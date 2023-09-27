@@ -2,6 +2,7 @@ import { EpisodeRepository } from "#modules/episodes";
 import { SerieRepository } from "#modules/series";
 import {HistoryListDeleteOneEntryByIdRequest, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
   HistoryListGetOneByIdRequest} from "#shared/models/historyLists";
+import { PublicMethodsOf } from "#shared/utils/types";
 import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
@@ -13,9 +14,9 @@ import {deleteOneEntryByIdValidation, getManyEntriesBySearchValidation,
   getOneByIdValidation} from "./validation";
 
 type Params = {
-  historyListRepository: ListRepository;
-  serieRepository: SerieRepository;
-  episodeRepository: EpisodeRepository;
+  historyListRepository: PublicMethodsOf<ListRepository>;
+  serieRepository: PublicMethodsOf<SerieRepository>;
+  episodeRepository: PublicMethodsOf<EpisodeRepository>;
 };
 export default class RestController
 implements
@@ -23,11 +24,11 @@ implements
     CanGetOneById<HistoryListGetOneByIdRequest, Response>,
     CanGetAll<Request, Response>
 {
-  #historyListRepository: ListRepository;
+  #historyListRepository: PublicMethodsOf<ListRepository>;
 
-  #serieRepository: SerieRepository;
+  #serieRepository: PublicMethodsOf<SerieRepository>;
 
-  #episodeRepository: EpisodeRepository;
+  #episodeRepository: PublicMethodsOf<EpisodeRepository>;
 
   constructor( {historyListRepository,
     episodeRepository,

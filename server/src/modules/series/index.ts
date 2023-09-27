@@ -5,6 +5,6 @@ export {
 } from "./models";
 
 export {
-  DocOdm as SerieDocOdm, ModelOdm as SerieModelOdm, Repository as SerieRepository,
+  DocOdm as SerieDocOdm, ModelOdm as SerieModelOdm, RelationshipWithStreamFixer as SerieRelationshipWithStreamFixer, Repository as SerieRepository,
   docOdmToModel as serieDocOdmToModel, modelToDocOdm as serieToDocOdm,
 } from "./repositories";

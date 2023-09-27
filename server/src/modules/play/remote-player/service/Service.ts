@@ -5,7 +5,7 @@ import { assertIsRemotePlayerStatusResponse, RemotePlayerPlaylistElement, Remote
 import { assertIsDefined } from "#shared/utils/validation";
 import { decode } from "html-entities";
 import PlaylistResponse, { PlaylistELement } from "../web-interface/PlaylistResponse";
-import StatusResponse, { CategoryObject, InfoStatusResponse } from "../web-interface/StatusResponse";
+import StatusResponse, { CategoryObject, InfoObject, InfoStatusResponse } from "../web-interface/StatusResponse";
 
 type Obj = {
   [key: string]: string;
@@ -78,9 +78,22 @@ export default class Service {
         } else
           meta = category;
 
+        let titleInfo: InfoObject | undefined;
+        let filenameInfo: InfoObject | undefined;
+
+        if (Array.isArray(meta.info)) {
+          titleInfo = meta.info.find((i: InfoStatusResponse) => i["@_name"] === "title");
+          filenameInfo = meta.info.find((i: InfoStatusResponse) => i["@_name"] === "filename");
+        } else
+          titleInfo = meta?.info?.["@_name"] === "title" ? meta.info : undefined;
+
+        const titleOriginal = titleInfo?.["#text"]?.toString();
+        const title = titleOriginal ? decode(titleOriginal) : undefined;
+        const filename = filenameInfo?.["#text"]?.toString();
+
         status.status.meta = {
-          title: decode(meta.info?.find((i: InfoStatusResponse) => i["@_name"] === "title")?.["#text"]?.toString()),
-          filename: meta.info?.find((i: InfoStatusResponse) => i["@_name"] === "filename")?.["#text"]?.toString(),
+          title,
+          filename,
         };
       }
 

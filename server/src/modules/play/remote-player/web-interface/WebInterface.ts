@@ -59,6 +59,8 @@ export default class WebInterface {
         break;
       case 401:
         throw new UnauthorizedError();
+      case 404:
+        return null;
       default:
         throw new Error(`Unknown error: ${response.status}`);
     }

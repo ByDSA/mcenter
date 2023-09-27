@@ -1,4 +1,6 @@
+import { isDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
+import { ModelFullId } from "../models";
 
 export interface DocOdm {
   episodeId: string;
@@ -63,3 +65,20 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, SchemaOdm);
+
+export async function getIdModelOdmFromId(fullId: ModelFullId) {
+  const episodeOdm = await ModelOdm.findOne( {
+    serieId: fullId.serieId,
+    episodeId: fullId.episodeId,
+  } );
+
+  if (!episodeOdm)
+    return null;
+
+  const id = episodeOdm.toObject()._id as mongoose.Types.ObjectId;
+
+  if (!isDefined(id))
+    return null;
+
+  return id;
+}

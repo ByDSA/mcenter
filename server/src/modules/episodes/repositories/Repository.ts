@@ -1,6 +1,5 @@
 import { SerieId } from "#modules/series";
 import { HistoryList } from "#shared/models/historyLists";
-import { assertFound } from "#utils/http/validation";
 import { CanCreateManyAndGet, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Model, ModelFullId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
@@ -14,6 +13,20 @@ CanUpdateOneByIdAndGet<Model, ModelFullId>,
 CanPatchOneByIdAndGet<Model, ModelFullId>,
 CanCreateManyAndGet<Model>
 {
+  async patchOneByPathAndGet(path: string, episode: Partial<UpdateOneParams>): Promise<Model | null> {
+    const partialDocOdm: Partial<DocOdm> = partialModelToDocOdm(episode);
+    const updateResult = await ModelOdm.updateOne( {
+      path,
+    }, partialDocOdm);
+
+    if (updateResult.matchedCount === 0)
+      return null;
+
+    const newPath = episode.path ?? path;
+
+    return this.getOneByPath(newPath);
+  }
+
   async getAllBySerieId(id: SerieId): Promise<Model[]> {
     const episodesOdm = await ModelOdm.find( {
       serieId: id,
@@ -56,6 +69,17 @@ CanCreateManyAndGet<Model>
     return docOdmToModel(episodeOdm);
   }
 
+  async getOneByPath(path: string): Promise<Model | null> {
+    const episodeOdm = await ModelOdm.findOne( {
+      path,
+    } );
+
+    if (!episodeOdm)
+      return null;
+
+    return docOdmToModel(episodeOdm);
+  }
+
   async getManyBySerieId(serieId: string): Promise<Model[]> {
     const episodesOdm = await ModelOdm.find( {
       serieId,
@@ -82,7 +106,7 @@ CanCreateManyAndGet<Model>
     const updateResult = await ModelOdm.updateOne(fullId, partialDocOdm);
 
     if (updateResult.matchedCount === 0)
-      assertFound(null);
+      return null;
 
     return this.getOneById(fullId);
   }
