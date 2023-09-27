@@ -7,11 +7,11 @@ const Schema = z.object( {
   data: z.any().optional(),
 } ).strict();
 
-export function createFullResponseSchemaWithData<T>(dataSchema: z.ZodSchema<T>) {
-  return Schema.extend( {
-    data: dataSchema,
-  } );
-}
+// export function createFullResponseSchemaWithData<T>(dataSchema: z.ZodSchema<T>) {
+//   return Schema.extend( {
+//     data: dataSchema,
+//   } );
+// }
 
 type Model<T = any> = z.infer<typeof Schema> & {
   data?: T;

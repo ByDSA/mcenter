@@ -12,5 +12,4 @@ export {
 export {
   default as FullResponse,
   assertIsModel as assertIsFullResponse,
-  createFullResponseSchemaWithData,
 } from "./FullResponse";
