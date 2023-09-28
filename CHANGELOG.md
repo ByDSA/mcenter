@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.7.0](https://github.com/ByDSA/mcenter/compare/v2.6.1...v2.7.0) (2023-09-28)
+
+
+### Features
+
+* mostrar todos los stream en 'play' ([713693a](https://github.com/ByDSA/mcenter/commit/713693a19b2ffbac754c9daffe5af1f7725c7adc))
+
 ### [2.6.1](https://github.com/ByDSA/mcenter/compare/v2.6.0...v2.6.1) (2023-09-27)
 
 
