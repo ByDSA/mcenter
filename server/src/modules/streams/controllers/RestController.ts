@@ -72,8 +72,6 @@ implements
             lastTimePlayedDic[serieId] = lastEntry.date.timestamp;
         }
 
-        console.log(Object.entries(lastTimePlayedDic).map(([key, value]) => `${key}: ${new Date(value ? +value * 1000 : 0).toISOString()}`));
-
         // cambiar por toSorted en node 20
         got = got.sort((a, b) => {
           const serieIdA = a.group.origins[0]?.id;
