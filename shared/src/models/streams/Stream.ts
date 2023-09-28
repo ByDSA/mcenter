@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
+import { SerieSchema } from "../series";
 
 export enum Mode {
   SEQUENTIAL = "SEQUENTIAL",
@@ -13,10 +14,18 @@ export enum OriginType {
   STREAM = "stream"
 };
 
-const OriginSchema = z.object( {
-  type: z.nativeEnum(OriginType),
+const OriginSerieSchema = z.object( {
+  type:z.literal(OriginType.SERIE),
   id: z.string(),
+  serie: SerieSchema.optional(),
 } ).strict();
+const OriginStreamSchema = z.object( {
+  type:z.literal(OriginType.STREAM),
+  id: z.string(),
+} )
+  .strict();
+const OriginSchema = OriginSerieSchema
+  .or(OriginStreamSchema);
 
 export type Origin = z.infer<typeof OriginSchema>;
 
@@ -26,7 +35,7 @@ const GroupSchema = z.object( {
 
 export type Group = z.infer<typeof GroupSchema>;
 
-const ModelSchema = z.object( {
+export const ModelSchema = z.object( {
   id: z.string(),
   group: GroupSchema,
   mode: z.nativeEnum(Mode),

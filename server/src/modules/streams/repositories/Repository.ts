@@ -1,19 +1,31 @@
 import { SerieId } from "#modules/series";
 import { Stream, StreamMode } from "#modules/streams";
-import { CanCreateOne, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
+import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import { Model, ModelId, OriginType } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
-import { ModelOdm } from "./odm";
+import { DocOdm, ModelOdm } from "./odm";
 
 export default class Repository
 implements CanGetOneById<Model, ModelId>,
 CanUpdateOneById<Model, ModelId>,
-CanCreateOne<Model> {
-  async getManyBySerieId(id: SerieId): Promise<Model[]> {
+CanCreateOne<Model>, CanGetAll<Model> {
+  async getAll(): Promise<Model[]> {
+    const allStreamsDocOdm = await this.#getAllDocOdm();
+
+    return allStreamsDocOdm.map(docOdmToModel);
+  }
+
+  async #getAllDocOdm(): Promise<DocOdm[]> {
     const allStreamsDocOdm = await ModelOdm.find( {
     }, {
       _id: 0,
     } );
+
+    return allStreamsDocOdm;
+  }
+
+  async getManyBySerieId(id: SerieId): Promise<Model[]> {
+    const allStreamsDocOdm = await this.#getAllDocOdm();
     const docsOdm = allStreamsDocOdm.filter(streamDocOdm => {
       const origins = streamDocOdm.group.origins.filter(o=>o.type === "serie" && o.id === id);
 

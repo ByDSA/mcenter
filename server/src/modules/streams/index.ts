@@ -8,3 +8,7 @@ export {
   docOdmToModel as streamDocOdmToModel,
   modelToDocOdm as streamToDocOdm,
 } from "./repositories";
+
+export {
+  RestController as StreamRestController,
+} from "./controllers";

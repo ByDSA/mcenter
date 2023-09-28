@@ -9,7 +9,7 @@ import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerCon
 import { RemotePlayerService, RemotePlayerWebSocketsService } from "#modules/play/remote-player";
 import { VLCWebInterface } from "#modules/play/remote-player/web-interface";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
-import { StreamRepository } from "#modules/streams";
+import { StreamRepository, StreamRestController } from "#modules/streams";
 import { assertIsDefined } from "#shared/utils/validation";
 import dotenv from "dotenv";
 import { Server } from "http";
@@ -107,6 +107,13 @@ import RealDatabase from "./main/db/Database";
           historyListRepository,
           episodeRepository,
           serieRepository,
+        } ),
+      },
+      streams: {
+        restController: new StreamRestController( {
+          streamRepository,
+          serieRepository,
+          historyListRepository,
         } ),
       },
       episodes: {

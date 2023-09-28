@@ -6,7 +6,7 @@ import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
 import { RemotePlayerWebSocketsService } from "#modules/play/remote-player";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
-import { StreamRepository } from "#modules/streams";
+import { StreamRepository, StreamRestController } from "#modules/streams";
 import { deepFreeze, deepMerge } from "#shared/utils/objects";
 import { OptionalPropsRecursive, PublicMethodsOf } from "#shared/utils/types";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
@@ -41,6 +41,9 @@ export type ExpressAppDependencies = {
     actionController: PublicMethodsOf<ActionController>;
     historyList: {
       restController: PublicMethodsOf<HistoryListRestController>;
+    };
+    streams: {
+      restController: PublicMethodsOf<StreamRestController>;
     };
     episodes: {
       restController: PublicMethodsOf<EpisodeRestController>;
@@ -135,6 +138,8 @@ export default class ExpressApp implements App {
     app.use("/api/actions", this.#dependencies.modules.actionController.getRouter());
 
     app.use("/api/history-list", this.#dependencies.modules.historyList.restController.getRouter());
+
+    app.use("/api/streams", this.#dependencies.modules.streams.restController.getRouter());
 
     app.use("/api/episodes", this.#dependencies.modules.episodes.restController.getRouter());
 
