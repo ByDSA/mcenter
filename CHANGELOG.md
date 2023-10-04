@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.1](https://github.com/ByDSA/mcenter/compare/v2.7.0...v2.7.1) (2023-10-04)
+
+
+### Bug Fixes
+
+* **front:** eslint next plugin and fix build ([9aa0379](https://github.com/ByDSA/mcenter/commit/9aa0379ee961d9f4d65e253a4120054545f60db6))
+
 ## [2.7.0](https://github.com/ByDSA/mcenter/compare/v2.6.1...v2.7.0) (2023-09-28)
 
 
