@@ -9,7 +9,7 @@ module.exports = {
     NodeJS: true,
     React: true,
   },
-  extends: ["airbnb-base", "prettier"],
+  extends: ["airbnb-base", "prettier", "plugin:@next/next/recommended"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 12,

@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "#sharedSrc": "workspace:../shared/src",
+    "@next/eslint-plugin-next": "^13.5.4",
     "@types/react": "18.2.21"
   },
   "engines": {
