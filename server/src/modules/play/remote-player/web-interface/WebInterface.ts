@@ -48,7 +48,9 @@ export default class WebInterface {
           return null;
         }
 
-        throw e;
+        console.error(e);
+
+        return null;
       } );
 
     if (!response)
