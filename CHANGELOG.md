@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.2](https://github.com/ByDSA/mcenter/compare/v2.7.1...v2.7.2) (2023-10-06)
+
+
+### Bug Fixes
+
+* no lanzar error en fetchSecure ([7a0ca77](https://github.com/ByDSA/mcenter/commit/7a0ca7724381676fdcb8b04519e5b38a9c0b064e))
+
 ### [2.7.1](https://github.com/ByDSA/mcenter/compare/v2.7.0...v2.7.1) (2023-10-04)
 
 
