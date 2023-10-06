@@ -53,7 +53,8 @@ export const serverEnvSchema = z.object( {
   PORT: z.string().refine(isPort),
   MONGO_HOSTNAME: z.string(),
   MONGO_DB: z.string(),
-  MONGO_PORT: z.string().refine(isPort),
+  MONGO_PORT: z.string().refine(isPort)
+    .or(z.string().refine((s) => s === "", "Empty string")),
   MONGO_USER: z.string(),
   MONGO_PASSWORD: z.string(),
 
