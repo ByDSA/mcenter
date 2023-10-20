@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.8.2](https://github.com/ByDSA/mcenter/compare/v2.8.1...v2.8.2) (2023-10-20)
+
+
+### Bug Fixes
+
+* **back:** permitir reproducir path media con espacios ([6ac1344](https://github.com/ByDSA/mcenter/commit/6ac13442331e044432d37c5eb6f3a789dec2238c))
+
 ### [2.8.1](https://github.com/ByDSA/mcenter/compare/v2.8.0...v2.8.1) (2023-10-20)
 
 
