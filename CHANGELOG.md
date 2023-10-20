@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.8.0](https://github.com/ByDSA/mcenter/compare/v2.7.2...v2.8.0) (2023-10-20)
+
+
+### Features
+
+* enviar al front 'duration' y mostrarlo ([16e6f46](https://github.com/ByDSA/mcenter/commit/16e6f46b60808fcda6220e2148427b1fca104385))
+
 ### [2.7.2](https://github.com/ByDSA/mcenter/compare/v2.7.1...v2.7.2) (2023-10-06)
 
 
