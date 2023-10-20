@@ -12,3 +12,7 @@ export {
   PatchOneByIdRequest, PatchOneByIdSchema,
   assertIsPatchOneByIdRequest,
 } from "./PatchOneByIdRequest";
+
+export {
+  dtoToModel,
+} from "./adapters";

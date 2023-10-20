@@ -12,9 +12,6 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
     weight: docOdm.weight ?? 0,
   };
 
-  if (docOdm.duration !== undefined)
-    model.duration = docOdm.duration;
-
   if (docOdm.disabled !== undefined)
     model.disabled = docOdm.disabled;
 
@@ -40,9 +37,6 @@ export function modelToDocOdm(model: Episode): DocOdm {
     end: model.end,
     weight: model.weight,
   };
-
-  if (model.duration !== undefined)
-    ret.duration = model.duration;
 
   if (model.disabled !== undefined)
     ret.disabled = model.disabled;
@@ -80,9 +74,6 @@ export function partialModelToDocOdm(model: Partial<Episode>): Partial<DocOdm> {
 
   if (model.weight !== undefined)
     ret.weight = model.weight;
-
-  if (model.duration !== undefined)
-    ret.duration = model.duration;
 
   if (model.disabled !== undefined)
     ret.disabled = model.disabled;

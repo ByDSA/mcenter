@@ -1,7 +1,14 @@
+import { FileInfo } from "#shared/models/episodes/fileinfo";
 import { assertIsDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
-import { Model, ModelWithSuperId, assertIsModel, assertIsModelWithSuperId } from "../models";
+import { FileInfoWithSuperId, assertIsFileInfo, assertIsFileInfoWithSuperId } from "#sharedSrc/models/episodes/fileinfo";
 import { DocOdm } from "./odm";
+
+type Model = FileInfo;
+type ModelWithSuperId = FileInfoWithSuperId;
+
+const assertIsModel: typeof assertIsFileInfo = assertIsFileInfo;
+const assertIsModelWithSuperId: typeof assertIsFileInfoWithSuperId = assertIsFileInfoWithSuperId;
 
 export function docOdmToModel(docOdm: DocOdm): Model {
   assertIsDefined(docOdm);

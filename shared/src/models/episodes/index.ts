@@ -4,4 +4,9 @@ export {
 
 export {
   GetAllRequest as EpisodeGetAllRequest, GetAllSchema as EpisodeGetAllSchema, GetOneByIdRequest as EpisodeGetOneByIdRequest, GetOneByIdSchema as EpisodeGetOneByIdSchema, PatchOneByIdRequest as EpisodePatchOneByIdRequest, PatchOneByIdSchema as EpisodePatchOneByIdSchema, assertIsGetAllRequest as assertIsEpisodeGetAllRequest, assertIsGetOneByIdRequest as assertIsEpisodeGetOneByIdRequest, assertIsPatchOneByIdRequest as assertIsEpisodePatchOneByIdRequest,
+  dtoToModel as episodeDtoToModel,
 } from "./dto";
+
+export {
+  FileInfo as EpisodeFileInfo, assertIsFileInfo as assertIsEpisodeFileInfo,
+} from "./fileinfo";

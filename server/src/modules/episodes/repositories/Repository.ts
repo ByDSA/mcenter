@@ -1,11 +1,31 @@
 import { SerieId } from "#modules/series";
 import { HistoryList } from "#shared/models/historyLists";
 import { CanCreateManyAndGet, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import { z } from "zod";
+import { EpisodeFileInfoRepository } from "..";
 import { Model, ModelFullId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 
 type UpdateOneParams = Model;
+
+enum ExpandEnum {
+  FileInfo = "fileInfo",
+}
+
+export {
+  ExpandEnum as EpisodeRepositoryExpandEnum,
+};
+const OptionsSchema = z.object( {
+  expand: z.array(z.nativeEnum(ExpandEnum)).optional(),
+} );
+
+type Options = z.infer<typeof OptionsSchema>;
+
+function validateOptions(opts?: Options) {
+  if (opts)
+    OptionsSchema.parse(opts);
+}
 
 export default class Repository
 implements CanGetOneById<Model, ModelFullId>,
@@ -13,6 +33,12 @@ CanUpdateOneByIdAndGet<Model, ModelFullId>,
 CanPatchOneByIdAndGet<Model, ModelFullId>,
 CanCreateManyAndGet<Model>
 {
+  #fileInfoRepository: EpisodeFileInfoRepository;
+
+  constructor() {
+    this.#fileInfoRepository = new EpisodeFileInfoRepository();
+  }
+
   async patchOneByPathAndGet(path: string, episode: Partial<UpdateOneParams>): Promise<Model | null> {
     const partialDocOdm: Partial<DocOdm> = partialModelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
@@ -57,7 +83,8 @@ CanCreateManyAndGet<Model>
     return this.getOneById(fullId);
   }
 
-  async getOneById(fullId: ModelFullId): Promise<Model | null> {
+  async getOneById(fullId: ModelFullId, opts?: Options): Promise<Model | null> {
+    validateOptions(opts);
     const episodeOdm = await ModelOdm.findOne( {
       serieId: fullId.serieId,
       episodeId: fullId.episodeId,
@@ -66,7 +93,19 @@ CanCreateManyAndGet<Model>
     if (!episodeOdm)
       return null;
 
-    return docOdmToModel(episodeOdm);
+    const ret = docOdmToModel(episodeOdm);
+
+    if (opts?.expand?.includes(ExpandEnum.FileInfo)) {
+      const id = episodeOdm._id?.toString();
+      const fileInfo = await this.#fileInfoRepository.getAllBySuperId(id);
+
+      if (!fileInfo)
+        throw new Error("Episode has no file info");
+
+      ret.fileInfo = fileInfo.at(0);
+    }
+
+    return ret;
   }
 
   async getOneByPath(path: string): Promise<Model | null> {

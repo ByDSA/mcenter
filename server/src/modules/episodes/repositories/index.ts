@@ -5,5 +5,5 @@ export {
 export * from "./adapters";
 
 export {
-  default as Repository,
+  EpisodeRepositoryExpandEnum, default as Repository,
 } from "./Repository";

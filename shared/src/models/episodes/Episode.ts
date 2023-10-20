@@ -2,6 +2,7 @@ import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
 import { resourceSchema } from "../resource";
 import { canDurableSchema } from "../resource/CanDurable";
+import { FileInfoSchema } from "./fileinfo";
 
 export type ModelId = string;
 
@@ -12,7 +13,12 @@ export const ModelFullIdSchema = z.object( {
 
 export type ModelFullId = z.infer<typeof ModelFullIdSchema>;
 
-export const ModelSchema = resourceSchema.merge(ModelFullIdSchema).merge(canDurableSchema);
+export const ModelSchema = resourceSchema
+  .merge(ModelFullIdSchema)
+  .merge(canDurableSchema)
+  .merge(z.object( {
+    fileInfo: FileInfoSchema.optional(),
+  } ));
 
 type Model = z.infer<typeof ModelSchema>;
 export default Model;

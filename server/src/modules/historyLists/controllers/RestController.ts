@@ -1,4 +1,4 @@
-import { EpisodeRepository } from "#modules/episodes";
+import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#modules/episodes";
 import { SerieRepository } from "#modules/series";
 import {HistoryListDeleteOneEntryByIdRequest, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
   HistoryListGetOneByIdRequest} from "#shared/models/historyLists";
@@ -138,6 +138,8 @@ implements
           const episode = await this.#episodeRepository.getOneById( {
             episodeId,
             serieId,
+          }, {
+            expand: [EpisodeRepositoryExpandEnum.FileInfo],
           } );
 
           if (episode)

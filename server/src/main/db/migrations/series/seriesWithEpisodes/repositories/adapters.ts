@@ -17,7 +17,6 @@ export function episodeInSerieToOldDocOdm(episodeInSerie: EpisodeInSerie): Episo
     end: episodeInSerie.end,
     start: episodeInSerie.start,
     tags: episodeInSerie.tags,
-    duration: episodeInSerie.duration,
     title: episodeInSerie.title,
     disabled: episodeInSerie.disabled,
     weight: episodeInSerie.weight,
@@ -39,7 +38,7 @@ export function episodeInSerieToEpisode(episodeInSerie: EpisodeInSerie, serieId:
     title: episodeInSerie.title ?? `${serieId } ${episodeInSerie.id}`,
     weight: episodeInSerie.weight ?? 0,
   };
-  const optionalKeys: (OptionalKeys<Episode>)[] = [ "lastTimePlayed", "disabled", "duration", "tags" ];
+  const optionalKeys: (OptionalKeys<Episode>)[] = [ "lastTimePlayed", "disabled", "tags" ];
 
   for (const key of optionalKeys){
     if (episodeInSerie[key] !== undefined)
@@ -61,7 +60,7 @@ export function episodeInSerieDocOdmToModel(episodeInSerieDocOdm: EpisodeInSerie
     id: episodeInSerieDocOdm.id,
     path: episodeInSerieDocOdm.path,
   };
-  const optionalKeys: (OptionalKeys<EpisodeInSerie>)[] = [ "start", "end", "weight", "title","lastTimePlayed", "disabled", "tags", "duration" ];
+  const optionalKeys: (OptionalKeys<EpisodeInSerie>)[] = [ "start", "end", "weight", "title","lastTimePlayed", "disabled", "tags" ];
 
   for (const key of optionalKeys){
     if (episodeInSerieDocOdm[key] !== undefined)

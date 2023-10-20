@@ -2,7 +2,7 @@
 /* eslint-disable require-await */
 import HistoryEntryElement from "#modules/history/entry/HistoryEntryElement";
 import { getBackendUrl } from "#modules/utils";
-import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
+import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse, historyListEntryDtoToModel } from "#shared/models/historyLists";
 import Loading from "app/loading";
 import React, { Fragment } from "react";
 import useSWR from "swr";
@@ -34,10 +34,15 @@ export const fetcher = async (url: string) => {
 
 export default function Page() {
   const URL = `${getBackendUrl()}/api/history-list/entries/search`;
-  const { data, error, isLoading } = useSWR(
+  const { data:dto, error, isLoading } = useSWR(
     URL,
     fetcher,
   );
+  let data = dto;
+
+  if (!error && dto)
+    data = (dto as any[]).map(historyListEntryDtoToModel);
+
   const [list, setList] = React.useState(data);
 
   if (error)

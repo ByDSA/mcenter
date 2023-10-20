@@ -11,7 +11,6 @@ export const EpisodeInSerieSchema = z.object( {
   id: z.string(),
   start: z.number().optional(),
   end: z.number().optional(),
-  duration: z.number().optional(),
 } ).strict();
 
 export type EpisodeInSerie = z.infer<typeof EpisodeInSerieSchema>;

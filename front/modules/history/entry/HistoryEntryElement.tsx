@@ -120,6 +120,12 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
           <span>End:</span><span><input type="number" value={currentEnd} onChange={handleOnChange(setCurrentEnd)}/><span> {currentEnd && currentEnd > 0 ? secsToMS(currentEnd) : "-"}</span></span>
         </span>
         <span className={style.break} />
+        {value.episode?.fileInfo?.mediaInfo.duration &&
+        <span>
+          <span>Duration : {secsToMS(value.episode?.fileInfo?.mediaInfo.duration)} ({value.episode?.fileInfo?.mediaInfo.duration} s)</span>
+        </span>
+        }
+        <span className={style.break} />
         <span><a onClick={() => reset()}>Reset</a></span>
         {isModified && <span><a href="#" onClick={() => update()}>Update</a></span>}
         <span className={style.break} />

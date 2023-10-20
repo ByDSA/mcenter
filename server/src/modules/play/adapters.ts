@@ -21,17 +21,13 @@ export function episodeToMediaElement(e: Episode): MediaElement {
 
 function calculateLength(e: Episode): number {
   let length = -1;
+  const end = e.end ?? -1;
+  const start = e.start ?? 0;
 
-  if (e.start !== undefined && e.end !== undefined)
-    length = e.end - e.start;
-  else if (e.duration !== undefined) {
-    if (e.start !== undefined && e.end === undefined)
-      length = e.duration - e.start;
-    else if (e.start === undefined && e.end !== undefined)
-      length = e.end;
-    else
-      length = e.duration;
-  }
+  if (end === -1)
+    return -1;
+
+  length = end - start;
 
   return length;
 }

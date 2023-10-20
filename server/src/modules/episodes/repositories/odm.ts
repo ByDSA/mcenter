@@ -10,7 +10,6 @@ export interface DocOdm {
   weight?: number;
   start?: number;
   end?: number;
-  duration?: number;
   tags?: string[];
   disabled?: boolean;
   lastTimePlayed?: number;
@@ -46,9 +45,6 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   end: {
     type: Number,
   },
-  duration: {
-    type: Number,
-  },
   tags: {
     type: [String],
     default: undefined,
@@ -60,7 +56,7 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
     type: Number,
   },
 }, {
-  _id: false,
+  _id: true,
   autoIndex: false,
 } );
 

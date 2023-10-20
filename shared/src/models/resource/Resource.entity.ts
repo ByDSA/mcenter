@@ -8,7 +8,6 @@ export const ModelSchema = z.object( {
   start: z.number(),
   end: z.number(),
   tags: z.array(z.string()).optional(),
-  duration: z.number().optional(),
   disabled: z.boolean().optional(),
   lastTimePlayed: z.number().optional(),
 } );

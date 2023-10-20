@@ -1,10 +1,14 @@
+import { FileInfo, FileInfoWithSuperId } from "#shared/models/episodes/fileinfo";
 import { CanGetAllBySuperId, CanUpdateMany, CanUpdateOneBySuperId } from "#utils/layers/repository";
-import { ModelWithSuperId, SuperId } from "../models";
-import { docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
+import { FileInfoSuperId } from "#sharedSrc/models/episodes/fileinfo";
+import { docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
 import { ModelOdm } from "./odm";
 
+type ModelWithSuperId = FileInfoWithSuperId;
+type Model = FileInfo;
+type SuperId = FileInfoSuperId;
 export default class Repository
-implements CanGetAllBySuperId<ModelWithSuperId, SuperId>,
+implements CanGetAllBySuperId<Model, SuperId>,
 CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId> {
   async updateOneBySuperId(id: string, model: ModelWithSuperId): Promise<void> {
     const docOdm = modelWithSuperIdToDocOdm(model);
@@ -22,7 +26,7 @@ CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId
     await Promise.all(promises);
   }
 
-  async getAllBySuperId(id: SuperId): Promise<ModelWithSuperId[]> {
+  async getAllBySuperId(id: SuperId): Promise<Model[]> {
     const modelsOdm = await ModelOdm.find( {
       episodeId: id,
     } );
@@ -30,7 +34,7 @@ CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId
     if (modelsOdm.length === 0)
       return [];
 
-    return modelsOdm.map(docOdmToModelWithSuperId);
+    return modelsOdm.map(docOdmToModel);
   }
 
   async getOneByPath(path: string): Promise<ModelWithSuperId | null> {

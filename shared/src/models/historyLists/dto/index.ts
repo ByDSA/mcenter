@@ -21,3 +21,8 @@ export {
 export {
   DeleteOneEntryByIdRequest, assertIsDeleteOneEntryByIdRequest,
 } from "./DeleteOneEntryByIdRequest";
+
+export {
+  dtoToModel,
+  entryDtoToModel,
+} from "./adapters";

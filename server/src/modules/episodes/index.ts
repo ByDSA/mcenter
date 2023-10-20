@@ -7,7 +7,7 @@ export {
 } from "./models";
 
 export {
-  DocOdm as EpisodeDocOdm, ModelOdm as EpisodeModelOdm, Repository as EpisodeRepository, SchemaOdm as EpisodeSchemaOdm, docOdmToModel as episodeDocOdmToModel, modelToDocOdm as episodeToDocOdm,
+  DocOdm as EpisodeDocOdm, ModelOdm as EpisodeModelOdm, Repository as EpisodeRepository, EpisodeRepositoryExpandEnum, SchemaOdm as EpisodeSchemaOdm, docOdmToModel as episodeDocOdmToModel, modelToDocOdm as episodeToDocOdm,
 } from "./repositories";
 
 export {

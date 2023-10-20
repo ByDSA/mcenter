@@ -1,5 +1,6 @@
 import { EpisodeRepository } from "#modules/episodes";
 import { EpisodeGetAllRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest } from "#shared/models/episodes";
+import { PublicMethodsOf } from "#shared/utils/types";
 import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
@@ -9,7 +10,7 @@ import {getAllValidation,
   patchOneByIdValidation} from "./validation";
 
 type Params = {
-  episodeRepository: EpisodeRepository;
+  episodeRepository: PublicMethodsOf<EpisodeRepository>;
 };
 export default class RestController
 implements
@@ -18,7 +19,7 @@ implements
     CanGetAll<EpisodeGetAllRequest, Response>,
     CanPatchOneByIdAndGet<EpisodePatchOneByIdRequest, Response>
 {
-  #episodeRepository: EpisodeRepository;
+  #episodeRepository: PublicMethodsOf<EpisodeRepository>;
 
   constructor( {episodeRepository}: Params) {
     this.#episodeRepository = episodeRepository;
