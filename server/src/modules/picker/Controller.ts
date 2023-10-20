@@ -40,14 +40,14 @@ export default class PickerController implements Controller {
       episodeRepository,
     } );
     const { streamId } = getParams(req, res);
-    const stream = await streamRepository.getOneById(streamId);
+    const stream = await streamRepository.getOneByIdOrCreate(streamId);
 
     assertFound(stream);
-    const historyList = await historyListRepository.getOneById(streamId);
+    const historyList = await historyListRepository.getOneByIdOrCreate(streamId);
 
     assertFound(historyList);
 
-    const seriePromise = serieRepository.getOneById(stream.group.origins[0].id);
+    const seriePromise = serieRepository.getOneByIdOrCreate(stream.group.origins[0].id);
     const lastEpPromise = serieService.findLastEpisodeInHistoryList(historyList);
 
     await Promise.all([seriePromise, lastEpPromise]);

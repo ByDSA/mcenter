@@ -47,7 +47,7 @@ implements
         for (const origin of stream.group.origins) {
           if (origin.type === StreamOriginType.SERIE) {
             // eslint-disable-next-line no-param-reassign, no-await-in-loop
-            origin.serie = await this.#serieRepository.getOneById(origin.id) ?? undefined;
+            origin.serie = await this.#serieRepository.getOneByIdOrCreate(origin.id) ?? undefined;
           }
         }
       }
@@ -65,7 +65,7 @@ implements
             // eslint-disable-next-line no-continue
             continue;
 
-          const historyList = await this.#historyListRepository.getOneById(stream.id);
+          const historyList = await this.#historyListRepository.getOneByIdOrCreate(stream.id);
           const lastEntry = historyList?.entries.at(-1);
 
           if (lastEntry)

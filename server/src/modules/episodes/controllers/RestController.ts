@@ -55,7 +55,7 @@ implements
       episodeId,
       serieId,
     };
-    const got = await this.#episodeRepository.getOneById(id);
+    const got = await this.#episodeRepository.getOneByIdOrCreate(id);
 
     assertFound(got);
 

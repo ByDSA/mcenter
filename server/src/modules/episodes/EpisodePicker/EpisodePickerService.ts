@@ -31,7 +31,7 @@ export default class EpisodePickerService {
   }
 
   async getByStreamId(streamId: StreamId, n = 1): Promise<Episode[]> {
-    const stream = await this.#streamRepository.getOneById(streamId);
+    const stream = await this.#streamRepository.getOneByIdOrCreate(streamId);
 
     if (!stream)
       return [];
@@ -47,12 +47,12 @@ export default class EpisodePickerService {
   async getByStream(stream: Stream, n = 1): Promise<Episode[]> {
     console.log(`Calculating next ${n} episodes ...`);
 
-    const historyList = await this.#historyListRepository.getOneById(stream.id);
+    const historyList = await this.#historyListRepository.getOneByIdOrCreate(stream.id);
 
     assertFound(historyList, `Cannot get history list from stream '${stream.id}'`);
 
     const serieId: string = stream.group.origins[0].id;
-    const serie = await this.#serieRepository.getOneById(serieId);
+    const serie = await this.#serieRepository.getOneByIdOrCreate(serieId);
 
     assertFound(serie, `Cannot get serie from id '${serieId}'`);
     const allEpisodesInSerie = await this.#episodeRepository.getManyBySerieId(serie.id);

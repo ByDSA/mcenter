@@ -48,7 +48,7 @@ implements
     req: HistoryListGetOneByIdRequest,
   ): Promise<Model> {
     const { id } = req.params;
-    const got = await this.#historyListRepository.getOneById(id);
+    const got = await this.#historyListRepository.getOneByIdOrCreate(id);
 
     assertFound(got);
 
@@ -120,7 +120,7 @@ implements
       if (body.expand.includes("series")) {
         const promises = newEntries.map(async (entry) => {
           const { serieId } = entry;
-          const serie = await this.#serieRepository.getOneById(serieId);
+          const serie = await this.#serieRepository.getOneByIdOrCreate(serieId);
 
           if (serie)
             // eslint-disable-next-line no-param-reassign
@@ -135,7 +135,7 @@ implements
       if (body.expand.includes("episodes")) {
         const promises = newEntries.map(async (entry) => {
           const { episodeId, serieId } = entry;
-          const episode = await this.#episodeRepository.getOneById( {
+          const episode = await this.#episodeRepository.getOneByIdOrCreate( {
             episodeId,
             serieId,
           }, {
@@ -188,7 +188,7 @@ implements
     res: Response,
   ): Promise<void> {
     const {id, entryId} = req.params;
-    const historyList = await this.#historyListRepository.getOneById(id);
+    const historyList = await this.#historyListRepository.getOneByIdOrCreate(id);
 
     assertFound(historyList);
 

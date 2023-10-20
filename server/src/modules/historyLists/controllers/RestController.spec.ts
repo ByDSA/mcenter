@@ -38,24 +38,24 @@ describe("RestController", () => {
         .get("/id")
         .send();
 
-      expect(historyListRepositoryMock.getOneById).toBeCalledTimes(1);
-      expect(historyListRepositoryMock.getOneById).toBeCalledWith("id");
+      expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledTimes(1);
+      expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledWith("id");
     } );
 
     it("should return null and 404 if 'id' is not found in repository", async () => {
-      historyListRepositoryMock.getOneById.mockResolvedValueOnce(null);
+      historyListRepositoryMock.getOneByIdOrCreate.mockResolvedValueOnce(null);
       await request(routerApp)
         .get("/id")
         .expect(HttpStatusCode.NOT_FOUND)
         .send();
 
-      expect(historyListRepositoryMock.getOneById).toHaveReturnedWith(Promise.resolve(null));
+      expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveReturnedWith(Promise.resolve(null));
     } );
 
     it("should return same as repository returns", async () => {
       const historyList = HISTORY_LIST_WITH_NO_ENTRIES;
 
-      historyListRepositoryMock.getOneById.mockResolvedValueOnce(historyList);
+      historyListRepositoryMock.getOneByIdOrCreate.mockResolvedValueOnce(historyList);
 
       const response = await request(routerApp)
         .get("/id")
@@ -73,24 +73,24 @@ describe("RestController", () => {
           .get("/id/entries")
           .send();
 
-        expect(historyListRepositoryMock.getOneById).toBeCalledTimes(1);
-        expect(historyListRepositoryMock.getOneById).toBeCalledWith("id");
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledTimes(1);
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledWith("id");
       } );
 
       it("should return null and 404 if 'id' is not found in repository", async () => {
-        historyListRepositoryMock.getOneById.mockResolvedValueOnce(null);
+        historyListRepositoryMock.getOneByIdOrCreate.mockResolvedValueOnce(null);
         await request(routerApp)
           .get("/id/entries")
           .expect(HttpStatusCode.NOT_FOUND)
           .send();
 
-        expect(historyListRepositoryMock.getOneById).toHaveReturnedWith(Promise.resolve(null));
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveReturnedWith(Promise.resolve(null));
       } );
 
       it("should return the same entries that repository returns inside", async () => {
         const historyList = HISTORY_LIST_SIMPSONS;
 
-        historyListRepositoryMock.getOneById.mockResolvedValueOnce(historyList);
+        historyListRepositoryMock.getOneByIdOrCreate.mockResolvedValueOnce(historyList);
 
         const response = await request(routerApp)
           .get("/id/entries")
@@ -107,18 +107,18 @@ describe("RestController", () => {
           .post("/id/entries/search")
           .send();
 
-        expect(historyListRepositoryMock.getOneById).toBeCalledTimes(1);
-        expect(historyListRepositoryMock.getOneById).toBeCalledWith("id");
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledTimes(1);
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledWith("id");
       } );
 
       it("should return null and 404 if id is not found in repository", async () => {
-        historyListRepositoryMock.getOneById.mockResolvedValueOnce(null);
+        historyListRepositoryMock.getOneByIdOrCreate.mockResolvedValueOnce(null);
         await request(routerApp)
           .post("/id/entries/search")
           .expect(HttpStatusCode.NOT_FOUND)
           .send();
 
-        expect(historyListRepositoryMock.getOneById).toHaveReturnedWith(Promise.resolve(null));
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveReturnedWith(Promise.resolve(null));
       } );
 
       it("should throw 422 if provided unexpected property", async () => {
@@ -133,7 +133,7 @@ describe("RestController", () => {
       it("should return all entries if no criteria provided", async () => {
         const historyList = HISTORY_LIST_SIMPSONS;
 
-        historyListRepositoryMock.getOneById.mockResolvedValueOnce(historyList);
+        historyListRepositoryMock.getOneByIdOrCreate.mockResolvedValueOnce(historyList);
 
         const response = await request(routerApp)
           .post("/id/entries/search")

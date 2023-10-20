@@ -47,7 +47,7 @@ export default class EpisodesUpdateLastTimePlayedController implements Controlle
           return;
         }
 
-        const historyList: HistoryList | null = await this.#historyListRepository.getOneById(stream.id);
+        const historyList: HistoryList | null = await this.#historyListRepository.getOneByIdOrCreate(stream.id);
 
         assertFound(historyList, `History list not found for stream ${stream.id}`);
         await this.#episodeRepository.getAllBySerieId(serie.id).then(episodes => {

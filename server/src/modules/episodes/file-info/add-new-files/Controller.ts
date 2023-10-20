@@ -119,7 +119,7 @@ export default class ThisController implements Controller {
     const episodes: Episode[] = [];
 
     for (const serieInTree of seriesInTree) {
-      let serie = await this.#serieRepository.getOneById(serieInTree.id);
+      let serie = await this.#serieRepository.getOneByIdOrCreate(serieInTree.id);
 
       if (!serie) {
         serie = await this.#serieRepository.createOneAndGet( {

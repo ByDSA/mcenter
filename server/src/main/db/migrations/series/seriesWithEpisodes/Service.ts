@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
-import { FileNode, getSerieTreeRemote } from "#modules/actions/nginxTree";
 import { StreamWithHistoryList } from "#main/db/migrations/streams/streamsWithHistoryList";
+import { FileNode, getSerieTreeRemote } from "#modules/actions/nginxTree";
 import { Episode, EpisodeRepository } from "#modules/episodes";
 import { Serie, SerieId, SerieRepository } from "#modules/series";
 
@@ -24,7 +24,7 @@ export default class Service {
   }
 
   async getSerieAndEpisodesByIdOrCreateFromFiles(id: SerieId): Promise<SerieAndEpisodes | null> {
-    let serie = await this.#serieRepository.getOneById(id);
+    let serie = await this.#serieRepository.getOneByIdOrCreate(id);
     let episodes: Episode[] | null = null;
 
     if (!serie) {
@@ -74,12 +74,12 @@ export default class Service {
     if (!serieId)
       return null;
 
-    const serie = await this.#serieRepository.getOneById(serieId);
+    const serie = await this.#serieRepository.getOneByIdOrCreate(serieId);
 
     if (!serie)
       return null;
 
-    return this.#episodeRepository.getOneById( {
+    return this.#episodeRepository.getOneByIdOrCreate( {
       episodeId,
       serieId: serie.id,
     } );

@@ -184,7 +184,9 @@ export default class ExpressApp implements App {
 
     if (isDefined(mediaFolderPath)) {
       for (const item of ["pelis", "series", "music"]) {
-        app.use(`/raw/${item}/`, express.static(`${mediaFolderPath}/${item}/`), serveIndex(`${mediaFolderPath}/${item}/`, {
+        app.use(`/raw/${item}/`, express.static(`${mediaFolderPath}/${item}/`, {
+          acceptRanges: false, // Evita que a veces salga el error de "Range Not Satisfiable"
+        } ), serveIndex(`${mediaFolderPath}/${item}/`, {
           view: "details",
           icons: true,
         } ));

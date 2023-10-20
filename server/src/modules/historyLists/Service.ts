@@ -39,7 +39,7 @@ export default class Service {
     if ("historyList" in params)
       historyList = params.historyList;
     else if ("historyListId" in params) {
-      const got = await this.#listRepository.getOneById(params.historyListId);
+      const got = await this.#listRepository.getOneByIdOrCreate(params.historyListId);
 
       assertFound(got);
 
@@ -50,7 +50,7 @@ export default class Service {
     return historyList;
   }
 
-  async #getHistoryListIdFromParams(params: HistoryAndEpisodeParams): Promise<ModelId> {
+  #getHistoryListIdFromParams(params: HistoryAndEpisodeParams): ModelId {
     let historyListId: ModelId;
 
     if ("historyList" in params)
@@ -82,7 +82,7 @@ export default class Service {
     if ("episode" in params)
       episode = params.episode;
     else if ("episodeFullId" in params) {
-      const got = await this.#episodeRepository.getOneById(params.episodeFullId);
+      const got = await this.#episodeRepository.getOneByIdOrCreate(params.episodeFullId);
 
       assertFound(got);
 
@@ -109,7 +109,7 @@ export default class Service {
 
     const episode: Episode = await this.#getEpisodeFromParams(params);
     const newEntry: Entry = createHistoryEntryByEpisodeFullId(episode);
-    const historyListId = await this.#getHistoryListIdFromParams(params);
+    const historyListId = this.#getHistoryListIdFromParams(params);
 
     await this.#entryRepository.createOneBySuperId(historyListId, newEntry);
 

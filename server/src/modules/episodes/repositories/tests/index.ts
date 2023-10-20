@@ -2,6 +2,8 @@ import { PublicMethodsOf } from "#shared/utils/types";
 import Repository from "../Repository";
 
 export class EpisodeRepositoryMock implements PublicMethodsOf<Repository> {
+  getOneByIdOrCreate = jest.fn();
+
   getAllBySerieId = jest.fn();
 
   findLastEpisodeInHistoryList = jest.fn();

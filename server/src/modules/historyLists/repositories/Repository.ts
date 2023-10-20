@@ -1,3 +1,4 @@
+import { HistoryList } from "#shared/models/historyLists";
 import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
@@ -24,19 +25,32 @@ CanGetAll<Model> {
     const docOdm = modelToDocOdm(historyList);
 
     await ModelOdm.create(docOdm);
+    console.log(`History list created for ${historyList.id}`);
   }
 
-  async getOneById(id: ModelId): Promise<Model | null> {
+  async #createOneDefaultModelById(id: ModelId): Promise<Model> {
+    const historyList: HistoryList = {
+      id,
+      entries: [],
+      maxSize: -1,
+    };
+
+    await this.createOne(historyList);
+
+    return historyList;
+  }
+
+  async getOneByIdOrCreate(id: ModelId): Promise<Model> {
     const docOdm = await ModelOdm.findOne( {
       id,
     }, {
       _id: 0,
     } );
 
-    if (!docOdm)
-      return null;
+    if (docOdm)
+      return docOdmToModel(docOdm);
 
-    return docOdmToModel(docOdm);
+    return this.#createOneDefaultModelById(id);
   }
 
   async updateOneById(id: ModelId, historyList: Model): Promise<void> {

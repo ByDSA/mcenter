@@ -80,10 +80,10 @@ CanCreateManyAndGet<Model>
       serieId,
     };
 
-    return this.getOneById(fullId);
+    return this.getOneByIdOrCreate(fullId);
   }
 
-  async getOneById(fullId: ModelFullId, opts?: Options): Promise<Model | null> {
+  async getOneByIdOrCreate(fullId: ModelFullId, opts?: Options): Promise<Model | null> {
     validateOptions(opts);
     const episodeOdm = await ModelOdm.findOne( {
       serieId: fullId.serieId,
@@ -137,7 +137,7 @@ CanCreateManyAndGet<Model>
     if (updateResult.matchedCount === 0)
       return null;
 
-    return this.getOneById(fullId);
+    return this.getOneByIdOrCreate(fullId);
   }
 
   async patchOneByIdAndGet(fullId: ModelFullId, episode: Partial<UpdateOneParams>): Promise<Model | null> {
@@ -147,7 +147,7 @@ CanCreateManyAndGet<Model>
     if (updateResult.matchedCount === 0)
       return null;
 
-    return this.getOneById(fullId);
+    return this.getOneByIdOrCreate(fullId);
   }
 
   async createManyAndGet(models: Model[]): Promise<Model[]> {

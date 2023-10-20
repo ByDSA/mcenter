@@ -1,5 +1,5 @@
 export interface CanGetOneById<T, ID> {
-  getOneById(id: ID): Promise<T | null>;
+  getOneByIdOrCreate(id: ID): Promise<T | null>;
 }
 
 export interface CanFindOneById<T, ID> {
