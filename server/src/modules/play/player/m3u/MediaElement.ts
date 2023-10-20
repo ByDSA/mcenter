@@ -27,7 +27,7 @@ export function render(element: MediaElement): string {
   if (stopTime)
     sb += "\n" + `#EXTVLCOPT:stop-time=${stopTime}`;
 
-  sb += `\n${ path }\n`;
+  sb += `\n${ encodeURI(path) }\n`;
 
   return sb;
 }
