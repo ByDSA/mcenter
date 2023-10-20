@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.8.1](https://github.com/ByDSA/mcenter/compare/v2.8.0...v2.8.1) (2023-10-20)
+
+
+### Bug Fixes
+
+* **back:** crea historyList si se necesita y no existe ([ad21b7a](https://github.com/ByDSA/mcenter/commit/ad21b7ad590260efb865eb188ef9b6c93ef30b91))
+
 ## [2.8.0](https://github.com/ByDSA/mcenter/compare/v2.7.2...v2.8.0) (2023-10-20)
 
 
