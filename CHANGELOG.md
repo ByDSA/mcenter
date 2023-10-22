@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.8.3](https://github.com/ByDSA/mcenter/compare/v2.8.2...v2.8.3) (2023-10-22)
+
+
+### Bug Fixes
+
+* **back:** quitado #sharedSrc de sitios compilables. pasado zod a dependencia normal ([c2ece2a](https://github.com/ByDSA/mcenter/commit/c2ece2ae32a2958d92bd3faa602d95a659b1cd0b))
+
 ### [2.8.2](https://github.com/ByDSA/mcenter/compare/v2.8.1...v2.8.2) (2023-10-20)
 
 
