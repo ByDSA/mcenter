@@ -1,31 +1,14 @@
 import { SerieId } from "#modules/series";
 import { HistoryList } from "#shared/models/historyLists";
 import { CanCreateManyAndGet, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
-import { z } from "zod";
 import { EpisodeFileInfoRepository } from "..";
 import { Model, ModelFullId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
+import { GetOptions, validateGetOptions } from "./get-options";
+import ExpandEnum from "./get-options/ExpandEnum";
 import { DocOdm, ModelOdm } from "./odm";
 
 type UpdateOneParams = Model;
-
-enum ExpandEnum {
-  FileInfo = "fileInfo",
-}
-
-export {
-  ExpandEnum as EpisodeRepositoryExpandEnum,
-};
-const OptionsSchema = z.object( {
-  expand: z.array(z.nativeEnum(ExpandEnum)).optional(),
-} );
-
-type Options = z.infer<typeof OptionsSchema>;
-
-function validateOptions(opts?: Options) {
-  if (opts)
-    OptionsSchema.parse(opts);
-}
 
 export default class Repository
 implements CanGetOneById<Model, ModelFullId>,
@@ -83,8 +66,8 @@ CanCreateManyAndGet<Model>
     return this.getOneByIdOrCreate(fullId);
   }
 
-  async getOneByIdOrCreate(fullId: ModelFullId, opts?: Options): Promise<Model | null> {
-    validateOptions(opts);
+  async getOneByIdOrCreate(fullId: ModelFullId, opts?: GetOptions): Promise<Model | null> {
+    validateGetOptions(opts);
     const episodeOdm = await ModelOdm.findOne( {
       serieId: fullId.serieId,
       episodeId: fullId.episodeId,

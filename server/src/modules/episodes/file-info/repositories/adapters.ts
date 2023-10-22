@@ -1,7 +1,6 @@
-import { FileInfo } from "#shared/models/episodes/fileinfo";
+import { FileInfo, FileInfoWithSuperId, assertIsFileInfo, assertIsFileInfoWithSuperId } from "#shared/models/episodes/fileinfo";
 import { assertIsDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
-import { FileInfoWithSuperId, assertIsFileInfo, assertIsFileInfoWithSuperId } from "#sharedSrc/models/episodes/fileinfo";
 import { DocOdm } from "./odm";
 
 type Model = FileInfo;

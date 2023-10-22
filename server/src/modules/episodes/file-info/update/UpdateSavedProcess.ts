@@ -1,6 +1,6 @@
 import { getIdModelOdmFromId } from "#modules/episodes/repositories/odm";
 import { EpisodeFileInfo, EpisodeFullId } from "#shared/models/episodes";
-import { FileInfoWithSuperId } from "#shared/models/episodes/fileinfo";
+import { FileInfoWithSuperId, compareFileInfo } from "#shared/models/episodes/fileinfo";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { deepMerge } from "#shared/utils/objects";
 import { assertIsDefined } from "#shared/utils/validation";
@@ -8,7 +8,6 @@ import ffmpeg from "fluent-ffmpeg";
 import { existsSync } from "fs";
 import crypto from "node:crypto";
 import fs from "node:fs";
-import { compareFileInfo } from "#sharedSrc/models/episodes/fileinfo";
 import SavedSerieTreeService from "../../saved-serie-tree-service/SavedSerieTreeService";
 import { Repository } from "../repositories";
 import { SerieFolderTree } from "../tree";

@@ -1,6 +1,5 @@
-import { FileInfo, FileInfoWithSuperId } from "#shared/models/episodes/fileinfo";
+import { FileInfo, FileInfoSuperId, FileInfoWithSuperId } from "#shared/models/episodes/fileinfo";
 import { CanGetAllBySuperId, CanUpdateMany, CanUpdateOneBySuperId } from "#utils/layers/repository";
-import { FileInfoSuperId } from "#sharedSrc/models/episodes/fileinfo";
 import { docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
 import { ModelOdm } from "./odm";
 
