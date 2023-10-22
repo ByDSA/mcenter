@@ -1,10 +1,9 @@
 import { EpisodeRepository } from "#modules/episodes";
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
-import { HistoryList, HistoryListRepository } from "#modules/historyLists";
+import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
 import { Controller, SecureRouter } from "#utils/express";
-import { assertFound } from "#utils/http/validation";
 import { Request, Response, Router } from "express";
 
 type Params = {
@@ -47,9 +46,8 @@ export default class EpisodesUpdateLastTimePlayedController implements Controlle
           return;
         }
 
-        const historyList: HistoryList | null = await this.#historyListRepository.getOneByIdOrCreate(stream.id);
+        const historyList = await this.#historyListRepository.getOneByIdOrCreate(stream.id);
 
-        assertFound(historyList, `History list not found for stream ${stream.id}`);
         await this.#episodeRepository.getAllBySerieId(serie.id).then(episodes => {
           for (const episode of episodes) {
             const updatePromise = this.#lastTimePlayedService.updateEpisodeLastTimePlayedAndGetFromHistoryList( {
