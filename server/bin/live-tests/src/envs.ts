@@ -67,7 +67,8 @@ export const serverEnvSchema = z.object( {
   PICKER_MIN_DAYS: z.string().refine(...isStringPositiveIntegerRefine()),
   PICKER_MIN_WEIGHT: z.string().refine(...isStringIntegerRefine()),
 
-  MEDIA_PATH: z.string().url(),
+  MEDIA_PATH: z.string().url()
+    .or(z.string().refine(...isAbsolutePathFileRefine())),
   MEDIA_FOLDER_PATH: z.string().refine(...isAbsolutePathFileRefine()),
   TMP_PATH: z.string(),
 
