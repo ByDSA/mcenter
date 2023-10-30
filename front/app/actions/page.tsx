@@ -27,6 +27,10 @@ const ACTIONS: Action[] = [
     url: "fixer",
     name: "Fixer: streams-series",
   },
+  {
+    url: "log",
+    name: "Log",
+  },
 ];
 
 export default function Page() {

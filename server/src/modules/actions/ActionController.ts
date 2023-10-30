@@ -1,6 +1,9 @@
 import { EpisodeAddNewFileInfosController, EpisodeUpdateFileInfoController } from "#modules/episodes";
+import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
-import { Router } from "express";
+import { Request, Response, Router } from "express";
+import fs from "fs";
+import path from "path";
 import EpisodesUpdateLastTimePlayedController from "./EpisodesUpdateLastTimePlayedController";
 import FixerController from "./FixerController";
 
@@ -33,6 +36,20 @@ export default class ActionController implements Controller {
     router.use("/episodes/file-info/update", this.#episodesUpdateFileInfoController.getRouter());
     router.use("/episodes/add-new-files", this.#episodesAddNewFilesController.getRouter());
     router.use("/fixer", this.#fixerController.getRouter());
+
+    router.get("/log", (req: Request, res: Response) => {
+      try {
+        const { TMP_PATH } = process.env;
+
+        assertIsDefined(TMP_PATH);
+        const pathFile = path.join(TMP_PATH, ".log");
+        const log = fs.readFileSync(pathFile, "utf-8");
+
+        res.send(log);
+      } catch (e) {
+        res.send("No log file");
+      }
+    } );
 
     return router;
   }
