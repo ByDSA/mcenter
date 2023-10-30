@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.9.0](https://github.com/ByDSA/mcenter/compare/v2.8.3...v2.9.0) (2023-10-30)
+
+
+### Features
+
+* **front:** llamar a actions y ver el resultado ([2b562a7](https://github.com/ByDSA/mcenter/commit/2b562a7110a7a3e4bea028284d368abcff394ded))
+
 ### [2.8.3](https://github.com/ByDSA/mcenter/compare/v2.8.2...v2.8.3) (2023-10-22)
 
 
