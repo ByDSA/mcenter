@@ -1,6 +1,6 @@
 import { SerieId } from "#modules/series";
 import { HistoryList } from "#shared/models/historyLists";
-import { CanCreateManyAndGet, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { EpisodeFileInfoRepository } from "..";
 import { Model, ModelFullId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
@@ -14,7 +14,8 @@ export default class Repository
 implements CanGetOneById<Model, ModelFullId>,
 CanUpdateOneByIdAndGet<Model, ModelFullId>,
 CanPatchOneByIdAndGet<Model, ModelFullId>,
-CanCreateManyAndGet<Model>
+CanCreateManyAndGet<Model>,
+CanGetAll<Model>
 {
   #fileInfoRepository: EpisodeFileInfoRepository;
 
@@ -34,6 +35,15 @@ CanCreateManyAndGet<Model>
     const newPath = episode.path ?? path;
 
     return this.getOneByPath(newPath);
+  }
+
+  async getAll(): Promise<Model[]> {
+    const episodesOdm = await ModelOdm.find();
+
+    if (episodesOdm.length === 0)
+      return [];
+
+    return episodesOdm.map(docOdmToModel);
   }
 
   async getAllBySerieId(id: SerieId): Promise<Model[]> {

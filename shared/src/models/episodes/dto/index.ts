@@ -16,3 +16,7 @@ export {
 export {
   dtoToModel,
 } from "./adapters";
+
+export {
+  GetManyBySearchRequest, assertIsGetManyBySearchRequest,
+} from "./GetManyBySearchRequest";

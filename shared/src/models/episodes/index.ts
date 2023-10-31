@@ -3,8 +3,7 @@ export {
 } from "./Episode";
 
 export {
-  GetAllRequest as EpisodeGetAllRequest, GetAllSchema as EpisodeGetAllSchema, GetOneByIdRequest as EpisodeGetOneByIdRequest, GetOneByIdSchema as EpisodeGetOneByIdSchema, PatchOneByIdRequest as EpisodePatchOneByIdRequest, PatchOneByIdSchema as EpisodePatchOneByIdSchema, assertIsGetAllRequest as assertIsEpisodeGetAllRequest, assertIsGetOneByIdRequest as assertIsEpisodeGetOneByIdRequest, assertIsPatchOneByIdRequest as assertIsEpisodePatchOneByIdRequest,
-  dtoToModel as episodeDtoToModel,
+  GetAllRequest as EpisodeGetAllRequest, GetAllSchema as EpisodeGetAllSchema, GetManyBySearchRequest as EpisodeGetManyBySearchRequest, GetOneByIdRequest as EpisodeGetOneByIdRequest, GetOneByIdSchema as EpisodeGetOneByIdSchema, PatchOneByIdRequest as EpisodePatchOneByIdRequest, PatchOneByIdSchema as EpisodePatchOneByIdSchema, assertIsGetAllRequest as assertIsEpisodeGetAllRequest, assertIsGetManyBySearchRequest as assertIsEpisodeGetManyBySearchRequest, assertIsGetOneByIdRequest as assertIsEpisodeGetOneByIdRequest, assertIsPatchOneByIdRequest as assertIsEpisodePatchOneByIdRequest, dtoToModel as episodeDtoToModel,
 } from "./dto";
 
 export {

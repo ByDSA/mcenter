@@ -21,4 +21,6 @@ export class EpisodeRepositoryMock implements PublicMethodsOf<Repository> {
   patchOneByPathAndGet = jest.fn();
 
   getOneByPath = jest.fn();
+
+  getAll = jest.fn();
 }

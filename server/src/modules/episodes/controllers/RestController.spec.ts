@@ -1,22 +1,26 @@
-import { Episode } from "#shared/models/episodes";
+import { Episode, EpisodeGetManyBySearchRequest } from "#shared/models/episodes";
 import HttpStatusCode from "#shared/utils/http/StatusCode";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
+import { EpisodeFileInfoRepositoryMock } from "../file-info/repositories/test";
 import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
 import RestController from "./RestController";
 
 describe("RestController", () => {
   let routerApp: Application;
   let episodeRepositoryMock: RepositoryMock;
+  let controller: RestController;
 
   beforeAll(async () => {
     episodeRepositoryMock = new RepositoryMock();
-    const controller = new RestController( {
+    controller = new RestController( {
       episodeRepository: episodeRepositoryMock,
+      episodeFileInfoRepository: new EpisodeFileInfoRepositoryMock(),
     } );
 
+    controller.getManyBySearch = jest.fn(controller.getManyBySearch);
     routerApp = RouterApp(controller.getRouter());
   } );
 
@@ -163,6 +167,53 @@ describe("RestController", () => {
 
       expect(response.body).toEqual(episode);
       expect(response.statusCode).toBe(HttpStatusCode.OK);
+    } );
+  } );
+
+  describe("get many episodes by search", () => {
+    const URL = "/search";
+    const path = "series/simpsons/1/1_80.mkv";
+    const body: EpisodeGetManyBySearchRequest["body"] = {
+      filter: {
+        path,
+      },
+    };
+
+    it("should call controller", async () => {
+      await request(routerApp)
+        .post(URL)
+        .send(body);
+
+      expect(controller.getManyBySearch).toBeCalledTimes(1);
+    } );
+
+    it("should call repository", async () => {
+      await request(routerApp)
+        .post(URL)
+        .send(body);
+
+      expect(episodeRepositoryMock.getOneByPath).toBeCalledTimes(1);
+      expect(episodeRepositoryMock.getOneByPath).toBeCalledWith(path);
+    } );
+    it("should return valid episode", async () => {
+      const episode = EPISODES_SIMPSONS[0];
+
+      episodeRepositoryMock.getOneByPath.mockResolvedValueOnce(episode);
+      const response = await request(routerApp)
+        .post(URL)
+        .send(body);
+
+      expect(response.body).toEqual([episode]);
+    } );
+
+    it("should return empty array", async () => {
+      const response = await request(routerApp)
+        .post(URL)
+        .send(body);
+
+      episodeRepositoryMock.getOneByPath.mockResolvedValueOnce(null);
+
+      expect(response.body).toEqual([]);
     } );
   } );
 } );

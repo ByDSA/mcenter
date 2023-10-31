@@ -62,6 +62,8 @@ import RealDatabase from "./main/db/Database";
     streamRepository,
     serieRelationshipWithStreamFixer,
   } );
+  const episodeFileInfoRepository = new EpisodeFileInfoRepository();
+  const lastTimePlayedService = new LastTimePlayedService();
   const app: ExpressApp = new ExpressApp( {
     db: {
       instance: new RealDatabase(),
@@ -86,7 +88,7 @@ import RealDatabase from "./main/db/Database";
       },
       actionController: new ActionController( {
         episodesUpdateLastTimePlayedController: new EpisodesUpdateLastTimePlayedController( {
-          lastTimePlayedService: new LastTimePlayedService(),
+          lastTimePlayedService,
           episodeRepository,
           historyListRepository,
           serieRepository,
@@ -97,7 +99,7 @@ import RealDatabase from "./main/db/Database";
             episodeRepository,
             serieRepository,
           } ),
-          episodeFileRepository: new EpisodeFileInfoRepository(),
+          episodeFileRepository: episodeFileInfoRepository,
         } ),
         episodesAddNewFilesController: new EpisodeAddNewFileInfosController(),
         fixerController,
@@ -107,6 +109,7 @@ import RealDatabase from "./main/db/Database";
           historyListRepository,
           episodeRepository,
           serieRepository,
+          lastTimePlayedService,
         } ),
       },
       streams: {
@@ -119,6 +122,7 @@ import RealDatabase from "./main/db/Database";
       episodes: {
         restController: new EpisodeRestController( {
           episodeRepository,
+          episodeFileInfoRepository,
         } ),
       },
     },

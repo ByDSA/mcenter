@@ -10,4 +10,6 @@ export class EpisodeRestControllerMock implements PublicMethodsOf<RestController
   getAll = jest.fn();
 
   patchOneByIdAndGet = jest.fn();
+
+  getManyBySearch = jest.fn();
 }

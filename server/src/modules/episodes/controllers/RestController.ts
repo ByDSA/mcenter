@@ -1,16 +1,25 @@
 import { EpisodeRepository } from "#modules/episodes";
-import { EpisodeGetAllRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest } from "#shared/models/episodes";
+import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest } from "#shared/models/episodes";
 import { PublicMethodsOf } from "#shared/utils/types";
+import { neverCase } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
 import express, { Response, Router } from "express";
+import { FileInfoRepository } from "../file-info";
+import { Model } from "../models";
 import {getAllValidation,
+  getManyBySearchValidation,
   getOneByIdValidation,
   patchOneByIdValidation} from "./validation";
 
+enum ResourceType {
+  SERIES = "series",
+}
+
 type Params = {
   episodeRepository: PublicMethodsOf<EpisodeRepository>;
+  episodeFileInfoRepository: PublicMethodsOf<FileInfoRepository>;
 };
 export default class RestController
 implements
@@ -21,8 +30,11 @@ implements
 {
   #episodeRepository: PublicMethodsOf<EpisodeRepository>;
 
-  constructor( {episodeRepository}: Params) {
+  #episodeFileInfoRepository: PublicMethodsOf<FileInfoRepository>;
+
+  constructor( {episodeRepository, episodeFileInfoRepository: fileInfoRepository}: Params) {
     this.#episodeRepository = episodeRepository;
+    this.#episodeFileInfoRepository = fileInfoRepository;
   }
 
   async patchOneByIdAndGet(req: EpisodePatchOneByIdRequest, res: Response<any, Record<string, any>>): Promise<void> {
@@ -62,6 +74,34 @@ implements
     res.send(got);
   }
 
+  async getManyBySearch(
+    req: EpisodeGetManyBySearchRequest,
+    res: Response,
+  ): Promise<void> {
+    const episodes = [];
+    const filterPath = req.body.filter?.path;
+
+    if (filterPath) {
+      const splitted = filterPath.split("/");
+      const type: ResourceType = splitted[0] as ResourceType;
+
+      switch (type) {
+        case ResourceType.SERIES: {
+          const episode: Model | null = await this.#episodeRepository.getOneByPath(filterPath);
+
+          if (episode)
+            episodes.push(episode);
+
+          break;
+        }
+        default:
+          neverCase(type);
+      }
+    }
+
+    res.send(episodes);
+  }
+
   getRouter(): Router {
     const router = SecureRouter();
 
@@ -76,6 +116,12 @@ implements
     } );
     router.use(express.json());
     router.patch("/:serieId/:episodeId", patchOneByIdValidation, this.patchOneByIdAndGet.bind(this));
+
+    router.post(
+      "/search",
+      getManyBySearchValidation,
+      this.getManyBySearch.bind(this),
+    );
 
     return router;
   }
