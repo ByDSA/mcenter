@@ -1,4 +1,5 @@
 import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#modules/episodes";
+import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { SerieRepository } from "#modules/series";
 import {HistoryListDeleteOneEntryByIdRequest, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
   HistoryListGetOneByIdRequest} from "#shared/models/historyLists";
@@ -17,6 +18,7 @@ type Params = {
   historyListRepository: PublicMethodsOf<ListRepository>;
   serieRepository: PublicMethodsOf<SerieRepository>;
   episodeRepository: PublicMethodsOf<EpisodeRepository>;
+  lastTimePlayedService: PublicMethodsOf<LastTimePlayedService>;
 };
 export default class RestController
 implements
@@ -30,12 +32,16 @@ implements
 
   #episodeRepository: PublicMethodsOf<EpisodeRepository>;
 
+  #lastTimePlayedService: PublicMethodsOf<LastTimePlayedService>;
+
   constructor( {historyListRepository,
     episodeRepository,
-    serieRepository}: Params) {
+    serieRepository,
+    lastTimePlayedService}: Params) {
     this.#historyListRepository = historyListRepository;
     this.#serieRepository = serieRepository;
     this.#episodeRepository = episodeRepository;
+    this.#lastTimePlayedService = lastTimePlayedService;
   }
 
   async getAll(_: Request, res: Response): Promise<void> {
@@ -201,6 +207,11 @@ implements
     assertIsEntryWithId(deleted);
 
     await this.#historyListRepository.updateOneById(historyList.id, historyList);
+
+    this.#lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
+      episodeFullId: deleted,
+      entries: historyList.entries,
+    } );
 
     res.send(deleted);
   }

@@ -1,4 +1,5 @@
 import { EpisodeRepositoryMock } from "#modules/episodes/repositories/tests";
+import { LastTimePlayedServiceMock } from "#modules/episodes/tests";
 import { SerieRepositoryMock } from "#modules/series/repositories/tests";
 import HttpStatusCode from "#shared/utils/http/StatusCode";
 import { HISTORY_LIST_SIMPSONS, HISTORY_LIST_WITH_NO_ENTRIES } from "#tests/main/db/fixtures";
@@ -18,6 +19,7 @@ describe("RestController", () => {
       historyListRepository: historyListRepositoryMock,
       serieRepository: new SerieRepositoryMock(),
       episodeRepository: new EpisodeRepositoryMock(),
+      lastTimePlayedService: new LastTimePlayedServiceMock(),
     } );
 
     routerApp = RouterApp(controller.getRouter());

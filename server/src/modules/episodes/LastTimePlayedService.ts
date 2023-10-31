@@ -1,9 +1,8 @@
-import { HistoryList, HistoryListRepository } from "#modules/historyLists";
+import { HistoryList } from "#modules/historyLists";
 import { deepCopy } from "#shared/utils/objects";
 import { DateType } from "#shared/utils/time";
-import { isDefined } from "#shared/utils/validation";
 import { DateTime } from "luxon";
-import { Model, compareFullId, fullIdOf } from "./models";
+import { Model, ModelFullId, compareFullId, fullIdOf } from "./models";
 import { Repository } from "./repositories";
 
 function getTimestampFromDateType(date: DateType): number {
@@ -15,15 +14,9 @@ function getTimestampFromDateType(date: DateType): number {
   return d.getTime() / 1000;
 }
 
-type HistoryListParam = {
-  historyList: HistoryList;
-} | {
-  historyListRepository: HistoryListRepository;
-  streamId: string;
-};
-
-type FuncParams = HistoryListParam & {
-  episode: Model;
+type FuncParams = {
+  episodeFullId: ModelFullId;
+  entries: HistoryList["entries"];
 };
 
 type Params = {
@@ -37,39 +30,28 @@ export default class lastTimePlayedService {
     this.#episodeRepository = episodeRepository ?? new Repository();
   }
 
-  async updateEpisodeLastTimePlayedAndGetFromHistoryList( {episode: self, ...otherParams}: FuncParams): Promise<number | null> {
-    let historyList: HistoryList | null | undefined;
-
-    if ("historyList" in otherParams)
-      historyList = otherParams.historyList;
-
-    if (!historyList)
-      return null;
-
-    const lastTimePlayedFromHistory = this.getLastTimePlayedFromHistory(self, historyList);
-
-    if (lastTimePlayedFromHistory === null)
-      return null;
-
-    if (isDefined(self.lastTimePlayed) && self.lastTimePlayed === lastTimePlayedFromHistory)
-      return self.lastTimePlayed;
-
-    const selfCopy: Model = {
-      ...deepCopy(self),
-      lastTimePlayed: lastTimePlayedFromHistory,
+  async updateEpisodeLastTimePlayedFromEntriesAndGet( {episodeFullId, entries}: FuncParams): Promise<number | null> {
+    const {episodeId, serieId} = episodeFullId;
+    const fullId = {
+      episodeId,
+      serieId,
     };
-    const fullId = fullIdOf(selfCopy);
+    const lastTimePlayed = this.getLastTimePlayedFromHistory(
+      fullId,
+      entries) ?? undefined;
 
-    await this.#episodeRepository.updateOneByIdAndGet(fullId, selfCopy);
+    this.#episodeRepository.patchOneByIdAndGet(fullId, {
+      lastTimePlayed,
+    } );
 
-    return lastTimePlayedFromHistory;
+    return lastTimePlayed ?? null;
   }
 
-  getLastTimePlayedFromHistory(self: Model, historyList: HistoryList): number | null {
+  getLastTimePlayedFromHistory(selfId: ModelFullId, entries: HistoryList["entries"]): number | null {
     let lastTimePlayed = 0;
 
-    for (const historyEntry of historyList.entries) {
-      if (self && compareFullId(historyEntry, self)) {
+    for (const historyEntry of entries) {
+      if (compareFullId(historyEntry, selfId)) {
         const currentTimestamp = getTimestampFromDateType(historyEntry.date);
 
         if (currentTimestamp > lastTimePlayed)
@@ -87,7 +69,7 @@ export default class lastTimePlayedService {
     let lastTimePlayed = self.lastTimePlayed ?? null;
 
     if (!lastTimePlayed) {
-      lastTimePlayed = this.getLastTimePlayedFromHistory(self, historyList);
+      lastTimePlayed = this.getLastTimePlayedFromHistory(self, historyList.entries);
 
       if (lastTimePlayed) {
         const selfCopy: Model = {

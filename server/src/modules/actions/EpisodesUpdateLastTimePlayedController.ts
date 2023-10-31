@@ -50,9 +50,9 @@ export default class EpisodesUpdateLastTimePlayedController implements Controlle
 
         await this.#episodeRepository.getAllBySerieId(serie.id).then(episodes => {
           for (const episode of episodes) {
-            const updatePromise = this.#lastTimePlayedService.updateEpisodeLastTimePlayedAndGetFromHistoryList( {
-              episode,
-              historyList,
+            const updatePromise = this.#lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
+              episodeFullId: episode,
+              entries: historyList.entries,
             } );
 
             promisesToAwait.push(updatePromise);
