@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.11.0](https://github.com/ByDSA/mcenter/compare/v2.10.1...v2.11.0) (2023-11-01)
+
+
+### Features
+
+* **back:** endpoint de búsqueda de Episodes por path real ([f0a7697](https://github.com/ByDSA/mcenter/commit/f0a76972884fa2089ab6771c49eb36d2fd2da4db))
+* ver info del Episode en el player ([99f4ae3](https://github.com/ByDSA/mcenter/commit/99f4ae35da3e6970d0670533ec65012e7de58de8))
+
 ### [2.10.1](https://github.com/ByDSA/mcenter/compare/v2.10.0...v2.10.1) (2023-10-31)
 
 
