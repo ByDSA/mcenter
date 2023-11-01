@@ -82,7 +82,7 @@ export default class Service {
     if ("episode" in params)
       episode = params.episode;
     else if ("episodeFullId" in params) {
-      const got = await this.#episodeRepository.getOneByIdOrCreate(params.episodeFullId);
+      const got = await this.#episodeRepository.getOneById(params.episodeFullId);
 
       assertFound(got);
 

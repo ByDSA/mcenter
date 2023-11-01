@@ -1,4 +1,8 @@
 export interface CanGetOneById<T, ID> {
+  getOneById(id: ID): Promise<T | null>;
+}
+
+export interface CanGetOneByIdOrCreate<T, ID> {
   getOneByIdOrCreate(id: ID): Promise<T | null>;
 }
 

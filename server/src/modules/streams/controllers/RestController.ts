@@ -47,7 +47,7 @@ implements
         for (const origin of stream.group.origins) {
           if (origin.type === StreamOriginType.SERIE) {
             // eslint-disable-next-line no-param-reassign, no-await-in-loop
-            origin.serie = await this.#serieRepository.getOneByIdOrCreate(origin.id) ?? undefined;
+            origin.serie = await this.#serieRepository.getOneById(origin.id) ?? undefined;
           }
         }
       }

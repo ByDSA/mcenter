@@ -47,7 +47,7 @@ CanGetAll<Model>
     return serie;
   }
 
-  async getOneByIdOrCreate(id: ModelId): Promise<Model | null> {
+  async getOneById(id: ModelId): Promise<Model | null> {
     const [serieDB]: DocOdm[] = await ModelOdm.find( {
       id,
     }, {

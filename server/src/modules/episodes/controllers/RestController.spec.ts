@@ -1,10 +1,10 @@
+import { SerieRepositoryMock } from "#modules/series/repositories/tests";
 import { Episode, EpisodeGetManyBySearchRequest } from "#shared/models/episodes";
 import HttpStatusCode from "#shared/utils/http/StatusCode";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
-import { EpisodeFileInfoRepositoryMock } from "../file-info/repositories/test";
 import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
 import RestController from "./RestController";
 
@@ -17,7 +17,7 @@ describe("RestController", () => {
     episodeRepositoryMock = new RepositoryMock();
     controller = new RestController( {
       episodeRepository: episodeRepositoryMock,
-      episodeFileInfoRepository: new EpisodeFileInfoRepositoryMock(),
+      serieRepo: new SerieRepositoryMock(),
     } );
 
     controller.getManyBySearch = jest.fn(controller.getManyBySearch);

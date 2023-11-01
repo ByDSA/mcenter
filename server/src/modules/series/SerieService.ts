@@ -24,12 +24,12 @@ export default class SerieService {
       return null;
 
     const {episodeId} = lastEntry;
-    const serie = await this.#serieRepository.getOneByIdOrCreate(lastEntry.serieId);
+    const serie = await this.#serieRepository.getOneById(lastEntry.serieId);
 
     if (!serie)
       return null;
 
-    return this.#episodeRepository.getOneByIdOrCreate( {
+    return this.#episodeRepository.getOneById( {
       episodeId,
       serieId: serie.id,
     } );

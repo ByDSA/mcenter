@@ -2,6 +2,7 @@ import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
 import { resourceSchema } from "../resource";
 import { canDurableSchema } from "../resource/CanDurable";
+import { SerieSchema } from "../series";
 import { FileInfoSchema } from "./fileinfo";
 
 export type ModelId = string;
@@ -9,6 +10,7 @@ export type ModelId = string;
 export const ModelFullIdSchema = z.object( {
   episodeId: z.string(),
   serieId: z.string(),
+  serie: SerieSchema.optional(),
 } ).strict();
 
 export type ModelFullId = z.infer<typeof ModelFullIdSchema>;

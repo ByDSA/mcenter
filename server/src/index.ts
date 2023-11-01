@@ -122,7 +122,7 @@ import RealDatabase from "./main/db/Database";
       episodes: {
         restController: new EpisodeRestController( {
           episodeRepository,
-          episodeFileInfoRepository,
+          serieRepo: serieRepository,
         } ),
       },
     },

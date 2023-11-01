@@ -1,4 +1,5 @@
 import { EpisodeRepository } from "#modules/episodes";
+import { SerieRepository } from "#modules/series";
 import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest } from "#shared/models/episodes";
 import { PublicMethodsOf } from "#shared/utils/types";
 import { neverCase } from "#shared/utils/validation";
@@ -6,7 +7,7 @@ import { Controller, SecureRouter } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
 import express, { Response, Router } from "express";
-import { FileInfoRepository } from "../file-info";
+import { Serie } from "#sharedSrc/models/series";
 import { Model } from "../models";
 import {getAllValidation,
   getManyBySearchValidation,
@@ -19,7 +20,7 @@ enum ResourceType {
 
 type Params = {
   episodeRepository: PublicMethodsOf<EpisodeRepository>;
-  episodeFileInfoRepository: PublicMethodsOf<FileInfoRepository>;
+  serieRepo: PublicMethodsOf<SerieRepository>;
 };
 export default class RestController
 implements
@@ -30,11 +31,11 @@ implements
 {
   #episodeRepository: PublicMethodsOf<EpisodeRepository>;
 
-  #episodeFileInfoRepository: PublicMethodsOf<FileInfoRepository>;
+  #serieRepo: PublicMethodsOf<SerieRepository>;
 
-  constructor( {episodeRepository, episodeFileInfoRepository: fileInfoRepository}: Params) {
+  constructor( {episodeRepository, serieRepo}: Params) {
     this.#episodeRepository = episodeRepository;
-    this.#episodeFileInfoRepository = fileInfoRepository;
+    this.#serieRepo = serieRepo;
   }
 
   async patchOneByIdAndGet(req: EpisodePatchOneByIdRequest, res: Response<any, Record<string, any>>): Promise<void> {
@@ -67,7 +68,7 @@ implements
       episodeId,
       serieId,
     };
-    const got = await this.#episodeRepository.getOneByIdOrCreate(id);
+    const got = await this.#episodeRepository.getOneById(id);
 
     assertFound(got);
 
@@ -96,6 +97,21 @@ implements
         }
         default:
           neverCase(type);
+      }
+    }
+
+    if (req.body.expand?.includes(ResourceType.SERIES)) {
+      const series: {[serieId: string]: Serie} = {
+      };
+
+      for (const ep of episodes) {
+        const {serieId} = ep;
+        // eslint-disable-next-line no-await-in-loop
+        const serie = series[serieId] ?? await this.#serieRepo.getOneById(serieId);
+
+        ep.serie = serie;
+
+        series[serieId] = serie;
       }
     }
 

@@ -1,12 +1,12 @@
 import { HistoryList } from "#shared/models/historyLists";
-import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
+import { CanCreateOne, CanGetAll, CanGetOneByIdOrCreate, CanUpdateOneById } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 import { ModelOdm } from "./odm";
 
 export default class Repository
 implements CanUpdateOneById<Model, ModelId>,
-CanGetOneById<Model, ModelId>,
+CanGetOneByIdOrCreate<Model, ModelId>,
 CanCreateOne<Model>,
 CanGetAll<Model> {
   async getAll(): Promise<Model[]> {

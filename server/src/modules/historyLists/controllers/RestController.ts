@@ -126,7 +126,7 @@ implements
       if (body.expand.includes("series")) {
         const promises = newEntries.map(async (entry) => {
           const { serieId } = entry;
-          const serie = await this.#serieRepository.getOneByIdOrCreate(serieId);
+          const serie = await this.#serieRepository.getOneById(serieId);
 
           if (serie)
             // eslint-disable-next-line no-param-reassign
@@ -141,7 +141,7 @@ implements
       if (body.expand.includes("episodes")) {
         const promises = newEntries.map(async (entry) => {
           const { episodeId, serieId } = entry;
-          const episode = await this.#episodeRepository.getOneByIdOrCreate( {
+          const episode = await this.#episodeRepository.getOneById( {
             episodeId,
             serieId,
           }, {

@@ -17,8 +17,9 @@ type Props = {
   state?: string;
   volume?: number;
   time: {
-    current?: number;
-    length?: number;
+    start?: number;
+    current: number;
+    length: number;
   };
   length?: string;
   actions: {
@@ -30,9 +31,10 @@ type Props = {
   };
 };
 
-export default function MediaPlayer( { meta:{title, artist}, state, volume, time:{current,length}, actions: {previous, next, stop, seek, pauseToggle} }: Props) {
-  const {current: currentTime, endsAt, remaining, length: lengthStr} = timeRepresentation(current, length);
-  const percentage = current !== undefined && length !== undefined ? (current / length) * 100 : 0;
+export default function MediaPlayer( { meta:{title, artist}, state, volume, time:{current = 0, start = 0, length}, actions: {previous, next, stop, seek, pauseToggle} }: Props) {
+  const currentStartFixed = current - start;
+  const {current: currentTime, endsAt, remaining, length: lengthStr} = timeRepresentation(currentStartFixed, length);
+  const percentage = length !== undefined ? (currentStartFixed / length) * 100 : 0;
   const [mode, setMode] = useState(TimeMode.FORWARD);
   let time1;
   let time2;
@@ -63,7 +65,7 @@ export default function MediaPlayer( { meta:{title, artist}, state, volume, time
             <h3 className={styles.artist}>{artist}</h3>
           </header>
           <section>
-            <div className={styles.timeDiv}><span className={styles.time} onClick={onClickChangeMode}>{time1}</span>{progressBar(percentage, seek, length)}<span className={styles.time} onClick={onClickChangeMode}>{time2}</span></div>
+            <div className={styles.timeDiv}><span className={styles.time} onClick={onClickChangeMode}>{time1}</span>{progressBar(percentage, seek, start, length)}<span className={styles.time} onClick={onClickChangeMode}>{time2}</span></div>
             <span className={styles.controls}>
               <span className={`${styles.btn} btnClickable`} onClick={()=>previous()}><SkipPrevious fontSize="large"/></span>
               <span className={`${styles.btn} btnClickable`} onClick={()=>seek(-10)}><FastRewind fontSize="large" /></span>
@@ -82,7 +84,7 @@ export default function MediaPlayer( { meta:{title, artist}, state, volume, time
   );
 }
 
-function progressBar(percentage, seek, length) {
+function progressBar(percentage, seek, start: number, length: number) {
   const [tooltipText, setTooltipText] = useState("");
   const [tooltipPosition, setTooltipPosition] = useState( {
     top: 0,
@@ -105,7 +107,7 @@ function progressBar(percentage, seek, length) {
   return (
     <>
       <span className={`${styles.progressBar} btnClickable`} onMouseMove={update} onMouseEnter={update}
-        onMouseLeave={hideTooltip} onClick={progressBarOnClick(seek)}>
+        onMouseLeave={hideTooltip} onClick={progressBarOnClick(seek, start, length)}>
         <span style={{
           width: `${percentage}%`,
         }}></span>
@@ -125,14 +127,15 @@ function progressBar(percentage, seek, length) {
   );
 }
 
-function progressBarOnClick(seek: (p: number | string)=> void) {
+function progressBarOnClick(seek: (p: number | string)=> void, start: number, length: number) {
   return (e) => {
     const rect = e.target.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const width = rect.right - rect.left;
     const percentage = (x / width) * 100;
+    const secs = Math.round((length) * (percentage / 100)) + start;
 
-    seek(`${percentage }%`);
+    seek(secs);
   };
 }
 

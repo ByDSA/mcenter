@@ -71,7 +71,7 @@ CanCreateOne<Model>, CanGetAll<Model> {
     await ModelOdm.create(docOdm);
   }
 
-  async getOneByIdOrCreate(id: ModelId): Promise<Model | null> {
+  async getOneById(id: ModelId): Promise<Model | null> {
     console.log(`getting stream by id=${id}`);
     const docOdm = await ModelOdm.findOne( {
       id,

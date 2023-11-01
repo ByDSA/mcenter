@@ -32,11 +32,11 @@ export default class PlaySerieController implements Controller {
     const forceStr = req.query.force;
     const force = !!forceStr;
     const { id: episodeId, name: serieId } = req.params;
-    const serie = await this.#serieRepository.getOneByIdOrCreate(serieId);
+    const serie = await this.#serieRepository.getOneById(serieId);
 
     assertFound(serie);
 
-    const episode = await this.#episodeRepository.getOneByIdOrCreate( {
+    const episode = await this.#episodeRepository.getOneById( {
       serieId,
       episodeId,
     } );
