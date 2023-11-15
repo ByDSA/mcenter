@@ -1,1 +1,1 @@
-sudo docker compose --project-name mcenter up
+sudo docker compose --project-name mcenter up -d
