@@ -159,7 +159,7 @@ function padZero(num: number): string {
   return num.toString().padStart(2, "0");
 }
 
-function timeRepresentation(time, length) {
+function timeRepresentation(time: number, length: number) {
   const hasTime = length >= 0;
   let timeStr = TIME_UNDEFINED;
   let remainingStr = TIME_UNDEFINED;

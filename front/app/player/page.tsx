@@ -119,6 +119,28 @@ function getPathFromUri(uri: string) {
   return null;
 }
 
+function calcStartLength(statusLength: number | undefined, resource: Episode | null = null) {
+  let resourceEnd;
+  let resourceStart;
+
+  if (typeof resource?.end !== "number" || resource?.end < 0 || resource.end < resource.start)
+    resourceEnd = statusLength;
+  else
+    resourceEnd = resource.end;
+
+  if (typeof resource?.start !== "number" || resource?.start < 0 || resource.start > resource.end)
+    resourceStart = 0;
+  else
+    resourceStart = resource.start;
+
+  const length = resourceEnd - resourceStart;
+
+  return {
+    start: resourceStart,
+    length,
+  };
+}
+
 function statusRepresentaton(status: RemotePlayerStatusResponse, resource: Episode | null = null) {
   const uri = status?.status?.playlist?.current?.uri;
   let title = "-";
@@ -135,16 +157,9 @@ function statusRepresentaton(status: RemotePlayerStatusResponse, resource: Episo
   else
     artist = uri?.slice(uri.lastIndexOf("/") + 1) ?? "-";
 
-  const time = status?.status?.time ?? 0 - (resource?.start ?? 0);
-  let length;
   const statusLength = status?.status?.length;
-
-  if (resource?.end !== undefined && resource?.start !== undefined)
-    length = resource.end - resource.start;
-  else if (statusLength !== undefined) {
-    if (resource?.start !== undefined)
-      length = statusLength - resource.start;
-  }
+  const { start: resourceStart, length } = calcStartLength(statusLength, resource);
+  const time = status?.status?.time ?? 0 - (resourceStart ?? 0);
 
   return <>
     Estado: {status.running ? "Abierto" : "Cerrado"}
@@ -157,7 +172,7 @@ function statusRepresentaton(status: RemotePlayerStatusResponse, resource: Episo
           artist,
         }} time={{
           current: time,
-          start: resource?.start ?? 0,
+          start: resourceStart,
           length,
         }}
         volume={status.status?.volume}
