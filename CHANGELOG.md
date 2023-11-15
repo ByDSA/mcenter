@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.12.1](https://github.com/ByDSA/mcenter/compare/v2.12.0...v2.12.1) (2023-11-15)
+
+
+### Bug Fixes
+
+* **front:** time end cuando no está explícitamente definido en DB ([7b98e1c](https://github.com/ByDSA/mcenter/commit/7b98e1c606d619ac4a105cedd7317be923853b0d))
+
 ## [2.12.0](https://github.com/ByDSA/mcenter/compare/v2.11.0...v2.12.0) (2023-11-15)
 
 
