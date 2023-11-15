@@ -1,3 +1,4 @@
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { assertIsDefined } from "#shared/utils/validation";
 import ExpressAppMock from "#tests/main/ExpressAppMock";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
@@ -7,7 +8,9 @@ import request from "supertest";
 import PickerController from "./Controller";
 
 let app: ExpressAppMock;
-const pickerController = new PickerController();
+const pickerController = new PickerController( {
+  domainMessageBroker: new DomainMessageBroker(),
+} );
 
 async function loadFixtures() {
   await app.dropDb();

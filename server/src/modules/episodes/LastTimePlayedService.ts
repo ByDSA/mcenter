@@ -1,3 +1,4 @@
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { HistoryList } from "#modules/historyLists";
 import { deepCopy } from "#shared/utils/objects";
 import { DateType } from "#shared/utils/time";
@@ -20,14 +21,16 @@ type FuncParams = {
 };
 
 type Params = {
-  episodeRepository?: Repository;
+  episodeRepository: Repository;
+  domainMessageBroker: DomainMessageBroker;
 };
 export default class lastTimePlayedService {
   #episodeRepository: Repository;
 
-  constructor( {episodeRepository}: Params = {
-  } ) {
-    this.#episodeRepository = episodeRepository ?? new Repository();
+  constructor( {episodeRepository, domainMessageBroker}: Params) {
+    this.#episodeRepository = episodeRepository ?? new Repository( {
+      domainMessageBroker,
+    } );
   }
 
   async updateEpisodeLastTimePlayedFromEntriesAndGet( {episodeFullId, entries}: FuncParams): Promise<number | null> {

@@ -1,4 +1,5 @@
 import ActionController from "#modules/actions/ActionController";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeRepository, EpisodeRestController } from "#modules/episodes";
 import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
 import { HistoryListRepository, HistoryListRestController } from "#modules/historyLists";
@@ -27,6 +28,9 @@ export type ExpressAppDependencies = {
     instance: Database;
   };
   modules: {
+    domainMessageBroker: {
+      instance: DomainMessageBroker;
+    };
     play: {
       playSerieController: PublicMethodsOf<PlaySerieController>;
       playStreamController: PublicMethodsOf<PlayStreamController>;
@@ -69,7 +73,7 @@ export default class ExpressApp implements App {
   #dependencies: Required<ExpressAppDependencies>;
 
   constructor(dependencies: ExpressAppDependencies) {
-    this.#dependencies = deepMerge(DEFAULT_DEPENDENCIES as Required<ExpressAppDependencies>, dependencies);
+    this.#dependencies = deepMerge(DEFAULT_DEPENDENCIES as Required<ExpressAppDependencies>, dependencies) as Required<ExpressAppDependencies>;
   }
 
   async init() {
@@ -124,24 +128,25 @@ export default class ExpressApp implements App {
     if (process.env.NODE_ENV === "development")
       app.get("/", HELLO_WORLD_HANDLER);
 
-    const {playSerieController, playStreamController, remotePlayer} = this.#dependencies.modules.play;
+    const {modules} = this.#dependencies;
+    const {playSerieController, playStreamController, remotePlayer} = modules.play;
     const {controller: remotePlayerController} = remotePlayer;
 
     app.use("/api/play/serie", playSerieController.getRouter());
     app.use("/api/play/stream", playStreamController.getRouter());
     app.use("/api/player/remote", remotePlayerController.getRouter());
 
-    const {controller: pickerController} = this.#dependencies.modules.picker;
+    const {controller: pickerController} = modules.picker;
 
     app.use("/api/picker", pickerController.getRouter());
 
-    app.use("/api/actions", this.#dependencies.modules.actionController.getRouter());
+    app.use("/api/actions", modules.actionController.getRouter());
 
-    app.use("/api/history-list", this.#dependencies.modules.historyList.restController.getRouter());
+    app.use("/api/history-list", modules.historyList.restController.getRouter());
 
-    app.use("/api/streams", this.#dependencies.modules.streams.restController.getRouter());
+    app.use("/api/streams", modules.streams.restController.getRouter());
 
-    app.use("/api/episodes", this.#dependencies.modules.episodes.restController.getRouter());
+    app.use("/api/episodes", modules.episodes.restController.getRouter());
 
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;
@@ -151,7 +156,10 @@ export default class ExpressApp implements App {
       } );
       const episodePickerService = new EpisodePickerService( {
         streamRepository,
-        episodeRepository: new EpisodeRepository(),
+        episodeRepository: new EpisodeRepository( {
+          domainMessageBroker : modules.domainMessageBroker.instance,
+        } ),
+        domainMessageBroker: modules.domainMessageBroker.instance,
         serieRepository: new SerieRepository( {
           relationshipWithStreamFixer: serieRelationshipWithStreamFixer,
         } ),

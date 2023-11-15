@@ -1,9 +1,9 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import { Router } from "express";
+import { getRouterMock } from "#tests/main";
 import RemotePlayerController from "../Controller";
 
 export default class ControllerMock implements PublicMethodsOf<RemotePlayerController> {
-  getRouter = jest.fn((): Router => Router());
+  getRouter = getRouterMock;
 
   getStatus = jest.fn();
 

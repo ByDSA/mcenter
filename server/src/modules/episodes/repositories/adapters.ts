@@ -1,4 +1,5 @@
 import { Episode, assertIsEpisode } from "#shared/models/episodes";
+import { UpdateQuery } from "mongoose";
 import { DocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {
@@ -50,8 +51,8 @@ export function modelToDocOdm(model: Episode): DocOdm {
   return ret;
 }
 
-export function partialModelToDocOdm(model: Partial<Episode>): Partial<DocOdm> {
-  const ret: Partial<DocOdm> = {
+export function partialModelToDocOdm(model: Partial<Episode>): UpdateQuery<Episode> {
+  const ret: UpdateQuery<Episode> = {
   };
 
   if (model.episodeId !== undefined)
@@ -72,17 +73,36 @@ export function partialModelToDocOdm(model: Partial<Episode>): Partial<DocOdm> {
   if (model.end !== undefined)
     ret.end = model.end;
 
-  if (model.weight !== undefined)
-    ret.weight = model.weight;
+  if ("weight" in model){
+    if (model.weight !== undefined)
+      ret.weight = model.weight;
+    else {
+      ret.$unset = ret.$unset ?? {
+      };
+      ret.$unset.weight = 1;
+    }
+  }
 
-  if (model.disabled !== undefined)
+  if ("disabled" in model)
+  {if (model.disabled !== undefined)
     ret.disabled = model.disabled;
+  else {
+    ret.$unset = ret.$unset ?? {
+    };
+    ret.$unset.disabled = 1;
+  }}
 
   if (model.tags !== undefined)
     ret.tags = model.tags;
 
-  if (model.lastTimePlayed !== undefined)
+  if ("lastTimePlayed" in model)
+  {if (model.lastTimePlayed !== undefined)
     ret.lastTimePlayed = model.lastTimePlayed;
+  else {
+    ret.$unset = ret.$unset ?? {
+    };
+    ret.$unset.lastTimePlayed = 1;
+  }}
 
   return ret;
 }

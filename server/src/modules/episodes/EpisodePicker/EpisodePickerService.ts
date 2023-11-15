@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { Stream, StreamId, StreamRepository } from "#modules/streams";
@@ -13,6 +14,7 @@ type Params = {
   serieRepository: SerieRepository;
   episodeRepository: Repository;
   historyListRepository: HistoryListRepository;
+  domainMessageBroker: DomainMessageBroker;
 };
 export default class EpisodePickerService {
   #streamRepository: StreamRepository;
@@ -23,11 +25,14 @@ export default class EpisodePickerService {
 
   #historyListRepository: HistoryListRepository;
 
-  constructor( {streamRepository,episodeRepository, serieRepository, historyListRepository}: Params) {
+  #domainMessageBroker: DomainMessageBroker;
+
+  constructor( {streamRepository,episodeRepository, serieRepository, historyListRepository, domainMessageBroker}: Params) {
     this.#streamRepository = streamRepository;
     this.#episodeRepository = episodeRepository;
     this.#serieRepository = serieRepository;
     this.#historyListRepository = historyListRepository;
+    this.#domainMessageBroker = domainMessageBroker;
   }
 
   async getByStreamId(streamId: StreamId, n = 1): Promise<Episode[]> {
@@ -64,6 +69,8 @@ export default class EpisodePickerService {
       stream,
       historyList,
       lastEp: lastEp ?? undefined,
+      domainMessageBroker: this.#domainMessageBroker,
+      episodeRepository: this.#episodeRepository,
     } );
     const episodes = await picker.pick(n);
 

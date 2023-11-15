@@ -1,5 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable require-await */
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { EpisodeRepository } from "#modules/episodes";
 import { HistoryList } from "#modules/historyLists";
 import { isDefined } from "#shared/utils/validation";
 import { daysBetween } from "date-ops";
@@ -10,16 +12,27 @@ import WeightFixer, { WeightFixerParams } from "./WeightFixer";
 
 type Params = {
   historyList: HistoryList;
+  domainMessageBroker: DomainMessageBroker;
+  episodeRepository: EpisodeRepository;
 };
 export default class CalculatorWeightFixer implements WeightFixer<Model> {
   #historyList: HistoryList;
 
-  constructor( {historyList}: Params) {
+  #domainMessageBroker: DomainMessageBroker;
+
+  #episodeRepository: EpisodeRepository;
+
+  constructor( {historyList, domainMessageBroker, episodeRepository}: Params) {
     this.#historyList = historyList;
+    this.#domainMessageBroker = domainMessageBroker;
+    this.#episodeRepository = episodeRepository;
   }
 
   #getDaysFromLastPlayed = async (self: Model): Promise<number> => {
-    const lastTimePlayedService = new LastTimePlayed();
+    const lastTimePlayedService = new LastTimePlayed( {
+      episodeRepository: this.#episodeRepository,
+      domainMessageBroker: this.#domainMessageBroker,
+    } );
     let daysFromLastTime: number | undefined;
 
     if (self.lastTimePlayed) {

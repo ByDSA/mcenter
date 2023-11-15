@@ -1,6 +1,7 @@
 import { ExpressApp } from "#main";
 import { ExpressAppDependencies } from "#main/ExpressApp";
 import { ActionControllerMock } from "#modules/actions/test";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeRestControllerMock } from "#modules/episodes/controllers/test";
 import { HistoryListRestControllerMock } from "#modules/historyLists/controllers/test";
 import { PickerControllerMock } from "#modules/picker/tests";
@@ -21,6 +22,9 @@ export default class ExpressAppMock extends ExpressApp {
         instance: new TestMongoDatabase(),
       },
       modules: {
+        domainMessageBroker: {
+          instance: new DomainMessageBroker(),
+        },
         play: {
           playSerieController: new PlaySerieControllerMock(),
           playStreamController: new PlayStreamControllerMock(),

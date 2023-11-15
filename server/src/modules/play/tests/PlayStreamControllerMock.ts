@@ -1,9 +1,9 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import { Router } from "express";
+import { getRouterMock } from "#tests/main";
 import PlayStreamController from "../PlayStreamController";
 
 export default class PlayStreamControllerMock implements PublicMethodsOf<PlayStreamController> {
   playStream = jest.fn();
 
-  getRouter = jest.fn((): Router => Router());
+  getRouter = getRouterMock;
 }

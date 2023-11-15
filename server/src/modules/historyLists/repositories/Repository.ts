@@ -1,4 +1,8 @@
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { QUEUE_NAME } from "#modules/episodes/repositories";
+import { logDomainEvent } from "#modules/log";
 import { HistoryList } from "#shared/models/historyLists";
+import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { CanCreateOne, CanGetAll, CanGetOneByIdOrCreate, CanUpdateOneById } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
@@ -9,6 +13,17 @@ implements CanUpdateOneById<Model, ModelId>,
 CanGetOneByIdOrCreate<Model, ModelId>,
 CanCreateOne<Model>,
 CanGetAll<Model> {
+  #domainMessageBroker: DomainMessageBroker;
+
+  constructor() {
+    this.#domainMessageBroker = DomainMessageBroker.singleton();
+
+    this.#domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
+      logDomainEvent(event);
+
+      return Promise.resolve();
+    } );
+  }
   async getAll(): Promise<Model[]> {
     const docsOdm = await ModelOdm.find( {
     }, {
@@ -25,7 +40,12 @@ CanGetAll<Model> {
     const docOdm = modelToDocOdm(historyList);
 
     await ModelOdm.create(docOdm);
-    console.log(`History list created for ${historyList.id}`);
+
+    const event = new ModelEvent<Model>(EventType.CREATED, {
+      entity: historyList,
+    });
+
+    this.#domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
   async #createOneDefaultModelById(id: ModelId): Promise<Model> {
@@ -59,5 +79,11 @@ CanGetAll<Model> {
     await ModelOdm.findOneAndUpdate( {
       id,
     }, docOdm);
+
+    const event = new ModelEvent<Model>(EventType.UPDATED, {
+      entity: historyList,
+    });
+
+    this.#domainMessageBroker.publish(QUEUE_NAME, event);
   }
 }

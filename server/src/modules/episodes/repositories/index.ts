@@ -11,3 +11,5 @@ export {
 export {
   ExpandEnum as EpisodeRepositoryExpandEnum,
 } from "./get-options";
+
+export * from "./events";

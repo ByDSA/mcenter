@@ -1,3 +1,4 @@
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { Episode, EpisodeRepository } from "#modules/episodes";
 import { genPickerWithData } from "#modules/episodes/EpisodePicker/EpisodePickerRandom";
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
@@ -16,7 +17,17 @@ type ResultType = Episode & {
   percentage: number;
   days: number;
 };
+
+type Params = {
+  domainMessageBroker: DomainMessageBroker;
+};
 export default class PickerController implements Controller {
+  #domainMessageBroker: DomainMessageBroker;
+
+  constructor( {domainMessageBroker}: Params) {
+    this.#domainMessageBroker = domainMessageBroker;
+  }
+
   getRouter(): express.Router {
     const router = SecureRouter();
 
@@ -34,7 +45,9 @@ export default class PickerController implements Controller {
       relationshipWithStreamFixer: serieRelationshipWithStreamFixer,
     } );
     const historyListRepository = new HistoryListRepository();
-    const episodeRepository = new EpisodeRepository();
+    const episodeRepository = new EpisodeRepository( {
+      domainMessageBroker: this.#domainMessageBroker,
+    } );
     const serieService = new SerieService( {
       serieRepository,
       episodeRepository,
@@ -65,9 +78,14 @@ export default class PickerController implements Controller {
       lastEp: lastEp ?? undefined,
       stream,
       historyList,
+      domainMessageBroker: this.#domainMessageBroker,
+      episodeRepository,
     } );
     const pickerWeight = picker.weight;
-    const lastTimePlayedService = new LastTimePlayedService();
+    const lastTimePlayedService = new LastTimePlayedService( {
+      episodeRepository,
+      domainMessageBroker: this.#domainMessageBroker,
+    } );
     const ret = (await asyncMap(picker.data.filter((e) => e.end < 100), async(e: Model) => {
       const selfWeight = picker.getWeight(e);
 

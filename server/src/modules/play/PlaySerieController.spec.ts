@@ -1,3 +1,4 @@
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeRepository } from "#modules/episodes";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
@@ -26,7 +27,10 @@ describe("PlaySerieController", () => {
     await db.drop();
     await loadFixtureSimpsons();
 
-    const episodeRepository = new EpisodeRepository();
+    const domainMessageBroker = new DomainMessageBroker();
+    const episodeRepository = new EpisodeRepository( {
+      domainMessageBroker,
+    } );
     const serieRepository = new SerieRepository( {
       relationshipWithStreamFixer: null as any,
     } );

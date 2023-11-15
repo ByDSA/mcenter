@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-await-in-loop */
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { HistoryList, createHistoryEntryByEpisodeFullId } from "#modules/historyLists";
 import { Serie } from "#modules/series";
 import { Stream } from "#modules/streams";
@@ -8,6 +9,7 @@ import { throwErrorPopStack } from "#shared/utils/errors";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
+import { EpisodeRepository } from "..";
 import { Model, compareFullId } from "../models";
 import EpisodePicker from "./EpisodePicker";
 import { PickerFilter } from "./filters";
@@ -19,6 +21,8 @@ type FuncGeneratorParams = {
   lastEp?: Model;
   stream: Stream;
   historyList: HistoryList;
+  domainMessageBroker: DomainMessageBroker;
+  episodeRepository: EpisodeRepository;
 };
 
 type Params = {
@@ -27,6 +31,8 @@ type Params = {
   serie: Serie;
   stream: Stream;
   historyList: HistoryList;
+  domainMessageBroker: DomainMessageBroker;
+  episodeRepository: EpisodeRepository;
 };
 export default class RandomPicker implements EpisodePicker {
   #episodes: Model[];
@@ -39,12 +45,18 @@ export default class RandomPicker implements EpisodePicker {
 
   #historyList: HistoryList;
 
-  constructor( {episodes,historyList, serie,stream,lastEp}: Params) {
+  #domainMessageBroker: DomainMessageBroker;
+
+  #episodeRepository: EpisodeRepository;
+
+  constructor( {episodes,historyList, serie,stream,lastEp,domainMessageBroker,episodeRepository}: Params) {
     this.#episodes = episodes;
     this.#historyList = historyList;
     this.#serie = serie;
     this.#stream = stream;
     this.#lastEp = lastEp;
+    this.#domainMessageBroker = domainMessageBroker;
+    this.#episodeRepository = episodeRepository;
   }
 
   async pick(n: number): Promise<Model[]> {
@@ -57,6 +69,8 @@ export default class RandomPicker implements EpisodePicker {
         lastEp: this.#lastEp,
         stream: this.#stream,
         historyList: this.#historyList,
+        domainMessageBroker: this.#domainMessageBroker,
+        episodeRepository: this.#episodeRepository,
       } );
 
       if (i < n - 1) {
@@ -92,6 +106,8 @@ export default class RandomPicker implements EpisodePicker {
       lastEp,
       stream,
       historyList,
+      domainMessageBroker: this.#domainMessageBroker,
+      episodeRepository: this.#episodeRepository,
     } );
 
     console.log("Picking one ...");
@@ -103,17 +119,22 @@ export default class RandomPicker implements EpisodePicker {
   }
 }
 
-export async function genPickerWithData( {serie, episodes, lastEp, stream, historyList}: FuncGeneratorParams) {
+export async function genPickerWithData( {serie, episodes, lastEp, stream, historyList, domainMessageBroker, episodeRepository}: FuncGeneratorParams) {
   console.log("Getting random picker...");
 
   const picker: Picker<Model> = newPicker(episodes, {
     weighted: true,
   } );
 
-  await new PickerFilter(serie, episodes, lastEp ?? null, stream, historyList).filter(picker);
+  await new PickerFilter(serie, episodes, lastEp ?? null, stream, historyList, {
+    domainMessageBroker,
+    episodeRepository,
+  } ).filter(picker);
   assertPickerHasData(picker);
   await new PickerWeightFixer( {
     historyList,
+    domainMessageBroker,
+    episodeRepository,
   } ).weightFix(picker);
 
   return picker;

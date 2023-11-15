@@ -1,7 +1,9 @@
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { HistoryList } from "#modules/historyLists";
 import { Serie } from "#modules/series";
 import { Stream, StreamMode } from "#modules/streams";
 import { neverCase } from "#shared/utils/validation";
+import { EpisodeRepository } from "..";
 import { Model } from "../models";
 import EpisodePicker from "./EpisodePicker";
 import RandomPicker from "./EpisodePickerRandom";
@@ -14,8 +16,10 @@ type Params = {
   serie: Serie;
   stream: Stream;
   historyList: HistoryList;
+  domainMessageBroker: DomainMessageBroker;
+  episodeRepository: EpisodeRepository;
 };
-export default function buildEpisodePicker( { mode, episodes, lastEp, historyList, serie, stream }: Params): EpisodePicker {
+export default function buildEpisodePicker( { mode, episodes, lastEp, historyList, serie, stream, domainMessageBroker, episodeRepository }: Params): EpisodePicker {
   let picker: EpisodePicker;
 
   switch (mode) {
@@ -32,6 +36,8 @@ export default function buildEpisodePicker( { mode, episodes, lastEp, historyLis
         historyList,
         serie,
         stream,
+        domainMessageBroker,
+        episodeRepository,
       } );
       break;
     default:

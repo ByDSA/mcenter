@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { Episode, EpisodeRepository } from "#modules/episodes";
 import { SavedSerieTreeService } from "#modules/episodes/saved-serie-tree-service";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
@@ -12,6 +13,9 @@ import { diffSerieTree, findAllSerieFolderTreesAt } from "../tree";
 import { OldNew } from "../tree/diff";
 import { Serie } from "../tree/models";
 
+type Dependencies = {
+  domainMessageBroker: DomainMessageBroker;
+};
 export default class ThisController implements Controller {
   #savedSerieTreeService: SavedSerieTreeService;
 
@@ -19,7 +23,10 @@ export default class ThisController implements Controller {
 
   #serieRepository: SerieRepository;
 
-  constructor() {
+  #domainMessageBroker: DomainMessageBroker;
+
+  constructor( {domainMessageBroker}: Dependencies) {
+    this.#domainMessageBroker = domainMessageBroker;
     const relationshipWithStreamFixer = new SerieRelationshipWithStreamFixer( {
       streamRepository: new StreamRepository(),
     } );
@@ -28,7 +35,9 @@ export default class ThisController implements Controller {
         relationshipWithStreamFixer,
       },
     );
-    const episodeRepository = new EpisodeRepository();
+    const episodeRepository = new EpisodeRepository( {
+      domainMessageBroker,
+    } );
 
     this.#episodeRepository = episodeRepository;
     this.#serieRepository = serieRepository;

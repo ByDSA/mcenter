@@ -1,6 +1,7 @@
 import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
 import FixerController from "#modules/actions/FixerController";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeAddNewFileInfosController, EpisodeFileInfoRepository, EpisodePickerService, EpisodeRepository, EpisodeRestController, EpisodeUpdateFileInfoController, SavedSerieTreeService } from "#modules/episodes";
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
@@ -19,6 +20,9 @@ import RealDatabase from "./main/db/Database";
 (async function main() {
   dotenv.config();
 
+  const domainMessageBroker = new DomainMessageBroker();
+
+  DomainMessageBroker.setSingleton(domainMessageBroker);
   const streamRepository = new StreamRepository();
   const historyListRepository = new HistoryListRepository();
   const serieRelationshipWithStreamFixer = new SerieRelationshipWithStreamFixer( {
@@ -27,7 +31,9 @@ import RealDatabase from "./main/db/Database";
   const serieRepository = new SerieRepository( {
     relationshipWithStreamFixer: serieRelationshipWithStreamFixer,
   } );
-  const episodeRepository = new EpisodeRepository();
+  const episodeRepository = new EpisodeRepository( {
+    domainMessageBroker,
+  } );
   const historyListService = new HistoryListService( {
     episodeRepository,
     historyListRepository,
@@ -48,6 +54,7 @@ import RealDatabase from "./main/db/Database";
     historyListRepository,
     serieRepository,
     streamRepository,
+    domainMessageBroker,
   } );
   const playStreamController = new PlayStreamController( {
     playService,
@@ -63,12 +70,18 @@ import RealDatabase from "./main/db/Database";
     serieRelationshipWithStreamFixer,
   } );
   const episodeFileInfoRepository = new EpisodeFileInfoRepository();
-  const lastTimePlayedService = new LastTimePlayedService();
+  const lastTimePlayedService = new LastTimePlayedService( {
+    domainMessageBroker,
+    episodeRepository,
+  } );
   const app: ExpressApp = new ExpressApp( {
     db: {
       instance: new RealDatabase(),
     },
     modules: {
+      domainMessageBroker: {
+        instance: domainMessageBroker,
+      },
       play: {
         playSerieController,
         playStreamController,
@@ -84,7 +97,9 @@ import RealDatabase from "./main/db/Database";
         },
       },
       picker: {
-        controller: new PickerController(),
+        controller: new PickerController( {
+          domainMessageBroker,
+        } ),
       },
       actionController: new ActionController( {
         episodesUpdateLastTimePlayedController: new EpisodesUpdateLastTimePlayedController( {
@@ -101,7 +116,9 @@ import RealDatabase from "./main/db/Database";
           } ),
           episodeFileRepository: episodeFileInfoRepository,
         } ),
-        episodesAddNewFilesController: new EpisodeAddNewFileInfosController(),
+        episodesAddNewFilesController: new EpisodeAddNewFileInfosController( {
+          domainMessageBroker,
+        } ),
         fixerController,
       } ),
       historyList: {

@@ -1,3 +1,5 @@
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { EpisodeRepository } from "#modules/episodes";
 import { Model } from "#modules/episodes/models";
 import { HistoryList } from "#modules/historyLists";
 import { Picker } from "rand-picker";
@@ -8,12 +10,20 @@ import WeightFixer from "./WeightFixer";
 
 type Params = {
   historyList: HistoryList;
+  domainMessageBroker: DomainMessageBroker;
+  episodeRepository: EpisodeRepository;
 };
 export default class Exec {
   #historyList: HistoryList;
 
-  constructor( {historyList}: Params) {
+  #episodeRepository: EpisodeRepository;
+
+  #domainMessageBroker: DomainMessageBroker;
+
+  constructor( {historyList, domainMessageBroker, episodeRepository}: Params) {
     this.#historyList = historyList;
+    this.#domainMessageBroker = domainMessageBroker;
+    this.#episodeRepository = episodeRepository;
   }
 
   getWeightFixers(picker: Picker<Model>): WeightFixer<Model>[] {
@@ -21,6 +31,8 @@ export default class Exec {
 
     ret.push(new CalculatorWeightFixer( {
       historyList: this.#historyList,
+      domainMessageBroker: this.#domainMessageBroker,
+      episodeRepository: this.#episodeRepository,
     } ));
     ret.push(new TagWeightFixer());
     ret.push(new LimiterWeightFixer(Number.MAX_SAFE_INTEGER / picker.data.length));

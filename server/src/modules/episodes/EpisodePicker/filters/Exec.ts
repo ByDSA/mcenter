@@ -1,4 +1,6 @@
 /* eslint-disable import/prefer-default-export */
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { EpisodeRepository } from "#modules/episodes";
 import { HistoryList } from "#modules/historyLists";
 import { Serie, SerieId } from "#modules/series";
 import { Stream } from "#modules/streams";
@@ -13,6 +15,10 @@ import PreventRepeatInDaysFilter from "./PreventRepeatInDaysFilter";
 import PreventRepeatLastFilter from "./PreventRepeatLastFilter";
 import RemoveWeightLowerOrEqualThanFilter from "./RemoveWeightLowerOrEqualThanFilter";
 
+type Params = {
+  domainMessageBroker: DomainMessageBroker;
+  episodeRepository: EpisodeRepository;
+};
 export default class PickerFilter {
   #serie: Serie;
 
@@ -22,16 +28,23 @@ export default class PickerFilter {
 
   #historyList: HistoryList;
 
+  #domainMessageBroker: DomainMessageBroker;
+
+  #episodeRepository: EpisodeRepository;
+
   constructor(
     serie: Serie,
     episodes: Model[],
     lastEp: Model | null,
     stream: Stream,
-    historyList: HistoryList) {
+    historyList: HistoryList, {domainMessageBroker,episodeRepository}: Params) {
     this.#serie = serie;
     this.#episodes = episodes;
     this.#lastEp = lastEp;
     this.#historyList = historyList;
+
+    this.#domainMessageBroker = domainMessageBroker;
+    this.#episodeRepository = episodeRepository;
   }
 
   // eslint-disable-next-line require-await
@@ -82,7 +95,10 @@ export default class PickerFilter {
     filters.push(new PreventRepeatInDaysFilter( {
       minDays: +(PICKER_MIN_DAYS ?? 0),
       historyList : this.#historyList,
-      lastTimePlayedService: new LastTimePlayedService(),
+      lastTimePlayedService: new LastTimePlayedService( {
+        domainMessageBroker: this.#domainMessageBroker,
+        episodeRepository: this.#episodeRepository,
+      } ),
     } ));
 
     return filters;
