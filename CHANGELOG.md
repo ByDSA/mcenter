@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.12.0](https://github.com/ByDSA/mcenter/compare/v2.11.0...v2.12.0) (2023-11-15)
+
+
+### Features
+
+* misc ([c6f665e](https://github.com/ByDSA/mcenter/commit/c6f665edc9316881849ea7b7bdd16e563041027a))
+
 ## [2.11.0](https://github.com/ByDSA/mcenter/compare/v2.10.1...v2.11.0) (2023-11-01)
 
 
