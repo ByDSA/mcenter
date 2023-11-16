@@ -1,8 +1,8 @@
+import { HistoryList } from "#shared/models/historyLists";
+import { deepMerge } from "#shared/utils/objects";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#modules/series";
-import { HistoryList } from "#shared/models/historyLists";
-import { deepMerge } from "#shared/utils/objects";
 import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
@@ -19,7 +19,7 @@ type Dependencies = {
   domainMessageBroker: DomainMessageBroker;
 };
 
-type GetManyOptions = {
+export type GetManyOptions = {
   sortById?: boolean;
 };
 
@@ -155,35 +155,17 @@ CanGetAll<Model>
     let episodesOdm: DocOdm[];
 
     if (actualOptions.sortById) {
-      episodesOdm = await ModelOdm.aggregate([
-        {
-          $match: {
-            serieId,
-          },
-        },
-        {
-          $addFields: {
-          // Divide el campo episodeId en dos números y los convierte a números
-            episodeNumbers: {
-              $map: {
-                input: {
-                  $split: ["$episodeId", "x"],
-                },
-                as: "num",
-                in: {
-                  $toInt: "$$num",
-                },
-              },
-            },
-          },
-        },
-        {
-          $sort: {
-            "episodeNumbers.0": 1, // Ordena por el primer número
-            "episodeNumbers.1": 1, // Si son iguales, ordena por el segundo número
-          },
-        },
-      ]);
+      episodesOdm = await ModelOdm.find( {
+        serieId,
+      } )
+        .sort( {
+          episodeId: 1,
+        } )
+        .collation( {
+          locale: "en_US",
+          numericOrdering: true,
+        } )
+        .exec();
     } else {
       episodesOdm = await ModelOdm.find( {
         serieId,

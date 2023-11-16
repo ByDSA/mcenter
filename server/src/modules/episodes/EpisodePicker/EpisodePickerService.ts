@@ -2,10 +2,11 @@
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
-import { Stream, StreamId, StreamRepository } from "#modules/streams";
+import { Stream, StreamId, StreamMode, StreamRepository } from "#modules/streams";
 import { assertFound } from "#utils/http/validation";
 import { Episode } from "..";
 import { Repository } from "../repositories";
+import { GetManyOptions } from "../repositories/Repository";
 import EpisodePicker from "./EpisodePicker";
 import buildEpisodePicker from "./EpisodePickerBuilder";
 
@@ -60,7 +61,10 @@ export default class EpisodePickerService {
     const serie = await this.#serieRepository.getOneById(serieId);
 
     assertFound(serie, `Cannot get serie from id '${serieId}'`);
-    const allEpisodesInSerie = await this.#episodeRepository.getManyBySerieId(serie.id);
+    const options: GetManyOptions = {
+      sortById: stream.mode === StreamMode.SEQUENTIAL,
+    };
+    const allEpisodesInSerie = await this.#episodeRepository.getManyBySerieId(serie.id, options);
     const lastEp = await this.#episodeRepository.findLastEpisodeInHistoryList(historyList);
     const picker: EpisodePicker = buildEpisodePicker( {
       mode: stream.mode,
