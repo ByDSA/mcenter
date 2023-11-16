@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.12.2](https://github.com/ByDSA/mcenter/compare/v2.12.1...v2.12.2) (2023-11-16)
+
+
+### Bug Fixes
+
+* **back:** ordenación por serie-episodio ([fec6fae](https://github.com/ByDSA/mcenter/commit/fec6fae4fb9b8963674c4483da5a6c0b3c31580a))
+
 ### [2.12.1](https://github.com/ByDSA/mcenter/compare/v2.12.0...v2.12.1) (2023-11-15)
 
 
