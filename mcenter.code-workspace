@@ -4,6 +4,9 @@
       "path": "./shared"
     },
     {
+      "path": "./vlc"
+    },
+    {
       "path": "./server"
     }
   ],

@@ -1,0 +1,7 @@
+.env
+.stop
+.schedule.*
+.calendar.*
+.tag.*
+.log
+*.m3u8

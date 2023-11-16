@@ -1,5 +1,5 @@
-import { getOrCreateTmpFolder } from "#utils/tests";
-import { existsSync, rmdirSync } from "node:fs";
+import { existsSync, mkdirSync, rmdirSync } from "node:fs";
+import { join } from "node:path";
 import QueuePlaylistManager from "./QueuePlaylistManager";
 
 const FOLDER = getOrCreateTmpFolder();
@@ -45,3 +45,12 @@ it("clear files ", () => {
   expect(existsSync(`${folder}/next_0.m3u8`)).toBeFalsy();
   expect(existsSync(`${folder}/next_1.m3u8`)).toBeFalsy();
 } );
+
+function getOrCreateTmpFolder() {
+  const tmp = join(__dirname, "..", "..", "..", "..", "tests", "tmp");
+
+  if (!existsSync(tmp))
+    mkdirSync(tmp);
+
+  return tmp;
+}

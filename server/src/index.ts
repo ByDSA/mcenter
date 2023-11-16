@@ -1,3 +1,6 @@
+import { assertIsDefined } from "#shared/utils/validation";
+import dotenv from "dotenv";
+import { Server } from "http";
 import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
 import FixerController from "#modules/actions/FixerController";
@@ -6,14 +9,11 @@ import { EpisodeAddNewFileInfosController, EpisodeFileInfoRepository, EpisodePic
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
-import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerController, VLCService } from "#modules/play";
+import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerController } from "#modules/play";
 import { RemotePlayerService, RemotePlayerWebSocketsService } from "#modules/play/remote-player";
 import { VLCWebInterface } from "#modules/play/remote-player/web-interface";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository, StreamRestController } from "#modules/streams";
-import { assertIsDefined } from "#shared/utils/validation";
-import dotenv from "dotenv";
-import { Server } from "http";
 import { ExpressApp } from "./main";
 import RealDatabase from "./main/db/Database";
 
@@ -39,10 +39,7 @@ import RealDatabase from "./main/db/Database";
     historyListRepository,
     historyEntryRepository: new HistoryEntryRepository(),
   } );
-  const vlcService = new VLCService();
-  const playService = new PlayService( {
-    playerService: vlcService,
-  } );
+  const playService = new PlayService();
   const playSerieController = new PlaySerieController( {
     serieRepository,
     episodeRepository,

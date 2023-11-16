@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { Episode } from "#modules/episodes";
+import { Episode } from "#shared/models/episodes";
 import { assertIsDefined } from "#shared/utils/validation";
 import { MediaElement } from "./player";
 

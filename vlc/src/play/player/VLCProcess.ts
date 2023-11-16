@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
-import { execAndWaitUntilStarted, isRunning, killAll, killProcessByPid } from "#utils/process";
 import * as cp from "child_process";
+import { execAndWaitUntilStarted, isRunning, killAll, killProcessByPid } from "#shared/utils/process/process";
 
 export enum VLCFlag {
     PLAY_AND_EXIT = "--play-and-exit",

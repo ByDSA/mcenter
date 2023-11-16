@@ -1,7 +1,7 @@
-import UnauthorizedError from "#utils/http/validation/UnauthorizedError";
-import UnprocessablEntityError from "#utils/http/validation/UnprocessableEntityError";
 import { XMLParser } from "fast-xml-parser";
 import querystring from "node:querystring";
+import UnauthorizedError from "#utils/http/validation/UnauthorizedError";
+import UnprocessablEntityError from "#utils/http/validation/UnprocessableEntityError";
 import PlaylistResponse, { assertIsPlaylistResponse } from "./PlaylistResponse";
 import StatusQuery from "./StatusQuery";
 import StatusResponse, { assertIsStatusResponse } from "./StatusResponse";
@@ -33,6 +33,11 @@ export default class WebInterface {
     this.#headers = new Headers( {
       Authorization: `Basic ${ btoa(`:${ this.#password }`) }`,
     } );
+  }
+
+  // eslint-disable-next-line require-await, class-methods-use-this
+  async isVlcRunning(): Promise<boolean> {
+    throw new Error("Method not implemented.");
   }
 
   async #fetchSecureWithHeadersJson(file: XMLFile, query?: StatusQuery): Promise<unknown | null> {

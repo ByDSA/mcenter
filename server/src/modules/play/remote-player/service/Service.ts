@@ -1,9 +1,8 @@
 /* eslint-disable no-use-before-define */
-import { VLCProcess } from "#modules/play/player";
-import { VLCWebInterface } from "#modules/play/remote-player/web-interface";
 import { assertIsRemotePlayerStatusResponse, RemotePlayerPlaylistElement, RemotePlayerStatusResponse } from "#shared/models/player";
 import { assertIsDefined } from "#shared/utils/validation";
 import { decode } from "html-entities";
+import { VLCWebInterface } from "../web-interface";
 import PlaylistResponse, { PlaylistELement } from "../web-interface/PlaylistResponse";
 import StatusResponse, { CategoryObject, InfoObject, InfoStatusResponse } from "../web-interface/StatusResponse";
 
@@ -22,7 +21,7 @@ export default class Service {
   }
 
   async getStatusOrFail(): Promise<RemotePlayerStatusResponse> {
-    const isRunning = await VLCProcess.isRunningAsync();
+    const isRunning = await this.#webInterface.isVlcRunning();
     const status: RemotePlayerStatusResponse = {
       running: isRunning,
     };

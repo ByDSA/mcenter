@@ -8,4 +8,4 @@ export {
 
 export {
   default as PlayerServiceMock,
-} from "./PlayerServiceMock";
+} from "../../../../../vlc/src/play/player/tests/PlayerServiceMock";

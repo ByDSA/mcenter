@@ -1,7 +1,7 @@
-import { rootFolder } from "#utils";
-import { FileNotFoundError } from "#utils/fs";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { FileNotFoundError } from "../fs";
+import { rootFolder } from "../nodejs";
 
 function getTestsProjectFolder() {
   const root = rootFolder();

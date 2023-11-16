@@ -27,15 +27,7 @@
       "#utils": ["src/utils"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "tests/**/*.ts",
-    "../vlc/src/play/adapters.ts",
-    "../vlc/src/play/player/tests/PlayerServiceMock.ts",
-    "../vlc/src/play/PlayService.ts",
-    "../shared/src/utils/tests/projectFolders.ts",
-    "../vlc/src/play/PlayServiceMock.ts"
-  ],
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "exclude": ["node_modules"],
   "types": ["node"]
 }

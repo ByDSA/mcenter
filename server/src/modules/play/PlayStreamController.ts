@@ -1,11 +1,11 @@
 /* eslint-disable no-await-in-loop */
+import { assertIsDefined } from "#shared/utils/validation";
+import { Request, Response, Router } from "express";
 import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
 import { HistoryListService } from "#modules/historyLists";
 import { StreamRepository } from "#modules/streams";
-import { assertIsDefined } from "#shared/utils/validation";
 import { Controller } from "#utils/express";
 import { assertFound } from "#utils/http/validation";
-import { Request, Response, Router } from "express";
 import PlayService from "./PlayService";
 
 type Params = {

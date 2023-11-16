@@ -1,3 +1,14 @@
+import { deepFreeze, deepMerge } from "#shared/utils/objects";
+import { OptionalPropsRecursive, PublicMethodsOf } from "#shared/utils/types";
+import { assertIsDefined, isDefined } from "#shared/utils/validation";
+import cors from "cors";
+import express, { NextFunction, Request, Response } from "express";
+import helmet from "helmet";
+import schedule from "node-schedule";
+import { execSync } from "node:child_process";
+import fs from "node:fs";
+import { Server } from "node:http";
+import serveIndex from "serve-index";
 import ActionController from "#modules/actions/ActionController";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeRepository, EpisodeRestController } from "#modules/episodes";
@@ -8,20 +19,9 @@ import { PlaySerieController, PlayStreamController, RemotePlayerController } fro
 import { RemotePlayerWebSocketsService } from "#modules/play/remote-player";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository, StreamRestController } from "#modules/streams";
-import { deepFreeze, deepMerge } from "#shared/utils/objects";
-import { OptionalPropsRecursive, PublicMethodsOf } from "#shared/utils/types";
-import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import ForbiddenError from "#utils/http/validation/ForbiddenError";
 import { Database } from "#utils/layers/db";
-import cors from "cors";
-import express, { NextFunction, Request, Response } from "express";
-import helmet from "helmet";
-import schedule from "node-schedule";
-import { execSync } from "node:child_process";
-import fs from "node:fs";
-import { Server } from "node:http";
-import serveIndex from "serve-index";
 
 export type ExpressAppDependencies = {
   db: {

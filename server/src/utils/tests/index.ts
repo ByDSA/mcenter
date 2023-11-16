@@ -1,3 +1,0 @@
-export {
-  getOrCreateTmpFolder,
-} from "./projectFolders";
