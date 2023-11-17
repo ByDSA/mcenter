@@ -1,7 +1,7 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import WebSocketsService from "../WebSocketsService";
+import WebSocketsFrontServerService from "../WebSocketsFrontServerService";
 
-export default class WebSocketsServiceMock implements PublicMethodsOf<WebSocketsService> {
+export default class WebSocketsServiceMock implements PublicMethodsOf<WebSocketsFrontServerService> {
   onPauseToggle = jest.fn();
 
   onNext = jest.fn();

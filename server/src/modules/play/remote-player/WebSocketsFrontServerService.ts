@@ -6,10 +6,10 @@ import { Server, Socket } from "socket.io";
 import { Service } from "./service";
 
 type Params = {
-  remotePlayerService: Service;
+  remoteFrontPlayerService: Service;
   getHttpServer: ()=> HttpServer;
 };
-export default class WebSocketsService {
+export default class WebSocketsFrontServerService {
   #io: Server | undefined;
 
   #remotePlayerService: Service;
@@ -18,7 +18,7 @@ export default class WebSocketsService {
 
   #status: RemotePlayerStatusResponse | undefined;
 
-  constructor( {getHttpServer, remotePlayerService}: Params) {
+  constructor( {getHttpServer, remoteFrontPlayerService: remotePlayerService}: Params) {
     this.#getHttpServer = getHttpServer;
     this.#remotePlayerService = remotePlayerService;
 

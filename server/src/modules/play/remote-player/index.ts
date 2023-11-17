@@ -1,11 +1,11 @@
 export {
-  default as RemotePlayerController,
+  default as RemoteFrontPlayerController,
 } from "./Controller";
 
 export {
-  Service as RemotePlayerService,
+  Service as RemoteFrontPlayerService,
 } from "./service";
 
 export {
-  default as RemotePlayerWebSocketsService,
-} from "./WebSocketsService";
+  default as RemoteFrontPlayerWebSocketsServerService,
+} from "./WebSocketsFrontServerService";

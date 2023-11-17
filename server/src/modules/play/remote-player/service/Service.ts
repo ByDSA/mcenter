@@ -1,40 +1,40 @@
 /* eslint-disable no-use-before-define */
 import { assertIsRemotePlayerStatusResponse, RemotePlayerPlaylistElement, RemotePlayerStatusResponse } from "#shared/models/player";
+import { CategoryObject, InfoObject, PlaylistELement, PlaylistResponse, StatusResponse } from "#shared/models/vlc";
+import { InfoStatusResponse } from "#shared/models/vlc/responses/StatusResponse";
 import { assertIsDefined } from "#shared/utils/validation";
 import { decode } from "html-entities";
-import { VLCWebInterface } from "../web-interface";
-import PlaylistResponse, { PlaylistELement } from "../web-interface/PlaylistResponse";
-import StatusResponse, { CategoryObject, InfoObject, InfoStatusResponse } from "../web-interface/StatusResponse";
+import VlcBackService from "./VlcBackService";
 
 type Obj = {
   [key: string]: string;
 };
 
 type Params = {
-  webInterface: VLCWebInterface;
+  vlcBackService: VlcBackService;
 };
 export default class Service {
-  #webInterface: VLCWebInterface;
+  vlcBackService: VlcBackService;
 
-  constructor( {webInterface}: Params) {
-    this.#webInterface = webInterface;
+  constructor( {vlcBackService: webInterface}: Params) {
+    this.vlcBackService = webInterface;
   }
 
   async getStatusOrFail(): Promise<RemotePlayerStatusResponse> {
-    const isRunning = await this.#webInterface.isVlcRunning();
+    const isRunning = await this.vlcBackService.isVlcRunning();
     const status: RemotePlayerStatusResponse = {
       running: isRunning,
     };
     let remoteStatus: StatusResponse | undefined;
     let remotePlaylist: PlaylistResponse | undefined;
-    const promise1 = this.#webInterface.fetchSecureShowStatus()
+    const promise1 = this.vlcBackService.fetchSecureShowStatus()
       .then((s) => {
         if (!s)
           return;
 
         remoteStatus = s;
       } );
-    const promise2 = this.#webInterface.fetchSecurePlaylist()
+    const promise2 = this.vlcBackService.fetchSecurePlaylist()
       .then(p => {
         if (!p)
           return;
@@ -146,7 +146,7 @@ export default class Service {
   }
 
   async pauseToggle() {
-    const ret = await this.#webInterface.fetchSecureTogglePause();
+    const ret = await this.vlcBackService.fetchSecureTogglePause();
 
     if (!ret)
       return null;
@@ -157,29 +157,29 @@ export default class Service {
   }
 
   async getPlaylist() {
-    const ret = await this.#webInterface.fetchSecurePlaylist();
+    const ret = await this.vlcBackService.fetchSecurePlaylist();
 
     return ret;
   }
 
   async next(): Promise<void> {
-    await this.#webInterface.fetchSecureNext();
+    await this.vlcBackService.fetchSecureNext();
   }
 
   async previous(): Promise<void> {
-    await this.#webInterface.fetchSecurePrevious();
+    await this.vlcBackService.fetchSecurePrevious();
   }
 
   async stop(): Promise<void> {
-    await this.#webInterface.fetchSecureStop();
+    await this.vlcBackService.fetchSecureStop();
   }
 
   async toggleFullScreen(): Promise<void> {
-    await this.#webInterface.fetchSecureToggleFullscreen();
+    await this.vlcBackService.fetchSecureToggleFullscreen();
   }
 
   async seek(val: number | string): Promise<TimeRet | null> {
-    const res = await this.#webInterface.fetchSecureSeek(val);
+    const res = await this.vlcBackService.fetchSecureSeek(val);
 
     if (!res)
       return null;
@@ -190,7 +190,7 @@ export default class Service {
   }
 
   async play(id: number): Promise<void> {
-    await this.#webInterface.fetchPlay(id);
+    await this.vlcBackService.fetchPlay(id);
   }
 }
 

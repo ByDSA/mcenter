@@ -41,12 +41,7 @@ module.exports = {
         capIsConstructor: false,
       },
     ],
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        devDependencies: ["**/*.{test,spec}.{ts,tsx}", "**/test/**"],
-      },
-    ],
+    "import/no-extraneous-dependencies": "off",
     "no-useless-constructor": "off",
     "no-empty-function": [
       "error",

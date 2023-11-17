@@ -1,5 +1,4 @@
 import * as dotenv from "dotenv";
-import mongoose from "mongoose";
 import { existsSync } from "node:fs";
 // eslint-disable-next-line import/no-relative-packages
 import { isDebugging } from "../shared/src/utils/vscode";
@@ -13,11 +12,9 @@ if (!isDebugging()) {
 const envFilePath = "tests/.env";
 
 if (!existsSync(envFilePath))
-  throw new Error(`File ${envFilePath} does not exist`);
-
-dotenv.config( {
-  path: envFilePath,
-} );
-
-mongoose.set("bufferCommands", false); // Para que lance error si no hay una conexión a la DB
-mongoose.set("autoCreate", false); // disable `autoCreate` since `bufferCommands` is false, value)
+  console.log(`File ${envFilePath} does not exist`);
+else {
+  dotenv.config( {
+    path: envFilePath,
+  } );
+}

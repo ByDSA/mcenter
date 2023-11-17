@@ -1,10 +1,9 @@
+import { PlaylistResponse, StatusResponse, assertIsPlaylistResponse, assertIsStatusResponse } from "#shared/models/vlc";
 import { XMLParser } from "fast-xml-parser";
 import querystring from "node:querystring";
 import UnauthorizedError from "#utils/http/validation/UnauthorizedError";
 import UnprocessablEntityError from "#utils/http/validation/UnprocessableEntityError";
-import PlaylistResponse, { assertIsPlaylistResponse } from "./PlaylistResponse";
 import StatusQuery from "./StatusQuery";
-import StatusResponse, { assertIsStatusResponse } from "./StatusResponse";
 
 enum XMLFile {
   status = "status.xml",

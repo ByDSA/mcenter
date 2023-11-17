@@ -1,6 +1,6 @@
 
-import { Controller, SecureRouter } from "#utils/express";
 import { Request, Response, Router } from "express";
+import { Controller, SecureRouter } from "#utils/express";
 
 import { Service } from "./service";
 

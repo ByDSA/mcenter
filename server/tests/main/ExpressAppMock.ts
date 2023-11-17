@@ -1,3 +1,4 @@
+import { deepMerge } from "#shared/utils/objects";
 import { ExpressApp } from "#main";
 import { ExpressAppDependencies } from "#main/ExpressApp";
 import { ActionControllerMock } from "#modules/actions/test";
@@ -8,7 +9,6 @@ import { PickerControllerMock } from "#modules/picker/tests";
 import { PlayStatusControllerMock, WebSocketsServiceMock } from "#modules/play/remote-player/tests";
 import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
 import { StreamRestControllerMock } from "#modules/streams/controllers/test";
-import { deepMerge } from "#shared/utils/objects";
 import { TestMongoDatabase } from "./db";
 import TestDatabase from "./db/TestDatabase";
 

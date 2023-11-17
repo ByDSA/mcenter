@@ -16,7 +16,7 @@ import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerS
 import { HistoryListRepository, HistoryListRestController } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
-import { RemotePlayerWebSocketsService } from "#modules/play/remote-player";
+import { WebSocketsFrontServerService } from "#modules/play/remote-player";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository, StreamRestController } from "#modules/streams";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
@@ -36,7 +36,7 @@ export type ExpressAppDependencies = {
       playStreamController: PublicMethodsOf<PlayStreamController>;
       remotePlayer: {
       controller: PublicMethodsOf<RemotePlayerController>;
-      webSocketsService: PublicMethodsOf<RemotePlayerWebSocketsService>;
+      webSocketsService: PublicMethodsOf<WebSocketsFrontServerService>;
       };
     };
     picker: {

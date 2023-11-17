@@ -11,5 +11,5 @@ export {
 } from "./PlayService";
 
 export {
-  RemotePlayerController,
+  RemoteFrontPlayerController as RemotePlayerController,
 } from "./remote-player";

@@ -10,8 +10,8 @@ import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerController } from "#modules/play";
-import { RemotePlayerService, RemotePlayerWebSocketsService } from "#modules/play/remote-player";
-import { VLCWebInterface } from "#modules/play/remote-player/web-interface";
+import { RemoteFrontPlayerService, RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
+import VlcBackServiceImp from "#modules/play/remote-player/service/VlcBackServiceImp";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository, StreamRestController } from "#modules/streams";
 import { ExpressApp } from "./main";
@@ -87,8 +87,8 @@ import RealDatabase from "./main/db/Database";
           controller: new RemotePlayerController( {
             remotePlayerService,
           } ),
-          webSocketsService: new RemotePlayerWebSocketsService( {
-            remotePlayerService,
+          webSocketsService: new RemoteFrontPlayerWebSocketsServerService( {
+            remoteFrontPlayerService: remotePlayerService,
             getHttpServer: () => app.httpServer as Server,
           } ),
         },
@@ -158,12 +158,9 @@ function genRemotePlayerService() {
   if (port === -1)
     throw new Error("VLC_HTTP_PORT is not defined");
 
-  const webInterface = new VLCWebInterface( {
-    password,
-    port,
-  } );
-  const service = new RemotePlayerService( {
-    webInterface,
+  const vlcBackService = new VlcBackServiceImp();
+  const service = new RemoteFrontPlayerService( {
+    vlcBackService,
   } );
 
   return service;
