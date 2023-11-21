@@ -40,13 +40,13 @@ export default class WebInterface {
       headers: this.#headers,
     } )
       .catch(e => {
-        if (e instanceof TypeError && e.cause instanceof Error && e.cause.toString().includes("ECONNREFUSED")) {
+        if (e instanceof TypeError && e.cause instanceof Error && JSON.stringify(e.cause).includes("ECONNREFUSED")) {
           // console.error(new ServiceUnavailableError(`VLC is not running with the web interface enabled. Trying to fetch: ${url}`));
 
           return null;
         }
 
-        console.error(e);
+        console.error(JSON.stringify(e, null, 2));
 
         return null;
       } );
