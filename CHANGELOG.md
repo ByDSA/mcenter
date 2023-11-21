@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/ByDSA/mcenter/compare/v3.0.0...v3.0.1) (2023-11-21)
+
+
+### Bug Fixes
+
+* implementación correcta de interfaz ([b340899](https://github.com/ByDSA/mcenter/commit/b3408992f8ecbc2fc28513a63bdb768fa40fc06e))
+
 ## [3.0.0](https://github.com/ByDSA/mcenter/compare/v2.12.2...v3.0.0) (2023-11-21)
 
 
