@@ -10,6 +10,8 @@ enum TimeMode {
   REMAINING,
 }
 
+type SeekFunction = (time: number | string)=> Promise<void>;
+
 type Props = {
   meta: {
     title: string;
@@ -60,7 +62,7 @@ export default function MediaPlayer( { meta:{title, artist}, state, volume, time
             <h3 className={styles.artist}>{artist}</h3>
           </header>
           <section>
-            <div className={styles.timeDiv}><span className={styles.time} onClick={onClickChangeMode}>{time1}</span>{progressBar(percentage, player.seek, start, length)}<span className={styles.time} onClick={onClickChangeMode}>{time2}</span></div>
+            <div className={styles.timeDiv}><span className={styles.time} onClick={onClickChangeMode}>{time1}</span>{progressBar(percentage, player.seek.bind(player), start, length)}<span className={styles.time} onClick={onClickChangeMode}>{time2}</span></div>
             <span className={styles.controls}>
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.previous()}><SkipPrevious fontSize="large"/></span>
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.seek(-10)}><FastRewind fontSize="large" /></span>
@@ -79,7 +81,7 @@ export default function MediaPlayer( { meta:{title, artist}, state, volume, time
   );
 }
 
-function progressBar(percentage, seek, start: number, length: number) {
+function progressBar(percentage, seek: SeekFunction, start: number, length: number) {
   const [tooltipText, setTooltipText] = useState("");
   const [tooltipPosition, setTooltipPosition] = useState( {
     top: 0,
@@ -122,7 +124,7 @@ function progressBar(percentage, seek, start: number, length: number) {
   );
 }
 
-function progressBarOnClick(seek: (p: number | string)=> void, start: number, length: number) {
+function progressBarOnClick(seek: SeekFunction, start: number, length: number) {
   return (e) => {
     const rect = e.target.getBoundingClientRect();
     const x = e.clientX - rect.left;
