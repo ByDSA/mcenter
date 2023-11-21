@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.3](https://github.com/ByDSA/mcenter/compare/v3.0.2...v3.0.3) (2023-11-21)
+
+
+### Bug Fixes
+
+* **front:** toggle pause button ([0170370](https://github.com/ByDSA/mcenter/commit/017037021fd0ac4901c5e24013b4764e0961943b))
+
 ### [3.0.2](https://github.com/ByDSA/mcenter/compare/v3.0.1...v3.0.2) (2023-11-21)
 
 
