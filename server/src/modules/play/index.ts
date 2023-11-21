@@ -11,9 +11,5 @@ export {
 } from "./PlayService";
 
 export {
-  default as VLCService,
-} from "./player/PlayerService";
-
-export {
-  RemotePlayerController,
+  RemoteFrontPlayerController as RemotePlayerController,
 } from "./remote-player";

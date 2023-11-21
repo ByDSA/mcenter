@@ -3,7 +3,7 @@ import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { Stream, StreamId, StreamMode, StreamRepository } from "#modules/streams";
-import { assertFound } from "#utils/http/validation";
+import { assertFound } from "#shared/utils/http/validation";
 import { Episode } from "..";
 import { Repository } from "../repositories";
 import { GetManyOptions } from "../repositories/Repository";

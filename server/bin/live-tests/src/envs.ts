@@ -67,13 +67,8 @@ export const serverEnvSchema = z.object( {
   PICKER_MIN_DAYS: z.string().refine(...isStringPositiveIntegerRefine()),
   PICKER_MIN_WEIGHT: z.string().refine(...isStringIntegerRefine()),
 
-  MEDIA_PATH: z.string().url()
-    .or(z.string().refine(...isAbsolutePathFileRefine())),
   MEDIA_FOLDER_PATH: z.string().refine(...isAbsolutePathFileRefine()),
   TMP_PATH: z.string(),
-
-  VLC_HTTP_PORT: z.string().refine(isPort),
-  VLC_HTTP_PASSWORD: z.string(),
 } );
 
 export const serverEnvs: z.infer<typeof serverEnvSchema> = process.env as any;

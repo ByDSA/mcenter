@@ -1,36 +1,29 @@
 
 import { Controller, SecureRouter } from "#utils/express";
 import { Request, Response, Router } from "express";
-
-import { Service } from "./service";
+import { VlcBackWebSocketsServerService } from "./vlc-back-service";
 
 type Params = {
-  remotePlayerService: Service;
+  remotePlayerService: VlcBackWebSocketsServerService;
 };
 export default class RemotePlayerController implements Controller {
-  #service: Service;
+  #vlcBackService: VlcBackWebSocketsServerService;
 
   constructor( {remotePlayerService}: Params) {
-    this.#service = remotePlayerService;
+    this.#vlcBackService = remotePlayerService;
   }
 
-  async getStatus(_: Request, res: Response) {
-    const status = await this.#service.getStatusOrFail();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getStatus(_: Request, _res: Response) {
+    throw new Error("Not implemented");
 
-    res.send(status);
-  }
-
-  async getPlaylist(_: Request, res: Response) {
-    const ret = await this.#service.getPlaylist();
-
-    res.send(ret);
+    // res.send(status);
   }
 
   getRouter(): Router {
     const router = SecureRouter();
 
     router.get("/status", this.getStatus.bind(this));
-    router.get("/playlist", this.getPlaylist.bind(this));
 
     return router;
   }

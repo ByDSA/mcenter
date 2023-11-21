@@ -1,4 +1,16 @@
 export {
-  PlaylistElement as RemotePlayerPlaylistElement, RemotePlayerStatusResponse,
-  assertIsRemotePlayerStatusResponse,
-} from "./remote-player";
+  default as PlayerStatusResponse,
+  assertIsStatusResponse as assertIsPlayerStatusResponse,
+} from "./StatusResponse";
+
+export {
+  default as PlayerPlaylistElement,
+} from "./PlaylistElement";
+
+export {
+  PlayResourceMessage, WebSocketsEvents as PlayerEvent,
+} from "./web-sockets";
+
+export {
+  default as Player, PlayerActions, PlayerActionsReceiver,
+} from "./Player";

@@ -5,14 +5,14 @@ import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerS
 import { HistoryListRepository, HistoryListRestController } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
-import { RemotePlayerWebSocketsService } from "#modules/play/remote-player";
+import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository, StreamRestController } from "#modules/streams";
+import { ForbiddenError } from "#shared/utils/http";
 import { deepFreeze, deepMerge } from "#shared/utils/objects";
 import { OptionalPropsRecursive, PublicMethodsOf } from "#shared/utils/types";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
-import ForbiddenError from "#utils/http/validation/ForbiddenError";
 import { Database } from "#utils/layers/db";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
@@ -36,7 +36,7 @@ export type ExpressAppDependencies = {
       playStreamController: PublicMethodsOf<PlayStreamController>;
       remotePlayer: {
       controller: PublicMethodsOf<RemotePlayerController>;
-      webSocketsService: PublicMethodsOf<RemotePlayerWebSocketsService>;
+      webSocketsService: PublicMethodsOf<RemoteFrontPlayerWebSocketsServerService>;
       };
     };
     picker: {

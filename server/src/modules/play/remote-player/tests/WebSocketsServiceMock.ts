@@ -1,7 +1,7 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import WebSocketsService from "../WebSocketsService";
+import WebSocketsFrontServerService from "../RemoteFrontPlayerWebSocketsServerService";
 
-export default class WebSocketsServiceMock implements PublicMethodsOf<WebSocketsService> {
+export default class WebSocketsServiceMock implements PublicMethodsOf<WebSocketsFrontServerService> {
   onPauseToggle = jest.fn();
 
   onNext = jest.fn();
@@ -17,4 +17,6 @@ export default class WebSocketsServiceMock implements PublicMethodsOf<WebSockets
   startSocket = jest.fn();
 
   emitStatus = jest.fn();
+
+  onFullscreenToggle = jest.fn();
 }

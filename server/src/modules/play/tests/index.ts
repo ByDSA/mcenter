@@ -5,7 +5,3 @@ export {
 export {
   default as PlayStreamControllerMock,
 } from "./PlayStreamControllerMock";
-
-export {
-  default as PlayerServiceMock,
-} from "./PlayerServiceMock";

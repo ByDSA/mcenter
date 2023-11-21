@@ -1,7 +1,5 @@
-export * from "./fs";
+export * from "#sharedSrc/utils/process";
 
-export * from "./process";
-
-export * from "./nodejs";
+export * from "#sharedSrc/utils/nodejs";
 
 export * from "./Utils";

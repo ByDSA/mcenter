@@ -1,6 +1,6 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import PlayerService from "../player/PlayerService";
+import PlayService from "../PlayService";
 
-export default class PlayServiceMock implements PublicMethodsOf<PlayerService> {
+export default class PlayServiceMock implements PublicMethodsOf<PlayService> {
   play = jest.fn();
 }

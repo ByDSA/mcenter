@@ -2,31 +2,31 @@
 import { Episode } from "#modules/episodes";
 import { PublicMethodsOf } from "#shared/utils/types";
 import { assertIsNotEmpty } from "#shared/utils/validation";
-import { episodeToMediaElement } from "./adapters";
-import { MediaElement, PlayerService } from "./player";
+import { VlcBackWebSocketsServerService as PlayerWebSocketsServerService } from "./remote-player";
+
+type Params = {
+  playerWebSocketsServerService: PublicMethodsOf<PlayerWebSocketsServerService>;
+};
 
 type PlayParams = {
   force?: boolean;
   episodes: Episode[];
 };
-type Params = {
-  playerService: PublicMethodsOf<PlayerService>;
-};
 export default class PlayService {
-  #playerService: PublicMethodsOf<PlayerService>;
+  #vlcBackWebSocketsServerService: PublicMethodsOf<PlayerWebSocketsServerService>;
 
-  constructor( {playerService}: Params) {
-    this.#playerService = playerService;
+  constructor( {playerWebSocketsServerService}: Params) {
+    this.#vlcBackWebSocketsServerService = playerWebSocketsServerService;
   }
 
   async play( {episodes, force}: PlayParams): Promise<boolean> {
     assertIsNotEmpty(episodes);
 
-    const elements: MediaElement[] = episodes.map(episodeToMediaElement);
-    const ok = await this.#playerService.play(elements, {
-      openNewInstance: force ?? false,
+    this.#vlcBackWebSocketsServerService.playResource( {
+      resources: episodes,
+      force,
     } );
 
-    return ok;
+    return true;
   }
 }
