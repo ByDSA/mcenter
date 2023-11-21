@@ -17,3 +17,6 @@ pnpm build
 
 cd ../server
 pnpm build
+
+cd ../vlc
+pnpm build
