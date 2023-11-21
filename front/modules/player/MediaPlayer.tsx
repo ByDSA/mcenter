@@ -64,7 +64,7 @@ export default function MediaPlayer( { meta:{title, artist}, state, volume, time
             <span className={styles.controls}>
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.previous()}><SkipPrevious fontSize="large"/></span>
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.seek(-10)}><FastRewind fontSize="large" /></span>
-              {playPauseButton(state, player.pauseToggle)}
+              {playPauseButton(state, () =>player.pauseToggle())}
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.seek("+10")}><FastForwardIcon fontSize="large"/></span>
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.next()}><SkipNext fontSize="large" /></span>
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.stop()}><Stop fontSize="large" /></span>
@@ -175,8 +175,8 @@ function timeRepresentation(time: number, length: number) {
   };
 }
 
-function playPauseButton(state: string | undefined, pauseToggle): React.JSX.Element {
-  let contentStr;
+function playPauseButton(state: string | undefined, pauseToggle: ()=> Promise<void>): React.JSX.Element {
+  let contentStr: React.JSX.Element;
 
   if (state === "playing")
     contentStr = <Pause fontSize="large"/>;
