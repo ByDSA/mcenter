@@ -1,5 +1,5 @@
 import { Episode, EpisodeFullId, EpisodeRepository, compareEpisodeFullId } from "#modules/episodes";
-import { assertFound } from "#utils/http/validation";
+import { assertFound } from "#shared/utils/http/validation";
 import { Entry, Model, ModelId, createHistoryEntryByEpisodeFullId } from "./models";
 import { ListRepository } from "./repositories";
 import EntryRepository from "./repositories/EntryRepository";

@@ -1,3 +1,4 @@
 .env
 .log
 *.m3u8
+/coverage

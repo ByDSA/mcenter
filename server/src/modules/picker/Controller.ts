@@ -8,9 +8,9 @@ import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/seri
 import SerieService from "#modules/series/SerieService";
 import { StreamRepository } from "#modules/streams";
 import { asyncMap } from "#shared/utils/arrays";
+import { assertFound } from "#shared/utils/http/validation";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
-import { assertFound } from "#utils/http/validation";
 import express, { Request, Response } from "express";
 
 type ResultType = Episode & {

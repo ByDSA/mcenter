@@ -1,9 +1,10 @@
+/* eslint-disable require-await */
 import { getBackendUrl } from "#modules/utils";
-import { RemotePlayerStatusResponse, assertIsRemotePlayerStatusResponse } from "#shared/models/player";
-import { RemotePlayerWebSocketsEvents } from "#shared/models/player/remote-player";
+import { PlayerEvent, PlayerStatusResponse, assertIsPlayerStatusResponse } from "#shared/models/player";
+import { PlayResourceParams, PlayerActions } from "#shared/models/player/Player";
 import { Socket, io } from "socket.io-client";
 
-export default abstract class WebSocketsClient {
+export default abstract class WebSocketsClient implements PlayerActions {
   socket: Socket;
 
   // eslint-disable-next-line class-methods-use-this
@@ -15,40 +16,48 @@ export default abstract class WebSocketsClient {
       path: "/ws/",
     } );
 
-    this.socket.on(RemotePlayerWebSocketsEvents.CONNECT, () => {
+    this.socket.on(PlayerEvent.CONNECT, () => {
       console.log("connected");
       this.socket.emit("join", "player");
     } );
 
-    this.socket.on(RemotePlayerWebSocketsEvents.STATUS, (data: RemotePlayerStatusResponse) => {
-      assertIsRemotePlayerStatusResponse(data);
+    this.socket.on(PlayerEvent.STATUS, (data: PlayerStatusResponse) => {
+      assertIsPlayerStatusResponse(data);
       this.onStatus(data);
     } );
   }
 
-  abstract onStatus(status: RemotePlayerStatusResponse): void;
+  abstract onStatus(status: PlayerStatusResponse): void;
 
-  emitPauseToggle() {
-    this.socket.emit(RemotePlayerWebSocketsEvents.PAUSE_TOGGLE, null);
+  playResource(params: PlayResourceParams): Promise<boolean> {
+    throw new Error("Method not implemented.");
   }
 
-  emitNext() {
-    this.socket.emit(RemotePlayerWebSocketsEvents.NEXT, null);
+  fullscreenToggle(): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 
-  emitPrevious() {
-    this.socket.emit(RemotePlayerWebSocketsEvents.PREVIOUS, null);
+  async pauseToggle() {
+    this.socket.emit(PlayerEvent.PAUSE_TOGGLE, null);
   }
 
-  emitStop() {
-    this.socket.emit(RemotePlayerWebSocketsEvents.STOP, null);
+  async next() {
+    this.socket.emit(PlayerEvent.NEXT, null);
   }
 
-  emitSeek(val: number | string) {
-    this.socket.emit(RemotePlayerWebSocketsEvents.SEEK, val);
+  async previous() {
+    this.socket.emit(PlayerEvent.PREVIOUS, null);
   }
 
-  emitPlay(id?: number | string) {
-    this.socket.emit(RemotePlayerWebSocketsEvents.PLAY, id);
+  async stop() {
+    this.socket.emit(PlayerEvent.STOP, null);
+  }
+
+  async seek(val: number | string) {
+    this.socket.emit(PlayerEvent.SEEK, val);
+  }
+
+  async play(id?: number | string) {
+    this.socket.emit(PlayerEvent.PLAY, id);
   }
 }

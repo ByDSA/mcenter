@@ -1,5 +1,5 @@
+import { HttpError } from "#shared/utils/http";
 import { isDebugging } from "#shared/utils/vscode";
-import HttpError from "#utils/http/validation/HttpError";
 import { NextFunction, Request, Response } from "express";
 
 const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {

@@ -1,10 +1,10 @@
 import { EpisodeRepository } from "#modules/episodes";
 import { SerieRepository } from "#modules/series";
 import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest } from "#shared/models/episodes";
+import { assertFound } from "#shared/utils/http/validation";
 import { PublicMethodsOf } from "#shared/utils/types";
 import { neverCase } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
-import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
 import express, { Response, Router } from "express";
 import { Serie } from "#sharedSrc/models/series";

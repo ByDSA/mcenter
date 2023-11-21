@@ -1,6 +1,3 @@
-import { assertIsDefined } from "#shared/utils/validation";
-import dotenv from "dotenv";
-import { Server } from "http";
 import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
 import FixerController from "#modules/actions/FixerController";
@@ -10,10 +7,12 @@ import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerController } from "#modules/play";
-import { RemoteFrontPlayerService, RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
-import VlcBackServiceImp from "#modules/play/remote-player/service/VlcBackServiceImp";
+import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
+import { VlcBackWebSocketsServerService } from "#modules/play/remote-player/vlc-back-service";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository, StreamRestController } from "#modules/streams";
+import dotenv from "dotenv";
+import { Server } from "http";
 import { ExpressApp } from "./main";
 import RealDatabase from "./main/db/Database";
 
@@ -39,7 +38,13 @@ import RealDatabase from "./main/db/Database";
     historyListRepository,
     historyEntryRepository: new HistoryEntryRepository(),
   } );
-  const playService = new PlayService();
+  const getHttpServer = () => app.httpServer as Server;
+  const vlcBackWebSocketsServerService = new VlcBackWebSocketsServerService( {
+    getHttpServer,
+  } );
+  const playService = new PlayService( {
+    playerWebSocketsServerService: vlcBackWebSocketsServerService,
+  } );
   const playSerieController = new PlaySerieController( {
     serieRepository,
     episodeRepository,
@@ -59,7 +64,6 @@ import RealDatabase from "./main/db/Database";
     episodePickerService,
     historyListService,
   } );
-  const remotePlayerService = genRemotePlayerService();
   const fixerController = new FixerController( {
     episodeRepository,
     serieRepository,
@@ -85,11 +89,11 @@ import RealDatabase from "./main/db/Database";
         remotePlayer:
         {
           controller: new RemotePlayerController( {
-            remotePlayerService,
+            remotePlayerService: vlcBackWebSocketsServerService,
           } ),
           webSocketsService: new RemoteFrontPlayerWebSocketsServerService( {
-            remoteFrontPlayerService: remotePlayerService,
-            getHttpServer: () => app.httpServer as Server,
+            vlcBackService: vlcBackWebSocketsServerService,
+            getHttpServer,
           } ),
         },
       },
@@ -148,20 +152,3 @@ import RealDatabase from "./main/db/Database";
   await app.init();
   app.listen();
 } )();
-
-function genRemotePlayerService() {
-  const password = process.env.VLC_HTTP_PASSWORD;
-  const port = +(process.env.VLC_HTTP_PORT ?? -1);
-
-  assertIsDefined(password, "VLC_HTTP_PASSWORD");
-
-  if (port === -1)
-    throw new Error("VLC_HTTP_PORT is not defined");
-
-  const vlcBackService = new VlcBackServiceImp();
-  const service = new RemoteFrontPlayerService( {
-    vlcBackService,
-  } );
-
-  return service;
-}

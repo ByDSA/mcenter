@@ -1,16 +1,29 @@
-import WebSocketsService from "./play/WebSocketsService";
+import { getEnvs } from "./Envs";
+import { WebSocketsService } from "./modules/ws-client";
 
 type Params = {
   webSocketsService: WebSocketsService;
 };
 export default class App {
-  #webSocketsService: WebSocketsService;
+  #webSocketsService: WebSocketsService | undefined;
 
-  constructor( {webSocketsService}: Params) {
+  constructor() {
+  }
+
+  addDependencies( {webSocketsService}: Params) {
     this.#webSocketsService = webSocketsService;
   }
 
-  start() {
-    setTimeout(this.#webSocketsService.startSocket.bind(this.#webSocketsService), 0); // Porque sino intenta acceder síncronamente a 'app.httpServer' antes de que se haya creado
+  async start() {
+    if (!this.#webSocketsService)
+      throw new Error("webSocketsService is not defined");
+
+    const {WS_SERVER_HOST: host, WS_SERVER_PATH: path, WS_SERVER_PORT: port} = getEnvs();
+
+    await this.#webSocketsService.startSocket( {
+      host,
+      port,
+      path,
+    } );
   }
 }

@@ -1,3 +1,4 @@
+import { PlayerActions } from "#shared/models/player";
 import { FastRewind, Pause, SkipNext, SkipPrevious, Stop } from "@mui/icons-material";
 import FastForwardIcon from "@mui/icons-material/FastForward";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -22,16 +23,10 @@ type Props = {
     length: number;
   };
   length?: string;
-  actions: {
-    pauseToggle: ()=> void;
-    previous: ()=> void;
-    next: ()=> void;
-    stop: ()=> void;
-    seek: (time: number | string)=> void;
-  };
+  player: PlayerActions;
 };
 
-export default function MediaPlayer( { meta:{title, artist}, state, volume, time:{current = 0, start = 0, length}, actions: {previous, next, stop, seek, pauseToggle} }: Props) {
+export default function MediaPlayer( { meta:{title, artist}, state, volume, time:{current = 0, start = 0, length}, player }: Props) {
   const currentStartFixed = current - start;
   const {current: currentTime, endsAt, remaining, length: lengthStr} = timeRepresentation(currentStartFixed, length);
   const percentage = length !== undefined ? (currentStartFixed / length) * 100 : 0;
@@ -65,14 +60,14 @@ export default function MediaPlayer( { meta:{title, artist}, state, volume, time
             <h3 className={styles.artist}>{artist}</h3>
           </header>
           <section>
-            <div className={styles.timeDiv}><span className={styles.time} onClick={onClickChangeMode}>{time1}</span>{progressBar(percentage, seek, start, length)}<span className={styles.time} onClick={onClickChangeMode}>{time2}</span></div>
+            <div className={styles.timeDiv}><span className={styles.time} onClick={onClickChangeMode}>{time1}</span>{progressBar(percentage, player.seek, start, length)}<span className={styles.time} onClick={onClickChangeMode}>{time2}</span></div>
             <span className={styles.controls}>
-              <span className={`${styles.btn} btnClickable`} onClick={()=>previous()}><SkipPrevious fontSize="large"/></span>
-              <span className={`${styles.btn} btnClickable`} onClick={()=>seek(-10)}><FastRewind fontSize="large" /></span>
-              {playPauseButton(state, pauseToggle)}
-              <span className={`${styles.btn} btnClickable`} onClick={()=>seek("+10")}><FastForwardIcon fontSize="large"/></span>
-              <span className={`${styles.btn} btnClickable`} onClick={()=>next()}><SkipNext fontSize="large" /></span>
-              <span className={`${styles.btn} btnClickable`} onClick={()=>stop()}><Stop fontSize="large" /></span>
+              <span className={`${styles.btn} btnClickable`} onClick={()=>player.previous()}><SkipPrevious fontSize="large"/></span>
+              <span className={`${styles.btn} btnClickable`} onClick={()=>player.seek(-10)}><FastRewind fontSize="large" /></span>
+              {playPauseButton(state, player.pauseToggle)}
+              <span className={`${styles.btn} btnClickable`} onClick={()=>player.seek("+10")}><FastForwardIcon fontSize="large"/></span>
+              <span className={`${styles.btn} btnClickable`} onClick={()=>player.next()}><SkipNext fontSize="large" /></span>
+              <span className={`${styles.btn} btnClickable`} onClick={()=>player.stop()}><Stop fontSize="large" /></span>
             </span>
             <span className={styles.controlsVolume}>
               <span className={`${styles.btn} btnClickable`}>-</span> <span>{Math.round(((volume ?? 0) / 256) * 100)}%</span> <span className={`${styles.btn} btnClickable`}>+</span><br/>

@@ -1,21 +1,23 @@
-import { Application } from "express";
-import request from "supertest";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeRepository } from "#modules/episodes";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
+import { PublicMethodsOf } from "#shared/utils/types";
 import { TestMongoDatabase } from "#tests/main";
 import TestDatabase from "#tests/main/db/TestDatabase";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
-import PlayService from "../../../../vlc/src/play/PlayService";
+import { Application } from "express";
+import request from "supertest";
 import PlaySerieController from "./PlaySerieController";
-import { PlayerServiceMock } from "./tests";
+import PlayService from "./PlayService";
+import { VlcBackWebSocketsServerService } from "./remote-player/vlc-back-service";
+import PlayerBackWebSocketsServiceMock from "./remote-player/vlc-back-service/tests/PlayerBackWebSocketsServiceMock";
 
 describe("PlaySerieController", () => {
   let playSerieController: PlaySerieController;
-  let playerServiceMock: PlayerServiceMock;
+  let playerServiceMock: PublicMethodsOf<VlcBackWebSocketsServerService>;
   let routerApp: Application;
   let db: TestDatabase;
 
@@ -40,9 +42,9 @@ describe("PlaySerieController", () => {
       historyEntryRepository: new HistoryEntryRepository(),
     } );
 
-    playerServiceMock = new PlayerServiceMock();
+    playerServiceMock = new PlayerBackWebSocketsServiceMock();
     const playService = new PlayService( {
-      playerService: playerServiceMock,
+      playerWebSocketsServerService: playerServiceMock,
     } );
 
     playSerieController = new PlaySerieController( {

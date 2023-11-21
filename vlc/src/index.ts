@@ -1,16 +1,23 @@
-import express from "express";
 import App from "./App";
-import WebSocketsService from "./play/WebSocketsService";
+import { getEnvs } from "./Envs";
+import { PlayerService } from "./modules/player-service";
+import { VLCProcessService } from "./modules/vlc";
+import { VLCWebInterface } from "./modules/vlc/http-interface";
+import { WebSocketsService } from "./modules/ws-client";
 
-const expressApp = express();
-const httpServer = expressApp.listen(3000, () => {
-  console.log("Listening on port 3000");
-} );
+const app = new App();
 const webSocketsService = new WebSocketsService( {
-  getHttpServer: () => httpServer,
+  playerService: new PlayerService( {
+    playerWebInterfaceService: new VLCWebInterface( {
+      port: getEnvs().VLC_HTTP_PORT,
+      password: getEnvs().VLC_HTTP_PASSWORD,
+      host: "localhost",
+    } ),
+    playerProcessService: new VLCProcessService(),
+  } ),
 } );
-const app = new App( {
+
+app.addDependencies( {
   webSocketsService,
 } );
-
 app.start();

@@ -3,9 +3,9 @@ import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { SerieRepository } from "#modules/series";
 import {HistoryListDeleteOneEntryByIdRequest, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
   HistoryListGetOneByIdRequest} from "#shared/models/historyLists";
+import { assertFound } from "#shared/utils/http/validation";
 import { PublicMethodsOf } from "#shared/utils/types";
 import { Controller, SecureRouter } from "#utils/express";
-import { assertFound } from "#utils/http/validation";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
 import express, { Request, Response, Router } from "express";
 import { Entry, EntryWithId, Model, assertIsEntryWithId } from "../models";

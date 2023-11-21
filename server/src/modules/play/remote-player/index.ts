@@ -3,9 +3,9 @@ export {
 } from "./Controller";
 
 export {
-  Service as RemoteFrontPlayerService,
-} from "./service";
+  VlcBackWebSocketsServerService,
+} from "./vlc-back-service";
 
 export {
   default as RemoteFrontPlayerWebSocketsServerService,
-} from "./WebSocketsFrontServerService";
+} from "./RemoteFrontPlayerWebSocketsServerService";

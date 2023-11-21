@@ -4,13 +4,12 @@ import MediaPlayer from "#modules/player/MediaPlayer";
 import WebSocketsClient from "#modules/player/WebSocketsClient";
 import { getBackendUrl } from "#modules/utils";
 import { Episode, EpisodeGetManyBySearchRequest, assertIsEpisode } from "#shared/models/episodes";
-import { RemotePlayerStatusResponse } from "#shared/models/player";
-import PlaylistELement from "#shared/models/player/remote-player/PlaylistElement";
+import { PlayerPlaylistElement, PlayerStatusResponse } from "#shared/models/player";
 import Loading from "app/loading";
 import React, { useEffect } from "react";
 import styles from "./Player.module.css";
 
-let webSockets: WebSocketsClient | null = null;
+let webSockets: WebSocketsClient | undefined;
 const RESOURCES = [
   "series",
 ];
@@ -24,7 +23,7 @@ export default function Player() {
   const socketInitializer = () => {
     webSockets = new (class A extends WebSocketsClient {
       // eslint-disable-next-line class-methods-use-this
-      onStatus(status: RemotePlayerStatusResponse) {
+      onStatus(status: PlayerStatusResponse) {
         setStatus(status);
 
         const uri = status.status?.playlist?.current?.uri;
@@ -82,7 +81,7 @@ export default function Player() {
   };
 
   useEffect(() => socketInitializer(), []);
-  const [status, setStatus] = React.useState<RemotePlayerStatusResponse | null | undefined>(undefined);
+  const [status, setStatus] = React.useState<PlayerStatusResponse | null | undefined>(undefined);
 
   return (
     <>
@@ -141,7 +140,7 @@ function calcStartLength(statusLength: number | undefined, resource: Episode | n
   };
 }
 
-function statusRepresentaton(status: RemotePlayerStatusResponse, resource: Episode | null = null) {
+function statusRepresentaton(status: PlayerStatusResponse, resource: Episode | null = null) {
   const uri = status?.status?.playlist?.current?.uri;
   let title = "-";
 
@@ -162,10 +161,12 @@ function statusRepresentaton(status: RemotePlayerStatusResponse, resource: Episo
   const time = status?.status?.time ?? 0 - (resourceStart ?? 0);
 
   return <>
-    Estado: {status.running ? "Abierto" : "Cerrado"}
+    Proceso: {status.open ? "Abierto" : "Cerrado"}
+    <br/>
+    Conexión HTTP: {status.status ? "Sí" : "No"}
     <br/>
     {
-      status.running &&
+      status.open && status.status && webSockets &&
       <>
         <MediaPlayer meta={{
           title,
@@ -177,13 +178,7 @@ function statusRepresentaton(status: RemotePlayerStatusResponse, resource: Episo
         }}
         volume={status.status?.volume}
         state={status.status?.state}
-        actions={{
-          pauseToggle,
-          previous,
-          next,
-          stop,
-          seek,
-        }}/>
+        player={webSockets}/>
       </>
     }
     <div className="extra-margin">
@@ -204,7 +199,7 @@ function statusRepresentaton(status: RemotePlayerStatusResponse, resource: Episo
   </>;
 }
 
-function mapElements(array: PlaylistELement[]): React.JSX.Element {
+function mapElements(array: PlayerPlaylistElement[]): React.JSX.Element {
   return <ol className={styles.list} >
     {
       array.filter((_, i)=>i < 10).map((item, index) =>
@@ -214,22 +209,6 @@ function mapElements(array: PlaylistELement[]): React.JSX.Element {
   </ol>;
 }
 
-function pauseToggle() {
-  webSockets?.emitPauseToggle();
-}
-function next() {
-  webSockets?.emitNext();
-}
-function previous() {
-  webSockets?.emitPrevious();
-}
-function stop() {
-  webSockets?.emitStop();
-}
-function seek(val: number | string) {
-  webSockets?.emitSeek(val);
-}
-
 function playId(id: number) {
-  webSockets?.emitPlay(id);
+  webSockets?.play(id);
 }

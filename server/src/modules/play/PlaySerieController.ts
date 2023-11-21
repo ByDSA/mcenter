@@ -1,9 +1,9 @@
-import { Request, Response, Router } from "express";
 import { EpisodeRepository } from "#modules/episodes";
 import { HistoryListService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
+import { assertFound } from "#shared/utils/http/validation";
 import { Controller, SecureRouter } from "#utils/express";
-import { assertFound } from "#utils/http/validation";
+import { Request, Response, Router } from "express";
 import PlayService from "./PlayService";
 
 type Params = {
