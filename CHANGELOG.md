@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.2](https://github.com/ByDSA/mcenter/compare/v3.0.1...v3.0.2) (2023-11-21)
+
+
+### Bug Fixes
+
+* quitar dependencias no usadas en tsconfig en server ([3034340](https://github.com/ByDSA/mcenter/commit/3034340def398457a163b7ef7fb90eb9db5ed36f))
+
 ### [3.0.1](https://github.com/ByDSA/mcenter/compare/v3.0.0...v3.0.1) (2023-11-21)
 
 
