@@ -25,12 +25,16 @@ export default class Service implements PlayerService {
     this.#playerProcessService = playService;
 
     const f = async () => {
+      let nextTime = 100;
+
       try {
-        this.#updateStatusOrFail();
+        if (await this.isRunning() || this.#status?.open)
+          this.#updateStatusOrFail();
       } catch (error) {
         console.error(error);
+        nextTime = 1000;
       }
-      setTimeout(f, 100);
+      setTimeout(f, nextTime);
     };
 
     setTimeout(f, 100);
