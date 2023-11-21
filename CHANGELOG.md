@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.4](https://github.com/ByDSA/mcenter/compare/v3.0.3...v3.0.4) (2023-11-21)
+
+
+### Bug Fixes
+
+* **vlc:** no hacer fetch si no está abierto VLC ([d4aff55](https://github.com/ByDSA/mcenter/commit/d4aff55516b98ae1d58fc7766addbc89abcd55d7))
+
 ### [3.0.3](https://github.com/ByDSA/mcenter/compare/v3.0.2...v3.0.3) (2023-11-21)
 
 
