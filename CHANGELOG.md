@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/ByDSA/mcenter/compare/v2.12.2...v3.0.0) (2023-11-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* split VLC Player into another package (#11)
+
+* split VLC Player into another package ([#11](https://github.com/ByDSA/mcenter/issues/11)) ([9a442c7](https://github.com/ByDSA/mcenter/commit/9a442c74073fadaadca0413c8e74df9ad1a4f7ae))
+
 ### [2.12.2](https://github.com/ByDSA/mcenter/compare/v2.12.1...v2.12.2) (2023-11-16)
 
 
