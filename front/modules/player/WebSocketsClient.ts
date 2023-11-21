@@ -29,10 +29,12 @@ export default abstract class WebSocketsClient implements PlayerActions {
 
   abstract onStatus(status: PlayerStatusResponse): void;
 
-  playResource(params: PlayResourceParams): Promise<boolean> {
+  // eslint-disable-next-line class-methods-use-this
+  playResource(_: PlayResourceParams): Promise<void> {
     throw new Error("Method not implemented.");
   }
 
+  // eslint-disable-next-line class-methods-use-this
   fullscreenToggle(): Promise<void> {
     throw new Error("Method not implemented.");
   }
