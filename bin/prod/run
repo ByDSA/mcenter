@@ -16,6 +16,11 @@ else
   pnpm start &>.log &
 fi
 
+# MCenter VLC
+echo "Runing mcenter VLC ..."
+cd "$ROOT/vlc" || exit
+pnpm start &>.log &
+
 # Mcenter Front
 if sudo netstat -tulpn | grep ":3002 " >/dev/null; then
   echo "Ya está mcenter en ejecución"
