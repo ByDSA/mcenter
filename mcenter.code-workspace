@@ -1,13 +1,19 @@
 {
   "folders": [
     {
-      "path": "./shared"
+      "path": "./packages/shared"
     },
     {
-      "path": "./vlc"
+      "path": "./packages/vlc"
     },
     {
-      "path": "./server"
+      "path": "./packages/server"
+    },
+    {
+      "path": "./packages/front"
+    },
+    {
+      "path": "./bin"
     }
   ],
   "settings": {

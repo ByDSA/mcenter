@@ -43,7 +43,7 @@
   },
   "scripts": {
     "release": "standard-version",
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install packages/.husky",
     "clean:modules": "rm -rf node_modules && cd server && npm clean:modules",
     "lint:eslint": "eslint **/*.{ts,js,tsx,jsx}",
     "lint:prettier": "prettier **/*.{json,jsonc,scss,yml}",
