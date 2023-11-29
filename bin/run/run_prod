@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+ROOT=$DIR/../..
+ROOT_PACKAGES=$ROOT/packages
+
 # muslib
 if sudo netstat -tulpn | grep ":3000 " >/dev/null; then
   echo "Ya está muslib en ejecución"
@@ -10,30 +14,26 @@ else
   npm start &>.log &
 fi
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-
 "$DIR"/run
 
-cd "$DIR"/../..
-
 echo "Running mcenter VLC ..."
-cd vlc
+set +e
 CURRENT_PID=$(pgrep -f packages/vlc)
+set -e
 if [ -n "$CURRENT_PID" ]; then
   echo "Killing previous mcenter VLC listener ..."
   kill "$CURRENT_PID"
 fi
-pnpm i
-pnpm build
+VLC_PATH="$ROOT_PACKAGES"/vlc
+cd "$VLC_PATH" || exit
 pnpm start &>.log &
 
 echo "Running mcenter server live tests ..."
-cd ../server/bin/live-tests || exit
 CURRENT_PID=$(pgrep -f /server/bin/live-tests)
 if [ -n "$CURRENT_PID" ]; then
   echo "Killing mcenter server live tests ..."
   kill "$CURRENT_PID"
 fi
-pnpm i
-pnpm build
+LIVE_TESTS_PATH="$ROOT_PACKAGES"/server/bin/live-tests
+cd "$LIVE_TESTS_PATH" || exit
 pnpm start &>.log &
