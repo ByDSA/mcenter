@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.7](https://github.com/ByDSA/mcenter/compare/v3.0.6...v3.0.7) (2023-11-29)
+
+
+### Bug Fixes
+
+* **server:** conexión con DB desde Docker ([2d68a18](https://github.com/ByDSA/mcenter/commit/2d68a1814dc69ec21be0217cb518e94c656b4669))
+
 ### [3.0.6](https://github.com/ByDSA/mcenter/compare/v3.0.5...v3.0.6) (2023-11-29)
 
 
