@@ -39,7 +39,8 @@ RUN rm -rf /packages/node_modules/.pnpm/@next+swc*
 
 # Install dependencies only when needed
 FROM deps-base AS deps-build
-COPY ./shared ./shared
+COPY ./shared/src ./shared/src
+COPY ./shared/tsconfig* ./shared/package.json ./shared/
 
 COPY <<EOF ./pnpm-workspace.yaml
 packages:
@@ -60,8 +61,7 @@ COPY --from=deps-build /packages/node_modules ./node_modules
 COPY --from=deps-build /packages/.eslintrc* ./
 
 WORKDIR /packages/shared
-COPY ./shared .
-COPY --from=deps-build /packages/shared/node_modules ./node_modules
+COPY --from=deps-build /packages/shared ./
 
 WORKDIR /packages/app
 COPY ./$APP/app/ ./app
