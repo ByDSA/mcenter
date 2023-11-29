@@ -90,7 +90,7 @@ export default class RealDatabase implements Database {
 
     assertIsDefined(MONGO_HOSTNAME);
 
-    const isLocal = MONGO_PORT !== undefined || (MONGO_HOSTNAME === "localhost" || MONGO_HOSTNAME === "127.0.0.1");
+    const isLocal = (MONGO_PORT !== undefined || (MONGO_HOSTNAME === "localhost" || MONGO_HOSTNAME === "127.0.0.1")) && !MONGO_HOSTNAME.includes("mongodb.net");
     let ret = `${isLocal ? "mongodb" : "mongodb+srv"}://`;
 
     if (MONGO_USER && MONGO_PASSWORD)
