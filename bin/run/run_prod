@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+# muslib
+if sudo netstat -tulpn | grep ":3000 " >/dev/null; then
+  echo "Ya está muslib en ejecución"
+else
+  echo "Running musiclib ..."
+  cd /root/muslib || exit
+  npm start &>.log &
+fi
+
+./run
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+cd "$DIR"/../..
+
+echo "Running mcenter VLC ..."
+cd vlc
+CURRENT_PID=$(pgrep -f packages/vlc)
+if [ -n "$CURRENT_PID" ]; then
+  echo "Killing previous mcenter VLC listener ..."
+  kill "$CURRENT_PID"
+fi
+pnpm i
+pnpm build
+pnpm start &>.log &
+
+echo "Running mcenter server live tests ..."
+cd ../server/bin/live-tests || exit
+CURRENT_PID=$(pgrep -f /server/bin/live-tests)
+if [ -n "$CURRENT_PID" ]; then
+  echo "Killing mcenter server live tests ..."
+  kill "$CURRENT_PID"
+fi
+pnpm i
+pnpm build
+pnpm start &>.log &

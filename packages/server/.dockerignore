@@ -1,0 +1,9 @@
+/.vscode
+/build
+/node_modules
+/.log
+/.git
+/.gitignore
+/.eslintrc.js
+/nodemon.json
+*.env

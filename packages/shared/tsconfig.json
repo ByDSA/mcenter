@@ -11,7 +11,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "importHelpers": true,
+    "importHelpers": false, // Para no necesitar tslib en producción
     "target": "es2015",
     "noImplicitAny": true,
     "typeRoots": ["node_modules/@types"],
@@ -19,12 +19,7 @@
     "baseUrl": ".",
     "paths": {
       "#tests/*": ["tests/*"],
-      "#tests": ["tests"],
-      "#modules/*": ["src/modules/*"],
-      "#main/*": ["src/main/*"],
-      "#main": ["src/main"],
-      "#utils/*": ["src/utils/*"],
-      "#utils": ["src/utils"]
+      "#tests": ["tests"]
     }
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"],

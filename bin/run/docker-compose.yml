@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  front:
+    build:
+      context:  ../../packages
+      dockerfile: front/Dockerfile
+      args:
+        ENV: ${ENV}
+    image: mcenter-front:${MCENTER_VERSION}
+    container_name: mcenter-front
+    ports:
+      - "${MCENTER_FRONT_PORT}:3000"
+    depends_on:
+      - server
+
+  server:
+    build:
+      context:  ../../packages
+      dockerfile: server/Dockerfile
+      args:
+        ENV: ${ENV}
+    image: mcenter-server:${MCENTER_VERSION}
+    container_name: mcenter-server
+    ports:
+      - "${MCENTER_SERVER_PORT}:8080"
+    volumes:
+      - ${MCENTER_SERVER_MEDIA_PATH}:/home/node/media:ro
+      - ../../packages/server/.calendar.js:/packages/app/.calendar.js:ro
+      - ../../packages/server/.schedule.js:/packages/app/.schedule.js:ro
+      - ../../packages/server/.tag.js:/packages/app/.tag.js:ro
+  mongo:
+    profiles: ["local"]
+    image: mongo:7.0.3
+    container_name: mcenter-mongo
+    restart: always
+    ports:
+      - 27017:27017
+    env_file:
+      - .env.db
+
+  mongo-express:
+    profiles: ["local"]
+    image: mongo-express
+    container_name: mcenter-mongo-express
+    restart: always
+    ports:
+      - 8079:8081
+    env_file:
+      - .env.me

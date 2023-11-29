@@ -48,7 +48,7 @@
     "migrate": "./src/main/db/migrations/migrate.sh",
     "start": "NODE_ENV=production node build/index.js",
     "start:watch": "NODE_ENV=development nodemon",
-    "test": "NODE_ENV=test jest --maxWorkers=1 --testPathIgnorePatterns=VLCProcess*",
+    "test": "NODE_ENV=test jest --maxWorkers=1",
     "test:coverage": "pnpm run test --coverage",
     "test:coverage:clean": "rm -rf coverage",
     "test:watch": "pnpm run test --watch"

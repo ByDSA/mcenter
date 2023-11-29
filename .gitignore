@@ -1,9 +1,1 @@
-build
-dist
-node_modules
-
-**/dump-*/
-
 .env*
-
-*.db
