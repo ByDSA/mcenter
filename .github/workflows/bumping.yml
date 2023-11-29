@@ -29,7 +29,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version: "20"
 
       - name: Instalar pnpm
         uses: pnpm/action-setup@v2
@@ -54,6 +54,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd packages
           pnpm install --no-frozen-lockfile
           cd server
           pnpm install --no-frozen-lockfile
@@ -87,6 +88,7 @@ jobs:
       - name: "Bumping [Primer release]"
         if: steps.first_release.outputs.first_release == 1
         run: |
+          cd packages
           pnpm run version:release --first-release --no-verify
 
       - name: "Bumping [Release normal]"
@@ -106,6 +108,7 @@ jobs:
             echo "\nCommits nuevos a considerar para el bumping:"
             echo "$bumping_messages"
 
+            cd packages
             pnpm run version:release --no-verify
           else
             echo "No se ha encontrado ningún commit nuevo que requiera bumping."
