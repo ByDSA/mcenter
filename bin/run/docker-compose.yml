@@ -11,6 +11,7 @@ services:
     container_name: mcenter-front
     ports:
       - "${MCENTER_FRONT_PORT}:3000"
+    restart: always
     depends_on:
       - server
 
@@ -24,11 +25,13 @@ services:
     container_name: mcenter-server
     ports:
       - "${MCENTER_SERVER_PORT}:8080"
+    restart: always
     volumes:
       - ${MCENTER_SERVER_MEDIA_PATH}:/home/node/media:ro
       - ../../packages/server/.calendar.js:/packages/app/.calendar.js:ro
       - ../../packages/server/.schedule.js:/packages/app/.schedule.js:ro
       - ../../packages/server/.tag.js:/packages/app/.tag.js:ro
+
   mongo:
     profiles: ["local"]
     image: mongo:7.0.3
