@@ -11,7 +11,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "importHelpers": true,
+    "importHelpers": false, // Para no necesitar tslib en producción
     "target": "es2015",
     "noImplicitAny": true,
     "typeRoots": ["node_modules/@types"],

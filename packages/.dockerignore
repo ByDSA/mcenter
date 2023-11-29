@@ -1,0 +1,17 @@
+.git
+
+**/**.gitignore
+**/*.nvmrc
+**/Dockerfile
+**/.dockerignore
+**/npm-debug.log
+**/README.md
+**/.vscode
+
+front/.next
+front/.env
+
+server/build
+server/.log
+server/.eslintrc.js
+server/nodemon.json

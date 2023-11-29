@@ -1,1 +1,1 @@
-../server/.eslintrc.js
+../.eslintrc.js
