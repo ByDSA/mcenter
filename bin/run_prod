@@ -2,7 +2,7 @@
 set -e
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-ROOT=$DIR/../..
+ROOT=$DIR/../
 ROOT_PACKAGES=$ROOT/packages
 
 # muslib
@@ -25,7 +25,11 @@ if [ -n "$CURRENT_PID" ]; then
   kill "$CURRENT_PID"
 fi
 VLC_PATH="$ROOT_PACKAGES"/vlc
-cd "$VLC_PATH" || exit
+cd "$VLC_PATH" || exit 1
+if [ ! -d ./build ]; then
+  pnpm i
+  pnpm run build
+fi
 pnpm start &>.log &
 
 echo "Running mcenter server live tests ..."
@@ -35,5 +39,9 @@ if [ -n "$CURRENT_PID" ]; then
   kill "$CURRENT_PID"
 fi
 LIVE_TESTS_PATH="$ROOT_PACKAGES"/server/bin/live-tests
-cd "$LIVE_TESTS_PATH" || exit
+cd "$LIVE_TESTS_PATH" || exit 1
+if [ ! -d ./build ]; then
+  pnpm i
+  pnpm run build
+fi
 pnpm start &>.log &

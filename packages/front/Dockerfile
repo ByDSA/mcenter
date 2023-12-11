@@ -1,7 +1,7 @@
 # Fuente: https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile
 
 FROM node:20.9.0-alpine3.18 AS base
-ARG ENV=production
+ARG ENV=local
 ENV APP=front
 
 FROM base AS deps-base
@@ -70,7 +70,7 @@ COPY ./$APP/styles ./styles
 COPY ./$APP/public ./public
 COPY --from=deps-build /packages/app/node_modules ./node_modules
 COPY ./$APP/package.json ./$APP/*lock* ./$APP/tsconfig* ./$APP/next.config* ./
-COPY /$APP/.env.${ENV} .env
+COPY ./$APP/.env.$ENV ./.env
 
 # Disable telemetry during the build.
 # Learn more here: https://nextjs.org/telemetry

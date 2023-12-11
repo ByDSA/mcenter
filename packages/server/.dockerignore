@@ -6,4 +6,4 @@
 /.gitignore
 /.eslintrc.js
 /nodemon.json
-*.env
+*.env*

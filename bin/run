@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+DIR="$(realpath "$(dirname "$0")")"
+if [ -z "$PROJECT_LIB" ]; then
+  PROJECT_LIB=$(realpath "$DIR"/../lib)
+fi
+PACKAGES_ROOT=$(realpath "$PROJECT_LIB"/../packages)
+
+set -a
+# shellcheck disable=SC1091
+. "$PACKAGES_ROOT"/.env
+set +a
+
+cd "$DIR/docker" || exit 1
+
+docker compose --profile "$ENV" up -d

@@ -1,5 +1,4 @@
 FROM node:20.9.0-alpine3.18 AS base
-ARG ENV=production
 ENV APP=server
 
 FROM base AS base-pnpm
@@ -41,6 +40,5 @@ WORKDIR /packages/app
 COPY --from=deps-prod /packages/app/node_modules ./node_modules
 COPY --from=builder /packages/app/build ./build
 COPY --from=builder /packages/app/package.json ./
-COPY ./${APP}/.env.${ENV} .env
 EXPOSE 8080
 CMD [ "yarn", "start" ]

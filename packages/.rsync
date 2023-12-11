@@ -1,0 +1,7 @@
++ /server/
++ /shared/
++ /vlc/
++ /package.json
++ /pnpm*.yaml
+- node_modules/
+- /*
