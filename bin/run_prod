@@ -25,8 +25,9 @@ if [ -n "$CURRENT_PID" ]; then
   kill "$CURRENT_PID"
 fi
 VLC_PATH="$ROOT_PACKAGES"/vlc
-cd "$VLC_PATH" || exit 1
+cd "$VLC_PATH" || echo "Error: $VLC_PATH does not exist" && exit 1
 if [ ! -d ./build ]; then
+  echo "Building mcenter VLC listener ..."
   pnpm i
   pnpm run build
 fi
@@ -40,8 +41,9 @@ if [ -n "$CURRENT_PID" ]; then
   kill "$CURRENT_PID"
 fi
 LIVE_TESTS_PATH="$ROOT_PACKAGES"/server/bin/live-tests
-cd "$LIVE_TESTS_PATH" || exit 1
-if [ ! -d ./build ]; then
+cd "$LIVE_TESTS_PATH" || echo "Error: $LIVE_TESTS_PATH does not exist" && exit 1
+if [ ! -d ./node_modules ]; then
+  echo "Installing mcenter server live tests dependencies ..."
   pnpm i
 fi
 pnpm start &>.log &
