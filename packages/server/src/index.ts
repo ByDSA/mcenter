@@ -1,3 +1,4 @@
+import { Server } from "http";
 import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
 import FixerController from "#modules/actions/FixerController";
@@ -11,14 +12,10 @@ import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-p
 import { VlcBackWebSocketsServerService } from "#modules/play/remote-player/vlc-back-service";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository, StreamRestController } from "#modules/streams";
-import dotenv from "dotenv";
-import { Server } from "http";
 import { ExpressApp } from "./main";
 import RealDatabase from "./main/db/Database";
 
 (async function main() {
-  dotenv.config();
-
   const domainMessageBroker = new DomainMessageBroker();
 
   DomainMessageBroker.setSingleton(domainMessageBroker);

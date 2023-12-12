@@ -1,11 +1,9 @@
-import dotenv from "dotenv";
 import path from "path";
 import findAllSeriesTreeAt from "./find";
 
 let MEDIA_FOLDER_PATH: string;
 
 beforeAll(() => {
-  dotenv.config();
   MEDIA_FOLDER_PATH = process.env.MEDIA_FOLDER_PATH as string;
 } );
 

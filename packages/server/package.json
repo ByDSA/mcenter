@@ -4,7 +4,6 @@
     "axios": "1.5.0",
     "cors": "2.8.5",
     "date-ops": "2.2.0",
-    "dotenv": "16.3.1",
     "envalid": "7.3.1",
     "express": "4.18.2",
     "fluent-ffmpeg": "2.1.2",
@@ -22,6 +21,7 @@
   "description": "",
   "devDependencies": {
     "#sharedSrc": "workspace:../shared/src",
+    "dotenv": "16.3.1",
     "@types/cors": "2.8.14",
     "@types/express": "4.17.17",
     "@types/fluent-ffmpeg": "2.1.22",
@@ -34,7 +34,7 @@
     "@types/sha256-file": "1.0.1",
     "@types/supertest": "2.0.12",
     "jest": "workspace:../node_modules/jest",
-    "nodemon": "2.0.20",
+    "nodemon": "3.0.2",
     "supertest": "6.3.3",
     "ts-node": "10.9.1",
     "tsc-alias": "1.8.7"
@@ -46,7 +46,7 @@
     "build:clean": "rm -rf build",
     "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
     "migrate": "./src/main/db/migrations/migrate.sh",
-    "start": "NODE_ENV=production node build/index.js",
+    "start": "NODE_ENV=production node build/index.js --env-file .env",
     "start:watch": "NODE_ENV=development nodemon",
     "test": "NODE_ENV=test jest --maxWorkers=1",
     "test:coverage": "pnpm run test --coverage",

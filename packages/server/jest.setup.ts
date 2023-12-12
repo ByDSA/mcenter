@@ -4,20 +4,24 @@ import { existsSync } from "node:fs";
 // eslint-disable-next-line import/no-relative-packages
 import { isDebugging } from "../shared/src/utils/vscode";
 
+function loadEnvsFile(p: string): void {
+  if (!existsSync(p))
+    throw new Error(`File ${p} does not exist`);
+
+  dotenv.config( {
+    path: p,
+    override: true,
+  } );
+}
+
 if (!isDebugging()) {
   global.console.log = jest.fn(); // Mockear console.log
   global.console.error = jest.fn(); // Mockear console.error
   global.console.warn = jest.fn(); // Mockear console.warn
 }
 
-const envFilePath = "tests/.env";
-
-if (!existsSync(envFilePath))
-  throw new Error(`File ${envFilePath} does not exist`);
-
-dotenv.config( {
-  path: envFilePath,
-} );
+loadEnvsFile(".env.dev");
+loadEnvsFile("tests/.env");
 
 mongoose.set("bufferCommands", false); // Para que lance error si no hay una conexión a la DB
 mongoose.set("autoCreate", false); // disable `autoCreate` since `bufferCommands` is false, value)
