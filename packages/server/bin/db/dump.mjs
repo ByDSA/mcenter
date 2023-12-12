@@ -1,21 +1,29 @@
-#!/usr/bin/env dazx
+#!/usr/bin/env zx
 // @ts-check
 
-import { loadEnv } from "dazx/bash";
+import { loadProjectEnvs } from "../../../../lib/projects/envs.mjs";
 
-const from = getFromArgOrFail();
-const outFile = getOutFileArg();
-const {ENV} = loadProjectEnv();
-const thisFilenameWithoutExt = getFilenameWithoutExtOrFail(import.meta.url);
-const folder = path.join(__dirname, `.${thisFilenameWithoutExt}`);
-const candidates = fs.readdirSync(folder).filter((f) => f.endsWith(".mjs") || f.endsWith(".sh"));
-const file = findScriptFileByParamsOrFail(candidates,
-  {
+(async () => {
+  const from = getFromArgOrFail();
+  const outFile = getOutFileArg();
+
+  await loadProjectEnvs();
+  const { ENV } = process.env;
+  const thisFilenameWithoutExt = getFilenameWithoutExtOrFail(import.meta.url);
+  const folder = path.join(__dirname, `.${thisFilenameWithoutExt}`);
+  const candidates = fs
+    .readdirSync(folder)
+    .filter((f) => f.endsWith(".mjs") || f.endsWith(".sh"));
+  const file = findScriptFileByParamsOrFail(candidates, {
     from,
     env: ENV,
   } );
 
-await $`ENV=${ENV} from=${from} outFile=${outFile} ${path.join(folder, file)}`;
+  await $`ENV=${ENV} from=${from} outFile=${outFile} ${path.join(
+    folder,
+    file,
+  )}`;
+} )().catch(console.error);
 
 /**
  * @param {string[]} scriptFiles
@@ -75,50 +83,6 @@ function getFromArgOrFail() {
   return getArgOrFail(["from", "f"]);
 }
 
-function findProjectEnvFileOrFail() {
-  let folder = __dirname;
-
-  do {
-    fs.readdirSync(folder);
-
-    const gitFolderPath = path.join(folder, ".git");
-    const isRootProjectFolder = fs.existsSync(gitFolderPath) && fs.lstatSync(gitFolderPath).isDirectory();
-    const envFilePath = path.join(folder, ".env");
-
-    if (isRootProjectFolder && fs.existsSync(envFilePath) && fs.lstatSync(envFilePath).isFile())
-      return envFilePath;
-
-    folder = path.join(folder, "..");
-  } while (folder !== "/");
-
-  throw new Error(`No project .env file found from ${__dirname}`);
-}
-
-function loadProjectEnv() {
-  const projectEnvFile = findProjectEnvFileOrFail();
-  const beforeEnvs = process.env;
-
-  loadEnv(projectEnvFile);
-  const afterEnvs = process.env;
-  /** @type {{[key: string]: string}} */
-  const loadedEnvs = Object.entries(afterEnvs).filter(entry => !beforeEnvs[entry[0]])
-    .reduce((acc, [key, value]) => {
-      acc[key] = value;
-
-      return acc;
-    }, {
-    } );
-  const {ENV} = loadedEnvs;
-
-  if (!ENV)
-    throw new Error("No ENV in .env file");
-
-  return {
-    ...process.env,
-    ENV,
-  };
-}
-
 /**
  * @param {string[]} args
  */
@@ -133,13 +97,15 @@ function getArgOrFail(args) {
   }
 
   if (!f) {
-    const argsNames = args.map(a => {
+    const argsNames = args.map((a) => {
       if (a.length === 1)
         return `-${a}`;
 
       return `--${a}`;
     } );
-    const argsList = `${argsNames.slice(0, -1).join(", ") } or ${ argsNames.slice(-1)}`;
+    const argsList = `${argsNames.slice(0, -1).join(", ")} or ${argsNames.slice(
+      -1,
+    )}`;
 
     throw new Error(`Missing ${argsList}`);
   }
