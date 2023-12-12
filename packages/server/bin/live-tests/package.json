@@ -1,13 +1,14 @@
 {
   "dependencies": {
-    "@js-temporal/polyfill": "^0.4.4",
-    "ansi-to-html": "^0.7.2",
-    "node-schedule": "^2.1.1",
+    "@js-temporal/polyfill": "0.4.4",
+    "ansi-to-html": "0.7.2",
+    "node-schedule": "2.1.1",
     "nodemailer": "6.9.5",
     "zod": "3.22.3"
   },
   "description": "",
   "devDependencies": {
+    "@types/node-schedule": "2.1.5",
     "@types/jest": "29.5.5",
     "@types/node": "20.8.2",
     "@types/nodemailer": "6.4.11",
