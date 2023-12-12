@@ -49,12 +49,19 @@ function isStringIntegerRefine(): Refinement {
   ];
 }
 
+const projectEnvSchema = z.object( {
+  ENV: z.string(),
+  MCENTER_SERVER_PORT: z.string().refine(isPort),
+  MCENTER_SERVER_MEDIA_PATH: z.string().refine(...isAbsolutePathFileRefine()),
+  MCENTER_FRONT_PORT: z.string().refine(isPort),
+} );
+
 export const serverEnvSchema = z.object( {
   PORT: z.string().refine(isPort),
   MONGO_HOSTNAME: z.string(),
   MONGO_DB: z.string(),
   MONGO_PORT: z.string().refine(isPort)
-    .or(z.string().refine((s) => s === "", "Empty string")),
+    .or(z.undefined()),
   MONGO_USER: z.string(),
   MONGO_PASSWORD: z.string(),
 
@@ -72,3 +79,5 @@ export const serverEnvSchema = z.object( {
 } );
 
 export const serverEnvs: z.infer<typeof serverEnvSchema> = process.env as any;
+
+export const projectEnvs: z.infer<typeof projectEnvSchema> = process.env as any;
