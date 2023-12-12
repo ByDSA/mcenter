@@ -31,6 +31,7 @@ if [ ! -d ./build ]; then
   pnpm run build
 fi
 pnpm start &>.log &
+echo "mcenter VLC listener running"
 
 echo "Running mcenter server live tests ..."
 CURRENT_PID=$(pgrep -f /server/bin/live-tests)
@@ -42,6 +43,6 @@ LIVE_TESTS_PATH="$ROOT_PACKAGES"/server/bin/live-tests
 cd "$LIVE_TESTS_PATH" || exit 1
 if [ ! -d ./build ]; then
   pnpm i
-  pnpm run build
 fi
 pnpm start &>.log &
+echo "mcenter server live tests running"
