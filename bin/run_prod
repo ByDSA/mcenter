@@ -3,7 +3,7 @@ set -e
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 ROOT=$DIR/../
-ROOT_PACKAGES=$ROOT/packages
+ROOT_PACKAGES=$(realpath "$ROOT/packages")
 
 "$DIR"/run
 
@@ -16,7 +16,7 @@ if [ -n "$CURRENT_PID" ]; then
   kill "$CURRENT_PID"
 fi
 VLC_PATH="$ROOT_PACKAGES"/vlc
-cd "$VLC_PATH" || echo "Error: $VLC_PATH does not exist" && exit 1
+cd "$VLC_PATH" || (echo "Error: $VLC_PATH does not exist" && exit 1)
 if [ ! -d ./build ]; then
   echo "Building mcenter VLC listener ..."
   pnpm i
@@ -26,13 +26,15 @@ pnpm start &>.log &
 echo "mcenter VLC listener running"
 
 echo "Running mcenter server live tests ..."
+set +e
 CURRENT_PID=$(pgrep -f /server/bin/live-tests)
+set -e
 if [ -n "$CURRENT_PID" ]; then
   echo "Killing mcenter server live tests ..."
   kill "$CURRENT_PID"
 fi
 LIVE_TESTS_PATH="$ROOT_PACKAGES"/server/bin/live-tests
-cd "$LIVE_TESTS_PATH" || echo "Error: $LIVE_TESTS_PATH does not exist" && exit 1
+cd "$LIVE_TESTS_PATH" || (echo "Error: $LIVE_TESTS_PATH does not exist" && exit 1)
 if [ ! -d ./node_modules ]; then
   echo "Installing mcenter server live tests dependencies ..."
   pnpm i
