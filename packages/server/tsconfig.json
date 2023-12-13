@@ -14,6 +14,7 @@
     "importHelpers": false, // Para no necesitar tslib en producción
     "target": "es2015",
     "noImplicitAny": true,
+    "skipLibCheck": true, // Para que no compruebe 'noImplicitAny' en las librerías de terceros
     "typeRoots": ["node_modules/@types"],
     "lib": ["es2023", "dom"],
     "baseUrl": ".",

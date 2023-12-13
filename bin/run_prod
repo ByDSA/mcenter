@@ -5,15 +5,6 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 ROOT=$DIR/../
 ROOT_PACKAGES=$ROOT/packages
 
-# muslib
-if sudo netstat -tulpn | grep ":3000 " >/dev/null; then
-  echo "Ya está muslib en ejecución"
-else
-  echo "Running musiclib ..."
-  cd /root/muslib || exit
-  npm start &>.log &
-fi
-
 "$DIR"/run
 
 echo "Running mcenter VLC ..."

@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "tests/**/*",
+    "**/test",
+    "**/tests",
+    "spec",
+    "src/**/tests/*",
+    "src/**/testUtils.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ],
+  "compilerOptions": {
+    "sourceMap": false,
+    "inlineSources": false
+  }
+}

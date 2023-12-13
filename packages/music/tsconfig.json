@@ -1,0 +1,34 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "outDir": "build",
+    "sourceMap": true,
+    "inlineSources": true,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "importHelpers": false, // Para no necesitar tslib en producción
+    "target": "es2015",
+    "noImplicitAny": true,
+    "skipLibCheck": true, // Para que no compruebe 'noImplicitAny' en las librerías de terceros
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2023", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "#tests/*": ["tests/*"],
+      "#tests": ["tests"],
+      "#modules/*": ["src/modules/*"],
+      "#main/*": ["src/main/*"],
+      "#main": ["src/main"],
+      "#utils/*": ["src/utils/*"],
+      "#utils": ["src/utils"]
+    }
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules"],
+  "types": ["node"]
+}
