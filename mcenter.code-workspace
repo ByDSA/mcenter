@@ -10,10 +10,16 @@
       "path": "./packages/server"
     },
     {
+      "path": "./packages/music"
+    },
+    {
       "path": "./packages/front"
     },
     {
       "path": "./bin"
+    },
+    {
+      "path": "./lib"
     }
   ],
   "settings": {
