@@ -8,6 +8,7 @@ import {
   deployProjectEnd,
 } from "../lib/projects/deploy/index.mjs";
 import { frontPackageDeployParticular } from "../packages/front/lib/index.mjs";
+import { musicPackageDeployParticular } from "../packages/music/lib/index.mjs";
 import { serverPackageDeployParticular } from "../packages/server/lib/index.mjs";
 
 (async () => {
@@ -16,6 +17,9 @@ import { serverPackageDeployParticular } from "../packages/server/lib/index.mjs"
   const { ENVS } = await deployProjectBegin();
 
   await serverPackageDeployParticular({
+    ...ENVS,
+  });
+  await musicPackageDeployParticular({
     ...ENVS,
   });
 

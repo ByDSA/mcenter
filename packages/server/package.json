@@ -46,7 +46,7 @@
     "build:clean": "rm -rf build",
     "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
     "migrate": "./src/main/db/migrations/migrate.sh",
-    "start": "NODE_ENV=production node build/index.js --env-file .env",
+    "start": "NODE_ENV=production node build/index.js",
     "start:watch": "NODE_ENV=development nodemon",
     "test": "NODE_ENV=test jest --maxWorkers=1",
     "test:coverage": "pnpm run test --coverage",
