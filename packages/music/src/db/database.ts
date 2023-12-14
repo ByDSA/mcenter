@@ -33,8 +33,6 @@ async function connect() {
 
   const dbConnectionURL = generateUrl();
 
-  console.log("dbConnectionURL", dbConnectionURL);
-
   await mongoose.connect(dbConnectionURL, options);
 }
 

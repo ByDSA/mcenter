@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "#shared": "workspace:../shared/build",
     "express": "4.18.2",
     "glob": "10.3.10",
     "mongoose": "8.0.3",
@@ -7,7 +8,8 @@
     "node-media-server": "2.6.2",
     "rand-picker": "1.1.0",
     "sha256-file": "1.0.0",
-    "youtube-mp3-downloader": "0.7.11"
+    "youtube-mp3-downloader": "0.7.11",
+    "zod": "3.22.4"
   },
   "description": "",
   "devDependencies": {

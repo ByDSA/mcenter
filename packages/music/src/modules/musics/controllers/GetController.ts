@@ -1,10 +1,11 @@
 import { Request, Response, Router } from "express";
 import { newPicker } from "rand-picker";
+import { Music } from "src/models/musics";
 import { getFullPath } from "../../../env";
 import { SERVER } from "../../../routes/routes.config";
-import { DocOdm, Repository } from "../repositories";
+import { Repository } from "../repositories";
 
-let lastPicked: DocOdm | undefined;
+let lastPicked: Music | undefined;
 
 type Params = {
   musicRepository: Repository;
@@ -32,7 +33,7 @@ export default class GetController {
     res.send(musics);
   }
 
-  async findAllMusicsAndFilter(req: Request): Promise<DocOdm[]> {
+  async findAllMusicsAndFilter(req: Request): Promise<Music[]> {
     let musics = await this.#musicRepository.findAll();
     const tagsQuery = <string | undefined>req.query.tags;
     const minWeightQuery = <string | undefined>req.query.minWeight;
@@ -60,8 +61,8 @@ export default class GetController {
     return musics;
   }
 
-  #sortMusics(musics: DocOdm[]): DocOdm[] {
-    return musics.sort((a: DocOdm, b: DocOdm) => {
+  #sortMusics(musics: Music[]): Music[] {
+    return musics.sort((a: Music, b: Music) => {
       if (!a.artist || !b.artist || a.artist === b.artist)
         return a.title.localeCompare(b.title);
 
@@ -99,7 +100,7 @@ export default class GetController {
   }
 }
 
-function randomPick(musics: DocOdm[]): DocOdm {
+function randomPick(musics: Music[]): Music {
   const picker = newPicker(musics, {
     weighted: true,
     randomMode: 0,
@@ -133,7 +134,7 @@ function randomPick(musics: DocOdm[]): DocOdm {
   return picked;
 }
 
-function generatePlaylist(picked: DocOdm, nextUrl: string): string {
+function generatePlaylist(picked: Music, nextUrl: string): string {
   const ROUTE_RAW = "/api/get/raw";
   const ret = `#EXTM3U
   #EXTINF:317,${picked.title}

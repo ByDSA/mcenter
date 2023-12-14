@@ -1,9 +1,9 @@
 import { Request, Response, Router } from "express";
 import { existsSync } from "node:fs";
+import { Music } from "src/models/musics";
 import { MusicRepository } from "..";
 import { assertEnv, getFullPath } from "../../../env";
 import { calcHashFromFile, findAllValidMusicFiles, findFiles } from "../../../files";
-import { DocOdm } from "../repositories";
 
 const API = "/api";
 const CREATE = `${API}/create`;
@@ -19,7 +19,7 @@ export default class FixController {
     this.#musicRepository = musicRepository;
   }
 
-  async fixAll(req: Request, res: Response) {
+  async fixAll(_: Request, res: Response) {
     const remoteMusic = await this.#musicRepository.findAll();
     const localMusic = await this.#fixDataFromLocalFiles();
 
@@ -31,7 +31,7 @@ export default class FixController {
           continue mainLoop;
       }
 
-      m.deleteOne();
+      this.#musicRepository.deleteOneByPath(m.path);
     }
 
     res.send(localMusic);
@@ -40,11 +40,18 @@ export default class FixController {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async fixOne(req: Request, res: Response) {
     const local = <string | undefined>req.query.local;
-    const url = <string | undefined>req.query.url;
-    let path = local;
-    let music: DocOdm | null = null;
+    const {url} = req.query;
 
-    if (!path && url) {
+    if (typeof url !== "string" && typeof local !== "string") {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    let path = local;
+    let music: Music | null = null;
+
+    if (!path && typeof url === "string") {
       music = await this.#musicRepository.findByUrl(url);
 
       if (music)
@@ -64,7 +71,7 @@ export default class FixController {
 
     await this.#fixDataFromLocalFile(path);
 
-    if (music) {
+    if (music && typeof url === "string") {
       const { hash } = music;
 
       assertEnv();
@@ -78,15 +85,15 @@ export default class FixController {
       if (files.length > 0) {
       // eslint-disable-next-line prefer-destructuring
         music.path = files[0];
-        music.save();
+        this.#musicRepository.updateOneByUrl(url, music);
       } else
-        music.deleteOne();
+        this.#musicRepository.deleteOneByPath(music.path);
     }
 
     res.sendStatus(200);
   }
 
-  async #fixDataFromLocalFiles(): Promise<DocOdm[]> {
+  async #fixDataFromLocalFiles(): Promise<Music[]> {
     const files = findAllValidMusicFiles();
     const musics = files.map((relativePath) => this.#fixDataFromLocalFile(relativePath));
 
@@ -104,7 +111,7 @@ export default class FixController {
 
       if (music.path !== relativePath) {
         music.path = relativePath;
-        music.save();
+        this.#musicRepository.updateOneByHash(hash, music);
       }
     } else {
       const musicByPath = await this.#musicRepository.findByPath(relativePath);
@@ -112,10 +119,9 @@ export default class FixController {
       if (musicByPath) {
         musicByPath.hash = hash;
         music = musicByPath;
+        this.#musicRepository.updateOneByPath(relativePath, music);
       } else
         music = await this.#musicRepository.createFromPath(relativePath);
-
-      music.save();
     }
 
     return music;
@@ -129,7 +135,7 @@ export default class FixController {
 
     router.get(`${ROUTE_CREATE_YT}/:id`, async (req, res) => {
       const { id } = req.params;
-      const data = await this.#musicRepository.findOrCreateAndSaveFromYoutube(id);
+      const data = await this.#musicRepository.findOrCreateFromYoutube(id);
 
       res.send(data);
     } );

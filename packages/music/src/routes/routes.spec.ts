@@ -42,15 +42,7 @@ describe("all", () => {
       path: "dk.mp3",
       title: "dk",
       url: "dk",
-      __v: 0,
     }];
-
-    for (const m of res.body) {
-      // eslint-disable-next-line no-underscore-dangle
-      expect(m._id).toBeDefined();
-      // eslint-disable-next-line no-underscore-dangle
-      delete m._id;
-    }
 
     expect(res.body).toEqual(expectedJson);
   } );

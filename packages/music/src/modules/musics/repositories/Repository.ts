@@ -1,44 +1,56 @@
 import NodeID3 from "node-id3";
 import path from "path";
+import { Music } from "src/models/musics";
 import { getFullPath } from "../../../env";
 import { calcHashFromFile } from "../../../files";
 import { AUDIO_EXTENSIONS } from "../../../files/files.music";
 import { download } from "../../../youtube";
+import { docOdmToModel } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 
 export default class Repository {
-  async findByHash(hash: string): Promise<DocOdm | null> {
-    const music: DocOdm | null = await ModelOdm.findOne( {
+  async findByHash(hash: string): Promise<Music | null> {
+    const musicOdm: DocOdm | null = await ModelOdm.findOne( {
       hash,
     } );
 
-    return music;
+    if (!musicOdm)
+      return null;
+
+    return docOdmToModel(musicOdm);
   }
 
-  async findByUrl(url: string): Promise<DocOdm | null> {
+  async findByUrl(url: string): Promise<Music | null> {
     const music: DocOdm | null = await ModelOdm.findOne( {
       url,
     } );
 
-    return music;
+    if (!music)
+      return null;
+
+    return docOdmToModel(music);
   }
 
-  async findAll(): Promise<Array<DocOdm>> {
-    const ret = await ModelOdm.find( {
+  async findAll(): Promise<Music[]> {
+    const docOdms = await ModelOdm.find( {
     } );
+    const ret = docOdms.map((docOdm) => docOdmToModel(docOdm));
 
     return ret;
   }
 
-  async findByPath(relativePath: string): Promise<DocOdm | null> {
-    const music = await ModelOdm.findOne( {
+  async findByPath(relativePath: string): Promise<Music | null> {
+    const docOdm = await ModelOdm.findOne( {
       path: relativePath,
     } );
 
-    return music;
+    if (!docOdm)
+      return null;
+
+    return docOdmToModel(docOdm);
   }
 
-  async createFromPath(relativePath: string): Promise<DocOdm> {
+  async createFromPath(relativePath: string): Promise<Music> {
     const fullPath = getFullPath(relativePath);
     const tags = NodeID3.read(fullPath);
     const title = tags.title || getTitleFromFilename(fullPath);
@@ -47,8 +59,7 @@ export default class Repository {
     baseName = baseName.substr(0, baseName.lastIndexOf("."));
     const url = getUrl(baseName);
     const hash = calcHashFromFile(fullPath);
-
-    return ModelOdm.create( {
+    const docOdm = await ModelOdm.create( {
       hash,
       path: relativePath,
       title,
@@ -57,30 +68,53 @@ export default class Repository {
       addedAt: Date.now(),
       url,
     } );
+
+    docOdm.save();
+
+    return docOdmToModel(docOdm);
   }
 
-  async createFromPathAndSave(relativePath: string): Promise<DocOdm> {
-    return this.createFromPath(relativePath)
-      .then((music) => music.save());
-  }
-
-  async findOrCreateAndSaveFromPath(relativePath: string): Promise<DocOdm> {
+  async findOrCreateFromPath(relativePath: string): Promise<Music> {
     const read = await this.findByPath(relativePath);
 
     if (read)
       return read;
 
-    return this.createFromPathAndSave(relativePath);
+    return this.createFromPath(relativePath);
   }
 
-  async findOrCreateAndSaveFromYoutube(strId: string): Promise<DocOdm> {
+  async findOrCreateFromYoutube(strId: string): Promise<Music> {
     const data = await download(strId);
 
-    return this.findOrCreateAndSaveFromPath(data.file);
+    return this.findOrCreateFromPath(data.file);
   }
 
   async deleteAll() {
     await ModelOdm.deleteMany();
+  }
+
+  async deleteOneByPath(relativePath: string) {
+    await ModelOdm.deleteOne( {
+      path: relativePath,
+    } );
+  }
+
+  async updateOneByUrl(url: string, data: Partial<Music>): Promise<void> {
+    await ModelOdm.updateOne( {
+      url,
+    }, data);
+  }
+
+  async updateOneByHash(hash: string, data: Partial<Music>): Promise<void> {
+    await ModelOdm.updateOne( {
+      hash,
+    }, data);
+  }
+
+  async updateOneByPath(relativePath: string, data: Partial<Music>): Promise<void> {
+    await ModelOdm.updateOne( {
+      path: relativePath,
+    }, data);
   }
 }
 
@@ -111,7 +145,7 @@ function getUrl(title: string) {
   return uri;
 }
 
-export function generateView(musics: DocOdm[]): string {
+export function generateView(musics: Music[]): string {
   let ret = "<ul>";
 
   musics.map((m) => `<li><a href='/raw/${m.url}'>${m.title}</li>`)

@@ -1,1 +1,4 @@
-// TODO: Aquí poner los modelos al margen del ODM, los que irán en shared
+export {
+  default as Music,
+  assertIsModel as assertIsMusic,
+} from "./Music";
