@@ -22,19 +22,22 @@ export default class FixController {
   async fixAll(_: Request, res: Response) {
     const remoteMusic = await this.#musicRepository.findAll();
     const localMusic = await this.#fixDataFromLocalFiles();
+    const ret = {
+      new: [] as Music[],
+      deleted: [] as Music[],
+    };
 
     // eslint-disable-next-line no-restricted-syntax, no-labels
-    mainLoop: for (const m of remoteMusic) {
-      for (const ml of localMusic) {
-        if (m.path === ml.path)
-          // eslint-disable-next-line no-continue, no-labels
-          continue mainLoop;
+    for (const m of remoteMusic) {
+      if (!localMusic.some((ml) => ml.path === m.path)) {
+        // this.#musicRepository.deleteOneByPath(m.path);
+        ret.deleted.push(m);
       }
-
-      this.#musicRepository.deleteOneByPath(m.path);
     }
 
-    res.send(localMusic);
+    // TODO: faltan los nuevos en el ret
+
+    res.send(ret);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
