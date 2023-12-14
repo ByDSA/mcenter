@@ -1,15 +1,7 @@
+import { Music } from "#shared/models/musics";
 import mongoose, { Document } from "mongoose";
 
-export interface DocOdm extends Document {
-  hash: string;
-  title: string;
-  url: string;
-  path: string;
-  weight?: number;
-  artist?: string;
-  tags?: string[];
-  duration?: number;
-  disabled?: boolean;
+export interface DocOdm extends Document, Music {
 }
 
 const NAME = "Music";
@@ -17,7 +9,6 @@ const NAME = "Music";
 export const SchemaOdm = new mongoose.Schema( {
   hash: {
     type: String,
-    required: true,
     unique: true,
   },
   url: {
@@ -35,9 +26,11 @@ export const SchemaOdm = new mongoose.Schema( {
   },
   title: {
     type: String,
+    required: true,
   },
   artist: {
     type: String,
+    required: true,
   },
   album: {
     type: String,
@@ -50,6 +43,9 @@ export const SchemaOdm = new mongoose.Schema( {
   },
   disabled: {
     type: Boolean,
+  },
+  lastTimePlayed: {
+    type: Number,
   },
 } );
 

@@ -13,6 +13,7 @@ export function docOdmToModel(docOdm: DocOdm): Music {
     tags: docOdm.tags,
     duration: docOdm.duration,
     disabled: docOdm.disabled,
+    lastTimePlayed: docOdm.lastTimePlayed,
   };
 
   assertIsMusic(model);

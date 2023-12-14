@@ -1,8 +1,9 @@
 export {
-  default as CanDurable,
-} from "./CanDurable";
+  LocalFile,
+  Pickable, TimeRange,
+} from "./PartialSchemas";
 
 export {
   default as Resource,
-  ModelSchema as resourceSchema,
+  ModelSchema as ResourceSchema,
 } from "./Resource.entity";

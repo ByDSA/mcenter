@@ -1,18 +1,20 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
+import { ResourceSchema } from "../resource";
+import { LocalFileSchema, PickableSchema, TaggableSchema } from "../resource/PartialSchemas";
 
+// TODO: quitar 'path', 'hash' y 'duration' de aqui y ponerlo en el 'fileInfo'
 export const ModelSchema = z.object( {
-  hash: z.string(),
-  title: z.string(),
-  url: z.string(),
-  path: z.string(),
-  weight: z.number().optional(),
   artist: z.string().optional(),
-  tags: z.array(z.string()).optional(),
+  hash: z.string().optional(),
+  url: z.string(),
   duration: z.number().optional(),
-  disabled: z.boolean().optional(),
-} );
+} )
+  .merge(ResourceSchema)
+  .merge(PickableSchema)
+  .merge(LocalFileSchema)
+  .merge(TaggableSchema);
 
 type Model = z.infer<typeof ModelSchema>;
 export default Model;

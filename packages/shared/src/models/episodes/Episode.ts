@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
-import { resourceSchema } from "../resource";
-import { canDurableSchema } from "../resource/CanDurable";
+import { ResourceSchema } from "../resource";
+import { TimeRangeSchema } from "../resource/PartialSchemas";
 import { SerieSchema } from "../series";
 import { FileInfoSchema } from "./fileinfo";
 
@@ -15,9 +15,10 @@ export const ModelFullIdSchema = z.object( {
 
 export type ModelFullId = z.infer<typeof ModelFullIdSchema>;
 
-export const ModelSchema = resourceSchema
+// TODO: quitar 'path' de aqui y ponerlo en el 'fileInfo'
+export const ModelSchema = ResourceSchema
   .merge(ModelFullIdSchema)
-  .merge(canDurableSchema)
+  .merge(TimeRangeSchema)
   .merge(z.object( {
     fileInfo: FileInfoSchema.optional(),
   } ));
