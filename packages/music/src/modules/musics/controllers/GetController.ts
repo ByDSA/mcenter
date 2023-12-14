@@ -1,6 +1,6 @@
+import { Music } from "#shared/models/musics";
 import { Request, Response, Router } from "express";
 import { newPicker } from "rand-picker";
-import { Music } from "src/models/musics";
 import { getFullPath } from "../../../env";
 import { SERVER } from "../../../routes/routes.config";
 import { Repository } from "../repositories";

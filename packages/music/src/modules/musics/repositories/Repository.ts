@@ -1,6 +1,6 @@
+import { Music } from "#shared/models/musics";
 import NodeID3 from "node-id3";
 import path from "path";
-import { Music } from "src/models/musics";
 import { getFullPath } from "../../../env";
 import { calcHashFromFile } from "../../../files";
 import { AUDIO_EXTENSIONS } from "../../../files/files.music";

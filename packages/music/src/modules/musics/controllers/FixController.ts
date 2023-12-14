@@ -1,6 +1,6 @@
+import { Music } from "#shared/models/musics";
 import { Request, Response, Router } from "express";
 import { existsSync } from "node:fs";
-import { Music } from "src/models/musics";
 import { MusicRepository } from "..";
 import { assertEnv, getFullPath } from "../../../env";
 import { calcHashFromFile, findAllValidMusicFiles, findFiles } from "../../../files";

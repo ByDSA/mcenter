@@ -1,4 +1,4 @@
-import { Music } from "src/models/musics";
+import { Music } from "#shared/models/musics";
 import { TestingApp1 } from "../../../routes/tests/TestingApps";
 import { generateView } from "../repositories/Repository";
 

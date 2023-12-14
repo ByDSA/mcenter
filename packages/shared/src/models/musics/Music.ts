@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { assertZodPopStack } from "#shared/utils/validation/zod";
 import { z } from "zod";
+import { assertZodPopStack } from "../../utils/validation/zod";
 
 export const ModelSchema = z.object( {
   hash: z.string(),
@@ -18,5 +18,5 @@ type Model = z.infer<typeof ModelSchema>;
 export default Model;
 
 export function assertIsModel(model: unknown, msg?: string): asserts model is Model {
-  assertZodPopStack(ModelSchema as any, model, msg); // TODO: quitar el any cuando se ponga en shared
+  assertZodPopStack(ModelSchema, model, msg);
 }
