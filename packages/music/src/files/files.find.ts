@@ -4,14 +4,13 @@ import path from "path";
 import { calcHashFromFile } from "./files.hash";
 
 export type FindOptions = {
-  baseFolder?: string;
   folder?: string;
   recursive?: boolean;
   extensions?: string[];
   fileHash?: string;
   onlyFile?: boolean;
   onlyFirst?: boolean;
-}
+};
 
 export function findFiles(options?: FindOptions) {
   const opts = initializeFindByHashOptions(options);
@@ -93,8 +92,7 @@ function getAllFilesByExtensionCommon(
 }
 
 const DefaultOptions: FindOptions = {
-  baseFolder: ".",
-  folder: ".",
+  folder: process.env.MEDIA_PATH ?? ".",
   recursive: true,
   onlyFirst: false,
 };
@@ -137,7 +135,7 @@ function matchHashInGroupOfFiles(hash: string, files: string[]): string[] {
 export type HashFile = {
   hash: string;
   path: string;
-}
+};
 
 export function fixHashFile<T extends HashFile>(
   obj: T,

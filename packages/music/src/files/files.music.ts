@@ -1,7 +1,7 @@
-import { loadEnv } from "../env";
+import { assertEnv } from "../env";
 import { findFiles } from "./files.find";
 
-loadEnv();
+assertEnv();
 
 export const AUDIO_EXTENSIONS = ["mp3", "flac"];
 

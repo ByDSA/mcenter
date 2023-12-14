@@ -1,21 +1,18 @@
 import mongoose, { ConnectOptions } from "mongoose";
-import { loadEnv } from "../env";
-
-loadEnv();
+import { assertEnv } from "../env";
 
 // mongoose options
 const options: ConnectOptions = {
   autoIndex: false,
 };
-// mongodb environment variables
-const { MONGO_HOSTNAME,
-  MONGO_DB,
-  MONGO_PORT,
-  MONGO_USER,
-  MONGO_PASSWORD } = process.env;
-const dbConnectionURL = generateUrl();
 
 function generateUrl() {
+  // mongodb environment variables
+  const { MONGO_HOSTNAME,
+    MONGO_DB,
+    MONGO_PORT,
+    MONGO_USER,
+    MONGO_PASSWORD } = process.env;
   let ret = MONGO_PORT === undefined ? "mongodb+srv://" : "mongodb://";
 
   if (MONGO_USER && MONGO_PASSWORD)
@@ -32,6 +29,12 @@ function generateUrl() {
 }
 
 async function connect() {
+  assertEnv();
+
+  const dbConnectionURL = generateUrl();
+
+  console.log("dbConnectionURL", dbConnectionURL);
+
   await mongoose.connect(dbConnectionURL, options);
 }
 

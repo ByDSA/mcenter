@@ -1,6 +1,20 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
-export default new mongoose.Schema( {
+export interface DocOdm extends Document {
+  hash: string;
+  title: string;
+  url: string;
+  path: string;
+  weight?: number;
+  artist?: string;
+  tags?: string[];
+  duration?: number;
+  disabled?: boolean;
+}
+
+const NAME = "Music";
+
+export const SchemaOdm = new mongoose.Schema( {
   hash: {
     type: String,
     required: true,
@@ -38,3 +52,5 @@ export default new mongoose.Schema( {
     type: Boolean,
   },
 } );
+
+export const ModelOdm = mongoose.model<DocOdm>(NAME, SchemaOdm);

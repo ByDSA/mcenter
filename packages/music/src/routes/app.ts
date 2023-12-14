@@ -1,8 +1,12 @@
+import { MusicController } from "#modules/musics";
 import express, { Express } from "express";
 import http from "http";
 import { connect, disconnect } from "../db/database";
-import { loadEnv } from "../env";
-import apiRoutes from "./api/routes.api";
+import { assertEnv } from "../env";
+
+type Params = {
+  musicController: MusicController;
+};
 
 type OnKillFunc = ()=> void;
 type OnRunFunc = ()=> void;
@@ -11,14 +15,20 @@ export default class App {
 
   server: http.Server | undefined;
 
-  private connections: any[] = [];
+  #connections: any[] = [];
 
-  private onKill: (OnKillFunc)[] = [];
+  #onKill: (OnKillFunc)[] = [];
 
-  private onRun: (OnRunFunc)[] = [];
+  #onRun: (OnRunFunc)[] = [];
+
+  #musicController: MusicController;
+
+  constructor( {musicController}: Params) {
+    this.#musicController = musicController;
+  }
 
   async run() {
-    loadEnv();
+    assertEnv();
 
     await connect();
 
@@ -28,24 +38,24 @@ export default class App {
     process.on("SIGINT", this.shutDown);
 
     this.server?.on("connection", (connection: any) => {
-      this.connections.push(connection);
+      this.#connections.push(connection);
       connection.on("close", () => {
-        this.connections = this.connections.filter((curr) => curr !== connection);
+        this.#connections = this.#connections.filter((curr) => curr !== connection);
 
-        return this.connections;
+        return this.#connections;
       } );
     } );
 
-    for (const f of this.onRun)
+    for (const f of this.#onRun)
       f();
   }
 
   addOnKill(f: OnKillFunc) {
-    this.onKill.push(f);
+    this.#onKill.push(f);
   }
 
   addOnRun(f: OnRunFunc) {
-    this.onRun.push(f);
+    this.#onRun.push(f);
   }
 
   private createExpressApp() {
@@ -53,7 +63,7 @@ export default class App {
 
     this.expressApp.disable("x-powered-by");
 
-    apiRoutes(this.expressApp);
+    this.expressApp.use("/api", this.#musicController.getRouter());
 
     const PORT: number = +(process.env.PORT ?? 8080);
 
@@ -63,7 +73,7 @@ export default class App {
   }
 
   async kill() {
-    for (const f of this.onKill)
+    for (const f of this.#onKill)
       f();
 
     await disconnect();
@@ -81,7 +91,7 @@ export default class App {
     //   process.exit(1);
     // }, 10000);
 
-    this.connections.forEach((curr) => curr.end());
-    setTimeout(() => this.connections.forEach((curr) => curr.destroy()), 5000);
+    this.#connections.forEach((curr) => curr.end());
+    setTimeout(() => this.#connections.forEach((curr) => curr.destroy()), 5000);
   }
 }

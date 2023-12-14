@@ -161,9 +161,15 @@ importers:
       '@types/sha256-file':
         specifier: 1.0.3
         version: 1.0.3
+      '@types/supertest':
+        specifier: 2.0.12
+        version: 2.0.12
       dotenv:
         specifier: 16.3.1
         version: 16.3.1
+      jest:
+        specifier: workspace:../node_modules/jest
+        version: link:../node_modules/jest
       nodemon:
         specifier: 3.0.2
         version: 3.0.2

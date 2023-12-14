@@ -15,7 +15,9 @@
     "@types/jest": "29.5.11",
     "@types/node": "20.10.4",
     "@types/sha256-file": "1.0.3",
+    "@types/supertest": "2.0.12",
     "dotenv": "16.3.1",
+    "jest": "workspace:../node_modules/jest",
     "nodemon": "3.0.2",
     "supertest": "6.3.3"
   },

@@ -1,7 +1,7 @@
 import YoutubeMp3Downloader from "youtube-mp3-downloader";
-import { loadEnv } from "./env";
+import { assertEnv } from "./env";
 
-loadEnv();
+assertEnv();
 
 // eslint-disable-next-line import/prefer-default-export
 export function download(str: string): Promise<any> {

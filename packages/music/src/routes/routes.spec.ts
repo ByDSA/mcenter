@@ -1,8 +1,8 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-extraneous-dependencies */
 import request from "supertest";
-import { TestingApp1 } from "./TestingApps";
 import App from "./app";
+import { TestingApp1 } from "./tests/TestingApps";
 
 const app: App = new TestingApp1();
 

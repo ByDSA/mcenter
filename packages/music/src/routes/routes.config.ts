@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { loadEnv } from "../env";
+import { assertEnv } from "../env";
 
-loadEnv();
+assertEnv();
 export const {SERVER} = process.env;
