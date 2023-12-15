@@ -29,8 +29,8 @@ export const SchemaOdm = new mongoose.Schema( {
     required: true,
   },
   artist: {
+    // TODO: required: true, que cuando se cree siempre ponga un artista: undefined, "", etc
     type: String,
-    required: true,
   },
   album: {
     type: String,
