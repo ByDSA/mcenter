@@ -1,8 +1,7 @@
 import { Music } from "#shared/models/musics";
 import { Request, Response, Router } from "express";
 import { newPicker } from "rand-picker";
-import { getFullPath } from "../../../env";
-import { SERVER } from "../../../routes/routes.config";
+import { ENVS, getFullPath } from "../../../env";
 import { Repository } from "../repositories";
 
 let lastPicked: Music | undefined;
@@ -138,7 +137,7 @@ function generatePlaylist(picked: Music, nextUrl: string): string {
   const ROUTE_RAW = "/api/get/raw";
   const ret = `#EXTM3U
   #EXTINF:317,${picked.title}
-  ${SERVER}${ROUTE_RAW}/${picked.url}
+  ${ENVS.server}${ROUTE_RAW}/${picked.url}
   #EXTINF:-1,NEXT
   ${nextUrl}`;
 

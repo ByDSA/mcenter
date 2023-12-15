@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { glob } from "glob";
 import path from "path";
+import { ENVS } from "../env";
 import { calcHashFromFile } from "./files.hash";
 
 export type FindOptions = {
@@ -92,7 +93,7 @@ function getAllFilesByExtensionCommon(
 }
 
 const DefaultOptions: FindOptions = {
-  folder: process.env.MEDIA_PATH ?? ".",
+  folder: ENVS.mediaPath,
   recursive: true,
   onlyFirst: false,
 };

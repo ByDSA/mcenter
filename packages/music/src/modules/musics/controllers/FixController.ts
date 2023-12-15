@@ -2,7 +2,7 @@ import { Music } from "#shared/models/musics";
 import { Request, Response, Router } from "express";
 import { existsSync } from "node:fs";
 import { MusicRepository } from "..";
-import { assertEnv, getFullPath } from "../../../env";
+import { ENVS, getFullPath } from "../../../env";
 import { calcHashFromFile, findAllValidMusicFiles, findFiles } from "../../../files";
 
 const API = "/api";
@@ -76,9 +76,7 @@ export default class FixController {
 
     if (music && typeof url === "string") {
       const { hash } = music;
-
-      assertEnv();
-      const folder = <string>process.env.MEDIA_PATH;
+      const folder = ENVS.mediaPath;
       const files = findFiles( {
         fileHash: hash,
         folder,

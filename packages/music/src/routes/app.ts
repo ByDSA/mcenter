@@ -2,7 +2,7 @@ import { MusicController } from "#modules/musics";
 import express, { Express } from "express";
 import http from "http";
 import { connect, disconnect } from "../db/database";
-import { assertEnv } from "../env";
+import { ENVS } from "../env";
 
 type Params = {
   musicController: MusicController;
@@ -28,8 +28,6 @@ export default class App {
   }
 
   async run() {
-    assertEnv();
-
     await connect();
 
     this.createExpressApp();
@@ -65,7 +63,7 @@ export default class App {
 
     this.expressApp.use("/api", this.#musicController.getRouter());
 
-    const PORT: number = +(process.env.PORT ?? 8080);
+    const PORT: number = ENVS.port;
 
     this.server = this.expressApp.listen(PORT, () => {
       console.log(`Example app listening at http://localhost:${PORT}`);

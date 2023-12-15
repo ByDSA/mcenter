@@ -1,16 +1,12 @@
-import { assertEnv } from "../env";
+import { ENVS } from "../env";
 import { findFiles } from "./files.find";
-
-assertEnv();
 
 export const AUDIO_EXTENSIONS = ["mp3", "flac"];
 
 // eslint-disable-next-line import/prefer-default-export
 export function findAllValidMusicFiles() {
-  const { MEDIA_PATH } = process.env;
-
   return findFiles( {
-    folder: <string>MEDIA_PATH,
+    folder: ENVS.mediaPath,
     recursive: true,
     extensions: AUDIO_EXTENSIONS,
   } ).map((fullPath) => {
@@ -24,11 +20,11 @@ export function findAllValidMusicFiles() {
 }
 
 function getRelativePath(fullPath: string): string | null {
-  const MEDIA_PATH = <string>process.env.MEDIA_PATH;
-  const index = fullPath.indexOf(MEDIA_PATH);
+  const {mediaPath} = ENVS;
+  const index = fullPath.indexOf(mediaPath);
 
   if (index < 0)
     return null;
 
-  return fullPath.substr(index + MEDIA_PATH.length + 1);
+  return fullPath.substr(index + mediaPath.length + 1);
 }

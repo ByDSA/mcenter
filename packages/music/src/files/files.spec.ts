@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { calcHashFromFile, findFiles, FindOptions, fixHashFile } from ".";
+import { ENVS } from "../env";
 
 describe("getHashFromFile", () => {
   it("existing path", () => {
@@ -147,11 +148,11 @@ describe("findFilesByExtensionRecursive", () => {
 
 describe("findFiles", () => {
   it("unique hash", () => {
-    const expected = [join(process.env.MEDIA_PATH ?? "", "dk.mp3")];
+    const expected = [join(ENVS.mediaPath, "dk.mp3")];
     const hash = "eacf40b68de85b759524e3bd0bea1b4393360f682db3a7f3ec25ff46b1d01872";
     const options: FindOptions = {
       fileHash: hash,
-      folder: process.env.MEDIA_PATH,
+      folder: ENVS.mediaPath,
       recursive: false,
     };
     const actual = findFiles(options);
@@ -164,7 +165,7 @@ describe("findFiles", () => {
     const hash = "54ca5061257adafcedee8523e4f8cc3f0347ab9143cddb0fd9b4997498e34ce2";
     const options: FindOptions = {
       fileHash: hash,
-      folder: process.env.MEDIA_PATH,
+      folder: ENVS.mediaPath,
       recursive: false,
     };
     const actual = findFiles(options);
@@ -177,7 +178,7 @@ describe("findFiles", () => {
     const hash = "1234";
     const options: FindOptions = {
       fileHash: hash,
-      folder: process.env.MEDIA_PATH,
+      folder: ENVS.mediaPath,
       recursive: false,
     };
     const actual = findFiles(options);
@@ -192,7 +193,7 @@ describe("findFilesRecursive", () => {
     const hash = "eacf40b68de85b759524e3bd0bea1b4393360f682db3a7f3ec25ff46b1d01872";
     const options = {
       fileHash: hash,
-      folder: process.env.MEDIA_PATH,
+      folder: ENVS.mediaPath,
     };
     const actual = findFiles(options);
 
@@ -204,7 +205,7 @@ describe("findFilesRecursive", () => {
     const hash = "54ca5061257adafcedee8523e4f8cc3f0347ab9143cddb0fd9b4997498e34ce2";
     const options = {
       fileHash: hash,
-      folder: process.env.MEDIA_PATH,
+      folder: ENVS.mediaPath,
     };
     const actual = findFiles(options);
 
@@ -216,7 +217,7 @@ describe("findFilesRecursive", () => {
     const hash = "1234";
     const options = {
       fileHash: hash,
-      folder: process.env.MEDIA_PATH,
+      folder: ENVS.mediaPath,
     };
     const actual = findFiles(options);
 

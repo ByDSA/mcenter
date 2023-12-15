@@ -1,5 +1,5 @@
 import mongoose, { ConnectOptions } from "mongoose";
-import { assertEnv } from "../env";
+import { ENVS } from "../env";
 
 // mongoose options
 const options: ConnectOptions = {
@@ -8,29 +8,27 @@ const options: ConnectOptions = {
 
 function generateUrl() {
   // mongodb environment variables
-  const { MONGO_HOSTNAME,
-    MONGO_DB,
-    MONGO_PORT,
-    MONGO_USER,
-    MONGO_PASSWORD } = process.env;
-  let ret = MONGO_PORT === undefined ? "mongodb+srv://" : "mongodb://";
+  const { hostname,
+    db,
+    port,
+    user,
+    password } = ENVS.mongo;
+  let ret = port === undefined ? "mongodb+srv://" : "mongodb://";
 
-  if (MONGO_USER && MONGO_PASSWORD)
-    ret += `${MONGO_USER}:${MONGO_PASSWORD}@`;
+  if (user && password)
+    ret += `${user}:${password}@`;
 
-  ret += MONGO_HOSTNAME;
+  ret += hostname;
 
-  if (MONGO_PORT)
-    ret += `:${MONGO_PORT}`;
+  if (port)
+    ret += `:${port}`;
 
-  ret += `/${MONGO_DB}`;
+  ret += `/${db}`;
 
   return ret;
 }
 
 async function connect() {
-  assertEnv();
-
   const dbConnectionURL = generateUrl();
 
   await mongoose.connect(dbConnectionURL, options);

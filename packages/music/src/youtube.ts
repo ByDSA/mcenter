@@ -1,13 +1,11 @@
 import YoutubeMp3Downloader from "youtube-mp3-downloader";
-import { assertEnv } from "./env";
-
-assertEnv();
+import { ENVS } from "./env";
 
 // eslint-disable-next-line import/prefer-default-export
 export function download(str: string): Promise<any> {
   const YD = new YoutubeMp3Downloader( {
     ffmpegPath: "ffmpeg", // FFmpeg binary location
-    outputPath: process.env.MEDIA_PATH || ".", // Output file location (default: the home directory)
+    outputPath: ENVS.mediaPath, // Output file location (default: the home directory)
     youtubeVideoQuality: "highestaudio", // Desired video quality (default: highestaudio)
     queueParallelism: 2, // Download parallelism (default: 1)
     progressTimeout: 2000, // Interval in ms for the progress reports (default: 1000)
