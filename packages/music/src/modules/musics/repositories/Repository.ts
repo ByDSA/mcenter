@@ -1,10 +1,13 @@
 import { Music } from "#shared/models/musics";
+import { statSync } from "fs";
 import NodeID3 from "node-id3";
 import path from "path";
 import { getFullPath } from "../../../env";
 import { calcHashFromFile } from "../../../files";
 import { AUDIO_EXTENSIONS } from "../../../files/files.music";
 import { download } from "../../../youtube";
+// eslint-disable-next-line import/no-cycle
+import UrlGenerator from "./UrlGenerator";
 import { docOdmToModel } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 
@@ -52,24 +55,28 @@ export default class Repository {
 
   async createFromPath(relativePath: string): Promise<Music> {
     const fullPath = getFullPath(relativePath);
-    const tags = NodeID3.read(fullPath);
-    const title = tags.title || getTitleFromFilename(fullPath);
-    let baseName = path.basename(fullPath);
-
-    baseName = baseName.substr(0, baseName.lastIndexOf("."));
-    const url = getUrl(baseName);
+    const id3Tags = NodeID3.read(fullPath);
+    const title = id3Tags.title ?? getTitleFromFilenamePath(fullPath);
+    const artist = id3Tags.artist ?? "";
+    const urlGenerator = new UrlGenerator( {
+      musicRepository: this,
+    } );
+    const urlPromise = urlGenerator.generateAvailableUrlFrom( {
+      title,
+      artist,
+    } );
     const hash = calcHashFromFile(fullPath);
+    const {size} = statSync(fullPath);
     const docOdm = await ModelOdm.create( {
       hash,
+      size,
       path: relativePath,
       title,
-      artist: tags.artist,
-      album: tags.album,
+      artist,
+      album: id3Tags.album,
       addedAt: Date.now(),
-      url,
+      url: await urlPromise,
     } );
-
-    docOdm.save();
 
     return docOdmToModel(docOdm);
   }
@@ -118,10 +125,12 @@ export default class Repository {
   }
 }
 
-function getTitleFromFilename(relativePath: string): string {
-  const title = path.basename(relativePath);
+function getTitleFromFilenamePath(relativePath: string): string {
+  let title = path.basename(relativePath);
 
-  return removeExtension(title);
+  title = removeExtension(title);
+
+  return fixTitle(title);
 }
 
 function removeExtension(str: string): string {
@@ -135,14 +144,10 @@ function removeExtension(str: string): string {
   return str;
 }
 
-function getUrl(title: string) {
-  const uri = title
-    .toLowerCase()
-    .replace(/(-\s-)|(\s-)|(-\s)/g, "-")
-    .replace(/\s/g, "_")
-    .replace(/&|\?|\[|\]|:|'|"/g, "");
-
-  return uri;
+function fixTitle(title: string): string {
+  return title.replace(/ \((Official )?(Lyric|Music) Video\)/ig,"")
+    .replace(/\(videoclip\)/ig,"")
+    .replace(/ $/g,"");
 }
 
 export function generateView(musics: Music[]): string {

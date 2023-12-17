@@ -22,40 +22,4 @@ describe("fix", () => {
         .expect(200);
     } );
   } );
-
-  describe("fix one", () => {
-    it("no arg not found", async () => {
-      await request(app.expressApp)
-        .get("/api/update/fix/one")
-        .expect(404);
-    } );
-
-    describe("url", () => {
-      it("not in remote - not found", async () => {
-        await request(app.expressApp)
-          .get("/api/update/fix/one?url=asdf")
-          .expect(404);
-      } );
-
-      it("in remote - found", async () => {
-        await request(app.expressApp)
-          .get("/api/update/fix/one?url=dk")
-          .expect(200);
-      } );
-    } );
-
-    describe("local", () => {
-      it("not found", async () => {
-        await request(app.expressApp)
-          .get("/api/update/fix/one?local=dk")
-          .expect(404);
-      } );
-
-      it("found", async () => {
-        await request(app.expressApp)
-          .get("/api/update/fix/one?local=dk.mp3")
-          .expect(200);
-      } );
-    } );
-  } );
 } );

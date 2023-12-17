@@ -14,6 +14,7 @@ export function docOdmToModel(docOdm: DocOdm): Music {
     duration: docOdm.duration,
     disabled: docOdm.disabled,
     lastTimePlayed: docOdm.lastTimePlayed,
+    size: docOdm.size,
   };
 
   assertIsMusic(model);

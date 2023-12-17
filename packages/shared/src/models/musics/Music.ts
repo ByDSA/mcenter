@@ -10,6 +10,7 @@ export const ModelSchema = z.object( {
   hash: z.string().optional(),
   url: z.string(),
   duration: z.number().optional(),
+  size: z.number().optional(),
 } )
   .merge(ResourceSchema)
   .merge(PickableSchema)

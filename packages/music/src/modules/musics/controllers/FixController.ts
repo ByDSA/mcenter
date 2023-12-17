@@ -1,9 +1,11 @@
 import { Music } from "#shared/models/musics";
 import { Request, Response, Router } from "express";
-import { existsSync } from "node:fs";
+import { statSync } from "node:fs";
 import { MusicRepository } from "..";
-import { ENVS, getFullPath } from "../../../env";
-import { calcHashFromFile, findAllValidMusicFiles, findFiles } from "../../../files";
+import { getFullPath } from "../../../env";
+import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../../files";
+import UrlGenerator, { fixUrl } from "../repositories/UrlGenerator";
+import ChangesDetector, { FileWithStats } from "./ChangesDetector";
 
 const API = "/api";
 const CREATE = `${API}/create`;
@@ -21,118 +23,163 @@ export default class FixController {
 
   async fixAll(_: Request, res: Response) {
     const remoteMusic = await this.#musicRepository.findAll();
-    const localMusic = await this.#fixDataFromLocalFiles();
-    const ret = {
-      new: [] as Music[],
-      deleted: [] as Music[],
-    };
+    const changes = await this.#detectChangesFromLocalFiles(remoteMusic);
+    const promises = [];
+    const created: Music[] = [];
 
-    // eslint-disable-next-line no-restricted-syntax, no-labels
-    for (const m of remoteMusic) {
-      if (!localMusic.some((ml) => ml.path === m.path)) {
-        // this.#musicRepository.deleteOneByPath(m.path);
-        ret.deleted.push(m);
-      }
+    for (const localFileMusic of changes.new) {
+      const p = this.#musicRepository.createFromPath(localFileMusic.path)
+        .then((music) => {
+          created.push(music);
+        } );
+
+      promises.push(p);
     }
 
-    // TODO: faltan los nuevos en el ret
+    for (const deletedMusic of changes.deleted) {
+      const p = this.#musicRepository.deleteOneByPath(deletedMusic.path);
+
+      promises.push(p);
+    }
+
+    for (const {original, newPath} of changes.moved) {
+      const newMusic = {
+        ...original,
+        path: newPath,
+      };
+      const p = this.#musicRepository.updateOneByPath(original.path, newMusic);
+
+      promises.push(p);
+    }
+
+    for (const updatedMusic of changes.updated) {
+      const p = this.#musicRepository.updateOneByPath(updatedMusic.path, updatedMusic);
+
+      promises.push(p);
+    }
+
+    await Promise.all(promises);
+
+    const ret = {
+      new: created,
+      deleted: changes.deleted,
+      moved: changes.moved,
+      updated: changes.updated,
+    };
 
     res.send(ret);
   }
 
+  async #detectChangesFromLocalFiles(remoteMusics: Music[]) {
+    const files = findAllPathsOfValidMusicFiles();
+    const filesWithMeta: FileWithStats[] = files.map((relativePath) => ( {
+      path: relativePath,
+      stats: statSync(getFullPath(relativePath)),
+    } ));
+    const changesDetector = new ChangesDetector(remoteMusics, filesWithMeta);
+
+    return changesDetector.detectChanges();
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async fixOne(req: Request, res: Response) {
-    const local = <string | undefined>req.query.local;
-    const {url} = req.query;
+  async fixIntegrity(_: Request, res: Response) {
+    const musics = await this.#musicRepository.findAll();
+    const ret = {
+      updatedSize: [] as Music[],
+      repeatedPaths: [] as Music[],
+      repeatedUrls: [] as Music[],
+      repeatedHashes: [] as Music[],
+      fixedUrls: [] as {original: Music; newUrl: string}[],
+    };
+    const promises = [];
 
-    if (typeof url !== "string" && typeof local !== "string") {
-      res.sendStatus(404);
+    for (const music of musics) {
+      // Músicas sin size
+      if (music.size === undefined) {
+        const stats = statSync(getFullPath(music.path));
 
-      return;
-    }
+        // eslint-disable-next-line no-param-reassign
+        music.size = stats.size;
 
-    let path = local;
-    let music: Music | null = null;
+        const p = this.#musicRepository.updateOneByPath(music.path, music);
 
-    if (!path && typeof url === "string") {
-      music = await this.#musicRepository.findByUrl(url);
-
-      if (music)
-        path = music.path;
-    }
-
-    let existsPath = false;
-
-    if (path)
-      existsPath = existsSync(getFullPath(path));
-
-    if (!path || (!music && !existsPath)) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    await this.#fixDataFromLocalFile(path);
-
-    if (music && typeof url === "string") {
-      const { hash } = music;
-      const folder = ENVS.mediaPath;
-      const files = findFiles( {
-        fileHash: hash,
-        folder,
-        onlyFirst: true,
-      } );
-
-      if (files.length > 0) {
-      // eslint-disable-next-line prefer-destructuring
-        music.path = files[0];
-        this.#musicRepository.updateOneByUrl(url, music);
-      } else
-        this.#musicRepository.deleteOneByPath(music.path);
-    }
-
-    res.sendStatus(200);
-  }
-
-  async #fixDataFromLocalFiles(): Promise<Music[]> {
-    const files = findAllValidMusicFiles();
-    const musics = files.map((relativePath) => this.#fixDataFromLocalFile(relativePath));
-
-    return Promise.all(musics);
-  }
-
-  async #fixDataFromLocalFile(relativePath: string) {
-    const fullPath = getFullPath(relativePath);
-    const hash = calcHashFromFile(fullPath);
-    const musicByHash = await this.#musicRepository.findByHash(hash);
-    let music;
-
-    if (musicByHash) {
-      music = musicByHash;
-
-      if (music.path !== relativePath) {
-        music.path = relativePath;
-        this.#musicRepository.updateOneByHash(hash, music);
+        p.then(() => {
+          ret.updatedSize.push(music);
+        } );
+        promises.push(p);
       }
-    } else {
-      const musicByPath = await this.#musicRepository.findByPath(relativePath);
 
-      if (musicByPath) {
-        musicByPath.hash = hash;
-        music = musicByPath;
-        this.#musicRepository.updateOneByPath(relativePath, music);
-      } else
-        music = await this.#musicRepository.createFromPath(relativePath);
+      // Paths repetidos
+      {
+        const mFound = musics.find((m) => m.path === music.path) as Music | undefined;
+
+        if (!mFound)
+          throw new Error("mFound is undefined");
+
+        if (mFound !== music)
+          ret.repeatedPaths.push(music, mFound);
+      }
+
+      // Urls repetidas
+      {
+        const mFound = musics.find((m) => m.url === music.url) as Music | undefined;
+
+        if (!mFound)
+          throw new Error("mFound is undefined");
+
+        if (mFound !== music)
+          ret.repeatedUrls.push(music, mFound);
+      }
+
+      // Hash repetido
+      {
+        const mFound = musics.find((m) => m.hash === music.hash) as Music | undefined;
+
+        if (!mFound)
+          throw new Error("mFound is undefined");
+
+        if (mFound !== music)
+          ret.repeatedHashes.push(music, mFound);
+      }
+
+      // Urls fixes
+      {
+        const {url} = music;
+        const fixedUrl = fixUrl(url);
+
+        if (fixedUrl !== url) {
+          const urlGenerator = new UrlGenerator( {
+            musicRepository: this.#musicRepository,
+          } );
+          const p = urlGenerator.getAvailableUrlFromUrl(fixedUrl)
+            .then((availableUrl) => {
+              ret.fixedUrls.push( {
+                original: music,
+                newUrl: availableUrl,
+              } );
+
+              return this.#musicRepository.updateOneByPath(music.path, {
+                ...music,
+                url: availableUrl,
+              } );
+            } );
+
+          promises.push(p);
+        }
+      }
     }
 
-    return music;
+    await Promise.all(promises);
+
+    res.send(ret);
   }
 
   getRouter(): Router {
     const router = Router(); // TODO: cambiar por SecureRouter
 
     router.get("/all", this.fixAll.bind(this));
-    router.get("/one", this.fixOne.bind(this));
+
+    router.get("/integrity", this.fixIntegrity.bind(this));
 
     router.get(`${ROUTE_CREATE_YT}/:id`, async (req, res) => {
       const { id } = req.params;

@@ -21,6 +21,9 @@ export const SchemaOdm = new mongoose.Schema( {
     required: true,
     unique: true,
   },
+  size: {
+    type: Number,
+  },
   weight: {
     type: Number,
   },
