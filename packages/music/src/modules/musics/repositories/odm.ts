@@ -26,14 +26,19 @@ export const SchemaOdm = new mongoose.Schema( {
   },
   weight: {
     type: Number,
+    required: true,
+    // TODO: quitar default cuando se haya actualizado la base de datos de producción
+    default: 0,
   },
   title: {
     type: String,
     required: true,
   },
   artist: {
-    // TODO: required: true, que cuando se cree siempre ponga un artista: undefined, "", etc
     type: String,
+    required: true,
+    // TODO: quitar default cuando se haya actualizado la base de datos de producción
+    default: "",
   },
   album: {
     type: String,

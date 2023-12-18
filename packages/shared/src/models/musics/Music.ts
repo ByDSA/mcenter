@@ -6,7 +6,7 @@ import { LocalFileSchema, PickableSchema, TaggableSchema } from "../resource/Par
 
 // TODO: quitar 'path', 'hash' y 'duration' de aqui y ponerlo en el 'fileInfo'
 export const ModelSchema = z.object( {
-  artist: z.string().optional(),
+  artist: z.string(),
   hash: z.string().optional(),
   url: z.string(),
   duration: z.number().optional(),

@@ -16,9 +16,8 @@ export const LocalFileSchema = z.object( {
 
 export type LocalFile = z.infer<typeof LocalFileSchema>;
 
-// TODO: poner todos los weight no asignados a 0 y quitar 'optional'
 export const PickableSchema = z.object( {
-  weight: z.number().optional(),
+  weight: z.number(),
 } );
 
 export type Pickable = z.infer<typeof PickableSchema>;
