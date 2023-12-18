@@ -7,10 +7,32 @@ export interface DocOdm extends Document, Music {
 const NAME = "Music";
 
 export const SchemaOdm = new mongoose.Schema( {
+  // Parte FileInfo a quitar
   hash: {
     type: String,
     unique: true,
   },
+  size: {
+    type: Number,
+    default: null, // TODO: quitar cuando se haya actualizado la base de datos de producción
+  },
+  mediaInfo: {
+    duration: {
+      type: Number,
+      default: null,
+    },
+  },
+  timestamps: {
+    createdAt: {
+      type: Date,
+      default: null, // TODO: quitar cuando se haya actualizado la base de datos de producción
+    },
+    updatedAt: {
+      type: Date,
+      default: null, // TODO: quitar cuando se haya actualizado la base de datos de producción
+    },
+  },
+  // END
   url: {
     type: String,
     required: true,
@@ -20,9 +42,6 @@ export const SchemaOdm = new mongoose.Schema( {
     type: String,
     required: true,
     unique: true,
-  },
-  size: {
-    type: Number,
   },
   weight: {
     type: Number,
@@ -42,9 +61,6 @@ export const SchemaOdm = new mongoose.Schema( {
   },
   album: {
     type: String,
-  },
-  duration: {
-    type: Number,
   },
   tags: {
     type: [String],

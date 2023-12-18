@@ -3,7 +3,7 @@ import { assertZodPopStack } from "../../utils/validation/zod";
 import { ResourceSchema } from "../resource";
 import { TimeRangeSchema } from "../resource/PartialSchemas";
 import { SerieSchema } from "../series";
-import { FileInfoSchema } from "./fileinfo";
+import { FileInfoSchemaVideo } from "./fileinfo";
 
 export type ModelId = string;
 
@@ -20,7 +20,7 @@ export const ModelSchema = ResourceSchema
   .merge(ModelFullIdSchema)
   .merge(TimeRangeSchema)
   .merge(z.object( {
-    fileInfo: FileInfoSchema.optional(),
+    fileInfo: FileInfoSchemaVideo.optional(),
   } ));
 
 type Model = z.infer<typeof ModelSchema>;

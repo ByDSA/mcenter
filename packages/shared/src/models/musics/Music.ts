@@ -1,17 +1,19 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
+import { FileInfoSchema } from "../episodes/fileinfo";
 import { ResourceSchema } from "../resource";
 import { LocalFileSchema, PickableSchema, TaggableSchema } from "../resource/PartialSchemas";
 
-// TODO: quitar 'path', 'hash' y 'duration' de aqui y ponerlo en el 'fileInfo'
 export const ModelSchema = z.object( {
   artist: z.string(),
-  hash: z.string().optional(),
   url: z.string(),
-  duration: z.number().optional(),
-  size: z.number().optional(),
+  mediaInfo: z.object( {
+    duration: z.number().nullable(),
+  } ).strict(),
 } )
+// TODO: quitar esto de aquí y ponerlo en un 'fileInfoAudio'
+  .merge(FileInfoSchema)
   .merge(ResourceSchema)
   .merge(PickableSchema)
   .merge(LocalFileSchema)

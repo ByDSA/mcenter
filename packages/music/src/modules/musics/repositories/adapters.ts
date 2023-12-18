@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { Music, assertIsMusic } from "#shared/models/musics";
+import { Music } from "#shared/models/musics";
 import { DocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Music {
@@ -11,13 +11,20 @@ export function docOdmToModel(docOdm: DocOdm): Music {
     weight: docOdm.weight,
     artist: docOdm.artist,
     tags: docOdm.tags,
-    duration: docOdm.duration,
+    mediaInfo: {
+      duration: docOdm.mediaInfo.duration,
+    },
     disabled: docOdm.disabled,
     lastTimePlayed: docOdm.lastTimePlayed,
     size: docOdm.size,
+    timestamps: {
+      createdAt: docOdm.timestamps.createdAt,
+      updatedAt: docOdm.timestamps.updatedAt,
+    },
   };
 
-  assertIsMusic(model);
+  // TODO: descomentar cuando se arreglen los datos en producción
+  // assertIsMusic(model);
 
   return model;
 }

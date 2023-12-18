@@ -3,7 +3,7 @@ import { Request, Response, Router } from "express";
 import { statSync } from "node:fs";
 import { MusicRepository } from "..";
 import { getFullPath } from "../../../env";
-import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../../files";
+import { calcHashFromFile, findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../../files";
 import UrlGenerator, { fixUrl } from "../repositories/UrlGenerator";
 import ChangesDetector, { FileWithStats } from "./ChangesDetector";
 
@@ -71,7 +71,7 @@ export default class FixController {
   }
 
   async #detectChangesFromLocalFiles(remoteMusics: Music[]) {
-    const files = findAllPathsOfValidMusicFiles();
+    const files = await findAllPathsOfValidMusicFiles();
     const filesWithMeta: FileWithStats[] = files.map((relativePath) => ( {
       path: relativePath,
       stats: statSync(getFullPath(relativePath)),
@@ -90,12 +90,30 @@ export default class FixController {
       repeatedUrls: [] as Music[],
       repeatedHashes: [] as Music[],
       fixedUrls: [] as {original: Music; newUrl: string}[],
+      fixedHashes: [] as {original: Music; newHash: string}[],
     };
     const promises = [];
 
     for (const music of musics) {
+      // Hashes SHA256 en vez de MD5
+      if (music.hash === null || music.hash.length !== 32) {
+        // eslint-disable-next-line no-await-in-loop
+        const hash = await calcHashFromFile(getFullPath(music.path));
+
+        // eslint-disable-next-line no-await-in-loop
+        await this.#musicRepository.updateOneByPath(music.path, {
+          ...music,
+          hash,
+        } ).then(() => {
+          ret.fixedHashes.push( {
+            original: music,
+            newHash: hash,
+          } );
+        } );
+      }
+
       // Músicas sin size
-      if (music.size === undefined) {
+      if (!music.size && music.size !== 0) {
         const stats = statSync(getFullPath(music.path));
 
         // eslint-disable-next-line no-param-reassign

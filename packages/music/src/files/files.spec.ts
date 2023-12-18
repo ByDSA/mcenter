@@ -29,14 +29,14 @@ describe("getHashFromFile", () => {
 } );
 
 describe("findFiles", () => {
-  it("tests/files folder", () => {
+  it("tests/files folder", async () => {
     const expected = [
       "tests/files/dk.mp3",
       "tests/files/aot4_copy.mp3",
       "tests/files/nomusic",
       "tests/files/Driftveil.mp3"];
     const path = "tests/files";
-    const actual = findFiles( {
+    const actual = await findFiles( {
       folder: path,
     } );
 
@@ -65,7 +65,7 @@ describe("findFiles", () => {
 } );
 
 describe("findFilesResursive", () => {
-  it("tests/files folder", () => {
+  it("tests/files folder", async () => {
     const expected = [
       "tests/files/dk.mp3",
       "tests/files/nomusic",
@@ -73,7 +73,7 @@ describe("findFilesResursive", () => {
       "tests/files/a/aot4.mp3",
       "tests/files/Driftveil.mp3"];
     const path = "tests/files";
-    const actual = findFiles( {
+    const actual = await findFiles( {
       folder: path,
       recursive: true,
     } );
@@ -105,14 +105,14 @@ describe("findFilesResursive", () => {
 } );
 
 describe("findFilesByExtensionRecursive", () => {
-  it("tests/files folder", () => {
+  it("tests/files folder", async () => {
     const expected = [
       "tests/files/dk.mp3",
       "tests/files/aot4_copy.mp3",
       "tests/files/a/aot4.mp3",
       "tests/files/Driftveil.mp3"];
     const path = "tests/files";
-    const actual = findFiles( {
+    const actual = await findFiles( {
       folder: path,
       recursive: true,
       extensions: ["mp3"],
@@ -200,14 +200,14 @@ describe("findFilesRecursive", () => {
     expect(actual).toStrictEqual(expected);
   } );
 
-  it("duplicated hash", () => {
+  it("duplicated hash", async () => {
     const expected = ["tests/files/aot4_copy.mp3", "tests/files/a/aot4.mp3"];
     const hash = "54ca5061257adafcedee8523e4f8cc3f0347ab9143cddb0fd9b4997498e34ce2";
     const options = {
       fileHash: hash,
       folder: ENVS.mediaPath,
     };
-    const actual = findFiles(options);
+    const actual = await findFiles(options);
 
     expect(actual.sort()).toStrictEqual(expected.sort());
   } );
@@ -226,14 +226,14 @@ describe("findFilesRecursive", () => {
 } );
 
 describe("fixHashFile", () => {
-  it("no fix: file exists, hash correct", () => {
+  it("no fix: file exists, hash correct", async () => {
     const hash = "54ca5061257adafcedee8523e4f8cc3f0347ab9143cddb0fd9b4997498e34ce2";
     const path = "tests/files/aot4_copy.mp3";
     const expected = {
       hash,
       path,
     };
-    const actual = fixHashFile( {
+    const actual = await fixHashFile( {
       hash,
       path,
     } );
@@ -257,12 +257,12 @@ describe("fixHashFile", () => {
     expect(actual).toStrictEqual(expected);
   } );
 
-  it("file incorrent, hash correct", () => {
+  it("file incorrent, hash correct", async () => {
     const wrongPath = "wrongfile";
     const expectedPathRegExp = /(tests\/files\/aot4_copy\.mp3)|(tests\/files\/a\/aot4\.mp3)/;
     const hash = "54ca5061257adafcedee8523e4f8cc3f0347ab9143cddb0fd9b4997498e34ce2";
     const expectedHash = hash;
-    const actual = fixHashFile( {
+    const actual = await fixHashFile( {
       hash,
       path: wrongPath,
     } );

@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-param-reassign */
 import { glob } from "glob";
 import path from "path";
@@ -105,16 +106,16 @@ export function initializeFindByHashOptions(options?: FindOptions) {
   };
 }
 
-function findByHashNonRecursive(hash: string, folder: string): string[] {
-  const files = findFiles( {
+async function findByHashNonRecursive(hash: string, folder: string): Promise<string[]> {
+  const files = await findFiles( {
     folder,
   } );
 
   return matchHashInGroupOfFiles(hash, files);
 }
 
-function findByHashRecursive(hash: string, folder: string): string[] {
-  const files = findFiles( {
+async function findByHashRecursive(hash: string, folder: string): Promise<string[]> {
+  const files = await findFiles( {
     folder,
     recursive: true,
   } );
@@ -122,11 +123,11 @@ function findByHashRecursive(hash: string, folder: string): string[] {
   return matchHashInGroupOfFiles(hash, files);
 }
 
-function matchHashInGroupOfFiles(hash: string, files: string[]): string[] {
+async function matchHashInGroupOfFiles(hash: string, files: string[]): Promise<string[]> {
   const ret = [];
 
   for (const f of files) {
-    if (calcHashFromFile(f) === hash)
+    if (await calcHashFromFile(f) === hash)
       ret.push(f);
   }
 
@@ -138,22 +139,23 @@ export type HashFile = {
   path: string;
 };
 
-export function fixHashFile<T extends HashFile>(
+// TODO: esto se usa en algún sitio que no sea sólo en el test?
+export async function fixHashFile<T extends HashFile>(
   obj: T,
   options?: FindOptions,
-): T | undefined {
+): Promise<T | undefined> {
   const opts = initializeFindByHashOptions(options);
 
   try {
     const fullPath = path.join(options?.folder || "", obj.path);
-    const hashFromFile = calcHashFromFile(fullPath);
+    const hashFromFile = await calcHashFromFile(fullPath);
 
     if (hashFromFile === obj.hash)
       return obj;
 
     obj.hash = hashFromFile;
   } catch (e) { // File doesn't exists
-    const files = findFiles( {
+    const files = await findFiles( {
       fileHash: obj.hash,
       folder: opts.folder,
       recursive: true,

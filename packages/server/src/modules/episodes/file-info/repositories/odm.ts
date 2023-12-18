@@ -3,11 +3,11 @@ import mongoose from "mongoose";
 export interface DocOdm {
   episodeId: mongoose.Types.ObjectId;
   path: string;
-  hash: string | null;
-  size: number | null;
+  hash: string;
+  size: number;
   timestamps: {
-    createdAt: Date | null;
-    updatedAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
   };
   mediaInfo: {
     duration: number | null;

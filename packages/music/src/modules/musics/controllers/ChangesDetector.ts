@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import { Music } from "#shared/models/musics";
 import { Stats } from "node:fs";
 import { getFullPath } from "src/env";
@@ -13,6 +14,9 @@ type GroupBySize<T> = {
   [size: number | symbol]: T[];
 };
 
+type Options = {
+  useOnlyHashChecking?: boolean;
+};
 export default class ChangesDetector {
   #remoteMusic: Music[];
 
@@ -26,7 +30,9 @@ export default class ChangesDetector {
 
   #pathToLocalMusicFile: Map<string, FileWithStats>;
 
-  constructor(remoteMusic: Music[], localFiles: FileWithStats[]) {
+  #options: Required<Options>;
+
+  constructor(remoteMusic: Music[], localFiles: FileWithStats[], options?: Options) {
     this.#remoteMusic = remoteMusic;
     this.#localFiles = localFiles;
 
@@ -39,17 +45,22 @@ export default class ChangesDetector {
     this.#pathToRemoteMusic = new Map();
 
     this.#pathToLocalMusicFile = new Map();
+
+    this.#options = {
+      useOnlyHashChecking: false,
+      ...options,
+    };
   }
 
-  #findRemoteMusicInLocalFiles(remoteMusic: Music): FileWithStats | null {
+  async #findRemoteMusicInLocalFiles(remoteMusic: Music): Promise<FileWithStats | null> {
     const candidateByPath = this.#pathToLocalMusicFile.get(remoteMusic.path);
 
-    if (candidateByPath && this.#isSameFile(remoteMusic, candidateByPath))
+    if (candidateByPath && await this.#isSameFile(remoteMusic, candidateByPath))
       return candidateByPath;
 
     const candidates = [] as FileWithStats[];
 
-    if (remoteMusic.size !== undefined) {
+    if (remoteMusic.size !== null) {
       const candidatesWithSameSize = this.#localFilesGroupedBySize[remoteMusic.size];
 
       if (candidatesWithSameSize)
@@ -62,17 +73,17 @@ export default class ChangesDetector {
       candidates.push(...candidatesNoGrouped);
 
     for (const candidate of candidates) {
-      if (this.#isSameFile(remoteMusic, candidate))
+      if (await this.#isSameFile(remoteMusic, candidate))
         return candidate;
     }
 
     return null;
   }
 
-  #findLocalFileMusicInRemoteMusics(localFile: FileWithStats): Music | null {
+  async #findLocalFileMusicInRemoteMusics(localFile: FileWithStats): Promise<Music | null> {
     const candidateByPath = this.#pathToRemoteMusic.get(localFile.path);
 
-    if (candidateByPath && this.#isSameFile(candidateByPath, localFile))
+    if (candidateByPath && await this.#isSameFile(candidateByPath, localFile))
       return candidateByPath;
 
     const candidates = [] as Music[];
@@ -87,7 +98,7 @@ export default class ChangesDetector {
       candidates.push(...candidatesNoGrouped);
 
     for (const candidate of candidates) {
-      if (this.#isSameFile(candidate, localFile))
+      if (await this.#isSameFile(candidate, localFile))
         return candidate;
     }
 
@@ -121,7 +132,7 @@ export default class ChangesDetector {
     }
   }
 
-  detectChanges() {
+  async detectChanges() {
     const ret = {
       new: [] as FileWithStats[],
       deleted: [] as Music[],
@@ -135,7 +146,7 @@ export default class ChangesDetector {
       const foundSamePath = this.#pathToLocalMusicFile.get(m.path);
 
       if (!foundSamePath) {
-        const foundSameContent = this.#findRemoteMusicInLocalFiles(m);
+        const foundSameContent = await this.#findRemoteMusicInLocalFiles(m);
 
         if (foundSameContent) {
           ret.moved.push( {
@@ -163,8 +174,8 @@ export default class ChangesDetector {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  #isSameFile(music: Music, fileWithMetadata: FileWithStats) {
-    if (music.size && music.size === fileWithMetadata.stats.size)
+  async #isSameFile(music: Music, fileWithMetadata: FileWithStats) {
+    if (!this.#options.useOnlyHashChecking && music.size && music.size === fileWithMetadata.stats.size)
       return true;
 
     if (!music.hash)
@@ -172,7 +183,7 @@ export default class ChangesDetector {
 
     if (!fileWithMetadata.hash)
       // eslint-disable-next-line no-param-reassign
-      fileWithMetadata.hash = calcHashFromFile(getFullPath(fileWithMetadata.path));
+      fileWithMetadata.hash = await calcHashFromFile(getFullPath(fileWithMetadata.path));
 
     if (music.hash !== fileWithMetadata.hash)
       return false;

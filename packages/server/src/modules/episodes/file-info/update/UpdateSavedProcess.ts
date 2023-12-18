@@ -1,6 +1,6 @@
 import { getIdModelOdmFromId } from "#modules/episodes/repositories/odm";
 import { EpisodeFileInfo, EpisodeFullId } from "#shared/models/episodes";
-import { FileInfoWithSuperId, compareFileInfo } from "#shared/models/episodes/fileinfo";
+import { FileInfoVideoWithSuperId, compareFileInfoVideo } from "#shared/models/episodes/fileinfo";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { deepMerge } from "#shared/utils/objects";
 import { assertIsDefined } from "#shared/utils/validation";
@@ -13,8 +13,8 @@ import { Repository } from "../repositories";
 import { SerieFolderTree } from "../tree";
 
 type Model = EpisodeFileInfo;
-type ModelWithSuperId = FileInfoWithSuperId;
-const compareModel: typeof compareFileInfo = compareFileInfo;
+type ModelWithSuperId = FileInfoVideoWithSuperId;
+const compareModel: typeof compareFileInfoVideo = compareFileInfoVideo;
 
 type Data = ModelWithSuperId[];
 function md5FileAsync(fullFilePath: string): Promise<string> {
@@ -77,16 +77,15 @@ export default class UpdateMetadataProcess {
             height: metadata.streams[0].height ?? null,
           };
           const fps = metadata.streams[0].r_frame_rate ?? null;
-          const size = metadata.format?.size ?? null;
-          const { mtime, ctime } = fs.statSync(fullFilePath);
+          const { mtime, ctime, size } = fs.statSync(fullFilePath);
           const createdAt = new Date(ctime);
           const updatedAt = new Date(mtime);
 
           console.log(`got metadata of ${filePath}`);
-          const hash = currentEpisodeFile?.hash ?? null;
+
           const ret: Model = {
             path: filePath,
-            hash,
+            hash: currentEpisodeFile?.hash ?? "null",
             size,
             timestamps: {
               createdAt,
