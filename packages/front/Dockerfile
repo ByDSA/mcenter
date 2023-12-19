@@ -70,7 +70,7 @@ COPY ./$APP/styles ./styles
 COPY ./$APP/public ./public
 COPY --from=deps-build /packages/app/node_modules ./node_modules
 COPY ./$APP/package.json ./$APP/*lock* ./$APP/tsconfig* ./$APP/next.config* ./
-COPY ./$APP/.env.$ENV ./.env
+COPY ./$APP/.env.docker.$ENV ./.env
 
 # Disable telemetry during the build.
 # Learn more here: https://nextjs.org/telemetry

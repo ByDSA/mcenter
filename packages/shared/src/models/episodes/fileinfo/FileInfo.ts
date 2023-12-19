@@ -1,5 +1,7 @@
 import z from "zod";
 
+const DateSchema = z.date().or(z.string().pipe(z.coerce.date()));
+
 export const Schema = z.object( {
   path: z.string(),
   hash: z.string()
@@ -8,8 +10,8 @@ export const Schema = z.object( {
     } ),
   size: z.number(),
   timestamps: z.object( {
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: DateSchema,
+    updatedAt: DateSchema,
   } ).strict(),
 } ).strict();
 

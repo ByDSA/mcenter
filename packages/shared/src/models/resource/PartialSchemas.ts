@@ -1,11 +1,12 @@
 import { z } from "zod";
 
-export const PositiveOrZeroSchema = z.number().int()
+export const PositiveOrZeroSchema = z.number()
   .gte(0);
 
 export const TimeRangeSchema = z.object( {
-  start: PositiveOrZeroSchema,
-  end: PositiveOrZeroSchema,
+  // TODO: quitar lo de -1 cuando se haya corregido el modelo y start y end sean opcionales
+  start: PositiveOrZeroSchema.or(z.literal(-1)).optional(),
+  end: PositiveOrZeroSchema.or(z.literal(-1)).optional(),
 } );
 
 export type TimeRange = z.infer<typeof TimeRangeSchema>;

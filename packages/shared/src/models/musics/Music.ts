@@ -12,7 +12,7 @@ export const ModelSchema = z.object( {
     duration: z.number().nullable(),
   } ).strict(),
 } )
-// TODO: quitar esto de aquí y ponerlo en un 'fileInfoAudio'
+// TODO: quitar FileInfo de aquí y ponerlo en un 'fileInfoAudio'
   .merge(FileInfoSchema)
   .merge(ResourceSchema)
   .merge(PickableSchema)
@@ -24,4 +24,8 @@ export default Model;
 
 export function assertIsModel(model: unknown, msg?: string): asserts model is Model {
   assertZodPopStack(ModelSchema, model, msg);
+}
+
+export function parseModel(model: unknown): Model {
+  return ModelSchema.parse(model);
 }

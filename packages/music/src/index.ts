@@ -1,24 +1,40 @@
-import { MusicController, MusicRepository } from "#modules/musics";
-import FixController from "#modules/musics/controllers/FixController";
-import GetController from "#modules/musics/controllers/GetController";
-import mediaServer from "./MediaServer";
-import App from "./routes/app";
+import express, { Request, Response } from "express";
+import { ENVS } from "./env";
 
-const musicRepository = new MusicRepository();
-const fixController = new FixController( {
-  musicRepository,
-} );
-const getController = new GetController( {
-  musicRepository,
-} );
-const musicController = new MusicController( {
-  fixController,
-  getController,
-} );
-const app = new App( {
-  musicController,
+const app = express();
+
+app.get("/api/get/random", (req: Request, res: Response) => {
+  const {redirectServer} = ENVS;
+  const {tags} = req.query;
+  let query = "";
+
+  if (tags)
+    query += `?tags=${tags}`;
+
+  const newUrl = `${redirectServer}/api/musics/get/random${query}`;
+
+  res.redirect(newUrl);
 } );
 
-app.run();
+app.get("/api/get/raw/:name", (req: Request, res: Response) => {
+  const { name } = req.params;
+  const newUrl = `${ENVS.redirectServer }/api/musics/get/raw/${ name}`;
 
-mediaServer.run();
+  res.redirect(newUrl);
+} );
+
+app.get("/api/update/fix/all", (_: Request, res: Response) => {
+  const newUrl = `${ENVS.redirectServer}/api/musics/update/fix/all`;
+
+  res.redirect(newUrl);
+} );
+
+app.get("/api/update/fix/integrity", (_: Request, res: Response) => {
+  const newUrl = `${ENVS.redirectServer}/api/musics/update/fix/integrity`;
+
+  res.redirect(newUrl);
+} );
+
+app.listen(ENVS.port, () => {
+  console.log(`Server listening on port ${ENVS.port}`);
+} );

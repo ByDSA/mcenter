@@ -1,8 +1,8 @@
 /* eslint-disable no-await-in-loop */
+import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { Music } from "#shared/models/musics";
 import { Stats } from "node:fs";
-import { getFullPath } from "src/env";
-import { calcHashFromFile } from "src/files";
+import { getFullPath } from "../utils";
 
 export type FileWithStats = {
   path: string;
@@ -12,6 +12,13 @@ export type FileWithStats = {
 
 type GroupBySize<T> = {
   [size: number | symbol]: T[];
+};
+
+export type Changes = {
+  new: FileWithStats[];
+  deleted: Music[];
+  moved: {original: Music; newPath: string}[];
+  updated: Music[];
 };
 
 type Options = {
@@ -132,7 +139,7 @@ export default class ChangesDetector {
     }
   }
 
-  async detectChanges() {
+  async detectChanges(): Promise<Changes> {
     const ret = {
       new: [] as FileWithStats[],
       deleted: [] as Music[],
@@ -160,7 +167,7 @@ export default class ChangesDetector {
 
     for (const ml of this.#localFiles) {
       const foundSamePath = this.#pathToRemoteMusic.get(ml.path);
-      const foundSameContent = this.#findLocalFileMusicInRemoteMusics(ml);
+      const foundSameContent = await this.#findLocalFileMusicInRemoteMusics(ml);
 
       if (!foundSameContent) {
         if (!foundSamePath)
@@ -183,7 +190,7 @@ export default class ChangesDetector {
 
     if (!fileWithMetadata.hash)
       // eslint-disable-next-line no-param-reassign
-      fileWithMetadata.hash = await calcHashFromFile(getFullPath(fileWithMetadata.path));
+      fileWithMetadata.hash = await md5FileAsync(getFullPath(fileWithMetadata.path));
 
     if (music.hash !== fileWithMetadata.hash)
       return false;

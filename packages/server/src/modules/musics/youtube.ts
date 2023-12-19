@@ -1,5 +1,5 @@
 import YoutubeMp3Downloader from "youtube-mp3-downloader";
-import { ENVS } from "./env";
+import { ENVS } from "./utils";
 
 // eslint-disable-next-line import/prefer-default-export
 export function download(str: string): Promise<any> {

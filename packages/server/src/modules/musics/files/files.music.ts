@@ -1,4 +1,4 @@
-import { ENVS } from "../env";
+import { getFullPath } from "../utils";
 import { findFiles } from "./files.find";
 
 export const AUDIO_EXTENSIONS = ["mp3", "flac"];
@@ -6,7 +6,7 @@ export const AUDIO_EXTENSIONS = ["mp3", "flac"];
 // eslint-disable-next-line import/prefer-default-export
 export async function findAllValidMusicFiles() {
   return (await findFiles( {
-    folder: ENVS.mediaPath,
+    folder: getFullPath(),
     recursive: true,
     extensions: AUDIO_EXTENSIONS,
   } )).map((fullPath) => {
@@ -20,7 +20,7 @@ export async function findAllValidMusicFiles() {
 }
 
 function getRelativePath(fullPath: string): string | null {
-  const {mediaPath} = ENVS;
+  const mediaPath = getFullPath();
   const index = fullPath.indexOf(mediaPath);
 
   if (index < 0)

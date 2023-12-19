@@ -16,7 +16,11 @@
     "serve-index": "1.9.1",
     "sha256-file": "1.0.0",
     "socket.io": "4.7.2",
-    "zod": "3.22.2"
+    "zod": "3.22.2",
+    "youtube-mp3-downloader": "0.7.11",
+    "node-media-server": "2.6.2",
+    "node-id3": "0.2.6",
+    "glob": "10.3.10"
   },
   "description": "",
   "devDependencies": {

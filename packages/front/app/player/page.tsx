@@ -122,12 +122,12 @@ function calcStartLength(statusLength: number | undefined, resource: Episode | n
   let resourceEnd;
   let resourceStart;
 
-  if (typeof resource?.end !== "number" || resource?.end < 0 || resource.end < resource.start)
+  if (typeof resource?.end !== "number" || resource?.end < 0 || (resource.start !== undefined && resource.end < resource.start))
     resourceEnd = statusLength;
   else
     resourceEnd = resource.end;
 
-  if (typeof resource?.start !== "number" || resource?.start < 0 || resource.start > resource.end)
+  if (typeof resource?.start !== "number" || resource?.start < 0 || (resource.end !== undefined && resource.start > resource.end))
     resourceStart = 0;
   else
     resourceStart = resource.start;

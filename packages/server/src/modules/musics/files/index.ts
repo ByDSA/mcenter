@@ -1,10 +1,6 @@
 export {
-  findFiles, FindOptions, fixHashFile,
+  FindOptions, findFiles,
 } from "./files.find";
-
-export {
-  calcHashFromFile,
-} from "./files.hash";
 
 export {
   findAllValidMusicFiles,

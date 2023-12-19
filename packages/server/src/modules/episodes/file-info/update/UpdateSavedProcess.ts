@@ -17,7 +17,7 @@ type ModelWithSuperId = FileInfoVideoWithSuperId;
 const compareModel: typeof compareFileInfoVideo = compareFileInfoVideo;
 
 type Data = ModelWithSuperId[];
-function md5FileAsync(fullFilePath: string): Promise<string> {
+export function md5FileAsync(fullFilePath: string): Promise<string> {
   return new Promise((res, rej) => {
     const hash = crypto.createHash("md5");
     const rStream = fs.createReadStream(fullFilePath);

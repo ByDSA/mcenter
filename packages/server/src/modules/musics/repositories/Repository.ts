@@ -1,11 +1,11 @@
+import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { Music } from "#shared/models/musics";
 import { statSync } from "fs";
 import NodeID3 from "node-id3";
 import path from "path";
-import { getFullPath } from "../../../env";
-import { calcHashFromFile } from "../../../files";
-import { AUDIO_EXTENSIONS } from "../../../files/files.music";
-import { download } from "../../../youtube";
+import { AUDIO_EXTENSIONS } from "../files/files.music";
+import { getFullPath } from "../utils";
+import { download } from "../youtube";
 // eslint-disable-next-line import/no-cycle
 import UrlGenerator from "./UrlGenerator";
 import { docOdmToModel } from "./adapters";
@@ -65,7 +65,7 @@ export default class Repository {
       title,
       artist,
     } );
-    const hash = calcHashFromFile(fullPath);
+    const hash = md5FileAsync(fullPath);
     const {size} = statSync(fullPath);
     const docOdm = await ModelOdm.create( {
       hash,
@@ -148,14 +148,4 @@ function fixTitle(title: string): string {
   return title.replace(/ \((Official )?(Lyric|Music) Video\)/ig,"")
     .replace(/\(videoclip\)/ig,"")
     .replace(/ $/g,"");
-}
-
-export function generateView(musics: Music[]): string {
-  let ret = "<ul>";
-
-  musics.map((m) => `<li><a href='/raw/${m.url}'>${m.title}</li>`)
-    .forEach((line) => { ret += line; } );
-  ret += "</ul>";
-
-  return ret;
 }

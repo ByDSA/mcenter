@@ -1,21 +1,31 @@
+import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { Music } from "#shared/models/musics";
+import { PublicMethodsOf } from "#shared/utils/types";
+import { SecureRouter } from "#utils/express";
 import { Request, Response, Router } from "express";
 import { statSync } from "node:fs";
 import { MusicRepository } from "..";
-import { getFullPath } from "../../../env";
-import { calcHashFromFile, findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../../files";
+import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../files";
 import UrlGenerator, { fixUrl } from "../repositories/UrlGenerator";
+import { getFullPath } from "../utils";
 import ChangesDetector, { FileWithStats } from "./ChangesDetector";
 
 const API = "/api";
 const CREATE = `${API}/create`;
 const ROUTE_CREATE_YT = `${CREATE}/yt`;
 
+export type ChangesResponse = {
+  new: Music[];
+  deleted: Music[];
+  moved: {original: Music; newPath: string}[];
+  updated: Music[];
+};
+
 type Params = {
   musicRepository: MusicRepository;
 };
 export default class FixController {
-  #musicRepository: MusicRepository;
+  #musicRepository: PublicMethodsOf<MusicRepository>;
 
   constructor( { musicRepository }: Params) {
     this.#musicRepository = musicRepository;
@@ -60,7 +70,7 @@ export default class FixController {
 
     await Promise.all(promises);
 
-    const ret = {
+    const ret: ChangesResponse = {
       new: created,
       deleted: changes.deleted,
       moved: changes.moved,
@@ -95,10 +105,10 @@ export default class FixController {
     const promises = [];
 
     for (const music of musics) {
-      // Hashes SHA256 en vez de MD5
+      // Si tiene hashes SHA256 en vez de MD5
       if (music.hash === null || music.hash.length !== 32) {
         // eslint-disable-next-line no-await-in-loop
-        const hash = await calcHashFromFile(getFullPath(music.path));
+        const hash = await md5FileAsync(getFullPath(music.path));
 
         // eslint-disable-next-line no-await-in-loop
         await this.#musicRepository.updateOneByPath(music.path, {
@@ -193,7 +203,7 @@ export default class FixController {
   }
 
   getRouter(): Router {
-    const router = Router(); // TODO: cambiar por SecureRouter
+    const router = SecureRouter();
 
     router.get("/all", this.fixAll.bind(this));
 

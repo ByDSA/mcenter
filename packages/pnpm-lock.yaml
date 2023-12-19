@@ -206,6 +206,9 @@ importers:
       fluent-ffmpeg:
         specifier: 2.1.2
         version: 2.1.2
+      glob:
+        specifier: 10.3.10
+        version: 10.3.10
       helmet:
         specifier: 7.0.0
         version: 7.0.0
@@ -218,6 +221,12 @@ importers:
       mongoose:
         specifier: 7.5.0
         version: 7.5.0
+      node-id3:
+        specifier: 0.2.6
+        version: 0.2.6
+      node-media-server:
+        specifier: 2.6.2
+        version: 2.6.2
       node-schedule:
         specifier: 2.1.1
         version: 2.1.1
@@ -233,6 +242,9 @@ importers:
       socket.io:
         specifier: 4.7.2
         version: 4.7.2
+      youtube-mp3-downloader:
+        specifier: 0.7.11
+        version: 0.7.11
       zod:
         specifier: 3.22.2
         version: 3.22.2

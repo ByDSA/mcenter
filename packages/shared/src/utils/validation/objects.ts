@@ -1,6 +1,6 @@
 export function assertHasKey<T extends Object>(value: T, key: string) {
   if (!(key in value))
-    throw new Error(`TODO must have '${key}'`);
+    throw new Error(`Must have '${key}'`);
 }
 
 export function assertHasAnyKey<T extends Object>(value: T, keys: string[]) {
@@ -9,7 +9,7 @@ export function assertHasAnyKey<T extends Object>(value: T, keys: string[]) {
       return;
   }
 
-  throw new Error(`TODO must have any key of '${keys.join(", ")}'`);
+  throw new Error(`Must have any key of '${keys.join(", ")}'`);
 }
 
 export function assertIsInstanceOf<T>(value: unknown, clazz: new (...args: any[])=> T): asserts value is T {

@@ -1,9 +1,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-param-reassign */
+import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { glob } from "glob";
-import path from "path";
-import { ENVS } from "../env";
-import { calcHashFromFile } from "./files.hash";
+import { getFullPath } from "../utils";
 
 export type FindOptions = {
   folder?: string;
@@ -94,7 +93,7 @@ function getAllFilesByExtensionCommon(
 }
 
 const DefaultOptions: FindOptions = {
-  folder: ENVS.mediaPath,
+  folder: getFullPath(),
   recursive: true,
   onlyFirst: false,
 };
@@ -127,7 +126,7 @@ async function matchHashInGroupOfFiles(hash: string, files: string[]): Promise<s
   const ret = [];
 
   for (const f of files) {
-    if (await calcHashFromFile(f) === hash)
+    if (await md5FileAsync(f) === hash)
       ret.push(f);
   }
 
@@ -138,36 +137,3 @@ export type HashFile = {
   hash: string;
   path: string;
 };
-
-// TODO: esto se usa en algún sitio que no sea sólo en el test?
-export async function fixHashFile<T extends HashFile>(
-  obj: T,
-  options?: FindOptions,
-): Promise<T | undefined> {
-  const opts = initializeFindByHashOptions(options);
-
-  try {
-    const fullPath = path.join(options?.folder || "", obj.path);
-    const hashFromFile = await calcHashFromFile(fullPath);
-
-    if (hashFromFile === obj.hash)
-      return obj;
-
-    obj.hash = hashFromFile;
-  } catch (e) { // File doesn't exists
-    const files = await findFiles( {
-      fileHash: obj.hash,
-      folder: opts.folder,
-      recursive: true,
-    } );
-
-    if (files.length === 0)
-      return undefined;
-
-    const newFile = files[0];
-
-    obj.path = newFile;
-  }
-
-  return obj;
-}

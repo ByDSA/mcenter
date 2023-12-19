@@ -1,8 +1,10 @@
 import { Music } from "#shared/models/musics";
+import { SecureRouter } from "#utils/express";
 import { Request, Response, Router } from "express";
+import path from "node:path";
 import { newPicker } from "rand-picker";
-import { ENVS, getFullPath } from "../../../env";
 import { Repository } from "../repositories";
+import { ENVS, getFullPath } from "../utils";
 
 let lastPicked: Music | undefined;
 
@@ -19,7 +21,9 @@ export default class GetController {
   async getRandom(req: Request, res: Response) {
     const musics = await this.findAllMusicsAndFilter(req);
     const picked = randomPick(musics);
-    const ret = generatePlaylist(picked, req.url);
+    const nextUrlServer = ENVS.backendUrl;
+    const nextUrl = `${nextUrlServer}/${path.join("api/musics/get", req.url)}`;
+    const ret = generatePlaylist(picked, nextUrl);
 
     res.send(ret);
   }
@@ -27,7 +31,6 @@ export default class GetController {
   async getAll(req: Request, res: Response) {
     const musics = await this.findAllMusicsAndFilter(req);
 
-    // const ret = generateView(musics);
     this.#sortMusics(musics);
     res.send(musics);
   }
@@ -89,7 +92,7 @@ export default class GetController {
   }
 
   getRouter(): Router {
-    const router = Router(); // TODO: cambiar por SecureRouter
+    const router = SecureRouter();
 
     router.get("/random", this.getRandom.bind(this));
     router.get("/all", this.getAll.bind(this));
@@ -134,10 +137,11 @@ function randomPick(musics: Music[]): Music {
 }
 
 function generatePlaylist(picked: Music, nextUrl: string): string {
-  const ROUTE_RAW = "/api/get/raw";
+  const ROUTE_RAW = "/api/musics/get/raw";
+  const {backendUrl: server} = ENVS;
   const ret = `#EXTM3U
   #EXTINF:317,${picked.title}
-  ${ENVS.server}${ROUTE_RAW}/${picked.url}
+  ${server}${ROUTE_RAW}/${picked.url}
   #EXTINF:-1,NEXT
   ${nextUrl}`;
 
