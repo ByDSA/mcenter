@@ -4,9 +4,11 @@
 // @ts-check
 
 // @ts-ignore
-// eslint-disable-next-line import/no-absolute-path
 
 import { updateRemoteEnvs } from "./envs.mjs";
+
+// eslint-disable-next-line import/no-absolute-path
+import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 
 import {
   dockerImagePush,
@@ -85,13 +87,19 @@ export async function deployParticular(ENVS) {
 
   await migrations({
     targetEnv: ENVS.TARGET_ENV,
+    projectRoot: ENVS.project.root,
   });
 }
 
 /**
- * @param {{targetEnv: string}} params
+ * @param {{targetEnv: string, projectRoot: string}} params
  * @returns {Promise<void>}
  */
 async function migrations(params) {
-  await $`pnpm db:migrate -e ${params.targetEnv}`;
+  console.log("Checking migrations ...");
+  const verboseTmp = $.verbose;
+
+  $.verbose = true;
+  await $`cd ${params.projectRoot}/packages/server && pnpm db:migrate -e ${params.targetEnv}`;
+  $.verbose = verboseTmp;
 }
