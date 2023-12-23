@@ -67,6 +67,9 @@ const DEFAULT_DEPENDENCIES: OptionalPropsRecursive<ExpressAppDependencies> = dee
   controllers: {
     cors: true,
   },
+  db: {
+    migrator: null,
+  },
 } );
 
 // Necesario para poder replicarla para test
@@ -220,7 +223,8 @@ export default class ExpressApp implements App {
     schedule.gracefulShutdown();
   }
 
-  listen() {
+  // eslint-disable-next-line require-await
+  async listen() {
     assertIsDefined(this.#instance);
     const PORT: number = +(process.env.PORT ?? 8080);
 

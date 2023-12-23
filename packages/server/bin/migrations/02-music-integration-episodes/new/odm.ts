@@ -1,6 +1,6 @@
 import { isDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
-import { ModelFullId } from "../models";
+import { ModelFullId } from "./Episode";
 
 export interface DocOdm {
   _id?: mongoose.Types.ObjectId;

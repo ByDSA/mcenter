@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 
 export interface DocOdm {
-  _id?: mongoose.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   episodeId: mongoose.Types.ObjectId;
   path: string;
-  hash: string;
-  size: number;
+  hash: string | null;
+  size: number | null;
   timestamps: {
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: Date | null;
+    updatedAt: Date | null;
   };
   mediaInfo: {
     duration: number | null;
@@ -19,8 +19,6 @@ export interface DocOdm {
     fps: string | null;
   };
 }
-
-const NAME = "EpisodeFileInfo";
 
 export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   episodeId: {
@@ -51,5 +49,3 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
 }, {
   autoIndex: false,
 } );
-
-export const ModelOdm = mongoose.model<DocOdm>(NAME, SchemaOdm);

@@ -7,10 +7,16 @@ import { LocalFileSchema, PickableSchema, TaggableSchema } from "../resource/Par
 
 export const ModelSchema = z.object( {
   artist: z.string(),
+  album: z.string().optional(),
   url: z.string(),
   mediaInfo: z.object( {
     duration: z.number().nullable(),
   } ).strict(),
+  game: z.string().optional(),
+  year: z.number().int()
+    .optional(),
+  country: z.string().optional(),
+  todo: z.string().optional(),
 } )
 // TODO: quitar FileInfo de aquí y ponerlo en un 'fileInfoAudio'
   .merge(FileInfoSchema)

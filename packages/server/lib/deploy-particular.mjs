@@ -82,4 +82,16 @@ export async function deployParticular(ENVS) {
       sourceImageTag: tag,
     });
   }
+
+  await migrations({
+    targetEnv: ENVS.TARGET_ENV,
+  });
+}
+
+/**
+ * @param {{targetEnv: string}} params
+ * @returns {Promise<void>}
+ */
+async function migrations(params) {
+  await $`pnpm db:migrate -e ${params.targetEnv}`;
 }

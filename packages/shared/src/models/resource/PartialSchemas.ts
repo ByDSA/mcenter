@@ -4,9 +4,8 @@ export const PositiveOrZeroSchema = z.number()
   .gte(0);
 
 export const TimeRangeSchema = z.object( {
-  // TODO: quitar lo de -1 cuando se haya corregido el modelo y start y end sean opcionales
-  start: PositiveOrZeroSchema.or(z.literal(-1)).optional(),
-  end: PositiveOrZeroSchema.or(z.literal(-1)).optional(),
+  start: PositiveOrZeroSchema.optional(),
+  end: PositiveOrZeroSchema.optional(),
 } );
 
 export type TimeRange = z.infer<typeof TimeRangeSchema>;
