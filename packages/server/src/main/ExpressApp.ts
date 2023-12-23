@@ -3,6 +3,7 @@ import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeRepository, EpisodeRestController } from "#modules/episodes";
 import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
 import { HistoryListRepository, HistoryListRestController } from "#modules/historyLists";
+import { MusicController } from "#modules/musics";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
 import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
@@ -22,6 +23,7 @@ import { execSync } from "node:child_process";
 import fs from "node:fs";
 import { Server } from "node:http";
 import serveIndex from "serve-index";
+import mediaServer from "../modules/musics/MediaServer";
 
 export type ExpressAppDependencies = {
   db: {
@@ -52,6 +54,9 @@ export type ExpressAppDependencies = {
     episodes: {
       restController: PublicMethodsOf<EpisodeRestController>;
     };
+    musics: {
+      controller: PublicMethodsOf<MusicController>;
+    };
   };
   controllers: {
     cors?: boolean;
@@ -61,6 +66,9 @@ export type ExpressAppDependencies = {
 const DEFAULT_DEPENDENCIES: OptionalPropsRecursive<ExpressAppDependencies> = deepFreeze( {
   controllers: {
     cors: true,
+  },
+  db: {
+    migrator: null,
   },
 } );
 
@@ -148,6 +156,8 @@ export default class ExpressApp implements App {
 
     app.use("/api/episodes", modules.episodes.restController.getRouter());
 
+    app.use("/api/musics", modules.musics.controller.getRouter());
+
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;
       const streamRepository = new StreamRepository();
@@ -213,7 +223,8 @@ export default class ExpressApp implements App {
     schedule.gracefulShutdown();
   }
 
-  listen() {
+  // eslint-disable-next-line require-await
+  async listen() {
     assertIsDefined(this.#instance);
     const PORT: number = +(process.env.PORT ?? 8080);
 
@@ -227,6 +238,8 @@ export default class ExpressApp implements App {
 
       console.log(`Server Listening on http://localhost:${realPort}`);
     } );
+
+    mediaServer.run();
   }
 
   getExpressApp(): express.Express | null {

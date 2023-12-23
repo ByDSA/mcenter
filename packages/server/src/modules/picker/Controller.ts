@@ -86,7 +86,7 @@ export default class PickerController implements Controller {
       episodeRepository,
       domainMessageBroker: this.#domainMessageBroker,
     } );
-    const ret = (await asyncMap(picker.data.filter((e) => e.end < 100), async(e: Model) => {
+    const ret = (await asyncMap(picker.data.filter((e) => e.end === undefined || e.end < 100), async(e: Model) => {
       const selfWeight = picker.getWeight(e);
 
       assertIsDefined(selfWeight);

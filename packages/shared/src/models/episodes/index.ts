@@ -7,5 +7,5 @@ export {
 } from "./dto";
 
 export {
-  FileInfo as EpisodeFileInfo, assertIsFileInfo as assertIsEpisodeFileInfo,
+  FileInfoVideo as EpisodeFileInfo, assertIsFileInfoVideo as assertIsEpisodeFileInfo,
 } from "./fileinfo";

@@ -1,11 +1,11 @@
-import { FileInfo, FileInfoSuperId, FileInfoWithSuperId } from "#shared/models/episodes/fileinfo";
+import { FileInfoVideo, FileInfoVideoSuperId, FileInfoVideoWithSuperId } from "#shared/models/episodes/fileinfo";
 import { CanGetAllBySuperId, CanUpdateMany, CanUpdateOneBySuperId } from "#utils/layers/repository";
 import { docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
 import { ModelOdm } from "./odm";
 
-type ModelWithSuperId = FileInfoWithSuperId;
-type Model = FileInfo;
-type SuperId = FileInfoSuperId;
+type ModelWithSuperId = FileInfoVideoWithSuperId;
+type Model = FileInfoVideo;
+type SuperId = FileInfoVideoSuperId;
 export default class Repository
 implements CanGetAllBySuperId<Model, SuperId>,
 CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId> {

@@ -8,8 +8,7 @@
     "src/**/tests/*",
     "src/**/testUtils.ts",
     "**/*.spec.ts",
-    "**/*.test.ts",
-    "src/main/db/migrations"
+    "**/*.test.ts"
   ],
   "compilerOptions": {
     "sourceMap": false,

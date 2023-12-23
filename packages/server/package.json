@@ -16,7 +16,11 @@
     "serve-index": "1.9.1",
     "sha256-file": "1.0.0",
     "socket.io": "4.7.2",
-    "zod": "3.22.2"
+    "zod": "3.22.2",
+    "youtube-mp3-downloader": "0.7.11",
+    "node-media-server": "2.6.2",
+    "node-id3": "0.2.6",
+    "glob": "10.3.10"
   },
   "description": "",
   "devDependencies": {
@@ -45,7 +49,7 @@
     "build": "pnpm build:clean && pnpm build:raw",
     "build:clean": "rm -rf build",
     "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
-    "migrate": "./src/main/db/migrations/migrate.sh",
+    "db:migrate": "./bin/migrations/migrate.mjs",
     "start": "NODE_ENV=production node build/index.js",
     "start:watch": "NODE_ENV=development nodemon",
     "test": "NODE_ENV=test jest --maxWorkers=1",

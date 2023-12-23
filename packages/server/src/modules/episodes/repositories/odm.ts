@@ -3,11 +3,12 @@ import mongoose from "mongoose";
 import { ModelFullId } from "../models";
 
 export interface DocOdm {
+  _id?: mongoose.Types.ObjectId;
   episodeId: string;
   serieId: string;
   path: string;
-  title?: string;
-  weight?: number;
+  title: string;
+  weight: number;
   start?: number;
   end?: number;
   tags?: string[];
@@ -35,9 +36,11 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   },
   title: {
     type: String,
+    required: true,
   },
   weight: {
     type: Number,
+    required: true,
   },
   start: {
     type: Number,

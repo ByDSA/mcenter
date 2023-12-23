@@ -109,11 +109,10 @@ implements
       const ascSort = (a: Entry, b: Entry) =>
         a.date.timestamp - b.date.timestamp;
 
-      // TODO: cambiar a toSorted en node 20
       if (timestamp === "asc")
-        newEntries = newEntries.sort(ascSort);
+        newEntries = newEntries.toSorted(ascSort);
       else if (timestamp === "desc")
-        newEntries = newEntries.sort(descSort);
+        newEntries = newEntries.toSorted(descSort);
     }
 
     if (body.offset)

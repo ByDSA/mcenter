@@ -1,4 +1,3 @@
-import { Server } from "http";
 import ActionController from "#modules/actions/ActionController";
 import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
 import FixerController from "#modules/actions/FixerController";
@@ -6,12 +5,16 @@ import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeAddNewFileInfosController, EpisodeFileInfoRepository, EpisodePickerService, EpisodeRepository, EpisodeRestController, EpisodeUpdateFileInfoController, SavedSerieTreeService } from "#modules/episodes";
 import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
+import { MusicController, MusicRepository } from "#modules/musics";
+import FixController from "#modules/musics/controllers/FixController";
+import GetController from "#modules/musics/controllers/GetController";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerController } from "#modules/play";
 import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
 import { VlcBackWebSocketsServerService } from "#modules/play/remote-player/vlc-back-service";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository, StreamRestController } from "#modules/streams";
+import { Server } from "http";
 import { ExpressApp } from "./main";
 import RealDatabase from "./main/db/Database";
 
@@ -71,6 +74,15 @@ import RealDatabase from "./main/db/Database";
   const lastTimePlayedService = new LastTimePlayedService( {
     domainMessageBroker,
     episodeRepository,
+  } );
+  const musicRepository = new MusicRepository();
+  const musicController = new MusicController( {
+    fixController: new FixController( {
+      musicRepository,
+    } ),
+    getController: new GetController( {
+      musicRepository,
+    } ),
   } );
   const app: ExpressApp = new ExpressApp( {
     db: {
@@ -139,6 +151,9 @@ import RealDatabase from "./main/db/Database";
           episodeRepository,
           serieRepo: serieRepository,
         } ),
+      },
+      musics: {
+        controller: musicController,
       },
     },
     controllers: {

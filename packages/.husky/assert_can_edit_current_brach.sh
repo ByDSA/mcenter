@@ -3,6 +3,8 @@ set -e
 
 . "$(dirname -- "$0")/_/husky.sh"
 
+. "$(dirname -- "$0")/shared-imports.sh"
+
 fatal_error() {
   message=${1:-"Error fatal"}
   echo "ERROR: $message"
@@ -10,13 +12,10 @@ fatal_error() {
 }
 
 main() {
-  local current_branch
-  current_branch=$(git rev-parse --abbrev-ref HEAD)
+  isPrBranch=$(is_pr_branch)
 
-  local match='^((fix)|(feat)|(chore))(\((.+)\))?\/(.+)$'
-
-  if ! (echo "$current_branch" | grep -Eq "$match"); then
-    fatal_error "No se puede editar diréctamente la rama $current_branch."
+  if [ "$isPrBranch" = "0" ]; then
+    fatal_error "No se puede editar diréctamente la rama actual."
   fi
 }
 

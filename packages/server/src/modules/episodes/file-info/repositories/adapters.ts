@@ -1,23 +1,23 @@
-import { FileInfo, FileInfoWithSuperId, assertIsFileInfo, assertIsFileInfoWithSuperId } from "#shared/models/episodes/fileinfo";
+import { FileInfoVideo, FileInfoVideoWithSuperId, assertIsFileInfoVideo, assertIsFileInfoVideoWithSuperId } from "#shared/models/episodes/fileinfo";
 import { assertIsDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
 import { DocOdm } from "./odm";
 
-type Model = FileInfo;
-type ModelWithSuperId = FileInfoWithSuperId;
+type Model = FileInfoVideo;
+type ModelWithSuperId = FileInfoVideoWithSuperId;
 
-const assertIsModel: typeof assertIsFileInfo = assertIsFileInfo;
-const assertIsModelWithSuperId: typeof assertIsFileInfoWithSuperId = assertIsFileInfoWithSuperId;
+const assertIsModel: typeof assertIsFileInfoVideo = assertIsFileInfoVideo;
+const assertIsModelWithSuperId: typeof assertIsFileInfoVideoWithSuperId = assertIsFileInfoVideoWithSuperId;
 
 export function docOdmToModel(docOdm: DocOdm): Model {
   assertIsDefined(docOdm);
   const model: Model = {
     path: docOdm.path ?? null,
-    hash: docOdm.hash ?? null,
-    size: docOdm.size ?? null,
+    hash: docOdm.hash,
+    size: docOdm.size,
     timestamps: {
-      createdAt: docOdm.timestamps?.createdAt ?? null,
-      updatedAt: docOdm.timestamps?.updatedAt ?? null,
+      createdAt: docOdm.timestamps?.createdAt,
+      updatedAt: docOdm.timestamps?.updatedAt,
     },
     mediaInfo: {
       duration: docOdm.mediaInfo?.duration ?? null,
