@@ -79,7 +79,7 @@ const targetEnv = targetEnvArg ?? "dev";
     envFilePath,
     migrationMode: "up",
   } );
-} )().catch(console.error);
+} )();
 
 /**
  *

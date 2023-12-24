@@ -30,4 +30,4 @@ import { serverPackageDeployParticular } from "../packages/server/lib/index.mjs"
   await deployProjectEnd({
     ...ENVS,
   });
-})().catch(console.error);
+})();

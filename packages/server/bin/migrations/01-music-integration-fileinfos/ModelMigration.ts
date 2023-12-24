@@ -79,7 +79,8 @@ export abstract class ModelMigration<OldDocOdm extends Object, NewDocOdm extends
     this.log("Backing up old collection ...");
     assert(this.backup);
 
-    await this.backup.modelOdm.collection.drop();
+    // eslint-disable-next-line no-empty-function
+    await this.backup.modelOdm.collection.drop().catch((_) => {} );
 
     await this.backup.modelOdm.insertMany(this.#oldDocs);
 

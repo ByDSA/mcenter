@@ -21,4 +21,4 @@ import { deployParticular } from "../lib/deploy-particular.mjs";
   await deployProjectEnd({
     ...ENVS,
   });
-})().catch(console.error);
+})();

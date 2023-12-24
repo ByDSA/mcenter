@@ -101,5 +101,6 @@ async function migrations(params) {
 
   $.verbose = true;
   await $`cd ${params.projectRoot}/packages/server && pnpm db:migrate -e ${params.targetEnv}`;
+
   $.verbose = verboseTmp;
 }

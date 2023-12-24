@@ -23,7 +23,7 @@ import { loadProjectEnvs } from "../../../../lib/projects/envs.mjs";
     folder,
     file,
   )}`;
-} )().catch(console.error);
+} )();
 
 /**
  * @param {string[]} scriptFiles
