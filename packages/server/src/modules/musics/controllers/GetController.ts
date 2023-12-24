@@ -35,6 +35,17 @@ export default class GetController {
     res.send(musics);
   }
 
+  async getPlaylist(req: Request, res: Response) {
+    const {name} = req.params;
+    const playlistsFolder = path.join(ENVS.mediaPath, "music", "playlists");
+    const filePath = path.join(playlistsFolder, name);
+
+    res.download(filePath, (error) => {
+      if (error)
+        res.sendStatus(404);
+    } );
+  }
+
   async findAllMusicsAndFilter(req: Request): Promise<Music[]> {
     let musics = await this.#musicRepository.findAll();
     const tagsQuery = <string | undefined>req.query.tags;
@@ -97,6 +108,7 @@ export default class GetController {
     router.get("/random", this.getRandom.bind(this));
     router.get("/all", this.getAll.bind(this));
     router.get("/raw/:name", this.rawAccess.bind(this));
+    router.get("/playlist/:name", this.getPlaylist.bind(this));
 
     return router;
   }
