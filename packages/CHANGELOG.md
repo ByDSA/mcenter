@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.0](https://github.com/ByDSA/mcenter/compare/v3.3.0...v3.4.0) (2023-12-24)
+
+
+### Features
+
+* **server:** playlists raw ([ddf9cc4](https://github.com/ByDSA/mcenter/commit/ddf9cc408ef2ca779b0a3ecf26ce0f60dbb8bc69))
+
 ## [3.3.0](https://github.com/ByDSA/mcenter/compare/v3.2.1...v3.3.0) (2023-12-23)
 
 
