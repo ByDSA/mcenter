@@ -8,6 +8,7 @@ import { HistoryEntryRepository, HistoryListRepository, HistoryListRestControlle
 import { MusicController, MusicRepository } from "#modules/musics";
 import FixController from "#modules/musics/controllers/FixController";
 import GetController from "#modules/musics/controllers/GetController";
+import UpdateRemoteController from "#modules/musics/controllers/UpdateRemoteController";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerController } from "#modules/play";
 import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
@@ -81,6 +82,9 @@ import RealDatabase from "./main/db/Database";
       musicRepository,
     } ),
     getController: new GetController( {
+      musicRepository,
+    } ),
+    updateRemoteController: new UpdateRemoteController( {
       musicRepository,
     } ),
   } );

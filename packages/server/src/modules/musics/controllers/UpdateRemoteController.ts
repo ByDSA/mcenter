@@ -1,12 +1,9 @@
 /* eslint-disable no-use-before-define */
 import { PublicMethodsOf } from "#shared/utils/types";
 import { SecureRouter } from "#utils/express";
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 import { MusicRepository } from "..";
-
-const API = "/api";
-const CREATE = `${API}/create`;
-const ROUTE_CREATE_YT = `${CREATE}/yt`;
+import { UpdateRemoteTreeService } from "../services/update-remote-tree";
 
 type Params = {
   musicRepository: MusicRepository;
@@ -18,15 +15,19 @@ export default class FixController {
     this.#musicRepository = musicRepository;
   }
 
+  async all(_: Request, res: Response) {
+    const updateRemoteTreeService = new UpdateRemoteTreeService( {
+      musicRepository: this.#musicRepository,
+    } );
+    const ret = await updateRemoteTreeService.update();
+
+    res.send(ret);
+  }
+
   getRouter(): Router {
     const router = SecureRouter();
 
-    router.get(`${ROUTE_CREATE_YT}/:id`, async (req, res) => {
-      const { id } = req.params;
-      const data = await this.#musicRepository.findOrCreateFromYoutube(id);
-
-      res.send(data);
-    } );
+    router.get("/", this.all.bind(this));
 
     return router;
   }

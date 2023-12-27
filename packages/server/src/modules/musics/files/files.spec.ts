@@ -1,42 +1,43 @@
 import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
-import { join } from "node:path";
-import { findFiles, FindOptions } from ".";
-import { ENVS } from "../utils";
+import { MUSIC_DATA_FOLDER } from "#tests/MusicData";
+import { AOT4_COPY, A_AOT4, DK, DRIFTVEIL } from "#tests/main/db/fixtures/models/music";
+import { join } from "path";
+import { FindOptions, findFiles } from ".";
 
 describe("getHashFromFile", () => {
-  it("existing path", () => {
-    const expected = "eacf40b68de85b759524e3bd0bea1b4393360f682db3a7f3ec25ff46b1d01872";
-    const path = "tests/files/dk.mp3";
-    const actual = md5FileAsync(path);
+  it("existing path", async () => {
+    const expected = DK.hash;
+    const fullPath = `${MUSIC_DATA_FOLDER}/${DK.path}`;
+    const actual = await md5FileAsync(fullPath);
 
     expect(actual).toBe(expected);
   } );
 
   it("existing path folder", () => {
-    const path = "tests/files/";
+    const path = `${MUSIC_DATA_FOLDER}/`;
 
-    expect(() => {
-      md5FileAsync(path);
-    } ).toThrow("EISDIR: illegal operation on a directory, read");
+    expect(async () => {
+      await md5FileAsync(path);
+    } ).rejects.toThrow("EISDIR: illegal operation on a directory, read");
   } );
 
   it("unexisting path", () => {
     const path = "unexisting/path/";
 
-    expect(() => {
-      md5FileAsync(path);
-    } ).toThrow(`ENOENT: no such file or directory, open '${path}'`);
+    expect(async () => {
+      await md5FileAsync(path);
+    } ).rejects.toThrow(`ENOENT: no such file or directory, open '${path}'`);
   } );
 } );
 
 describe("findFiles", () => {
   it("tests/files folder", async () => {
     const expected = [
-      "tests/files/dk.mp3",
-      "tests/files/aot4_copy.mp3",
-      "tests/files/nomusic",
-      "tests/files/Driftveil.mp3"];
-    const path = "tests/files";
+      `${MUSIC_DATA_FOLDER}/${DK.path}`,
+      `${MUSIC_DATA_FOLDER}/${AOT4_COPY.path}`,
+      `${MUSIC_DATA_FOLDER}/nomusic`,
+      `${MUSIC_DATA_FOLDER}/${DRIFTVEIL.path}`];
+    const path = `${MUSIC_DATA_FOLDER}/`;
     const actual = await findFiles( {
       folder: path,
     } );
@@ -68,12 +69,12 @@ describe("findFiles", () => {
 describe("findFilesResursive", () => {
   it("tests/files folder", async () => {
     const expected = [
-      "tests/files/dk.mp3",
-      "tests/files/nomusic",
-      "tests/files/aot4_copy.mp3",
-      "tests/files/a/aot4.mp3",
-      "tests/files/Driftveil.mp3"];
-    const path = "tests/files";
+      `${MUSIC_DATA_FOLDER}/${DK.path}`,
+      `${MUSIC_DATA_FOLDER}/nomusic`,
+      `${MUSIC_DATA_FOLDER}/${AOT4_COPY.path}`,
+      `${MUSIC_DATA_FOLDER}/${A_AOT4.path}`,
+      `${MUSIC_DATA_FOLDER}/${DRIFTVEIL.path}`];
+    const path = `${MUSIC_DATA_FOLDER}/`;
     const actual = await findFiles( {
       folder: path,
       recursive: true,
@@ -108,10 +109,10 @@ describe("findFilesResursive", () => {
 describe("findFilesByExtensionRecursive", () => {
   it("tests/files folder", async () => {
     const expected = [
-      "tests/files/dk.mp3",
-      "tests/files/aot4_copy.mp3",
-      "tests/files/a/aot4.mp3",
-      "tests/files/Driftveil.mp3"];
+      `${MUSIC_DATA_FOLDER}/${DK.path}`,
+      `${MUSIC_DATA_FOLDER}/${AOT4_COPY.path}`,
+      `${MUSIC_DATA_FOLDER}/${A_AOT4.path}`,
+      `${MUSIC_DATA_FOLDER}/${DRIFTVEIL.path}`];
     const path = "tests/files";
     const actual = await findFiles( {
       folder: path,
@@ -148,79 +149,79 @@ describe("findFilesByExtensionRecursive", () => {
 } );
 
 describe("findFiles", () => {
-  it("unique hash", () => {
-    const expected = [join(ENVS.mediaPath, "dk.mp3")];
-    const hash = "eacf40b68de85b759524e3bd0bea1b4393360f682db3a7f3ec25ff46b1d01872";
+  it("unique hash", async () => {
+    const expected = [join(MUSIC_DATA_FOLDER, DK.path)];
+    const {hash} = DK;
     const options: FindOptions = {
       fileHash: hash,
-      folder: ENVS.mediaPath,
+      folder: MUSIC_DATA_FOLDER,
       recursive: false,
     };
-    const actual = findFiles(options);
+    const actual = await findFiles(options);
 
     expect(actual).toStrictEqual(expected);
   } );
 
-  it("unique hash 2", () => {
-    const expected = ["tests/files/aot4_copy.mp3"];
-    const hash = "54ca5061257adafcedee8523e4f8cc3f0347ab9143cddb0fd9b4997498e34ce2";
+  it("unique hash 2", async () => {
+    const expected = [`${MUSIC_DATA_FOLDER}/${AOT4_COPY.path}`];
+    const {hash} = AOT4_COPY;
     const options: FindOptions = {
       fileHash: hash,
-      folder: ENVS.mediaPath,
+      folder: MUSIC_DATA_FOLDER,
       recursive: false,
     };
-    const actual = findFiles(options);
+    const actual = await findFiles(options);
 
     expect(actual).toStrictEqual(expected);
   } );
 
-  it("not found", () => {
+  it("not found", async () => {
     const expected: string[] = [];
     const hash = "1234";
     const options: FindOptions = {
       fileHash: hash,
-      folder: ENVS.mediaPath,
+      folder: MUSIC_DATA_FOLDER,
       recursive: false,
     };
-    const actual = findFiles(options);
+    const actual = await findFiles(options);
 
     expect(actual).toStrictEqual(expected);
   } );
 } );
 
 describe("findFilesRecursive", () => {
-  it("unique hash", () => {
-    const expected = ["tests/files/dk.mp3"];
-    const hash = "eacf40b68de85b759524e3bd0bea1b4393360f682db3a7f3ec25ff46b1d01872";
+  it("unique hash", async () => {
+    const expected = [`${MUSIC_DATA_FOLDER}/${DK.path}`];
+    const {hash} = DK;
     const options = {
       fileHash: hash,
-      folder: ENVS.mediaPath,
+      folder: MUSIC_DATA_FOLDER,
     };
-    const actual = findFiles(options);
+    const actual = await findFiles(options);
 
     expect(actual).toStrictEqual(expected);
   } );
 
   it("duplicated hash", async () => {
-    const expected = ["tests/files/aot4_copy.mp3", "tests/files/a/aot4.mp3"];
-    const hash = "54ca5061257adafcedee8523e4f8cc3f0347ab9143cddb0fd9b4997498e34ce2";
+    const expected = [`${MUSIC_DATA_FOLDER}/${AOT4_COPY.path}`, `${MUSIC_DATA_FOLDER}/${A_AOT4.path}`];
+    const {hash} = A_AOT4;
     const options = {
       fileHash: hash,
-      folder: ENVS.mediaPath,
+      folder: MUSIC_DATA_FOLDER,
     };
     const actual = await findFiles(options);
 
     expect(actual.sort()).toStrictEqual(expected.sort());
   } );
 
-  it("not found", () => {
+  it("not found", async () => {
     const expected: string[] = [];
     const hash = "1234";
     const options = {
       fileHash: hash,
-      folder: ENVS.mediaPath,
+      folder:MUSIC_DATA_FOLDER,
     };
-    const actual = findFiles(options);
+    const actual = await findFiles(options);
 
     expect(actual).toStrictEqual(expected);
   } );

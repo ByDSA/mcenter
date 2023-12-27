@@ -3,10 +3,12 @@ import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
 import { MUSICS_SAMPLES_IN_DISK, RepositoryMock } from "../repositories/tests";
+import { UpdateResult } from "../services/update-remote-tree";
 import { ENVS } from "../utils";
 import Controller from "./Controller";
-import FixController, { ChangesResponse } from "./FixController";
+import FixController from "./FixController";
 import GetController from "./GetController";
+import UpdateRemoteController from "./UpdateRemoteController";
 
 describe("GetAll", () =>{
   let routerApp: Application;
@@ -21,6 +23,9 @@ describe("GetAll", () =>{
 
     controller = new Controller( {
       fixController: new FixController( {
+        musicRepository: musicRepositoryMock,
+      } ),
+      updateRemoteController: new UpdateRemoteController( {
         musicRepository: musicRepositoryMock,
       } ),
       getController,
@@ -66,9 +71,9 @@ describe("GetAll", () =>{
     musicRepositoryMock.updateOneByPath = jest.fn().mockResolvedValue(undefined);
     musicRepositoryMock.deleteOneByPath = jest.fn().mockResolvedValue(undefined);
     const response = await request(routerApp)
-      .get("/update/fix/all")
+      .get("/update/remote")
       .expect(200);
-    const body = response.body as ChangesResponse;
+    const body = response.body as UpdateResult;
 
     expect(body).toBeDefined();
     expect(body.deleted).toHaveLength(0);
@@ -89,9 +94,9 @@ describe("GetAll", () =>{
     musicRepositoryMock.updateOneByPath = jest.fn().mockResolvedValue(undefined);
     musicRepositoryMock.deleteOneByPath = jest.fn().mockResolvedValue(undefined);
     const response = await request(routerApp)
-      .get("/update/fix/all")
+      .get("/update/remote")
       .expect(200);
-    const body = response.body as ChangesResponse;
+    const body = response.body as UpdateResult;
 
     expect(body).toBeDefined();
     expect(body.deleted).toHaveLength(0);

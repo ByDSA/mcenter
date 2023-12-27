@@ -2,7 +2,7 @@
 import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { Music } from "#shared/models/musics";
 import { Stats } from "node:fs";
-import { getFullPath } from "../utils";
+import { getFullPath } from "../../utils";
 
 export type FileWithStats = {
   path: string;
