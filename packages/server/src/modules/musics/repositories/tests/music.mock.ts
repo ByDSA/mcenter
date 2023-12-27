@@ -36,4 +36,6 @@ export class RepositoryMock implements PublicMethodsOf<MusicRepository> {
   createFromPath = jest.fn();
 
   deleteAll = jest.fn();
+
+  updateHashOf = jest.fn();
 }

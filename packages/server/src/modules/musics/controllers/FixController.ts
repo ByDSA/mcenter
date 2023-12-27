@@ -1,4 +1,4 @@
-import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
+/* eslint-disable no-use-before-define */
 import { Music } from "#shared/models/musics";
 import { PublicMethodsOf } from "#shared/utils/types";
 import { SecureRouter } from "#utils/express";
@@ -6,7 +6,6 @@ import { Request, Response, Router } from "express";
 import { statSync } from "node:fs";
 import { MusicRepository } from "..";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../files";
-import UrlGenerator, { fixUrl } from "../repositories/UrlGenerator";
 import { getFullPath } from "../utils";
 import ChangesDetector, { FileWithStats } from "./ChangesDetector";
 
@@ -91,123 +90,10 @@ export default class FixController {
     return changesDetector.detectChanges();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async fixIntegrity(_: Request, res: Response) {
-    const musics = await this.#musicRepository.findAll();
-    const ret = {
-      updatedSize: [] as Music[],
-      repeatedPaths: [] as Music[],
-      repeatedUrls: [] as Music[],
-      repeatedHashes: [] as Music[],
-      fixedUrls: [] as {original: Music; newUrl: string}[],
-      fixedHashes: [] as {original: Music; newHash: string}[],
-    };
-    const promises = [];
-
-    for (const music of musics) {
-      // Si tiene hashes SHA256 en vez de MD5
-      if (music.hash === null || music.hash.length !== 32) {
-        // eslint-disable-next-line no-await-in-loop
-        const hash = await md5FileAsync(getFullPath(music.path));
-
-        // eslint-disable-next-line no-await-in-loop
-        await this.#musicRepository.updateOneByPath(music.path, {
-          ...music,
-          hash,
-        } ).then(() => {
-          ret.fixedHashes.push( {
-            original: music,
-            newHash: hash,
-          } );
-        } );
-      }
-
-      // Músicas sin size
-      if (!music.size && music.size !== 0) {
-        const stats = statSync(getFullPath(music.path));
-
-        // eslint-disable-next-line no-param-reassign
-        music.size = stats.size;
-
-        const p = this.#musicRepository.updateOneByPath(music.path, music);
-
-        p.then(() => {
-          ret.updatedSize.push(music);
-        } );
-        promises.push(p);
-      }
-
-      // Paths repetidos
-      {
-        const mFound = musics.find((m) => m.path === music.path) as Music | undefined;
-
-        if (!mFound)
-          throw new Error("mFound is undefined");
-
-        if (mFound !== music)
-          ret.repeatedPaths.push(music, mFound);
-      }
-
-      // Urls repetidas
-      {
-        const mFound = musics.find((m) => m.url === music.url) as Music | undefined;
-
-        if (!mFound)
-          throw new Error("mFound is undefined");
-
-        if (mFound !== music)
-          ret.repeatedUrls.push(music, mFound);
-      }
-
-      // Hash repetido
-      {
-        const mFound = musics.find((m) => m.hash === music.hash) as Music | undefined;
-
-        if (!mFound)
-          throw new Error("mFound is undefined");
-
-        if (mFound !== music)
-          ret.repeatedHashes.push(music, mFound);
-      }
-
-      // Urls fixes
-      {
-        const {url} = music;
-        const fixedUrl = fixUrl(url);
-
-        if (fixedUrl !== url) {
-          const urlGenerator = new UrlGenerator( {
-            musicRepository: this.#musicRepository,
-          } );
-          const p = urlGenerator.getAvailableUrlFromUrl(fixedUrl)
-            .then((availableUrl) => {
-              ret.fixedUrls.push( {
-                original: music,
-                newUrl: availableUrl,
-              } );
-
-              return this.#musicRepository.updateOneByPath(music.path, {
-                ...music,
-                url: availableUrl,
-              } );
-            } );
-
-          promises.push(p);
-        }
-      }
-    }
-
-    await Promise.all(promises);
-
-    res.send(ret);
-  }
-
   getRouter(): Router {
     const router = SecureRouter();
 
     router.get("/all", this.fixAll.bind(this));
-
-    router.get("/integrity", this.fixIntegrity.bind(this));
 
     router.get(`${ROUTE_CREATE_YT}/:id`, async (req, res) => {
       const { id } = req.params;

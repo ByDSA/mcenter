@@ -81,6 +81,18 @@ export default class Repository {
     return docOdmToModel(docOdm);
   }
 
+  async updateHashOf(music: Music) {
+    const hash = await md5FileAsync(getFullPath(music.path));
+
+    // eslint-disable-next-line no-await-in-loop
+    await this.updateOneByPath(music.path, {
+      ...music,
+      hash,
+    } );
+
+    return hash;
+  }
+
   async findOrCreateFromPath(relativePath: string): Promise<Music> {
     const read = await this.findByPath(relativePath);
 
