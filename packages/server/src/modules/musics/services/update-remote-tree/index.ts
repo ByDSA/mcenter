@@ -1,3 +1,4 @@
+import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { MusicRepository } from "#modules/musics";
 import { Music } from "#shared/models/musics";
 import { statSync } from "node:fs";
@@ -68,10 +69,11 @@ export class UpdateRemoteTreeService {
       promises.push(p);
     }
 
-    for (const updatedMusic of changes.updated) {
-      const p = this.#musicRepository.updateOneByPath(updatedMusic.path, updatedMusic)
+    for (const oldMusic of changes.updated) {
+      const newMusic = await toUpdatedFileInfo(oldMusic);
+      const p = this.#musicRepository.updateOneByPath(oldMusic.path, newMusic)
         .catch((err: Error) => {
-          console.error(err.message, updatedMusic);
+          console.error(err.message, newMusic);
 
           throw err;
         } );
@@ -100,4 +102,23 @@ async function detectChangesFromLocalFiles(remoteMusics: Music[]) {
   const changesDetector = new ChangesDetector(remoteMusics, filesWithMeta);
 
   return changesDetector.detectChanges();
+}
+
+async function toUpdatedFileInfo(music: Music) {
+  const fullPath = getFullPath(music.path);
+  const {size, ctime, mtime} = statSync(fullPath);
+  const newMusic: Music = {
+    ...music,
+    size,
+    timestamps: {
+      createdAt: ctime,
+      updatedAt: mtime,
+    },
+    hash: await md5FileAsync(fullPath),
+    mediaInfo: {
+      duration: null,
+    },
+  };
+
+  return newMusic;
 }
