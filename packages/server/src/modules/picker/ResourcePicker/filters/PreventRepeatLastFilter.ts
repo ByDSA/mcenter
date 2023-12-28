@@ -1,21 +1,26 @@
 /* eslint-disable class-methods-use-this */
+import { Resource } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
-import { Model, ModelFullId, compareFullId } from "../../models";
 import Filter from "./Filter";
+import { CompareResourceIdFunc } from "./utils";
 
-export default class PreventRepeatLastFilter implements Filter<Model>{
-  #lastEp: ModelFullId | undefined;
+type Params<ID, R extends Resource> = {
+  lastId: ID | undefined;
+  compareResourceId: CompareResourceIdFunc<R,ID>;
+};
+export default class PreventRepeatLastFilter<ID = string, R extends Resource = Resource> implements Filter<R>{
+  #params: Params<ID, R>;
 
-  constructor(lastEp: ModelFullId | undefined) {
-    this.#lastEp = lastEp;
+  constructor(params: Params<ID, R>) {
+    this.#params = params;
   }
 
   // eslint-disable-next-line require-await
-  async filter(episode: Model): Promise<boolean> {
-    if (!isDefined(this.#lastEp))
+  async filter(resource: R): Promise<boolean> {
+    if (!isDefined(this.#params.lastId))
       return true;
 
-    if (!compareFullId(this.#lastEp, episode))
+    if (!this.#params.compareResourceId(resource, this.#params.lastId))
       return true;
 
     return false;

@@ -1,19 +1,15 @@
 /* eslint-disable import/prefer-default-export */
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { EpisodeRepository } from "#modules/episodes";
+import { EpisodeRepository, compareEpisodeFullId } from "#modules/episodes";
 import { HistoryList } from "#modules/historyLists";
+import { DependencyFilter, Filter, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { Serie, SerieId } from "#modules/series";
 import { Stream } from "#modules/streams";
 import { asyncFilter } from "#shared/utils/arrays";
 import { Picker } from "rand-picker";
-import LastTimePlayedService from "../../LastTimePlayedService";
-import { Model, ModelFullId, ModelId } from "../../models";
-import DependencyFilter from "./DependencyFilter";
-import Filter from "./Filter";
-import PreventDisabledFilter from "./PreventDisabledFilter";
-import PreventRepeatInDaysFilter from "./PreventRepeatInDaysFilter";
-import PreventRepeatLastFilter from "./PreventRepeatLastFilter";
-import RemoveWeightLowerOrEqualThanFilter from "./RemoveWeightLowerOrEqualThanFilter";
+import { Model, ModelFullId, ModelId, fullIdOf } from "../../models";
+
+const compareResourceId = (episode: Model, id: ModelFullId) =>compareEpisodeFullId(episode, id);
 
 type Params = {
   domainMessageBroker: DomainMessageBroker;
@@ -76,9 +72,11 @@ export default class PickerFilter {
         } )) as [ModelFullId, ModelFullId];
 
         filters.push(new DependencyFilter( {
-          lastEp: this.#lastEp,
-          firstEpisodeFullId: dependencyFullId[0],
-          secondEpisodeFullId: dependencyFullId[1],
+          lastId: fullIdOf(this.#lastEp),
+          firstId: dependencyFullId[0],
+          secondId: dependencyFullId[1],
+          compareId: compareEpisodeFullId,
+          compareResourceId,
         } ));
 
         return filters;
@@ -88,17 +86,17 @@ export default class PickerFilter {
     filters.push(new PreventDisabledFilter());
 
     if (this.#lastEp)
-      filters.push(new PreventRepeatLastFilter(this.#lastEp));
+    {filters.push(new PreventRepeatLastFilter(
+      {
+        lastId: fullIdOf(this.#lastEp),
+        compareResourceId,
+      } ));}
 
     filters.push(new RemoveWeightLowerOrEqualThanFilter(+(PICKER_MIN_WEIGHT ?? -99)));
 
     filters.push(new PreventRepeatInDaysFilter( {
       minDays: +(PICKER_MIN_DAYS ?? 0),
-      historyList : this.#historyList,
-      lastTimePlayedService: new LastTimePlayedService( {
-        domainMessageBroker: this.#domainMessageBroker,
-        episodeRepository: this.#episodeRepository,
-      } ),
+      lastTimePlayed: this.#lastEp?.lastTimePlayed ?? 0,
     } ));
 
     return filters;

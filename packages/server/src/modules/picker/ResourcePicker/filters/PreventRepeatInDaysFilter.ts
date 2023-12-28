@@ -1,29 +1,14 @@
-import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
-import { HistoryList } from "#modules/historyLists";
-import { Model } from "../../models";
-import Filter from "./Filter";
+import { PreventRepeatInTimeFilter } from "#modules/picker";
 
 type Params = {
   minDays: number;
-  historyList: HistoryList;
-  lastTimePlayedService: LastTimePlayedService;
+  lastTimePlayed: number;
 };
-export default class PreventRepeatInDaysFilter implements Filter<Model> {
-  #minDays: number;
-
-  #historyList: HistoryList;
-
-  #lastTimePlayedService: LastTimePlayedService;
-
-  constructor( {minDays, historyList, lastTimePlayedService}: Params) {
-    this.#minDays = minDays;
-    this.#historyList = historyList;
-    this.#lastTimePlayedService = lastTimePlayedService;
-  }
-
-  async filter(self: Model): Promise<boolean> {
-    const daysFromLastTime = await this.#lastTimePlayedService.getDaysFromLastPlayed(self, this.#historyList);
-
-    return daysFromLastTime >= this.#minDays;
+export default class PreventRepeatInDaysFilter extends PreventRepeatInTimeFilter {
+  constructor(params: Params) {
+    super( {
+      lastTimePlayed: params.lastTimePlayed,
+      minSecondsElapsed: params.minDays * 24 * 60 * 60,
+    } );
   }
 }

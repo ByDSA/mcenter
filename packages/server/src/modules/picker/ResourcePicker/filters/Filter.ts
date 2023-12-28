@@ -1,5 +1,5 @@
-import { Resource } from "#shared/models/resource";
+import { Pickable } from "#sharedSrc/models/resource";
 
-export default interface Filter<R extends Resource> {
+export default interface Filter<R extends Pickable = Pickable> {
   filter(resource: R): Promise<boolean>;
 }
