@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.4.1](https://github.com/ByDSA/mcenter/compare/v3.4.0...v3.4.1) (2023-12-28)
+
+
+### Bug Fixes
+
+* **server:** fixed values creating new musics ([07e7589](https://github.com/ByDSA/mcenter/commit/07e75898dd39fc6bd7efcaeb70c6c7f558648368))
+
 ## [3.4.0](https://github.com/ByDSA/mcenter/compare/v3.3.0...v3.4.0) (2023-12-24)
 
 
