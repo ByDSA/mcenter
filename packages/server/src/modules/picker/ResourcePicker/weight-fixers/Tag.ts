@@ -1,8 +1,9 @@
 /* eslint-disable class-methods-use-this */
+import { Pickable, Taggable } from "#shared/models/resource/PartialSchemas";
 import { dynamicLoadScriptFromEnvVar } from "../../../../DynamicLoad";
-import { Model } from "../../models";
 import WeightFixer, { WeightFixerParams } from "./WeightFixer";
 
+type Model = Pickable & Taggable;
 export default class TagWeightFixer implements WeightFixer<Model> {
   async fixWeight( { resource, currentWeight }: WeightFixerParams<Model>): Promise<number> {
     let weight = currentWeight ?? 0;

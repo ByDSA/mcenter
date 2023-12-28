@@ -3,12 +3,15 @@
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeRepository } from "#modules/episodes";
 import { HistoryList } from "#modules/historyLists";
+import { WeightFixer, WeightFixerParams } from "#modules/picker";
+import LastTimeWeightFixer from "#modules/picker/ResourcePicker/weight-fixers/LastTime";
+import { Pickable } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
-import { daysBetween } from "date-ops";
 import { DateTime } from "luxon";
 import LastTimePlayed from "../../LastTimePlayedService";
 import { Model } from "../../models";
-import WeightFixer, { WeightFixerParams } from "./WeightFixer";
+
+const SECONDS_IN_DAY = 24 * 60 * 60;
 
 type Params = {
   historyList: HistoryList;
@@ -28,43 +31,52 @@ export default class CalculatorWeightFixer implements WeightFixer<Model> {
     this.#episodeRepository = episodeRepository;
   }
 
-  #getDaysFromLastPlayed = async (self: Model): Promise<number> => {
-    const lastTimePlayedService = new LastTimePlayed( {
-      episodeRepository: this.#episodeRepository,
-      domainMessageBroker: this.#domainMessageBroker,
-    } );
-    let daysFromLastTime: number | undefined;
+  #getLastTimePicked = async (self: Model): Promise<number> => {
+    let lastTimePicked: number | undefined;
 
-    if (self.lastTimePlayed) {
-      const nowDateTime = DateTime.now();
-      const lastTimePlayedDateTime = DateTime.fromSeconds(self.lastTimePlayed);
+    lastTimePicked = self.lastTimePlayed;
 
-      daysFromLastTime = daysBetween(lastTimePlayedDateTime, nowDateTime);
+    if (!isDefined(lastTimePicked)) {
+      const lastTimePlayedService = new LastTimePlayed( {
+        episodeRepository: this.#episodeRepository,
+        domainMessageBroker: this.#domainMessageBroker,
+      } );
+
+      lastTimePicked = DateTime.now().toSeconds() - await lastTimePlayedService.getDaysFromLastPlayed(self, this.#historyList) * SECONDS_IN_DAY;
     }
 
-    if (!isDefined(daysFromLastTime))
-      daysFromLastTime = await lastTimePlayedService.getDaysFromLastPlayed(self, this.#historyList);
+    if (!isDefined(lastTimePicked))
+      lastTimePicked = Number.MAX_SAFE_INTEGER;
 
-    if (!isDefined(daysFromLastTime))
-      daysFromLastTime = Number.MAX_SAFE_INTEGER;
+    if (lastTimePicked < 0 || Number.isNaN(lastTimePicked))
+      throw new Error(`Invalid secondsFromLastTime: ${lastTimePicked}`);
 
-    if (daysFromLastTime < 0 || Number.isNaN(daysFromLastTime))
-      throw new Error(`Invalid daysFromLastTime: ${daysFromLastTime}`);
-
-    return daysFromLastTime;
+    return lastTimePicked;
   };
 
-  async fixWeight( { resource }: WeightFixerParams<Model>): Promise<number> {
-    const self = resource;
-    const daysFromLastTime = await this.#getDaysFromLastPlayed(self);
-    let reinforcementFactor = 1;
-    const weight = self && self.weight ? self.weight : 0;
+  async fixWeight( { resource, currentWeight }: WeightFixerParams<Model>): Promise<number> {
+    const lastTimePicked = await this.#getLastTimePicked(resource);
+    const fx = (r: Pickable, x: number): number => {
+      const daysFromLastTime = x / SECONDS_IN_DAY;
+      let reinforcementFactor = 1;
+      const {weight} = r;
 
-    if (weight < -1)
-      reinforcementFactor = 1.0 / (-weight);
-    else if (weight > 1)
-      reinforcementFactor = weight;
+      if (weight < -1)
+        reinforcementFactor = 1.0 / (-weight);
+      else if (weight > 1)
+        reinforcementFactor = weight;
 
-    return reinforcementFactor * daysFromLastTime;
+      return reinforcementFactor * daysFromLastTime;
+    };
+    const lastTimeWeightFixer = new LastTimeWeightFixer( {
+      lastTimePicked,
+      fx,
+    } );
+    const ret = await lastTimeWeightFixer.fixWeight( {
+      resource,
+      currentWeight,
+    } );
+
+    return ret;
   }
 }

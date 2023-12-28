@@ -2,11 +2,9 @@ import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeRepository } from "#modules/episodes";
 import { Model } from "#modules/episodes/models";
 import { HistoryList } from "#modules/historyLists";
+import { LimiterWeightFixer, TagWeightFixer, WeightFixer } from "#modules/picker";
 import { Picker } from "rand-picker";
 import CalculatorWeightFixer from "./Calculator";
-import LimiterWeightFixer from "./Limiter";
-import TagWeightFixer from "./Tag";
-import WeightFixer from "./WeightFixer";
 
 type Params = {
   historyList: HistoryList;
