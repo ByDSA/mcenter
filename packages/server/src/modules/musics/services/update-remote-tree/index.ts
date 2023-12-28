@@ -10,7 +10,7 @@ export type UpdateResult = {
   new: Music[];
   deleted: Music[];
   moved: {original: Music; newPath: string}[];
-  updated: Music[];
+  updated: {old: Music, new: Music}[];
 };
 
 type Params = {
@@ -27,7 +27,8 @@ export class UpdateRemoteTreeService {
     const remoteMusic = await this.#musicRepository.findAll();
     const changes = await detectChangesFromLocalFiles(remoteMusic);
     const promises = [];
-    const created: Music[] = [];
+    const created: UpdateResult["new"] = [];
+    const updated: UpdateResult["updated"] = [];
 
     for (const localFileMusic of changes.new) {
       const p = this.#musicRepository.createFromPath(localFileMusic.path)
@@ -78,6 +79,8 @@ export class UpdateRemoteTreeService {
           throw err;
         } );
 
+        updated.push({old: oldMusic, new: newMusic});
+
       promises.push(p);
     }
 
@@ -87,7 +90,7 @@ export class UpdateRemoteTreeService {
       new: created,
       deleted: changes.deleted,
       moved: changes.moved,
-      updated: changes.updated,
+      updated,
     };
 
     return ret;
