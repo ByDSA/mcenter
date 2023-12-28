@@ -35,3 +35,5 @@ export function assertIsModel(model: unknown, msg?: string): asserts model is Mo
 export function parseModel(model: unknown): Model {
   return ModelSchema.parse(model);
 }
+
+export const ARTIST_EMPTY = "(Unknown Artist)";

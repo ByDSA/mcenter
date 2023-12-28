@@ -32,13 +32,23 @@ export class UpdateRemoteTreeService {
       const p = this.#musicRepository.createFromPath(localFileMusic.path)
         .then((music) => {
           created.push(music);
+        } )
+        .catch((err) => {
+          console.error(err.message, localFileMusic);
+
+          throw err;
         } );
 
       promises.push(p);
     }
 
     for (const deletedMusic of changes.deleted) {
-      const p = this.#musicRepository.deleteOneByPath(deletedMusic.path);
+      const p = this.#musicRepository.deleteOneByPath(deletedMusic.path)
+        .catch((err) => {
+          console.error(err.message, deletedMusic);
+
+          throw err;
+        } );
 
       promises.push(p);
     }
@@ -48,13 +58,23 @@ export class UpdateRemoteTreeService {
         ...original,
         path: newPath,
       };
-      const p = this.#musicRepository.updateOneByPath(original.path, newMusic);
+      const p = this.#musicRepository.updateOneByPath(original.path, newMusic)
+        .catch((err) => {
+          console.error(err.message, original, newMusic);
+
+          throw err;
+        } );
 
       promises.push(p);
     }
 
     for (const updatedMusic of changes.updated) {
-      const p = this.#musicRepository.updateOneByPath(updatedMusic.path, updatedMusic);
+      const p = this.#musicRepository.updateOneByPath(updatedMusic.path, updatedMusic)
+        .catch((err: Error) => {
+          console.error(err.message, updatedMusic);
+
+          throw err;
+        } );
 
       promises.push(p);
     }

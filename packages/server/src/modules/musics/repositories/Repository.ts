@@ -7,6 +7,7 @@ import { AUDIO_EXTENSIONS } from "../files/files.music";
 import { getFullPath } from "../utils";
 import { download } from "../youtube";
 // eslint-disable-next-line import/no-cycle
+import { ARTIST_EMPTY } from "#shared/models/musics/Music";
 import UrlGenerator from "./UrlGenerator";
 import { docOdmToModel } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
@@ -57,7 +58,7 @@ export default class Repository {
     const fullPath = getFullPath(relativePath);
     const id3Tags = NodeID3.read(fullPath);
     const title = id3Tags.title ?? getTitleFromFilenamePath(fullPath);
-    const artist = id3Tags.artist ?? "";
+    const artist = id3Tags.artist ?? ARTIST_EMPTY;
     const urlGenerator = new UrlGenerator( {
       musicRepository: this,
     } );
@@ -65,18 +66,26 @@ export default class Repository {
       title,
       artist,
     } );
-    const hash = md5FileAsync(fullPath);
-    const {size} = statSync(fullPath);
-    const docOdm = await ModelOdm.create( {
+    const hash = await md5FileAsync(fullPath);
+    const {size, mtime, ctime} = statSync(fullPath);
+    const newDocOdm: DocOdm = {
       hash,
       size,
       path: relativePath,
       title,
       artist,
       album: id3Tags.album,
-      addedAt: Date.now(),
+      weight: 0,
+      timestamps: {
+        createdAt: ctime,
+        updatedAt: mtime,
+      },
+      mediaInfo: {
+        duration: null,
+      },
       url: await urlPromise,
-    } );
+    };
+    const docOdm: DocOdm = await ModelOdm.create(newDocOdm);
 
     return docOdmToModel(docOdm);
   }

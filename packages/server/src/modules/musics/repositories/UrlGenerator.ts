@@ -1,4 +1,5 @@
 import { Music } from "#shared/models/musics";
+import { ARTIST_EMPTY } from "#shared/models/musics/Music";
 // eslint-disable-next-line import/no-cycle
 import MusicRepository from "./Repository";
 
@@ -44,13 +45,13 @@ type GenerateUrlParams = {
   artist: string;
 };
 function generateUrl( {title, artist}: GenerateUrlParams): string {
-  const base = !artist ? title : `${artist}-${title}`;
+  const base = !artist || artist === ARTIST_EMPTY ? title : `${artist}-${title}`;
 
   return fixUrl(base);
 }
 
 export function fixUrl(url: string): string {
-  const fixed = url
+  let fixed = url
     .toLowerCase()
     .replaceAll(/&|\[|\]|:/g, "")
     .replaceAll(/,|\./g,"")
@@ -63,15 +64,36 @@ export function fixUrl(url: string): string {
     .replaceAll(/-$/g,"")
     .replaceAll(/ñ/g,"n")
     .replaceAll(/ç/g,"c")
-    .replaceAll(/á|à|ä/g,"a")
-    .replaceAll(/é|è|ë/g,"e")
-    .replaceAll(/í|ì|ï/g,"i")
-    .replaceAll(/ó|ò|ö/g,"o")
-    .replaceAll(/ú|ù|ü/g,"u")
+    .replaceAll(/á|à|ä|â/g,"a")
+    .replaceAll(/é|è|ë|ê/g,"e")
+    .replaceAll(/í|ì|ï|î/g,"i")
+    .replaceAll(/ó|ò|ö|ô/g,"o")
+    .replaceAll(/ú|ù|ü|û/g,"u")
     .replaceAll(/_/g,"-")
     .replaceAll(/\//g,"-")
-    .replaceAll(/ /g, "-")
-    .replaceAll(/--/g,"-");
+    .replaceAll(/ /g, "-");
+
+  fixed = removeForeignCharacters(fixed);
+
+  if (fixed.length === 0)
+    return "empty";
+
+  fixed = fixed.replaceAll(/--/g,"-");
 
   return fixed;
+}
+
+function isValidCharacter(c: string): boolean {
+  return /^[a-z0-9-]+$/.test(c);
+}
+
+function removeForeignCharacters(str: string): string {
+  let ret = "";
+
+  for (const c of str) {
+    if (isValidCharacter(c))
+      ret += c;
+  }
+
+  return ret;
 }
