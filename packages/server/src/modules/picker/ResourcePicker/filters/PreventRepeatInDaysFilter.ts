@@ -1,4 +1,4 @@
-import { PreventRepeatInTimeFilter } from "#modules/picker";
+import PreventRepeatInTimeFilter from "./PreventRepeatInTimeFilter";
 
 type Params = {
   minDays: number;

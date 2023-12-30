@@ -9,8 +9,6 @@ export default class LimiterWeightFixer implements WeightFixer {
   }
 
   async fixWeight( {currentWeight}: WeightFixerParams): Promise<number> {
-    const weight = currentWeight || 1;
-
-    return Math.min(weight, this.#limit);
+    return Math.min(currentWeight, this.#limit);
   }
 }

@@ -2,6 +2,7 @@ import { Pickable } from "#shared/models/resource";
 
 type Params<R extends Pickable = Pickable> = {
   resource: R;
+  resources: readonly R[];
   currentWeight: number;
 };
 
@@ -10,6 +11,5 @@ export default interface WeightFixer<R extends Pickable = Pickable> {
 }
 
 export {
-  Params as WeightFixerParams
+  Params as WeightFixerParams,
 };
-

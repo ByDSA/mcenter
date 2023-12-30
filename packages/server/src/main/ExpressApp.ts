@@ -7,7 +7,6 @@ import { MusicController } from "#modules/musics";
 import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
 import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
-import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
 import { StreamRepository, StreamRestController } from "#modules/streams";
 import { ForbiddenError } from "#shared/utils/http";
 import { deepFreeze, deepMerge } from "#shared/utils/objects";
@@ -161,17 +160,10 @@ export default class ExpressApp implements App {
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;
       const streamRepository = new StreamRepository();
-      const serieRelationshipWithStreamFixer = new SerieRelationshipWithStreamFixer( {
-        streamRepository,
-      } );
       const episodePickerService = new EpisodePickerService( {
         streamRepository,
         episodeRepository: new EpisodeRepository( {
           domainMessageBroker : modules.domainMessageBroker.instance,
-        } ),
-        domainMessageBroker: modules.domainMessageBroker.instance,
-        serieRepository: new SerieRepository( {
-          relationshipWithStreamFixer: serieRelationshipWithStreamFixer,
         } ),
         historyListRepository: new HistoryListRepository(),
       } );

@@ -1,6 +1,6 @@
+import { getPortFromServer } from "#shared/utils/nodejs/http";
 import { assertIsNotEmpty } from "#shared/utils/validation";
 import request from "supertest";
-import { getPortFromServer } from "#sharedSrc/utils/nodejs/http";
 import App from "./App";
 
 describe("App", () => {

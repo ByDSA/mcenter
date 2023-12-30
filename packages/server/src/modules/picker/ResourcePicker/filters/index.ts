@@ -25,3 +25,7 @@ export {
 export {
   default as RemoveWeightLowerOrEqualThanFilter,
 } from "./RemoveWeightLowerOrEqualThanFilter";
+
+export {
+  default as FilterApplier,
+} from "./FilterApplier";
