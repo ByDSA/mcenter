@@ -1,24 +1,24 @@
-import { LastTimeWeightFixer, LimiterSafeIntegerPerItems, TagWeightFixer, WeightFixerApplier } from "#modules/picker";
+import { WeightFixerApplier } from "#modules/picker";
 import { Music } from "#shared/models/musics";
 import { Pickable, ResourceVO } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
 
 const SECONDS_IN_DAY = 24 * 60 * 60;
 
-export default class EpisodeWeightFixerApplier<R extends ResourceVO = ResourceVO> extends WeightFixerApplier<R> {
+export default class MusicWeightFixerApplier<R extends ResourceVO = ResourceVO> extends WeightFixerApplier<R> {
   constructor() {
     super();
     this.add(new LastTimeWeightFixer( {
       fx,
       getLastTimePicked,
     } ));
-    this.add(new TagWeightFixer());
-    this.add(new LimiterSafeIntegerPerItems());
+    // this.add(new TagWeightFixer());
+    // this.add(new LimiterSafeIntegerPerItems());
   }
 }
 
 const fx = (r: Pickable, x: number): number => {
-  const daysFromLastTime = x / SECONDS_IN_DAY;
+  const daysFromLastTime = 1;// x / SECONDS_IN_DAY; // TODO: ignorar tiempo por ahora
   let reinforcementFactor = 1;
   const {weight} = r;
 
@@ -45,5 +45,5 @@ function getLastTimePicked(self: ResourceVO): number {
 };
 
 export function genWeightFixerApplier() {
-  return new EpisodeWeightFixerApplier<Music>();
+  return new MusicWeightFixerApplier<Music>();
 }

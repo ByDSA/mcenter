@@ -1,7 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { HistoryListRepository } from "#modules/historyLists";
-import { ResourcePicker } from "#modules/picker";
-import PickMode from "#modules/picker/ResourcePicker/PickMode";
+import { PickMode, ResourcePicker } from "#modules/picker";
 import { Stream, StreamId, StreamMode, StreamRepository } from "#modules/streams";
 import { assertFound } from "#shared/utils/http/validation";
 import { neverCase } from "#shared/utils/validation";

@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
+import { FilterApplier, PreventDisabledFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { Music, getIdOfMusic } from "#shared/models/musics";
 import { ResourceVO } from "#shared/models/resource";
 
@@ -39,10 +39,10 @@ export default class MusicFilterApplier extends FilterApplier<Model> {
 
     this.add(new RemoveWeightLowerOrEqualThanFilter(+PICKER_MIN_WEIGHT));
 
-    this.add(new PreventRepeatInDaysFilter( {
-      minDays: +PICKER_MIN_DAYS,
-      lastTimePlayed: lastEp?.lastTimePlayed ?? 0,
-    } ));
+    // this.add(new PreventRepeatInDaysFilter( {
+    //   minDays: +PICKER_MIN_DAYS,
+    //   lastTimePlayed: lastEp?.lastTimePlayed ?? 0,
+    // } ));
   }
 }
 

@@ -14,7 +14,7 @@ import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import express, { Request, Response } from "express";
 import { Picker } from "rand-picker";
-import { genRandomPickerWithData } from "./ResourcePicker/ResourcePickerRandom";
+import { genRandomPickerWithData } from "../../picker/ResourcePicker/ResourcePickerRandom";
 
 type ResultType = Episode & {
   percentage: number;

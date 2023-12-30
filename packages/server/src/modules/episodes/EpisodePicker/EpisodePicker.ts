@@ -1,4 +1,4 @@
-import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker/ResourcePicker";
+import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
 import { neverCase } from "#shared/utils/validation";
 import { compareEpisodeFullId } from "..";
 import { Model, ModelFullId, fullIdOf } from "../models";

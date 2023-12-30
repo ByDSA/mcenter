@@ -1,5 +1,5 @@
+export * from "./ResourcePicker";
+
 export {
   default as PickerController,
-} from "./Controller";
-
-export * from "./ResourcePicker";
+} from "../episodes/controllers/PickerController";
