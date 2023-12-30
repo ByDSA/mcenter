@@ -1,3 +1,4 @@
+import { ResourcePickerRandom } from "#modules/picker";
 import { Music } from "#shared/models/musics";
 import { SecureRouter } from "#utils/express";
 import { Request, Response, Router } from "express";
@@ -115,6 +116,12 @@ export default class GetController {
 }
 
 function randomPick(musics: Music[]): Music {
+  const nPicker = new ResourcePickerRandom<Music>( {
+    resources: musics,
+    lastEp: lastPicked,
+    filterApplier: genMusicFilterApplier(episodes, lastEp),
+    weightFixerApplier: genMusicWeightFixerApplier(),
+  } );
   const picker = newPicker(musics, {
     weighted: true,
     randomMode: 0,

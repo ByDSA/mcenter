@@ -1,16 +1,16 @@
-import { Resource } from "#shared/models/resource";
+import { ResourceVO } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
 import Filter from "./Filter";
 import { CompareFunc, CompareResourceIdFunc } from "./utils";
 
-type Params<ID, R extends Resource> = {
+type Params<ID, R extends ResourceVO> = {
   lastId: ID | null;
   firstId: ID;
   secondId: ID;
   compareId: CompareFunc<ID>;
   compareResourceId: CompareResourceIdFunc<R, ID>;
 };
-export default class DependencyFilter<ID = string, R extends Resource = Resource> implements Filter<R> {
+export default class DependencyFilter<ID = string, R extends ResourceVO = ResourceVO> implements Filter<R> {
   #params: Params<ID, R>;
 
   constructor(params: Params<ID, R>) {

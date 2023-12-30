@@ -1,5 +1,4 @@
-import { Music } from "#shared/models/musics";
-import { ARTIST_EMPTY } from "#shared/models/musics/Music";
+import { ARTIST_EMPTY, Music } from "#shared/models/musics";
 // eslint-disable-next-line import/no-cycle
 import MusicRepository from "./Repository";
 

@@ -13,30 +13,30 @@ const compareId = (episode: Episode, id: EpisodeFullId) => episode.serieId === i
 
 describe("PreventRepeatLastFilter", () => {
   it("should return true when last episode is undefined", async () => {
-    const filter = new PreventRepeatLastFilter<EpisodeFullId, Episode>({
+    const filter = new PreventRepeatLastFilter<EpisodeFullId, Episode>( {
       lastId: undefined,
-      compareResourceId: compareId,
-    });
+      compareResourceWithId: compareId,
+    } );
     const result = await filter.filter(DEFAULT_EPISODE);
 
     expect(result).toBe(true);
   } );
 
   it("should return true when current episode is different from last episode", async () => {
-    const filter = new PreventRepeatLastFilter({
+    const filter = new PreventRepeatLastFilter( {
       lastId: episodeFullIdOf(OTHER_EPISODE),
-      compareResourceId: compareId
-    });
+      compareResourceWithId: compareId,
+    } );
     const result = await filter.filter(DEFAULT_EPISODE);
 
     expect(result).toBe(true);
   } );
 
   it("should return false when current episode is the same as last episode", async () => {
-    const filter = new PreventRepeatLastFilter({
+    const filter = new PreventRepeatLastFilter( {
       lastId: episodeFullIdOf(DEFAULT_EPISODE),
-      compareResourceId: compareId
-    });
+      compareResourceWithId: compareId,
+    } );
     const result = await filter.filter(DEFAULT_EPISODE);
 
     expect(result).toBe(false);

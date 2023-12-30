@@ -1,5 +1,5 @@
 import { LastTimeWeightFixer, LimiterSafeIntegerPerItems, TagWeightFixer, WeightFixerApplier } from "#modules/picker";
-import { Episode } from "#shared/models/episodes";
+import { Music } from "#shared/models/musics";
 import { Pickable, ResourceVO } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
 
@@ -44,6 +44,6 @@ function getLastTimePicked(self: ResourceVO): number {
   return lastTimePicked;
 };
 
-export function genEpisodeWeightFixerApplier() {
-  return new EpisodeWeightFixerApplier<Episode>();
+export function genWeightFixerApplier() {
+  return new EpisodeWeightFixerApplier<Music>();
 }

@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
-import { Music } from "#shared/models/musics";
+import { MusicVO } from "#shared/models/musics";
 import { Stats } from "node:fs";
 import { getFullPath } from "../../utils";
 
@@ -16,30 +16,30 @@ type GroupBySize<T> = {
 
 export type Changes = {
   new: FileWithStats[];
-  deleted: Music[];
-  moved: {original: Music; newPath: string}[];
-  updated: Music[];
+  deleted: MusicVO[];
+  moved: {original: MusicVO; newPath: string}[];
+  updated: MusicVO[];
 };
 
 type Options = {
   useOnlyHashChecking?: boolean;
 };
 export default class ChangesDetector {
-  #remoteMusic: Music[];
+  #remoteMusic: MusicVO[];
 
   #localFiles: FileWithStats[];
 
-  #remoteMusicGroupedBySize: GroupBySize<Music>;
+  #remoteMusicGroupedBySize: GroupBySize<MusicVO>;
 
   #localFilesGroupedBySize: GroupBySize<FileWithStats>;
 
-  #pathToRemoteMusic: Map<string, Music>;
+  #pathToRemoteMusic: Map<string, MusicVO>;
 
   #pathToLocalMusicFile: Map<string, FileWithStats>;
 
   #options: Required<Options>;
 
-  constructor(remoteMusic: Music[], localFiles: FileWithStats[], options?: Options) {
+  constructor(remoteMusic: MusicVO[], localFiles: FileWithStats[], options?: Options) {
     this.#remoteMusic = remoteMusic;
     this.#localFiles = localFiles;
 
@@ -59,7 +59,7 @@ export default class ChangesDetector {
     };
   }
 
-  async #findRemoteMusicInLocalFiles(remoteMusic: Music): Promise<FileWithStats | null> {
+  async #findRemoteMusicInLocalFiles(remoteMusic: MusicVO): Promise<FileWithStats | null> {
     const candidateByPath = this.#pathToLocalMusicFile.get(remoteMusic.path);
 
     if (candidateByPath && await this.#isSameFile(remoteMusic, candidateByPath))
@@ -87,13 +87,13 @@ export default class ChangesDetector {
     return null;
   }
 
-  async #findLocalFileMusicInRemoteMusics(localFile: FileWithStats): Promise<Music | null> {
+  async #findLocalFileMusicInRemoteMusics(localFile: FileWithStats): Promise<MusicVO | null> {
     const candidateByPath = this.#pathToRemoteMusic.get(localFile.path);
 
     if (candidateByPath && await this.#isSameFile(candidateByPath, localFile))
       return candidateByPath;
 
-    const candidates = [] as Music[];
+    const candidates = [] as MusicVO[];
     const group = this.#remoteMusicGroupedBySize[localFile.stats.size];
 
     if (group)
@@ -142,9 +142,9 @@ export default class ChangesDetector {
   async detectChanges(): Promise<Changes> {
     const ret = {
       new: [] as FileWithStats[],
-      deleted: [] as Music[],
-      moved: [] as {original: Music; newPath: string}[],
-      updated: [] as Music[],
+      deleted: [] as MusicVO[],
+      moved: [] as {original: MusicVO; newPath: string}[],
+      updated: [] as MusicVO[],
     };
 
     this.#createCaches();
@@ -181,7 +181,7 @@ export default class ChangesDetector {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async #isSameFile(music: Music, fileWithMetadata: FileWithStats) {
+  async #isSameFile(music: MusicVO, fileWithMetadata: FileWithStats) {
     if (!this.#options.useOnlyHashChecking && music.size && music.size === fileWithMetadata.stats.size)
       return true;
 

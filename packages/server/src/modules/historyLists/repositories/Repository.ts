@@ -24,6 +24,7 @@ CanGetAll<Model> {
       return Promise.resolve();
     } );
   }
+
   async getAll(): Promise<Model[]> {
     const docsOdm = await ModelOdm.find( {
     }, {
@@ -43,7 +44,7 @@ CanGetAll<Model> {
 
     const event = new ModelEvent<Model>(EventType.CREATED, {
       entity: historyList,
-    });
+    } );
 
     this.#domainMessageBroker.publish(QUEUE_NAME, event);
   }
@@ -82,7 +83,7 @@ CanGetAll<Model> {
 
     const event = new ModelEvent<Model>(EventType.UPDATED, {
       entity: historyList,
-    });
+    } );
 
     this.#domainMessageBroker.publish(QUEUE_NAME, event);
   }

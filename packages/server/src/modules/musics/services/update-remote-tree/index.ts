@@ -1,16 +1,16 @@
 import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { MusicRepository } from "#modules/musics";
-import { Music } from "#shared/models/musics";
+import { MusicVO } from "#shared/models/musics";
 import { statSync } from "node:fs";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
 import { getFullPath } from "../../utils";
 import ChangesDetector, { FileWithStats } from "./ChangesDetector";
 
 export type UpdateResult = {
-  new: Music[];
-  deleted: Music[];
-  moved: {original: Music; newPath: string}[];
-  updated: {old: Music, new: Music}[];
+  new: MusicVO[];
+  deleted: MusicVO[];
+  moved: {original: MusicVO; newPath: string}[];
+  updated: {old: MusicVO; new: MusicVO}[];
 };
 
 type Params = {
@@ -71,6 +71,7 @@ export class UpdateRemoteTreeService {
     }
 
     for (const oldMusic of changes.updated) {
+      // eslint-disable-next-line no-await-in-loop
       const newMusic = await toUpdatedFileInfo(oldMusic);
       const p = this.#musicRepository.updateOneByPath(oldMusic.path, newMusic)
         .catch((err: Error) => {
@@ -79,7 +80,10 @@ export class UpdateRemoteTreeService {
           throw err;
         } );
 
-        updated.push({old: oldMusic, new: newMusic});
+      updated.push( {
+        old: oldMusic,
+        new: newMusic,
+      } );
 
       promises.push(p);
     }
@@ -96,7 +100,7 @@ export class UpdateRemoteTreeService {
     return ret;
   }
 }
-async function detectChangesFromLocalFiles(remoteMusics: Music[]) {
+async function detectChangesFromLocalFiles(remoteMusics: MusicVO[]) {
   const files = await findAllPathsOfValidMusicFiles();
   const filesWithMeta: FileWithStats[] = files.map((relativePath) => ( {
     path: relativePath,
@@ -107,10 +111,10 @@ async function detectChangesFromLocalFiles(remoteMusics: Music[]) {
   return changesDetector.detectChanges();
 }
 
-async function toUpdatedFileInfo(music: Music) {
+async function toUpdatedFileInfo(music: MusicVO) {
   const fullPath = getFullPath(music.path);
   const {size, ctime, mtime} = statSync(fullPath);
-  const newMusic: Music = {
+  const newMusic: MusicVO = {
     ...music,
     size,
     timestamps: {

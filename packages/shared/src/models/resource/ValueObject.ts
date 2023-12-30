@@ -2,7 +2,7 @@ import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
 import { LocalFileSchema, PickableSchema, TaggableSchema } from "./PartialSchemas";
 
-export const ModelSchema = z.object( {
+export const ValueObjectSchema = z.object( {
   title: z.string(),
   disabled: z.boolean().optional(),
   lastTimePlayed: z.number().optional(),
@@ -10,10 +10,8 @@ export const ModelSchema = z.object( {
   .merge(PickableSchema)
   .merge(TaggableSchema);
 
-type Model = z.infer<typeof ModelSchema>;
+export type ValueObject = z.infer<typeof ValueObjectSchema>;
 
-export default Model;
-
-export function assertIsResource(model: unknown): asserts model is Model {
-  assertZodPopStack(ModelSchema, model);
+export function assertIsVO(model: unknown): asserts model is ValueObject {
+  assertZodPopStack(ValueObjectSchema, model);
 }

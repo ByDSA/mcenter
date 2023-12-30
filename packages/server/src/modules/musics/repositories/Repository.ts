@@ -1,5 +1,5 @@
 import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
-import { Music } from "#shared/models/musics";
+import { ARTIST_EMPTY, Music, MusicVO } from "#shared/models/musics";
 import { statSync } from "fs";
 import NodeID3 from "node-id3";
 import path from "path";
@@ -7,7 +7,6 @@ import { AUDIO_EXTENSIONS } from "../files/files.music";
 import { getFullPath } from "../utils";
 import { download } from "../youtube";
 // eslint-disable-next-line import/no-cycle
-import { ARTIST_EMPTY } from "#shared/models/musics/Music";
 import UrlGenerator from "./UrlGenerator";
 import { docOdmToModel } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
@@ -68,7 +67,7 @@ export default class Repository {
     } );
     const hash = await md5FileAsync(fullPath);
     const {size, mtime, ctime} = statSync(fullPath);
-    const newDocOdm: DocOdm = {
+    const newDocOdm = {
       hash,
       size,
       path: relativePath,
@@ -85,7 +84,7 @@ export default class Repository {
       },
       url: await urlPromise,
     };
-    const docOdm: DocOdm = await ModelOdm.create(newDocOdm);
+    const docOdm: DocOdm = await ModelOdm.create<MusicVO>(newDocOdm);
 
     return docOdmToModel(docOdm);
   }

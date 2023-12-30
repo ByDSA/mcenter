@@ -1,13 +1,13 @@
 /* eslint-disable import/prefer-default-export */
 import { Episode, compareEpisodeFullId } from "#modules/episodes";
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { Resource } from "#shared/models/resource";
+import { ResourceVO } from "#shared/models/resource";
 import { Model, ModelFullId, fullIdOf } from "../../models";
 import { DependenciesList } from "./Dependencies";
 
 const compareResourceId = (episode: Model, id: ModelFullId) =>compareEpisodeFullId(episode, id);
 
-type Params<R extends Resource = Resource, ID = string> = {
+type Params<R extends ResourceVO = ResourceVO, ID = string> = {
   resources: R[];
   lastEp: R | null;
   lastId: ID | undefined;
@@ -66,7 +66,7 @@ export default class EpisodeFilterApplier extends FilterApplier<Episode> {
       this.add(new PreventRepeatLastFilter(
         {
           lastId,
-          compareResourceId,
+          compareResourceWithId: compareResourceId,
         } ));
     }
 

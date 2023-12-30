@@ -19,12 +19,14 @@ const AOT4_COMMON = {
 /* eslint-disable import/prefer-default-export */
 export const MUSICS_SAMPLES_IN_DISK: Music[] = deepFreeze([
   {
+    id: "1",
     path: "aot4_copy.mp3",
     title: "aot4_copy",
     url: "aot4_copy",
     ...AOT4_COMMON,
   },
   {
+    id: "2",
     path: "dk.mp3",
     title: "dk",
     url: "dk",
@@ -41,6 +43,7 @@ export const MUSICS_SAMPLES_IN_DISK: Music[] = deepFreeze([
     },
   },
   {
+    id: "3",
     path: "Driftveil.mp3",
     title: "Driftveil",
     url: "driftveil",
@@ -57,6 +60,7 @@ export const MUSICS_SAMPLES_IN_DISK: Music[] = deepFreeze([
     },
   },
   {
+    id: "4",
     path: "a/aot4.mp3",
     title: "aot4",
     url: "aot4",

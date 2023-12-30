@@ -1,17 +1,17 @@
-import { Resource } from "#shared/models/resource";
+import { ResourceVO } from "#shared/models/resource";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
 import ResourcePicker from "./ResourcePicker";
 import { FilterApplier } from "./filters";
 import { WeightFixerApplier } from "./weight-fixers";
 
-type Params<R extends Resource> = {
+type Params<R extends ResourceVO> = {
   resources: R[];
   lastEp?: R;
   filterApplier: FilterApplier<R>;
   weightFixerApplier: WeightFixerApplier<R>;
 };
-export default class RandomPicker<R extends Resource> implements ResourcePicker<R> {
+export default class RandomPicker<R extends ResourceVO> implements ResourcePicker<R> {
   #params: Params<R>;
 
   constructor(params: Params<R>) {
@@ -47,7 +47,7 @@ export default class RandomPicker<R extends Resource> implements ResourcePicker<
   }
 }
 
-export async function genRandomPickerWithData<R extends Resource>( {resources, filterApplier, weightFixerApplier }: Params<R>): Promise<Picker<R>> {
+export async function genRandomPickerWithData<R extends ResourceVO>( {resources, filterApplier, weightFixerApplier }: Params<R>): Promise<Picker<R>> {
   console.log("Getting random picker...");
 
   if (resources.length === 0)
