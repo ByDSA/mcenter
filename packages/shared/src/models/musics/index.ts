@@ -1,5 +1,5 @@
 export {
-  Entity as Music, Id as MusicID, assertIsEntity as assertIsMusic, compareId as compareMusicId, getIdOfEntity as getIdOfMusic, parse as parseMusic,
+  Entity as Music, Id as MusicID, assertIsEntity as assertIsMusic, compareId as compareMusicId, parse as parseMusic,
 } from "./Entity";
 
 export {

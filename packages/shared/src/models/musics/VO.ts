@@ -25,24 +25,12 @@ export const VOSchema = z.object( {
   .merge(LocalFileSchema)
   .merge(TaggableSchema);
 
-export const EntitySchema = VOSchema.merge(z.object( {
-  id: z.string(),
-} ));
-
 export type VO = z.infer<typeof VOSchema>;
-
-export type Entity = z.infer<typeof EntitySchema>;
 
 export function assertIsVO(model: unknown, msg?: string): asserts model is VO {
   assertZodPopStack(VOSchema, model, msg);
 }
 
-export function assertIsEntity(model: unknown, msg?: string): asserts model is Entity {
-  assertZodPopStack(EntitySchema, model, msg);
-}
-
 export function parseModel(model: unknown): VO {
   return VOSchema.parse(model);
 }
-
-export const ARTIST_EMPTY = "(Unknown Artist)";
