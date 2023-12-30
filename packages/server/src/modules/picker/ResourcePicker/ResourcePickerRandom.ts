@@ -20,7 +20,6 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
 
   async pick(n: number): Promise<R[]> {
     const ret: R[] = [];
-    const {resources} = this.#params;
     let {lastEp} = this.#params;
 
     for (let i = 0; i < n; i++) {
@@ -30,20 +29,20 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
         ...this.#params,
         lastEp,
       } );
-      const episode: R | undefined = picker.pickOne();
+      const resource: R | undefined = picker.pickOne();
 
-      if (!episode)
+      if (!resource)
         throw new Error("Picker has no data");
 
       if (i < n - 1) {
-        episode.lastTimePlayed = Math.floor(DateTime.now().toSeconds());
-        lastEp = episode;
+        resource.lastTimePlayed = Math.floor(DateTime.now().toSeconds());
+        lastEp = resource;
       }
 
-      resources.push(episode);
+      ret.push(resource);
     }
 
-    return ret as R[];
+    return ret;
   }
 }
 

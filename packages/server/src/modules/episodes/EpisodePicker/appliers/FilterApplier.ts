@@ -1,11 +1,9 @@
 /* eslint-disable import/prefer-default-export */
-import { Episode, compareEpisodeFullId } from "#modules/episodes";
+import { Episode, compareEpisodeId } from "#modules/episodes";
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { ResourceVO } from "#shared/models/resource";
-import { Model, ModelFullId, fullIdOf } from "../../models";
+import { Model, ModelId } from "../../models";
 import { DependenciesList } from "./Dependencies";
-
-const compareResourceId = (episode: Model, id: ModelFullId) =>compareEpisodeFullId(episode, id);
 
 type Params<R extends ResourceVO = ResourceVO, ID = string> = {
   resources: R[];
@@ -14,9 +12,9 @@ type Params<R extends ResourceVO = ResourceVO, ID = string> = {
   dependencies: DependenciesList;
 };
 export default class EpisodeFilterApplier extends FilterApplier<Episode> {
-  #params: Params<Episode, ModelFullId>;
+  #params: Params<Episode, ModelId>;
 
-  constructor(params: Params<Episode, ModelFullId>) {
+  constructor(params: Params<Episode, ModelId>) {
     super();
     this.#params = params;
 
@@ -29,20 +27,19 @@ export default class EpisodeFilterApplier extends FilterApplier<Episode> {
 
     if (lastId && serieId && serieId in dependencies) {
       const serieDependencies = dependencies[serieId];
-      const dependency = serieDependencies.find(([a]) => a === lastId.episodeId);
+      const dependency = serieDependencies.find(([a]) => a === lastId.innerId);
 
       if (dependency) {
-        const dependencyFullId: [ModelFullId, ModelFullId] = dependency.map((episodeId) => ( {
-          episodeId,
+        const dependencyFullId: [ModelId, ModelId] = dependency.map((episodeId) => ( {
+          innerId: episodeId,
           serieId,
-        } )) as [ModelFullId, ModelFullId];
+        } )) as [ModelId, ModelId];
 
-        this.add(new DependencyFilter<ModelFullId, Episode>( {
+        this.add(new DependencyFilter<ModelId, Episode>( {
           lastId,
           firstId: dependencyFullId[0],
           secondId: dependencyFullId[1],
-          compareId: compareEpisodeFullId,
-          compareResourceId,
+          compareId: compareEpisodeId,
         } ));
 
         return true;
@@ -66,7 +63,7 @@ export default class EpisodeFilterApplier extends FilterApplier<Episode> {
       this.add(new PreventRepeatLastFilter(
         {
           lastId,
-          compareResourceWithId: compareResourceId,
+          compareId: compareEpisodeId,
         } ));
     }
 
@@ -83,7 +80,7 @@ export function genEpisodeFilterApplier(resources: Model[], deps: DependenciesLi
   return new EpisodeFilterApplier( {
     resources,
     lastEp: lastEp ?? null,
-    lastId: lastEp ? fullIdOf(lastEp) : undefined,
+    lastId: lastEp?.id,
     dependencies: deps,
   } );
 }

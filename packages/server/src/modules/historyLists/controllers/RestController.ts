@@ -87,12 +87,12 @@ implements
 
     if (body.filter) {
       newEntries = newEntries.filter((entry) => {
-        const { serieId, episodeId } = entry;
+        const { episodeId: {serieId, innerId} } = entry;
 
         if (body.filter?.serieId && serieId !== body.filter.serieId)
           return false;
 
-        if (body.filter?.episodeId && episodeId !== body.filter.episodeId)
+        if (body.filter?.episodeId && innerId !== body.filter.episodeId)
           return false;
 
         if (body.filter?.timestampMax !== undefined && entry.date.timestamp > body.filter.timestampMax)
@@ -124,7 +124,7 @@ implements
     if (body.expand) {
       if (body.expand.includes("series")) {
         const promises = newEntries.map(async (entry) => {
-          const { serieId } = entry;
+          const { episodeId: {serieId} } = entry;
           const serie = await this.#serieRepository.getOneById(serieId);
 
           if (serie)
@@ -139,9 +139,9 @@ implements
 
       if (body.expand.includes("episodes")) {
         const promises = newEntries.map(async (entry) => {
-          const { episodeId, serieId } = entry;
+          const { episodeId: {innerId, serieId} } = entry;
           const episode = await this.#episodeRepository.getOneById( {
-            episodeId,
+            innerId,
             serieId,
           }, {
             expand: [EpisodeRepositoryExpandEnum.FileInfo],
@@ -208,7 +208,7 @@ implements
     await this.#historyListRepository.updateOneById(historyList.id, historyList);
 
     this.#lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
-      episodeFullId: deleted,
+      episodeId: deleted.episodeId,
       entries: historyList.entries,
     } );
 

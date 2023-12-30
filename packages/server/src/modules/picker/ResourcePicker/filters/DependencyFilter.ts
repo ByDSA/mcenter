@@ -1,19 +1,18 @@
-import { ResourceVO } from "#shared/models/resource";
+import { Resource } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
 import Filter from "./Filter";
-import { CompareFunc, CompareResourceIdFunc } from "./utils";
+import { CompareIdFunc } from "./utils";
 
-type Params<ID, R extends ResourceVO> = {
+type Params<ID> = {
   lastId: ID | null;
   firstId: ID;
   secondId: ID;
-  compareId: CompareFunc<ID>;
-  compareResourceId: CompareResourceIdFunc<R, ID>;
+  compareId: CompareIdFunc<ID>;
 };
-export default class DependencyFilter<ID = string, R extends ResourceVO = ResourceVO> implements Filter<R> {
-  #params: Params<ID, R>;
+export default class DependencyFilter<ID = string, R extends Resource<ID> = Resource<ID>> implements Filter<R> {
+  #params: Params<ID>;
 
-  constructor(params: Params<ID, R>) {
+  constructor(params: Params<ID>) {
     this.#params = params;
   }
 
@@ -23,7 +22,7 @@ export default class DependencyFilter<ID = string, R extends ResourceVO = Resour
       return true;
 
     if (this.#params.compareId(this.#params.lastId, this.#params.firstId))
-      return this.#params.compareResourceId(self, this.#params.secondId);
+      return this.#params.compareId(self.id, this.#params.secondId);
 
     return true;
   }

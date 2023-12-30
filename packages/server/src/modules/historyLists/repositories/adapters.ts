@@ -14,8 +14,10 @@ export function entryDocOdmToModel(entryDocOdm: DocOdm["entries"][0], historyLis
   return {
     id: entryDocOdm.date.timestamp.toString(),
     historyListId,
-    serieId: entryDocOdm.serieId,
-    episodeId: entryDocOdm.episodeId,
+    episodeId: {
+      innerId: entryDocOdm.episodeId,
+      serieId: entryDocOdm.serieId,
+    },
     date: {
       year: entryDocOdm.date.year,
       month: entryDocOdm.date.month,
@@ -27,8 +29,8 @@ export function entryDocOdmToModel(entryDocOdm: DocOdm["entries"][0], historyLis
 
 export function entryToDocOdm(entry: Entry): DocOdm["entries"][0] {
   return {
-    serieId: entry.serieId,
-    episodeId: entry.episodeId,
+    episodeId: entry.episodeId.innerId,
+    serieId: entry.episodeId.serieId,
     date: {
       year: entry.date.year,
       month: entry.date.month,

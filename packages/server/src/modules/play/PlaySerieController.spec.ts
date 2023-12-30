@@ -86,14 +86,14 @@ describe("PlaySerieController", () => {
     } );
 
     it("should return 404 if serie not found", async () => {
-      const response = await request(routerApp).get(`/simpson/${ EPISODES_SIMPSONS[0].episodeId}`)
+      const response = await request(routerApp).get(`/simpson/${ EPISODES_SIMPSONS[0].id.innerId}`)
         .expect(404);
 
       expect(response).toBeDefined();
     } );
 
     it("should return 200 if episode found", async () => {
-      const response = await request(routerApp).get(`/simpsons/${ EPISODES_SIMPSONS[0].episodeId}`)
+      const response = await request(routerApp).get(`/simpsons/${ EPISODES_SIMPSONS[0].id.innerId}`)
         .expect(200);
 
       expect(response).toBeDefined();

@@ -1,17 +1,16 @@
-/* eslint-disable class-methods-use-this */
-import { ResourceVO } from "#shared/models/resource";
+import { Resource } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
 import Filter from "./Filter";
-import { CompareResourceIdFunc } from "./utils";
+import { CompareIdFunc } from "./utils";
 
-type Params<ID, R extends ResourceVO> = {
+type Params<ID> = {
   lastId: ID | undefined;
-  compareResourceWithId: CompareResourceIdFunc<R,ID>;
+  compareId: CompareIdFunc<ID>;
 };
-export default class PreventRepeatLastFilter<ID = string, R extends ResourceVO = ResourceVO> implements Filter<R>{
-  #params: Params<ID, R>;
+export default class PreventRepeatLastFilter<ID = string, R extends Resource<ID> = Resource<ID>> implements Filter<R>{
+  #params: Params<ID>;
 
-  constructor(params: Params<ID, R>) {
+  constructor(params: Params<ID>) {
     this.#params = params;
   }
 
@@ -20,7 +19,7 @@ export default class PreventRepeatLastFilter<ID = string, R extends ResourceVO =
     if (!isDefined(this.#params.lastId))
       return true;
 
-    if (!this.#params.compareResourceWithId(resource, this.#params.lastId))
+    if (!this.#params.compareId(resource.id, this.#params.lastId))
       return true;
 
     return false;

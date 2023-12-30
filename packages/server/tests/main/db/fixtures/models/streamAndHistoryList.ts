@@ -9,8 +9,10 @@ export const HISTORY_LIST_WITH_NO_ENTRIES: HistoryList = deepFreeze( {
   entries: [],
 } );
 const HISTORY_ENTRY_SIMPSONS1: HistoryEntry = {
-  episodeId : "1x01",
-  serieId : "simpsons",
+  episodeId:{
+    innerId : "1x01",
+    serieId: "simpsons",
+  },
   date : {
     year : 2020,
     day: 1,

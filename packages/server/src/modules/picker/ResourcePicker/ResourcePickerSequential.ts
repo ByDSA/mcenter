@@ -1,16 +1,16 @@
-import { ResourceVO } from "#shared/models/resource";
+import { Resource } from "#shared/models/resource";
 import ResourcePicker from "./ResourcePicker";
-import { CompareResourceIdFunc } from "./filters/utils";
+import { CompareIdFunc } from "./filters/utils";
 
-type Params<R extends ResourceVO, ID> = {
+type Params<ID, R extends Resource<ID>> = {
   resources: R[];
   lastId?: ID;
-  compareResourceWithId: CompareResourceIdFunc<R,ID>;
+  compareId: CompareIdFunc<ID>;
 };
-export default class SequentialPicker<R extends ResourceVO = ResourceVO, ID=string> implements ResourcePicker {
-  #params: Params<R, ID>;
+export default class SequentialPicker<ID = string, R extends Resource<ID> = Resource<ID>> implements ResourcePicker {
+  #params: Params<ID, R>;
 
-  constructor(params: Params<R, ID>) {
+  constructor(params: Params<ID, R>) {
     this.#params = params;
   }
 
@@ -32,7 +32,7 @@ export default class SequentialPicker<R extends ResourceVO = ResourceVO, ID=stri
   }
 
   #findIndexById(id: ID): number {
-    return this.#params.resources.findIndex((e) => this.#params.compareResourceWithId(e, id));
+    return this.#params.resources.findIndex((e) => this.#params.compareId(e.id, id));
   }
 
   #calcNextIndex(index: number): number {

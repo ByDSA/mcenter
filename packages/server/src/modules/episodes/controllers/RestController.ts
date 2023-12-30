@@ -42,7 +42,7 @@ implements
     const { episodeId, serieId } = req.params;
     const episodePartial = req.body;
     const id = {
-      episodeId,
+      innerId: episodeId,
       serieId,
     };
     const got = await this.#episodeRepository.patchOneByIdAndGet(id, episodePartial);
@@ -65,7 +65,7 @@ implements
   ): Promise<void> {
     const { episodeId, serieId } = req.params;
     const id = {
-      episodeId,
+      innerId: episodeId,
       serieId,
     };
     const got = await this.#episodeRepository.getOneById(id);
@@ -105,7 +105,7 @@ implements
       };
 
       for (const ep of episodes) {
-        const {serieId} = ep;
+        const {serieId} = ep.id;
         // eslint-disable-next-line no-await-in-loop
         const serie = series[serieId] ?? await this.#serieRepo.getOneById(serieId);
 

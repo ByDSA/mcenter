@@ -5,7 +5,7 @@ import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { Consumer } from "#utils/message-broker";
-import { Model, ModelFullId } from "../models";
+import { Model, ModelId } from "../models";
 import Repository from "./Repository";
 import { QUEUE_NAME } from "./events";
 
@@ -28,9 +28,9 @@ beforeAll(async () => {
   } );
 } );
 it("should emit Patch Event", async () => {
-  const episodeId: ModelFullId = {
+  const episodeId: ModelId = {
     serieId: "simpsons",
-    episodeId: "1x01",
+    innerId: "1x01",
   };
   const fn = jest.fn();
 
@@ -55,8 +55,8 @@ it("should emit Patch Event", async () => {
 it("should emit Create Event", async () => {
   const fn = jest.fn((event: ModelEvent<Model>) => {
     expect(event.type).toBe(EventType.CREATED);
-    expect(event.payload.entity.serieId).toBe("simpsons");
-    expect(event.payload.entity.episodeId.startsWith("X")).toBeTruthy();
+    expect(event.payload.entity.id.serieId).toBe("simpsons");
+    expect(event.payload.entity.id.innerId.startsWith("X")).toBeTruthy();
 
     return Promise.resolve();
   } ) as Consumer<any>;
@@ -65,7 +65,10 @@ it("should emit Create Event", async () => {
 
   const models = EPISODES_SIMPSONS.slice(0, 10).map(episode => ( {
     ...episode,
-    episodeId: `X${ episode.episodeId}`,
+    id: {
+      innerId: `X${episode.id.innerId}`,
+      serieId: episode.id.serieId,
+    } as ModelId,
   } ) as Model);
 
   await episodeRepository.createManyAndGet(models);

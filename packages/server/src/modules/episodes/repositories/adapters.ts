@@ -4,8 +4,10 @@ import { DocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {
   const model: Episode = {
-    episodeId: docOdm.episodeId,
-    serieId: docOdm.serieId,
+    id: {
+      innerId: docOdm.episodeId,
+      serieId: docOdm.serieId,
+    },
     path: docOdm.path,
     title: docOdm.title,
     start: docOdm.start,
@@ -30,8 +32,8 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
 export function modelToDocOdm(model: Episode): DocOdm {
   assertIsEpisode(model);
   const ret: DocOdm = {
-    episodeId: model.episodeId,
-    serieId: model.serieId,
+    episodeId: model.id.innerId,
+    serieId: model.id.serieId,
     path: model.path,
     title: model.title,
     start: model.start,
@@ -55,11 +57,11 @@ export function partialModelToDocOdm(model: Partial<Episode>): UpdateQuery<Episo
   const ret: UpdateQuery<Episode> = {
   };
 
-  if (model.episodeId !== undefined)
-    ret.episodeId = model.episodeId;
+  if (model.id !== undefined) {
+    ret.episodeId = model.id.innerId;
 
-  if (model.serieId !== undefined)
-    ret.serieId = model.serieId;
+    ret.serieId = model.id.serieId;
+  }
 
   if (model.path !== undefined)
     ret.path = model.path;

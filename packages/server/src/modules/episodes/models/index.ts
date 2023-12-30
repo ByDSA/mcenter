@@ -1,3 +1,3 @@
 export {
-  Episode as Model, EpisodeFullId as ModelFullId, EpisodeFullIdSchema as ModelFullIdSchema, EpisodeId as ModelId, EpisodeSchema as ModelSchema, assertIsEpisode as assertIsModel, compareEpisodeFullId as compareFullId, episodeFullIdOf as fullIdOf,
+  Episode as Model, EpisodeId as ModelId, EpisodeIdSchema as ModelIdSchema, EpisodeSchema as ModelSchema, assertIsEpisode as assertIsModel, compareEpisodeId as compareId,
 } from "#shared/models/episodes";

@@ -1,8 +1,15 @@
+import { DateType } from "#shared/utils/time";
 import { DateTypeOdmSchema } from "#utils/time";
 import mongoose from "mongoose";
-import { Entry, Model } from "../models";
+import { Model } from "../models";
 
-export const EntrySchema = new mongoose.Schema<Entry>( {
+export type EntryDocOdm = {
+  date: DateType;
+  episodeId: string;
+  serieId: string;
+};
+
+export const EntrySchema = new mongoose.Schema<EntryDocOdm>( {
   date: {
     type: DateTypeOdmSchema,
     required: true,
@@ -16,8 +23,6 @@ export const EntrySchema = new mongoose.Schema<Entry>( {
     required: true,
   },
 } );
-
-export type EntryDocOdm = Entry;
 
 export type DocOdm = Omit<Model, "entries"> & {
   entries: EntryDocOdm[];

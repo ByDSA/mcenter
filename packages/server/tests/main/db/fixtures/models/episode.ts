@@ -2,8 +2,10 @@ import { Episode } from "#modules/episodes";
 import { deepFreeze } from "#shared/utils/objects";
 
 const ep1x01: Episode = {
-  "episodeId" : "1x01",
-  serieId: "simpsons",
+  id: {
+    innerId : "1x01",
+    serieId: "simpsons",
+  },
   "title" : "Sin Blanca Navidad",
   "path" : "series/simpsons/1/1_80.mkv",
   "weight" : -6,
@@ -18,8 +20,10 @@ const ep1x01: Episode = {
 export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
   ep1x01,
   {
-    "episodeId" : "1x02",
-    serieId: "simpsons",
+    id: {
+      innerId : "1x02",
+      serieId: "simpsons",
+    },
     "path" : "series/simpsons/1/2_80.mkv",
     "title" : "Bart, el genio",
     "weight" : -30,
@@ -27,8 +31,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1337,
   },
   {
-    "episodeId" : "1x03",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x03",
+      serieId: "simpsons",
+    },
     "path" : "series/simpsons/1/3_80.mkv",
     "title" : "La odisea de Homer",
     "weight" : -4,
@@ -36,8 +42,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1320,
   },
   {
-    "episodeId" : "1x04",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x04",
+      serieId: "simpsons",
+    },
     "path" : "series/simpsons/1/4_80.mkv",
     "title" : "Hogar, agridulce hogar",
     "weight" : -2,
@@ -45,8 +53,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1277.5,
   },
   {
-    "episodeId" : "1x05",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x05",
+      serieId: "simpsons",
+    },
     "path" : "series/simpsons/1/5_80.mkv",
     "title" : "Bart, el general",
     "weight" : -8,
@@ -54,8 +64,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1289,
   },
   {
-    "episodeId" : "1x06",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x06",
+      serieId: "simpsons",
+    },
     "path" : "series/simpsons/1/6_80.mkv",
     "title" : "El blues de la Mona Lisa",
     "weight" : 0,
@@ -63,8 +75,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1316,
   },
   {
-    "episodeId" : "1x07",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x07",
+      serieId: "simpsons",
+    },
     "path" : "series/simpsons/1/7_80_+cat.mkv",
     "title" : "El abominable hombre del bosque",
     "weight" : -8,
@@ -72,8 +86,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1315,
   },
   {
-    "episodeId" : "1x08",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x08",
+      serieId: "simpsons",
+    },
     "path" : "series/simpsons/1/8_80.mkv",
     "title" : "La cabeza chiflada",
     "weight" : -4,
@@ -81,8 +97,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1307,
   },
   {
-    "episodeId" : "1x09",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x09",
+      serieId: "simpsons",
+    },
     "path" : "series/simpsons/1/9_80.mkv",
     "title" : "Jacques, el rompecorazones",
     "weight" : -8,
@@ -90,8 +108,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1333,
   },
   {
-    "episodeId" : "1x10",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x10",
+      serieId: "simpsons",
+    },
     "path" : "series/simpsons/1/10_80.mkv",
     "title" : "Homer se va de juerga",
     "weight" : -16,
@@ -99,8 +119,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1331.5,
   },
   {
-    "episodeId" : "1x11",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x11",
+      serieId: "simpsons",
+    },
     "title" : "Viva la vendimia",
     "path" : "series/simpsons/1/11_80.mkv",
     "weight" : -8,
@@ -108,8 +130,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1366,
   },
   {
-    "episodeId" : "1x12",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x12",
+      serieId: "simpsons",
+    },
     "title" : "Krusty entra en chirona",
     "path" : "series/simpsons/1/12_80.mkv",
     "weight" : 0,
@@ -117,8 +141,10 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "end" : 1381,
   },
   {
-    "episodeId" : "1x13",
-    serieId: "simpsons",
+    id: {
+      "innerId" : "1x13",
+      serieId: "simpsons",
+    },
     "title" : "La baby siter ataca de nuevo",
     "path" : "series/simpsons/1/13_80.mkv",
     "weight" : -6,

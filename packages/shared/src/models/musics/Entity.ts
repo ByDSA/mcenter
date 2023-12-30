@@ -5,7 +5,7 @@ import { VOSchema } from "./VO";
 
 const IDSchema = z.string();
 
-export type ID = z.infer<typeof IDSchema>;
+export type Id = z.infer<typeof IDSchema>;
 
 export const EntitySchema = VOSchema.merge(z.object( {
   id: IDSchema,
@@ -21,14 +21,6 @@ export function parse(model: unknown): Entity {
   return EntitySchema.parse(model);
 }
 
-export function compareId(a: Entity, b: Entity): boolean {
-  return a.id === b.id;
-}
-
-export function compareEntityWithId(e: Entity, id: ID): boolean {
-  return e.id === id;
-}
-
-export function getIdOfEntity(e: Entity): ID {
-  return e.id;
+export function compareId(a: Id, b: Id): boolean {
+  return a === b;
 }

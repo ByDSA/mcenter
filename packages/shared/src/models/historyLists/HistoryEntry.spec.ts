@@ -4,8 +4,10 @@ const assertIsModel: typeof assertIsEntry = assertIsEntry;
 
 describe("assertIsModel", () => {
   const VALID_MODEL = {
-    episodeId: "1x01",
-    serieId: "serie",
+    episodeId: {
+      innerId: "1x01",
+      serieId: "serie",
+    },
     date: {
       year: 2021,
       month: 1,

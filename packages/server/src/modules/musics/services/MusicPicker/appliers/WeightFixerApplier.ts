@@ -1,9 +1,7 @@
-import { WeightFixerApplier } from "#modules/picker";
+import { LastTimeWeightFixer, WeightFixerApplier } from "#modules/picker";
 import { Music } from "#shared/models/musics";
 import { Pickable, ResourceVO } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
-
-const SECONDS_IN_DAY = 24 * 60 * 60;
 
 export default class MusicWeightFixerApplier<R extends ResourceVO = ResourceVO> extends WeightFixerApplier<R> {
   constructor() {

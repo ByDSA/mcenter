@@ -1,22 +1,20 @@
 /* eslint-disable import/prefer-default-export */
 import { FilterApplier, PreventDisabledFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { Music, getIdOfMusic } from "#shared/models/musics";
-import { ResourceVO } from "#shared/models/resource";
+import { Music, compareMusicId, getIdOfMusic } from "#shared/models/musics";
+import { Resource } from "#shared/models/resource";
 
 type Model = Music;
 type ModelId = string;
 
-const compareResourceWithId = (m: Model, id: ModelId) =>m.url === id;
-
-type Params<R extends ResourceVO = ResourceVO, ID = string> = {
+type Params<ID, R extends Resource<ID> = Resource<ID>> = {
   resources: R[];
   lastEp: R | null;
   lastId: ID | undefined;
 };
 export default class MusicFilterApplier extends FilterApplier<Model> {
-  #params: Params<Model, ModelId>;
+  #params: Params<ModelId, Model>;
 
-  constructor(params: Params<Model, ModelId>) {
+  constructor(params: Params<ModelId, Model>) {
     super();
     this.#params = params;
 
@@ -30,10 +28,10 @@ export default class MusicFilterApplier extends FilterApplier<Model> {
     this.add(new PreventDisabledFilter());
 
     if (lastEp) {
-      this.add(new PreventRepeatLastFilter(
+      this.add(new PreventRepeatLastFilter<ModelId, Model>(
         {
           lastId,
-          compareResourceWithId,
+          compareId: compareMusicId,
         } ));
     }
 

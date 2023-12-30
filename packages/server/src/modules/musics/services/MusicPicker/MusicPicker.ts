@@ -15,10 +15,10 @@ export default function buildMusicPicker( { mode, episodes, lastOne }: Params): 
 
   switch (mode) {
     case PickMode.SEQUENTIAL:
-      picker = new ResourcePickerSequential<Model, ModelId>( {
+      picker = new ResourcePickerSequential<ModelId, Model>( {
         resources: episodes,
         lastId: lastOne ? lastOne.url : undefined,
-        compareResourceWithId: (r, id) => r.url === id,
+        compareId: (a, b) => a === b,
       } );
       break;
     case PickMode.RANDOM:

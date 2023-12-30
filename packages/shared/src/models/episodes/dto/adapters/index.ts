@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import Model from "../../Episode";
+import Model from "../../Entity";
 
 export function dtoToModel(dto: Model): Model {
   return {

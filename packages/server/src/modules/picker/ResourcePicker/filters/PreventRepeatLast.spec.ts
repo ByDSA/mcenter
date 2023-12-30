@@ -1,4 +1,4 @@
-import { Episode, EpisodeFullId, episodeFullIdOf } from "#shared/models/episodes";
+import { Episode, EpisodeId, compareEpisodeId as compareId } from "#shared/models/episodes";
 import { assertIsDefined } from "#shared/utils/validation";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import PreventRepeatLastFilter from "./PreventRepeatLastFilter";
@@ -9,13 +9,11 @@ const OTHER_EPISODE = EPISODES_SIMPSONS[1];
 assertIsDefined(DEFAULT_EPISODE);
 assertIsDefined(OTHER_EPISODE);
 
-const compareId = (episode: Episode, id: EpisodeFullId) => episode.serieId === id.serieId && episode.episodeId === id.episodeId;
-
 describe("PreventRepeatLastFilter", () => {
   it("should return true when last episode is undefined", async () => {
-    const filter = new PreventRepeatLastFilter<EpisodeFullId, Episode>( {
+    const filter = new PreventRepeatLastFilter<EpisodeId, Episode>( {
       lastId: undefined,
-      compareResourceWithId: compareId,
+      compareId,
     } );
     const result = await filter.filter(DEFAULT_EPISODE);
 
@@ -24,8 +22,8 @@ describe("PreventRepeatLastFilter", () => {
 
   it("should return true when current episode is different from last episode", async () => {
     const filter = new PreventRepeatLastFilter( {
-      lastId: episodeFullIdOf(OTHER_EPISODE),
-      compareResourceWithId: compareId,
+      lastId: OTHER_EPISODE.id,
+      compareId,
     } );
     const result = await filter.filter(DEFAULT_EPISODE);
 
@@ -34,8 +32,8 @@ describe("PreventRepeatLastFilter", () => {
 
   it("should return false when current episode is the same as last episode", async () => {
     const filter = new PreventRepeatLastFilter( {
-      lastId: episodeFullIdOf(DEFAULT_EPISODE),
-      compareResourceWithId: compareId,
+      lastId: DEFAULT_EPISODE.id,
+      compareId,
     } );
     const result = await filter.filter(DEFAULT_EPISODE);
 

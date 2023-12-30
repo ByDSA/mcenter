@@ -70,7 +70,7 @@ export default class PickerController implements Controller {
     const serie = await seriePromise;
     const lastEp = await lastEpPromise;
 
-    console.log(`Received serie=${serie?.id} and lastEp=${lastEp?.episodeId}`);
+    console.log(`Received serie=${serie?.id} and lastEp=${lastEp?.id.innerId}`);
 
     assertFound(serie);
 

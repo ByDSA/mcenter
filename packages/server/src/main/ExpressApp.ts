@@ -1,10 +1,9 @@
 import ActionController from "#modules/actions/ActionController";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { EpisodeRepository, EpisodeRestController } from "#modules/episodes";
+import { EpisodePickerController, EpisodeRepository, EpisodeRestController } from "#modules/episodes";
 import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
 import { HistoryListRepository, HistoryListRestController } from "#modules/historyLists";
 import { MusicController } from "#modules/musics";
-import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
 import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
 import { StreamRepository, StreamRestController } from "#modules/streams";
@@ -41,7 +40,7 @@ export type ExpressAppDependencies = {
       };
     };
     picker: {
-      controller: PublicMethodsOf<PickerController>;
+      controller: PublicMethodsOf<EpisodePickerController>;
     };
     actionController: PublicMethodsOf<ActionController>;
     historyList: {

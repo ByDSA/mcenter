@@ -55,9 +55,7 @@ import RealDatabase from "./main/db/Database";
   const episodePickerService = new EpisodePickerService( {
     episodeRepository,
     historyListRepository,
-    serieRepository,
     streamRepository,
-    domainMessageBroker,
   } );
   const playStreamController = new PlayStreamController( {
     playService,
