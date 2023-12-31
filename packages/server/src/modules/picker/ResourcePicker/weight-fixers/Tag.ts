@@ -3,6 +3,8 @@ import { Pickable, Taggable } from "#shared/models/resource/PartialSchemas";
 import { dynamicLoadScriptFromEnvVar } from "../../../../DynamicLoad";
 import WeightFixer, { WeightFixerParams } from "./WeightFixer";
 
+// TODO: externalizar calendar y tag y luego hacer los tests
+
 type Model = Pickable & Taggable;
 export default class TagWeightFixer implements WeightFixer<Model> {
   async fixWeight( { resource, currentWeight }: WeightFixerParams<Model>): Promise<number> {

@@ -2,9 +2,10 @@ import { SECONDS_IN_DAY } from "#modules/resources";
 import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { ResourceVO } from "#shared/models/resource";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
+import { useFakeTime } from "#tests/time";
 import PreventRepeatInDaysFilter from "../PreventRepeatInDaysFilter";
 
-jest.setSystemTime(new Date()); // Por la diferencia de Date.now durante la ejecución
+useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
 const EP_BASE: ResourceVO = {
   ...EPISODES_SIMPSONS[0],
@@ -58,22 +59,22 @@ type CaseLastTimePlayed = {
 const casesLastTimePlayed = [
   {
     lastTimePlayed: 0,
-    minDays: Number.MAX_SAFE_INTEGER,
+    minDays: Infinity,
     expected: true,
   },
   {
     lastTimePlayed: -1,
-    minDays: Number.MAX_SAFE_INTEGER,
+    minDays: Infinity,
     expected: true,
   },
   {
     lastTimePlayed: undefined,
-    minDays: Number.MAX_SAFE_INTEGER,
+    minDays: Infinity,
     expected: true,
   },
   {
     lastTimePlayed: 1,
-    minDays: Number.MAX_SAFE_INTEGER,
+    minDays: Infinity,
     expected: false,
   },
 ] as CaseLastTimePlayed[];

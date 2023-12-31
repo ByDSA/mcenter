@@ -15,7 +15,15 @@ export default class LastTime<R extends ResourceVO = ResourceVO> implements Weig
 
   // eslint-disable-next-line require-await
   async fixWeight( { resource }: WeightFixerParams<R>): Promise<number> {
-    const secondsElapsed = secondsElapsedFrom(resource.lastTimePlayed ?? Number.MAX_SAFE_INTEGER);
+    let secondsElapsed;
+
+    if (resource.lastTimePlayed) {
+      secondsElapsed = secondsElapsedFrom(resource.lastTimePlayed);
+
+      if (secondsElapsed < 0)
+        secondsElapsed = 0;
+    } else
+      secondsElapsed = Infinity;
 
     return this.#params.fx(resource, secondsElapsed);
   }
