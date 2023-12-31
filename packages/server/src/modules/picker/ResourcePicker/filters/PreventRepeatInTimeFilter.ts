@@ -17,8 +17,9 @@ export default class PreventRepeatInTimeFilter implements Filter<ResourceVO> {
     if (resource.lastTimePlayed === undefined || resource.lastTimePlayed <= 0)
       return true;
 
+    const {minSecondsElapsed} = this.#params;
     const secondsElapsed = secondsElapsedFrom(resource.lastTimePlayed);
 
-    return secondsElapsed > this.#params.minSecondsElapsed;
+    return secondsElapsed >= minSecondsElapsed;
   }
 }

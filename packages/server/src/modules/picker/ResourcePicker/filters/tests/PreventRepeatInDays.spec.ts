@@ -1,7 +1,10 @@
+import { SECONDS_IN_DAY } from "#modules/resources";
 import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { ResourceVO } from "#shared/models/resource";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import PreventRepeatInDaysFilter from "../PreventRepeatInDaysFilter";
+
+jest.setSystemTime(new Date()); // Por la diferencia de Date.now durante la ejecución
 
 const EP_BASE: ResourceVO = {
   ...EPISODES_SIMPSONS[0],
@@ -21,12 +24,12 @@ const casesDaysAgo = [
   },
   {
     lastTimePlayedDaysAgo: 3,
-    minDays: 2.99,
+    minDays: 3,
     expected: true,
   },
   {
     lastTimePlayedDaysAgo: 3,
-    minDays: 3.01,
+    minDays: 3 + 1 / SECONDS_IN_DAY,
     expected: false,
   },
 ] as CaseDaysAgo[];
