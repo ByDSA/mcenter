@@ -24,7 +24,7 @@ export {
 
 export {
   default as RemoveWeightLowerOrEqualThanFilter,
-} from "./RemoveWeightLowerOrEqualThanFilter";
+} from "./MinWeightFilter";
 
 export {
   default as FilterApplier,

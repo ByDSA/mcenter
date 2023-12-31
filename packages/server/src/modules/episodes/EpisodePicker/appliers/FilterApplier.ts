@@ -71,7 +71,6 @@ export default class EpisodeFilterApplier extends FilterApplier<Episode> {
 
     this.add(new PreventRepeatInDaysFilter( {
       minDays: +PICKER_MIN_DAYS,
-      lastTimePlayed: lastEp?.lastTimePlayed ?? 0,
     } ));
   }
 }

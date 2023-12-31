@@ -1,12 +1,11 @@
-import { Pickable } from "#shared/models/resource";
+import { ResourceVO } from "#shared/models/resource";
 import { secondsElapsedFrom } from "../utils";
 import Filter from "./Filter";
 
 type Params = {
   minSecondsElapsed: number;
-  lastTimePlayed: number;
 };
-export default class PreventRepeatInTimeFilter implements Filter {
+export default class PreventRepeatInTimeFilter implements Filter<ResourceVO> {
   #params: Params;
 
   constructor(params: Params) {
@@ -14,9 +13,12 @@ export default class PreventRepeatInTimeFilter implements Filter {
   }
 
   // eslint-disable-next-line require-await
-  async filter(_: Pickable): Promise<boolean> {
-    const secondsElapsed = secondsElapsedFrom(this.#params.lastTimePlayed);
+  async filter(resource: ResourceVO): Promise<boolean> {
+    if (resource.lastTimePlayed === undefined || resource.lastTimePlayed <= 0)
+      return true;
 
-    return secondsElapsed >= this.#params.minSecondsElapsed;
+    const secondsElapsed = secondsElapsedFrom(resource.lastTimePlayed);
+
+    return secondsElapsed > this.#params.minSecondsElapsed;
   }
 }
