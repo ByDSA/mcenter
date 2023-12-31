@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { FilterApplier, PreventDisabledFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { Music, compareMusicId, getIdOfMusic } from "#shared/models/musics";
+import { Music, compareMusicId } from "#shared/models/musics";
 import { Resource } from "#shared/models/resource";
 
 type Model = Music;
@@ -48,6 +48,6 @@ export function genFilterApplier(resources: Model[], lastOne?: Model) {
   return new MusicFilterApplier( {
     resources,
     lastEp: lastOne ?? null,
-    lastId: lastOne ? getIdOfMusic(lastOne) : undefined,
+    lastId: lastOne?.id,
   } );
 }
