@@ -1,9 +1,9 @@
+import { SECONDS_IN_DAY } from "#modules/resources";
 import PreventRepeatInTimeFilter from "./PreventRepeatInTimeFilter";
 
 type Params = {
   minDays: number;
 };
-export const SECONDS_IN_DAY = 24 * 60 * 60;
 
 export default class PreventRepeatInDaysFilter extends PreventRepeatInTimeFilter {
   constructor(params: Params) {

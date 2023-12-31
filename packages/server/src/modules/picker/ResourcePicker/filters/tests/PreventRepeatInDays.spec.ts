@@ -1,10 +1,8 @@
+import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { ResourceVO } from "#shared/models/resource";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
-import PreventRepeatInDaysFilter, { SECONDS_IN_DAY } from "../PreventRepeatInDaysFilter";
+import PreventRepeatInDaysFilter from "../PreventRepeatInDaysFilter";
 
-function genLastTimePlayedDaysAgo(days: number) {
-  return Date.now() / 1000 - (days * SECONDS_IN_DAY);
-}
 const EP_BASE: ResourceVO = {
   ...EPISODES_SIMPSONS[0],
 };
