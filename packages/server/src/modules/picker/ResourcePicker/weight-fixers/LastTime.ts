@@ -2,8 +2,9 @@ import { Pickable, ResourceVO } from "#shared/models/resource";
 import { secondsElapsedFrom } from "../utils";
 import WeightFixer, { WeightFixerParams } from "./WeightFixer";
 
+export type Fx<R extends Pickable = Pickable> = (pickable: R, x: number)=> number;
 type Params<R extends Pickable> = {
-  fx: (pickable: R, x: number)=> number;
+  fx: Fx<R>;
 };
 export default class LastTime<R extends ResourceVO = ResourceVO> implements WeightFixer<R> {
   #params: Params<R>;

@@ -1,4 +1,5 @@
 import { LastTimeWeightFixer, WeightFixerApplier } from "#modules/picker";
+import { Fx } from "#modules/picker/ResourcePicker/weight-fixers/LastTime";
 import { Music } from "#shared/models/musics";
 import { Pickable, ResourceVO } from "#shared/models/resource";
 
@@ -13,7 +14,7 @@ export default class MusicWeightFixerApplier<R extends ResourceVO = ResourceVO> 
   }
 }
 
-const fx = (r: Pickable, x: number): number => {
+const fx: Fx = (r: Pickable, x: number): number => {
   const daysFromLastTime = 1;// x / SECONDS_IN_DAY; // TODO: ignorar tiempo por ahora
   let reinforcementFactor = 1;
   const {weight} = r;
