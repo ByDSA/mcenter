@@ -152,7 +152,7 @@ function statusRepresentaton(status: PlayerStatusResponse, resource: Episode | n
   let artist = "-";
 
   if (resource)
-    artist = `${resource.episodeId}, ${ resource?.serie?.name}`;
+    artist = `${resource.id.innerId}, ${ resource?.serie?.name}`;
   else
     artist = uri?.slice(uri.lastIndexOf("/") + 1) ?? "-";
 

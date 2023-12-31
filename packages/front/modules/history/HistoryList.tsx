@@ -75,7 +75,7 @@ export default function Page() {
           if (i === 0 || !isSameday(list[i - 1].date.timestamp, entry.date.timestamp))
             dayTitle = <h2 key={getDateStr(new Date(entry.date.timestamp * 1000))}>{getDateStr(new Date(entry.date.timestamp * 1000))}</h2>;
 
-          return <Fragment key={`${entry.serieId} ${entry.episodeId}`}>
+          return <Fragment key={`${entry.episodeId.serieId} ${entry.episodeId}`}>
             {dayTitle}
             <HistoryEntryElement value={entry} onRemove={() => {
               setList(list.toSpliced(i, 1));
