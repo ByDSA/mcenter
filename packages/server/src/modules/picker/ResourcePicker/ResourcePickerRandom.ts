@@ -23,7 +23,6 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
     let {lastEp} = this.#params;
 
     for (let i = 0; i < n; i++) {
-      console.log("Picking one ...");
       // eslint-disable-next-line no-await-in-loop
       const picker = await genRandomPickerWithData( {
         ...this.#params,
@@ -47,8 +46,6 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
 }
 
 export async function genRandomPickerWithData<R extends ResourceVO>( {resources, filterApplier, weightFixerApplier }: Params<R>): Promise<Picker<R>> {
-  console.log("Getting random picker...");
-
   if (resources.length === 0)
     throw new Error("Empty resources");
 

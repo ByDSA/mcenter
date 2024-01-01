@@ -11,6 +11,22 @@ import UrlGenerator from "./UrlGenerator";
 import { docOdmToModel } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 
+export type FindParams = {
+  tags?: string[];
+  weight?: {
+    max?: number;
+    min?: number;
+  };
+};
+type FindQueryParams = {
+  tags?: {
+    $in: string[];
+  };
+  weight?: {
+    $gte?: number;
+    $lte?: number;
+  };
+};
 export default class Repository {
   async findByHash(hash: string): Promise<Music | null> {
     const musicOdm: DocOdm | null = await ModelOdm.findOne( {
@@ -37,6 +53,14 @@ export default class Repository {
   async findAll(): Promise<Music[]> {
     const docOdms = await ModelOdm.find( {
     } );
+    const ret = docOdms.map((docOdm) => docOdmToModel(docOdm));
+
+    return ret;
+  }
+
+  async find(params: FindParams): Promise<Music[]> {
+    const query = findParamsToQueryParams(params);
+    const docOdms = await ModelOdm.find(query);
     const ret = docOdms.map((docOdm) => docOdmToModel(docOdm));
 
     return ret;
@@ -168,4 +192,28 @@ function fixTitle(title: string): string {
   return title.replace(/ \((Official )?(Lyric|Music) Video\)/ig,"")
     .replace(/\(videoclip\)/ig,"")
     .replace(/ $/g,"");
+}
+
+function findParamsToQueryParams(params: FindParams): FindQueryParams {
+  const queryParams: FindQueryParams = {
+  };
+
+  if (params.tags) {
+    queryParams.tags = {
+      $in: params.tags,
+    };
+  }
+
+  if (params.weight) {
+    queryParams.weight = {
+    };
+
+    if (params.weight.min !== undefined)
+      queryParams.weight.$gte = params.weight.min;
+
+    if (params.weight.max !== undefined)
+      queryParams.weight.$lte = params.weight.max;
+  }
+
+  return queryParams;
 }

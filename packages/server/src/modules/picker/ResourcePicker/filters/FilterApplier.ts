@@ -9,21 +9,26 @@ export default class FilterApplier<R extends Pickable = Pickable> {
   }
 
   async apply(data: readonly R[]): Promise<R[]> {
-    console.log("Filtering...");
     const newData: R[] = [];
 
-    // eslint-disable-next-line no-restricted-syntax, no-labels
-    main: for (const self of data) {
-      for (const f of this.#filters) {
-        // eslint-disable-next-line no-await-in-loop
-        if (!await f.filter(self))
-          // eslint-disable-next-line no-labels, no-continue
-          continue main;
-      }
-
-      newData.push(self);
+    for (const self of data) {
+      await this.#applyFiltersToResource(self)
+        .then(ok=> {
+          if (ok)
+            newData.push(self);
+        } );
     }
 
     return newData;
+  }
+
+  async #applyFiltersToResource(resource: R): Promise<boolean> {
+    for (const f of this.#filters) {
+      // eslint-disable-next-line no-await-in-loop
+      if (!await f.filter(resource))
+        return false;
+    }
+
+    return true;
   }
 }

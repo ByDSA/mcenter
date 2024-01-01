@@ -13,7 +13,6 @@ export default class WeightFixerApplier<R extends Pickable = Pickable> {
   }
 
   async apply(picker: Picker<R>): Promise<void> {
-    console.log("Fixing weight...");
     const resources = picker.data;
 
     for (const resource of resources) {
@@ -30,7 +29,5 @@ export default class WeightFixerApplier<R extends Pickable = Pickable> {
 
       picker.put(resource, currentWeight);
     }
-
-    console.log("Fixed weight!");
   }
 }
