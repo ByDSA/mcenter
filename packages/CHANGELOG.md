@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.4.3](https://github.com/ByDSA/mcenter/compare/v3.4.2...v3.4.3) (2024-01-01)
+
+
+### Bug Fixes
+
+* picker integration ([#15](https://github.com/ByDSA/mcenter/issues/15)) ([ce67a43](https://github.com/ByDSA/mcenter/commit/ce67a432f9187284c337b91bef3a5a6f984b0c20))
+
 ### [3.4.2](https://github.com/ByDSA/mcenter/compare/v3.4.1...v3.4.2) (2023-12-28)
 
 
