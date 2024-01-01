@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { MusicVO } from "#shared/models/musics";
 import { Stats } from "node:fs";

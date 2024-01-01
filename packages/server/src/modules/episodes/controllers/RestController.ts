@@ -106,7 +106,7 @@ implements
 
       for (const ep of episodes) {
         const {serieId} = ep.id;
-        // eslint-disable-next-line no-await-in-loop
+        // TODO: quitar await en for
         const serie = series[serieId] ?? await this.#serieRepo.getOneById(serieId);
 
         ep.serie = serie;

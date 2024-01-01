@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { HistoryListRepository } from "#modules/historyLists";
 import { PickMode, ResourcePicker } from "#modules/picker";
 import { Stream, StreamId, StreamMode, StreamRepository } from "#modules/streams";
