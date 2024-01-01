@@ -21,22 +21,13 @@ export default class GetController {
   }
 
   async getRandom(req: Request, res: Response) {
-    console.time("getRandom");
-    console.time("findAllMusicsAndFilter");
     const musics = await this.#findMusics(req);
-
-    console.timeEnd("findAllMusicsAndFilter");
-    console.time("randomPick");
     const picked = await randomPick(musics);
-
-    console.timeEnd("randomPick");
-
     const nextUrlServer = ENVS.backendUrl;
     const nextUrl = `${nextUrlServer}/${path.join("api/musics/get", req.url)}`;
     const ret = generatePlaylist(picked, nextUrl);
 
     res.send(ret);
-    console.timeEnd("getRandom");
   }
 
   async getAll(req: Request, res: Response) {

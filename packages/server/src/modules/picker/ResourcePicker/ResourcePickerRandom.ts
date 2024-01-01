@@ -1,4 +1,5 @@
 import { ResourceVO } from "#shared/models/resource";
+import { assertIsDefined, assertIsNotEmpty } from "#shared/utils/validation";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
 import ResourcePicker from "./ResourcePicker";
@@ -29,8 +30,7 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
       } );
       const resource: R | undefined = picker.pickOne();
 
-      if (!resource)
-        throw new Error("Picker has no data");
+      assertIsDefined(resource, "Picker has no data");
 
       if (i < n - 1) {
         resource.lastTimePlayed = Math.floor(DateTime.now().toSeconds());
@@ -45,8 +45,8 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
 }
 
 export async function genRandomPickerWithData<R extends ResourceVO>( {resources, filterApplier, weightFixerApplier }: Params<R>): Promise<Picker<R>> {
-  if (resources.length === 0)
-    throw new Error("Empty resources");
+  assertIsDefined(resources, "Undefined resources");
+  assertIsNotEmpty(resources, "Empty resources");
 
   const dataToAdd = await filterApplier.apply(resources);
 
