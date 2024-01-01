@@ -1,13 +1,13 @@
-import { HistoryList } from "#shared/models/historyLists";
-import { deepMerge } from "#shared/utils/objects";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#modules/series";
+import { HistoryList } from "#shared/models/historyLists";
+import { deepMerge } from "#shared/utils/objects";
 import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
 import { EpisodeFileInfoRepository } from "..";
-import { Model, ModelFullId } from "../models";
+import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 import { QUEUE_NAME } from "./events";
 import { GetOptions, validateGetOptions } from "./get-options";
@@ -24,9 +24,9 @@ export type GetManyOptions = {
 };
 
 export default class Repository
-implements CanGetOneById<Model, ModelFullId>,
-CanUpdateOneByIdAndGet<Model, ModelFullId>,
-CanPatchOneByIdAndGet<Model, ModelFullId>,
+implements CanGetOneById<Model, ModelId>,
+CanUpdateOneByIdAndGet<Model, ModelId>,
+CanPatchOneByIdAndGet<Model, ModelId>,
 CanCreateManyAndGet<Model>,
 CanGetAll<Model>
 {
@@ -58,11 +58,8 @@ CanGetAll<Model>
     const ret = await this.getOneByPath(newPath);
 
     if (ret) {
-      const event = new PatchEvent<Model, ModelFullId>( {
-        entityId: {
-          serieId: ret.serieId,
-          episodeId: ret.episodeId,
-        },
+      const event = new PatchEvent<Model, ModelId>( {
+        entityId: ret.id,
         key: "path",
         value: newPath,
       } );
@@ -82,9 +79,9 @@ CanGetAll<Model>
     return episodesOdm.map(docOdmToModel);
   }
 
-  async getAllBySerieId(id: SerieId): Promise<Model[]> {
+  async getAllBySerieId(serieId: SerieId): Promise<Model[]> {
     const episodesOdm = await ModelOdm.find( {
-      serieId: id,
+      serieId,
     } );
 
     if (episodesOdm.length === 0)
@@ -99,24 +96,19 @@ CanGetAll<Model>
     if (!historyEntry)
       return null;
 
-    const {episodeId, serieId} = historyEntry;
+    const {episodeId: fullId} = historyEntry;
 
-    if (!episodeId || !serieId)
+    if (!fullId.innerId || !fullId.serieId)
       return null;
-
-    const fullId: ModelFullId = {
-      episodeId,
-      serieId,
-    };
 
     return this.getOneById(fullId);
   }
 
-  async getOneById(fullId: ModelFullId, opts?: GetOptions): Promise<Model | null> {
+  async getOneById(id: ModelId, opts?: GetOptions): Promise<Model | null> {
     validateGetOptions(opts);
     const episodeOdm = await ModelOdm.findOne( {
-      serieId: fullId.serieId,
-      episodeId: fullId.episodeId,
+      serieId: id.serieId,
+      episodeId: id.innerId,
     } );
 
     if (!episodeOdm)
@@ -125,8 +117,8 @@ CanGetAll<Model>
     const ret = docOdmToModel(episodeOdm);
 
     if (opts?.expand?.includes(ExpandEnum.FileInfo)) {
-      const id = episodeOdm._id?.toString();
-      const fileInfo = await this.#fileInfoRepository.getAllBySuperId(id);
+      const _id = episodeOdm._id?.toString();
+      const fileInfo = await this.#fileInfoRepository.getAllBySuperId(_id);
 
       if (!fileInfo)
         throw new Error("Episode has no file info");
@@ -178,9 +170,12 @@ CanGetAll<Model>
     return episodesOdm.map(docOdmToModel);
   }
 
-  async updateOneByIdAndGet(fullId: ModelFullId, episode: UpdateOneParams): Promise<Model | null> {
+  async updateOneByIdAndGet(fullId: ModelId, episode: UpdateOneParams): Promise<Model | null> {
     const docOdm: DocOdm = modelToDocOdm(episode);
-    const updateResult = await ModelOdm.updateOne(fullId, docOdm);
+    const updateResult = await ModelOdm.updateOne( {
+      episodeId:fullId.innerId,
+      serieId: fullId.serieId,
+    }, docOdm);
 
     if (updateResult.matchedCount === 0)
       return null;
@@ -194,15 +189,18 @@ CanGetAll<Model>
     return this.getOneById(fullId);
   }
 
-  async patchOneByIdAndGet(fullId: ModelFullId, episode: Partial<UpdateOneParams>): Promise<Model | null> {
+  async patchOneByIdAndGet(fullId: ModelId, episode: Partial<UpdateOneParams>): Promise<Model | null> {
     const partialDocOdm = partialModelToDocOdm(episode);
-    const updateResult = await ModelOdm.updateOne(fullId, partialDocOdm);
+    const updateResult = await ModelOdm.updateOne( {
+      episodeId:fullId.innerId,
+      serieId: fullId.serieId,
+    }, partialDocOdm);
 
     if (updateResult.matchedCount === 0 || updateResult.acknowledged === false)
       return null;
 
     for (const [key, value] of Object.entries(episode)) {
-      const event = new PatchEvent<Model, ModelFullId>( {
+      const event = new PatchEvent<Model, ModelId>( {
         entityId: fullId,
         key: key as keyof Model,
         value,

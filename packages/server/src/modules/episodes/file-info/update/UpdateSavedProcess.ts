@@ -1,5 +1,5 @@
 import { getIdModelOdmFromId } from "#modules/episodes/repositories/odm";
-import { EpisodeFileInfo, EpisodeFullId } from "#shared/models/episodes";
+import { EpisodeFileInfo, EpisodeId } from "#shared/models/episodes";
 import { FileInfoVideoWithSuperId, compareFileInfoVideo } from "#shared/models/episodes/fileinfo";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { deepMerge } from "#shared/utils/objects";
@@ -133,21 +133,19 @@ export default class UpdateMetadataProcess {
         for (const episode of season.children) {
           const {episodeId} = episode.content;
           const {filePath} = episode.content;
-          const fullId: EpisodeFullId = {
+          const fullId: EpisodeId = {
             serieId,
-            episodeId,
+            innerId: episodeId,
           };
           const f = async () => {
             const episodeIdOdm = await getIdModelOdmFromId(fullId);
 
             if (!episodeIdOdm)
-              throw new Error(`episode with id ${fullId.episodeId} in ${fullId.serieId} not found`);
+              throw new Error(`episode with id ${fullId.innerId} in ${fullId.serieId} not found`);
 
-            // eslint-disable-next-line no-await-in-loop
             const episodeFileInfo = await this.genEpisodeFileInfoFromFilePathOrFail(filePath);
 
             if (episodeFileInfo === null)
-            // eslint-disable-next-line no-continue
               return null;
 
             const episodeFileWithId = {
@@ -160,7 +158,6 @@ export default class UpdateMetadataProcess {
             return episodeFileWithId;
           };
 
-          // eslint-disable-next-line no-await-in-loop
           await f()
             .then((episodeFileWithId) => {
               if (episodeFileWithId)

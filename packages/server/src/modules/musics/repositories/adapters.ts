@@ -4,6 +4,8 @@ import { DocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Music {
   const model: Music = {
+    // eslint-disable-next-line no-underscore-dangle
+    id: docOdm._id.toString(),
     hash: docOdm.hash,
     title: docOdm.title,
     url: docOdm.url,

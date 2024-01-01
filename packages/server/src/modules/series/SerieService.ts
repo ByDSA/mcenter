@@ -9,11 +9,8 @@ type Params = {
 export default class SerieService {
   #episodeRepository: EpisodeRepository;
 
-  #serieRepository: Repository;
-
-  constructor( {episodeRepository, serieRepository}: Params) {
+  constructor( {episodeRepository}: Params) {
     this.#episodeRepository = episodeRepository;
-    this.#serieRepository = serieRepository;
   }
 
   async findLastEpisodeInHistoryList(historyList: HistoryList): Promise<Episode | null> {
@@ -24,14 +21,7 @@ export default class SerieService {
       return null;
 
     const {episodeId} = lastEntry;
-    const serie = await this.#serieRepository.getOneById(lastEntry.serieId);
 
-    if (!serie)
-      return null;
-
-    return this.#episodeRepository.getOneById( {
-      episodeId,
-      serieId: serie.id,
-    } );
+    return this.#episodeRepository.getOneById(episodeId);
   }
 }

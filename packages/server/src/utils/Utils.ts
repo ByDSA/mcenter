@@ -1,4 +1,4 @@
-import { execPromisify } from "#sharedSrc/utils/process";
+import { execPromisify } from "#shared/utils/process";
 
 export type CompressParams = {
   folder: string;

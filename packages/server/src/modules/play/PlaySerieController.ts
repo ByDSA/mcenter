@@ -31,14 +31,14 @@ export default class PlaySerieController implements Controller {
   async playSerie(req: Request, res: Response) {
     const forceStr = req.query.force;
     const force = !!forceStr;
-    const { id: episodeId, name: serieId } = req.params;
+    const { id: innerId, name: serieId } = req.params;
     const serie = await this.#serieRepository.getOneById(serieId);
 
     assertFound(serie);
 
     const episode = await this.#episodeRepository.getOneById( {
       serieId,
-      episodeId,
+      innerId,
     } );
 
     assertFound(episode);

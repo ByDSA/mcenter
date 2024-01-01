@@ -46,7 +46,7 @@ describe("GetAll", () =>{
   it("getRandom", async () => {
     const musics = MUSICS_SAMPLES_IN_DISK;
 
-    musicRepositoryMock.findAll = jest.fn().mockResolvedValueOnce(musics);
+    musicRepositoryMock.find = jest.fn().mockResolvedValueOnce(musics);
     const response = await request(routerApp)
       .get("/get/random")
       .expect(200);

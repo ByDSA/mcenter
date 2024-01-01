@@ -5,7 +5,7 @@ import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
-import PickerController from "./Controller";
+import PickerController from "../episodes/controllers/PickerController";
 
 let app: ExpressAppMock;
 const pickerController = new PickerController( {

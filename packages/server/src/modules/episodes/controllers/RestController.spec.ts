@@ -67,8 +67,8 @@ describe("RestController", () => {
     } );
   } );
 
-  describe("get one episode by serieId and episodeId", () => {
-    const URL = "/serieId/episodeId";
+  describe("get one episode by serieId and innerId", () => {
+    const URL = "/serieId/innerId";
 
     it("should call repository", async () => {
       await request(routerApp)
@@ -78,7 +78,7 @@ describe("RestController", () => {
       expect(episodeRepositoryMock.getOneById).toBeCalledTimes(1);
       expect(episodeRepositoryMock.getOneById).toBeCalledWith( {
         serieId: "serieId",
-        episodeId: "episodeId",
+        innerId: "innerId",
       } );
     } );
 
@@ -106,8 +106,8 @@ describe("RestController", () => {
     } );
   } );
 
-  describe("patch one episode by serieId, episodeId and partial episode", () => {
-    const URL = "/serieId/episodeId";
+  describe("patch one episode by serieId, innerId and partial episode", () => {
+    const URL = "/serieId/innerId";
     const validPartial: Partial<Episode> = {
       title: "new title",
     };
@@ -142,7 +142,7 @@ describe("RestController", () => {
       expect(episodeRepositoryMock.patchOneByIdAndGet).toBeCalledTimes(1);
       expect(episodeRepositoryMock.patchOneByIdAndGet).toBeCalledWith( {
         serieId: "serieId",
-        episodeId: "episodeId",
+        innerId: "innerId",
       }, validPartial);
     } );
 

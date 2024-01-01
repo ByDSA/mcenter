@@ -1,13 +1,13 @@
-import { Music } from "#shared/models/musics";
+import { MusicVO } from "#shared/models/musics";
 import mongoose from "mongoose";
 
-export interface DocOdm extends Music {
-  _id?: mongoose.Types.ObjectId;
+export interface DocOdm extends MusicVO {
+  _id: mongoose.Types.ObjectId;
 }
 
 const NAME = "Music";
 
-export const SchemaOdm = new mongoose.Schema( {
+export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   // TODO: Parte FileInfo a quitar
   hash: {
     type: String,
@@ -70,4 +70,4 @@ export const SchemaOdm = new mongoose.Schema( {
   },
 } );
 
-export const ModelOdm = mongoose.model<DocOdm>(NAME, SchemaOdm);
+export const ModelOdm = mongoose.model<MusicVO>(NAME, SchemaOdm);

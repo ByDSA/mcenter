@@ -1,5 +1,4 @@
-import { Music } from "#shared/models/musics";
-import { ARTIST_EMPTY } from "#shared/models/musics/Music";
+import { ARTIST_EMPTY, Music } from "#shared/models/musics";
 // eslint-disable-next-line import/no-cycle
 import MusicRepository from "./Repository";
 
@@ -20,7 +19,6 @@ export default class UrlGenerator {
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      // eslint-disable-next-line no-await-in-loop
       music = await this.#musicRepository.findByUrl(currentUrl);
 
       if (!music)
@@ -64,6 +62,7 @@ export function fixUrl(url: string): string {
     .replaceAll(/-$/g,"")
     .replaceAll(/ñ/g,"n")
     .replaceAll(/ç/g,"c")
+    .replaceAll(/\$/, "s")
     .replaceAll(/á|à|ä|â/g,"a")
     .replaceAll(/é|è|ë|ê/g,"e")
     .replaceAll(/í|ì|ï|î/g,"i")

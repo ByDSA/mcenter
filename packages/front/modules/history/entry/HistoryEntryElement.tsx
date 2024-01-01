@@ -1,5 +1,5 @@
 import { getBackendUrl } from "#modules/utils";
-import { Episode, EpisodeFullId, assertIsEpisode } from "#shared/models/episodes";
+import { Episode, EpisodeId, assertIsEpisode } from "#shared/models/episodes";
 import { HistoryEntry, HistoryEntryId, HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, HistoryListId, assertIsHistoryEntryWithId, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 import Loading from "app/loading";
 import React, { Fragment, useEffect, useRef } from "react";
@@ -24,7 +24,7 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
   useEffect(() => {
     let newName = "";
 
-    if (entry.episode?.title.trim() && !entry.episode.title.includes(entry.episodeId))
+    if (entry.episode?.title.trim() && !entry.episode.title.includes(entry.episodeId.innerId))
       newName += `${entry.episode.title}`;
 
     setName(newName);
@@ -65,12 +65,9 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
       start: currentStart,
       end: currentEnd,
     };
-    const fullId = {
-      serieId: value.serieId,
-      episodeId: value.episodeId,
-    };
+    const id = value.episodeId;
 
-    fetchSecurePatch(fullId, partial)
+    fetchSecurePatch(id, partial)
       .then((data: Episode | null) => {
         if (!data)
           return;
@@ -103,7 +100,7 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
         <div className={style.name}>
           <span className={style.item}>{value.serie?.name}</span>
           {name && <p className={`${style.item} ${style.title}`}>{name}</p>}
-          <span className={style.item}>{value.episodeId}</span>
+          <span className={style.item}>{value.episodeId.innerId}</span>
         </div>
       </div>
       {showDropdown &&
@@ -132,8 +129,8 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
         <span><a onClick={()=> {
           // eslint-disable-next-line no-restricted-globals, no-alert
           if (confirm(`Borar esta entrada del historial?\n${ JSON.stringify( {
-            serieId: entry.serieId,
-            episodeId: entry.episodeId,
+            serieId: entry.episodeId.serieId,
+            episodeId: entry.episodeId.innerId,
             date: entry.date,
           }, null, 2)}`))
             remove();
@@ -156,7 +153,7 @@ function lastestComponent(lastest: HistoryEntryWithId[] | undefined) {
 
   return <>
     <span>Últimas veces:</span>
-    {lastest && lastest.map((e: HistoryEntryWithId) => <Fragment key={`${e.serieId} ${e.episodeId} ${e.date.timestamp}`}>
+    {lastest && lastest.map((e: HistoryEntryWithId) => <Fragment key={`${e.episodeId.serieId} ${e.episodeId.innerId} ${e.date.timestamp}`}>
       <><span className={style.break} /><span>{dateInLastestComponent(new Date(e.date.timestamp * 1000))}</span></>
     </Fragment>)}
   </>;
@@ -194,8 +191,9 @@ function handleOnChange(f: React.Dispatch<React.SetStateAction<number>>) {
   };
 }
 
-function fetchSecurePatch(id: EpisodeFullId, partial: Partial<Episode>): Promise<Episode | null> {
-  const URL = `${getBackendUrl()}/api/episodes/${id.serieId}/${id.episodeId}`;
+// eslint-disable-next-line require-await
+async function fetchSecurePatch(id: EpisodeId, partial: Partial<Episode>): Promise<Episode | null> {
+  const URL = `${getBackendUrl()}/api/episodes/${id.serieId}/${id.innerId}`;
 
   return fetch(URL, {
     method: "PATCH",
@@ -238,8 +236,8 @@ export function fetchSecureLastestHistoryEntries(historyEntry: HistoryEntry): Pr
   const URL = `${getBackendUrl()}/api/history-list/entries/search`;
   const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
     "filter": {
-      "serieId": historyEntry.serieId,
-      "episodeId": historyEntry.episodeId,
+      "serieId": historyEntry.episodeId.serieId,
+      "episodeId": historyEntry.episodeId.innerId,
       "timestampMax": historyEntry.date.timestamp - 1,
     },
     "sort": {

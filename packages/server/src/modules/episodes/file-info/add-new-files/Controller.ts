@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { Episode, EpisodeRepository } from "#modules/episodes";
 import { SavedSerieTreeService } from "#modules/episodes/saved-serie-tree-service";
@@ -111,7 +110,6 @@ export default class ThisController implements Controller {
 
     for (const entry of oldNew) {
       const p: Promise<Episode | null> = this.#episodeRepository.patchOneByPathAndGet(entry.old.content.filePath, {
-        episodeId: entry.new.content.episodeId,
         path: entry.new.content.filePath,
       } );
 
@@ -127,6 +125,7 @@ export default class ThisController implements Controller {
   async #saveNewEpisodes(seriesInTree: Serie[]): Promise<Episode[]> {
     const episodes: Episode[] = [];
 
+    // TODO: quitar await en for si se puede
     for (const serieInTree of seriesInTree) {
       let serie = await this.#serieRepository.getOneById(serieInTree.id);
 
@@ -140,10 +139,12 @@ export default class ThisController implements Controller {
       for (const seasonInTree of serieInTree.children) {
         for (const episodeInTree of seasonInTree.children) {
           const episode: Episode = {
-            episodeId: episodeInTree.content.episodeId,
+            id: {
+              innerId: episodeInTree.content.episodeId,
+              serieId: serie.id,
+            },
             path: episodeInTree.content.filePath,
             end: -1,
-            serieId: serie.id,
             start: -1,
             title: `${serie.name} ${episodeInTree.content.episodeId}`,
             weight: 0,

@@ -11,7 +11,7 @@ import { updateRemoteEnvs } from "./envs.mjs";
 import {
   dockerImagePush,
   dockerImageTag,
-  packageBuildIfNotExists,
+  packageBuild,
   remoteDockerImagePull,
   sshCmd,
 } from "../../../lib/index.mjs";
@@ -32,13 +32,14 @@ export async function deployParticular(ENVS) {
       : `${ENVS.docker.registryUrl}/${imageNameEnv}`;
 
   // Image Build
-  await packageBuildIfNotExists({
+  await packageBuild({
     dockerPlatform: ENVS.docker.platform,
     projectRoot: ENVS.project.root,
     packageName,
     imageName: imageNameEnvRemote,
     tag,
     targetEnv: ENVS.TARGET_ENV,
+    replace: ENVS.docker.replaceImage,
   });
 
   if (ENVS.TARGET_ENV !== "local") {

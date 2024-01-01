@@ -1,4 +1,4 @@
-import Model from "../Episode";
+import Model from "../Entity";
 
 export function expectEpisodes(episodes1: Model[], episodes2: Model[]) {
   expect(episodes1).toHaveLength(episodes2.length);

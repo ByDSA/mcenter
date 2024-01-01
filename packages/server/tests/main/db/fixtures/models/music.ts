@@ -2,6 +2,7 @@ import { Music } from "#shared/models/musics";
 import { deepFreeze } from "#shared/utils/objects";
 
 export const A_AOT4: Music = {
+  id: "1",
   artist: "undefined",
   title: "undefined",
   url: "undefined",
@@ -20,17 +21,20 @@ export const A_AOT4: Music = {
 
 export const AOT4_COPY: Music = {
   ...A_AOT4,
+  id: "2",
   path: "aot4_copy.mp3",
 };
 
 export const DK: Music = {
   ...A_AOT4,
+  id: "3",
   path: "dk.mp3",
   hash: "53cc4a37a3daa3ff0e283deac3d2f9b2",
 };
 
 export const DRIFTVEIL: Music = {
   ...A_AOT4,
+  id: "4",
   path: "Driftveil.mp3",
   hash: "4c8d3285f37bd9537e66fb8a4034edff",
 };

@@ -9,41 +9,42 @@
 import {
   dockerImagePush,
   dockerImageTag,
-  packageBuildIfNotExists,
+  packageBuild,
   remoteDockerImagePull,
   sshCmd,
 } from "../../../lib/index.mjs";
 
 /**
- * @param {import("../../../lib/projects/deploy/types.mjs").TreeEnvs} params
+ * @param {import("../../../lib/projects/deploy/types.mjs").TreeEnvs} ENVS
  */
-export async function deployParticular(params) {
+export async function deployParticular(ENVS) {
   const packageName = "front";
-  const packageVersion = process.env.PROJECT_VERSION;
-  const { ssh } = params;
-  const imageName = `${params.project.name}/${packageName}`;
-  const imageNameEnv = `${imageName}_${params.TARGET_ENV}`;
+  const packageVersion = ENVS.project.version;
+  const { ssh } = ENVS;
+  const imageName = `${ENVS.project.name}/${packageName}`;
+  const imageNameEnv = `${imageName}_${ENVS.TARGET_ENV}`;
   const tag = packageVersion;
   const imageNameEnvRemote =
-    params.TARGET_ENV === "local"
+    ENVS.TARGET_ENV === "local"
       ? imageNameEnv
-      : `${params.docker.registryUrl}/${imageNameEnv}`;
+      : `${ENVS.docker.registryUrl}/${imageNameEnv}`;
 
   // Image Build
-  await packageBuildIfNotExists({
-    dockerPlatform: params.docker.platform,
-    projectRoot: params.project.root,
+  await packageBuild({
+    dockerPlatform: ENVS.docker.platform,
+    projectRoot: ENVS.project.root,
     packageName,
     imageName: imageNameEnvRemote,
     tag,
-    targetEnv: params.TARGET_ENV,
+    targetEnv: ENVS.TARGET_ENV,
+    replace: ENVS.docker.replaceImage,
   });
 
-  if (params.TARGET_ENV !== "local") {
+  if (ENVS.TARGET_ENV !== "local") {
     // Image Push
     await dockerImagePush({
       imageName: imageNameEnv,
-      dockerRegistryUrl: params.docker.registryUrl,
+      dockerRegistryUrl: ENVS.docker.registryUrl,
       tag,
     });
 

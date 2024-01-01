@@ -1,9 +1,11 @@
+import { ResourcePickerRandom } from "#modules/picker";
 import { Music } from "#shared/models/musics";
 import { SecureRouter } from "#utils/express";
 import { Request, Response, Router } from "express";
 import path from "node:path";
-import { newPicker } from "rand-picker";
 import { Repository } from "../repositories";
+import { FindParams } from "../repositories/Repository";
+import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services/MusicPicker/appliers";
 import { ENVS, getFullPath } from "../utils";
 
 let lastPicked: Music | undefined;
@@ -19,8 +21,8 @@ export default class GetController {
   }
 
   async getRandom(req: Request, res: Response) {
-    const musics = await this.findAllMusicsAndFilter(req);
-    const picked = randomPick(musics);
+    const musics = await this.#findMusics(req);
+    const picked = await randomPick(musics);
     const nextUrlServer = ENVS.backendUrl;
     const nextUrl = `${nextUrlServer}/${path.join("api/musics/get", req.url)}`;
     const ret = generatePlaylist(picked, nextUrl);
@@ -29,7 +31,7 @@ export default class GetController {
   }
 
   async getAll(req: Request, res: Response) {
-    const musics = await this.findAllMusicsAndFilter(req);
+    const musics = await this.#findMusics(req);
 
     this.#sortMusics(musics);
     res.send(musics);
@@ -46,30 +48,9 @@ export default class GetController {
     } );
   }
 
-  async findAllMusicsAndFilter(req: Request): Promise<Music[]> {
-    let musics = await this.#musicRepository.findAll();
-    const tagsQuery = <string | undefined>req.query.tags;
-    const minWeightQuery = <string | undefined>req.query.minWeight;
-    const maxWeightQuery = <string | undefined>req.query.maxWeight;
-
-    if (minWeightQuery !== undefined) {
-      const minWeight = parseInt(minWeightQuery, 10);
-
-      musics = musics.filter((m) => (m.weight || 0) >= minWeight);
-    }
-
-    if (maxWeightQuery !== undefined) {
-      const maxWeight = parseInt(maxWeightQuery, 10);
-
-      musics = musics.filter((m) => (m.weight || 0) <= maxWeight);
-    }
-
-    if (tagsQuery) {
-      const multipleTags = tagsQuery.split(",");
-
-      for (const tag of multipleTags)
-        musics = musics.filter((m) => m.tags?.includes(tag));
-    }
+  async #findMusics(req: Request): Promise<Music[]> {
+    const params = requestToFindMusicParams(req);
+    const musics = await this.#musicRepository.find(params);
 
     return musics;
   }
@@ -114,32 +95,16 @@ export default class GetController {
   }
 }
 
-function randomPick(musics: Music[]): Music {
-  const picker = newPicker(musics, {
-    weighted: true,
-    randomMode: 0,
+async function randomPick(musics: Music[]): Promise<Music> {
+  const picker = new ResourcePickerRandom<Music>( {
+    resources: musics,
+    lastEp: lastPicked,
+    filterApplier: genMusicFilterApplier(musics, lastPicked),
+    weightFixerApplier: genMusicWeightFixerApplier(),
   } );
+  let [picked] = await picker.pick(1);
 
-  for (const m of musics) {
-    const initialWeight = m.weight || 0;
-    let finalWeight = getFinalWeight(initialWeight);
-
-    if (initialWeight <= -99)
-      finalWeight = 0;
-
-    if (m.url === lastPicked?.url)
-      finalWeight = 0;
-
-    picker.put(m, finalWeight);
-  }
-
-  if (lastPicked) {
-    if (picker.length === 1)
-      return lastPicked;
-  }
-
-  let picked = picker.pickOne();
-
+  // default case
   if (!picked)
     [picked] = musics;
 
@@ -160,12 +125,29 @@ function generatePlaylist(picked: Music, nextUrl: string): string {
   return ret;
 }
 
-function getFinalWeight(value: number): number {
-  if (value >= -1 && value <= 1)
-    return 1;
+function requestToFindMusicParams(req: Request): FindParams {
+  const tagsQuery = <string | undefined>req.query.tags;
+  const minWeightQuery = <string | undefined>req.query.minWeight;
+  const maxWeightQuery = <string | undefined>req.query.maxWeight;
+  const params: FindParams = {
+  };
 
-  if (value < 0)
-    return 1 / -value;
+  if (minWeightQuery !== undefined || maxWeightQuery !== undefined){
+    params.weight = {
+    };
 
-  return value;
+    if (minWeightQuery !== undefined)
+      params.weight.min = +minWeightQuery;
+
+    if (maxWeightQuery !== undefined)
+      params.weight.max = +maxWeightQuery;
+  }
+
+  if (tagsQuery) {
+    const multipleTags = tagsQuery.split(",");
+
+    params.tags = multipleTags;
+  }
+
+  return params;
 }

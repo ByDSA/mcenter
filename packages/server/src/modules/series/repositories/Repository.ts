@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-
 import { deepMerge } from "#shared/utils/objects";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";

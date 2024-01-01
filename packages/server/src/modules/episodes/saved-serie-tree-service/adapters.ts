@@ -4,9 +4,8 @@ import { getSeasonEpisodeFromEpisodeId } from "../file-info/tree/idGetter";
 import { Model as Episode } from "../models";
 
 export function putModelInSerieFolderTree(episode: Episode, serieFolderTree: SerieFolderTree): SerieFolderTree {
-  const {serieId} = episode;
-  const {episodeId} = episode;
-  const seasonId = getSeasonFromEpisodeId(episodeId) ?? "";
+  const {id: {serieId, innerId}} = episode;
+  const seasonId = getSeasonFromInnerId(innerId) ?? "";
   const episodeFile: EpisodeFile = episodeToEpisodeFile(episode);
 
   treePut(serieFolderTree, [serieId, seasonId], episodeFile.id, episodeFile.content);
@@ -14,8 +13,8 @@ export function putModelInSerieFolderTree(episode: Episode, serieFolderTree: Ser
   return serieFolderTree;
 }
 
-function getSeasonFromEpisodeId(episodeId: string): string | null {
-  const match = episodeId.match(/^(\d+)x/);
+function getSeasonFromInnerId(innerId: string): string | null {
+  const match = innerId.match(/^(\d+)x/);
 
   if (match)
     return match[1];
@@ -25,9 +24,9 @@ function getSeasonFromEpisodeId(episodeId: string): string | null {
 
 export function episodeToEpisodeFile(episode: Episode): EpisodeFile {
   const episodeFile: EpisodeFile = {
-    id: getSeasonEpisodeFromEpisodeId(episode.episodeId).episode,
+    id: getSeasonEpisodeFromEpisodeId(episode.id.innerId).episode,
     content: {
-      episodeId: episode.episodeId,
+      episodeId: episode.id.innerId,
       filePath: episode.path,
     },
   };

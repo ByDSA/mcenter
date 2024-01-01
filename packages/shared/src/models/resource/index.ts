@@ -4,6 +4,9 @@ export {
 } from "./PartialSchemas";
 
 export {
-  default as Resource,
-  ModelSchema as ResourceSchema,
-} from "./Resource.entity";
+  ValueObject as ResourceVO, ValueObjectSchema as ResourceVOSchema,
+} from "./ValueObject";
+
+export {
+  Entity as Resource,
+} from "./Entity";

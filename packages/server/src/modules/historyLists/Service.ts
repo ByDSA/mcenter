@@ -1,13 +1,13 @@
-import { Episode, EpisodeFullId, EpisodeRepository, compareEpisodeFullId } from "#modules/episodes";
+import { Episode, EpisodeId, EpisodeRepository, compareEpisodeId } from "#modules/episodes";
 import { assertFound } from "#shared/utils/http/validation";
-import { Entry, Model, ModelId, createHistoryEntryByEpisodeFullId } from "./models";
+import { Entry, Model, ModelId, createHistoryEntryByEpisodeFullId as createHistoryEntryByEpisodeId } from "./models";
 import { ListRepository } from "./repositories";
 import EntryRepository from "./repositories/EntryRepository";
 
 type HistoryAndEpisodeParams = ( {
   episode: Episode;
 } | {
-  episodeFullId: EpisodeFullId;
+  episodeFullId: EpisodeId;
 } ) & ( {
   historyList: Model;
 } | {
@@ -63,17 +63,17 @@ export default class Service {
     return historyListId;
   }
 
-  async #getEpisodeFullIdFromParams(params: HistoryAndEpisodeParams): Promise<EpisodeFullId> {
-    let episodeFullId: EpisodeFullId;
+  async #getEpisodeIdFromParams(params: HistoryAndEpisodeParams): Promise<EpisodeId> {
+    let episodeId: EpisodeId;
 
     if ("episode" in params)
-      episodeFullId = params.episode;
+      episodeId = params.episode.id;
     else if ("episodeFullId" in params)
-      episodeFullId = params.episodeFullId;
+      episodeId = params.episodeFullId;
     else
       throw new Error("No se ha especificado el episodio");
 
-    return episodeFullId;
+    return episodeId;
   }
 
   async #getEpisodeFromParams(params: HistoryAndEpisodeParams): Promise<Episode> {
@@ -94,9 +94,9 @@ export default class Service {
   }
 
   async findLastHistoryEntryForEpisodeId(params: HistoryAndEpisodeParams): Promise<Entry | null> {
-    const episodeFullId: EpisodeFullId = await this.#getEpisodeFullIdFromParams(params);
+    const episodeFullId: EpisodeId = await this.#getEpisodeIdFromParams(params);
     const historyList: Model = await this.#getHistoryListFromParams(params);
-    const historyEntry = historyList.entries.findLast((h) => compareEpisodeFullId(h, episodeFullId));
+    const historyEntry = historyList.entries.findLast((h) => compareEpisodeId(h.episodeId, episodeFullId));
 
     if (!historyEntry)
       return null;
@@ -108,19 +108,19 @@ export default class Service {
     console.log("Añadiendo al historial ...");
 
     const episode: Episode = await this.#getEpisodeFromParams(params);
-    const newEntry: Entry = createHistoryEntryByEpisodeFullId(episode);
+    const newEntry: Entry = createHistoryEntryByEpisodeId(episode.id);
     const historyListId = this.#getHistoryListIdFromParams(params);
 
     await this.#entryRepository.createOneBySuperId(historyListId, newEntry);
 
-    await this.#episodeRepository.patchOneByIdAndGet(episode, {
+    await this.#episodeRepository.patchOneByIdAndGet(episode.id, {
       lastTimePlayed: newEntry.date.timestamp,
     } );
   }
 
   async addEpisodesToHistory( {episodes, historyListId}: {episodes: Episode[]; historyListId: ModelId} ) {
+    // TODO: usar bulk insert (quitar await en for)
     for (const episode of episodes) {
-      // eslint-disable-next-line no-await-in-loop
       await this.addEpisodeToHistory( {
         episode,
         historyListId,
@@ -132,8 +132,8 @@ export default class Service {
     console.log("Eliminando del historial ...");
 
     const historyList = await this.#getHistoryListFromParams(params);
-    const episodeFullId: EpisodeFullId = await this.#getEpisodeFullIdFromParams(params);
-    const historyEntryIndex = historyList.entries.findLastIndex((h: Entry) => compareEpisodeFullId(h, episodeFullId));
+    const episodeFullId: EpisodeId = await this.#getEpisodeIdFromParams(params);
+    const historyEntryIndex = historyList.entries.findLastIndex((h: Entry) => compareEpisodeId(h.episodeId, episodeFullId));
 
     if (historyEntryIndex === -1)
       return;

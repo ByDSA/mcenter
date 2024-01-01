@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { Episode } from "#modules/episodes";
 import { PublicMethodsOf } from "#shared/utils/types";
 import { assertIsNotEmpty } from "#shared/utils/validation";

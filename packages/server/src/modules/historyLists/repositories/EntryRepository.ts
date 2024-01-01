@@ -1,9 +1,8 @@
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { ModelId } from "#modules/episodes/models";
 import { logDomainEvent } from "#modules/log";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { CanCreateOneBySuperId } from "#utils/layers/repository";
-import { Entry } from "../models";
+import { Entry, ModelId } from "../models";
 import { entryToDocOdm } from "./adapters";
 import { ENTRY_QUEUE_NAME } from "./events";
 import { ModelOdm } from "./odm";
