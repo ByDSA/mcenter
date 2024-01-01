@@ -17,6 +17,7 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "import", "jest", "prettier"],
   rules: {
+    "no-await-in-loop": "off",
     "import/no-internal-modules": [
       "error",
       {

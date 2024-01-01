@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { StreamCriteriaSort, StreamGetManyRequest, StreamOriginType } from "#shared/models/streams";
@@ -46,7 +45,8 @@ implements
       for (const stream of got) {
         for (const origin of stream.group.origins) {
           if (origin.type === StreamOriginType.SERIE) {
-            // eslint-disable-next-line no-param-reassign, no-await-in-loop
+            // TODO: quitar await en for si se puede
+            // eslint-disable-next-line no-param-reassign
             origin.serie = await this.#serieRepository.getOneById(origin.id) ?? undefined;
           }
         }

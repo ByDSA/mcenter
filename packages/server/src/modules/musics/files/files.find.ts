@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 /* eslint-disable no-param-reassign */
 import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { glob } from "glob";
@@ -126,6 +125,7 @@ async function matchHashInGroupOfFiles(hash: string, files: string[]): Promise<s
   const ret = [];
 
   for (const f of files) {
+    // TODO: quitar await en for
     if (await md5FileAsync(f) === hash)
       ret.push(f);
   }

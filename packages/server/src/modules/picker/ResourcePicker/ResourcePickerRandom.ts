@@ -23,7 +23,6 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
     let {lastEp} = this.#params;
 
     for (let i = 0; i < n; i++) {
-      // eslint-disable-next-line no-await-in-loop
       const picker = await genRandomPickerWithData( {
         ...this.#params,
         lastEp,

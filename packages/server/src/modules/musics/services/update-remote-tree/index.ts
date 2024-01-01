@@ -71,7 +71,6 @@ export class UpdateRemoteTreeService {
     }
 
     for (const oldMusic of changes.updated) {
-      // eslint-disable-next-line no-await-in-loop
       const newMusic = await toUpdatedFileInfo(oldMusic);
       const p = this.#musicRepository.updateOneByPath(oldMusic.path, newMusic)
         .catch((err: Error) => {

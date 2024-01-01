@@ -143,11 +143,9 @@ export default class UpdateMetadataProcess {
             if (!episodeIdOdm)
               throw new Error(`episode with id ${fullId.innerId} in ${fullId.serieId} not found`);
 
-            // eslint-disable-next-line no-await-in-loop
             const episodeFileInfo = await this.genEpisodeFileInfoFromFilePathOrFail(filePath);
 
             if (episodeFileInfo === null)
-            // eslint-disable-next-line no-continue
               return null;
 
             const episodeFileWithId = {
@@ -160,7 +158,6 @@ export default class UpdateMetadataProcess {
             return episodeFileWithId;
           };
 
-          // eslint-disable-next-line no-await-in-loop
           await f()
             .then((episodeFileWithId) => {
               if (episodeFileWithId)

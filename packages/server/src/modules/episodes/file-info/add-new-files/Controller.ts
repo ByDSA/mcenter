@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { Episode, EpisodeRepository } from "#modules/episodes";
 import { SavedSerieTreeService } from "#modules/episodes/saved-serie-tree-service";
@@ -126,6 +125,7 @@ export default class ThisController implements Controller {
   async #saveNewEpisodes(seriesInTree: Serie[]): Promise<Episode[]> {
     const episodes: Episode[] = [];
 
+    // TODO: quitar await en for si se puede
     for (const serieInTree of seriesInTree) {
       let serie = await this.#serieRepository.getOneById(serieInTree.id);
 

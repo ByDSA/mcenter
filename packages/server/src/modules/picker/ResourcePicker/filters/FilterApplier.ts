@@ -24,7 +24,6 @@ export default class FilterApplier<R extends Pickable = Pickable> {
 
   async #applyFiltersToResource(resource: R): Promise<boolean> {
     for (const f of this.#filters) {
-      // eslint-disable-next-line no-await-in-loop
       if (!await f.filter(resource))
         return false;
     }

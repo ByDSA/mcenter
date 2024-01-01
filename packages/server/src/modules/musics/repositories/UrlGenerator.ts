@@ -19,7 +19,6 @@ export default class UrlGenerator {
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      // eslint-disable-next-line no-await-in-loop
       music = await this.#musicRepository.findByUrl(currentUrl);
 
       if (!music)

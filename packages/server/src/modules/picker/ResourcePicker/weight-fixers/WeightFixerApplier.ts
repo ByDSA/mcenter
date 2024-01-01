@@ -19,7 +19,6 @@ export default class WeightFixerApplier<R extends Pickable = Pickable> {
       let currentWeight: number = picker.getWeight(resource) ?? 1;
 
       for (const weightFixer of this.#weightFixers) {
-        // eslint-disable-next-line no-await-in-loop
         currentWeight = await weightFixer.fixWeight( {
           resource,
           resources,

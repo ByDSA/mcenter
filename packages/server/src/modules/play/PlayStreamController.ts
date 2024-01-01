@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
 import { HistoryListService } from "#modules/historyLists";
 import { StreamRepository } from "#modules/streams";

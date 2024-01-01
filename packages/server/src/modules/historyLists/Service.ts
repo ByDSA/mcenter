@@ -119,8 +119,8 @@ export default class Service {
   }
 
   async addEpisodesToHistory( {episodes, historyListId}: {episodes: Episode[]; historyListId: ModelId} ) {
+    // TODO: usar bulk insert (quitar await en for)
     for (const episode of episodes) {
-      // eslint-disable-next-line no-await-in-loop
       await this.addEpisodeToHistory( {
         episode,
         historyListId,

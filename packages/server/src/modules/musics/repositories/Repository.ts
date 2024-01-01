@@ -116,7 +116,6 @@ export default class Repository {
   async updateHashOf(music: Music) {
     const hash = await md5FileAsync(getFullPath(music.path));
 
-    // eslint-disable-next-line no-await-in-loop
     await this.updateOneByPath(music.path, {
       ...music,
       hash,
