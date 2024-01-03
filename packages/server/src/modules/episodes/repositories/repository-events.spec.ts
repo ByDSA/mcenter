@@ -5,12 +5,14 @@ import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { Consumer } from "#utils/message-broker";
+import { container } from "tsyringe";
+import { EpisodeRepository } from "..";
 import { Model, ModelId } from "../models";
-import Repository from "./Repository";
+import EpisodesRepository from "./Repository";
 import { QUEUE_NAME } from "./events";
 
 let db: TestDatabase;
-let episodeRepository: Repository;
+let episodeRepository: EpisodesRepository;
 let domainMessageBroker: DomainMessageBroker<ModelMessage<Model>>;
 
 beforeAll(async () => {
@@ -21,11 +23,11 @@ beforeAll(async () => {
   await db.drop();
   await loadFixtureSimpsons();
 
-  domainMessageBroker = new DomainMessageBroker<ModelMessage<Model>>();
+  container.registerInstance(DomainMessageBroker, new DomainMessageBroker<ModelMessage<Model>>());
+  container.registerSingleton(EpisodeRepository);
 
-  episodeRepository = new Repository( {
-    domainMessageBroker,
-  } );
+  domainMessageBroker = container.resolve(DomainMessageBroker<ModelMessage<Model>>);
+  episodeRepository = container.resolve(EpisodeRepository);
 } );
 it("should emit Patch Event", async () => {
   const episodeId: ModelId = {

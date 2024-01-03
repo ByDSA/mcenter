@@ -1,34 +1,39 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { Episode, EpisodeRepository } from "#modules/episodes";
-import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "#modules/episodes/EpisodePicker/appliers";
-import { dependencies } from "#modules/episodes/EpisodePicker/appliers/Dependencies";
-import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
-import { Model } from "#modules/episodes/models";
 import { HistoryListRepository } from "#modules/historyLists";
-import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
-import SerieService from "#modules/series/SerieService";
+import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
 import { asyncMap } from "#shared/utils/arrays";
 import { assertFound } from "#shared/utils/http/validation";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import express, { Request, Response } from "express";
 import { Picker } from "rand-picker";
+import LastTimePlayedService from "../../historyLists/LastTimePlayedService";
 import { genRandomPickerWithData } from "../../picker/ResourcePicker/ResourcePickerRandom";
+import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "../EpisodePicker/appliers";
+import { dependencies } from "../EpisodePicker/appliers/Dependencies";
+import { Model } from "../models";
+import { Repository as EpisodeRepository } from "../repositories";
 
-type ResultType = Episode & {
+type ResultType = Model & {
   percentage: number;
   days: number;
 };
 
-type Params = {
-  domainMessageBroker: DomainMessageBroker;
+const DepsMap = {
+  streamRepository: StreamRepository,
+  episodeRepository: EpisodeRepository,
+  historyListRepository: HistoryListRepository,
+  serieRepository: SerieRepository,
 };
-export default class PickerController implements Controller {
-  #domainMessageBroker: DomainMessageBroker;
 
-  constructor( {domainMessageBroker}: Params) {
-    this.#domainMessageBroker = domainMessageBroker;
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
+export default class PickerController implements Controller {
+  #deps: Deps;
+
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = (deps as Deps);
   }
 
   getRouter(): express.Router {
@@ -40,23 +45,9 @@ export default class PickerController implements Controller {
   }
 
   async #showPicker(req: Request, res: Response) {
-    const streamRepository = new StreamRepository();
-    const serieRelationshipWithStreamFixer = new SerieRelationshipWithStreamFixer( {
-      streamRepository,
-    } );
-    const serieRepository = new SerieRepository( {
-      relationshipWithStreamFixer: serieRelationshipWithStreamFixer,
-    } );
-    const historyListRepository = new HistoryListRepository();
-    const episodeRepository = new EpisodeRepository( {
-      domainMessageBroker: this.#domainMessageBroker,
-    } );
-    const serieService = new SerieService( {
-      serieRepository,
-      episodeRepository,
-    } );
+    const {serieRepository, historyListRepository, episodeRepository} = this.#deps;
     const { streamId } = getParams(req, res);
-    const stream = await streamRepository.getOneById(streamId);
+    const stream = await this.#deps.streamRepository.getOneById(streamId);
 
     assertFound(stream);
     const historyList = await historyListRepository.getOneByIdOrCreate(streamId);
@@ -64,7 +55,8 @@ export default class PickerController implements Controller {
     assertFound(historyList);
 
     const seriePromise = serieRepository.getOneById(stream.group.origins[0].id);
-    const lastEpPromise = serieService.findLastEpisodeInHistoryList(historyList);
+    const lastEpId = historyList.entries.at(-1)?.episodeId;
+    const lastEpPromise = lastEpId ? this.#deps.episodeRepository.getOneById(lastEpId) : Promise.resolve(null) ;
 
     await Promise.all([seriePromise, lastEpPromise]);
     const serie = await seriePromise;
@@ -74,7 +66,7 @@ export default class PickerController implements Controller {
 
     assertFound(serie);
 
-    const episodes: Episode[] = await episodeRepository.getManyBySerieId(serie.id);
+    const episodes: Model[] = await episodeRepository.getManyBySerieId(serie.id);
     const picker = await genRandomPickerWithData( {
       resources: episodes,
       lastEp: lastEp ?? undefined,
@@ -82,10 +74,7 @@ export default class PickerController implements Controller {
       weightFixerApplier: genEpisodeWeightFixerApplier(),
     } );
     const pickerWeight = picker.weight;
-    const lastTimePlayedService = new LastTimePlayedService( {
-      episodeRepository,
-      domainMessageBroker: this.#domainMessageBroker,
-    } );
+    const lastTimePlayedService = new LastTimePlayedService();
     const ret = (await asyncMap(
       "end" in picker.data[0]
         ? (picker as Picker<Model>).data.filter(

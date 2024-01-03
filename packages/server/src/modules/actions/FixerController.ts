@@ -1,30 +1,21 @@
-import { EpisodeRepository } from "#modules/episodes";
 import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
-import { StreamRepository } from "#modules/streams";
 import { FullResponse, LogElementResponse } from "#shared/utils/http";
 import { Controller, SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 
-type Params = {
-  streamRepository: StreamRepository;
-  serieRepository: SerieRepository;
-  episodeRepository: EpisodeRepository;
-  serieRelationshipWithStreamFixer: SerieRelationshipWithStreamFixer;
+const DepsMap = {
+  serieRepository: SerieRepository,
+  serieRelationshipWithStreamFixer: SerieRelationshipWithStreamFixer,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class FixerController implements Controller {
-  #episodeRepository: EpisodeRepository;
+  #deps: Deps;
 
-  #serieRepository: SerieRepository;
-
-  #streamRepository: StreamRepository;
-
-  #serieRelationshipWithStreamFixer: SerieRelationshipWithStreamFixer;
-
-  constructor( {episodeRepository,serieRepository,streamRepository, serieRelationshipWithStreamFixer}: Params) {
-    this.#episodeRepository = episodeRepository;
-    this.#serieRepository = serieRepository;
-    this.#streamRepository = streamRepository;
-    this.#serieRelationshipWithStreamFixer = serieRelationshipWithStreamFixer;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async endpoint(_: Request, res: Response) {
@@ -41,11 +32,11 @@ export default class FixerController implements Controller {
 
   async fixSeries(): Promise<LogElementResponse[]> {
     const actions: LogElementResponse[] = [];
-    const series = await this.#serieRepository.getAll();
+    const series = await this.#deps.serieRepository.getAll();
     const promises: Promise<LogElementResponse | null>[] = [];
 
     for (const serie of series) {
-      const promise = this.#serieRelationshipWithStreamFixer.fixDefaultStreamForSerie(serie.id);
+      const promise = this.#deps.serieRelationshipWithStreamFixer.fixDefaultStreamForSerie(serie.id);
 
       promises.push(promise);
     }

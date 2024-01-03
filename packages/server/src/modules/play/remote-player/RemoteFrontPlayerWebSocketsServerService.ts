@@ -1,27 +1,28 @@
+import ExpressApp from "#main/ExpressApp";
 import { PlayerActionsReceiver, PlayerEvent, PlayerStatusResponse } from "#shared/models/player";
 import { assertIsDefined } from "#shared/utils/validation";
-import { Server as HttpServer } from "node:http";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Server, Socket } from "socket.io";
 import { VlcBackWebSocketsServerService } from "./vlc-back-service";
 
-type Params = {
-  vlcBackService: VlcBackWebSocketsServerService;
-  getHttpServer: ()=> HttpServer;
+const DepsMap = {
+  vlcBackService: VlcBackWebSocketsServerService,
+  app: ExpressApp,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class WebSocketsFrontServerService implements PlayerActionsReceiver {
   #io: Server | undefined;
 
-  #vlcBackService: VlcBackWebSocketsServerService;
+  #deps: Deps;
 
-  #getHttpServer: ()=> HttpServer;
-
-  constructor( {getHttpServer, vlcBackService}: Params) {
-    this.#getHttpServer = getHttpServer;
-    this.#vlcBackService = vlcBackService;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
 
     setTimeout(() => {
       this.startSocket();
-      this.#vlcBackService.startSocket( {
+      this.#deps.vlcBackService.startSocket( {
         remoteFrontPlayerWebSocketsServerService: this,
       } );
     }, 0); // Porque sino intenta acceder síncronamente a 'app.httpServer' antes de que se haya creado
@@ -35,13 +36,13 @@ export default class WebSocketsFrontServerService implements PlayerActionsReceiv
     if (this.#io)
       return;
 
-    if (!this.#getHttpServer()) {
+    if (!this.#deps.app.getHttpServer()) {
       setTimeout(this.startSocket.bind(this), 100);
 
       return;
     }
 
-    this.#io = new Server(this.#getHttpServer(), {
+    this.#io = new Server(this.#deps.app.getHttpServer(), {
       path: "/ws/",
       cors: {
         origin: "*",
@@ -101,7 +102,7 @@ export default class WebSocketsFrontServerService implements PlayerActionsReceiv
   }
 
   #sendLastStatus() {
-    const lastStatus = this.#vlcBackService.getLastStatus();
+    const lastStatus = this.#deps.vlcBackService.getLastStatus();
 
     if (lastStatus) {
       console.log("[FRONT] sending last status");
@@ -115,26 +116,26 @@ export default class WebSocketsFrontServerService implements PlayerActionsReceiv
   }
 
   async onPauseToggle() {
-    await this.#vlcBackService.pauseToggle();
+    await this.#deps.vlcBackService.pauseToggle();
   }
 
   async onNext() {
-    await this.#vlcBackService.next();
+    await this.#deps.vlcBackService.next();
   }
 
   async onPrevious() {
-    await this.#vlcBackService.previous();
+    await this.#deps.vlcBackService.previous();
   }
 
   async onStop() {
-    await this.#vlcBackService.stop();
+    await this.#deps.vlcBackService.stop();
   }
 
   async onSeek(val: number | string) {
-    await this.#vlcBackService.seek(val);
+    await this.#deps.vlcBackService.seek(val);
   }
 
   async onPlay(id: number) {
-    await this.#vlcBackService.play(id);
+    await this.#deps.vlcBackService.play(id);
   }
 }

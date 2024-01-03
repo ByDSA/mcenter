@@ -1,8 +1,7 @@
 /* eslint-disable import/prefer-default-export */
-import { Episode, compareEpisodeId } from "#modules/episodes";
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { ResourceVO } from "#shared/models/resource";
-import { Model, ModelId } from "../../models";
+import { Model, ModelId, compareId } from "../../models";
 import { DependenciesList } from "./Dependencies";
 
 type Params<R extends ResourceVO = ResourceVO, ID = string> = {
@@ -11,10 +10,10 @@ type Params<R extends ResourceVO = ResourceVO, ID = string> = {
   lastId: ID | undefined;
   dependencies: DependenciesList;
 };
-export default class EpisodeFilterApplier extends FilterApplier<Episode> {
-  #params: Params<Episode, ModelId>;
+export default class EpisodeFilterApplier extends FilterApplier<Model> {
+  #params: Params<Model, ModelId>;
 
-  constructor(params: Params<Episode, ModelId>) {
+  constructor(params: Params<Model, ModelId>) {
     super();
     this.#params = params;
 
@@ -35,11 +34,11 @@ export default class EpisodeFilterApplier extends FilterApplier<Episode> {
           serieId,
         } )) as [ModelId, ModelId];
 
-        this.add(new DependencyFilter<ModelId, Episode>( {
+        this.add(new DependencyFilter<ModelId, Model>( {
           lastId,
           firstId: dependencyFullId[0],
           secondId: dependencyFullId[1],
-          compareId: compareEpisodeId,
+          compareId,
         } ));
 
         return true;
@@ -63,7 +62,7 @@ export default class EpisodeFilterApplier extends FilterApplier<Episode> {
       this.add(new PreventRepeatLastFilter(
         {
           lastId,
-          compareId: compareEpisodeId,
+          compareId,
         } ));
     }
 

@@ -1,50 +1,30 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { Episode, EpisodeRepository } from "#modules/episodes";
-import { SavedSerieTreeService } from "#modules/episodes/saved-serie-tree-service";
-import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
-import { StreamRepository } from "#modules/streams";
+import { SerieRepository } from "#modules/series";
+import { SavedSerieTreeService } from "#modules/series/saved-serie-tree-service";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import path from "path";
+import { Model as Episode } from "../../models";
+import { Repository as EpisodeRepository } from "../../repositories";
 import { diffSerieTree, findAllSerieFolderTreesAt } from "../tree";
 import { OldNew } from "../tree/diff";
 import { Serie } from "../tree/models";
 
-type Dependencies = {
-  domainMessageBroker: DomainMessageBroker;
+const DepsMap = {
+  serieRepository: SerieRepository,
+  episodeRepository: EpisodeRepository,
+  savedSerieTreeService: SavedSerieTreeService,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class ThisController implements Controller {
-  #savedSerieTreeService: SavedSerieTreeService;
+  #deps: Deps;
 
-  #episodeRepository: EpisodeRepository;
-
-  #serieRepository: SerieRepository;
-
-  #domainMessageBroker: DomainMessageBroker;
-
-  constructor( {domainMessageBroker}: Dependencies) {
-    this.#domainMessageBroker = domainMessageBroker;
-    const relationshipWithStreamFixer = new SerieRelationshipWithStreamFixer( {
-      streamRepository: new StreamRepository(),
-    } );
-    const serieRepository = new SerieRepository(
-      {
-        relationshipWithStreamFixer,
-      },
-    );
-    const episodeRepository = new EpisodeRepository( {
-      domainMessageBroker,
-    } );
-
-    this.#episodeRepository = episodeRepository;
-    this.#serieRepository = serieRepository;
-
-    this.#savedSerieTreeService = new SavedSerieTreeService( {
-      serieRepository,
-      episodeRepository,
-    } );
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async endpoint(req: Request, res: Response) {
@@ -60,7 +40,7 @@ export default class ThisController implements Controller {
     if (filesSerieTreeResult.errors)
       errors.push(...filesSerieTreeResult.errors);
 
-    const savedSerieTree = await this.#savedSerieTreeService.getSavedSeriesTree();
+    const savedSerieTree = await this.#deps.savedSerieTreeService.getSavedSeriesTree();
     const diff = diffSerieTree(savedSerieTree,
       {
         children: filesSerieTreeResult.data,
@@ -109,7 +89,7 @@ export default class ThisController implements Controller {
     const promises: Promise<Episode | null>[] = [];
 
     for (const entry of oldNew) {
-      const p: Promise<Episode | null> = this.#episodeRepository.patchOneByPathAndGet(entry.old.content.filePath, {
+      const p: Promise<Episode | null> = this.#deps.episodeRepository.patchOneByPathAndGet(entry.old.content.filePath, {
         path: entry.new.content.filePath,
       } );
 
@@ -127,10 +107,10 @@ export default class ThisController implements Controller {
 
     // TODO: quitar await en for si se puede
     for (const serieInTree of seriesInTree) {
-      let serie = await this.#serieRepository.getOneById(serieInTree.id);
+      let serie = await this.#deps.serieRepository.getOneById(serieInTree.id);
 
       if (!serie) {
-        serie = await this.#serieRepository.createOneAndGet( {
+        serie = await this.#deps.serieRepository.createOneAndGet( {
           name: serieInTree.id,
           id: serieInTree.id,
         } );
@@ -155,7 +135,7 @@ export default class ThisController implements Controller {
       }
     }
 
-    await this.#episodeRepository.createManyAndGet(episodes);
+    await this.#deps.episodeRepository.createManyAndGet(episodes);
 
     return episodes;
   }

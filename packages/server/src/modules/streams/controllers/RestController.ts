@@ -2,44 +2,41 @@ import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { StreamCriteriaSort, StreamGetManyRequest, StreamOriginType } from "#shared/models/streams";
 import { CriteriaSortDir } from "#shared/utils/criteria";
-import { PublicMethodsOf } from "#shared/utils/types";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetMany } from "#utils/layers/controller";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import express, { Request, Response, Router } from "express";
 import { Repository } from "../repositories";
 import { getManyValidation } from "./validation";
 
-type Params = {
-  streamRepository: PublicMethodsOf<Repository>;
-  serieRepository: PublicMethodsOf<SerieRepository>;
-  historyListRepository: PublicMethodsOf<HistoryListRepository>;
+const DepsMap = {
+  streamRepository: Repository,
+  serieRepository: SerieRepository,
+  historyListRepository: HistoryListRepository,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class RestController
 implements
     Controller,
     CanGetAll<Request, Response>,
     CanGetMany<StreamGetManyRequest, Response>
 {
-  #streamRepository: PublicMethodsOf<Repository>;
+  #deps: Deps;
 
-  #serieRepository: PublicMethodsOf<SerieRepository>;
-
-  #historyListRepository: PublicMethodsOf<HistoryListRepository>;
-
-  constructor( {streamRepository, serieRepository, historyListRepository}: Params) {
-    this.#streamRepository = streamRepository;
-    this.#serieRepository = serieRepository;
-    this.#historyListRepository = historyListRepository;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async getAll(_: Request, res: Response): Promise<void> {
-    const got = await this.#streamRepository.getAll();
+    const got = await this.#deps.streamRepository.getAll();
 
     res.send(got);
   }
 
   async getMany(req: StreamGetManyRequest, res: Response): Promise<void> {
-    let got = await this.#streamRepository.getAll();
+    let got = await this.#deps.streamRepository.getAll();
 
     if (req.body.expand) {
       for (const stream of got) {
@@ -47,7 +44,7 @@ implements
           if (origin.type === StreamOriginType.SERIE) {
             // TODO: quitar await en for si se puede
             // eslint-disable-next-line no-param-reassign
-            origin.serie = await this.#serieRepository.getOneById(origin.id) ?? undefined;
+            origin.serie = await this.#deps.serieRepository.getOneById(origin.id) ?? undefined;
           }
         }
       }
@@ -65,7 +62,7 @@ implements
             // eslint-disable-next-line no-continue
             continue;
 
-          const historyList = await this.#historyListRepository.getOneByIdOrCreate(stream.id);
+          const historyList = await this.#deps.historyListRepository.getOneByIdOrCreate(stream.id);
           const lastEntry = historyList?.entries.at(-1);
 
           if (lastEntry)

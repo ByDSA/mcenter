@@ -1,4 +1,6 @@
 import { deepMerge } from "#shared/utils/objects";
+import { PublicMethodsOf } from "#shared/utils/types";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";
 import RelationWithStreamFixer from "./RelationshipWithStreamFixer";
@@ -11,21 +13,22 @@ type CreationOptions = {
 const DEFAULT_CREATION_OPTIONS: Required<CreationOptions> = {
   ignoreStream: false,
 };
-
-type Params = {
-  relationshipWithStreamFixer: RelationWithStreamFixer;
+const DepsMap = {
+  relationshipWithStreamFixer: RelationWithStreamFixer,
 };
 
-export default class Repository
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
+export default class SeriesRepository
 implements CanGetOneById<Model, ModelId>,
 CanUpdateOneByIdAndGet<Model, ModelId>,
 CanCreateOneAndGet<Model>,
 CanGetAll<Model>
 {
-  #relationshipWithStreamFixer: RelationWithStreamFixer;
+  #relationshipWithStreamFixer: PublicMethodsOf<RelationWithStreamFixer>;
 
-  constructor( {relationshipWithStreamFixer: relationshipWithStream}: Params) {
-    this.#relationshipWithStreamFixer = relationshipWithStream;
+  constructor(deps?: Partial<Deps>) {
+    this.#relationshipWithStreamFixer = (deps as Deps).relationshipWithStreamFixer;
   }
 
   async getAll(): Promise<Model[]> {
@@ -39,6 +42,7 @@ CanGetAll<Model>
     const serieOdm: DocOdm = await ModelOdm.create(model).then(s => s.save());
     const serie = docOdmToModel(serieOdm);
 
+    // TODO: pasar a broker message esto: que se cree el stream si no existe al crear la serie
     if (!actualOptions.ignoreStream)
       await this.#relationshipWithStreamFixer.fixDefaultStreamForSerie(serie.id);
 

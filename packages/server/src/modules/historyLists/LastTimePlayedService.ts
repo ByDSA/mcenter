@@ -1,10 +1,10 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { HistoryList } from "#modules/historyLists";
+import { EpisodeRepository } from "#modules/episodes";
 import { deepCopy } from "#shared/utils/objects";
 import { DateType } from "#shared/utils/time";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { DateTime } from "luxon";
-import { Model, ModelId, compareId } from "./models";
-import { Repository } from "./repositories";
+import { Model, ModelId, compareId } from "../episodes/models";
+import { Model as HistoryList } from "./models";
 
 function getTimestampFromDateType(date: DateType): number {
   if (date.timestamp)
@@ -20,17 +20,17 @@ type FuncParams = {
   entries: HistoryList["entries"];
 };
 
-type Params = {
-  episodeRepository: Repository;
-  domainMessageBroker: DomainMessageBroker;
+const DepsMap = {
+  episodeRepository: EpisodeRepository,
 };
-export default class lastTimePlayedService {
-  #episodeRepository: Repository;
 
-  constructor( {episodeRepository, domainMessageBroker}: Params) {
-    this.#episodeRepository = episodeRepository ?? new Repository( {
-      domainMessageBroker,
-    } );
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
+export default class LastTimePlayedService {
+  #deps: Deps;
+
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async updateEpisodeLastTimePlayedFromEntriesAndGet( {episodeId, entries}: FuncParams): Promise<number | null> {
@@ -38,7 +38,7 @@ export default class lastTimePlayedService {
       episodeId,
       entries) ?? undefined;
 
-    this.#episodeRepository.patchOneByIdAndGet(episodeId, {
+    this.#deps.episodeRepository.patchOneByIdAndGet(episodeId, {
       lastTimePlayed,
     } );
 
@@ -76,7 +76,7 @@ export default class lastTimePlayedService {
         };
         const {id} = selfCopy;
 
-        await this.#episodeRepository.updateOneByIdAndGet(id, selfCopy);
+        await this.#deps.episodeRepository.updateOneByIdAndGet(id, selfCopy);
       }
     }
 

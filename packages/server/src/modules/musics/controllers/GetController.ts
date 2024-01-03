@@ -1,6 +1,10 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-param-reassign */
+// eslint-disable-next-line max-classes-per-file
 import { ResourcePickerRandom } from "#modules/picker";
 import { Music } from "#shared/models/musics";
 import { SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import path from "node:path";
 import { Repository } from "../repositories";
@@ -9,15 +13,17 @@ import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services/M
 import { ENVS, getFullPath } from "../utils";
 
 let lastPicked: Music | undefined;
-
-type Params = {
-  musicRepository: Repository;
+const DepsMap = {
+  musicRepository: Repository,
 };
-export default class GetController {
-  #musicRepository: Repository;
 
-  constructor( {musicRepository}: Params) {
-    this.#musicRepository = musicRepository;
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
+export default class GetController {
+  #deps: Deps;
+
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async getRandom(req: Request, res: Response) {
@@ -50,7 +56,7 @@ export default class GetController {
 
   async #findMusics(req: Request): Promise<Music[]> {
     const params = requestToFindMusicParams(req);
-    const musics = await this.#musicRepository.find(params);
+    const musics = await this.#deps.musicRepository.find(params);
 
     return musics;
   }
@@ -66,7 +72,7 @@ export default class GetController {
 
   async rawAccess(req: Request, res: Response) {
     const { name } = req.params;
-    const music = await this.#musicRepository.findByUrl(name);
+    const music = await this.#deps.musicRepository.findByUrl(name);
 
     if (!music) {
       res.sendStatus(404);

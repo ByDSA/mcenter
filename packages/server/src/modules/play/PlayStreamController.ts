@@ -4,46 +4,41 @@ import { StreamRepository } from "#modules/streams";
 import { assertFound } from "#shared/utils/http/validation";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Controller } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import PlayService from "./PlayService";
 
-type Params = {
-  playService: PlayService;
-  episodePickerService: EpisodePickerService;
-  streamRepository: StreamRepository;
-  historyListService: HistoryListService;
+const DepsMap = {
+  playService: PlayService,
+  episodePickerService: EpisodePickerService,
+  streamRepository: StreamRepository,
+  historyListService: HistoryListService,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class PlayController implements Controller{
-  #streamRepository: StreamRepository;
+  #deps: Deps;
 
-  #episodePickerService: EpisodePickerService;
-
-  #playService: PlayService;
-
-  #historyListService: HistoryListService;
-
-  constructor( {streamRepository, episodePickerService, playService: service, historyListService}: Params) {
-    this.#playService = service;
-    this.#streamRepository = streamRepository;
-    this.#episodePickerService = episodePickerService;
-    this.#historyListService = historyListService;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async playStream(req: Request, res: Response) {
     console.log("playStream");
     const { id, number, force } = validateParams(req);
-    const stream = await this.#streamRepository.getOneById(id);
+    const stream = await this.#deps.streamRepository.getOneById(id);
 
     assertFound(stream);
 
-    const episodes = await this.#episodePickerService.getByStream(stream, number);
-    const ok = await this.#playService.play( {
+    const episodes = await this.#deps.episodePickerService.getByStream(stream, number);
+    const ok = await this.#deps.playService.play( {
       episodes,
       force,
     } );
 
     if (ok) {
-      await this.#historyListService.addEpisodesToHistory( {
+      await this.#deps.historyListService.addEpisodesToHistory( {
         historyListId: stream.id,
         episodes,
       } );

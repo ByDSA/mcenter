@@ -1,10 +1,13 @@
-import { SerieRepositoryMock } from "#modules/series/repositories/tests";
 import { Episode, EpisodeGetManyBySearchRequest } from "#shared/models/episodes";
 import HttpStatusCode from "#shared/utils/http/StatusCode";
+import { registerSingletonIfNotAndGet } from "#tests/main";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
+import { resolveRequired } from "#utils/layers/deps";
 import { Application } from "express";
 import request from "supertest";
+import { container } from "tsyringe";
+import { Repository } from "../repositories";
 import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
 import RestController from "./RestController";
 
@@ -14,11 +17,12 @@ describe("RestController", () => {
   let controller: RestController;
 
   beforeAll(async () => {
-    episodeRepositoryMock = new RepositoryMock();
-    controller = new RestController( {
-      episodeRepository: episodeRepositoryMock,
-      serieRepo: new SerieRepositoryMock(),
-    } );
+    registerSingletonIfNotAndGet(Repository, RepositoryMock);
+    episodeRepositoryMock = resolveRequired(Repository) as RepositoryMock;
+
+    container.registerSingleton(RestController);
+
+    controller = container.resolve(RestController);
 
     controller.getManyBySearch = jest.fn(controller.getManyBySearch);
     routerApp = RouterApp(controller.getRouter());

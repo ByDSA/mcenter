@@ -1,17 +1,15 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeRepository } from "#modules/episodes";
-import { HistoryEntryRepository, HistoryListRepository, HistoryListService } from "#modules/historyLists";
-import { SerieRepository } from "#modules/series";
+import { HistoryListService } from "#modules/historyLists";
 import { PublicMethodsOf } from "#shared/utils/types";
-import { TestMongoDatabase } from "#tests/main";
+import { TestMongoDatabase, registerSingletonIfNotAndGet } from "#tests/main";
 import TestDatabase from "#tests/main/db/TestDatabase";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
+import { container } from "tsyringe";
 import PlaySerieController from "./PlaySerieController";
-import PlayService from "./PlayService";
 import { VlcBackWebSocketsServerService } from "./remote-player/vlc-back-service";
 import PlayerBackWebSocketsServiceMock from "./remote-player/vlc-back-service/tests/PlayerBackWebSocketsServiceMock";
 
@@ -28,31 +26,13 @@ describe("PlaySerieController", () => {
     await db.drop();
     await loadFixtureSimpsons();
 
-    const domainMessageBroker = new DomainMessageBroker();
-    const episodeRepository = new EpisodeRepository( {
-      domainMessageBroker,
-    } );
-    const serieRepository = new SerieRepository( {
-      relationshipWithStreamFixer: null as any,
-    } );
-    const historyListRepository = new HistoryListRepository();
-    const historyListService = new HistoryListService( {
-      episodeRepository,
-      historyListRepository,
-      historyEntryRepository: new HistoryEntryRepository(),
-    } );
+    container.registerInstance(HistoryListService, new HistoryListService( {
+      episodeRepository: registerSingletonIfNotAndGet(EpisodeRepository),
+    } ));
 
-    playerServiceMock = new PlayerBackWebSocketsServiceMock();
-    const playService = new PlayService( {
-      playerWebSocketsServerService: playerServiceMock,
-    } );
+    playerServiceMock = registerSingletonIfNotAndGet(VlcBackWebSocketsServerService,PlayerBackWebSocketsServiceMock);
 
-    playSerieController = new PlaySerieController( {
-      episodeRepository,
-      serieRepository,
-      playService,
-      historyListService,
-    } );
+    playSerieController = registerSingletonIfNotAndGet(PlaySerieController);
 
     routerApp = RouterApp(playSerieController.getRouter());
   } );

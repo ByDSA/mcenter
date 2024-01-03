@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import * as dotenv from "dotenv";
 import mongoose from "mongoose";
 import { existsSync } from "node:fs";

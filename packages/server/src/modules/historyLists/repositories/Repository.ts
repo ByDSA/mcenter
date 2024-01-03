@@ -1,25 +1,32 @@
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { QUEUE_NAME } from "#modules/episodes/repositories";
 import { logDomainEvent } from "#modules/log";
-import { HistoryList } from "#shared/models/historyLists";
+import { PublicMethodsOf } from "#shared/utils/types";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOne, CanGetAll, CanGetOneByIdOrCreate, CanUpdateOneById } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
+import { LIST_QUEUE_NAME } from "./events";
 import { ModelOdm } from "./odm";
 
+const DepsMap = {
+  domainMessageBroker: DomainMessageBroker,
+};
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class Repository
 implements CanUpdateOneById<Model, ModelId>,
 CanGetOneByIdOrCreate<Model, ModelId>,
 CanCreateOne<Model>,
 CanGetAll<Model> {
-  #domainMessageBroker: DomainMessageBroker;
+  #domainMessageBroker: PublicMethodsOf<DomainMessageBroker>;
 
-  constructor() {
-    this.#domainMessageBroker = DomainMessageBroker.singleton();
+  constructor(deps?: Partial<Deps>) {
+    this.#domainMessageBroker = (deps as Deps).domainMessageBroker;
 
-    this.#domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
-      logDomainEvent(event);
+    this.#domainMessageBroker.subscribe(LIST_QUEUE_NAME, (event: any) => {
+      logDomainEvent(LIST_QUEUE_NAME, event);
 
       return Promise.resolve();
     } );
@@ -46,11 +53,11 @@ CanGetAll<Model> {
       entity: historyList,
     } );
 
-    this.#domainMessageBroker.publish(QUEUE_NAME, event);
+    this.#domainMessageBroker.publish(LIST_QUEUE_NAME, event);
   }
 
   async #createOneDefaultModelById(id: ModelId): Promise<Model> {
-    const historyList: HistoryList = {
+    const historyList: Model = {
       id,
       entries: [],
       maxSize: -1,
@@ -85,6 +92,6 @@ CanGetAll<Model> {
       entity: historyList,
     } );
 
-    this.#domainMessageBroker.publish(QUEUE_NAME, event);
+    this.#domainMessageBroker.publish(LIST_QUEUE_NAME, event);
   }
 }

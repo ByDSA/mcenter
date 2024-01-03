@@ -1,7 +1,7 @@
+import { EpisodeFile, SerieFolderTree } from "#modules/episodes/file-info/tree";
+import { getSeasonEpisodeFromEpisodeId } from "#modules/episodes/file-info/tree/idGetter";
+import { Model as Episode } from "#modules/episodes/models";
 import { treePut } from "#shared/utils/trees";
-import { EpisodeFile, SerieFolderTree } from "../file-info/tree";
-import { getSeasonEpisodeFromEpisodeId } from "../file-info/tree/idGetter";
-import { Model as Episode } from "../models";
 
 export function putModelInSerieFolderTree(episode: Episode, serieFolderTree: SerieFolderTree): SerieFolderTree {
   const {id: {serieId, innerId}} = episode;

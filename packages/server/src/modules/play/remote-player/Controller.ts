@@ -1,16 +1,21 @@
 
+import { PublicMethodsOf } from "#shared/utils/types";
 import { Controller, SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import { VlcBackWebSocketsServerService } from "./vlc-back-service";
 
-type Params = {
-  remotePlayerService: VlcBackWebSocketsServerService;
+const DepsMap = {
+  remotePlayerService: VlcBackWebSocketsServerService,
 };
-export default class RemotePlayerController implements Controller {
-  #vlcBackService: VlcBackWebSocketsServerService;
 
-  constructor( {remotePlayerService}: Params) {
-    this.#vlcBackService = remotePlayerService;
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
+export default class RemotePlayerController implements Controller {
+  #vlcBackService: PublicMethodsOf<VlcBackWebSocketsServerService>;
+
+  constructor(deps?: Partial<Deps>) {
+    this.#vlcBackService = (deps as Deps).remotePlayerService;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

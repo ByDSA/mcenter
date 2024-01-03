@@ -1,8 +1,9 @@
-import { Episode, EpisodeId, EpisodeRepository, compareEpisodeId } from "#modules/episodes";
+import { Repository as EpisodeRepository } from "#modules/episodes/repositories";
+import { Episode, EpisodeId, compareEpisodeId } from "#shared/models/episodes";
 import { assertFound } from "#shared/utils/http/validation";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Entry, Model, ModelId, createHistoryEntryByEpisodeFullId as createHistoryEntryByEpisodeId } from "./models";
-import { ListRepository } from "./repositories";
-import EntryRepository from "./repositories/EntryRepository";
+import { EntryRepository, ListRepository } from "./repositories";
 
 type HistoryAndEpisodeParams = ( {
   episode: Episode;
@@ -14,23 +15,19 @@ type HistoryAndEpisodeParams = ( {
   historyListId: ModelId;
 } );
 
-type Params = {
-  episodeRepository: EpisodeRepository;
-  historyListRepository: ListRepository;
-  historyEntryRepository: EntryRepository;
+const DepsMap = {
+  episodeRepository: EpisodeRepository,
+  historyListRepository: ListRepository,
+  historyEntryRepository: EntryRepository,
 };
 
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class Service {
-  #listRepository: ListRepository;
+  #deps: Deps;
 
-  #episodeRepository: EpisodeRepository;
-
-  #entryRepository: EntryRepository;
-
-  constructor( {historyListRepository: historyRepository, episodeRepository,historyEntryRepository}: Params) {
-    this.#listRepository = historyRepository;
-    this.#episodeRepository = episodeRepository;
-    this.#entryRepository = historyEntryRepository;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async #getHistoryListFromParams(params: HistoryAndEpisodeParams): Promise<Model> {
@@ -39,7 +36,7 @@ export default class Service {
     if ("historyList" in params)
       historyList = params.historyList;
     else if ("historyListId" in params) {
-      const got = await this.#listRepository.getOneByIdOrCreate(params.historyListId);
+      const got = await this.#deps.historyListRepository.getOneByIdOrCreate(params.historyListId);
 
       assertFound(got);
 
@@ -82,7 +79,7 @@ export default class Service {
     if ("episode" in params)
       episode = params.episode;
     else if ("episodeFullId" in params) {
-      const got = await this.#episodeRepository.getOneById(params.episodeFullId);
+      const got = await this.#deps.episodeRepository.getOneById(params.episodeFullId);
 
       assertFound(got);
 
@@ -111,9 +108,9 @@ export default class Service {
     const newEntry: Entry = createHistoryEntryByEpisodeId(episode.id);
     const historyListId = this.#getHistoryListIdFromParams(params);
 
-    await this.#entryRepository.createOneBySuperId(historyListId, newEntry);
+    await this.#deps.historyEntryRepository.createOneBySuperId(historyListId, newEntry);
 
-    await this.#episodeRepository.patchOneByIdAndGet(episode.id, {
+    await this.#deps.episodeRepository.patchOneByIdAndGet(episode.id, {
       lastTimePlayed: newEntry.date.timestamp,
     } );
   }
@@ -142,7 +139,7 @@ export default class Service {
 
     historyList.entries.splice(historyEntryIndex, 1);
 
-    await this.#listRepository.updateOneById(historyList.id, historyList);
+    await this.#deps.historyListRepository.updateOneById(historyList.id, historyList);
 
     const episode: Episode = await this.#getEpisodeFromParams(params);
 
@@ -152,7 +149,7 @@ export default class Service {
         episodeFullId,
       } );
 
-      await this.#episodeRepository.patchOneByIdAndGet(episodeFullId, {
+      await this.#deps.episodeRepository.patchOneByIdAndGet(episodeFullId, {
         lastTimePlayed: lastTimeHistoryEntry?.date.timestamp,
       } );
     }

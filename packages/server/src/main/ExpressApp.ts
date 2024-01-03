@@ -1,18 +1,18 @@
 import ActionController from "#modules/actions/ActionController";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { EpisodePickerController, EpisodeRepository, EpisodeRestController } from "#modules/episodes";
+import { EpisodeRestController } from "#modules/episodes";
 import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
-import { HistoryListRepository, HistoryListRestController } from "#modules/historyLists";
+import { HistoryListRestController } from "#modules/historyLists";
 import { MusicController } from "#modules/musics";
-import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
-import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
-import { StreamRepository, StreamRestController } from "#modules/streams";
+import { PickerController } from "#modules/picker";
+import { PlaySerieController, PlayStreamController } from "#modules/play";
+import { StreamRestController } from "#modules/streams";
 import { ForbiddenError } from "#shared/utils/http";
 import { deepFreeze, deepMerge } from "#shared/utils/objects";
-import { OptionalPropsRecursive, PublicMethodsOf } from "#shared/utils/types";
+import { OptionalPropsRecursive } from "#shared/utils/types";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import { Database } from "#utils/layers/db";
+import { resolveRequired } from "#utils/layers/deps";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
@@ -27,35 +27,6 @@ export type ExpressAppDependencies = {
   db: {
     instance: Database;
   };
-  modules: {
-    domainMessageBroker: {
-      instance: DomainMessageBroker;
-    };
-    play: {
-      playSerieController: PublicMethodsOf<PlaySerieController>;
-      playStreamController: PublicMethodsOf<PlayStreamController>;
-      remotePlayer: {
-      controller: PublicMethodsOf<RemotePlayerController>;
-      webSocketsService: PublicMethodsOf<RemoteFrontPlayerWebSocketsServerService>;
-      };
-    };
-    picker: {
-      controller: PublicMethodsOf<EpisodePickerController>;
-    };
-    actionController: PublicMethodsOf<ActionController>;
-    historyList: {
-      restController: PublicMethodsOf<HistoryListRestController>;
-    };
-    streams: {
-      restController: PublicMethodsOf<StreamRestController>;
-    };
-    episodes: {
-      restController: PublicMethodsOf<EpisodeRestController>;
-    };
-    musics: {
-      controller: PublicMethodsOf<MusicController>;
-    };
-  };
   controllers: {
     cors?: boolean;
   };
@@ -65,21 +36,22 @@ const DEFAULT_DEPENDENCIES: OptionalPropsRecursive<ExpressAppDependencies> = dee
   controllers: {
     cors: true,
   },
-  db: {
-    migrator: null,
-  },
 } );
 
 // Necesario para poder replicarla para test
 export default class ExpressApp implements App {
   #instance: express.Express | null = null;
 
-  httpServer: Server | undefined;
+  #httpServer: Server | undefined;
 
   #dependencies: Required<ExpressAppDependencies>;
 
-  constructor(dependencies: ExpressAppDependencies) {
-    this.#dependencies = deepMerge(DEFAULT_DEPENDENCIES as Required<ExpressAppDependencies>, dependencies) as Required<ExpressAppDependencies>;
+  constructor(deps?: ExpressAppDependencies) {
+    this.#dependencies = deepMerge(DEFAULT_DEPENDENCIES as Required<ExpressAppDependencies>, deps) as Required<ExpressAppDependencies>;
+  }
+
+  getHttpServer(): Server | undefined {
+    return this.#httpServer;
   }
 
   async init() {
@@ -134,38 +106,40 @@ export default class ExpressApp implements App {
     if (process.env.NODE_ENV === "development")
       app.get("/", HELLO_WORLD_HANDLER);
 
-    const {modules} = this.#dependencies;
-    const {playSerieController, playStreamController, remotePlayer} = modules.play;
-    const {controller: remotePlayerController} = remotePlayer;
+    const playSerieController = resolveRequired(PlaySerieController);
 
     app.use("/api/play/serie", playSerieController.getRouter());
-    app.use("/api/play/stream", playStreamController.getRouter());
-    app.use("/api/player/remote", remotePlayerController.getRouter());
 
-    const {controller: pickerController} = modules.picker;
+    const playStreamController = resolveRequired(PlayStreamController);
+
+    app.use("/api/play/stream", playStreamController.getRouter());
+
+    const pickerController = resolveRequired(PickerController);
 
     app.use("/api/picker", pickerController.getRouter());
 
-    app.use("/api/actions", modules.actionController.getRouter());
+    const actionController = resolveRequired(ActionController);
 
-    app.use("/api/history-list", modules.historyList.restController.getRouter());
+    app.use("/api/actions", actionController.getRouter());
+    const historyListRestController = resolveRequired(HistoryListRestController);
 
-    app.use("/api/streams", modules.streams.restController.getRouter());
+    app.use("/api/history-list", historyListRestController.getRouter());
 
-    app.use("/api/episodes", modules.episodes.restController.getRouter());
+    const streamRestController = resolveRequired(StreamRestController);
 
-    app.use("/api/musics", modules.musics.controller.getRouter());
+    app.use("/api/streams", streamRestController.getRouter());
+
+    const episodesRestController = resolveRequired(EpisodeRestController);
+
+    app.use("/api/episodes", episodesRestController.getRouter());
+
+    const musicController = resolveRequired(MusicController);
+
+    app.use("/api/musics", musicController.getRouter());
 
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;
-      const streamRepository = new StreamRepository();
-      const episodePickerService = new EpisodePickerService( {
-        streamRepository,
-        episodeRepository: new EpisodeRepository( {
-          domainMessageBroker : modules.domainMessageBroker.instance,
-        } ),
-        historyListRepository: new HistoryListRepository(),
-      } );
+      const episodePickerService = resolveRequired(EpisodePickerService);
       const nextEpisode = await episodePickerService.getByStreamId(idstream);
 
       res.send(nextEpisode);
@@ -220,8 +194,8 @@ export default class ExpressApp implements App {
     const PORT: number = +(process.env.PORT ?? 8080);
 
     killProcessesUsingPort(PORT);
-    this.httpServer = this.#instance.listen(PORT, () => {
-      const address = (this.httpServer as Server).address();
+    this.#httpServer = this.#instance.listen(PORT, () => {
+      const address = (this.#httpServer as Server).address();
       let realPort = PORT;
 
       if (address && typeof address !== "string")

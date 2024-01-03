@@ -1,24 +1,28 @@
+import ExpressApp from "#main/ExpressApp";
 import { PlayResourceMessage, PlayerActions, PlayerEvent, PlayerStatusResponse } from "#shared/models/player";
 import { assertIsDefined } from "#shared/utils/validation";
-import { Server as HttpServer } from "node:http";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Server, Socket } from "socket.io";
 import RemoteFrontPlayerWebSocketsServerService from "../RemoteFrontPlayerWebSocketsServerService";
 
 type StartSocketParams = {
   remoteFrontPlayerWebSocketsServerService: RemoteFrontPlayerWebSocketsServerService;
 };
-type Params = {
-  getHttpServer: ()=> HttpServer;
+const DepsMap = {
+  app: ExpressApp,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class WSService implements PlayerActions {
   #io: Server | undefined;
 
   #lastStatus: PlayerStatusResponse | undefined;
 
-  #getHttpServer: ()=> HttpServer;
+  #deps: Deps;
 
-  constructor( {getHttpServer}: Params) {
-    this.#getHttpServer = getHttpServer;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
 
     // setTimeout(this.startSocket.bind(this), 0); // Porque sino intenta acceder síncronamente a 'app.httpServer' antes de que se haya creado
   }
@@ -27,7 +31,7 @@ export default class WSService implements PlayerActions {
     if (this.#io)
       return;
 
-    if (!this.#getHttpServer()) {
+    if (!this.#deps.app.getHttpServer()) {
       setTimeout(() => this.startSocket( {
         remoteFrontPlayerWebSocketsServerService,
       } ), 100);
@@ -35,7 +39,7 @@ export default class WSService implements PlayerActions {
       return;
     }
 
-    this.#io = new Server(this.#getHttpServer(), {
+    this.#io = new Server(this.#deps.app.getHttpServer(), {
       path: "/ws-vlc/",
       cors: {
         origin: "*",

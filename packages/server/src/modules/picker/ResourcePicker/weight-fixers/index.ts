@@ -1,5 +1,5 @@
 export {
-  default as LastTimeWeightFixer,
+  Fx as LastTimeFx, default as LastTimeWeightFixer,
 } from "./LastTime";
 
 export {

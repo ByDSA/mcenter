@@ -6,7 +6,8 @@ import { ModelOdm } from "./odm";
 type ModelWithSuperId = FileInfoVideoWithSuperId;
 type Model = FileInfoVideo;
 type SuperId = FileInfoVideoSuperId;
-export default class Repository
+
+export default class EpisodeFileInfoRepository
 implements CanGetAllBySuperId<Model, SuperId>,
 CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId> {
   async updateOneBySuperId(id: string, model: ModelWithSuperId): Promise<void> {

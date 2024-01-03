@@ -1,7 +1,7 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import Repository from "../Repository";
+import EpisodeFileInfoRepository from "../Repository";
 
-export class EpisodeFileInfoRepositoryMock implements PublicMethodsOf<Repository> {
+export class EpisodeFileInfoRepositoryMock implements PublicMethodsOf<EpisodeFileInfoRepository> {
   updateOneBySuperId = jest.fn();
 
   updateMany = jest.fn();

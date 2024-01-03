@@ -1,6 +1,6 @@
 import { EpisodeId } from "#shared/models/episodes";
 import { PublicMethodsOf } from "#shared/utils/types";
-import LastTimePlayedService from "../LastTimePlayedService";
+import LastTimePlayedService from "../../historyLists/LastTimePlayedService";
 
 export class LastTimePlayedServiceMock implements PublicMethodsOf<LastTimePlayedService> {
   getDaysFromLastPlayed = jest.fn();

@@ -1,7 +1,6 @@
-import { SerieId } from "#modules/series";
-import { Stream, StreamMode } from "#modules/streams";
+import { ModelId as SerieId } from "#modules/series/models";
 import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
-import { Model, ModelId, OriginType } from "../models";
+import { Model, ModelId, OriginType, Mode as StreamMode } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 
@@ -36,7 +35,7 @@ CanCreateOne<Model>, CanGetAll<Model> {
   }
 
   async createDefaultFromSerie(serieId: SerieId): Promise<void> {
-    const stream: Stream = {
+    const stream: Model = {
       group: {
         origins: [
           {

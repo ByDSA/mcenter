@@ -1,14 +1,15 @@
-import { getIdModelOdmFromId } from "#modules/episodes/repositories/odm";
-import { EpisodeFileInfo, EpisodeId } from "#shared/models/episodes";
+import { SavedSerieTreeService } from "#modules/series/saved-serie-tree-service";
 import { FileInfoVideoWithSuperId, compareFileInfoVideo } from "#shared/models/episodes/fileinfo";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { deepMerge } from "#shared/utils/objects";
 import { assertIsDefined } from "#shared/utils/validation";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import ffmpeg from "fluent-ffmpeg";
 import { existsSync } from "fs";
 import crypto from "node:crypto";
 import fs from "node:fs";
-import SavedSerieTreeService from "../../saved-serie-tree-service/SavedSerieTreeService";
+import { EpisodeFileInfo, ModelId as EpisodeId } from "../../models";
+import { getIdModelOdmFromId } from "../../repositories/odm";
 import { Repository } from "../repositories";
 import { SerieFolderTree } from "../tree";
 
@@ -38,21 +39,20 @@ type Options = {
   forceHash?: boolean;
 };
 
-type Params = {
-  savedSerieTreeService: SavedSerieTreeService;
-  episodeFileRepository: Repository;
+const DepsMap = {
+  savedSerieTreeService: SavedSerieTreeService,
+  episodeFileRepository: Repository,
 };
 
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class UpdateMetadataProcess {
-  #episodeFileRepository: Repository;
+  #deps: Deps;
 
   #options!: Options;
 
-  #savedSerieTreeService: SavedSerieTreeService;
-
-  constructor( {savedSerieTreeService, episodeFileRepository}: Params) {
-    this.#episodeFileRepository = episodeFileRepository;
-    this.#savedSerieTreeService = savedSerieTreeService;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   // eslint-disable-next-line require-await
@@ -61,7 +61,7 @@ export default class UpdateMetadataProcess {
 
     assertIsDefined(MEDIA_FOLDER);
 
-    const currentEpisodeFile = await this.#episodeFileRepository.getOneByPath(filePath);
+    const currentEpisodeFile = await this.#deps.episodeFileRepository.getOneByPath(filePath);
 
     return new Promise((resolve, reject) =>{
       const fullFilePath = `${MEDIA_FOLDER}/${filePath}`;
@@ -120,7 +120,7 @@ export default class UpdateMetadataProcess {
     this.#options = deepMerge( {
       forceHash: false,
     }, options);
-    const seriesTree: SerieFolderTree = await this.#savedSerieTreeService.getSavedSeriesTree();
+    const seriesTree: SerieFolderTree = await this.#deps.savedSerieTreeService.getSavedSeriesTree();
 
     console.log("got paths");
     const fileInfos: ModelWithSuperId[] = [];
@@ -153,7 +153,7 @@ export default class UpdateMetadataProcess {
               episodeId: episodeIdOdm.toString(),
             } as ModelWithSuperId;
 
-            await this.#episodeFileRepository.updateOneBySuperId(episodeFileWithId.episodeId, episodeFileWithId);
+            await this.#deps.episodeFileRepository.updateOneBySuperId(episodeFileWithId.episodeId, episodeFileWithId);
 
             return episodeFileWithId;
           };

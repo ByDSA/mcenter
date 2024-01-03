@@ -17,3 +17,7 @@ export {
 export {
   RestController as HistoryListRestController,
 } from "./controllers";
+
+export {
+  default as LastTimePlayedService,
+} from "./LastTimePlayedService";
