@@ -1,4 +1,4 @@
-import ActionController from "#modules/actions/ActionController";
+import { ActionController } from "#modules/actions";
 import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
 import { EpisodeRestController } from "#modules/episodes";
 import { HistoryListRestController } from "#modules/historyLists";

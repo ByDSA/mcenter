@@ -1,5 +1,4 @@
-import { SerieRepository } from "#modules/series";
-import { SavedSerieTreeService } from "#modules/series/saved-serie-tree-service";
+import { SavedSerieTreeService, SerieRepository } from "#modules/series";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";

@@ -1,6 +1,6 @@
-import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { MUSIC_DATA_FOLDER } from "#tests/MusicData";
 import { AOT4_COPY, A_AOT4, DK, DRIFTVEIL } from "#tests/main/db/fixtures/models/music";
+import { md5FileAsync } from "#utils/crypt";
 import { join } from "path";
 import { FindOptions, findFiles } from ".";
 

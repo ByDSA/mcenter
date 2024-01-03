@@ -11,7 +11,8 @@ export {
 } from "./controllers";
 
 export {
-  FileInfoRepository as EpisodeFileInfoRepository,
+  AddNewFilesController as EpisodeAddNewFilesController, FileInfoRepository as EpisodeFileInfoRepository,
+  UpdateController,
 } from "./file-info";
 
 export {

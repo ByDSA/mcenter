@@ -1,6 +1,6 @@
 import { ExpressApp } from "#main";
 import { ExpressAppDependencies } from "#main/ExpressApp";
-import ActionController from "#modules/actions/ActionController";
+import { ActionController } from "#modules/actions";
 import { ActionControllerMock } from "#modules/actions/test";
 import { EpisodePickerController } from "#modules/episode-picker";
 import { EpisodePickerControllerMock } from "#modules/episode-picker/tests";
@@ -10,8 +10,7 @@ import { HistoryListRestController } from "#modules/historyLists";
 import { HistoryListRestControllerMock } from "#modules/historyLists/controllers/test";
 import { MusicController } from "#modules/musics";
 import { MusicControllerMock } from "#modules/musics/controllers/tests";
-import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
-import WebSocketsFrontServerService from "#modules/play/remote-player/RemoteFrontPlayerWebSocketsServerService";
+import { PlaySerieController, PlayStreamController, RemotePlayerController, RemotePlayerWebSocketsServerService as WebSocketsFrontServerService } from "#modules/play";
 import { PlayStatusControllerMock, WebSocketsServiceMock } from "#modules/play/remote-player/tests";
 import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
 import { StreamRestController } from "#modules/streams";

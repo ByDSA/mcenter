@@ -1,17 +1,13 @@
 import "reflect-metadata";
 
-import ActionController from "#modules/actions/ActionController";
+import { ActionController } from "#modules/actions";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
-import { EpisodeFileInfoRepository, EpisodeRepository, EpisodeRestController } from "#modules/episodes";
-import { AddNewFilesController } from "#modules/episodes/file-info/add-new-files";
+import { EpisodeAddNewFilesController, EpisodeFileInfoRepository, EpisodeRepository, EpisodeRestController } from "#modules/episodes";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { MusicController } from "#modules/musics";
-import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
-import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
-import { VlcBackWebSocketsServerService } from "#modules/play/remote-player/vlc-back-service";
-import { SerieRepository } from "#modules/series";
-import { SavedSerieTreeService } from "#modules/series/saved-serie-tree-service";
+import { PlaySerieController, PlayStreamController, RemotePlayerWebSocketsServerService as RemoteFrontPlayerWebSocketsServerService, RemotePlayerController, VlcBackWebSocketsServerService } from "#modules/play";
+import { SavedSerieTreeService, SerieRepository } from "#modules/series";
 import { StreamRestController } from "#modules/streams";
 import { container } from "tsyringe";
 import { ExpressApp } from "./main";
@@ -42,7 +38,7 @@ import RealDatabase from "./main/db/Database";
     .registerSingleton(MusicController)
     .registerSingleton(StreamRestController)
     .registerSingleton(StreamRestController)
-    .registerSingleton(AddNewFilesController)
+    .registerSingleton(EpisodeAddNewFilesController)
     .registerSingleton(ActionController)
     .registerSingleton(HistoryListService)
     .registerSingleton(PlayStreamController)

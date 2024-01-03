@@ -1,5 +1,5 @@
-import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { MusicVO } from "#shared/models/musics";
+import { md5FileAsync } from "#utils/crypt";
 import { Stats } from "node:fs";
 import { getFullPath } from "../../utils";
 

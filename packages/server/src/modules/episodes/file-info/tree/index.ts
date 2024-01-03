@@ -9,3 +9,7 @@ export {
 export {
   default as diffSerieTree,
 } from "./diff";
+
+export {
+  getSeasonEpisodeFromEpisodeId,
+} from "./idGetter";

@@ -1,4 +1,4 @@
-import { StreamRepository } from "#modules/streams/index";
+import { StreamRepository } from "#modules/streams";
 import { SerieId } from "#shared/models/series";
 import { LogElementResponse } from "#shared/utils/http";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";

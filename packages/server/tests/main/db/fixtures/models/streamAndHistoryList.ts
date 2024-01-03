@@ -1,6 +1,5 @@
 import { HistoryEntry, HistoryList } from "#modules/historyLists";
-import { Stream, StreamMode } from "#modules/streams";
-import { OriginType } from "#modules/streams/models";
+import { OriginType, Stream, StreamMode } from "#modules/streams";
 import { deepFreeze } from "#shared/utils/objects";
 
 export const HISTORY_LIST_WITH_NO_ENTRIES: HistoryList = deepFreeze( {

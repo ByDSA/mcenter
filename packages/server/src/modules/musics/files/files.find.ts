@@ -1,5 +1,4 @@
-/* eslint-disable no-param-reassign */
-import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
+import { md5FileAsync } from "#utils/crypt";
 import { glob } from "glob";
 import { getFullPath } from "../utils";
 

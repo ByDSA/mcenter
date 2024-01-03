@@ -1,5 +1,5 @@
-import { md5FileAsync } from "#modules/episodes/file-info/update/UpdateSavedProcess";
 import { ARTIST_EMPTY, Music, MusicVO } from "#shared/models/musics";
+import { md5FileAsync } from "#utils/crypt";
 import { statSync } from "fs";
 import NodeID3 from "node-id3";
 import path from "path";

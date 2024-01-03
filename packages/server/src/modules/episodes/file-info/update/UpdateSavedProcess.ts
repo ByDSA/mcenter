@@ -1,12 +1,12 @@
-import { SavedSerieTreeService } from "#modules/series/saved-serie-tree-service";
+import { SavedSerieTreeService } from "#modules/series";
 import { FileInfoVideoWithSuperId, compareFileInfoVideo } from "#shared/models/episodes/fileinfo";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { deepMerge } from "#shared/utils/objects";
 import { assertIsDefined } from "#shared/utils/validation";
+import { md5FileAsync } from "#utils/crypt";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import ffmpeg from "fluent-ffmpeg";
 import { existsSync } from "fs";
-import crypto from "node:crypto";
 import fs from "node:fs";
 import { EpisodeFileInfo, ModelId as EpisodeId } from "../../models";
 import { getIdModelOdmFromId } from "../../repositories/odm";
@@ -18,22 +18,6 @@ type ModelWithSuperId = FileInfoVideoWithSuperId;
 const compareModel: typeof compareFileInfoVideo = compareFileInfoVideo;
 
 type Data = ModelWithSuperId[];
-export function md5FileAsync(fullFilePath: string): Promise<string> {
-  return new Promise((res, rej) => {
-    const hash = crypto.createHash("md5");
-    const rStream = fs.createReadStream(fullFilePath);
-
-    rStream.on("data", (data) => {
-      hash.update(data);
-    } );
-    rStream.on("error", (err) => {
-      rej(err);
-    } );
-    rStream.on("end", () => {
-      res(hash.digest("hex"));
-    } );
-  } );
-}
 
 type Options = {
   forceHash?: boolean;
