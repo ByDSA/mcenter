@@ -2,12 +2,11 @@ import "reflect-metadata";
 
 import ActionController from "#modules/actions/ActionController";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
 import { EpisodeFileInfoRepository, EpisodeRepository, EpisodeRestController } from "#modules/episodes";
-import { EpisodePickerService } from "#modules/episodes/EpisodePicker";
 import { AddNewFilesController } from "#modules/episodes/file-info/add-new-files";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { MusicController } from "#modules/musics";
-import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
 import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
 import { VlcBackWebSocketsServerService } from "#modules/play/remote-player/vlc-back-service";
@@ -47,7 +46,7 @@ import RealDatabase from "./main/db/Database";
     .registerSingleton(ActionController)
     .registerSingleton(HistoryListService)
     .registerSingleton(PlayStreamController)
-    .registerSingleton(PickerController)
+    .registerSingleton(EpisodePickerController)
     .registerSingleton(HistoryListRestController);
 
   const app: ExpressApp = new ExpressApp( {

@@ -1,9 +1,8 @@
 import ActionController from "#modules/actions/ActionController";
+import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
 import { EpisodeRestController } from "#modules/episodes";
-import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
 import { HistoryListRestController } from "#modules/historyLists";
 import { MusicController } from "#modules/musics";
-import { PickerController } from "#modules/picker";
 import { PlaySerieController, PlayStreamController } from "#modules/play";
 import { StreamRestController } from "#modules/streams";
 import { ForbiddenError } from "#shared/utils/http";
@@ -45,6 +44,8 @@ export default class ExpressApp implements App {
   #httpServer: Server | undefined;
 
   #dependencies: Required<ExpressAppDependencies>;
+
+  #httpServerRequirers: {setHttpServer(server: Server): void}[] = [];
 
   constructor(deps?: ExpressAppDependencies) {
     this.#dependencies = deepMerge(DEFAULT_DEPENDENCIES as Required<ExpressAppDependencies>, deps) as Required<ExpressAppDependencies>;
@@ -108,13 +109,15 @@ export default class ExpressApp implements App {
 
     const playSerieController = resolveRequired(PlaySerieController);
 
+    this.#httpServerRequirers.push(playSerieController);
+
     app.use("/api/play/serie", playSerieController.getRouter());
 
     const playStreamController = resolveRequired(PlayStreamController);
 
     app.use("/api/play/stream", playStreamController.getRouter());
 
-    const pickerController = resolveRequired(PickerController);
+    const pickerController = resolveRequired(EpisodePickerController);
 
     app.use("/api/picker", pickerController.getRouter());
 
@@ -202,6 +205,10 @@ export default class ExpressApp implements App {
         realPort = address.port;
 
       console.log(`Server Listening on http://localhost:${realPort}`);
+    } );
+
+    this.#httpServerRequirers.forEach(requirer => {
+      requirer.setHttpServer(this.#httpServer as Server);
     } );
 
     mediaServer.run();

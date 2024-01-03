@@ -1,7 +1,7 @@
 import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
 import { compareEpisodeId } from "#shared/models/episodes";
 import { neverCase } from "#shared/utils/validation";
-import { Model } from "../models";
+import { Model } from "../episodes/models";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 import { dependencies } from "./appliers/Dependencies";
 

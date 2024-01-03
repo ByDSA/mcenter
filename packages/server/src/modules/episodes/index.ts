@@ -7,7 +7,7 @@ export {
 } from "./repositories";
 
 export {
-  PickerController as EpisodePickerController, RestController as EpisodeRestController,
+  RestController as EpisodeRestController,
 } from "./controllers";
 
 export {

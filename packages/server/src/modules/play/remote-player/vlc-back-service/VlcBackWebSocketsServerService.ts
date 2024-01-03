@@ -1,7 +1,7 @@
-import ExpressApp from "#main/ExpressApp";
 import { PlayResourceMessage, PlayerActions, PlayerEvent, PlayerStatusResponse } from "#shared/models/player";
 import { assertIsDefined } from "#shared/utils/validation";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Server as HttpServer } from "node:http";
 import { Server, Socket } from "socket.io";
 import RemoteFrontPlayerWebSocketsServerService from "../RemoteFrontPlayerWebSocketsServerService";
 
@@ -9,7 +9,6 @@ type StartSocketParams = {
   remoteFrontPlayerWebSocketsServerService: RemoteFrontPlayerWebSocketsServerService;
 };
 const DepsMap = {
-  app: ExpressApp,
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
@@ -21,6 +20,12 @@ export default class WSService implements PlayerActions {
 
   #deps: Deps;
 
+  #httpServer: HttpServer | undefined;
+
+  setHttpServer(httpServer: HttpServer) {
+    this.#httpServer = httpServer;
+  }
+
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
 
@@ -31,7 +36,7 @@ export default class WSService implements PlayerActions {
     if (this.#io)
       return;
 
-    if (!this.#deps.app.getHttpServer()) {
+    if (!this.#httpServer) {
       setTimeout(() => this.startSocket( {
         remoteFrontPlayerWebSocketsServerService,
       } ), 100);
@@ -39,7 +44,7 @@ export default class WSService implements PlayerActions {
       return;
     }
 
-    this.#io = new Server(this.#deps.app.getHttpServer(), {
+    this.#io = new Server(this.#httpServer, {
       path: "/ws-vlc/",
       cors: {
         origin: "*",

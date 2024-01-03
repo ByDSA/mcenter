@@ -1,20 +1,10 @@
-import { deepMerge } from "#shared/utils/objects";
-import { PublicMethodsOf } from "#shared/utils/types";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";
-import RelationWithStreamFixer from "./RelationshipWithStreamFixer";
 import { docOdmToModel } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 
-type CreationOptions = {
-  ignoreStream?: boolean;
-};
-const DEFAULT_CREATION_OPTIONS: Required<CreationOptions> = {
-  ignoreStream: false,
-};
 const DepsMap = {
-  relationshipWithStreamFixer: RelationWithStreamFixer,
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
@@ -25,10 +15,10 @@ CanUpdateOneByIdAndGet<Model, ModelId>,
 CanCreateOneAndGet<Model>,
 CanGetAll<Model>
 {
-  #relationshipWithStreamFixer: PublicMethodsOf<RelationWithStreamFixer>;
+  #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
-    this.#relationshipWithStreamFixer = (deps as Deps).relationshipWithStreamFixer;
+    this.#deps = deps as Deps;
   }
 
   async getAll(): Promise<Model[]> {
@@ -37,14 +27,15 @@ CanGetAll<Model>
     return seriesDocOdm.map(docOdmToModel);
   }
 
-  async createOneAndGet(model: Model, options: CreationOptions = DEFAULT_CREATION_OPTIONS): Promise<Model> {
-    const actualOptions = deepMerge(DEFAULT_CREATION_OPTIONS, options);
+  async createOneAndGet(model: Model): Promise<Model> {
     const serieOdm: DocOdm = await ModelOdm.create(model).then(s => s.save());
     const serie = docOdmToModel(serieOdm);
 
     // TODO: pasar a broker message esto: que se cree el stream si no existe al crear la serie
-    if (!actualOptions.ignoreStream)
-      await this.#relationshipWithStreamFixer.fixDefaultStreamForSerie(serie.id);
+    // Comentado para eliminar dependencias circulares
+    // const actualOptions = deepMerge(DEFAULT_CREATION_OPTIONS, options);
+    // if (!actualOptions.ignoreStream)
+    //   await this.#relationshipWithStreamFixer.fixDefaultStreamForSerie(serie.id);
 
     return serie;
   }

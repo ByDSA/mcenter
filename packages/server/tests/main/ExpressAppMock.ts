@@ -2,14 +2,14 @@ import { ExpressApp } from "#main";
 import { ExpressAppDependencies } from "#main/ExpressApp";
 import ActionController from "#modules/actions/ActionController";
 import { ActionControllerMock } from "#modules/actions/test";
+import { EpisodePickerController } from "#modules/episode-picker";
+import { EpisodePickerControllerMock } from "#modules/episode-picker/tests";
 import { EpisodeRestController } from "#modules/episodes";
 import { EpisodeRestControllerMock } from "#modules/episodes/controllers/test";
 import { HistoryListRestController } from "#modules/historyLists";
 import { HistoryListRestControllerMock } from "#modules/historyLists/controllers/test";
 import { MusicController } from "#modules/musics";
 import { MusicControllerMock } from "#modules/musics/controllers/tests";
-import { PickerController } from "#modules/picker";
-import { PickerControllerMock } from "#modules/picker/tests";
 import { PlaySerieController, PlayStreamController, RemotePlayerController } from "#modules/play";
 import WebSocketsFrontServerService from "#modules/play/remote-player/RemoteFrontPlayerWebSocketsServerService";
 import { PlayStatusControllerMock, WebSocketsServiceMock } from "#modules/play/remote-player/tests";
@@ -45,7 +45,7 @@ export default class ExpressAppMock extends ExpressApp {
 }
 
 function registerSingletons() {
-  registerSingletonIfNotAndGet(PickerController, PickerControllerMock);
+  registerSingletonIfNotAndGet(EpisodePickerController, EpisodePickerControllerMock);
   registerSingletonIfNotAndGet(HistoryListRestController, HistoryListRestControllerMock);
   registerSingletonIfNotAndGet(MusicController, MusicControllerMock);
   registerSingletonIfNotAndGet(PlaySerieController, PlaySerieControllerMock);

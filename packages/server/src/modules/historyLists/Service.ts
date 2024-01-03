@@ -1,4 +1,4 @@
-import { Repository as EpisodeRepository } from "#modules/episodes/repositories";
+import { EpisodeRepository } from "#modules/episodes";
 import { Episode, EpisodeId, compareEpisodeId } from "#shared/models/episodes";
 import { assertFound } from "#shared/utils/http/validation";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";

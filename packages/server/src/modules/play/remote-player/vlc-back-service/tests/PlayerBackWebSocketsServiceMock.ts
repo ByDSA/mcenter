@@ -21,4 +21,6 @@ export default class PlayerBackWebSocketsServiceMock implements PublicMethodsOf<
   playResource = jest.fn();
 
   getLastStatus = jest.fn();
+
+  setHttpServer = jest.fn();
 }

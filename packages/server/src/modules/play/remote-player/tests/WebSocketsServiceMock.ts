@@ -19,4 +19,6 @@ export default class WebSocketsServiceMock implements PublicMethodsOf<WebSockets
   emitStatus = jest.fn();
 
   onFullscreenToggle = jest.fn();
+
+  setHttpServer = jest.fn();
 }

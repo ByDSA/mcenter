@@ -6,4 +6,6 @@ export default class PlaySerieControllerMock implements PublicMethodsOf<PlaySeri
   playSerie = jest.fn();
 
   getRouter = getRouterMock;
+
+  setHttpServer = jest.fn();
 }

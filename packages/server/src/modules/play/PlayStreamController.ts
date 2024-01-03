@@ -1,4 +1,4 @@
-import EpisodePickerService from "#modules/episodes/EpisodePicker/EpisodePickerService";
+import { EpisodePickerService } from "#modules/episode-picker";
 import { HistoryListService } from "#modules/historyLists";
 import { StreamRepository } from "#modules/streams";
 import { assertFound } from "#shared/utils/http/validation";
@@ -6,6 +6,7 @@ import { assertIsDefined } from "#shared/utils/validation";
 import { Controller } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
+import { Server } from "http";
 import PlayService from "./PlayService";
 
 const DepsMap = {
@@ -22,6 +23,10 @@ export default class PlayController implements Controller{
 
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
+  }
+
+  setHttpServer(server: Server) {
+    this.#deps.playService.setHttpServer(server);
   }
 
   async playStream(req: Request, res: Response) {

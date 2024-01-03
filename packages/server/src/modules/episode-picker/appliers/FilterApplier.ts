@@ -1,7 +1,6 @@
-/* eslint-disable import/prefer-default-export */
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { ResourceVO } from "#shared/models/resource";
-import { Model, ModelId, compareId } from "../../models";
+import { Model, ModelId, compareId } from "../../episodes/models";
 import { DependenciesList } from "./Dependencies";
 
 type Params<R extends ResourceVO = ResourceVO, ID = string> = {

@@ -8,12 +8,12 @@ import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import express, { Request, Response } from "express";
 import { Picker } from "rand-picker";
-import LastTimePlayedService from "../../historyLists/LastTimePlayedService";
-import { genRandomPickerWithData } from "../../picker/ResourcePicker/ResourcePickerRandom";
-import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "../EpisodePicker/appliers";
-import { dependencies } from "../EpisodePicker/appliers/Dependencies";
-import { Model } from "../models";
-import { Repository as EpisodeRepository } from "../repositories";
+import { Model } from "../episodes/models";
+import { Repository as EpisodeRepository } from "../episodes/repositories";
+import LastTimePlayedService from "../historyLists/LastTimePlayedService";
+import { genRandomPickerWithData } from "../picker/ResourcePicker/ResourcePickerRandom";
+import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
+import { dependencies } from "./appliers/Dependencies";
 
 type ResultType = Model & {
   percentage: number;

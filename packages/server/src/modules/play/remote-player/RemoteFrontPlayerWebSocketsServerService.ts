@@ -1,13 +1,12 @@
-import ExpressApp from "#main/ExpressApp";
 import { PlayerActionsReceiver, PlayerEvent, PlayerStatusResponse } from "#shared/models/player";
 import { assertIsDefined } from "#shared/utils/validation";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Server as HttpServer } from "node:http";
 import { Server, Socket } from "socket.io";
 import { VlcBackWebSocketsServerService } from "./vlc-back-service";
 
 const DepsMap = {
   vlcBackService: VlcBackWebSocketsServerService,
-  app: ExpressApp,
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
@@ -16,6 +15,8 @@ export default class WebSocketsFrontServerService implements PlayerActionsReceiv
   #io: Server | undefined;
 
   #deps: Deps;
+
+  #httpServer: HttpServer | undefined;
 
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
@@ -32,17 +33,21 @@ export default class WebSocketsFrontServerService implements PlayerActionsReceiv
     throw new Error("Method not implemented.");
   }
 
+  setHttpServer(httpServer: HttpServer): void {
+    this.#httpServer = httpServer;
+  }
+
   startSocket() {
     if (this.#io)
       return;
 
-    if (!this.#deps.app.getHttpServer()) {
+    if (!this.#httpServer) {
       setTimeout(this.startSocket.bind(this), 100);
 
       return;
     }
 
-    this.#io = new Server(this.#deps.app.getHttpServer(), {
+    this.#io = new Server(this.#httpServer, {
       path: "/ws/",
       cors: {
         origin: "*",

@@ -4,9 +4,9 @@ import { Stream, StreamId, StreamMode, StreamRepository } from "#modules/streams
 import { assertFound } from "#shared/utils/http/validation";
 import { neverCase } from "#shared/utils/validation";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Episode } from "..";
-import { Repository } from "../repositories";
-import { GetManyOptions } from "../repositories/Repository";
+import { Episode } from "../episodes";
+import { Repository } from "../episodes/repositories";
+import { GetManyOptions } from "../episodes/repositories/Repository";
 import buildEpisodePicker from "./EpisodePicker";
 
 const DepsMap = {

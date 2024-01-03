@@ -1,8 +1,9 @@
-import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
+import { SerieRepository } from "#modules/series";
 import { FullResponse, LogElementResponse } from "#shared/utils/http";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
+import SerieRelationshipWithStreamFixer from "./SerieRelationshipWithStreamFixer";
 
 const DepsMap = {
   serieRepository: SerieRepository,

@@ -5,6 +5,7 @@ import { assertFound } from "#shared/utils/http/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
+import { Server } from "node:http";
 import PlayService from "./PlayService";
 
 const DepsMap = {
@@ -21,6 +22,10 @@ export default class PlaySerieController implements Controller {
 
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
+  }
+
+  setHttpServer(server: Server) {
+    this.#deps.playService.setHttpServer(server);
   }
 
   async playSerie(req: Request, res: Response) {

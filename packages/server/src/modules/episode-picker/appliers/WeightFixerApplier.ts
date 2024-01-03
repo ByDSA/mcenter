@@ -1,5 +1,4 @@
-import { LastTimeWeightFixer, LimiterSafeIntegerPerItems, TagWeightFixer, WeightFixerApplier } from "#modules/picker";
-import { Fx } from "#modules/picker/ResourcePicker/weight-fixers/LastTime";
+import { LastTimeWeightFilterFx, LastTimeWeightFixer, LimiterSafeIntegerPerItems, TagWeightFixer, WeightFixerApplier } from "#modules/picker";
 import { Episode } from "#shared/models/episodes";
 import { Pickable, ResourceVO } from "#shared/models/resource";
 
@@ -16,7 +15,7 @@ export default class EpisodeWeightFixerApplier<R extends ResourceVO = ResourceVO
   }
 }
 
-const fx: Fx = (r: Pickable, x: number): number => {
+const fx: LastTimeWeightFilterFx = (r: Pickable, x: number): number => {
   const daysFromLastTime = x / SECONDS_IN_DAY;
   let reinforcementFactor = 1;
   const {weight} = r;
