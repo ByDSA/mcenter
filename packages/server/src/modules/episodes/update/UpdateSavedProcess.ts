@@ -1,4 +1,3 @@
-import { SavedSerieTreeService } from "#modules/series";
 import { FileInfoVideoWithSuperId, compareFileInfoVideo } from "#shared/models/episodes/fileinfo";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { deepMerge } from "#shared/utils/objects";
@@ -8,10 +7,11 @@ import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import ffmpeg from "fluent-ffmpeg";
 import { existsSync } from "fs";
 import fs from "node:fs";
-import { EpisodeFileInfo, ModelId as EpisodeId } from "../../models";
-import { getIdModelOdmFromId } from "../../repositories/odm";
-import { Repository } from "../repositories";
-import { SerieFolderTree } from "../tree";
+import { Repository } from "../../file-info/repositories";
+import { SerieFolderTree } from "../../file-info/tree";
+import { EpisodeFileInfo, ModelId as EpisodeId } from "../models";
+import { getIdModelOdmFromId } from "../repositories/odm";
+import { SavedSerieTreeService } from "../saved-serie-tree-service";
 
 type Model = EpisodeFileInfo;
 type ModelWithSuperId = FileInfoVideoWithSuperId;

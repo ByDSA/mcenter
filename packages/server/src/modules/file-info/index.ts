@@ -3,7 +3,3 @@ export {
 } from "./repositories";
 
 export * from "./tree";
-
-export * from "./add-new-files";
-
-export * from "./update";

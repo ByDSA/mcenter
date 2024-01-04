@@ -1,5 +1,5 @@
 import { Episode } from "#modules/episodes";
-import { EpisodeFile, SerieFolderTree, getSeasonEpisodeFromEpisodeId } from "#modules/episodes/file-info";
+import { EpisodeFile, SerieFolderTree, getSeasonEpisodeFromEpisodeId } from "#modules/file-info";
 import { treePut } from "#shared/utils/trees";
 
 export function putModelInSerieFolderTree(episode: Episode, serieFolderTree: SerieFolderTree): SerieFolderTree {

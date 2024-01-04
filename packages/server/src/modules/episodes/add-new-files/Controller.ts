@@ -1,15 +1,16 @@
-import { SavedSerieTreeService, SerieRepository } from "#modules/series";
+import { diffSerieTree, findAllSerieFolderTreesAt } from "#modules/file-info";
+import { OldNew } from "#modules/file-info/tree/diff";
+import { Serie } from "#modules/file-info/tree/models";
+import { SerieRepository } from "#modules/series";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import path from "path";
-import { Model as Episode } from "../../models";
-import { Repository as EpisodeRepository } from "../../repositories";
-import { diffSerieTree, findAllSerieFolderTreesAt } from "../tree";
-import { OldNew } from "../tree/diff";
-import { Serie } from "../tree/models";
+import { Model as Episode } from "../models";
+import { Repository as EpisodeRepository } from "../repositories";
+import { SavedSerieTreeService } from "../saved-serie-tree-service";
 
 const DepsMap = {
   serieRepository: SerieRepository,

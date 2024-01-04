@@ -11,10 +11,15 @@ export {
 } from "./controllers";
 
 export {
-  AddNewFilesController as EpisodeAddNewFilesController, FileInfoRepository as EpisodeFileInfoRepository,
-  UpdateController,
-} from "./file-info";
-
-export {
   QUEUE_NAME as EPISODE_QUEUE_NAME,
 } from "./repositories";
+
+export {
+  AddNewFilesController as EpisodeAddNewFilesController,
+} from "./add-new-files";
+
+export {
+  UpdateController as EpisodeUpdateController,
+} from "./update";
+
+export * from "./saved-serie-tree-service";

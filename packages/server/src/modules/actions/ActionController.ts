@@ -1,4 +1,4 @@
-import { EpisodeAddNewFilesController, UpdateController } from "#modules/episodes";
+import { EpisodeAddNewFilesController, EpisodeUpdateController } from "#modules/episodes";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
@@ -10,7 +10,7 @@ import FixerController from "./FixerController";
 
 const DepsMap = {
   episodesUpdateLastTimePlayedController: EpisodesUpdateLastTimePlayedController,
-  episodesUpdateFileInfoController: UpdateController,
+  episodesUpdateFileInfoController: EpisodeUpdateController,
   episodesAddNewFilesController: EpisodeAddNewFilesController,
   fixerController: FixerController,
 };

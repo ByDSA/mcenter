@@ -1,4 +1,5 @@
 import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#shared/models/series";
 import { deepMerge } from "#shared/utils/objects";
@@ -6,7 +7,6 @@ import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
-import { FileInfoRepository as EpisodeFileInfoRepository } from "../file-info";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 import { QUEUE_NAME } from "./events";
@@ -105,8 +105,7 @@ CanGetAll<Model>
 
     if (opts?.expand?.includes(ExpandEnum.FileInfo)) {
       const _id = episodeOdm._id?.toString();
-      const deps = this.#deps;
-      const fileInfo = await deps.episodeFileInfoRepository.getAllBySuperId(_id);
+      const fileInfo = await this.#deps.episodeFileInfoRepository.getAllBySuperId(_id);
 
       if (!fileInfo)
         throw new Error("Episode has no file info");
