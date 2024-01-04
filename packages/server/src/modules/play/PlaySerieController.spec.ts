@@ -10,7 +10,7 @@ import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
 import PlaySerieController from "./PlaySerieController";
-import { VlcBackWebSocketsServerService } from "./remote-player/vlc-back-service";
+import { VlcBackWebSocketsServerService } from "./remote-player";
 import PlayerBackWebSocketsServiceMock from "./remote-player/vlc-back-service/tests/PlayerBackWebSocketsServiceMock";
 
 describe("PlaySerieController", () => {

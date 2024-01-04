@@ -10,8 +10,7 @@ import { Event } from "#utils/message-broker";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 import { QUEUE_NAME } from "./events";
-import { GetOptions, validateGetOptions } from "./get-options";
-import ExpandEnum from "./get-options/ExpandEnum";
+import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
 import { DocOdm, ModelOdm } from "./odm";
 
 type UpdateOneParams = Model;

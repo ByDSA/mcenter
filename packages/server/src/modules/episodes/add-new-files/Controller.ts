@@ -1,8 +1,6 @@
-import { diffSerieTree, findAllSerieFolderTreesAt } from "#modules/file-info";
-import { OldNew } from "#modules/file-info/tree/diff";
-import { Serie } from "#modules/file-info/tree/models";
+import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew, SerieFolder as Serie } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
-import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
+import { ErrorElementResponse, errorToErrorElementResponse, FullResponse } from "#shared/utils/http";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";

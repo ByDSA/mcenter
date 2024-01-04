@@ -1,3 +1,4 @@
+import { EpisodePickerController } from "#modules/episode-picker";
 import { assertIsDefined } from "#shared/utils/validation";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import ExpressAppMock from "#tests/main/ExpressAppMock";
@@ -5,10 +6,9 @@ import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
-import PickerController from "../episode-picker/PickerController";
 
 let app: ExpressAppMock;
-const pickerController = registerSingletonIfNotAndGet(PickerController);
+const pickerController = registerSingletonIfNotAndGet(EpisodePickerController);
 
 async function loadFixtures() {
   await app.dropDb();

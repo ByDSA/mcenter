@@ -5,7 +5,7 @@ import { Application } from "express";
 import request from "supertest";
 import { Repository } from "../repositories";
 import { MUSICS_SAMPLES_IN_DISK, RepositoryMock } from "../repositories/tests";
-import { UpdateResult } from "../services/update-remote-tree";
+import { UpdateResult } from "../services";
 import { ENVS } from "../utils";
 import Controller from "./Controller";
 

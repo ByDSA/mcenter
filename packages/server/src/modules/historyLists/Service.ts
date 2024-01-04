@@ -102,8 +102,6 @@ export default class Service {
   }
 
   async addEpisodeToHistory(params: HistoryAndEpisodeParams) {
-    console.log("Añadiendo al historial ...");
-
     const episode: Episode = await this.#getEpisodeFromParams(params);
     const newEntry: Entry = createHistoryEntryByEpisodeId(episode.id);
     const historyListId = this.#getHistoryListIdFromParams(params);
@@ -126,8 +124,6 @@ export default class Service {
   }
 
   async removeLastTimeEpisodeFromHistory(params: HistoryAndEpisodeParams) {
-    console.log("Eliminando del historial ...");
-
     const historyList = await this.#getHistoryListFromParams(params);
     const episodeFullId: EpisodeId = await this.#getEpisodeIdFromParams(params);
     const historyEntryIndex = historyList.entries.findLastIndex((h: Entry) => compareEpisodeId(h.episodeId, episodeFullId));

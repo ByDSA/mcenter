@@ -8,6 +8,7 @@ export {
 
 export {
   default as ResourcePickerRandom,
+  genRandomPickerWithData,
 } from "./ResourcePickerRandom";
 
 export {

@@ -1,4 +1,4 @@
-import { FileInfoVideo, FileInfoVideoSuperId, FileInfoVideoWithSuperId } from "#shared/models/episodes/fileinfo";
+import { FileInfoVideo, FileInfoVideoSuperId, FileInfoVideoWithSuperId } from "#modules/file-info";
 import { CanGetAllBySuperId, CanUpdateMany, CanUpdateOneBySuperId } from "#utils/layers/repository";
 import { docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
 import { ModelOdm } from "./odm";

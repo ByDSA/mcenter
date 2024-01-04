@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
 import { Event } from "#utils/message-broker";
 

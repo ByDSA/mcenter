@@ -7,7 +7,7 @@ export {
 } from "./models";
 
 export {
-  default as diffSerieTree,
+  OldNew as OldNewSerieTree, default as diffSerieTree,
 } from "./diff";
 
 export {

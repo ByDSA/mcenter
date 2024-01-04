@@ -1,6 +1,6 @@
+import { EpisodeId, compareEpisodeId as compareId } from "#modules/episodes";
 import { stringifyEpisodeId } from "#modules/episodes/tests";
-import { EpisodeId, compareEpisodeId as compareId } from "#shared/models/episodes";
-import { Resource } from "#shared/models/resource";
+import { Resource } from "#modules/resources";
 import { assertIsDefined } from "#shared/utils/validation";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import PreventRepeatLastFilter from "../PreventRepeatLastFilter";

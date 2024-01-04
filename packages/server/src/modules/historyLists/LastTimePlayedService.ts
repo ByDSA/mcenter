@@ -1,9 +1,8 @@
-import { EpisodeRepository } from "#modules/episodes";
+import { Episode, EpisodeId, EpisodeRepository, compareEpisodeId } from "#modules/episodes";
 import { deepCopy } from "#shared/utils/objects";
 import { DateType } from "#shared/utils/time";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { DateTime } from "luxon";
-import { Model, ModelId, compareId } from "../episodes/models";
 import { Model as HistoryList } from "./models";
 
 function getTimestampFromDateType(date: DateType): number {
@@ -16,7 +15,7 @@ function getTimestampFromDateType(date: DateType): number {
 }
 
 type FuncParams = {
-  episodeId: ModelId;
+  episodeId: EpisodeId;
   entries: HistoryList["entries"];
 };
 
@@ -45,11 +44,11 @@ export default class LastTimePlayedService {
     return lastTimePlayed ?? null;
   }
 
-  getLastTimePlayedFromHistory(selfId: ModelId, entries: HistoryList["entries"]): number | null {
+  getLastTimePlayedFromHistory(selfId: EpisodeId, entries: HistoryList["entries"]): number | null {
     let lastTimePlayed = 0;
 
     for (const historyEntry of entries) {
-      if (compareId(historyEntry.episodeId, selfId)) {
+      if (compareEpisodeId(historyEntry.episodeId, selfId)) {
         const currentTimestamp = getTimestampFromDateType(historyEntry.date);
 
         if (currentTimestamp > lastTimePlayed)
@@ -63,14 +62,14 @@ export default class LastTimePlayedService {
     return lastTimePlayed;
   }
 
-  async getDaysFromLastPlayed(self: Model, historyList: HistoryList): Promise<number> {
+  async getDaysFromLastPlayed(self: Episode, historyList: HistoryList): Promise<number> {
     let lastTimePlayed = self.lastTimePlayed ?? null;
 
     if (!lastTimePlayed) {
       lastTimePlayed = this.getLastTimePlayedFromHistory(self.id, historyList.entries);
 
       if (lastTimePlayed) {
-        const selfCopy: Model = {
+        const selfCopy: Episode = {
           ...deepCopy(self),
           lastTimePlayed,
         };

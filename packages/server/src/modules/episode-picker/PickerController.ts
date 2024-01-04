@@ -1,4 +1,6 @@
-import { HistoryListRepository } from "#modules/historyLists";
+import { Episode, EpisodeRepository } from "#modules/episodes";
+import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
+import { genRandomPickerWithData } from "#modules/picker";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
 import { asyncMap } from "#shared/utils/arrays";
@@ -8,14 +10,11 @@ import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import express, { Request, Response } from "express";
 import { Picker } from "rand-picker";
-import { Model } from "../episodes/models";
-import { Repository as EpisodeRepository } from "../episodes/repositories";
-import LastTimePlayedService from "../historyLists/LastTimePlayedService";
-import { genRandomPickerWithData } from "../picker/ResourcePicker/ResourcePickerRandom";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
+// eslint-disable-next-line import/no-internal-modules
 import { dependencies } from "./appliers/Dependencies";
 
-type ResultType = Model & {
+type ResultType = Episode & {
   percentage: number;
   days: number;
 };
@@ -62,11 +61,9 @@ export default class PickerController implements Controller {
     const serie = await seriePromise;
     const lastEp = await lastEpPromise;
 
-    console.log(`Received serie=${serie?.id} and lastEp=${lastEp?.id.innerId}`);
-
     assertFound(serie);
 
-    const episodes: Model[] = await episodeRepository.getManyBySerieId(serie.id);
+    const episodes: Episode[] = await episodeRepository.getManyBySerieId(serie.id);
     const picker = await genRandomPickerWithData( {
       resources: episodes,
       lastEp: lastEp ?? undefined,
@@ -77,11 +74,11 @@ export default class PickerController implements Controller {
     const lastTimePlayedService = new LastTimePlayedService();
     const ret = (await asyncMap(
       "end" in picker.data[0]
-        ? (picker as Picker<Model>).data.filter(
+        ? (picker as Picker<Episode>).data.filter(
           (e) => e.end === undefined || e.end < 100,
         )
         : picker.data,
-      async(e: Model) => {
+      async(e: Episode) => {
         const selfWeight = picker.getWeight(e);
 
         assertIsDefined(selfWeight);

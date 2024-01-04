@@ -1,7 +1,7 @@
-import { ModelId } from "#shared/models/historyLists/HistoryList";
+import { HistoryListId } from "#shared/models/historyLists";
 import { SerieId } from "#shared/models/series";
 
-export type DependenciesList = {[key: SerieId]: [ModelId, ModelId][]};
+export type DependenciesList = {[key: SerieId]: [HistoryListId, HistoryListId][]};
 
 export const dependencies: DependenciesList = {
   simpsons: [

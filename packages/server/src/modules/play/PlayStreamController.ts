@@ -30,7 +30,6 @@ export default class PlayController implements Controller{
   }
 
   async playStream(req: Request, res: Response) {
-    console.log("playStream");
     const { id, number, force } = validateParams(req);
     const stream = await this.#deps.streamRepository.getOneById(id);
 

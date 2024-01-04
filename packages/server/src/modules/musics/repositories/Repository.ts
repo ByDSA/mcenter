@@ -3,7 +3,7 @@ import { md5FileAsync } from "#utils/crypt";
 import { statSync } from "fs";
 import NodeID3 from "node-id3";
 import path from "path";
-import { AUDIO_EXTENSIONS } from "../files/files.music";
+import { AUDIO_EXTENSIONS } from "../files";
 import { getFullPath } from "../utils";
 import { download } from "../youtube";
 // eslint-disable-next-line import/no-cycle

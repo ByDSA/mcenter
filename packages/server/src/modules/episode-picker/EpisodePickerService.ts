@@ -1,17 +1,15 @@
+import { Episode, EpisodeRepository, RepositoryGetManyOptions } from "#modules/episodes";
 import { HistoryListRepository } from "#modules/historyLists";
 import { PickMode, ResourcePicker } from "#modules/picker";
 import { Stream, StreamId, StreamMode, StreamRepository } from "#modules/streams";
 import { assertFound } from "#shared/utils/http/validation";
 import { neverCase } from "#shared/utils/validation";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Episode } from "../episodes";
-import { Repository } from "../episodes/repositories";
-import { GetManyOptions } from "../episodes/repositories/Repository";
 import buildEpisodePicker from "./EpisodePicker";
 
 const DepsMap = {
   streamRepository: StreamRepository,
-  episodeRepository: Repository,
+  episodeRepository: EpisodeRepository,
   historyListRepository: HistoryListRepository,
 };
 
@@ -39,10 +37,8 @@ export default class EpisodePickerService {
   }
 
   async getByStream(stream: Stream, n = 1): Promise<Episode[]> {
-    console.log(`Calculating next ${n} episodes ...`);
-
     const serieId: string = stream.group.origins[0].id;
-    const options: GetManyOptions = {
+    const options: RepositoryGetManyOptions = {
       sortById: stream.mode === StreamMode.SEQUENTIAL,
     };
     const allEpisodesInSerie = await this.#deps.episodeRepository.getManyBySerieId(serieId, options);

@@ -7,12 +7,11 @@ import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController,
 import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
 import { MusicController } from "#modules/musics";
-import { PlaySerieController, PlayStreamController, RemotePlayerWebSocketsServerService as RemoteFrontPlayerWebSocketsServerService, RemotePlayerController, VlcBackWebSocketsServerService } from "#modules/play";
+import { PlaySerieController, PlayStreamController, RemotePlayerController, RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
 import { SerieRepository } from "#modules/series";
 import { StreamRestController } from "#modules/streams";
 import { container } from "tsyringe";
-import { ExpressApp } from "./main";
-import RealDatabase from "./main/db/Database";
+import { ExpressApp, RealMongoDatabase } from "./main";
 
 (async function main() {
   container
@@ -31,7 +30,7 @@ import RealDatabase from "./main/db/Database";
 
     .registerSingleton(VlcBackWebSocketsServerService)
 
-    .registerSingleton(RemoteFrontPlayerWebSocketsServerService)
+    .registerSingleton(RemotePlayerWebSocketsServerService)
 
     .registerSingleton(RemotePlayerController)
     .registerSingleton(PlaySerieController)
@@ -48,7 +47,7 @@ import RealDatabase from "./main/db/Database";
 
   const app: ExpressApp = new ExpressApp( {
     db: {
-      instance: new RealDatabase(),
+      instance: new RealMongoDatabase(),
     },
     controllers: {
       cors: true,

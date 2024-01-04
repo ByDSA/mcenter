@@ -12,6 +12,7 @@ export {
 
 export {
   QUEUE_NAME as EPISODE_QUEUE_NAME,
+  RepositoryGetManyOptions,
 } from "./repositories";
 
 export {

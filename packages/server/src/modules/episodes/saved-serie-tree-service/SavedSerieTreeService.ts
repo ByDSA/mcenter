@@ -1,4 +1,4 @@
-import { SerieTree } from "#modules/file-info/tree/models";
+import { SerieFolderTree as SerieTree } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Model as Episode } from "../models";

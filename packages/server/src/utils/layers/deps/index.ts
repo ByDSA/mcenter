@@ -1,6 +1,8 @@
 import { PublicMethodsOf } from "#shared/utils/types";
 import { InjectionToken, container } from "tsyringe";
+// eslint-disable-next-line import/no-internal-modules
 import { DelayedConstructor } from "tsyringe/dist/typings/lazy-helpers";
+// eslint-disable-next-line import/no-internal-modules
 import { constructor } from "tsyringe/dist/typings/types";
 
 export type DepsMapType = Record<string, constructor<any> | DelayedConstructor<any>>;

@@ -1,15 +1,11 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable no-param-reassign */
-// eslint-disable-next-line max-classes-per-file
 import { ResourcePickerRandom } from "#modules/picker";
 import { Music } from "#shared/models/musics";
 import { SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import path from "node:path";
-import { Repository } from "../repositories";
-import { FindParams } from "../repositories/Repository";
-import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services/MusicPicker/appliers";
+import { RepositoryFindParams as FindParams, Repository } from "../repositories";
+import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
 
 let lastPicked: Music | undefined;

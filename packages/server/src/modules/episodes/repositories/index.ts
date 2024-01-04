@@ -6,6 +6,7 @@ export * from "./adapters";
 
 export {
   default as Repository,
+  GetManyOptions as RepositoryGetManyOptions,
 } from "./Repository";
 
 export {
