@@ -53,7 +53,7 @@ CanGetAll<Model> {
       entity: historyList,
     } );
 
-    this.#domainMessageBroker.publish(LIST_QUEUE_NAME, event);
+    await this.#domainMessageBroker.publish(LIST_QUEUE_NAME, event);
   }
 
   async #createOneDefaultModelById(id: ModelId): Promise<Model> {
@@ -92,6 +92,6 @@ CanGetAll<Model> {
       entity: historyList,
     } );
 
-    this.#domainMessageBroker.publish(LIST_QUEUE_NAME, event);
+    await this.#domainMessageBroker.publish(LIST_QUEUE_NAME, event);
   }
 }

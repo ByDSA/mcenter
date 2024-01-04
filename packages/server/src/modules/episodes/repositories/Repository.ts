@@ -65,7 +65,7 @@ CanGetAll<Model>
         value: newPath,
       } );
 
-      this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
     }
 
     return ret;
@@ -172,7 +172,7 @@ CanGetAll<Model>
       entity: episode,
     } );
 
-    this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
 
     return this.getOneById(fullId);
   }
@@ -194,7 +194,7 @@ CanGetAll<Model>
         value,
       } );
 
-      this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
     }
 
     return this.getOneById(fullId);
@@ -210,7 +210,7 @@ CanGetAll<Model>
         entity: model,
       } );
 
-      this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
     }
 
     return ret;

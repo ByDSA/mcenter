@@ -1,13 +1,13 @@
 import { SerieRepository } from "#modules/series";
+import { StreamRepository } from "#modules/streams";
 import { FullResponse, LogElementResponse } from "#shared/utils/http";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
-import SerieRelationshipWithStreamFixer from "./SerieRelationshipWithStreamFixer";
 
 const DepsMap = {
   serieRepository: SerieRepository,
-  serieRelationshipWithStreamFixer: SerieRelationshipWithStreamFixer,
+  streamRepository: StreamRepository,
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
@@ -37,7 +37,7 @@ export default class FixerController implements Controller {
     const promises: Promise<LogElementResponse | null>[] = [];
 
     for (const serie of series) {
-      const promise = this.#deps.serieRelationshipWithStreamFixer.fixDefaultStreamForSerie(serie.id);
+      const promise = this.#deps.streamRepository.fixDefaultStreamForSerie(serie.id);
 
       promises.push(promise);
     }

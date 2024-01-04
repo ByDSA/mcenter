@@ -44,6 +44,6 @@ implements CanCreateOneBySuperId<Entry, ModelId> {
       entity: entry,
     } );
 
-    this.#domainMessageBroker.publish(ENTRY_QUEUE_NAME, event);
+    await this.#domainMessageBroker.publish(ENTRY_QUEUE_NAME, event);
   }
 }

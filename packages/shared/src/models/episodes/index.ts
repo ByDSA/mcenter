@@ -13,3 +13,7 @@ export {
 export {
   FileInfoVideo as EpisodeFileInfo, assertIsFileInfoVideo as assertIsEpisodeFileInfo,
 } from "./fileinfo";
+
+export {
+  QUEUE_NAME as EPISODES_QUEUE_NAME,
+} from "./events";

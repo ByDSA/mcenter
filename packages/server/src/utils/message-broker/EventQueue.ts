@@ -8,8 +8,14 @@ export default class EventQueue {
     this.#consumers = [];
   }
 
-  publish(event: Event<any>): Promise<void> {
-    this.#consumers.forEach(consumer => consumer(event));
+  async publish(event: Event<any>): Promise<void> {
+    const promises: Promise<void>[] = [];
+
+    this.#consumers.forEach(consumer => {
+      promises.push(consumer(event));
+    } );
+
+    await Promise.all(promises);
 
     return Promise.resolve();
   }
