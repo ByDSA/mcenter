@@ -3,7 +3,7 @@ import { assertIsDefined } from "#shared/utils/validation";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Server as HttpServer } from "node:http";
 import { Server, Socket } from "socket.io";
-import VlcBackWebSocketsServerService from "./vlc-back-service/VlcBackWebSocketsServerService";
+import { VlcBackWebSocketsServerService } from "./vlc-back-service";
 
 const DepsMap = {
 };
