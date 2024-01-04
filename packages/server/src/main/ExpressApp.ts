@@ -3,6 +3,7 @@ import { EpisodePickerController, EpisodePickerService } from "#modules/episode-
 import { EpisodeRestController } from "#modules/episodes";
 import { HistoryListRestController } from "#modules/historyLists";
 import { MusicController } from "#modules/musics";
+import mediaServer from "#modules/musics/MediaServer";
 import { PlaySerieController, PlayStreamController } from "#modules/play";
 import { StreamRestController } from "#modules/streams";
 import { ForbiddenError } from "#shared/utils/http";
@@ -20,7 +21,6 @@ import { execSync } from "node:child_process";
 import fs from "node:fs";
 import { Server } from "node:http";
 import serveIndex from "serve-index";
-import mediaServer from "../modules/musics/MediaServer";
 
 export type ExpressAppDependencies = {
   db: {

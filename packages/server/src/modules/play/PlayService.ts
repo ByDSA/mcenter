@@ -29,7 +29,7 @@ export default class PlayService {
   async play( {episodes, force}: PlayParams): Promise<boolean> {
     assertIsNotEmpty(episodes);
 
-    this.#deps.playerWebSocketsServerService.playResource( {
+    await this.#deps.playerWebSocketsServerService.playResource( {
       resources: episodes,
       force,
     } );

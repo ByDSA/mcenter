@@ -29,7 +29,6 @@ import { ExpressApp, RealMongoDatabase } from "./main";
     .registerSingleton(HistoryListService)
 
     .registerSingleton(VlcBackWebSocketsServerService)
-
     .registerSingleton(RemotePlayerWebSocketsServerService)
 
     .registerSingleton(RemotePlayerController)

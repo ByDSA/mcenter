@@ -5,10 +5,8 @@ import { Server as HttpServer } from "node:http";
 import { Server, Socket } from "socket.io";
 import RemoteFrontPlayerWebSocketsServerService from "../RemoteFrontPlayerWebSocketsServerService";
 
-type StartSocketParams = {
-  remoteFrontPlayerWebSocketsServerService: RemoteFrontPlayerWebSocketsServerService;
-};
 const DepsMap = {
+  remoteFrontPlayerWebSocketsServerService: RemoteFrontPlayerWebSocketsServerService,
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
@@ -22,27 +20,23 @@ export default class WSService implements PlayerActions {
 
   #httpServer: HttpServer | undefined;
 
-  setHttpServer(httpServer: HttpServer) {
-    this.#httpServer = httpServer;
-  }
-
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
 
-    // setTimeout(this.startSocket.bind(this), 0); // Porque sino intenta acceder síncronamente a 'app.httpServer' antes de que se haya creado
+    this.#deps.remoteFrontPlayerWebSocketsServerService.setVlcBackService(this);
   }
 
-  startSocket( {remoteFrontPlayerWebSocketsServerService}: StartSocketParams) {
+  setHttpServer(httpServer: HttpServer) {
+    this.#httpServer = httpServer;
+
+    this.#startSocket();
+
+    this.#deps.remoteFrontPlayerWebSocketsServerService.setHttpServer(httpServer);
+  }
+
+  #startSocket() {
     if (this.#io)
       return;
-
-    if (!this.#httpServer) {
-      setTimeout(() => this.startSocket( {
-        remoteFrontPlayerWebSocketsServerService,
-      } ), 100);
-
-      return;
-    }
 
     this.#io = new Server(this.#httpServer, {
       path: "/ws-vlc/",
@@ -62,7 +56,7 @@ export default class WSService implements PlayerActions {
       } );
 
       socket.on(PlayerEvent.STATUS, (status) => {
-        remoteFrontPlayerWebSocketsServerService.emitStatus(status);
+        this.#deps.remoteFrontPlayerWebSocketsServerService.emitStatus(status);
 
         this.#lastStatus = status;
       } );

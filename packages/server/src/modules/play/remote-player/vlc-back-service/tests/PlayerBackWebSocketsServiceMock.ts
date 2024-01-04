@@ -2,7 +2,7 @@ import { PublicMethodsOf } from "#shared/utils/types";
 import { VlcBackWebSocketsServerService } from "..";
 
 export default class PlayerBackWebSocketsServiceMock implements PublicMethodsOf<VlcBackWebSocketsServerService> {
-  startSocket = jest.fn();
+  #startSocket = jest.fn();
 
   pauseToggle = jest.fn();
 
