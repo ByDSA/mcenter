@@ -1,167 +1,65 @@
-import ActionController from "#modules/actions/ActionController";
-import EpisodesUpdateLastTimePlayedController from "#modules/actions/EpisodesUpdateLastTimePlayedController";
-import FixerController from "#modules/actions/FixerController";
+import "reflect-metadata";
+
+import { ActionController } from "#modules/actions";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { EpisodeAddNewFileInfosController, EpisodeFileInfoRepository, EpisodePickerService, EpisodeRepository, EpisodeRestController, EpisodeUpdateFileInfoController, SavedSerieTreeService } from "#modules/episodes";
-import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
+import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
+import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController, SavedSerieTreeService } from "#modules/episodes";
+import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
-import { MusicController, MusicRepository } from "#modules/musics";
-import FixController from "#modules/musics/controllers/FixController";
-import GetController from "#modules/musics/controllers/GetController";
-import UpdateRemoteController from "#modules/musics/controllers/UpdateRemoteController";
-import { PickerController } from "#modules/picker";
-import { PlaySerieController, PlayService, PlayStreamController, RemotePlayerController } from "#modules/play";
-import { RemoteFrontPlayerWebSocketsServerService } from "#modules/play/remote-player";
-import { VlcBackWebSocketsServerService } from "#modules/play/remote-player/vlc-back-service";
-import { SerieRelationshipWithStreamFixer, SerieRepository } from "#modules/series";
-import { StreamRepository, StreamRestController } from "#modules/streams";
-import { Server } from "http";
-import { ExpressApp } from "./main";
-import RealDatabase from "./main/db/Database";
+import { MusicController } from "#modules/musics";
+import { PlaySerieController, PlayStreamController, RemotePlayerController, RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
+import { SerieRepository } from "#modules/series";
+import { StreamRestController } from "#modules/streams";
+import { container } from "tsyringe";
+import { ExpressApp, RealMongoDatabase } from "./main";
 
 (async function main() {
-  const domainMessageBroker = new DomainMessageBroker();
+  container
+    .registerSingleton(DomainMessageBroker)
+    .registerSingleton(EpisodeFileInfoRepository)
+    .registerSingleton(EpisodeRepository)
+    .registerSingleton(EpisodePickerService)
 
-  DomainMessageBroker.setSingleton(domainMessageBroker);
-  const streamRepository = new StreamRepository();
-  const historyListRepository = new HistoryListRepository();
-  const serieRelationshipWithStreamFixer = new SerieRelationshipWithStreamFixer( {
-    streamRepository,
-  } );
-  const serieRepository = new SerieRepository( {
-    relationshipWithStreamFixer: serieRelationshipWithStreamFixer,
-  } );
-  const episodeRepository = new EpisodeRepository( {
-    domainMessageBroker,
-  } );
-  const historyListService = new HistoryListService( {
-    episodeRepository,
-    historyListRepository,
-    historyEntryRepository: new HistoryEntryRepository(),
-  } );
-  const getHttpServer = () => app.httpServer as Server;
-  const vlcBackWebSocketsServerService = new VlcBackWebSocketsServerService( {
-    getHttpServer,
-  } );
-  const playService = new PlayService( {
-    playerWebSocketsServerService: vlcBackWebSocketsServerService,
-  } );
-  const playSerieController = new PlaySerieController( {
-    serieRepository,
-    episodeRepository,
-    playService,
-    historyListService,
-  } );
-  const episodePickerService = new EpisodePickerService( {
-    episodeRepository,
-    historyListRepository,
-    streamRepository,
-  } );
-  const playStreamController = new PlayStreamController( {
-    playService,
-    streamRepository,
-    episodePickerService,
-    historyListService,
-  } );
-  const fixerController = new FixerController( {
-    episodeRepository,
-    serieRepository,
-    streamRepository,
-    serieRelationshipWithStreamFixer,
-  } );
-  const episodeFileInfoRepository = new EpisodeFileInfoRepository();
-  const lastTimePlayedService = new LastTimePlayedService( {
-    domainMessageBroker,
-    episodeRepository,
-  } );
-  const musicRepository = new MusicRepository();
-  const musicController = new MusicController( {
-    fixController: new FixController( {
-      musicRepository,
-    } ),
-    getController: new GetController( {
-      musicRepository,
-    } ),
-    updateRemoteController: new UpdateRemoteController( {
-      musicRepository,
-    } ),
-  } );
+    .registerSingleton(SerieRepository)
+    .registerSingleton(SavedSerieTreeService)
+
+    .registerSingleton(HistoryEntryRepository)
+    .registerSingleton(HistoryListRepository)
+    .registerSingleton(HistoryListService)
+
+    .registerSingleton(VlcBackWebSocketsServerService)
+    .registerSingleton(RemotePlayerWebSocketsServerService)
+
+    .registerSingleton(RemotePlayerController)
+    .registerSingleton(PlaySerieController)
+    .registerSingleton(EpisodeRestController)
+    .registerSingleton(MusicController)
+    .registerSingleton(StreamRestController)
+    .registerSingleton(StreamRestController)
+    .registerSingleton(EpisodeAddNewFilesController)
+    .registerSingleton(ActionController)
+    .registerSingleton(HistoryListService)
+    .registerSingleton(PlayStreamController)
+    .registerSingleton(EpisodePickerController)
+    .registerSingleton(HistoryListRestController);
+
   const app: ExpressApp = new ExpressApp( {
     db: {
-      instance: new RealDatabase(),
-    },
-    modules: {
-      domainMessageBroker: {
-        instance: domainMessageBroker,
-      },
-      play: {
-        playSerieController,
-        playStreamController,
-        remotePlayer:
-        {
-          controller: new RemotePlayerController( {
-            remotePlayerService: vlcBackWebSocketsServerService,
-          } ),
-          webSocketsService: new RemoteFrontPlayerWebSocketsServerService( {
-            vlcBackService: vlcBackWebSocketsServerService,
-            getHttpServer,
-          } ),
-        },
-      },
-      picker: {
-        controller: new PickerController( {
-          domainMessageBroker,
-        } ),
-      },
-      actionController: new ActionController( {
-        episodesUpdateLastTimePlayedController: new EpisodesUpdateLastTimePlayedController( {
-          lastTimePlayedService,
-          episodeRepository,
-          historyListRepository,
-          serieRepository,
-          streamRepository,
-        } ),
-        episodesUpdateFileInfoController: new EpisodeUpdateFileInfoController( {
-          savedSerieTreeService: new SavedSerieTreeService( {
-            episodeRepository,
-            serieRepository,
-          } ),
-          episodeFileRepository: episodeFileInfoRepository,
-        } ),
-        episodesAddNewFilesController: new EpisodeAddNewFileInfosController( {
-          domainMessageBroker,
-        } ),
-        fixerController,
-      } ),
-      historyList: {
-        restController: new HistoryListRestController( {
-          historyListRepository,
-          episodeRepository,
-          serieRepository,
-          lastTimePlayedService,
-        } ),
-      },
-      streams: {
-        restController: new StreamRestController( {
-          streamRepository,
-          serieRepository,
-          historyListRepository,
-        } ),
-      },
-      episodes: {
-        restController: new EpisodeRestController( {
-          episodeRepository,
-          serieRepo: serieRepository,
-        } ),
-      },
-      musics: {
-        controller: musicController,
-      },
+      instance: new RealMongoDatabase(),
     },
     controllers: {
       cors: true,
     },
   } );
+  const vlcBackWebSocketsServerService = container.resolve(VlcBackWebSocketsServerService);
+  const remotePlayerWebSocketsServerService = container.resolve(RemotePlayerWebSocketsServerService);
+
+  app.onHttpServerListen((server) => {
+    vlcBackWebSocketsServerService.startSocket(server);
+    remotePlayerWebSocketsServerService.startSocket(server);
+  } );
+
+  container.registerInstance(ExpressApp, app);
 
   await app.init();
   app.listen();

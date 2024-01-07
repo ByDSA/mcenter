@@ -12,5 +12,5 @@ export {
 } from "./web-sockets";
 
 export {
-  default as Player, PlayerActions, PlayerActionsReceiver,
+  default as Player, PlayerActions,
 } from "./Player";

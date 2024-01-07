@@ -6,4 +6,5 @@ export {
 
 export {
   default as Repository,
+  FindParams as RepositoryFindParams,
 } from "./Repository";

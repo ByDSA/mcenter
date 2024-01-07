@@ -1,5 +1,5 @@
 export {
-  Model as Stream, ModelId as StreamId, Mode as StreamMode, assertIsModel as assertIsStream,
+  OriginType, Model as Stream, ModelId as StreamId, Mode as StreamMode, assertIsModel as assertIsStream,
 } from "./models";
 
 export {

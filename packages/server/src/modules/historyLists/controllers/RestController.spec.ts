@@ -1,11 +1,12 @@
-import { EpisodeRepositoryMock } from "#modules/episodes/repositories/tests";
-import { LastTimePlayedServiceMock } from "#modules/episodes/tests";
-import { SerieRepositoryMock } from "#modules/series/repositories/tests";
 import HttpStatusCode from "#shared/utils/http/StatusCode";
+import { registerSingletonIfNotAndGet } from "#tests/main";
 import { HISTORY_LIST_SIMPSONS, HISTORY_LIST_WITH_NO_ENTRIES } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
+import { resolveRequired } from "#utils/layers/deps";
 import { Application } from "express";
 import request from "supertest";
+import { container } from "tsyringe";
+import { ListRepository as HistoryListRepository } from "../repositories";
 import { HistoryListRepositoryMock } from "../repositories/tests";
 import RestController from "./RestController";
 
@@ -14,13 +15,10 @@ describe("RestController", () => {
   let historyListRepositoryMock: HistoryListRepositoryMock;
 
   beforeAll(async () => {
-    historyListRepositoryMock = new HistoryListRepositoryMock();
-    const controller = new RestController( {
-      historyListRepository: historyListRepositoryMock,
-      serieRepository: new SerieRepositoryMock(),
-      episodeRepository: new EpisodeRepositoryMock(),
-      lastTimePlayedService: new LastTimePlayedServiceMock(),
-    } );
+    registerSingletonIfNotAndGet(HistoryListRepository, HistoryListRepositoryMock);
+    historyListRepositoryMock = resolveRequired(HistoryListRepository) as HistoryListRepositoryMock;
+    container.registerSingleton(RestController);
+    const controller = resolveRequired(RestController);
 
     routerApp = RouterApp(controller.getRouter());
   } );

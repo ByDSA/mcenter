@@ -23,16 +23,10 @@ module.exports = {
       {
         allow: [
           "*modules/*",
-          "**/repository/odm/**",
           "*modules/utils/**",
           "*utils/**",
-          "*modules/time/*",
-          "**/src/actions/**",
-          "**/src/db/**",
-          "**/src/backup/**",
-          "*modules/series/*",
-          "*modules/**/routes",
-          "**", // provisional
+          "*shared/utils/**",
+          "*shared/models/*",
         ],
       },
     ],
@@ -247,6 +241,26 @@ module.exports = {
     "linebreak-style": ["error", "unix"],
   },
   overrides: [
+    {
+      files: ["*.spec.ts", "**/test/**/*.ts", "**/tests/**/*.ts"],
+      rules: {
+        "import/no-internal-modules": [
+          "error",
+          {
+            allow: [
+              "*modules/*",
+              "**/repositories/*",
+              "*modules/utils/**",
+              "*utils/**",
+              "*shared/utils/**",
+              "*shared/models/*",
+              "**/test/**",
+              "**/tests/**",
+            ],
+          },
+        ],
+      },
+    },
     {
       files: [
         "*{s,S}ervice*.{ts,js}",

@@ -6,4 +6,6 @@ export default class PlayStreamControllerMock implements PublicMethodsOf<PlayStr
   playStream = jest.fn();
 
   getRouter = getRouterMock;
+
+  setHttpServer = jest.fn();
 }

@@ -1,8 +1,4 @@
 export {
-  EpisodePickerService,
-} from "./EpisodePicker";
-
-export {
   Model as Episode, ModelId as EpisodeId, ModelIdSchema as EpisodeIdSchema, ModelSchema as EpisodeSchema, assertIsModel as assertIsEpisode, compareId as compareEpisodeId,
 } from "./models";
 
@@ -11,17 +7,20 @@ export {
 } from "./repositories";
 
 export {
-  PickerController as EpisodePickerController, RestController as EpisodeRestController,
+  RestController as EpisodeRestController,
 } from "./controllers";
 
 export {
-  AddNewFileInfosController as EpisodeAddNewFileInfosController, FileInfoRepository as EpisodeFileInfoRepository, UpdateFileInfoController as EpisodeUpdateFileInfoController,
-} from "./file-info";
-
-export {
-  SavedSerieTreeService,
-} from "./saved-serie-tree-service";
-
-export {
   QUEUE_NAME as EPISODE_QUEUE_NAME,
+  RepositoryGetManyOptions,
 } from "./repositories";
+
+export {
+  AddNewFilesController as EpisodeAddNewFilesController,
+} from "./add-new-files";
+
+export {
+  UpdateController as EpisodeUpdateController,
+} from "./update";
+
+export * from "./saved-serie-tree-service";

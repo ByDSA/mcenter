@@ -1,5 +1,5 @@
-import { Episode, assertIsEpisode } from "#shared/models/episodes";
 import { UpdateQuery } from "mongoose";
+import { Model as Episode, assertIsModel as assertIsEpisode } from "../models";
 import { DocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {

@@ -1,43 +1,34 @@
 import { EpisodeRepository } from "#modules/episodes";
-import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
-import { HistoryListRepository } from "#modules/historyLists";
+import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
 import { Controller, SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 
-type Params = {
-  lastTimePlayedService: LastTimePlayedService;
-  serieRepository: SerieRepository;
-  episodeRepository: EpisodeRepository;
-  historyListRepository: HistoryListRepository;
-  streamRepository: StreamRepository;
+const DepsMap = {
+  lastTimePlayedService: LastTimePlayedService,
+  serieRepository: SerieRepository,
+  episodeRepository: EpisodeRepository,
+  historyListRepository: HistoryListRepository,
+  streamRepository: StreamRepository,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class EpisodesUpdateLastTimePlayedController implements Controller {
-  #lastTimePlayedService: LastTimePlayedService;
+  #deps: Deps;
 
-  #serieRepository: SerieRepository;
-
-  #episodeRepository: EpisodeRepository;
-
-  #historyListRepository: HistoryListRepository;
-
-  #streamRepository: StreamRepository;
-
-  constructor( {lastTimePlayedService, serieRepository, episodeRepository, historyListRepository, streamRepository}: Params) {
-    this.#lastTimePlayedService = lastTimePlayedService;
-    this.#serieRepository = serieRepository;
-    this.#episodeRepository = episodeRepository;
-    this.#historyListRepository = historyListRepository;
-    this.#streamRepository = streamRepository;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async #action(req: Request, res: Response): Promise<void> {
-    const series = await this.#serieRepository.getAll();
+    const series = await this.#deps.serieRepository.getAll();
     const promisesToAwait = [];
 
     for (const serie of series) {
-      const promise = this.#streamRepository.getManyBySerieId(serie.id).then(async streams => {
+      const promise = this.#deps.streamRepository.getManyBySerieId(serie.id).then(async streams => {
         const stream = streams[0];
 
         if (!stream) {
@@ -46,11 +37,11 @@ export default class EpisodesUpdateLastTimePlayedController implements Controlle
           return;
         }
 
-        const historyList = await this.#historyListRepository.getOneByIdOrCreate(stream.id);
+        const historyList = await this.#deps.historyListRepository.getOneByIdOrCreate(stream.id);
 
-        await this.#episodeRepository.getAllBySerieId(serie.id).then(episodes => {
+        await this.#deps.episodeRepository.getAllBySerieId(serie.id).then(episodes => {
           for (const episode of episodes) {
-            const updatePromise = this.#lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
+            const updatePromise = this.#deps.lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
               episodeId: episode.id,
               entries: historyList.entries,
             } );

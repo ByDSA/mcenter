@@ -1,14 +1,60 @@
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#modules/series";
-import { Stream, StreamMode } from "#modules/streams";
+import { SERIES_QUEUE_NAME, assertIsSerie } from "#shared/models/series";
+import { LogElementResponse } from "#shared/utils/http";
+import { EventType } from "#utils/event-sourcing";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
-import { Model, ModelId, OriginType } from "../models";
+import { Event } from "#utils/message-broker";
+import { Mode, Model, ModelId, OriginType } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 
+const DepsMap = {
+  domainMessageBroker: DomainMessageBroker,
+};
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class Repository
 implements CanGetOneById<Model, ModelId>,
 CanUpdateOneById<Model, ModelId>,
 CanCreateOne<Model>, CanGetAll<Model> {
+  #deps: Deps;
+
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
+
+    this.#deps.domainMessageBroker.subscribe(SERIES_QUEUE_NAME, async (event: Event<any>) => {
+      logDomainEvent(SERIES_QUEUE_NAME, event);
+
+      if (event.type === EventType.CREATED) {
+        const serie = event.payload.entity;
+
+        assertIsSerie(serie);
+        await this.fixDefaultStreamForSerie(serie.id);
+      }
+
+      return Promise.resolve();
+    } );
+  }
+
+  async fixDefaultStreamForSerie(serieId: SerieId): Promise<LogElementResponse | null> {
+    const hasDefault = await this.hasDefaultForSerie(serieId);
+
+    if (!hasDefault) {
+      await this.createDefaultFromSerie(serieId);
+
+      return {
+        message: `Created default stream for serie ${serieId}`,
+        type: "StreamCreated",
+      };
+    }
+
+    return null;
+  }
+
   async getAll(): Promise<Model[]> {
     const allStreamsDocOdm = await this.#getAllDocOdm();
 
@@ -36,7 +82,7 @@ CanCreateOne<Model>, CanGetAll<Model> {
   }
 
   async createDefaultFromSerie(serieId: SerieId): Promise<void> {
-    const stream: Stream = {
+    const stream: Model = {
       group: {
         origins: [
           {
@@ -45,7 +91,7 @@ CanCreateOne<Model>, CanGetAll<Model> {
           },
         ],
       },
-      mode: StreamMode.SEQUENTIAL,
+      mode: Mode.SEQUENTIAL,
       id: serieId,
     };
 
@@ -72,7 +118,6 @@ CanCreateOne<Model>, CanGetAll<Model> {
   }
 
   async getOneById(id: ModelId): Promise<Model | null> {
-    console.log(`getting stream by id=${id}`);
     const docOdm = await ModelOdm.findOne( {
       id,
     }, {

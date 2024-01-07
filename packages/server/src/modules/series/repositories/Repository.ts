@@ -1,31 +1,36 @@
-import { deepMerge } from "#shared/utils/objects";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { logDomainEvent } from "#modules/log";
+import { EventType, ModelEvent } from "#utils/event-sourcing";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import { Event } from "#utils/message-broker";
 import { Model, ModelId } from "../models";
-import RelationWithStreamFixer from "./RelationshipWithStreamFixer";
 import { docOdmToModel } from "./adapters";
+import { QUEUE_NAME } from "./events";
 import { DocOdm, ModelOdm } from "./odm";
 
-type CreationOptions = {
-  ignoreStream?: boolean;
-};
-const DEFAULT_CREATION_OPTIONS: Required<CreationOptions> = {
-  ignoreStream: false,
+const DepsMap = {
+  domainMessageBroker: DomainMessageBroker,
 };
 
-type Params = {
-  relationshipWithStreamFixer: RelationWithStreamFixer;
-};
-
-export default class Repository
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
+export default class SeriesRepository
 implements CanGetOneById<Model, ModelId>,
 CanUpdateOneByIdAndGet<Model, ModelId>,
 CanCreateOneAndGet<Model>,
 CanGetAll<Model>
 {
-  #relationshipWithStreamFixer: RelationWithStreamFixer;
+  #deps: Deps;
 
-  constructor( {relationshipWithStreamFixer: relationshipWithStream}: Params) {
-    this.#relationshipWithStreamFixer = relationshipWithStream;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
+
+    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: Event<any>) => {
+      logDomainEvent(QUEUE_NAME, event);
+
+      return Promise.resolve();
+    } );
   }
 
   async getAll(): Promise<Model[]> {
@@ -34,13 +39,14 @@ CanGetAll<Model>
     return seriesDocOdm.map(docOdmToModel);
   }
 
-  async createOneAndGet(model: Model, options: CreationOptions = DEFAULT_CREATION_OPTIONS): Promise<Model> {
-    const actualOptions = deepMerge(DEFAULT_CREATION_OPTIONS, options);
-    const serieOdm: DocOdm = await ModelOdm.create(model).then(s => s.save());
+  async createOneAndGet(model: Model): Promise<Model> {
+    const serieOdm: DocOdm = await ModelOdm.create(model);
     const serie = docOdmToModel(serieOdm);
+    const event = new ModelEvent(EventType.CREATED, {
+      entity: serie,
+    } );
 
-    if (!actualOptions.ignoreStream)
-      await this.#relationshipWithStreamFixer.fixDefaultStreamForSerie(serie.id);
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
 
     return serie;
   }
@@ -68,6 +74,13 @@ CanGetAll<Model>
     if (!docOdm)
       return null;
 
-    return docOdmToModel(docOdm);
+    const ret = docOdmToModel(docOdm);
+    const event = new ModelEvent(EventType.UPDATED, {
+      entity: ret,
+    } );
+
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+
+    return ret;
   }
 }

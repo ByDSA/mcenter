@@ -1,45 +1,45 @@
 import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
 import { logDomainEvent } from "#modules/log";
-import { SerieId } from "#modules/series";
-import { HistoryList } from "#shared/models/historyLists";
+import { SerieId } from "#shared/models/series";
 import { deepMerge } from "#shared/utils/objects";
 import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
-import { EpisodeFileInfoRepository } from "..";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 import { QUEUE_NAME } from "./events";
-import { GetOptions, validateGetOptions } from "./get-options";
-import ExpandEnum from "./get-options/ExpandEnum";
+import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
 import { DocOdm, ModelOdm } from "./odm";
 
 type UpdateOneParams = Model;
-type Dependencies = {
-  domainMessageBroker: DomainMessageBroker;
-};
 
 export type GetManyOptions = {
   sortById?: boolean;
 };
 
-export default class Repository
+const DepsMap = {
+  domainMessageBroker: DomainMessageBroker,
+  episodeFileInfoRepository: EpisodeFileInfoRepository,
+};
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
+export default class EpisodesRepository
 implements CanGetOneById<Model, ModelId>,
 CanUpdateOneByIdAndGet<Model, ModelId>,
 CanPatchOneByIdAndGet<Model, ModelId>,
 CanCreateManyAndGet<Model>,
 CanGetAll<Model>
 {
-  #fileInfoRepository: EpisodeFileInfoRepository;
+  #deps: Deps;
 
-  #domainMessageBroker: DomainMessageBroker;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
 
-  constructor( {domainMessageBroker}: Dependencies) {
-    this.#fileInfoRepository = new EpisodeFileInfoRepository();
-    this.#domainMessageBroker = domainMessageBroker;
-
-    this.#domainMessageBroker.subscribe(QUEUE_NAME, (event: Event<any>) => {
-      logDomainEvent(event);
+    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: Event<any>) => {
+      logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
     } );
@@ -64,7 +64,7 @@ CanGetAll<Model>
         value: newPath,
       } );
 
-      this.#domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
     }
 
     return ret;
@@ -90,20 +90,6 @@ CanGetAll<Model>
     return episodesOdm.map(docOdmToModel);
   }
 
-  async findLastEpisodeInHistoryList(historyList: HistoryList): Promise<Model | null> {
-    const historyEntry = historyList.entries.at(-1);
-
-    if (!historyEntry)
-      return null;
-
-    const {episodeId: fullId} = historyEntry;
-
-    if (!fullId.innerId || !fullId.serieId)
-      return null;
-
-    return this.getOneById(fullId);
-  }
-
   async getOneById(id: ModelId, opts?: GetOptions): Promise<Model | null> {
     validateGetOptions(opts);
     const episodeOdm = await ModelOdm.findOne( {
@@ -118,7 +104,7 @@ CanGetAll<Model>
 
     if (opts?.expand?.includes(ExpandEnum.FileInfo)) {
       const _id = episodeOdm._id?.toString();
-      const fileInfo = await this.#fileInfoRepository.getAllBySuperId(_id);
+      const fileInfo = await this.#deps.episodeFileInfoRepository.getAllBySuperId(_id);
 
       if (!fileInfo)
         throw new Error("Episode has no file info");
@@ -184,7 +170,7 @@ CanGetAll<Model>
       entity: episode,
     } );
 
-    this.#domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
 
     return this.getOneById(fullId);
   }
@@ -206,7 +192,7 @@ CanGetAll<Model>
         value,
       } );
 
-      this.#domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
     }
 
     return this.getOneById(fullId);
@@ -222,7 +208,7 @@ CanGetAll<Model>
         entity: model,
       } );
 
-      this.#domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
     }
 
     return ret;

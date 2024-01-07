@@ -3,5 +3,5 @@ export {
 } from "./files.find";
 
 export {
-  findAllValidMusicFiles,
+  AUDIO_EXTENSIONS, findAllValidMusicFiles,
 } from "./files.music";

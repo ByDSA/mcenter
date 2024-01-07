@@ -1,14 +1,13 @@
 import { parseMusic } from "#shared/models/musics";
+import { registerSingletonIfNotAndGet } from "#tests/main";
 import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
+import { Repository } from "../repositories";
 import { MUSICS_SAMPLES_IN_DISK, RepositoryMock } from "../repositories/tests";
-import { UpdateResult } from "../services/update-remote-tree";
+import { UpdateResult } from "../services";
 import { ENVS } from "../utils";
 import Controller from "./Controller";
-import FixController from "./FixController";
-import GetController from "./GetController";
-import UpdateRemoteController from "./UpdateRemoteController";
 
 describe("GetAll", () =>{
   let routerApp: Application;
@@ -16,20 +15,8 @@ describe("GetAll", () =>{
   let controller: Controller;
 
   beforeAll(() => {
-    musicRepositoryMock = new RepositoryMock();
-    const getController = new GetController( {
-      musicRepository: musicRepositoryMock,
-    } );
-
-    controller = new Controller( {
-      fixController: new FixController( {
-        musicRepository: musicRepositoryMock,
-      } ),
-      updateRemoteController: new UpdateRemoteController( {
-        musicRepository: musicRepositoryMock,
-      } ),
-      getController,
-    } );
+    musicRepositoryMock = registerSingletonIfNotAndGet(Repository, RepositoryMock) as RepositoryMock;
+    controller = registerSingletonIfNotAndGet(Controller);
 
     routerApp = RouterApp(controller.getRouter());
   } );

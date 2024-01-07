@@ -1,16 +1,14 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { EpisodePickerController } from "#modules/episode-picker";
 import { assertIsDefined } from "#shared/utils/validation";
+import { registerSingletonIfNotAndGet } from "#tests/main";
 import ExpressAppMock from "#tests/main/ExpressAppMock";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
-import PickerController from "../episodes/controllers/PickerController";
 
 let app: ExpressAppMock;
-const pickerController = new PickerController( {
-  domainMessageBroker: new DomainMessageBroker(),
-} );
+const pickerController = registerSingletonIfNotAndGet(EpisodePickerController);
 
 async function loadFixtures() {
   await app.dropDb();
@@ -18,16 +16,7 @@ async function loadFixtures() {
 }
 
 describe("showPicker", () => {
-  app = new ExpressAppMock( {
-    modules: {
-      picker: {
-        controller: pickerController,
-      },
-    },
-    controllers: {
-      cors: false,
-    },
-  } );
+  app = new ExpressAppMock();
   let expressApp: Application | null = null;
 
   beforeAll(async () => {

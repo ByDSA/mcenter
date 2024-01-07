@@ -4,6 +4,4 @@ export {
   ExpressApp,
 };
 
-export {
-  Options as DatabaseOptions, default as RealMongoDatabase,
-} from "./db/Database";
+export * from "./db";

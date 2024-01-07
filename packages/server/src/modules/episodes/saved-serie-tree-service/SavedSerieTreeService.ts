@@ -1,31 +1,31 @@
+import { SerieFolderTree as SerieTree } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
-import { SerieFolderTree } from "../file-info";
-import { SerieTree } from "../file-info/tree/models";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Model as Episode } from "../models";
 import { Repository as EpisodeRepository } from "../repositories";
 import { putModelInSerieFolderTree } from "./adapters";
 
-type Params = {
-  episodeRepository: EpisodeRepository;
-  serieRepository: SerieRepository;
+const DepsMap = {
+  episodeRepository: EpisodeRepository,
+  serieRepository: SerieRepository,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class Service {
-  #episodeRepository: EpisodeRepository;
+  #deps: Deps;
 
-  #serieRepository: SerieRepository;
-
-  constructor( {episodeRepository, serieRepository}: Params) {
-    this.#episodeRepository = episodeRepository;
-    this.#serieRepository = serieRepository;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async getSavedSeriesTree(): Promise<SerieTree> {
-    const serieFolderTree: SerieFolderTree = {
+    const serieFolderTree: SerieTree = {
       children: [],
     };
-    const series = await this.#serieRepository.getAll();
+    const series = await this.#deps.serieRepository.getAll();
     const episodesOfSeriePromises = series.map(async serie => {
-      const serieEpisodes = await this.#episodeRepository.getAllBySerieId(serie.id);
+      const serieEpisodes = await this.#deps.episodeRepository.getAllBySerieId(serie.id);
 
       return serieEpisodes;
     } );

@@ -1,51 +1,42 @@
 import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#modules/episodes";
-import LastTimePlayedService from "#modules/episodes/LastTimePlayedService";
 import { SerieRepository } from "#modules/series";
 import {HistoryListDeleteOneEntryByIdRequest, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
   HistoryListGetOneByIdRequest} from "#shared/models/historyLists";
 import { assertFound } from "#shared/utils/http/validation";
-import { PublicMethodsOf } from "#shared/utils/types";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import express, { Request, Response, Router } from "express";
+import LastTimePlayedService from "../LastTimePlayedService";
 import { Entry, EntryWithId, Model, assertIsEntryWithId } from "../models";
 import { ListRepository } from "../repositories";
 import {deleteOneEntryByIdValidation, getManyEntriesBySearchValidation,
   getManyEntriesBySuperIdValidation,
   getOneByIdValidation} from "./validation";
 
-type Params = {
-  historyListRepository: PublicMethodsOf<ListRepository>;
-  serieRepository: PublicMethodsOf<SerieRepository>;
-  episodeRepository: PublicMethodsOf<EpisodeRepository>;
-  lastTimePlayedService: PublicMethodsOf<LastTimePlayedService>;
+const DepsMap = {
+  historyListRepository: ListRepository,
+  serieRepository: SerieRepository,
+  episodeRepository: EpisodeRepository,
+  lastTimePlayedService: LastTimePlayedService,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class RestController
 implements
     Controller,
     CanGetOneById<HistoryListGetOneByIdRequest, Response>,
     CanGetAll<Request, Response>
 {
-  #historyListRepository: PublicMethodsOf<ListRepository>;
+  #deps: Deps;
 
-  #serieRepository: PublicMethodsOf<SerieRepository>;
-
-  #episodeRepository: PublicMethodsOf<EpisodeRepository>;
-
-  #lastTimePlayedService: PublicMethodsOf<LastTimePlayedService>;
-
-  constructor( {historyListRepository,
-    episodeRepository,
-    serieRepository,
-    lastTimePlayedService}: Params) {
-    this.#historyListRepository = historyListRepository;
-    this.#serieRepository = serieRepository;
-    this.#episodeRepository = episodeRepository;
-    this.#lastTimePlayedService = lastTimePlayedService;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async getAll(_: Request, res: Response): Promise<void> {
-    const got = this.#historyListRepository.getAll();
+    const got = this.#deps.historyListRepository.getAll();
 
     res.send(got);
   }
@@ -54,7 +45,7 @@ implements
     req: HistoryListGetOneByIdRequest,
   ): Promise<Model> {
     const { id } = req.params;
-    const got = await this.#historyListRepository.getOneByIdOrCreate(id);
+    const got = await this.#deps.historyListRepository.getOneByIdOrCreate(id);
 
     assertFound(got);
 
@@ -125,7 +116,7 @@ implements
       if (body.expand.includes("series")) {
         const promises = newEntries.map(async (entry) => {
           const { episodeId: {serieId} } = entry;
-          const serie = await this.#serieRepository.getOneById(serieId);
+          const serie = await this.#deps.serieRepository.getOneById(serieId);
 
           if (serie)
             // eslint-disable-next-line no-param-reassign
@@ -140,7 +131,7 @@ implements
       if (body.expand.includes("episodes")) {
         const promises = newEntries.map(async (entry) => {
           const { episodeId: {innerId, serieId} } = entry;
-          const episode = await this.#episodeRepository.getOneById( {
+          const episode = await this.#deps.episodeRepository.getOneById( {
             innerId,
             serieId,
           }, {
@@ -177,7 +168,7 @@ implements
     req: HistoryListGetManyEntriesBySearchRequest,
     res: Response,
   ): Promise<void> {
-    const got = await this.#historyListRepository.getAll();
+    const got = await this.#deps.historyListRepository.getAll();
     let entries: EntryWithId[] = [];
 
     for (const historyList of got)
@@ -193,7 +184,7 @@ implements
     res: Response,
   ): Promise<void> {
     const {id, entryId} = req.params;
-    const historyList = await this.#historyListRepository.getOneByIdOrCreate(id);
+    const historyList = await this.#deps.historyListRepository.getOneByIdOrCreate(id);
 
     assertFound(historyList);
 
@@ -205,9 +196,9 @@ implements
 
     assertIsEntryWithId(deleted);
 
-    await this.#historyListRepository.updateOneById(historyList.id, historyList);
+    await this.#deps.historyListRepository.updateOneById(historyList.id, historyList);
 
-    this.#lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
+    this.#deps.lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
       episodeId: deleted.episodeId,
       entries: historyList.entries,
     } );

@@ -1,25 +1,23 @@
-/* eslint-disable no-use-before-define */
-import { PublicMethodsOf } from "#shared/utils/types";
 import { SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
-import { MusicRepository } from "..";
-import { UpdateRemoteTreeService } from "../services/update-remote-tree";
+import { UpdateRemoteTreeService } from "../services";
 
-type Params = {
-  musicRepository: MusicRepository;
+const DepsMap = {
+  updateRemoteTreeService: UpdateRemoteTreeService,
 };
-export default class FixController {
-  #musicRepository: PublicMethodsOf<MusicRepository>;
 
-  constructor( { musicRepository }: Params) {
-    this.#musicRepository = musicRepository;
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
+export default class UpdateRemoteController {
+  #deps: Deps;
+
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async all(_: Request, res: Response) {
-    const updateRemoteTreeService = new UpdateRemoteTreeService( {
-      musicRepository: this.#musicRepository,
-    } );
-    const ret = await updateRemoteTreeService.update();
+    const ret = await this.#deps.updateRemoteTreeService.update();
 
     res.send(ret);
   }

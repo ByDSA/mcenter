@@ -1,14 +1,14 @@
-import { EpisodeRepository } from "#modules/episodes";
 import { SerieRepository } from "#modules/series";
 import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest } from "#shared/models/episodes";
 import { Serie } from "#shared/models/series";
 import { assertFound } from "#shared/utils/http/validation";
-import { PublicMethodsOf } from "#shared/utils/types";
 import { neverCase } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import express, { Response, Router } from "express";
 import { Model } from "../models";
+import { Repository as EpisodeRepository } from "../repositories";
 import {getAllValidation,
   getManyBySearchValidation,
   getOneByIdValidation,
@@ -18,10 +18,13 @@ enum ResourceType {
   SERIES = "series",
 }
 
-type Params = {
-  episodeRepository: PublicMethodsOf<EpisodeRepository>;
-  serieRepo: PublicMethodsOf<SerieRepository>;
+const DepsMap = {
+  episodeRepository: EpisodeRepository,
+  serieRepo: SerieRepository,
 };
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
 export default class RestController
 implements
     Controller,
@@ -29,13 +32,10 @@ implements
     CanGetAll<EpisodeGetAllRequest, Response>,
     CanPatchOneByIdAndGet<EpisodePatchOneByIdRequest, Response>
 {
-  #episodeRepository: PublicMethodsOf<EpisodeRepository>;
+  #deps: Deps;
 
-  #serieRepo: PublicMethodsOf<SerieRepository>;
-
-  constructor( {episodeRepository, serieRepo}: Params) {
-    this.#episodeRepository = episodeRepository;
-    this.#serieRepo = serieRepo;
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
   }
 
   async patchOneByIdAndGet(req: EpisodePatchOneByIdRequest, res: Response<any, Record<string, any>>): Promise<void> {
@@ -45,7 +45,7 @@ implements
       innerId: episodeId,
       serieId,
     };
-    const got = await this.#episodeRepository.patchOneByIdAndGet(id, episodePartial);
+    const got = await this.#deps.episodeRepository.patchOneByIdAndGet(id, episodePartial);
 
     assertFound(got);
 
@@ -54,7 +54,7 @@ implements
 
   async getAll(req: EpisodeGetAllRequest, res: Response): Promise<void> {
     const {serieId} = req.params;
-    const got = await this.#episodeRepository.getAllBySerieId(serieId);
+    const got = await this.#deps.episodeRepository.getAllBySerieId(serieId);
 
     res.send(got);
   }
@@ -68,7 +68,7 @@ implements
       innerId: episodeId,
       serieId,
     };
-    const got = await this.#episodeRepository.getOneById(id);
+    const got = await this.#deps.episodeRepository.getOneById(id);
 
     assertFound(got);
 
@@ -88,7 +88,7 @@ implements
 
       switch (type) {
         case ResourceType.SERIES: {
-          const episode: Model | null = await this.#episodeRepository.getOneByPath(filterPath);
+          const episode: Model | null = await this.#deps.episodeRepository.getOneByPath(filterPath);
 
           if (episode)
             episodes.push(episode);
@@ -107,7 +107,7 @@ implements
       for (const ep of episodes) {
         const {serieId} = ep.id;
         // TODO: quitar await en for
-        const serie = series[serieId] ?? await this.#serieRepo.getOneById(serieId);
+        const serie = series[serieId] ?? await this.#deps.serieRepo.getOneById(serieId);
 
         ep.serie = serie;
 
