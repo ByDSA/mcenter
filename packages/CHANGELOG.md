@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.4.4](https://github.com/ByDSA/mcenter/compare/v3.4.3...v3.4.4) (2024-01-07)
+
+
+### Bug Fixes
+
+* **server:** dependency injection ([#16](https://github.com/ByDSA/mcenter/issues/16)) ([b216b4f](https://github.com/ByDSA/mcenter/commit/b216b4f46b81c10d2bdfddbdd86fa51023ca966f))
+
 ### [3.4.3](https://github.com/ByDSA/mcenter/compare/v3.4.2...v3.4.3) (2024-01-01)
 
 
