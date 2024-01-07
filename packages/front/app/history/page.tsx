@@ -1,6 +1,6 @@
 "use client";
 
-import HistoryList from "../../modules/history/HistoryList";
+import { HistoryList } from "#modules/history";
 
 export default function History() {
   return (

@@ -27,6 +27,7 @@ module.exports = {
           "*utils/**",
           "*shared/utils/**",
           "*shared/models/*",
+          "*/*", // Dos niveles de profundidad
         ],
       },
     ],

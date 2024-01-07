@@ -1,7 +1,6 @@
 "use client";
 
-import MediaPlayer from "#modules/player/MediaPlayer";
-import WebSocketsClient from "#modules/player/WebSocketsClient";
+import { MediaPlayer, WebSocketsClient } from "#modules/player";
 import { getBackendUrl } from "#modules/utils";
 import { Episode, EpisodeGetManyBySearchRequest, assertIsEpisode } from "#shared/models/episodes";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#shared/models/player";
