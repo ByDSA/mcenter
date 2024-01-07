@@ -45,14 +45,14 @@ export default class ExpressApp implements App {
 
   #dependencies: Required<ExpressAppDependencies>;
 
-  #httpServerRequirers: {setHttpServer(server: Server): void}[] = [];
+  #httpServerRequirers: ((server: Server)=> void)[] = [];
 
   constructor(deps?: ExpressAppDependencies) {
     this.#dependencies = deepMerge(DEFAULT_DEPENDENCIES as Required<ExpressAppDependencies>, deps) as Required<ExpressAppDependencies>;
   }
 
-  getHttpServer(): Server | undefined {
-    return this.#httpServer;
+  onHttpServerListen(requirer: (server: Server)=> void) {
+    this.#httpServerRequirers.push(requirer);
   }
 
   async init() {
@@ -108,8 +108,6 @@ export default class ExpressApp implements App {
       app.get("/", HELLO_WORLD_HANDLER);
 
     const playSerieController = resolveRequired(PlaySerieController);
-
-    this.#httpServerRequirers.push(playSerieController);
 
     app.use("/api/play/serie", playSerieController.getRouter());
 
@@ -208,7 +206,7 @@ export default class ExpressApp implements App {
     } );
 
     this.#httpServerRequirers.forEach(requirer => {
-      requirer.setHttpServer(this.#httpServer as Server);
+      requirer(this.#httpServer as Server);
     } );
 
     mediaServer.run();

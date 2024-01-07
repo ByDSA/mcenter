@@ -3,7 +3,7 @@ import { PublicMethodsOf } from "#shared/utils/types";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
-import { VlcBackWebSocketsServerService } from "./vlc-back-service";
+import { VlcBackWebSocketsServerService } from "./vlc-back";
 
 const DepsMap = {
   remotePlayerService: VlcBackWebSocketsServerService,

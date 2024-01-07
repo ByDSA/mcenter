@@ -11,7 +11,7 @@ import { HistoryListRestControllerMock } from "#modules/historyLists/controllers
 import { MusicController } from "#modules/musics";
 import { MusicControllerMock } from "#modules/musics/controllers/tests";
 import { PlaySerieController, PlayStreamController, RemotePlayerController, RemotePlayerWebSocketsServerService as WebSocketsFrontServerService } from "#modules/play";
-import { PlayStatusControllerMock, WebSocketsServiceMock } from "#modules/play/remote-player/tests";
+import { PlayStatusControllerMock, WebSocketsServiceMock } from "#modules/play/player-services/tests";
 import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
 import { StreamRestController } from "#modules/streams";
 import { StreamRestControllerMock } from "#modules/streams/controllers/test";

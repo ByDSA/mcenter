@@ -99,6 +99,10 @@ export default class Service implements PlayerService {
   }
 
   async seek(val: number | string): Promise<void> {
+    if (typeof val === "number")
+      // eslint-disable-next-line no-param-reassign
+      val = Math.round(val);
+
     const vlcResponse = await this.#playerWebInterfaceService.fetchSecureSeek(val);
     const response = vlcResponsesToGenericResponses(true, vlcResponse, undefined);
 

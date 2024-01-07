@@ -1,8 +1,7 @@
 import { Episode } from "#modules/episodes";
 import { assertIsNotEmpty } from "#shared/utils/validation";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Server } from "node:http";
-import { VlcBackWebSocketsServerService } from "./remote-player";
+import { VlcBackWebSocketsServerService } from "./player-services";
 
 type PlayParams = {
   force?: boolean;
@@ -10,7 +9,7 @@ type PlayParams = {
 };
 
 const DepsMap = {
-  playerWebSocketsServerService: VlcBackWebSocketsServerService,
+  vlcBackWSServerService: VlcBackWebSocketsServerService,
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
@@ -22,14 +21,10 @@ export default class PlayService {
     this.#deps = deps as Deps;
   }
 
-  setHttpServer(server: Server) {
-    this.#deps.playerWebSocketsServerService.setHttpServer(server);
-  }
-
   async play( {episodes, force}: PlayParams): Promise<boolean> {
     assertIsNotEmpty(episodes);
 
-    await this.#deps.playerWebSocketsServerService.playResource( {
+    await this.#deps.vlcBackWSServerService.emitPlayResource( {
       resources: episodes,
       force,
     } );

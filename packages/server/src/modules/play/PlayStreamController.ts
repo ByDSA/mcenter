@@ -6,7 +6,6 @@ import { assertIsDefined } from "#shared/utils/validation";
 import { Controller } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
-import { Server } from "http";
 import PlayService from "./PlayService";
 
 const DepsMap = {
@@ -18,15 +17,11 @@ const DepsMap = {
 
 type Deps = DepsFromMap<typeof DepsMap>;
 @injectDeps(DepsMap)
-export default class PlayController implements Controller{
+export default class PlayController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
-  }
-
-  setHttpServer(server: Server) {
-    this.#deps.playService.setHttpServer(server);
   }
 
   async playStream(req: Request, res: Response) {

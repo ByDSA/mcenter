@@ -16,7 +16,6 @@ import { ExpressApp, RealMongoDatabase } from "./main";
 (async function main() {
   container
     .registerSingleton(DomainMessageBroker)
-
     .registerSingleton(EpisodeFileInfoRepository)
     .registerSingleton(EpisodeRepository)
     .registerSingleton(EpisodePickerService)
@@ -51,6 +50,13 @@ import { ExpressApp, RealMongoDatabase } from "./main";
     controllers: {
       cors: true,
     },
+  } );
+  const vlcBackWebSocketsServerService = container.resolve(VlcBackWebSocketsServerService);
+  const remotePlayerWebSocketsServerService = container.resolve(RemotePlayerWebSocketsServerService);
+
+  app.onHttpServerListen((server) => {
+    vlcBackWebSocketsServerService.startSocket(server);
+    remotePlayerWebSocketsServerService.startSocket(server);
   } );
 
   container.registerInstance(ExpressApp, app);

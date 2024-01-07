@@ -7,7 +7,7 @@
     {
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "name": "nodemon",
+      "name": "debug vlc",
       "request": "launch",
       "restart": true,
       "runtimeExecutable": "npm",

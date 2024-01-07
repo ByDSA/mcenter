@@ -12,6 +12,6 @@ export {
 
 export {
   RemoteFrontPlayerController as RemotePlayerController,
-  RemoteFrontPlayerWebSocketsServerService as RemotePlayerWebSocketsServerService,
+  FrontWebSocketsServerService as RemotePlayerWebSocketsServerService,
   VlcBackWebSocketsServerService,
-} from "./remote-player";
+} from "./player-services";
