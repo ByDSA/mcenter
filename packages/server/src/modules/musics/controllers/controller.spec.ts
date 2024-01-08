@@ -3,6 +3,8 @@ import { registerSingletonIfNotAndGet } from "#tests/main";
 import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
+import { HistoryRepository } from "../history";
+import { HistoryRepositoryMock } from "../history/repositories/tests";
 import { Repository } from "../repositories";
 import { MUSICS_SAMPLES_IN_DISK, RepositoryMock } from "../repositories/tests";
 import { UpdateResult } from "../services";
@@ -16,6 +18,7 @@ describe("GetAll", () => {
 
   beforeAll(() => {
     musicRepositoryMock = registerSingletonIfNotAndGet(Repository, RepositoryMock) as unknown as RepositoryMock;
+    registerSingletonIfNotAndGet(HistoryRepository, HistoryRepositoryMock);
     controller = registerSingletonIfNotAndGet(Controller);
 
     routerApp = RouterApp(controller.getRouter());
