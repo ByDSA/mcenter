@@ -3,7 +3,7 @@ import { ARTIST_EMPTY, Music, MusicID, MusicVO } from "#shared/models/musics";
 import { md5FileAsync } from "#utils/crypt";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { CanPatchOneById } from "#utils/layers/repository";
+import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
 import { statSync } from "fs";
 import NodeID3 from "node-id3";
@@ -41,7 +41,8 @@ const DepsMap = {
 type Deps = DepsFromMap<typeof DepsMap>;
 @injectDeps(DepsMap)
 export default class Repository
-implements CanPatchOneById<Music, MusicID>
+implements CanPatchOneById<Music, MusicID>,
+CanGetOneById<Music, MusicID>
 {
   #deps: Deps;
 
@@ -61,6 +62,15 @@ implements CanPatchOneById<Music, MusicID>
         lastTimePlayed,
       } );
     } );
+  }
+
+  async getOneById(id: string): Promise<Music | null> {
+    const docOdm = await ModelOdm.findById(id);
+
+    if (!docOdm)
+      return null;
+
+    return docOdmToModel(docOdm);
   }
 
   async patchOneById(id: string, partialModel: Partial<Music>): Promise<void> {

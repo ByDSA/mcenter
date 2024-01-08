@@ -8,7 +8,7 @@ import { WeightFixerApplier } from "./weight-fixers";
 
 type Params<R extends ResourceVO> = {
   resources: R[];
-  lastEp?: R;
+  lastOne?: R;
   filterApplier: FilterApplier<R>;
   weightFixerApplier: WeightFixerApplier<R>;
 };
@@ -21,12 +21,12 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
 
   async pick(n: number): Promise<R[]> {
     const ret: R[] = [];
-    let {lastEp} = this.#params;
+    let {lastOne: lastEp} = this.#params;
 
     for (let i = 0; i < n; i++) {
       const picker = await genRandomPickerWithData( {
         ...this.#params,
-        lastEp,
+        lastOne: lastEp,
       } );
       const resource: R | undefined = picker.pickOne();
 

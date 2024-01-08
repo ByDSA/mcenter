@@ -43,6 +43,21 @@ CanGetAll<Model> {
     return docsOdm.map(docOdmToModel);
   }
 
+  async getLast(): Promise<Model | null> {
+    const docsOdm = await ModelOdm.find( {
+    }, {
+      _id: 0,
+    } ).sort( {
+      "date.timestamp": -1,
+    } )
+      .limit(1);
+
+    if (docsOdm.length === 0)
+      return null;
+
+    return docOdmToModel(docsOdm[0]);
+  }
+
   async createOne(model: Model): Promise<void> {
     const docOdm = modelToDocOdm(model);
 

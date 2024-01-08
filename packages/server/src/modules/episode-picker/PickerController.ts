@@ -66,7 +66,7 @@ export default class PickerController implements Controller {
     const episodes: Episode[] = await episodeRepository.getManyBySerieId(serie.id);
     const picker = await genRandomPickerWithData( {
       resources: episodes,
-      lastEp: lastEp ?? undefined,
+      lastOne: lastEp ?? undefined,
       filterApplier: genEpisodeFilterApplier(episodes, dependencies, lastEp ?? undefined),
       weightFixerApplier: genEpisodeWeightFixerApplier(),
     } );

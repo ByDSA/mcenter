@@ -15,7 +15,7 @@ describe("GetAll", () =>{
   let controller: Controller;
 
   beforeAll(() => {
-    musicRepositoryMock = registerSingletonIfNotAndGet(Repository, RepositoryMock) as RepositoryMock;
+    musicRepositoryMock = registerSingletonIfNotAndGet(Repository, RepositoryMock) as unknown as RepositoryMock;
     controller = registerSingletonIfNotAndGet(Controller);
 
     routerApp = RouterApp(controller.getRouter());

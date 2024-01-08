@@ -24,7 +24,7 @@ export default function buildEpisodePicker( { mode, episodes, lastEp }: Params):
     case PickMode.RANDOM:
       picker = new ResourcePickerRandom<Model>( {
         resources: episodes,
-        lastEp,
+        lastOne: lastEp,
         filterApplier: genEpisodeFilterApplier(episodes, dependencies, lastEp),
         weightFixerApplier: genEpisodeWeightFixerApplier(),
       } );

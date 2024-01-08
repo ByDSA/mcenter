@@ -9,7 +9,6 @@ import { RepositoryFindParams as FindParams, Repository } from "../repositories"
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
 
-let lastPicked: Music | undefined;
 const DepsMap = {
   musicRepository: Repository,
   historyMusicRepository: HistoryRepository,
@@ -26,12 +25,40 @@ export default class GetController {
 
   async getRandom(req: Request, res: Response) {
     const musics = await this.#findMusics(req);
-    const picked = await randomPick(musics);
+    const picked = await this.#randomPick(musics);
     const nextUrlServer = ENVS.backendUrl;
     const nextUrl = `${nextUrlServer}/${path.join("api/musics/get", req.url)}`;
     const ret = generatePlaylist(picked, nextUrl);
 
     res.send(ret);
+  }
+
+  async #getLastMusicInHistory(): Promise<Music | null> {
+    const lastOneEntry = await this.#deps.historyMusicRepository.getLast();
+
+    if (!lastOneEntry)
+      return null;
+
+    const lastOne = await this.#deps.musicRepository.getOneById(lastOneEntry.resourceId);
+
+    return lastOne;
+  }
+
+  async #randomPick(musics: Music[]): Promise<Music> {
+    const lastOne = await this.#getLastMusicInHistory() ?? undefined;
+    const picker = new ResourcePickerRandom<Music>( {
+      resources: musics,
+      lastOne,
+      filterApplier: genMusicFilterApplier(musics, lastOne),
+      weightFixerApplier: genMusicWeightFixerApplier(),
+    } );
+    let [picked] = await picker.pick(1);
+
+    // default case
+    if (!picked)
+      [picked] = musics;
+
+    return picked;
   }
 
   async getAll(req: Request, res: Response) {
@@ -104,24 +131,6 @@ export default class GetController {
 
     return router;
   }
-}
-
-async function randomPick(musics: Music[]): Promise<Music> {
-  const picker = new ResourcePickerRandom<Music>( {
-    resources: musics,
-    lastEp: lastPicked,
-    filterApplier: genMusicFilterApplier(musics, lastPicked),
-    weightFixerApplier: genMusicWeightFixerApplier(),
-  } );
-  let [picked] = await picker.pick(1);
-
-  // default case
-  if (!picked)
-    [picked] = musics;
-
-  lastPicked = picked;
-
-  return picked;
 }
 
 function generatePlaylist(picked: Music, nextUrl: string): string {
