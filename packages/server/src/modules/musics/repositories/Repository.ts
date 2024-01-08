@@ -64,8 +64,6 @@ CanGetOneById<Music, MusicID>
       if (event.type !== EventType.CREATED)
         return;
 
-      console.log("logC");
-
       const id = event.payload.entity.resourceId;
       const lastTimePlayed = event.payload.entity.date.timestamp;
 
