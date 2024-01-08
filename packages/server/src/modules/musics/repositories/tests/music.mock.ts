@@ -1,18 +1,11 @@
 import { MusicRepository } from "#modules/musics";
 import { PublicMethodsOf } from "#shared/utils/types";
-import Repository from "../Repository";
 
-const repository = new Repository();
+export default class RepositoryMock implements PublicMethodsOf<MusicRepository> {
+  getOneById = jest.fn();
 
-export async function initializeMock() {
-  await repository.createFromPath("dk.mp3");
-}
+  patchOneById = jest.fn();
 
-export async function clearMock() {
-  await repository.deleteAll();
-}
-
-export class RepositoryMock implements PublicMethodsOf<MusicRepository> {
   findByHash = jest.fn();
 
   findByUrl = jest.fn();
@@ -34,8 +27,6 @@ export class RepositoryMock implements PublicMethodsOf<MusicRepository> {
   updateOneByPath = jest.fn();
 
   createFromPath = jest.fn();
-
-  deleteAll = jest.fn();
 
   updateHashOf = jest.fn();
 

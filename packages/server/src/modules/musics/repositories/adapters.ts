@@ -34,3 +34,42 @@ export function docOdmToModel(docOdm: DocOdm): Music {
 
   return model;
 }
+
+export function partialModelToPartialDocOdm(model: Partial<Music>): Partial<DocOdm> {
+  const docOdm: Partial<DocOdm> = {
+    hash: model.hash,
+    title: model.title,
+    url: model.url,
+    path: model.path,
+    weight: model.weight,
+    artist: model.artist,
+    tags: model.tags,
+    disabled: model.disabled,
+    lastTimePlayed: model.lastTimePlayed,
+    size: model.size,
+    album: model.album,
+    country: model.country,
+    game: model.game,
+  };
+
+  if (model.mediaInfo){
+    docOdm.mediaInfo = {
+      duration: model.mediaInfo.duration,
+    };
+  }
+
+  if (model.timestamps) {
+    docOdm.timestamps = {
+      createdAt: model.timestamps.createdAt,
+      updatedAt: model.timestamps.updatedAt,
+    };
+  }
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key in docOdm) {
+    if ((docOdm as any)[key] === undefined)
+      delete (docOdm as any)[key];
+  }
+
+  return docOdm;
+}

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
 import { VOSchema } from "./VO";
 
-const IDSchema = z.string();
+export const IDSchema = z.string();
 
 export type Id = z.infer<typeof IDSchema>;
 

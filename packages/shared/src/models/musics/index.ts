@@ -7,3 +7,7 @@ export {
 } from "./VO";
 
 export const ARTIST_EMPTY = "(Unknown Artist)";
+
+export {
+  HistoryEntry as HistoryMusicEntry, assertIsHistoryEntry as assertIsHistoryMusicEntry, createHistoryEntryById as createHistoryEntryByMusicId,
+} from "./history";

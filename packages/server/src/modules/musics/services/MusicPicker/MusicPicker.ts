@@ -24,7 +24,7 @@ export default function buildMusicPicker( { mode, episodes, lastOne }: Params): 
     case PickMode.RANDOM:
       picker = new ResourcePickerRandom<Model>( {
         resources: episodes,
-        lastEp: lastOne,
+        lastOne,
         filterApplier: genMusicFilterApplier(episodes, lastOne),
         weightFixerApplier: genMusicWeightFixerApplier(),
       } );

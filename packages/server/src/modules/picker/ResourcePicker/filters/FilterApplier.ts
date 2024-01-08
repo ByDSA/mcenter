@@ -2,32 +2,53 @@ import { Pickable } from "#shared/models/resource";
 import Filter from "./Filter";
 
 export default class FilterApplier<R extends Pickable = Pickable> {
-  #filters: Filter<R>[] = [];
+  #nonReversibleFilters: Filter<R>[] = [];
+
+  #reversibleFilters: Filter<R>[] = [];
 
   add(...filters: Filter<R>[]): void {
-    this.#filters.push(...filters);
+    this.#nonReversibleFilters.push(...filters);
   }
 
-  async apply(data: readonly R[]): Promise<R[]> {
-    const newData: R[] = [];
+  addReversible(...filters: Filter<R>[]): void {
+    this.#reversibleFilters.push(...filters);
+  }
 
-    for (const self of data) {
-      await this.#applyFiltersToResource(self)
-        .then(ok=> {
-          if (ok)
-            newData.push(self);
-        } );
+  async apply(data: R[]): Promise<R[]> {
+    let currentData: R[] = data;
+
+    {
+      const newData: R[] = [];
+
+      for (const self of currentData) {
+        if (await applyFiltersToResource(self, this.#nonReversibleFilters))
+          newData.push(self);
+      }
+
+      currentData = newData;
     }
 
-    return newData;
-  }
+    for (const f of this.#reversibleFilters) {
+      const newData: R[] = [];
 
-  async #applyFiltersToResource(resource: R): Promise<boolean> {
-    for (const f of this.#filters) {
-      if (!await f.filter(resource))
-        return false;
+      for (const self of currentData) {
+        if (await f.filter(self))
+          newData.push(self);
+      }
+
+      if (newData.length > 0)
+        currentData = newData;
     }
 
-    return true;
+    return currentData;
   }
+}
+
+async function applyFiltersToResource<R extends Pickable>(resource: R, filters: Filter[]): Promise<boolean> {
+  for (const f of filters) {
+    if (!await f.filter(resource))
+      return false;
+  }
+
+  return true;
 }

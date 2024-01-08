@@ -1,4 +1,14 @@
-export const SECONDS_IN_DAY = 24 * 60 * 60;
+export const SECONDS_IN_MINUTE = 60;
+
+export const SECONDS_IN_HOUR = 60 * SECONDS_IN_MINUTE;
+
+export const SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR;
+
+export const SECONDS_IN_WEEK = 7 * SECONDS_IN_DAY;
+
+export const SECONDS_IN_MONTH = 30 * SECONDS_IN_DAY;
+
+export const SECONDS_IN_YEAR = 365 * SECONDS_IN_DAY;
 
 export {
   Resource,

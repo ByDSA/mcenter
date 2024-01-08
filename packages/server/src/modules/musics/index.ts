@@ -5,3 +5,7 @@ export {
 export {
   Controller as MusicController,
 } from "./controllers";
+
+export {
+  HistoryRepository as MusicHistoryRepository,
+} from "./history";

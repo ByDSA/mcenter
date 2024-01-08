@@ -1,16 +1,17 @@
 import { ResourcePickerRandom } from "#modules/picker";
-import { Music } from "#shared/models/musics";
 import { SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import path from "node:path";
+import { HistoryRepository, createHistoryEntryByMusicId } from "../history";
+import { Model as Music } from "../models";
 import { RepositoryFindParams as FindParams, Repository } from "../repositories";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
 
-let lastPicked: Music | undefined;
 const DepsMap = {
   musicRepository: Repository,
+  historyMusicRepository: HistoryRepository,
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
@@ -24,12 +25,40 @@ export default class GetController {
 
   async getRandom(req: Request, res: Response) {
     const musics = await this.#findMusics(req);
-    const picked = await randomPick(musics);
+    const picked = await this.#randomPick(musics);
     const nextUrlServer = ENVS.backendUrl;
     const nextUrl = `${nextUrlServer}/${path.join("api/musics/get", req.url)}`;
     const ret = generatePlaylist(picked, nextUrl);
 
     res.send(ret);
+  }
+
+  async #getLastMusicInHistory(): Promise<Music | null> {
+    const lastOneEntry = await this.#deps.historyMusicRepository.getLast();
+
+    if (!lastOneEntry)
+      return null;
+
+    const lastOne = await this.#deps.musicRepository.getOneById(lastOneEntry.resourceId);
+
+    return lastOne;
+  }
+
+  async #randomPick(musics: Music[]): Promise<Music> {
+    const lastOne = await this.#getLastMusicInHistory() ?? undefined;
+    const picker = new ResourcePickerRandom<Music>( {
+      resources: musics,
+      lastOne,
+      filterApplier: genMusicFilterApplier(musics, lastOne),
+      weightFixerApplier: genMusicWeightFixerApplier(),
+    } );
+    let [picked] = await picker.pick(1);
+
+    // default case
+    if (!picked)
+      [picked] = musics;
+
+    return picked;
   }
 
   async getAll(req: Request, res: Response) {
@@ -68,6 +97,7 @@ export default class GetController {
 
   async rawAccess(req: Request, res: Response) {
     const { name } = req.params;
+    // find in DB
     const music = await this.#deps.musicRepository.findByUrl(name);
 
     if (!music) {
@@ -76,6 +106,12 @@ export default class GetController {
       return;
     }
 
+    // History
+    const entry = createHistoryEntryByMusicId(music.id);
+
+    await this.#deps.historyMusicRepository.createOne(entry);
+
+    // Download
     const relativePath = music.path;
     const fullpath = getFullPath(relativePath);
 
@@ -95,24 +131,6 @@ export default class GetController {
 
     return router;
   }
-}
-
-async function randomPick(musics: Music[]): Promise<Music> {
-  const picker = new ResourcePickerRandom<Music>( {
-    resources: musics,
-    lastEp: lastPicked,
-    filterApplier: genMusicFilterApplier(musics, lastPicked),
-    weightFixerApplier: genMusicWeightFixerApplier(),
-  } );
-  let [picked] = await picker.pick(1);
-
-  // default case
-  if (!picked)
-    [picked] = musics;
-
-  lastPicked = picked;
-
-  return picked;
 }
 
 function generatePlaylist(picked: Music, nextUrl: string): string {
