@@ -9,7 +9,7 @@ import { UpdateResult } from "../services";
 import { ENVS } from "../utils";
 import Controller from "./Controller";
 
-describe("GetAll", () =>{
+describe("GetAll", () => {
   let routerApp: Application;
   let musicRepositoryMock: RepositoryMock;
   let controller: Controller;

@@ -1,7 +1,9 @@
 import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { logDomainEvent } from "#modules/log";
 import { ARTIST_EMPTY, Music, MusicID, MusicVO } from "#shared/models/musics";
+import { assertIsDefined } from "#shared/utils/validation";
 import { md5FileAsync } from "#utils/crypt";
-import { EventType, ModelEvent } from "#utils/event-sourcing";
+import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
@@ -15,6 +17,7 @@ import { download } from "../youtube";
 // eslint-disable-next-line import/no-cycle
 import UrlGenerator from "./UrlGenerator";
 import { docOdmToModel, partialModelToPartialDocOdm } from "./adapters";
+import { QUEUE_NAME } from "./events";
 import { DocOdm, ModelOdm } from "./odm";
 
 export type FindParams = {
@@ -40,7 +43,7 @@ const DepsMap = {
 
 type Deps = DepsFromMap<typeof DepsMap>;
 @injectDeps(DepsMap)
-export default class Repository
+export default class MusicRepository
 implements CanPatchOneById<Music, MusicID>,
 CanGetOneById<Music, MusicID>
 {
@@ -49,11 +52,19 @@ CanGetOneById<Music, MusicID>
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
 
+    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
+      logDomainEvent(QUEUE_NAME, event);
+
+      return Promise.resolve();
+    } );
+
     this.#deps.domainMessageBroker.subscribe(HISTORY_QUEUE_NAME, async (_ev: Event<unknown>) => {
       const event = _ev as ModelEvent<HistoryMusicEntry>;
 
       if (event.type !== EventType.CREATED)
         return;
+
+      console.log("logC");
 
       const id = event.payload.entity.resourceId;
       const lastTimePlayed = event.payload.entity.date.timestamp;
@@ -77,6 +88,18 @@ CanGetOneById<Music, MusicID>
     const partialDocOdm = partialModelToPartialDocOdm(partialModel);
 
     await ModelOdm.findByIdAndUpdate(id, partialDocOdm);
+
+    // eslint-disable-next-line no-restricted-syntax, guard-for-in
+    for (const [k, value] of Object.entries(partialModel)) {
+      const key = k as keyof Music;
+      const event = new PatchEvent<Music, MusicID>( {
+        entityId: id,
+        key,
+        value,
+      } );
+
+      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    }
   }
 
   async findByHash(hash: string): Promise<Music | null> {
@@ -160,8 +183,14 @@ CanGetOneById<Music, MusicID>
       url: await urlPromise,
     };
     const docOdm: DocOdm = await ModelOdm.create<MusicVO>(newDocOdm);
+    const ret = docOdmToModel(docOdm);
+    const event = new ModelEvent<MusicVO>(EventType.CREATED, {
+      entity: ret,
+    } );
 
-    return docOdmToModel(docOdm);
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+
+    return ret;
   }
 
   async updateHashOf(music: Music) {
@@ -190,32 +219,66 @@ CanGetOneById<Music, MusicID>
     return this.findOrCreateFromPath(data.file);
   }
 
-  async deleteAll() {
-    await ModelOdm.deleteMany();
-  }
-
   async deleteOneByPath(relativePath: string) {
-    await ModelOdm.deleteOne( {
+    const docOdm = await ModelOdm.findByIdAndDelete( {
       path: relativePath,
     } );
+
+    if (!docOdm)
+      return;
+
+    const model = docOdmToModel(docOdm);
+    const event = new ModelEvent<MusicVO>(EventType.DELETED, {
+      entity: model,
+    } );
+
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
   async updateOneByUrl(url: string, data: Partial<Music>): Promise<void> {
     await ModelOdm.updateOne( {
       url,
     }, data);
+
+    const model = await this.findByUrl(url);
+
+    assertIsDefined(model);
+    const event = new ModelEvent<MusicVO>(EventType.UPDATED, {
+      entity: model,
+    } );
+
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
   async updateOneByHash(hash: string, data: Partial<Music>): Promise<void> {
     await ModelOdm.updateOne( {
       hash,
     }, data);
+
+    const model = await this.findByHash(hash);
+
+    assertIsDefined(model);
+
+    const event = new ModelEvent<MusicVO>(EventType.UPDATED, {
+      entity: model,
+    } );
+
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
   async updateOneByPath(relativePath: string, data: Partial<Music>): Promise<void> {
     await ModelOdm.updateOne( {
       path: relativePath,
     }, data);
+
+    const model = await this.findByPath(relativePath);
+
+    assertIsDefined(model);
+    const event = new ModelEvent<MusicVO>(EventType.UPDATED, {
+      entity: model,
+    } );
+
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 }
 

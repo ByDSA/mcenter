@@ -1,3 +1,5 @@
 export * from "./fixtures";
 
-export * from "./music.mock";
+export {
+  default as RepositoryMock,
+} from "./music.mock";

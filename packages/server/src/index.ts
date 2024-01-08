@@ -6,7 +6,7 @@ import { EpisodePickerController, EpisodePickerService } from "#modules/episode-
 import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController, SavedSerieTreeService } from "#modules/episodes";
 import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
-import { MusicController } from "#modules/musics";
+import { MusicController, MusicHistoryRepository, MusicRepository } from "#modules/musics";
 import { PlaySerieController, PlayStreamController, RemotePlayerController, RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
 import { SerieRepository } from "#modules/series";
 import { StreamRestController } from "#modules/streams";
@@ -19,6 +19,9 @@ import { ExpressApp, RealMongoDatabase } from "./main";
     .registerSingleton(EpisodeFileInfoRepository)
     .registerSingleton(EpisodeRepository)
     .registerSingleton(EpisodePickerService)
+
+    .registerSingleton(MusicRepository)
+    .registerSingleton(MusicHistoryRepository)
 
     .registerSingleton(SerieRepository)
     .registerSingleton(SavedSerieTreeService)
