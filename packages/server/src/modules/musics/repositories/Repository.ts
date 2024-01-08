@@ -1,14 +1,20 @@
-import { ARTIST_EMPTY, Music, MusicVO } from "#shared/models/musics";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { ARTIST_EMPTY, Music, MusicID, MusicVO } from "#shared/models/musics";
 import { md5FileAsync } from "#utils/crypt";
+import { EventType, ModelEvent } from "#utils/event-sourcing";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { CanPatchOneById } from "#utils/layers/repository";
+import { Event } from "#utils/message-broker";
 import { statSync } from "fs";
 import NodeID3 from "node-id3";
 import path from "path";
 import { AUDIO_EXTENSIONS } from "../files";
+import { HISTORY_QUEUE_NAME, HistoryMusicEntry } from "../history";
 import { getFullPath } from "../utils";
 import { download } from "../youtube";
 // eslint-disable-next-line import/no-cycle
 import UrlGenerator from "./UrlGenerator";
-import { docOdmToModel } from "./adapters";
+import { docOdmToModel, partialModelToPartialDocOdm } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 
 export type FindParams = {
@@ -27,7 +33,42 @@ type FindQueryParams = {
     $lte?: number;
   };
 };
-export default class Repository {
+
+const DepsMap = {
+  domainMessageBroker: DomainMessageBroker,
+};
+
+type Deps = DepsFromMap<typeof DepsMap>;
+@injectDeps(DepsMap)
+export default class Repository
+implements CanPatchOneById<Music, MusicID>
+{
+  #deps: Deps;
+
+  constructor(deps?: Partial<Deps>) {
+    this.#deps = deps as Deps;
+
+    this.#deps.domainMessageBroker.subscribe(HISTORY_QUEUE_NAME, async (_ev: Event<unknown>) => {
+      const event = _ev as ModelEvent<HistoryMusicEntry>;
+
+      if (event.type !== EventType.CREATED)
+        return;
+
+      const id = event.payload.entity.resourceId;
+      const lastTimePlayed = event.payload.entity.date.timestamp;
+
+      await this.patchOneById(id, {
+        lastTimePlayed,
+      } );
+    } );
+  }
+
+  async patchOneById(id: string, partialModel: Partial<Music>): Promise<void> {
+    const partialDocOdm = partialModelToPartialDocOdm(partialModel);
+
+    await ModelOdm.findByIdAndUpdate(id, partialDocOdm);
+  }
+
   async findByHash(hash: string): Promise<Music | null> {
     const musicOdm: DocOdm | null = await ModelOdm.findOne( {
       hash,

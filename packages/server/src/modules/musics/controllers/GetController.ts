@@ -1,9 +1,10 @@
 import { ResourcePickerRandom } from "#modules/picker";
-import { Music } from "#shared/models/musics";
 import { SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import path from "node:path";
+import { HistoryRepository, createHistoryEntryByMusicId } from "../history";
+import { Model as Music } from "../models";
 import { RepositoryFindParams as FindParams, Repository } from "../repositories";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
@@ -11,6 +12,7 @@ import { ENVS, getFullPath } from "../utils";
 let lastPicked: Music | undefined;
 const DepsMap = {
   musicRepository: Repository,
+  historyMusicRepository: HistoryRepository,
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
@@ -68,6 +70,7 @@ export default class GetController {
 
   async rawAccess(req: Request, res: Response) {
     const { name } = req.params;
+    // find in DB
     const music = await this.#deps.musicRepository.findByUrl(name);
 
     if (!music) {
@@ -76,6 +79,12 @@ export default class GetController {
       return;
     }
 
+    // History
+    const entry = createHistoryEntryByMusicId(music.id);
+
+    await this.#deps.historyMusicRepository.createOne(entry);
+
+    // Download
     const relativePath = music.path;
     const fullpath = getFullPath(relativePath);
 

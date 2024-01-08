@@ -13,6 +13,8 @@ export async function clearMock() {
 }
 
 export class RepositoryMock implements PublicMethodsOf<MusicRepository> {
+  patchOneById = jest.fn();
+
   findByHash = jest.fn();
 
   findByUrl = jest.fn();
