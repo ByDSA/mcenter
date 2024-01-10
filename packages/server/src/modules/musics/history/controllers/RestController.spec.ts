@@ -1,5 +1,4 @@
-import { assertIsHistoryMusicListGetManyEntriesBySearchResponse } from "#shared/models/musics";
-import { GetManyEntriesBySearchResponseSchema } from "#shared/models/musics/history/dto/GetManyEntriesBySearchResponse";
+import { assertIsHistoryMusicListGetManyEntriesBySearchResponse, HistoryMusicListGetManyEntriesBySearchResponseSchema } from "#shared/models/musics";
 import HttpStatusCode from "#shared/utils/http/StatusCode";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
@@ -62,7 +61,7 @@ describe("RestController", () => {
         const response = await request(routerApp)
           .post(URL)
           .send();
-        const body = GetManyEntriesBySearchResponseSchema.parse(response.body);
+        const body = HistoryMusicListGetManyEntriesBySearchResponseSchema.parse(response.body);
 
         expect(response.statusCode).toEqual(HttpStatusCode.OK);
         assertIsHistoryMusicListGetManyEntriesBySearchResponse(body);
