@@ -9,5 +9,7 @@ export {
 export const ARTIST_EMPTY = "(Unknown Artist)";
 
 export {
-  HistoryEntry as HistoryMusicEntry, assertIsHistoryEntry as assertIsHistoryMusicEntry, createHistoryEntryById as createHistoryEntryByMusicId,
+  HistoryEntry as HistoryMusicEntry, HistoryListGetManyEntriesBySearchRequest as HistoryMusicListGetManyEntriesBySearchRequest,
+  HistoryListGetManyEntriesBySearchResponse as HistoryMusicListGetManyEntriesBySearchResponse, assertIsHistoryEntry as assertIsHistoryMusicEntry, assertIsHistoryListGetManyEntriesBySearchRequest as assertIsHistoryMusicListGetManyEntriesBySearchRequest,
+  assertIsHistoryListGetManyEntriesBySearchResponse as assertIsHistoryMusicListGetManyEntriesBySearchResponse, createHistoryEntryById as createHistoryEntryByMusicId,
 } from "./history";
