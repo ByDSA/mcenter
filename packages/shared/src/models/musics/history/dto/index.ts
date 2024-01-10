@@ -5,5 +5,6 @@ export {
 
 export {
   GetManyEntriesBySearchResponse,
+  GetManyEntriesBySearchResponseSchema,
   assertIsGetManyEntriesBySearchResponse,
 } from "./GetManyEntriesBySearchResponse";
