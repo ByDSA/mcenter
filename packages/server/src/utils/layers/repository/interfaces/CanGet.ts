@@ -21,3 +21,7 @@ export interface CanGetAllBySuperId<T, SID> {
 export interface CanGetMany<T, PARTIAL=Partial<T>> {
   getMany(partial: PARTIAL): Promise<T[]>;
 }
+
+export interface CanGetManyCriteria<T, C> {
+  getManyCriteria(criteria: C): Promise<T[]>;
+}
