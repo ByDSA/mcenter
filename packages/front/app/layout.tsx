@@ -14,7 +14,8 @@ export default function RootLayout( {children}: {
           <main className="main">
             <a href="/">Inicio</a>
             <a href="/actions">Actions</a>
-            <a href="/history">Historial</a>
+            <a href="/history">H. Episodes</a>
+            <a href="/music-history">H. Música</a>
             <a href="/play">Play</a>
             <a href="/player">Player</a>
           </main>

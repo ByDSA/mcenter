@@ -156,6 +156,16 @@
   --color-primary2-darker2: var(--color-yellow-darker2);
   --color-primary2-darker3: var(--color-yellow-darker3);
   --color-primary2-darker4: var(--color-yellow-darker4);
+
+  --color-music: var(--color-primary);
+  --color-music-light: var(--color-primary-light);
+  --color-music-light2: var(--color-primary-light2);
+  --color-music-light3: var(--color-primary-light3);
+  --color-music-light4: var(--color-primary-light4);
+  --color-music-darker: var(--color-primary-darker);
+  --color-music-darker2: var(--color-primary-darker2);
+  --color-music-darker3: var(--color-primary-darker3);
+  --color-music-darker4: var(--color-primary-darker4);
 }
 
 html,
@@ -185,6 +195,16 @@ body {
 a {
   color: var(--color-primary);
   text-decoration: none;
+}
+
+.music {
+  a {
+    color: var(--color-yellow);
+  }
+
+  a:hover {
+    color: var(--color-yellow-light4);
+  }
 }
 
 a:hover,
