@@ -1,13 +1,14 @@
+import { formatDate } from "#modules/utils/dates";
 import { HistoryMusicEntry } from "#shared/models/musics";
 import style from "./style.module.css";
-import { getSmallDateStr } from "./utils";
 
 type HeaderProps = {
   entry: Required<HistoryMusicEntry>;
   resource: Required<HistoryMusicEntry>["resource"];
   showDropdownState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  showDate: boolean;
 };
-export default function Header( {resource, entry, showDropdownState}: HeaderProps) {
+export default function Header( {resource, entry, showDropdownState, showDate}: HeaderProps) {
   const center = resource.artist;
   const leftCenter = `${resource.title } - ${ resource.artist}`;
   const left = resource.title;
@@ -19,7 +20,11 @@ export default function Header( {resource, entry, showDropdownState}: HeaderProp
     <div className={style.fullTime}>
       <span className={style.time}>{timeStampDate.toLocaleTimeString()}</span>
 
-      <span className={style.date}>{getSmallDateStr(timeStampDate)}</span>
+      {showDate &&
+      <span className={style.date}>{formatDate(timeStampDate, {
+        dateTime: "date",
+        ago: "no",
+      } )}</span> }
     </div>
     <div className={style.name}>
       { leftCenter && <span className={`${style.itemLeftCenter} ${style.hideMinLg} ${style.center}`}>{leftCenter}</span> }

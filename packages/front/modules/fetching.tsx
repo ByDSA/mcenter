@@ -92,11 +92,8 @@ export function FetchingRender<T>( {useRequest, render}: FetchingRenderParams<T>
     </>;
   }
 
-  if (isLoading)
+  if (isLoading || !data)
     return <Loading/>;
-
-  if (!data)
-    return <>No data</>;
 
   return render(data);
 }

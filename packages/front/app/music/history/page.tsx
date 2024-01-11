@@ -9,7 +9,7 @@ export default function History() {
           Historial
       </h2>
 
-      <MusicHistoryList />
+      <MusicHistoryList showDate="groupByDay"/>
     </>
   );
 }

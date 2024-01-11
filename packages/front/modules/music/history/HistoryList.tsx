@@ -1,18 +1,18 @@
 
 /* eslint-disable require-await */
 import { FetchingRender } from "#modules/fetching";
+import { formatDate } from "#modules/utils/dates";
 import { HistoryMusicEntry } from "#shared/models/musics";
 import extend from "just-extend";
 import { Fragment } from "react";
 import HistoryEntryElement from "./entry/HistoryEntry";
 import { useRequest } from "./request";
-import { getDateStr } from "./utils";
 
 type Props = {
-  splitByDay?: boolean;
+  showDate?: "eachOne" | "groupByDay" | "none";
 };
 const DEFAULT_PARAMS: Required<Props> = {
-  splitByDay: true,
+  showDate: "groupByDay",
 };
 
 export default function HistoryList(props?: Props) {
@@ -29,8 +29,8 @@ export default function HistoryList(props?: Props) {
       }}>
         {
           data && data.map((entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
-            {params.splitByDay ? dayTitle(entry, i, array) : null}
-            <HistoryEntryElement value={entry} />
+            {params.showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
+            <HistoryEntryElement showDate={params.showDate === "eachOne"} value={entry} />
           </Fragment>)
         }
       </span>
@@ -40,7 +40,10 @@ export default function HistoryList(props?: Props) {
 
 function dayTitle(entry: Required<HistoryMusicEntry>, i: number, array: Required<HistoryMusicEntry>[]) {
   if (i === 0 || !isSameday(array[i - 1].date.timestamp, entry.date.timestamp))
-    return <h2 key={getDateStr(new Date(entry.date.timestamp * 1000))}>{getDateStr(new Date(entry.date.timestamp * 1000))}</h2>;
+  {return <h2 key={entry.date.timestamp}>{formatDate(new Date(entry.date.timestamp * 1000), {
+    ago: "no",
+    dateTime: "fullDate",
+  } )}</h2>;}
 
   return null;
 }

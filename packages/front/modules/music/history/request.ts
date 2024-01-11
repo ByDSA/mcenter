@@ -27,5 +27,5 @@ const fetcher = makeFetcher( {
 export const useRequest = makeUseRequest<Required<HistoryMusicEntry>[]>( {
   url: `${getBackendUrl()}/api/musics/history/user/search`,
   fetcher,
-  refreshInterval: 1 * 1000,
+  refreshInterval: 100 * 1000,
 } );

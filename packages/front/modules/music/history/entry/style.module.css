@@ -84,31 +84,41 @@
   padding: 2vh 5vw;
   border-top: 2px solid border-color;
   display: flex;
-  flex-direction: row;
-  justify-content: start;
+  flex-direction: column;
+  justify-content: flex-start;
   flex-wrap: wrap;
+}
 
-  .item {
-    display: block;
-    width: 100vw;
-    margin: 0;
-    padding: 0 0vw;
-    margin-bottom: 2vh;
-  }
+.dropdown .item {
+  display: block;
+  width: 100vw;
+  margin: 0;
+  padding: 0 0vw;
+  margin-bottom: 2vh;
+}
+
+.dropdown .column2 {
+  display: block;
+  width: 100%;
+}
+.dropdown .column2 > span {
+  display: inline-block;
+  width: 50%;
+}
+
+.dropdown .line,
+.dropdown .line1half {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+
+.dropdown .line1half {
+  margin-bottom: 0.5em;
 }
 
 .dropdown .weight input {
   min-width: 50px;
-}
-
-.dropdown > span {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  overflow: visible;
 }
 
 .dropdown > span + span {
