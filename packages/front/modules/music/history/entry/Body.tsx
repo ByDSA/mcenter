@@ -1,64 +1,52 @@
+import { getBackendUrl } from "#modules/utils";
+import { secsToMmss } from "#modules/utils/dates";
 import { HistoryMusicEntry } from "#shared/models/musics";
-import Loading from "app/loading";
-import { Fragment } from "react";
+import LastestComponent from "./Lastest";
+import Tag from "./Tag";
 import style from "./style.module.css";
-import { dateInLastestComponent, secsToMS } from "./utils";
 
 type Props = {
   resource: Required<HistoryMusicEntry>["resource"];
+  resourceId: string;
   weightState: [number, React.Dispatch<React.SetStateAction<number>>];
-  lastest?: HistoryMusicEntry[];
 };
-export default function Body( {resource, weightState, lastest}: Props) {
+export default function Body( {resource, resourceId, weightState}: Props) {
   const [weight, setWeight] = weightState;
   const reset = () => {
     setWeight(resource.weight);
   };
 
   return <div className={style.dropdown}>
-    <span>Título: {resource.title}</span>
-    <span className={style.break} />
-    <span>Artista: {resource.artist}</span>
-    <span className={style.break} />
-    <span>Tags: {resource.tags?.join(", ")}</span>
+    <span className={`${style.line1half}` }>
+      <span className={style.column2}>
+        <span>Título: {resource.title}</span>
+        <span>Artista: {resource.artist}</span>
+      </span>
+    </span>
     {resource.game && <>
-      <span className={style.break} />
-      <span>Game: {resource.game}</span>
+      <span className={style.line1half}>Game: {resource.game}</span>
     </>}
     {resource.country && <>
-      <span className={style.break} />
-      <span>Country: {resource.country}</span>
+      <span className={style.line1half}>Country: {resource.country}</span>
     </>}
-    <span className={style.break} />
-    <span className={`${style.weight}`}>
+    <span className={`${style.line1half} ${style.weight}`}>
       <span>Weight:</span> <input type="number" value={weight} onChange={handleOnChange(setWeight)}/>
     </span>
+    <span className={style.line1half}>url: <a href={fullUrlOf(resource.url)}>{resource.url}</a></span>
     {(resource.mediaInfo.duration && resource.mediaInfo.duration > 0 && <>
-      <span className={style.break} />
-      <span>Duration : {secsToMS(resource.mediaInfo.duration)} ({resource.mediaInfo.duration} s)</span>
+      <span className="line">Duration : {secsToMmss(resource.mediaInfo.duration)}</span>
     </>) || null}
+    <span className="line">Tags: {resource.tags?.map(t=>(<Tag key={t} name={t}/>))}</span>
     <span className={style.break} />
-    <span><a onClick={() => reset()}>Reset</a></span>
+    <span className="line"><a onClick={() => reset()}>Reset</a></span>
     <span className={style.break} />
     <span className={style.break} />
-    {lastestComponent(lastest)}
-
+    <LastestComponent resourceId={resourceId} />
   </div>;
 }
 
-function lastestComponent(lastest: HistoryMusicEntry[] | undefined) {
-  if (!lastest)
-    return <Loading/>;
-
-  if (lastest.length === 0)
-    return <span>No se había reproducido antes.</span>;
-
-  return <>
-    <span>Últimas veces:</span>
-    {lastest && lastest.map((entry: HistoryMusicEntry) => <Fragment key={`${entry.date.timestamp}`}>
-      <><span className={style.break} /><span>{dateInLastestComponent(new Date(entry.date.timestamp * 1000))}</span></>
-    </Fragment>)}
-  </>;
+function fullUrlOf(url: string) {
+  return `${getBackendUrl()}/api/musics/get/raw/${ url}`;
 }
 
 function handleOnChange(f: React.Dispatch<React.SetStateAction<number>>) {

@@ -10,7 +10,7 @@ import MusicRepository from "../../repositories/Repository";
 import { QUEUE_NAME } from "../events";
 import { Model } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
-import { ModelOdm } from "./odm";
+import { DocOdm, ModelOdm } from "./odm";
 
 export type GetManyCriteria = {
   limit?: number;
@@ -46,11 +46,11 @@ CanGetAll<Model> {
   }
 
   async getManyCriteria(criteria: GetManyCriteria): Promise<Model[]> {
-    const findParams: FilterQuery<Model> = {
+    const findParams: FilterQuery<DocOdm> = {
     };
 
     if (criteria.filter?.resourceId)
-      findParams.resourceId = criteria.filter.resourceId;
+      findParams.musicId = criteria.filter.resourceId;
 
     const query = ModelOdm.find(findParams);
 
