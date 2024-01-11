@@ -33,7 +33,7 @@ export default function LastestComponent( {resourceId, dateFormat = DATE_FORMAT_
   const useRequest: UseRequest<HistoryMusicEntry[]> = makeUseRequest<Required<HistoryMusicEntry>[]>( {
     url: `${getBackendUrl()}/api/musics/history/user/search`,
     fetcher,
-    refreshInterval: 1 * 1000,
+    refreshInterval: 10 * 1000,
   } );
 
   return FetchingRender<HistoryMusicEntry[]>( {

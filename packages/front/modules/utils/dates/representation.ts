@@ -74,18 +74,33 @@ export function localeDateAgo(date: Date): string {
 
   if (secsAgo < SECS_IN_DAY) {
     if (secsAgo < SECS_IN_HOUR)
-      return `${pad2(minutesAgo)} minutos`;
+      return `${pad2(minutesAgo)} ${getLocaleMinutes(minutesAgo)}`;
 
-    return `${pad2(hoursAgo)}:${pad2(minutesMod60Ago)} horas`;
+    return `${pad2(hoursAgo)}:${pad2(minutesMod60Ago)} ${getLocaleHours(2)}`;
   }
 
-  if (secsAgo < SECS_IN_DAY * 2)
-    return `${pad2(hoursAgo)} horas`;
-
   const days = daysBetween(date);
-  const diasStr = days === 1 ? "día" : "días";
+  const diasStr = getLocaleDays(days);
+
+  if (secsAgo < SECS_IN_DAY * 2) {
+    const hoursAgoMod24 = hoursAgo % 24;
+
+    return `${days} ${diasStr} y ${hoursAgoMod24} ${getLocaleHours(hoursAgoMod24)}`;
+  }
 
   return `${days} ${diasStr}`;
+}
+
+function getLocaleDays(days: number) {
+  return days === 1 ? "día" : "días";
+}
+
+function getLocaleHours(hours: number) {
+  return hours === 1 ? "hora" : "horas";
+}
+
+function getLocaleMinutes(minutes: number) {
+  return minutes === 1 ? "minuto" : "minutos";
 }
 
 export function formatDate(date: Date, {dateTime, ago}: DateFormat) {
