@@ -1,10 +1,5 @@
-import { assertIsHistoryListDeleteOneEntryByIdRequest, assertIsHistoryListGetManyEntriesBySearchRequest, assertIsHistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetOneByIdRequest } from "#shared/models/historyLists";
+/* eslint-disable import/prefer-default-export */
+import { assertIsHistoryMusicListGetManyEntriesBySearchRequest } from "#shared/models/musics";
 import { validateRequest } from "#utils/validation/zod-express";
 
-export const getOneByIdValidation = validateRequest(assertIsHistoryListGetOneByIdRequest);
-
-export const getManyEntriesBySuperIdValidation = validateRequest(assertIsHistoryListGetManyEntriesBySuperIdRequest);
-
-export const getManyEntriesBySearchValidation = validateRequest(assertIsHistoryListGetManyEntriesBySearchRequest);
-
-export const deleteOneEntryByIdValidation = validateRequest(assertIsHistoryListDeleteOneEntryByIdRequest);
+export const getManyEntriesBySearchValidation = validateRequest(assertIsHistoryMusicListGetManyEntriesBySearchRequest);

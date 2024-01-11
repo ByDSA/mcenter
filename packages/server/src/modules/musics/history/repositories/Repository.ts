@@ -5,10 +5,11 @@ import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOne, CanGetAll, CanGetManyCriteria } from "#utils/layers/repository";
 import { FilterQuery } from "mongoose";
-import { Repository as MusicRepository } from "../../repositories";
+import { delay } from "tsyringe";
+import MusicRepository from "../../repositories/Repository";
+import { QUEUE_NAME } from "../events";
 import { Model } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
-import { QUEUE_NAME } from "./events";
 import { ModelOdm } from "./odm";
 
 export type GetManyCriteria = {
@@ -22,7 +23,7 @@ export type GetManyCriteria = {
 };
 const DepsMap = {
   domainMessageBroker: DomainMessageBroker,
-  musicRepository: MusicRepository,
+  musicRepository: delay(()=>MusicRepository),
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
