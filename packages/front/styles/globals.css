@@ -3,6 +3,8 @@
   --color-yellow-hue: calc(var(--color-red-hue) + 66);
   --color-orange-hue: calc(var(--color-red-hue) + 38);
   --color-blue-hue: calc(var(--color-red-hue) + 210);
+  --color-green-hue: calc(var(--color-red-hue) + 160);
+  --color-cyan-hue: calc(var(--color-red-hue) + 185);
 
   --color-light: 33%;
   --color-light2: 42%;
@@ -12,6 +14,132 @@
   --color-darker2: 30%;
   --color-darker3: 70%;
   --color-darker4: 90%;
+
+  --color-red: hsl(var(--color-red-hue), 100%, 50%);
+  --color-red-darker: color-mix(
+    in srgb,
+    var(--color-red),
+    #000 var(--color-darker)
+  );
+  --color-red-darker2: color-mix(
+    in srgb,
+    var(--color-red),
+    #000 var(--color-darker2)
+  );
+  --color-red-darker3: color-mix(
+    in srgb,
+    var(--color-red),
+    #000 var(--color-darker3)
+  );
+  --color-red-darker4: color-mix(
+    in srgb,
+    var(--color-red),
+    #000 var(--color-darker4)
+  );
+  --color-red-light: color-mix(
+    in srgb,
+    var(--color-red),
+    #fff var(--color-light)
+  );
+  --color-red-light2: color-mix(
+    in srgb,
+    var(--color-red),
+    #fff var(--color-light2)
+  );
+  --color-red-light3: color-mix(
+    in srgb,
+    var(--color-red),
+    #fff var(--color-light3)
+  );
+  --color-red-light4: color-mix(
+    in srgb,
+    var(--color-red),
+    #fff var(--color-light4)
+  );
+
+  --color-green: hsl(var(--color-green-hue), 100%, 50%);
+  --color-green-darker: color-mix(
+    in srgb,
+    var(--color-green),
+    #000 var(--color-darker)
+  );
+  --color-green-darker2: color-mix(
+    in srgb,
+    var(--color-green),
+    #000 var(--color-darker2)
+  );
+  --color-green-darker3: color-mix(
+    in srgb,
+    var(--color-green),
+    #000 var(--color-darker3)
+  );
+  --color-green-darker4: color-mix(
+    in srgb,
+    var(--color-green),
+    #000 var(--color-darker4)
+  );
+  --color-green-light: color-mix(
+    in srgb,
+    var(--color-green),
+    #fff var(--color-light)
+  );
+  --color-green-light2: color-mix(
+    in srgb,
+    var(--color-green),
+    #fff var(--color-light2)
+  );
+  --color-green-light3: color-mix(
+    in srgb,
+    var(--color-green),
+    #fff var(--color-light3)
+  );
+  --color-green-light4: color-mix(
+    in srgb,
+    var(--color-green),
+    #fff var(--color-light4)
+  );
+
+  --color-cyan: hsl(var(--color-cyan-hue), 100%, 50%);
+  --color-cyan-darker: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #000 var(--color-darker)
+  );
+  --color-cyan-darker2: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #000 var(--color-darker2)
+  );
+  --color-cyan-darker3: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #000 var(--color-darker3)
+  );
+  --color-cyan-darker4: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #000 var(--color-darker4)
+  );
+  --color-cyan-light: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #fff var(--color-light)
+  );
+  --color-cyan-light2: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #fff var(--color-light2)
+  );
+  --color-cyan-light3: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #fff var(--color-light3)
+  );
+  --color-cyan-light4: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #fff var(--color-light4)
+  );
 
   --color-yellow: hsl(var(--color-yellow-hue), 100%, 50%);
   --color-yellow-darker: color-mix(
@@ -157,15 +285,15 @@
   --color-primary2-darker3: var(--color-yellow-darker3);
   --color-primary2-darker4: var(--color-yellow-darker4);
 
-  --color-music: var(--color-primary);
-  --color-music-light: var(--color-primary-light);
-  --color-music-light2: var(--color-primary-light2);
-  --color-music-light3: var(--color-primary-light3);
-  --color-music-light4: var(--color-primary-light4);
-  --color-music-darker: var(--color-primary-darker);
-  --color-music-darker2: var(--color-primary-darker2);
-  --color-music-darker3: var(--color-primary-darker3);
-  --color-music-darker4: var(--color-primary-darker4);
+  --color-music: var(--color-cyan);
+  --color-music-light: var(--color-cyan-light);
+  --color-music-light2: var(--color-cyan-light2);
+  --color-music-light3: var(--color-cyan-light3);
+  --color-music-light4: var(--color-cyan-light4);
+  --color-music-darker: var(--color-cyan-darker);
+  --color-music-darker2: var(--color-cyan-darker2);
+  --color-music-darker3: var(--color-cyan-darker3);
+  --color-music-darker4: var(--color-cyan-darker4);
 }
 
 html,
@@ -200,10 +328,10 @@ a {
 .music {
   a {
     color: var(--color-yellow);
-  }
 
-  a:hover {
-    color: var(--color-yellow-light4);
+    &:hover {
+      color: var(--color-yellow-light4);
+    }
   }
 }
 
@@ -252,7 +380,14 @@ a:hover {
   margin-top: 1rem;
   margin-bottom: 1rem;
   line-height: 1;
-  font-size: 10vw;
+}
+
+h1.title {
+  font-size: 7vw;
+}
+
+h2.title {
+  font-size: 4vw;
 }
 
 .title {
@@ -275,17 +410,38 @@ a:hover {
 
 /** Menú **/
 nav {
-  width: 100vw;
   height: 3rem;
-  background-color: var(--color-primary);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &.main-nav {
+    width: 100vw;
+    background-color: var(--color-primary);
+
+    & a {
+      color: var(--color-primary2);
+
+      &:hover {
+        color: var(--color-primary2-light3);
+      }
+    }
+  }
+
+  &.sub-nav {
+    width: 100vw;
+    height: 2rem;
+    background-color: var(--color-green);
+
+    & a {
+      color: var(--color-primary2);
+
+      &:hover {
+        color: var(--color-primary2-light3);
+      }
+    }
+  }
 }
 nav :has(a) {
   display: flex;
@@ -296,19 +452,12 @@ nav :has(a) {
   color: white;
 
   & a {
-    color: var(--color-primary2);
-
     &:hover {
-      color: var(--color-primary2-light3);
       text-decoration-line: underline;
       text-underline-offset: 0.35em;
       text-decoration-thickness: 0.15em;
     }
   }
-}
-
-body {
-  padding-top: 3rem;
 }
 
 /** Buttons */

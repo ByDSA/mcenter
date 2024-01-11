@@ -5,9 +5,9 @@ import { HistoryList } from "#modules/history";
 export default function History() {
   return (
     <>
-      <h1 className="title">
+      <h2 className="title">
           Historial
-      </h1>
+      </h2>
 
       <HistoryList />
     </>
