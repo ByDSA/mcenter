@@ -56,6 +56,7 @@ export function makeUseRequest<T>( {url, fetcher, refreshInterval}: MakeUseReque
       fetcher,
       {
         refreshInterval,
+        dedupingInterval: 0,
         onSuccess: (d: T) => {
           setData(d);
         },
