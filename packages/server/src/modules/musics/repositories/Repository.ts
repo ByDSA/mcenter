@@ -11,7 +11,8 @@ import { statSync } from "fs";
 import NodeID3 from "node-id3";
 import path from "path";
 import { AUDIO_EXTENSIONS } from "../files";
-import { HISTORY_QUEUE_NAME, HistoryMusicEntry } from "../history";
+import { QUEUE_NAME as HISTORY_QUEUE_NAME } from "../history/events";
+import { Model as HistoryMusicEntry } from "../history/models";
 import { getFullPath } from "../utils";
 import { download } from "../youtube";
 // eslint-disable-next-line import/no-cycle

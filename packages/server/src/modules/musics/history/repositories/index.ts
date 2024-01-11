@@ -8,5 +8,3 @@ export {
   DocOdm,
   ModelOdm,
 } from "./odm";
-
-export * from "./events";
