@@ -8,7 +8,6 @@ import { HistoryRepositoryMock } from "../history/repositories/tests";
 import { Repository } from "../repositories";
 import { MUSICS_SAMPLES_IN_DISK, RepositoryMock } from "../repositories/tests";
 import { UpdateResult } from "../services";
-import { ENVS } from "../utils";
 import Controller from "./Controller";
 
 describe("GetAll", () => {
@@ -44,7 +43,7 @@ describe("GetAll", () => {
 
     expect(musics.some((m) => responseText.includes(`,${m.title}`))).toBeTruthy();
 
-    expect(responseText.includes(ENVS.backendUrl)).toBeTruthy();
+    expect(responseText.includes("127.0.0.1")).toBeTruthy();
     expect(musics.some((m) => responseText.includes(`/get/raw/${m.url}`))).toBeTruthy();
     expect(responseText.includes("/random")).toBeTruthy();
   } );

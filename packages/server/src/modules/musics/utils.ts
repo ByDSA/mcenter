@@ -18,6 +18,5 @@ export const ENVS = Object.freeze( {
     port: process.env.MONGO_PORT ? +process.env.MONGO_PORT : undefined,
     hostname: process.env.MONGO_HOSTNAME as string,
   },
-  backendUrl: process.env.BACKEND_URL as string,
   port: +(process.env.PORT ?? 8080),
 } );

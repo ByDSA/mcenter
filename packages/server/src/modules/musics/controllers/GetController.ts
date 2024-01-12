@@ -26,9 +26,13 @@ export default class GetController {
   async getRandom(req: Request, res: Response) {
     const musics = await this.#findMusics(req);
     const picked = await this.#randomPick(musics);
-    const nextUrlServer = ENVS.backendUrl;
+    const nextUrlServer = `${req.protocol}://${req.get("host")}`;
     const nextUrl = `${nextUrlServer}/${path.join("api/musics/get", req.url)}`;
-    const ret = generatePlaylist(picked, nextUrl);
+    const ret = generatePlaylist( {
+      picked,
+      nextUrl,
+      server: nextUrlServer,
+    } );
 
     res.send(ret);
   }
@@ -133,9 +137,13 @@ export default class GetController {
   }
 }
 
-function generatePlaylist(picked: Music, nextUrl: string): string {
+type GenPlayListParams = {
+  picked: Music;
+  nextUrl: string;
+  server: string;
+};
+function generatePlaylist( {picked, nextUrl, server}: GenPlayListParams): string {
   const ROUTE_RAW = "/api/musics/get/raw";
-  const {backendUrl: server} = ENVS;
   const ret = `#EXTM3U
   #EXTINF:317,${picked.title}
   ${server}${ROUTE_RAW}/${picked.url}
