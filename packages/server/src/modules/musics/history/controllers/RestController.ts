@@ -75,6 +75,9 @@ function bodyToCriteria(body: HistoryMusicListGetManyEntriesBySearchRequest["bod
 
     if (body.filter.resourceId)
       ret.filter.resourceId = body.filter.resourceId;
+
+    if (body.filter.timestampMax)
+      ret.filter.timestampMax = body.filter.timestampMax;
   }
 
   if (body.sort) {

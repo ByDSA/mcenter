@@ -4,6 +4,7 @@ import { z } from "zod";
 export const SearchSchema = z.object( {
   filter: z.object( {
     resourceId: z.string().optional(),
+    timestampMax: z.number().optional(),
   } ).strict()
     .optional(),
   sort: z.object( {

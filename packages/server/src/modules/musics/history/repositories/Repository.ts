@@ -18,6 +18,7 @@ export type GetManyCriteria = {
   sort?: ("asc" | "desc");
   filter?: {
     resourceId?: string;
+    timestampMax?: number;
   };
   offset?: number;
 };
@@ -51,6 +52,12 @@ CanGetAll<Model> {
 
     if (criteria.filter?.resourceId)
       findParams.musicId = criteria.filter.resourceId;
+
+    if (criteria.filter?.timestampMax) {
+      findParams["date.timestamp"] = {
+        $lte: criteria.filter.timestampMax,
+      };
+    }
 
     const query = ModelOdm.find(findParams);
 
