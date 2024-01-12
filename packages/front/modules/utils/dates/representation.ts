@@ -68,13 +68,17 @@ function pad2(n: number | string) {
 
 export function localeDateAgo(date: Date): string {
   const secsAgo = secsBetween(date);
+  const secsAgoInt = Math.floor(secsAgo);
   const minutesAgo = Math.floor(secsAgo / 60);
   const hoursAgo = Math.floor(secsAgo / SECS_IN_HOUR);
   const minutesMod60Ago = minutesAgo % 60;
 
   if (secsAgo < SECS_IN_DAY) {
+    if (secsAgo < 60)
+      return `${secsAgoInt} ${getLocaleSeconds(secsAgoInt)}`;
+
     if (secsAgo < SECS_IN_HOUR)
-      return `${pad2(minutesAgo)} ${getLocaleMinutes(minutesAgo)}`;
+      return `${minutesAgo} ${getLocaleMinutes(minutesAgo)}`;
 
     return `${pad2(hoursAgo)}:${pad2(minutesMod60Ago)} ${getLocaleHours(2)}`;
   }
@@ -101,6 +105,9 @@ function getLocaleHours(hours: number) {
 
 function getLocaleMinutes(minutes: number) {
   return minutes === 1 ? "minuto" : "minutos";
+}
+function getLocaleSeconds(seconds: number) {
+  return seconds === 1 ? "segundo" : "segundos";
 }
 
 export function formatDate(date: Date, {dateTime, ago}: DateFormat) {
