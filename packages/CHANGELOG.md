@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.5.1](https://github.com/ByDSA/mcenter/compare/v3.5.0...v3.5.1) (2024-01-12)
+
+
+### Bug Fixes
+
+* **server:** responsed playlist has same server as request ([602d1cc](https://github.com/ByDSA/mcenter/commit/602d1cc87cae2401d14e244ddb5878c3c072ce26))
+
 ## [3.5.0](https://github.com/ByDSA/mcenter/compare/v3.4.4...v3.5.0) (2024-01-08)
 
 
