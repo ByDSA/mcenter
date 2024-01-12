@@ -68,14 +68,13 @@ function pad2(n: number | string) {
 
 export function localeDateAgo(date: Date): string {
   const secsAgo = secsBetween(date);
-  const secsAgoInt = Math.floor(secsAgo);
   const minutesAgo = Math.floor(secsAgo / 60);
   const hoursAgo = Math.floor(secsAgo / SECS_IN_HOUR);
   const minutesMod60Ago = minutesAgo % 60;
 
   if (secsAgo < SECS_IN_DAY) {
     if (secsAgo < 60)
-      return `${secsAgoInt} ${getLocaleSeconds(secsAgoInt)}`;
+      return "menos de un minuto";
 
     if (secsAgo < SECS_IN_HOUR)
       return `${minutesAgo} ${getLocaleMinutes(minutesAgo)}`;

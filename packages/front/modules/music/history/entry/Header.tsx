@@ -4,11 +4,11 @@ import style from "./style.module.css";
 
 type HeaderProps = {
   entry: Required<HistoryMusicEntry>;
-  resource: Required<HistoryMusicEntry>["resource"];
   showDropdownState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
   showDate: boolean;
 };
-export default function Header( {resource, entry, showDropdownState, showDate}: HeaderProps) {
+export default function Header( {entry, showDropdownState, showDate}: HeaderProps) {
+  const {resource} = entry;
   const center = resource.artist;
   const leftCenter = `${resource.title } - ${ resource.artist}`;
   const left = resource.title;

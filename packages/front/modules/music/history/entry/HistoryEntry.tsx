@@ -13,7 +13,7 @@ export default function HistoryEntryElement( {value, showDate = true}: Props) {
   const [showDropdown, setShowDropdown] = showDropdownState;
   const hasDropdownBeenShown = useRef(false);
   const [entry, setEntry] = React.useState(value);
-  const {resource, resourceId} = entry;
+  const {resource} = entry;
   const weightState = React.useState(value.resource.weight);
   const [currentWeight] = weightState;
   const [isModified, setIsModified] = React.useState(false);
@@ -29,13 +29,11 @@ export default function HistoryEntryElement( {value, showDate = true}: Props) {
       {Header( {
         entry: value,
         showDate,
-        resource,
         showDropdownState,
       } )}
       {showDropdown &&
       Body( {
-        resource,
-        resourceId,
+        entry,
         weightState,
       } )
       }

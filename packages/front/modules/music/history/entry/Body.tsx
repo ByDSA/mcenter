@@ -6,11 +6,11 @@ import Tag from "./Tag";
 import style from "./style.module.css";
 
 type Props = {
-  resource: Required<HistoryMusicEntry>["resource"];
-  resourceId: string;
+  entry: Required<HistoryMusicEntry>;
   weightState: [number, React.Dispatch<React.SetStateAction<number>>];
 };
-export default function Body( {resource, resourceId, weightState}: Props) {
+export default function Body( {entry, weightState}: Props) {
+  const {resource} = entry;
   const [weight, setWeight] = weightState;
   const reset = () => {
     setWeight(resource.weight);
@@ -36,12 +36,12 @@ export default function Body( {resource, resourceId, weightState}: Props) {
     {(resource.mediaInfo.duration && resource.mediaInfo.duration > 0 && <>
       <span className="line">Duration : {secsToMmss(resource.mediaInfo.duration)}</span>
     </>) || null}
-    <span className="line">Tags: {resource.tags?.map(t=>(<Tag key={t} name={t}/>))}</span>
+    <span className="line">Tags: {resource.tags?.map((t,i)=>(<Tag key={t + i} name={t}/>))}</span>
     <span className={style.break} />
     <span className="line"><a onClick={() => reset()}>Reset</a></span>
     <span className={style.break} />
     <span className={style.break} />
-    <LastestComponent resourceId={resourceId} />
+    <LastestComponent resourceId={entry.resourceId} date={entry.date}/>
   </div>;
 }
 

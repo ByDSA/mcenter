@@ -74,12 +74,14 @@ export function makeUseRequest<T>( {url, fetcher, refreshInterval}: MakeUseReque
   return ret;
 }
 
-type FetchingRenderParams<T> = {
+type FetchingRenderParams<T, U> = {
 useRequest: UseRequest<T>;
-render: (data: T)=> JSX.Element;
+render: (data: T, hooksRet: U)=> JSX.Element;
+hooks?: (data: T | undefined)=> void;
 };
-export function FetchingRender<T>( {useRequest, render}: FetchingRenderParams<T>): JSX.Element {
+export function FetchingRender<T, U = undefined>( {useRequest, render, hooks}: FetchingRenderParams<T, U>): JSX.Element {
   const {data, error, isLoading, url} = useRequest();
+  const hooksRet = hooks?.(data) as U;
 
   if (error) {
     const errorShown = {
@@ -96,5 +98,5 @@ export function FetchingRender<T>( {useRequest, render}: FetchingRenderParams<T>
   if (isLoading || !data)
     return <Loading/>;
 
-  return render(data);
+  return render(data, hooksRet);
 }
