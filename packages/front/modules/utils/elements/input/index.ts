@@ -13,3 +13,7 @@ export {
 export {
   type InputResourceProps,
 } from "./props";
+
+export {
+  default as ResourceInputArrayString,
+} from "./ResourceInputArrayString";

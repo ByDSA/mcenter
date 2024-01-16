@@ -1,7 +1,7 @@
 import { isModified as isModifiedd } from "#modules/utils/objects";
 import { HistoryMusicEntry, MusicVO, assertIsMusicVO } from "#shared/models/musics";
 import { assertIsDefined } from "#shared/utils/validation";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import Body from "./Body";
 import Header from "./Header";
 import style from "./style.module.css";
@@ -26,6 +26,7 @@ export default function HistoryEntryElement( {value: entry, showDate = true}: Pr
     setBodyVisible(!isBodyVisible);
   };
   const {errors} = useValidation(resource);
+  const initialResource = useMemo(()=> entry.resource, []);
 
   return (
     <div className={`music ${style.container}`}>
@@ -38,6 +39,7 @@ export default function HistoryEntryElement( {value: entry, showDate = true}: Pr
       Body( {
         entry,
         resourceState,
+        initialResource,
         isModified,
         errors,
       } )

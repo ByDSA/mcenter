@@ -1,11 +1,10 @@
-import { Music, assertIsMusicGetOneByIdReq, assertIsMusicPatchOneByIdReq, assertIsMusicPatchOneByIdResBody } from "#shared/models/musics";
+import { Music, MusicGetOneByIdReq, MusicPatchOneByIdReq, MusicPatchOneByIdResBody, assertIsMusic, assertIsMusicGetOneByIdReq, assertIsMusicPatchOneByIdReq, assertIsMusicPatchOneByIdResBody } from "#shared/models/musics";
 import { HttpStatusCode } from "#shared/utils/http";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetOneById, CanPatchOneById } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { ResponseWithBody, sendBody, validateReq, validateResBody } from "#utils/validation/zod-express";
 import express, { NextFunction, Router } from "express";
-import { MusicGetOneByIdReq, MusicPatchOneByIdReq, MusicPatchOneByIdResBody, assertIsMusic } from "#sharedSrc/models/musics";
 import { Repository } from "../repositories";
 import { PatchOneParams } from "../repositories/types";
 
@@ -32,7 +31,7 @@ implements
     const {entity, unset} = req.body;
     const patchParams: PatchOneParams = {
       entity,
-      unset: unset as (keyof PatchOneParams["entity"])[],
+      unset,
     };
 
     await this.#deps.repo.patchOneById(id, patchParams);

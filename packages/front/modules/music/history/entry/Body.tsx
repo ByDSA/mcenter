@@ -1,36 +1,36 @@
 import { BACKEND_URLS } from "#modules/urls";
 import { secsToMmss } from "#modules/utils/dates";
-import { InputResourceProps, ResourceInput } from "#modules/utils/elements";
+import { InputResourceProps, ResourceInput, ResourceInputArrayString } from "#modules/utils/elements";
 import { getDiff } from "#modules/utils/objects";
 import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO } from "#shared/models/musics";
 import { PropInfo } from "#shared/utils/validation/zod";
 import { JSX, useState } from "react";
 import { fetchPatch } from "../../requests";
 import LastestComponent from "./Lastest";
-import Tag from "./Tag";
 import style from "./style.module.css";
 import { MUSIC_PROPS } from "./utils";
+
+function generateBody(entryResource: MusicVO, resource: MusicVO) {
+  const patchBodyParams: MusicPatchOneByIdReq["body"] = getDiff(entryResource, resource);
+
+  return patchBodyParams;
+}
 
 type Props = {
   entry: Required<HistoryMusicEntry>;
   resourceState: [MusicVO, React.Dispatch<React.SetStateAction<MusicVO>>];
+  initialResource: MusicVO;
   isModified: boolean;
   errors?: Record<keyof MusicVO, string>;
 };
-export default function Body( {entry, resourceState, isModified, errors}: Props) {
+export default function Body( {entry, initialResource, resourceState, isModified, errors}: Props) {
   const [resource, setResource] = resourceState;
   const reset = () => {
     setResource(entry.resource);
   };
   const update = () => {
-    const partial = getDiff(entry.resource, resource);
     const id = entry.resourceId;
-    const unset = Object.entries(partial).filter(([_, value]) => value === undefined)
-      .map(([key]) => key);
-    const patchBodyParams: MusicPatchOneByIdReq["body"] = {
-      unset: unset.length > 0 ? unset : undefined,
-      entity: partial,
-    };
+    const patchBodyParams = generateBody(entry.resource, resource);
 
     fetchPatch(id, patchBodyParams).then(() => {
       // eslint-disable-next-line no-param-reassign
@@ -49,25 +49,46 @@ export default function Body( {entry, resourceState, isModified, errors}: Props)
     return acc;
   }, {
   } as Record<keyof MusicVO, PropInfo>);
+  let titleArtist: JSX.Element;
+  const titleElement = <ResourceInput caption={MUSIC_PROPS.title.caption} prop="title" resourceState={resourceState} error={errors?.title}/>;
+  const artistElement = <ResourceInput caption={MUSIC_PROPS.artist.caption} prop="artist" resourceState={resourceState} error={errors?.artist}/>;
+
+  if (initialResource.title.length < 10) {
+    titleArtist = <span className={`${style.line1half}` }>
+      <span className={style.column2}>
+        {titleElement}
+        {artistElement}
+      </span>
+    </span>;
+  } else {
+    titleArtist = <>
+      <span className={style.line1half}>
+        {titleElement}
+      </span>
+      <span className={style.line1half}>
+        {artistElement}
+      </span>
+    </>;
+  }
 
   return <div className={style.dropdown}>
     {errors && Object.entries(errors).length > 0 && Object.entries(errors).map(([key, value]) => <span key={key} className="line">{key}: {value}</span>)}
-    <span className={`${style.line1half}` }>
-      <span className={style.column2}>
-        <ResourceInput caption={MUSIC_PROPS.title.caption} prop="title" resourceState={resourceState} error={errors?.title}/>
-        <ResourceInput caption={MUSIC_PROPS.artist.caption} prop="artist" resourceState={resourceState} error={errors?.artist}/>
-      </span>
-    </span>
+    {titleArtist}
     <span className={`${style.line1half} ${style.weight}`}
       style={{
         alignItems: "center",
       }}
     >
-      <ResourceInput width="auto" caption={MUSIC_PROPS.weight.caption} prop="weight" resourceState={resourceState}/>
-      <span>Tags:</span>
-      <span style= {{
-        marginLeft: "1em",
-      }}>{resource.tags?.map((t,i)=>(<Tag key={t + i} name={t}/>))}</span>
+      <ResourceInput style={{
+        width: "auto",
+        minWidth: "calc(100% / 4)",
+      }}
+      caption={MUSIC_PROPS.weight.caption}
+      type="number"
+      prop="weight"
+      resourceState={resourceState}/>
+      <span>{MUSIC_PROPS.tags.caption}</span>
+      <ResourceInputArrayString prop="tags" resourceState={resourceState}/>
     </span>
     <span className={style.line1half}>
       <ResourceInput caption={MUSIC_PROPS.album.caption} prop="album" resourceState={resourceState}/>

@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { generatePatchBody } from "../../utils/dtos";
+import { generatePatchBodySchema } from "../../utils/dtos";
 import { EntitySchema } from "../Entity";
 import { Schema as GetOneByIdSchema } from "./GetOneByIdReq";
 
-const BodySchema = generatePatchBody(EntitySchema);
+const BodySchema = generatePatchBodySchema(EntitySchema);
 
 export type BodyType = z.infer<typeof BodySchema>;
 

@@ -3,13 +3,14 @@ import OptionalCheckbox from "./OptionalCheckbox";
 import { InputResourceProps } from "./props";
 import { commonStyle } from "./style";
 
-export default function _<T>( {prop, resourceState, isOptional}: InputResourceProps<T>) {
+export default function ResourceInputNumber<T>( {prop, style, resourceState, isOptional}: InputResourceProps<T>) {
   const [resource, setResource] = resourceState;
   const checkboxName = `${prop.toString()}-Checkbox`;
   const value = isDefined(resource[prop]) ? +resource[prop] : "";
 
   return <span style={{
-    width: "100%",
+    width: style?.width ?? "100%",
+    ...style,
   }}><input
       style={commonStyle}
       type="number"

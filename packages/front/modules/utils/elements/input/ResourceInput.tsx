@@ -1,29 +1,28 @@
-import { JSX, ReactNode } from "react";
+import { JSX } from "react";
 import ResourceInputNumber from "./ResourceInputNumber";
 import ResourceInputText from "./ResourceInputText";
 import { InputResourceProps } from "./props";
 
-function MarginWidth( {children}: {children: ReactNode} ) {
-  return <span style={{
-    margin: "0 1em",
-    width: "100%",
-  }}>{children}</span>;
-}
-
 export type ResourceInputProps<T extends Object> = InputResourceProps<T> & {
   caption?: JSX.Element | string;
-  width?: "100%" | "auto";
+  style?: React.CSSProperties;
+  inputStyle?: React.CSSProperties;
   type?: "number" | "string";
 };
 
-export default function ResourceInput<T extends Object>( {width, caption, prop, resourceState, isOptional = false, error, type}: ResourceInputProps<T>) {
+export default function ResourceInput<T extends Object>( {style, inputStyle, caption, prop, resourceState, isOptional = false, error, type}: ResourceInputProps<T>) {
   let input: JSX.Element;
+  const actualInputStyle = {
+    ...defaultStyle,
+    ...inputStyle,
+  };
 
   if (type === "number") {
     input = ResourceInputNumber( {
       prop,
       resourceState,
       isOptional,
+      style: actualInputStyle,
       error,
     } );
   } else {
@@ -31,6 +30,7 @@ export default function ResourceInput<T extends Object>( {width, caption, prop, 
       prop,
       resourceState,
       isOptional,
+      style: actualInputStyle,
       error,
     } );
   }
@@ -38,16 +38,18 @@ export default function ResourceInput<T extends Object>( {width, caption, prop, 
   if (caption) {
     return <span style={{
       alignItems: "center",
-      width: width ?? "100%",
+      width: style?.width ?? "100%",
+      ...style,
     }}>
       <span>{caption}</span>
-      <MarginWidth>
-        {input}
-      </MarginWidth>
+      {input}
     </span>;
   }
 
-  return <MarginWidth>
-    {input}
-  </MarginWidth>;
+  return input;
 }
+
+const defaultStyle: React.CSSProperties = {
+  margin: "0 1em",
+  width: "100%",
+};

@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { Music, MusicVO, assertIsMusic } from "#shared/models/musics";
+import { Music, assertIsMusic } from "#shared/models/musics";
 import { UpdateQuery } from "mongoose";
 import { DocOdm } from "./odm";
 import { PatchOneParams } from "./types";
@@ -28,7 +28,6 @@ export function docOdmToModel(docOdm: DocOdm): Music {
     album: docOdm.album,
     country: docOdm.country,
     game: docOdm.game,
-    todo: docOdm.todo,
     year: docOdm.year,
   };
 
@@ -53,15 +52,27 @@ export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<Do
     album: entity.album,
     country: entity.country,
     game: entity.game,
+    year: entity.year,
   };
 
   if (params.unset && params.unset.length > 0) {
-    updateQuery.$unset = params.unset.reduce((acc, key) => {
+    updateQuery.$unset = params.unset.reduce((acc, path) => {
+      const key = path.join(".");
+
       acc[key] = 1;
 
       return acc;
     }, {
-    } as Record<keyof MusicVO, 1>);
+    } as Record<string, 1>);
+
+    // updateQuery.$pull = params.unset.reduce((acc, path) => {
+    //   const key = path.toSpliced(-1).join(".");
+
+    //   acc[key] = null;
+
+    //   return acc;
+    // }, {
+    // } );
   }
 
   if (entity.mediaInfo){

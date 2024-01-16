@@ -86,6 +86,16 @@ CanGetOneById<Music, MusicID>
 
       await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
     }
+
+    for (const p of params.unset ?? []) {
+      const event = new PatchEvent<Music, MusicID>( {
+        entityId: id,
+        key: p.join(".") as keyof Music,
+        value: undefined,
+      } );
+
+      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    }
   }
 
   async findByHash(hash: string): Promise<Music | null> {

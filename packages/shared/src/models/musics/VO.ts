@@ -11,7 +11,6 @@ const OptionalPropsSchema = z.object( {
   year: z.number().int()
     .optional(),
   country: z.string().optional(),
-  todo: z.string().optional(),
 } );
 
 export const VOSchema = OptionalPropsSchema.extend( {
