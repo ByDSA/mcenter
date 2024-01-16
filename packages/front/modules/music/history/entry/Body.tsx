@@ -104,7 +104,7 @@ function OptionalProps( {resourceState, optionalProps, errors}: OptionalPropsPro
 
   ret.top = (<>
     <span className={style.line1half}>
-      <a href="#" onClick={() => setIsVisible(!isVisible)}>{!isVisible ? "Mostrar" : "Ocultar"} todas las propiedades opcionales</a>
+      <a onClick={() => setIsVisible(!isVisible)}>{!isVisible ? "Mostrar" : "Ocultar"} todas las propiedades opcionales</a>
     </span>
   </>);
 
