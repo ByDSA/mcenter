@@ -9,9 +9,9 @@ type MakeFetcherParams<ReqBody, ResBody> = {
   method: "DELETE" | "GET" | "PATCH" | "POST";
   reqBodyValidator?: (data: ReqBody)=> void;
   resBodyValidator: (data: ResBody)=> void;
-  errorHandler?: (error: any)=> void;
+  errorMiddleware?: (error: any)=> void;
 };
-export function makeFetcher<ReqBody, ResBody>( {body, method, resBodyValidator, reqBodyValidator, errorHandler = console.error}: MakeFetcherParams<ReqBody, ResBody>): Fetcher<ResBody> {
+export function makeFetcher<ReqBody, ResBody>( {body, method, resBodyValidator, reqBodyValidator, errorMiddleware = console.error}: MakeFetcherParams<ReqBody, ResBody>): Fetcher<ResBody> {
   const ret = async (url: string) => {
     reqBodyValidator?.(body);
 
@@ -37,9 +37,9 @@ export function makeFetcher<ReqBody, ResBody>( {body, method, resBodyValidator, 
 
       return value;
     } catch (error) {
-      errorHandler(error);
+      errorMiddleware(error);
 
-      return null;
+      throw error;
     }
   };
 

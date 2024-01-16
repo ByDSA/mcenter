@@ -1,14 +1,15 @@
-import { fetchSecurePatch } from "#modules/music/requests";
 import { BACKEND_URLS } from "#modules/urls";
 import { secsToMmss } from "#modules/utils/dates";
 import { InputResourceProps, ResourceInput } from "#modules/utils/elements";
 import { getDiff } from "#modules/utils/objects";
 import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO } from "#shared/models/musics";
+import { PropInfo } from "#shared/utils/validation/zod";
 import { JSX, useState } from "react";
+import { fetchPatch } from "../../requests";
 import LastestComponent from "./Lastest";
 import Tag from "./Tag";
 import style from "./style.module.css";
-import { MUSIC_PROPS, PropInfo } from "./utils";
+import { MUSIC_PROPS } from "./utils";
 
 type Props = {
   entry: Required<HistoryMusicEntry>;
@@ -31,7 +32,7 @@ export default function Body( {entry, resourceState, isModified, errors}: Props)
       entity: partial,
     };
 
-    fetchSecurePatch(id, patchBodyParams).then(() => {
+    fetchPatch(id, patchBodyParams).then(() => {
       // eslint-disable-next-line no-param-reassign
       entry.resource = resource;
     } );

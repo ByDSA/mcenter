@@ -40,3 +40,8 @@ export function assertZodPopStack<T>(schema: ZodType<T>, model: unknown, setting
     throw e;
   }
 }
+
+export {
+  PropInfo,
+  schemaToReadableFormat as zodSchemaToReadableFormat,
+} from "./utils";

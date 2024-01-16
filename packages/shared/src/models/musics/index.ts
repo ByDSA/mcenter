@@ -3,7 +3,7 @@ export {
 } from "./Entity";
 
 export {
-  VO as MusicVO, assertIsVO as assertIsMusicVO,
+  VO as MusicVO, VOSchema as MusicVOSchema, assertIsVO as assertIsMusicVO,
 } from "./VO";
 
 export const ARTIST_EMPTY = "(Unknown Artist)";

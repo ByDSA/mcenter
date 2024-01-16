@@ -4,7 +4,7 @@ import { BACKEND_URLS } from "#modules/urls";
 import { MusicID, MusicPatchOneByIdReq, MusicPatchOneByIdReqBody, MusicPatchOneByIdResBody, assertIsMusicPatchOneByIdReqBody, assertIsMusicPatchOneByIdResBody } from "#shared/models/musics";
 
 // eslint-disable-next-line require-await
-export async function fetchSecurePatch(id: MusicID, body: MusicPatchOneByIdReq["body"]): Promise<MusicPatchOneByIdResBody> {
+export async function fetchPatch(id: MusicID, body: MusicPatchOneByIdReq["body"]): Promise<MusicPatchOneByIdResBody | undefined> {
   const fetcher = makeFetcher<MusicPatchOneByIdReqBody, MusicPatchOneByIdResBody>( {
     method: "PATCH",
     body,
