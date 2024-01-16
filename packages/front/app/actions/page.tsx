@@ -1,10 +1,10 @@
 "use client";
 
-import { getBackendUrl } from "#modules/utils";
+import { BACKEND_URLS } from "#modules/urls";
 import { useState } from "react";
 import styles from "./Page.module.css";
 
-const ACTIONS_URL = `${getBackendUrl()}/api/actions`;
+const ACTIONS_URL = BACKEND_URLS.actions;
 
 type Action = {
   url: string;

@@ -1,12 +1,12 @@
-import { HistoryMusicListGetManyEntriesBySearchRequest } from "#shared/models/musics";
+import { HistoryMusicListGetManyEntriesBySearchRequest, assertIsHistoryMusicListGetManyEntriesBySearchRequest } from "#shared/models/musics";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { validateReq } from "#utils/validation/zod-express";
 import express, { Request, Response, Router } from "express";
 import { Repository as MusicRepository } from "../../repositories";
 import { Repository } from "../repositories";
 import { GetManyCriteria } from "../repositories/Repository";
-import { getManyEntriesBySearchValidation } from "./validation";
 
 const DepsMap = {
   historyRepository: Repository,
@@ -48,7 +48,7 @@ implements
     router.use(express.json());
     router.post(
       "/:user/search",
-      getManyEntriesBySearchValidation,
+      validateReq(assertIsHistoryMusicListGetManyEntriesBySearchRequest),
       this.getManyEntriesBySearch.bind(this),
     );
     router.options("/:user/search", (req, res) => {

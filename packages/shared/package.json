@@ -13,12 +13,12 @@
     "test:coverage:clean": "rm -rf coverage"
   },
   "dependencies": {
-    "zod": "3.22.2",
-    "find-process": "1.4.7"
+    "find-process": "1.4.7",
+    "zod": "3.22.2"
   },
   "devDependencies": {
-    "jest": "workspace:../node_modules/jest",
     "@types/jest": "29.5.4",
-    "@types/node": "18.17.14"
+    "@types/node": "18.17.14",
+    "jest": "workspace:../node_modules/jest"
   }
 }

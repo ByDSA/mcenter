@@ -4,9 +4,8 @@ export {
 } from "./Entry";
 
 export {
-  GetManyEntriesBySearchRequest as HistoryListGetManyEntriesBySearchRequest,
-  GetManyEntriesBySearchResponse as HistoryListGetManyEntriesBySearchResponse,
   GetManyEntriesBySearchResponseSchema as HistoryListGetManyEntriesBySearchResponseSchema,
   assertIsGetManyEntriesBySearchRequest as assertIsHistoryListGetManyEntriesBySearchRequest,
-  assertIsGetManyEntriesBySearchResponse as assertIsHistoryListGetManyEntriesBySearchResponse,
+  assertIsGetManyEntriesBySearchResponse as assertIsHistoryListGetManyEntriesBySearchResponse, type GetManyEntriesBySearchRequest as HistoryListGetManyEntriesBySearchRequest,
+  type GetManyEntriesBySearchResponse as HistoryListGetManyEntriesBySearchResponse,
 } from "./dto";

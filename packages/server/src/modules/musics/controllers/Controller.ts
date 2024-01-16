@@ -4,6 +4,7 @@ import { Router } from "express";
 import { HistoryRestController } from "../history";
 import FixController from "./FixController";
 import GetController from "./GetController";
+import RestController from "./RestController";
 import UpdateRemoteController from "./UpdateRemoteController";
 
 const DepsMap = {
@@ -11,6 +12,7 @@ const DepsMap = {
   fixController: FixController,
   updateRemoteController: UpdateRemoteController,
   historyController: HistoryRestController,
+  restController: RestController,
 };
 
 type Deps = DepsFromMap<typeof DepsMap>;
@@ -24,6 +26,8 @@ export default class ApiController implements Controller {
 
   getRouter(): Router {
     const router = SecureRouter();
+
+    router.use("/", this.#deps.restController.getRouter());
 
     router.use("/get", this.#deps.getController.getRouter());
     router.use("/update/fix", this.#deps.fixController.getRouter());

@@ -1,4 +1,4 @@
-import { getBackendUrl } from "#modules/utils";
+import { BACKEND_URLS } from "#modules/urls";
 import { Episode, EpisodeId, assertIsEpisode } from "#shared/models/episodes";
 import { HistoryEntry, HistoryEntryId, HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, HistoryListId, assertIsHistoryEntryWithId, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 import Loading from "app/loading";
@@ -193,7 +193,7 @@ function handleOnChange(f: React.Dispatch<React.SetStateAction<number>>) {
 
 // eslint-disable-next-line require-await
 async function fetchSecurePatch(id: EpisodeId, partial: Partial<Episode>): Promise<Episode | null> {
-  const URL = `${getBackendUrl()}/api/episodes/${id.serieId}/${id.innerId}`;
+  const URL = `${BACKEND_URLS.resources.episodes.crud.get}/api/episodes/${id.serieId}/${id.innerId}`;
 
   return fetch(URL, {
     method: "PATCH",
@@ -215,7 +215,7 @@ async function fetchSecurePatch(id: EpisodeId, partial: Partial<Episode>): Promi
 }
 
 function fetchSecureDelete(listId: HistoryListId, entryId: HistoryEntryId): Promise<HistoryEntry | null> {
-  const URL = `${getBackendUrl()}/api/history-list/${listId}/entries/${entryId}`;
+  const URL = `${BACKEND_URLS.resources.series.historyList.crud.get}/${listId}/entries/${entryId}`;
 
   return fetch(URL, {
     method: "DELETE",
@@ -233,7 +233,7 @@ function fetchSecureDelete(listId: HistoryListId, entryId: HistoryEntryId): Prom
 }
 
 export function fetchSecureLastestHistoryEntries(historyEntry: HistoryEntry): Promise<HistoryEntryWithId[] | null> {
-  const URL = `${getBackendUrl()}/api/history-list/entries/search`;
+  const URL = BACKEND_URLS.resources.series.historyList.entries.crud.search;
   const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
     "filter": {
       "serieId": historyEntry.episodeId.serieId,

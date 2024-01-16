@@ -2,13 +2,19 @@ import Loading from "app/loading";
 import React, { JSX } from "react";
 import useSWR from "swr";
 
-type MakeFetcherParams<T> = {
-  body: Object;
-  method: "GET" | "POST";
-  validator: (data: T)=> void;
+export type Fetcher<ResBody> = (url: string)=> Promise<ResBody>;
+
+type MakeFetcherParams<ReqBody, ResBody> = {
+  body: ReqBody;
+  method: "DELETE" | "GET" | "PATCH" | "POST";
+  reqBodyValidator?: (data: ReqBody)=> void;
+  resBodyValidator: (data: ResBody)=> void;
+  errorHandler?: (error: any)=> void;
 };
-export function makeFetcher<T>( {body, method, validator}: MakeFetcherParams<T>) {
+export function makeFetcher<ReqBody, ResBody>( {body, method, resBodyValidator, reqBodyValidator, errorHandler = console.error}: MakeFetcherParams<ReqBody, ResBody>): Fetcher<ResBody> {
   const ret = async (url: string) => {
+    reqBodyValidator?.(body);
+
     const options = {
       method,
       cors: "no-cors",
@@ -18,16 +24,23 @@ export function makeFetcher<T>( {body, method, validator}: MakeFetcherParams<T>)
         "Content-Type": "application/json",
       },
     };
-    const res = await fetch(url, options);
 
-    if (!res.ok)
-      throw new Error("An error occurred while fetching the data.");
+    try {
+      const res = await fetch(url, options);
 
-    const value = await res.json();
+      if (!res.ok)
+        throw new Error("An error occurred while fetching the data.");
 
-    validator(value);
+      const value: ResBody = await res.json();
 
-    return value;
+      resBodyValidator(value);
+
+      return value;
+    } catch (error) {
+      errorHandler(error);
+
+      return null;
+    }
   };
 
   return ret;
@@ -39,16 +52,15 @@ type UseRequestResult<T> = {
   isLoading: boolean;
   url: string;
 };
-export type Fetcher = (url: string)=> Promise<any>;
-type MakeUseRequestParams = {
+type MakeUseRequestParams<ResBody> = {
   url: string;
-  fetcher: Fetcher;
+  fetcher: Fetcher<ResBody>;
   refreshInterval?: number;
 };
 
 export type UseRequest<T> = ()=> UseRequestResult<T>;
 
-export function makeUseRequest<T>( {url, fetcher, refreshInterval}: MakeUseRequestParams): UseRequest<T> {
+export function makeUseRequest<T>( {url, fetcher, refreshInterval}: MakeUseRequestParams<T>): UseRequest<T> {
   const ret: UseRequest<T> = () => {
     const [data, setData] = React.useState<T | undefined>(undefined);
     const { error, isLoading } = useSWR(

@@ -1,10 +1,8 @@
 export {
-  GetManyEntriesBySearchRequest,
-  assertIsGetManyEntriesBySearchRequest,
+  assertIsGetManyEntriesBySearchRequest, type GetManyEntriesBySearchRequest,
 } from "./GetManyEntriesBySearchRequest";
 
 export {
-  GetManyEntriesBySearchResponse,
   GetManyEntriesBySearchResponseSchema,
-  assertIsGetManyEntriesBySearchResponse,
+  assertIsGetManyEntriesBySearchResponse, type GetManyEntriesBySearchResponse,
 } from "./GetManyEntriesBySearchResponse";

@@ -4,19 +4,18 @@ import style from "./style.module.css";
 
 type HeaderProps = {
   entry: Required<HistoryMusicEntry>;
-  showDropdownState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  toggleShowBody: ()=> void;
   showDate: boolean;
 };
-export default function Header( {entry, showDropdownState, showDate}: HeaderProps) {
+export default function Header( {entry, toggleShowBody, showDate}: HeaderProps) {
   const {resource} = entry;
   const center = resource.artist;
-  const leftCenter = `${resource.title } - ${ resource.artist}`;
+  const leftCenter = `${resource.title} - ${resource.artist}`;
   const left = resource.title;
   const right = resource.weight.toString();
   const timeStampDate = new Date(entry.date.timestamp * 1000);
-  const [showDropdown, setShowDropdown] = showDropdownState;
 
-  return <div className={style.header} onClick={()=>setShowDropdown(!showDropdown)}>
+  return <div className={style.header} onClick={()=>toggleShowBody()}>
     <div className={style.fullTime}>
       <span className={style.time}>{timeStampDate.toLocaleTimeString()}</span>
 

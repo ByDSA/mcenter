@@ -1,5 +1,5 @@
 /* eslint-disable require-await */
-import { getBackendUrl } from "#modules/utils";
+import { BACKEND_URLS } from "#modules/urls";
 import { PlayerEvent, PlayerStatusResponse, assertIsPlayerStatusResponse } from "#shared/models/player";
 import { PlayResourceParams, PlayerActions } from "#shared/models/player/Player";
 import { Socket, io } from "socket.io-client";
@@ -9,7 +9,7 @@ export default abstract class WebSocketsClient implements PlayerActions {
 
   // eslint-disable-next-line class-methods-use-this
   init() {
-    const SOCKET_URL = getBackendUrl();
+    const SOCKET_URL = BACKEND_URLS.socketUrl;
 
     console.log("connecting to", SOCKET_URL);
     this.socket = io(SOCKET_URL, {

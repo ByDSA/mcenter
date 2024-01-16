@@ -105,18 +105,22 @@ function getLocaleHours(hours: number) {
 function getLocaleMinutes(minutes: number) {
   return minutes === 1 ? "minuto" : "minutos";
 }
-function getLocaleSeconds(seconds: number) {
-  return seconds === 1 ? "segundo" : "segundos";
-}
 
 export function formatDate(date: Date, {dateTime, ago}: DateFormat) {
   let ret = "";
 
-  if (dateTime !== "none")
-    ret += getLongDateStr(date, dateTime);
-
   if (ago === "yes")
-    ret += ` (hace ${localeDateAgo(date)})`;
+    ret += `Hace ${localeDateAgo(date)}`;
+
+  if (dateTime !== "none") {
+    if (ago === "yes")
+      ret += " (";
+
+    ret += `${getLongDateStr(date, dateTime)}`;
+
+    if (ago === "yes")
+      ret += ")";
+  }
 
   return ret;
 }

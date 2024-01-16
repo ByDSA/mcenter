@@ -17,26 +17,10 @@ import { getFullPath } from "../utils";
 import { download } from "../youtube";
 // eslint-disable-next-line import/no-cycle
 import UrlGenerator from "./UrlGenerator";
-import { docOdmToModel, partialModelToPartialDocOdm } from "./adapters";
+import { docOdmToModel, patchParamsToUpdateQuery } from "./adapters";
 import { QUEUE_NAME } from "./events";
 import { DocOdm, ModelOdm } from "./odm";
-
-export type FindParams = {
-  tags?: string[];
-  weight?: {
-    max?: number;
-    min?: number;
-  };
-};
-type FindQueryParams = {
-  tags?: {
-    $in: string[];
-  };
-  weight?: {
-    $gte?: number;
-    $lte?: number;
-  };
-};
+import { FindParams, FindQueryParams, PatchOneParams } from "./types";
 
 const DepsMap = {
   domainMessageBroker: DomainMessageBroker,
@@ -45,7 +29,7 @@ const DepsMap = {
 type Deps = DepsFromMap<typeof DepsMap>;
 @injectDeps(DepsMap)
 export default class MusicRepository
-implements CanPatchOneById<Music, MusicID>,
+implements CanPatchOneById<Music, MusicID, PatchOneParams>,
 CanGetOneById<Music, MusicID>
 {
   #deps: Deps;
@@ -69,7 +53,9 @@ CanGetOneById<Music, MusicID>
       const lastTimePlayed = event.payload.entity.date.timestamp;
 
       await this.patchOneById(id, {
-        lastTimePlayed,
+        entity: {
+          lastTimePlayed,
+        },
       } );
     } );
   }
@@ -83,13 +69,14 @@ CanGetOneById<Music, MusicID>
     return docOdmToModel(docOdm);
   }
 
-  async patchOneById(id: string, partialModel: Partial<Music>): Promise<void> {
-    const partialDocOdm = partialModelToPartialDocOdm(partialModel);
+  async patchOneById(id: string, params: PatchOneParams): Promise<void> {
+    const {entity} = params;
+    const updateQuery = patchParamsToUpdateQuery(params);
 
-    await ModelOdm.findByIdAndUpdate(id, partialDocOdm);
+    await ModelOdm.findByIdAndUpdate(id, updateQuery);
 
     // eslint-disable-next-line no-restricted-syntax, guard-for-in
-    for (const [k, value] of Object.entries(partialModel)) {
+    for (const [k, value] of Object.entries(entity)) {
       const key = k as keyof Music;
       const event = new PatchEvent<Music, MusicID>( {
         entityId: id,

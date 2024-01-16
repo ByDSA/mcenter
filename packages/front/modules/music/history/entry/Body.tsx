@@ -1,58 +1,137 @@
-import { getBackendUrl } from "#modules/utils";
+import { fetchSecurePatch } from "#modules/music/requests";
+import { BACKEND_URLS } from "#modules/urls";
 import { secsToMmss } from "#modules/utils/dates";
-import { HistoryMusicEntry } from "#shared/models/musics";
+import { InputResourceProps, ResourceInput } from "#modules/utils/elements";
+import { getDiff } from "#modules/utils/objects";
+import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO } from "#shared/models/musics";
+import { JSX, useState } from "react";
 import LastestComponent from "./Lastest";
 import Tag from "./Tag";
 import style from "./style.module.css";
+import { MUSIC_PROPS, PropInfo } from "./utils";
 
 type Props = {
   entry: Required<HistoryMusicEntry>;
-  weightState: [number, React.Dispatch<React.SetStateAction<number>>];
+  resourceState: [MusicVO, React.Dispatch<React.SetStateAction<MusicVO>>];
+  isModified: boolean;
+  errors?: Record<keyof MusicVO, string>;
 };
-export default function Body( {entry, weightState}: Props) {
-  const {resource} = entry;
-  const [weight, setWeight] = weightState;
+export default function Body( {entry, resourceState, isModified, errors}: Props) {
+  const [resource, setResource] = resourceState;
   const reset = () => {
-    setWeight(resource.weight);
+    setResource(entry.resource);
   };
+  const update = () => {
+    const partial = getDiff(entry.resource, resource);
+    const id = entry.resourceId;
+    const unset = Object.entries(partial).filter(([_, value]) => value === undefined)
+      .map(([key]) => key);
+    const patchBodyParams: MusicPatchOneByIdReq["body"] = {
+      unset: unset.length > 0 ? unset : undefined,
+      entity: partial,
+    };
+
+    fetchSecurePatch(id, patchBodyParams).then(() => {
+      // eslint-disable-next-line no-param-reassign
+      entry.resource = resource;
+    } );
+  };
+  const optionalProps: Record<keyof MusicVO, PropInfo> = Object.entries(MUSIC_PROPS).reduce((acc, [key, value]) => {
+    if (value.required)
+      return acc;
+
+    if (["lastTimePlayed", "album", "tags"].includes(key))
+      return acc;
+
+    acc[key as keyof MusicVO] = value;
+
+    return acc;
+  }, {
+  } as Record<keyof MusicVO, PropInfo>);
 
   return <div className={style.dropdown}>
+    {errors && Object.entries(errors).length > 0 && Object.entries(errors).map(([key, value]) => <span key={key} className="line">{key}: {value}</span>)}
     <span className={`${style.line1half}` }>
       <span className={style.column2}>
-        <span>Título: {resource.title}</span>
-        <span>Artista: {resource.artist}</span>
+        <ResourceInput caption={MUSIC_PROPS.title.caption} prop="title" resourceState={resourceState} error={errors?.title}/>
+        <ResourceInput caption={MUSIC_PROPS.artist.caption} prop="artist" resourceState={resourceState} error={errors?.artist}/>
       </span>
     </span>
-    {resource.game && <>
-      <span className={style.line1half}>Game: {resource.game}</span>
-    </>}
-    {resource.country && <>
-      <span className={style.line1half}>Country: {resource.country}</span>
-    </>}
-    <span className={`${style.line1half} ${style.weight}`}>
-      <span>Weight:</span> <input type="number" value={weight} onChange={handleOnChange(setWeight)}/>
+    <span className={`${style.line1half} ${style.weight}`}
+      style={{
+        alignItems: "center",
+      }}
+    >
+      <ResourceInput width="auto" caption={MUSIC_PROPS.weight.caption} prop="weight" resourceState={resourceState}/>
+      <span>Tags:</span>
+      <span style= {{
+        marginLeft: "1em",
+      }}>{resource.tags?.map((t,i)=>(<Tag key={t + i} name={t}/>))}</span>
     </span>
-    <span className={style.line1half}>url: <a href={fullUrlOf(resource.url)}>{resource.url}</a></span>
+    <span className={style.line1half}>
+      <ResourceInput caption={MUSIC_PROPS.album.caption} prop="album" resourceState={resourceState}/>
+    </span>
+    <span className={style.line1half}>
+      <ResourceInput caption={MUSIC_PROPS.path.caption} prop="path" resourceState={resourceState}/>
+    </span>
+    <span className={style.line1half}>
+      <ResourceInput caption={<><a href={fullUrlOf(resource.url)}>url</a>:</>} prop="url" resourceState={resourceState}/>
+    </span>
     {(resource.mediaInfo.duration && resource.mediaInfo.duration > 0 && <>
       <span className="line">Duration : {secsToMmss(resource.mediaInfo.duration)}</span>
     </>) || null}
-    <span className="line">Tags: {resource.tags?.map((t,i)=>(<Tag key={t + i} name={t}/>))}</span>
+    <OptionalProps resourceState={resourceState} optionalProps={optionalProps} errors={errors}/>
+
     <span className={style.break} />
-    <span className="line"><a onClick={() => reset()}>Reset</a></span>
-    <span className={style.break} />
+    <span className="line">
+      <span><a onClick={() => reset()}>Reset</a></span>
+      {isModified && <span style={{
+        marginLeft: "1em",
+      }}><a href="#" onClick={() => update()}>Update</a></span>}</span>
     <span className={style.break} />
     <LastestComponent resourceId={entry.resourceId} date={entry.date}/>
   </div>;
 }
 
-function fullUrlOf(url: string) {
-  return `${getBackendUrl()}/api/musics/get/raw/${ url}`;
+type OptionalPropsProps = Omit<InputResourceProps<MusicVO>, "prop"> & {
+  optionalProps: Record<keyof MusicVO, PropInfo>;
+  errors?: Record<keyof MusicVO, string>;
+};
+function OptionalProps( {resourceState, optionalProps, errors}: OptionalPropsProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ret: Record<string, JSX.Element> = {
+  };
+
+  ret.top = (<>
+    <span className={style.line1half}>
+      <a href="#" onClick={() => setIsVisible(!isVisible)}>{!isVisible ? "Mostrar" : "Ocultar"} todas las propiedades opcionales</a>
+    </span>
+  </>);
+
+  const [resource] = resourceState;
+  const entries = Object.entries(optionalProps) as [keyof MusicVO, PropInfo][];
+
+  for (const entry of entries) {
+    const prop = entry[0];
+    const propInfo = entry[1];
+    const {type, caption = prop} = propInfo;
+
+    if (prop in resource || isVisible) {
+      ret[prop] = (<>
+        <span className={style.line1half}>
+          <ResourceInput caption={caption} type={type === "number" ? "number" : "string"} prop={prop} resourceState={resourceState} isOptional error={errors?.[prop]}/>
+        </span>
+      </>);
+    }
+  }
+
+  return <>
+    {Object.entries(ret).map(([key, value]) => <span key={key}>{value}</span>)}
+  </>;
 }
 
-function handleOnChange(f: React.Dispatch<React.SetStateAction<number>>) {
-  return (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = +e.target.value;
-
-    f(v);
-  };
+function fullUrlOf(url: string) {
+  return BACKEND_URLS.resources.musics.raw( {
+    url,
+  } );
 }

@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { z } from "zod";
-import { assertZodPopStack } from "../../utils/validation/zod";
+import { AssertZodSettings, assertZodPopStack } from "../../utils/validation/zod";
 import { VOSchema } from "./VO";
 
 export const IDSchema = z.string();
@@ -13,8 +13,8 @@ export const EntitySchema = VOSchema.merge(z.object( {
 
 export type Entity = z.infer<typeof EntitySchema>;
 
-export function assertIsEntity(model: unknown, msg?: string): asserts model is Entity {
-  assertZodPopStack(EntitySchema, model, msg);
+export function assertIsEntity(model: unknown, settings?: AssertZodSettings): asserts model is Entity {
+  assertZodPopStack(EntitySchema, model, settings);
 }
 
 export function parse(model: unknown): Entity {

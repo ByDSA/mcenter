@@ -1,18 +1,20 @@
 import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#modules/episodes";
 import { SerieRepository } from "#modules/series";
 import {HistoryListDeleteOneEntryByIdRequest, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
-  HistoryListGetOneByIdRequest} from "#shared/models/historyLists";
+  HistoryListGetOneByIdRequest,
+  assertIsHistoryListDeleteOneEntryByIdRequest,
+  assertIsHistoryListGetManyEntriesBySearchRequest,
+  assertIsHistoryListGetManyEntriesBySuperIdRequest,
+  assertIsHistoryListGetOneByIdRequest} from "#shared/models/historyLists";
 import { assertFound } from "#shared/utils/http/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { validateReq } from "#utils/validation/zod-express";
 import express, { Request, Response, Router } from "express";
 import LastTimePlayedService from "../LastTimePlayedService";
 import { Entry, EntryWithId, Model, assertIsEntryWithId } from "../models";
 import { ListRepository } from "../repositories";
-import {deleteOneEntryByIdValidation, getManyEntriesBySearchValidation,
-  getManyEntriesBySuperIdValidation,
-  getOneByIdValidation} from "./validation";
 
 const DepsMap = {
   historyListRepository: ListRepository,
@@ -210,23 +212,26 @@ implements
     const router = SecureRouter();
 
     router.get("/", this.getAll.bind(this));
-    router.get("/:id", getOneByIdValidation, this.getOneById.bind(this));
+    router.get("/:id",
+      validateReq(assertIsHistoryListGetOneByIdRequest),
+      this.getOneById.bind(this),
+    );
     router.get(
       "/:id/entries",
-      getOneByIdValidation,
+      validateReq(assertIsHistoryListGetOneByIdRequest),
       this.getManyEntriesByHistoryListId.bind(this),
     );
 
     router.delete(
       "/:id/entries/:entryId",
-      deleteOneEntryByIdValidation,
+      validateReq(assertIsHistoryListDeleteOneEntryByIdRequest),
       this.deleteOneEntryById.bind(this),
     );
 
     router.use(express.json());
     router.post(
       "/entries/search",
-      getManyEntriesBySearchValidation,
+      validateReq(assertIsHistoryListGetManyEntriesBySearchRequest),
       this.getManyEntriesBySearch.bind(this),
     );
     router.options("/entries/search", (req, res) => {
@@ -237,7 +242,7 @@ implements
     } );
     router.post(
       "/:id/entries/search",
-      getManyEntriesBySuperIdValidation,
+      validateReq(assertIsHistoryListGetManyEntriesBySuperIdRequest),
       this.getManyEntriesByHistoryListIdSearch.bind(this),
     );
 

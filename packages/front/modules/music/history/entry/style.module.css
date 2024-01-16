@@ -98,17 +98,23 @@
 }
 
 .dropdown .column2 {
-  display: block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   width: 100%;
 }
 .dropdown .column2 > span {
-  display: inline-block;
+  display: flex;
+  flex-direction: row;
   width: 50%;
+}
+
+.dropdown span {
+  display: flex;
 }
 
 .dropdown .line,
 .dropdown .line1half {
-  display: block;
   width: 100%;
   margin: 0;
 }
@@ -133,11 +139,14 @@ span.break {
 
 .dropdown input {
   min-width: 50px;
-  width: 5vw;
   margin: 0 0.25rem;
   background-color: white;
   border-width: 1px;
   border-radius: 2vw;
+}
+
+.dropdown .weight input {
+  width: 5vw;
 }
 
 .dropdown .dropdownTime {
