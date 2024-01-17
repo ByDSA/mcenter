@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.6.2](https://github.com/ByDSA/mcenter/compare/v3.6.1...v3.6.2) (2024-01-17)
+
+
+### Bug Fixes
+
+* **server:** use req.get("host") instead of req.get("x-forwarded-host") if available ([dfcbfb9](https://github.com/ByDSA/mcenter/commit/dfcbfb96e31158de8f2c782beb0ab53d95f1df6f))
+
 ### [3.6.1](https://github.com/ByDSA/mcenter/compare/v3.6.0...v3.6.1) (2024-01-17)
 
 
