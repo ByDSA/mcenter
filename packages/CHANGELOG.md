@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.6.1](https://github.com/ByDSA/mcenter/compare/v3.6.0...v3.6.1) (2024-01-17)
+
+
+### Bug Fixes
+
+* **front:** show version in production ([b0ffb8c](https://github.com/ByDSA/mcenter/commit/b0ffb8ca85fb3d07d924f5b2877d8f6a75b5f23b))
+
 ## [3.6.0](https://github.com/ByDSA/mcenter/compare/v3.5.1...v3.6.0) (2024-01-17)
 
 
