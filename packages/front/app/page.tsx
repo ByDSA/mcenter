@@ -1,9 +1,10 @@
 "use client";
 
-import { version } from "../../package.json" assert { type: "json" };
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
+  const version = process.env.version ?? "undefined";
+
   return (
     <div className="extra-margin" style={{
       display: "flex",

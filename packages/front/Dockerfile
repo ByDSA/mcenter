@@ -60,6 +60,9 @@ WORKDIR /packages
 COPY --from=deps-build /packages/node_modules ./node_modules
 COPY --from=deps-build /packages/.eslintrc* ./
 
+# Para mostrar la versión global en producción
+COPY ./package.json ./
+
 WORKDIR /packages/shared
 COPY --from=deps-build /packages/shared ./
 
