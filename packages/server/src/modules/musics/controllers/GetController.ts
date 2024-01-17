@@ -9,6 +9,29 @@ import { RepositoryFindParams as FindParams, Repository } from "../repositories"
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
 
+function getRootUrlFromForwardedRequest(req: Request) {
+  const protocol = req.get("x-forwarded-proto") ?? req.protocol;
+  const hostname = req.get("x-forwarded-host") ?? req.hostname;
+  const portStr = req.get("x-forwarded-port");
+  let ret = `${protocol }://`;
+
+  ret += hostname;
+
+  if (portStr && ((protocol === "http" && +portStr !== 80) || (protocol === "https" && +portStr !== 443)))
+    ret += `:${portStr}`;
+
+  return ret;
+}
+
+function getRootUrlFromRequest(req: Request) {
+  const isForwarded = req.get("x-forwarded-host") !== undefined;
+
+  if (isForwarded)
+    return getRootUrlFromForwardedRequest(req);
+
+  return `${req.protocol}://${req.get("host")}`;
+}
+
 const DepsMap = {
   musicRepository: Repository,
   historyMusicRepository: HistoryRepository,
@@ -26,12 +49,12 @@ export default class GetController {
   async getRandom(req: Request, res: Response) {
     const musics = await this.#findMusics(req);
     const picked = await this.#randomPick(musics);
-    const nextUrlServer = `${req.protocol}://${req.get("host")}`;
-    const nextUrl = `${nextUrlServer}/${path.join("api/musics/get", req.url)}`;
+    const nextRootUrl = getRootUrlFromRequest(req);
+    const nextUrl = `${nextRootUrl}/${path.join("api/musics/get", req.url)}`;
     const ret = generatePlaylist( {
       picked,
       nextUrl,
-      server: nextUrlServer,
+      server: nextRootUrl,
     } );
 
     res.send(ret);
