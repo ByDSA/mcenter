@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/ByDSA/mcenter/compare/v3.5.1...v3.6.0) (2024-01-17)
+
+
+### Features
+
+* **server, front:** history music ([#18](https://github.com/ByDSA/mcenter/issues/18)) ([faa17ab](https://github.com/ByDSA/mcenter/commit/faa17abcf57cc4cf31896ca8994bcadc968cf601))
+
 ### [3.5.1](https://github.com/ByDSA/mcenter/compare/v3.5.0...v3.5.1) (2024-01-12)
 
 
