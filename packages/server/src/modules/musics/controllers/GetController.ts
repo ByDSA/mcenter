@@ -11,7 +11,7 @@ import { ENVS, getFullPath } from "../utils";
 
 function getRootUrlFromForwardedRequest(req: Request) {
   const protocol = req.get("x-forwarded-proto") ?? req.protocol;
-  const hostname = req.get("x-forwarded-host") ?? req.hostname;
+  const hostname = req.get("host") ?? req.get("x-forwarded-host") ?? req.hostname;
   const portStr = req.get("x-forwarded-port");
   let ret = `${protocol }://`;
 
