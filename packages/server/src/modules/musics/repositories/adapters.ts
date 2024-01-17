@@ -1,6 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import { Music, assertIsMusic } from "#shared/models/musics";
+import { UpdateQuery } from "mongoose";
 import { DocOdm } from "./odm";
+import { PatchOneParams } from "./types";
 
 export function docOdmToModel(docOdm: DocOdm): Music {
   const model: Music = {
@@ -26,7 +28,6 @@ export function docOdmToModel(docOdm: DocOdm): Music {
     album: docOdm.album,
     country: docOdm.country,
     game: docOdm.game,
-    todo: docOdm.todo,
     year: docOdm.year,
   };
 
@@ -35,41 +36,63 @@ export function docOdmToModel(docOdm: DocOdm): Music {
   return model;
 }
 
-export function partialModelToPartialDocOdm(model: Partial<Music>): Partial<DocOdm> {
-  const docOdm: Partial<DocOdm> = {
-    hash: model.hash,
-    title: model.title,
-    url: model.url,
-    path: model.path,
-    weight: model.weight,
-    artist: model.artist,
-    tags: model.tags,
-    disabled: model.disabled,
-    lastTimePlayed: model.lastTimePlayed,
-    size: model.size,
-    album: model.album,
-    country: model.country,
-    game: model.game,
+export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<DocOdm> {
+  const {entity} = params;
+  const updateQuery: UpdateQuery<DocOdm> = {
+    hash: entity.hash,
+    title: entity.title,
+    url: entity.url,
+    path: entity.path,
+    weight: entity.weight,
+    artist: entity.artist,
+    tags: entity.tags,
+    disabled: entity.disabled,
+    lastTimePlayed: entity.lastTimePlayed,
+    size: entity.size,
+    album: entity.album,
+    country: entity.country,
+    game: entity.game,
+    year: entity.year,
   };
 
-  if (model.mediaInfo){
-    docOdm.mediaInfo = {
-      duration: model.mediaInfo.duration,
+  if (params.unset && params.unset.length > 0) {
+    updateQuery.$unset = params.unset.reduce((acc, path) => {
+      const key = path.join(".");
+
+      acc[key] = 1;
+
+      return acc;
+    }, {
+    } as Record<string, 1>);
+
+    // updateQuery.$pull = params.unset.reduce((acc, path) => {
+    //   const key = path.toSpliced(-1).join(".");
+
+    //   acc[key] = null;
+
+    //   return acc;
+    // }, {
+    // } );
+  }
+
+  if (entity.mediaInfo){
+    updateQuery.mediaInfo = {
+      duration: entity.mediaInfo.duration,
     };
   }
 
-  if (model.timestamps) {
-    docOdm.timestamps = {
-      createdAt: model.timestamps.createdAt,
-      updatedAt: model.timestamps.updatedAt,
+  if (entity.timestamps) {
+    updateQuery.timestamps = {
+      createdAt: entity.timestamps.createdAt,
+      updatedAt: entity.timestamps.updatedAt,
     };
   }
 
   // eslint-disable-next-line no-restricted-syntax
-  for (const key in docOdm) {
-    if ((docOdm as any)[key] === undefined)
-      delete (docOdm as any)[key];
+  for (const key in updateQuery) {
+    if ((updateQuery as any)[key] === undefined)
+      delete (updateQuery as any)[key];
   }
 
-  return docOdm;
+  return updateQuery;
 }

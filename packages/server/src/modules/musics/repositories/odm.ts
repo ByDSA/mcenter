@@ -68,6 +68,15 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   lastTimePlayed: {
     type: Number,
   },
+  game: {
+    type: String,
+  },
+  country: {
+    type: String,
+  },
+  year: {
+    type: Number,
+  },
 } );
 
 export const ModelOdm = mongoose.model<MusicVO>(NAME, SchemaOdm);

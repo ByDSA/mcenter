@@ -1,18 +1,15 @@
 import { SerieRepository } from "#modules/series";
-import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest } from "#shared/models/episodes";
+import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest } from "#shared/models/episodes";
 import { Serie } from "#shared/models/series";
 import { assertFound } from "#shared/utils/http/validation";
 import { neverCase } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { validateReq } from "#utils/validation/zod-express";
 import express, { Response, Router } from "express";
 import { Model } from "../models";
 import { Repository as EpisodeRepository } from "../repositories";
-import {getAllValidation,
-  getManyBySearchValidation,
-  getOneByIdValidation,
-  patchOneByIdValidation} from "./validation";
 
 enum ResourceType {
   SERIES = "series",
@@ -121,8 +118,13 @@ implements
   getRouter(): Router {
     const router = SecureRouter();
 
-    router.get("/:serieId", getAllValidation, this.getAll.bind(this));
-    router.get("/:serieId/:episodeId", getOneByIdValidation, this.getOneById.bind(this));
+    router.get("/:serieId",
+      validateReq(assertIsEpisodeGetAllRequest),
+      this.getAll.bind(this),
+    );
+    router.get("/:serieId/:episodeId",
+      validateReq(assertIsEpisodeGetOneByIdRequest),
+      this.getOneById.bind(this));
 
     router.options("/:serieId/:episodeId", (_, res) => {
       res.header("Access-Control-Allow-Origin", "*");
@@ -131,11 +133,14 @@ implements
       res.sendStatus(200);
     } );
     router.use(express.json());
-    router.patch("/:serieId/:episodeId", patchOneByIdValidation, this.patchOneByIdAndGet.bind(this));
+    router.patch("/:serieId/:episodeId",
+      validateReq(assertIsEpisodePatchOneByIdRequest),
+      this.patchOneByIdAndGet.bind(this),
+    );
 
     router.post(
       "/search",
-      getManyBySearchValidation,
+      validateReq(assertIsEpisodeGetManyBySearchRequest),
       this.getManyBySearch.bind(this),
     );
 

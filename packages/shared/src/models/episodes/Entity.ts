@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { assertZodPopStack } from "../../utils/validation/zod";
+import { AssertZodSettings, assertZodPopStack } from "../../utils/validation/zod";
 import { SerieSchema } from "../series";
 import { VOSchema } from "./VO";
 
@@ -24,6 +24,6 @@ export function compareId(a: Id, b: Id): boolean {
   return a.innerId === b.innerId && a.serieId === b.serieId;
 }
 
-export function assertIsModel(model: unknown, msg?: string): asserts model is Model {
-  assertZodPopStack(EntitySchema, model, msg);
+export function assertIsModel(model: unknown, settings?: AssertZodSettings): asserts model is Model {
+  assertZodPopStack(EntitySchema, model, settings);
 }

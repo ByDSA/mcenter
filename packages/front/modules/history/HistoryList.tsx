@@ -1,7 +1,7 @@
 
 /* eslint-disable require-await */
 import HistoryEntryElement from "#modules/history/entry/HistoryEntryElement";
-import { getBackendUrl } from "#modules/utils";
+import { BACKEND_URLS } from "#modules/urls";
 import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse, historyListEntryDtoToModel } from "#shared/models/historyLists";
 import Loading from "app/loading";
 import React, { Fragment } from "react";
@@ -33,7 +33,7 @@ export const fetcher = async (url: string) => {
 };
 
 export default function Page() {
-  const URL = `${getBackendUrl()}/api/history-list/entries/search`;
+  const URL = BACKEND_URLS.resources.series.historyList.entries.crud.search;
   const { data:dto, error, isLoading } = useSWR(
     URL,
     fetcher,

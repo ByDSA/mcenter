@@ -1,6 +1,6 @@
 "use client";
 
-import { getBackendUrl } from "#modules/utils";
+import { BACKEND_URLS } from "#modules/urls";
 import { Stream, assertIsStream, assertIsStreamGetManyResponse } from "#shared/models/streams";
 import Loading from "app/loading";
 import { Fragment, MouseEventHandler, useState } from "react";
@@ -8,7 +8,7 @@ import useSWR from "swr";
 import fetcher from "./fetcher";
 
 export default function List() {
-  const URL = `${getBackendUrl()}/api/streams/criteria`;
+  const URL = BACKEND_URLS.resources.streams.crud.search;
   const { data, error, isLoading } = useSWR(
     URL,
     fetcher,
@@ -35,7 +35,7 @@ export default function List() {
 
   const playStream: (stream: string)=> MouseEventHandler = (stream: string) => (e) => {
     e.preventDefault();
-    fetch(`${getBackendUrl()}/api/play/stream/${stream}`, {
+    fetch(`${BACKEND_URLS.play.stream}/${stream}`, {
       method: "GET",
     } );
   };

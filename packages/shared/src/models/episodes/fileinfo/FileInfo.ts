@@ -1,6 +1,6 @@
 import z from "zod";
 
-const DateSchema = z.date().or(z.string().pipe(z.coerce.date()));
+const DateSchema = z.date().or(z.string().transform((str) => new Date(str)));
 
 export const Schema = z.object( {
   path: z.string(),

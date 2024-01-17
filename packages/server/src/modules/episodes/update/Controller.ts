@@ -1,7 +1,7 @@
 import { FullResponse } from "#shared/utils/http";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { validateRequest } from "#utils/validation/zod-express";
+import { validateReq } from "#utils/validation/zod-express";
 import { Response, Router } from "express";
 import UpdateMetadataProcess from "./UpdateSavedProcess";
 import { UpdateEpisodesFileRequest, assertIsUpdateEpisodesFileRequest } from "./validation";
@@ -35,7 +35,10 @@ export default class ThisController implements Controller {
   getRouter(): Router {
     const router = SecureRouter();
 
-    router.get("/saved", validateRequest(assertIsUpdateEpisodesFileRequest),this.endpoint.bind(this));
+    router.get("/saved",
+      validateReq(assertIsUpdateEpisodesFileRequest),
+      this.endpoint.bind(this),
+    );
 
     return router;
   }

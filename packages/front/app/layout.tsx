@@ -1,8 +1,16 @@
+import { makeMenu } from "#modules/menus";
 import "../styles/globals.css";
 
 export default function RootLayout( {children}: {
   children: React.ReactNode;
 } ) {
+  const menu = makeMenu( {
+    "/" : "Inicio",
+    "/actions" : "Actions",
+    "/series/history" : "Series",
+    "/music/history" : "Música",
+  } );
+
   return (
     <html lang="es">
       <head>
@@ -10,21 +18,9 @@ export default function RootLayout( {children}: {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
-        <nav>
-          <main className="main">
-            <a href="/">Inicio</a>
-            <a href="/actions">Actions</a>
-            <a href="/history">Historial</a>
-            <a href="/play">Play</a>
-            <a href="/player">Player</a>
-          </main>
-        </nav>
+        {menu}
 
-        <div className="container">
-          <main className="main">
-            {children}
-          </main>
-        </div>
+        {children}
       </body>
     </html>
   );

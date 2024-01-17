@@ -1,6 +1,7 @@
 import { HistoryEntry, HistoryList } from "#modules/historyLists";
 import { OriginType, Stream, StreamMode } from "#modules/streams";
 import { deepFreeze } from "#shared/utils/objects";
+import { SAMPLE1 as DATE_SAMPLE1 } from "./dates";
 
 export const HISTORY_LIST_WITH_NO_ENTRIES: HistoryList = deepFreeze( {
   id: "id",
@@ -12,12 +13,7 @@ const HISTORY_ENTRY_SIMPSONS1: HistoryEntry = {
     innerId : "1x01",
     serieId: "simpsons",
   },
-  date : {
-    year : 2020,
-    day: 1,
-    month: 1,
-    timestamp : 0,
-  },
+  date : DATE_SAMPLE1,
 };
 
 export const STREAM_SIMPSONS: Stream = deepFreeze( {

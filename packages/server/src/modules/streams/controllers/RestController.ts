@@ -1,13 +1,13 @@
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
-import { StreamCriteriaSort, StreamGetManyRequest, StreamOriginType } from "#shared/models/streams";
+import { StreamCriteriaSort, StreamGetManyRequest, StreamOriginType, assertIsStreamGetManyRequest } from "#shared/models/streams";
 import { CriteriaSortDir } from "#shared/utils/criteria";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetMany } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { validateReq } from "#utils/validation/zod-express";
 import express, { Request, Response, Router } from "express";
 import { Repository } from "../repositories";
-import { getManyValidation } from "./validation";
 
 const DepsMap = {
   streamRepository: Repository,
@@ -96,7 +96,10 @@ implements
 
     router.get("/", this.getAll.bind(this));
     router.use(express.json());
-    router.post("/criteria", getManyValidation, this.getMany.bind(this));
+    router.post("/criteria",
+      validateReq(assertIsStreamGetManyRequest),
+      this.getMany.bind(this),
+    );
 
     router.options("/", (req, res) => {
       res.header("Access-Control-Allow-Origin", "*");

@@ -1,7 +1,18 @@
 import { ZodType } from "zod";
 import { throwErrorPopStack } from "../../errors";
 
-export function assertZod<T>(schema: ZodType<T>, model: unknown, msg?: string): asserts model is T {
+export type AssertZodSettings = {
+  msg?: string;
+  useZodError?: boolean;
+};
+
+export function assertZod<T>(schema: ZodType<T>, model: unknown, settings?: AssertZodSettings): asserts model is T {
+  if (settings?.useZodError) {
+    schema.parse(model);
+
+    return;
+  }
+
   const result = schema.safeParse(model);
 
   if (!result.success) {
@@ -13,15 +24,15 @@ export function assertZod<T>(schema: ZodType<T>, model: unknown, msg?: string): 
 
       return ret;
     } );
-    const error = new Error(msg ?? `${plainErrors.join("\n")}\nValue: ${JSON.stringify(model, null, 2)}`);
+    const error = new Error(settings?.msg ?? `${plainErrors.join("\n")}\nValue: ${JSON.stringify(model, null, 2)}`);
 
     throwErrorPopStack(error);
   }
 }
 
-export function assertZodPopStack<T>(schema: ZodType<T>, model: unknown, msg?: string): asserts model is T {
+export function assertZodPopStack<T>(schema: ZodType<T>, model: unknown, settings?: AssertZodSettings): asserts model is T {
   try {
-    return assertZod(schema, model, msg);
+    return assertZod(schema, model, settings);
   } catch (e) {
     if (e instanceof Error)
       throwErrorPopStack(e, 2);
@@ -29,3 +40,10 @@ export function assertZodPopStack<T>(schema: ZodType<T>, model: unknown, msg?: s
     throw e;
   }
 }
+
+export {
+  PropInfo,
+  schemaToReadableFormat as zodSchemaToReadableFormat,
+} from "./utils";
+
+export * from "./refinements";

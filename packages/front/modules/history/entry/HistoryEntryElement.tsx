@@ -1,4 +1,4 @@
-import { getBackendUrl } from "#modules/utils";
+import { BACKEND_URLS } from "#modules/urls";
 import { Episode, EpisodeId, assertIsEpisode } from "#shared/models/episodes";
 import { HistoryEntry, HistoryEntryId, HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, HistoryListId, assertIsHistoryEntryWithId, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 import Loading from "app/loading";
@@ -32,7 +32,7 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
 
   useEffect(() => {
     if (showDropdown && !hasDropdownBeenShown.current) {
-      fetchSecureLastestHistoryEntries(value).then((data: HistoryEntryWithId[] | null) => {
+      fetchLastestHistoryEntries(value).then((data: HistoryEntryWithId[] | null) => {
         if (!data)
           return;
 
@@ -67,7 +67,7 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
     };
     const id = value.episodeId;
 
-    fetchSecurePatch(id, partial)
+    fetchPatch(id, partial)
       .then((data: Episode | null) => {
         if (!data)
           return;
@@ -82,7 +82,7 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
     const historyEntryId = value.id;
     const {historyListId} = value;
 
-    fetchSecureDelete(historyListId, historyEntryId)
+    fetchDelete(historyListId, historyEntryId)
       .then((data: HistoryEntry | null) => {
         if (!data)
           return;
@@ -192,8 +192,8 @@ function handleOnChange(f: React.Dispatch<React.SetStateAction<number>>) {
 }
 
 // eslint-disable-next-line require-await
-async function fetchSecurePatch(id: EpisodeId, partial: Partial<Episode>): Promise<Episode | null> {
-  const URL = `${getBackendUrl()}/api/episodes/${id.serieId}/${id.innerId}`;
+async function fetchPatch(id: EpisodeId, partial: Partial<Episode>): Promise<Episode | null> {
+  const URL = `${BACKEND_URLS.resources.episodes.crud.get}/api/episodes/${id.serieId}/${id.innerId}`;
 
   return fetch(URL, {
     method: "PATCH",
@@ -206,16 +206,11 @@ async function fetchSecurePatch(id: EpisodeId, partial: Partial<Episode>): Promi
       assertIsEpisode(episode);
 
       return episode;
-    } )
-    .catch((error) => {
-      console.error("Error:", error);
-
-      return null;
     } );
 }
 
-function fetchSecureDelete(listId: HistoryListId, entryId: HistoryEntryId): Promise<HistoryEntry | null> {
-  const URL = `${getBackendUrl()}/api/history-list/${listId}/entries/${entryId}`;
+function fetchDelete(listId: HistoryListId, entryId: HistoryEntryId): Promise<HistoryEntry | null> {
+  const URL = `${BACKEND_URLS.resources.series.historyList.crud.get}/${listId}/entries/${entryId}`;
 
   return fetch(URL, {
     method: "DELETE",
@@ -224,16 +219,11 @@ function fetchSecureDelete(listId: HistoryListId, entryId: HistoryEntryId): Prom
       assertIsHistoryEntryWithId(historyEntry);
 
       return historyEntry;
-    } )
-    .catch((error) => {
-      console.error("Error:", error);
-
-      return null;
     } );
 }
 
-export function fetchSecureLastestHistoryEntries(historyEntry: HistoryEntry): Promise<HistoryEntryWithId[] | null> {
-  const URL = `${getBackendUrl()}/api/history-list/entries/search`;
+export function fetchLastestHistoryEntries(historyEntry: HistoryEntry): Promise<HistoryEntryWithId[] | null> {
+  const URL = BACKEND_URLS.resources.series.historyList.entries.crud.search;
   const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
     "filter": {
       "serieId": historyEntry.episodeId.serieId,
@@ -257,10 +247,5 @@ export function fetchSecureLastestHistoryEntries(historyEntry: HistoryEntry): Pr
       assertIsHistoryListGetManyEntriesBySearchResponse(data);
 
       return data;
-    } )
-    .catch((error) => {
-      console.error("Error:", error);
-
-      return null;
     } );
 }

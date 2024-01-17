@@ -3,5 +3,13 @@ export {
 } from "./models";
 
 export {
-  QUEUE_NAME as HISTORY_QUEUE_NAME, Repository as HistoryRepository, 
+  Repository as HistoryRepository,
 } from "./repositories";
+
+export {
+  RestController as HistoryRestController,
+} from "./controllers";
+
+export {
+  QUEUE_NAME as HISTORY_QUEUE_NAME,
+} from "./events";
