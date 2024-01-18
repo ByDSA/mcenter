@@ -52,9 +52,9 @@ export default function Body( {entry, initialResource, resourceState, isModified
   let titleArtist: JSX.Element;
   const titleElement = <ResourceInput caption={MUSIC_PROPS.title.caption} prop="title" resourceState={resourceState} error={errors?.title}/>;
   const artistElement = <ResourceInput caption={MUSIC_PROPS.artist.caption} prop="artist" resourceState={resourceState} error={errors?.artist}/>;
-  const maxLength = 10;
+  const maxLength = 22;
 
-  if (initialResource.title.length < maxLength && initialResource.artist.length < maxLength) {
+  if (initialResource.title.length <= maxLength && initialResource.artist.length <= maxLength) {
     titleArtist = <span className={`${style.line1half}` }>
       <span className={style.column2}>
         {titleElement}
