@@ -18,6 +18,7 @@ export const BACKEND_URLS = {
     episodes: {
       crud: {
         get: `${getBackendUrl()}/api/episodes`,
+        patch: ( {episodeId, serieId}: {episodeId: string; serieId: string} )=>`${getBackendUrl()}/api/episodes/${serieId}/${episodeId}`,
         search: `${getBackendUrl()}/api/episodes/search`,
       },
     },

@@ -193,7 +193,10 @@ function handleOnChange(f: React.Dispatch<React.SetStateAction<number>>) {
 
 // eslint-disable-next-line require-await
 async function fetchPatch(id: EpisodeId, partial: Partial<Episode>): Promise<Episode | null> {
-  const URL = `${BACKEND_URLS.resources.episodes.crud.get}/api/episodes/${id.serieId}/${id.innerId}`;
+  const URL = `${BACKEND_URLS.resources.episodes.crud.patch( {
+    serieId: id.serieId,
+    episodeId: id.innerId,
+  } )}`;
 
   return fetch(URL, {
     method: "PATCH",
