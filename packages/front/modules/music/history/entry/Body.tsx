@@ -2,9 +2,9 @@ import { BACKEND_URLS } from "#modules/urls";
 import { secsToMmss } from "#modules/utils/dates";
 import { InputResourceProps, ResourceInput, ResourceInputArrayString } from "#modules/utils/elements";
 import { getDiff } from "#modules/utils/objects";
+import { JSX, useState } from "react";
 import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO } from "#shared/models/musics";
 import { PropInfo } from "#shared/utils/validation/zod";
-import { JSX, useState } from "react";
 import { fetchPatch } from "../../requests";
 import LastestComponent from "./Lastest";
 import style from "./style.module.css";
@@ -52,8 +52,9 @@ export default function Body( {entry, initialResource, resourceState, isModified
   let titleArtist: JSX.Element;
   const titleElement = <ResourceInput caption={MUSIC_PROPS.title.caption} prop="title" resourceState={resourceState} error={errors?.title}/>;
   const artistElement = <ResourceInput caption={MUSIC_PROPS.artist.caption} prop="artist" resourceState={resourceState} error={errors?.artist}/>;
+  const maxLength = 10;
 
-  if (initialResource.title.length < 10) {
+  if (initialResource.title.length < maxLength && initialResource.artist.length < maxLength) {
     titleArtist = <span className={`${style.line1half}` }>
       <span className={style.column2}>
         {titleElement}
