@@ -48,8 +48,6 @@ function locatePathPackageJson(initialDir = __dirname) {
   while (dir !== root) {
     const packageJsonPath = path.join(dir, "package.json");
 
-    console.log(packageJsonPath, fs.existsSync(packageJsonPath));
-
     if (fs.existsSync(packageJsonPath))
       return packageJsonPath;
 
