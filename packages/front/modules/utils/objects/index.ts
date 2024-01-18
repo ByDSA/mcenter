@@ -19,28 +19,20 @@ export function getDiff(old: MusicVO, neww: MusicVO, settings?: Settings): Ret {
     if (settings?.ignoreNewUndefined && ops.op === "add" && value === undefined)
       continue;
 
+    if (typeof ops.path.at(-1) === "number") {
+      const parentPath = ops.path.toSpliced(-1);
+      const got = get(neww, parentPath);
+
+      set(d, parentPath, got);
+      continue;
+    }
+
     switch (ops.op) {
       case "remove": {
-        if (typeof ops.path.at(-1) === "number") {
-          const parentPath = ops.path.toSpliced(-1);
-          const got = get(neww, parentPath);
-
-          set(d, parentPath, got);
-          continue;
-        }
-
         unset.push(ops.path);
         break;
       }
       case "add": {
-        if (typeof ops.path.at(-1) === "number") {
-          const parentPath = ops.path.toSpliced(-1);
-          const got = get(neww, parentPath);
-
-          set(d, parentPath, got);
-          continue;
-        }
-
         set(d, ops.path, value);
         break;
       }
