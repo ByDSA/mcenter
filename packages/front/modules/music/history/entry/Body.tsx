@@ -1,10 +1,10 @@
 import { BACKEND_URLS } from "#modules/urls";
 import { secsToMmss } from "#modules/utils/dates";
-import { InputResourceProps, ResourceInput, ResourceInputArrayString } from "#modules/utils/elements";
 import { getDiff } from "#modules/utils/objects";
-import { JSX, useState } from "react";
 import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO } from "#shared/models/musics";
 import { PropInfo } from "#shared/utils/validation/zod";
+import { JSX, useState } from "react";
+import { InputResourceProps, ResourceInput, ResourceInputArrayString } from "#uikit/input";
 import { fetchPatch } from "../../requests";
 import LastestComponent from "./Lastest";
 import style from "./style.module.css";

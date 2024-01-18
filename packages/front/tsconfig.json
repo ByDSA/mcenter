@@ -13,6 +13,7 @@
     "paths": {
       "#modules/*": ["modules/*"],
       "#shared/*": ["../shared/build/*"],
+      "#uikit/*": ["modules/ui-kit/*"],
       "#sharedSrc/*": [
         // quitar en producción
         "../shared/src/*"
