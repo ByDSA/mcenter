@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.6.3](https://github.com/ByDSA/mcenter/compare/v3.6.2...v3.6.3) (2024-01-18)
+
+
+### Bug Fixes
+
+* **front:** add cursor tracking ([42ed46a](https://github.com/ByDSA/mcenter/commit/42ed46abbc095cedf77a6ff03566d27c5157ff5f))
+* **front:** artist will be in one line if it's too long ([2ddf120](https://github.com/ByDSA/mcenter/commit/2ddf12061960923b5aea621a164b97f418453dd7))
+* **front:** patch url ([b637876](https://github.com/ByDSA/mcenter/commit/b637876fc8e2e7d871e256f2f4598a5d877757c9))
+* **front:** remove '#' link href ([0a646e2](https://github.com/ByDSA/mcenter/commit/0a646e2584fef7f262b170d142347917ff523b56))
+* **front:** update maxLength in Body component ([0f6c999](https://github.com/ByDSA/mcenter/commit/0f6c999c4044782fa33b897daf8b4ba6d3bf6d7c))
+
 ### [3.6.2](https://github.com/ByDSA/mcenter/compare/v3.6.1...v3.6.2) (2024-01-17)
 
 
