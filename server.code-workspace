@@ -4,6 +4,9 @@
       "path": "./packages/server"
     },
     {
+      "path": "./packages/music"
+    },
+    {
       "path": "./packages/shared"
     }
   ],
