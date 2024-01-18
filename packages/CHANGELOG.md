@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.0](https://github.com/ByDSA/mcenter/compare/v3.6.3...v3.7.0) (2024-01-18)
+
+
+### Features
+
+* **front:** update remote resource on press enter ([ed337ec](https://github.com/ByDSA/mcenter/commit/ed337ec4675312b1f7f3a3dcd1af016d67519f4e))
+
+
+### Bug Fixes
+
+* **front:** add+remove tag ([a91732a](https://github.com/ByDSA/mcenter/commit/a91732a05ba53bf92fb4b54c5a826abdc92ef981))
+
 ### [3.6.3](https://github.com/ByDSA/mcenter/compare/v3.6.2...v3.6.3) (2024-01-18)
 
 
