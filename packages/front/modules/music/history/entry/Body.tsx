@@ -110,7 +110,7 @@ export default function Body( {entry, initialResource, resourceState, isModified
       <span><a onClick={() => reset()}>Reset</a></span>
       {isModified && <span style={{
         marginLeft: "1em",
-      }}><a href="#" onClick={() => update()}>Update</a></span>}</span>
+      }}><a onClick={() => update()}>Update</a></span>}</span>
     <span className={style.break} />
     <LastestComponent resourceId={entry.resourceId} date={entry.date}/>
   </div>;

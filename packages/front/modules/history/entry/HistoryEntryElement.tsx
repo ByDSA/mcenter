@@ -124,7 +124,7 @@ export default function HistoryEntryElement( {value, onRemove}: Props) {
         }
         <span className={style.break} />
         <span><a onClick={() => reset()}>Reset</a></span>
-        {isModified && <span><a href="#" onClick={() => update()}>Update</a></span>}
+        {isModified && <span><a onClick={() => update()}>Update</a></span>}
         <span className={style.break} />
         <span><a onClick={()=> {
           // eslint-disable-next-line no-restricted-globals, no-alert
