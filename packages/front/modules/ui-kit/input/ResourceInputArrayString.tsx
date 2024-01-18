@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { isDefined } from "#shared/utils/validation";
+import { InputTextProps } from "./InputText";
 import { useInputTextWithState } from "./InputTextWithState";
-import { InputResourceProps } from "./props";
+import { InputResourceProps, InputTextPropsMod } from "./props";
 
-export default function ResourceInputArrayString<T extends Object>( {resourceState, prop}: InputResourceProps<T>) {
+export default function ResourceInputArrayString<T extends Object>( {resourceState, prop, inputTextProps}: InputResourceProps<T>) {
   const [resource] = resourceState;
   const array = (resource[prop] ?? []) as string[];
 
@@ -27,6 +28,7 @@ export default function ResourceInputArrayString<T extends Object>( {resourceSta
         AddIcon( {
           resourceState,
           prop,
+          inputTextProps,
         } )
       }
     </span>
@@ -118,10 +120,30 @@ const deleteIconOnClickHandler = <T,>( {prop, resourceState, index}: DeleteIconP
   } );
 };
 
-function AddIcon<T>( {resourceState, prop}: AddDeleteIconProps<T>) {
-  const props = {
+type AddIconProps<T> = AddDeleteIconProps<T> & {
+  inputTextProps?: InputTextPropsMod;
+};
+
+function AddIcon<T>( {resourceState, prop, inputTextProps}: AddIconProps<T>) {
+  const add = ()=>addIconOnClickHandler( {
+    prop,
+    resourceState,
+    inputTextState: state,
+  } );
+  const props: InputTextProps = {
     style: {
       width: "auto",
+    },
+    ...inputTextProps,
+    onPressEnter: (text: string) => {
+      if (text === "" && inputTextProps?.onEmptyPressEnter)
+        inputTextProps?.onEmptyPressEnter?.();
+      else {
+        add();
+
+        if (typeof inputTextProps?.onPressEnter === "function")
+          inputTextProps?.onPressEnter?.(text);
+      }
     },
   };
   const {state, element} = useInputTextWithState(props);
@@ -132,19 +154,15 @@ function AddIcon<T>( {resourceState, prop}: AddDeleteIconProps<T>) {
       color: "green",
       padding: "0 0.25em",
     }}
-    onClick={() => addIconOnClickHandler( {
-      prop,
-      resourceState,
-      inputTextState: state,
-    } )}
+    onClick={()=>add}
     >+</a>
   </ItemBox>;
 }
 
-type AddIconProps<T> = AddDeleteIconProps<T> & {
+type AddIconHandlerProps<T> = AddDeleteIconProps<T> & {
   inputTextState: ReturnType<typeof useInputTextWithState>["state"];
 };
-const addIconOnClickHandler = <T,>( {prop, resourceState, inputTextState}: AddIconProps<T>) => {
+const addIconOnClickHandler = <T,>( {prop, resourceState, inputTextState}: AddIconHandlerProps<T>) => {
   const [resource, setResource] = resourceState;
   const array = (resource[prop] ?? []) as string[];
   const [inputText, setInputText] = inputTextState;

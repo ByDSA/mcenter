@@ -4,7 +4,7 @@ import { InputText } from "./InputText";
 import OptionalCheckbox from "./OptionalCheckbox";
 import { InputResourceProps } from "./props";
 
-export default function ResourceInputText<T extends Object>( {resourceState, style, prop: key, isOptional, error}: InputResourceProps<T>) {
+export default function ResourceInputText<T extends Object>( {resourceState, style, prop: key, isOptional, error, inputTextProps: inputTextPropsMod}: InputResourceProps<T>) {
   const [resource, setResource] = resourceState;
   const [value, setValue] = useState(resource[key]?.toString());
 
@@ -22,13 +22,18 @@ export default function ResourceInputText<T extends Object>( {resourceState, sty
     } );
   };
   const disabled = isOptional && !isDefined(value);
-  const textArea = <InputText
-    style={{
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const {onEmptyPressEnter:_, ...inputTextProps} = inputTextPropsMod ?? {
+  };
+  const textArea = InputText( {
+    style: {
       width: "100%",
-    }}
-    value={value}
-    disabled={disabled}
-    onChange={handleChange}></InputText>;
+    },
+    value,
+    disabled,
+    onChange: handleChange,
+    ...inputTextProps,
+  } );
 
   return <span style={{
     flexFlow: "column",

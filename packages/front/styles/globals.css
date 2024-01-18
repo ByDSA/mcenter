@@ -294,6 +294,9 @@
   --color-music-darker2: var(--color-cyan-darker2);
   --color-music-darker3: var(--color-cyan-darker3);
   --color-music-darker4: var(--color-cyan-darker4);
+
+  --spinner-size: 1rem;
+  --spinner-color: var(--color-yellow);
 }
 
 html,

@@ -3,8 +3,8 @@ import { secsToMmss } from "#modules/utils/dates";
 import { getDiff } from "#modules/utils/objects";
 import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO } from "#shared/models/musics";
 import { PropInfo } from "#shared/utils/validation/zod";
+import { InputResourceProps, LinkAsyncAction, ResourceInput, ResourceInputArrayString, useAsyncAction } from "#uikit/input";
 import { JSX, useState } from "react";
-import { InputResourceProps, ResourceInput, ResourceInputArrayString } from "#uikit/input";
 import { fetchPatch } from "../../requests";
 import LastestComponent from "./Lastest";
 import style from "./style.module.css";
@@ -22,20 +22,32 @@ type Props = {
   initialResource: MusicVO;
   isModified: boolean;
   errors?: Record<keyof MusicVO, string>;
+  asyncUpdateAction: ReturnType<typeof useAsyncAction>;
+  isBodyVisible: boolean;
 };
-export default function Body( {entry, initialResource, resourceState, isModified, errors}: Props) {
+export default function Body( {isBodyVisible, entry, initialResource, resourceState, isModified, errors, asyncUpdateAction}: Props) {
   const [resource, setResource] = resourceState;
   const reset = () => {
     setResource(entry.resource);
   };
-  const update = () => {
+  // eslint-disable-next-line require-await
+  const update = async () => {
+    if (!isModified)
+      return;
+
+    const {done, start} = asyncUpdateAction;
+
+    start();
     const id = entry.resourceId;
     const patchBodyParams = generateBody(entry.resource, resource);
 
-    fetchPatch(id, patchBodyParams).then(() => {
+    // eslint-disable-next-line consistent-return
+    return fetchPatch(id, patchBodyParams)
+      .then(() => {
       // eslint-disable-next-line no-param-reassign
-      entry.resource = resource;
-    } );
+        entry.resource = resource;
+      } )
+      .then(()=>done());
   };
   const optionalProps: Record<keyof MusicVO, PropInfo> = Object.entries(MUSIC_PROPS).reduce((acc, [key, value]) => {
     if (value.required)
@@ -50,8 +62,24 @@ export default function Body( {entry, initialResource, resourceState, isModified
   }, {
   } as Record<keyof MusicVO, PropInfo>);
   let titleArtist: JSX.Element;
-  const titleElement = <ResourceInput caption={MUSIC_PROPS.title.caption} prop="title" resourceState={resourceState} error={errors?.title}/>;
-  const artistElement = <ResourceInput caption={MUSIC_PROPS.artist.caption} prop="artist" resourceState={resourceState} error={errors?.artist}/>;
+  const commonInputProps = {
+    inputTextProps: {
+      onPressEnter: ()=>update(),
+    },
+    resourceState,
+  };
+  const titleElement = ResourceInput( {
+    caption: MUSIC_PROPS.title.caption,
+    prop:"title",
+    error: errors?.title,
+    ...commonInputProps,
+  } );
+  const artistElement = ResourceInput( {
+    caption: MUSIC_PROPS.artist.caption,
+    prop:"artist",
+    error: errors?.artist,
+    ...commonInputProps,
+  } );
   const maxLength = 22;
 
   if (initialResource.title.length <= maxLength && initialResource.artist.length <= maxLength) {
@@ -72,7 +100,11 @@ export default function Body( {entry, initialResource, resourceState, isModified
     </>;
   }
 
-  return <div className={style.dropdown}>
+  return <div className={style.dropdown} style={
+    {
+      display: isBodyVisible ? "block" : "none",
+    }
+  }>
     {errors && Object.entries(errors).length > 0 && Object.entries(errors).map(([key, value]) => <span key={key} className="line">{key}: {value}</span>)}
     {titleArtist}
     <span className={`${style.line1half} ${style.weight}`}
@@ -80,37 +112,61 @@ export default function Body( {entry, initialResource, resourceState, isModified
         alignItems: "center",
       }}
     >
-      <ResourceInput style={{
-        width: "auto",
-        minWidth: "calc(100% / 4)",
-      }}
-      caption={MUSIC_PROPS.weight.caption}
-      type="number"
-      prop="weight"
-      resourceState={resourceState}/>
+      {ResourceInput( {
+        style:{
+          width: "auto",
+          minWidth: "calc(100% / 4)",
+        },
+        caption: MUSIC_PROPS.weight.caption,
+        type: "number",
+        prop: "weight",
+        ...commonInputProps,
+      } )}
       <span>{MUSIC_PROPS.tags.caption}</span>
-      <ResourceInputArrayString prop="tags" resourceState={resourceState}/>
+      {ResourceInputArrayString( {
+        prop: "tags",
+        resourceState,
+        inputTextProps: {
+          onEmptyPressEnter: commonInputProps.inputTextProps.onPressEnter,
+        },
+      } )}
     </span>
     <span className={style.line1half}>
-      <ResourceInput caption={MUSIC_PROPS.album.caption} prop="album" resourceState={resourceState}/>
+      {ResourceInput( {
+        caption:MUSIC_PROPS.album.caption,
+        prop:"album",
+        ...commonInputProps,
+      } )}
     </span>
     <span className={style.line1half}>
-      <ResourceInput caption={MUSIC_PROPS.path.caption} prop="path" resourceState={resourceState}/>
+      {ResourceInput( {
+        caption:MUSIC_PROPS.path.caption,
+        prop:"path",
+        ...commonInputProps,
+      } )}
     </span>
     <span className={style.line1half}>
-      <ResourceInput caption={<><a href={fullUrlOf(resource.url)}>url</a>:</>} prop="url" resourceState={resourceState}/>
+      {ResourceInput( {
+        caption: <><a href={fullUrlOf(resource.url)}>url</a>:</>,
+        prop:"url",
+        ...commonInputProps,
+      } )}
     </span>
     {(resource.mediaInfo.duration && resource.mediaInfo.duration > 0 && <>
       <span className="line">Duration : {secsToMmss(resource.mediaInfo.duration)}</span>
     </>) || null}
-    <OptionalProps resourceState={resourceState} optionalProps={optionalProps} errors={errors}/>
+    {OptionalProps( {
+      optionalProps,
+      errors,
+      ...commonInputProps,
+    } )}
 
     <span className={style.break} />
     <span className="line">
       <span><a onClick={() => reset()}>Reset</a></span>
       {isModified && <span style={{
         marginLeft: "1em",
-      }}><a onClick={() => update()}>Update</a></span>}</span>
+      }}>{<LinkAsyncAction action={update} isDoing={asyncUpdateAction.isDoing}>Update</LinkAsyncAction>}</span>}</span>
     <span className={style.break} />
     <LastestComponent resourceId={entry.resourceId} date={entry.date}/>
   </div>;

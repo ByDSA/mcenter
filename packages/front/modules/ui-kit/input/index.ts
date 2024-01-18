@@ -17,3 +17,7 @@ export {
 export {
   default as ResourceInputArrayString,
 } from "./ResourceInputArrayString";
+
+export {
+  LinkAsyncAction, useAsyncAction,
+} from "./LinkAsyncAction";

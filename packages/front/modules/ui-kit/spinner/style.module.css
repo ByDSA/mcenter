@@ -1,0 +1,21 @@
+@import url("/styles/spinner.css");
+
+.spinner {
+  border-top: 2px solid var(--spinner-color);
+  border-right: 2px solid var(--spinner-color);
+  border-bottom: 2px solid var(--spinner-color);
+  border-left: 2px solid transparent;
+  border-radius: 50%;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -1,14 +1,17 @@
 import { ChangeEvent, ChangeEventHandler, useEffect, useRef, useState } from "react";
 import { commonStyle } from "./style";
 
+export type OnPressEnterFn = (text: string)=> void;
+
 export type InputTextProps = {
   style?: React.CSSProperties;
   value?: string;
   disabled?: boolean;
   onChange?: ChangeEventHandler<HTMLTextAreaElement>;
+  onPressEnter?: OnPressEnterFn | "newLine" | "nothing";
 };
 
-export function InputText( {style, value: valueProp, disabled, onChange}: InputTextProps) {
+export function InputText( {style, value: valueProp, disabled, onChange, onPressEnter = "nothing"}: InputTextProps) {
   const updateHeight = ( {value, element}: {value: string; element: HTMLTextAreaElement} ) => {
     const rows = getVisualLines(element, value) || 1;
     const paddingTop = +window.getComputedStyle(element).paddingTop.replace("px", "");
@@ -44,6 +47,15 @@ export function InputText( {style, value: valueProp, disabled, onChange}: InputT
     setCursor(e.target.selectionStart);
     onChange?.(e);
   };
+  const keyDownHandler = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      if (typeof onPressEnter === "function" || onPressEnter === "nothing")
+        e.preventDefault();
+
+      if (typeof onPressEnter === "function")
+        onPressEnter(e.currentTarget.value);
+    }
+  };
   const textArea = <textarea
     ref={ref}
     style={{
@@ -52,7 +64,10 @@ export function InputText( {style, value: valueProp, disabled, onChange}: InputT
     }}
     value={valueProp}
     disabled={disabled}
-    onChange={handleChange}></textarea>;
+    onChange={handleChange}
+    onKeyDown={keyDownHandler}
+
+  ></textarea>;
 
   return textArea;
 }

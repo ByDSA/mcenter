@@ -1,6 +1,7 @@
 import { isModified as isModifiedd } from "#modules/utils/objects";
 import { HistoryMusicEntry, MusicVO, assertIsMusicVO } from "#shared/models/musics";
 import { assertIsDefined } from "#shared/utils/validation";
+import { useAsyncAction } from "#uikit/input";
 import React, { useEffect, useMemo } from "react";
 import Body from "./Body";
 import Header from "./Header";
@@ -22,11 +23,18 @@ export default function HistoryEntryElement( {value: entry, showDate = true}: Pr
   const resourceState = React.useState(resourceBase);
   const [resource] = resourceState;
   const isModified = useIsModified(resourceBase, resource, calcIsModified);
+
+  // Para mostrar/ocultar 'update' en tiempo real en el body
+  // eslint-disable-next-line no-empty-function
+  useEffect(() => {
+  }, [isModified]);
+
   const toggleShowBody = () => {
     setBodyVisible(!isBodyVisible);
   };
   const {errors} = useValidation(resource);
   const initialResource = useMemo(()=> entry.resource, []);
+  const asyncUpdateAction = useAsyncAction();
 
   return (
     <div className={`music ${style.container}`}>
@@ -35,14 +43,16 @@ export default function HistoryEntryElement( {value: entry, showDate = true}: Pr
         showDate,
         toggleShowBody,
       } )}
-      {isBodyVisible &&
-      Body( {
-        entry,
-        resourceState,
-        initialResource,
-        isModified,
-        errors,
-      } )
+      {
+        Body( {
+          isBodyVisible,
+          entry,
+          resourceState,
+          initialResource,
+          isModified,
+          errors,
+          asyncUpdateAction,
+        } )
       }
     </div>
   );
@@ -107,7 +117,7 @@ function useResourceBase(entry: HistoryMusicEntry, compare: CompareFn<MusicVO>) 
   useEffect(() => {
     if (compare(entryResource, resourceBase))
       setResourceBase(entryResource);
-  }, [entry]);
+  }, [entry, entryResource]);
 
   return resourceBase;
 }

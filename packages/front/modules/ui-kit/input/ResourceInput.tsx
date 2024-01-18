@@ -10,7 +10,7 @@ export type ResourceInputProps<T extends Object> = InputResourceProps<T> & {
   type?: "number" | "string";
 };
 
-export default function ResourceInput<T extends Object>( {style, inputStyle, caption, prop, resourceState, isOptional = false, error, type}: ResourceInputProps<T>) {
+export default function ResourceInput<T extends Object>( {style, inputStyle, caption, prop, resourceState, isOptional = false, error, type, inputTextProps}: ResourceInputProps<T>) {
   let input: JSX.Element;
   const actualInputStyle = {
     ...defaultStyle,
@@ -22,6 +22,7 @@ export default function ResourceInput<T extends Object>( {style, inputStyle, cap
       prop,
       resourceState,
       isOptional,
+      inputTextProps,
       style: actualInputStyle,
       error,
     } );
@@ -30,6 +31,7 @@ export default function ResourceInput<T extends Object>( {style, inputStyle, cap
       prop,
       resourceState,
       isOptional,
+      inputTextProps,
       style: actualInputStyle,
       error,
     } );
