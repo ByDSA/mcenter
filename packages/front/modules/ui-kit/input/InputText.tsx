@@ -1,4 +1,4 @@
-import { ChangeEventHandler, useEffect, useRef } from "react";
+import { ChangeEvent, ChangeEventHandler, useEffect, useRef, useState } from "react";
 import { commonStyle } from "./style";
 
 export type InputTextProps = {
@@ -18,10 +18,11 @@ export function InputText( {style, value: valueProp, disabled, onChange}: InputT
     // eslint-disable-next-line no-param-reassign
     element.style.height = `calc(${rows * 1.3}em + ${paddingHeight}px)`; // Set the height to the scrollHeight
   };
-  const textareaRef = useRef(null as HTMLTextAreaElement | null);
+  const ref = useRef(null as HTMLTextAreaElement | null);
+  const [cursor, setCursor] = useState<number | null>(null);
 
   useEffect(() => {
-    const element = textareaRef.current;
+    const element = ref.current;
 
     if (!element)
       return;
@@ -31,15 +32,27 @@ export function InputText( {style, value: valueProp, disabled, onChange}: InputT
       element,
     } );
   }, [valueProp]);
+
+  useEffect(() => {
+    const input = ref.current;
+
+    if (input)
+      input.setSelectionRange(cursor, cursor);
+  }, [ref, cursor, valueProp]);
+
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setCursor(e.target.selectionStart);
+    onChange?.(e);
+  };
   const textArea = <textarea
-    ref={textareaRef}
+    ref={ref}
     style={{
       ...commonStyle,
       ...style,
     }}
     value={valueProp}
     disabled={disabled}
-    onChange={onChange}></textarea>;
+    onChange={handleChange}></textarea>;
 
   return textArea;
 }
