@@ -1,7 +1,6 @@
 import { isModified as isModifiedd } from "#modules/utils/objects";
 import { HistoryMusicEntry, MusicVO, assertIsMusicVO } from "#shared/models/musics";
 import { assertIsDefined } from "#shared/utils/validation";
-import { useAsyncAction } from "#uikit/input";
 import React, { useEffect, useMemo } from "react";
 import Body from "./Body";
 import Header from "./Header";
@@ -34,7 +33,6 @@ export default function HistoryEntryElement( {value: entry, showDate = true}: Pr
   };
   const {errors} = useValidation(resource);
   const initialResource = useMemo(()=> entry.resource, []);
-  const asyncUpdateAction = useAsyncAction();
 
   return (
     <div className={`music ${style.container}`}>
@@ -51,7 +49,6 @@ export default function HistoryEntryElement( {value: entry, showDate = true}: Pr
           initialResource,
           isModified,
           errors,
-          asyncUpdateAction,
         } )
       }
     </div>

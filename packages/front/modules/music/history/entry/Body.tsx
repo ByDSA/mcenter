@@ -22,10 +22,10 @@ type Props = {
   initialResource: MusicVO;
   isModified: boolean;
   errors?: Record<keyof MusicVO, string>;
-  asyncUpdateAction: ReturnType<typeof useAsyncAction>;
   isBodyVisible: boolean;
 };
-export default function Body( {isBodyVisible, entry, initialResource, resourceState, isModified, errors, asyncUpdateAction}: Props) {
+export default function Body( {isBodyVisible, entry, initialResource, resourceState, isModified, errors}: Props) {
+  const asyncUpdateAction = useAsyncAction();
   const [resource, setResource] = resourceState;
   const reset = () => {
     setResource(entry.resource);
