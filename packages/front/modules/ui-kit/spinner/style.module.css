@@ -1,6 +1,8 @@
-@import url("/styles/spinner.css");
+@import url("/globals.css");
 
 .spinner {
+  --spinner-color: var(--color-yellow);
+  --spinner-size: 1rem;
   border-top: 2px solid var(--spinner-color);
   border-right: 2px solid var(--spinner-color);
   border-bottom: 2px solid var(--spinner-color);
