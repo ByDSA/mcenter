@@ -1,0 +1,26 @@
+:root {
+  --width-xs: 160px;
+  --width-sm: 320px;
+  --width-lg: 640px;
+  --width-xl: 1280px;
+}
+
+@media (width < 640px) {
+  .showMinLg {
+    display: none;
+  }
+
+  .hideMinLg {
+    display: block;
+  }
+}
+
+@media (width >= 640px) {
+  .showMinLg {
+    display: block;
+  }
+
+  .hideMinLg {
+    display: none;
+  }
+}

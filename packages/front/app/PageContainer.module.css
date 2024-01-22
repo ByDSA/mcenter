@@ -1,0 +1,40 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-bottom: calc(4vh - 2px);
+  min-height: 100%;
+}
+
+.container > main {
+  width: 95vw;
+  height: 100%;
+
+  @media (width >= 640px) {
+    width: calc(640px * 0.95);
+  }
+}
+
+.container > main h1,
+.container > main h2,
+.container > main h3 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.container > main h1 {
+  font-size: 3rem;
+}
+
+.container > main h2 {
+  font-size: 2rem;
+}
+
+.container > main h3 {
+  font-size: 1.5rem;
+}

@@ -1,14 +1,15 @@
 import { BACKEND_URLS } from "#modules/urls";
 import { secsToMmss } from "#modules/utils/dates";
-import { getDiff } from "#modules/utils/objects";
-import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO } from "#shared/models/musics";
+import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
+import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO, assertIsMusicVO } from "#shared/models/musics";
+import { assertIsDefined } from "#shared/utils/validation";
 import { PropInfo } from "#shared/utils/validation/zod";
 import { InputResourceProps, LinkAsyncAction, ResourceInput, ResourceInputArrayString, useAsyncAction } from "#uikit/input";
-import { JSX, useState } from "react";
-import { fetchPatch } from "../../requests";
+import React, { JSX, useEffect, useMemo, useState } from "react";
+import { fetchPatch } from "../../../requests";
+import { MUSIC_PROPS } from "../utils";
 import LastestComponent from "./Lastest";
 import style from "./style.module.css";
-import { MUSIC_PROPS } from "./utils";
 
 function generateBody(entryResource: MusicVO, resource: MusicVO) {
   const patchBodyParams: MusicPatchOneByIdReq["body"] = getDiff(entryResource, resource);
@@ -18,18 +19,19 @@ function generateBody(entryResource: MusicVO, resource: MusicVO) {
 
 type Props = {
   entry: Required<HistoryMusicEntry>;
-  resourceState: [MusicVO, React.Dispatch<React.SetStateAction<MusicVO>>];
-  initialResource: MusicVO;
-  isModified: boolean;
-  errors?: Record<keyof MusicVO, string>;
   isBodyVisible: boolean;
 };
-export default function Body( {isBodyVisible, entry, initialResource, resourceState, isModified, errors}: Props) {
-  const asyncUpdateAction = useAsyncAction();
+export default function Body( {isBodyVisible, entry}: Props) {
+  const resourceBase = useResourceBase(entry, calcIsModified);
+  const resourceState = useState(resourceBase);
   const [resource, setResource] = resourceState;
+  const isModified = useIsModified(resourceBase, resource, calcIsModified);
+  const initialResource = useMemo(()=> entry.resource, []);
+  const asyncUpdateAction = useAsyncAction();
   const reset = () => {
     setResource(entry.resource);
   };
+  const {errors} = useValidation(resource);
   // eslint-disable-next-line require-await
   const update = async () => {
     if (!isModified)
@@ -100,7 +102,7 @@ export default function Body( {isBodyVisible, entry, initialResource, resourceSt
     </>;
   }
 
-  return <div className={style.dropdown} style={
+  return <div className={style.container} style={
     {
       display: isBodyVisible ? "block" : "none",
     }
@@ -212,5 +214,87 @@ function OptionalProps( {resourceState, optionalProps, errors}: OptionalPropsPro
 function fullUrlOf(url: string) {
   return BACKEND_URLS.resources.musics.raw( {
     url,
+  } );
+}
+
+function useValidation<T>(resource: T): {isValid: boolean; errors: Record<keyof T, string>} {
+  const [errors, setErrors] = React.useState( {
+  } as Record<keyof T, string>);
+
+  useEffect(() => {
+    try {
+      assertIsMusicVO(resource, {
+        useZodError: true,
+      } );
+    } catch (e) {
+      if (e.name !== "ZodError")
+        throw e;
+
+      setErrors(parseErrors(e) as Record<keyof T, string>);
+    }
+  }, [resource]);
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+}
+
+type ZodIssue = {
+    "code": string;
+    "expected": string;
+    "received": string;
+    "path": string[];
+    "message": string;
+  };
+
+  type ZodError = {
+    issues: ZodIssue[];
+  };
+function parseErrors(e: ZodError): Record<string, string> {
+  const errors: {} = {
+  };
+  const {issues} = e;
+
+  for (const issue of issues) {
+    const path = issue.path[0];
+    const {message} = issue;
+
+    errors[path] = message;
+  }
+
+  return errors;
+}
+
+type CompareFn<T> = (r1: T, r2: T)=> boolean;
+function useResourceBase(entry: HistoryMusicEntry, compare: CompareFn<MusicVO>) {
+  const entryResource = entry.resource;
+
+  assertIsDefined(entryResource);
+  const [resourceBase, setResourceBase] = React.useState(entryResource);
+
+  useEffect(() => {
+    if (compare(entryResource, resourceBase))
+      setResourceBase(entryResource);
+  }, [entry, entryResource]);
+
+  return resourceBase;
+}
+
+function useIsModified<T>(base: T, current: T, compare: CompareFn<T>) {
+  const [isModified, setIsModified] = useState(false);
+
+  useEffect(() => {
+    const v = compare(base, current);
+
+    setIsModified(v);
+  }, [base, current]);
+
+  return isModified;
+}
+
+function calcIsModified(r1: MusicVO, r2: MusicVO) {
+  return isModifiedd(r1, r2, {
+    ignoreNewUndefined: true,
   } );
 }

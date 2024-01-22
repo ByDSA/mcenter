@@ -40,10 +40,10 @@ export default function HistoryList(props?: Props) {
 
 function dayTitle(entry: Required<HistoryMusicEntry>, i: number, array: Required<HistoryMusicEntry>[]) {
   if (i === 0 || !isSameday(array[i - 1].date.timestamp, entry.date.timestamp))
-  {return <h2 key={entry.date.timestamp}>{formatDate(new Date(entry.date.timestamp * 1000), {
+  {return <h3 key={entry.date.timestamp}>{formatDate(new Date(entry.date.timestamp * 1000), {
     ago: "no",
     dateTime: "fullDate",
-  } )}</h2>;}
+  } )}</h3>;}
 
   return null;
 }

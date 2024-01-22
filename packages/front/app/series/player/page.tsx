@@ -84,9 +84,7 @@ export default function Player() {
 
   return (
     <>
-      <h1 className="title">
-          Player
-      </h1>
+      <h1>Player</h1>
 
       {status === undefined && <Loading/>}
       {status === null && "Error"}

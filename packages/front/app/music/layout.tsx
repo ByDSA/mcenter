@@ -1,6 +1,5 @@
 import { makeMenu } from "#modules/menus";
 import PageContainer from "app/PageContainer";
-import "../../styles/globals.css";
 
 export default function MusicLayout( {children}: {
   children: React.ReactNode;
@@ -15,9 +14,7 @@ export default function MusicLayout( {children}: {
     <>
       {submenu}
       <PageContainer>
-        <h1 className="title">
-          Música
-        </h1>
+        <h1>Música</h1>
         {children}
       </PageContainer>
     </>);

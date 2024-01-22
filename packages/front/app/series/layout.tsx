@@ -1,6 +1,5 @@
 import { makeMenu } from "#modules/menus";
 import PageContainer from "app/PageContainer";
-import "../../styles/globals.css";
 
 export default function SeriesLayout( {children}: {
   children: React.ReactNode;
@@ -18,9 +17,7 @@ export default function SeriesLayout( {children}: {
     <>
       {submenu}
       <PageContainer>
-        <h1 className="title">
-          Series
-        </h1>
+        <h1>Series</h1>
         {children}
       </PageContainer>
     </>);

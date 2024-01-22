@@ -1,0 +1,24 @@
+:root {
+  --color-music: var(--color-cyan);
+  --color-music-light: var(--color-cyan-light);
+  --color-music-light2: var(--color-cyan-light2);
+  --color-music-light3: var(--color-cyan-light3);
+  --color-music-light4: var(--color-cyan-light4);
+  --color-music-darker: var(--color-cyan-darker);
+  --color-music-darker2: var(--color-cyan-darker2);
+  --color-music-darker3: var(--color-cyan-darker3);
+  --color-music-darker4: var(--color-cyan-darker4);
+
+  --color-music-text: black;
+  --color-music-text-on-light: black;
+  --color-music-text-on-light2: black;
+  --color-music-text-on-light3: black;
+  --color-music-text-on-light4: black;
+  --color-music-text-on-darker: white;
+  --color-music-text-on-darker2: white;
+  --color-music-text-on-darker3: white;
+  --color-music-text-on-darker4: white;
+
+  --color-music-link: var(--color-yellow);
+  --color-music-link-hover: var(--color-yellow-light4);
+}

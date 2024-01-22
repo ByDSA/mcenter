@@ -1,0 +1,91 @@
+.container {
+  padding: 2vh 5vw;
+  border-top: 2px solid var(--history-entry-border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.container .item {
+  display: block;
+  width: 100vw;
+  margin: 0;
+  padding: 0 0vw;
+  margin-bottom: 2vh;
+}
+
+.container .column2 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+.container .column2 > span {
+  display: flex;
+  flex-direction: row;
+  width: 50%;
+}
+
+.container span {
+  display: flex;
+}
+
+.container .line,
+.container .line1half {
+  width: 100%;
+  margin: 0;
+}
+
+.container .line1half {
+  margin-bottom: 0.5em;
+}
+
+.container .weight input {
+  min-width: 50px;
+}
+
+.container > span + span {
+  margin-right: 4vw;
+}
+
+span.break {
+  flex-basis: 100%;
+  height: 0;
+  margin-bottom: 3vh;
+}
+
+.container input {
+  min-width: 50px;
+  margin: 0 0.25rem;
+  background-color: white;
+  border-width: 1px;
+  border-radius: 2vw;
+}
+
+.container .weight input {
+  width: 5vw;
+}
+
+.container .containerTime {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.container .containerTime span {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0.5vw;
+}
+
+@media (width >= var(--width-lg)) {
+  .header {
+    padding: 1.25rem 2rem;
+  }
+
+  .container {
+    padding: 1rem 2rem;
+  }
+}

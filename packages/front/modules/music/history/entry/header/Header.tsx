@@ -9,9 +9,8 @@ type HeaderProps = {
 };
 export default function Header( {entry, toggleShowBody, showDate}: HeaderProps) {
   const {resource} = entry;
-  const center = resource.artist;
-  const leftCenter = `${resource.title} - ${resource.artist}`;
-  const left = resource.title;
+  const {title} = resource;
+  const subtitle = resource.game ?? resource.artist;
   const right = resource.weight.toString();
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
@@ -25,11 +24,10 @@ export default function Header( {entry, toggleShowBody, showDate}: HeaderProps) 
         ago: "no",
       } )}</span> }
     </div>
-    <div className={style.name}>
-      { leftCenter && <span className={`${style.itemLeftCenter} ${style.hideMinLg} ${style.center}`}>{leftCenter}</span> }
-      { left && <span className={`${style.item} ${style.showMinLg}`}>{left}</span> }
-      { center && <p className={`${style.item} ${style.showMinLg} ${style.center}`}>{center}</p> }
-      { right && <span className={style.item}>{right}</span> }
-    </div>
+    <span className={`${style.center} ellipsis`}>
+      <span className="ellipsis">{title}</span>
+      <span className="ellipsis">{subtitle}</span>
+    </span>
+    { right && <span className={style.item}>{right}</span> }
   </div>;
 }

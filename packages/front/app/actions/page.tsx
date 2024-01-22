@@ -38,9 +38,7 @@ export default function Page() {
 
   return (
     <>
-      <h1 className="title">
-          Actions
-      </h1>
+      <h1>Actions</h1>
 
       <ul>
         {ACTIONS.map(( {url, name}: Action) => (

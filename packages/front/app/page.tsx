@@ -1,25 +1,16 @@
-"use client";
-
-import styles from "../styles/Home.module.css";
+import "../styles/globals.css";
+import styles from "./style.module.css";
 
 export default function Home() {
   const version = process.env.version ?? "undefined";
 
   return (
-    <div className="extra-margin" style={{
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "calc(100vh - 78px)",
-    }}>
+    <div className={`extra-margin ${styles.container}`}>
       <main>
         <h1 className={styles.title}>
-          Welcome to <a href="https://mcenter.danisales.es">MCenter!</a>
+          Welcome to<br/><a href="https://mcenter.danisales.es">MCenter</a>!
         </h1>
-        <h2 style={{
-          textAlign: "center",
-        }}>Versión: {version}</h2>
+        <h2 className={styles.version}>Versión: {version}</h2>
       </main>
 
     </div>

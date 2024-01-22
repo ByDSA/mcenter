@@ -1,0 +1,290 @@
+:root {
+  --color-red-hue: -8;
+  --color-yellow-hue: calc(var(--color-red-hue) + 66);
+  --color-orange-hue: calc(var(--color-red-hue) + 38);
+  --color-blue-hue: calc(var(--color-red-hue) + 210);
+  --color-green-hue: calc(var(--color-red-hue) + 160);
+  --color-cyan-hue: calc(var(--color-red-hue) + 185);
+
+  --color-light: 33%;
+  --color-light2: 42%;
+  --color-light3: 53%;
+  --color-light4: 66%;
+  --color-darker: 15%;
+  --color-darker2: 30%;
+  --color-darker3: 70%;
+  --color-darker4: 90%;
+
+  --color-red: hsl(var(--color-red-hue), 100%, 50%);
+  --color-red-darker: color-mix(
+    in srgb,
+    var(--color-red),
+    #000 var(--color-darker)
+  );
+  --color-red-darker2: color-mix(
+    in srgb,
+    var(--color-red),
+    #000 var(--color-darker2)
+  );
+  --color-red-darker3: color-mix(
+    in srgb,
+    var(--color-red),
+    #000 var(--color-darker3)
+  );
+  --color-red-darker4: color-mix(
+    in srgb,
+    var(--color-red),
+    #000 var(--color-darker4)
+  );
+  --color-red-light: color-mix(
+    in srgb,
+    var(--color-red),
+    #fff var(--color-light)
+  );
+  --color-red-light2: color-mix(
+    in srgb,
+    var(--color-red),
+    #fff var(--color-light2)
+  );
+  --color-red-light3: color-mix(
+    in srgb,
+    var(--color-red),
+    #fff var(--color-light3)
+  );
+  --color-red-light4: color-mix(
+    in srgb,
+    var(--color-red),
+    #fff var(--color-light4)
+  );
+
+  --color-green: hsl(var(--color-green-hue), 100%, 50%);
+  --color-green-darker: color-mix(
+    in srgb,
+    var(--color-green),
+    #000 var(--color-darker)
+  );
+  --color-green-darker2: color-mix(
+    in srgb,
+    var(--color-green),
+    #000 var(--color-darker2)
+  );
+  --color-green-darker3: color-mix(
+    in srgb,
+    var(--color-green),
+    #000 var(--color-darker3)
+  );
+  --color-green-darker4: color-mix(
+    in srgb,
+    var(--color-green),
+    #000 var(--color-darker4)
+  );
+  --color-green-light: color-mix(
+    in srgb,
+    var(--color-green),
+    #fff var(--color-light)
+  );
+  --color-green-light2: color-mix(
+    in srgb,
+    var(--color-green),
+    #fff var(--color-light2)
+  );
+  --color-green-light3: color-mix(
+    in srgb,
+    var(--color-green),
+    #fff var(--color-light3)
+  );
+  --color-green-light4: color-mix(
+    in srgb,
+    var(--color-green),
+    #fff var(--color-light4)
+  );
+
+  --color-cyan: hsl(var(--color-cyan-hue), 100%, 50%);
+  --color-cyan-darker: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #000 var(--color-darker)
+  );
+  --color-cyan-darker2: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #000 var(--color-darker2)
+  );
+  --color-cyan-darker3: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #000 var(--color-darker3)
+  );
+  --color-cyan-darker4: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #000 var(--color-darker4)
+  );
+  --color-cyan-light: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #fff var(--color-light)
+  );
+  --color-cyan-light2: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #fff var(--color-light2)
+  );
+  --color-cyan-light3: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #fff var(--color-light3)
+  );
+  --color-cyan-light4: color-mix(
+    in srgb,
+    var(--color-cyan),
+    #fff var(--color-light4)
+  );
+
+  --color-yellow: hsl(var(--color-yellow-hue), 100%, 50%);
+  --color-yellow-darker: color-mix(
+    in srgb,
+    var(--color-yellow),
+    #000 var(--color-darker)
+  );
+  --color-yellow-darker2: color-mix(
+    in srgb,
+    var(--color-yellow),
+    #000 var(--color-darker2)
+  );
+  --color-yellow-darker3: color-mix(
+    in srgb,
+    var(--color-yellow),
+    #000 var(--color-darker3)
+  );
+  --color-yellow-darker4: color-mix(
+    in srgb,
+    var(--color-yellow),
+    #000 var(--color-darker4)
+  );
+  --color-yellow-light: color-mix(
+    in srgb,
+    var(--color-yellow),
+    #fff var(--color-light)
+  );
+  --color-yellow-light2: color-mix(
+    in srgb,
+    var(--color-yellow),
+    #fff var(--color-light2)
+  );
+  --color-yellow-light3: color-mix(
+    in srgb,
+    var(--color-yellow),
+    #fff var(--color-light3)
+  );
+  --color-yellow-light4: color-mix(
+    in srgb,
+    var(--color-yellow),
+    #fff var(--color-light4)
+  );
+  --color-orange: hsl(var(--color-orange-hue), 100%, 50%);
+  --color-orange-darker: color-mix(
+    in srgb,
+    var(--color-orange),
+    #000 var(--color-darker)
+  );
+  --color-orange-darker2: color-mix(
+    in srgb,
+    var(--color-orange),
+    #000 var(--color-darker2)
+  );
+  --color-orange-darker3: color-mix(
+    in srgb,
+    var(--color-orange),
+    #000 var(--color-darker3)
+  );
+  --color-orange-darker4: color-mix(
+    in srgb,
+    var(--color-orange),
+    #000 var(--color-darker4)
+  );
+  --color-orange-light: color-mix(
+    in srgb,
+    var(--color-orange),
+    #fff var(--color-light)
+  );
+  --color-orange-light2: color-mix(
+    in srgb,
+    var(--color-orange),
+    #fff var(--color-light2)
+  );
+  --color-orange-light3: color-mix(
+    in srgb,
+    var(--color-orange),
+    #fff var(--color-light3)
+  );
+  --color-orange-light4: color-mix(
+    in srgb,
+    var(--color-orange),
+    #fff var(--color-light4)
+  );
+  --color-blue: hsl(var(--color-blue-hue), 100%, 50%);
+  --color-blue-light: color-mix(
+    in srgb,
+    var(--color-blue),
+    #fff var(--color-light)
+  );
+  --color-blue-light2: color-mix(
+    in srgb,
+    var(--color-blue),
+    #fff var(--color-light2)
+  );
+  --color-blue-light3: color-mix(
+    in srgb,
+    var(--color-blue),
+    #fff var(--color-light3)
+  );
+  --color-blue-light4: color-mix(
+    in srgb,
+    var(--color-blue),
+    #fff var(--color-light4)
+  );
+  --color-blue-darker: color-mix(
+    in srgb,
+    var(--color-blue),
+    #000 var(--color-darker)
+  );
+  --color-blue-darker2: color-mix(
+    in srgb,
+    var(--color-blue),
+    #000 var(--color-darker2)
+  );
+  --color-blue-darker3: color-mix(
+    in srgb,
+    var(--color-blue),
+    #000 var(--color-darker3)
+  );
+  --color-blue-darker4: color-mix(
+    in srgb,
+    var(--color-blue),
+    #000 var(--color-darker4)
+  );
+
+  --color-primary: var(--color-blue);
+  --color-primary-light: var(--color-blue-light);
+  --color-primary-light2: var(--color-blue-light2);
+  --color-primary-light3: var(--color-blue-light3);
+  --color-primary-light4: var(--color-blue-light4);
+  --color-primary-darker: var(--color-blue-darker);
+  --color-primary-darker2: var(--color-blue-darker2);
+  --color-primary-darker3: var(--color-blue-darker3);
+  --color-primary-darker4: var(--color-blue-darker4);
+  --color-primary2-varname: --color-yellow;
+  --color-primary2: var(--color-yellow);
+  --color-primary2-light: var(--color-yellow-light);
+  --color-primary2-light2: var(--color-yellow-light2);
+  --color-primary2-light3: var(--color-yellow-light3);
+  --color-primary2-light4: var(--color-yellow-light4);
+  --color-primary2-darker: var(--color-yellow-darker);
+  --color-primary2-darker2: var(--color-yellow-darker2);
+  --color-primary2-darker3: var(--color-yellow-darker3);
+  --color-primary2-darker4: var(--color-yellow-darker4);
+
+  --color-link: var(--color-primary);
+  --color-link-hover: var(--color-primary-light);
+}
