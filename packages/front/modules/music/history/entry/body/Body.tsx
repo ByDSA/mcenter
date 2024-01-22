@@ -5,7 +5,7 @@ import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO, assertIsMusicVO } fro
 import { assertIsDefined } from "#shared/utils/validation";
 import { PropInfo } from "#shared/utils/validation/zod";
 import { InputResourceProps, LinkAsyncAction, ResourceInput, ResourceInputArrayString, useAsyncAction } from "#uikit/input";
-import React, { JSX, useEffect, useMemo, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { fetchPatch } from "../../../requests";
 import { MUSIC_PROPS } from "../utils";
 import LastestComponent from "./Lastest";
@@ -30,7 +30,6 @@ export default function Body( {isBodyVisible, entry}: Props) {
   } as MusicVO);
   const [resource, setResource] = resourceState;
   const isModified = useIsModified(resourceBase, resource, calcIsModified);
-  const initialResource = useMemo(()=> entry.resource, []);
   const asyncUpdateAction = useAsyncAction();
   const reset = () => {
     setResource(entry.resource);
@@ -67,7 +66,6 @@ export default function Body( {isBodyVisible, entry}: Props) {
     return acc;
   }, {
   } as Record<keyof MusicVO, PropInfo>);
-  let titleArtist: JSX.Element;
   const commonInputProps = {
     inputTextProps: {
       onPressEnter: ()=>update(),
@@ -86,25 +84,14 @@ export default function Body( {isBodyVisible, entry}: Props) {
     error: errors?.artist,
     ...commonInputProps,
   } );
-  const maxLength = 22;
-
-  if (initialResource.title.length <= maxLength && initialResource.artist.length <= maxLength) {
-    titleArtist = <span className={`${style.line1half}` }>
-      <span className={style.column2}>
-        {titleElement}
-        {artistElement}
-      </span>
-    </span>;
-  } else {
-    titleArtist = <>
-      <span className={style.line1half}>
-        {titleElement}
-      </span>
-      <span className={style.line1half}>
-        {artistElement}
-      </span>
-    </>;
-  }
+  const titleArtist = <span className={style.line}>
+    <span className={`${style.height1half} ${style.title}`}>
+      {titleElement}
+    </span>
+    <span className={`${style.height1half} ${style.artist}`}>
+      {artistElement}
+    </span>
+  </span>;
 
   return <div className={style.container} style={
     {
@@ -113,21 +100,33 @@ export default function Body( {isBodyVisible, entry}: Props) {
   }>
     {errors && Object.entries(errors).length > 0 && Object.entries(errors).map(([key, value]) => <span key={key} className="line">{key}: {value}</span>)}
     {titleArtist}
-    <span className={`${style.line1half} ${style.weight}`}
-      style={{
-        alignItems: "center",
-      }}
-    >
-      {ResourceInput( {
-        style:{
-          width: "auto",
-          minWidth: "calc(100% / 4)",
-        },
-        caption: MUSIC_PROPS.weight.caption,
-        type: "number",
-        prop: "weight",
-        ...commonInputProps,
-      } )}
+
+    <span className={`${style.line}`}>
+      <span className={`${style.height1half} ${style.weight}`}>
+        {ResourceInput( {
+          style:{
+            width: "150px",
+          },
+          caption: MUSIC_PROPS.weight.caption,
+          type: "number",
+          prop: "weight",
+          ...commonInputProps,
+        } )}
+      </span>
+      <span className={`${style.height1half} ${style.album}`}>
+        {ResourceInput( {
+          style: {
+            minWidth: "250px",
+            width: "100%",
+            marginBottom: "0",
+          },
+          caption:MUSIC_PROPS.album.caption,
+          prop:"album",
+          ...commonInputProps,
+        } )}
+      </span>
+    </span>
+    <span className={`${style.line} ${style.height1half} ${style.tags}`}>
       <span>{MUSIC_PROPS.tags.caption}</span>
       {ResourceInputArrayString( {
         prop: "tags",
@@ -137,21 +136,14 @@ export default function Body( {isBodyVisible, entry}: Props) {
         },
       } )}
     </span>
-    <span className={style.line1half}>
-      {ResourceInput( {
-        caption:MUSIC_PROPS.album.caption,
-        prop:"album",
-        ...commonInputProps,
-      } )}
-    </span>
-    <span className={style.line1half}>
+    <span className={`${style.line} ${style.height1half}`}>
       {ResourceInput( {
         caption:MUSIC_PROPS.path.caption,
         prop:"path",
         ...commonInputProps,
       } )}
     </span>
-    <span className={style.line1half}>
+    <span className={`${style.line} ${style.height1half}`}>
       {ResourceInput( {
         caption: <><a href={fullUrlOf(resource.url)}>url</a>:</>,
         prop:"url",
@@ -188,7 +180,7 @@ function OptionalProps( {resourceState, optionalProps, errors}: OptionalPropsPro
   };
 
   ret.top = (<>
-    <span className={style.line1half}>
+    <span className={`${style.line} ${style.height1half}`}>
       <a onClick={() => setIsVisible(!isVisible)}>{!isVisible ? "Mostrar" : "Ocultar"} todas las propiedades opcionales</a>
     </span>
   </>);
@@ -203,7 +195,7 @@ function OptionalProps( {resourceState, optionalProps, errors}: OptionalPropsPro
 
     if (prop in resource || isVisible) {
       ret[prop] = (<>
-        <span className={style.line1half}>
+        <span className={`${style.line} ${style.height1half}`}>
           <ResourceInput caption={caption} type={type === "number" ? "number" : "string"} prop={prop} resourceState={resourceState} isOptional error={errors?.[prop]}/>
         </span>
       </>);

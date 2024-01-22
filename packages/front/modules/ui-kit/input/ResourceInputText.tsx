@@ -4,7 +4,7 @@ import { useInputText } from "./InputText";
 import OptionalCheckbox from "./OptionalCheckbox";
 import { InputResourceProps } from "./props";
 
-export default function ResourceInputText<T extends Object>( {resourceState, style, prop: key, isOptional, error, inputTextProps: inputTextPropsMod}: InputResourceProps<T>) {
+export default function ResourceInputText<T extends Object>( {resourceState, prop: key, isOptional, error, inputTextProps: inputTextPropsMod}: InputResourceProps<T>) {
   const [resource, setResource] = resourceState;
   const calcFinalValue = (v?: string) => {
     if (v === "" && isOptional)
@@ -30,9 +30,6 @@ export default function ResourceInputText<T extends Object>( {resourceState, sty
   const {onEmptyPressEnter:_, ...inputTextProps} = inputTextPropsMod ?? {
   };
   const {element: inputText, setValue, getValue} = useInputText( {
-    style: {
-      width: "100%",
-    },
     value: initialValue,
     disabled,
     onChange: handleChange,
@@ -48,22 +45,20 @@ export default function ResourceInputText<T extends Object>( {resourceState, sty
     setValue(initialValue ?? "");
   }, [resource]);
 
-  return <span style={{
-    flexFlow: "column",
-    width: "100%",
-    ...style,
-  }}>
-    <span style={{
-      width: "100%",
-    }}>
-      {inputText}
-      {isOptional && OptionalCheckbox( {
-        prop: key,
-        resourceState,
-        defaultValue: "",
-        name: `${key.toString()}-Checkbox`,
-      } ) }
+  return <>
+    <span className="ui-kit-resource-input-text">
+      <span>
+        {inputText}
+        {error && <span className="error">{error}</span>}
+      </span>
+      <span>
+        {isOptional && OptionalCheckbox( {
+          prop: key,
+          resourceState,
+          defaultValue: "",
+          name: `${key.toString()}-Checkbox`,
+        } ) }
+      </span>
     </span>
-    {error && <span className="error">{error}</span>}
-  </span>;
+  </>;
 }

@@ -13,6 +13,8 @@ export const MUSIC_PROPS = Object.entries(zodSchemaToReadableFormat<MusicVO>(VOS
         return "Peso:";
       case "path":
         return "Path:";
+      case "tags":
+        return "Tags:";
       case "url":
         return "Url:";
       case "album":

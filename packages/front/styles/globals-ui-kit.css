@@ -1,0 +1,42 @@
+.ui-kit-input-text,
+.ui-kit-input-number {
+  width: 100%;
+}
+
+.ui-kit-input-text {
+  min-width: 150px;
+}
+
+.ui-kit-resource-input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.ui-kit-resource-input .ui-kit-resource-input-text,
+.ui-kit-resource-input .ui-kit-resource-input-number {
+  flex-flow: row;
+  width: 100%;
+  margin: 0 1em;
+
+  & label {
+    text-wrap: nowrap;
+  }
+}
+
+.ui-kit-resource-input .ui-kit-resource-input-text > span:first-child,
+.ui-kit-resource-input .ui-kit-resource-input-number > span:first-child {
+  width: 100%;
+}
+
+.ui-kit-input-text,
+.ui-kit-input-number {
+  resize: none;
+  padding: 0.2em;
+  line-height: 1.3em;
+  background: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  overflow: hidden;
+}

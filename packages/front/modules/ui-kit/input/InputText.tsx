@@ -1,5 +1,4 @@
 import { ChangeEventHandler, useEffect, useMemo, useRef } from "react";
-import { commonStyle } from "./style";
 
 export type OnPressEnterFn = (text: string)=> void;
 
@@ -37,8 +36,8 @@ export function useInputText( {style, disabled, value, onChange, onPressEnter = 
   };
   const textArea = useMemo(()=><textarea
     ref={ref}
+    className="ui-kit-input-text"
     style={{
-      ...commonStyle,
       ...style,
     }}
     defaultValue={value}

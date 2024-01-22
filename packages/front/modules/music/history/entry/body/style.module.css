@@ -35,40 +35,44 @@
   display: flex;
 }
 
-.container .line,
-.container .line1half {
+.container .line {
   width: 100%;
   margin: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-items: center;
 }
 
-.container .line1half {
-  margin-bottom: 0.5em;
+.container textarea {
+  min-width: 150px;
+}
+
+.container .height1half {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.container .album,
+.container .title,
+.container .artist {
+  flex-grow: 1;
+  width: auto;
+}
+
+.container .tags {
+  flex-wrap: nowrap;
 }
 
 .container .weight input {
+  width: 5vw;
   min-width: 50px;
-}
-
-.container > span + span {
-  margin-right: 4vw;
 }
 
 span.break {
   flex-basis: 100%;
   height: 0;
   margin-bottom: 3vh;
-}
-
-.container input {
-  min-width: 50px;
-  margin: 0 0.25rem;
-  background-color: white;
-  border-width: 1px;
-  border-radius: 2vw;
-}
-
-.container .weight input {
-  width: 5vw;
 }
 
 .container .containerTime {

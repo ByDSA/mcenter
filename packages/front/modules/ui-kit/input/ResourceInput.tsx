@@ -6,16 +6,11 @@ import { InputResourceProps } from "./props";
 export type ResourceInputProps<T extends Object> = InputResourceProps<T> & {
   caption?: JSX.Element | string;
   style?: React.CSSProperties;
-  inputStyle?: React.CSSProperties;
   type?: "number" | "string";
 };
 
-export default function ResourceInput<T extends Object>( {style, inputStyle, caption, prop, resourceState, isOptional = false, error, type, inputTextProps}: ResourceInputProps<T>) {
+export default function ResourceInput<T extends Object>( {caption, prop, resourceState, isOptional = false, error, type, inputTextProps}: ResourceInputProps<T>) {
   let input: JSX.Element;
-  const actualInputStyle = {
-    ...defaultStyle,
-    ...inputStyle,
-  };
 
   if (type === "number") {
     input = ResourceInputNumber( {
@@ -23,7 +18,6 @@ export default function ResourceInput<T extends Object>( {style, inputStyle, cap
       resourceState,
       isOptional,
       inputTextProps,
-      style: actualInputStyle,
       error,
     } );
   } else {
@@ -32,17 +26,12 @@ export default function ResourceInput<T extends Object>( {style, inputStyle, cap
       resourceState,
       isOptional,
       inputTextProps,
-      style: actualInputStyle,
       error,
     } );
   }
 
   if (caption) {
-    return <span style={{
-      alignItems: "center",
-      width: style?.width ?? "100%",
-      ...style,
-    }}>
+    return <span className="ui-kit-resource-input">
       <span>{caption}</span>
       {input}
     </span>;
@@ -50,8 +39,3 @@ export default function ResourceInput<T extends Object>( {style, inputStyle, cap
 
   return input;
 }
-
-const defaultStyle: React.CSSProperties = {
-  margin: "0 1em",
-  width: "100%",
-};
