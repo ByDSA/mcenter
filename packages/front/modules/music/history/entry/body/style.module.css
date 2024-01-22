@@ -5,6 +5,10 @@
   flex-direction: column;
   justify-content: flex-start;
   flex-wrap: wrap;
+
+  @media (width >= 640px) {
+    padding: 1rem 2rem;
+  }
 }
 
 .container .item {
@@ -78,14 +82,4 @@ span.break {
   display: flex;
   flex-direction: column;
   padding: 0 0.5vw;
-}
-
-@media (width >= var(--width-lg)) {
-  .header {
-    padding: 1.25rem 2rem;
-  }
-
-  .container {
-    padding: 1rem 2rem;
-  }
 }
