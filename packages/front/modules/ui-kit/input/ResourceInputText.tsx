@@ -1,39 +1,52 @@
 import { isDefined } from "#shared/utils/validation";
-import { ChangeEvent, useEffect, useState } from "react";
-import { InputText } from "./InputText";
+import { ChangeEvent, useEffect, useMemo } from "react";
+import { useInputText } from "./InputText";
 import OptionalCheckbox from "./OptionalCheckbox";
 import { InputResourceProps } from "./props";
 
 export default function ResourceInputText<T extends Object>( {resourceState, style, prop: key, isOptional, error, inputTextProps: inputTextPropsMod}: InputResourceProps<T>) {
   const [resource, setResource] = resourceState;
-  const [value, setValue] = useState(resource[key]?.toString());
+  const calcFinalValue = (v?: string) => {
+    if (v === "" && isOptional)
+      return undefined;
 
-  useEffect(() => {
-    setValue(resource[key]?.toString());
-  },[resource]);
+    if (v === undefined && !isOptional)
+      return "";
 
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    return v;
+  };
+  const initialValue = useMemo(()=>calcFinalValue(resource[key]?.toString()), [resource]);
+  const handleChange = useMemo(()=>(e: ChangeEvent<HTMLTextAreaElement>) => {
     const {value: targetValue} = e.target;
-    const finalValue = targetValue === "" && isOptional ? undefined : targetValue;
+    const finalValue = calcFinalValue(targetValue);
 
     setResource( {
       ...resource,
       [key]: finalValue,
     } );
-  };
-  const disabled = isOptional && !isDefined(value);
+  }, [resource]);
+  const disabled = isOptional && !isDefined(initialValue);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {onEmptyPressEnter:_, ...inputTextProps} = inputTextPropsMod ?? {
   };
-  const textArea = InputText( {
+  const {element: inputText, setValue, getValue} = useInputText( {
     style: {
       width: "100%",
     },
-    value,
+    value: initialValue,
     disabled,
     onChange: handleChange,
     ...inputTextProps,
   } );
+
+  useEffect(() => {
+    const currentValue = calcFinalValue(getValue());
+
+    if (initialValue === currentValue)
+      return;
+
+    setValue(initialValue ?? "");
+  }, [resource]);
 
   return <span style={{
     flexFlow: "column",
@@ -43,7 +56,7 @@ export default function ResourceInputText<T extends Object>( {resourceState, sty
     <span style={{
       width: "100%",
     }}>
-      {textArea}
+      {inputText}
       {isOptional && OptionalCheckbox( {
         prop: key,
         resourceState,

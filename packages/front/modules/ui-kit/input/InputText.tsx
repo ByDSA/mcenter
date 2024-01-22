@@ -1,52 +1,31 @@
-import { ChangeEvent, ChangeEventHandler, useEffect, useRef, useState } from "react";
+import { ChangeEventHandler, useEffect, useMemo, useRef } from "react";
 import { commonStyle } from "./style";
 
 export type OnPressEnterFn = (text: string)=> void;
 
 export type InputTextProps = {
   style?: React.CSSProperties;
-  value?: string;
   disabled?: boolean;
   onChange?: ChangeEventHandler<HTMLTextAreaElement>;
   onPressEnter?: OnPressEnterFn | "newLine" | "nothing";
+  value?: string;
 };
 
-export function InputText( {style, value: valueProp, disabled, onChange, onPressEnter = "nothing"}: InputTextProps) {
-  const updateHeight = ( {value, element}: {value: string; element: HTMLTextAreaElement} ) => {
-    const rows = getVisualLines(element, value) || 1;
-    const paddingTop = +window.getComputedStyle(element).paddingTop.replace("px", "");
-    const paddingBottom = +window.getComputedStyle(element).paddingBottom.replace("px", "");
-    const paddingHeight = paddingTop + paddingBottom;
-
-    // eslint-disable-next-line no-param-reassign
-    element.style.height = `calc(${rows * 1.3}em + ${paddingHeight}px)`; // Set the height to the scrollHeight
-  };
+export function useInputText( {style, disabled, value, onChange, onPressEnter = "nothing"}: InputTextProps) {
+  const updateProps = [onChange, onPressEnter];
   const ref = useRef(null as HTMLTextAreaElement | null);
-  const [cursor, setCursor] = useState<number | null>(null);
+  const updateH = () => ref?.current && updateHeight( {
+    value: ref.current.value,
+    element: ref.current,
+  } );
 
   useEffect(() => {
-    const element = ref.current;
+    updateH();
+  }, [value]);
 
-    if (!element)
-      return;
-
-    updateHeight( {
-      value: valueProp?.toString() ?? "",
-      element,
-    } );
-  }, [valueProp]);
-
-  useEffect(() => {
-    const input = ref.current;
-
-    if (input)
-      input.setSelectionRange(cursor, cursor);
-  }, [ref, cursor, valueProp]);
-
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setCursor(e.target.selectionStart);
-    onChange?.(e);
-  };
+  useFirstVisible(ref, () => {
+    updateH();
+  } );
   const keyDownHandler = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       if (typeof onPressEnter === "function" || onPressEnter === "nothing")
@@ -56,20 +35,29 @@ export function InputText( {style, value: valueProp, disabled, onChange, onPress
         onPressEnter(e.currentTarget.value);
     }
   };
-  const textArea = <textarea
+  const textArea = useMemo(()=><textarea
     ref={ref}
     style={{
       ...commonStyle,
       ...style,
     }}
-    value={valueProp}
+    defaultValue={value}
     disabled={disabled}
-    onChange={handleChange}
+    onChange={onChange}
     onKeyDown={keyDownHandler}
 
-  ></textarea>;
+  ></textarea>, updateProps);
 
-  return textArea;
+  return {
+    element: textArea,
+    getValue: ()=>ref?.current?.value,
+    setValue: (v: string) => {
+      if (!ref?.current)
+        return;
+
+      ref.current.value = v;
+    },
+  };
 }
 
 function getVisualLines(textarea: HTMLTextAreaElement, sentence: string) {
@@ -97,7 +85,7 @@ function getVisualLines(textarea: HTMLTextAreaElement, sentence: string) {
     const wordWidth = context.measureText(`${w} `).width;
     const lineWidth = context.measureText(currentLine).width;
 
-    if (w !== "" && lineWidth + wordWidth > textAreaWidth) {
+    if (w !== "" && lineWidth + wordWidth > textAreaWidth + 1) {
       lineCount++;
       currentLine = `${w} `;
     } else
@@ -123,7 +111,7 @@ function splitIntoWords(str: string): string[] {
       continue;
     }
 
-    if (currentWord !== ""){
+    if (currentWord !== "") {
       if (l === " " && lastLetter !== " ") {
         words.push(currentWord);
         currentWord = "";
@@ -145,3 +133,42 @@ function splitIntoWords(str: string): string[] {
 
   return words;
 }
+
+function useFirstVisible<T extends HTMLElement>(ref: React.RefObject<T | null>, callback: (current: T)=> void) {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (!ref?.current)
+              return;
+
+            callback(ref.current);
+            observer.disconnect();
+          }
+        } );
+      },
+      {
+        threshold: 0.1,
+      },
+    );
+
+    if (!ref?.current)
+      return;
+
+    observer.observe(ref.current);
+
+    // eslint-disable-next-line consistent-return
+    return () => observer.disconnect();
+  }, []);
+}
+
+const updateHeight = ( {value, element}: {value: string; element: HTMLTextAreaElement} ) => {
+  const rows = getVisualLines(element, value) || 1;
+  const paddingTop = +window.getComputedStyle(element).paddingTop.replace("px", "");
+  const paddingBottom = +window.getComputedStyle(element).paddingBottom.replace("px", "");
+  const paddingHeight = paddingTop + paddingBottom;
+
+  // eslint-disable-next-line no-param-reassign
+  element.style.height = `calc(${rows * 1.3}em + ${paddingHeight}px)`; // Set the height to the scrollHeight
+};

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { isDefined } from "#shared/utils/validation";
-import { InputTextProps } from "./InputText";
-import { useInputTextWithState } from "./InputTextWithState";
+import { InputTextProps, useInputText } from "./InputText";
 import { InputResourceProps, InputTextPropsMod } from "./props";
 
 export default function ResourceInputArrayString<T extends Object>( {resourceState, prop, inputTextProps}: InputResourceProps<T>) {
@@ -128,7 +127,8 @@ function AddIcon<T>( {resourceState, prop, inputTextProps}: AddIconProps<T>) {
   const add = ()=>addIconOnClickHandler( {
     prop,
     resourceState,
-    inputTextState: state,
+    setInputText,
+    inputText: getInputText(),
   } );
   const props: InputTextProps = {
     style: {
@@ -136,9 +136,10 @@ function AddIcon<T>( {resourceState, prop, inputTextProps}: AddIconProps<T>) {
     },
     ...inputTextProps,
     onPressEnter: (text: string) => {
-      if (text === "" && inputTextProps?.onEmptyPressEnter)
-        inputTextProps?.onEmptyPressEnter?.();
-      else {
+      if (text === "") {
+        if (inputTextProps?.onEmptyPressEnter)
+          inputTextProps?.onEmptyPressEnter?.();
+      } else {
         add();
 
         if (typeof inputTextProps?.onPressEnter === "function")
@@ -146,7 +147,7 @@ function AddIcon<T>( {resourceState, prop, inputTextProps}: AddIconProps<T>) {
       }
     },
   };
-  const {state, element} = useInputTextWithState(props);
+  const {setValue: setInputText, getValue: getInputText, element} = useInputText(props);
 
   return <ItemBox hideBorder>
     {element}
@@ -160,12 +161,14 @@ function AddIcon<T>( {resourceState, prop, inputTextProps}: AddIconProps<T>) {
 }
 
 type AddIconHandlerProps<T> = AddDeleteIconProps<T> & {
-  inputTextState: ReturnType<typeof useInputTextWithState>["state"];
+  inputText: string | undefined;
+  setInputText: React.Dispatch<React.SetStateAction<string>>;
 };
-const addIconOnClickHandler = <T,>( {prop, resourceState, inputTextState}: AddIconHandlerProps<T>) => {
+const addIconOnClickHandler = <T,>( {prop, resourceState, inputText, setInputText}: AddIconHandlerProps<T>) => {
   const [resource, setResource] = resourceState;
-  const array = (resource[prop] ?? []) as string[];
-  const [inputText, setInputText] = inputTextState;
+  let array = (resource[prop] ?? []) as string[];
+
+  array = [...array];
   const newTag = inputText?.trim();
 
   if (!isDefined(newTag) || newTag === "")

@@ -23,7 +23,11 @@ type Props = {
 };
 export default function Body( {isBodyVisible, entry}: Props) {
   const resourceBase = useResourceBase(entry, calcIsModified);
-  const resourceState = useState(resourceBase);
+  const resourceState = useState( {
+    ...resourceBase,
+    // eslint-disable-next-line no-unsafe-optional-chaining
+    tags: [...(resourceBase?.tags ?? [])],
+  } as MusicVO);
   const [resource, setResource] = resourceState;
   const isModified = useIsModified(resourceBase, resource, calcIsModified);
   const initialResource = useMemo(()=> entry.resource, []);
