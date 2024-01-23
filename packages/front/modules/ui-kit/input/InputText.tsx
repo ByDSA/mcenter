@@ -50,11 +50,11 @@ export function useInputText( {style, disabled, value, onChange, onPressEnter = 
   return {
     element: textArea,
     getValue: ()=>ref?.current?.value,
-    setValue: (v: string) => {
+    setValue: (v: string | undefined) => {
       if (!ref?.current)
         return;
 
-      ref.current.value = v;
+      ref.current.value = v ?? "";
       updateH();
     },
   };

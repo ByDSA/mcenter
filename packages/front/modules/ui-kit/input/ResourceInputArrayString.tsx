@@ -162,7 +162,7 @@ function AddIcon<T>( {resourceState, prop, inputTextProps}: AddIconProps<T>) {
 
 type AddIconHandlerProps<T> = AddDeleteIconProps<T> & {
   inputText: string | undefined;
-  setInputText: React.Dispatch<React.SetStateAction<string>>;
+  setInputText: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 const addIconOnClickHandler = <T,>( {prop, resourceState, inputText, setInputText}: AddIconHandlerProps<T>) => {
   const [resource, setResource] = resourceState;
