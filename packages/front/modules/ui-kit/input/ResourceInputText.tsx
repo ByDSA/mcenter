@@ -42,19 +42,17 @@ export default function ResourceInputText<T extends Object>( {resourceState, pro
     setValue(initialValue ?? "");
   }, [resource]);
 
-  return <>
-    <span className="ui-kit-resource-input-text">
-      <span>
-        {inputText}
-        {error && <span className="error">{error}</span>}
-      </span>
-      <span>
-        {isOptional && OptionalCheckbox( {
-          prop: key,
-          resourceState,
-          name: `${key.toString()}-Checkbox`,
-        } ) }
-      </span>
+  return <span className="ui-kit-resource-input-text">
+    <span>
+      {inputText}
+      {error && <span className="error">{error}</span>}
     </span>
-  </>;
+    <span>
+      {isOptional && OptionalCheckbox( {
+        prop: key,
+        resourceState,
+        name: `${key.toString()}-Checkbox`,
+      } ) }
+    </span>
+  </span>;
 }
