@@ -1,13 +1,13 @@
 "use client";
 
-import { HistoryList } from "#modules/history";
+import { SerieHistoryList } from "#modules/series";
 
 export default function History() {
   return (
     <>
       <h2>Historial</h2>
 
-      <HistoryList />
+      <SerieHistoryList />
     </>
   );
 }

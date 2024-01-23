@@ -1,11 +1,11 @@
 
 /* eslint-disable require-await */
-import HistoryEntryElement from "#modules/history/entry/HistoryEntryElement";
 import { BACKEND_URLS } from "#modules/urls";
 import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse, historyListEntryDtoToModel } from "#shared/models/historyLists";
 import Loading from "app/loading";
 import React, { Fragment } from "react";
 import useSWR from "swr";
+import HistoryEntryElement from "./entry/HistoryEntryElement";
 import { getDateStr } from "./utils";
 
 const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {

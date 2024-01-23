@@ -1,6 +1,6 @@
 "use client";
 
-import { MediaPlayer, WebSocketsClient } from "#modules/player";
+import { MediaPlayer, WebSocketsClient } from "#modules/remote-player";
 import { BACKEND_URLS } from "#modules/urls";
 import { Episode, EpisodeGetManyBySearchRequest, assertIsEpisode } from "#shared/models/episodes";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#shared/models/player";
