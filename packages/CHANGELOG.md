@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.7.1](https://github.com/ByDSA/mcenter/compare/v3.7.0...v3.7.1) (2024-01-23)
+
+
+### Bug Fixes
+
+* **front:** body padding ([6fc5a22](https://github.com/ByDSA/mcenter/commit/6fc5a22e63970628a2241b6542621897f2c7935e))
+* **front:** fetching latest played times ([511f499](https://github.com/ByDSA/mcenter/commit/511f499491ee651fa8791912efef258d5e392665))
+* **front:** input text behaivour ([661f7b7](https://github.com/ByDSA/mcenter/commit/661f7b7245cdbdeccf2fb48d46d4dcfe9e7a19c5))
+* **front:** refactor Body component and remove unused code ([f27231d](https://github.com/ByDSA/mcenter/commit/f27231db9da83c5345e4d43b4ac5fc13784430cc))
+* **front:** some style improvements ([94ab49b](https://github.com/ByDSA/mcenter/commit/94ab49b226752e61842b93f9f2f705bc074a4afd))
+* **front:** spinner style to use global CSS variables ([3cb1e10](https://github.com/ByDSA/mcenter/commit/3cb1e10dee9c5a97f16249b3129cbf99461cbea2))
+* **front:** style updates ([637d5c3](https://github.com/ByDSA/mcenter/commit/637d5c36a53ea1a0bc7bbcbc7adb5bb5e55168f6))
+* **front:** update title styling and add new color variables ([8384094](https://github.com/ByDSA/mcenter/commit/838409418994f4ecaaea64e691d28a989f73bceb))
+
 ## [3.7.0](https://github.com/ByDSA/mcenter/compare/v3.6.3...v3.7.0) (2024-01-18)
 
 
