@@ -5,6 +5,7 @@
   --color-blue-hue: calc(var(--color-red-hue) + 210);
   --color-green-hue: calc(var(--color-red-hue) + 160);
   --color-cyan-hue: calc(var(--color-red-hue) + 185);
+  --color-purple-hue: calc(var(--color-red-hue) + 266);
 
   --color-light: 33%;
   --color-light2: 42%;
@@ -263,6 +264,48 @@
     in srgb,
     var(--color-blue),
     #000 var(--color-darker4)
+  );
+
+  --color-purple: hsl(var(--color-purple-hue), 100%, 50%);
+  --color-purple-darker: color-mix(
+    in srgb,
+    var(--color-purple),
+    #000 var(--color-darker)
+  );
+  --color-purple-darker2: color-mix(
+    in srgb,
+    var(--color-purple),
+    #000 var(--color-darker2)
+  );
+  --color-purple-darker3: color-mix(
+    in srgb,
+    var(--color-purple),
+    #000 var(--color-darker3)
+  );
+  --color-purple-darker4: color-mix(
+    in srgb,
+    var(--color-purple),
+    #000 var(--color-darker4)
+  );
+  --color-purple-light: color-mix(
+    in srgb,
+    var(--color-purple),
+    #fff var(--color-light)
+  );
+  --color-purple-light2: color-mix(
+    in srgb,
+    var(--color-purple),
+    #fff var(--color-light2)
+  );
+  --color-purple-light3: color-mix(
+    in srgb,
+    var(--color-purple),
+    #fff var(--color-light3)
+  );
+  --color-purple-light4: color-mix(
+    in srgb,
+    var(--color-purple),
+    #fff var(--color-light4)
   );
 
   --color-primary: var(--color-blue);

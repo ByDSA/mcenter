@@ -6,6 +6,18 @@
   height: calc(100vh - 78px);
 }
 
+.container .title .titlePart1 {
+  color: var(--color-green-darker);
+}
+
+.container .title .titlePart2 {
+  color: var(--color-orange-darker);
+}
+
+.container .version {
+  color: var(--color-red-darker2);
+}
+
 .title a {
   color: var(--color-primary);
   text-decoration: none;
