@@ -3,7 +3,8 @@ import { makeFetcher, makeUseRequest } from "#modules/fetching";
 import { BACKEND_URLS } from "#modules/urls";
 import { HistoryMusicEntry, HistoryMusicListGetManyEntriesBySearchRequest, assertIsHistoryMusicListGetManyEntriesBySearchResponse, assertIsMusicVO } from "#shared/models/musics";
 
-const body: HistoryMusicListGetManyEntriesBySearchRequest["body"] = {
+type ReqBody = HistoryMusicListGetManyEntriesBySearchRequest["body"];
+const body: ReqBody = {
   "filter": {
   },
   "sort": {
@@ -18,16 +19,22 @@ const validator = (data: Required<HistoryMusicEntry>[]) => {
   for (const d of data)
     assertIsMusicVO(d.resource);
 };
+const method = "POST";
 const fetcher = makeFetcher( {
-  method: "POST",
+  method,
   body,
   resBodyValidator: validator,
 } );
 
-export const useRequest = makeUseRequest<Required<HistoryMusicEntry>[]>( {
-  url: BACKEND_URLS.resources.musics.history.crud.search( {
-    user: "user",
-  } ),
+export const useRequest = makeUseRequest<ReqBody, Required<HistoryMusicEntry>[]>( {
+  key:
+  {
+    url: BACKEND_URLS.resources.musics.history.crud.search( {
+      user: "user",
+    } ),
+    method,
+    body,
+  },
   fetcher,
   refreshInterval: 5 * 1000,
 } );

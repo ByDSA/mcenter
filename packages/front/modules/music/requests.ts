@@ -5,8 +5,9 @@ import { MusicID, MusicPatchOneByIdReq, MusicPatchOneByIdReqBody, MusicPatchOneB
 
 // eslint-disable-next-line require-await
 export async function fetchPatch(id: MusicID, body: MusicPatchOneByIdReq["body"]): Promise<MusicPatchOneByIdResBody | undefined> {
+  const method = "PATCH";
   const fetcher = makeFetcher<MusicPatchOneByIdReqBody, MusicPatchOneByIdResBody>( {
-    method: "PATCH",
+    method,
     body,
     reqBodyValidator: assertIsMusicPatchOneByIdReqBody,
     resBodyValidator: assertIsMusicPatchOneByIdResBody,
@@ -15,5 +16,9 @@ export async function fetchPatch(id: MusicID, body: MusicPatchOneByIdReq["body"]
     id,
   } );
 
-  return fetcher(URL);
+  return fetcher( {
+    url:URL,
+    method,
+    body,
+  } );
 }

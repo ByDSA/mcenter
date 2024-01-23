@@ -31,15 +31,20 @@ export default function LastestComponent( {resourceId, date, dateFormat = DATE_F
     "limit": 2,
     "expand": ["musics"],
   };
+  const method = "POST";
   const fetcher = makeFetcher( {
-    method: "POST",
+    method,
     body,
     resBodyValidator: validator,
   } );
-  const useRequest: UseRequest<HistoryMusicEntry[]> = makeUseRequest<Required<HistoryMusicEntry>[]>( {
-    url: BACKEND_URLS.resources.musics.history.crud.search( {
-      user: "user",
-    } ),
+  const useRequest: UseRequest<HistoryMusicEntry[]> = makeUseRequest<HistoryMusicListGetManyEntriesBySearchRequest["body"], Required<HistoryMusicEntry>[]>( {
+    key: {
+      url: BACKEND_URLS.resources.musics.history.crud.search( {
+        user: "user",
+      } ),
+      method,
+      body,
+    },
     fetcher,
   } );
 

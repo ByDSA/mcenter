@@ -1,10 +1,8 @@
 .spinner {
-  --spinner-color: var(--color-yellow);
-  --spinner-size: 1rem;
-  border-top: 2px solid var(--spinner-color);
-  border-right: 2px solid var(--spinner-color);
-  border-bottom: 2px solid var(--spinner-color);
-  border-left: 2px solid transparent;
+  border-top: var(--spinner-width) solid var(--spinner-color);
+  border-right: var(--spinner-width) solid var(--spinner-color);
+  border-bottom: var(--spinner-width) solid var(--spinner-color);
+  border-left: var(--spinner-width) solid transparent;
   border-radius: 50%;
   width: var(--spinner-size);
   height: var(--spinner-size);

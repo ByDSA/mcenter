@@ -1,3 +1,9 @@
+:root {
+  --spinner-color: var(--color-yellow);
+  --spinner-size: 1rem;
+  --spinner-width: 2px;
+}
+
 .ui-kit-input-text,
 .ui-kit-input-number {
   width: 100%;

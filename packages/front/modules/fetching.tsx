@@ -1,19 +1,25 @@
-import Loading from "app/loading";
 import React, { JSX } from "react";
 import useSWR from "swr";
+import { Spinner } from "./ui-kit/spinner";
 
-export type Fetcher<ResBody> = (url: string)=> Promise<ResBody>;
+type Method = "DELETE" | "GET" | "PATCH" | "POST";
+type FetcherParams<ReqBody> = {
+  url: string;
+  method: Method;
+  body: ReqBody;
+};
+export type Fetcher<ReqBody, ResBody> = (params: FetcherParams<ReqBody>)=> Promise<ResBody>;
 
 type MakeFetcherParams<ReqBody, ResBody> = {
   body: ReqBody;
-  method: "DELETE" | "GET" | "PATCH" | "POST";
+  method: Method;
   reqBodyValidator?: (data: ReqBody)=> void;
   resBodyValidator: (data: ResBody)=> void;
   errorMiddleware?: (error: any)=> void;
 };
-export function makeFetcher<ReqBody, ResBody>( {body, method, resBodyValidator, reqBodyValidator, errorMiddleware = console.error}: MakeFetcherParams<ReqBody, ResBody>): Fetcher<ResBody> {
-  const ret = async (url: string) => {
-    reqBodyValidator?.(body);
+export function makeFetcher<ReqBody, ResBody>( {body, method, resBodyValidator, reqBodyValidator, errorMiddleware = console.error}: MakeFetcherParams<ReqBody, ResBody>): Fetcher<ReqBody, ResBody> {
+  const ret = async (params: FetcherParams<ReqBody>) => {
+    reqBodyValidator?.(params.body);
 
     const options = {
       method,
@@ -26,7 +32,7 @@ export function makeFetcher<ReqBody, ResBody>( {body, method, resBodyValidator, 
     };
 
     try {
-      const res = await fetch(url, options);
+      const res = await fetch(params.url, options);
 
       if (!res.ok)
         throw new Error("An error occurred while fetching the data.");
@@ -50,21 +56,20 @@ type UseRequestResult<T> = {
   data: T | undefined;
   error?: any;
   isLoading: boolean;
-  url: string;
 };
-type MakeUseRequestParams<ResBody> = {
-  url: string;
-  fetcher: Fetcher<ResBody>;
+type MakeUseRequestParams<ReqBody, ResBody> = {
+  key: FetcherParams<ReqBody>;
+  fetcher: Fetcher<ReqBody, ResBody>;
   refreshInterval?: number;
 };
 
 export type UseRequest<T> = ()=> UseRequestResult<T>;
 
-export function makeUseRequest<T>( {url, fetcher, refreshInterval}: MakeUseRequestParams<T>): UseRequest<T> {
+export function makeUseRequest<R, T>( {key, fetcher, refreshInterval}: MakeUseRequestParams<R, T>): UseRequest<T> {
   const ret: UseRequest<T> = () => {
     const [data, setData] = React.useState<T | undefined>(undefined);
     const { error, isLoading } = useSWR(
-      url,
+      key,
       fetcher,
       {
         refreshInterval,
@@ -79,7 +84,6 @@ export function makeUseRequest<T>( {url, fetcher, refreshInterval}: MakeUseReque
       data,
       error,
       isLoading,
-      url,
     };
   };
 
@@ -92,7 +96,7 @@ render: (data: T, hooksRet: U)=> JSX.Element;
 hooks?: (data: T | undefined)=> void;
 };
 export function FetchingRender<T, U = undefined>( {useRequest, render, hooks}: FetchingRenderParams<T, U>): JSX.Element {
-  const {data, error, isLoading, url} = useRequest();
+  const {data, error, isLoading} = useRequest();
   const hooksRet = hooks?.(data) as U;
 
   if (error) {
@@ -102,13 +106,26 @@ export function FetchingRender<T, U = undefined>( {useRequest, render, hooks}: F
 
     return <>
       <p>Failed to request.</p>
-      <p>URL: <a href={url}>{url}</a></p>
       {error && <p>{JSON.stringify(errorShown, null, 2)}</p>}
     </>;
   }
 
-  if (isLoading || !data)
-    return <Loading/>;
+  if (isLoading) {
+    return <span style={{
+      justifyContent: "center",
+      display: "flex",
+      alignItems: "center",
+      width: "100%",
+      height: "100%",
+    }}><Spinner style={{
+        width: "5rem",
+        height: "5rem",
+        borderWidth: "0.25rem",
+      }}/></span>;
+  }
+
+  if (!data)
+    return <span>Empty data.</span>;
 
   return render(data, hooksRet);
 }
