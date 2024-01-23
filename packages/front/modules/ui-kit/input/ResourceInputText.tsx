@@ -1,4 +1,3 @@
-import { isDefined } from "#shared/utils/validation";
 import { ChangeEvent, useEffect, useMemo } from "react";
 import { useInputText } from "./InputText";
 import OptionalCheckbox from "./OptionalCheckbox";
@@ -25,13 +24,11 @@ export default function ResourceInputText<T extends Object>( {resourceState, pro
       [key]: finalValue,
     } );
   }, [resource]);
-  const disabled = isOptional && !isDefined(initialValue);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {onEmptyPressEnter:_, ...inputTextProps} = inputTextPropsMod ?? {
   };
   const {element: inputText, setValue, getValue} = useInputText( {
     value: initialValue,
-    disabled,
     onChange: handleChange,
     ...inputTextProps,
   } );
@@ -55,7 +52,6 @@ export default function ResourceInputText<T extends Object>( {resourceState, pro
         {isOptional && OptionalCheckbox( {
           prop: key,
           resourceState,
-          defaultValue: "",
           name: `${key.toString()}-Checkbox`,
         } ) }
       </span>

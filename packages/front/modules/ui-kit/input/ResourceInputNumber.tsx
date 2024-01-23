@@ -14,7 +14,6 @@ export default function ResourceInputNumber<T>( {prop, resourceState, isOptional
         type="number"
         value={value}
         className="ui-kit-input-number"
-        disabled={isOptional && !isDefined(resource[prop])}
         onChange={handleOnChange((v: number) => {
           setResource( {
             ...resource,
@@ -27,7 +26,6 @@ export default function ResourceInputNumber<T>( {prop, resourceState, isOptional
         prop,
         name: checkboxName,
         resourceState,
-        defaultValue: 0,
       } )}
     </span>
   </span>;

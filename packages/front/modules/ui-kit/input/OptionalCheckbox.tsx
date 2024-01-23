@@ -2,24 +2,18 @@ type InputResourceProps<T> = {
   prop: keyof T;
   name: string;
   resourceState: [T, React.Dispatch<React.SetStateAction<T>>];
-  defaultValue?: number | string;
 };
-export default function OptionalCheckbox( {name: checkboxName, prop, resourceState, defaultValue}: InputResourceProps<any>) {
+export default function OptionalCheckbox( {name: checkboxName, prop, resourceState}: InputResourceProps<any>) {
   const [resource, setResource] = resourceState;
 
   return <>
-    <input type="checkbox" name={checkboxName} checked={resource[prop] === undefined} onChange={(e) => {
-      let v;
-
-      if (e.target.checked)
-        v = undefined;
-      else
-        v = defaultValue;
-
-      setResource( {
-        ...resource,
-        [prop]: v,
-      } );
+    <input type="checkbox" disabled={resource[prop] === undefined} name={checkboxName} checked={resource[prop] === undefined} onChange={(e) => {
+      if (e.target.checked) {
+        setResource( {
+          ...resource,
+          [prop]: undefined,
+        } );
+      }
     }}/>
     <label htmlFor={checkboxName}>Sin valor</label>
   </>;
