@@ -1,7 +1,7 @@
 import { stringToNumberOrUndefined } from "#shared/utils/data-types";
 import { ChangeEvent, useEffect, useMemo } from "react";
 import { useInputNumber } from "./InputNumber";
-import OptionalCheckbox from "./OptionalCheckbox";
+import { ResourceOptionalCheckbox } from "./ResourceCheckboxOptional";
 import { InputResourceProps } from "./props";
 
 export default function ResourceInputNumber<T>( {prop, resourceState, isOptional}: InputResourceProps<T>) {
@@ -37,7 +37,7 @@ export default function ResourceInputNumber<T>( {prop, resourceState, isOptional
       {inputNumber}
     </span>
     <span>
-      {isOptional && OptionalCheckbox( {
+      {isOptional && ResourceOptionalCheckbox( {
         prop,
         name: `${prop.toString()}-Checkbox`,
         resourceState,

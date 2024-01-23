@@ -1,27 +1,17 @@
 import { numberToStringOrEmpty, stringToNumberOrUndefined } from "#shared/utils/data-types";
 import { useMemo, useRef } from "react";
-import { InputTextProps } from "./InputText";
+import { InputTextNumberCommonProps, keyDownHandlerGenerator } from "./InputTextNumberCommon";
 
 type InputElement = HTMLInputElement;
 
-type InputNumberProps = Omit<InputTextProps, "keyDownHandler" | "onChange" | "value"> & {
-  onChange?: (e: React.ChangeEvent<InputElement>)=> void;
-  onPressEnter?: (n: number)=> void;
-  value?: number;
-};
+type InputNumberProps = InputTextNumberCommonProps<InputElement, number>;
 /* eslint-disable import/prefer-default-export */
-export function useInputNumber( {value, onPressEnter, onChange}: InputNumberProps) {
+export function useInputNumber( {value, onPressEnter = "nothing", onChange}: InputNumberProps) {
   const ref = useRef(null as InputElement | null);
-  const keyDownHandler = (e: React.KeyboardEvent<InputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      if (typeof onPressEnter === "function" || onPressEnter === "nothing")
-        e.preventDefault();
-
-      if (typeof onPressEnter === "function")
-        onPressEnter(e.currentTarget.value);
-    }
-  };
-  const updateProps = [onChange, onPressEnter];
+  const keyDownHandler = useMemo(()=>keyDownHandlerGenerator<number, InputElement>( {
+    onPressEnter,
+    transformValue: e =>stringToNumberOrUndefined(e.currentTarget.value),
+  } ), [onPressEnter]);
   const inputElement = useMemo(()=><input
     ref={ref}
     type="number"
@@ -29,7 +19,7 @@ export function useInputNumber( {value, onPressEnter, onChange}: InputNumberProp
     className="ui-kit-input-number"
     onChange={onChange}
     onKeyDown={keyDownHandler}
-  />, updateProps);
+  />, [onChange, onPressEnter]);
 
   return {
     element: inputElement,

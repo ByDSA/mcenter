@@ -1,9 +1,10 @@
+/* eslint-disable import/prefer-default-export */
 type InputResourceProps<T> = {
   prop: keyof T;
   name: string;
   resourceState: [T, React.Dispatch<React.SetStateAction<T>>];
 };
-export default function OptionalCheckbox( {name: checkboxName, prop, resourceState}: InputResourceProps<any>) {
+export function ResourceOptionalCheckbox( {name: checkboxName, prop, resourceState}: InputResourceProps<any>) {
   const [resource, setResource] = resourceState;
 
   return <>

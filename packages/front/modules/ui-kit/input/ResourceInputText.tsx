@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useMemo } from "react";
 import { useInputText } from "./InputText";
-import OptionalCheckbox from "./OptionalCheckbox";
+import { ResourceOptionalCheckbox } from "./ResourceCheckboxOptional";
 import { InputResourceProps } from "./props";
 
 export default function ResourceInputText<T extends Object>( {resourceState, prop: key, isOptional, error, inputTextProps: inputTextPropsMod}: InputResourceProps<T>) {
@@ -48,7 +48,7 @@ export default function ResourceInputText<T extends Object>( {resourceState, pro
       {error && <span className="error">{error}</span>}
     </span>
     <span>
-      {isOptional && OptionalCheckbox( {
+      {isOptional && ResourceOptionalCheckbox( {
         prop: key,
         resourceState,
         name: `${key.toString()}-Checkbox`,

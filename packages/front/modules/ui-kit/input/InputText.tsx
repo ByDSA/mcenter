@@ -1,40 +1,30 @@
-import { ChangeEventHandler, useEffect, useMemo, useRef } from "react";
+/* eslint-disable import/prefer-default-export */
+import { useEffect, useMemo, useRef } from "react";
+import { InputTextNumberCommonProps, InputTextNumberReturnType, keyDownHandlerGenerator } from "./InputTextNumberCommon";
 
-export type OnPressEnterFn = (text: string)=> void;
+type T = string;
+type InputElement = HTMLTextAreaElement;
+export type InputTextProps = InputTextNumberCommonProps<InputElement, T>;
 
-export type InputTextProps = {
-  style?: React.CSSProperties;
-  disabled?: boolean;
-  onChange?: ChangeEventHandler<HTMLTextAreaElement>;
-  onPressEnter?: OnPressEnterFn | "newLine" | "nothing";
-  value?: string;
-};
-
-export function useInputText( {style, disabled, value, onChange, onPressEnter = "nothing"}: InputTextProps) {
-  const updateProps = [onChange, onPressEnter];
-  const ref = useRef(null as HTMLTextAreaElement | null);
-  const updateH = () => ref?.current && updateHeight( {
+export function useInputText( {style, disabled, value, onChange, onPressEnter = "nothing"}: InputTextProps): InputTextNumberReturnType<T, InputElement> {
+  const ref = useRef(null as InputElement | null);
+  const updateH = useMemo(()=>() => ref?.current && updateHeight( {
     value: ref.current.value,
     element: ref.current,
-  } );
+  } ), [ref]);
 
   useEffect(() => {
     updateH();
   }, [value]);
 
-  useFirstVisible(ref, () => {
+  useFirstTimeVisible(ref, () => {
     updateH();
   } );
-  const keyDownHandler = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      if (typeof onPressEnter === "function" || onPressEnter === "nothing")
-        e.preventDefault();
-
-      if (typeof onPressEnter === "function")
-        onPressEnter(e.currentTarget.value);
-    }
-  };
-  const textArea = useMemo(()=><textarea
+  const keyDownHandler = useMemo(()=>keyDownHandlerGenerator<string, InputElement>( {
+    onPressEnter,
+    transformValue: e =>e.currentTarget.value,
+  } ), [onPressEnter]);
+  const inputElement = useMemo(()=><textarea
     ref={ref}
     className="ui-kit-input-text"
     style={{
@@ -44,11 +34,10 @@ export function useInputText( {style, disabled, value, onChange, onPressEnter = 
     disabled={disabled}
     onChange={onChange}
     onKeyDown={keyDownHandler}
-
-  ></textarea>, updateProps);
+  ></textarea>, [onChange, onPressEnter]);
 
   return {
-    element: textArea,
+    element: inputElement,
     getValue: ()=>ref?.current?.value,
     setValue: (v: string | undefined) => {
       if (!ref?.current)
@@ -60,7 +49,7 @@ export function useInputText( {style, disabled, value, onChange, onPressEnter = 
   };
 }
 
-function getVisualLines(textarea: HTMLTextAreaElement, sentence: string) {
+function getVisualLines(textarea: InputElement, sentence: string) {
   const textareaStyles = window.getComputedStyle(textarea);
   const font = `${textareaStyles.fontSize} ${textareaStyles.fontFamily}`;
   const canvas = document.createElement("canvas");
@@ -134,7 +123,7 @@ function splitIntoWords(str: string): string[] {
   return words;
 }
 
-function useFirstVisible<T extends HTMLElement>(ref: React.RefObject<T | null>, callback: (current: T)=> void) {
+function useFirstTimeVisible<E extends HTMLElement>(ref: React.RefObject<E | null>, callback: (current: E)=> void) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -163,7 +152,7 @@ function useFirstVisible<T extends HTMLElement>(ref: React.RefObject<T | null>, 
   }, []);
 }
 
-const updateHeight = ( {value, element}: {value: string; element: HTMLTextAreaElement} ) => {
+const updateHeight = ( {value, element}: {value: string; element: InputElement} ) => {
   const rows = getVisualLines(element, value) || 1;
   const paddingTop = +window.getComputedStyle(element).paddingTop.replace("px", "");
   const paddingBottom = +window.getComputedStyle(element).paddingBottom.replace("px", "");
