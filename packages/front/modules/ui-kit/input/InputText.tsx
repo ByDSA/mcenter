@@ -55,6 +55,7 @@ export function useInputText( {style, disabled, value, onChange, onPressEnter = 
         return;
 
       ref.current.value = v;
+      updateH();
     },
   };
 }
