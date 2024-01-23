@@ -1,3 +1,4 @@
+import { numberToStringOrEmpty, stringToNumberOrUndefined } from "#shared/utils/data-types";
 import { useMemo, useRef } from "react";
 import { InputTextProps } from "./InputText";
 
@@ -24,7 +25,7 @@ export function useInputNumber( {value, onPressEnter, onChange}: InputNumberProp
   const inputElement = useMemo(()=><input
     ref={ref}
     type="number"
-    value={toStringOrEmpty(value)}
+    value={numberToStringOrEmpty(value)}
     className="ui-kit-input-number"
     onChange={onChange}
     onKeyDown={keyDownHandler}
@@ -32,31 +33,12 @@ export function useInputNumber( {value, onPressEnter, onChange}: InputNumberProp
 
   return {
     element: inputElement,
-    getValue:()=>toNumberOrUndefined(ref?.current?.value),
+    getValue:()=>stringToNumberOrUndefined(ref?.current?.value),
     setValue: (v: number | undefined) => {
       if (!ref?.current)
         return;
 
-      ref.current.value = toStringOrEmpty(v);
+      ref.current.value = numberToStringOrEmpty(v);
     },
   };
-}
-
-function toStringOrEmpty(v: number | undefined) {
-  if (v === undefined)
-    return "";
-
-  return v.toString();
-}
-
-export function toNumberOrUndefined(v: string | undefined) {
-  if (v === undefined)
-    return undefined;
-
-  const parsed = +v;
-
-  if (Number.isNaN(parsed))
-    return undefined;
-
-  return parsed;
 }

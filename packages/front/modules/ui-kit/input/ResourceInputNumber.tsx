@@ -1,15 +1,16 @@
+import { stringToNumberOrUndefined } from "#shared/utils/data-types";
 import { ChangeEvent, useEffect, useMemo } from "react";
-import { toNumberOrUndefined, useInputNumber } from "./InputNumber";
+import { useInputNumber } from "./InputNumber";
 import OptionalCheckbox from "./OptionalCheckbox";
 import { InputResourceProps } from "./props";
 
 export default function ResourceInputNumber<T>( {prop, resourceState, isOptional}: InputResourceProps<T>) {
   const [resource, setResource] = resourceState;
   const calcFinalValue = (v?: number) => v;
-  const resourceValue = useMemo(()=>calcFinalValue(toNumberOrUndefined(resource[prop]?.toString())), [resource]);
+  const resourceValue = useMemo(()=>calcFinalValue(stringToNumberOrUndefined(resource[prop]?.toString())), [resource]);
   const handleChange = useMemo(()=>(e: ChangeEvent<HTMLInputElement>) => {
     const {value: targetValue} = e.target;
-    const finalValue = calcFinalValue(toNumberOrUndefined(targetValue));
+    const finalValue = calcFinalValue(stringToNumberOrUndefined(targetValue));
 
     setResource( {
       ...resource,
