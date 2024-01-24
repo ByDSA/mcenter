@@ -17,13 +17,12 @@ export const EntitySchema = VOSchema
     serie: SerieSchema.optional(),
   } ));
 
-type Model = z.infer<typeof EntitySchema>;
-export default Model;
+export type Entity = z.infer<typeof EntitySchema>;
 
 export function compareId(a: Id, b: Id): boolean {
   return a.innerId === b.innerId && a.serieId === b.serieId;
 }
 
-export function assertIsModel(model: unknown, settings?: AssertZodSettings): asserts model is Model {
+export function assertIsModel(model: unknown, settings?: AssertZodSettings): asserts model is Entity {
   assertZodPopStack(EntitySchema, model, settings);
 }

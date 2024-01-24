@@ -1,0 +1,57 @@
+.header {
+  --color-hover: var(--color-serie-darker);
+  --color-hover-text: var(--color-serie-text-on-darker);
+  --color-open: var(--color-hover);
+
+  padding: 0.33rem var(--padding-x);
+  height: 3rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  @media (width >= 640px) {
+    padding: 0.67rem var(--padding-x);
+    height: 4rem;
+  }
+
+  .fullTime {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .time {
+      display: flex;
+      font-size: 1rem;
+    }
+
+    .date {
+      display: flex;
+      align-items: center;
+      font-size: 0.67rem;
+    }
+  }
+}
+
+.center {
+  width: 100vw;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.center > * {
+  width: 100%;
+  text-align: center;
+}
+
+.header:hover {
+  cursor: pointer;
+  background-color: var(--color-hover);
+  color: var(--color-hover-text);
+}
+
+.header:has(+ *:not([style*="display: none"])) {
+  background-color: var(--color-open);
+  color: var(--color-hover-text);
+}

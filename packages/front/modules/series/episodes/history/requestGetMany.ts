@@ -1,5 +1,3 @@
-/* eslint-disable require-await */
-/* eslint-disable import/prefer-default-export */
 import { UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
 import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";

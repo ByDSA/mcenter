@@ -1,8 +1,9 @@
 import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#modules/episodes";
 import { SerieRepository } from "#modules/series";
-import {HistoryListDeleteOneEntryByIdRequest, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
+import {HistoryListDeleteOneEntryByIdRequest, HistoryListDeleteOneEntryByIdResBody, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
   HistoryListGetOneByIdRequest,
   assertIsHistoryListDeleteOneEntryByIdRequest,
+  assertIsHistoryListDeleteOneEntryByIdResBody,
   assertIsHistoryListGetManyEntriesBySearchRequest,
   assertIsHistoryListGetManyEntriesBySuperIdRequest,
   assertIsHistoryListGetOneByIdRequest} from "#shared/models/historyLists";
@@ -205,7 +206,13 @@ implements
       entries: historyList.entries,
     } );
 
-    res.send(deleted);
+    const body: HistoryListDeleteOneEntryByIdResBody = {
+      entry: deleted,
+    };
+
+    assertIsHistoryListDeleteOneEntryByIdResBody(body);
+
+    res.send(body);
   }
 
   getRouter(): Router {

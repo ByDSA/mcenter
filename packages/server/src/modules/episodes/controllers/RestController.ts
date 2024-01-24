@@ -1,12 +1,12 @@
 import { SerieRepository } from "#modules/series";
-import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest } from "#shared/models/episodes";
+import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest, assertIsEpisodePatchOneByIdResBody } from "#shared/models/episodes";
 import { Serie } from "#shared/models/series";
 import { assertFound } from "#shared/utils/http/validation";
 import { neverCase } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { validateReq } from "#utils/validation/zod-express";
+import { ResponseWithBody, validateReq } from "#utils/validation/zod-express";
 import express, { Response, Router } from "express";
 import { Model } from "../models";
 import { Repository as EpisodeRepository } from "../repositories";
@@ -27,7 +27,7 @@ implements
     Controller,
     CanGetOneById<EpisodeGetOneByIdRequest, Response>,
     CanGetAll<EpisodeGetAllRequest, Response>,
-    CanPatchOneByIdAndGet<EpisodePatchOneByIdRequest, Response>
+    CanPatchOneByIdAndGet<EpisodePatchOneByIdRequest, ResponseWithBody<EpisodePatchOneByIdResBody>>
 {
   #deps: Deps;
 
@@ -35,18 +35,24 @@ implements
     this.#deps = deps as Deps;
   }
 
-  async patchOneByIdAndGet(req: EpisodePatchOneByIdRequest, res: Response<any, Record<string, any>>): Promise<void> {
+  async patchOneByIdAndGet(req: EpisodePatchOneByIdRequest, res: ResponseWithBody<EpisodePatchOneByIdResBody>): Promise<void> {
     const { episodeId, serieId } = req.params;
     const episodePartial = req.body;
     const id = {
       innerId: episodeId,
       serieId,
     };
-    const got = await this.#deps.episodeRepository.patchOneByIdAndGet(id, episodePartial);
+    const got = await this.#deps.episodeRepository.patchOneByIdAndGet(id, episodePartial.entity);
+    const body: EpisodePatchOneByIdResBody = {
+      entity: got ?? undefined,
+    };
 
-    assertFound(got);
-
-    res.send(got);
+    try {
+      assertIsEpisodePatchOneByIdResBody(body);
+    } catch (e) {
+      res.status(501).send(body);
+    }
+    res.send(body);
   }
 
   async getAll(req: EpisodeGetAllRequest, res: Response): Promise<void> {

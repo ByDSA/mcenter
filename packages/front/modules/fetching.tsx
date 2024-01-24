@@ -35,7 +35,7 @@ export function makeFetcher<ReqBody, ResBody>( {body, method, resBodyValidator, 
       const res = await fetch(params.url, options);
 
       if (!res.ok)
-        throw new Error("An error occurred while fetching the data.");
+        throw new Error(await res.text());
 
       const value: ResBody = await res.json();
 

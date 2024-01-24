@@ -1,133 +1,15 @@
-@value border-color: grey;
-
 .container {
-  background-color: var(--color-primary2-light2);
-  border: 2px solid border-color;
+  --color-border: var(--history-entry-border-color);
+  --padding-x: 1.5rem;
+
+  @media (width >= 640px) {
+    --padding-x: 2rem;
+  }
+
+  background-color: var(--color-serie-light2);
+  border: 2px solid var(--color-border);
   border-radius: 10px;
   width: 100%;
   margin: 0.25rem;
   overflow: hidden;
-}
-
-.header p {
-  margin: 0;
-  padding: 0;
-}
-
-.header {
-  padding: 1.25rem 1rem;
-  display: flex;
-  flex-direction: row;
-
-  .time {
-    display: flex;
-  }
-
-  .name {
-    width: 100vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    .item {
-      margin: 0 1rem;
-      padding: 0;
-    }
-  }
-}
-
-.title {
-  display: none;
-}
-
-.header:hover,
-.header:has(+ .dropdown):hover {
-  cursor: pointer;
-  background-color: var(--color-primary2-darker);
-}
-
-.header:has(+ .dropdown) {
-  background-color: var(--color-primary2);
-}
-
-.dropdown {
-  padding: 2vh 5vw;
-  border-top: 2px solid border-color;
-  display: flex;
-  flex-direction: row;
-  justify-content: start;
-  flex-wrap: wrap;
-
-  .title {
-    display: block;
-    width: 100vw;
-    margin: 0;
-    padding: 0 0vw;
-    margin-bottom: 2vh;
-  }
-}
-
-.dropdown .weight input {
-  min-width: 50px;
-}
-
-.dropdown > span {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  overflow: visible;
-}
-
-.dropdown > span + span {
-  margin-right: 4vw;
-}
-
-span.break {
-  flex-basis: 100%;
-  height: 0;
-  margin-bottom: 3vh;
-}
-
-.dropdown input {
-  min-width: 50px;
-  width: 5vw;
-  margin: 0 0.25rem;
-  background-color: white;
-  border-width: 1px;
-  border-radius: 2vw;
-}
-
-.dropdown .dropdownTime {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-}
-
-.dropdown .dropdownTime span {
-  display: flex;
-  flex-direction: column;
-  padding: 0 0.5vw;
-}
-
-@media (width >= 640px) {
-  .header {
-    padding: 1.25rem 2rem;
-  }
-
-  .dropdown {
-    padding: 1rem 2rem;
-
-    .title {
-      display: none;
-    }
-  }
-
-  .title {
-    display: block;
-  }
 }

@@ -1,14 +1,23 @@
 import { z } from "zod";
-import { EpisodeSchema } from "..";
-import { GetOneByIdSchema } from "./GetOneByIdRequest";
+import { generatePatchBodySchema } from "../../utils/dtos";
+import { EntitySchema } from "../Entity";
+import { Schema as GetOneByIdSchema } from "./GetOneByIdReq";
 
-export const PatchOneByIdSchema = GetOneByIdSchema.extend( {
-  body: EpisodeSchema.partial()
-    .strict(),
-} ).required();
+const BodySchema = generatePatchBodySchema(EntitySchema);
 
-export type PatchOneByIdRequest = z.infer<typeof PatchOneByIdSchema>;
+export type BodyType = z.infer<typeof BodySchema>;
 
-export function assertIsPatchOneByIdRequest(o: unknown): asserts o is PatchOneByIdRequest {
-  PatchOneByIdSchema.parse(o);
+export function assertIsBody(o: unknown): asserts o is BodyType {
+  BodySchema.parse(o);
+}
+
+export const Schema = GetOneByIdSchema.extend( {
+  body: BodySchema,
+} )
+  .required();
+
+export type Type = z.infer<typeof Schema>;
+
+export function assert(o: unknown): asserts o is Type {
+  Schema.parse(o);
 }

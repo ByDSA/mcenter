@@ -1,0 +1,90 @@
+.container {
+  padding: 0.75rem var(--padding-x);
+  border-top: 2px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+
+  @media (width >= 640px) {
+    padding: 1.5rem var(--padding-x);
+  }
+
+  .line {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-items: center;
+  }
+
+  .height2 {
+    min-height: 2em;
+  }
+}
+
+.container span {
+  display: flex;
+}
+.container :global(.ui-kit-input-text) {
+  min-width: 150px;
+}
+
+span.break {
+  flex-basis: 100%;
+  height: 0;
+  margin-bottom: 3vh;
+}
+
+.container :global(.ui-kit-resource-input-text):last-child {
+  margin-right: 0;
+}
+
+.container {
+  .weight :global(.ui-kit-input-number) {
+    width: 4rem;
+  }
+
+  .startEnd {
+    column-gap: 1.5em;
+
+    .start :global(.ui-kit-input-number),
+    .end :global(.ui-kit-input-number) {
+      width: 6rem;
+    }
+
+    .start :global(.ui-kit-resource-input),
+    .end :global(.ui-kit-resource-input) {
+      width: auto;
+    }
+
+    .start,
+    .end {
+      flex-grow: 1;
+      flex-shrink: 1;
+    }
+
+    .start span,
+    .end span {
+      align-items: center;
+    }
+  }
+
+  .tags {
+    flex-wrap: nowrap;
+  }
+
+  .url {
+    flex-wrap: nowrap;
+  }
+
+  .url * {
+    margin: 0.25em 0;
+  }
+
+  .url a {
+    margin-left: 1em;
+    text-wrap: wrap;
+  }
+}

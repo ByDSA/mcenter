@@ -1,7 +1,7 @@
 export {
-  GetOneByIdRequest, GetOneByIdSchema,
+  GetOneByIdRequest, Schema as GetOneByIdSchema,
   assertIsGetOneByIdRequest,
-} from "./GetOneByIdRequest";
+} from "./GetOneByIdReq";
 
 export {
   GetAllRequest, GetAllSchema,
@@ -9,8 +9,7 @@ export {
 } from "./GetAllRequest";
 
 export {
-  PatchOneByIdRequest, PatchOneByIdSchema,
-  assertIsPatchOneByIdRequest,
+  BodyType as PatchOneByIdReqBody, Type as PatchOneByIdRequest, Schema as PatchOneByIdSchema, assertIsBody as assertIsPatchOneByIdReqBody, assert as assertIsPatchOneByIdRequest,
 } from "./PatchOneByIdRequest";
 
 export {
@@ -20,3 +19,7 @@ export {
 export {
   GetManyBySearchRequest, assertIsGetManyBySearchRequest,
 } from "./GetManyBySearchRequest";
+
+export {
+  assert as assertIsPatchOneByIdResBody, type Type as PatchOneByIdResBody,
+} from "./PatchOneByIdResBody";

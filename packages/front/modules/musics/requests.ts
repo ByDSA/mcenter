@@ -26,7 +26,7 @@ export async function fetchPatch(id: MusicID, body: MusicPatchOneByIdReq["body"]
   } );
 
   return fetcher( {
-    url:URL,
+    url: URL,
     method,
     body,
   } );

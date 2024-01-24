@@ -1,0 +1,24 @@
+:root {
+  --color-serie: var(--color-yellow);
+  --color-serie-light: var(--color-yellow-light);
+  --color-serie-light2: var(--color-yellow-light2);
+  --color-serie-light3: var(--color-yellow-light3);
+  --color-serie-light4: var(--color-yellow-light4);
+  --color-serie-darker: var(--color-yellow-darker);
+  --color-serie-darker2: var(--color-yellow-darker2);
+  --color-serie-darker3: var(--color-yellow-darker3);
+  --color-serie-darker4: var(--color-yellow-darker4);
+
+  --color-serie-text: black;
+  --color-serie-text-on-light: black;
+  --color-serie-text-on-light2: black;
+  --color-serie-text-on-light3: black;
+  --color-serie-text-on-light4: black;
+  --color-serie-text-on-darker: black;
+  --color-serie-text-on-darker2: black;
+  --color-serie-text-on-darker3: white;
+  --color-serie-text-on-darker4: white;
+
+  --color-serie-link: var(--color-yellow);
+  --color-serie-link-hover: var(--color-yellow-light4);
+}

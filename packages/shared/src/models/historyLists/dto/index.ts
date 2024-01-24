@@ -19,7 +19,7 @@ export {
 } from "./GetManyEntriesBySearchResponse";
 
 export {
-  DeleteOneEntryByIdRequest, assertIsDeleteOneEntryByIdRequest,
+  DeleteOneEntryByIdReqBody, DeleteOneEntryByIdRequest, DeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdRequest, assertIsDeleteOneEntryByIdResBody,
 } from "./DeleteOneEntryByIdRequest";
 
 export {
