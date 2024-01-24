@@ -13,7 +13,7 @@ export const BACKEND_URLS = {
           search: ( {user} ) => `${BACKEND_URLS.root}/api/musics/history/${user}/search`,
         },
       },
-      raw: ( {url} )=>`${BACKEND_URLS.root}/api/musics/raw/${url}`,
+      raw: ( {url} )=>`${BACKEND_URLS.root}/api/musics/get/raw/${url}`,
     },
     episodes: {
       crud: {
