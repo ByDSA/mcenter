@@ -2,7 +2,7 @@ import { Episode, EpisodeId, assertIsEpisode } from "#shared/models/episodes";
 import { HistoryEntry, HistoryEntryId, HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, HistoryListId, assertIsHistoryEntryWithId, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 import Loading from "app/loading";
 import React, { Fragment, useEffect, useRef } from "react";
-import { backendUrls as seriesBackendUrls } from "../../requests";
+import { backendUrls as seriesBackendUrls } from "../../../requests";
 import { backendUrls } from "../requests";
 import { getDateStr } from "../utils";
 import style from "./style.module.css";

@@ -1,6 +1,6 @@
 export {
-  HistoryList as SerieHistoryList,
-} from "./history";
+  EpisodeHistoryList,
+} from "./episodes";
 
 export {
   backendUrls as seriesBackendUrls,
