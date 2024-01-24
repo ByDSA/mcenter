@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { makeFetcher, makeUseRequest } from "#modules/fetching";
-import { BACKEND_URLS } from "#modules/urls";
+import { rootBackendUrl } from "#modules/requests";
 import { HistoryMusicEntry, HistoryMusicListGetManyEntriesBySearchRequest, assertIsHistoryMusicListGetManyEntriesBySearchResponse, assertIsMusicVO } from "#shared/models/musics";
 
 type ReqBody = HistoryMusicListGetManyEntriesBySearchRequest["body"];
@@ -26,10 +26,16 @@ const fetcher = makeFetcher( {
   resBodyValidator: validator,
 } );
 
+export const backendUrls = {
+  crud: {
+    search: ( {user} ) => `${rootBackendUrl}/api/musics/history/${user}/search`,
+  },
+};
+
 export const useRequest = makeUseRequest<ReqBody, Required<HistoryMusicEntry>[]>( {
   key:
   {
-    url: BACKEND_URLS.resources.musics.history.crud.search( {
+    url: backendUrls.crud.search( {
       user: "user",
     } ),
     method,

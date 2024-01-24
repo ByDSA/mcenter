@@ -1,8 +1,8 @@
 import { FetchingRender, UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
-import { BACKEND_URLS } from "#modules/urls";
 import { DateFormat, formatDate } from "#modules/utils/dates";
 import { HistoryMusicEntry, HistoryMusicListGetManyEntriesBySearchRequest, assertIsHistoryMusicListGetManyEntriesBySearchResponse, assertIsMusicVO } from "#shared/models/musics";
 import { Fragment, useEffect, useState } from "react";
+import { backendUrls } from "../../requests";
 import style from "./style.module.css";
 
 type Props = {
@@ -39,7 +39,7 @@ export default function LastestComponent( {resourceId, date, dateFormat = DATE_F
   } );
   const useRequest: UseRequest<HistoryMusicEntry[]> = makeUseRequest<HistoryMusicListGetManyEntriesBySearchRequest["body"], Required<HistoryMusicEntry>[]>( {
     key: {
-      url: BACKEND_URLS.resources.musics.history.crud.search( {
+      url: backendUrls.crud.search( {
         user: "user",
       } ),
       method,

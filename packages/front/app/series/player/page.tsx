@@ -1,7 +1,7 @@
 "use client";
 
 import { MediaPlayer, WebSocketsClient } from "#modules/remote-player";
-import { BACKEND_URLS } from "#modules/urls";
+import { seriesBackendUrls } from "#modules/series";
 import { Episode, EpisodeGetManyBySearchRequest, assertIsEpisode } from "#shared/models/episodes";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#shared/models/player";
 import Loading from "app/loading";
@@ -51,7 +51,7 @@ export default function Player() {
           const bodyStr = JSON.stringify(request.body);
 
           fetchingResource = true;
-          fetch(`${BACKEND_URLS.resources.episodes.crud.search}`, {
+          fetch(`${seriesBackendUrls.episodes.crud.search}`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -4,7 +4,7 @@ import { FetchingRender } from "#modules/fetching";
 import { HistoryEntryWithId } from "#shared/models/historyLists";
 import { Fragment } from "react";
 import HistoryEntryElement from "./entry/HistoryEntryElement";
-import { useRequest } from "./request";
+import { useRequest } from "./requests";
 import { getDateStr } from "./utils";
 
 export default function HistoryList() {

@@ -1,19 +1,24 @@
 /* eslint-disable require-await */
-import { BACKEND_URLS } from "#modules/urls";
+import { rootBackendUrl } from "#modules/requests";
 import { PlayerEvent, PlayerStatusResponse, assertIsPlayerStatusResponse } from "#shared/models/player";
 import { PlayResourceParams, PlayerActions } from "#shared/models/player/Player";
 import { Socket, io } from "socket.io-client";
+
+export const backendUrl = {
+  url: rootBackendUrl,
+  path: "/ws/",
+};
 
 export default abstract class WebSocketsClient implements PlayerActions {
   socket: Socket;
 
   // eslint-disable-next-line class-methods-use-this
   init() {
-    const SOCKET_URL = BACKEND_URLS.socketUrl;
+    const SOCKET_URL = backendUrl.url;
 
     console.log("connecting to", SOCKET_URL);
     this.socket = io(SOCKET_URL, {
-      path: "/ws/",
+      path: backendUrl.path,
     } );
 
     this.socket.on(PlayerEvent.CONNECT, () => {

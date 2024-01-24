@@ -1,4 +1,3 @@
-import { BACKEND_URLS } from "#modules/urls";
 import { secsToMmss } from "#modules/utils/dates";
 import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
 import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO, assertIsMusicVO } from "#shared/models/musics";
@@ -6,7 +5,7 @@ import { assertIsDefined } from "#shared/utils/validation";
 import { PropInfo } from "#shared/utils/validation/zod";
 import { InputResourceProps, LinkAsyncAction, ResourceInput, ResourceInputArrayString, useAsyncAction } from "#uikit/input";
 import React, { JSX, useEffect, useState } from "react";
-import { fetchPatch } from "../../../requests";
+import { fetchPatch as fetchMusicPatch, backendUrls as musicBackendUrls } from "../../../requests";
 import { MUSIC_PROPS } from "../utils";
 import LastestComponent from "./Lastest";
 import style from "./style.module.css";
@@ -47,7 +46,7 @@ export default function Body( {isBodyVisible, entry}: Props) {
     const patchBodyParams = generateBody(entry.resource, resource);
 
     // eslint-disable-next-line consistent-return
-    return fetchPatch(id, patchBodyParams)
+    return fetchMusicPatch(id, patchBodyParams)
       .then(() => {
       // eslint-disable-next-line no-param-reassign
         entry.resource = resource;
@@ -208,7 +207,7 @@ function OptionalProps( {resourceState, optionalProps, errors}: OptionalPropsPro
 }
 
 function fullUrlOf(url: string) {
-  return BACKEND_URLS.resources.musics.raw( {
+  return musicBackendUrls.raw( {
     url,
   } );
 }

@@ -1,7 +1,7 @@
 /* eslint-disable require-await */
 /* eslint-disable import/prefer-default-export */
 import { UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
-import { BACKEND_URLS } from "#modules/urls";
+import { rootBackendUrl } from "#modules/requests";
 import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 
 const body: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
@@ -23,9 +23,20 @@ const fetcher = makeFetcher( {
   resBodyValidator: validator,
 } );
 
+export const backendUrls = {
+  entries: {
+    crud: {
+      search: `${rootBackendUrl}/api/history-list/entries/search`,
+    },
+  },
+  crud: {
+    get: `${rootBackendUrl}/api/history-list`,
+  },
+};
+
 export const useRequest: UseRequest<Required<HistoryEntryWithId>[]> = makeUseRequest<HistoryListGetManyEntriesBySuperIdRequest["body"], Required<HistoryEntryWithId>[]>( {
   key: {
-    url: BACKEND_URLS.resources.series.historyList.entries.crud.search,
+    url: backendUrls.entries.crud.search,
     method,
     body,
   },

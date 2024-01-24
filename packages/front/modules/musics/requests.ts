@@ -1,7 +1,16 @@
 /* eslint-disable import/prefer-default-export */
 import { makeFetcher } from "#modules/fetching";
-import { BACKEND_URLS } from "#modules/urls";
+import { rootBackendUrl } from "#modules/requests";
 import { MusicID, MusicPatchOneByIdReq, MusicPatchOneByIdReqBody, MusicPatchOneByIdResBody, assertIsMusicPatchOneByIdReqBody, assertIsMusicPatchOneByIdResBody } from "#shared/models/musics";
+import { historyBackendUrls } from "./history";
+
+export const backendUrls = {
+  crud: {
+    patch: ( {id} )=>`${rootBackendUrl}/api/musics/${id}`,
+  },
+  history: historyBackendUrls,
+  raw: ( {url} )=>`${rootBackendUrl}/api/musics/get/raw/${url}`,
+};
 
 // eslint-disable-next-line require-await
 export async function fetchPatch(id: MusicID, body: MusicPatchOneByIdReq["body"]): Promise<MusicPatchOneByIdResBody | undefined> {
@@ -12,7 +21,7 @@ export async function fetchPatch(id: MusicID, body: MusicPatchOneByIdReq["body"]
     reqBodyValidator: assertIsMusicPatchOneByIdReqBody,
     resBodyValidator: assertIsMusicPatchOneByIdResBody,
   } );
-  const URL = BACKEND_URLS.resources.musics.crud.patch( {
+  const URL = backendUrls.crud.patch( {
     id,
   } );
 

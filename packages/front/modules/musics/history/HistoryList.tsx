@@ -6,7 +6,7 @@ import { HistoryMusicEntry } from "#shared/models/musics";
 import extend from "just-extend";
 import { Fragment } from "react";
 import HistoryEntryElement from "./entry/HistoryEntry";
-import { useRequest } from "./request";
+import { useRequest } from "./requests";
 
 type Props = {
   showDate?: "eachOne" | "groupByDay" | "none";
