@@ -1,4 +1,5 @@
 import { formatDate } from "#modules/utils/dates";
+import { classes } from "#modules/utils/styles";
 import { HistoryMusicEntry } from "#shared/models/musics";
 import style from "./style.module.css";
 
@@ -14,7 +15,7 @@ export default function Header( {entry, toggleShowBody, showDate}: HeaderProps) 
   const right = resource.weight.toString();
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
-  return <div className={style.header} onClick={()=>toggleShowBody()}>
+  return <div className={classes(style.header, "noselect")} onClick={()=>toggleShowBody()}>
     <div className={style.fullTime}>
       <span className={style.time}>{timeStampDate.toLocaleTimeString()}</span>
 
