@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.7.2](https://github.com/ByDSA/mcenter/compare/v3.7.1...v3.7.2) (2024-01-24)
+
+
+### Bug Fixes
+
+* **front:** extract data-types conversion functions to shared module ([91d2119](https://github.com/ByDSA/mcenter/commit/91d2119e4531a29813823563a9840298c0c520dc))
+* **front:** fix cyclic dependency ([d800f9a](https://github.com/ByDSA/mcenter/commit/d800f9a5bffecd71c14b902c2564a28e289843af))
+* **front:** fix input number behaviour ([40315f4](https://github.com/ByDSA/mcenter/commit/40315f4a214f0793b93a72813e26d59cb39628e6))
+* **front:** fix input value assignment in InputText and ResourceInputArrayString ([9df57c8](https://github.com/ByDSA/mcenter/commit/9df57c8aef44791cc311c864878d7bbdfaa3ba99))
+* **front:** fix issue with input text height not updating ([9496745](https://github.com/ByDSA/mcenter/commit/9496745eeb9f6e7274679d3a57a320c5598a0d50))
+* **front:** fix raw music URL endpoint ([3d2d6bc](https://github.com/ByDSA/mcenter/commit/3d2d6bc261e1b6a328b4d013fb9dcfd4ab7e2d94))
+* **front:** prevent selection in Header component ([47e20de](https://github.com/ByDSA/mcenter/commit/47e20dea7b26019b3a49639c8f64904264983b89))
+* **front:** refactor CSS styles in music history entry body ([8e6bdbc](https://github.com/ByDSA/mcenter/commit/8e6bdbcbd2ed16cdb147df1d6d71f76baeefc712))
+* **front:** refactor input components ([a5be29b](https://github.com/ByDSA/mcenter/commit/a5be29bff6c2a28ff51b7571171a74cb307e974e))
+* **front:** use new request and render system for series ([c03abf6](https://github.com/ByDSA/mcenter/commit/c03abf69e755acb98b591649bd0561fdc50398f2))
+
 ### [3.7.1](https://github.com/ByDSA/mcenter/compare/v3.7.0...v3.7.1) (2024-01-23)
 
 
