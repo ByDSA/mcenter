@@ -2,7 +2,7 @@
 import { makeFetcher } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
 import { MusicID, MusicPatchOneByIdReq, MusicPatchOneByIdReqBody, MusicPatchOneByIdResBody, assertIsMusicPatchOneByIdReqBody, assertIsMusicPatchOneByIdResBody } from "#shared/models/musics";
-import { historyBackendUrls } from "./history";
+import { backendUrls as historyBackendUrls } from "./history/requests";
 
 export const backendUrls = {
   crud: {

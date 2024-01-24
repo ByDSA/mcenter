@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
-import { episodesBackendUrl } from "./episodes";
-import { historyBackendUrls } from "./history";
-import { streamsBackendUrls } from "./streams";
+import { backendUrl as episodesBackendUrl } from "./episodes/requests";
+import { backendUrls as historyBackendUrls } from "./history/requests";
+import { backendUrls as streamsBackendUrls } from "./streams/requests";
 
 export const backendUrls = {
   episodes: episodesBackendUrl,
