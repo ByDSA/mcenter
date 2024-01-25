@@ -1,25 +1,22 @@
+import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { HistoryEntry, HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
-import "#styles/resources/history-entry.css";
-import "#styles/resources/serie.css";
-import React from "react";
 import { backendUrls } from "../requests";
+import Header from "./Header";
 import Body from "./body/Body";
-import Header from "./header/Header";
-import style from "./style.module.css";
 
 type Props = {
   value: HistoryEntryWithId;
   onRemove?: (data: HistoryEntry)=> void;
 };
 export default function HistoryEntryElement( {value}: Props) {
-  const [showDropdown, setShowDropdown] = React.useState(false);
-
-  return (
-    <div className={style.container}>
-      <Header entry={value} toggleShowBody={()=>setShowDropdown(!showDropdown)} showDate={false}/>
-      <Body entry={value} isBodyVisible={showDropdown}/>
-    </div>
-  );
+  return <span className="history-entry">
+    {
+      ResourceAccordion( {
+        headerContent: <Header entry={value} showDate={false}/>,
+        bodyContent: <Body entry={value}/>,
+      } )
+    }
+  </span>;
 }
 
 export function fetchLastestHistoryEntries(historyEntry: HistoryEntry): Promise<HistoryEntryWithId[] | null> {

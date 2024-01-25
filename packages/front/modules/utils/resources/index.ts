@@ -1,0 +1,3 @@
+export {
+  useResourceEdition,
+} from "./useResourceEdition";

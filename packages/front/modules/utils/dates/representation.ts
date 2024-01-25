@@ -145,3 +145,17 @@ export function localeWeekDay(weekDay: number): string {
       throw new Error(`Invalid weekDay: ${weekDay}`);
   }
 }
+
+export function formatDateHHmm(date: Date) {
+  const hour = getHH(date);
+  const minutes = getMm(date);
+
+  return `${hour}:${minutes}`;
+}
+
+export function formatDateDDMMYYY(date: Date) {
+  return formatDate(date, {
+    dateTime: "date",
+    ago: "no",
+  } );
+}

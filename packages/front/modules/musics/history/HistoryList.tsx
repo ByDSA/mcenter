@@ -8,6 +8,10 @@ import { Fragment } from "react";
 import HistoryEntryElement from "./entry/HistoryEntry";
 import { useRequest } from "./requests";
 
+import "#styles/resources/history-entry.css";
+import "#styles/resources/history-musics.css";
+import "#styles/resources/music.css";
+
 type Props = {
   showDate?: "eachOne" | "groupByDay" | "none";
 };

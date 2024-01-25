@@ -1,11 +1,13 @@
-
-/* eslint-disable require-await */
 import { FetchingRender } from "#modules/fetching";
 import { HistoryEntryWithId } from "#shared/models/historyLists";
 import { Fragment } from "react";
-import HistoryEntryElement from "./entry/HistoryEntryElement";
+import HistoryEntryElement from "./entry/HistoryEntry";
 import { useRequest } from "./requests";
 import { getDateStr } from "./utils";
+
+import "#styles/resources/history-entry.css";
+import "#styles/resources/history-episodes.css";
+import "#styles/resources/serie.css";
 
 export default function HistoryList() {
   return FetchingRender<Required<HistoryEntryWithId>[]>( {

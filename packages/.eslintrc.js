@@ -28,6 +28,9 @@ module.exports = {
           "*shared/utils/**",
           "*shared/models/*",
           "*/*", // Dos niveles de profundidad
+          // Front:
+          "*modules/ui-kit/*",
+          "*styles/**/*.css",
         ],
       },
     ],

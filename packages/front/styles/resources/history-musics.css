@@ -1,0 +1,11 @@
+.history-entry {
+  .ui-kit-accordion {
+    --color-hover: var(--color-music-darker);
+    --color-hover-text: var(--color-music-text-on-darker);
+    --color-open: var(--color-hover);
+    --color-container: var(--color-music-light2);
+
+    --color-link: var(--color-music-link);
+    --color-link-hover: var(--color-music-link-hover);
+  }
+}

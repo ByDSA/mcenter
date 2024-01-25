@@ -1,0 +1,32 @@
+.container {
+  background-color: var(--color-container);
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  width: 100%;
+  margin: 0.25rem;
+  overflow: hidden;
+
+  .header > * {
+    padding: 0.33rem var(--padding-x);
+    height: 3rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    @media (width >= 640px) {
+      padding: 0.67rem var(--padding-x);
+      height: 4rem;
+    }
+  }
+}
+
+.header:hover {
+  cursor: pointer;
+  background-color: var(--color-hover);
+  color: var(--color-hover-text);
+}
+
+.header:has(+ *:not([style*="display: none"])) {
+  background-color: var(--color-open);
+  color: var(--color-hover-text);
+}
