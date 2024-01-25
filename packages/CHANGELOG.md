@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.7.3](https://github.com/ByDSA/mcenter/compare/v3.7.2...v3.7.3) (2024-01-25)
+
+
+### Bug Fixes
+
+* **front:** update CSS styles ([7e046cd](https://github.com/ByDSA/mcenter/commit/7e046cda38242f39073d2144b4b7ba156a20d559))
+
 ### [3.7.2](https://github.com/ByDSA/mcenter/compare/v3.7.1...v3.7.2) (2024-01-24)
 
 
