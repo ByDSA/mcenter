@@ -5,7 +5,6 @@ import { Spinner } from "../spinner/Spinner";
 type LabelAsyncActionProps = {
   isDoing: boolean;
   action: ()=> Promise<void>;
-  style?: React.CSSProperties;
   children?: React.ReactNode;
   spinnerSide?: "left" | "right";
 };
@@ -20,12 +19,10 @@ export function useAsyncAction() {
   };
 }
 
-export function LinkAsyncAction( {isDoing, action, spinnerSide = "right", style, children}: LabelAsyncActionProps) {
+export function LinkAsyncAction( {isDoing, action, spinnerSide = "right", children}: LabelAsyncActionProps) {
   const element = (<span>
     {spinnerSide === "left" && isDoing && <Spinner/> }
     <a style={{
-      ...style,
-      cursor: "pointer",
       [spinnerSide === "left" ? "marginLeft" : "marginRight"]: "0.5em",
     }} onClick={()=> action()}>{children}</a>
     {spinnerSide === "right" && isDoing && <Spinner/> }

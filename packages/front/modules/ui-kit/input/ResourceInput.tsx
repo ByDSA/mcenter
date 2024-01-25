@@ -5,7 +5,6 @@ import { InputResourceProps } from "./props";
 
 export type ResourceInputProps<T extends Object> = InputResourceProps<T> & {
   caption?: JSX.Element | string;
-  style?: React.CSSProperties;
   type?: "number" | "string";
 };
 

@@ -25,12 +25,7 @@ export default function HistoryList(props?: Props) {
   return FetchingRender<Required<HistoryMusicEntry>[]>( {
     useRequest,
     render: (data) => (
-      <span style={{
-        flexDirection:"column",
-        display:"flex",
-        alignItems:"center",
-        justifyContent:"center",
-      }}>
+      <span className="history-list">
         {
           data && data.map((entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
             {params.showDate === "groupByDay" ? dayTitle(entry, i, array) : null}

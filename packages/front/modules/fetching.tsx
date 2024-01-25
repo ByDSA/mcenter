@@ -1,5 +1,6 @@
 import React, { JSX } from "react";
 import useSWR from "swr";
+import style from "./fetching.style.module.css";
 import { Spinner } from "./ui-kit/spinner";
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
@@ -110,19 +111,8 @@ export function FetchingRender<T, U = undefined>( {useRequest, render, hooks}: F
     </>;
   }
 
-  if (isLoading) {
-    return <span style={{
-      justifyContent: "center",
-      display: "flex",
-      alignItems: "center",
-      width: "100%",
-      height: "100%",
-    }}><Spinner style={{
-        width: "5rem",
-        height: "5rem",
-        borderWidth: "0.25rem",
-      }}/></span>;
-  }
+  if (isLoading)
+    return <span className={style.loading}><Spinner /></span>;
 
   if (!data)
     return <span>Empty data.</span>;

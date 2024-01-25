@@ -13,12 +13,7 @@ export default function HistoryList() {
   return FetchingRender<Required<HistoryEntryWithId>[]>( {
     useRequest,
     render: (data) => (
-      <span style={{
-        flexDirection:"column",
-        display:"flex",
-        alignItems:"center",
-        justifyContent:"center",
-      }}>
+      <span className="history-list">
         {
           data && data.map((entry: HistoryEntryWithId, i: number) => {
             let dayTitle;

@@ -4,7 +4,6 @@ type OnPressEnterFn<T> = (value: T | undefined)=> void;
 type OnPressEnter<T> = OnPressEnterFn<T> | "newLine" | "nothing";
 
 export type InputTextNumberCommonProps<E extends HTMLElement, T> = {
-  style?: React.CSSProperties;
   disabled?: boolean;
   onChange?: ChangeEventHandler<E>;
   onPressEnter?: OnPressEnter<T>;

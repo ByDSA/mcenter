@@ -19,6 +19,6 @@
   --color-serie-text-on-darker3: white;
   --color-serie-text-on-darker4: white;
 
-  --color-serie-link: var(--color-yellow);
-  --color-serie-link-hover: var(--color-yellow-light4);
+  --color-serie-link: var(--color-primary);
+  --color-serie-link-hover: var(--color-primary-light);
 }

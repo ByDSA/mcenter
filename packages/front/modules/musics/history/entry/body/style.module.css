@@ -5,11 +5,16 @@
     flex-grow: 1;
   }
 
-  .tags {
-    flex-wrap: nowrap;
-  }
-
   .weight :global(.ui-kit-input-number) {
     width: 4rem;
+  }
+
+  .weightAlbum,
+  .titleArtist {
+    flex-wrap: wrap !important;
+  }
+
+  .update {
+    margin-left: 1em;
   }
 }

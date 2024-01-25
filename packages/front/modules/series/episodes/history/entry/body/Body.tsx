@@ -105,10 +105,10 @@ export default function Body( {entry: entryEpisode}: Props) {
         </span>
       </span>
     </span>
-    <span className={classes("line", "height2")}>
-      <span>Duration : {(isDefined(duration) && <>{secsToMmss(duration)} ({duration} s)</>) || "-"}</span>
+    <span className={classes("line", "height2", style.duration)}>
+      <span>Duration:</span><span>{(isDefined(duration) && <>{secsToMmss(duration)} ({duration} s)</>) || "-"}</span>
     </span>
-    <span className={classes("line", "height2",style.tags)}>
+    <span className={classes("line", "height2", style.tags)}>
       <span>{EPISODE_PROPS.tags.caption}</span>
       {ResourceInputArrayString( {
         prop: "tags",
@@ -133,9 +133,7 @@ export default function Body( {entry: entryEpisode}: Props) {
     <span className={"break"} />
     <span className="line">
       <span><a onClick={() => reset()}>Reset</a></span>
-      {isModified && <span style={{
-        marginLeft: "1em",
-      }}>{<LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>}</span>}</span>
+      {isModified && <span className={style.update}>{<LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>}</span>}</span>
     <span className={"break"} />
     {
       deleteEntry &&

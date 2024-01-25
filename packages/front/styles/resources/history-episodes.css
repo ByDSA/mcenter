@@ -4,5 +4,10 @@
     --color-hover-text: var(--color-serie-text-on-darker);
     --color-open: var(--color-hover);
     --color-container: var(--color-serie-light2);
+
+    --color-link: var(--color-serie-link);
+    --color-link-hover: var(--color-serie-link-hover);
+
+    --spinner-color: var(--color-link);
   }
 }

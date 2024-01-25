@@ -6,7 +6,7 @@ type T = string;
 type InputElement = HTMLTextAreaElement;
 export type InputTextProps = InputTextNumberCommonProps<InputElement, T>;
 
-export function useInputText( {style, disabled, value, onChange, onPressEnter = "nothing"}: InputTextProps): InputTextNumberReturnType<T, InputElement> {
+export function useInputText( {disabled, value, onChange, onPressEnter = "nothing"}: InputTextProps): InputTextNumberReturnType<T, InputElement> {
   const ref = useRef(null as InputElement | null);
   const updateH = useMemo(()=>() => ref?.current && updateHeight( {
     value: ref.current.value,
@@ -27,9 +27,6 @@ export function useInputText( {style, disabled, value, onChange, onPressEnter = 
   const inputElement = useMemo(()=><textarea
     ref={ref}
     className="ui-kit-input-text"
-    style={{
-      ...style,
-    }}
     defaultValue={value}
     disabled={disabled}
     onChange={onChange}

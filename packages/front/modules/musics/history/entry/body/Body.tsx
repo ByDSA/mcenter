@@ -64,7 +64,7 @@ export default function Body( {entry}: Props) {
     error: errors?.artist,
     ...commonInputProps,
   } );
-  const titleArtist = <span className={"line"}>
+  const titleArtist = <span className={classes("line", style.titleArtist)}>
     <span className={`${"height2"} ${style.title}`}>
       {titleElement}
     </span>
@@ -77,12 +77,9 @@ export default function Body( {entry}: Props) {
     {errors && Object.entries(errors).length > 0 && Object.entries(errors).map(([key, value]) => <span key={key} className="line">{key}: {value}</span>)}
     {titleArtist}
 
-    <span className={`${"line"}`}>
+    <span className={classes("line", style.weightAlbum)}>
       <span className={classes("height2", style.weight)}>
         {ResourceInput( {
-          style:{
-            width: "150px",
-          },
           caption: MUSIC_PROPS.weight.caption,
           type: "number",
           prop: "weight",
@@ -91,28 +88,21 @@ export default function Body( {entry}: Props) {
       </span>
       <span className={classes("height2", style.album)}>
         {ResourceInput( {
-          style: {
-            minWidth: "250px",
-            width: "100%",
-            marginBottom: "0",
-          },
           caption:MUSIC_PROPS.album.caption,
           prop:"album",
           ...commonInputProps,
         } )}
       </span>
     </span>
-    <span className={classes("line", "height2")}>
-      <span className={style.tags}>
-        <span>{MUSIC_PROPS.tags.caption}</span>
-        {ResourceInputArrayString( {
-          prop: "tags",
-          resourceState,
-          inputTextProps: {
-            onEmptyPressEnter: commonInputProps.inputTextProps.onPressEnter,
-          },
-        } )}
-      </span>
+    <span className={classes("line", "height2", style.tags)}>
+      <span>{MUSIC_PROPS.tags.caption}</span>
+      {ResourceInputArrayString( {
+        prop: "tags",
+        resourceState,
+        inputTextProps: {
+          onEmptyPressEnter: commonInputProps.inputTextProps.onPressEnter,
+        },
+      } )}
     </span>
     <span className={classes("line", "height2")}>
       {ResourceInput( {
@@ -140,9 +130,7 @@ export default function Body( {entry}: Props) {
     <span className={"break"} />
     <span className="line">
       <span><a onClick={() => reset()}>Reset</a></span>
-      {isModified && <span style={{
-        marginLeft: "1em",
-      }}>{<LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>}</span>}</span>
+      {isModified && <span className={style.update}>{<LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>}</span>}</span>
     <span className={"break"} />
     <LastestComponent resourceId={entry.resourceId} date={entry.date}/>
   </div>;

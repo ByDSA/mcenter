@@ -7,5 +7,7 @@
 
     --color-link: var(--color-music-link);
     --color-link-hover: var(--color-music-link-hover);
+
+    --spinner-color: var(--color-link);
   }
 }
