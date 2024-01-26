@@ -4,8 +4,8 @@ import { InputTextNumberCommonProps, keyDownHandlerGenerator } from "./InputText
 
 type InputElement = HTMLInputElement;
 
-type InputNumberProps = InputTextNumberCommonProps<InputElement, number>;
-/* eslint-disable import/prefer-default-export */
+export type InputNumberProps = InputTextNumberCommonProps<InputElement, number>;
+
 export function useInputNumber( {value, onPressEnter = "nothing", onChange}: InputNumberProps) {
   const ref = useRef(null as InputElement | null);
   const keyDownHandler = useMemo(()=>keyDownHandlerGenerator<number, InputElement>( {

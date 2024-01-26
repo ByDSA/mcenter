@@ -1,10 +1,14 @@
 import { stringToNumberOrUndefined } from "#shared/utils/data-types";
 import { ChangeEvent, useEffect, useMemo } from "react";
-import { useInputNumber } from "./InputNumber";
+import { InputNumberProps, useInputNumber } from "./InputNumber";
 import { ResourceOptionalCheckbox } from "./ResourceCheckboxOptional";
-import { InputResourceProps } from "./props";
+import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
 
-export default function ResourceInputNumber<T>( {prop, resourceState, isOptional}: InputResourceProps<T>) {
+export type ResourceInputNumberProps<R extends Object> = ResourceInputCommonProps<R> & {
+  inputNumberProps?: InputNumberProps;
+};
+
+export default function ResourceInputNumber<R extends Object>( {prop, resourceState, isOptional, inputNumberProps}: ResourceInputNumberProps<R>) {
   const [resource, setResource] = resourceState;
   const calcFinalValue = (v?: number) => v;
   const resourceValue = useMemo(()=>calcFinalValue(stringToNumberOrUndefined(resource[prop]?.toString())), [resource]);
@@ -20,6 +24,7 @@ export default function ResourceInputNumber<T>( {prop, resourceState, isOptional
   const {element: inputNumber, setValue, getValue} = useInputNumber( {
     value: resourceValue,
     onChange: handleChange,
+    onPressEnter: inputNumberProps?.onPressEnter ?? "nothing",
   } );
 
   useEffect(() => {

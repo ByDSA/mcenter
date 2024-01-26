@@ -1,9 +1,13 @@
 import { ChangeEvent, useEffect, useMemo } from "react";
-import { useInputText } from "./InputText";
+import { InputTextProps, useInputText } from "./InputText";
 import { ResourceOptionalCheckbox } from "./ResourceCheckboxOptional";
-import { InputResourceProps } from "./props";
+import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
 
-export default function ResourceInputText<T extends Object>( {resourceState, prop: key, isOptional, error, inputTextProps: inputTextPropsMod}: InputResourceProps<T>) {
+export type ResourceInputTextProps<R> = ResourceInputCommonProps<R> & {
+  inputTextProps?: InputTextProps;
+};
+
+export default function ResourceInputText<R extends Object>( {resourceState, prop: key, isOptional, error, inputTextProps}: ResourceInputTextProps<R>) {
   const [resource, setResource] = resourceState;
   const calcFinalValue = (v?: string) => {
     if (v === "" && isOptional)
@@ -24,9 +28,6 @@ export default function ResourceInputText<T extends Object>( {resourceState, pro
       [key]: finalValue,
     } );
   }, [resource]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {onEmptyPressEnter:_, ...inputTextProps} = inputTextPropsMod ?? {
-  };
   const {element: inputText, setValue, getValue} = useInputText( {
     value: initialValue,
     onChange: handleChange,

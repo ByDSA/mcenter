@@ -50,8 +50,14 @@ export default function Body( {entry: entryEpisode}: Props) {
   const {isModified, update:{action: update, isDoing: isUpdating}, errors, resourceState, reset} = resourceRet;
   const [resource] = resourceState;
   // eslint-disable-next-line require-await
-  const commonInputProps = {
+  const commonInputTextProps = {
     inputTextProps: {
+      onPressEnter: ()=>update(),
+    },
+    resourceState,
+  };
+  const commonInputNumberProps = {
+    inputNumberProps: {
       onPressEnter: ()=>update(),
     },
     resourceState,
@@ -60,7 +66,7 @@ export default function Body( {entry: entryEpisode}: Props) {
     caption: EPISODE_PROPS.title.caption,
     prop:"title",
     error: errors?.title,
-    ...commonInputProps,
+    ...commonInputTextProps,
   } );
   const titleArtist = <span className={classes("line", "height2")}>
     {titleElement}
@@ -77,7 +83,7 @@ export default function Body( {entry: entryEpisode}: Props) {
           caption: EPISODE_PROPS.weight.caption,
           type: "number",
           prop: "weight",
-          ...commonInputProps,
+          ...commonInputNumberProps,
         } )}
       </span>
     </span>
@@ -87,7 +93,7 @@ export default function Body( {entry: entryEpisode}: Props) {
           caption: EPISODE_PROPS.start.caption,
           type: "number",
           prop: "start",
-          ...commonInputProps,
+          ...commonInputTextProps,
         } )}
         <span>
           {resource.start && resource.start > 0 ? secsToMmss(resource.start) : "-"}
@@ -98,7 +104,7 @@ export default function Body( {entry: entryEpisode}: Props) {
           caption: EPISODE_PROPS.end.caption,
           type: "number",
           prop: "end",
-          ...commonInputProps,
+          ...commonInputTextProps,
         } )}
         <span>
           {resource.end && resource.end > 0 ? secsToMmss(resource.end) : "-"}
@@ -114,7 +120,7 @@ export default function Body( {entry: entryEpisode}: Props) {
         prop: "tags",
         resourceState,
         inputTextProps: {
-          onEmptyPressEnter: commonInputProps.inputTextProps.onPressEnter,
+          onEmptyPressEnter: commonInputTextProps.inputTextProps.onPressEnter,
         },
       } )}
     </span>
@@ -122,7 +128,7 @@ export default function Body( {entry: entryEpisode}: Props) {
       {ResourceInput( {
         caption:EPISODE_PROPS.path.caption,
         prop:"path",
-        ...commonInputProps,
+        ...commonInputTextProps,
       } )}
     </span>
     <span className={classes("line", "height2", style.url)}>

@@ -8,11 +8,8 @@ export {
 
 export {
   default as ResourceInput,
+  type ResourceInputProps,
 } from "./ResourceInput";
-
-export {
-  type InputResourceProps,
-} from "./props";
 
 export {
   default as ResourceInputArrayString,

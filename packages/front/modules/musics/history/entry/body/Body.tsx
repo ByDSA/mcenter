@@ -4,7 +4,7 @@ import { useResourceEdition } from "#modules/utils/resources";
 import { classes } from "#modules/utils/styles";
 import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO, assertIsMusicVO } from "#shared/models/musics";
 import { PropInfo } from "#shared/utils/validation/zod";
-import { InputResourceProps, LinkAsyncAction, ResourceInput, ResourceInputArrayString } from "#uikit/input";
+import { LinkAsyncAction, ResourceInput, ResourceInputArrayString, ResourceInputProps } from "#uikit/input";
 import { JSX, useState } from "react";
 import { fetchPatch, backendUrls as musicBackendUrls } from "../../../requests";
 import { MUSIC_PROPS } from "../utils";
@@ -46,8 +46,14 @@ export default function Body( {entry}: Props) {
     return acc;
   }, {
   } as Record<keyof MusicVO, PropInfo>);
-  const commonInputProps = {
+  const commonInputTextProps = {
     inputTextProps: {
+      onPressEnter: ()=>update(),
+    },
+    resourceState,
+  };
+  const commonInputNumberProps = {
+    inputNumberProps: {
       onPressEnter: ()=>update(),
     },
     resourceState,
@@ -56,13 +62,13 @@ export default function Body( {entry}: Props) {
     caption: MUSIC_PROPS.title.caption,
     prop:"title",
     error: errors?.title,
-    ...commonInputProps,
+    ...commonInputTextProps,
   } );
   const artistElement = ResourceInput( {
     caption: MUSIC_PROPS.artist.caption,
     prop:"artist",
     error: errors?.artist,
-    ...commonInputProps,
+    ...commonInputTextProps,
   } );
   const titleArtist = <span className={classes("line", style.titleArtist)}>
     <span className={`${"height2"} ${style.title}`}>
@@ -83,14 +89,14 @@ export default function Body( {entry}: Props) {
           caption: MUSIC_PROPS.weight.caption,
           type: "number",
           prop: "weight",
-          ...commonInputProps,
+          ...commonInputNumberProps,
         } )}
       </span>
       <span className={classes("height2", style.album)}>
         {ResourceInput( {
           caption:MUSIC_PROPS.album.caption,
           prop:"album",
-          ...commonInputProps,
+          ...commonInputTextProps,
         } )}
       </span>
     </span>
@@ -100,7 +106,7 @@ export default function Body( {entry}: Props) {
         prop: "tags",
         resourceState,
         inputTextProps: {
-          onEmptyPressEnter: commonInputProps.inputTextProps.onPressEnter,
+          onEmptyPressEnter: commonInputTextProps.inputTextProps.onPressEnter,
         },
       } )}
     </span>
@@ -108,14 +114,14 @@ export default function Body( {entry}: Props) {
       {ResourceInput( {
         caption:MUSIC_PROPS.path.caption,
         prop:"path",
-        ...commonInputProps,
+        ...commonInputTextProps,
       } )}
     </span>
     <span className={classes("line", "height2")}>
       {ResourceInput( {
         caption: <><a href={fullUrlOf(resource.url)}>Url</a>:</>,
         prop:"url",
-        ...commonInputProps,
+        ...commonInputTextProps,
       } )}
     </span>
     {(resource.mediaInfo.duration && resource.mediaInfo.duration > 0 && <>
@@ -124,7 +130,8 @@ export default function Body( {entry}: Props) {
     {OptionalProps( {
       optionalProps,
       errors,
-      ...commonInputProps,
+      ...commonInputTextProps,
+      ...commonInputNumberProps,
     } )}
 
     <span className={"break"} />
@@ -136,11 +143,11 @@ export default function Body( {entry}: Props) {
   </div>;
 }
 
-type OptionalPropsProps = Omit<InputResourceProps<MusicVO>, "prop"> & {
+type OptionalPropsProps = Omit<ResourceInputProps<MusicVO>, "prop"> & {
   optionalProps: Record<keyof MusicVO, PropInfo>;
   errors?: Record<keyof MusicVO, string>;
 };
-function OptionalProps( {resourceState, optionalProps, errors}: OptionalPropsProps) {
+function OptionalProps( {resourceState, optionalProps, errors, inputNumberProps, inputTextProps}: OptionalPropsProps) {
   const [isVisible, setIsVisible] = useState(false);
   const ret: Record<string, JSX.Element> = {
   };
@@ -160,11 +167,25 @@ function OptionalProps( {resourceState, optionalProps, errors}: OptionalPropsPro
     const {type, caption = prop} = propInfo;
 
     if (prop in resource || isVisible) {
-      ret[prop] = (<>
-        <span className={classes("line", "height2")}>
-          <ResourceInput caption={caption} type={type === "number" ? "number" : "string"} prop={prop} resourceState={resourceState} isOptional error={errors?.[prop]}/>
-        </span>
-      </>);
+      const t = type === "number" ? "number" : "string";
+
+      switch (t) {
+        case "string":
+        // eslint-disable-next-line default-case-last, no-fallthrough
+        default:
+          ret[prop] = (<>
+            <span className={classes("line", "height2")}>
+              <ResourceInput caption={caption} type={t} prop={prop} resourceState={resourceState} isOptional error={errors?.[prop]} inputTextProps={inputTextProps}/>
+            </span>
+          </>);
+          break;
+        case "number":
+          ret[prop] = (<>
+            <span className={classes("line", "height2")}>
+              <ResourceInput caption={caption} type={t} prop={prop} resourceState={resourceState} isOptional error={errors?.[prop]} inputNumberProps={inputNumberProps}/>
+            </span>
+          </>);
+      }
     }
   }
 

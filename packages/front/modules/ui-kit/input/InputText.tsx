@@ -2,11 +2,12 @@
 import { useEffect, useMemo, useRef } from "react";
 import { InputTextNumberCommonProps, InputTextNumberReturnType, keyDownHandlerGenerator } from "./InputTextNumberCommon";
 
-type T = string;
 type InputElement = HTMLTextAreaElement;
-export type InputTextProps = InputTextNumberCommonProps<InputElement, T>;
+export type InputTextProps = InputTextNumberCommonProps<InputElement, string> & {
+  onEmptyPressEnter?: ()=> void;
+};
 
-export function useInputText( {disabled, value, onChange, onPressEnter = "nothing"}: InputTextProps): InputTextNumberReturnType<T, InputElement> {
+export function useInputText<T extends string = string>( {disabled, value, onChange, onPressEnter = "nothing"}: InputTextProps): InputTextNumberReturnType<T, InputElement> {
   const ref = useRef(null as InputElement | null);
   const updateH = useMemo(()=>() => ref?.current && updateHeight( {
     value: ref.current.value,
@@ -20,9 +21,9 @@ export function useInputText( {disabled, value, onChange, onPressEnter = "nothin
   useFirstTimeVisible(ref, () => {
     updateH();
   } );
-  const keyDownHandler = useMemo(()=>keyDownHandlerGenerator<string, InputElement>( {
+  const keyDownHandler = useMemo(()=>keyDownHandlerGenerator<T, InputElement>( {
     onPressEnter,
-    transformValue: e =>e.currentTarget.value,
+    transformValue: e =>e.currentTarget.value as T,
   } ), [onPressEnter]);
   const inputElement = useMemo(()=><textarea
     ref={ref}
@@ -35,7 +36,7 @@ export function useInputText( {disabled, value, onChange, onPressEnter = "nothin
 
   return {
     element: inputElement,
-    getValue: ()=>ref?.current?.value,
+    getValue: ()=>ref?.current?.value as T | undefined,
     setValue: (v: string | undefined) => {
       if (!ref?.current)
         return;
