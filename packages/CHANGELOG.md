@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.7.4](https://github.com/ByDSA/mcenter/compare/v3.7.3...v3.7.4) (2024-11-09)
+
+
+### Bug Fixes
+
+* **back:** fixed some bugs on update song list ([305ee28](https://github.com/ByDSA/mcenter/commit/305ee28e63cd3448dab07a70a4a1817d49fe481c))
+* **front:** update when presss enter in optional properties and number inputs ([a83e458](https://github.com/ByDSA/mcenter/commit/a83e4581a8ed89cc9592366e77c7ed36e54d700e))
+* upgrade db mongo version ([e9bccad](https://github.com/ByDSA/mcenter/commit/e9bccadabc484f4ffed5410ed605f025896e6eb4))
+
 ### [3.7.3](https://github.com/ByDSA/mcenter/compare/v3.7.2...v3.7.3) (2024-01-25)
 
 
