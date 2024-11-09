@@ -37,7 +37,7 @@ services:
 
   mongo:
     profiles: ["local"]
-    image: mongo:7.0.3
+    image: mongo:8.0
     container_name: mcenter_mongo
     restart: always
     ports:
