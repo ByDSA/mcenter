@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.7.5](https://github.com/ByDSA/mcenter/compare/v3.7.4...v3.7.5) (2024-11-09)
+
+
+### Bug Fixes
+
+* **front:** fix LegacyKeyValueFormat warnings ([e1f0b8b](https://github.com/ByDSA/mcenter/commit/e1f0b8bc14652e0a7933201bbfe42c0c12b792e7))
+
 ### [3.7.4](https://github.com/ByDSA/mcenter/compare/v3.7.3...v3.7.4) (2024-11-09)
 
 
