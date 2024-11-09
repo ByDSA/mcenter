@@ -31,6 +31,8 @@ export default class ApiController implements Controller {
 
     router.use("/get", this.#deps.getController.getRouter());
     router.use("/update/fix", this.#deps.fixController.getRouter());
+
+    // Debug: http://localhost:8011/api/musics/update/remote
     router.use("/update/remote", this.#deps.updateRemoteController.getRouter());
 
     router.use("/history", this.#deps.historyController.getRouter());
