@@ -62,7 +62,7 @@ export function fixUrl(url: string): string {
     .replaceAll(/-$/g,"")
     .replaceAll(/ñ/g,"n")
     .replaceAll(/ç/g,"c")
-    .replaceAll(/\$/, "s")
+    .replaceAll(/\$/g, "s")
     .replaceAll(/á|à|ä|â/g,"a")
     .replaceAll(/é|è|ë|ê/g,"e")
     .replaceAll(/í|ì|ï|î/g,"i")

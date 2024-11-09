@@ -267,7 +267,7 @@ CanGetOneById<Music, MusicID>
       path: relativePath,
     }, data);
 
-    const model = await this.findByPath(relativePath);
+    const model = await this.findByPath(data.path ?? relativePath);
 
     assertIsDefined(model);
     const event = new ModelEvent<MusicVO>(EventType.UPDATED, {
