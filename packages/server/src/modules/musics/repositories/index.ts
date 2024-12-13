@@ -10,4 +10,4 @@ export {
 
 export {
   FindParams as RepositoryFindParams,
-} from "./types";
+} from "./queries/Queries";

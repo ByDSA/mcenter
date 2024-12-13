@@ -5,7 +5,8 @@ import { Request, Response, Router } from "express";
 import path from "node:path";
 import { HistoryRepository, createHistoryEntryByMusicId } from "../history";
 import { Model as Music } from "../models";
-import { RepositoryFindParams as FindParams, Repository } from "../repositories";
+import { Repository } from "../repositories";
+import { requestToFindMusicParams } from "../repositories/queries/Queries";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
 
@@ -174,31 +175,4 @@ function generatePlaylist( {picked, nextUrl, server}: GenPlayListParams): string
   ${nextUrl}`;
 
   return ret;
-}
-
-function requestToFindMusicParams(req: Request): FindParams {
-  const tagsQuery = <string | undefined>req.query.tags;
-  const minWeightQuery = <string | undefined>req.query.minWeight;
-  const maxWeightQuery = <string | undefined>req.query.maxWeight;
-  const params: FindParams = {
-  };
-
-  if (minWeightQuery !== undefined || maxWeightQuery !== undefined){
-    params.weight = {
-    };
-
-    if (minWeightQuery !== undefined)
-      params.weight.min = +minWeightQuery;
-
-    if (maxWeightQuery !== undefined)
-      params.weight.max = +maxWeightQuery;
-  }
-
-  if (tagsQuery) {
-    const multipleTags = tagsQuery.split(",");
-
-    params.tags = multipleTags;
-  }
-
-  return params;
 }

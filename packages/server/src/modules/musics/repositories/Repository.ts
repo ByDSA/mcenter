@@ -16,11 +16,13 @@ import { Model as HistoryMusicEntry } from "../history/models";
 import { getFullPath } from "../utils";
 import { download } from "../youtube";
 // eslint-disable-next-line import/no-cycle
-import UrlGenerator from "./UrlGenerator";
 import { docOdmToModel, patchParamsToUpdateQuery } from "./adapters";
 import { QUEUE_NAME } from "./events";
 import { DocOdm, ModelOdm } from "./odm";
-import { FindParams, FindQueryParams, PatchOneParams } from "./types";
+import { FindParams } from "./queries/Queries";
+import { findParamsToQueryParams } from "./queries/QueriesOdm";
+import { PatchOneParams } from "./types";
+import UrlGenerator from "./UrlGenerator";
 
 const DepsMap = {
   domainMessageBroker: DomainMessageBroker,
@@ -301,28 +303,4 @@ function fixTitle(title: string): string {
   return title.replace(/ \((Official )?(Lyric|Music) Video\)/ig,"")
     .replace(/\(videoclip\)/ig,"")
     .replace(/ $/g,"");
-}
-
-function findParamsToQueryParams(params: FindParams): FindQueryParams {
-  const queryParams: FindQueryParams = {
-  };
-
-  if (params.tags) {
-    queryParams.tags = {
-      $in: params.tags,
-    };
-  }
-
-  if (params.weight) {
-    queryParams.weight = {
-    };
-
-    if (params.weight.min !== undefined)
-      queryParams.weight.$gte = params.weight.min;
-
-    if (params.weight.max !== undefined)
-      queryParams.weight.$lte = params.weight.max;
-  }
-
-  return queryParams;
 }
