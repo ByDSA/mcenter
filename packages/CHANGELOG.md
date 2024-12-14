@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.0](https://github.com/ByDSA/mcenter/compare/v3.7.5...v3.8.0) (2024-12-14)
+
+
+### Features
+
+* **back:** queries ([7095a1f](https://github.com/ByDSA/mcenter/commit/7095a1fa9e134bf5b5aa952ff8db36785ef15a66))
+
 ### [3.7.5](https://github.com/ByDSA/mcenter/compare/v3.7.4...v3.7.5) (2024-11-09)
 
 
