@@ -1,14 +1,7 @@
 import { Request } from "express";
 import { QueryLexer } from "./1-str-to-obj/QueryLexer";
 import { QueryParser } from "./1-str-to-obj/QueryParserChevrotain";
-
-export type FindParams = {
-  tags?: string[];
-  weight?: {
-    max?: number;
-    min?: number;
-  };
-};
+import { ExpressionNode, IntersectionNode, TagNode, WeightNode } from "./QueryObject";
 
 const parserInstance = new QueryParser();
 const BaseVisitor = parserInstance.getBaseCstVisitorConstructor();
@@ -49,6 +42,7 @@ class QueryEvaluator extends BaseVisitor {
     return (song: any) => terms.every(fn => fn(song));
   }
 
+  // eslint-disable-next-line class-methods-use-this
   filter(ctx: any): (song: any)=> boolean {
     const property = ctx.Identifier[0].image;
 
@@ -90,29 +84,67 @@ export function filterSongs(query: string, songs: any[]): any[] {
   return songs.filter(filterFn);
 }
 
-export function requestToFindMusicParams(req: Request): FindParams {
+export function requestToFindMusicParams(req: Request): ExpressionNode | null {
   const tagsQuery = <string | undefined>req.query.tags;
   const minWeightQuery = <string | undefined>req.query.minWeight;
   const maxWeightQuery = <string | undefined>req.query.maxWeight;
-  const params: FindParams = {
-  };
-
-  if (minWeightQuery !== undefined || maxWeightQuery !== undefined){
-    params.weight = {
-    };
-
-    if (minWeightQuery !== undefined)
-      params.weight.min = +minWeightQuery;
-
-    if (maxWeightQuery !== undefined)
-      params.weight.max = +maxWeightQuery;
-  }
+  let tagsNode: TagNode | undefined;
+  let weightNode: WeightNode | undefined;
 
   if (tagsQuery) {
-    const multipleTags = tagsQuery.split(",");
-
-    params.tags = multipleTags;
+    tagsNode = {
+      type: "tag",
+      value: tagsQuery,
+    } satisfies TagNode;
   }
 
-  return params;
+  const min = minWeightQuery ? +minWeightQuery : null;
+  const max = maxWeightQuery ? +maxWeightQuery : null;
+
+  if (min !== null && max !== null) {
+    weightNode = {
+      type:"weight",
+      value: {
+        type:"range",
+        min,
+        minIncluded: true,
+        max,
+        maxIncluded: true,
+      },
+    };
+  } else if (min !== null) {
+    weightNode = {
+      type:"weight",
+      value: {
+        type:"range",
+        min,
+        minIncluded: true,
+      },
+    };
+  } else if (max !== null) {
+    weightNode = {
+      type:"weight",
+      value: {
+        type:"range",
+        max,
+        maxIncluded: true,
+      },
+    };
+  }
+
+  if (tagsNode && weightNode) {
+    return {
+      type:"intersection",
+      child1: tagsNode,
+      child2: weightNode,
+    } satisfies IntersectionNode;
+  }
+
+  if (tagsNode)
+    return tagsNode;
+
+  if (weightNode)
+    return weightNode;
+
+  return null;
 }
