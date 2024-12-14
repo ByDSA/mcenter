@@ -7,7 +7,3 @@ export {
 export {
   default as Repository,
 } from "./Repository";
-
-export {
-  FindParams as RepositoryFindParams,
-} from "./types";

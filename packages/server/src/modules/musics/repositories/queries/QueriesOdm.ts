@@ -1,0 +1,242 @@
+/* eslint-disable no-restricted-syntax */
+import { ExpressionNode, OperationNode } from "./QueryObject";
+
+type WeightYear = {
+  $gte?: number;
+  $gt?: number;
+  $lte?: number;
+  $lt?: number;
+};
+
+export type FindQueryParams = {
+  tags?: {
+    $in?: string[];
+    $all?: string[];
+  };
+  weight?: WeightYear;
+  year?: WeightYear;
+};
+
+type Props = {
+  parentOperation: OperationNode["type"];
+};
+export function findParamsToQueryParams(params: ExpressionNode, props?: Props): FindQueryParams {
+  const error = new Error("Error");
+
+  switch (params.type) {
+    case "tag":
+      if (props?.parentOperation === "union") {
+        return {
+          tags: {
+            $in: [params.value],
+          },
+        };
+      }
+
+      return {
+        tags: {
+          $all: [params.value],
+        },
+      };
+    case "weight":
+    {
+      if (params.value.type === "number")
+        throw error;
+
+      const weight = {
+      } as NonNullable<FindQueryParams["weight"]>;
+
+      if ("min" in params.value) {
+        if (params.value.minIncluded)
+          weight.$gte = params.value.min;
+        else
+          weight.$gt = params.value.min;
+      }
+
+      if ("max" in params.value) {
+        if (params.value.maxIncluded)
+          weight.$lte = params.value.max;
+        else
+          weight.$lt = params.value.max;
+      }
+
+      return {
+        weight,
+      };
+    }
+    case "intersection":
+      return interceptionCase(params);
+    case "union":
+      return unionCase(params);
+    case "year":
+    case "difference":
+    case "complement":
+    default: throw error;
+  }
+}
+
+function interceptionCase(node: ExpressionNode, query: FindQueryParams = {
+
+} ): FindQueryParams {
+  const operation = "intersection";
+  const props = {
+    parentOperation: operation,
+  } as Props;
+
+  if (node.type === "tag" || node.type === "weight" || node.type === "year")
+    return findParamsToQueryParams(node, props);
+
+  if (node.type !== operation)
+    throw new Error("error");
+
+  const left = node.child1;
+  const right = node.child2;
+  const leftQuery = findParamsToQueryParams(left, props);
+  const rightQuery = findParamsToQueryParams(right, props);
+  const leftRightMerge = mergeQuery(leftQuery, rightQuery);
+
+  return mergeQuery(query, leftRightMerge);
+}
+
+function unionCase(node: ExpressionNode, query: FindQueryParams = {
+
+} ): FindQueryParams {
+  const operation = "union";
+  const props = {
+    parentOperation: operation,
+  } as Props;
+
+  if (node.type === "tag" || node.type === "weight" || node.type === "year")
+    return findParamsToQueryParams(node, props);
+
+  if (node.type !== operation)
+    throw new Error("error");
+
+  const left = node.child1;
+  const right = node.child2;
+  const leftQuery = findParamsToQueryParams(left, props);
+  const rightQuery = findParamsToQueryParams(right, props);
+  const leftRightMerge = mergeQuery(leftQuery, rightQuery);
+
+  return mergeQuery(query, leftRightMerge);
+}
+
+function mergeQuery(q1: FindQueryParams, q2: FindQueryParams): FindQueryParams {
+  const ret: FindQueryParams = {
+  };
+  const error = new Error("Error");
+
+  if (q1.tags)
+    ret.tags = copyOfTags(q1.tags);
+
+  if (q2.tags) {
+    if (!ret.tags) {
+      ret.tags = {
+      };
+    }
+
+    if (q2.tags?.$all) {
+      if (ret.tags?.$in)
+        throw error;
+
+      if (ret.tags.$all)
+        ret.tags.$all.push(...q2.tags.$all);
+      else
+        ret.tags.$all = q2.tags.$all;
+    } else if (q2.tags?.$in) {
+      if (ret.tags?.$all)
+        throw error;
+
+      if (ret.tags?.$in)
+        ret.tags.$in.push(...q2.tags.$in);
+      else {
+        if (!ret.tags) {
+          ret.tags = {
+          };
+        }
+
+        ret.tags.$in = q2.tags.$in;
+      }
+    }
+  }
+
+  if (q1.weight && q2.weight)
+    ret.weight = mergeWeightYear(q1.weight, q2.weight);
+  else if (q1.weight || q2.weight)
+    ret.weight = q1.weight ?? q2.weight;
+
+  if (q1.year && q2.year)
+    ret.year = mergeWeightYear(q1.year, q2.year);
+  else if (q1.year || q2.year)
+    ret.year = q1.year ?? q2.year;
+
+  return ret;
+}
+
+function mergeWeightYear(w1: WeightYear, w2: WeightYear): WeightYear {
+  const ret = copyOfWeightYear(w1);
+  const error = new Error("Error");
+
+  if (w2.$gt) {
+    if (ret.$gt !== undefined)
+      throw error;
+
+    ret.$gt = w2.$gt;
+  }
+
+  if (w2.$gte) {
+    if (w1?.$gte !== undefined)
+      throw error;
+
+    ret.$gte = w2.$gte;
+  }
+
+  if (w2.$lt) {
+    if (w1?.$lt !== undefined)
+      throw error;
+
+    ret.$lt = w2.$lt;
+  }
+
+  if (w2.$lte) {
+    if (w1?.$lte !== undefined)
+      throw error;
+
+    ret.$lte = w2.$lte;
+  }
+
+  return ret;
+}
+
+function copyOfTags(tags: NonNullable<FindQueryParams["tags"]>): NonNullable<FindQueryParams["tags"]> {
+  const ret: FindQueryParams["tags"] = {
+  };
+
+  if (tags.$all)
+    ret.$all = [...tags.$all];
+
+  if (tags.$in)
+    ret.$in = [...tags.$in];
+
+  return ret;
+}
+
+function copyOfWeightYear(input: WeightYear): WeightYear {
+  const ret: WeightYear = {
+
+  };
+
+  if (input.$gt !== undefined)
+    ret.$gt = input.$gt;
+
+  if (input.$gte !== undefined)
+    ret.$gte = input.$gte;
+
+  if (input.$lt !== undefined)
+    ret.$lt = input.$lt;
+
+  if (input.$lte !== undefined)
+    ret.$lte = input.$lte;
+
+  return ret;
+}
