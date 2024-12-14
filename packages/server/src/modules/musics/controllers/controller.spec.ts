@@ -1,8 +1,8 @@
-import { parseMusic } from "#shared/models/musics";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
+import { parseMusic } from "#shared/models/musics";
 import { HistoryRepository } from "../history";
 import { HistoryRepositoryMock } from "../history/repositories/tests";
 import { Repository } from "../repositories";
@@ -35,7 +35,7 @@ describe("GetAll", () => {
   it("getRandom", async () => {
     const musics = MUSICS_SAMPLES_IN_DISK;
 
-    musicRepositoryMock.find = jest.fn().mockResolvedValueOnce(musics);
+    musicRepositoryMock.findAll = jest.fn().mockResolvedValueOnce(musics);
     const response = await request(routerApp)
       .get("/get/random")
       .expect(200);

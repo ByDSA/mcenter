@@ -1,5 +1,3 @@
-import { Episode, EpisodeGetManyBySearchRequest } from "#shared/models/episodes";
-import HttpStatusCode from "#shared/utils/http/StatusCode";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
@@ -7,6 +5,8 @@ import { resolveRequired } from "#utils/layers/deps";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
+import HttpStatusCode from "#shared/utils/http/StatusCode";
+import { Episode, EpisodeGetManyBySearchRequest } from "#shared/models/episodes";
 import { Repository } from "../repositories";
 import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
 import RestController from "./RestController";
@@ -122,7 +122,9 @@ describe("RestController", () => {
       };
       const response = await request(routerApp)
         .patch(URL)
-        .send(partial);
+        .send( {
+          entity: partial,
+        } );
 
       expect(response.statusCode).not.toBe(HttpStatusCode.UNPROCESSABLE_ENTITY);
     } );
@@ -141,7 +143,9 @@ describe("RestController", () => {
     it("should call repository", async () => {
       await request(routerApp)
         .patch(URL)
-        .send(validPartial);
+        .send( {
+          entity: validPartial,
+        } );
 
       expect(episodeRepositoryMock.patchOneByIdAndGet).toBeCalledTimes(1);
       expect(episodeRepositoryMock.patchOneByIdAndGet).toBeCalledWith( {
@@ -155,7 +159,9 @@ describe("RestController", () => {
       await request(routerApp)
         .patch("/serieId/notfoundId")
         .expect(HttpStatusCode.NOT_FOUND)
-        .send(validPartial);
+        .send( {
+          entity: validPartial,
+        } );
 
       expect(episodeRepositoryMock.patchOneByIdAndGet).toHaveReturnedWith(Promise.resolve(null));
     } );
@@ -167,9 +173,13 @@ describe("RestController", () => {
 
       const response = await request(routerApp)
         .patch(URL)
-        .send(validPartial);
+        .send( {
+          entity: validPartial,
+        } );
 
-      expect(response.body).toEqual(episode);
+      expect(response.body).toEqual( {
+        entity: episode,
+      } );
       expect(response.statusCode).toBe(HttpStatusCode.OK);
     } );
   } );

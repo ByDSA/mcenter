@@ -1,13 +1,13 @@
 import { SerieRepository } from "#modules/series";
-import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest, assertIsEpisodePatchOneByIdResBody } from "#shared/models/episodes";
-import { Serie } from "#shared/models/series";
-import { assertFound } from "#shared/utils/http/validation";
-import { neverCase } from "#shared/utils/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { ResponseWithBody, validateReq } from "#utils/validation/zod-express";
 import express, { Response, Router } from "express";
+import { neverCase } from "#shared/utils/validation";
+import { assertFound } from "#shared/utils/http/validation";
+import { Serie } from "#shared/models/series";
+import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest, assertIsEpisodePatchOneByIdResBody } from "#shared/models/episodes";
 import { Model } from "../models";
 import { Repository as EpisodeRepository } from "../repositories";
 
@@ -43,6 +43,8 @@ implements
       serieId,
     };
     const got = await this.#deps.episodeRepository.patchOneByIdAndGet(id, episodePartial.entity);
+
+    assertFound(got);
     const body: EpisodePatchOneByIdResBody = {
       entity: got ?? undefined,
     };
