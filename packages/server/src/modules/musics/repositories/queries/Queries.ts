@@ -1,5 +1,6 @@
 import { Request } from "express";
 import { QueryLexer } from "./1-str-to-obj/QueryLexer";
+import { parseQuery } from "./1-str-to-obj/QueryParser";
 import { QueryParser } from "./1-str-to-obj/QueryParserChevrotain";
 import { ExpressionNode, IntersectionNode, TagNode, WeightNode } from "./QueryObject";
 
@@ -85,6 +86,18 @@ export function filterSongs(query: string, songs: any[]): any[] {
 }
 
 export function requestToFindMusicParams(req: Request): ExpressionNode | null {
+  const query = <string | undefined>req.query.q;
+
+  if (!query)
+    return oldForm(req);
+
+  return parseQuery(query).root;
+}
+
+/**
+ * @deprecated
+ */
+function oldForm(req: Request): ExpressionNode | null {
   const tagsQuery = <string | undefined>req.query.tags;
   const minWeightQuery = <string | undefined>req.query.minWeight;
   const maxWeightQuery = <string | undefined>req.query.maxWeight;

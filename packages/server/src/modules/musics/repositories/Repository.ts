@@ -19,8 +19,8 @@ import { download } from "../youtube";
 import { docOdmToModel, patchParamsToUpdateQuery } from "./adapters";
 import { QUEUE_NAME } from "./events";
 import { DocOdm, ModelOdm } from "./odm";
-import { FindParams } from "./queries/Queries";
 import { findParamsToQueryParams } from "./queries/QueriesOdm";
+import { ExpressionNode } from "./queries/QueryObject";
 import { PatchOneParams } from "./types";
 import UrlGenerator from "./UrlGenerator";
 
@@ -130,7 +130,7 @@ CanGetOneById<Music, MusicID>
     return ret;
   }
 
-  async find(params: FindParams): Promise<Music[]> {
+  async find(params: ExpressionNode): Promise<Music[]> {
     const query = findParamsToQueryParams(params);
     const docOdms = await ModelOdm.find(query);
     const ret = docOdms.map((docOdm) => docOdmToModel(docOdm));

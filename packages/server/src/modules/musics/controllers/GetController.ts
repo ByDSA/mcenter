@@ -1,3 +1,4 @@
+/* eslint-disable import/no-internal-modules */
 import { ResourcePickerRandom } from "#modules/picker";
 import { SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
@@ -109,9 +110,11 @@ export default class GetController {
 
   async #findMusics(req: Request): Promise<Music[]> {
     const params = requestToFindMusicParams(req);
-    const musics = await this.#deps.musicRepository.find(params);
 
-    return musics;
+    if (params)
+      return this.#deps.musicRepository.find(params);
+
+    return this.#deps.musicRepository.findAll();
   }
 
   #sortMusics(musics: Music[]): Music[] {
