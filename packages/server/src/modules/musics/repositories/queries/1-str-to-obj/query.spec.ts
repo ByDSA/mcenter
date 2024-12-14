@@ -257,7 +257,60 @@ it("intersection operator", () => {
   expect(obj).toEqual(expected);
 } );
 
-it("union and intersection operators", () => {
+it("double union operator", () => {
+  const query = "tag:rock + tag:pop + tag:jazz";
+  const obj = parseQuery(query);
+  const expected = {
+    root: {
+      type: "union",
+      child1: {
+        type: "tag",
+        value: "rock",
+      } satisfies TagNode,
+      child2: {
+        type: "union",
+        child1: {
+          type: "tag",
+          value: "pop",
+        } satisfies TagNode,
+        child2: {
+          type: "tag",
+          value: "jazz",
+        } satisfies TagNode,
+      } satisfies UnionNode,
+    } satisfies UnionNode,
+  };
+
+  expect(obj).toEqual(expected);
+} );
+it("double intersection operator", () => {
+  const query = "tag:rock * tag:pop * tag:jazz";
+  const obj = parseQuery(query);
+  const expected = {
+    root: {
+      type: "intersection",
+      child1: {
+        type: "tag",
+        value: "rock",
+      } satisfies TagNode,
+      child2: {
+        type: "intersection",
+        child1: {
+          type: "tag",
+          value: "pop",
+        } satisfies TagNode,
+        child2: {
+          type: "tag",
+          value: "jazz",
+        } satisfies TagNode,
+      } satisfies IntersectionNode,
+    } satisfies IntersectionNode,
+  };
+
+  expect(obj).toEqual(expected);
+} );
+
+it("mix union and intersection operators", () => {
   const query = "(tag:rock + tag:pop) * weight:>=50";
   const obj = parseQuery(query);
   const expected = {
@@ -283,6 +336,74 @@ it("union and intersection operators", () => {
         },
       } satisfies WeightNode,
     } satisfies IntersectionNode,
+  };
+
+  expect(obj).toEqual(expected);
+} );
+
+it("mix union and intersection operators 2", () => {
+  const query = "(tag:rock + tag:pop) * (tag:jazz + tag:metal)";
+  const obj = parseQuery(query);
+  const expected = {
+    root: {
+      type: "intersection",
+      child1: {
+        type: "union",
+        child1: {
+          type: "tag",
+          value: "rock",
+        } satisfies TagNode,
+        child2: {
+          type: "tag",
+          value: "pop",
+        } satisfies TagNode,
+      } satisfies UnionNode,
+      child2: {
+        type: "union",
+        child1: {
+          type: "tag",
+          value: "jazz",
+        } satisfies TagNode,
+        child2: {
+          type: "tag",
+          value: "metal",
+        } satisfies TagNode,
+      } satisfies UnionNode,
+    } satisfies IntersectionNode,
+  };
+
+  expect(obj).toEqual(expected);
+} );
+
+it("mix union and intersection operators 3", () => {
+  const query = "(tag:rock * tag:pop) + (tag:jazz * tag:metal)";
+  const obj = parseQuery(query);
+  const expected = {
+    root: {
+      type: "union",
+      child1: {
+        type: "intersection",
+        child1: {
+          type: "tag",
+          value: "rock",
+        } satisfies TagNode,
+        child2: {
+          type: "tag",
+          value: "pop",
+        } satisfies TagNode,
+      } satisfies IntersectionNode,
+      child2: {
+        type: "intersection",
+        child1: {
+          type: "tag",
+          value: "jazz",
+        } satisfies TagNode,
+        child2: {
+          type: "tag",
+          value: "metal",
+        } satisfies TagNode,
+      } satisfies IntersectionNode,
+    } satisfies UnionNode,
   };
 
   expect(obj).toEqual(expected);

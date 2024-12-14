@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable import/prefer-default-export */
 import { CstElement, CstNode, IToken } from "@chevrotain/types";
-import { DifferenceNode, FilterNode, IntersectionNode, NumberLiteral, QueryObject, RangeNumber, UnionNode, WeightNode, YearNode } from "../QueryObject";
+import { BinaryOperationNode, DifferenceNode, FilterNode, IntersectionNode, NumberLiteral, QueryObject, RangeNumber, UnionNode, WeightNode, YearNode } from "../QueryObject";
 import { QueryLexer } from "./QueryLexer";
 import { QueryParser } from "./QueryParserChevrotain";
 
@@ -49,19 +49,13 @@ const expressionToObj = (node: CstNode): any => {
 };
 
 function additionExpressionToObj(node: CstNode): DifferenceNode | FilterNode | IntersectionNode | UnionNode {
-  const {multiplicationExpression: multiplicationExpressionArray} = node.children;
+  const multiplicationExpressionArray = node.children.multiplicationExpression as CstNode[];
 
-  if (multiplicationExpressionArray.length === 2) {
-    const m1 = multiplicationExpressionToObj(multiplicationExpressionArray[0] as CstNode);
-    const m2 = multiplicationExpressionToObj(multiplicationExpressionArray[1] as CstNode);
-    const operator = (node.children.AdditionOperator[0] as IToken).image;
-    const type = operator === "-" ? "difference" : "union";
+  if (multiplicationExpressionArray.length > 1) {
+    const AdditionOperatorArray = node.children.AdditionOperator as IToken[];
+    const filters = multiplicationExpressionArray.map(me=> atomicExpressionToObj(me.children.atomicExpression[0] as CstNode));
 
-    return {
-      type,
-      child1: m1,
-      child2: m2,
-    } as DifferenceNode | UnionNode;
+    return arrayFilterToTree(filters, AdditionOperatorArray);
   }
 
   if (multiplicationExpressionArray.length === 1)
@@ -70,22 +64,60 @@ function additionExpressionToObj(node: CstNode): DifferenceNode | FilterNode | I
   throw new Error("Error");
 }
 
-function multiplicationExpressionToObj(node: CstNode): FilterNode | IntersectionNode{
+function getOperatorType(op: IToken): BinaryOperationNode["type"] {
+  const operator = op.image;
+
+  switch (operator) {
+    case "-": return "difference";
+    case "+": return "union";
+    case "*": return "intersection";
+    default: throw new Error();
+  }
+}
+
+function multiplicationExpressionToObj(node: CstNode): BinaryOperationNode | FilterNode {
   const atomicExpressionArray = node.children.atomicExpression as CstNode[];
   const filters = atomicExpressionArray.map(atomicExpressionToObj);
+  const operators = node.children.MultiplicationOperator as IToken[];
 
   if (filters.length === 1)
     return filters[0];
 
-  if (filters.length === 2) {
-    return {
-      type:"intersection",
-      child1: filters[0],
-      child2: filters[1],
-    } satisfies IntersectionNode;
-  }
+  if (filters.length > 1)
+    return arrayFilterToTree(filters, operators);
 
   throw new Error("Error");
+}
+
+function arrayFilterToTree(filters: FilterNode[], operatorsArray: IToken[]): BinaryOperationNode {
+  let rootIntersection: BinaryOperationNode | undefined;
+  let currentIntersection!: BinaryOperationNode;
+
+  for (let i = 0; i < filters.length; i++) {
+    if (i === 0) {
+      rootIntersection = {
+        type: getOperatorType(operatorsArray[0]),
+        child1: filters[i],
+        child2: null as any,
+      } as BinaryOperationNode;
+      currentIntersection = rootIntersection;
+    } else if (i === filters.length - 1)
+      currentIntersection.child2 = filters[i];
+    else {
+      currentIntersection.child2 = {
+        type: getOperatorType(operatorsArray[i]),
+        child1: filters[i],
+        child2: null as any,
+      } as BinaryOperationNode;
+
+      currentIntersection = currentIntersection.child2;
+    }
+  }
+
+  if (!rootIntersection)
+    throw new Error("error");
+
+  return rootIntersection;
 }
 
 function atomicExpressionToObj(node: CstNode): FilterNode {

@@ -2,7 +2,13 @@
 
 export type ExpressionNode = FilterNode | OperationNode;
 
-type OperationNode = ComplementNode | IntersectionNode | MinusNode | UnionNode;
+export type OperationNode = BinaryOperationNode | ComplementNode;
+
+export type BinaryOperationNode = AdditionNode | MultiplicationNode;
+
+export type MultiplicationNode = IntersectionNode;
+
+export type AdditionNode = DifferenceNode | UnionNode;
 
 export type FilterNode = TagNode | WeightNode | YearNode;
 
