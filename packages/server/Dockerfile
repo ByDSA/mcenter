@@ -23,6 +23,9 @@ WORKDIR /packages
 RUN pnpm i --fix-lockfile --frozen-lockfile --ignore-scripts
 RUN cd shared && pnpm build
 
+RUN apk add --no-cache git # Instalar git
+RUN sh ./app/lib/install_chevrotain.sh
+
 FROM deps-common AS deps-prod
 RUN pnpm i --prod --fix-lockfile --frozen-lockfile --ignore-scripts
 
@@ -37,6 +40,7 @@ COPY --from=deps-prod /packages/node_modules ./node_modules
 WORKDIR /packages/shared
 COPY --from=deps-prod /packages/shared/node_modules ./node_modules
 WORKDIR /packages/app
+COPY --from=deps /packages/app/lib/chevrotain ./lib/chevrotain
 COPY --from=deps-prod /packages/app/node_modules ./node_modules
 COPY --from=builder /packages/app/build ./build
 COPY --from=builder /packages/app/package.json ./
