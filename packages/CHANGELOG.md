@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.8.2](https://github.com/ByDSA/mcenter/compare/v3.8.1...v3.8.2) (2024-12-14)
+
+
+### Bug Fixes
+
+* **back:** chevrotain docker ([6a2d94b](https://github.com/ByDSA/mcenter/commit/6a2d94be158d8318a027e0aa2b030492a90dd34d))
+
 ### [3.8.1](https://github.com/ByDSA/mcenter/compare/v3.8.0...v3.8.1) (2024-12-14)
 
 
