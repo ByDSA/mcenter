@@ -69,6 +69,7 @@ function getOperatorType(op: IToken): BinaryOperationNode["type"] {
 
   switch (operator) {
     case "-": return "difference";
+    case "|":
     case "+": return "union";
     case "*": return "intersection";
     default: throw new Error();

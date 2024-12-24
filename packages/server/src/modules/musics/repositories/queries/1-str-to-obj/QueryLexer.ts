@@ -8,8 +8,8 @@ export const AdditionOperator = createToken( {
 } );
 
 export const Plus = createToken( {
-  name: "Plus",
-  pattern: /\+/,
+  name: "Or",
+  pattern: /\+|\|/,
   categories: AdditionOperator,
 } );
 

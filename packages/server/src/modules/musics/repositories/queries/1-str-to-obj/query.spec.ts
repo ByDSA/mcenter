@@ -217,22 +217,32 @@ describe.each([
   } );
 } );
 
-it("union opeator", () => {
+const OR1_EXPECTED = {
+  root: {
+    type: "union",
+    child1: {
+      type: "tag",
+      value: "rock",
+    } satisfies TagNode,
+    child2: {
+      type: "tag",
+      value: "pop",
+    } satisfies TagNode,
+  } satisfies UnionNode,
+};
+
+it("union opeator +", () => {
   const query = "tag:rock + tag:pop";
   const obj = parseQuery(query);
-  const expected = {
-    root: {
-      type: "union",
-      child1: {
-        type: "tag",
-        value: "rock",
-      } satisfies TagNode,
-      child2: {
-        type: "tag",
-        value: "pop",
-      } satisfies TagNode,
-    } satisfies UnionNode,
-  };
+  const expected = OR1_EXPECTED;
+
+  expect(obj).toEqual(expected);
+} );
+
+it("union opeator |", () => {
+  const query = "tag:rock | tag:pop";
+  const obj = parseQuery(query);
+  const expected = OR1_EXPECTED;
 
   expect(obj).toEqual(expected);
 } );
