@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.9.0](https://github.com/ByDSA/mcenter/compare/v3.8.2...v3.9.0) (2024-12-24)
+
+
+### Features
+
+* **back:** add year parameter handling in query conversion ([842904b](https://github.com/ByDSA/mcenter/commit/842904b9377ae634cde7cfc4fb19b2f243b2de43))
+* **back:** update query lexer and parser to support '|' as an OR operator ([49f9354](https://github.com/ByDSA/mcenter/commit/49f93545b68d6d42dcf68650a5850b5f7e993656))
+
+
+### Bug Fixes
+
+* **back:** improve playlist generation by formatting artist and title ([0b5e039](https://github.com/ByDSA/mcenter/commit/0b5e039682b4c3d0e713ad37ea96fe2c4afe9b76))
+* **back:** support additional characters and handle unclosed quotes ([0b00a09](https://github.com/ByDSA/mcenter/commit/0b00a09857f429bec7cba4dcddaf3574f854ccfc))
+
 ### [3.8.2](https://github.com/ByDSA/mcenter/compare/v3.8.1...v3.8.2) (2024-12-14)
 
 
