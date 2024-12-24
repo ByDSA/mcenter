@@ -69,6 +69,31 @@ export function findParamsToQueryParams(params: ExpressionNode, props?: Props): 
     case "union":
       return unionCase(params);
     case "year":
+    {
+      if (params.value.type === "number")
+        throw error;
+
+      const year = {
+      } as NonNullable<FindQueryParams["year"]>;
+
+      if ("min" in params.value) {
+        if (params.value.minIncluded)
+          year.$gte = params.value.min;
+        else
+          year.$gt = params.value.min;
+      }
+
+      if ("max" in params.value) {
+        if (params.value.maxIncluded)
+          year.$lte = params.value.max;
+        else
+          year.$lt = params.value.max;
+      }
+
+      return {
+        year,
+      };
+    }
     case "difference":
     case "complement":
     default: throw error;
