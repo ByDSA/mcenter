@@ -171,11 +171,17 @@ type GenPlayListParams = {
 };
 function generatePlaylist( {picked, nextUrl, server}: GenPlayListParams): string {
   const ROUTE_RAW = "/api/musics/get/raw";
+  const artist = fixTxt(picked.artist);
+  const title = fixTxt(picked.title);
   const ret = `#EXTM3U
-  #EXTINF:317,${picked.title}
+  #EXTINF:317,${artist},${title}
   ${server}${ROUTE_RAW}/${picked.url}
   #EXTINF:-1,NEXT
   ${nextUrl}`;
 
   return ret;
+}
+
+function fixTxt(txt: string): string {
+  return txt.replace(/,/g, "﹐");
 }
