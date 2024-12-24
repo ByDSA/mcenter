@@ -192,12 +192,13 @@ describe.each([
   } );
 } );
 
-const TAG_ROCK_OBJ = {
+const createTag = (tag: string) => ( {
   root: {
     type: "tag",
-    value: "rock",
-  },
-};
+    value: tag,
+  } satisfies TagNode,
+} );
+const TAG_ROCK_OBJ = createTag("rock");
 
 describe.each([
   ["tag:\"rock\"", TAG_ROCK_OBJ],
@@ -205,6 +206,16 @@ describe.each([
   ["tag:", null],
   ["tag:\"rock", null],
   ["tag:rock\"", null],
+  ["tag:aáéíóúàèìòù", createTag("aáéíóúàèìòù")],
+  ["tag:aäëïöü", createTag("aäëïöü")],
+  ["tag:ÑÇñç", createTag("ÑÇñç")],
+  ["tag:ÁÉÍÓÚÀÈÌÒÙ", createTag("ÁÉÍÓÚÀÈÌÒÙ")],
+  ["tag:ÄËÏÖÜ", createTag("ÄËÏÖÜ")],
+  ["tag:?gim", createTag("?gim")],
+  ["tag:!¿¡", createTag("!¿¡")],
+  ["tag:\"?gim\"", createTag("?gim")],
+  ["tag:#metal", createTag("#metal")],
+  ["tag:\"#metal\"", createTag("#metal")],
 ])("parseQuery with different inputs", (query, expected) => {
   it(`should parse query: ${query}`, () => {
     if (expected === null)

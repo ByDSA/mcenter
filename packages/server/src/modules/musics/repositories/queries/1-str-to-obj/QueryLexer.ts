@@ -107,7 +107,8 @@ export const TagIdentifier = createToken( {
 
 export const StringLiteral = createToken( {
   name: "StringLiteral",
-  pattern: /(["']?)([a-zA-Z0-9]+)\1/,
+  // eslint-disable-next-line no-control-regex
+  pattern: /(?:["'?!#a-zA-Z0-9._~-]|[^\x00-\x7F])+/,
 } );
 
 export const WhiteSpace = createToken( {

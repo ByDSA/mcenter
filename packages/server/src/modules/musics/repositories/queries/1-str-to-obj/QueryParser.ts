@@ -186,6 +186,12 @@ function removeQuotes(input: string): string {
   ))
     return input.substring(1, input.length - 1);
 
+  if ((input[0] === "\"" && input.at(-1) !== "\"")
+    || (input.at(-1) === "\"" && input[0] !== "\"")
+  || (input[0] === "'" && input.at(-1) !== "'")
+  || (input.at(-1) === "'" && input[0] !== "'"))
+    throw new Error("Non closed quotes");
+
   return input;
 }
 
