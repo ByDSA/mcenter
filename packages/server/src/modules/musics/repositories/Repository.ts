@@ -218,7 +218,7 @@ CanGetOneById<Music, MusicID>
   }
 
   async deleteOneByPath(relativePath: string) {
-    const docOdm = await ModelOdm.findByIdAndDelete( {
+    const docOdm = await ModelOdm.findOneAndDelete( {
       path: relativePath,
     } );
 
