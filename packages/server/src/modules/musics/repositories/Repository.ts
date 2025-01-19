@@ -161,10 +161,10 @@ CanGetOneById<Music, MusicID>
       title,
       artist,
     } );
-    const hash = await md5FileAsync(fullPath);
+    const hashPromise = md5FileAsync(fullPath);
     const {size, mtime, ctime} = statSync(fullPath);
     const newDocOdm = {
-      hash,
+      hash: await hashPromise,
       size,
       path: relativePath,
       title,
