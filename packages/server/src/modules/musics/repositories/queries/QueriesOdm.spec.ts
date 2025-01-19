@@ -4,11 +4,14 @@ import { findParamsToQueryParams, FindQueryParams } from "./QueriesOdm";
 
 describe.each([
   ["tag:rock", {
-    tags: {
-      $all: [
-        "rock",
-      ],
-    },
+    $and: [{
+      tags: {
+        $in: [
+          "rock",
+          "only-rock",
+        ],
+      },
+    }],
   }],
   ["weight:>=50", {
     weight: {
@@ -31,38 +34,101 @@ describe.each([
     },
   }],
   ["tag:rock * tag:pop", {
-    tags: {
-      $all: [
-        "rock", "pop",
-      ],
+    $and: [{
+      tags: {
+        $in: [
+          "rock",
+          "only-rock",
+        ],
+      },
     },
+    {
+      tags: {
+        $in: [
+          "pop",
+          "only-pop",
+        ],
+      },
+    }],
   }],
   ["tag:rock * tag:pop * tag:jazz", {
-    tags: {
-      $all: [
-        "rock", "pop", "jazz",
-      ],
+    $and: [{
+      tags: {
+        $in: [
+          "rock",
+          "only-rock",
+        ],
+      },
     },
+    {
+      tags: {
+        $in: [
+          "pop",
+          "only-pop",
+        ],
+      },
+    },
+    {
+      tags: {
+        $in: [
+          "jazz",
+          "only-jazz",
+        ],
+      },
+    }],
   }],
   ["tag:rock + tag:pop + tag:jazz", {
     tags: {
       $in: [
-        "rock", "pop", "jazz",
+        "rock",
+        "only-rock",
+        "pop",
+        "only-pop",
+        "jazz",
+        "only-jazz",
       ],
     },
   }],
-  ["(tag:rock * tag:pop) + tag:jazz", null],
-  ["tag:rock * weight:>50", {
+  ["(tag:rock * tag:pop) + tag:jazz", {
+    $and: [{
+      tags: {
+        $in: [
+          "rock",
+          "only-rock",
+        ],
+      },
+    },
+    {
+      tags: {
+        $in: [
+          "pop",
+          "only-pop",
+        ],
+      },
+    }],
     tags: {
-      $all: [
-        "rock",
+      $in: [
+        "jazz",
+        "only-jazz",
       ],
     },
+  }],
+  ["tag:rock * weight:>50", {
+    $and: [{
+      tags: {
+        $in: [
+          "rock",
+          "only-rock",
+        ],
+      },
+    },
+    ],
     weight: {
       $gt: 50,
     },
   }],
-])("tests", (query: string, expected: FindQueryParams | null) => {
+] as [string, FindQueryParams | null][],
+)("tests", (query: string, expected: FindQueryParams | null) => {
   it(`query=${query}`, () => {
     const f = (q: string) => {
       const obj = parseQuery(q);

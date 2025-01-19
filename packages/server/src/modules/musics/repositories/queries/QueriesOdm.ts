@@ -9,6 +9,7 @@ type WeightYear = {
 };
 
 export type FindQueryParams = {
+  $and?: FindQueryParams[];
   tags?: {
     $in?: string[];
     $all?: string[];
@@ -28,15 +29,18 @@ export function findParamsToQueryParams(params: ExpressionNode, props?: Props): 
       if (props?.parentOperation === "union") {
         return {
           tags: {
-            $in: [params.value],
+            $in: [params.value, `only-${ params.value}`],
           },
         };
       }
 
       return {
-        tags: {
-          $all: [params.value],
+        $and: [{
+          tags: {
+            $in: [params.value, `only-${ params.value}`],
+          },
         },
+        ],
       };
     case "weight":
     {
@@ -65,7 +69,7 @@ export function findParamsToQueryParams(params: ExpressionNode, props?: Props): 
       };
     }
     case "intersection":
-      return interceptionCase(params);
+      return intersectionCase(params);
     case "union":
       return unionCase(params);
     case "year":
@@ -100,7 +104,7 @@ export function findParamsToQueryParams(params: ExpressionNode, props?: Props): 
   }
 }
 
-function interceptionCase(node: ExpressionNode, query: FindQueryParams = {
+function intersectionCase(node: ExpressionNode, query: FindQueryParams = {
 
 } ): FindQueryParams {
   const operation = "intersection";
@@ -150,6 +154,11 @@ function mergeQuery(q1: FindQueryParams, q2: FindQueryParams): FindQueryParams {
   const ret: FindQueryParams = {
   };
   const error = new Error("Error");
+
+  if (q1.$and && q2.$and)
+    ret.$and = [...q1.$and, ...q2.$and];
+  else if (q1.$and || q2.$and)
+    ret.$and = q1.$and ?? q2.$and;
 
   if (q1.tags)
     ret.tags = copyOfTags(q1.tags);
