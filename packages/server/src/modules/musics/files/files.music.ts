@@ -1,7 +1,7 @@
 import { getFullPath } from "../utils";
 import { findFiles } from "./files.find";
 
-export const AUDIO_EXTENSIONS = ["mp3", "flac", "wma"];
+export const AUDIO_EXTENSIONS = ["mp3", "flac", "wma", "ape", "m4a"];
 
 // eslint-disable-next-line import/prefer-default-export
 export async function findAllValidMusicFiles() {
