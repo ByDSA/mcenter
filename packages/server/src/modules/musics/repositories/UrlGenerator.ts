@@ -44,40 +44,118 @@ type GenerateUrlParams = {
 };
 function generateUrl( {title, artist}: GenerateUrlParams): string {
   const base = !artist || artist === ARTIST_EMPTY ? title : `${artist}-${title}`;
+  const ret = fixUrl(base);
 
-  return fixUrl(base);
+  if (ret === null)
+    throw new Error("Invalid url");
+
+  return ret;
 }
+const cyrillicToLatinMap: { [key: string]: string } = {
+  а: "a",
+  б: "b",
+  в: "v",
+  г: "g",
+  д: "d",
+  е: "e",
+  ё: "e",
+  ж: "zh",
+  з: "z",
+  и: "i",
+  й: "i",
+  к: "k",
+  л: "l",
+  м: "m",
+  н: "n",
+  о: "o",
+  п: "p",
+  р: "r",
+  с: "s",
+  т: "t",
+  у: "u",
+  ф: "f",
+  х: "kh",
+  ц: "ts",
+  ч: "ch",
+  ш: "sh",
+  щ: "shch",
+  ы: "y",
+  э: "e",
+  ю: "yu",
+  я: "ya",
+  і: "i",
+  ь: "",
+  ъ: "",
+  є: "e",
+  ї: "i",
+};
+const charMap: { [key: string]: string } = {
+  "&": "",
+  "[": "",
+  "]": "",
+  ":": "",
+  ",": "",
+  ".": "",
+  "!": "",
+  "¡": "",
+  "?": "",
+  "¿": "",
+  "(": "",
+  ")": "",
+  "\"": "",
+  "'": "",
+  "”": "",
+  "’": "",
+  "ñ": "n",
+  "ç": "c",
+  "$": "s",
+  "á": "a",
+  "à": "a",
+  "ä": "a",
+  "â": "a",
+  "é": "e",
+  "è": "e",
+  "ë": "e",
+  "ê": "e",
+  "í": "i",
+  "ì": "i",
+  "ï": "i",
+  "î": "i",
+  "ó": "o",
+  "ò": "o",
+  "ö": "o",
+  "ô": "o",
+  "ú": "u",
+  "ù": "u",
+  "ü": "u",
+  "û": "u",
+  "_": "-",
+  "/": "-",
+  " ": "-",
+  ...cyrillicToLatinMap,
+};
 
-export function fixUrl(url: string): string {
-  let fixed = url
+export function fixUrl(url: string): string | null {
+  let fixed: string = url
     .toLowerCase()
-    .replaceAll(/&|\[|\]|:/g, "")
-    .replaceAll(/,|\./g,"")
-    .replaceAll(/!|¡|\?|¿/g,"")
-    .replaceAll(/\(/g,"")
-    .replaceAll(/\)/g,"")
-    .replaceAll(/"|'/g,"")
-    .replaceAll(/”|’/g,"")
-    .replaceAll(/(official-)?lyric-video/g,"")
-    .replaceAll(/-$/g,"")
-    .replaceAll(/ñ/g,"n")
-    .replaceAll(/ç/g,"c")
-    .replaceAll(/\$/g, "s")
-    .replaceAll(/á|à|ä|â/g,"a")
-    .replaceAll(/é|è|ë|ê/g,"e")
-    .replaceAll(/í|ì|ï|î/g,"i")
-    .replaceAll(/ó|ò|ö|ô/g,"o")
-    .replaceAll(/ú|ù|ü|û/g,"u")
-    .replaceAll(/_/g,"-")
-    .replaceAll(/\//g,"-")
-    .replaceAll(/ /g, "-");
+    .replaceAll(/(official-)?lyric-video/g, "");
+  const fixedTmp = fixed;
+
+  fixed = "";
+
+  for (const c of fixedTmp)
+    fixed += charMap[c] ?? c;
 
   fixed = removeForeignCharacters(fixed);
 
   if (fixed.length === 0)
-    return "empty";
+    return null;
 
-  fixed = fixed.replaceAll(/--/g,"-");
+  while (fixed.includes("--")) 
+    fixed = fixed.replace("--", "-");
+
+  // Remove end ans start "-"
+  fixed = fixed.replace(/^-+|-+$/g, "");
 
   return fixed;
 }
