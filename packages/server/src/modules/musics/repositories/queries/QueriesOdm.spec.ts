@@ -4,15 +4,25 @@ import { findParamsToQueryParams, FindQueryParams } from "./QueriesOdm";
 
 describe.each([
   ["tag:rock", {
-    $and: [{
-      tags: {
-        $in: [
-          "rock",
-          "only-rock",
-        ],
+    $or: [
+      {
+        $and: [{
+          tags: {
+            $in: ["rock"],
+          },
+          onlyTags: {
+            $size: 0,
+          },
+        }],
       },
-    }],
-  }],
+      {
+        onlyTags: {
+          $in: ["rock"],
+        },
+      },
+    ],
+  },
+  ],
   ["weight:>=50", {
     weight: {
       $gte: 50,
@@ -35,97 +45,240 @@ describe.each([
   }],
   ["tag:rock * tag:pop", {
     $and: [{
-      tags: {
-        $in: [
-          "rock",
-          "only-rock",
-        ],
-      },
+      $or: [
+        {
+          $and: [{
+            tags: {
+              $in: ["rock"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },
+        {
+          onlyTags: {
+            $in: ["rock"],
+          },
+        },
+      ],
     },
     {
-      tags: {
-        $in: [
-          "pop",
-          "only-pop",
-        ],
-      },
+      $or: [
+        {
+          $and: [{
+            tags: {
+              $in: ["pop"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },
+        {
+          onlyTags: {
+            $in: ["pop"],
+          },
+        },
+      ],
     }],
   }],
   ["tag:rock * tag:pop * tag:jazz", {
     $and: [{
-      tags: {
-        $in: [
-          "rock",
-          "only-rock",
-        ],
-      },
+      $or: [
+        {
+          $and: [{
+            tags: {
+              $in: ["rock"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },
+        {
+          onlyTags: {
+            $in: ["rock"],
+          },
+        },
+      ],
     },
     {
-      tags: {
-        $in: [
-          "pop",
-          "only-pop",
-        ],
-      },
+      $or: [
+        {
+          $and: [{
+            tags: {
+              $in: ["pop"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },
+        {
+          onlyTags: {
+            $in: ["pop"],
+          },
+        },
+      ],
     },
     {
-      tags: {
-        $in: [
-          "jazz",
-          "only-jazz",
-        ],
-      },
+      $or: [
+        {
+          $and: [{
+            tags: {
+              $in: ["jazz"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },
+        {
+          onlyTags: {
+            $in: ["jazz"],
+          },
+        },
+      ],
     }],
   }],
   ["tag:rock + tag:pop + tag:jazz", {
-    tags: {
-      $in: [
-        "rock",
-        "only-rock",
-        "pop",
-        "only-pop",
-        "jazz",
-        "only-jazz",
+    $or: [{
+      $or: [
+        {
+          $and: [{
+            tags: {
+              $in: ["rock"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },
+        {
+          onlyTags: {
+            $in: ["rock"],
+          },
+        },
       ],
-    },
-  }],
-  ["(tag:rock * tag:pop) + tag:jazz", {
-    $and: [{
-      tags: {
-        $in: [
-          "rock",
-          "only-rock",
-        ],
-      },
     },
     {
-      tags: {
-        $in: [
-          "pop",
-          "only-pop",
-        ],
-      },
-    }],
-    tags: {
-      $in: [
-        "jazz",
-        "only-jazz",
+      $or: [
+        {
+          $and: [{
+            tags: {
+              $in: ["pop"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },
+        {
+          onlyTags: {
+            $in: ["pop"],
+          },
+        },
       ],
     },
+    {
+      $or: [
+        {
+          $and: [{
+            tags: {
+              $in: ["jazz"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },
+        {
+          onlyTags: {
+            $in: ["jazz"],
+          },
+        },
+      ],
+    }],
+  }],
+  ["(tag:rock * tag:pop) + tag:jazz", {
+    $or: [{
+      $and: [{
+        $or: [{
+          $and: [{
+            tags: {
+              $in: ["rock"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },{
+          onlyTags: {
+            $in: ["rock"],
+          },
+        }],
+      },
+      {
+        $or: [{
+          $and: [{
+            tags: {
+              $in: ["pop"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },{
+          onlyTags: {
+            $in: ["pop"],
+          },
+        }],
+      }],
+    },
+    {
+      $or: [{
+        $and: [{
+          tags: {
+            $in: ["jazz"],
+          },
+          onlyTags: {
+            $size: 0,
+          },
+        }],
+      },{
+        onlyTags: {
+          $in: ["jazz"],
+        },
+      }],
+    }],
   }],
   ["tag:rock * weight:>50", {
     $and: [{
-      tags: {
-        $in: [
-          "rock",
-          "only-rock",
-        ],
+      $or: [
+        {
+          $and: [{
+            tags: {
+              $in: ["rock"],
+            },
+            onlyTags: {
+              $size: 0,
+            },
+          }],
+        },
+        {
+          onlyTags: {
+            $in: ["rock"],
+          },
+        },
+      ],
+    },
+    {
+      weight: {
+        $gt: 50,
       },
     },
     ],
-    weight: {
-      $gt: 50,
-    },
   }],
 ] as [string, FindQueryParams | null][],
 )("tests", (query: string, expected: FindQueryParams | null) => {

@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 export interface DocOdm extends MusicVO {
   _id: mongoose.Types.ObjectId;
+  onlyTags?: string[];
 }
 
 const NAME = "Music";
@@ -60,6 +61,9 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
     type: String,
   },
   tags: {
+    type: [String],
+  },
+  onlyTags: {
     type: [String],
   },
   disabled: {

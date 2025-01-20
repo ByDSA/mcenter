@@ -1,9 +1,9 @@
 export {
-  Model as HistoryMusicEntry, assertIsModel as assertIsHistoryMusicEntry, createByMusicId as createHistoryEntryByMusicId,
+  assertIsModel as assertIsHistoryMusicEntry, createByMusicId as createHistoryEntryByMusicId, Model as HistoryMusicEntry,
 } from "./models";
 
 export {
-  Repository as HistoryRepository,
+  ModelOdm as HistoryMusicModelOdm, Repository as HistoryRepository,
 } from "./repositories";
 
 export {

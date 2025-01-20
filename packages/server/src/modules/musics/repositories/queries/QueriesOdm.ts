@@ -10,9 +10,15 @@ type WeightYear = {
 
 export type FindQueryParams = {
   $and?: FindQueryParams[];
+  $or?: FindQueryParams[];
   tags?: {
     $in?: string[];
     $all?: string[];
+  };
+  onlyTags?: {
+    $in?: string[];
+    $all?: string[];
+    $size?: number;
   };
   weight?: WeightYear;
   year?: WeightYear;
@@ -21,25 +27,29 @@ export type FindQueryParams = {
 type Props = {
   parentOperation: OperationNode["type"];
 };
-export function findParamsToQueryParams(params: ExpressionNode, props?: Props): FindQueryParams {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function findParamsToQueryParams(params: ExpressionNode, _props?: Props): FindQueryParams {
   const error = new Error("Error");
 
   switch (params.type) {
     case "tag":
-      if (props?.parentOperation === "union") {
-        return {
-          tags: {
-            $in: [params.value, `only-${ params.value}`],
-          },
-        };
-      }
-
       return {
-        $and: [{
-          tags: {
-            $in: [params.value, `only-${ params.value}`],
+        $or: [
+          {
+            $and:[{
+              tags: {
+                $in: [params.value],
+              },
+              onlyTags: {
+                $size: 0,
+              },
+            }],
           },
-        },
+          {
+            onlyTags: {
+              $in: [params.value],
+            },
+          },
         ],
       };
     case "weight":
@@ -105,7 +115,6 @@ export function findParamsToQueryParams(params: ExpressionNode, props?: Props): 
 }
 
 function intersectionCase(node: ExpressionNode, query: FindQueryParams = {
-
 } ): FindQueryParams {
   const operation = "intersection";
   const props = {
@@ -122,13 +131,24 @@ function intersectionCase(node: ExpressionNode, query: FindQueryParams = {
   const right = node.child2;
   const leftQuery = findParamsToQueryParams(left, props);
   const rightQuery = findParamsToQueryParams(right, props);
-  const leftRightMerge = mergeQuery(leftQuery, rightQuery);
+  const leftRightMerge = {
+    $and: [] as FindQueryParams[],
+  } satisfies FindQueryParams;
+
+  if (left.type === "intersection" && leftQuery.$and)
+    leftRightMerge.$and.push(...leftQuery.$and);
+  else
+    leftRightMerge.$and.push(leftQuery);
+
+  if (right.type === "intersection" && rightQuery.$and)
+    leftRightMerge.$and.push(...rightQuery.$and);
+  else
+    leftRightMerge.$and.push(rightQuery);
 
   return mergeQuery(query, leftRightMerge);
 }
 
 function unionCase(node: ExpressionNode, query: FindQueryParams = {
-
 } ): FindQueryParams {
   const operation = "union";
   const props = {
@@ -145,7 +165,19 @@ function unionCase(node: ExpressionNode, query: FindQueryParams = {
   const right = node.child2;
   const leftQuery = findParamsToQueryParams(left, props);
   const rightQuery = findParamsToQueryParams(right, props);
-  const leftRightMerge = mergeQuery(leftQuery, rightQuery);
+  const leftRightMerge = {
+    $or: [] as FindQueryParams[],
+  } satisfies FindQueryParams;
+
+  if (left.type === "union" && leftQuery.$or)
+    leftRightMerge.$or.push(...leftQuery.$or);
+  else
+    leftRightMerge.$or.push(leftQuery);
+
+  if (right.type === "union" && rightQuery.$or)
+    leftRightMerge.$or.push(...rightQuery.$or);
+  else
+    leftRightMerge.$or.push(rightQuery);
 
   return mergeQuery(query, leftRightMerge);
 }
@@ -159,6 +191,11 @@ function mergeQuery(q1: FindQueryParams, q2: FindQueryParams): FindQueryParams {
     ret.$and = [...q1.$and, ...q2.$and];
   else if (q1.$and || q2.$and)
     ret.$and = q1.$and ?? q2.$and;
+
+  if (q1.$or && q2.$or)
+    ret.$or = [...q1.$or, ...q2.$or];
+  else if (q1.$or || q2.$or)
+    ret.$or = q1.$or ?? q2.$or;
 
   if (q1.tags)
     ret.tags = copyOfTags(q1.tags);

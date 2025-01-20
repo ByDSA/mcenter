@@ -7,5 +7,9 @@ export {
 } from "./Simpsons";
 
 export {
+  default as loadFixtureMusicsWithTags,
+} from "./Musics1";
+
+export {
   default as loadFixtureStreamAndHistoryListSimpsons,
 } from "./StreamAndHistoryListSimpsons";

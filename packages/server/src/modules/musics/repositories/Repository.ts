@@ -15,13 +15,13 @@ import { QUEUE_NAME as HISTORY_QUEUE_NAME } from "../history/events";
 import { Model as HistoryMusicEntry } from "../history/models";
 import { getFullPath } from "../utils";
 import { download } from "../youtube";
-// eslint-disable-next-line import/no-cycle
-import { docOdmToModel, patchParamsToUpdateQuery } from "./adapters";
+import { musicDocOdmToModel, patchParamsToUpdateQuery } from "./adapters";
 import { QUEUE_NAME } from "./events";
 import { DocOdm, ModelOdm } from "./odm";
 import { findParamsToQueryParams } from "./queries/QueriesOdm";
 import { ExpressionNode } from "./queries/QueryObject";
 import { PatchOneParams } from "./types";
+// eslint-disable-next-line import/no-cycle
 import UrlGenerator from "./UrlGenerator";
 
 const DepsMap = {
@@ -68,7 +68,7 @@ CanGetOneById<Music, MusicID>
     if (!docOdm)
       return null;
 
-    return docOdmToModel(docOdm);
+    return musicDocOdmToModel(docOdm);
   }
 
   async patchOneById(id: string, params: PatchOneParams): Promise<void> {
@@ -108,7 +108,7 @@ CanGetOneById<Music, MusicID>
     if (!musicOdm)
       return null;
 
-    return docOdmToModel(musicOdm);
+    return musicDocOdmToModel(musicOdm);
   }
 
   async findByUrl(url: string): Promise<Music | null> {
@@ -119,13 +119,13 @@ CanGetOneById<Music, MusicID>
     if (!music)
       return null;
 
-    return docOdmToModel(music);
+    return musicDocOdmToModel(music);
   }
 
   async findAll(): Promise<Music[]> {
     const docOdms = await ModelOdm.find( {
     } );
-    const ret = docOdms.map((docOdm) => docOdmToModel(docOdm));
+    const ret = docOdms.map((docOdm) => musicDocOdmToModel(docOdm));
 
     return ret;
   }
@@ -133,7 +133,7 @@ CanGetOneById<Music, MusicID>
   async find(params: ExpressionNode): Promise<Music[]> {
     const query = findParamsToQueryParams(params);
     const docOdms = await ModelOdm.find(query);
-    const ret = docOdms.map((docOdm) => docOdmToModel(docOdm));
+    const ret = docOdms.map((docOdm) => musicDocOdmToModel(docOdm));
 
     return ret;
   }
@@ -146,7 +146,7 @@ CanGetOneById<Music, MusicID>
     if (!docOdm)
       return null;
 
-    return docOdmToModel(docOdm);
+    return musicDocOdmToModel(docOdm);
   }
 
   async createFromPath(relativePath: string): Promise<Music> {
@@ -181,7 +181,7 @@ CanGetOneById<Music, MusicID>
       url: await urlPromise,
     };
     const docOdm: DocOdm = await ModelOdm.create<MusicVO>(newDocOdm);
-    const ret = docOdmToModel(docOdm);
+    const ret = musicDocOdmToModel(docOdm);
     const event = new ModelEvent<MusicVO>(EventType.CREATED, {
       entity: ret,
     } );
@@ -225,7 +225,7 @@ CanGetOneById<Music, MusicID>
     if (!docOdm)
       return;
 
-    const model = docOdmToModel(docOdm);
+    const model = musicDocOdmToModel(docOdm);
     const event = new ModelEvent<MusicVO>(EventType.DELETED, {
       entity: model,
     } );

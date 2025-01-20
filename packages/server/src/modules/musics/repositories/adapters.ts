@@ -1,10 +1,31 @@
 /* eslint-disable import/prefer-default-export */
 import { Music, assertIsMusic } from "#shared/models/musics";
-import { UpdateQuery } from "mongoose";
+import mongoose, { UpdateQuery } from "mongoose";
 import { DocOdm } from "./odm";
 import { PatchOneParams } from "./types";
 
-export function docOdmToModel(docOdm: DocOdm): Music {
+function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
+  if (!docOdm.tags && !docOdm.onlyTags)
+    return undefined;
+
+  let tags: string[] | undefined;
+
+  if (docOdm.tags)
+    tags = [...docOdm.tags];
+
+  if (docOdm.onlyTags) {
+    if (!tags)
+      tags = [];
+
+    tags.push(...docOdm.onlyTags.map((tag) => `only-${tag}`));
+
+    return tags;
+  }
+
+  return tags;
+}
+
+export function musicDocOdmToModel(docOdm: DocOdm): Music {
   const model: Music = {
     // eslint-disable-next-line no-underscore-dangle
     id: docOdm._id.toString(),
@@ -14,7 +35,7 @@ export function docOdmToModel(docOdm: DocOdm): Music {
     path: docOdm.path,
     weight: docOdm.weight,
     artist: docOdm.artist,
-    tags: docOdm.tags,
+    tags: docOdmToModelTags(docOdm),
     mediaInfo: {
       duration: docOdm.mediaInfo.duration,
     },
@@ -36,8 +57,89 @@ export function docOdmToModel(docOdm: DocOdm): Music {
   return model;
 }
 
+export function musicModelToDocOdm(model: Music): DocOdm {
+  const docOdm: Partial<DocOdm> = {
+    hash: model.hash,
+    title: model.title,
+    url: model.url,
+  };
+
+  if (model.id !== undefined)
+    // eslint-disable-next-line no-underscore-dangle
+    docOdm._id = new mongoose.Types.ObjectId(model.id);
+
+  if (model.path !== undefined)
+    docOdm.path = model.path;
+
+  if (model.weight !== undefined)
+    docOdm.weight = model.weight;
+
+  if (model.artist !== undefined)
+    docOdm.artist = model.artist;
+
+  if (model.tags !== undefined) {
+    const docOdmTags = modelTagsToDocOdmTags(model.tags);
+
+    docOdm.tags = docOdmTags.tags;
+    docOdm.onlyTags = docOdmTags.onlyTags;
+  }
+
+  if (model.disabled !== undefined)
+    docOdm.disabled = model.disabled;
+
+  if (model.lastTimePlayed !== undefined)
+    docOdm.lastTimePlayed = model.lastTimePlayed;
+
+  if (model.size !== undefined)
+    docOdm.size = model.size;
+
+  if (model.album !== undefined)
+    docOdm.album = model.album;
+
+  if (model.country !== undefined)
+    docOdm.country = model.country;
+
+  if (model.game !== undefined)
+    docOdm.game = model.game;
+
+  if (model.year !== undefined)
+    docOdm.year = model.year;
+
+  if (model.mediaInfo !== undefined) {
+    docOdm.mediaInfo = {
+      duration: model.mediaInfo.duration,
+    };
+  }
+
+  if (model.timestamps) {
+    docOdm.timestamps = {
+      createdAt: model.timestamps.createdAt,
+      updatedAt: model.timestamps.updatedAt,
+    };
+  }
+
+  return docOdm as DocOdm;
+}
+
+function modelTagsToDocOdmTags(tags: string[] | undefined): { tags?: string[]; onlyTags?: string[] } {
+  if (!tags) {
+    return {
+    };
+  }
+
+  const ret: { tags?: string[]; onlyTags?: string[] } = {
+  };
+
+  ret.tags = tags.filter((tag) => !tag.startsWith("only-"));
+
+  ret.onlyTags = tags.filter((tag) => tag.startsWith("only-")).map((tag) => tag.slice(5));
+
+  return ret;
+}
+
 export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<DocOdm> {
   const {entity} = params;
+  const docOdmTags = modelTagsToDocOdmTags(entity.tags);
   const updateQuery: UpdateQuery<DocOdm> = {
     hash: entity.hash,
     title: entity.title,
@@ -45,7 +147,8 @@ export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<Do
     path: entity.path,
     weight: entity.weight,
     artist: entity.artist,
-    tags: entity.tags,
+    tags: docOdmTags.tags,
+    onlyTags: docOdmTags.onlyTags,
     disabled: entity.disabled,
     lastTimePlayed: entity.lastTimePlayed,
     size: entity.size,
