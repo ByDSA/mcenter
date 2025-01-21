@@ -108,7 +108,7 @@ CanGetAll<Model> {
     return docsOdm.map(docOdmToModel);
   }
 
-  async getLast(): Promise<Model | null> {
+  async #getLastOdm(): Promise<DocOdm | null> {
     const docsOdm = await ModelOdm.find( {
     }, {
       _id: 0,
@@ -120,10 +120,24 @@ CanGetAll<Model> {
     if (docsOdm.length === 0)
       return null;
 
-    return docOdmToModel(docsOdm[0]);
+    return docsOdm[0];
+  }
+
+  async getLast(): Promise<Model | null> {
+    const docOdm = await this.#getLastOdm();
+
+    if (!docOdm)
+      return null;
+
+    return docOdmToModel(docOdm);
   }
 
   async createOne(model: Model): Promise<void> {
+    const lastOdm = await this.#getLastOdm();
+
+    if (lastOdm?.musicId === model.resourceId)
+      return;
+
     const docOdm = modelToDocOdm(model);
 
     await ModelOdm.create(docOdm);
