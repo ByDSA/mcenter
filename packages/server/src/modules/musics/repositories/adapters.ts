@@ -81,8 +81,11 @@ export function musicModelToDocOdm(model: Music): DocOdm {
   if (model.tags !== undefined) {
     const docOdmTags = modelTagsToDocOdmTags(model.tags);
 
-    docOdm.tags = docOdmTags.tags;
-    docOdm.onlyTags = docOdmTags.onlyTags;
+    if (docOdmTags.tags)
+      docOdm.tags = docOdmTags.tags;
+
+    if (docOdmTags.onlyTags)
+      docOdm.onlyTags = docOdmTags.onlyTags;
   }
 
   if (model.disabled !== undefined)
@@ -129,14 +132,13 @@ function modelTagsToDocOdmTags(tags: string[] | undefined): { tags?: string[]; o
     };
   }
 
-  const ret: { tags?: string[]; onlyTags?: string[] } = {
+  const retTags = tags.filter((tag) => !tag.startsWith("only-"));
+  const retOnlyTags = tags.filter((tag) => tag.startsWith("only-")).map((tag) => tag.slice(5));
+
+  return {
+    tags: retTags.length > 0 ? retTags : undefined,
+    onlyTags: retOnlyTags.length > 0 ? retOnlyTags : undefined,
   };
-
-  ret.tags = tags.filter((tag) => !tag.startsWith("only-"));
-
-  ret.onlyTags = tags.filter((tag) => tag.startsWith("only-")).map((tag) => tag.slice(5));
-
-  return ret;
 }
 
 export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<DocOdm> {

@@ -1,5 +1,6 @@
 /* eslint-disable import/no-internal-modules */
 import { ResourcePickerRandom } from "#modules/picker";
+import { assertIsNotEmpty } from "#shared/utils/validation";
 import { SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
@@ -50,6 +51,8 @@ export default class GetController {
 
   async getRandom(req: Request, res: Response) {
     const musics = await this.#findMusics(req);
+
+    assertIsNotEmpty(musics);
     const picked = await this.#randomPick(musics);
     const nextRootUrl = getRootUrlFromRequest(req);
     const nextUrl = `${nextRootUrl}/${path.join("api/musics/get", req.url)}`;

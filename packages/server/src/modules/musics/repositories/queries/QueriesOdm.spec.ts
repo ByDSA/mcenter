@@ -10,10 +10,20 @@ describe.each([
           tags: {
             $in: ["rock"],
           },
-          onlyTags: {
-            $size: 0,
+        },
+        {
+          $or: [{
+            onlyTags: {
+              $size: 0,
+            },
+          }, {
+            onlyTags: {
+              $exists: false,
+            },
           },
-        }],
+          ],
+        },
+        ],
       },
       {
         onlyTags: {
@@ -51,9 +61,17 @@ describe.each([
             tags: {
               $in: ["rock"],
             },
-            onlyTags: {
-              $size: 0,
+          },{
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },
         {
@@ -70,9 +88,17 @@ describe.each([
             tags: {
               $in: ["pop"],
             },
-            onlyTags: {
-              $size: 0,
+          }, {
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },
         {
@@ -91,9 +117,17 @@ describe.each([
             tags: {
               $in: ["rock"],
             },
-            onlyTags: {
-              $size: 0,
+          },{
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },
         {
@@ -110,9 +144,17 @@ describe.each([
             tags: {
               $in: ["pop"],
             },
-            onlyTags: {
-              $size: 0,
+          }, {
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },
         {
@@ -129,9 +171,17 @@ describe.each([
             tags: {
               $in: ["jazz"],
             },
-            onlyTags: {
-              $size: 0,
+          }, {
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },
         {
@@ -150,9 +200,17 @@ describe.each([
             tags: {
               $in: ["rock"],
             },
-            onlyTags: {
-              $size: 0,
+          }, {
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },
         {
@@ -169,9 +227,17 @@ describe.each([
             tags: {
               $in: ["pop"],
             },
-            onlyTags: {
-              $size: 0,
+          },{
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },
         {
@@ -188,9 +254,17 @@ describe.each([
             tags: {
               $in: ["jazz"],
             },
-            onlyTags: {
-              $size: 0,
+          }, {
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },
         {
@@ -209,9 +283,17 @@ describe.each([
             tags: {
               $in: ["rock"],
             },
-            onlyTags: {
-              $size: 0,
+          },{
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },{
           onlyTags: {
@@ -225,9 +307,17 @@ describe.each([
             tags: {
               $in: ["pop"],
             },
-            onlyTags: {
-              $size: 0,
+          },{
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },{
           onlyTags: {
@@ -242,9 +332,17 @@ describe.each([
           tags: {
             $in: ["jazz"],
           },
-          onlyTags: {
-            $size: 0,
+        },{
+          $or: [{
+            onlyTags: {
+              $size: 0,
+            },
+          }, {
+            onlyTags: {
+              $exists: false,
+            },
           },
+          ],
         }],
       },{
         onlyTags: {
@@ -261,9 +359,17 @@ describe.each([
             tags: {
               $in: ["rock"],
             },
-            onlyTags: {
-              $size: 0,
+          },{
+            $or: [{
+              onlyTags: {
+                $size: 0,
+              },
+            }, {
+              onlyTags: {
+                $exists: false,
+              },
             },
+            ],
           }],
         },
         {

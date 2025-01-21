@@ -58,9 +58,13 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   },
   tags: {
     type: [String],
+    required: false,
+    default: undefined,
   },
   onlyTags: {
     type: [String],
+    required: false,
+    default: undefined,
   },
   disabled: {
     type: Boolean,

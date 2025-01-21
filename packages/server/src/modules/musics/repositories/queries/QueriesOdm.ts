@@ -19,6 +19,7 @@ export type FindQueryParams = {
     $in?: string[];
     $all?: string[];
     $size?: number;
+    $exists?: boolean;
   };
   weight?: WeightYear;
   year?: WeightYear;
@@ -40,9 +41,18 @@ export function findParamsToQueryParams(params: ExpressionNode, _props?: Props):
               tags: {
                 $in: [params.value],
               },
-              onlyTags: {
-                $size: 0,
+            },
+            {
+              $or: [{
+                onlyTags: {
+                  $size: 0,
+                },
               },
+              {
+                onlyTags: {
+                  $exists: false,
+                },
+              }],
             }],
           },
           {
