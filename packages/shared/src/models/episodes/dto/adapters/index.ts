@@ -1,19 +1,14 @@
 /* eslint-disable no-param-reassign */
 import { Entity as Model } from "../../Entity";
 
-export function dtoToModel(dto: Model): Model {
+export function episodeDtoToModel(dto: Model): Model {
   return {
     ...dto,
-    fileInfo: fileInfoDtoToModel(dto.fileInfo),
+    fileInfo: dto.fileInfo,
+    timestamps: {
+      createdAt: new Date(dto.timestamps.createdAt),
+      updatedAt: new Date(dto.timestamps.updatedAt),
+      addedAt: new Date(dto.timestamps.addedAt),
+    },
   };
-}
-
-function fileInfoDtoToModel(dto: Model["fileInfo"]): Model["fileInfo"] {
-  if (dto?.timestamps.createdAt)
-    dto.timestamps.createdAt = new Date(dto.timestamps.createdAt);
-
-  if (dto?.timestamps.updatedAt)
-    dto.timestamps.updatedAt = new Date(dto.timestamps.updatedAt);
-
-  return dto;
 }

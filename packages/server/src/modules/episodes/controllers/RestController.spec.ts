@@ -1,3 +1,5 @@
+import { Episode, episodeDtoToModel, EpisodeGetManyBySearchRequest } from "#shared/models/episodes";
+import HttpStatusCode from "#shared/utils/http/StatusCode";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
@@ -5,8 +7,7 @@ import { resolveRequired } from "#utils/layers/deps";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
-import HttpStatusCode from "#shared/utils/http/StatusCode";
-import { Episode, EpisodeGetManyBySearchRequest } from "#shared/models/episodes";
+import { expectEpisode, expectEpisodes } from "../models/test";
 import { Repository } from "../repositories";
 import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
 import RestController from "./RestController";
@@ -58,16 +59,18 @@ describe("RestController", () => {
     } );
 
     it("should return same as repository returns", async () => {
-      const episodes = EPISODES_SIMPSONS;
+      const expectedEpisodes = EPISODES_SIMPSONS;
 
-      episodeRepositoryMock.getAllBySerieId.mockResolvedValueOnce(episodes);
+      episodeRepositoryMock.getAllBySerieId.mockResolvedValueOnce(expectedEpisodes);
 
       const response = await request(routerApp)
         .get("/id")
         .expect(HttpStatusCode.OK)
         .send();
+      const dto = response.body;
+      const episodes = dto.map(episodeDtoToModel);
 
-      expect(response.body).toEqual(episodes);
+      expectEpisodes(episodes, expectedEpisodes);
     } );
   } );
 
@@ -97,16 +100,18 @@ describe("RestController", () => {
     } );
 
     it("should return same as repository returns", async () => {
-      const episode = EPISODES_SIMPSONS[0];
+      const expectedEpisode = EPISODES_SIMPSONS[0];
 
-      episodeRepositoryMock.getOneById.mockResolvedValueOnce(episode);
+      episodeRepositoryMock.getOneById.mockResolvedValueOnce(expectedEpisode);
 
       const response = await request(routerApp)
         .get(URL)
         .expect(HttpStatusCode.OK)
         .send();
+      const dto = response.body;
+      const actualEpisode = episodeDtoToModel(dto);
 
-      expect(response.body).toEqual(episode);
+      expectEpisode(actualEpisode, expectedEpisode);
     } );
   } );
 
@@ -167,19 +172,23 @@ describe("RestController", () => {
     } );
 
     it("should return same as repository returns", async () => {
-      const episode = EPISODES_SIMPSONS[0];
+      const expectedEpisode = EPISODES_SIMPSONS[0];
 
-      episodeRepositoryMock.patchOneByIdAndGet.mockResolvedValueOnce(episode);
+      episodeRepositoryMock.patchOneByIdAndGet.mockResolvedValueOnce(expectedEpisode);
 
       const response = await request(routerApp)
         .patch(URL)
         .send( {
           entity: validPartial,
         } );
+      const dto = response.body;
 
-      expect(response.body).toEqual( {
-        entity: episode,
-      } );
+      expect(dto).toHaveProperty("entity");
+
+      const actualEpisode = episodeDtoToModel(dto.entity);
+
+      expectEpisode(actualEpisode, expectedEpisode);
+
       expect(response.statusCode).toBe(HttpStatusCode.OK);
     } );
   } );
@@ -210,14 +219,18 @@ describe("RestController", () => {
       expect(episodeRepositoryMock.getOneByPath).toBeCalledWith(path);
     } );
     it("should return valid episode", async () => {
-      const episode = EPISODES_SIMPSONS[0];
+      const expectedEpisode = EPISODES_SIMPSONS[0];
 
-      episodeRepositoryMock.getOneByPath.mockResolvedValueOnce(episode);
+      episodeRepositoryMock.getOneByPath.mockResolvedValueOnce(expectedEpisode);
       const response = await request(routerApp)
         .post(URL)
         .send(body);
+      const dto = response.body;
 
-      expect(response.body).toEqual([episode]);
+      expect(dto).toHaveLength(1);
+      const episode = episodeDtoToModel(dto[0]);
+
+      expectEpisode(episode, expectedEpisode);
     } );
 
     it("should return empty array", async () => {
@@ -227,7 +240,7 @@ describe("RestController", () => {
 
       episodeRepositoryMock.getOneByPath.mockResolvedValueOnce(null);
 
-      expect(response.body).toEqual([]);
+      expect(response.body).toHaveLength(0);
     } );
   } );
 } );

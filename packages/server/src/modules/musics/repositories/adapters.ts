@@ -45,6 +45,7 @@ export function musicDocOdmToModel(docOdm: DocOdm): Music {
     timestamps: {
       createdAt: docOdm.timestamps.createdAt,
       updatedAt: docOdm.timestamps.updatedAt,
+      addedAt: docOdm.timestamps.addedAt,
     },
     album: docOdm.album,
     country: docOdm.country,
@@ -115,6 +116,7 @@ export function musicModelToDocOdm(model: Music): DocOdm {
     docOdm.timestamps = {
       createdAt: model.timestamps.createdAt,
       updatedAt: model.timestamps.updatedAt,
+      addedAt: model.timestamps.addedAt,
     };
   }
 

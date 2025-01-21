@@ -1,3 +1,4 @@
+/* eslint-disable import/no-internal-modules */
 import { FileInfoRepository, SerieFolderTree } from "#modules/file-info";
 import { FileInfoVideoWithSuperId, compareFileInfoVideo } from "#shared/models/episodes/fileinfo";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";

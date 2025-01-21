@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-internal-modules
+import { TimestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { MusicVO } from "#shared/models/musics";
 import mongoose from "mongoose";
 
@@ -25,14 +27,8 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
     },
   },
   timestamps: {
-    createdAt: {
-      type: Date,
-      required: true,
-    },
-    updatedAt: {
-      type: Date,
-      required: true,
-    },
+    type: TimestampsSchemaOdm,
+    required: true,
   },
   // END
   url: {

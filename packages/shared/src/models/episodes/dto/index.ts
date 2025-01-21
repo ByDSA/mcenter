@@ -13,7 +13,7 @@ export {
 } from "./PatchOneByIdRequest";
 
 export {
-  dtoToModel,
+  episodeDtoToModel as dtoToModel,
 } from "./adapters";
 
 export {

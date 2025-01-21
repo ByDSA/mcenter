@@ -10,6 +10,7 @@ const AOT4_COMMON = {
   timestamps: {
     createdAt: DATE,
     updatedAt: DATE,
+    addedAt: DATE,
   },
   mediaInfo: {
     duration: 123,
@@ -37,6 +38,7 @@ export const MUSICS_SAMPLES_IN_DISK: Music[] = deepFreeze([
     timestamps: {
       createdAt: DATE,
       updatedAt: DATE,
+      addedAt: DATE,
     },
     mediaInfo: {
       duration: 123,
@@ -54,6 +56,7 @@ export const MUSICS_SAMPLES_IN_DISK: Music[] = deepFreeze([
     timestamps: {
       createdAt: DATE,
       updatedAt: DATE,
+      addedAt: DATE,
     },
     mediaInfo: {
       duration: 123,

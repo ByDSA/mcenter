@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-internal-modules
+import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 import { UpdateQuery } from "mongoose";
 import { Model as Episode, assertIsModel as assertIsEpisode } from "../models";
 import { DocOdm } from "./odm";
@@ -13,6 +15,14 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
     start: docOdm.start,
     end: docOdm.end,
     weight: docOdm.weight,
+    timestamps:
+      docOdm.timestamps
+        ? timestampsDocOdmToModel(docOdm.timestamps)
+        : {
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          addedAt: new Date(),
+        },
   };
 
   if (docOdm.disabled !== undefined)
@@ -39,6 +49,7 @@ export function modelToDocOdm(model: Episode): DocOdm {
     start: model.start,
     end: model.end,
     weight: model.weight,
+    timestamps: model.timestamps,
   };
 
   if (model.disabled !== undefined)

@@ -33,6 +33,7 @@ describe("musicModelToDocOdm", () => {
       timestamps: {
         createdAt: music.timestamps.createdAt,
         updatedAt: music.timestamps.updatedAt,
+        addedAt: music.timestamps.addedAt,
       },
       album: music.album,
       country: music.country,
@@ -59,6 +60,7 @@ describe("musicModelToDocOdm", () => {
       timestamps: {
         createdAt: new Date(),
         updatedAt: new Date(),
+        addedAt: new Date(),
       },
       artist: "Test Artist",
       path: "test/path",
@@ -76,6 +78,7 @@ describe("musicModelToDocOdm", () => {
       timestamps: {
         createdAt: music.timestamps.createdAt,
         updatedAt: music.timestamps.updatedAt,
+        addedAt: music.timestamps.addedAt,
       },
       artist: music.artist,
       path: music.path,
@@ -109,6 +112,7 @@ describe("musicDocOdmToModel", () => {
       timestamps: {
         createdAt: new Date(),
         updatedAt: new Date(),
+        addedAt: new Date(),
       },
       album: "Test Album",
       country: "Test Country",
@@ -133,6 +137,7 @@ describe("musicDocOdmToModel", () => {
       timestamps: {
         createdAt: docOdm.timestamps.createdAt,
         updatedAt: docOdm.timestamps.updatedAt,
+        addedAt: docOdm.timestamps.addedAt,
       },
       album: docOdm.album,
       country: docOdm.country,
@@ -156,6 +161,7 @@ describe("musicDocOdmToModel", () => {
       timestamps: {
         createdAt: new Date(),
         updatedAt: new Date(),
+        addedAt: new Date(),
       },
       artist: "Test Artist",
       path: "test/path",
@@ -173,6 +179,7 @@ describe("musicDocOdmToModel", () => {
       timestamps: {
         createdAt: docOdm.timestamps.createdAt,
         updatedAt: docOdm.timestamps.updatedAt,
+        addedAt: docOdm.timestamps.addedAt,
       },
       artist: docOdm.artist,
       path: docOdm.path,
@@ -209,6 +216,7 @@ describe("reversibility", () => {
       timestamps: {
         createdAt: A_AOT4.timestamps.createdAt,
         updatedAt: A_AOT4.timestamps.updatedAt,
+        addedAt: A_AOT4.timestamps.addedAt,
       },
       path: A_AOT4.path,
       size: A_AOT4.size,

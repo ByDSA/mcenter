@@ -116,14 +116,11 @@ async function detectChangesFromLocalFiles(remoteMusics: MusicVO[]) {
 
 async function toUpdatedFileInfo(music: MusicVO) {
   const fullPath = getFullPath(music.path);
-  const {size, ctime, mtime} = statSync(fullPath);
+  const {size} = statSync(fullPath);
   const newMusic: MusicVO = {
     ...music,
     size,
-    timestamps: {
-      createdAt: ctime,
-      updatedAt: mtime,
-    },
+    timestamps: music.timestamps,
     hash: await md5FileAsync(fullPath),
     mediaInfo: {
       duration: null,

@@ -102,6 +102,7 @@ export default class ThisController implements Controller {
 
   async #saveNewEpisodes(seriesInTree: Serie[]): Promise<Episode[]> {
     const episodes: Episode[] = [];
+    const now = new Date();
 
     // TODO: quitar await en for si se puede
     for (const serieInTree of seriesInTree) {
@@ -126,6 +127,11 @@ export default class ThisController implements Controller {
             start: -1,
             title: `${serie.name} ${episodeInTree.content.episodeId}`,
             weight: 0,
+            timestamps: {
+              createdAt: now,
+              updatedAt: now,
+              addedAt: now,
+            },
           };
 
           episodes.push(episode);

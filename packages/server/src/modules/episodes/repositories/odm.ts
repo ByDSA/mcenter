@@ -1,5 +1,8 @@
+// eslint-disable-next-line import/no-internal-modules
+import { TimestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { isDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
+import { TimestampsModel } from "#sharedSrc/models/utils/dtos/Timestamps";
 import { ModelId } from "../models";
 
 export interface DocOdm {
@@ -14,6 +17,7 @@ export interface DocOdm {
   tags?: string[];
   disabled?: boolean;
   lastTimePlayed?: number;
+  timestamps?: TimestampsModel; // TODO: cambiar a true y modificar episodes en db
 }
 
 const NAME = "Episode";
@@ -57,6 +61,10 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   },
   lastTimePlayed: {
     type: Number,
+  },
+  timestamps: {
+    type: TimestampsSchemaOdm,
+    required: false, // TODO: cambiar a true y modificar episodes en db
   },
 }, {
   _id: true,

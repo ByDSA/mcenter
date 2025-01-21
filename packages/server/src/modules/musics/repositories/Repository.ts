@@ -162,8 +162,9 @@ CanGetOneById<Music, MusicID>
       artist,
     } );
     const hashPromise = md5FileAsync(fullPath);
-    const {size, mtime, ctime} = statSync(fullPath);
-    const newDocOdm = {
+    const {size} = statSync(fullPath);
+    const now = new Date();
+    const newDocOdm: Omit<DocOdm, "_id"> = {
       hash: await hashPromise,
       size,
       path: relativePath,
@@ -172,8 +173,9 @@ CanGetOneById<Music, MusicID>
       album: id3Tags.album,
       weight: 0,
       timestamps: {
-        createdAt: ctime,
-        updatedAt: mtime,
+        createdAt: now,
+        updatedAt: now,
+        addedAt: now,
       },
       mediaInfo: {
         duration: null,

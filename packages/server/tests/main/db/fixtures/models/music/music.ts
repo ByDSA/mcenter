@@ -17,6 +17,7 @@ export const A_AOT4_VO: MusicVO = {
   timestamps: {
     createdAt: DATEJS_SAMPLE1,
     updatedAt: DATEJS_SAMPLE1,
+    addedAt: DATEJS_SAMPLE1,
   },
   weight: 50,
 };

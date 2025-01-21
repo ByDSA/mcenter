@@ -1,4 +1,5 @@
 import z from "zod";
+import { TimestampsFileSchema } from "../../utils/dtos/Timestamps";
 import { Schema as FileInfoSchema, compareModel as compareFileInfo } from "./FileInfo";
 
 export const Schema = FileInfoSchema.extend( {
@@ -10,6 +11,7 @@ export const Schema = FileInfoSchema.extend( {
     } ).strict(),
     fps: z.string().nullable(),
   } ).strict(),
+  timestamps: TimestampsFileSchema, // TODO: quitarlo de aquí y ponerlo en FileInfo común cuando se cree FileInfoMusic
 } ).strict();
 const SchemaWithSuperId = Schema.extend( {
   episodeId: z.string()

@@ -1,6 +1,12 @@
 import { Episode } from "#modules/episodes";
 import { deepFreeze } from "#shared/utils/objects";
+import { DATEJS_SAMPLE1 } from "./dates";
 
+const timestamps = {
+  createdAt: DATEJS_SAMPLE1,
+  updatedAt: DATEJS_SAMPLE1,
+  addedAt: DATEJS_SAMPLE1,
+};
 const ep1x01: Episode = {
   id: {
     innerId : "1x01",
@@ -14,6 +20,7 @@ const ep1x01: Episode = {
   "tags" : [
     "navidad",
   ],
+  timestamps,
 };
 
 /* eslint-disable import/prefer-default-export */
@@ -29,6 +36,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -30,
     "start" : 90,
     "end" : 1337,
+    timestamps,
   },
   {
     id: {
@@ -40,6 +48,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -4,
     "start" : 90,
     "end" : 1320,
+    timestamps,
   },
   {
     id: {
@@ -51,6 +60,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -2,
     "start" : 90,
     "end" : 1277.5,
+    timestamps,
   },
   {
     id: {
@@ -62,6 +72,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -8,
     "start" : 11,
     "end" : 1289,
+    timestamps,
   },
   {
     id: {
@@ -73,6 +84,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : 0,
     "start" : 89,
     "end" : 1316,
+    timestamps,
   },
   {
     id: {
@@ -84,6 +96,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -8,
     "start" : 89.5,
     "end" : 1315,
+    timestamps,
   },
   {
     id: {
@@ -95,6 +108,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -4,
     "start" : 88.5,
     "end" : 1307,
+    timestamps,
   },
   {
     id: {
@@ -106,6 +120,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -8,
     "start" : 13.5,
     "end" : 1333,
+    timestamps,
   },
   {
     id: {
@@ -117,6 +132,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -16,
     "start" : 90,
     "end" : 1331.5,
+    timestamps,
   },
   {
     id: {
@@ -128,6 +144,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -8,
     "start" : 87,
     "end" : 1366,
+    timestamps,
   },
   {
     id: {
@@ -139,6 +156,7 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : 0,
     "start" : 86,
     "end" : 1381,
+    timestamps,
   },
   {
     id: {
@@ -150,5 +168,6 @@ export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
     "weight" : -6,
     "start" : 87,
     "end" : 1366.5,
+    timestamps,
   },
 ]);
