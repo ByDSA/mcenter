@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.10.0](https://github.com/ByDSA/mcenter/compare/v3.9.0...v3.10.0) (2025-01-21)
+
+
+### Features
+
+* **back:** add addedAt timestamp to music and episode models ([728ba6a](https://github.com/ByDSA/mcenter/commit/728ba6ae2cad3fd3d584b6990745b9dbe28eaa36))
+* **back:** add support for additional audio file extensions ([77c24c0](https://github.com/ByDSA/mcenter/commit/77c24c057743a2c676f2dd2c9930f170986dda6a))
+* **back:** add support for music only-tags ([b176235](https://github.com/ByDSA/mcenter/commit/b176235a033d5f95b37b4a8e9c7280da4a5685c9))
+* **back:** support tags starting with "only-" ([d84b0bc](https://github.com/ByDSA/mcenter/commit/d84b0bc932e2fc3178aeaba409d75c0a9d080467))
+
+
+### Bug Fixes
+
+* **back:** add unit tests for fixUrl function and fix URL sanitization ([bf6d41c](https://github.com/ByDSA/mcenter/commit/bf6d41cdd8bb514ffdd80caf2955863eebe4b983))
+* **back:** don't add history entry music if last music played is the same ([e1f8e69](https://github.com/ByDSA/mcenter/commit/e1f8e6914e9d9e6338d4f20ce3815d7526436ef8))
+* **back:** fix delete method ([bd1ad85](https://github.com/ByDSA/mcenter/commit/bd1ad8586e09abda075768a3b39df78d39916967))
+
 ## [3.9.0](https://github.com/ByDSA/mcenter/compare/v3.8.2...v3.9.0) (2024-12-24)
 
 
