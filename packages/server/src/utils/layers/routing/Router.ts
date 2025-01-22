@@ -25,7 +25,7 @@ export default class Router {
     this.url = realParams.url;
     this.expressRouter = ExpressRouter();
 
-    const {routes} = realParams;
+    const { routes } = realParams;
 
     routes.forEach(this.addRoute);
   }

@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { Music, assertIsMusic } from "#shared/models/musics";
 import mongoose, { UpdateQuery } from "mongoose";
 import { DocOdm } from "./odm";
@@ -27,7 +26,7 @@ function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
 
 export function musicDocOdmToModel(docOdm: DocOdm): Music {
   const model: Music = {
-    // eslint-disable-next-line no-underscore-dangle
+
     id: docOdm._id.toString(),
     hash: docOdm.hash,
     title: docOdm.title,
@@ -66,7 +65,7 @@ export function musicModelToDocOdm(model: Music): DocOdm {
   };
 
   if (model.id !== undefined)
-    // eslint-disable-next-line no-underscore-dangle
+
     docOdm._id = new mongoose.Types.ObjectId(model.id);
 
   if (model.path !== undefined)
@@ -126,11 +125,11 @@ export function musicModelToDocOdm(model: Music): DocOdm {
   return docOdm as DocOdm;
 }
 
-function modelTagsToDocOdmTags(tags: string[] | undefined): { tags?: string[]; onlyTags?: string[] } {
-  if (!tags) {
-    return {
-    };
-  }
+function modelTagsToDocOdmTags(
+  tags: string[] | undefined,
+): { tags?: string[]; onlyTags?: string[] } {
+  if (!tags)
+    return {};
 
   const retTags = tags.filter((tag) => !tag.startsWith("only-"));
   const retOnlyTags = tags.filter((tag) => tag.startsWith("only-")).map((tag) => tag.slice(5));
@@ -142,7 +141,7 @@ function modelTagsToDocOdmTags(tags: string[] | undefined): { tags?: string[]; o
 }
 
 export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<DocOdm> {
-  const {entity} = params;
+  const { entity } = params;
   const docOdmTags = modelTagsToDocOdmTags(entity.tags);
   const updateQuery: UpdateQuery<DocOdm> = {
     hash: entity.hash,
@@ -169,8 +168,7 @@ export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<Do
       acc[key] = 1;
 
       return acc;
-    }, {
-    } as Record<string, 1>);
+    }, {} as Record<string, 1>);
 
     // updateQuery.$pull = params.unset.reduce((acc, path) => {
     //   const key = path.toSpliced(-1).join(".");
@@ -182,7 +180,7 @@ export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<Do
     // } );
   }
 
-  if (entity.mediaInfo){
+  if (entity.mediaInfo) {
     updateQuery.mediaInfo = {
       duration: entity.mediaInfo.duration,
     };

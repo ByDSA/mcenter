@@ -1,7 +1,7 @@
-import { SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import { UpdateRemoteTreeService } from "../services";
+import { SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
 const DepsMap = {
   updateRemoteTreeService: UpdateRemoteTreeService,

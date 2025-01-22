@@ -1,9 +1,9 @@
+import { Model, assertIsModel } from "../models";
+import Repository from "./Repository";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { OriginType, Stream, StreamMode, StreamRepository, assertIsStream } from "#modules/streams";
 import { TestMongoDatabase, registerSingletonIfNotAndGet } from "#tests/main";
 import TestDatabase from "#tests/main/db/TestDatabase";
-import { Model, assertIsModel } from "../models";
-import Repository from "./Repository";
 
 let db: TestDatabase;
 let repository: Repository;

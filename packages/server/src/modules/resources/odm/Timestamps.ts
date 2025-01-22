@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-// eslint-disable-next-line import/no-internal-modules
 import { TimestampsModel } from "#shared/models/utils/dtos/Timestamps";
 import mongoose from "mongoose";
 

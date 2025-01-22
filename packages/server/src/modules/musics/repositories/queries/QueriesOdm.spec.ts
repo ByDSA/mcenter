@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-internal-modules
 import { parseQuery } from "./1-str-to-obj/QueryParser";
 import { findParamsToQueryParams, FindQueryParams } from "./QueriesOdm";
 
@@ -61,7 +60,7 @@ describe.each([
             tags: {
               $in: ["rock"],
             },
-          },{
+          }, {
             $or: [{
               onlyTags: {
                 $size: 0,
@@ -117,7 +116,7 @@ describe.each([
             tags: {
               $in: ["rock"],
             },
-          },{
+          }, {
             $or: [{
               onlyTags: {
                 $size: 0,
@@ -227,7 +226,7 @@ describe.each([
             tags: {
               $in: ["pop"],
             },
-          },{
+          }, {
             $or: [{
               onlyTags: {
                 $size: 0,
@@ -283,7 +282,7 @@ describe.each([
             tags: {
               $in: ["rock"],
             },
-          },{
+          }, {
             $or: [{
               onlyTags: {
                 $size: 0,
@@ -295,7 +294,7 @@ describe.each([
             },
             ],
           }],
-        },{
+        }, {
           onlyTags: {
             $in: ["rock"],
           },
@@ -307,7 +306,7 @@ describe.each([
             tags: {
               $in: ["pop"],
             },
-          },{
+          }, {
             $or: [{
               onlyTags: {
                 $size: 0,
@@ -319,7 +318,7 @@ describe.each([
             },
             ],
           }],
-        },{
+        }, {
           onlyTags: {
             $in: ["pop"],
           },
@@ -332,7 +331,7 @@ describe.each([
           tags: {
             $in: ["jazz"],
           },
-        },{
+        }, {
           $or: [{
             onlyTags: {
               $size: 0,
@@ -344,7 +343,7 @@ describe.each([
           },
           ],
         }],
-      },{
+      }, {
         onlyTags: {
           $in: ["jazz"],
         },
@@ -359,7 +358,7 @@ describe.each([
             tags: {
               $in: ["rock"],
             },
-          },{
+          }, {
             $or: [{
               onlyTags: {
                 $size: 0,
@@ -386,8 +385,7 @@ describe.each([
     },
     ],
   }],
-] as [string, FindQueryParams | null][],
-)("tests", (query: string, expected: FindQueryParams | null) => {
+] as [string, FindQueryParams | null][])("tests", (query: string, expected: FindQueryParams | null) => {
   it(`query=${query}`, () => {
     const f = (q: string) => {
       const obj = parseQuery(q);

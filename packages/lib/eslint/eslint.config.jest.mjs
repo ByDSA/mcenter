@@ -24,12 +24,12 @@ export default {
   plugin,
   config: [
     {
-      files: ["**/*.{e2e,}.{test,spec}.ts{x,}", "**/test{s,}/**/*.ts"],
+      files: ["**/*.{,e2e.}{test,spec}.ts{,x}", "**/test{s,}/**/*.ts"],
       plugins: {
         jest: plugin,
       },
       languageOptions: {
-        globals: plugin.environments.globals.globals,
+        globals: jestPlugin.environments.globals.globals,
       },
       rules,
     },

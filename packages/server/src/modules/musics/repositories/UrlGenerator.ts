@@ -8,7 +8,7 @@ type Params = {
 export default class UrlGenerator {
   #musicRepository: MusicRepository;
 
-  constructor( {musicRepository}: Params) {
+  constructor( { musicRepository }: Params) {
     this.#musicRepository = musicRepository;
   }
 
@@ -17,7 +17,6 @@ export default class UrlGenerator {
     let music: Music | null;
     let i = 1;
 
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       music = await this.#musicRepository.findByUrl(currentUrl);
 
@@ -42,7 +41,7 @@ type GenerateUrlParams = {
   title: string;
   artist: string;
 };
-function generateUrl( {title, artist}: GenerateUrlParams): string {
+function generateUrl( { title, artist }: GenerateUrlParams): string {
   const base = !artist || artist === ARTIST_EMPTY ? title : `${artist}-${title}`;
   const ret = fixUrl(base);
 
@@ -106,30 +105,30 @@ const charMap: { [key: string]: string } = {
   "'": "",
   "”": "",
   "’": "",
-  "ñ": "n",
-  "ç": "c",
-  "$": "s",
-  "á": "a",
-  "à": "a",
-  "ä": "a",
-  "â": "a",
-  "é": "e",
-  "è": "e",
-  "ë": "e",
-  "ê": "e",
-  "í": "i",
-  "ì": "i",
-  "ï": "i",
-  "î": "i",
-  "ó": "o",
-  "ò": "o",
-  "ö": "o",
-  "ô": "o",
-  "ú": "u",
-  "ù": "u",
-  "ü": "u",
-  "û": "u",
-  "_": "-",
+  ñ: "n",
+  ç: "c",
+  $: "s",
+  á: "a",
+  à: "a",
+  ä: "a",
+  â: "a",
+  é: "e",
+  è: "e",
+  ë: "e",
+  ê: "e",
+  í: "i",
+  ì: "i",
+  ï: "i",
+  î: "i",
+  ó: "o",
+  ò: "o",
+  ö: "o",
+  ô: "o",
+  ú: "u",
+  ù: "u",
+  ü: "u",
+  û: "u",
+  _: "-",
   "/": "-",
   " ": "-",
   ...cyrillicToLatinMap,
@@ -151,7 +150,7 @@ export function fixUrl(url: string): string | null {
   if (fixed.length === 0)
     return null;
 
-  while (fixed.includes("--")) 
+  while (fixed.includes("--"))
     fixed = fixed.replace("--", "-");
 
   // Remove end ans start "-"

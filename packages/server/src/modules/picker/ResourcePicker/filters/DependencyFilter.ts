@@ -9,7 +9,8 @@ type Params<ID> = {
   secondId: ID;
   compareId: CompareIdFunc<ID>;
 };
-export default class DependencyFilter<ID = string, R extends Resource<ID> = Resource<ID>> implements Filter<R> {
+export default class DependencyFilter<ID = string, R extends Resource<ID> = Resource<ID>>
+implements Filter<R> {
   #params: Params<ID>;
 
   constructor(params: Params<ID>) {

@@ -1,6 +1,6 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import { getRouterMock } from "#tests/main";
 import PickerController from "../PickerController";
+import { getRouterMock } from "#tests/main";
 
 export class EpisodePickerControllerMock implements PublicMethodsOf<PickerController> {
   getOneById = jest.fn();

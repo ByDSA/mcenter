@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 import { Group, Model, Origin } from "../models";
 
-export interface DocOdm extends Model {
-}
+export type DocOdm = Model;
 
 const NAME = "Stream";
 const OriginSchema = new mongoose.Schema<Origin>( {

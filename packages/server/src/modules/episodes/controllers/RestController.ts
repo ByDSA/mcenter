@@ -1,15 +1,15 @@
-import { SerieRepository } from "#modules/series";
+import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest, assertIsEpisodePatchOneByIdResBody } from "#shared/models/episodes";
+import { Serie } from "#shared/models/series";
+import { assertFound } from "#shared/utils/http/validation";
+import { neverCase } from "#shared/utils/validation";
+import express, { Response, Router } from "express";
+import { Model } from "../models";
+import { Repository as EpisodeRepository } from "../repositories";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { ResponseWithBody, validateReq } from "#utils/validation/zod-express";
-import express, { Response, Router } from "express";
-import { neverCase } from "#shared/utils/validation";
-import { assertFound } from "#shared/utils/http/validation";
-import { Serie } from "#shared/models/series";
-import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest, assertIsEpisodePatchOneByIdResBody } from "#shared/models/episodes";
-import { Model } from "../models";
-import { Repository as EpisodeRepository } from "../repositories";
+import { SerieRepository } from "#modules/series";
 
 enum ResourceType {
   SERIES = "series",
@@ -27,8 +27,7 @@ implements
     Controller,
     CanGetOneById<EpisodeGetOneByIdRequest, Response>,
     CanGetAll<EpisodeGetAllRequest, Response>,
-    CanPatchOneByIdAndGet<EpisodePatchOneByIdRequest, ResponseWithBody<EpisodePatchOneByIdResBody>>
-{
+    CanPatchOneByIdAndGet<EpisodePatchOneByIdRequest, ResponseWithBody<EpisodePatchOneByIdResBody>> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -58,7 +57,7 @@ implements
   }
 
   async getAll(req: EpisodeGetAllRequest, res: Response): Promise<void> {
-    const {serieId} = req.params;
+    const { serieId } = req.params;
     const got = await this.#deps.episodeRepository.getAllBySerieId(serieId);
 
     res.send(got);
@@ -106,11 +105,10 @@ implements
     }
 
     if (req.body.expand?.includes(ResourceType.SERIES)) {
-      const series: {[serieId: string]: Serie} = {
-      };
+      const series: {[serieId: string]: Serie} = {};
 
       for (const ep of episodes) {
-        const {serieId} = ep.id;
+        const { serieId } = ep.id;
         // TODO: quitar await en for
         const serie = series[serieId] ?? await this.#deps.serieRepo.getOneById(serieId);
 
@@ -126,13 +124,16 @@ implements
   getRouter(): Router {
     const router = SecureRouter();
 
-    router.get("/:serieId",
+    router.get(
+      "/:serieId",
       validateReq(assertIsEpisodeGetAllRequest),
       this.getAll.bind(this),
     );
-    router.get("/:serieId/:episodeId",
+    router.get(
+      "/:serieId/:episodeId",
       validateReq(assertIsEpisodeGetOneByIdRequest),
-      this.getOneById.bind(this));
+      this.getOneById.bind(this),
+    );
 
     router.options("/:serieId/:episodeId", (_, res) => {
       res.header("Access-Control-Allow-Origin", "*");
@@ -141,7 +142,8 @@ implements
       res.sendStatus(200);
     } );
     router.use(express.json());
-    router.patch("/:serieId/:episodeId",
+    router.patch(
+      "/:serieId/:episodeId",
       validateReq(assertIsEpisodePatchOneByIdRequest),
       this.patchOneByIdAndGet.bind(this),
     );

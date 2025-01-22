@@ -1,14 +1,15 @@
 import { PublicMethodsOf } from "#shared/utils/types";
 import { InjectionToken, container } from "tsyringe";
-// eslint-disable-next-line import/no-internal-modules
+
 import { DelayedConstructor } from "tsyringe/dist/typings/lazy-helpers";
-// eslint-disable-next-line import/no-internal-modules
+
 import { constructor } from "tsyringe/dist/typings/types";
 
 export type DepsMapType = Record<string, constructor<any> | DelayedConstructor<any>>;
 
 export type DepsFromMap<T extends DepsMapType> = {
-  [K in keyof T]: PublicMethodsOf<T[K] extends constructor<infer R> ? R : T[K] extends DelayedConstructor<infer R> ? R : never>;
+  [K in keyof T]: PublicMethodsOf<T[K] extends constructor<infer R>
+  ? R : T[K] extends DelayedConstructor<infer R> ? R : never>;
 };
 
 function resolveDeps<T, M extends DepsMapType>(depsMap: M, deps?: Partial<T>): DepsFromMap<M> {
@@ -30,9 +31,11 @@ function resolveDeps<T, M extends DepsMapType>(depsMap: M, deps?: Partial<T>): D
 }
 
 export function injectDeps(map: DepsMapType) {
-  return function f<T extends { new (...args: any[]): {} }>(clazz: T) {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  return function f<T extends { new(...args: any[]): {} }>(clazz: T) {
     return class extends clazz {
       constructor(...args: any[]) {
+        // eslint-disable-next-line prefer-destructuring
         const deps = args[0];
         const newDeps = resolveDeps(map, deps);
 

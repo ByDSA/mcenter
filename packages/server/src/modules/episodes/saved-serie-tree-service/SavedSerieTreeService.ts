@@ -1,9 +1,9 @@
-import { SerieFolderTree as SerieTree } from "#modules/file-info";
-import { SerieRepository } from "#modules/series";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Model as Episode } from "../models";
 import { Repository as EpisodeRepository } from "../repositories";
 import { putModelInSerieFolderTree } from "./adapters";
+import { SerieFolderTree as SerieTree } from "#modules/file-info";
+import { SerieRepository } from "#modules/series";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
 const DepsMap = {
   episodeRepository: EpisodeRepository,

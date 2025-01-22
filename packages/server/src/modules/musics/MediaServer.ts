@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable padding-line-between-statements */
 const NodeMediaServer = require("node-media-server");
 

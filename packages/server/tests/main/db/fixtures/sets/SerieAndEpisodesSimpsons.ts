@@ -1,7 +1,7 @@
+import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "../models";
 import { episodeToDocOdm } from "#modules/episodes";
 import { DocOdm, ModelOdm } from "#modules/episodes/repositories";
 import { SerieDocOdm, SerieModelOdm, serieToDocOdm } from "#modules/series";
-import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "../models";
 
 export default async () => {
   // Series

@@ -1,7 +1,7 @@
-import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
 import { Music } from "#shared/models/musics";
 import { neverCase } from "#shared/utils/validation";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./appliers";
+import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
 
 type Model = Music;
 type ModelId = string;
@@ -10,7 +10,9 @@ type Params = {
   lastOne?: Model;
   mode: PickMode;
 };
-export default function buildMusicPicker( { mode, episodes, lastOne }: Params): ResourcePicker<Model> {
+export default function buildMusicPicker(
+  { mode, episodes, lastOne }: Params,
+): ResourcePicker<Model> {
   let picker: ResourcePicker<Music>;
 
   switch (mode) {

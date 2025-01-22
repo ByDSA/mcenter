@@ -1,15 +1,14 @@
 import { Music, MusicVO } from "#shared/models/musics";
 import { assertIsDefined } from "#shared/utils/validation";
+import { Application } from "express";
+import request from "supertest";
+import GetController from "./controllers/GetController";
+import { HistoryMusicModelOdm } from "./history";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import ExpressAppMock from "#tests/main/ExpressAppMock";
 import { MUSICS_WITH_TAGS_SAMPLES } from "#tests/main/db/fixtures/models/music";
 import { loadFixtureMusicsWithTags } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
-import { Application } from "express";
-import request from "supertest";
-// eslint-disable-next-line import/no-internal-modules
-import GetController from "./controllers/GetController";
-import { HistoryMusicModelOdm } from "./history";
 
 let app: ExpressAppMock;
 const getController = registerSingletonIfNotAndGet(GetController);
@@ -51,8 +50,7 @@ describe("picker", () => {
   } );
 
   beforeEach(async () => {
-    await HistoryMusicModelOdm.deleteMany( {
-    } );
+    await HistoryMusicModelOdm.deleteMany( {} );
   } );
 
   afterAll(async () => {

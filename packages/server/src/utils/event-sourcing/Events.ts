@@ -1,12 +1,11 @@
-/* eslint-disable max-classes-per-file */
-import { Event } from "#utils/message-broker";
 import EventType from "./EventType";
 import ModelMessage from "./ModelMessage";
 import PatchModelMessage from "./PatchModelMessage";
+import { Event } from "#utils/message-broker";
 
 type ModelEventType = EventType.CREATED | EventType.DELETED | EventType.UPDATED;
 
-export class ModelEvent<M extends Object> implements Event<ModelMessage<M>> {
+export class ModelEvent<M extends object> implements Event<ModelMessage<M>> {
   readonly type: ModelEventType;
 
   readonly payload: ModelMessage<M>;
@@ -17,7 +16,8 @@ export class ModelEvent<M extends Object> implements Event<ModelMessage<M>> {
   }
 }
 
-export class PatchEvent<M extends Object, ID extends Object> implements Event<PatchModelMessage<M, ID>> {
+export class PatchEvent<M extends object, ID extends unknown>
+implements Event<PatchModelMessage<M, ID>> {
   readonly type: EventType.PATCHED;
 
   readonly payload: PatchModelMessage<M, ID>;

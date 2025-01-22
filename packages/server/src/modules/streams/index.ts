@@ -1,11 +1,14 @@
 export {
-  OriginType, Model as Stream, ModelId as StreamId, Mode as StreamMode, assertIsModel as assertIsStream,
+  assertIsModel as assertIsStream,
+  OriginType,
+  Model as Stream, ModelId as StreamId,
+  Mode as StreamMode,
 } from "./models";
 
 export {
   DocOdm as StreamDocOdm,
-  ModelOdm as StreamModelOdm, Repository as StreamRepository,
   docOdmToModel as streamDocOdmToModel,
+  ModelOdm as StreamModelOdm, Repository as StreamRepository,
   modelToDocOdm as streamToDocOdm,
 } from "./repositories";
 

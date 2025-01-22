@@ -7,7 +7,8 @@ type Params<ID, R extends Resource<ID>> = {
   lastId?: ID;
   compareId: CompareIdFunc<ID>;
 };
-export default class SequentialPicker<ID = string, R extends Resource<ID> = Resource<ID>> implements ResourcePicker {
+export default class SequentialPicker<ID = string, R extends Resource<ID> = Resource<ID>>
+implements ResourcePicker {
   #params: Params<ID, R>;
 
   constructor(params: Params<ID, R>) {

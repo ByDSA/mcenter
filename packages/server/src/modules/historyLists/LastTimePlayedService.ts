@@ -1,9 +1,9 @@
-import { Episode, EpisodeId, EpisodeRepository, compareEpisodeId } from "#modules/episodes";
 import { deepCopy } from "#shared/utils/objects";
 import { DateType } from "#shared/utils/time";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { DateTime } from "luxon";
 import { Model as HistoryList } from "./models";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Episode, EpisodeId, EpisodeRepository, compareEpisodeId } from "#modules/episodes";
 
 function getTimestampFromDateType(date: DateType): number {
   if (date.timestamp)
@@ -32,10 +32,13 @@ export default class LastTimePlayedService {
     this.#deps = deps as Deps;
   }
 
-  async updateEpisodeLastTimePlayedFromEntriesAndGet( {episodeId, entries}: FuncParams): Promise<number | null> {
+  async updateEpisodeLastTimePlayedFromEntriesAndGet(
+    { episodeId, entries }: FuncParams,
+  ): Promise<number | null> {
     const lastTimePlayed = this.getLastTimePlayedFromHistory(
       episodeId,
-      entries) ?? undefined;
+      entries,
+    ) ?? undefined;
 
     this.#deps.episodeRepository.patchOneByIdAndGet(episodeId, {
       lastTimePlayed,
@@ -73,7 +76,7 @@ export default class LastTimePlayedService {
           ...deepCopy(self),
           lastTimePlayed,
         };
-        const {id} = selfCopy;
+        const { id } = selfCopy;
 
         await this.#deps.episodeRepository.updateOneByIdAndGet(id, selfCopy);
       }
@@ -82,7 +85,7 @@ export default class LastTimePlayedService {
     if (lastTimePlayed) {
       const now = DateTime.now();
       const lastTimePlayedDate = DateTime.fromSeconds(lastTimePlayed);
-      const {days} = now.diff(lastTimePlayedDate, "days");
+      const { days } = now.diff(lastTimePlayedDate, "days");
 
       return days;
     }

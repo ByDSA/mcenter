@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { ResourceVO } from "#shared/models/resource";
 import Filter from "./Filter";
 

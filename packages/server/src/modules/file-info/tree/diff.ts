@@ -24,26 +24,41 @@ export default function diff(tree1: SerieTree, tree2: SerieTree): Return {
     children: [],
   };
   const moved: OldNew[] = [];
-  const {branchesMap: tree1BranchesMap, contentMap: tree1ContentMap } = plainTreeMaps(tree1);
-  const {branchesMap: tree2BranchesMap, contentMap: tree2ContentMap } = plainTreeMaps(tree2);
-  // eslint-disable-next-line no-use-before-define
-  const compareContentNode = (node1: TreeNode, node2: TreeNode) => node1.content.filePath === node2.content.filePath;
+  const { branchesMap: tree1BranchesMap, contentMap: tree1ContentMap } = plainTreeMaps(tree1);
+  const { branchesMap: tree2BranchesMap, contentMap: tree2ContentMap } = plainTreeMaps(tree2);
+  const compareContentNode = (
+    node1: TreeNode,
+    node2: TreeNode,
+  ) => node1.content.filePath === node2.content.filePath;
 
   for (const [branches, plainTreeEntry] of Object.entries(tree1BranchesMap)) {
     const branchesArray = branches.split("/");
+    // eslint-disable-next-line prefer-destructuring
     const serieId = branchesArray[0];
+    // eslint-disable-next-line prefer-destructuring
     const seasonId = branchesArray[1];
 
     if (tree2BranchesMap[branches] === undefined) { // si no está en el mismo sitio en el nuevo
-      if (tree2ContentMap[plainTreeEntry.content.filePath] === undefined) // ni el filePath lo tiene otro nodo
-        treePut(removed, [serieId, seasonId], plainTreeEntry.id, plainTreeEntry.content); // se ha eliminado
+      if (
+        tree2ContentMap[plainTreeEntry.content.filePath] === undefined
+      ) // ni el filePath lo tiene otro nodo
+      {
+        treePut(
+          removed,
+          [serieId, seasonId],
+          plainTreeEntry.id,
+          plainTreeEntry.content,
+        );
+      } // se ha eliminado
       else {
         moved.push( { // se ha movido
           old: plainTreeEntry,
           new: tree2ContentMap[plainTreeEntry.content.filePath],
         } );
       }
-    } else if (compareContentNode(tree2BranchesMap[branches], plainTreeEntry)) // si está en ambos sitios y son iguales en contenido
+    } else if (
+      compareContentNode(tree2BranchesMap[branches], plainTreeEntry)
+    ) // si está en ambos sitios y son iguales en contenido
       treePut(both, [serieId, seasonId], plainTreeEntry.id, plainTreeEntry.content);
     else { // si está en ambos sitios y son diferentes en contenido
       updated.push( {
@@ -54,9 +69,12 @@ export default function diff(tree1: SerieTree, tree2: SerieTree): Return {
   }
 
   for (const [branches, plainTreeEntry] of Object.entries(tree2BranchesMap)) {
-    if (tree1BranchesMap[branches] === undefined && tree1ContentMap[plainTreeEntry.content.filePath] === undefined) {
+    if (tree1BranchesMap[branches] === undefined
+      && tree1ContentMap[plainTreeEntry.content.filePath] === undefined) {
       const branchesArray = branches.split("/");
+      // eslint-disable-next-line prefer-destructuring
       const serieId = branchesArray[0];
+      // eslint-disable-next-line prefer-destructuring
       const seasonId = branchesArray[1];
 
       treePut(news, [serieId, seasonId], plainTreeEntry.id, plainTreeEntry.content);
@@ -76,10 +94,8 @@ type Hash = string;
 type Branches = [Serie["id"], Season["id"], Episode["id"]];
 type TreeNode = Episode;
 function plainTreeMaps(serieTree: SerieTree) {
-  const branchesMap: {[key: string]: TreeNode} = {
-  };
-  const contentMap: {[key: Hash]: TreeNode} = {
-  };
+  const branchesMap: {[key: string]: TreeNode} = {};
+  const contentMap: {[key: Hash]: TreeNode} = {};
 
   for (const serie of serieTree.children) {
     for (const season of serie.children) {

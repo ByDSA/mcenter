@@ -1,9 +1,8 @@
-// eslint-disable-next-line import/no-internal-modules
-import { TimestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { isDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
-import { TimestampsModel } from "#sharedSrc/models/utils/dtos/Timestamps";
 import { ModelId } from "../models";
+import { TimestampsModel } from "#sharedSrc/models/utils/dtos/Timestamps";
+import { TimestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 
 export interface DocOdm {
   _id?: mongoose.Types.ObjectId;

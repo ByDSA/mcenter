@@ -25,7 +25,7 @@ export async function getSerieTreeRemote(uri: string, options: Options = {
   maxLevel: 0,
 } ): Promise<FileNode[] | null> {
   if (!uri.endsWith("/"))
-    // eslint-disable-next-line no-param-reassign
+
     uri += "/";
 
   const promises: Promise<FileNode[]>[] = [];
@@ -47,7 +47,9 @@ export async function getSerieTreeRemote(uri: string, options: Options = {
   }
 }
 
-async function getPageElements( { uri, relativeUri, promises, level, options }: Params): Promise<FileNode[]> {
+async function getPageElements(
+  { uri, relativeUri, promises, level, options }: Params,
+): Promise<FileNode[]> {
   console.log(`Requesting ${ uri}`);
   const response = await axios.get(uri);
   const data: string = await response.data;
@@ -60,6 +62,7 @@ async function getPageElements( { uri, relativeUri, promises, level, options }: 
 
     row.querySelectorAll("td").forEach((column, index) => {
       if (index === 0)
+        // eslint-disable-next-line prefer-destructuring
         alt = (<HTMLImageElement>column.querySelector("img")).alt;
       else if (index === 1) {
         const anchor = <HTMLAnchorElement>column.querySelector("a");

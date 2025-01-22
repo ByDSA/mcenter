@@ -1,3 +1,6 @@
+import { TestMongoDatabase } from "./db";
+import TestDatabase from "./db/TestDatabase";
+import { registerSingletonIfNotAndGet } from "./utils";
 import { ExpressApp } from "#main";
 import { ExpressAppDependencies } from "#main/ExpressApp";
 import { ActionController } from "#modules/actions";
@@ -15,9 +18,6 @@ import { PlayStatusControllerMock, WebSocketsServiceMock } from "#modules/play/p
 import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
 import { StreamRestController } from "#modules/streams";
 import { StreamRestControllerMock } from "#modules/streams/controllers/test";
-import { TestMongoDatabase } from "./db";
-import TestDatabase from "./db/TestDatabase";
-import { registerSingletonIfNotAndGet } from "./utils";
 
 export default class ExpressAppMock extends ExpressApp {
   #database: TestDatabase;

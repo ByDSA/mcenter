@@ -1,5 +1,5 @@
-import { SECONDS_IN_DAY } from "#modules/resources";
 import PreventRepeatInTimeFilter from "./PreventRepeatInTimeFilter";
+import { SECONDS_IN_DAY } from "#modules/resources";
 
 type Params = {
   minDays: number;

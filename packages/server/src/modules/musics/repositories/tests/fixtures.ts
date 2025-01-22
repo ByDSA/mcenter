@@ -17,7 +17,6 @@ const AOT4_COMMON = {
   },
 };
 
-/* eslint-disable import/prefer-default-export */
 export const MUSICS_SAMPLES_IN_DISK: Music[] = deepFreeze([
   {
     id: "1",

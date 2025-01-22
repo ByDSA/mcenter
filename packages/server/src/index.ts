@@ -1,5 +1,7 @@
 import "reflect-metadata";
 
+import { container } from "tsyringe";
+import { ExpressApp, RealMongoDatabase } from "./main";
 import { ActionController } from "#modules/actions";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
@@ -10,10 +12,8 @@ import { MusicController, MusicHistoryRepository, MusicRepository } from "#modul
 import { PlaySerieController, PlayStreamController, RemotePlayerController, RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
 import { SerieRepository } from "#modules/series";
 import { StreamRestController } from "#modules/streams";
-import { container } from "tsyringe";
-import { ExpressApp, RealMongoDatabase } from "./main";
 
-(async function main() {
+await (async function main() {
   container
     .registerSingleton(DomainMessageBroker)
     .registerSingleton(EpisodeFileInfoRepository)
@@ -55,7 +55,8 @@ import { ExpressApp, RealMongoDatabase } from "./main";
     },
   } );
   const vlcBackWebSocketsServerService = container.resolve(VlcBackWebSocketsServerService);
-  const remotePlayerWebSocketsServerService = container.resolve(RemotePlayerWebSocketsServerService);
+  const remotePlayerWebSocketsServerService = container
+    .resolve(RemotePlayerWebSocketsServerService);
 
   app.onHttpServerListen((server) => {
     vlcBackWebSocketsServerService.startSocket(server);
@@ -65,5 +66,5 @@ import { ExpressApp, RealMongoDatabase } from "./main";
   container.registerInstance(ExpressApp, app);
 
   await app.init();
-  app.listen();
+  await app.listen();
 } )();

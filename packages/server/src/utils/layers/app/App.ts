@@ -1,7 +1,7 @@
-import { assertIsDefined } from "#shared/utils/validation";
-import express, { Express } from "express";
 import { Server } from "node:http";
 import https from "node:https";
+import { assertIsDefined } from "#shared/utils/validation";
+import express, { Express } from "express";
 import { Components, initializeComponents } from "./components";
 import { GlobalConfig, GlobalConfigOptions } from "./config";
 
@@ -37,17 +37,16 @@ export default class App {
 
     if (components) {
       initializeComponents( {
-        app:this.$expressApp,
+        app: this.$expressApp,
         components,
       } );
     }
 
-    this.$expressApp.get("/", (req, res) => {
+    this.$expressApp.get("/", (_req, res) => {
       res.send("El servicio está en funcionamiento");
     } );
   }
 
-  // eslint-disable-next-line class-methods-use-this
   protected initializeConfig(options?: GlobalConfigOptions) {
     const config = GlobalConfig.create(options);
 
@@ -60,7 +59,7 @@ export default class App {
     if (this.$openServers.length > 0)
       return null;
 
-    const {port} = this.$config.net;
+    const { port } = this.$config.net;
     const sslConfig = this.$config.net.ssl;
     const httpsEnabled = sslConfig.enabled;
     let server: Server;

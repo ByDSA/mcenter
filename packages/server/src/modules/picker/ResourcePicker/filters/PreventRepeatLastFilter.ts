@@ -7,7 +7,8 @@ type Params<ID> = {
   lastId: ID | undefined;
   compareId: CompareIdFunc<ID>;
 };
-export default class PreventRepeatLastFilter<ID = string, R extends Resource<ID> = Resource<ID>> implements Filter<R>{
+export default class PreventRepeatLastFilter<ID = string, R extends Resource<ID> = Resource<ID>>
+implements Filter<R> {
   #params: Params<ID>;
 
   constructor(params: Params<ID>) {

@@ -1,6 +1,7 @@
+/* eslint-disable prefer-destructuring */
 import { Episode, compareEpisodeId } from "#shared/models/episodes";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import ResourcePickerSequential from "./ResourcePickerSequential";
+import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 
 type Model = Episode;
 
@@ -8,7 +9,6 @@ it("should pick 1x02 when lastEp is 1x01", async () => {
   const episodes = EPISODES_SIMPSONS;
   const lastEp = EPISODES_SIMPSONS[0];
   const expected = EPISODES_SIMPSONS[1];
-  // eslint-disable-next-line no-undef
   const seq = new ResourcePickerSequential( {
     resources: episodes,
     lastId: lastEp.id,

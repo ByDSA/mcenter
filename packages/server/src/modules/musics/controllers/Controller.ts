@@ -1,11 +1,11 @@
-import { Controller, SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Router } from "express";
 import { HistoryRestController } from "../history";
 import FixController from "./FixController";
 import GetController from "./GetController";
 import RestController from "./RestController";
 import UpdateRemoteController from "./UpdateRemoteController";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Controller, SecureRouter } from "#utils/express";
 
 const DepsMap = {
   getController: GetController,

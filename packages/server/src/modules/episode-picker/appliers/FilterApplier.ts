@@ -1,7 +1,7 @@
-import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { ResourceVO } from "#shared/models/resource";
 import { Model, ModelId, compareId } from "../../episodes/models";
 import { DependenciesList } from "./Dependencies";
+import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 
 type Params<R extends ResourceVO = ResourceVO, ID = string> = {
   resources: R[];
@@ -20,7 +20,7 @@ export default class EpisodeFilterApplier extends FilterApplier<Model> {
   }
 
   #addDependencyFilter(): boolean {
-    const {dependencies, lastId} = this.#params;
+    const { dependencies, lastId } = this.#params;
     const serieId = lastId?.serieId;
 
     if (lastId && serieId && serieId in dependencies) {
@@ -49,7 +49,7 @@ export default class EpisodeFilterApplier extends FilterApplier<Model> {
 
   #createFilters(): void {
     const { PICKER_MIN_WEIGHT = -99, PICKER_MIN_DAYS = 0 } = process.env;
-    const {lastEp, lastId} = this.#params;
+    const { lastEp, lastId } = this.#params;
     const addedDependencyFilter = this.#addDependencyFilter();
 
     if (addedDependencyFilter)
@@ -57,12 +57,13 @@ export default class EpisodeFilterApplier extends FilterApplier<Model> {
 
     this.add(new PreventDisabledFilter());
 
-    if (lastEp){
+    if (lastEp) {
       this.add(new PreventRepeatLastFilter(
         {
           lastId,
           compareId,
-        } ));
+        },
+      ));
     }
 
     this.add(new RemoveWeightLowerOrEqualThanFilter(+PICKER_MIN_WEIGHT));
@@ -73,7 +74,11 @@ export default class EpisodeFilterApplier extends FilterApplier<Model> {
   }
 }
 
-export function genEpisodeFilterApplier(resources: Model[], deps: DependenciesList, lastEp?: Model) {
+export function genEpisodeFilterApplier(
+  resources: Model[],
+  deps: DependenciesList,
+  lastEp?: Model,
+) {
   return new EpisodeFilterApplier( {
     resources,
     lastEp: lastEp ?? null,

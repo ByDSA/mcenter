@@ -1,16 +1,15 @@
-/* eslint-disable import/no-internal-modules */
-import { FileInfoRepository, SerieFolderTree } from "#modules/file-info";
+import fs, { existsSync } from "node:fs";
 import { FileInfoVideoWithSuperId, compareFileInfoVideo } from "#shared/models/episodes/fileinfo";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { deepMerge } from "#shared/utils/objects";
 import { assertIsDefined } from "#shared/utils/validation";
-import { md5FileAsync } from "#utils/crypt";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import ffmpeg from "fluent-ffmpeg";
-import fs, { existsSync } from "node:fs";
 import { EpisodeFileInfo, ModelId as EpisodeId } from "../models";
 import { getIdModelOdmFromId } from "../repositories/odm";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { md5FileAsync } from "#utils/crypt";
+import { FileInfoRepository, SerieFolderTree } from "#modules/file-info";
 
 type Model = EpisodeFileInfo;
 type ModelWithSuperId = FileInfoVideoWithSuperId;
@@ -38,7 +37,6 @@ export default class UpdateMetadataProcess {
     this.#deps = deps as Deps;
   }
 
-  // eslint-disable-next-line require-await
   async genEpisodeFileInfoFromFilePathOrFail(filePath: string): Promise<Model | null> {
     const MEDIA_FOLDER = process.env.MEDIA_FOLDER_PATH;
 
@@ -80,7 +78,9 @@ export default class UpdateMetadataProcess {
               fps,
             },
           };
-          const mustUpdate = this.#options.forceHash || !currentEpisodeFile || !compareModel(ret, currentEpisodeFile);
+          const mustUpdate = this.#options.forceHash
+           || !currentEpisodeFile
+           || !compareModel(ret, currentEpisodeFile);
 
           if (!mustUpdate) {
             resolve(null);
@@ -114,8 +114,8 @@ export default class UpdateMetadataProcess {
 
       for (const season of serie.children) {
         for (const episode of season.children) {
-          const {episodeId} = episode.content;
-          const {filePath} = episode.content;
+          const { episodeId } = episode.content;
+          const { filePath } = episode.content;
           const fullId: EpisodeId = {
             serieId,
             innerId: episodeId,
@@ -136,7 +136,8 @@ export default class UpdateMetadataProcess {
               episodeId: episodeIdOdm.toString(),
             } as ModelWithSuperId;
 
-            await this.#deps.episodeFileRepository.updateOneBySuperId(episodeFileWithId.episodeId, episodeFileWithId);
+            await this.#deps.episodeFileRepository
+              .updateOneBySuperId(episodeFileWithId.episodeId, episodeFileWithId);
 
             return episodeFileWithId;
           };

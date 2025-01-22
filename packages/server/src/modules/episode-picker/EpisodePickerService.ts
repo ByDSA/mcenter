@@ -1,11 +1,11 @@
+import { assertFound } from "#shared/utils/http/validation";
+import { neverCase } from "#shared/utils/validation";
+import buildEpisodePicker from "./EpisodePicker";
 import { Episode, EpisodeRepository, RepositoryGetManyOptions } from "#modules/episodes";
 import { HistoryListRepository } from "#modules/historyLists";
 import { PickMode, ResourcePicker } from "#modules/picker";
 import { Stream, StreamId, StreamMode, StreamRepository } from "#modules/streams";
-import { assertFound } from "#shared/utils/http/validation";
-import { neverCase } from "#shared/utils/validation";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import buildEpisodePicker from "./EpisodePicker";
 
 const DepsMap = {
   streamRepository: StreamRepository,
@@ -41,12 +41,15 @@ export default class EpisodePickerService {
     const options: RepositoryGetManyOptions = {
       sortById: stream.mode === StreamMode.SEQUENTIAL,
     };
-    const allEpisodesInSerie = await this.#deps.episodeRepository.getManyBySerieId(serieId, options);
+    const allEpisodesInSerie = await this.#deps.episodeRepository
+      .getManyBySerieId(serieId, options);
     const historyList = await this.#deps.historyListRepository.getOneByIdOrCreate(stream.id);
 
     assertFound(historyList, `Cannot get history list from stream '${stream.id}'`);
     const lastPlayedEpInSerieId = historyList.entries.at(-1)?.episodeId;
-    const lastPlayedEpInSerie = lastPlayedEpInSerieId ? await this.#deps.episodeRepository.getOneById(lastPlayedEpInSerieId) : null;
+    const lastPlayedEpInSerie = lastPlayedEpInSerieId
+      ? await this.#deps.episodeRepository.getOneById(lastPlayedEpInSerieId)
+      : null;
     const picker: ResourcePicker<Episode> = buildEpisodePicker( {
       mode: streamModeToPickerMode(stream.mode),
       episodes: allEpisodesInSerie,

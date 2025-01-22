@@ -1,15 +1,15 @@
+import { SERIES_QUEUE_NAME, assertIsSerie } from "#shared/models/series";
+import { LogElementResponse } from "#shared/utils/http";
+import { Mode, Model, ModelId, OriginType } from "../models";
+import { docOdmToModel, modelToDocOdm } from "./adapters";
+import { DocOdm, ModelOdm } from "./odm";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#modules/series";
-import { SERIES_QUEUE_NAME, assertIsSerie } from "#shared/models/series";
-import { LogElementResponse } from "#shared/utils/http";
 import { EventType } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
-import { Mode, Model, ModelId, OriginType } from "../models";
-import { docOdmToModel, modelToDocOdm } from "./adapters";
-import { DocOdm, ModelOdm } from "./odm";
 
 const DepsMap = {
   domainMessageBroker: DomainMessageBroker,
@@ -62,8 +62,7 @@ CanCreateOne<Model>, CanGetAll<Model> {
   }
 
   async #getAllDocOdm(): Promise<DocOdm[]> {
-    const allStreamsDocOdm = await ModelOdm.find( {
-    }, {
+    const allStreamsDocOdm = await ModelOdm.find( {}, {
       _id: 0,
     } );
 

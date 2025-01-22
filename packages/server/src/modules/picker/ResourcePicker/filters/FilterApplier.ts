@@ -44,7 +44,10 @@ export default class FilterApplier<R extends Pickable = Pickable> {
   }
 }
 
-async function applyFiltersToResource<R extends Pickable>(resource: R, filters: Filter[]): Promise<boolean> {
+async function applyFiltersToResource<R extends Pickable>(
+  resource: R,
+  filters: Filter[],
+): Promise<boolean> {
   for (const f of filters) {
     if (!await f.filter(resource))
       return false;

@@ -10,12 +10,12 @@ export type GeneralRoute = {
   handlers: ArrayOneOrMore<Handler>;
 };
 
-export const NOT_IMPLEMENTED_HANDLER: Handler = (req: Request, res: Response) => {
+export const NOT_IMPLEMENTED_HANDLER: Handler = (_req: Request, res: Response) => {
   res.status(501);
   res.send("Method not implemented");
 };
 
-export const HELLO_WORLD_HANDLER: Handler = (req: Request, res: Response) => {
+export const HELLO_WORLD_HANDLER: Handler = (_req: Request, res: Response) => {
   res.status(200);
   res.send("Hello world!");
 };

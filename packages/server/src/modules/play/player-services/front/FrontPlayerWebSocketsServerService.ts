@@ -1,12 +1,12 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { PlayerEvent as PlayerEventType, PlayerStatusResponse } from "#shared/models/player";
-import { assertIsDefined } from "#shared/utils/validation";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Event } from "#utils/message-broker";
 import assert from "node:assert";
 import { Server as HttpServer } from "node:http";
+import { PlayerEvent as PlayerEventType, PlayerStatusResponse } from "#shared/models/player";
+import { assertIsDefined } from "#shared/utils/validation";
 import { Server, Socket } from "socket.io";
 import { EmptyPlayerEvent, PlayPlayerEvent, QUEUE_NAME, SeekPlayerEvent } from "../messaging";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Event } from "#utils/message-broker";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 
 const DepsMap = {
   domainMessageBroker: DomainMessageBroker,
@@ -61,36 +61,57 @@ export default class FrontWSServerService {
       } );
 
       socket.on(PlayerEventType.PAUSE_TOGGLE, () => {
-        this.#deps.domainMessageBroker.publish(QUEUE_NAME, new EmptyPlayerEvent(PlayerEventType.PAUSE_TOGGLE));
+        this.#deps.domainMessageBroker.publish(
+          QUEUE_NAME,
+          new EmptyPlayerEvent(PlayerEventType.PAUSE_TOGGLE),
+        );
       } );
 
       socket.on(PlayerEventType.NEXT, () => {
-        this.#deps.domainMessageBroker.publish(QUEUE_NAME, new EmptyPlayerEvent(PlayerEventType.NEXT));
+        this.#deps.domainMessageBroker.publish(
+          QUEUE_NAME,
+          new EmptyPlayerEvent(PlayerEventType.NEXT),
+        );
       } );
 
       socket.on(PlayerEventType.PREVIOUS, () => {
-        this.#deps.domainMessageBroker.publish(QUEUE_NAME, new EmptyPlayerEvent(PlayerEventType.PREVIOUS));
+        this.#deps.domainMessageBroker.publish(
+          QUEUE_NAME,
+          new EmptyPlayerEvent(PlayerEventType.PREVIOUS),
+        );
       } );
 
       socket.on(PlayerEventType.STOP, () => {
-        this.#deps.domainMessageBroker.publish(QUEUE_NAME, new EmptyPlayerEvent(PlayerEventType.STOP));
+        this.#deps.domainMessageBroker.publish(
+          QUEUE_NAME,
+          new EmptyPlayerEvent(PlayerEventType.STOP),
+        );
       } );
 
       socket.on(PlayerEventType.PLAY, (id: number) => {
-        this.#deps.domainMessageBroker.publish(QUEUE_NAME, new PlayPlayerEvent(id));
+        this.#deps.domainMessageBroker.publish(
+          QUEUE_NAME,
+          new PlayPlayerEvent(id),
+        );
       } );
 
       socket.on(PlayerEventType.SEEK, (val: number | string) => {
         if (!(typeof val === "string" || typeof val === "number"))
           throw new Error("val is not string or number");
 
-        this.#deps.domainMessageBroker.publish(QUEUE_NAME, new SeekPlayerEvent(val));
+        this.#deps.domainMessageBroker.publish(
+          QUEUE_NAME,
+          new SeekPlayerEvent(val),
+        );
       } );
 
       socket.on(PlayerEventType.FULLSCREEN_TOGGLE, () => {
         console.log("[FRONT] fullscreen toggle");
 
-        this.#deps.domainMessageBroker.publish(QUEUE_NAME, new EmptyPlayerEvent(PlayerEventType.FULLSCREEN_TOGGLE));
+        this.#deps.domainMessageBroker.publish(
+          QUEUE_NAME,
+          new EmptyPlayerEvent(PlayerEventType.FULLSCREEN_TOGGLE),
+        );
       } );
     } );
   }

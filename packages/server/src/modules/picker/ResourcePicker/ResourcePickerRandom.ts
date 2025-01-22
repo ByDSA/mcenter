@@ -21,7 +21,7 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
 
   async pick(n: number): Promise<R[]> {
     const ret: R[] = [];
-    let {lastOne: lastEp} = this.#params;
+    let { lastOne: lastEp } = this.#params;
 
     for (let i = 0; i < n; i++) {
       const picker = await genRandomPickerWithData( {
@@ -44,7 +44,9 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
   }
 }
 
-export async function genRandomPickerWithData<R extends ResourceVO>( {resources, filterApplier, weightFixerApplier }: Params<R>): Promise<Picker<R>> {
+export async function genRandomPickerWithData<R extends ResourceVO>(
+  { resources, filterApplier, weightFixerApplier }: Params<R>,
+): Promise<Picker<R>> {
   assertIsDefined(resources, "Undefined resources");
   assertIsNotEmpty(resources, "Empty resources");
 

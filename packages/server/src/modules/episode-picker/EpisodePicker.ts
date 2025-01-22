@@ -1,16 +1,18 @@
-import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
 import { compareEpisodeId } from "#shared/models/episodes";
 import { neverCase } from "#shared/utils/validation";
 import { Model } from "../episodes/models";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 import { dependencies } from "./appliers/Dependencies";
+import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
 
 type Params = {
   episodes: Model[];
   lastEp?: Model;
   mode: PickMode;
 };
-export default function buildEpisodePicker( { mode, episodes, lastEp }: Params): ResourcePicker<Model> {
+export default function buildEpisodePicker(
+  { mode, episodes, lastEp }: Params,
+): ResourcePicker<Model> {
   let picker: ResourcePicker<Model>;
 
   switch (mode) {

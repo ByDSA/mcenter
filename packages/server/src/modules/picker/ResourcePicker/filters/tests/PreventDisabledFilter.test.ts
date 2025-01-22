@@ -1,6 +1,6 @@
 import { ResourceVO } from "#shared/models/resource";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import PreventDisabledFilter from "../PreventDisabledFilter";
+import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 
 const ENABLED_NO_DISABLED: ResourceVO = {
   ...EPISODES_SIMPSONS[0],
@@ -27,7 +27,7 @@ describe.each([
   [ENABLED_NO_DISABLED, true],
   [ENABLED_DISABLED_FALSE, true],
   [ENABLED_DISABLED_UNDEFINED, true],
-] as Case[])("PreventDisabledFilter", (self, expected) => {
+] as Case[])("preventDisabledFilter", (self, expected) => {
   it(`should return ${expected} when disabled = ${self.disabled}`, async () => {
     const filter = new PreventDisabledFilter();
     const result = await filter.filter(self);

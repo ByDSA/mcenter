@@ -1,13 +1,13 @@
+import { Model, ModelId } from "../models";
+import { docOdmToModel } from "./adapters";
+import { QUEUE_NAME } from "./events";
+import { DocOdm, ModelOdm } from "./odm";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
-import { Model, ModelId } from "../models";
-import { docOdmToModel } from "./adapters";
-import { QUEUE_NAME } from "./events";
-import { DocOdm, ModelOdm } from "./odm";
 
 const DepsMap = {
   domainMessageBroker: DomainMessageBroker,
@@ -19,8 +19,7 @@ export default class SeriesRepository
 implements CanGetOneById<Model, ModelId>,
 CanUpdateOneByIdAndGet<Model, ModelId>,
 CanCreateOneAndGet<Model>,
-CanGetAll<Model>
-{
+CanGetAll<Model> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

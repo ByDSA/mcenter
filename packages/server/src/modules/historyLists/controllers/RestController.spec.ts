@@ -1,14 +1,14 @@
 import HttpStatusCode from "#shared/utils/http/StatusCode";
-import { registerSingletonIfNotAndGet } from "#tests/main";
-import { HISTORY_LIST_SIMPSONS, HISTORY_LIST_WITH_NO_ENTRIES } from "#tests/main/db/fixtures";
-import { RouterApp } from "#utils/express/test";
-import { resolveRequired } from "#utils/layers/deps";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
 import { ListRepository as HistoryListRepository } from "../repositories";
 import { HistoryListRepositoryMock } from "../repositories/tests";
 import RestController from "./RestController";
+import { resolveRequired } from "#utils/layers/deps";
+import { RouterApp } from "#utils/express/test";
+import { HISTORY_LIST_SIMPSONS, HISTORY_LIST_WITH_NO_ENTRIES } from "#tests/main/db/fixtures";
+import { registerSingletonIfNotAndGet } from "#tests/main";
 
 describe("RestController", () => {
   let routerApp: Application;

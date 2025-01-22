@@ -1,9 +1,16 @@
 export {
-  Model as Episode, ModelId as EpisodeId, ModelIdSchema as EpisodeIdSchema, ModelSchema as EpisodeSchema, assertIsModel as assertIsEpisode, compareId as compareEpisodeId,
+  assertIsModel as assertIsEpisode,
+  compareId as compareEpisodeId, Model as Episode,
+  ModelId as EpisodeId,
+  ModelIdSchema as EpisodeIdSchema,
+  ModelSchema as EpisodeSchema,
 } from "./models";
 
 export {
-  DocOdm as EpisodeDocOdm, ModelOdm as EpisodeModelOdm, Repository as EpisodeRepository, EpisodeRepositoryExpandEnum, SchemaOdm as EpisodeSchemaOdm, docOdmToModel as episodeDocOdmToModel, modelToDocOdm as episodeToDocOdm,
+  DocOdm as EpisodeDocOdm, docOdmToModel as episodeDocOdmToModel, ModelOdm as EpisodeModelOdm,
+  Repository as EpisodeRepository,
+  EpisodeRepositoryExpandEnum,
+  SchemaOdm as EpisodeSchemaOdm, modelToDocOdm as episodeToDocOdm,
 } from "./repositories";
 
 export {

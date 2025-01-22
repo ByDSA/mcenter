@@ -1,5 +1,5 @@
-import { MusicRepository } from "#modules/musics";
 import { PublicMethodsOf } from "#shared/utils/types";
+import { MusicRepository } from "#modules/musics";
 
 export default class RepositoryMock implements PublicMethodsOf<MusicRepository> {
   getOneById = jest.fn();

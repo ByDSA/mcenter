@@ -1,12 +1,12 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { PlayResourceMessage, PlayerEvent } from "#shared/models/player";
-import { assertIsDefined } from "#shared/utils/validation";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Event } from "#utils/message-broker";
 import assert from "node:assert";
 import { Server as HttpServer } from "node:http";
+import { PlayResourceMessage, PlayerEvent } from "#shared/models/player";
+import { assertIsDefined } from "#shared/utils/validation";
 import { Server, Socket } from "socket.io";
 import { QUEUE_NAME, StatusPlayerEvent } from "../messaging";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Event } from "#utils/message-broker";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 
 const DepsMap = {
   domainMessageBroker: DomainMessageBroker,

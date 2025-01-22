@@ -29,7 +29,7 @@ describe.each([
   [W3, 2, true],
   [W0, 0, true],
   [W7, 0, true],
-] as Case[])("MinWeightFilter", (self, num, expected) => {
+] as Case[])("minWeightFilter", (self, num, expected) => {
   it(`should return ${expected} when weight = ${self.weight} and min = ${num}`, async () => {
     const filter = new MinWeightFilter(num);
     const result = await filter.filter(self);

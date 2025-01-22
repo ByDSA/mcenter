@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { Entry, EntryWithId, Model, ModelId } from "../models";
 import { DocOdm } from "./odm";
 

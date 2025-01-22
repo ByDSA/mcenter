@@ -1,9 +1,5 @@
 import { Episode, episodeDtoToModel, EpisodeGetManyBySearchRequest } from "#shared/models/episodes";
 import HttpStatusCode from "#shared/utils/http/StatusCode";
-import { registerSingletonIfNotAndGet } from "#tests/main";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
-import { RouterApp } from "#utils/express/test";
-import { resolveRequired } from "#utils/layers/deps";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
@@ -11,6 +7,10 @@ import { expectEpisode, expectEpisodes } from "../models/test";
 import { Repository } from "../repositories";
 import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
 import RestController from "./RestController";
+import { resolveRequired } from "#utils/layers/deps";
+import { RouterApp } from "#utils/express/test";
+import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
+import { registerSingletonIfNotAndGet } from "#tests/main";
 
 describe("RestController", () => {
   let routerApp: Application;

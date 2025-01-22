@@ -1,15 +1,15 @@
 import { assertIsHistoryMusicListGetManyEntriesBySearchResponse, HistoryMusicListGetManyEntriesBySearchResponseSchema } from "#shared/models/musics";
 import HttpStatusCode from "#shared/utils/http/StatusCode";
-import { registerSingletonIfNotAndGet } from "#tests/main";
-import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
-import { RouterApp } from "#utils/express/test";
-import { resolveRequired } from "#utils/layers/deps";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
 import { Repository } from "../repositories";
 import { HistoryRepositoryMock as RepositoryMock } from "../repositories/tests";
 import RestController from "./RestController";
+import { resolveRequired } from "#utils/layers/deps";
+import { RouterApp } from "#utils/express/test";
+import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
+import { registerSingletonIfNotAndGet } from "#tests/main";
 
 describe("RestController", () => {
   let routerApp: Application;

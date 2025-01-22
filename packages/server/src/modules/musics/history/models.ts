@@ -1,3 +1,4 @@
 export {
-  HistoryMusicEntry as Model, assertIsHistoryMusicEntry as assertIsModel, createHistoryEntryByMusicId as createByMusicId,
+  assertIsHistoryMusicEntry as assertIsModel,
+  createHistoryEntryByMusicId as createByMusicId, HistoryMusicEntry as Model,
 } from "#shared/models/musics";

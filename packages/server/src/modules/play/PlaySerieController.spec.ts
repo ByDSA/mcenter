@@ -1,17 +1,17 @@
-import { EpisodeRepository } from "#modules/episodes";
-import { HistoryListService } from "#modules/historyLists";
 import { PublicMethodsOf } from "#shared/utils/types";
-import { TestMongoDatabase, registerSingletonIfNotAndGet } from "#tests/main";
-import TestDatabase from "#tests/main/db/TestDatabase";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
-import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
-import { RouterApp } from "#utils/express/test";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
 import PlaySerieController from "./PlaySerieController";
 import { VlcBackWebSocketsServerService } from "./player-services";
 import PlayerBackWebSocketsServiceMock from "./player-services/vlc-back/tests/PlayerBackWebSocketsServiceMock";
+import { EpisodeRepository } from "#modules/episodes";
+import { HistoryListService } from "#modules/historyLists";
+import { TestMongoDatabase, registerSingletonIfNotAndGet } from "#tests/main";
+import TestDatabase from "#tests/main/db/TestDatabase";
+import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
+import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
+import { RouterApp } from "#utils/express/test";
 
 describe("PlaySerieController", () => {
   let playSerieController: PlaySerieController;
@@ -30,7 +30,10 @@ describe("PlaySerieController", () => {
       episodeRepository: registerSingletonIfNotAndGet(EpisodeRepository),
     } ));
 
-    playerServiceMock = registerSingletonIfNotAndGet(VlcBackWebSocketsServerService,PlayerBackWebSocketsServiceMock);
+    playerServiceMock = registerSingletonIfNotAndGet(
+      VlcBackWebSocketsServerService,
+      PlayerBackWebSocketsServiceMock,
+    );
 
     playSerieController = registerSingletonIfNotAndGet(PlaySerieController);
 

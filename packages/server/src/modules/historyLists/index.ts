@@ -1,12 +1,15 @@
 export {
+  assertIsEntry as assertIsHistoryEntry,
+  assertIsModel as assertIsHistoryList,
+  createHistoryEntryByEpisodeFullId,
   Entry as HistoryEntry, Model as HistoryList,
   ModelId as HistoryListId,
-  assertIsEntry as assertIsHistoryEntry, assertIsModel as assertIsHistoryList, createHistoryEntryByEpisodeFullId,
 } from "./models";
 
 export {
-  EntryRepository as HistoryEntryRepository, DocOdm as HistoryListDocOdm,
-  ModelOdm as HistoryListModelOdm, ListRepository as HistoryListRepository, docOdmToModel as historyListDocOdmToModel,
+  EntryRepository as HistoryEntryRepository,
+  DocOdm as HistoryListDocOdm, docOdmToModel as historyListDocOdmToModel,
+  ModelOdm as HistoryListModelOdm, ListRepository as HistoryListRepository,
   modelToDocOdm as historyListToDocOdm,
 } from "./repositories";
 

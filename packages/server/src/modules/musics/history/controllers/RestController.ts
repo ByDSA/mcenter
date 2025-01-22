@@ -1,12 +1,12 @@
 import { HistoryMusicListGetManyEntriesBySearchRequest, assertIsHistoryMusicListGetManyEntriesBySearchRequest } from "#shared/models/musics";
-import { Controller, SecureRouter } from "#utils/express";
-import { CanGetAll } from "#utils/layers/controller";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { validateReq } from "#utils/validation/zod-express";
 import express, { Request, Response, Router } from "express";
 import { Repository as MusicRepository } from "../../repositories";
 import { Repository } from "../repositories";
 import { GetManyCriteria } from "../repositories/Repository";
+import { Controller, SecureRouter } from "#utils/express";
+import { CanGetAll } from "#utils/layers/controller";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { validateReq } from "#utils/validation/zod-express";
 
 const DepsMap = {
   historyRepository: Repository,
@@ -18,8 +18,7 @@ type Deps = DepsFromMap<typeof DepsMap>;
 export default class RestController
 implements
     Controller,
-    CanGetAll<Request, Response>
-{
+    CanGetAll<Request, Response> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -27,7 +26,7 @@ implements
   }
 
   async getAll(_: Request, res: Response): Promise<void> {
-    const got = this.#deps.historyRepository.getAll();
+    const got = await this.#deps.historyRepository.getAll();
 
     res.send(got);
   }
@@ -51,7 +50,7 @@ implements
       validateReq(assertIsHistoryMusicListGetManyEntriesBySearchRequest),
       this.getManyEntriesBySearch.bind(this),
     );
-    router.options("/:user/search", (req, res) => {
+    router.options("/:user/search", (_req, res) => {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "POST,DELETE,OPTIONS");
       res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
@@ -70,8 +69,7 @@ function bodyToCriteria(body: HistoryMusicListGetManyEntriesBySearchRequest["bod
   };
 
   if (body.filter) {
-    ret.filter = {
-    };
+    ret.filter = {};
 
     if (body.filter.resourceId)
       ret.filter.resourceId = body.filter.resourceId;

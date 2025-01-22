@@ -1,7 +1,7 @@
 import { compareEpisodeId } from "#shared/models/episodes";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import FilterApplier from "../FilterApplier";
 import PreventRepeatLastFilter from "../PreventRepeatLastFilter";
+import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 
 const TWO_EPS = [
   EPISODES_SIMPSONS[0],
@@ -11,7 +11,7 @@ const ONE_EP = [
   EPISODES_SIMPSONS[0],
 ];
 
-describe("PreventRepeatLastFilter", () => {
+describe("preventRepeatLastFilter", () => {
   describe("with lastEp = 0", () => {
     const FILTER_APPLIER_WITH_LAST_EP0 = new FilterApplier();
 

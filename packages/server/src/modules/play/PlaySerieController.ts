@@ -1,11 +1,11 @@
+import { assertFound } from "#shared/utils/http/validation";
+import { Request, Response, Router } from "express";
+import PlayService from "./PlayService";
 import { EpisodeRepository } from "#modules/episodes";
 import { HistoryListService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
-import { assertFound } from "#shared/utils/http/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Request, Response, Router } from "express";
-import PlayService from "./PlayService";
 
 const DepsMap = {
   serieRepository: SerieRepository,

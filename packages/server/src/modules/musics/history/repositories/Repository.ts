@@ -1,9 +1,4 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { logDomainEvent } from "#modules/log";
 import { isDefined } from "#shared/utils/validation";
-import { EventType, ModelEvent } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { CanCreateOne, CanGetAll, CanGetManyCriteria } from "#utils/layers/repository";
 import { FilterQuery } from "mongoose";
 import { delay } from "tsyringe";
 import MusicRepository from "../../repositories/Repository";
@@ -11,6 +6,11 @@ import { QUEUE_NAME } from "../events";
 import { Model } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
+import { CanCreateOne, CanGetAll, CanGetManyCriteria } from "#utils/layers/repository";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { EventType, ModelEvent } from "#utils/event-sourcing";
+import { logDomainEvent } from "#modules/log";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 
 export type GetManyCriteria = {
   limit?: number;
@@ -47,8 +47,7 @@ CanGetAll<Model> {
   }
 
   async getManyCriteria(criteria: GetManyCriteria): Promise<Model[]> {
-    const findParams: FilterQuery<DocOdm> = {
-    };
+    const findParams: FilterQuery<DocOdm> = {};
 
     if (criteria.filter?.resourceId)
       findParams.musicId = criteria.filter.resourceId;
@@ -86,7 +85,7 @@ CanGetAll<Model> {
         const resource = await this.#deps.musicRepository.getOneById(resourceId);
 
         if (resource)
-          // eslint-disable-next-line no-param-reassign
+
           model.resource = resource;
       } );
 
@@ -97,8 +96,7 @@ CanGetAll<Model> {
   }
 
   async getAll(): Promise<Model[]> {
-    const docsOdm = await ModelOdm.find( {
-    }, {
+    const docsOdm = await ModelOdm.find( {}, {
       _id: 0,
     } );
 
@@ -109,8 +107,7 @@ CanGetAll<Model> {
   }
 
   async #getLastOdm(): Promise<DocOdm | null> {
-    const docsOdm = await ModelOdm.find( {
-    }, {
+    const docsOdm = await ModelOdm.find( {}, {
       _id: 0,
     } ).sort( {
       "date.timestamp": -1,

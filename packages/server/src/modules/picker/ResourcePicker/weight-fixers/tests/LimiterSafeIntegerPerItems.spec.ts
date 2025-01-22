@@ -49,7 +49,7 @@ const cases = [
   },
 ] as Case[];
 
-describe.each(cases)("LimiterSafeIntegerPerItemsWeightFixer", (testCase) => {
+describe.each(cases)("limiterSafeIntegerPerItemsWeightFixer", (testCase) => {
   it(`should return ${testCase.expectedWeight} when initialWeight = ${testCase.initialWeight} and resources length = ${testCase.resources.length}`, async () => {
     const weightFixer = new LimiterSafeIntegerPerItems();
     const result = await weightFixer.fixWeight( {

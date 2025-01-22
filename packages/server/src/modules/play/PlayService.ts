@@ -1,7 +1,7 @@
-import { Episode } from "#modules/episodes";
 import { assertIsNotEmpty } from "#shared/utils/validation";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { VlcBackWebSocketsServerService } from "./player-services";
+import { Episode } from "#modules/episodes";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
 type PlayParams = {
   force?: boolean;
@@ -21,7 +21,7 @@ export default class PlayService {
     this.#deps = deps as Deps;
   }
 
-  async play( {episodes, force}: PlayParams): Promise<boolean> {
+  async play( { episodes, force }: PlayParams): Promise<boolean> {
     assertIsNotEmpty(episodes);
 
     await this.#deps.vlcBackWSServerService.emitPlayResource( {

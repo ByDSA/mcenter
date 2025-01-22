@@ -1,15 +1,8 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { logDomainEvent } from "#modules/log";
-import { ARTIST_EMPTY, Music, MusicID, MusicVO } from "#shared/models/musics";
-import { assertIsDefined } from "#shared/utils/validation";
-import { md5FileAsync } from "#utils/crypt";
-import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
-import { Event } from "#utils/message-broker";
 import { statSync } from "fs";
-import NodeID3 from "node-id3";
 import path from "path";
+import NodeID3 from "node-id3";
+import { assertIsDefined } from "#shared/utils/validation";
+import { ARTIST_EMPTY, Music, MusicID, MusicVO } from "#shared/models/musics";
 import { AUDIO_EXTENSIONS } from "../files";
 import { QUEUE_NAME as HISTORY_QUEUE_NAME } from "../history/events";
 import { Model as HistoryMusicEntry } from "../history/models";
@@ -21,8 +14,14 @@ import { DocOdm, ModelOdm } from "./odm";
 import { findParamsToQueryParams } from "./queries/QueriesOdm";
 import { ExpressionNode } from "./queries/QueryObject";
 import { PatchOneParams } from "./types";
-// eslint-disable-next-line import/no-cycle
 import UrlGenerator from "./UrlGenerator";
+import { Event } from "#utils/message-broker";
+import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
+import { md5FileAsync } from "#utils/crypt";
+import { logDomainEvent } from "#modules/log";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 
 const DepsMap = {
   domainMessageBroker: DomainMessageBroker,
@@ -32,8 +31,7 @@ type Deps = DepsFromMap<typeof DepsMap>;
 @injectDeps(DepsMap)
 export default class MusicRepository
 implements CanPatchOneById<Music, MusicID, PatchOneParams>,
-CanGetOneById<Music, MusicID>
-{
+CanGetOneById<Music, MusicID> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -72,12 +70,11 @@ CanGetOneById<Music, MusicID>
   }
 
   async patchOneById(id: string, params: PatchOneParams): Promise<void> {
-    const {entity} = params;
+    const { entity } = params;
     const updateQuery = patchParamsToUpdateQuery(params);
 
     await ModelOdm.findByIdAndUpdate(id, updateQuery);
 
-    // eslint-disable-next-line no-restricted-syntax, guard-for-in
     for (const [k, value] of Object.entries(entity)) {
       const key = k as keyof Music;
       const event = new PatchEvent<Music, MusicID>( {
@@ -123,8 +120,7 @@ CanGetOneById<Music, MusicID>
   }
 
   async findAll(): Promise<Music[]> {
-    const docOdms = await ModelOdm.find( {
-    } );
+    const docOdms = await ModelOdm.find( {} );
     const ret = docOdms.map((docOdm) => musicDocOdmToModel(docOdm));
 
     return ret;
@@ -162,7 +158,7 @@ CanGetOneById<Music, MusicID>
       artist,
     } );
     const hashPromise = md5FileAsync(fullPath);
-    const {size} = statSync(fullPath);
+    const { size } = statSync(fullPath);
     const now = new Date();
     const newDocOdm: Omit<DocOdm, "_id"> = {
       hash: await hashPromise,
@@ -302,7 +298,7 @@ function removeExtension(str: string): string {
 }
 
 function fixTitle(title: string): string {
-  return title.replace(/ \((Official )?(Lyric|Music) Video\)/ig,"")
-    .replace(/\(videoclip\)/ig,"")
-    .replace(/ $/g,"");
+  return title.replace(/ \((Official )?(Lyric|Music) Video\)/ig, "")
+    .replace(/\(videoclip\)/ig, "")
+    .replace(/ $/g, "");
 }

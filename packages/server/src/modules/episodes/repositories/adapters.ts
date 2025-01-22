@@ -1,8 +1,7 @@
-// eslint-disable-next-line import/no-internal-modules
-import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 import { UpdateQuery } from "mongoose";
 import { Model as Episode, assertIsModel as assertIsEpisode } from "../models";
 import { DocOdm } from "./odm";
+import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {
   const model: Episode = {
@@ -65,8 +64,7 @@ export function modelToDocOdm(model: Episode): DocOdm {
 }
 
 export function partialModelToDocOdm(model: Partial<Episode>): UpdateQuery<Episode> {
-  const ret: UpdateQuery<Episode> = {
-  };
+  const ret: UpdateQuery<Episode> = {};
 
   if (model.id !== undefined) {
     ret.episodeId = model.id.innerId;
@@ -86,36 +84,35 @@ export function partialModelToDocOdm(model: Partial<Episode>): UpdateQuery<Episo
   if (model.end !== undefined)
     ret.end = model.end;
 
-  if ("weight" in model){
+  if ("weight" in model) {
     if (model.weight !== undefined)
       ret.weight = model.weight;
     else {
-      ret.$unset = ret.$unset ?? {
-      };
+      ret.$unset = ret.$unset ?? {};
       ret.$unset.weight = 1;
     }
   }
 
-  if ("disabled" in model)
-  {if (model.disabled !== undefined)
-    ret.disabled = model.disabled;
-  else {
-    ret.$unset = ret.$unset ?? {
-    };
-    ret.$unset.disabled = 1;
-  }}
+  if ("disabled" in model) {
+    if (model.disabled !== undefined)
+      ret.disabled = model.disabled;
+    else {
+      ret.$unset = ret.$unset ?? {};
+      ret.$unset.disabled = 1;
+    }
+  }
 
   if (model.tags !== undefined)
     ret.tags = model.tags;
 
-  if ("lastTimePlayed" in model)
-  {if (model.lastTimePlayed !== undefined)
-    ret.lastTimePlayed = model.lastTimePlayed;
-  else {
-    ret.$unset = ret.$unset ?? {
-    };
-    ret.$unset.lastTimePlayed = 1;
-  }}
+  if ("lastTimePlayed" in model) {
+    if (model.lastTimePlayed !== undefined)
+      ret.lastTimePlayed = model.lastTimePlayed;
+    else {
+      ret.$unset = ret.$unset ?? {};
+      ret.$unset.lastTimePlayed = 1;
+    }
+  }
 
   return ret;
 }

@@ -1,9 +1,9 @@
+import { FullResponse, LogElementResponse } from "#shared/utils/http";
+import { Request, Response, Router } from "express";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams";
-import { FullResponse, LogElementResponse } from "#shared/utils/http";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Request, Response, Router } from "express";
 
 const DepsMap = {
   serieRepository: SerieRepository,

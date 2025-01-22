@@ -1,13 +1,11 @@
-/* eslint-disable no-underscore-dangle */
 import { Music } from "#shared/models/musics";
-// eslint-disable-next-line import/no-internal-modules
-import { A_AOT4 } from "#tests/main/db/fixtures/models/music";
+
 import mongoose from "mongoose";
 import { musicDocOdmToModel, musicModelToDocOdm } from "./adapters";
 import { DocOdm } from "./odm";
+import { A_AOT4 } from "#tests/main/db/fixtures/models/music";
 
 function removeUndefinedProps(obj: Record<string, any>) {
-  // eslint-disable-next-line no-param-reassign
   Object.keys(obj).forEach((key) => obj[key] === undefined && delete obj[key]);
 }
 

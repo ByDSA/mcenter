@@ -1,12 +1,12 @@
-import { EpisodeAddNewFilesController, EpisodeUpdateController } from "#modules/episodes";
-import { assertIsDefined } from "#shared/utils/validation";
-import { Controller, SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Request, Response, Router } from "express";
 import fs from "fs";
 import path from "path";
+import { Request, Response, Router } from "express";
+import { assertIsDefined } from "#shared/utils/validation";
 import EpisodesUpdateLastTimePlayedController from "./EpisodesUpdateLastTimePlayedController";
 import FixerController from "./FixerController";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Controller, SecureRouter } from "#utils/express";
+import { EpisodeAddNewFilesController, EpisodeUpdateController } from "#modules/episodes";
 
 const DepsMap = {
   episodesUpdateLastTimePlayedController: EpisodesUpdateLastTimePlayedController,
@@ -32,7 +32,7 @@ export default class ActionController implements Controller {
     router.use("/episodes/add-new-files", this.#deps.episodesAddNewFilesController.getRouter());
     router.use("/fixer", this.#deps.fixerController.getRouter());
 
-    router.get("/log", (req: Request, res: Response) => {
+    router.get("/log", (_req: Request, res: Response) => {
       try {
         const { TMP_PATH } = process.env;
 
@@ -41,7 +41,7 @@ export default class ActionController implements Controller {
         const log = fs.readFileSync(pathFile, "utf-8");
 
         res.send(log);
-      } catch (e) {
+      } catch {
         res.send("No log file");
       }
     } );

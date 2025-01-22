@@ -1,7 +1,7 @@
-import { MusicVO } from "#shared/models/musics";
-import { md5FileAsync } from "#utils/crypt";
 import { Stats } from "node:fs";
+import { MusicVO } from "#shared/models/musics";
 import { getFullPath } from "../../utils";
+import { md5FileAsync } from "#utils/crypt";
 
 export type FileWithStats = {
   path: string;
@@ -42,11 +42,9 @@ export default class ChangesDetector {
     this.#remoteMusic = remoteMusic;
     this.#localFiles = localFiles;
 
-    this.#remoteMusicGroupedBySize = {
-    };
+    this.#remoteMusicGroupedBySize = {};
 
-    this.#localFilesGroupedBySize = {
-    };
+    this.#localFilesGroupedBySize = {};
 
     this.#pathToRemoteMusic = new Map();
 
@@ -127,7 +125,7 @@ export default class ChangesDetector {
     }
 
     for (const ml of this.#localFiles) {
-      const {size} = ml.stats;
+      const { size } = ml.stats;
 
       if (!this.#localFilesGroupedBySize[size])
         this.#localFilesGroupedBySize[size] = [];
@@ -179,16 +177,16 @@ export default class ChangesDetector {
     return ret;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async #isSameFile(music: MusicVO, fileWithMetadata: FileWithStats) {
-    if (!this.#options.useOnlyHashChecking && music.size && music.size === fileWithMetadata.stats.size)
+    if (!this.#options.useOnlyHashChecking
+      && music.size && music.size === fileWithMetadata.stats.size)
       return true;
 
     if (!music.hash)
       throw new Error("music.hash is undefined");
 
     if (!fileWithMetadata.hash)
-      // eslint-disable-next-line no-param-reassign
+
       fileWithMetadata.hash = await md5FileAsync(getFullPath(fileWithMetadata.path));
 
     if (music.hash !== fileWithMetadata.hash)

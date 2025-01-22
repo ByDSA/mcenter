@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 import { PlayerEvent as PlayerEventType } from "#shared/models/player";
 import { Event } from "#utils/message-broker";
 

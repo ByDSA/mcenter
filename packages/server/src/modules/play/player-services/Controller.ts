@@ -1,9 +1,8 @@
-
 import { PublicMethodsOf } from "#shared/utils/types";
-import { Controller, SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
 import { VlcBackWebSocketsServerService } from "./vlc-back";
+import { Controller, SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
 const DepsMap = {
   remotePlayerService: VlcBackWebSocketsServerService,
@@ -18,7 +17,6 @@ export default class RemotePlayerController implements Controller {
     this.#vlcBackService = (deps as Deps).remotePlayerService;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getStatus(_: Request, _res: Response) {
     throw new Error("Not implemented");
 

@@ -1,7 +1,6 @@
-// eslint-disable-next-line import/no-internal-modules
-import { TimestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { MusicVO } from "#shared/models/musics";
 import mongoose from "mongoose";
+import { TimestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 
 export interface DocOdm extends MusicVO {
   _id: mongoose.Types.ObjectId;

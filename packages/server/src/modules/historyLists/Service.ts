@@ -1,9 +1,9 @@
-import { EpisodeRepository } from "#modules/episodes";
 import { Episode, EpisodeId, compareEpisodeId } from "#shared/models/episodes";
 import { assertFound } from "#shared/utils/http/validation";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Entry, Model, ModelId, createHistoryEntryByEpisodeFullId as createHistoryEntryByEpisodeId } from "./models";
 import { EntryRepository, ListRepository } from "./repositories";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { EpisodeRepository } from "#modules/episodes";
 
 type HistoryAndEpisodeParams = ( {
   episode: Episode;
@@ -34,6 +34,7 @@ export default class Service {
     let historyList: Model;
 
     if ("historyList" in params)
+      // eslint-disable-next-line prefer-destructuring
       historyList = params.historyList;
     else if ("historyListId" in params) {
       const got = await this.#deps.historyListRepository.getOneByIdOrCreate(params.historyListId);
@@ -53,6 +54,7 @@ export default class Service {
     if ("historyList" in params)
       historyListId = params.historyList.id;
     else if ("historyListId" in params)
+      // eslint-disable-next-line prefer-destructuring
       historyListId = params.historyListId;
     else
       throw new Error("No se ha especificado el historyList");
@@ -77,6 +79,7 @@ export default class Service {
     let episode: Episode;
 
     if ("episode" in params)
+      // eslint-disable-next-line prefer-destructuring
       episode = params.episode;
     else if ("episodeFullId" in params) {
       const got = await this.#deps.episodeRepository.getOneById(params.episodeFullId);
@@ -93,7 +96,9 @@ export default class Service {
   async findLastHistoryEntryForEpisodeId(params: HistoryAndEpisodeParams): Promise<Entry | null> {
     const episodeFullId: EpisodeId = await this.#getEpisodeIdFromParams(params);
     const historyList: Model = await this.#getHistoryListFromParams(params);
-    const historyEntry = historyList.entries.findLast((h) => compareEpisodeId(h.episodeId, episodeFullId));
+    const historyEntry = historyList.entries.findLast(
+      (h) => compareEpisodeId(h.episodeId, episodeFullId),
+    );
 
     if (!historyEntry)
       return null;
@@ -113,7 +118,9 @@ export default class Service {
     } );
   }
 
-  async addEpisodesToHistory( {episodes, historyListId}: {episodes: Episode[]; historyListId: ModelId} ) {
+  async addEpisodesToHistory(
+    { episodes, historyListId }: {episodes: Episode[]; historyListId: ModelId},
+  ) {
     // TODO: usar bulk insert (quitar await en for)
     for (const episode of episodes) {
       await this.addEpisodeToHistory( {
@@ -126,7 +133,9 @@ export default class Service {
   async removeLastTimeEpisodeFromHistory(params: HistoryAndEpisodeParams) {
     const historyList = await this.#getHistoryListFromParams(params);
     const episodeFullId: EpisodeId = await this.#getEpisodeIdFromParams(params);
-    const historyEntryIndex = historyList.entries.findLastIndex((h: Entry) => compareEpisodeId(h.episodeId, episodeFullId));
+    const historyEntryIndex = historyList.entries.findLastIndex(
+      (h: Entry) => compareEpisodeId(h.episodeId, episodeFullId),
+    );
 
     if (historyEntryIndex === -1)
       return;

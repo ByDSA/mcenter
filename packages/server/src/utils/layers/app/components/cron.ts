@@ -1,6 +1,5 @@
 import { Component } from "./common";
 
-type CronOptions = {
-};
+type CronOptions = object;
 
 export type CronComponent = Component<CronOptions>;

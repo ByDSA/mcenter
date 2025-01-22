@@ -1,3 +1,8 @@
+import { container } from "tsyringe";
+import { EpisodeRepository } from "..";
+import { Model, ModelId } from "../models";
+import EpisodesRepository from "./Repository";
+import { QUEUE_NAME } from "./events";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { TestMongoDatabase } from "#tests/main";
 import TestDatabase from "#tests/main/db/TestDatabase";
@@ -5,11 +10,6 @@ import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { Consumer } from "#utils/message-broker";
-import { container } from "tsyringe";
-import { EpisodeRepository } from "..";
-import { Model, ModelId } from "../models";
-import EpisodesRepository from "./Repository";
-import { QUEUE_NAME } from "./events";
 
 let db: TestDatabase;
 let episodeRepository: EpisodesRepository;

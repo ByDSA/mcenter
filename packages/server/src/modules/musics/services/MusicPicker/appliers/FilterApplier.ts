@@ -1,7 +1,6 @@
-/* eslint-disable import/prefer-default-export */
-import { FilterApplier, PreventDisabledFilter, PreventRepeatInTimeFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { Music, compareMusicId } from "#shared/models/musics";
 import { Resource } from "#shared/models/resource";
+import { FilterApplier, PreventDisabledFilter, PreventRepeatInTimeFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 
 type Model = Music;
 type ModelId = string;
@@ -23,7 +22,7 @@ export default class MusicFilterApplier extends FilterApplier<Model> {
 
   #createFilters(): void {
     const { PICKER_MIN_WEIGHT = -99 } = process.env;
-    const {lastEp, lastId} = this.#params;
+    const { lastEp, lastId } = this.#params;
 
     this.add(new PreventDisabledFilter());
 
@@ -32,7 +31,8 @@ export default class MusicFilterApplier extends FilterApplier<Model> {
         {
           lastId,
           compareId: compareMusicId,
-        } ));
+        },
+      ));
     }
 
     this.add(new RemoveWeightLowerOrEqualThanFilter(+PICKER_MIN_WEIGHT));

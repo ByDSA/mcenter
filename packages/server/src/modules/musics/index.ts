@@ -1,5 +1,8 @@
 export {
-  DocOdm as MusicDocOdm, ModelOdm as MusicModelOdm, Repository as MusicRepository, SchemaOdm as MusicSchemaOdm,
+  DocOdm as MusicDocOdm,
+  ModelOdm as MusicModelOdm,
+  Repository as MusicRepository,
+  SchemaOdm as MusicSchemaOdm,
 } from "./repositories";
 
 export {

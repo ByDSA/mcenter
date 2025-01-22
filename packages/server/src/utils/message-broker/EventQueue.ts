@@ -20,7 +20,7 @@ export default class EventQueue {
     return Promise.resolve();
   }
 
-  subscribe(eventType: string, callback: Consumer<any>): Promise<void> {
+  subscribe(_eventType: string, callback: Consumer<any>): Promise<void> {
     this.#consumers.push(callback);
 
     return Promise.resolve();

@@ -8,6 +8,8 @@ const UpdateEpisodesFileRequestSchema = z.object( {
 
 export type UpdateEpisodesFileRequest = z.infer<typeof UpdateEpisodesFileRequestSchema>;
 
-export function assertIsUpdateEpisodesFileRequest(o: unknown): asserts o is UpdateEpisodesFileRequest {
+export function assertIsUpdateEpisodesFileRequest(
+  o: unknown,
+): asserts o is UpdateEpisodesFileRequest {
   UpdateEpisodesFileRequestSchema.parse(o);
 }

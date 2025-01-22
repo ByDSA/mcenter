@@ -1,13 +1,13 @@
-import { HistoryListRepository } from "#modules/historyLists";
-import { SerieRepository } from "#modules/series";
 import { StreamCriteriaSort, StreamGetManyRequest, StreamOriginType, assertIsStreamGetManyRequest } from "#shared/models/streams";
 import { CriteriaSortDir } from "#shared/utils/criteria";
+import express, { Request, Response, Router } from "express";
+import { Repository } from "../repositories";
+import { HistoryListRepository } from "#modules/historyLists";
+import { SerieRepository } from "#modules/series";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetMany } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
-import express, { Request, Response, Router } from "express";
-import { Repository } from "../repositories";
 
 const DepsMap = {
   streamRepository: Repository,
@@ -21,8 +21,7 @@ export default class RestController
 implements
     Controller,
     CanGetAll<Request, Response>,
-    CanGetMany<StreamGetManyRequest, Response>
-{
+    CanGetMany<StreamGetManyRequest, Response> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -43,7 +42,7 @@ implements
         for (const origin of stream.group.origins) {
           if (origin.type === StreamOriginType.SERIE) {
             // TODO: quitar await en for si se puede
-            // eslint-disable-next-line no-param-reassign
+
             origin.serie = await this.#deps.serieRepository.getOneById(origin.id) ?? undefined;
           }
         }
@@ -52,8 +51,7 @@ implements
 
     if (req.body.sort) {
       if (req.body.sort[StreamCriteriaSort.lastTimePlayed]) {
-        const lastTimePlayedDic: {[key: string]: number | undefined} = {
-        };
+        const lastTimePlayedDic: {[key: string]: number | undefined} = {};
 
         for (const stream of got) {
           const serieId = stream.group.origins[0]?.id;
@@ -96,18 +94,19 @@ implements
 
     router.get("/", this.getAll.bind(this));
     router.use(express.json());
-    router.post("/criteria",
+    router.post(
+      "/criteria",
       validateReq(assertIsStreamGetManyRequest),
       this.getMany.bind(this),
     );
 
-    router.options("/", (req, res) => {
+    router.options("/", (_req, res) => {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET,OPTIONS");
       res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
       res.sendStatus(200);
     } );
-    router.options("/criteria", (req, res) => {
+    router.options("/criteria", (_req, res) => {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "POST,OPTIONS");
       res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");

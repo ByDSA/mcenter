@@ -1,8 +1,7 @@
-/* eslint-disable import/prefer-default-export */
-import { assertIsDefined } from "#shared/utils/validation";
 import assert from "node:assert";
 import { FileNotFoundError } from "#shared/utils/fs/errors";
 import { readIfExistsSync } from "#shared/utils/fs/operations";
+import { assertIsDefined } from "#shared/utils/validation";
 import { ConfigOptions, NetConfig, SSLMode, TextFile } from "./common";
 
 function initializeSSL(mode: SSLMode): NetConfig["ssl"] {
@@ -48,8 +47,8 @@ function initializeSSL(mode: SSLMode): NetConfig["ssl"] {
   if (mode === SSLMode.REQUIRED)
     assertLoaded(ENV_NAME.SSL_KEY, sslConfig.key);
 
-  sslConfig.enabled = !!sslConfig.key?.content &&
-      !!sslConfig.cert?.content;
+  sslConfig.enabled = !!sslConfig.key?.content
+      && !!sslConfig.cert?.content;
 
   if (mode === SSLMode.REQUIRED)
     assert(sslConfig.enabled, "SSL required but not enabled");

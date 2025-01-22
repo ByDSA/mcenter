@@ -1,10 +1,9 @@
-/* eslint-disable no-use-before-define */
 import { PublicMethodsOf } from "#shared/utils/types";
-import { SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Router } from "express";
 import { MusicRepository } from "..";
 import { Repository } from "../repositories";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { SecureRouter } from "#utils/express";
 
 const API = "/api";
 const CREATE = `${API}/create`;

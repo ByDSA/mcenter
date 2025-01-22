@@ -1,14 +1,14 @@
-import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew, SerieFolder as Serie } from "#modules/file-info";
-import { SerieRepository } from "#modules/series";
+import path from "path";
 import { ErrorElementResponse, errorToErrorElementResponse, FullResponse } from "#shared/utils/http";
 import { assertIsDefined } from "#shared/utils/validation";
-import { Controller, SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Request, Response, Router } from "express";
-import path from "path";
 import { Model as Episode } from "../models";
 import { Repository as EpisodeRepository } from "../repositories";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Controller, SecureRouter } from "#utils/express";
+import { SerieRepository } from "#modules/series";
+import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew, SerieFolder as Serie } from "#modules/file-info";
 
 const DepsMap = {
   serieRepository: SerieRepository,
@@ -25,8 +25,8 @@ export default class ThisController implements Controller {
     this.#deps = deps as Deps;
   }
 
-  async endpoint(req: Request, res: Response) {
-    const {MEDIA_FOLDER_PATH} = process.env;
+  async endpoint(_req: Request, res: Response) {
+    const { MEDIA_FOLDER_PATH } = process.env;
 
     assertIsDefined(MEDIA_FOLDER_PATH);
 
@@ -39,10 +39,12 @@ export default class ThisController implements Controller {
       errors.push(...filesSerieTreeResult.errors);
 
     const savedSerieTree = await this.#deps.savedSerieTreeService.getSavedSeriesTree();
-    const diff = diffSerieTree(savedSerieTree,
+    const diff = diffSerieTree(
+      savedSerieTree,
       {
         children: filesSerieTreeResult.data,
-      } );
+      },
+    );
 
     diff.moved = diff.moved.filter(move => move.old.content.filePath !== move.new.content.filePath);
 
@@ -87,9 +89,10 @@ export default class ThisController implements Controller {
     const promises: Promise<Episode | null>[] = [];
 
     for (const entry of oldNew) {
-      const p: Promise<Episode | null> = this.#deps.episodeRepository.patchOneByPathAndGet(entry.old.content.filePath, {
-        path: entry.new.content.filePath,
-      } );
+      const p: Promise<Episode | null> = this.#deps.episodeRepository
+        .patchOneByPathAndGet(entry.old.content.filePath, {
+          path: entry.new.content.filePath,
+        } );
 
       promises.push(p);
     }

@@ -1,11 +1,11 @@
-import { MusicVO } from "#shared/models/musics";
-import { md5FileAsync } from "#utils/crypt";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { statSync } from "node:fs";
+import { MusicVO } from "#shared/models/musics";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
 import { Repository as MusicRepository } from "../../repositories";
 import { getFullPath } from "../../utils";
 import ChangesDetector, { FileWithStats } from "./ChangesDetector";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { md5FileAsync } from "#utils/crypt";
 
 export type UpdateResult = {
   new: MusicVO[];
@@ -59,7 +59,7 @@ export class UpdateRemoteTreeService {
       promises.push(p);
     }
 
-    for (const {original, newPath} of changes.moved) {
+    for (const { original, newPath } of changes.moved) {
       const newMusic = {
         ...original,
         path: newPath,
@@ -116,7 +116,7 @@ async function detectChangesFromLocalFiles(remoteMusics: MusicVO[]) {
 
 async function toUpdatedFileInfo(music: MusicVO) {
   const fullPath = getFullPath(music.path);
-  const {size} = statSync(fullPath);
+  const { size } = statSync(fullPath);
   const newMusic: MusicVO = {
     ...music,
     size,

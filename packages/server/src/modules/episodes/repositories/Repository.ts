@@ -1,17 +1,17 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
-import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#shared/models/series";
 import { deepMerge } from "#shared/utils/objects";
-import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
-import { Event } from "#utils/message-broker";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 import { QUEUE_NAME } from "./events";
 import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
 import { DocOdm, ModelOdm } from "./odm";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
+import { logDomainEvent } from "#modules/log";
+import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import { Event } from "#utils/message-broker";
 
 type UpdateOneParams = Model;
 
@@ -31,8 +31,7 @@ implements CanGetOneById<Model, ModelId>,
 CanUpdateOneByIdAndGet<Model, ModelId>,
 CanPatchOneByIdAndGet<Model, ModelId>,
 CanCreateManyAndGet<Model>,
-CanGetAll<Model>
-{
+CanGetAll<Model> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -45,7 +44,10 @@ CanGetAll<Model>
     } );
   }
 
-  async patchOneByPathAndGet(path: string, episode: Partial<UpdateOneParams>): Promise<Model | null> {
+  async patchOneByPathAndGet(
+    path: string,
+    episode: Partial<UpdateOneParams>,
+  ): Promise<Model | null> {
     const partialDocOdm = partialModelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
       path,
@@ -159,7 +161,7 @@ CanGetAll<Model>
   async updateOneByIdAndGet(fullId: ModelId, episode: UpdateOneParams): Promise<Model | null> {
     const docOdm: DocOdm = modelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
-      episodeId:fullId.innerId,
+      episodeId: fullId.innerId,
       serieId: fullId.serieId,
     }, docOdm);
 
@@ -175,10 +177,13 @@ CanGetAll<Model>
     return this.getOneById(fullId);
   }
 
-  async patchOneByIdAndGet(fullId: ModelId, episode: Partial<UpdateOneParams>): Promise<Model | null> {
+  async patchOneByIdAndGet(
+    fullId: ModelId,
+    episode: Partial<UpdateOneParams>,
+  ): Promise<Model | null> {
     const partialDocOdm = partialModelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
-      episodeId:fullId.innerId,
+      episodeId: fullId.innerId,
       serieId: fullId.serieId,
     }, partialDocOdm);
 

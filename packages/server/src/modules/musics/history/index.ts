@@ -1,5 +1,7 @@
 export {
-  assertIsModel as assertIsHistoryMusicEntry, createByMusicId as createHistoryEntryByMusicId, Model as HistoryMusicEntry,
+  assertIsModel as assertIsHistoryMusicEntry,
+  createByMusicId as createHistoryEntryByMusicId,
+  Model as HistoryMusicEntry,
 } from "./models";
 
 export {

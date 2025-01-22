@@ -26,7 +26,7 @@ export default class GlobalConfig {
     assertIsDefined(this.#netConfig);
 
     return {
-      ssl:{
+      ssl: {
         ...this.#netConfig.ssl,
       },
       port: this.#netConfig.port,

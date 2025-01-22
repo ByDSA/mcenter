@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { Pickable, Taggable } from "#shared/models/resource/PartialSchemas";
 import { dynamicLoadScriptFromEnvVar } from "../../../../DynamicLoad";
 import WeightFixer, { WeightFixerParams } from "./WeightFixer";

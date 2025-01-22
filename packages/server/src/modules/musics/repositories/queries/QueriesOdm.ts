@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import { ExpressionNode, OperationNode } from "./QueryObject";
 
 type WeightYear = {
@@ -28,7 +27,7 @@ export type FindQueryParams = {
 type Props = {
   parentOperation: OperationNode["type"];
 };
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 export function findParamsToQueryParams(params: ExpressionNode, _props?: Props): FindQueryParams {
   const error = new Error("Error");
 
@@ -37,7 +36,7 @@ export function findParamsToQueryParams(params: ExpressionNode, _props?: Props):
       return {
         $or: [
           {
-            $and:[{
+            $and: [{
               tags: {
                 $in: [params.value],
               },
@@ -67,8 +66,7 @@ export function findParamsToQueryParams(params: ExpressionNode, _props?: Props):
       if (params.value.type === "number")
         throw error;
 
-      const weight = {
-      } as NonNullable<FindQueryParams["weight"]>;
+      const weight = {} as NonNullable<FindQueryParams["weight"]>;
 
       if ("min" in params.value) {
         if (params.value.minIncluded)
@@ -97,8 +95,7 @@ export function findParamsToQueryParams(params: ExpressionNode, _props?: Props):
       if (params.value.type === "number")
         throw error;
 
-      const year = {
-      } as NonNullable<FindQueryParams["year"]>;
+      const year = {} as NonNullable<FindQueryParams["year"]>;
 
       if ("min" in params.value) {
         if (params.value.minIncluded)
@@ -124,8 +121,7 @@ export function findParamsToQueryParams(params: ExpressionNode, _props?: Props):
   }
 }
 
-function intersectionCase(node: ExpressionNode, query: FindQueryParams = {
-} ): FindQueryParams {
+function intersectionCase(node: ExpressionNode, query: FindQueryParams = {} ): FindQueryParams {
   const operation = "intersection";
   const props = {
     parentOperation: operation,
@@ -158,8 +154,7 @@ function intersectionCase(node: ExpressionNode, query: FindQueryParams = {
   return mergeQuery(query, leftRightMerge);
 }
 
-function unionCase(node: ExpressionNode, query: FindQueryParams = {
-} ): FindQueryParams {
+function unionCase(node: ExpressionNode, query: FindQueryParams = {} ): FindQueryParams {
   const operation = "union";
   const props = {
     parentOperation: operation,
@@ -193,8 +188,7 @@ function unionCase(node: ExpressionNode, query: FindQueryParams = {
 }
 
 function mergeQuery(q1: FindQueryParams, q2: FindQueryParams): FindQueryParams {
-  const ret: FindQueryParams = {
-  };
+  const ret: FindQueryParams = {};
   const error = new Error("Error");
 
   if (q1.$and && q2.$and)
@@ -211,10 +205,8 @@ function mergeQuery(q1: FindQueryParams, q2: FindQueryParams): FindQueryParams {
     ret.tags = copyOfTags(q1.tags);
 
   if (q2.tags) {
-    if (!ret.tags) {
-      ret.tags = {
-      };
-    }
+    if (!ret.tags)
+      ret.tags = {};
 
     if (q2.tags?.$all) {
       if (ret.tags?.$in)
@@ -231,10 +223,8 @@ function mergeQuery(q1: FindQueryParams, q2: FindQueryParams): FindQueryParams {
       if (ret.tags?.$in)
         ret.tags.$in.push(...q2.tags.$in);
       else {
-        if (!ret.tags) {
-          ret.tags = {
-          };
-        }
+        if (!ret.tags)
+          ret.tags = {};
 
         ret.tags.$in = q2.tags.$in;
       }
@@ -290,8 +280,7 @@ function mergeWeightYear(w1: WeightYear, w2: WeightYear): WeightYear {
 }
 
 function copyOfTags(tags: NonNullable<FindQueryParams["tags"]>): NonNullable<FindQueryParams["tags"]> {
-  const ret: FindQueryParams["tags"] = {
-  };
+  const ret: FindQueryParams["tags"] = {};
 
   if (tags.$all)
     ret.$all = [...tags.$all];
@@ -303,9 +292,7 @@ function copyOfTags(tags: NonNullable<FindQueryParams["tags"]>): NonNullable<Fin
 }
 
 function copyOfWeightYear(input: WeightYear): WeightYear {
-  const ret: WeightYear = {
-
-  };
+  const ret: WeightYear = {};
 
   if (input.$gt !== undefined)
     ret.$gt = input.$gt;

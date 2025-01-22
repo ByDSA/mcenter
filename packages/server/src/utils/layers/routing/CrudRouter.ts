@@ -86,7 +86,13 @@ export default class CrudRouter extends Router {
     const realParams: Params = mergeOpts(DefaultParams, params);
     const { additionalRoutes } = realParams;
     const { createOne, deleteOneByPk, readMany, readOneByPk, updateOneByPk } = realParams.methods;
-    const routes = [...(additionalRoutes ?? []), createOne, deleteOneByPk, readMany, readOneByPk, updateOneByPk].filter(r=>r) as GeneralRoute[];
+    const routes = [
+      ...(additionalRoutes ?? []),
+      createOne,
+      deleteOneByPk,
+      readMany,
+      readOneByPk,
+      updateOneByPk].filter(r=>r) as GeneralRoute[];
     const superParams = {
       url: realParams.url,
       routes,

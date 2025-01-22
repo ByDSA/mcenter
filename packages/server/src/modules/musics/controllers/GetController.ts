@@ -1,16 +1,15 @@
-/* eslint-disable import/no-internal-modules */
-import { ResourcePickerRandom } from "#modules/picker";
-import { assertIsNotEmpty } from "#shared/utils/validation";
-import { SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Request, Response, Router } from "express";
 import path from "node:path";
+import { Request, Response, Router } from "express";
+import { assertIsNotEmpty } from "#shared/utils/validation";
 import { HistoryRepository, createHistoryEntryByMusicId } from "../history";
 import { Model as Music } from "../models";
 import { Repository } from "../repositories";
 import { requestToFindMusicParams } from "../repositories/queries/Queries";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { SecureRouter } from "#utils/express";
+import { ResourcePickerRandom } from "#modules/picker";
 
 function getRootUrlFromForwardedRequest(req: Request) {
   const protocol = req.get("x-forwarded-proto") ?? req.protocol;
@@ -101,7 +100,7 @@ export default class GetController {
   }
 
   async getPlaylist(req: Request, res: Response) {
-    const {name} = req.params;
+    const { name } = req.params;
     const playlistsFolder = path.join(ENVS.mediaPath, "music", "playlists");
     const filePath = path.join(playlistsFolder, name);
 
@@ -172,7 +171,7 @@ type GenPlayListParams = {
   nextUrl: string;
   server: string;
 };
-function generatePlaylist( {picked, nextUrl, server}: GenPlayListParams): string {
+function generatePlaylist( { picked, nextUrl, server }: GenPlayListParams): string {
   const ROUTE_RAW = "/api/musics/get/raw";
   const artist = fixTxt(picked.artist);
   const title = fixTxt(picked.title);

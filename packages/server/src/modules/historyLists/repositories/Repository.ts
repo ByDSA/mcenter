@@ -1,13 +1,13 @@
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { logDomainEvent } from "#modules/log";
 import { PublicMethodsOf } from "#shared/utils/types";
-import { EventType, ModelEvent } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { CanCreateOne, CanGetAll, CanGetOneByIdOrCreate, CanUpdateOneById } from "#utils/layers/repository";
 import { Model, ModelId } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 import { LIST_QUEUE_NAME } from "./events";
 import { ModelOdm } from "./odm";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { logDomainEvent } from "#modules/log";
+import { EventType, ModelEvent } from "#utils/event-sourcing";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { CanCreateOne, CanGetAll, CanGetOneByIdOrCreate, CanUpdateOneById } from "#utils/layers/repository";
 
 const DepsMap = {
   domainMessageBroker: DomainMessageBroker,
@@ -33,8 +33,7 @@ CanGetAll<Model> {
   }
 
   async getAll(): Promise<Model[]> {
-    const docsOdm = await ModelOdm.find( {
-    }, {
+    const docsOdm = await ModelOdm.find( {}, {
       _id: 0,
     } );
 

@@ -1,7 +1,6 @@
 import YoutubeMp3Downloader from "youtube-mp3-downloader";
 import { ENVS } from "./utils";
 
-// eslint-disable-next-line import/prefer-default-export
 export function download(str: string): Promise<any> {
   const YD = new YoutubeMp3Downloader( {
     ffmpegPath: "ffmpeg", // FFmpeg binary location

@@ -1,9 +1,9 @@
+import { ResourceVO } from "#shared/models/resource";
+import PreventRepeatInDaysFilter from "../PreventRepeatInDaysFilter";
 import { SECONDS_IN_DAY } from "#modules/resources";
 import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
-import { ResourceVO } from "#shared/models/resource";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { useFakeTime } from "#tests/time";
-import PreventRepeatInDaysFilter from "../PreventRepeatInDaysFilter";
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
@@ -30,12 +30,12 @@ const casesDaysAgo = [
   },
   {
     lastTimePlayedDaysAgo: 3,
-    minDays: 3 + 1 / SECONDS_IN_DAY,
+    minDays: 3 + (1 / SECONDS_IN_DAY),
     expected: false,
   },
 ] as CaseDaysAgo[];
 
-describe.each(casesDaysAgo)("PreventRepeatInDaysFilter", (testCase) => {
+describe.each(casesDaysAgo)("preventRepeatInDaysFilter", (testCase) => {
   it(`should return ${testCase.expected} when lastTimePlayedDaysAgo = ${testCase.lastTimePlayedDaysAgo} days ago and minDays = ${testCase.minDays}`, async () => {
     const params = {
       minDays: testCase.minDays,
@@ -79,7 +79,7 @@ const casesLastTimePlayed = [
   },
 ] as CaseLastTimePlayed[];
 
-describe.each(casesLastTimePlayed)("PreventRepeatInDaysFilter", (testCase) => {
+describe.each(casesLastTimePlayed)("preventRepeatInDaysFilter", (testCase) => {
   it(`should return ${testCase.expected} when lastTimePlayed = ${testCase.lastTimePlayed} and minDays = ${testCase.minDays}`, async () => {
     const params = {
       minDays: testCase.minDays,

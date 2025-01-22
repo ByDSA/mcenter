@@ -1,12 +1,12 @@
 import { Music, MusicGetOneByIdReq, MusicPatchOneByIdReq, MusicPatchOneByIdResBody, assertIsMusic, assertIsMusicGetOneByIdReq, assertIsMusicPatchOneByIdReq, assertIsMusicPatchOneByIdResBody } from "#shared/models/musics";
 import { HttpStatusCode } from "#shared/utils/http";
+import express, { NextFunction, Router } from "express";
+import { Repository } from "../repositories";
+import { PatchOneParams } from "../repositories/types";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetOneById, CanPatchOneById } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { ResponseWithBody, sendBody, validateReq, validateResBody } from "#utils/validation/zod-express";
-import express, { NextFunction, Router } from "express";
-import { Repository } from "../repositories";
-import { PatchOneParams } from "../repositories/types";
 
 const DepsMap = {
   repo: Repository,
@@ -18,17 +18,20 @@ export default class RestController
 implements
     Controller,
     CanGetOneById<MusicGetOneByIdReq, ResponseWithBody<Music | null>>,
-    CanPatchOneById<MusicPatchOneByIdReq, ResponseWithBody<MusicPatchOneByIdResBody>>
-{
+    CanPatchOneById<MusicPatchOneByIdReq, ResponseWithBody<MusicPatchOneByIdResBody>> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
   }
 
-  async patchOneById(req: MusicPatchOneByIdReq, res: ResponseWithBody<MusicPatchOneByIdResBody>, next: NextFunction): Promise<void> {
+  async patchOneById(
+    req: MusicPatchOneByIdReq,
+    res: ResponseWithBody<MusicPatchOneByIdResBody>,
+    next: NextFunction,
+  ): Promise<void> {
     const { id } = req.params;
-    const {entity, unset} = req.body;
+    const { entity, unset } = req.body;
     const patchParams: PatchOneParams = {
       entity,
       unset,
@@ -36,8 +39,7 @@ implements
 
     await this.#deps.repo.patchOneById(id, patchParams);
 
-    res.body = {
-    };
+    res.body = {};
 
     next();
   }
@@ -57,7 +59,8 @@ implements
   getRouter(): Router {
     const router = SecureRouter();
 
-    router.get("/:id",
+    router.get(
+      "/:id",
       validateReq(assertIsMusicGetOneByIdReq),
       this.getOneById.bind(this),
       validateResBody(assertIsMusic),
@@ -71,7 +74,8 @@ implements
       res.sendStatus(HttpStatusCode.OK);
     } );
     router.use(express.json());
-    router.patch("/:id",
+    router.patch(
+      "/:id",
       validateReq(assertIsMusicPatchOneByIdReq),
       this.patchOneById.bind(this),
       validateResBody(assertIsMusicPatchOneByIdResBody),
