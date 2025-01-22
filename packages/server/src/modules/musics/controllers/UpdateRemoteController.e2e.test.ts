@@ -9,7 +9,7 @@ import UpdateRemoteController from "./UpdateRemoteController";
 
 let app: ExpressAppMock;
 const updateRemoteController = registerSingletonIfNotAndGet(UpdateRemoteController);
-let routerApp: Application | null = null;
+let routerApp: Application;
 
 describe("UpdateRemoteController", () => {
   app = new ExpressAppMock();

@@ -13,7 +13,7 @@ import { HistoryMusicModelOdm } from "./history";
 
 let app: ExpressAppMock;
 const getController = registerSingletonIfNotAndGet(GetController);
-let routerApp: Application | null = null;
+let routerApp: Application;
 
 async function loadFixtures() {
   await app.dropDb();
