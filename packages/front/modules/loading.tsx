@@ -1,5 +1,4 @@
-
-export default function Loading() {
+const L = function Loading() {
   return (
     <div style={{
       fontSize: "8vw",
@@ -9,4 +8,8 @@ export default function Loading() {
     }}>Loading...
     </div>
   );
-}
+};
+
+export {
+  L as Loading,
+};

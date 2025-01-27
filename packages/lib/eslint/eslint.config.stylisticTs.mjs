@@ -1,4 +1,4 @@
-import plugin from "@stylistic/eslint-plugin-ts";
+import stylisticTsPlugin from "@stylistic/eslint-plugin-ts";
 
 const rules = {
   "@stylistic/ts/type-annotation-spacing": [ // Espaciado entre <variable>:<tipo>
@@ -18,9 +18,29 @@ const rules = {
   semi: "off",
   "@stylistic/ts/semi": ["error", "always"],
   "@stylistic/ts/member-delimiter-style": ["error"], // Uso de ";" como delimitador en miembros de interfaces y tipos
+  "@stylistic/ts/object-curly-newline": [
+    "error",
+    {
+      ImportDeclaration: "never",
+      ExportDeclaration: {
+        multiline: true,
+        minProperties: 1,
+      },
+      ObjectExpression: {
+        minProperties: 1,
+      },
+      ObjectPattern: "never",
+    },
+  ],
+  "@stylistic/ts/object-property-newline": [
+    "error",
+    {
+      allowAllPropertiesOnSameLine: false,
+    },
+  ],
 };
 
 export default {
   rules,
-  plugin,
+  plugin: stylisticTsPlugin,
 };

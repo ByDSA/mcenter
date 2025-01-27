@@ -1,7 +1,7 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import Controller from "../Controller";
+import { MusicController } from "../Controller";
 import { getRouterMock } from "#tests/main";
 
-export class MusicControllerMock implements PublicMethodsOf<Controller> {
+export class MusicControllerMock implements PublicMethodsOf<MusicController> {
   getRouter = getRouterMock;
 }

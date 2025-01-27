@@ -1,17 +1,18 @@
-import { useHistoryEntryEdition } from "#modules/history";
-import { rootBackendUrl } from "#modules/requests";
-import { secsToMmss } from "#modules/utils/dates";
-import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
-import { classes } from "#modules/utils/styles";
-import { Episode, EpisodePatchOneByIdRequest, assertIsEpisode } from "#shared/models/episodes";
-import { HistoryEntryWithId } from "#shared/models/historyLists";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
-import { LinkAsyncAction, ResourceInput, ResourceInputArrayString } from "#uikit/input";
 import { fetchPatch } from "../../../requests";
 import { fetchDelete } from "../../requests";
 import { EPISODE_PROPS } from "../utils";
-import LastestComponent from "./Lastest";
+import { LastestComponent } from "./Lastest";
 import style from "./style.module.css";
+import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
+import { EpisodePatchOneByIdRequest } from "#modules/series/episodes/models/transport";
+import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
+import { LinkAsyncAction, ResourceInput, ResourceInputArrayString } from "#uikit/input";
+import { classes } from "#modules/utils/styles";
+import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
+import { secsToMmss } from "#modules/utils/dates";
+import { rootBackendUrl } from "#modules/requests";
+import { useHistoryEntryEdition } from "#modules/history";
 
 function generatePatchBody(entryResource: Episode, resource: Episode) {
   const patchBodyParams: EpisodePatchOneByIdRequest["body"] = getDiff(entryResource, resource);
@@ -22,16 +23,17 @@ function generatePatchBody(entryResource: Episode, resource: Episode) {
 type Props = {
   entry: HistoryEntryWithId;
 };
-export default function Body( {entry: entryEpisode}: Props) {
-  const {episodeId: resourceId, episode: r, ...restEntryEpisode} = entryEpisode;
-  const entry = { // TODO: modificar HistoryEntry para que sea 'resource' y no 'episode' y poder quitar esto
+export function Body( { entry: entryEpisode }: Props) {
+  const { episodeId: resourceId, episode: r, ...restEntryEpisode } = entryEpisode;
+  // TODO: modificar HistoryEntry para que sea 'resource' y no 'episode' y poder quitar esto
+  const entry = {
     ...restEntryEpisode,
     resourceId,
     resource: r,
   };
 
   assertIsDefined(entry.resource, "entry.resource");
-  const {resource: resourceRet, delete: deleteEntry} = useHistoryEntryEdition( {
+  const { resource: resourceRet, delete: deleteEntry } = useHistoryEntryEdition( {
     resource: {
       calcIsModified,
       entry,
@@ -47,9 +49,12 @@ export default function Body( {entry: entryEpisode}: Props) {
       fetch: fetchDelete,
     },
   } );
-  const {isModified, update:{action: update, isDoing: isUpdating}, errors, resourceState, reset} = resourceRet;
+  const { isModified,
+    update: { action: update, isDoing: isUpdating },
+    errors,
+    resourceState,
+    reset } = resourceRet;
   const [resource] = resourceState;
-  // eslint-disable-next-line require-await
   const commonInputTextProps = {
     inputTextProps: {
       onPressEnter: ()=>update(),
@@ -64,7 +69,7 @@ export default function Body( {entry: entryEpisode}: Props) {
   };
   const titleElement = ResourceInput( {
     caption: EPISODE_PROPS.title.caption,
-    prop:"title",
+    prop: "title",
     error: errors?.title,
     ...commonInputTextProps,
   } );
@@ -126,8 +131,8 @@ export default function Body( {entry: entryEpisode}: Props) {
     </span>
     <span className={classes("line", "height2")}>
       {ResourceInput( {
-        caption:EPISODE_PROPS.path.caption,
-        prop:"path",
+        caption: EPISODE_PROPS.path.caption,
+        prop: "path",
         ...commonInputTextProps,
       } )}
     </span>
@@ -139,13 +144,17 @@ export default function Body( {entry: entryEpisode}: Props) {
     <span className={"break"} />
     <span className="line">
       <span><a onClick={() => reset()}>Reset</a></span>
-      {isModified && <span className={style.update}>{<LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>}</span>}</span>
+      {isModified && <span className={style.update}>{
+        <LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>}</span>
+      }</span>
     <span className={"break"} />
     {
-      deleteEntry &&
-    <>
+      deleteEntry
+    && <>
       <span className={"line"}>
-        <LinkAsyncAction action={deleteEntry.action} isDoing={deleteEntry.isDoing}>Borrar</LinkAsyncAction>
+        <LinkAsyncAction
+          action={deleteEntry.action}
+          isDoing={deleteEntry.isDoing}>Borrar</LinkAsyncAction>
       </span>
       <span className={"break"} />
     </>

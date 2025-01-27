@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import { treePut } from "#shared/utils/trees";
 import { Episode, Season, Serie, SerieTree } from "./models";
 
@@ -12,7 +13,7 @@ type Return = {
   moved: OldNew[];
   updated: OldNew[];
 };
-export default function diff(tree1: SerieTree, tree2: SerieTree): Return {
+export function diff(tree1: SerieTree, tree2: SerieTree): Return {
   const removed: SerieTree = {
     children: [],
   };
@@ -41,16 +42,14 @@ export default function diff(tree1: SerieTree, tree2: SerieTree): Return {
     if (tree2BranchesMap[branches] === undefined) { // si no está en el mismo sitio en el nuevo
       if (
         tree2ContentMap[plainTreeEntry.content.filePath] === undefined
-      ) // ni el filePath lo tiene otro nodo
-      {
+      ) { // ni el filePath lo tiene otro nodo
         treePut(
           removed,
           [serieId, seasonId],
           plainTreeEntry.id,
           plainTreeEntry.content,
-        );
-      } // se ha eliminado
-      else {
+        ); // se ha eliminado
+      } else {
         moved.push( { // se ha movido
           old: plainTreeEntry,
           new: tree2ContentMap[plainTreeEntry.content.filePath],

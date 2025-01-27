@@ -1,5 +1,5 @@
-import { ResourceVO } from "#shared/models/resource";
-import PreventDisabledFilter from "../PreventDisabledFilter";
+import { PreventDisabledFilter } from "../PreventDisabledFilter";
+import { ResourceVO } from "#modules/resources/models";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 
 const ENABLED_NO_DISABLED: ResourceVO = {

@@ -1,21 +1,21 @@
-import { HistoryMusicListGetManyEntriesBySearchRequest, assertIsHistoryMusicListGetManyEntriesBySearchRequest } from "#shared/models/musics";
 import express, { Request, Response, Router } from "express";
-import { Repository as MusicRepository } from "../../repositories";
-import { Repository } from "../repositories";
+import { MusicRepository } from "../../repositories";
+import { MusicHistoryRepository } from "../repositories";
 import { GetManyCriteria } from "../repositories/Repository";
+import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchRequest } from "#musics/history/models/transport";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
 
-const DepsMap = {
-  historyRepository: Repository,
+const DEPS_MAP = {
+  historyRepository: MusicHistoryRepository,
   musicRepository: MusicRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class RestController
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class MusicHistoryRestController
 implements
     Controller,
     CanGetAll<Request, Response> {
@@ -32,7 +32,7 @@ implements
   }
 
   async getManyEntriesBySearch(
-    req: HistoryMusicListGetManyEntriesBySearchRequest,
+    req: MusicHistoryListGetManyEntriesBySearchRequest,
     res: Response,
   ): Promise<void> {
     const criteria = bodyToCriteria(req.body);
@@ -47,7 +47,7 @@ implements
     router.use(express.json());
     router.post(
       "/:user/search",
-      validateReq(assertIsHistoryMusicListGetManyEntriesBySearchRequest),
+      validateReq(assertIsMusicHistoryListGetManyEntriesBySearchRequest),
       this.getManyEntriesBySearch.bind(this),
     );
     router.options("/:user/search", (_req, res) => {
@@ -61,7 +61,7 @@ implements
   }
 }
 
-function bodyToCriteria(body: HistoryMusicListGetManyEntriesBySearchRequest["body"]): GetManyCriteria {
+function bodyToCriteria(body: MusicHistoryListGetManyEntriesBySearchRequest["body"]): GetManyCriteria {
   const ret: GetManyCriteria = {
     expand: body.expand,
     limit: body.limit,

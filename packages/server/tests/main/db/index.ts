@@ -1,3 +1,3 @@
 export {
-  default as TestMongoDatabase,
+  TestMongoDatabase,
 } from "./TestMongoDatabase";

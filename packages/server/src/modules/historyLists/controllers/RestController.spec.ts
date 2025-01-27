@@ -1,24 +1,24 @@
-import HttpStatusCode from "#shared/utils/http/StatusCode";
+import { HttpStatusCode } from "#shared/utils/http/StatusCode";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
-import { ListRepository as HistoryListRepository } from "../repositories";
+import { HistoryListRepository } from "../repositories";
 import { HistoryListRepositoryMock } from "../repositories/tests";
-import RestController from "./RestController";
+import { HistoryListRestController } from "./RestController";
 import { resolveRequired } from "#utils/layers/deps";
 import { RouterApp } from "#utils/express/test";
 import { HISTORY_LIST_SIMPSONS, HISTORY_LIST_WITH_NO_ENTRIES } from "#tests/main/db/fixtures";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 
-describe("RestController", () => {
+describe("restController", () => {
   let routerApp: Application;
   let historyListRepositoryMock: HistoryListRepositoryMock;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     registerSingletonIfNotAndGet(HistoryListRepository, HistoryListRepositoryMock);
     historyListRepositoryMock = resolveRequired(HistoryListRepository) as HistoryListRepositoryMock;
-    container.registerSingleton(RestController);
-    const controller = resolveRequired(RestController);
+    container.registerSingleton(HistoryListRestController);
+    const controller = resolveRequired(HistoryListRestController);
 
     routerApp = RouterApp(controller.getRouter());
   } );
@@ -38,8 +38,8 @@ describe("RestController", () => {
         .get("/id")
         .send();
 
-      expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledTimes(1);
-      expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledWith("id");
+      expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveBeenCalledTimes(1);
+      expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveBeenCalledWith("id");
     } );
 
     it("should return null and 404 if 'id' is not found in repository", async () => {
@@ -49,7 +49,8 @@ describe("RestController", () => {
         .expect(HttpStatusCode.NOT_FOUND)
         .send();
 
-      expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveReturnedWith(Promise.resolve(null));
+      expect(historyListRepositoryMock.getOneByIdOrCreate)
+        .toHaveReturnedWith(Promise.resolve(null));
     } );
 
     it("should return same as repository returns", async () => {
@@ -73,8 +74,8 @@ describe("RestController", () => {
           .get("/id/entries")
           .send();
 
-        expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledTimes(1);
-        expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledWith("id");
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveBeenCalledTimes(1);
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveBeenCalledWith("id");
       } );
 
       it("should return null and 404 if 'id' is not found in repository", async () => {
@@ -84,7 +85,8 @@ describe("RestController", () => {
           .expect(HttpStatusCode.NOT_FOUND)
           .send();
 
-        expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveReturnedWith(Promise.resolve(null));
+        expect(historyListRepositoryMock.getOneByIdOrCreate)
+          .toHaveReturnedWith(Promise.resolve(null));
       } );
 
       it("should return the same entries that repository returns inside", async () => {
@@ -107,8 +109,8 @@ describe("RestController", () => {
           .post("/id/entries/search")
           .send();
 
-        expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledTimes(1);
-        expect(historyListRepositoryMock.getOneByIdOrCreate).toBeCalledWith("id");
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveBeenCalledTimes(1);
+        expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveBeenCalledWith("id");
       } );
 
       it("should return null and 404 if id is not found in repository", async () => {
@@ -118,7 +120,8 @@ describe("RestController", () => {
           .expect(HttpStatusCode.NOT_FOUND)
           .send();
 
-        expect(historyListRepositoryMock.getOneByIdOrCreate).toHaveReturnedWith(Promise.resolve(null));
+        expect(historyListRepositoryMock.getOneByIdOrCreate)
+          .toHaveReturnedWith(Promise.resolve(null));
       } );
 
       it("should throw 422 if provided unexpected property", async () => {
@@ -152,7 +155,7 @@ describe("RestController", () => {
           .post(URL)
           .send();
 
-        expect(historyListRepositoryMock.getAll).toBeCalledTimes(1);
+        expect(historyListRepositoryMock.getAll).toHaveBeenCalledTimes(1);
       } );
 
       it("should throw 422 if provided unexpected property", async () => {

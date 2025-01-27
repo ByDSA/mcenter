@@ -1,28 +1,31 @@
 import { z } from "zod";
 import { AssertZodSettings, assertZodPopStack } from "../../utils/validation/zod";
 import { SerieSchema } from "../series";
-import { VOSchema } from "./VO";
+import { voSchema } from "./VO";
 
-export const IdSchema = z.object( {
+export const idSchema = z.object( {
   innerId: z.string(),
   serieId: z.string(),
 } ).strict();
 
-export type Id = z.infer<typeof IdSchema>;
+export type Id = z.infer<typeof idSchema>;
 
 // TODO: quitar 'path' de aqui y ponerlo en el 'fileInfo'
-export const EntitySchema = VOSchema
+export const entitySchema = voSchema
   .merge(z.object( {
-    id: IdSchema,
+    id: idSchema,
     serie: SerieSchema.optional(),
   } ));
 
-export type Entity = z.infer<typeof EntitySchema>;
+export type Episode = z.infer<typeof entitySchema>;
 
-export function compareId(a: Id, b: Id): boolean {
+export function compareEpisodeId(a: Id, b: Id): boolean {
   return a.innerId === b.innerId && a.serieId === b.serieId;
 }
 
-export function assertIsModel(model: unknown, settings?: AssertZodSettings): asserts model is Entity {
-  assertZodPopStack(EntitySchema, model, settings);
+export function assertIsEpisode(
+  model: unknown,
+  settings?: AssertZodSettings,
+): asserts model is Episode {
+  assertZodPopStack(entitySchema, model, settings);
 }

@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 let alreadyLoaded = false;
 
 export const ENVS = Object.freeze( {
@@ -8,7 +6,6 @@ export const ENVS = Object.freeze( {
 } );
 assertEnv();
 
-// eslint-disable-next-line import/prefer-default-export
 function assertEnv() {
   if (alreadyLoaded)
     return;

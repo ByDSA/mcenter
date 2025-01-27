@@ -1,5 +1,5 @@
 import { UpdateQuery } from "mongoose";
-import { Model as Episode, assertIsModel as assertIsEpisode } from "../models";
+import { Episode, assertIsEpisode } from "../models";
 import { DocOdm } from "./odm";
 import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 

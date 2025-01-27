@@ -1,8 +1,4 @@
 export {
-  default as RemoteFrontPlayerController,
-} from "./Controller";
-
-export {
   VlcBackWebSocketsServerService,
 } from "./vlc-back";
 

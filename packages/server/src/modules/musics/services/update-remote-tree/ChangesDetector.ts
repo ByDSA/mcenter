@@ -1,6 +1,6 @@
 import { Stats } from "node:fs";
-import { MusicVO } from "#shared/models/musics";
 import { getFullPath } from "../../utils";
+import { MusicVO } from "#musics/models";
 import { md5FileAsync } from "#utils/crypt";
 
 export type FileWithStats = {
@@ -16,14 +16,15 @@ type GroupBySize<T> = {
 export type Changes = {
   new: FileWithStats[];
   deleted: MusicVO[];
-  moved: {original: MusicVO; newPath: string}[];
+  moved: {original: MusicVO;
+newPath: string;}[];
   updated: MusicVO[];
 };
 
 type Options = {
   useOnlyHashChecking?: boolean;
 };
-export default class ChangesDetector {
+export class ChangesDetector {
   #remoteMusic: MusicVO[];
 
   #localFiles: FileWithStats[];
@@ -140,7 +141,8 @@ export default class ChangesDetector {
     const ret = {
       new: [] as FileWithStats[],
       deleted: [] as MusicVO[],
-      moved: [] as {original: MusicVO; newPath: string}[],
+      moved: [] as {original: MusicVO;
+newPath: string;}[],
       updated: [] as MusicVO[],
     };
 

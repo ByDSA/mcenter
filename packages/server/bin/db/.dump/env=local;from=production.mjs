@@ -16,14 +16,13 @@ console.log = (...msg) => $.log( {
 
 const thisFolder = __dirname;
 // Importar variables de entorno
-const from = process.env.from;
+const { from } = process.env;
 const folderEnv = path.join(thisFolder, "..");
-
 const envFiles = fs.readdirSync(folderEnv).filter((f) => {
   const match = f.match(/^\.env\.[a-z]+$/);
 
   if (match === null)
-  return false;
+    return false;
 
   const env = match[0].replace(/^\.env\./, "");
 

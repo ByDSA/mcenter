@@ -1,10 +1,10 @@
 export {
-  default as PlayerStatusResponse,
-  assertIsStatusResponse as assertIsPlayerStatusResponse,
+  PlayerStatusResponse,
+  assertIsPlayerStatusResponse,
 } from "./StatusResponse";
 
 export {
-  default as PlayerPlaylistElement,
+  PlayerPlaylistElement,
 } from "./PlaylistElement";
 
 export {
@@ -12,5 +12,5 @@ export {
 } from "./web-sockets";
 
 export {
-  default as Player, PlayerActions,
+  PlayerService as Player, PlayerActions,
 } from "./Player";

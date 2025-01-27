@@ -1,23 +1,23 @@
 import { assertFound } from "#shared/utils/http/validation";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Request, Response, Router } from "express";
-import PlayService from "./PlayService";
+import { PlayService } from "./PlayService";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { HistoryListService } from "#modules/historyLists";
-import { StreamRepository } from "#modules/streams";
+import { StreamRepository } from "#modules/streams/repositories";
 import { Controller } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
-const DepsMap = {
+const DEPS_MAP = {
   playService: PlayService,
   episodePickerService: EpisodePickerService,
   streamRepository: StreamRepository,
   historyListService: HistoryListService,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class PlayController implements Controller {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class PlayStreamController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

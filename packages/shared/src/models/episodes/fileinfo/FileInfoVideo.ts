@@ -1,8 +1,8 @@
 import z from "zod";
-import { TimestampsFileSchema } from "../../utils/dtos/Timestamps";
-import { Schema as FileInfoSchema, compareModel as compareFileInfo } from "./FileInfo";
+import { timestampsFileSchema } from "../../utils/dtos/Timestamps";
+import { schema as FileInfoSchema, compareModel as compareFileInfo } from "./FileInfo";
 
-export const Schema = FileInfoSchema.extend( {
+export const schema = FileInfoSchema.extend( {
   mediaInfo: z.object( {
     duration: z.number().nullable(),
     resolution: z.object( {
@@ -11,31 +11,35 @@ export const Schema = FileInfoSchema.extend( {
     } ).strict(),
     fps: z.string().nullable(),
   } ).strict(),
-  timestamps: TimestampsFileSchema, // TODO: quitarlo de aquí y ponerlo en FileInfo común cuando se cree FileInfoMusic
+  // eslint-disable-next-line max-len
+  timestamps: timestampsFileSchema, // TODO: quitarlo de aquí y ponerlo en FileInfo común cuando se cree FileInfoMusic
 } ).strict();
-const SchemaWithSuperId = Schema.extend( {
+const schemaWithSuperId = schema.extend( {
   episodeId: z.string()
     .refine((id) => /^[a-f0-9]{24}$/.test(id), {
       message: "episodeId must be a mongodb id",
     } ),
 } ).strict();
 
-export type Model = z.infer<typeof Schema>;
+export type Model = z.infer<typeof schema>;
 
-export type ModelWithSuperId = z.infer<typeof SchemaWithSuperId>;
+export type ModelWithSuperId = z.infer<typeof schemaWithSuperId>;
 
 export type SuperId = ModelWithSuperId["episodeId"];
 
 export function assertIsModel(model: unknown): asserts model is Model {
-  Schema.parse(model);
+  schema.parse(model);
 }
 
 export function assertIsModelWithSuperId(model: unknown): asserts model is ModelWithSuperId {
-  SchemaWithSuperId.parse(model);
+  schemaWithSuperId.parse(model);
 }
 
 export function compareModel(a: Model, b: Model): boolean {
-  const sameMediaInfo = a.mediaInfo.duration === b.mediaInfo.duration && a.mediaInfo.resolution?.width === b.mediaInfo.resolution?.width && a.mediaInfo.resolution?.height === b.mediaInfo.resolution?.height && a.mediaInfo.fps === b.mediaInfo.fps;
+  const sameMediaInfo = a.mediaInfo.duration === b.mediaInfo.duration
+   && a.mediaInfo.resolution?.width === b.mediaInfo.resolution?.width
+   && a.mediaInfo.resolution?.height === b.mediaInfo.resolution?.height
+   && a.mediaInfo.fps === b.mediaInfo.fps;
 
   return compareFileInfo(a, b) && sameMediaInfo;
 }

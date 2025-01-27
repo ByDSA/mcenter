@@ -1,5 +1,5 @@
-import { Music, assertIsMusic } from "#shared/models/musics";
 import mongoose, { UpdateQuery } from "mongoose";
+import { Music, assertIsMusic } from "../models";
 import { DocOdm } from "./odm";
 import { PatchOneParams } from "./types";
 
@@ -127,7 +127,8 @@ export function musicModelToDocOdm(model: Music): DocOdm {
 
 function modelTagsToDocOdmTags(
   tags: string[] | undefined,
-): { tags?: string[]; onlyTags?: string[] } {
+): { tags?: string[];
+onlyTags?: string[]; } {
   if (!tags)
     return {};
 

@@ -1,18 +1,17 @@
 /* eslint-disable require-await */
-import { rootBackendUrl } from "#modules/requests";
 import { PlayerEvent, PlayerStatusResponse, assertIsPlayerStatusResponse } from "#shared/models/player";
 import { PlayResourceParams, PlayerActions } from "#shared/models/player/Player";
 import { Socket, io } from "socket.io-client";
+import { rootBackendUrl } from "#modules/requests";
 
 export const backendUrl = {
   url: rootBackendUrl,
   path: "/ws/",
 };
 
-export default abstract class WebSocketsClient implements PlayerActions {
+export abstract class RemotePlayerWebSocketsClient implements PlayerActions {
   socket: Socket;
 
-  // eslint-disable-next-line class-methods-use-this
   init() {
     const SOCKET_URL = backendUrl.url;
 
@@ -34,12 +33,10 @@ export default abstract class WebSocketsClient implements PlayerActions {
 
   abstract onStatus(status: PlayerStatusResponse): void;
 
-  // eslint-disable-next-line class-methods-use-this
   playResource(_: PlayResourceParams): Promise<void> {
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line class-methods-use-this
   fullscreenToggle(): Promise<void> {
     throw new Error("Method not implemented.");
   }

@@ -1,5 +1,5 @@
-import { HistoryListId } from "#shared/models/historyLists";
-import { SerieId } from "#shared/models/series";
+import { HistoryListId } from "#modules/historyLists/models";
+import { SerieId } from "#series/models";
 
 export type DependenciesList = {[key: SerieId]: [HistoryListId, HistoryListId][]};
 

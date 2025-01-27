@@ -1,20 +1,23 @@
-import { Music, MusicGetOneByIdReq, MusicPatchOneByIdReq, MusicPatchOneByIdResBody, assertIsMusic, assertIsMusicGetOneByIdReq, assertIsMusicPatchOneByIdReq, assertIsMusicPatchOneByIdResBody } from "#shared/models/musics";
 import { HttpStatusCode } from "#shared/utils/http";
 import express, { NextFunction, Router } from "express";
-import { Repository } from "../repositories";
+import { MusicRepository } from "../repositories";
 import { PatchOneParams } from "../repositories/types";
+import { Music, assertIsMusic } from "#musics/models";
+import { MusicGetOneByIdReq, MusicPatchOneByIdReq,
+  MusicPatchOneByIdResBody, assertIsMusicGetOneByIdReq,
+  assertIsMusicPatchOneByIdReq, assertIsMusicPatchOneByIdResBody } from "#musics/models/transport";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetOneById, CanPatchOneById } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { ResponseWithBody, sendBody, validateReq, validateResBody } from "#utils/validation/zod-express";
 
-const DepsMap = {
-  repo: Repository,
+const DEPS_MAP = {
+  repo: MusicRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class RestController
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class MusicRestController
 implements
     Controller,
     CanGetOneById<MusicGetOneByIdReq, ResponseWithBody<Music | null>>,

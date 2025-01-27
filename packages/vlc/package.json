@@ -1,4 +1,21 @@
 {
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "pnpm build:clean && pnpm build:raw",
+    "build:clean": "rm -rf build",
+    "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
+    "lint": "bin/lint.mjs",
+    "migrate": "./src/main/db/migrations/migrate.sh",
+    "start": "NODE_ENV=production node build/index.js",
+    "start:watch": "NODE_ENV=development nodemon",
+    "test": "NODE_ENV=test jest --maxWorkers=1 --testPathIgnorePatterns=VLCProcess*",
+    "test:coverage": "pnpm run test --coverage",
+    "test:coverage:clean": "rm -rf coverage",
+    "test:watch": "pnpm run test --watch"
+  },
   "dependencies": {
     "#shared": "workspace:../shared/build",
     "dotenv": "16.3.1",
@@ -7,7 +24,6 @@
     "socket.io-client": "4.7.2",
     "zod": "3.22.2"
   },
-  "description": "",
   "devDependencies": {
     "#sharedSrc": "workspace:../shared/src",
     "@types/jest": "29.5.4",
@@ -17,20 +33,5 @@
     "socket.io": "4.7.2",
     "ts-node": "10.9.1",
     "tsc-alias": "1.8.7"
-  },
-  "main": "build/index.js",
-  "name": "server",
-  "scripts": {
-    "build": "pnpm build:clean && pnpm build:raw",
-    "build:clean": "rm -rf build",
-    "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
-    "migrate": "./src/main/db/migrations/migrate.sh",
-    "start": "NODE_ENV=production node build/index.js",
-    "start:watch": "NODE_ENV=development nodemon",
-    "test": "NODE_ENV=test jest --maxWorkers=1 --testPathIgnorePatterns=VLCProcess*",
-    "test:coverage": "pnpm run test --coverage",
-    "test:coverage:clean": "rm -rf coverage",
-    "test:watch": "pnpm run test --watch"
-  },
-  "version": "1.0.0"
+  }
 }

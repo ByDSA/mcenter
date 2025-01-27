@@ -10,7 +10,7 @@ type Options = {
   config?: GlobalConfigOptions;
 };
 
-export default class App {
+export class App {
   private $options?: Options;
 
   private $expressApp!: Express;

@@ -2,7 +2,7 @@ import { HttpError } from "#shared/utils/http";
 import { isDebugging } from "#shared/utils/vscode";
 import { NextFunction, Request, Response } from "express";
 
-const errorHandler = (err: unknown, _req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (err: unknown, _req: Request, res: Response, next: NextFunction) => {
   if ((process.env.NODE_ENV !== "test" || (process.env.NODE_ENV === "test" && isDebugging())) && err instanceof Error && err.stack) { // TODO: usar enums
     let output = `${ err.name }`;
 
@@ -58,5 +58,3 @@ function getEndIndex(line: string) {
 
   return preLastIndex;
 }
-
-export default errorHandler;

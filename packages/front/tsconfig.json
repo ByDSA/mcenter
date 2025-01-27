@@ -12,24 +12,25 @@
     "noEmit": true,
     "paths": {
       "#modules/*": ["modules/*"],
+      "#musics/*": ["modules/musics/*"],
       "#shared/*": ["../shared/build/*"],
-      "#uikit/*": ["modules/ui-kit/*"],
-      "#styles/*": ["styles/*"],
       "#sharedSrc/*": [
         // quitar en producción
         "../shared/src/*"
-      ]
+      ],
+      "#styles/*": ["styles/*"],
+      "#uikit/*": ["modules/ui-kit/*"]
     },
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": false,
-    "strictNullChecks": true,
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "strictNullChecks": true
   },
   "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
+  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next-env.d.ts"]
 }

@@ -1,8 +1,10 @@
+import globals from "globals";
+import js from "@eslint/js";
 import customPlugin from "./custom-plugins/eslint-plugin-custom.mjs";
 import airbnbMod from "./eslint.config.airbnb.mjs";
 import importMod from "./eslint.config.import.mjs";
-import jestMod from "./eslint.config.jest.mjs";
-import stylisticMod from "./eslint.config.stylisticTs.mjs";
+import stylisticTsMod from "./eslint.config.stylisticTs.mjs";
+import stylisticMod from "./eslint.config.stylistic.mjs";
 import typescriptMod from "./eslint.config.typescript.mjs";
 
 const formatRules = {
@@ -24,15 +26,8 @@ const formatRules = {
   ],
   "linebreak-style": ["error", "unix"],
 };
-const modRules = {
-  ...airbnbMod.rules,
-  ...importMod.rules,
-  ...typescriptMod.rules,
-  ...stylisticMod.rules,
-};
-const globalRules = {
-  ...modRules,
-  ...formatRules,
+const otherNoPluginRules = {
+  "no-useless-rename": "error",
   "no-await-in-loop": "off",
   "no-invalid-this": [
     "error",
@@ -55,32 +50,6 @@ const globalRules = {
     {
       max: 1,
       maxEOF: 0,
-    },
-  ],
-  "newline-per-chained-call": [
-    "error",
-    {
-      ignoreChainWithDepth: 2,
-    },
-  ],
-  "object-curly-newline": [
-    "error",
-    {
-      ImportDeclaration: "never",
-      ExportDeclaration: {
-        multiline: true,
-        minProperties: 1,
-      },
-      ObjectExpression: {
-        minProperties: 1,
-      },
-      ObjectPattern: "never",
-    },
-  ],
-  "object-property-newline": [
-    "error",
-    {
-      allowAllPropertiesOnSameLine: false,
     },
   ],
   "comma-dangle": ["error", "always-multiline"],
@@ -188,54 +157,41 @@ const globalRules = {
   "multiline-ternary": ["error", "always-multiline"],
   "no-case-declarations": "error",
   "no-fallthrough": "error",
+  "object-curly-newline": "off", // deprecated. Usar @stylistic
+  "no-restricted-imports": [
+    "error",
+    "fs",
+    "path",
+    "child_process",
+    "util",
+  ],
 };
-const libEslintConfig = [
-  {
-    files: ["eslint.config.*"],
-    rules: {
-      ...importMod.rulesExceptions.libEslint,
-    },
-  },
-];
-
-jestMod.rules = {
-  ...jestMod.rules,
-  "import/no-internal-modules": "off",
+const noModRules = {
+  ...formatRules,
+  ...otherNoPluginRules,
 };
-const overrideConfigs = [
-  ...jestMod.config,
-  {
-    files: ["index.ts", "utils.ts"],
-    rules: {
-      "import/prefer-default-export": "off",
-    },
-  },
-  { // Scripting: zx
-    files: ["*.mjs"],
-    rules: {
-      "no-console": "off",
-      "require-await": "off",
-    },
-    languageOptions: {
-      globals: {
-        $: true,
-        argv: true,
-        path: true,
-        fs: true,
-        cd: true,
-        chalk: true,
-      },
-    },
-  },
-  ...libEslintConfig,
-];
-/* UNUSED: usado en eslint <9 y aún no adaptado */
-const env = {
-  browser: true,
-  es2021: true,
-  node: true,
+const tsRules = {
+  ...typescriptMod.rules,
+  ...stylisticTsMod.rules,
 };
-/** **************** */
+const noPluginRules = {
+  ...js.configs.recommended.rules,
+  ...airbnbMod.rules,
+  ...noModRules,
+};
+const jsRules = {
+  ...noPluginRules,
+  ...importMod.rules,
+  ...stylisticMod.rules,
+};
+const jsPlugins = {
+  import: importMod.plugin,
+  "@stylistic": stylisticMod.plugin,
+};
+const tsPlugins = {
+  "@typescript-eslint": typescriptMod.plugin,
+  "@stylistic/ts": stylisticTsMod.plugin,
+};
 const settings = {
   "import/parsers": {
     "@typescript-eslint/parser": [".ts", ".tsx"],
@@ -254,31 +210,130 @@ const customPluginsRules = {
   "custom/no-blank-lines-after-decorator": "error",
   "custom/no-blank-lines-between-decorators": "error",
   "custom/no-leading-blank-lines": "error",
+  "custom/mongoose-pascalcase-models": "error",
 };
 
-export default [
-  {
-    files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "*.mjs"],
-    settings,
-    languageOptions: {
-      parser: typescriptMod.parser,
-      parserOptions: typescriptMod.parserOptions,
-      globals: {
-        NodeJS: "readonly",
-        React: "readonly",
+export const configs = {
+  recommended: [
+  // React:
+    {
+      files: ["**/*.jsx", "**/*.jsx", "**/*.ts", "**/*.tsx"],
+      languageOptions: {
+        globals: {
+          NodeJS: "readonly",
+          React: "readonly",
+          ...globals.node,
+          ...globals.browser,
+        },
       },
     },
-    plugins: {
-      "@typescript-eslint": typescriptMod.plugin,
-      import: importMod.plugin,
-      "@stylistic/ts": stylisticMod.plugin,
-      // Custom plugins
-      custom: customPlugin,
+    // Node:
+    {
+      files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+      languageOptions: {
+        globals: {
+          ...globals.node,
+        },
+      },
+      plugins: {
+        ...jsPlugins,
+      },
+      rules: {
+        ...jsRules,
+      },
     },
-    rules: {
-      ...globalRules,
-      ...customPluginsRules,
+    // TypeScript:
+    {
+      files: ["**/*.ts", "**/*.tsx"],
+      settings,
+      languageOptions: {
+        parser: typescriptMod.parser,
+        parserOptions: typescriptMod.parserOptions,
+      },
+      plugins: {
+        ...tsPlugins,
+        custom: customPlugin,
+      },
+      rules: {
+        ...tsRules,
+        ...customPluginsRules,
+      },
     },
-  },
-  ...overrideConfigs,
-];
+    // Scripting .mjs:
+    {
+      files: ["**/*.mjs"],
+      languageOptions: {
+        globals: {
+          ...globals.node,
+          argv: true,
+          $: true,
+          path: true,
+          fs: false,
+          cd: true,
+          chalk: true,
+        },
+      },
+      plugins: {
+        ...jsPlugins,
+      },
+      rules: {
+        ...jsRules,
+        "import/no-internal-modules": "off",
+        "import/no-extraneous-dependencies": "off",
+      },
+    },
+    {
+      files: ["**/lib/**/*.mjs"],
+      rules: {
+        "no-console": "warn",
+        "import/no-default-export": "off",
+        "import/prefer-default-export": "off",
+      },
+    },
+    {
+      files: ["**/eslint.config.mjs"],
+      settings,
+      languageOptions: {
+        parserOptions: {
+          projectService: true,
+        },
+        globals: {
+          ...globals.node,
+        },
+      },
+      plugins: {
+        ...jsPlugins,
+      },
+      rules: {
+        ...jsRules,
+        "import/no-default-export": "off",
+        "import/prefer-default-export": "error",
+        "import/no-internal-modules": "off",
+        "import/no-extraneous-dependencies": "off",
+      },
+    },
+    // Prettier:
+    {
+      files: ["**/prettier.config.mjs"],
+      plugins: {
+        ...jsPlugins,
+      },
+      rules: {
+        ...jsRules,
+        "import/no-default-export": "off",
+        "import/prefer-default-export": "error",
+        "import/no-internal-modules": "off",
+        "import/no-extraneous-dependencies": "off",
+      },
+    },
+    {
+      ignores: ["**/{build,dist}/**", "**/node_modules/**"],
+    },
+    {
+      files: ["index.ts", "utils.ts"],
+      rules: {
+        "import/prefer-default-export": "off",
+      },
+    },
+  ],
+};

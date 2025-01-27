@@ -2,7 +2,7 @@ import { assertIsDefined } from "#shared/utils/validation";
 import { ConfigOptions, NetConfig } from "./common";
 import { getInitializedNetConfig } from "./initialization";
 
-export default class GlobalConfig {
+export class GlobalConfig {
   #options?: ConfigOptions;
 
   #netConfig: NetConfig | undefined;

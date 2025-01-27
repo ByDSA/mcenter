@@ -1,17 +1,19 @@
-import PlayerService from "#modules/PlayerService";
-import PlayerServiceMock from "#modules/player-service/tests/PlayerServiceMock";
-import { PlayerEvent } from "#shared/models/player";
+/* eslint-disable require-await */
+/* eslint-disable jest/no-done-callback */
 import { Socket } from "socket.io-client";
-import WebSocketsService from "./WebSocketsService";
-import FakeWSServer from "./tests/FakeWSServer";
+import { FakeWsServer } from "./tests/FakeWsServer";
+import { WebSocketsService } from "./WebSocketsService";
+import { PlayerEvent } from "#modules/models";
+import { PlayerServiceMock } from "#modules/player-service/tests/PlayerServiceMock";
+import { PlayerService } from "#modules/PlayerService";
 
 let client: WebSocketsService;
-let server: FakeWSServer;
+let server: FakeWsServer;
 let playerService: PlayerService;
 
 beforeAll(async () => {
   playerService = new PlayerServiceMock();
-  server = new FakeWSServer();
+  server = new FakeWsServer();
   await server.start();
   client = new WebSocketsService( {
     playerService,
@@ -40,7 +42,8 @@ afterAll(() => {
 describe("server emissions", () => {
   it("pause toggle", (done) => {
     playerService.pauseToggle = jest.fn(async () => {
-      expect(playerService.pauseToggle).toBeCalledTimes(1);
+      expect(playerService.pauseToggle).toHaveBeenCalledTimes(1);
+
       done();
     } );
     server.emit(PlayerEvent.PAUSE_TOGGLE, undefined);
@@ -48,7 +51,8 @@ describe("server emissions", () => {
 
   it("next", (done) => {
     playerService.next = jest.fn(async () => {
-      expect(playerService.next).toBeCalledTimes(1);
+      expect(playerService.next).toHaveBeenCalledTimes(1);
+
       done();
     } );
     server.emit(PlayerEvent.NEXT, undefined);
@@ -56,7 +60,8 @@ describe("server emissions", () => {
 
   it("previous", (done) => {
     playerService.previous = jest.fn(async () => {
-      expect(playerService.previous).toBeCalledTimes(1);
+      expect(playerService.previous).toHaveBeenCalledTimes(1);
+
       done();
     } );
     server.emit(PlayerEvent.PREVIOUS, undefined);
@@ -64,65 +69,70 @@ describe("server emissions", () => {
 
   it("stop", (done) => {
     playerService.stop = jest.fn(async () => {
-      expect(playerService.stop).toBeCalledTimes(1);
+      expect(playerService.stop).toHaveBeenCalledTimes(1);
+
       done();
     } );
     server.emit(PlayerEvent.STOP, undefined);
   } );
 
   it("play", (done) => {
-    const ID = 1;
+    const sendingId = 1;
 
     playerService.play = jest.fn(async (id) => {
-      expect(playerService.play).toBeCalledTimes(1);
-      expect(id).toBe(ID);
+      expect(playerService.play).toHaveBeenCalledTimes(1);
+      expect(id).toBe(sendingId);
+
       done();
     } );
-    server.emit(PlayerEvent.PLAY, ID);
+    server.emit(PlayerEvent.PLAY, sendingId);
   } );
 
   it("seek (valid string)", (done) => {
-    const DATA = "+5";
+    const sendingData = "+5";
 
     playerService.seek = jest.fn(async (data) => {
-      expect(playerService.seek).toBeCalledTimes(1);
-      expect(data).toBe(DATA);
+      expect(playerService.seek).toHaveBeenCalledTimes(1);
+      expect(data).toBe(sendingData);
+
       done();
     } );
-    server.emit(PlayerEvent.SEEK, DATA);
+    server.emit(PlayerEvent.SEEK, sendingData);
   } );
 
   it("seek (valid number)", (done) => {
-    const DATA = 1;
+    const sendingData = 1;
 
-    playerService.seek = jest.fn(async (data) => {
-      expect(playerService.seek).toBeCalledTimes(1);
-      expect(data).toBe(DATA);
+    playerService.seek = jest.fn(async (d) => {
+      expect(playerService.seek).toHaveBeenCalledTimes(1);
+      expect(d).toBe(sendingData);
+
       done();
     } );
-    server.emit(PlayerEvent.SEEK, DATA);
+    server.emit(PlayerEvent.SEEK, sendingData);
   } );
 
   it("seek (invalid type data)", (done) => {
-    const DATA = {
+    const sendingData = {
       a: 1,
     };
     const socket: Socket = (client as any).getSocket();
 
     socketErrorHandler(socket, PlayerEvent.SEEK, (error) => {
       expect(error.message).toBe("val is not string or number");
+
       done();
     } );
-    server.emit(PlayerEvent.SEEK, DATA);
+    server.emit(PlayerEvent.SEEK, sendingData);
   } );
 } );
 
 function socketErrorHandler(socket: Socket, eventType: string, handler: (error: Error)=> void) {
   const listeners = socket.listeners(eventType);
 
-  expect(listeners.length).toBe(1);
+  expect(listeners).toHaveLength(1);
 
-  const listener = listeners[0];
+  const [listener] = listeners;
 
   socket.off(eventType, listener);
 

@@ -1,5 +1,5 @@
 export {
-  default as Repository,
+  SerieRepository,
 } from "./Repository";
 
 export {

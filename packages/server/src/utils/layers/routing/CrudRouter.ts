@@ -1,9 +1,9 @@
 import { ArrayOneOrMore } from "#shared/utils/arrays";
-import HttpMethod from "#shared/utils/http/HttpMethod";
+import { HttpMethod } from "#shared/utils/http/HttpMethod";
 import { mergeOpts } from "#shared/utils/objects";
 import { Handler } from "express";
 import { NOT_IMPLEMENTED_HANDLER } from "../../express/handlers";
-import Router from "./Router";
+import { Router } from "./Router";
 
 type GeneralRoute = {
   method: HttpMethod;
@@ -44,7 +44,7 @@ PUT: /users/:id | updateUser() // Update one, dto en body
 DELETE: /users/:id | deleteUser() // Delete one, by pk
 */
 
-const DefaultParams: Params = {
+const DEFAULT_PARAMS: Params = {
   url: "/",
   methods: {
     createOne: {
@@ -81,9 +81,9 @@ const DefaultParams: Params = {
   },
 };
 
-export default class CrudRouter extends Router {
+export class CrudRouter extends Router {
   private constructor(params?: Params) {
-    const realParams: Params = mergeOpts(DefaultParams, params);
+    const realParams: Params = mergeOpts(DEFAULT_PARAMS, params);
     const { additionalRoutes } = realParams;
     const { createOne, deleteOneByPk, readMany, readOneByPk, updateOneByPk } = realParams.methods;
     const routes = [

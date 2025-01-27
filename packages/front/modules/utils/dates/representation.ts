@@ -55,7 +55,7 @@ export function getSmallDateStr(date: Date) {
 
 export function secsToMmss(secs: number) {
   const minutes = Math.floor(secs / 60);
-  const seconds = secs - minutes * 60;
+  const seconds = secs - (minutes * 60);
   const secondsInt = Math.floor(seconds);
   const secondsDecimal = seconds - secondsInt;
 
@@ -106,7 +106,7 @@ function getLocaleMinutes(minutes: number) {
   return minutes === 1 ? "minuto" : "minutos";
 }
 
-export function formatDate(date: Date, {dateTime, ago}: DateFormat) {
+export function formatDate(date: Date, { dateTime, ago }: DateFormat) {
   let ret = "";
 
   if (ago === "yes")

@@ -1,6 +1,6 @@
-import { ResourceVO } from "#shared/models/resource";
-import PreventRepeatInDaysFilter from "../PreventRepeatInDaysFilter";
+import { PreventRepeatInDaysFilter } from "../PreventRepeatInDaysFilter";
 import { SECONDS_IN_DAY } from "#modules/resources";
+import { ResourceVO } from "#modules/resources/models";
 import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { useFakeTime } from "#tests/time";

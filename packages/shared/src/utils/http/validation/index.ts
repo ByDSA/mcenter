@@ -1,33 +1,33 @@
 export * from "./found";
 
 export {
-  default as UnauthorizedError,
+  UnauthorizedError,
 } from "./UnauthorizedError";
 
 export {
-  default as MethodNotAllowedError,
+  MethodNotAllowedError,
 } from "./MethodNotAllowedError";
 
 export {
-  default as ModelNotFoundError,
+  ModelNotFoundError,
 } from "./ModelNotFoundError";
 
 export {
-  default as NotUpdatedError,
+  NotUpdatedError,
 } from "./NotUpdatedError";
 
 export {
-  default as ForbiddenError,
+  ForbiddenError,
 } from "./ForbiddenError";
 
 export {
-  default as UnprocessableEntityError,
+  UnprocessableEntityError,
 } from "./UnprocessableEntityError";
 
 export {
-  default as ServiceUnavailableError,
+  ServiceUnavailableError,
 } from "./ServiceUnavailableError";
 
 export {
-  default as HttpError,
+  HttpError,
 } from "./HttpError";

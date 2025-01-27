@@ -1,6 +1,6 @@
 packages:
-    - 'shared'
-    - 'server'
-    - 'music'
-    - 'front'
-    - 'vlc'
+  - "shared"
+  - "server"
+  - "music"
+  - "front"
+  - "vlc"

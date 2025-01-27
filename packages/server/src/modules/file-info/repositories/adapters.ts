@@ -1,12 +1,13 @@
-import { FileInfoVideo, FileInfoVideoWithSuperId, assertIsFileInfoVideo, assertIsFileInfoVideoWithSuperId } from "#shared/models/episodes/fileinfo";
 import { assertIsDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
 import { DocOdm } from "./odm";
+import { FileInfoVideo, FileInfoVideoWithSuperId, assertIsFileInfoVideo, assertIsFileInfoVideoWithSuperId } from "#modules/file-info/models";
 
 type Model = FileInfoVideo;
 type ModelWithSuperId = FileInfoVideoWithSuperId;
 
 const assertIsModel: typeof assertIsFileInfoVideo = assertIsFileInfoVideo;
+// eslint-disable-next-line max-len
 const assertIsModelWithSuperId: typeof assertIsFileInfoVideoWithSuperId = assertIsFileInfoVideoWithSuperId;
 
 export function docOdmToModel(docOdm: DocOdm): Model {

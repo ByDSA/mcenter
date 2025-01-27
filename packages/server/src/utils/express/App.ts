@@ -1,6 +1,6 @@
 import { Express } from "express";
 
-export default interface App {
+export interface App {
   init(): Promise<void>;
   listen(): Promise<void>;
   close(): Promise<void>;

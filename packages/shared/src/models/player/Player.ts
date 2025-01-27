@@ -16,6 +16,6 @@ export interface PlayerActions {
   seek(value: number | string): Promise<void>;
 }
 
-export default interface PlayerService extends PlayerActions {
+export interface PlayerService extends PlayerActions {
   isRunning(): Promise<boolean>;
 }

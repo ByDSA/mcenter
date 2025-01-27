@@ -1,15 +1,15 @@
 import { z } from "zod";
 
-const UpdateEpisodesFileRequestSchema = z.object( {
+const updateEpisodesFileRequestSchema = z.object( {
   query: z.object( {
     forceHash: z.enum(["0", "1", "true", "false"]).optional(),
   } ),
 } );
 
-export type UpdateEpisodesFileRequest = z.infer<typeof UpdateEpisodesFileRequestSchema>;
+export type UpdateEpisodesFileRequest = z.infer<typeof updateEpisodesFileRequestSchema>;
 
 export function assertIsUpdateEpisodesFileRequest(
   o: unknown,
 ): asserts o is UpdateEpisodesFileRequest {
-  UpdateEpisodesFileRequestSchema.parse(o);
+  updateEpisodesFileRequestSchema.parse(o);
 }

@@ -1,6 +1,7 @@
-import { PlayerEvent, PlayResourceMessage } from "#shared/models/player";
+import { showError } from "#shared/utils/errors/showError";
 import { io, Socket } from "socket.io-client";
-import PlayerService from "../PlayerService";
+import { PlayerService } from "../PlayerService";
+import { PlayerEvent, PlayResourceMessage } from "#modules/models";
 
 type StartSocketParams = {
   host: string;
@@ -11,12 +12,12 @@ type StartSocketParams = {
 type Params = {
   playerService: PlayerService;
 };
-export default class WebSocketsService {
+export class WebSocketsService {
   #socket: Socket | undefined;
 
   #playerService: PlayerService;
 
-  constructor( {playerService}: Params) {
+  constructor( { playerService }: Params) {
     this.#playerService = playerService;
   }
 
@@ -32,7 +33,7 @@ export default class WebSocketsService {
     return this.#socket;
   }
 
-  async startSocket( {host,path,port}: StartSocketParams): Promise<void> {
+  async startSocket( { host, path, port }: StartSocketParams): Promise<void> {
     this.#socket = io(`http://${host}:${port}`, {
       path,
     } );
@@ -45,42 +46,45 @@ export default class WebSocketsService {
 
     socket.on(PlayerEvent.CONNECT, () => {
       console.log("socket connected");
-    },
-    );
+    } );
 
     socket.on(PlayerEvent.DISCONNECT, () => {
       console.log("socket disconnected");
-    },
-    );
+    } );
 
     socket.on(PlayerEvent.PAUSE_TOGGLE, () => {
       console.log("pause toggle");
 
-      this.#playerService.pauseToggle();
+      this.#playerService.pauseToggle()
+        .catch(showError);
     } );
 
     socket.on(PlayerEvent.NEXT, () => {
       console.log("next");
 
-      this.#playerService.next();
+      this.#playerService.next()
+        .catch(showError);
     } );
 
     socket.on(PlayerEvent.PREVIOUS, () => {
       console.log("previous");
 
-      this.#playerService.previous();
+      this.#playerService.previous()
+        .catch(showError);
     } );
 
     socket.on(PlayerEvent.STOP, () => {
       console.log("stop");
 
-      this.#playerService.stop();
+      this.#playerService.stop()
+        .catch(showError);
     } );
 
     socket.on(PlayerEvent.PLAY, (id: number) => {
       console.log("play", id);
 
-      this.#playerService.play(id);
+      this.#playerService.play(id)
+        .catch(showError);
     } );
 
     socket.on(PlayerEvent.SEEK, (val: number | string) => {
@@ -89,11 +93,13 @@ export default class WebSocketsService {
 
       console.log("seek", val);
 
-      this.#playerService.seek(val);
+      this.#playerService.seek(val)
+        .catch(showError);
     } );
 
     socket.on(PlayerEvent.PLAY_RESOURCE, (msg: PlayResourceMessage) => {
-      this.#playerService.playResource(msg);
+      this.#playerService.playResource(msg)
+        .catch(showError);
     } );
 
     await new Promise<void>((resolve) => {

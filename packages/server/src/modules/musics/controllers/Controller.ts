@@ -1,23 +1,23 @@
 import { Router } from "express";
-import { HistoryRestController } from "../history";
-import FixController from "./FixController";
-import GetController from "./GetController";
-import RestController from "./RestController";
-import UpdateRemoteController from "./UpdateRemoteController";
+import { MusicHistoryRestController } from "../history";
+import { MusicFixController } from "./FixController";
+import { MusicGetController } from "./GetController";
+import { MusicRestController } from "./RestController";
+import { MusicUpdateRemoteController } from "./UpdateRemoteController";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Controller, SecureRouter } from "#utils/express";
 
-const DepsMap = {
-  getController: GetController,
-  fixController: FixController,
-  updateRemoteController: UpdateRemoteController,
-  historyController: HistoryRestController,
-  restController: RestController,
+const DEPS_MAP = {
+  getController: MusicGetController,
+  fixController: MusicFixController,
+  updateRemoteController: MusicUpdateRemoteController,
+  historyController: MusicHistoryRestController,
+  restController: MusicRestController,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class ApiController implements Controller {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class MusicController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

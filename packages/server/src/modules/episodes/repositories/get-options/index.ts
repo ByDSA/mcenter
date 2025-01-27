@@ -1,5 +1,5 @@
 export {
-  default as ExpandEnum,
+  ExpandEnum,
 } from "./ExpandEnum";
 
 export {

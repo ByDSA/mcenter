@@ -1,3 +1,3 @@
 export {
-  default as DomainMessageBroker,
+  Broker as DomainMessageBroker,
 } from "./MessageBroker";

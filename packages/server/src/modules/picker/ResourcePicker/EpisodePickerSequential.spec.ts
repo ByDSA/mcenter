@@ -1,7 +1,7 @@
 /* eslint-disable prefer-destructuring */
-import { Episode, compareEpisodeId } from "#shared/models/episodes";
-import ResourcePickerSequential from "./ResourcePickerSequential";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
+import { ResourcePickerSequential } from "./ResourcePickerSequential";
+import { Episode, compareEpisodeId } from "#episodes/models";
+import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures/models/episode";
 
 type Model = Episode;
 
@@ -16,7 +16,7 @@ it("should pick 1x02 when lastEp is 1x01", async () => {
   } );
   const actualEpisodes: Model[] = await seq.pick();
 
-  expect(actualEpisodes.length).toBe(1);
+  expect(actualEpisodes).toHaveLength(1);
 
   expect(actualEpisodes[0]).toEqual(expected);
 } );
@@ -32,7 +32,7 @@ it("should pick 1x01 (first one) when lastEp is undfined", async () => {
   } );
   const actualEpisodes: Model[] = await seq.pick();
 
-  expect(actualEpisodes.length).toBe(1);
+  expect(actualEpisodes).toHaveLength(1);
 
   expect(actualEpisodes[0]).toEqual(expected);
 } );
@@ -48,7 +48,7 @@ it("should pick 1x01 (first one) when lastEp is last", async () => {
   } );
   const actualEpisodes: Model[] = await seq.pick();
 
-  expect(actualEpisodes.length).toBe(1);
+  expect(actualEpisodes).toHaveLength(1);
 
   expect(actualEpisodes[0]).toEqual(expected);
 } );
@@ -64,7 +64,7 @@ it("should pick last and 1x01 (first one) when lastEp is previous to last and pi
   } );
   const actualEpisodes: Model[] = await seq.pick(2);
 
-  expect(actualEpisodes.length).toBe(2);
+  expect(actualEpisodes).toHaveLength(2);
 
   expect(actualEpisodes).toEqual(expected);
 } );

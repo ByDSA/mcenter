@@ -1,7 +1,7 @@
 import { PublicMethodsOf } from "#shared/utils/types";
 import { FrontWebSocketsServerService } from "../front";
 
-export default class WebSocketsServiceMock
+export class WebSocketsServiceMock
 implements PublicMethodsOf<FrontWebSocketsServerService> {
   startSocket = jest.fn();
 }

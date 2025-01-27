@@ -6,7 +6,7 @@ type InputElement = HTMLInputElement;
 
 export type InputNumberProps = InputTextNumberCommonProps<InputElement, number>;
 
-export function useInputNumber( {value, onPressEnter = "nothing", onChange}: InputNumberProps) {
+export function useInputNumber( { value, onPressEnter = "nothing", onChange }: InputNumberProps) {
   const ref = useRef(null as InputElement | null);
   const keyDownHandler = useMemo(()=>keyDownHandlerGenerator<number, InputElement>( {
     onPressEnter,
@@ -23,7 +23,7 @@ export function useInputNumber( {value, onPressEnter = "nothing", onChange}: Inp
 
   return {
     element: inputElement,
-    getValue:()=>stringToNumberOrUndefined(ref?.current?.value),
+    getValue: ()=>stringToNumberOrUndefined(ref?.current?.value),
     setValue: (v: number | undefined) => {
       if (!ref?.current)
         return;

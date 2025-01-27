@@ -14,5 +14,5 @@ front/.env
 
 server/build
 server/.log
-server/.eslintrc.js
+server/.eslint.config.js
 server/nodemon.json

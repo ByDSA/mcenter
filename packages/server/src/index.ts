@@ -2,18 +2,19 @@ import "reflect-metadata";
 
 import { container } from "tsyringe";
 import { ExpressApp, RealMongoDatabase } from "./main";
+import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController, SavedSerieTreeService } from "#episodes/index";
 import { ActionController } from "#modules/actions";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
-import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController, SavedSerieTreeService } from "#modules/episodes";
 import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
-import { MusicController, MusicHistoryRepository, MusicRepository } from "#modules/musics";
-import { PlaySerieController, PlayStreamController, RemotePlayerController, RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
+import { PlaySerieController, PlayStreamController, RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
 import { SerieRepository } from "#modules/series";
 import { StreamRestController } from "#modules/streams";
+import { MusicController, MusicHistoryRepository, MusicRepository } from "#musics/index";
 
-await (async function main() {
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
+(async function main() {
   container
     .registerSingleton(DomainMessageBroker)
     .registerSingleton(EpisodeFileInfoRepository)
@@ -33,7 +34,6 @@ await (async function main() {
     .registerSingleton(VlcBackWebSocketsServerService)
     .registerSingleton(RemotePlayerWebSocketsServerService)
 
-    .registerSingleton(RemotePlayerController)
     .registerSingleton(PlaySerieController)
     .registerSingleton(EpisodeRestController)
     .registerSingleton(MusicController)

@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-conditional-expect */
 import { parseQuery } from "./1-str-to-obj/QueryParser";
 import { findParamsToQueryParams, FindQueryParams } from "./QueriesOdm";
 

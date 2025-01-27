@@ -1,7 +1,7 @@
-import { Pickable } from "#shared/models/resource";
-import Filter from "./Filter";
+import { Filter } from "./Filter";
+import { Pickable } from "#modules/resources/models";
 
-export default class MinWeightFilter implements Filter {
+export class RemoveWeightLowerOrEqualThanFilter implements Filter {
   #num: number;
 
   constructor(num: number) {

@@ -1,32 +1,36 @@
 import path from "node:path";
-import tseslint from "typescript-eslint";
-import monorepoConfig from "../eslint.config.mjs";
+import { configs as projectConfigs } from "../lib/eslint.project.config.mjs";
 
 const packageDir = path.join(import.meta.url, "..").slice("file:".length);
-const projectConfig = [
+const packageConfig = [
+  {
+    ignores: ["lib/chevrotain", "bin/live-tests", "bin/migrations"],
+  },
   {
     files: ["**/*.ts"],
     rules: {
-      "import/no-internal-modules": "off",
       "import/no-extraneous-dependencies": ["error", {
         packageDir,
       }],
-      "no-underscore-dangle": ["error", {
-        allow: ["_id"],
-      }],
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [ // No funciona usar {episodes,musics}
+                "\\#modules/episodes",
+                "\\#modules/musics",
+              ],
+              message: "Usa el alias interno correspondiente en lugar de #modules/* (Ej: '#musics/models').",
+            },
+          ],
+        },
+      ],
     },
   },
 ];
-const ret = tseslint.config([
-  ...monorepoConfig,
-  ...projectConfig,
-  {
-    languageOptions: {
-      parserOptions: {
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
-]);
 
-export default ret;
+export default [
+  ...projectConfigs.recommended,
+  ...packageConfig,
+];

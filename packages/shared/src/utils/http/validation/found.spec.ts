@@ -21,6 +21,8 @@ describe("assertFound", () => {
   it("error stack in this file", () => {
     try {
       assertFound(undefined);
+
+      expect(true).toBeFalsy(); // No debería ejecutarse
     } catch (e) {
       expectErrorStackStartsWithThisFilename(e as NotFoundError);
     }

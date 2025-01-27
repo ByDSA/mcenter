@@ -1,15 +1,15 @@
 export {
-  default as LogElementResponse,
-  assertIsModel as assertIsLogElement,
+  LogElementResponse,
+  assertIsLogElement,
 } from "./LogElement";
 
 export {
-  default as ErrorElementResponse,
-  assertIsModel as assertIsErrorElementResponse,
-  errorToErrorElement as errorToErrorElementResponse,
+  ErrorElementResponse,
+  assertIsErrorElementResponse,
+  errorToErrorElementResponse,
 } from "./ErrorElement";
 
 export {
-  default as FullResponse,
+  FullResponse,
   assertIsModel as assertIsFullResponse,
 } from "./FullResponse";

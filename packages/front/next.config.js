@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+
 /** @type {import('next').NextConfig} */
 
 const dev = {
@@ -13,7 +13,6 @@ const dev = {
       fs: false,
     };
     config.plugins.push(
-
       new webpack.NormalModuleReplacementPlugin(
         /^node:/,
         (resource) => {
@@ -41,7 +40,7 @@ function readMainPackageJson() {
 };
 
 function locatePathPackageJson(initialDir = __dirname) {
-  const {root} = path.parse(initialDir);
+  const { root } = path.parse(initialDir);
   const currentDir = initialDir;
   let dir = currentDir;
 
@@ -51,6 +50,7 @@ function locatePathPackageJson(initialDir = __dirname) {
     if (fs.existsSync(packageJsonPath))
       return packageJsonPath;
 
+    // eslint-disable-next-line prefer-destructuring
     dir = path.parse(dir).dir;
   }
 
@@ -62,9 +62,12 @@ module.exports = {
   output: "standalone",
   reactStrictMode: true,
   swcMinify: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   env: {
     version: (() => {
-      const {version} = readMainPackageJson();
+      const { version } = readMainPackageJson();
 
       return version;
     } )(),

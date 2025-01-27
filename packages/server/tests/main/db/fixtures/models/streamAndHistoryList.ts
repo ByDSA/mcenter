@@ -1,7 +1,7 @@
 import { deepFreeze } from "#shared/utils/objects";
 import { SAMPLE1 as DATE_SAMPLE1 } from "./dates";
-import { HistoryEntry, HistoryList } from "#modules/historyLists";
-import { OriginType, Stream, StreamMode } from "#modules/streams";
+import { HistoryEntry, HistoryList } from "#modules/historyLists/models";
+import { Stream, StreamMode, StreamOriginType } from "#modules/streams";
 
 export const HISTORY_LIST_WITH_NO_ENTRIES: HistoryList = deepFreeze( {
   id: "id",
@@ -21,7 +21,7 @@ export const STREAM_SIMPSONS: Stream = deepFreeze( {
   group: {
     origins: [
       {
-        type: OriginType.SERIE,
+        type: StreamOriginType.SERIE,
         id: "simpsons",
       },
     ],

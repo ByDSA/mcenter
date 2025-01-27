@@ -12,7 +12,7 @@ const DEFAULT_OPTIONS: Required<Options> = {
   baseFolder: "",
 };
 
-export default function findAllSeriesTreeAt(
+export function findAllSerieFolderTreesAt(
   folderFullPath: string,
   options?: Options,
 ): FullResponse<Serie[]> {

@@ -23,7 +23,7 @@ function loadEnvs(): Envs {
 
   assertIsDefined(port, "VLC_HTTP_PORT");
 
-  const {WS_SERVER_HOST, WS_SERVER_PATH} = process.env;
+  const { WS_SERVER_HOST, WS_SERVER_PATH } = process.env;
   const WS_SERVER_PORT = Number(process.env.WS_SERVER_PORT);
 
   assertIsDefined(WS_SERVER_HOST, "WS_SERVER_HOST is not defined");
@@ -33,11 +33,11 @@ function loadEnvs(): Envs {
   if (Number.isNaN(WS_SERVER_PORT))
     throw new Error("WS_SERVER_PORT is not a number");
 
-  const {MEDIA_PATH} = process.env;
+  const { MEDIA_PATH } = process.env;
 
   assertIsDefined(MEDIA_PATH, "MEDIA_PATH is not defined");
 
-  const {TMP_PATH} = process.env;
+  const { TMP_PATH } = process.env;
 
   assertIsDefined(TMP_PATH, "TMP_PATH is not defined");
 

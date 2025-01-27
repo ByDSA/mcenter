@@ -1,27 +1,27 @@
-import { parseMusic } from "#shared/models/musics";
 import { Application } from "express";
 import request from "supertest";
-import { HistoryRepository } from "../history";
-import { HistoryRepositoryMock } from "../history/repositories/tests";
-import { Repository } from "../repositories";
-import { MUSICS_SAMPLES_IN_DISK, RepositoryMock } from "../repositories/tests";
+import { MusicHistoryRepository } from "../history";
+import { MusicHistoryRepositoryMock } from "../history/repositories/tests";
+import { MusicRepository } from "../repositories";
+import { MUSICS_SAMPLES_IN_DISK, MusicRepositoryMock } from "../repositories/tests";
 import { UpdateResult } from "../services";
-import Controller from "./Controller";
+import { MusicController } from "./Controller";
 import { RouterApp } from "#utils/express/test";
 import { registerSingletonIfNotAndGet } from "#tests/main";
+import { parseMusic } from "#musics/models";
 
-describe("GetAll", () => {
+describe("getAll", () => {
   let routerApp: Application;
-  let musicRepositoryMock: RepositoryMock;
-  let controller: Controller;
+  let musicRepositoryMock: MusicRepositoryMock;
+  let controller: MusicController;
 
   beforeAll(() => {
     musicRepositoryMock = registerSingletonIfNotAndGet(
-      Repository,
-      RepositoryMock,
-    ) as unknown as RepositoryMock;
-    registerSingletonIfNotAndGet(HistoryRepository, HistoryRepositoryMock);
-    controller = registerSingletonIfNotAndGet(Controller);
+      MusicRepository,
+      MusicRepositoryMock,
+    ) as unknown as MusicRepositoryMock;
+    registerSingletonIfNotAndGet(MusicHistoryRepository, MusicHistoryRepositoryMock);
+    controller = registerSingletonIfNotAndGet(MusicController);
 
     routerApp = RouterApp(controller.getRouter());
   } );
@@ -95,6 +95,7 @@ describe("GetAll", () => {
     expect(body.updated).toHaveLength(0);
     expect(body.moved).toHaveLength(0);
     expect(body.new).toHaveLength(1);
+
     const newGotParsed = parseMusic(body.new[0]);
 
     expect(newGotParsed).toEqual(MUSICS_SAMPLES_IN_DISK[1]);

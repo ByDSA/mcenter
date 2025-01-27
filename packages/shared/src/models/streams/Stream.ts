@@ -14,36 +14,35 @@ export enum OriginType {
   STREAM = "stream"
 };
 
-const OriginSerieSchema = z.object( {
-  type:z.literal(OriginType.SERIE),
+const originSerieSchema = z.object( {
+  type: z.literal(OriginType.SERIE),
   id: z.string(),
   serie: SerieSchema.optional(),
 } ).strict();
-const OriginStreamSchema = z.object( {
-  type:z.literal(OriginType.STREAM),
+const originStreamSchema = z.object( {
+  type: z.literal(OriginType.STREAM),
   id: z.string(),
 } )
   .strict();
-const OriginSchema = OriginSerieSchema
-  .or(OriginStreamSchema);
+const originSchema = originSerieSchema
+  .or(originStreamSchema);
 
-export type Origin = z.infer<typeof OriginSchema>;
+export type Origin = z.infer<typeof originSchema>;
 
-const GroupSchema = z.object( {
-  origins: z.array(OriginSchema),
+const groupSchema = z.object( {
+  origins: z.array(originSchema),
 } ).strict();
 
-export type Group = z.infer<typeof GroupSchema>;
+export type Group = z.infer<typeof groupSchema>;
 
-export const ModelSchema = z.object( {
+export const modelSchema = z.object( {
   id: z.string(),
-  group: GroupSchema,
+  group: groupSchema,
   mode: z.nativeEnum(Mode),
 } ).strict();
 
-type Model = z.infer<typeof ModelSchema>;
-export default Model;
+export type Stream = z.infer<typeof modelSchema>;
 
-export function assertIsModel(model: unknown): asserts model is Model {
-  assertZodPopStack(ModelSchema, model);
+export function assertIsModel(model: unknown): asserts model is Stream {
+  assertZodPopStack(modelSchema, model);
 }

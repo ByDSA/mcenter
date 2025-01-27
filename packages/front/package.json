@@ -1,4 +1,11 @@
 {
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "bin/lint.mjs",
+    "start": "[ -e .env ] && set -a && . ./.env; next start"
+  },
   "dependencies": {
     "#shared": "workspace:../shared/build",
     "@emotion/react": "^11.11.1",
@@ -22,11 +29,5 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "private": true,
-  "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "start": "[ -e .env ] && set -a && . ./.env; next start"
   }
 }

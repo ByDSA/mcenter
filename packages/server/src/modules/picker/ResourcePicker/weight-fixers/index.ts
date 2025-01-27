@@ -1,24 +1,24 @@
 export {
-  Fx as LastTimeWeightFilterFx, default as LastTimeWeightFixer,
+  Fx as LastTimeWeightFilterFx, LastTimeWeightFixer,
 } from "./LastTime";
 
 export {
-  default as LimiterWeightFixer,
+  LimiterWeightFixer,
 } from "./Limiter";
 
 export {
-  default as TagWeightFixer,
+  TagWeightFixer,
 } from "./Tag";
 
 export {
-  default as WeightFixer,
+  WeightFixer,
   WeightFixerParams,
 } from "./WeightFixer";
 
 export {
-  default as LimiterSafeIntegerPerItems,
+  LimiterWeightFixer as LimiterSafeIntegerPerItems,
 } from "./LimiterSafeIntegerPerItems";
 
 export {
-  default as WeightFixerApplier,
+  WeightFixerApplier,
 } from "./WeightFixerApplier";

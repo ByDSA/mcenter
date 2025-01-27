@@ -1,7 +1,7 @@
-import { Model } from "../models";
+import { MusicHistoryEntry } from "../models";
 import { DocOdm } from "./odm";
 
-export function docOdmToModel(docOdm: DocOdm): Model {
+export function docOdmToModel(docOdm: DocOdm): MusicHistoryEntry {
   return {
     resourceId: docOdm.musicId,
     date: {
@@ -13,7 +13,7 @@ export function docOdmToModel(docOdm: DocOdm): Model {
   };
 }
 
-export function modelToDocOdm(model: Model): DocOdm {
+export function modelToDocOdm(model: MusicHistoryEntry): DocOdm {
   return {
     musicId: model.resourceId,
     date: {

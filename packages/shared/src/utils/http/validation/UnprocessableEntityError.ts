@@ -1,11 +1,11 @@
-import HttpStatusCode from "../StatusCode";
-import HttpError from "./HttpError";
+import { HttpStatusCode } from "../StatusCode";
+import { HttpError } from "./HttpError";
 
-export const UnprocessablEntityErrorName = "UnprocessablEntityError";
+export const UNPROCESSABLE_ENTITY_ERROR_NAME = "UnprocessablEntityError";
 
-export default class UnprocessablEntityError extends HttpError {
+export class UnprocessableEntityError extends HttpError {
   constructor(message?: string) {
     super(HttpStatusCode.UNPROCESSABLE_ENTITY, message);
-    this.name = UnprocessablEntityErrorName;
+    this.name = UNPROCESSABLE_ENTITY_ERROR_NAME;
   }
 }

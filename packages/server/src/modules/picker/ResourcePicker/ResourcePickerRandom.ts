@@ -1,10 +1,10 @@
-import { ResourceVO } from "#shared/models/resource";
 import { assertIsDefined, assertIsNotEmpty } from "#shared/utils/validation";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
-import ResourcePicker from "./ResourcePicker";
+import { ResourcePicker } from "./ResourcePicker";
 import { FilterApplier } from "./filters";
 import { WeightFixerApplier } from "./weight-fixers";
+import { ResourceVO } from "#modules/resources/models";
 
 type Params<R extends ResourceVO> = {
   resources: R[];
@@ -12,7 +12,7 @@ type Params<R extends ResourceVO> = {
   filterApplier: FilterApplier<R>;
   weightFixerApplier: WeightFixerApplier<R>;
 };
-export default class RandomPicker<R extends ResourceVO> implements ResourcePicker<R> {
+export class ResourcePickerRandom<R extends ResourceVO> implements ResourcePicker<R> {
   #params: Params<R>;
 
   constructor(params: Params<R>) {

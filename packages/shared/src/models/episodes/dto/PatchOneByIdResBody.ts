@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { EntitySchema } from "../Entity";
+import { entitySchema } from "../Entity";
 
-export const Schema = z.object( {
-  entity: EntitySchema.strict().optional(),
+export const schema = z.object( {
+  entity: entitySchema.strict().optional(),
 } ).strict();
 
-export type Type = z.infer<typeof Schema>;
+export type Type = z.infer<typeof schema>;
 
 export function assert(o: unknown): asserts o is Type {
-  Schema.parse(o);
+  schema.parse(o);
 }

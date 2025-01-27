@@ -1,11 +1,13 @@
 import { z } from "zod";
 
-import { EntryWithIdSchema } from "../HistoryEntry";
+import { entryWithIdSchema } from "../HistoryEntry";
 
-export const GetManyEntriesBySearchResponseSchema = z.array(EntryWithIdSchema);
+export const getManyEntriesBySearchResponseSchema = z.array(entryWithIdSchema);
 
-export type GetManyEntriesBySearchResponse = z.infer<typeof GetManyEntriesBySearchResponseSchema>;
+export type GetManyEntriesBySearchResponse = z.infer<typeof getManyEntriesBySearchResponseSchema>;
 
-export function assertIsGetManyEntriesBySearchResponse(o: unknown): asserts o is GetManyEntriesBySearchResponse {
-  GetManyEntriesBySearchResponseSchema.parse(o);
+export function assertIsGetManyEntriesBySearchResponse(
+  o: unknown,
+): asserts o is GetManyEntriesBySearchResponse {
+  getManyEntriesBySearchResponseSchema.parse(o);
 }

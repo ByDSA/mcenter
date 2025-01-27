@@ -2,18 +2,18 @@ import { PublicMethodsOf } from "#shared/utils/types";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
-import PlaySerieController from "./PlaySerieController";
+import { PlaySerieController } from "./PlaySerieController";
 import { VlcBackWebSocketsServerService } from "./player-services";
-import PlayerBackWebSocketsServiceMock from "./player-services/vlc-back/tests/PlayerBackWebSocketsServiceMock";
-import { EpisodeRepository } from "#modules/episodes";
+import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests/PlayerBackWebSocketsServiceMock";
+import { EpisodeRepository } from "#episodes/index";
 import { HistoryListService } from "#modules/historyLists";
 import { TestMongoDatabase, registerSingletonIfNotAndGet } from "#tests/main";
-import TestDatabase from "#tests/main/db/TestDatabase";
+import { TestDatabase } from "#tests/main/db/TestDatabase";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
 
-describe("PlaySerieController", () => {
+describe("playSerieController", () => {
   let playSerieController: PlaySerieController;
   let playerServiceMock: PublicMethodsOf<VlcBackWebSocketsServerService>;
   let routerApp: Application;

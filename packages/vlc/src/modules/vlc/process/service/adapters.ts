@@ -1,7 +1,6 @@
-/* eslint-disable import/prefer-default-export */
-import { Episode } from "#shared/models/episodes";
 import { assertIsDefined } from "#shared/utils/validation";
 import { MediaElement } from "../../media";
+import { Episode } from "#modules/models/episodes";
 
 export function episodeToMediaElement(e: Episode): MediaElement {
   const { MEDIA_PATH } = process.env;

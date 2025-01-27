@@ -1,7 +1,7 @@
 import fs from "fs";
 import { MediaElement, render } from "./MediaElement";
 
-export default class Playlist {
+export class Playlist {
   #elements: MediaElement[] = [];
 
   addElement(element: MediaElement): Playlist {

@@ -1,8 +1,7 @@
 export {
-  assertIsEpisode as assertIsModel,
-  compareEpisodeId as compareId,
-  EpisodeFileInfo, Episode as Model,
-  EpisodeId as ModelId,
-  EpisodeIdSchema as ModelIdSchema,
-  EpisodeSchema as ModelSchema,
+  assertIsEpisode,
+  compareEpisodeId,
+  Episode,
+  EpisodeId,
+  EpisodeIdSchema, EPISODES_QUEUE_NAME, EpisodeSchema,
 } from "#shared/models/episodes";

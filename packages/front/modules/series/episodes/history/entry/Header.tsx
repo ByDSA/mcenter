@@ -1,14 +1,14 @@
+import { assertIsDefined } from "#shared/utils/validation";
+import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
 import { HistoryEntryHeader } from "#modules/history";
 import { formatDateDDMMYYY, formatDateHHmm } from "#modules/utils/dates";
-import { HistoryEntryWithId } from "#shared/models/historyLists";
-import { assertIsDefined } from "#shared/utils/validation";
 
 type HeaderProps = {
   entry: HistoryEntryWithId;
   showDate: boolean;
 };
-export default function Header( {entry, showDate}: HeaderProps) {
-  const {episode, serie} = entry;
+export function Header( { entry, showDate }: HeaderProps) {
+  const { episode, serie } = entry;
 
   assertIsDefined(episode);
   assertIsDefined(serie);

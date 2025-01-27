@@ -1,14 +1,16 @@
 import { z } from "zod";
-import { GetOneByIdSchema } from "./GetOneByIdRequest";
+import { getOneByIdSchema } from "./GetOneByIdRequest";
 
-import { SearchSchema } from "./Criteria";
+import { searchSchema } from "./Criteria";
 
-export const GetManyEntriesBySuperIdSchema = GetOneByIdSchema.extend( {
-  body: SearchSchema,
+export const getManyEntriesBySuperIdSchema = getOneByIdSchema.extend( {
+  body: searchSchema,
 } ).required();
 
-export type GetManyEntriesBySuperIdRequest = z.infer<typeof GetManyEntriesBySuperIdSchema>;
+export type GetManyEntriesBySuperIdRequest = z.infer<typeof getManyEntriesBySuperIdSchema>;
 
-export function assertIsGetManyEntriesBySuperIdRequest(o: unknown): asserts o is GetManyEntriesBySuperIdRequest {
-  GetManyEntriesBySuperIdSchema.parse(o);
+export function assertIsGetManyEntriesBySuperIdRequest(
+  o: unknown,
+): asserts o is GetManyEntriesBySuperIdRequest {
+  getManyEntriesBySuperIdSchema.parse(o);
 }

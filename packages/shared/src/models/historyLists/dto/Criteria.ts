@@ -1,7 +1,6 @@
-/* eslint-disable import/prefer-default-export */
 import { z } from "zod";
 
-export const SearchSchema = z.object( {
+export const searchSchema = z.object( {
   filter: z.object( {
     serieId: z.string().optional(),
     episodeId: z.string().optional(),

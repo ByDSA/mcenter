@@ -5,11 +5,12 @@ import express, { Request, Response } from "express";
 import { Picker } from "rand-picker";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 import { dependencies } from "./appliers/Dependencies";
-import { Episode, EpisodeRepository } from "#modules/episodes";
+import { EpisodeRepository } from "#episodes/index";
+import { Episode } from "#episodes/models";
 import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
 import { genRandomPickerWithData } from "#modules/picker";
 import { SerieRepository } from "#modules/series";
-import { StreamRepository } from "#modules/streams";
+import { StreamRepository } from "#modules/streams/repositories";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
@@ -18,16 +19,16 @@ type ResultType = Episode & {
   days: number;
 };
 
-const DepsMap = {
+const DEPS_MAP = {
   streamRepository: StreamRepository,
   episodeRepository: EpisodeRepository,
   historyListRepository: HistoryListRepository,
   serieRepository: SerieRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class PickerController implements Controller {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class EpisodePickerController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

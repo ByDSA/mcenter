@@ -1,15 +1,15 @@
 export {
-  default as EventQueue,
+  EventQueue,
 } from "./EventQueue";
 
 export {
-  default as Event,
+  Event,
 } from "./Event";
 
 export {
-  default as MessageBroker,
+  MessageBroker,
 } from "./MessageBroker";
 
 export {
-  default as Consumer,
+  Consumer,
 } from "./Consumer";

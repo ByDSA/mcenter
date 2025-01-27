@@ -1,6 +1,5 @@
-/* eslint-disable max-classes-per-file */
-import { execAndWaitUntilStarted, isRunning, killAll, killProcessByPid } from "#shared/utils/process";
 import * as cp from "child_process";
+import { execAndWaitUntilStarted, isRunning, killAll, killProcessByPid } from "#shared/utils/process";
 
 type OnHandler = (code: number)=> void;
 
@@ -33,7 +32,7 @@ class VLCProcessBuilder {
   }
 }
 
-export default class VLCProcess {
+export class VLCProcess {
   #process: cp.ChildProcess;
 
   private constructor(process: cp.ChildProcess) {

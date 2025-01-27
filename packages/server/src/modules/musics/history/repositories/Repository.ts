@@ -1,14 +1,15 @@
+import { showError } from "#shared/utils/errors/showError";
 import { isDefined } from "#shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { delay } from "tsyringe";
-import MusicRepository from "../../repositories/Repository";
+import { MusicRepository } from "../../repositories/Repository";
 import { QUEUE_NAME } from "../events";
-import { Model } from "../models";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 import { DocOdm, ModelOdm } from "./odm";
 import { CanCreateOne, CanGetAll, CanGetManyCriteria } from "#utils/layers/repository";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
+import { MusicHistoryEntry } from "#musics/history/models";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 
@@ -22,18 +23,18 @@ export type GetManyCriteria = {
   };
   offset?: number;
 };
-const DepsMap = {
+const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,
   musicRepository: delay(()=>MusicRepository),
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class Repository
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class MusicHistoryRepository
 implements
-CanCreateOne<Model>,
-CanGetManyCriteria<Model, GetManyCriteria>,
-CanGetAll<Model> {
+CanCreateOne<MusicHistoryEntry>,
+CanGetManyCriteria<MusicHistoryEntry, GetManyCriteria>,
+CanGetAll<MusicHistoryEntry> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -43,10 +44,10 @@ CanGetAll<Model> {
       logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
-    } );
+    } ).catch(showError);
   }
 
-  async getManyCriteria(criteria: GetManyCriteria): Promise<Model[]> {
+  async getManyCriteria(criteria: GetManyCriteria): Promise<MusicHistoryEntry[]> {
     const findParams: FilterQuery<DocOdm> = {};
 
     if (criteria.filter?.resourceId)
@@ -95,7 +96,7 @@ CanGetAll<Model> {
     return models;
   }
 
-  async getAll(): Promise<Model[]> {
+  async getAll(): Promise<MusicHistoryEntry[]> {
     const docsOdm = await ModelOdm.find( {}, {
       _id: 0,
     } );
@@ -120,7 +121,7 @@ CanGetAll<Model> {
     return docsOdm[0];
   }
 
-  async getLast(): Promise<Model | null> {
+  async getLast(): Promise<MusicHistoryEntry | null> {
     const docOdm = await this.#getLastOdm();
 
     if (!docOdm)
@@ -129,7 +130,7 @@ CanGetAll<Model> {
     return docOdmToModel(docOdm);
   }
 
-  async createOne(model: Model): Promise<void> {
+  async createOne(model: MusicHistoryEntry): Promise<void> {
     const lastOdm = await this.#getLastOdm();
 
     if (lastOdm?.musicId === model.resourceId)
@@ -139,7 +140,7 @@ CanGetAll<Model> {
 
     await ModelOdm.create(docOdm);
 
-    const event = new ModelEvent<Model>(EventType.CREATED, {
+    const event = new ModelEvent<MusicHistoryEntry>(EventType.CREATED, {
       entity: model,
     } );
 

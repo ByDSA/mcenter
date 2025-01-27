@@ -1,4 +1,4 @@
-import HttpMethod from "#shared/utils/http/HttpMethod";
+import { HttpMethod } from "#shared/utils/http/HttpMethod";
 import { deepMerge } from "#shared/utils/objects";
 import { neverCase } from "#shared/utils/validation";
 import { Application, Router as ExpressRouter } from "express";
@@ -9,18 +9,18 @@ type Params = {
   routes: GeneralRoute[];
 };
 
-const DefaultParams: Params = {
+const DEFAULT_PARAMS: Params = {
   url: "/",
   routes: [],
 };
 
-export default class Router {
+export class Router {
   private expressRouter: ExpressRouter;
 
   private url: string;
 
   protected constructor(params?: Params) {
-    const realParams: Params = deepMerge(DefaultParams, params);
+    const realParams: Params = deepMerge(DEFAULT_PARAMS, params);
 
     this.url = realParams.url;
     this.expressRouter = ExpressRouter();

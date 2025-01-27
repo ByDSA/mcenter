@@ -1,11 +1,10 @@
 import { z } from "zod";
 
-export const Schema = z.object( {
-} )
+export const schema = z.object( {} )
   .strict();
 
-export type Type = z.infer<typeof Schema>;
+export type Type = z.infer<typeof schema>;
 
 export function assert(o: unknown): asserts o is Type {
-  Schema.parse(o);
+  schema.parse(o);
 }

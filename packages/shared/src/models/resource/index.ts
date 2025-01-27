@@ -1,10 +1,10 @@
 export {
   LocalFile,
-  Pickable, TimeRange,
+  Pickable, Taggable, TimeRange, timeRangeSchema as TimeRangeSchema,
 } from "./PartialSchemas";
 
 export {
-  ValueObject as ResourceVO, ValueObjectSchema as ResourceVOSchema,
+  ValueObject as ResourceVO, valueObjectSchema as ResourceVOSchema,
 } from "./ValueObject";
 
 export {

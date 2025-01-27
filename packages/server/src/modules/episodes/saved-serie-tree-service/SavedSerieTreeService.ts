@@ -1,18 +1,18 @@
-import { Model as Episode } from "../models";
-import { Repository as EpisodeRepository } from "../repositories";
+import { Episode } from "../models";
+import { EpisodeRepository } from "../repositories";
 import { putModelInSerieFolderTree } from "./adapters";
 import { SerieFolderTree as SerieTree } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
-const DepsMap = {
+const DEPS_MAP = {
   episodeRepository: EpisodeRepository,
   serieRepository: SerieRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class Service {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class SavedSerieTreeService {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

@@ -1,3 +1,3 @@
 export {
-  default as AddNewFilesController,
+  EpisodeAddNewFilesController,
 } from "./Controller";

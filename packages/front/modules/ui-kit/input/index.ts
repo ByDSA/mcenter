@@ -1,18 +1,18 @@
 export {
-  default as ResourceInputText,
+  ResourceInputText,
 } from "./ResourceInputText";
 
 export {
-  default as ResourceInputNumber,
+  ResourceInputNumber,
 } from "./ResourceInputNumber";
 
 export {
-  default as ResourceInput,
+  ResourceInput,
   type ResourceInputProps,
 } from "./ResourceInput";
 
 export {
-  default as ResourceInputArrayString,
+  ResourceInputArrayString,
 } from "./ResourceInputArrayString";
 
 export {

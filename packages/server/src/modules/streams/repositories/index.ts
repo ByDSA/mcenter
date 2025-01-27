@@ -1,10 +1,9 @@
 export {
-  default as Repository,
+  StreamsRepository as StreamRepository,
 } from "./Repository";
 
 export {
-  DocOdm,
-  ModelOdm,
+  DocOdm as StreamDocOdm, ModelOdm as StreamModelOdm,
 } from "./odm";
 
 export * from "./adapters";

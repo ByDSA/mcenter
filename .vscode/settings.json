@@ -1,11 +1,19 @@
 {
+  "files.exclude": {
+    "**/.vscode": true,
+    "**/node_modules": true,
+    "packages/*/build": true,
+    "packages/*/coverage": true,
+    "packages/front/.next": true
+  },
+  "peacock.color": "#0053a6",
   "runOnSave.commands": [
     {
-      "globMatch": "**/shared/**",
       "command": "workspaceFolder=${workspaceFolder} ${workspaceFolder}/bin/on-save.mjs &",
+      "finishStatusMessage": "${workspaceFolderBasename} compiled",
+      "globMatch": "**/shared/**",
       "runIn": "terminal",
       "runningStatusMessage": "Compiling ${workspaceFolderBasename}...",
-      "finishStatusMessage": "${workspaceFolderBasename} compiled",
       "terminalHideTimeout": 3000
     }
   ],
@@ -36,13 +44,5 @@
     "titleBar.border": "#0053a6",
     "titleBar.inactiveBackground": "#0053a699",
     "titleBar.inactiveForeground": "#e7e7e799"
-  },
-  "peacock.color": "#0053a6",
-  "files.exclude": {
-    "**/node_modules": true,
-    "packages/*/build": true,
-    "packages/front/.next": true,
-    "packages/*/coverage": true,
-    "**/.vscode": true
   }
 }

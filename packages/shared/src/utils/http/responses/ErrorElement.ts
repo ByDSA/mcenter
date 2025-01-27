@@ -1,22 +1,19 @@
 import { z } from "zod";
-import { LogElementResponseSchema } from "./LogElement";
+import { logElementResponseSchema } from "./LogElement";
 
-const Schema = LogElementResponseSchema.extend( {
+const schema = logElementResponseSchema.extend( {
   trace: z.array(z.string()).optional(),
 } ).strict();
 
-type Model = z.infer<typeof Schema>;
+export type ErrorElementResponse = z.infer<typeof schema>;
 
-export default Model;
-
-export function assertIsModel(o: unknown): asserts o is Model {
-  Schema.parse(o);
+export function assertIsErrorElementResponse(o: unknown): asserts o is ErrorElementResponse {
+  schema.parse(o);
 }
 
-export function errorToErrorElement(err: Error): Model {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function errorToErrorElementResponse(err: Error): ErrorElementResponse {
   const [_, ...stack] = err.stack?.split("\n").map(s => s.trim()) ?? [];
-  const error: Model = {
+  const error: ErrorElementResponse = {
     message: err.message,
     trace: stack,
     type: typeof err,

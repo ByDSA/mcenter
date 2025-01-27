@@ -1,15 +1,15 @@
 export {
-  default as loadFixtureSerieAndEpisodesSimpsons,
+  loadFixtureSerieAndEpisodesSimpsons,
 } from "./SerieAndEpisodesSimpsons";
 
 export {
-  default as loadFixtureSimpsons,
+  loadFixtureSimpsons,
 } from "./Simpsons";
 
 export {
-  default as loadFixtureMusicsWithTags,
+  loadFixtureMusicsWithTags,
 } from "./Musics1";
 
 export {
-  default as loadFixtureStreamAndHistoryListSimpsons,
+  loadFixtureStreamAndHistoryListSimpsons,
 } from "./StreamAndHistoryListSimpsons";

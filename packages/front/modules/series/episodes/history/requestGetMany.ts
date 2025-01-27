@@ -1,15 +1,14 @@
+import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 import { UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
-import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 
 const body: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
-  "filter": {
+  filter: {},
+  sort: {
+    timestamp: "desc",
   },
-  "sort": {
-    "timestamp": "desc",
-  },
-  "limit": 10,
-  "expand": ["episodes", "series"],
+  limit: 10,
+  expand: ["episodes", "series"],
 };
 const validator = (data: Required<HistoryEntryWithId>[]) => {
   assertIsHistoryListGetManyEntriesBySearchResponse(data);

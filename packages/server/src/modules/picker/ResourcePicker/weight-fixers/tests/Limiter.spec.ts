@@ -1,5 +1,5 @@
-import { Pickable } from "#shared/models/resource";
-import LimiterWeightFixer from "../Limiter";
+import { LimiterWeightFixer } from "../Limiter";
+import { Pickable } from "#modules/resources/models";
 
 type Case = {
   limit: number;

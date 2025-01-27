@@ -1,4 +1,11 @@
+*-lock.yaml
 **/node_modules
 **/coverage
 build/
 docs/
+
+front/
+music/
+server/
+vlc/
+shared/

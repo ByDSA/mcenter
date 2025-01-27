@@ -1,3 +1,3 @@
 export {
-  default as SavedSerieTreeService,
+  SavedSerieTreeService,
 } from "./SavedSerieTreeService";

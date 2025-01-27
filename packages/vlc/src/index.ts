@@ -1,4 +1,4 @@
-import App from "./App";
+import { App } from "./App";
 import { getEnvs } from "./Envs";
 import { PlayerService } from "./modules/player-service";
 import { VLCProcessService } from "./modules/vlc";
@@ -20,4 +20,8 @@ const webSocketsService = new WebSocketsService( {
 app.addDependencies( {
   webSocketsService,
 } );
-app.start();
+
+app.start()
+  .catch((error) => {
+    console.error(error);
+  } );

@@ -2,7 +2,7 @@ import { TimestampsModel } from "#shared/models/utils/dtos/Timestamps";
 import mongoose from "mongoose";
 
 type DocOdm = TimestampsModel;
-export const TimestampsSchemaOdm = new mongoose.Schema<DocOdm>( {
+export const timestampsSchemaOdm = new mongoose.Schema<DocOdm>( {
   createdAt: {
     type: Date,
     required: true,

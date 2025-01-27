@@ -1,3 +1,3 @@
 export {
-  Options as DatabaseOptions, default as RealMongoDatabase,
+  Options as DatabaseOptions, RealDatabase as RealMongoDatabase,
 } from "./Database";

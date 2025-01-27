@@ -1,51 +1,14 @@
-import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import commonConfig from "./lib/eslint/eslint.config.mjs";
+// @ts-check
 
-const projectConfig = [
+import { configs as projectConfigs } from "./lib/eslint.project.config.mjs";
+
+const infrastructureConfig = [
   {
-    files: ["**/*.ts{,x}"],
-    rules: {
-      "import/no-internal-modules": ["error", {
-        allow: [
-          "**/modules/**",
-          "**/utils/**",
-        ],
-      },
-      ],
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: ["\\#modules/utils**", "*/modules/utils**", "\\#/utils/**"],
-              message: "Use #utils instead of another access",
-            },
-            {
-              group: ["\\#/modules/**"],
-              message: "Use \"#modules\" instead of \"#/modules\"",
-            },
-            {
-              group: ["\\#shared/models/**"],
-              message: "Cannot import from \"#shared\"",
-            },
-          ],
-        },
-      ],
-    },
+    ignores: ["**/front", "**/music", "**/server", "**/shared", "**/vlc"],
   },
 ];
-const ret = tseslint.config([
-  js.configs.recommended,
-  ...commonConfig,
-  ...projectConfig,
-  {
-    languageOptions: {
-      parserOptions: {
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
-]);
 
-export default ret;
+export default [
+  ...projectConfigs.recommended,
+  ...infrastructureConfig,
+];

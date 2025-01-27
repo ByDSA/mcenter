@@ -49,8 +49,7 @@ const ARRAY_EMPTY_ENTRY: Entry = {
 };
 const OBJECT_EMPTY_ENTRY: Entry = {
   description: "empty object",
-  value: {
-  },
+  value: {},
 };
 const FUNCTION_ENTRY: Entry = {
   description: "function",
@@ -83,7 +82,7 @@ const UNDEFINED_ENTRY: Entry = {
 };
 const SYMBOL_ENTRY: Entry = {
   description: "symbol",
-  // eslint-disable-next-line symbol-description
+
   value: Symbol(),
 };
 

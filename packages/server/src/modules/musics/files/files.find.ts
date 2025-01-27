@@ -11,7 +11,7 @@ export type FindOptions = {
   onlyFirst?: boolean;
 };
 
-export function findFiles(options?: FindOptions) {
+export function findFiles(options?: FindOptions): Promise<string[]> {
   const opts = initializeFindByHashOptions(options);
 
   if (options?.fileHash) {
@@ -25,16 +25,26 @@ export function findFiles(options?: FindOptions) {
   }
 
   if (options?.extensions && options.extensions.length > 0) {
-    if (options?.recursive)
-      return getAllFilesByExtensionRecursive(<string>opts.folder, <string[]>opts.extensions);
+    if (options?.recursive) {
+      return Promise.resolve(
+        getAllFilesByExtensionRecursive(<string>opts.folder, <string[]>opts.extensions),
+      );
+    }
 
-    return getAllFilesByExtensionNonRecursive(<string>opts.folder, <string[]>opts.extensions);
+    return Promise.resolve(
+      getAllFilesByExtensionNonRecursive(<string>opts.folder, <string[]>opts.extensions),
+    );
   }
 
-  if (options?.recursive)
-    return getAllFilesRecursive(<string>opts?.folder);
+  if (options?.recursive) {
+    return Promise.resolve(
+      getAllFilesRecursive(<string>opts?.folder),
+    );
+  }
 
-  return getAllFilesNonRecursive(<string>opts?.folder);
+  return Promise.resolve(
+    getAllFilesNonRecursive(<string>opts?.folder),
+  );
 }
 
 function getAllFilesRecursive(folder: string): string[] {
@@ -90,7 +100,7 @@ function getAllFilesByExtensionCommon(
   } );
 }
 
-const DefaultOptions: FindOptions = {
+const DEFAULT_OPTIONS: FindOptions = {
   folder: getFullPath(),
   recursive: true,
   onlyFirst: false,
@@ -98,7 +108,7 @@ const DefaultOptions: FindOptions = {
 
 export function initializeFindByHashOptions(options?: FindOptions) {
   return {
-    ...DefaultOptions,
+    ...DEFAULT_OPTIONS,
     ...options,
   };
 }

@@ -1,10 +1,10 @@
-import { Episode } from "#shared/models/episodes";
-import { Pickable, ResourceVO } from "#shared/models/resource";
+import { Episode } from "#episodes/models";
 import { LastTimeWeightFilterFx, LastTimeWeightFixer, LimiterSafeIntegerPerItems, TagWeightFixer, WeightFixerApplier } from "#modules/picker";
+import { Pickable, ResourceVO } from "#modules/resources/models";
 
 const SECONDS_IN_DAY = 24 * 60 * 60;
 
-export default class EpisodeWeightFixerApplier<R extends ResourceVO = ResourceVO>
+export class EpisodeWeightFixerApplier<R extends ResourceVO = ResourceVO>
   extends WeightFixerApplier<R> {
   constructor() {
     super();

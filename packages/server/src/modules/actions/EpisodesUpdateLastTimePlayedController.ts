@@ -1,12 +1,12 @@
 import { Request, Response, Router } from "express";
-import { EpisodeRepository } from "#modules/episodes";
+import { EpisodeRepository } from "#episodes/index";
 import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
-import { StreamRepository } from "#modules/streams";
+import { StreamRepository } from "#modules/streams/repositories";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
-const DepsMap = {
+const DEPS_MAP = {
   lastTimePlayedService: LastTimePlayedService,
   serieRepository: SerieRepository,
   episodeRepository: EpisodeRepository,
@@ -14,9 +14,9 @@ const DepsMap = {
   streamRepository: StreamRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class EpisodesUpdateLastTimePlayedController implements Controller {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class EpisodesUpdateLastTimePlayedController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

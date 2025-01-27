@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // @ts-check
 
-/* eslint-disable space-in-parens */
 // eslint-disable-next-line import/no-absolute-path
 import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 
@@ -14,11 +13,11 @@ import { deployParticular } from "../lib/deploy-particular.mjs";
 
   const { ENVS } = await deployProjectBegin();
 
-  await deployParticular({
+  await deployParticular( {
     ...ENVS,
-  });
+  } );
 
-  await deployProjectEnd({
+  await deployProjectEnd( {
     ...ENVS,
-  });
-})();
+  } );
+} )();

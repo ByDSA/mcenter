@@ -1,13 +1,13 @@
 import { assertIsDefined } from "#shared/utils/validation";
 import { Application } from "express";
 import request from "supertest";
-import UpdateRemoteController from "./UpdateRemoteController";
+import { MusicUpdateRemoteController } from "./UpdateRemoteController";
 import { registerSingletonIfNotAndGet } from "#tests/main";
-import ExpressAppMock from "#tests/main/ExpressAppMock";
+import { ExpressAppMock } from "#tests/main/ExpressAppMock";
 import { RouterApp } from "#utils/express/test";
 
 let app: ExpressAppMock;
-const updateRemoteController = registerSingletonIfNotAndGet(UpdateRemoteController);
+const updateRemoteController = registerSingletonIfNotAndGet(MusicUpdateRemoteController);
 let routerApp: Application;
 
 describe("updateRemoteController", () => {

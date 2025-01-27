@@ -1,3 +1,3 @@
 export {
-  default as ActionControllerMock,
+  ActionControllerMock,
 } from "./ActionControllerMock";

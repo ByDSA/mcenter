@@ -1,8 +1,7 @@
-/* eslint-disable import/prefer-default-export */
+import { Fragment, useEffect, useState } from "react";
 import { FetchingRender, UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { DateFormat, formatDate } from "#modules/utils/dates";
 import { Entry } from "#modules/utils/resources/useResourceEdition";
-import { Fragment, useEffect, useState } from "react";
 
 type Props<ReqBody, ResBody> = {
   url: string;
@@ -19,7 +18,9 @@ type HooksRet = {
   datesStr: string[];
 };
 
-export function Lastest<T extends Entry<any, any>, ReqBody, ResBody extends T[] = T[]>( {validator, url, body, dateFormat = DATE_FORMAT_DEFAULT}: Props<ReqBody, ResBody>) {
+export function Lastest<T extends Entry<any, any>, ReqBody, ResBody extends T[] = T[]>(
+  { validator, url, body, dateFormat = DATE_FORMAT_DEFAULT }: Props<ReqBody, ResBody>,
+) {
   const method = "POST";
   const fetcher = makeFetcher<ReqBody, ResBody>( {
     method,
@@ -43,7 +44,9 @@ export function Lastest<T extends Entry<any, any>, ReqBody, ResBody extends T[] 
       useEffect(() => {
         const f = () => {
           const timestamps = data?.map((entry: T) => entry.date.timestamp);
-          const newDatesStr = timestamps?.map((timestamp) => formatDate(new Date(timestamp * 1000), dateFormat)) ?? [];
+          const newDatesStr = timestamps?.map(
+            (timestamp) => formatDate(new Date(timestamp * 1000), dateFormat),
+          ) ?? [];
 
           if (!deepCompareArrays(datesStr, newDatesStr))
             setDatesStr(newDatesStr);
@@ -61,7 +64,7 @@ export function Lastest<T extends Entry<any, any>, ReqBody, ResBody extends T[] 
       };
     },
     render: (data, hooksRet) => {
-      const {datesStr} = hooksRet;
+      const { datesStr } = hooksRet;
 
       if (data.length === 0)
         return <span>No se había reproducido antes.</span>;
@@ -80,9 +83,10 @@ function deepCompareArrays<T>(a: T[], b: T[]) {
   if (a.length !== b.length)
     return false;
 
-  for (let i = 0; i < a.length; i++)
-  {if (a[i] !== b[i])
-    return false;}
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i])
+      return false;
+  }
 
   return true;
 }

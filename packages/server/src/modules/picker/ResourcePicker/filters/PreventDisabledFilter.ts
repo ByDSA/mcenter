@@ -1,7 +1,7 @@
-import { ResourceVO } from "#shared/models/resource";
-import Filter from "./Filter";
+import { Filter } from "./Filter";
+import { ResourceVO } from "#modules/resources/models";
 
-export default class PreventDisabledFilter implements Filter {
+export class PreventDisabledFilter implements Filter {
   // eslint-disable-next-line require-await
   async filter(episode: ResourceVO): Promise<boolean> {
     return episode.disabled !== true;

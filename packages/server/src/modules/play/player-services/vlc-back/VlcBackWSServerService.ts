@@ -1,20 +1,22 @@
+/* eslint-disable require-await */
 import assert from "node:assert";
 import { Server as HttpServer } from "node:http";
-import { PlayResourceMessage, PlayerEvent } from "#shared/models/player";
+import { showError } from "#shared/utils/errors/showError";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Server, Socket } from "socket.io";
 import { QUEUE_NAME, StatusPlayerEvent } from "../messaging";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { PlayerEvent, PlayResourceMessage } from "#modules/play/player-services/models";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Event } from "#utils/message-broker";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 
-const DepsMap = {
+const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class VlcBackWSService {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class VlcBackWSService {
   #io: Server | undefined;
 
   #deps: Deps;
@@ -22,35 +24,35 @@ export default class VlcBackWSService {
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
 
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: Event<any>) => {
+    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, async (event: Event<any>) => {
       switch (event.type) {
         case PlayerEvent.PAUSE_TOGGLE:
-          this.#emitPauseToggle();
+          await this.#emitPauseToggle();
           break;
         case PlayerEvent.NEXT:
-          this.#emitNext();
+          await this.#emitNext();
           break;
         case PlayerEvent.PREVIOUS:
-          this.#emitPrevious();
+          await this.#emitPrevious();
           break;
         case PlayerEvent.STOP:
-          this.#emitStop();
+          await this.#emitStop();
           break;
         case PlayerEvent.SEEK:
-          this.#emitSeek(event.payload.value);
+          await this.#emitSeek(event.payload.value);
           break;
         case PlayerEvent.PLAY:
-          this.#emitPlay(event.payload.id);
+          await this.#emitPlay(event.payload.id);
           break;
         case PlayerEvent.FULLSCREEN_TOGGLE:
-          this.#emitFullscreenToggle();
+          await this.#emitFullscreenToggle();
           break;
         default:
           break;
       }
 
       return Promise.resolve();
-    } );
+    } ).catch(showError);
   }
 
   startSocket(httpServer: HttpServer) {
@@ -74,7 +76,9 @@ export default class VlcBackWSService {
       } );
 
       socket.on(PlayerEvent.STATUS, (status) => {
-        this.#deps.domainMessageBroker.publish(QUEUE_NAME, new StatusPlayerEvent(status));
+        this.#deps.domainMessageBroker
+          .publish(QUEUE_NAME, new StatusPlayerEvent(status))
+          .catch(showError);
       } );
     } );
   }

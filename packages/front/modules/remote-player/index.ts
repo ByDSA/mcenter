@@ -1,11 +1,7 @@
 export {
-  default as RemotePlayerWebSocketsClient,
+  RemotePlayerWebSocketsClient,
 } from "./WebSocketsClient";
 
 export {
-  default as MediaPlayer,
+  MediaPlayer,
 } from "./MediaPlayer";
-
-export {
-  default as WebSocketsClient,
-} from "./WebSocketsClient";

@@ -1,7 +1,7 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import PlayerService from "../Service";
+import { VLCProcessService } from "../Service";
 
-export default class PlayerServiceMock implements PublicMethodsOf<PlayerService> {
+export class PlayerServiceMock implements PublicMethodsOf<VLCProcessService> {
   playResource = jest.fn();
 
   isProcessOpen = jest.fn();

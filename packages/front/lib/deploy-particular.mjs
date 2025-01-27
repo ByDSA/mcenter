@@ -1,10 +1,4 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable object-curly-newline */
-/* eslint-disable space-in-parens */
 // @ts-check
-
-// @ts-ignore
-// eslint-disable-next-line import/no-absolute-path
 
 import {
   dockerImagePush,
@@ -24,13 +18,12 @@ export async function deployParticular(ENVS) {
   const imageName = `${ENVS.project.name}/${packageName}`;
   const imageNameEnv = `${imageName}_${ENVS.TARGET_ENV}`;
   const tag = packageVersion;
-  const imageNameEnvRemote =
-    ENVS.TARGET_ENV === "local"
-      ? imageNameEnv
-      : `${ENVS.docker.registryUrl}/${imageNameEnv}`;
+  const imageNameEnvRemote = ENVS.TARGET_ENV === "local"
+    ? imageNameEnv
+    : `${ENVS.docker.registryUrl}/${imageNameEnv}`;
 
   // Image Build
-  await packageBuild({
+  await packageBuild( {
     dockerPlatform: ENVS.docker.platform,
     projectRoot: ENVS.project.root,
     packageName,
@@ -38,39 +31,39 @@ export async function deployParticular(ENVS) {
     tag,
     targetEnv: ENVS.TARGET_ENV,
     replace: ENVS.docker.replaceImage,
-  });
+  } );
 
   if (ENVS.TARGET_ENV !== "local") {
     // Image Push
-    await dockerImagePush({
+    await dockerImagePush( {
       imageName: imageNameEnv,
       dockerRegistryUrl: ENVS.docker.registryUrl,
       tag,
-    });
+    } );
 
     // Pull image (remote)
-    await remoteDockerImagePull({
+    await remoteDockerImagePull( {
       ssh,
       imageName: imageNameEnvRemote,
       tag,
-    });
+    } );
 
     // Update image latest tag (remote)
     const taggedImageEnvRegistry = `${imageNameEnvRemote}:${tag}`;
 
+    // eslint-disable-next-line no-console
     console.log(
-      // eslint-disable-next-line comma-dangle
-      `Remote: docker image tag ${imageName} -> ${taggedImageEnvRegistry} ...`
+      `Remote: docker image tag ${imageName} -> ${taggedImageEnvRegistry} ...`,
     );
-    await sshCmd({
+    await sshCmd( {
       cmd: `sudo docker tag "${taggedImageEnvRegistry}" "${imageName}"`,
       ssh,
-    });
+    } );
   } else {
-    await dockerImageTag({
+    await dockerImageTag( {
       sourceImageName: imageNameEnv,
       targetImageName: imageName,
       sourceImageTag: tag,
-    });
+    } );
   }
 }

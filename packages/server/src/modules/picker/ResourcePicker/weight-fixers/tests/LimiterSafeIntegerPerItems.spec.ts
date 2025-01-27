@@ -1,5 +1,5 @@
-import { Pickable } from "#shared/models/resource";
-import { LimiterSafeIntegerPerItems } from "..";
+import { LimiterWeightFixer as LimiterSafeIntegerPerItems } from "../LimiterSafeIntegerPerItems";
+import { Pickable } from "#modules/resources/models";
 
 type Case = {
   resources: readonly Pickable[];

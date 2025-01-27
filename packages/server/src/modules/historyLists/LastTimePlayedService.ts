@@ -1,9 +1,11 @@
+import { showError } from "#shared/utils/errors/showError";
 import { deepCopy } from "#shared/utils/objects";
 import { DateType } from "#shared/utils/time";
 import { DateTime } from "luxon";
-import { Model as HistoryList } from "./models";
+import { HistoryList } from "./models";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Episode, EpisodeId, EpisodeRepository, compareEpisodeId } from "#modules/episodes";
+import { Episode, EpisodeId, compareEpisodeId } from "#episodes/models";
+import { EpisodeRepository } from "#episodes/index";
 
 function getTimestampFromDateType(date: DateType): number {
   if (date.timestamp)
@@ -19,19 +21,20 @@ type FuncParams = {
   entries: HistoryList["entries"];
 };
 
-const DepsMap = {
+const DEPS_MAP = {
   episodeRepository: EpisodeRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class LastTimePlayedService {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class LastTimePlayedService {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
   }
 
+  // eslint-disable-next-line require-await
   async updateEpisodeLastTimePlayedFromEntriesAndGet(
     { episodeId, entries }: FuncParams,
   ): Promise<number | null> {
@@ -42,7 +45,7 @@ export default class LastTimePlayedService {
 
     this.#deps.episodeRepository.patchOneByIdAndGet(episodeId, {
       lastTimePlayed,
-    } );
+    } ).catch(showError);
 
     return lastTimePlayed ?? null;
   }

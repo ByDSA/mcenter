@@ -1,13 +1,16 @@
 import { z } from "zod";
 
-import { SearchSchema } from "./Criteria";
+import { searchSchema } from "./Criteria";
 
-export const GetManyEntriesBySearchSchema = z.object( {
-  body: SearchSchema,
+export const musicHistoryListGetManyEntriesBySearchSchema = z.object( {
+  body: searchSchema,
 } ).required();
 
-export type GetManyEntriesBySearchRequest = z.infer<typeof GetManyEntriesBySearchSchema>;
+export type MusicHistoryListGetManyEntriesBySearchRequest
+ = z.infer<typeof musicHistoryListGetManyEntriesBySearchSchema>;
 
-export function assertIsGetManyEntriesBySearchRequest(o: unknown): asserts o is GetManyEntriesBySearchRequest {
-  GetManyEntriesBySearchSchema.parse(o);
+export function assertIsMusicHistoryListGetManyEntriesBySearchRequest(
+  o: unknown,
+): asserts o is MusicHistoryListGetManyEntriesBySearchRequest {
+  musicHistoryListGetManyEntriesBySearchSchema.parse(o);
 }

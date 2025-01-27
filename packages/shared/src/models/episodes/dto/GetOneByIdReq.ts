@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const Schema = z.object( {
+export const schema = z.object( {
   params: z.object( {
     episodeId: z.string(),
     serieId: z.string(),
@@ -8,8 +8,8 @@ export const Schema = z.object( {
     .required(),
 } );
 
-export type GetOneByIdRequest = z.infer<typeof Schema>;
+export type GetOneByIdRequest = z.infer<typeof schema>;
 
 export function assertIsGetOneByIdRequest(o: unknown): asserts o is GetOneByIdRequest {
-  Schema.parse(o);
+  schema.parse(o);
 }

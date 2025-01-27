@@ -1,3 +1,4 @@
+/* eslint-disable import/no-default-export */
 const config = {
   moduleDirectories: ["node_modules", "src"],
   roots: ["<rootDir>/src", "<rootDir>/tests"],

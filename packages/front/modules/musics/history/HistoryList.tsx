@@ -1,12 +1,10 @@
-
-/* eslint-disable require-await */
-import { FetchingRender } from "#modules/fetching";
-import { formatDate } from "#modules/utils/dates";
-import { HistoryMusicEntry } from "#shared/models/musics";
 import extend from "just-extend";
 import { Fragment } from "react";
-import HistoryEntryElement from "./entry/HistoryEntry";
+import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { useRequest } from "./requests";
+import { MusicHistoryEntry } from "#modules/musics/history/models";
+import { formatDate } from "#modules/utils/dates";
+import { FetchingRender } from "#modules/fetching";
 
 import "#styles/resources/history-entry.css";
 import "#styles/resources/history-musics.css";
@@ -19,10 +17,10 @@ const DEFAULT_PARAMS: Required<Props> = {
   showDate: "groupByDay",
 };
 
-export default function HistoryList(props?: Props) {
+export function HistoryList(props?: Props) {
   const params = extend(true, DEFAULT_PARAMS, props) as typeof DEFAULT_PARAMS;
 
-  return FetchingRender<Required<HistoryMusicEntry>[]>( {
+  return FetchingRender<Required<MusicHistoryEntry>[]>( {
     useRequest,
     render: (data) => (
       <span className="history-list">
@@ -37,12 +35,17 @@ export default function HistoryList(props?: Props) {
   } );
 }
 
-function dayTitle(entry: Required<HistoryMusicEntry>, i: number, array: Required<HistoryMusicEntry>[]) {
-  if (i === 0 || !isSameday(array[i - 1].date.timestamp, entry.date.timestamp))
-  {return <h3 key={entry.date.timestamp}>{formatDate(new Date(entry.date.timestamp * 1000), {
-    ago: "no",
-    dateTime: "fullDate",
-  } )}</h3>;}
+function dayTitle(
+  entry: Required<MusicHistoryEntry>,
+  i: number,
+  array: Required<MusicHistoryEntry>[],
+) {
+  if (i === 0 || !isSameday(array[i - 1].date.timestamp, entry.date.timestamp)) {
+    return <h3 key={entry.date.timestamp}>{formatDate(new Date(entry.date.timestamp * 1000), {
+      ago: "no",
+      dateTime: "fullDate",
+    } )}</h3>;
+  }
 
   return null;
 }
@@ -51,7 +54,7 @@ function isSameday(timestamp1: number, timestamp2: number) {
   const date1 = new Date(timestamp1 * 1000);
   const date2 = new Date(timestamp2 * 1000);
 
-  return date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate();
+  return date1.getFullYear() === date2.getFullYear()
+    && date1.getMonth() === date2.getMonth()
+    && date1.getDate() === date2.getDate();
 }

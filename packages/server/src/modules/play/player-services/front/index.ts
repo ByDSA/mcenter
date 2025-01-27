@@ -1,3 +1,3 @@
 export {
-  default as FrontWebSocketsServerService,
+  FrontWSServerService as FrontWebSocketsServerService,
 } from "./FrontPlayerWebSocketsServerService";

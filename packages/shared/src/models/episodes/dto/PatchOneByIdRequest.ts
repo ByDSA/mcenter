@@ -1,23 +1,23 @@
 import { z } from "zod";
 import { generatePatchBodySchema } from "../../utils/dtos";
-import { EntitySchema } from "../Entity";
-import { Schema as GetOneByIdSchema } from "./GetOneByIdReq";
+import { entitySchema } from "../Entity";
+import { schema as GetOneByIdSchema } from "./GetOneByIdReq";
 
-const BodySchema = generatePatchBodySchema(EntitySchema);
+const bodySchema = generatePatchBodySchema(entitySchema);
 
-export type BodyType = z.infer<typeof BodySchema>;
+export type BodyType = z.infer<typeof bodySchema>;
 
 export function assertIsBody(o: unknown): asserts o is BodyType {
-  BodySchema.parse(o);
+  bodySchema.parse(o);
 }
 
-export const Schema = GetOneByIdSchema.extend( {
-  body: BodySchema,
+export const schema = GetOneByIdSchema.extend( {
+  body: bodySchema,
 } )
   .required();
 
-export type Type = z.infer<typeof Schema>;
+export type Type = z.infer<typeof schema>;
 
 export function assert(o: unknown): asserts o is Type {
-  Schema.parse(o);
+  schema.parse(o);
 }

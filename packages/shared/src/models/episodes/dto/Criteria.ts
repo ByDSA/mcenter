@@ -1,13 +1,11 @@
-/* eslint-disable import/prefer-default-export */
 import { z } from "zod";
 
-export const SearchSchema = z.object( {
+export const searchSchema = z.object( {
   filter: z.object( {
     path: z.string().optional(),
   } ).strict()
     .optional(),
-  sort: z.object( {
-  } ).strict()
+  sort: z.object( {} ).strict()
     .optional(),
   limit: z.number().optional(),
   offset: z.number().optional(),

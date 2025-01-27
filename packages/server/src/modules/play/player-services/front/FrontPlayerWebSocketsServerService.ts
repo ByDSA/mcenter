@@ -1,20 +1,21 @@
 import assert from "node:assert";
 import { Server as HttpServer } from "node:http";
-import { PlayerEvent as PlayerEventType, PlayerStatusResponse } from "#shared/models/player";
+import { showError } from "#shared/utils/errors/showError";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Server, Socket } from "socket.io";
 import { EmptyPlayerEvent, PlayPlayerEvent, QUEUE_NAME, SeekPlayerEvent } from "../messaging";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { PlayerEvent as PlayerEventType, PlayerStatusResponse } from "#modules/play/player-services/models";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Event } from "#utils/message-broker";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 
-const DepsMap = {
+const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class FrontWSServerService {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class FrontWSServerService {
   #io: Server | undefined;
 
   #deps: Deps;
@@ -34,7 +35,7 @@ export default class FrontWSServerService {
         console.log("[PLAYER]", `${event.type}: `, event.payload);
 
       return Promise.resolve();
-    } );
+    } ).catch(showError);
   }
 
   startSocket(httpServer: HttpServer) {
@@ -64,35 +65,35 @@ export default class FrontWSServerService {
         this.#deps.domainMessageBroker.publish(
           QUEUE_NAME,
           new EmptyPlayerEvent(PlayerEventType.PAUSE_TOGGLE),
-        );
+        ).catch(showError);
       } );
 
       socket.on(PlayerEventType.NEXT, () => {
         this.#deps.domainMessageBroker.publish(
           QUEUE_NAME,
           new EmptyPlayerEvent(PlayerEventType.NEXT),
-        );
+        ).catch(showError);
       } );
 
       socket.on(PlayerEventType.PREVIOUS, () => {
         this.#deps.domainMessageBroker.publish(
           QUEUE_NAME,
           new EmptyPlayerEvent(PlayerEventType.PREVIOUS),
-        );
+        ).catch(showError);
       } );
 
       socket.on(PlayerEventType.STOP, () => {
         this.#deps.domainMessageBroker.publish(
           QUEUE_NAME,
           new EmptyPlayerEvent(PlayerEventType.STOP),
-        );
+        ).catch(showError);
       } );
 
       socket.on(PlayerEventType.PLAY, (id: number) => {
         this.#deps.domainMessageBroker.publish(
           QUEUE_NAME,
           new PlayPlayerEvent(id),
-        );
+        ).catch(showError);
       } );
 
       socket.on(PlayerEventType.SEEK, (val: number | string) => {
@@ -102,7 +103,7 @@ export default class FrontWSServerService {
         this.#deps.domainMessageBroker.publish(
           QUEUE_NAME,
           new SeekPlayerEvent(val),
-        );
+        ).catch(showError);
       } );
 
       socket.on(PlayerEventType.FULLSCREEN_TOGGLE, () => {
@@ -111,7 +112,7 @@ export default class FrontWSServerService {
         this.#deps.domainMessageBroker.publish(
           QUEUE_NAME,
           new EmptyPlayerEvent(PlayerEventType.FULLSCREEN_TOGGLE),
-        );
+        ).catch(showError);
       } );
     } );
   }

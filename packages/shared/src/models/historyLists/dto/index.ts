@@ -1,5 +1,5 @@
 export {
-  GetOneByIdRequest, GetOneByIdSchema,
+  GetOneByIdRequest, getOneByIdSchema as GetOneByIdSchema,
   assertIsGetOneByIdRequest,
 } from "./GetOneByIdRequest";
 
@@ -19,7 +19,10 @@ export {
 } from "./GetManyEntriesBySearchResponse";
 
 export {
-  DeleteOneEntryByIdReqBody, DeleteOneEntryByIdRequest, DeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdRequest, assertIsDeleteOneEntryByIdResBody,
+  DeleteOneEntryByIdReqBody,
+  DeleteOneEntryByIdRequest,
+  DeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdRequest,
+  assertIsDeleteOneEntryByIdResBody,
 } from "./DeleteOneEntryByIdRequest";
 
 export {

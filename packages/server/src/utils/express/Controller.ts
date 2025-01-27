@@ -1,5 +1,5 @@
 import { Router } from "express";
 
-export default interface Controller {
+export interface Controller {
   getRouter(): Router;
 }

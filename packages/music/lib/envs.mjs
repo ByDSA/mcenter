@@ -2,7 +2,6 @@
 /* eslint-disable space-in-parens */
 import { remoteUpdateEnvs } from "../../../lib/packages/deploy/index.mjs";
 
-/* eslint-disable import/prefer-default-export */
 /**
  * @param {{
  * remoteProjectRoot: string,

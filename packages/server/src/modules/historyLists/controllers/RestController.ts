@@ -1,32 +1,36 @@
-import { HistoryListDeleteOneEntryByIdRequest, HistoryListDeleteOneEntryByIdResBody, HistoryListGetManyEntriesBySearchRequest, HistoryListGetManyEntriesBySuperIdRequest,
+import { showError } from "#shared/utils/errors/showError";
+import { assertFound } from "#shared/utils/http/validation";
+import express, { Request, Response, Router } from "express";
+import { LastTimePlayedService } from "../LastTimePlayedService";
+import { HistoryEntry, HistoryEntryWithId, HistoryList, assertIsHistoryEntryWithId } from "../models";
+import { HistoryListRepository } from "../repositories";
+import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#episodes/index";
+import { HistoryListDeleteOneEntryByIdRequest,
+  HistoryListDeleteOneEntryByIdResBody,
+  HistoryListGetManyEntriesBySearchRequest,
+  HistoryListGetManyEntriesBySuperIdRequest,
   HistoryListGetOneByIdRequest,
   assertIsHistoryListDeleteOneEntryByIdRequest,
   assertIsHistoryListDeleteOneEntryByIdResBody,
   assertIsHistoryListGetManyEntriesBySearchRequest,
   assertIsHistoryListGetManyEntriesBySuperIdRequest,
-  assertIsHistoryListGetOneByIdRequest } from "#shared/models/historyLists";
-import { assertFound } from "#shared/utils/http/validation";
-import express, { Request, Response, Router } from "express";
-import LastTimePlayedService from "../LastTimePlayedService";
-import { Entry, EntryWithId, Model, assertIsEntryWithId } from "../models";
-import { ListRepository } from "../repositories";
-import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#modules/episodes";
+  assertIsHistoryListGetOneByIdRequest } from "#modules/historyLists/models/transport";
 import { SerieRepository } from "#modules/series";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
 
-const DepsMap = {
-  historyListRepository: ListRepository,
+const DEPS_MAP = {
+  historyListRepository: HistoryListRepository,
   serieRepository: SerieRepository,
   episodeRepository: EpisodeRepository,
   lastTimePlayedService: LastTimePlayedService,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class RestController
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class HistoryListRestController
 implements
     Controller,
     CanGetOneById<HistoryListGetOneByIdRequest, Response>,
@@ -45,7 +49,7 @@ implements
 
   async #getOneByIdByRequest(
     req: HistoryListGetOneByIdRequest,
-  ): Promise<Model> {
+  ): Promise<HistoryList> {
     const { id } = req.params;
     const got = await this.#deps.historyListRepository.getOneByIdOrCreate(id);
 
@@ -73,7 +77,7 @@ implements
   }
 
   async #getEntriesWithCriteriaApplied(
-    entries: EntryWithId[],
+    entries: HistoryEntryWithId[],
     body: HistoryListGetManyEntriesBySuperIdRequest["body"],
   ) {
     let newEntries = entries;
@@ -98,8 +102,8 @@ implements
 
     if (body.sort) {
       const { timestamp } = body.sort;
-      const descSort = (a: Entry, b: Entry) => b.date.timestamp - a.date.timestamp;
-      const ascSort = (a: Entry, b: Entry) => a.date.timestamp - b.date.timestamp;
+      const descSort = (a: HistoryEntry, b: HistoryEntry) => b.date.timestamp - a.date.timestamp;
+      const ascSort = (a: HistoryEntry, b: HistoryEntry) => a.date.timestamp - b.date.timestamp;
 
       if (timestamp === "asc")
         newEntries = newEntries.toSorted(ascSort);
@@ -170,7 +174,7 @@ implements
     res: Response,
   ): Promise<void> {
     const got = await this.#deps.historyListRepository.getAll();
-    let entries: EntryWithId[] = [];
+    let entries: HistoryEntryWithId[] = [];
 
     for (const historyList of got)
       entries.push(...historyList.entries);
@@ -189,20 +193,22 @@ implements
 
     assertFound(historyList);
 
-    const entryIndex = historyList.entries.findIndex((entry: EntryWithId) => entry.id === entryId);
+    const entryIndex = historyList.entries.findIndex(
+      (entry: HistoryEntryWithId) => entry.id === entryId,
+    );
 
     assertFound(entryIndex !== -1);
 
     const [deleted] = historyList.entries.splice(entryIndex, 1);
 
-    assertIsEntryWithId(deleted);
+    assertIsHistoryEntryWithId(deleted);
 
     await this.#deps.historyListRepository.updateOneById(historyList.id, historyList);
 
     this.#deps.lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
       episodeId: deleted.episodeId,
       entries: historyList.entries,
-    } );
+    } ).catch(showError);
 
     const body: HistoryListDeleteOneEntryByIdResBody = {
       entry: deleted,

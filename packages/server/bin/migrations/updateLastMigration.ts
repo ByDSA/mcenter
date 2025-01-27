@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Database from "../../src/main/db/Database";
+import { RealDatabase as Database } from "../../src/main/db/Database";
 
 (async () => {
   const lastMigration = +process.argv[2];

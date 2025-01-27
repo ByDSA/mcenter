@@ -1,27 +1,27 @@
 "use client";
 
-import { MediaPlayer, WebSocketsClient } from "#modules/remote-player";
-import { seriesBackendUrls } from "#modules/series";
-import { Episode, EpisodeGetManyBySearchRequest, assertIsEpisode } from "#shared/models/episodes";
-import { PlayerPlaylistElement, PlayerStatusResponse } from "#shared/models/player";
-import Loading from "app/loading";
 import React, { useEffect } from "react";
+import { showError } from "#shared/utils/errors/showError";
 import styles from "./Player.module.css";
+import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
+import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
+import { EpisodeGetManyBySearchRequest } from "#modules/series/episodes/models/transport";
+import { Loading } from "#modules/loading";
+import { seriesBackendUrls } from "#modules/series";
+import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-player";
 
-let webSockets: WebSocketsClient | undefined;
+let webSockets: RemotePlayerWebSocketsClient | undefined;
 const RESOURCES = [
   "series",
 ];
-const uriToResource: {[key: string]: Episode | null} = {
-};
+const uriToResource: {[key: string]: Episode | null} = {};
 let fetchingResource = false;
 let previousUri = "";
 
 export default function Player() {
   const [resource, setResource] = React.useState<Episode | null>(null);
   const socketInitializer = () => {
-    webSockets = new (class A extends WebSocketsClient {
-      // eslint-disable-next-line class-methods-use-this
+    webSockets = new (class A extends RemotePlayerWebSocketsClient {
       onStatus(status: PlayerStatusResponse) {
         setStatus(status);
 
@@ -59,7 +59,7 @@ export default function Player() {
             body: bodyStr,
           } ).then(r => r.json())
             .then((episodes: Episode[]) => {
-              const episode = episodes[0];
+              const [episode] = episodes;
 
               try {
                 assertIsEpisode(episode);
@@ -71,7 +71,8 @@ export default function Player() {
               }
 
               fetchingResource = false;
-            } );
+            } )
+            .catch(showError);
         }
       }
     } )();
@@ -95,7 +96,7 @@ export default function Player() {
 
 function getPathFromUri(uri: string) {
   const url = new URL(uri);
-  const {pathname} = url;
+  const { pathname } = url;
   const pathNameSplitted = pathname.split("/");
   let indexResourceType = -1;
 
@@ -142,6 +143,7 @@ function statusRepresentaton(status: PlayerStatusResponse, resource: Episode | n
   let title = "-";
 
   if (resource)
+    // eslint-disable-next-line prefer-destructuring
     title = resource.title;
   else if (status?.status?.meta?.title)
     title = status?.status?.meta?.title;
@@ -163,8 +165,8 @@ function statusRepresentaton(status: PlayerStatusResponse, resource: Episode | n
     Conexión HTTP: {status.status ? "Sí" : "No"}
     <br/>
     {
-      status.open && status.status && webSockets &&
-      <>
+      status.open && status.status && webSockets
+      && <>
         <MediaPlayer meta={{
           title,
           artist,
@@ -199,13 +201,16 @@ function statusRepresentaton(status: PlayerStatusResponse, resource: Episode | n
 function mapElements(array: PlayerPlaylistElement[]): React.JSX.Element {
   return <ol className={styles.list} >
     {
-      array.filter((_, i)=>i < 10).map((item, index) =>
-        <li key={index}><a onClick={()=>playId(item.id)}>{item.name}</a></li>,
+      array.filter(
+        (_, i)=>i < 10,
+      ).map(
+        (item, index) => <li key={index}><a onClick={()=>playId(item.id)}>{item.name}</a></li>,
       )
     }
   </ol>;
 }
 
 function playId(id: number) {
-  webSockets?.play(id);
+  webSockets?.play(id)
+    .catch(showError);
 }

@@ -64,7 +64,6 @@ const targetEnv = targetEnvArg ?? "dev";
     console.log(`remaining migrations: ${additionalMigrationsToDo.map((migration) => migration.name)}`);
 
     for (const migration of additionalMigrationsToDo) {
-      // eslint-disable-next-line no-await-in-loop
       await migrate( {
         migration,
         envFilePath,

@@ -1,7 +1,7 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import Repository from "../Repository";
+import { HistoryListRepository } from "../Repository";
 
-export default class RepositoryMock implements PublicMethodsOf<Repository> {
+export class HistoryListRepositoryMock implements PublicMethodsOf<HistoryListRepository> {
   createOne = jest.fn();
 
   getOneByIdOrCreate = jest.fn();

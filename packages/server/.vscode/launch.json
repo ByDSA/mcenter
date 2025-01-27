@@ -2,7 +2,6 @@
   // Use IntelliSense para saber los atributos posibles.
   // Mantenga el puntero para ver las descripciones de los existentes atributos.
   // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
-  "version": "0.2.0",
   "configurations": [
     {
       "console": "integratedTerminal",
@@ -10,15 +9,12 @@
       "name": "debug (server)",
       "request": "launch",
       "restart": true,
-      "runtimeExecutable": "npm",
       "runtimeArgs": ["run-script", "start:watch"],
+      "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
       "type": "node"
     },
-    { /* Se usa para debuggear tests con la extensión de Jest */
-      "type": "node",
-      "name": "vscode-jest-tests.v2.server",
-      "request": "launch",
+    {
       "args": [
         "test",
         "--",
@@ -28,10 +24,14 @@
         "--runTestsByPath",
         "${jest.testFile}"
       ],
-      "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
       "internalConsoleOptions": "neverOpen",
-      "runtimeExecutable": "npm"
+      "name": "vscode-jest-tests.v2.server",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      /* Se usa para debuggear tests con la extensión de Jest */ "type": "node"
     }
-  ]
+  ],
+  "version": "0.2.0"
 }

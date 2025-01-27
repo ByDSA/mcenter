@@ -1,9 +1,10 @@
 export {
-  assertIsHistoryEntry as assertIsEntry,
-  assertIsHistoryEntryWithId as assertIsEntryWithId,
-  assertIsHistoryList as assertIsModel,
+  assertIsHistoryEntry,
+  assertIsHistoryEntryWithId,
+  assertIsHistoryList,
   createHistoryEntryByEpisodeFullId,
-  HistoryEntry as Entry, HistoryEntryWithId as EntryWithId,
-  HistoryList as Model,
-  HistoryListId as ModelId,
+  HistoryEntry,
+  HistoryEntryWithId,
+  HistoryList,
+  HistoryListId,
 } from "#shared/models/historyLists";

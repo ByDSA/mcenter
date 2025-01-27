@@ -1,40 +1,46 @@
-import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest, assertIsEpisodePatchOneByIdResBody } from "#shared/models/episodes";
-import { Serie } from "#shared/models/series";
 import { assertFound } from "#shared/utils/http/validation";
 import { neverCase } from "#shared/utils/validation";
 import express, { Response, Router } from "express";
-import { Model } from "../models";
-import { Repository as EpisodeRepository } from "../repositories";
+import { EpisodeRepository } from "../repositories";
+import { Episode } from "#episodes/models";
+import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest, assertIsEpisodePatchOneByIdResBody } from "#episodes/models/transport";
+import { SerieRepository } from "#modules/series";
+import { Serie } from "#modules/series/models";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { ResponseWithBody, validateReq } from "#utils/validation/zod-express";
-import { SerieRepository } from "#modules/series";
 
 enum ResourceType {
   SERIES = "series",
 }
 
-const DepsMap = {
+const DEPS_MAP = {
   episodeRepository: EpisodeRepository,
   serieRepo: SerieRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class RestController
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class EpisodesRestController
 implements
     Controller,
     CanGetOneById<EpisodeGetOneByIdRequest, Response>,
     CanGetAll<EpisodeGetAllRequest, Response>,
-    CanPatchOneByIdAndGet<EpisodePatchOneByIdRequest, ResponseWithBody<EpisodePatchOneByIdResBody>> {
+    CanPatchOneByIdAndGet<
+    EpisodePatchOneByIdRequest,
+     ResponseWithBody<EpisodePatchOneByIdResBody>
+     > {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
   }
 
-  async patchOneByIdAndGet(req: EpisodePatchOneByIdRequest, res: ResponseWithBody<EpisodePatchOneByIdResBody>): Promise<void> {
+  async patchOneByIdAndGet(
+    req: EpisodePatchOneByIdRequest,
+    res: ResponseWithBody<EpisodePatchOneByIdResBody>,
+  ): Promise<void> {
     const { episodeId, serieId } = req.params;
     const episodePartial = req.body;
     const id = {
@@ -50,7 +56,7 @@ implements
 
     try {
       assertIsEpisodePatchOneByIdResBody(body);
-    } catch (e) {
+    } catch {
       res.status(501).send(body);
     }
     res.send(body);
@@ -92,7 +98,8 @@ implements
 
       switch (type) {
         case ResourceType.SERIES: {
-          const episode: Model | null = await this.#deps.episodeRepository.getOneByPath(filterPath);
+          const episode: Episode | null = await this.#deps.episodeRepository
+            .getOneByPath(filterPath);
 
           if (episode)
             episodes.push(episode);

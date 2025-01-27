@@ -2,7 +2,7 @@ import YoutubeMp3Downloader from "youtube-mp3-downloader";
 import { ENVS } from "./utils";
 
 export function download(str: string): Promise<any> {
-  const YD = new YoutubeMp3Downloader( {
+  const ytDownloader = new YoutubeMp3Downloader( {
     ffmpegPath: "ffmpeg", // FFmpeg binary location
     outputPath: ENVS.mediaPath, // Output file location (default: the home directory)
     youtubeVideoQuality: "highestaudio", // Desired video quality (default: highestaudio)
@@ -12,10 +12,10 @@ export function download(str: string): Promise<any> {
   } );
   const id = getIdFromStr(str);
 
-  YD.download(id);
+  ytDownloader.download(id);
 
   return new Promise((solve, reject) => {
-    YD.on("finished", (err, data) => {
+    ytDownloader.on("finished", (err, data) => {
       if (err) {
         reject(err);
 

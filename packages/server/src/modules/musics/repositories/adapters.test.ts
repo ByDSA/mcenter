@@ -1,6 +1,5 @@
-import { Music } from "#shared/models/musics";
-
 import mongoose from "mongoose";
+import { Music } from "../models";
 import { musicDocOdmToModel, musicModelToDocOdm } from "./adapters";
 import { DocOdm } from "./odm";
 import { A_AOT4 } from "#tests/main/db/fixtures/models/music";

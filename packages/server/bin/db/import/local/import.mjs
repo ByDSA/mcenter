@@ -28,6 +28,7 @@ console.log("DB_PORT: ", DB_PORT);
 
 const containerId = (await $`(sudo docker ps | grep mongo | grep "${DB_PORT}/tcp" | awk '{print $1}')`).stdout.trim();
 const internalCmd = `mongorestore --host=${DB_HOST} --port=${DB_PORT} --username=${DB_USERNAME} --password=${DB_PASSWORD} --authenticationDatabase=admin --archive --drop`;
+// eslint-disable-next-line prefer-destructuring
 const inputFile = argv._[0];
 
 if (inputFile === undefined) {

@@ -1,8 +1,7 @@
 // @ts-check
-/* eslint-disable space-in-parens */
+
 import { remoteUpdateEnvs } from "../../../lib/packages/deploy/index.mjs";
 
-/* eslint-disable import/prefer-default-export */
 /**
  * @param {{
  * remoteProjectRoot: string,
@@ -16,12 +15,12 @@ export async function updateRemoteEnvs(params) {
   const packageName = "server";
   const projectName = "mcenter";
 
-  await remoteUpdateEnvs({
+  await remoteUpdateEnvs( {
     outEnvFile: `"${remoteProjectRoot}"/packages/${packageName}/.env`,
     packageName,
     projectName,
     ssh,
     targetEnv,
     vault,
-  });
+  } );
 }

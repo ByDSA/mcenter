@@ -1,6 +1,6 @@
-import { Music, compareMusicId } from "#shared/models/musics";
-import { Resource } from "#shared/models/resource";
 import { FilterApplier, PreventDisabledFilter, PreventRepeatInTimeFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
+import { Resource } from "#modules/resources/models";
+import { Music, compareMusicId } from "#musics/models";
 
 type Model = Music;
 type ModelId = string;
@@ -10,7 +10,7 @@ type Params<ID, R extends Resource<ID> = Resource<ID>> = {
   lastEp: R | null;
   lastId: ID | undefined;
 };
-export default class MusicFilterApplier extends FilterApplier<Model> {
+export class MusicFilterApplier extends FilterApplier<Model> {
   #params: Params<ModelId, Model>;
 
   constructor(params: Params<ModelId, Model>) {

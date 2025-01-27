@@ -1,16 +1,16 @@
-import { MusicID } from "#shared/models/musics";
 import { DateType } from "#shared/utils/time";
 import mongoose from "mongoose";
+import { MusicId } from "#musics/models";
 import { DateTypeOdmSchema } from "#utils/time";
 
 export type DocOdm = {
   date: DateType;
-  musicId: MusicID;
+  musicId: MusicId;
 };
 
 const NAME = "MusicHistory";
 
-export const Schema = new mongoose.Schema<DocOdm>(
+export const schemaOdm = new mongoose.Schema<DocOdm>(
   {
     date: {
       type: DateTypeOdmSchema,
@@ -26,4 +26,4 @@ export const Schema = new mongoose.Schema<DocOdm>(
   },
 );
 
-export const ModelOdm = mongoose.model<DocOdm>(NAME, Schema);
+export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

@@ -1,12 +1,8 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable object-curly-newline */
+
 /* eslint-disable space-in-parens */
 // @ts-check
 
 // @ts-ignore
-// eslint-disable-next-line import/no-absolute-path
-
-import { updateRemoteEnvs } from "./envs.mjs";
 
 import {
   dockerImagePush,
@@ -15,6 +11,7 @@ import {
   remoteDockerImagePull,
   sshCmd,
 } from "../../../lib/index.mjs";
+import { updateRemoteEnvs } from "./envs.mjs";
 
 /**
  * @param {import("../../../lib/projects/deploy/types.mjs").TreeEnvs} ENVS
@@ -26,10 +23,9 @@ export async function deployParticular(ENVS) {
   const imageName = `${ENVS.project.name}/${packageName}`;
   const imageNameEnv = `${imageName}_${ENVS.TARGET_ENV}`;
   const tag = packageVersion;
-  const imageNameEnvRemote =
-    ENVS.TARGET_ENV === "local"
-      ? imageNameEnv
-      : `${ENVS.docker.registryUrl}/${imageNameEnv}`;
+  const imageNameEnvRemote = ENVS.TARGET_ENV === "local"
+    ? imageNameEnv
+    : `${ENVS.docker.registryUrl}/${imageNameEnv}`;
 
   // Image Build
   await packageBuild({
@@ -60,9 +56,9 @@ export async function deployParticular(ENVS) {
     // Update image latest tag (remote)
     const taggedImageEnvRegistry = `${imageNameEnvRemote}:${tag}`;
 
+    // eslint-disable-next-line no-console
     console.log(
-      // eslint-disable-next-line comma-dangle
-      `Remote: docker image tag ${imageName} -> ${taggedImageEnvRegistry} ...`
+      `Remote: docker image tag ${imageName} -> ${taggedImageEnvRegistry} ...`,
     );
     await sshCmd({
       cmd: `sudo docker tag "${taggedImageEnvRegistry}" "${imageName}"`,

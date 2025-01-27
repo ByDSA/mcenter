@@ -1,4 +1,5 @@
-import { Model, ModelId } from "../models";
+import { showError } from "#shared/utils/errors/showError";
+import { Serie, SerieId } from "../models";
 import { docOdmToModel } from "./adapters";
 import { QUEUE_NAME } from "./events";
 import { DocOdm, ModelOdm } from "./odm";
@@ -9,17 +10,17 @@ import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
 
-const DepsMap = {
+const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class SeriesRepository
-implements CanGetOneById<Model, ModelId>,
-CanUpdateOneByIdAndGet<Model, ModelId>,
-CanCreateOneAndGet<Model>,
-CanGetAll<Model> {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class SerieRepository
+implements CanGetOneById<Serie, SerieId>,
+CanUpdateOneByIdAndGet<Serie, SerieId>,
+CanCreateOneAndGet<Serie>,
+CanGetAll<Serie> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -29,16 +30,16 @@ CanGetAll<Model> {
       logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
-    } );
+    } ).catch(showError);
   }
 
-  async getAll(): Promise<Model[]> {
+  async getAll(): Promise<Serie[]> {
     const seriesDocOdm = await ModelOdm.find();
 
     return seriesDocOdm.map(docOdmToModel);
   }
 
-  async createOneAndGet(model: Model): Promise<Model> {
+  async createOneAndGet(model: Serie): Promise<Serie> {
     const serieOdm: DocOdm = await ModelOdm.create(model);
     const serie = docOdmToModel(serieOdm);
     const event = new ModelEvent(EventType.CREATED, {
@@ -50,20 +51,20 @@ CanGetAll<Model> {
     return serie;
   }
 
-  async getOneById(id: ModelId): Promise<Model | null> {
-    const [serieDB]: DocOdm[] = await ModelOdm.find( {
+  async getOneById(id: SerieId): Promise<Serie | null> {
+    const [serieDb]: DocOdm[] = await ModelOdm.find( {
       id,
     }, {
       _id: 0,
     } );
 
-    if (!serieDB)
+    if (!serieDb)
       return null;
 
-    return docOdmToModel(serieDB);
+    return docOdmToModel(serieDb);
   }
 
-  async updateOneByIdAndGet(id: ModelId, serie: Model): Promise<Model | null> {
+  async updateOneByIdAndGet(id: SerieId, serie: Serie): Promise<Serie | null> {
     const docOdm = await ModelOdm.findOneAndUpdate( {
       id,
     }, serie, {

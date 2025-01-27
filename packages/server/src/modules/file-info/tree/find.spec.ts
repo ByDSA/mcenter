@@ -1,5 +1,5 @@
-import path from "path";
-import findAllSeriesTreeAt from "./find";
+import path from "node:path";
+import { findAllSerieFolderTreesAt } from "./find";
 
 let MEDIA_FOLDER_PATH: string;
 
@@ -8,7 +8,7 @@ beforeAll(() => {
 } );
 
 it("should read all episodes correctly", () => {
-  const actual = findAllSeriesTreeAt(path.join(MEDIA_FOLDER_PATH, "series"));
+  const actual = findAllSerieFolderTreesAt(path.join(MEDIA_FOLDER_PATH, "series"));
 
   expect(actual.errors).toHaveLength(0);
 } );

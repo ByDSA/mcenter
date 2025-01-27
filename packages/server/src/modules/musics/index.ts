@@ -1,14 +1,14 @@
 export {
   DocOdm as MusicDocOdm,
   ModelOdm as MusicModelOdm,
-  Repository as MusicRepository,
+  MusicRepository,
   SchemaOdm as MusicSchemaOdm,
 } from "./repositories";
 
 export {
-  Controller as MusicController,
+  MusicController,
 } from "./controllers";
 
 export {
-  HistoryRepository as MusicHistoryRepository,
+  MusicHistoryRepository,
 } from "./history";

@@ -1,7 +1,7 @@
 export {
-  default as VLCProcess,
+  VLCProcess,
 } from "./VLCProcess";
 
 export {
-  default as VLCFlag,
+  VLCFlag,
 } from "./VLCFlag";

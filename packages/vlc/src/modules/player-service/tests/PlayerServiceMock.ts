@@ -1,6 +1,6 @@
-import PlayerService from "#modules/PlayerService";
+import { PlayerService } from "#modules/PlayerService";
 
-export default class PlayerServiceMock implements PlayerService {
+export class PlayerServiceMock implements PlayerService {
   isRunning = jest.fn();
 
   pauseToggle = jest.fn();

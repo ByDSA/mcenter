@@ -3,13 +3,13 @@ import { UpdateRemoteTreeService } from "../services";
 import { SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
-const DepsMap = {
+const DEPS_MAP = {
   updateRemoteTreeService: UpdateRemoteTreeService,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class UpdateRemoteController {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class MusicUpdateRemoteController {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

@@ -6,7 +6,11 @@ export type AssertZodSettings = {
   useZodError?: boolean;
 };
 
-export function assertZod<T>(schema: ZodType<T>, model: unknown, settings?: AssertZodSettings): asserts model is T {
+export function assertZod<T>(
+  schema: ZodType<T>,
+  model: unknown,
+  settings?: AssertZodSettings,
+): asserts model is T {
   if (settings?.useZodError) {
     schema.parse(model);
 
@@ -30,7 +34,11 @@ export function assertZod<T>(schema: ZodType<T>, model: unknown, settings?: Asse
   }
 }
 
-export function assertZodPopStack<T>(schema: ZodType<T>, model: unknown, settings?: AssertZodSettings): asserts model is T {
+export function assertZodPopStack<T>(
+  schema: ZodType<T>,
+  model: unknown,
+  settings?: AssertZodSettings,
+): asserts model is T {
   try {
     return assertZod(schema, model, settings);
   } catch (e) {

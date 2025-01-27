@@ -1,4 +1,21 @@
 {
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "pnpm build:clean && pnpm build:raw",
+    "build:clean": "rm -rf build",
+    "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
+    "db:migrate": "./bin/migrations/migrate.mjs",
+    "lint": "bin/lint.mjs",
+    "start": "NODE_ENV=production node build/index.js",
+    "start:watch": "NODE_ENV=development nodemon",
+    "test": "NODE_ENV=test jest --maxWorkers=1",
+    "test:coverage": "pnpm run test --coverage",
+    "test:coverage:clean": "rm -rf coverage",
+    "test:watch": "pnpm run test --watch"
+  },
   "dependencies": {
     "#shared": "workspace:../shared/build",
     "axios": "1.7.9",
@@ -25,7 +42,6 @@
     "youtube-mp3-downloader": "0.7.11",
     "zod": "3.24.1"
   },
-  "description": "",
   "devDependencies": {
     "#sharedSrc": "workspace:../shared/src",
     "@chevrotain/types": "11.0.3",
@@ -46,20 +62,5 @@
     "supertest": "7.0.0",
     "ts-node": "10.9.2",
     "tsc-alias": "1.8.10"
-  },
-  "main": "build/index.js",
-  "name": "server",
-  "scripts": {
-    "build": "pnpm build:clean && pnpm build:raw",
-    "build:clean": "rm -rf build",
-    "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
-    "db:migrate": "./bin/migrations/migrate.mjs",
-    "start": "NODE_ENV=production node build/index.js",
-    "start:watch": "NODE_ENV=development nodemon",
-    "test": "NODE_ENV=test jest --maxWorkers=1",
-    "test:coverage": "pnpm run test --coverage",
-    "test:coverage:clean": "rm -rf coverage",
-    "test:watch": "pnpm run test --watch"
-  },
-  "version": "1.0.0"
+  }
 }

@@ -1,18 +1,18 @@
 import { FullResponse, LogElementResponse } from "#shared/utils/http";
 import { Request, Response, Router } from "express";
 import { SerieRepository } from "#modules/series";
-import { StreamRepository } from "#modules/streams";
+import { StreamRepository } from "#modules/streams/repositories";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
-const DepsMap = {
+const DEPS_MAP = {
   serieRepository: SerieRepository,
   streamRepository: StreamRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class FixerController implements Controller {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class FixerController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

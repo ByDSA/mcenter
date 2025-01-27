@@ -1,5 +1,5 @@
-import { Music } from "#shared/models/musics";
 import { deepFreeze } from "#shared/utils/objects";
+import { Music } from "#musics/models";
 
 const DATE = new Date();
 const AOT4_COMMON = {

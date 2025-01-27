@@ -1,7 +1,7 @@
 /* eslint-disable require-await */
-import WeightFixer, { WeightFixerParams } from "./WeightFixer";
+import { WeightFixer, WeightFixerParams } from "./WeightFixer";
 
-export default class LimiterWeightFixer implements WeightFixer {
+export class LimiterWeightFixer implements WeightFixer {
   #limit: number;
 
   constructor(limit: number) {

@@ -1,11 +1,11 @@
-import { ARTIST_EMPTY, Music } from "#shared/models/musics";
-// eslint-disable-next-line import/no-cycle
-import MusicRepository from "./Repository";
+/* eslint-disable import/no-cycle */
+import { MusicRepository } from "./Repository";
+import { ARTIST_EMPTY, Music } from "#musics/models";
 
 type Params = {
   musicRepository: MusicRepository;
 };
-export default class UrlGenerator {
+export class MusicUrlGenerator {
   #musicRepository: MusicRepository;
 
   constructor( { musicRepository }: Params) {

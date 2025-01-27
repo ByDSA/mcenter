@@ -1,25 +1,25 @@
 import { TestMongoDatabase } from "./db";
-import TestDatabase from "./db/TestDatabase";
+import { TestDatabase } from "./db/TestDatabase";
 import { registerSingletonIfNotAndGet } from "./utils";
+import { EpisodeRestControllerMock } from "#episodes/controllers/test";
+import { EpisodeRestController } from "#episodes/index";
 import { ExpressApp } from "#main";
 import { ExpressAppDependencies } from "#main/ExpressApp";
 import { ActionController } from "#modules/actions";
 import { ActionControllerMock } from "#modules/actions/test";
 import { EpisodePickerController } from "#modules/episode-picker";
 import { EpisodePickerControllerMock } from "#modules/episode-picker/tests";
-import { EpisodeRestController } from "#modules/episodes";
-import { EpisodeRestControllerMock } from "#modules/episodes/controllers/test";
 import { HistoryListRestController } from "#modules/historyLists";
 import { HistoryListRestControllerMock } from "#modules/historyLists/controllers/test";
-import { MusicController } from "#modules/musics";
-import { MusicControllerMock } from "#modules/musics/controllers/tests";
-import { PlaySerieController, PlayStreamController, RemotePlayerController, RemotePlayerWebSocketsServerService as WebSocketsFrontServerService } from "#modules/play";
-import { PlayStatusControllerMock, WebSocketsServiceMock } from "#modules/play/player-services/tests";
+import { PlaySerieController, PlayStreamController, RemotePlayerWebSocketsServerService as WebSocketsFrontServerService } from "#modules/play";
+import { WebSocketsServiceMock } from "#modules/play/player-services/tests";
 import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
 import { StreamRestController } from "#modules/streams";
 import { StreamRestControllerMock } from "#modules/streams/controllers/test";
+import { MusicControllerMock } from "#musics/controllers/tests";
+import { MusicController } from "#musics/index";
 
-export default class ExpressAppMock extends ExpressApp {
+export class ExpressAppMock extends ExpressApp {
   #database: TestDatabase;
 
   constructor() {
@@ -49,7 +49,6 @@ function registerSingletons() {
   registerSingletonIfNotAndGet(MusicController, MusicControllerMock);
   registerSingletonIfNotAndGet(PlaySerieController, PlaySerieControllerMock);
   registerSingletonIfNotAndGet(PlayStreamController, PlayStreamControllerMock);
-  registerSingletonIfNotAndGet(RemotePlayerController, PlayStatusControllerMock);
   registerSingletonIfNotAndGet(WebSocketsFrontServerService, WebSocketsServiceMock);
   registerSingletonIfNotAndGet(ActionController, ActionControllerMock);
   registerSingletonIfNotAndGet(StreamRestController, StreamRestControllerMock);

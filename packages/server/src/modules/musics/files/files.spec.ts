@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { join } from "path";
 import { FindOptions, findFiles } from ".";
 import { MUSIC_DATA_FOLDER } from "#tests/MusicData";
@@ -13,18 +14,18 @@ describe("getHashFromFile", () => {
     expect(actual).toBe(expected);
   } );
 
-  it("existing path folder", () => {
+  it("existing path folder", async () => {
     const path = `${MUSIC_DATA_FOLDER}/`;
 
-    expect(async () => {
+    await expect(async () => {
       await md5FileAsync(path);
     } ).rejects.toThrow("EISDIR: illegal operation on a directory, read");
   } );
 
-  it("unexisting path", () => {
+  it("unexisting path", async () => {
     const path = "unexisting/path/";
 
-    expect(async () => {
+    await expect(async () => {
       await md5FileAsync(path);
     } ).rejects.toThrow(`ENOENT: no such file or directory, open '${path}'`);
   } );
@@ -45,9 +46,9 @@ describe("findFiles", () => {
     expect(actual.sort()).toEqual(expected.sort());
   } );
 
-  it("unexisting folder", () => {
+  it("unexisting folder", async () => {
     const path = "unexisting/folder";
-    const actual = findFiles( {
+    const actual = await findFiles( {
       folder: path,
     } );
     const expected: string[] = [];
@@ -62,7 +63,7 @@ describe("findFiles", () => {
       findFiles( {
         folder: path,
       } );
-    } ).toThrowError();
+    } ).toThrow();
   } );
 } );
 
@@ -83,9 +84,9 @@ describe("findFilesResursive", () => {
     expect(actual.sort()).toEqual(expected.sort());
   } );
 
-  it("unexisting folder", () => {
+  it("unexisting folder", async () => {
     const path = "unexisting/folder";
-    const actual = findFiles( {
+    const actual = await findFiles( {
       folder: path,
       recursive: true,
     } );
@@ -102,7 +103,7 @@ describe("findFilesResursive", () => {
         folder: path,
         recursive: true,
       } );
-    } ).toThrowError();
+    } ).toThrow();
   } );
 } );
 
@@ -123,9 +124,9 @@ describe("findFilesByExtensionRecursive", () => {
     expect(actual.sort()).toEqual(expected.sort());
   } );
 
-  it("unexisting folder", () => {
+  it("unexisting folder", async () => {
     const path = "unexisting/folder";
-    const actual = findFiles( {
+    const actual = await findFiles( {
       folder: path,
       recursive: true,
       extensions: ["mp3"],
@@ -144,11 +145,11 @@ describe("findFilesByExtensionRecursive", () => {
         recursive: true,
         extensions: ["mp3"],
       } );
-    } ).toThrowError();
+    } ).toThrow();
   } );
 } );
 
-describe("findFiles", () => {
+describe("findFiles2", () => {
   it("unique hash", async () => {
     const expected = [join(MUSIC_DATA_FOLDER, DK.path)];
     const { hash } = DK;

@@ -12,11 +12,9 @@ type TreeMapId = string;
 export abstract class TreeMap<C> implements Tree<TreeMapId, C> {
   #rootNode: TreeBranchModel<TreeMapId, C>;
 
-  #branchesMap: { [key: string]: C } = {
-  };
+  #branchesMap: { [key: string]: C } = {};
 
-  #contentMap: { [key: TreeMapId]: C[] } = {
-  };
+  #contentMap: { [key: TreeMapId]: C[] } = {};
 
   constructor(root: C) {
     this.#rootNode = {
@@ -38,7 +36,6 @@ export abstract class TreeMap<C> implements Tree<TreeMapId, C> {
     this.#contentMapPut(key, content);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   #getPathId(...branches: TreeMapId[]): string {
     return branches.join(SEPARATOR);
   }

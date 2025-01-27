@@ -1,8 +1,8 @@
 import { HISTORY_LIST_SIMPSONS, STREAM_SIMPSONS } from "../models";
 import { HistoryListDocOdm, HistoryListModelOdm, historyListToDocOdm } from "#modules/historyLists";
-import { StreamDocOdm, StreamModelOdm, streamToDocOdm } from "#modules/streams";
+import { StreamDocOdm, StreamModelOdm, streamToDocOdm } from "#modules/streams/repositories";
 
-export default async () => {
+export const loadFixtureStreamAndHistoryListSimpsons = async () => {
   // Streams
   const streamsDocOdm: StreamDocOdm[] = [STREAM_SIMPSONS].map(streamToDocOdm);
 

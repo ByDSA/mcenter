@@ -1,7 +1,7 @@
 export {
-  default as FileAlreadyExistsError,
+  FileAlreadyExistsError,
 } from "./FileAlreadyExistsError";
 
 export {
-  default as FileNotFoundError,
+  FileNotFoundError,
 } from "./FileNotFoundError";

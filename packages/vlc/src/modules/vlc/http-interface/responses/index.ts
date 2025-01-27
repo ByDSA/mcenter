@@ -1,9 +1,7 @@
 export {
-  PlaylistELement, default as PlaylistResponse,
-  assertIsPlaylistResponse,
+  assertIsPlaylistResponse, PlaylistELement, PlaylistResponse,
 } from "./PlaylistResponse";
 
 export {
-  CategoryObject, InfoObject, InfoStatusResponse, default as StatusResponse,
-  assertIsStatusResponse,
+  assertIsStatusResponse, CategoryObject, InfoObject, InfoStatusResponse, StatusResponse,
 } from "./StatusResponse";

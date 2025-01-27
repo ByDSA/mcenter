@@ -1,29 +1,29 @@
 import { z } from "zod";
 
-export const PositiveOrZeroSchema = z.number()
+export const positiveOrZeroSchema = z.number()
   .gte(0);
 
-export const TimeRangeSchema = z.object( {
-  start: PositiveOrZeroSchema.optional(),
-  end: PositiveOrZeroSchema.optional(),
+export const timeRangeSchema = z.object( {
+  start: positiveOrZeroSchema.optional(),
+  end: positiveOrZeroSchema.optional(),
 } );
 
-export type TimeRange = z.infer<typeof TimeRangeSchema>;
+export type TimeRange = z.infer<typeof timeRangeSchema>;
 
-export const LocalFileSchema = z.object( {
+export const localFileSchema = z.object( {
   path: z.string(),
 } );
 
-export type LocalFile = z.infer<typeof LocalFileSchema>;
+export type LocalFile = z.infer<typeof localFileSchema>;
 
-export const PickableSchema = z.object( {
+export const pickableSchema = z.object( {
   weight: z.number(),
 } );
 
-export type Pickable = z.infer<typeof PickableSchema>;
+export type Pickable = z.infer<typeof pickableSchema>;
 
-export const TaggableSchema = z.object( {
+export const taggableSchema = z.object( {
   tags: z.array(z.string()).optional(),
 } );
 
-export type Taggable = z.infer<typeof TaggableSchema>;
+export type Taggable = z.infer<typeof taggableSchema>;

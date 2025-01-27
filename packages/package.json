@@ -1,20 +1,38 @@
 {
+  "private": true,
+  "name": "mcenter",
+  "version": "3.10.1",
+  "description": "Centro Multimedia",
+  "license": "UNLICENSED",
   "author": "Dani Sales",
   "contributors": [
     {
-      "email": "danisales.es@gmail.com",
-      "name": "Daniel Sales"
+      "name": "Daniel Sales",
+      "email": "danisales.es@gmail.com"
     }
   ],
+  "scripts": {
+    "clean:modules": "rm -rf node_modules && cd server && npm clean:modules",
+    "git:pr": "pnpm git:pr:create && pnpm git:pr:merge-delete",
+    "git:pr:create": "gh pr create --base main --fill",
+    "git:pr:merge": "gh pr merge --auto --rebase",
+    "git:pr:merge-delete": "gh pr merge --auto --rebase --delete-branch",
+    "lint": "bin/lint.mjs",
+    "lint:all": "bin/lint-all.mjs",
+    "prepare": "cd .. && husky install packages/.husky",
+    "release": "standard-version",
+    "version:release": "standard-version"
+  },
+  "workspaces": [],
   "dependencies": {
     "esm": "3.2.25",
     "tslib": "2.8.1"
   },
-  "description": "Centro Multimedia",
   "devDependencies": {
     "@commitlint/cli": "19.6.1",
     "@commitlint/config-conventional": "19.6.0",
-    "@stylistic/eslint-plugin-ts": "^2.13.0",
+    "@stylistic/eslint-plugin": "2.13.0",
+    "@stylistic/eslint-plugin-ts": "2.13.0",
     "@types/jest": "29.5.14",
     "@typescript-eslint/eslint-plugin": "8.21.0",
     "@typescript-eslint/parser": "8.21.0",
@@ -26,34 +44,19 @@
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jest": "28.11.0",
     "eslint-plugin-prettier": "5.2.3",
+    "globals": "15.14.0",
     "husky": "9.1.7",
     "jest": "29.7.0",
     "prettier": "3.4.2",
+    "prettier-plugin-packagejson": "2.5.8",
+    "prettier-plugin-sort-json": "^4.1.1",
     "standard-version": "9.5.0",
     "ts-jest": "29.2.5",
     "tsconfig-paths": "4.2.0",
     "typescript": "5.7.3",
     "typescript-eslint": "8.21.0"
   },
-  "license": "UNLICENSED",
-  "name": "mcenter",
   "nohoist": [
     "server"
-  ],
-  "private": true,
-  "scripts": {
-    "clean:modules": "rm -rf node_modules && cd server && npm clean:modules",
-    "git:pr": "pnpm git:pr:create && pnpm git:pr:merge-delete",
-    "git:pr:create": "gh pr create --base main --fill",
-    "git:pr:merge": "gh pr merge --auto --rebase",
-    "git:pr:merge-delete": "gh pr merge --auto --rebase --delete-branch",
-    "lint:eslint": "eslint **/*.{ts,js,tsx,jsx}",
-    "lint:fix": "pnpm run lint:prettier --write && pnpm run lint:eslint --fix",
-    "lint:prettier": "prettier **/*.{json,jsonc,scss,yml}",
-    "prepare": "cd .. && husky install packages/.husky",
-    "release": "standard-version",
-    "version:release": "standard-version"
-  },
-  "version": "3.10.1",
-  "workspaces": []
+  ]
 }

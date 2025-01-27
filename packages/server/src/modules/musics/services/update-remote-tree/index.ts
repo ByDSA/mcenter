@@ -1,25 +1,27 @@
 import { statSync } from "node:fs";
-import { MusicVO } from "#shared/models/musics";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
-import { Repository as MusicRepository } from "../../repositories";
+import { MusicRepository } from "../../repositories";
 import { getFullPath } from "../../utils";
-import ChangesDetector, { FileWithStats } from "./ChangesDetector";
+import { ChangesDetector, FileWithStats } from "./ChangesDetector";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { md5FileAsync } from "#utils/crypt";
+import { MusicVO } from "#musics/models";
 
 export type UpdateResult = {
   new: MusicVO[];
   deleted: MusicVO[];
-  moved: {original: MusicVO; newPath: string}[];
-  updated: {old: MusicVO; new: MusicVO}[];
+  moved: {original: MusicVO;
+newPath: string;}[];
+  updated: {old: MusicVO;
+new: MusicVO;}[];
 };
 
-const DepsMap = {
+const DEPS_MAP = {
   musicRepository: MusicRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
 export class UpdateRemoteTreeService {
   #deps: Deps;
 

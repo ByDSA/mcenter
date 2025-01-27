@@ -4,13 +4,14 @@ import { StreamCriteriaExpand, StreamCriteriaSort, StreamGetManyRequest } from "
 import { CriteriaSortDir } from "#shared/utils/criteria";
 
 const bodyJson: StreamGetManyRequest["body"] = {
-  "expand": [StreamCriteriaExpand.series],
+  expand: [StreamCriteriaExpand.series],
   sort: {
     [StreamCriteriaSort.lastTimePlayed]: CriteriaSortDir.DESC,
   },
 };
+
 // eslint-disable-next-line require-await
-const fetcher = async (url: string) => {
+export const fetcher = async (url: string) => {
   const options = {
     method: "POST",
     body: JSON.stringify(bodyJson),
@@ -23,5 +24,3 @@ const fetcher = async (url: string) => {
 
   return fetch(url, options).then(r => r.json());
 };
-
-export default fetcher;

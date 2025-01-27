@@ -1,3 +1,4 @@
+
 import plugin from "@typescript-eslint/eslint-plugin";
 import parser from "@typescript-eslint/parser";
 
@@ -22,6 +23,47 @@ const rules = {
   ],
   "no-shadow": "off", // impide redeclarar variables en scopes internos
   "@typescript-eslint/no-shadow": ["error"],
+  "@typescript-eslint/naming-convention": [
+    "warn",
+    {
+      selector: "variable",
+      modifiers: ["const"],
+      format: ["strictCamelCase", "UPPER_CASE"],
+      filter: {
+        regex: "(.*)Odm$",
+        match: false,
+      },
+      leadingUnderscore: "allow",
+      trailingUnderscore: "allow",
+    },
+    {
+      selector: "variable",
+      modifiers: ["global", "const"],
+      format: ["strictCamelCase", "UPPER_CASE"],
+      filter: {
+        regex: "(.*)Odm$",
+        match: false,
+      },
+      leadingUnderscore: "allow",
+      trailingUnderscore: "allow",
+      /* Ejemplos:
+        const UN_ARRAY = [...];
+        const unArray = [...];
+        const num = 1;
+        const A_NUM = 1;
+        const A_NUM2 = getNum();
+
+        Con este plugin no se puede hacer que la norma dependa de si se asigna un literal o no
+      */
+    },
+    {
+      selector: "variable",
+      modifiers: ["const", "destructured"],
+      format: ["strictCamelCase", "UPPER_CASE"],
+      leadingUnderscore: "allow",
+      trailingUnderscore: "allow",
+    },
+  ],
 };
 
 export default {
@@ -34,8 +76,6 @@ export default {
     ecmaFeatures: {
       jsx: true,
     },
-    projectService: {
-      allowDefaultProject: ["*.js", "*.mjs"],
-    },
+    projectService: true, // Para que pueda usar el parser para las rules que lo necesiten
   },
 };

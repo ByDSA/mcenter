@@ -1,22 +1,23 @@
+import { showError } from "#shared/utils/errors/showError";
 import { PublicMethodsOf } from "#shared/utils/types";
-import { Entry, ModelId } from "../models";
+import { HistoryEntry, HistoryListId } from "../models";
 import { entryToDocOdm } from "./adapters";
 import { ENTRY_QUEUE_NAME } from "./events";
 import { ModelOdm } from "./odm";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { logDomainEvent } from "#modules/log";
-import { EventType, ModelEvent } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOneBySuperId } from "#utils/layers/repository";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { EventType, ModelEvent } from "#utils/event-sourcing";
+import { logDomainEvent } from "#modules/log";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 
-const DepsMap = {
+const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class EntryRepository
-implements CanCreateOneBySuperId<Entry, ModelId> {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class HistoryListEntryRepository
+implements CanCreateOneBySuperId<HistoryEntry, HistoryListId> {
   #domainMessageBroker: PublicMethodsOf<DomainMessageBroker>;
 
   constructor(deps?: Partial<Deps>) {
@@ -26,10 +27,10 @@ implements CanCreateOneBySuperId<Entry, ModelId> {
       logDomainEvent(ENTRY_QUEUE_NAME, event);
 
       return Promise.resolve();
-    } );
+    } ).catch(showError);
   }
 
-  async createOneBySuperId(id: ModelId, entry: Entry): Promise<void> {
+  async createOneBySuperId(id: HistoryListId, entry: HistoryEntry): Promise<void> {
     const entryDocOdm = entryToDocOdm(entry);
 
     await ModelOdm.updateOne( {
@@ -40,7 +41,7 @@ implements CanCreateOneBySuperId<Entry, ModelId> {
       },
     } );
 
-    const event = new ModelEvent<Entry>(EventType.CREATED, {
+    const event = new ModelEvent<HistoryEntry>(EventType.CREATED, {
       entity: entry,
     } );
 

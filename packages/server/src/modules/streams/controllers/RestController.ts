@@ -1,23 +1,24 @@
-import { StreamCriteriaSort, StreamGetManyRequest, StreamOriginType, assertIsStreamGetManyRequest } from "#shared/models/streams";
 import { CriteriaSortDir } from "#shared/utils/criteria";
 import express, { Request, Response, Router } from "express";
-import { Repository } from "../repositories";
+import { StreamRepository } from "../repositories";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
+import { StreamCriteriaSort, StreamOriginType } from "#modules/streams/models";
+import { StreamGetManyRequest, assertIsStreamGetManyRequest } from "#modules/streams/models/transport";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetMany } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
 
-const DepsMap = {
-  streamRepository: Repository,
+const DEPS_MAP = {
+  streamRepository: StreamRepository,
   serieRepository: SerieRepository,
   historyListRepository: HistoryListRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class RestController
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class StreamsRestController
 implements
     Controller,
     CanGetAll<Request, Response>,

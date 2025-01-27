@@ -1,19 +1,13 @@
 import { z } from "zod";
 
-const Schema = z.object( {
+export const logElementResponseSchema = z.object( {
   message: z.string(),
   type: z.string(),
   data: z.any().optional(),
 } ).strict();
 
-type Model = z.infer<typeof Schema>;
+export type LogElementResponse = z.infer<typeof logElementResponseSchema>;
 
-export default Model;
-
-export {
-  Schema as LogElementResponseSchema,
-};
-
-export function assertIsModel(o: unknown): asserts o is Model {
-  Schema.parse(o);
+export function assertIsLogElement(o: unknown): asserts o is LogElementResponse {
+  logElementResponseSchema.parse(o);
 }

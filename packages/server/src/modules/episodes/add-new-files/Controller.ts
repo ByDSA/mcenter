@@ -2,23 +2,23 @@ import path from "path";
 import { ErrorElementResponse, errorToErrorElementResponse, FullResponse } from "#shared/utils/http";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Request, Response, Router } from "express";
-import { Model as Episode } from "../models";
-import { Repository as EpisodeRepository } from "../repositories";
+import { EpisodeRepository } from "../repositories";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Controller, SecureRouter } from "#utils/express";
-import { SerieRepository } from "#modules/series";
+import { Episode } from "#episodes/models";
 import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew, SerieFolder as Serie } from "#modules/file-info";
+import { SerieRepository } from "#modules/series";
+import { Controller, SecureRouter } from "#utils/express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
-const DepsMap = {
+const DEPS_MAP = {
   serieRepository: SerieRepository,
   episodeRepository: EpisodeRepository,
   savedSerieTreeService: SavedSerieTreeService,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class ThisController implements Controller {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class EpisodeAddNewFilesController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

@@ -1,19 +1,19 @@
 import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
-import { TimestampsSchema } from "../utils/dtos/Timestamps";
-import { LocalFileSchema, PickableSchema, TaggableSchema } from "./PartialSchemas";
+import { timestampsSchema } from "../utils/dtos/Timestamps";
+import { localFileSchema, pickableSchema, taggableSchema } from "./PartialSchemas";
 
-export const ValueObjectSchema = z.object( {
+export const valueObjectSchema = z.object( {
   title: z.string(),
   disabled: z.boolean().optional(),
   lastTimePlayed: z.number().optional(),
-  timestamps: TimestampsSchema,
-} ).merge(LocalFileSchema)
-  .merge(PickableSchema)
-  .merge(TaggableSchema);
+  timestamps: timestampsSchema,
+} ).merge(localFileSchema)
+  .merge(pickableSchema)
+  .merge(taggableSchema);
 
-export type ValueObject = z.infer<typeof ValueObjectSchema>;
+export type ValueObject = z.infer<typeof valueObjectSchema>;
 
 export function assertIsVO(model: unknown): asserts model is ValueObject {
-  assertZodPopStack(ValueObjectSchema, model);
+  assertZodPopStack(valueObjectSchema, model);
 }

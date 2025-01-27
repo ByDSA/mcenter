@@ -1,9 +1,9 @@
 export {
-  default as ListRepository,
+  HistoryListRepository,
 } from "./Repository";
 
 export {
-  default as EntryRepository,
+  HistoryListEntryRepository,
 } from "./EntryRepository";
 
 export * from "./adapters";

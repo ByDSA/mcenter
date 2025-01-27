@@ -1,7 +1,6 @@
-/* eslint-disable import/prefer-default-export */
-import { useAsyncAction } from "#modules/ui-kit/input";
 import { assertIsDefined } from "#shared/utils/validation";
 import { UseResourceEditionProps, UseResourceEditionRet, useResourceEdition } from "../../utils/resources/useResourceEdition";
+import { useAsyncAction } from "#modules/ui-kit/input";
 
 type Props<T, ID, FetchPatchReqBody, FetchPatchResBody> = {
   resource: UseResourceEditionProps<T, ID, FetchPatchReqBody, FetchPatchResBody>;
@@ -16,7 +15,9 @@ type Ret<T> = {
     isDoing: boolean;
   };
 };
-export function useHistoryEntryEdition<T extends Object, ID, FetchPatchReqBody, FetchPatchResBody>(params: Props<T, ID, FetchPatchReqBody, FetchPatchResBody>): Ret<T> {
+export function useHistoryEntryEdition<T extends object, ID, FetchPatchReqBody, FetchPatchResBody>(
+  params: Props<T, ID, FetchPatchReqBody, FetchPatchResBody>,
+): Ret<T> {
   const resourceRet = useResourceEdition(params.resource);
   const ret: Ret<T> = {
     resource: resourceRet,
@@ -25,20 +26,19 @@ export function useHistoryEntryEdition<T extends Object, ID, FetchPatchReqBody, 
   if (params.delete) {
     const asyncDeleteAction = useAsyncAction();
     const remove = () => {
-      const {entry} = params.resource;
+      const { entry } = params.resource;
 
-      // eslint-disable-next-line no-restricted-globals
       if (!confirm(`Borar esta entrada del historial?\n${ JSON.stringify( {
         id: entry.resourceId,
         date: entry.date,
       }, null, 2)}`))
         return Promise.resolve();
 
-      const {done, start} = asyncDeleteAction;
+      const { done, start } = asyncDeleteAction;
 
       start();
       const historyEntryId = entry.id;
-      const {historyListId} = entry;
+      const { historyListId } = entry;
 
       assertIsDefined(historyEntryId);
       assertIsDefined(historyListId);

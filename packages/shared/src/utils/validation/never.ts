@@ -1,6 +1,5 @@
 import { throwErrorPopStack } from "../errors";
 
-/* eslint-disable import/prefer-default-export */
 export function neverCase(value: never): never {
   const never: never = value;
 

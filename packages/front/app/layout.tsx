@@ -1,14 +1,14 @@
 import { makeMenu } from "#modules/menus";
 import "../styles/globals.css";
 
-export default function RootLayout( {children}: {
+export default function RootLayout( { children }: {
   children: React.ReactNode;
 } ) {
   const menu = makeMenu( {
-    "/" : "Inicio",
-    "/actions" : "Actions",
-    "/series/history" : "Series",
-    "/music/history" : "Música",
+    "/": "Inicio",
+    "/actions": "Actions",
+    "/series/history": "Series",
+    "/music/history": "Música",
   } );
 
   return (

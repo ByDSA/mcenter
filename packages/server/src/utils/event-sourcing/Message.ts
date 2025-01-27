@@ -1,3 +1,1 @@
-type Message = Record<string, any>;
-
-export default Message;
+export type Message = Record<string, any>;

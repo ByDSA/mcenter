@@ -1,24 +1,24 @@
 export {
-  default as EventStore,
+  EventStore,
   CanCreateOne as EventStoreCanCreate, CanDeleteOne as EventStoreCanDelete,
   CanPatchOne as EventStoreCanPatch, CanUpdateOne as EventStoreCanUpdate,
   FullEventStore,
 } from "./EventStore";
 
 export {
-  default as Message,
+  Message,
 } from "./Message";
 
 export {
-  default as PatchModelMessage,
+  PatchModelMessage,
 } from "./PatchModelMessage";
 
 export {
-  default as ModelMessage,
+  Message as ModelMessage,
 } from "./ModelMessage";
 
 export {
-  default as EventType,
+  EventType,
 } from "./EventType";
 
 export {

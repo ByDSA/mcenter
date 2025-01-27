@@ -1,3 +1,3 @@
-import { EPISODES_QUEUE_NAME } from "#shared/models/episodes";
+import { EPISODES_QUEUE_NAME } from "#episodes/models";
 
-export const QUEUE_NAME = EPISODES_QUEUE_NAME;
+export const EPISODE_QUEUE_NAME = EPISODES_QUEUE_NAME;

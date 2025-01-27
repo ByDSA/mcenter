@@ -1,17 +1,17 @@
 import fs, { existsSync } from "node:fs";
-import { FileInfoVideoWithSuperId, compareFileInfoVideo } from "#shared/models/episodes/fileinfo";
 import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
 import { deepMerge } from "#shared/utils/objects";
 import { assertIsDefined } from "#shared/utils/validation";
 import ffmpeg from "fluent-ffmpeg";
-import { EpisodeFileInfo, ModelId as EpisodeId } from "../models";
 import { getIdModelOdmFromId } from "../repositories/odm";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { md5FileAsync } from "#utils/crypt";
+import { EpisodeId } from "#episodes/models";
 import { FileInfoRepository, SerieFolderTree } from "#modules/file-info";
+import { FileInfoVideo, FileInfoVideoWithSuperId, compareFileInfoVideo } from "#modules/file-info/models";
+import { md5FileAsync } from "#utils/crypt";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
-type Model = EpisodeFileInfo;
+type Model = FileInfoVideo;
 type ModelWithSuperId = FileInfoVideoWithSuperId;
 const compareModel: typeof compareFileInfoVideo = compareFileInfoVideo;
 
@@ -21,14 +21,14 @@ type Options = {
   forceHash?: boolean;
 };
 
-const DepsMap = {
+const DEPS_MAP = {
   savedSerieTreeService: SavedSerieTreeService,
   episodeFileRepository: FileInfoRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class UpdateMetadataProcess {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class UpdateMetadataProcess {
   #deps: Deps;
 
   #options!: Options;

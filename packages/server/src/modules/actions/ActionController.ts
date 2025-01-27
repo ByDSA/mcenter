@@ -2,22 +2,22 @@ import fs from "fs";
 import path from "path";
 import { Request, Response, Router } from "express";
 import { assertIsDefined } from "#shared/utils/validation";
-import EpisodesUpdateLastTimePlayedController from "./EpisodesUpdateLastTimePlayedController";
-import FixerController from "./FixerController";
+import { EpisodesUpdateLastTimePlayedController } from "./EpisodesUpdateLastTimePlayedController";
+import { FixerController } from "./FixerController";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Controller, SecureRouter } from "#utils/express";
-import { EpisodeAddNewFilesController, EpisodeUpdateController } from "#modules/episodes";
+import { EpisodeAddNewFilesController, EpisodeUpdateController } from "#episodes/index";
 
-const DepsMap = {
+const DEPS_MAP = {
   episodesUpdateLastTimePlayedController: EpisodesUpdateLastTimePlayedController,
   episodesUpdateFileInfoController: EpisodeUpdateController,
   episodesAddNewFilesController: EpisodeAddNewFilesController,
   fixerController: FixerController,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class ActionController implements Controller {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class ActionController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

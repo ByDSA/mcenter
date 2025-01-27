@@ -1,7 +1,7 @@
+import querystring from "node:querystring";
 import { UnauthorizedError, UnprocessableEntityError } from "#shared/utils/http";
 import { XMLParser } from "fast-xml-parser";
-import querystring from "node:querystring";
-import StatusQuery from "./StatusQuery";
+import { StatusQuery } from "./StatusQuery";
 import { PlaylistResponse, StatusResponse, assertIsPlaylistResponse, assertIsStatusResponse } from "./responses";
 
 enum XMLFile {
@@ -14,7 +14,7 @@ type Params = {
   password: string;
   host?: string;
 };
-export default class WebInterface {
+export class VLCWebInterface {
   #password: string;
 
   #port: number;
@@ -23,12 +23,13 @@ export default class WebInterface {
 
   #headers;
 
-  constructor( {port, password, host}: Params) {
+  constructor( { port, password, host }: Params) {
     this.#port = port ?? 8080;
     this.#password = password;
     this.#host = host ?? "127.0.0.1";
 
     this.#headers = new Headers( {
+
       Authorization: `Basic ${ btoa(`:${ this.#password }`) }`,
     } );
   }
@@ -40,11 +41,8 @@ export default class WebInterface {
       headers: this.#headers,
     } )
       .catch(e => {
-        if (e instanceof TypeError && e.cause instanceof Error && JSON.stringify(e.cause).includes("ECONNREFUSED")) {
-          // console.error(new ServiceUnavailableError(`VLC is not running with the web interface enabled. Trying to fetch: ${url}`));
-
+        if (e instanceof TypeError && e.cause instanceof Error && JSON.stringify(e.cause).includes("ECONNREFUSED"))
           return null;
-        }
 
         console.error(JSON.stringify(e, null, 2));
 
@@ -69,12 +67,15 @@ export default class WebInterface {
       .then(text => text.slice(text.indexOf("\n") + 1)) // quitar línea ?xml
       .then(text => new XMLParser( {
         ignoreAttributes: false,
-        attributeNamePrefix : "@_",
+        attributeNamePrefix: "@_",
       } ).parse(text));
   }
 
   async #fetchSecureStatus(query?: StatusQuery): Promise<StatusResponse | null> {
-    const ret = await this.#fetchSecureWithHeadersJson(XMLFile.status, query) as Promise<StatusResponse>;
+    const ret = await this.#fetchSecureWithHeadersJson(
+      XMLFile.status,
+      query,
+    ) as Promise<StatusResponse>;
 
     if (!ret)
       return null;

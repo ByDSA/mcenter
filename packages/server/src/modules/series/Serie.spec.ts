@@ -1,16 +1,16 @@
-import { assertIsModel } from "./models";
+import { assertIsSerie } from "./models";
+
+const VALID_MODEL = {
+  id: "1x01",
+  name: "name",
+};
 
 describe("assertIsModel", () => {
-  const VALID_MODEL = {
-    id: "1x01",
-    name: "name",
-  };
-
   it("should not throw an error when asserting a valid object", () => {
     const obj = VALID_MODEL;
 
     expect(() => {
-      assertIsModel(obj);
+      assertIsSerie(obj);
     } ).not.toThrow();
   } );
 
@@ -21,7 +21,7 @@ describe("assertIsModel", () => {
     };
 
     expect(() => {
-      assertIsModel(obj);
+      assertIsSerie(obj);
     } ).toThrow();
   } );
 
@@ -34,18 +34,19 @@ describe("assertIsModel", () => {
     delete obj.name;
 
     expect(() => {
-      assertIsModel(obj);
+      assertIsSerie(obj);
     } ).toThrow();
   } );
 
   describe("domain tests", () => {
     it("should throw an error when asserting a non-object value", () => {
-      const obj = "not an object";
+      const NOT_AN_OBJECT = "not an object";
 
       expect(() => {
-        assertIsModel(obj);
+        assertIsSerie(NOT_AN_OBJECT);
       } ).toThrow();
     } );
+
     it("should throw an error when asserting an object with an invalid property type", () => {
       const obj = {
         ...VALID_MODEL,
@@ -53,7 +54,7 @@ describe("assertIsModel", () => {
       };
 
       expect(() => {
-        assertIsModel(obj);
+        assertIsSerie(obj);
       } ).toThrow();
     } );
   } );

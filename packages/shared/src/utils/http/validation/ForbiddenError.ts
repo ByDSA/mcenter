@@ -1,11 +1,11 @@
-import HttpStatusCode from "../StatusCode";
-import HttpError from "./HttpError";
+import { HttpStatusCode } from "../StatusCode";
+import { HttpError } from "./HttpError";
 
-export const ErrorName = "ForbiddenError";
+export const ERROR_NAME = "ForbiddenError";
 
-export default class ForbiddenError extends HttpError {
+export class ForbiddenError extends HttpError {
   constructor(message?: string) {
     super(HttpStatusCode.FORBIDDEN, message);
-    this.name = ErrorName;
+    this.name = ERROR_NAME;
   }
 }

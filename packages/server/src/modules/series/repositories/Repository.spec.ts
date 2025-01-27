@@ -1,22 +1,23 @@
-import { Model, assertIsModel } from "../models";
-import Repository from "./Repository";
+import { Serie, assertIsSerie } from "../models";
+import { SerieRepository } from "./Repository";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { OriginType, Stream, StreamMode, StreamRepository, assertIsStream } from "#modules/streams";
+import { Stream, StreamMode, StreamOriginType, assertIsStream } from "#modules/streams/models";
+import { StreamRepository } from "#modules/streams/repositories";
 import { TestMongoDatabase, registerSingletonIfNotAndGet } from "#tests/main";
-import TestDatabase from "#tests/main/db/TestDatabase";
+import { TestDatabase } from "#tests/main/db/TestDatabase";
 
 let db: TestDatabase;
-let repository: Repository;
+let repository: SerieRepository;
 let streamRepository: StreamRepository;
 
-describe("Repository", () => {
+describe("repository", () => {
   beforeAll(async () => {
     db = new TestMongoDatabase();
 
     db.init();
     await db.connect();
     registerSingletonIfNotAndGet(DomainMessageBroker);
-    repository = registerSingletonIfNotAndGet(Repository);
+    repository = registerSingletonIfNotAndGet(SerieRepository);
     streamRepository = registerSingletonIfNotAndGet(StreamRepository);
   } );
 
@@ -24,13 +25,13 @@ describe("Repository", () => {
     await db.disconnect();
   } );
 
-  describe("Create", () => {
-    const newModel: Model = {
+  describe("create", () => {
+    const newModel: Serie = {
       id: "serieId",
       name: "title",
     };
 
-    describe("Before Create", () => {
+    describe("before Create", () => {
       beforeAll(async () => {
         await db.drop();
       } );
@@ -52,16 +53,17 @@ describe("Repository", () => {
     it("should execute function without errors", async () => {
       const got = await repository.createOneAndGet(newModel);
 
-      assertIsModel(got);
+      assertIsSerie(got);
 
       expect(got).toStrictEqual(newModel);
     } );
 
-    describe("After Create", () => {
+    describe("after Create", () => {
       it("should be in db", async () => {
         const got = await repository.getOneById(newModel.id);
 
-        assertIsModel(got);
+        assertIsSerie(got);
+
         expect(got).toStrictEqual(newModel);
       } );
 
@@ -71,7 +73,7 @@ describe("Repository", () => {
           mode: StreamMode.SEQUENTIAL,
           group: {
             origins: [{
-              type: OriginType.SERIE,
+              type: StreamOriginType.SERIE,
               id: newModel.id,
             }],
           },
@@ -79,6 +81,7 @@ describe("Repository", () => {
         const got = await streamRepository.getOneById(streamExpected.id);
 
         assertIsStream(got);
+
         expect(got).toStrictEqual(streamExpected);
       } );
     } );

@@ -1,10 +1,9 @@
 export {
-  default as Serie,
-  ModelId as SerieId,
-  ModelSchema as SerieSchema,
-  assertIsModel as assertIsSerie,
+  Serie,
+  SerieId,
+  serieSchema as SerieSchema, assertIsSerie,
 } from "./Serie";
 
 export {
-  QUEUE_NAME as SERIES_QUEUE_NAME,
+  SERIES_QUEUE_NAME,
 } from "./events";

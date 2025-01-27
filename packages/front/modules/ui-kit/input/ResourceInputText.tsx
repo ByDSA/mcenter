@@ -7,7 +7,9 @@ export type ResourceInputTextProps<R> = ResourceInputCommonProps<R> & {
   inputTextProps?: InputTextProps;
 };
 
-export default function ResourceInputText<R extends Object>( {resourceState, prop: key, isOptional, error, inputTextProps}: ResourceInputTextProps<R>) {
+export function ResourceInputText<R extends object>(
+  { resourceState, prop: key, isOptional, error, inputTextProps }: ResourceInputTextProps<R>,
+) {
   const [resource, setResource] = resourceState;
   const calcFinalValue = (v?: string) => {
     if (v === "" && isOptional)
@@ -20,7 +22,7 @@ export default function ResourceInputText<R extends Object>( {resourceState, pro
   };
   const initialValue = useMemo(()=>calcFinalValue(resource[key]?.toString()), [resource]);
   const handleChange = useMemo(()=>(e: ChangeEvent<HTMLTextAreaElement>) => {
-    const {value: targetValue} = e.target;
+    const { value: targetValue } = e.target;
     const finalValue = calcFinalValue(targetValue);
 
     setResource( {
@@ -28,7 +30,7 @@ export default function ResourceInputText<R extends Object>( {resourceState, pro
       [key]: finalValue,
     } );
   }, [resource]);
-  const {element: inputText, setValue, getValue} = useInputText( {
+  const { element: inputText, setValue, getValue } = useInputText( {
     value: initialValue,
     onChange: handleChange,
     ...inputTextProps,

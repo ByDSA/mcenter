@@ -1,5 +1,5 @@
 export {
-  default as findAllSerieFolderTreesAt,
+  findAllSerieFolderTreesAt,
 } from "./find";
 
 export {
@@ -10,7 +10,7 @@ export {
 } from "./models";
 
 export {
-  default as diffSerieTree, OldNew as OldNewSerieTree,
+  diff as diffSerieTree, OldNew as OldNewSerieTree,
 } from "./diff";
 
 export {

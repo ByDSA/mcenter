@@ -31,20 +31,11 @@ const lintingRules = {
   "import/no-unresolved": "off",
   "import/extensions": "off",
 };
-const rulesExceptions = {
-  libEslint: {
-    "import/no-internal-modules": "off",
-    "import/no-extraneous-dependencies": "off",
-    "import/no-default-export": "off",
-    "import/prefer-default-export": "error",
-  },
-};
 
 export default {
   rules: {
     ...lintingRules,
     ...formatRules,
   },
-  rulesExceptions,
   plugin,
 };

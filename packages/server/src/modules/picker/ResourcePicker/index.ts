@@ -3,18 +3,17 @@ export * from "./weight-fixers";
 export * from "./filters";
 
 export {
-  default as ResourcePicker,
+  ResourcePicker,
 } from "./ResourcePicker";
 
 export {
-  default as ResourcePickerRandom,
-  genRandomPickerWithData,
+  genRandomPickerWithData, ResourcePickerRandom,
 } from "./ResourcePickerRandom";
 
 export {
-  default as ResourcePickerSequential,
+  ResourcePickerSequential,
 } from "./ResourcePickerSequential";
 
 export {
-  default as PickMode,
+  PickMode,
 } from "./PickMode";

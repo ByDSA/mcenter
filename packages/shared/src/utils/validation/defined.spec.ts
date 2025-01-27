@@ -35,6 +35,8 @@ describe("assertIsDefined", () => {
   it("error stack in this file", () => {
     try {
       assertIsDefined(undefined);
+
+      expect(false).toBe(true); // nunca se debería ejecutar
     } catch (e) {
       expectErrorStackStartsWithThisFilename(e as NotDefinedError);
     }

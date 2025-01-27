@@ -1,7 +1,7 @@
-import Consumer from "./Consumer";
-import Event from "./Event";
+import { Consumer } from "./Consumer";
+import { Event } from "./Event";
 
-export default class EventQueue {
+export class EventQueue {
   #consumers: Consumer<any>[];
 
   constructor() {

@@ -1,15 +1,9 @@
 export {
-  assertIsModel as assertIsHistoryMusicEntry,
-  createByMusicId as createHistoryEntryByMusicId,
-  Model as HistoryMusicEntry,
-} from "./models";
-
-export {
-  ModelOdm as HistoryMusicModelOdm, Repository as HistoryRepository,
+  ModelOdm as HistoryMusicModelOdm, MusicHistoryRepository,
 } from "./repositories";
 
 export {
-  RestController as HistoryRestController,
+  MusicHistoryRestController,
 } from "./controllers";
 
 export {

@@ -1,9 +1,7 @@
 export {
-  default as MusicWeightFixerApplier,
-  genWeightFixerApplier as genMusicWeightFixerApplier,
+  genWeightFixerApplier as genMusicWeightFixerApplier, MusicWeightFixerApplier,
 } from "./WeightFixerApplier";
 
 export {
-  default as MusicFilterApplier,
-  genFilterApplier as genMusicFilterApplier,
+  genFilterApplier as genMusicFilterApplier, MusicFilterApplier,
 } from "./FilterApplier";

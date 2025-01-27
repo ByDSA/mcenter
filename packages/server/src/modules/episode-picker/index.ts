@@ -1,7 +1,7 @@
 export {
-  default as EpisodePickerService,
+  EpisodePickerService,
 } from "./EpisodePickerService";
 
 export {
-  default as EpisodePickerController,
+  EpisodePickerController,
 } from "./PickerController";

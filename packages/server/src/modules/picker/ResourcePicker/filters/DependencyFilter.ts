@@ -1,7 +1,7 @@
-import { Resource } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
-import Filter from "./Filter";
+import { Filter } from "./Filter";
 import { CompareIdFunc } from "./utils";
+import { Resource } from "#modules/resources/models";
 
 type Params<ID> = {
   lastId: ID | null;
@@ -9,7 +9,7 @@ type Params<ID> = {
   secondId: ID;
   compareId: CompareIdFunc<ID>;
 };
-export default class DependencyFilter<ID = string, R extends Resource<ID> = Resource<ID>>
+export class DependencyFilter<ID = string, R extends Resource<ID> = Resource<ID>>
 implements Filter<R> {
   #params: Params<ID>;
 

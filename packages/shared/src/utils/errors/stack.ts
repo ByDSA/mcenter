@@ -19,7 +19,6 @@ export function errorSliceStack(error: Error, stackStartLevel: number, length = 
   stackArray.splice(stackStartLevel, length);
 
   // Si no se muta el error, la instancia nueva no es del mismo tipo que la original y da problemas
-  // eslint-disable-next-line no-param-reassign
   error.stack = `${stackArray.join(SEPARATOR)}`;
 
   return error;

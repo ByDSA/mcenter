@@ -1,18 +1,18 @@
 import { FullResponse } from "#shared/utils/http";
 import { Response, Router } from "express";
-import UpdateMetadataProcess from "./UpdateSavedProcess";
+import { UpdateMetadataProcess } from "./UpdateSavedProcess";
 import { UpdateEpisodesFileRequest, assertIsUpdateEpisodesFileRequest } from "./validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
 
-const DepsMap = {
+const DEPS_MAP = {
   updateMetadataProcess: UpdateMetadataProcess,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class ThisController implements Controller {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class EpisodesUpdateController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

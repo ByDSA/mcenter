@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import { Group, Model, Origin } from "../models";
+import { Stream, StreamGroup, StreamOrigin } from "../models";
 
-export type DocOdm = Model;
+export type DocOdm = Stream;
 
 const NAME = "Stream";
-const OriginSchema = new mongoose.Schema<Origin>( {
+const originSchema = new mongoose.Schema<StreamOrigin>( {
   type: {
     type: String,
     required: true,
@@ -14,20 +14,20 @@ const OriginSchema = new mongoose.Schema<Origin>( {
     required: true,
   },
 } );
-const GroupSchema = new mongoose.Schema<Group>( {
+const groupSchema = new mongoose.Schema<StreamGroup>( {
   origins: {
-    type: [OriginSchema],
+    type: [originSchema],
     required: true,
   },
 } );
 
-export const Schema = new mongoose.Schema<DocOdm>( {
+export const schema = new mongoose.Schema<DocOdm>( {
   id: {
     type: String,
     required: true,
   },
   group: {
-    type: GroupSchema,
+    type: groupSchema,
     required: true,
   },
   mode: {
@@ -36,4 +36,4 @@ export const Schema = new mongoose.Schema<DocOdm>( {
   },
 } );
 
-export const ModelOdm = mongoose.model<DocOdm>(NAME, Schema);
+export const ModelOdm = mongoose.model<DocOdm>(NAME, schema);

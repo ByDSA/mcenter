@@ -1,8 +1,8 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import RestController from "../RestController";
+import { StreamsRestController } from "../RestController";
 import { getRouterMock } from "#tests/main";
 
-export class StreamRestControllerMock implements PublicMethodsOf<RestController> {
+export class StreamRestControllerMock implements PublicMethodsOf<StreamsRestController> {
   getRouter = getRouterMock;
 
   getAll = jest.fn();

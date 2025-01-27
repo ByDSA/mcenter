@@ -1,5 +1,5 @@
 export {
-  default as WebSocketsEvents,
+  WebSocketsEvents,
 } from "./Events";
 
 export * from "./Messages";

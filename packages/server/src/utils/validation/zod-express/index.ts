@@ -13,7 +13,9 @@ export function validateReq<T>(assertFunc: AssertFunction<T>): ExpressMiddleware
       assertFunc(req as any);
 
       return next();
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error("Error in request validation:", error);
+
       return res.status(HttpStatusCode.UNPROCESSABLE_ENTITY).json( {
         errors: [error],
       } );

@@ -1,11 +1,11 @@
 /* eslint-disable require-await */
-/* eslint-disable import/prefer-default-export */
-import { useAsyncAction } from "#modules/ui-kit/input";
+
 import { assertIsDefined } from "#shared/utils/validation";
 import { AssertZodSettings } from "#shared/utils/validation/zod";
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import clone from "just-clone";
 import React, { useEffect, useState } from "react";
+import { useAsyncAction } from "#modules/ui-kit/input";
 
 type AssertionFn = (model: unknown, settings?: AssertZodSettings)=> void;
 
@@ -51,7 +51,12 @@ export type UseResourceEditionRet<T> = {
   resourceState: [T, React.Dispatch<React.SetStateAction<T>>];
 };
 
-export function useResourceEdition<T extends Object, ID, FetchPatchReqBody, FetchPatchResBody>( {entry, calcIsModified, assertionFn, fetching}: UseResourceEditionProps<T, ID, FetchPatchReqBody, FetchPatchResBody>): UseResourceEditionRet<T> {
+export function useResourceEdition<T extends object, ID, FetchPatchReqBody, FetchPatchResBody>(
+  { entry,
+    calcIsModified,
+    assertionFn,
+    fetching }: UseResourceEditionProps<T, ID, FetchPatchReqBody, FetchPatchResBody>,
+): UseResourceEditionRet<T> {
   const resourceBase = useResourceBase(entry, calcIsModified);
   const resourceState = useState(clone(resourceBase));
   const [resource, setResource] = resourceState;
@@ -63,25 +68,23 @@ export function useResourceEdition<T extends Object, ID, FetchPatchReqBody, Fetc
     assertIsDefined(entryResource);
     setResource(entryResource);
   };
-  const {errors} = useValidation(resource, assertionFn);
+  const { errors } = useValidation(resource, assertionFn);
   const update = async () => {
     if (!isModified)
       return;
 
-    const {done, start} = asyncUpdateAction;
+    const { done, start } = asyncUpdateAction;
 
     start();
     const id = entry.resourceId;
-    const {patch: {fetch:fetchPatch,
-      generateBody: generatePatchBody}} = fetching;
+    const { patch: { fetch: fetchPatch,
+      generateBody: generatePatchBody } } = fetching;
 
     assertIsDefined(entry.resource);
     const patchBodyParams = generatePatchBody(entry.resource, resource);
 
-    // eslint-disable-next-line consistent-return
     return fetchPatch(id, patchBodyParams)
       .then(() => {
-      // eslint-disable-next-line no-param-reassign
         entry.resource = resource;
       } )
       .then(()=>done());
@@ -127,9 +130,9 @@ function useIsModified<T>(base: T, current: T, compare: CompareFn<T>) {
   return isModified;
 }
 
-function useValidation<T>(resource: T, assertionFn: AssertionFn): {isValid: boolean; errors: Record<keyof T, string>} {
-  const [errors, setErrors] = React.useState( {
-  } as Record<keyof T, string>);
+function useValidation<T>(resource: T, assertionFn: AssertionFn): {isValid: boolean;
+errors: Record<keyof T, string>;} {
+  const [errors, setErrors] = React.useState( {} as Record<keyof T, string>);
 
   useEffect(() => {
     try {
@@ -162,13 +165,12 @@ type ZodError = {
   issues: ZodIssue[];
 };
 function parseErrors(e: ZodError): Record<string, string> {
-  const errors: {} = {
-  };
-  const {issues} = e;
+  const errors: Record<string, string> = {};
+  const { issues } = e;
 
   for (const issue of issues) {
-    const path = issue.path[0];
-    const {message} = issue;
+    const [path] = issue.path;
+    const { message } = issue;
 
     errors[path] = message;
   }

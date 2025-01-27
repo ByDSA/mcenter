@@ -1,12 +1,12 @@
-import merge from "./ts-deepmerge";
+import { deepMerge } from "./ts-deepmerge";
 
-export default function mergeOpts<T extends {}>(defaultParams: T, inputParams?: Partial<T>): T {
+export function mergeOpts<T extends object>(defaultParams: T, inputParams?: Partial<T>): T {
   if (!inputParams)
     return defaultParams;
 
-  const mergedParams = merge.withOptions( {
+  const mergedParams = deepMerge.withOptions( {
     mergeArrays: false,
-  },defaultParams, inputParams) as T;
+  }, defaultParams, inputParams) as T;
 
   return mergedParams;
 }

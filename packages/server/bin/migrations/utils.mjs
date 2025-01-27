@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 // @ts-check
 
 import fs from "node:fs";
@@ -16,7 +14,9 @@ const thisFolder = new URL(".", import.meta.url).pathname;
  * }} params
  */
 export async function migrate(params) {
-  const {migration: {id: migrationId, name: migrationName, path: migrationPath}, envFilePath} = params;
+  const { migration: {
+    id: migrationId, name: migrationName, path: migrationPath,
+  }, envFilePath } = params;
   const mainTsPath = path.join(migrationPath, "up.ts");
 
   console.log(`mainTsPath: ${mainTsPath}`);
@@ -67,6 +67,7 @@ export async function fetchLastMigration(envFilePath) {
 /**
  * @returns {Promise<InfoJson[]>}
  */
+// eslint-disable-next-line require-await
 export async function fetchListOfMigrations() {
   console.log("Fetching list of migrations...");
   const migrationsFolder = path.join(thisFolder);
@@ -103,7 +104,7 @@ export async function fetchListOfMigrations() {
       ret.push(infoJson);
     } );
 
-  ret.sort((a,b) => a.id - b.id);
+  ret.sort((a, b) => a.id - b.id);
 
   assertUniqueSequentialIds(ret);
 
