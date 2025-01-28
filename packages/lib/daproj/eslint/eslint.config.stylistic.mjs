@@ -1,6 +1,6 @@
 import stylisticPlugin from "@stylistic/eslint-plugin";
 
-const rules = {
+export const rules = {
   "@stylistic/newline-per-chained-call": [
     "error",
     {
@@ -9,7 +9,4 @@ const rules = {
   ],
 };
 
-export default {
-  rules,
-  plugin: stylisticPlugin,
-};
+export const plugin = stylisticPlugin;

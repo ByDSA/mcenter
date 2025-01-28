@@ -36,6 +36,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: 8.21.0
         version: 8.21.0(eslint@9.18.0(jiti@2.4.2))(typescript@5.7.3)
+      daproj:
+        specifier: workspace:./lib/daproj
+        version: link:lib/daproj
       eslint:
         specifier: 9.18.0
         version: 9.18.0(jiti@2.4.2)

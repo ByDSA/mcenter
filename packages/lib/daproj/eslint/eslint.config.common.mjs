@@ -1,11 +1,11 @@
 import globals from "globals";
 import js from "@eslint/js";
-import customPlugin from "./custom-plugins/eslint-plugin-custom.mjs";
-import airbnbMod from "./eslint.config.airbnb.mjs";
-import importMod from "./eslint.config.import.mjs";
-import stylisticTsMod from "./eslint.config.stylisticTs.mjs";
-import stylisticMod from "./eslint.config.stylistic.mjs";
-import typescriptMod from "./eslint.config.typescript.mjs";
+import { Dependencies } from "daproj";
+import { rules as rulesAirbnb } from "./eslint.config.airbnb.mjs";
+import { plugin as pluginImport, rules as rulesImport } from "./eslint.config.import.mjs";
+import { rules as rulesStylistic, plugin as pluginStylistic } from "./eslint.config.stylistic.mjs";
+
+// @ts-check
 
 const formatRules = {
   indent: [
@@ -27,6 +27,14 @@ const formatRules = {
   "linebreak-style": ["error", "unix"],
 };
 const otherNoPluginRules = {
+  "no-unused-vars": [
+    "error",
+    {
+      varsIgnorePattern: "^_", // Variables declaradas (ej: const _x = 1)
+      argsIgnorePattern: "^_", // Parámetros de función (ej: function(_param) {})
+      caughtErrorsIgnorePattern: "^_", // Errores en catch (ej: catch(_error) {})
+    },
+  ],
   "no-useless-rename": "error",
   "no-await-in-loop": "off",
   "no-invalid-this": [
@@ -170,170 +178,82 @@ const noModRules = {
   ...formatRules,
   ...otherNoPluginRules,
 };
-const tsRules = {
-  ...typescriptMod.rules,
-  ...stylisticTsMod.rules,
-};
 const noPluginRules = {
   ...js.configs.recommended.rules,
-  ...airbnbMod.rules,
+  ...rulesAirbnb,
   ...noModRules,
 };
-const jsRules = {
+const rules = {
   ...noPluginRules,
-  ...importMod.rules,
-  ...stylisticMod.rules,
+  ...rulesImport,
+  ...rulesStylistic,
 };
-const jsPlugins = {
-  import: importMod.plugin,
-  "@stylistic": stylisticMod.plugin,
+const plugins = {
+  import: pluginImport,
+  "@stylistic": pluginStylistic,
 };
-const tsPlugins = {
-  "@typescript-eslint": typescriptMod.plugin,
-  "@stylistic/ts": stylisticTsMod.plugin,
-};
-const settings = {
-  "import/parsers": {
-    "@typescript-eslint/parser": [".ts", ".tsx"],
-  },
-  "import/resolver": {
-    node: {
-      paths: ["src"],
+const configs = [
+  // Scripting .mjs:
+  {
+    files: ["**/*.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
-    typescript: {
-      alwaysTryTypes: true,
+    plugins: {
+      ...plugins,
+    },
+    rules: {
+      ...rules,
+      "import/no-internal-modules": "off",
+      "import/no-extraneous-dependencies": "off",
     },
   },
-};
-const customPluginsRules = {
-  "custom/indent-after-decorator": "error",
-  "custom/no-blank-lines-after-decorator": "error",
-  "custom/no-blank-lines-between-decorators": "error",
-  "custom/no-leading-blank-lines": "error",
-  "custom/mongoose-pascalcase-models": "error",
-};
+  {
+    files: ["**/lib/**/*.mjs"],
+    rules: {
+      "no-console": "warn",
+      "import/no-default-export": "off",
+      "import/prefer-default-export": "off",
+    },
+  },
+  {
+    ignores: ["**/{build,dist}/**", "**/node_modules/**"],
+  },
+  {
+    files: ["index.ts", "utils.ts"],
+    rules: {
+      "import/prefer-default-export": "off",
+    },
+  },
+];
 
-export const configs = {
-  recommended: [
-  // React:
+export function generateConfigs(args) {
+  let files = ["**/*.js"];
+
+  if (args[Dependencies.TypeScript]) {
+    files.push("**/*.ts");
+
+    if (args[Dependencies.React])
+      files.push("**/*.tsx");
+  }
+
+  if (args[Dependencies.React])
+    files.push("**/*.jsx");
+
+  const ret = [
     {
-      files: ["**/*.jsx", "**/*.jsx", "**/*.ts", "**/*.tsx"],
-      languageOptions: {
-        globals: {
-          NodeJS: "readonly",
-          React: "readonly",
-          ...globals.node,
-          ...globals.browser,
-        },
-      },
-    },
-    // Node:
-    {
-      files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
-      languageOptions: {
-        globals: {
-          ...globals.node,
-        },
-      },
+      files,
       plugins: {
-        ...jsPlugins,
+        ...plugins,
       },
       rules: {
-        ...jsRules,
+        ...rules,
       },
     },
-    // TypeScript:
-    {
-      files: ["**/*.ts", "**/*.tsx"],
-      settings,
-      languageOptions: {
-        parser: typescriptMod.parser,
-        parserOptions: typescriptMod.parserOptions,
-      },
-      plugins: {
-        ...tsPlugins,
-        custom: customPlugin,
-      },
-      rules: {
-        ...tsRules,
-        ...customPluginsRules,
-      },
-    },
-    // Scripting .mjs:
-    {
-      files: ["**/*.mjs"],
-      languageOptions: {
-        globals: {
-          ...globals.node,
-          argv: true,
-          $: true,
-          path: true,
-          fs: false,
-          cd: true,
-          chalk: true,
-        },
-      },
-      plugins: {
-        ...jsPlugins,
-      },
-      rules: {
-        ...jsRules,
-        "import/no-internal-modules": "off",
-        "import/no-extraneous-dependencies": "off",
-      },
-    },
-    {
-      files: ["**/lib/**/*.mjs"],
-      rules: {
-        "no-console": "warn",
-        "import/no-default-export": "off",
-        "import/prefer-default-export": "off",
-      },
-    },
-    {
-      files: ["**/eslint.config.mjs"],
-      settings,
-      languageOptions: {
-        parserOptions: {
-          projectService: true,
-        },
-        globals: {
-          ...globals.node,
-        },
-      },
-      plugins: {
-        ...jsPlugins,
-      },
-      rules: {
-        ...jsRules,
-        "import/no-default-export": "off",
-        "import/prefer-default-export": "error",
-        "import/no-internal-modules": "off",
-        "import/no-extraneous-dependencies": "off",
-      },
-    },
-    // Prettier:
-    {
-      files: ["**/prettier.config.mjs"],
-      plugins: {
-        ...jsPlugins,
-      },
-      rules: {
-        ...jsRules,
-        "import/no-default-export": "off",
-        "import/prefer-default-export": "error",
-        "import/no-internal-modules": "off",
-        "import/no-extraneous-dependencies": "off",
-      },
-    },
-    {
-      ignores: ["**/{build,dist}/**", "**/node_modules/**"],
-    },
-    {
-      files: ["index.ts", "utils.ts"],
-      rules: {
-        "import/prefer-default-export": "off",
-      },
-    },
-  ],
-};
+    ...configs,
+  ];
+
+  return ret;
+}

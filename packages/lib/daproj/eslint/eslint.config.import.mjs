@@ -1,4 +1,4 @@
-import plugin from "eslint-plugin-import";
+import importPlugin from "eslint-plugin-import";
 
 const formatRules = {
   // Da error en eslint v9.0.0:
@@ -32,10 +32,9 @@ const lintingRules = {
   "import/extensions": "off",
 };
 
-export default {
-  rules: {
-    ...lintingRules,
-    ...formatRules,
-  },
-  plugin,
+export const rules = {
+  ...lintingRules,
+  ...formatRules,
 };
+
+export const plugin = importPlugin;

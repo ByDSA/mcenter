@@ -1,10 +1,14 @@
+// @ts-check
+
 import jestPlugin from "eslint-plugin-jest";
-import customPlugin from "./custom-plugins/eslint-plugin-custom.mjs";
-import importMod from "./eslint.config.import.mjs";
-import typescriptMod from "./eslint.config.typescript.mjs";
+import globals from "globals";
+import { plugin as pluginImport } from "../../eslint/eslint.config.import.mjs";
+import { plugins as pluginsTs } from "../../typescript/eslint.mjs";
+import { Dependencies } from "../../index.mjs";
 
 const recommended = jestPlugin.configs["flat/recommended"];
-const rules = {
+
+export const rules = {
   ...recommended.rules,
   "jest/consistent-test-it": ["error", {
     fn: "it", // Obliga a usar 'it' y no 'test'
@@ -29,27 +33,40 @@ const rules = {
   "jest/valid-expect": "error",
   "jest/padding-around-all": "error",
 };
-const plugin = recommended.plugins.jest;
 
-export default {
-  rules,
-  plugin,
-  config: [
-    {
-      files: ["**/*.{,e2e.}{test,spec}.ts{,x}", "**/test{s,}/**/*.ts"],
-      plugins: {
-        jest: plugin,
-      },
-      languageOptions: {
-        globals: jestPlugin.environments.globals.globals,
-      },
-      rules,
-    },
-    {
+export const plugin = recommended.plugins.jest;
+
+export function generateConfigs(args) {
+  let files = [];
+  let ext;
+
+  if (args[Dependencies.TypeScript])
+    ext = "ts";
+  else
+    ext = "js";
+
+  files.push("**/test{s,}/**/*." + ext);
+
+  if (args[Dependencies.TypeScript])
+    ext = "ts";
+  else
+    ext = "js";
+
+  const jestSetupFile = "**/jest.setup." + ext;
+  const jestConfigFile = "**/jest.config." + ext;
+
+  if (args[Dependencies.React])
+    ext += "{,x}";
+
+  files.push("**/*.{,e2e.}{test,spec}." + ext);
+
+  const ret = [];
+
+  if (args[Dependencies.TypeScript]) {
+    ret.push( {
       files: ["**/jest.*.ts"],
       plugins: {
-        "@typescript-eslint": typescriptMod.plugin,
-        custom: customPlugin,
+        ...pluginsTs,
       },
       rules: {
         "@typescript-eslint/no-floating-promises": "off",
@@ -60,20 +77,36 @@ export default {
           projectService: true,
         },
       },
-    },
+    } );
+  }
+
+  ret.push(...[
     {
-      files: ["**/jest.setup.ts"],
+      files,
+      plugins: {
+        jest: plugin,
+      },
       languageOptions: {
         globals: jestPlugin.environments.globals.globals,
+      },
+      rules,
+    },
+    {
+      files: [jestSetupFile],
+      languageOptions: {
+        globals: {
+          ...jestPlugin.environments.globals.globals,
+          ...globals.node,
+        },
         parserOptions: {
           projectService: false,
         },
       },
     },
     {
-      files: ["**/jest.config.ts"],
+      files: [jestConfigFile],
       plugins: {
-        import: importMod.plugin,
+        import: pluginImport,
       },
       languageOptions: {
         parserOptions: {
@@ -84,5 +117,7 @@ export default {
         "import/no-default-export": "off",
       },
     },
-  ],
-};
+  ]);
+
+  return ret;
+}

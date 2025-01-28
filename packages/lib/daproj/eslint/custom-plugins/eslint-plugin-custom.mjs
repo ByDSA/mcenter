@@ -4,7 +4,7 @@
 import { NAME as mongoosePascalCaseModelsName, rule as mongoosePascalCaseModelsRule } from "./rules/mongoose-pascalcase-models.mjs";
 import { NAME as indentAfterDecoratorName, rule as indentAfterDecoratorRule } from "./rules/indent-after-decorator.mjs";
 
-const plugin = {
+export const plugin = {
   meta: {
     name: "eslint-plugin-custom",
     version: "0.0.1",
@@ -121,5 +121,3 @@ const plugin = {
     [mongoosePascalCaseModelsName]: mongoosePascalCaseModelsRule,
   },
 };
-
-export default plugin;

@@ -1,9 +1,6 @@
-import { configs as commonConfigs } from "./eslint/eslint.config.common.mjs";
-import jestMod from "./eslint/eslint.config.jest.mjs";
-
 const projectConfig = [
   {
-    files: ["**/*.ts{,x}"],
+    files: ["**/*.ts{,x}", "**/*.js{,x}"],
     rules: {
       "import/no-internal-modules": "off",
       "no-underscore-dangle": ["error", {
@@ -34,10 +31,4 @@ const projectConfig = [
   },
 ];
 
-export const configs = {
-  recommended: [
-    ...commonConfigs.recommended,
-    ...jestMod.config,
-    ...projectConfig,
-  ],
-};
+export const configs = projectConfig;
