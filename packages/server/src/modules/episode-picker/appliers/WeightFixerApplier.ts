@@ -28,7 +28,7 @@ const fx: LastTimeWeightFilterFx = (r: Pickable, x: number): number => {
 
   const PICKER_DAYS_EXP = +(process.env.PICKER_DAYS_EXP ?? 1);
 
-  return reinforcementFactor * daysFromLastTime ** PICKER_DAYS_EXP;
+  return reinforcementFactor * (daysFromLastTime ** PICKER_DAYS_EXP);
 };
 
 export function genEpisodeWeightFixerApplier() {
