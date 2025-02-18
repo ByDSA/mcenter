@@ -1,5 +1,5 @@
-import { Player, PlayerStatusResponse } from "#shared/models/player";
+import { Player, PlayerStatusResponse } from "#modules/models";
 
-export default interface PlayerService extends Player {
+export interface PlayerService extends Player {
   onStatusChange(callback: (status: PlayerStatusResponse)=> void): void;
 }

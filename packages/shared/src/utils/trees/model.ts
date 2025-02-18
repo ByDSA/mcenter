@@ -15,7 +15,12 @@ export type TreeBranchModel<ID, C> = TreeCommonModel<ID> & TreeRootModel<ID, C>;
 
 export type TreeModel<ID, C> = TreeBranchModel<ID, C> | TreeNodeModel<ID, C>;
 
-export function treePut<ID, C>(tree: TreeRootModel<ID, C>, branches: ID[], key: ID, content: C): void {
+export function treePut<ID, C>(
+  tree: TreeRootModel<ID, C>,
+  branches: ID[],
+  key: ID,
+  content: C,
+): void {
   const parentBranch: TreeBranchModel<ID, C> = treeGetOrCreateBranches(tree, branches);
   const currentNode: TreeNodeModel<ID, C> = {
     id: key,
@@ -25,7 +30,10 @@ export function treePut<ID, C>(tree: TreeRootModel<ID, C>, branches: ID[], key: 
   parentBranch.children.push(currentNode);
 }
 
-function treeGetOrCreateBranches<ID, C>(tree: TreeRootModel<ID, C>, branches: ID[]): TreeBranchModel<ID, C> {
+function treeGetOrCreateBranches<ID, C>(
+  tree: TreeRootModel<ID, C>,
+  branches: ID[],
+): TreeBranchModel<ID, C> {
   let currentBranch = tree;
 
   for (const branchName of branches) {

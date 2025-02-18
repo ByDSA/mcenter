@@ -1,19 +1,18 @@
+import { container } from "tsyringe";
+import { EpisodeRepository } from "..";
+import { EPISODE_QUEUE_NAME } from "./events";
+import { Episode, EpisodeId } from "#episodes/models";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { TestMongoDatabase } from "#tests/main";
-import TestDatabase from "#tests/main/db/TestDatabase";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
+import { TestDatabase } from "#tests/main/db/TestDatabase";
+import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures/models";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { Consumer } from "#utils/message-broker";
-import { container } from "tsyringe";
-import { EpisodeRepository } from "..";
-import { Model, ModelId } from "../models";
-import EpisodesRepository from "./Repository";
-import { QUEUE_NAME } from "./events";
 
 let db: TestDatabase;
-let episodeRepository: EpisodesRepository;
-let domainMessageBroker: DomainMessageBroker<ModelMessage<Model>>;
+let episodeRepository: EpisodeRepository;
+let domainMessageBroker: DomainMessageBroker<ModelMessage<Episode>>;
 
 beforeAll(async () => {
   db = new TestMongoDatabase();
@@ -23,29 +22,30 @@ beforeAll(async () => {
   await db.drop();
   await loadFixtureSimpsons();
 
-  container.registerInstance(DomainMessageBroker, new DomainMessageBroker<ModelMessage<Model>>());
+  container.registerInstance(DomainMessageBroker, new DomainMessageBroker<ModelMessage<Episode>>());
   container.registerSingleton(EpisodeRepository);
 
-  domainMessageBroker = container.resolve(DomainMessageBroker<ModelMessage<Model>>);
+  domainMessageBroker = container.resolve(DomainMessageBroker<ModelMessage<Episode>>);
   episodeRepository = container.resolve(EpisodeRepository);
 } );
+
 it("should emit Patch Event", async () => {
-  const episodeId: ModelId = {
+  const episodeId: EpisodeId = {
     serieId: "simpsons",
     innerId: "1x01",
   };
   const fn = jest.fn();
 
-  await domainMessageBroker.subscribe(QUEUE_NAME, fn);
+  await domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, fn);
 
-  const partialModel: Partial<Model> = {
+  const partialModel: Partial<Episode> = {
     title: "new title",
   };
 
   await episodeRepository.patchOneByIdAndGet(episodeId, partialModel);
 
-  expect(fn).toBeCalledTimes(1);
-  expect(fn).toBeCalledWith( {
+  expect(fn).toHaveBeenCalledTimes(1);
+  expect(fn).toHaveBeenCalledWith( {
     type: EventType.PATCHED,
     payload: {
       entityId: episodeId,
@@ -54,8 +54,9 @@ it("should emit Patch Event", async () => {
     },
   } );
 } );
+
 it("should emit Create Event", async () => {
-  const fn = jest.fn((event: ModelEvent<Model>) => {
+  const fn = jest.fn((event: ModelEvent<Episode>) => {
     expect(event.type).toBe(EventType.CREATED);
     expect(event.payload.entity.id.serieId).toBe("simpsons");
     expect(event.payload.entity.id.innerId.startsWith("X")).toBeTruthy();
@@ -63,19 +64,19 @@ it("should emit Create Event", async () => {
     return Promise.resolve();
   } ) as Consumer<any>;
 
-  await domainMessageBroker.subscribe(QUEUE_NAME, fn);
+  await domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, fn);
 
   const models = EPISODES_SIMPSONS.slice(0, 10).map(episode => ( {
     ...episode,
     id: {
       innerId: `X${episode.id.innerId}`,
       serieId: episode.id.serieId,
-    } as ModelId,
-  } ) as Model);
+    } as EpisodeId,
+  } ) as Episode);
 
   await episodeRepository.createManyAndGet(models);
 
-  expect(fn).toBeCalledTimes(models.length);
+  expect(fn).toHaveBeenCalledTimes(models.length);
 } );
 
 afterAll(async () => {

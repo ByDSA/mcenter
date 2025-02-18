@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, rmdirSync } from "node:fs";
 import { join } from "node:path";
-import QueuePlaylistManager from "./QueuePlaylistManager";
+import { QueuePlaylistManager } from "./QueuePlaylistManager";
 
 const FOLDER = getOrCreateTmpFolder();
 
@@ -27,7 +27,7 @@ function sampleQueuePlaylistManager(folder: string) {
   return queue;
 }
 
-it("create files ", () => {
+it("create files", () => {
   const folder = FOLDER;
 
   sampleQueuePlaylistManager(folder);
@@ -36,7 +36,7 @@ it("create files ", () => {
   expect(existsSync(`${folder}/next_1.m3u8`)).toBeTruthy();
 } );
 
-it("clear files ", () => {
+it("clear files", () => {
   const folder = FOLDER;
   const queue = sampleQueuePlaylistManager(folder);
 
@@ -47,7 +47,7 @@ it("clear files ", () => {
 } );
 
 function getOrCreateTmpFolder() {
-  const tmp = join(__dirname, "..", "..", "..","..","..", "tests", "tmp");
+  const tmp = join(__dirname, "..", "..", "..", "..", "..", "tests", "tmp");
 
   if (!existsSync(tmp))
     mkdirSync(tmp);

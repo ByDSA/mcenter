@@ -1,4 +1,13 @@
 {
+  "name": "live-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "start": "node -r ts-node/register --env-file=.env --env-file=../.env src/index.ts",
+    "test": "NODE_ENV=test jest --maxWorkers=1 --colors",
+    "test:watch": "pnpm run test --watch"
+  },
   "dependencies": {
     "@js-temporal/polyfill": "0.4.4",
     "ansi-to-html": "0.7.2",
@@ -6,11 +15,10 @@
     "nodemailer": "6.9.5",
     "zod": "3.22.3"
   },
-  "description": "",
   "devDependencies": {
-    "@types/node-schedule": "2.1.5",
     "@types/jest": "29.5.5",
     "@types/node": "20.8.2",
+    "@types/node-schedule": "2.1.5",
     "@types/nodemailer": "6.4.11",
     "@types/supertest": "2.0.14",
     "axios": "1.5.1",
@@ -18,13 +26,5 @@
     "jest": "29.7.0",
     "supertest": "6.3.3",
     "ts-node": "10.9.1"
-  },
-  "main": "build/index.js",
-  "name": "live-tests",
-  "scripts": {
-    "test": "NODE_ENV=test jest --maxWorkers=1 --colors",
-    "test:watch": "pnpm run test --watch",
-    "start": "node -r ts-node/register --env-file=.env --env-file=../.env src/index.ts"
-  },
-  "version": "1.0.0"
+  }
 }

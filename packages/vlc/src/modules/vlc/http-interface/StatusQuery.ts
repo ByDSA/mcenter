@@ -1,4 +1,4 @@
-type StatusQuery = {
+export type StatusQuery = {
   command: "in_enqueue";
   input: string;
   } | {
@@ -43,5 +43,3 @@ val: string;
 command: "volume";
 val: string;
 };
-
-export default StatusQuery;

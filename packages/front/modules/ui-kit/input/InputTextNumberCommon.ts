@@ -14,18 +14,20 @@ type KeyDownHandlerGeneratorParams<T, E extends HTMLElement> = {
   onPressEnter?: OnPressEnter<T>;
   transformValue: (e: React.KeyboardEvent<E>)=> T | undefined;
 };
-export const keyDownHandlerGenerator = <T, E extends HTMLElement>( {onPressEnter, transformValue}: KeyDownHandlerGeneratorParams<T, E>) => (e: React.KeyboardEvent<E>) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    if (typeof onPressEnter === "function" || onPressEnter === "nothing")
-      e.preventDefault();
+export const keyDownHandlerGenerator = <T, E extends HTMLElement>(
+  { onPressEnter,
+    transformValue }: KeyDownHandlerGeneratorParams<T, E>) => (e: React.KeyboardEvent<E>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      if (typeof onPressEnter === "function" || onPressEnter === "nothing")
+        e.preventDefault();
 
-    if (typeof onPressEnter === "function") {
-      const usedValue = transformValue(e);
+      if (typeof onPressEnter === "function") {
+        const usedValue = transformValue(e);
 
-      onPressEnter(usedValue);
+        onPressEnter(usedValue);
+      }
     }
-  }
-};
+  };
 
 export type InputTextNumberReturnType<T, E extends HTMLElement> = {
   element: ReactElement<E>;

@@ -1,7 +1,6 @@
-/* eslint-disable no-param-reassign */
-import { Entity as Model } from "../../Entity";
+import { Episode } from "../../Entity";
 
-export function episodeDtoToModel(dto: Model): Model {
+export function episodeDtoToModel(dto: Episode): Episode {
   return {
     ...dto,
     fileInfo: dto.fileInfo,

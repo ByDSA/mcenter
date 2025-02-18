@@ -1,7 +1,7 @@
-import find from "find-process";
 import * as cp from "node:child_process";
 import { exec, execSync } from "node:child_process";
 import util from "node:util";
+import find from "find-process";
 
 export const execPromisify = util.promisify(exec);
 
@@ -26,7 +26,7 @@ export function execAndWaitUntilStarted(command: string): Promise<cp.ChildProces
   } );
 }
 
-export const isRunning = (query: string): Promise<boolean> => {
+export function isRunning(query: string): Promise<boolean> {
   const cmd = `pgrep ${query} || true`;
   const pids = execSync(cmd, {
     stdio: ["ignore", "pipe", "pipe"],

@@ -1,12 +1,12 @@
-import { PlayResourceMessage } from "#shared/models/player";
-import { assertIsDefined, assertIsNotEmpty } from "#shared/utils/validation";
 import fs from "node:fs";
-import ProcessActions from "../../../PlayerProcessService";
+import { assertIsDefined, assertIsNotEmpty } from "#shared/utils/validation";
+import { PlayerProcessService } from "../../../PlayerProcessService";
 import { MediaElement, QueuePlaylistManager } from "../../media";
 import { VLCFlag, VLCProcess } from "../singleton";
 import { episodeToMediaElement } from "./adapters";
+import { PlayResourceMessage } from "#modules/models";
 
-export default class Service implements ProcessActions {
+export class VLCProcessService implements PlayerProcessService {
   #queue: QueuePlaylistManager;
 
   #openNewInstance: boolean;
@@ -54,7 +54,7 @@ export default class Service implements ProcessActions {
     this.#isRunningAnyInstance = isRunning;
   }
 
-  async playResource( {resources: episodes, force}: PlayResourceMessage): Promise<boolean> {
+  async playResource( { resources: episodes, force }: PlayResourceMessage): Promise<boolean> {
     assertIsNotEmpty(episodes);
 
     const elements: MediaElement[] = episodes.map(episodeToMediaElement);
@@ -99,10 +99,10 @@ export default class Service implements ProcessActions {
 }
 
 async function openVLC(file: string): Promise<VLCProcess> {
-  const HTTP_PORT = process.env.VLC_HTTP_PORT ?? "8080";
-  const HTTP_PASSWORD = process.env.VLC_HTTP_PASSWORD;
+  const httpPort = process.env.VLC_HTTP_PORT ?? "8080";
+  const httpPass = process.env.VLC_HTTP_PASSWORD;
 
-  assertIsDefined(HTTP_PASSWORD, "VLC_HTTP_PASSWORD");
+  assertIsDefined(httpPass, "VLC_HTTP_PASSWORD");
   const vlcConfig = [
     VLCFlag.PLAY_AND_EXIT,
     VLCFlag.NO_VIDEO_TITLE,
@@ -113,8 +113,8 @@ async function openVLC(file: string): Promise<VLCProcess> {
     VLCFlag.NO_LOOP,
     VLCFlag.ONE_INSTANCE,
     VLCFlag.EXTRAINF, "http",
-    VLCFlag.HTTP_PORT, HTTP_PORT,
-    VLCFlag.HTTP_PASSWORD, HTTP_PASSWORD,
+    VLCFlag.HTTP_PORT, httpPort,
+    VLCFlag.HTTP_PASSWORD, httpPass,
   ];
   const vlc = await VLCProcess.builder()
     .setFile(file)

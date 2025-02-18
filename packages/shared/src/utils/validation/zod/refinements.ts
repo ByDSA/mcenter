@@ -5,8 +5,8 @@ export type RefinementWithMessage<T> = [
   CustomErrorParams | string | ((arg: T)=> CustomErrorParams)
 ];
 
-/* eslint-disable import/prefer-default-export */
-export const AtLeastOneDefinedRefinement: RefinementWithMessage<Record<number | string | symbol, unknown>> = [
+export const atLeastOneDefinedRefinement:
+RefinementWithMessage<Record<number | string | symbol, unknown>> = [
   (obj) => {
     const values = Object.values(obj);
 

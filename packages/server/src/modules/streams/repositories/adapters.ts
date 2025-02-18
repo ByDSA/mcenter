@@ -1,7 +1,7 @@
-import { Model } from "../models";
+import { Stream } from "../models";
 import { DocOdm } from "./odm";
 
-export function docOdmToModel(docOdm: DocOdm): Model {
+export function streamDocOdmToModel(docOdm: DocOdm): Stream {
   return {
     id: docOdm.id,
     group: groupDocOdmToModel(docOdm.group),
@@ -9,7 +9,7 @@ export function docOdmToModel(docOdm: DocOdm): Model {
   };
 }
 
-function groupDocOdmToModel(groupDocOdm: DocOdm["group"]): Model["group"] {
+function groupDocOdmToModel(groupDocOdm: DocOdm["group"]): Stream["group"] {
   return {
     origins: groupDocOdm.origins.map(originDocOdm => ( {
       type: originDocOdm.type,
@@ -18,7 +18,7 @@ function groupDocOdmToModel(groupDocOdm: DocOdm["group"]): Model["group"] {
   };
 }
 
-export function modelToDocOdm(model: Model): DocOdm {
+export function streamToDocOdm(model: Stream): DocOdm {
   return {
     id: model.id,
     group: model.group,

@@ -1,5 +1,4 @@
-/* eslint-disable max-classes-per-file */
-import { PlayerEvent as PlayerEventType } from "#shared/models/player";
+import { PlayerEvent as PlayerEventType } from "#modules/play/player-services/models";
 import { Event } from "#utils/message-broker";
 
 export const QUEUE_NAME = "player";

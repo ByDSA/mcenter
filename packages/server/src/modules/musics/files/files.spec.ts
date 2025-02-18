@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+import { join } from "path";
+import { FindOptions, findFiles } from ".";
 import { MUSIC_DATA_FOLDER } from "#tests/MusicData";
 import { AOT4_COPY, A_AOT4, DK, DRIFTVEIL } from "#tests/main/db/fixtures/models/music";
 import { md5FileAsync } from "#utils/crypt";
-import { join } from "path";
-import { FindOptions, findFiles } from ".";
 
 describe("getHashFromFile", () => {
   it("existing path", async () => {
@@ -13,18 +14,18 @@ describe("getHashFromFile", () => {
     expect(actual).toBe(expected);
   } );
 
-  it("existing path folder", () => {
+  it("existing path folder", async () => {
     const path = `${MUSIC_DATA_FOLDER}/`;
 
-    expect(async () => {
+    await expect(async () => {
       await md5FileAsync(path);
     } ).rejects.toThrow("EISDIR: illegal operation on a directory, read");
   } );
 
-  it("unexisting path", () => {
+  it("unexisting path", async () => {
     const path = "unexisting/path/";
 
-    expect(async () => {
+    await expect(async () => {
       await md5FileAsync(path);
     } ).rejects.toThrow(`ENOENT: no such file or directory, open '${path}'`);
   } );
@@ -45,9 +46,9 @@ describe("findFiles", () => {
     expect(actual.sort()).toEqual(expected.sort());
   } );
 
-  it("unexisting folder", () => {
+  it("unexisting folder", async () => {
     const path = "unexisting/folder";
-    const actual = findFiles( {
+    const actual = await findFiles( {
       folder: path,
     } );
     const expected: string[] = [];
@@ -62,7 +63,7 @@ describe("findFiles", () => {
       findFiles( {
         folder: path,
       } );
-    } ).toThrowError();
+    } ).toThrow();
   } );
 } );
 
@@ -83,9 +84,9 @@ describe("findFilesResursive", () => {
     expect(actual.sort()).toEqual(expected.sort());
   } );
 
-  it("unexisting folder", () => {
+  it("unexisting folder", async () => {
     const path = "unexisting/folder";
-    const actual = findFiles( {
+    const actual = await findFiles( {
       folder: path,
       recursive: true,
     } );
@@ -102,7 +103,7 @@ describe("findFilesResursive", () => {
         folder: path,
         recursive: true,
       } );
-    } ).toThrowError();
+    } ).toThrow();
   } );
 } );
 
@@ -123,9 +124,9 @@ describe("findFilesByExtensionRecursive", () => {
     expect(actual.sort()).toEqual(expected.sort());
   } );
 
-  it("unexisting folder", () => {
+  it("unexisting folder", async () => {
     const path = "unexisting/folder";
-    const actual = findFiles( {
+    const actual = await findFiles( {
       folder: path,
       recursive: true,
       extensions: ["mp3"],
@@ -144,14 +145,14 @@ describe("findFilesByExtensionRecursive", () => {
         recursive: true,
         extensions: ["mp3"],
       } );
-    } ).toThrowError();
+    } ).toThrow();
   } );
 } );
 
-describe("findFiles", () => {
+describe("findFiles2", () => {
   it("unique hash", async () => {
     const expected = [join(MUSIC_DATA_FOLDER, DK.path)];
-    const {hash} = DK;
+    const { hash } = DK;
     const options: FindOptions = {
       fileHash: hash,
       folder: MUSIC_DATA_FOLDER,
@@ -164,7 +165,7 @@ describe("findFiles", () => {
 
   it("unique hash 2", async () => {
     const expected = [`${MUSIC_DATA_FOLDER}/${AOT4_COPY.path}`];
-    const {hash} = AOT4_COPY;
+    const { hash } = AOT4_COPY;
     const options: FindOptions = {
       fileHash: hash,
       folder: MUSIC_DATA_FOLDER,
@@ -192,7 +193,7 @@ describe("findFiles", () => {
 describe("findFilesRecursive", () => {
   it("unique hash", async () => {
     const expected = [`${MUSIC_DATA_FOLDER}/${DK.path}`];
-    const {hash} = DK;
+    const { hash } = DK;
     const options = {
       fileHash: hash,
       folder: MUSIC_DATA_FOLDER,
@@ -204,7 +205,7 @@ describe("findFilesRecursive", () => {
 
   it("duplicated hash", async () => {
     const expected = [`${MUSIC_DATA_FOLDER}/${AOT4_COPY.path}`, `${MUSIC_DATA_FOLDER}/${A_AOT4.path}`];
-    const {hash} = A_AOT4;
+    const { hash } = A_AOT4;
     const options = {
       fileHash: hash,
       folder: MUSIC_DATA_FOLDER,
@@ -219,7 +220,7 @@ describe("findFilesRecursive", () => {
     const hash = "1234";
     const options = {
       fileHash: hash,
-      folder:MUSIC_DATA_FOLDER,
+      folder: MUSIC_DATA_FOLDER,
     };
     const actual = await findFiles(options);
 

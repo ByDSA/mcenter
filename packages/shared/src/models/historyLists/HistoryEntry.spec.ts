@@ -1,21 +1,20 @@
-import { assertIsEntry } from "./HistoryEntry";
+import { assertIsHistoryEntry } from "./HistoryEntry";
 
-const assertIsModel: typeof assertIsEntry = assertIsEntry;
+const assertIsModel: typeof assertIsHistoryEntry = assertIsHistoryEntry;
+const VALID_MODEL = {
+  episodeId: {
+    innerId: "1x01",
+    serieId: "serie",
+  },
+  date: {
+    year: 2021,
+    month: 1,
+    day: 1,
+    timestamp: 1234567890,
+  },
+};
 
 describe("assertIsModel", () => {
-  const VALID_MODEL = {
-    episodeId: {
-      innerId: "1x01",
-      serieId: "serie",
-    },
-    date: {
-      year: 2021,
-      month: 1,
-      day: 1,
-      timestamp: 1234567890,
-    },
-  };
-
   it("should not throw an error when asserting a valid object", () => {
     const entry = VALID_MODEL;
 
@@ -56,6 +55,7 @@ describe("assertIsModel", () => {
         assertIsModel(obj);
       } ).toThrow();
     } );
+
     it("should throw an error when asserting an object with an invalid property type", () => {
       const obj = {
         ...VALID_MODEL,

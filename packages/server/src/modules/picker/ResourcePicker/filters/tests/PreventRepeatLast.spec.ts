@@ -1,9 +1,11 @@
-import { EpisodeId, compareEpisodeId as compareId } from "#modules/episodes";
-import { stringifyEpisodeId } from "#modules/episodes/tests";
-import { Resource } from "#modules/resources";
+/* eslint-disable prefer-destructuring */
 import { assertIsDefined } from "#shared/utils/validation";
+import { PreventRepeatLastFilter } from "../PreventRepeatLastFilter";
+import { EpisodeId } from "#episodes/models";
+import { stringifyEpisodeId } from "#episodes/tests";
+import { Resource } from "#modules/resources/models";
+import { compareEpisodeId } from "#sharedSrc/models/episodes/Entity";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
-import PreventRepeatLastFilter from "../PreventRepeatLastFilter";
 
 const DEFAULT_EPISODE = EPISODES_SIMPSONS[0];
 const OTHER_EPISODE = EPISODES_SIMPSONS[1];
@@ -35,11 +37,11 @@ describe.each([
     resource: DEFAULT_EPISODE,
     expected: false,
   },
-] as CaseEpisode[])("PreventRepeatLastFilter", ( {lastId, resource, expected}: CaseEpisode) => {
+] as CaseEpisode[])("preventRepeatLastFilter", ( { lastId, resource, expected }: CaseEpisode) => {
   it(`should return ${expected} when lastId = ${lastId ? stringifyEpisodeId(lastId) : undefined} and current episode is ${stringifyEpisodeId(resource.id)}`, async () => {
     const filter = new PreventRepeatLastFilter( {
       lastId,
-      compareId,
+      compareId: compareEpisodeId,
     } );
     const result = await filter.filter(resource);
 

@@ -1,9 +1,10 @@
 import { LastTimeWeightFilterFx, LastTimeWeightFixer, LimiterSafeIntegerPerItems, WeightFixerApplier } from "#modules/picker";
 import { SECONDS_IN_HOUR, SECONDS_IN_MONTH, SECONDS_IN_WEEK } from "#modules/resources";
-import { Music } from "#shared/models/musics";
-import { Pickable, ResourceVO } from "#shared/models/resource";
+import { Pickable, ResourceVO } from "#modules/resources/models";
+import { Music } from "#musics/models";
 
-export default class MusicWeightFixerApplier<R extends ResourceVO = ResourceVO> extends WeightFixerApplier<R> {
+export class MusicWeightFixerApplier<R extends ResourceVO = ResourceVO>
+  extends WeightFixerApplier<R> {
   constructor() {
     super();
     this.add(new LastTimeWeightFixer( {
@@ -14,7 +15,6 @@ export default class MusicWeightFixerApplier<R extends ResourceVO = ResourceVO> 
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fx: LastTimeWeightFilterFx = (r: Pickable, secondsFromLastTime: number): number => {
   const weightFactor = weightFactorFx(r.weight);
   const timeFactor = timeFactorFx(secondsFromLastTime);
@@ -40,7 +40,7 @@ function timeFactorFx(secondsFromLastTime: number): number {
     return (1.0 * secondsFromLastTime) / secondsToOne;
 
   if (secondsFromLastTime > minSecondsRise)
-    return 1.0 + (secondsFromLastTime - minSecondsRise) / SECONDS_IN_WEEK;
+    return 1.0 + ((secondsFromLastTime - minSecondsRise) / SECONDS_IN_WEEK);
 
   return 1;
 }

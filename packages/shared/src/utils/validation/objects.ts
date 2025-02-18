@@ -1,9 +1,9 @@
-export function assertHasKey<T extends Object>(value: T, key: string) {
+export function assertHasKey<T extends object>(value: T, key: string) {
   if (!(key in value))
     throw new Error(`Must have '${key}'`);
 }
 
-export function assertHasAnyKey<T extends Object>(value: T, keys: string[]) {
+export function assertHasAnyKey<T extends object>(value: T, keys: string[]) {
   for (const key of keys) {
     if (key in value)
       return;
@@ -12,7 +12,10 @@ export function assertHasAnyKey<T extends Object>(value: T, keys: string[]) {
   throw new Error(`Must have any key of '${keys.join(", ")}'`);
 }
 
-export function assertIsInstanceOf<T>(value: unknown, clazz: new (...args: any[])=> T): asserts value is T {
+export function assertIsInstanceOf<T>(
+  value: unknown,
+  clazz: new (...args: any[])=> T,
+): asserts value is T {
   if (!(value instanceof clazz))
     throw new Error(`Value must be an instance of '${clazz.name}'`);
 }

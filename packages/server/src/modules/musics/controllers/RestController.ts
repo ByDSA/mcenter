@@ -1,34 +1,40 @@
-import { Music, MusicGetOneByIdReq, MusicPatchOneByIdReq, MusicPatchOneByIdResBody, assertIsMusic, assertIsMusicGetOneByIdReq, assertIsMusicPatchOneByIdReq, assertIsMusicPatchOneByIdResBody } from "#shared/models/musics";
 import { HttpStatusCode } from "#shared/utils/http";
+import express, { NextFunction, Router } from "express";
+import { MusicRepository } from "../repositories";
+import { PatchOneParams } from "../repositories/types";
+import { Music, assertIsMusic } from "#musics/models";
+import { MusicGetOneByIdReq, MusicPatchOneByIdReq,
+  MusicPatchOneByIdResBody, assertIsMusicGetOneByIdReq,
+  assertIsMusicPatchOneByIdReq, assertIsMusicPatchOneByIdResBody } from "#musics/models/transport";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetOneById, CanPatchOneById } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { ResponseWithBody, sendBody, validateReq, validateResBody } from "#utils/validation/zod-express";
-import express, { NextFunction, Router } from "express";
-import { Repository } from "../repositories";
-import { PatchOneParams } from "../repositories/types";
 
-const DepsMap = {
-  repo: Repository,
+const DEPS_MAP = {
+  repo: MusicRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class RestController
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class MusicRestController
 implements
     Controller,
     CanGetOneById<MusicGetOneByIdReq, ResponseWithBody<Music | null>>,
-    CanPatchOneById<MusicPatchOneByIdReq, ResponseWithBody<MusicPatchOneByIdResBody>>
-{
+    CanPatchOneById<MusicPatchOneByIdReq, ResponseWithBody<MusicPatchOneByIdResBody>> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
   }
 
-  async patchOneById(req: MusicPatchOneByIdReq, res: ResponseWithBody<MusicPatchOneByIdResBody>, next: NextFunction): Promise<void> {
+  async patchOneById(
+    req: MusicPatchOneByIdReq,
+    res: ResponseWithBody<MusicPatchOneByIdResBody>,
+    next: NextFunction,
+  ): Promise<void> {
     const { id } = req.params;
-    const {entity, unset} = req.body;
+    const { entity, unset } = req.body;
     const patchParams: PatchOneParams = {
       entity,
       unset,
@@ -36,8 +42,7 @@ implements
 
     await this.#deps.repo.patchOneById(id, patchParams);
 
-    res.body = {
-    };
+    res.body = {};
 
     next();
   }
@@ -57,7 +62,8 @@ implements
   getRouter(): Router {
     const router = SecureRouter();
 
-    router.get("/:id",
+    router.get(
+      "/:id",
       validateReq(assertIsMusicGetOneByIdReq),
       this.getOneById.bind(this),
       validateResBody(assertIsMusic),
@@ -71,7 +77,8 @@ implements
       res.sendStatus(HttpStatusCode.OK);
     } );
     router.use(express.json());
-    router.patch("/:id",
+    router.patch(
+      "/:id",
       validateReq(assertIsMusicPatchOneByIdReq),
       this.patchOneById.bind(this),
       validateResBody(assertIsMusicPatchOneByIdResBody),

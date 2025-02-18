@@ -1,8 +1,11 @@
 export {
-  assertIsGetManyEntriesBySearchRequest, type GetManyEntriesBySearchRequest,
+  assertIsMusicHistoryListGetManyEntriesBySearchRequest,
+  MusicHistoryListGetManyEntriesBySearchRequest,
+  musicHistoryListGetManyEntriesBySearchSchema,
 } from "./GetManyEntriesBySearchRequest";
 
 export {
-  GetManyEntriesBySearchResponseSchema,
-  assertIsGetManyEntriesBySearchResponse, type GetManyEntriesBySearchResponse,
+  assertIsMusicHistoryListGetManyEntriesBySearchResponse,
+  MusicHistoryListGetManyEntriesBySearchResponse,
+  musicHistoryListGetManyEntriesBySearchResponseSchema,
 } from "./GetManyEntriesBySearchResponse";

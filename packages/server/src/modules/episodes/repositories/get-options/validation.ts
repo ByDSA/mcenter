@@ -1,13 +1,13 @@
 import { z } from "zod";
-import ExpandEnum from "./ExpandEnum";
+import { ExpandEnum } from "./ExpandEnum";
 
-const GetOptionsSchema = z.object( {
+const getOptionsSchema = z.object( {
   expand: z.array(z.nativeEnum(ExpandEnum)).optional(),
 } );
 
-export type GetOptions = z.infer<typeof GetOptionsSchema>;
+export type GetOptions = z.infer<typeof getOptionsSchema>;
 
 export function validateGetOptions(opts?: GetOptions) {
   if (opts)
-    GetOptionsSchema.parse(opts);
+    getOptionsSchema.parse(opts);
 }

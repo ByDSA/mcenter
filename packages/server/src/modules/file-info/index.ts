@@ -1,11 +1,5 @@
-/* eslint-disable import/no-internal-modules */
 export {
-  Repository as FileInfoRepository,
+  EpisodeFileInfoRepository as FileInfoRepository,
 } from "./repositories";
 
 export * from "./tree";
-
-export {
-  FileInfo,
-  FileInfoVideo, FileInfoVideoSuperId, FileInfoVideoWithSuperId,
-} from "#shared/models/episodes/fileinfo";

@@ -1,14 +1,8 @@
 export {
-  OriginType, Model as Stream, ModelId as StreamId, Mode as StreamMode, assertIsModel as assertIsStream,
+  assertIsStream, Stream, StreamId,
+  StreamMode, StreamOriginType,
 } from "./models";
 
 export {
-  DocOdm as StreamDocOdm,
-  ModelOdm as StreamModelOdm, Repository as StreamRepository,
-  docOdmToModel as streamDocOdmToModel,
-  modelToDocOdm as streamToDocOdm,
-} from "./repositories";
-
-export {
-  RestController as StreamRestController,
+  StreamsRestController as StreamRestController,
 } from "./controllers";

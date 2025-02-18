@@ -1,6 +1,6 @@
-import * as dotenv from "dotenv";
 import { existsSync } from "node:fs";
-// eslint-disable-next-line import/no-relative-packages
+import * as dotenv from "dotenv";
+
 import { isDebugging } from "../shared/src/utils/vscode";
 
 if (!isDebugging()) {
@@ -9,12 +9,12 @@ if (!isDebugging()) {
   global.console.warn = jest.fn(); // Mockear console.warn
 }
 
-const envFilePath = "tests/.env";
+const ENV_FILE_PATH = "tests/.env";
 
-if (!existsSync(envFilePath))
-  console.log(`File ${envFilePath} does not exist`);
+if (!existsSync(ENV_FILE_PATH))
+  console.log(`File ${ENV_FILE_PATH} does not exist`);
 else {
   dotenv.config( {
-    path: envFilePath,
+    path: ENV_FILE_PATH,
   } );
 }

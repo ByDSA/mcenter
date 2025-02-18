@@ -1,7 +1,7 @@
-import Consumer from "./Consumer";
-import Event from "./Event";
+import { Consumer } from "./Consumer";
+import { Event } from "./Event";
 
-export default class EventQueue {
+export class EventQueue {
   #consumers: Consumer<any>[];
 
   constructor() {
@@ -20,7 +20,7 @@ export default class EventQueue {
     return Promise.resolve();
   }
 
-  subscribe(eventType: string, callback: Consumer<any>): Promise<void> {
+  subscribe(_eventType: string, callback: Consumer<any>): Promise<void> {
     this.#consumers.push(callback);
 
     return Promise.resolve();

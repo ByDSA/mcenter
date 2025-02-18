@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { assertIsDefined } from "#shared/utils/validation";
 
 export const rootBackendUrl = getRootBackendUrl();

@@ -1,117 +1,116 @@
-/* eslint-disable no-use-before-define */
 import { createToken, Lexer } from "chevrotain";
 
 // Definición de tokens
-export const AdditionOperator = createToken( {
+export const additionOperator = createToken( {
   name: "AdditionOperator",
   pattern: Lexer.NA,
 } );
 
-export const Plus = createToken( {
+export const plus = createToken( {
   name: "Or",
   pattern: /\+|\|/,
-  categories: AdditionOperator,
+  categories: additionOperator,
 } );
 
-export const Minus = createToken( {
+export const minus = createToken( {
   name: "Minus",
   pattern: /-/,
-  categories: AdditionOperator,
+  categories: additionOperator,
 } );
 
-export const MultiplicationOperator = createToken( {
+export const multiplicationOperator = createToken( {
   name: "MultiplicationOperator",
   pattern: Lexer.NA,
 } );
 
-export const Star = createToken( {
+export const star = createToken( {
   name: "Star",
   pattern: /\*/,
-  categories: MultiplicationOperator,
+  categories: multiplicationOperator,
 } );
 
-export const Not = createToken( {
+export const not = createToken( {
   name: "Not",
   pattern: /!/,
 } );
 
-export const Colon = createToken( {
+export const colon = createToken( {
   name: "Colon",
   pattern: /:/,
 } );
 
-export const LParen = createToken( {
+export const lParen = createToken( {
   name: "LParen",
   pattern: /\(/,
 } );
 
-export const RParen = createToken( {
+export const rParen = createToken( {
   name: "RParen",
   pattern: /\)/,
 } );
 
-export const LBracket = createToken( {
+export const lBracket = createToken( {
   name: "LBracket",
   pattern: /\[/,
 } );
 
-export const RBracket = createToken( {
+export const rBracket = createToken( {
   name: "RBracket",
   pattern: /]/,
 } );
 
-export const Comma = createToken( {
+export const comma = createToken( {
   name: "Comma",
   pattern: /,/,
 } );
 
-export const GreaterEqual = createToken( {
+export const greaterEqual = createToken( {
   name: "GreaterEqual",
   pattern: />=/,
 } );
 
-export const LessEqual = createToken( {
+export const lessEqual = createToken( {
   name: "LessEqual",
   pattern: /<=/,
 } );
 
-export const GreaterThan = createToken( {
+export const greaterThan = createToken( {
   name: "GreaterThan",
   pattern: />/,
 } );
 
-export const LessThan = createToken( {
+export const lessThan = createToken( {
   name: "LessThan",
   pattern: /</,
 } );
 
-export const NumberLiteral = createToken( {
+export const numberLiteral = createToken( {
   name: "NumberLiteral",
   pattern: /\d+(\.\d+)?/,
 } );
 
-export const WeightIdentifier = createToken( {
+export const weightIdentifier = createToken( {
   name: "Weight",
   pattern: /weight/,
 } );
 
-export const YearIdentifier = createToken( {
+export const yearIdentifier = createToken( {
   name: "Year",
   pattern: /year/,
 } );
 
-export const TagIdentifier = createToken( {
+export const tagIdentifier = createToken( {
   name: "tag",
   pattern: /tag/,
 } );
 
-export const StringLiteral = createToken( {
+export const stringLiteral = createToken( {
   name: "StringLiteral",
   // eslint-disable-next-line no-control-regex
   pattern: /(?:["'?!#a-zA-Z0-9._~-]|[^\x00-\x7F])+/,
 } );
 
-export const WhiteSpace = createToken( {
+export const whiteSpace = createToken( {
   name: "WhiteSpace",
   pattern: /\s+/,
   group: Lexer.SKIPPED,
@@ -119,12 +118,12 @@ export const WhiteSpace = createToken( {
 
 // Tokens y Lexer
 export const tokens = [
-  WhiteSpace,
-  Plus, Star, Minus,
-  AdditionOperator, MultiplicationOperator,
-  Colon, LParen, RParen, LBracket, RBracket, Comma,
-  GreaterEqual, LessEqual, GreaterThan, LessThan,
-  NumberLiteral, TagIdentifier, YearIdentifier, WeightIdentifier, StringLiteral,
+  whiteSpace,
+  plus, star, minus,
+  additionOperator, multiplicationOperator,
+  colon, lParen, rParen, lBracket, rBracket, comma,
+  greaterEqual, lessEqual, greaterThan, lessThan,
+  numberLiteral, tagIdentifier, yearIdentifier, weightIdentifier, stringLiteral,
 ];
 
-export const QueryLexer = new Lexer(tokens);
+export const queryLexer = new Lexer(tokens);

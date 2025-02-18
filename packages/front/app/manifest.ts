@@ -1,3 +1,5 @@
+/* eslint-disable import/no-default-export */
+/* eslint-disable camelcase */
 import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {

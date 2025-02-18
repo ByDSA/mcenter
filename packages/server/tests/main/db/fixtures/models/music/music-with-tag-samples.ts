@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { Music } from "#shared/models/musics";
 import { deepFreeze } from "#shared/utils/objects";
 import { A_AOT4, DK, DRIFTVEIL } from "./music";

@@ -1,7 +1,6 @@
-// eslint-disable-next-line import/no-internal-modules
-import { TimestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
-import { MusicVO } from "#shared/models/musics";
 import mongoose from "mongoose";
+import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
+import { MusicVO } from "#musics/models";
 
 export interface DocOdm extends MusicVO {
   _id: mongoose.Types.ObjectId;
@@ -10,7 +9,7 @@ export interface DocOdm extends MusicVO {
 
 const NAME = "Music";
 
-export const SchemaOdm = new mongoose.Schema<DocOdm>( {
+export const schemaOdm = new mongoose.Schema<DocOdm>( {
   // TODO: Parte FileInfo a quitar
   hash: {
     type: String,
@@ -27,7 +26,7 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
     },
   },
   timestamps: {
-    type: TimestampsSchemaOdm,
+    type: timestampsSchemaOdm,
     required: true,
   },
   // END
@@ -83,4 +82,4 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   },
 } );
 
-export const ModelOdm = mongoose.model<MusicVO>(NAME, SchemaOdm);
+export const ModelOdm = mongoose.model<MusicVO>(NAME, schemaOdm);

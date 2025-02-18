@@ -1,3 +1,3 @@
 export {
-  default as HistoryListRepositoryMock,
+  HistoryListRepositoryMock,
 } from "./RepositoryMock";

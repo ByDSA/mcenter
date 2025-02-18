@@ -1,27 +1,31 @@
 import { z } from "zod";
-import { EntryWithIdSchema } from "../HistoryEntry";
-import { GetOneByIdSchema } from "./GetOneByIdRequest";
+import { entryWithIdSchema } from "../HistoryEntry";
+import { getOneByIdSchema } from "./GetOneByIdRequest";
 
-export const DeleteOneEntryByIdSchema = GetOneByIdSchema.extend( {
-  params: GetOneByIdSchema.shape.params.extend( {
+export const deleteOneEntryByIdSchema = getOneByIdSchema.extend( {
+  params: getOneByIdSchema.shape.params.extend( {
     entryId: z.string(),
   } ).strict(),
 } ).required();
 
-export type DeleteOneEntryByIdRequest = z.infer<typeof DeleteOneEntryByIdSchema>;
+export type DeleteOneEntryByIdRequest = z.infer<typeof deleteOneEntryByIdSchema>;
 
-export function assertIsDeleteOneEntryByIdRequest(o: unknown): asserts o is DeleteOneEntryByIdRequest {
-  DeleteOneEntryByIdSchema.parse(o);
+export function assertIsDeleteOneEntryByIdRequest(
+  o: unknown,
+): asserts o is DeleteOneEntryByIdRequest {
+  deleteOneEntryByIdSchema.parse(o);
 }
 
 export type DeleteOneEntryByIdReqBody = undefined;
 
-export const DeleteOneEntryByIdResBodySchema = z.object( {
-  entry: EntryWithIdSchema,
+export const deleteOneEntryByIdResBodySchema = z.object( {
+  entry: entryWithIdSchema,
 } ).strict();
 
-export type DeleteOneEntryByIdResBody = z.infer<typeof DeleteOneEntryByIdResBodySchema>;
+export type DeleteOneEntryByIdResBody = z.infer<typeof deleteOneEntryByIdResBodySchema>;
 
-export function assertIsDeleteOneEntryByIdResBody(o: unknown): asserts o is DeleteOneEntryByIdResBody {
-  DeleteOneEntryByIdResBodySchema.parse(o);
+export function assertIsDeleteOneEntryByIdResBody(
+  o: unknown,
+): asserts o is DeleteOneEntryByIdResBody {
+  deleteOneEntryByIdResBodySchema.parse(o);
 }

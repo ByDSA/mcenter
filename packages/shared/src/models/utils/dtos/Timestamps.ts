@@ -1,20 +1,19 @@
-/* eslint-disable import/prefer-default-export */
 import z from "zod";
 
-const DateSchema = z.date().or(z.string().transform((str) => new Date(str)));
+const dateSchema = z.date().or(z.string().transform((str) => new Date(str)));
 
-export const TimestampsFileSchema = z.object( {
-  createdAt: DateSchema,
-  updatedAt: DateSchema,
+export const timestampsFileSchema = z.object( {
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
 } ).strict();
 
-export const TimestampsSchema = z.object( {
-  createdAt: DateSchema,
-  updatedAt: DateSchema,
-  addedAt: DateSchema,
+export const timestampsSchema = z.object( {
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
+  addedAt: dateSchema,
 } ).strict();
 
-export type TimestampsModel = z.infer<typeof TimestampsSchema>;
+export type TimestampsModel = z.infer<typeof timestampsSchema>;
 
 export function compareTimestampsModel(a: TimestampsModel, b: TimestampsModel): boolean {
   const sameCreateaAt = a.createdAt.toString() === b.createdAt.toString();

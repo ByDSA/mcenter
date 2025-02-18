@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ValueObjectSchema } from "./ValueObject";
+import { valueObjectSchema } from "./ValueObject";
 
-export type Entity<ID> = z.infer<typeof ValueObjectSchema> & {
+export type Entity<ID> = z.infer<typeof valueObjectSchema> & {
   id: ID;
 };

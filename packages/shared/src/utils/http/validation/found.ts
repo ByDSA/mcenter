@@ -1,7 +1,7 @@
 import { throwErrorPopStack } from "../../errors";
 import { isDefined } from "../../validation";
-import HttpStatusCode from "../StatusCode";
-import HttpError from "./HttpError";
+import { HttpStatusCode } from "../StatusCode";
+import { HttpError } from "./HttpError";
 
 export function assertFound<T>(value: T | null | undefined, msg?: string): asserts value is T {
   if (!isDefined(value))

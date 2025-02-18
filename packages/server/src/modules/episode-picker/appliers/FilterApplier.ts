@@ -1,7 +1,7 @@
-import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { ResourceVO } from "#shared/models/resource";
-import { Model, ModelId, compareId } from "../../episodes/models";
+import { Episode, EpisodeId, compareEpisodeId } from "../../episodes/models";
 import { DependenciesList } from "./Dependencies";
+import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
+import { ResourceVO } from "#modules/resources/models";
 
 type Params<R extends ResourceVO = ResourceVO, ID = string> = {
   resources: R[];
@@ -9,10 +9,10 @@ type Params<R extends ResourceVO = ResourceVO, ID = string> = {
   lastId: ID | undefined;
   dependencies: DependenciesList;
 };
-export default class EpisodeFilterApplier extends FilterApplier<Model> {
-  #params: Params<Model, ModelId>;
+export class EpisodeFilterApplier extends FilterApplier<Episode> {
+  #params: Params<Episode, EpisodeId>;
 
-  constructor(params: Params<Model, ModelId>) {
+  constructor(params: Params<Episode, EpisodeId>) {
     super();
     this.#params = params;
 
@@ -20,7 +20,7 @@ export default class EpisodeFilterApplier extends FilterApplier<Model> {
   }
 
   #addDependencyFilter(): boolean {
-    const {dependencies, lastId} = this.#params;
+    const { dependencies, lastId } = this.#params;
     const serieId = lastId?.serieId;
 
     if (lastId && serieId && serieId in dependencies) {
@@ -28,16 +28,16 @@ export default class EpisodeFilterApplier extends FilterApplier<Model> {
       const dependency = serieDependencies.find(([a]) => a === lastId.innerId);
 
       if (dependency) {
-        const dependencyFullId: [ModelId, ModelId] = dependency.map((episodeId) => ( {
+        const dependencyFullId: [EpisodeId, EpisodeId] = dependency.map((episodeId) => ( {
           innerId: episodeId,
           serieId,
-        } )) as [ModelId, ModelId];
+        } )) as [EpisodeId, EpisodeId];
 
-        this.add(new DependencyFilter<ModelId, Model>( {
+        this.add(new DependencyFilter<EpisodeId, Episode>( {
           lastId,
           firstId: dependencyFullId[0],
           secondId: dependencyFullId[1],
-          compareId,
+          compareId: compareEpisodeId,
         } ));
 
         return true;
@@ -49,7 +49,7 @@ export default class EpisodeFilterApplier extends FilterApplier<Model> {
 
   #createFilters(): void {
     const { PICKER_MIN_WEIGHT = -99, PICKER_MIN_DAYS = 0 } = process.env;
-    const {lastEp, lastId} = this.#params;
+    const { lastEp, lastId } = this.#params;
     const addedDependencyFilter = this.#addDependencyFilter();
 
     if (addedDependencyFilter)
@@ -57,12 +57,13 @@ export default class EpisodeFilterApplier extends FilterApplier<Model> {
 
     this.add(new PreventDisabledFilter());
 
-    if (lastEp){
+    if (lastEp) {
       this.add(new PreventRepeatLastFilter(
         {
           lastId,
-          compareId,
-        } ));
+          compareId: compareEpisodeId,
+        },
+      ));
     }
 
     this.add(new RemoveWeightLowerOrEqualThanFilter(+PICKER_MIN_WEIGHT));
@@ -73,7 +74,11 @@ export default class EpisodeFilterApplier extends FilterApplier<Model> {
   }
 }
 
-export function genEpisodeFilterApplier(resources: Model[], deps: DependenciesList, lastEp?: Model) {
+export function genEpisodeFilterApplier(
+  resources: Episode[],
+  deps: DependenciesList,
+  lastEp?: Episode,
+) {
   return new EpisodeFilterApplier( {
     resources,
     lastEp: lastEp ?? null,

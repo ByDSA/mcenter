@@ -1,24 +1,24 @@
-import { assertIsHistoryMusicListGetManyEntriesBySearchResponse, HistoryMusicListGetManyEntriesBySearchResponseSchema } from "#shared/models/musics";
-import HttpStatusCode from "#shared/utils/http/StatusCode";
-import { registerSingletonIfNotAndGet } from "#tests/main";
-import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
-import { RouterApp } from "#utils/express/test";
-import { resolveRequired } from "#utils/layers/deps";
+import { HttpStatusCode } from "#shared/utils/http/StatusCode";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
-import { Repository } from "../repositories";
-import { HistoryRepositoryMock as RepositoryMock } from "../repositories/tests";
-import RestController from "./RestController";
+import { MusicHistoryRepository } from "../repositories";
+import { MusicHistoryRepositoryMock as RepositoryMock } from "../repositories/tests";
+import { MusicHistoryRestController } from "./RestController";
+import { resolveRequired } from "#utils/layers/deps";
+import { RouterApp } from "#utils/express/test";
+import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
+import { registerSingletonIfNotAndGet } from "#tests/main";
+import { assertIsMusicHistoryListGetManyEntriesBySearchResponse, musicHistoryListGetManyEntriesBySearchResponseSchema } from "#musics/history/models/transport";
 
-describe("RestController", () => {
+describe("restController", () => {
   let routerApp: Application;
   let repository: RepositoryMock;
 
-  beforeAll(async () => {
-    repository = registerSingletonIfNotAndGet(Repository, RepositoryMock);
-    container.registerSingleton(RestController);
-    const controller = resolveRequired(RestController);
+  beforeAll(() => {
+    repository = registerSingletonIfNotAndGet(MusicHistoryRepository, RepositoryMock);
+    container.registerSingleton(MusicHistoryRestController);
+    const controller = resolveRequired(MusicHistoryRestController);
 
     routerApp = RouterApp(controller.getRouter());
   } );
@@ -41,7 +41,7 @@ describe("RestController", () => {
           .post(URL)
           .send();
 
-        expect(repository.getManyCriteria).toBeCalledTimes(1);
+        expect(repository.getManyCriteria).toHaveBeenCalledTimes(1);
       } );
 
       it("should throw 422 if provided unexpected property", async () => {
@@ -61,10 +61,11 @@ describe("RestController", () => {
         const response = await request(routerApp)
           .post(URL)
           .send();
-        const body = HistoryMusicListGetManyEntriesBySearchResponseSchema.parse(response.body);
+        const body = musicHistoryListGetManyEntriesBySearchResponseSchema.parse(response.body);
 
         expect(response.statusCode).toEqual(HttpStatusCode.OK);
-        assertIsHistoryMusicListGetManyEntriesBySearchResponse(body);
+
+        assertIsMusicHistoryListGetManyEntriesBySearchResponse(body);
 
         expect(body).toEqual(expected);
       } );

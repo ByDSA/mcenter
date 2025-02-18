@@ -1,9 +1,8 @@
-/* eslint-disable no-use-before-define */
-import PlayerProcessService from "#modules/PlayerProcessService";
-import PlayerService from "#modules/PlayerService";
-import { PlayerStatusResponse, PlayResourceMessage } from "#shared/models/player";
 import { VLCWebInterface } from "../vlc/http-interface";
 import { vlcResponsesToGenericResponses } from "./adapters";
+import { PlayerStatusResponse, PlayResourceMessage } from "#modules/models";
+import { PlayerProcessService } from "#modules/PlayerProcessService";
+import { PlayerService } from "#modules/PlayerService";
 
 type OnStatusChangeCallback = (status: PlayerStatusResponse)=> void;
 
@@ -11,7 +10,7 @@ type Params = {
   playerWebInterfaceService: VLCWebInterface;
   playerProcessService: PlayerProcessService;
 };
-export default class Service implements PlayerService {
+export class Service implements PlayerService {
   #playerWebInterfaceService: VLCWebInterface;
 
   #playerProcessService: PlayerProcessService;
@@ -20,7 +19,7 @@ export default class Service implements PlayerService {
 
   #onStatusChangeListener: OnStatusChangeCallback | undefined;
 
-  constructor( {playerWebInterfaceService, playerProcessService: playService}: Params) {
+  constructor( { playerWebInterfaceService, playerProcessService: playService }: Params) {
     this.#playerWebInterfaceService = playerWebInterfaceService;
     this.#playerProcessService = playService;
 
@@ -28,8 +27,10 @@ export default class Service implements PlayerService {
       let nextTime = 100;
 
       try {
-        if (await this.isRunning() || this.#status?.open)
-          this.#updateStatusOrFail();
+        if (await this.isRunning() || this.#status?.open) {
+          this.#updateStatusOrFail()
+            .catch(e=> { throw e; } );
+        }
       } catch (error) {
         console.error(error);
         nextTime = 1000;
@@ -57,19 +58,23 @@ export default class Service implements PlayerService {
   }
 
   async playResource(params: PlayResourceMessage) {
-    this.#playerProcessService.playResource(params);
+    await this.#playerProcessService.playResource(params);
   }
 
   async #updateStatusOrFail(): Promise<void> {
-    const isVLCOpen = await this.isRunning();
+    const isVlcOpen = await this.isRunning();
     const vlcStatusPromise = this.#playerWebInterfaceService.fetchSecureShowStatus()
       .then((s) => s ?? undefined);
     const playlistPromise = this.#playerWebInterfaceService.fetchSecurePlaylist()
       .then(p => p ?? undefined);
 
-    await Promise.all([ vlcStatusPromise, playlistPromise ]);
+    await Promise.all([vlcStatusPromise, playlistPromise]);
 
-    this.#status = vlcResponsesToGenericResponses(isVLCOpen, await vlcStatusPromise, await playlistPromise);
+    this.#status = vlcResponsesToGenericResponses(
+      isVlcOpen,
+      await vlcStatusPromise,
+      await playlistPromise,
+    );
     this.#onStatusChangeListener?.(this.#status);
   }
 
@@ -100,7 +105,7 @@ export default class Service implements PlayerService {
 
   async seek(val: number | string): Promise<void> {
     if (typeof val === "number")
-      // eslint-disable-next-line no-param-reassign
+
       val = Math.round(val);
 
     const vlcResponse = await this.#playerWebInterfaceService.fetchSecureSeek(val);

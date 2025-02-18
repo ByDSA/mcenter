@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-concat */
 export type MediaElement = {
     title?: string;
     path: string;

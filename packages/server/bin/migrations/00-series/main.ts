@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import Database from "../../Database";
+import { Database } from "../../Database";
 import { SerieWithEpisodes, SerieWithEpisodesDocODM, assertIsSerieWithEpisodesDocOdm, serieWithEpisodesToSerie } from "./seriesWithEpisodes";
 import { episodeInSerieDocOdmToModel, episodeInSerieToEpisode, serieWithEpisodesDocOdmToModel } from "./seriesWithEpisodes/repositories/adapters";
 

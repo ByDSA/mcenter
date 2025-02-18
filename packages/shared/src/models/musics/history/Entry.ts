@@ -2,20 +2,19 @@ import { z } from "zod";
 import { getDateNow } from "../../../utils/time";
 import { assertZodPopStack } from "../../../utils/validation/zod";
 import { makeHistoryEntrySchema } from "../../history-lists-general";
-import { IDSchema, Id } from "../Entity";
-import { VOSchema } from "../VO";
+import { idSchema, MusicId } from "../Entity";
+import { musicVoSchema } from "../VO";
 
-export const EntrySchema = makeHistoryEntrySchema(IDSchema, VOSchema);
+export const entrySchema = makeHistoryEntrySchema(idSchema, musicVoSchema);
 
-type Entry = z.infer<typeof EntrySchema>;
-export default Entry;
+export type MusicHistoryEntry = z.infer<typeof entrySchema>;
 
-export function assertIsEntry(model: unknown): asserts model is Entry {
-  assertZodPopStack(EntrySchema, model);
+export function assertIsMusicHistoryEntry(model: unknown): asserts model is MusicHistoryEntry {
+  assertZodPopStack(entrySchema, model);
 }
 
-export function createById(musicId: Id): Entry {
-  const newEntry: Entry = {
+export function createMusicHistoryEntryById(musicId: MusicId): MusicHistoryEntry {
+  const newEntry: MusicHistoryEntry = {
     date: getDateNow(),
     resourceId: musicId,
   };

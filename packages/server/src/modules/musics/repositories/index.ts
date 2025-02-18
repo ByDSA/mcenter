@@ -1,9 +1,9 @@
 export {
   DocOdm,
   ModelOdm,
-  SchemaOdm,
+  schemaOdm as SchemaOdm,
 } from "./odm";
 
 export {
-  default as Repository,
+  MusicRepository,
 } from "./Repository";

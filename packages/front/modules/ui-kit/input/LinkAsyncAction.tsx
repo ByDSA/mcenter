@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Spinner } from "../spinner/Spinner";
 
-/* eslint-disable import/prefer-default-export */
 type LabelAsyncActionProps = {
   isDoing: boolean;
   action: ()=> Promise<void>;
@@ -19,7 +18,7 @@ export function useAsyncAction() {
   };
 }
 
-export function LinkAsyncAction( {isDoing, action, spinnerSide = "right", children}: LabelAsyncActionProps) {
+export function LinkAsyncAction( { isDoing, action, spinnerSide = "right", children }: LabelAsyncActionProps) {
   const element = (<span>
     {spinnerSide === "left" && isDoing && <Spinner/> }
     <a style={{

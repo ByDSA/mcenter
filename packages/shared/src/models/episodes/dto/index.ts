@@ -1,19 +1,20 @@
 export {
-  GetOneByIdRequest, Schema as GetOneByIdSchema,
-  assertIsGetOneByIdRequest,
+  GetOneByIdRequest, schema as GetOneByIdSchema, assertIsGetOneByIdRequest,
 } from "./GetOneByIdReq";
 
 export {
-  GetAllRequest, GetAllSchema,
-  assertIsGetAllRequest,
+  GetAllRequest, getAllSchema as GetAllSchema, assertIsGetAllRequest,
 } from "./GetAllRequest";
 
 export {
-  BodyType as PatchOneByIdReqBody, Type as PatchOneByIdRequest, Schema as PatchOneByIdSchema, assertIsBody as assertIsPatchOneByIdReqBody, assert as assertIsPatchOneByIdRequest,
+  BodyType as PatchOneByIdReqBody,
+  Type as PatchOneByIdRequest,
+  schema as PatchOneByIdSchema, assertIsBody as assertIsPatchOneByIdReqBody,
+  assert as assertIsPatchOneByIdRequest,
 } from "./PatchOneByIdRequest";
 
 export {
-  episodeDtoToModel as dtoToModel,
+  episodeDtoToModel,
 } from "./adapters";
 
 export {

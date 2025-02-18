@@ -1,6 +1,3 @@
 export {
-  Serie as Model,
-  SerieId as ModelId,
-  SerieSchema as ModelSchema,
-  assertIsSerie as assertIsModel,
+  assertIsSerie, Serie, SerieId, SERIES_QUEUE_NAME, SerieSchema,
 } from "#shared/models/series";

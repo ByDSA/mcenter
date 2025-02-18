@@ -23,7 +23,7 @@ type EpisodeParam = {
   serieId: Serie["id"];
 };
 
-export function putEpisodeInSerie( {episode, seasonId}: EpisodeParam, serie: Serie): Serie {
+export function putEpisodeInSerie( { episode, seasonId }: EpisodeParam, serie: Serie): Serie {
   treePut(serie, [seasonId], episode.id, episode);
 
   return serie;

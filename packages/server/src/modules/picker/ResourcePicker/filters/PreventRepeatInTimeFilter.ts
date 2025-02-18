@@ -1,11 +1,11 @@
-import { ResourceVO } from "#shared/models/resource";
 import { secondsElapsedFrom } from "../utils";
-import Filter from "./Filter";
+import { Filter } from "./Filter";
+import { ResourceVO } from "#modules/resources/models";
 
 type Params = {
   minSecondsElapsed: number;
 };
-export default class PreventRepeatInTimeFilter implements Filter<ResourceVO> {
+export class PreventRepeatInTimeFilter implements Filter<ResourceVO> {
   #params: Params;
 
   constructor(params: Params) {
@@ -17,7 +17,7 @@ export default class PreventRepeatInTimeFilter implements Filter<ResourceVO> {
     if (resource.lastTimePlayed === undefined || resource.lastTimePlayed <= 0)
       return true;
 
-    const {minSecondsElapsed} = this.#params;
+    const { minSecondsElapsed } = this.#params;
     const secondsElapsed = secondsElapsedFrom(resource.lastTimePlayed);
 
     return secondsElapsed >= minSecondsElapsed;

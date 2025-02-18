@@ -1,5 +1,8 @@
 {
-  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "inlineSources": false,
+    "sourceMap": false
+  },
   "exclude": [
     "tests/**/*",
     "**/test",
@@ -10,8 +13,5 @@
     "**/*.spec.ts",
     "**/*.test.ts"
   ],
-  "compilerOptions": {
-    "sourceMap": false,
-    "inlineSources": false
-  }
+  "extends": "./tsconfig.json"
 }

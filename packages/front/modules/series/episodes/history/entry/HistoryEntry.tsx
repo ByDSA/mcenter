@@ -1,14 +1,15 @@
-import { ResourceAccordion } from "#modules/ui-kit/accordion";
-import { HistoryEntry, HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 import { backendUrls } from "../requests";
-import Header from "./Header";
-import Body from "./body/Body";
+import { Header } from "./Header";
+import { Body } from "./body/Body";
+import { HistoryEntry } from "#modules/series/episodes/history/models";
+import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#modules/series/episodes/history/models/transport";
+import { ResourceAccordion } from "#modules/ui-kit/accordion";
 
 type Props = {
   value: HistoryEntryWithId;
   onRemove?: (data: HistoryEntry)=> void;
 };
-export default function HistoryEntryElement( {value}: Props) {
+export function HistoryEntryElement( { value }: Props) {
   return <span className="history-entry">
     {
       ResourceAccordion( {
@@ -19,18 +20,20 @@ export default function HistoryEntryElement( {value}: Props) {
   </span>;
 }
 
-export function fetchLastestHistoryEntries(historyEntry: HistoryEntry): Promise<HistoryEntryWithId[] | null> {
+export function fetchLastestHistoryEntries(
+  historyEntry: HistoryEntry,
+): Promise<HistoryEntryWithId[] | null> {
   const URL = backendUrls.entries.crud.search;
   const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
-    "filter": {
-      "serieId": historyEntry.episodeId.serieId,
-      "episodeId": historyEntry.episodeId.innerId,
-      "timestampMax": historyEntry.date.timestamp - 1,
+    filter: {
+      serieId: historyEntry.episodeId.serieId,
+      episodeId: historyEntry.episodeId.innerId,
+      timestampMax: historyEntry.date.timestamp - 1,
     },
-    "sort": {
-      "timestamp": "desc",
+    sort: {
+      timestamp: "desc",
     },
-    "limit": 10,
+    limit: 10,
   };
 
   return fetch(URL, {

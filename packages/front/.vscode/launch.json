@@ -1,16 +1,16 @@
 {
-  "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug",
-      "type": "node-terminal",
-      "request": "launch",
       "command": "npm run dev",
+      "name": "Debug",
+      "request": "launch",
       "serverReadyAction": {
+        "action": "debugWithChrome",
         "pattern": "Local:        (https?://.+)",
-        "uriFormat": "%s",
-        "action": "debugWithChrome"
-      }
+        "uriFormat": "%s"
+      },
+      "type": "node-terminal"
     }
-  ]
+  ],
+  "version": "0.2.0"
 }

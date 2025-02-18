@@ -18,7 +18,13 @@ type MakeFetcherParams<ReqBody, ResBody> = {
   resBodyValidator: (data: ResBody)=> void;
   errorMiddleware?: (error: any)=> void;
 };
-export function makeFetcher<ReqBody, ResBody>( {body, method, resBodyValidator, reqBodyValidator, errorMiddleware = console.error}: MakeFetcherParams<ReqBody, ResBody>): Fetcher<ReqBody, ResBody> {
+export function makeFetcher<ReqBody, ResBody>(
+  { body,
+    method,
+    resBodyValidator,
+    reqBodyValidator,
+    errorMiddleware = console.error }: MakeFetcherParams<ReqBody, ResBody>,
+): Fetcher<ReqBody, ResBody> {
   const ret = async (params: FetcherParams<ReqBody>) => {
     reqBodyValidator?.(params.body);
 
@@ -66,7 +72,9 @@ type MakeUseRequestParams<ReqBody, ResBody> = {
 
 export type UseRequest<T> = ()=> UseRequestResult<T>;
 
-export function makeUseRequest<R, T>( {key, fetcher, refreshInterval}: MakeUseRequestParams<R, T>): UseRequest<T> {
+export function makeUseRequest<R, T>(
+  { key, fetcher, refreshInterval }: MakeUseRequestParams<R, T>,
+): UseRequest<T> {
   const ret: UseRequest<T> = () => {
     const [data, setData] = React.useState<T | undefined>(undefined);
     const { error, isLoading } = useSWR(
@@ -96,8 +104,10 @@ useRequest: UseRequest<T>;
 render: (data: T, hooksRet: U)=> JSX.Element;
 hooks?: (data: T | undefined)=> void;
 };
-export function FetchingRender<T, U = undefined>( {useRequest, render, hooks}: FetchingRenderParams<T, U>): JSX.Element {
-  const {data, error, isLoading} = useRequest();
+export function FetchingRender<T, U = undefined>(
+  { useRequest, render, hooks }: FetchingRenderParams<T, U>,
+): JSX.Element {
+  const { data, error, isLoading } = useRequest();
   const hooksRet = hooks?.(data) as U;
 
   if (error) {

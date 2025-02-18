@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import { SearchSchema } from "./Criteria";
+import { searchSchema } from "./Criteria";
 
-export const GetManyEntriesBySearchSchema = z.object( {
-  body: SearchSchema,
+export const getManyEntriesBySearchSchema = z.object( {
+  body: searchSchema,
 } ).required();
 
-export type GetManyRequest = z.infer<typeof GetManyEntriesBySearchSchema>;
+export type GetManyRequest = z.infer<typeof getManyEntriesBySearchSchema>;
 
 export function assertIsGetManyRequest(o: unknown): asserts o is GetManyRequest {
-  GetManyEntriesBySearchSchema.parse(o);
+  getManyEntriesBySearchSchema.parse(o);
 }

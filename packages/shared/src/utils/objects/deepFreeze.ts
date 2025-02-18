@@ -1,4 +1,4 @@
-export default function deepFreeze<T extends Object>(object: T): T {
+export function deepFreeze<T extends object>(object: T): T {
   // Retrieve the property names defined on object
   const propNames = Reflect.ownKeys(object);
 

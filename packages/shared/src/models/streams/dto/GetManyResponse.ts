@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { ModelSchema } from "../Stream";
+import { modelSchema } from "../Stream";
 
-export const GetManyResponseSchema = z.array(ModelSchema);
+export const getManyResponseSchema = z.array(modelSchema);
 
-export type GetManyResponse = z.infer<typeof GetManyResponseSchema>;
+export type GetManyResponse = z.infer<typeof getManyResponseSchema>;
 
 export function assertIsGetResponse(o: unknown): asserts o is GetManyResponse {
-  GetManyResponseSchema.parse(o);
+  getManyResponseSchema.parse(o);
 }

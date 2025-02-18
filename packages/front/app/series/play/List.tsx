@@ -1,18 +1,20 @@
 "use client";
 
-import { rootBackendUrl } from "#modules/requests";
-import { seriesBackendUrls } from "#modules/series";
+// eslint-disable-next-line no-restricted-imports
 import { Stream, assertIsStream, assertIsStreamGetManyResponse } from "#shared/models/streams";
-import Loading from "app/loading";
 import { Fragment, MouseEventHandler, useState } from "react";
 import useSWR from "swr";
-import fetcher from "./fetcher";
+import { showError } from "#shared/utils/errors/showError";
+import { fetcher } from "./fetcher";
+import { Loading } from "#modules/loading";
+import { seriesBackendUrls } from "#modules/series";
+import { rootBackendUrl } from "#modules/requests";
 
 export const backendUrls = {
   stream: `${rootBackendUrl}/api/play/stream`,
 };
 
-export default function List() {
+export function List() {
   const URL = seriesBackendUrls.streams.crud.search;
   const { data, error, isLoading } = useSWR(
     URL,
@@ -20,12 +22,13 @@ export default function List() {
   );
   const [streams, setStreams] = useState<Stream[]>(data);
 
-  if (error)
-  {return <>
-    <p>Failed to load.</p>
-    <p>{URL}</p>
-    <p>{JSON.stringify(error, null, 2)}</p>
-  </>;}
+  if (error) {
+    return <>
+      <p>Failed to load.</p>
+      <p>{URL}</p>
+      <p>{JSON.stringify(error, null, 2)}</p>
+    </>;
+  }
 
   if (!streams && isLoading)
     return <Loading/>;
@@ -42,7 +45,8 @@ export default function List() {
     e.preventDefault();
     fetch(`${backendUrls.stream}/${stream}`, {
       method: "GET",
-    } );
+    } )
+      .catch(showError);
   };
 
   return <>
@@ -63,8 +67,7 @@ export default function List() {
             <br/>
           </Fragment>
         );
-      },
-      )
+      } )
     }
   </>;
 }

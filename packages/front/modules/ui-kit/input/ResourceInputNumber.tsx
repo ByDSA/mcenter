@@ -4,16 +4,21 @@ import { InputNumberProps, useInputNumber } from "./InputNumber";
 import { ResourceOptionalCheckbox } from "./ResourceCheckboxOptional";
 import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
 
-export type ResourceInputNumberProps<R extends Object> = ResourceInputCommonProps<R> & {
+export type ResourceInputNumberProps<R extends object> = ResourceInputCommonProps<R> & {
   inputNumberProps?: InputNumberProps;
 };
 
-export default function ResourceInputNumber<R extends Object>( {prop, resourceState, isOptional, inputNumberProps}: ResourceInputNumberProps<R>) {
+export function ResourceInputNumber<R extends object>(
+  { prop, resourceState, isOptional, inputNumberProps }: ResourceInputNumberProps<R>,
+) {
   const [resource, setResource] = resourceState;
   const calcFinalValue = (v?: number) => v;
-  const resourceValue = useMemo(()=>calcFinalValue(stringToNumberOrUndefined(resource[prop]?.toString())), [resource]);
+  const resourceValue = useMemo(
+    ()=>calcFinalValue(stringToNumberOrUndefined(resource[prop]?.toString())),
+    [resource],
+  );
   const handleChange = useMemo(()=>(e: ChangeEvent<HTMLInputElement>) => {
-    const {value: targetValue} = e.target;
+    const { value: targetValue } = e.target;
     const finalValue = calcFinalValue(stringToNumberOrUndefined(targetValue));
 
     setResource( {
@@ -21,7 +26,7 @@ export default function ResourceInputNumber<R extends Object>( {prop, resourceSt
       [prop]: finalValue,
     } );
   }, [resource]);
-  const {element: inputNumber, setValue, getValue} = useInputNumber( {
+  const { element: inputNumber, setValue, getValue } = useInputNumber( {
     value: resourceValue,
     onChange: handleChange,
     onPressEnter: inputNumberProps?.onPressEnter ?? "nothing",

@@ -20,8 +20,8 @@ type Params = {
   components: Components;
   config?: GlobalConfigOptions;
 };
-export function initializeComponents( {app, components}: Params) {
-  const {database, i18n, docs, cron} = components;
+export function initializeComponents( { app, components }: Params) {
+  const { database, i18n, docs, cron } = components;
 
   if (database)
     initializeComponent(app, database);

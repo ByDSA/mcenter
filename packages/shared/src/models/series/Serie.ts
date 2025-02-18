@@ -1,16 +1,15 @@
 import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
 
-export type ModelId = string;
+export type SerieId = string;
 
-export const ModelSchema = z.object( {
+export const serieSchema = z.object( {
   id: z.string(),
   name: z.string(),
 } ).strict();
 
-type Model = z.infer<typeof ModelSchema>;
-export default Model;
+export type Serie = z.infer<typeof serieSchema>;
 
-export function assertIsModel(model: unknown): asserts model is Model {
-  assertZodPopStack(ModelSchema, model);
+export function assertIsSerie(model: unknown): asserts model is Serie {
+  assertZodPopStack(serieSchema, model);
 }

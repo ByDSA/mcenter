@@ -118,7 +118,7 @@ describe("fixUrl", () => {
       description: "replace cyrillic characters",
     },
     {
-      input:"Kick-Ass Score - 35 - The Corridor",
+      input: "Kick-Ass Score - 35 - The Corridor",
       expected: "kick-ass-score-35-the-corridor",
       description: "replace multiple hyphens with a single hyphen2",
     },

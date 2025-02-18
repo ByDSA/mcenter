@@ -1,5 +1,5 @@
+/* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-param-reassign */
 
 // Source: https://github.com/voodoocreation/ts-deepmerge/blob/master/index.ts
 // Modificado para que acepte undefined como objeto a mergear
@@ -49,44 +49,43 @@ interface IObject {
   [key: string]: any;
 }
 
-const merge = <T extends IObject>(...objects: (T | undefined)[]): TMerged<T[][number]> =>
-  objects.reduce((result: IObject, current) => {
-    if (current === undefined)
-      return result;
-
-    if (Array.isArray(current)) {
-      throw new TypeError(
-        "Arguments provided to ts-deepmerge must be objects, not arrays.",
-      );
-    }
-
-    Object.keys(current).forEach((key) => {
-      if (["__proto__", "constructor", "prototype"].includes(key))
-        return;
-
-      if (Array.isArray(result[key]) && Array.isArray(current[key])) {
-        result[key] = merge.options.mergeArrays
-          ? merge.options.uniqueArrayItems
-            ? Array.from(
-              new Set((result[key] as unknown[]).concat(current[key])),
-            )
-            : [...result[key], ...current[key]]
-          : current[key];
-      } else if (isObject(result[key]) && isObject(current[key]))
-        result[key] = merge(result[key] as IObject, current[key] as IObject);
-      else {
-        result[key] =
-          current[key] === undefined
-            ? merge.options.allowUndefinedOverrides
-              ? current[key]
-              : result[key]
-            : current[key];
-      }
-    } );
-
+export const deepMerge = <T extends IObject>(
+  ...objects: (T | undefined)[]
+): TMerged<T[][number]> => objects.reduce((result: IObject, current) => {
+  if (current === undefined)
     return result;
-  }, {
-  } ) as any;
+
+  if (Array.isArray(current)) {
+    throw new TypeError(
+      "Arguments provided to ts-deepmerge must be objects, not arrays.",
+    );
+  }
+
+  Object.keys(current).forEach((key) => {
+    if (["__proto__", "constructor", "prototype"].includes(key))
+      return;
+
+    if (Array.isArray(result[key]) && Array.isArray(current[key])) {
+      result[key] = deepMerge.options.mergeArrays
+        ? deepMerge.options.uniqueArrayItems
+          ? Array.from(
+            new Set((result[key] as unknown[]).concat(current[key])),
+          )
+          : [...result[key], ...current[key]]
+        : current[key];
+    } else if (isObject(result[key]) && isObject(current[key]))
+      result[key] = deepMerge(result[key] as IObject, current[key] as IObject);
+    else {
+      result[key] = current[key] === undefined
+        ? deepMerge.options.allowUndefinedOverrides
+          ? current[key]
+          : result[key]
+        : current[key];
+    }
+  } );
+
+  return result;
+}, {} ) as any;
 
 interface IOptions {
   /**
@@ -120,22 +119,20 @@ const defaultOptions: IOptions = {
   uniqueArrayItems: true,
 };
 
-merge.options = defaultOptions;
+deepMerge.options = defaultOptions;
 
-merge.withOptions = <T extends IObject[]>(
+deepMerge.withOptions = <T extends IObject[]>(
   options: Partial<IOptions>,
   ...objects: T
 ) => {
-  merge.options = {
+  deepMerge.options = {
     ...defaultOptions,
     ...options,
   };
 
-  const result = merge(...objects);
+  const result = deepMerge(...objects);
 
-  merge.options = defaultOptions;
+  deepMerge.options = defaultOptions;
 
   return result;
 };
-
-export default merge;

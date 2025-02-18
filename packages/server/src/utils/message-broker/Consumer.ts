@@ -1,5 +1,3 @@
-import Event from "./Event";
+import { Event } from "./Event";
 
-type Consumer<P> = (event: Event<P>)=> Promise<void>;
-
-export default Consumer;
+export type Consumer<P> = (event: Event<P>)=> Promise<void>;

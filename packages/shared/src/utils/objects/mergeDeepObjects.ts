@@ -5,8 +5,7 @@ type MergeDeepObject = Record<string, any>;
 export function mergeDeepObjects(...sources: (MergeDeepObject | undefined)[]): MergeDeepObject {
   const definedSources = sources.filter((source) => source !== undefined) as MergeDeepObject[];
 
-  return mergeDeepInner( {
-  }, ...definedSources);
+  return mergeDeepInner( {}, ...definedSources);
 }
 
 export function mergeDeepSameObjects<T extends MergeDeepObject>(...sources: (T | undefined)[]): T {
@@ -26,8 +25,7 @@ function mergeDeepInner(target: MergeDeepObject, ...sources: MergeDeepObject[]):
       if (isObject(source[key])) {
         if (!target[key]) {
           Object.assign(target, {
-            [key]: {
-            },
+            [key]: {},
           } );
         }
 

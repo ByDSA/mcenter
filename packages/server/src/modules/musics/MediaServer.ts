@@ -1,4 +1,6 @@
+/* eslint-disable camelcase */
 /* eslint-disable padding-line-between-statements */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const NodeMediaServer = require("node-media-server");
 
 const config = {
@@ -20,6 +22,4 @@ const config = {
     secret: "nodemedia2017privatekey",
   },
 };
-const nms = new NodeMediaServer(config);
-
-export default nms;
+export const nms = new NodeMediaServer(config);

@@ -1,8 +1,8 @@
 "use client";
 
-import { rootBackendUrl } from "#modules/requests";
 import { useState } from "react";
 import styles from "./Page.module.css";
+import { rootBackendUrl } from "#modules/requests";
 
 const ACTIONS_URL = `${rootBackendUrl}/api/actions`;
 
@@ -41,13 +41,12 @@ export default function Page() {
       <h1>Actions</h1>
 
       <ul>
-        {ACTIONS.map(( {url, name}: Action) => (
+        {ACTIONS.map(( { url, name }: Action) => (
           <li key={url}><a onClick={()=>callAction( {
             useText,
             url,
           } )}>{name ?? url}</a></li>
-        ),
-        )}
+        ))}
       </ul>
 
       <p>Out:</p>
@@ -60,7 +59,7 @@ type ActionParams = {
   useText: (text: string)=> void;
   url: string;
 };
-async function callAction( {useText, url}: ActionParams) {
+async function callAction( { useText, url }: ActionParams) {
   const fullUrl = `${ACTIONS_URL}/${url}`;
 
   useText(`Loading: ${ fullUrl } ...`);
@@ -72,7 +71,7 @@ async function callAction( {useText, url}: ActionParams) {
     const formattedText = JSON.stringify(JSON.parse(responseText), null, 2);
 
     txt = formattedText;
-  } catch (e) {
+  } catch {
     txt = responseText;
   }
   useText(txt);

@@ -1,4 +1,5 @@
 #!/usr/bin/env zx
+/* eslint-disable no-continue */
 // @ts-check
 
 import { loadProjectEnvs } from "../../../../lib/projects/envs.mjs";
@@ -33,18 +34,18 @@ function findScriptFileByParamsOrFail(scriptFiles, params) {
   const paramsKeys = Object.keys(params);
   const files = [];
 
-  // eslint-disable-next-line no-restricted-syntax, no-labels
+  // eslint-disable-next-line no-restricted-syntax
   fileFor: for (const scriptFile of scriptFiles) {
     const scriptFileParams = getParamsFromScriptFile(scriptFile);
     const scriptFileParamsKeys = Object.keys(scriptFileParams);
 
     for (const key of scriptFileParamsKeys) {
       if (!paramsKeys.includes(key))
-        // eslint-disable-next-line no-labels, no-continue
+
         continue fileFor;
 
       if (!scriptFileParams[key].match(`^${params[key]}`))
-        // eslint-disable-next-line no-labels, no-continue
+
         continue fileFor;
     }
 

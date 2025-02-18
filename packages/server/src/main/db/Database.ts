@@ -1,10 +1,10 @@
 import { assertIsDefined } from "#shared/utils/validation";
-import { Database } from "#utils/layers/db";
 import mongoose, { ConnectOptions } from "mongoose";
+import { Database } from "#utils/layers/db";
 
 export type Options = ConnectOptions;
 
-export default class RealDatabase implements Database {
+export class RealDatabase implements Database {
   #options: ConnectOptions;
 
   #dbConnectionURL: string;
@@ -16,8 +16,7 @@ export default class RealDatabase implements Database {
   protected connection: mongoose.Connection | null = null;
 
   constructor(options?: Options) {
-    this.#options = options ?? {
-    };
+    this.#options = options ?? {};
 
     this.#dbConnectionURL = "";
     this.#initialized = false;
@@ -79,7 +78,6 @@ export default class RealDatabase implements Database {
     await mongoose.disconnect();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   protected generateUrl() {
     // mongodb environment variables
     const { MONGO_HOSTNAME,

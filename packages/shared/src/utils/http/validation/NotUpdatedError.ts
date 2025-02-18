@@ -1,11 +1,11 @@
-import HttpStatusCode from "../StatusCode";
-import HttpError from "./HttpError";
+import { HttpStatusCode } from "../StatusCode";
+import { HttpError } from "./HttpError";
 
-export const NotUpdatedErrorName = "NotUpdatedError";
+export const NOT_UPDATED_ERROR_NAME = "NotUpdatedError";
 
-export default class NotUpdatedError extends HttpError {
+export class NotUpdatedError extends HttpError {
   constructor(message?: string) {
     super(HttpStatusCode.CONFLICT, message);
-    this.name = NotUpdatedErrorName;
+    this.name = NOT_UPDATED_ERROR_NAME;
   }
 }

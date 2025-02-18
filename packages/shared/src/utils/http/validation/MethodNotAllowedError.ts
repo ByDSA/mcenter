@@ -1,11 +1,11 @@
-import HttpStatusCode from "../StatusCode";
-import HttpError from "./HttpError";
+import { HttpStatusCode } from "../StatusCode";
+import { HttpError } from "./HttpError";
 
-export const ErrorName = "MethodNotAllowedError";
+export const ERROR_NAME = "MethodNotAllowedError";
 
-export default class MethodNotAllowedError extends HttpError {
+export class MethodNotAllowedError extends HttpError {
   constructor(message?: string) {
     super(HttpStatusCode.METHOD_NOT_ALLOWED, message);
-    this.name = ErrorName;
+    this.name = ERROR_NAME;
   }
 }

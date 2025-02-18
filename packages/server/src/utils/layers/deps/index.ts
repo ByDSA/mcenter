@@ -1,25 +1,26 @@
 import { PublicMethodsOf } from "#shared/utils/types";
 import { InjectionToken, container } from "tsyringe";
-// eslint-disable-next-line import/no-internal-modules
+
 import { DelayedConstructor } from "tsyringe/dist/typings/lazy-helpers";
-// eslint-disable-next-line import/no-internal-modules
+
 import { constructor } from "tsyringe/dist/typings/types";
 
-export type DepsMapType = Record<string, constructor<any> | DelayedConstructor<any>>;
+export type DEPS_MAPType = Record<string, constructor<any> | DelayedConstructor<any>>;
 
-export type DepsFromMap<T extends DepsMapType> = {
-  [K in keyof T]: PublicMethodsOf<T[K] extends constructor<infer R> ? R : T[K] extends DelayedConstructor<infer R> ? R : never>;
+export type DepsFromMap<T extends DEPS_MAPType> = {
+  [K in keyof T]: PublicMethodsOf<T[K] extends constructor<infer R>
+  ? R : T[K] extends DelayedConstructor<infer R> ? R : never>;
 };
 
-function resolveDeps<T, M extends DepsMapType>(depsMap: M, deps?: Partial<T>): DepsFromMap<M> {
+function resolveDeps<T, M extends DEPS_MAPType>(DEPS_MAP: M, deps?: Partial<T>): DepsFromMap<M> {
   const ret: DepsFromMap<M> = {
     ...deps,
   } as DepsFromMap<M>;
 
   // eslint-disable-next-line no-restricted-syntax
-  for (const key in depsMap) {
+  for (const key in DEPS_MAP) {
     if (typeof key === "string" && !ret[key]) {
-      ret[key] = container.resolve(depsMap[key]);
+      ret[key] = container.resolve(DEPS_MAP[key]);
 
       if (ret[key] === undefined)
         throw new Error(`Could not resolve dependency ${key}`);
@@ -29,10 +30,12 @@ function resolveDeps<T, M extends DepsMapType>(depsMap: M, deps?: Partial<T>): D
   return ret;
 }
 
-export function injectDeps(map: DepsMapType) {
-  return function f<T extends { new (...args: any[]): {} }>(clazz: T) {
+export function injectDeps(map: DEPS_MAPType) {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  return function f<T extends { new(...args: any[]): {} }>(clazz: T) {
     return class extends clazz {
       constructor(...args: any[]) {
+        // eslint-disable-next-line prefer-destructuring
         const deps = args[0];
         const newDeps = resolveDeps(map, deps);
 

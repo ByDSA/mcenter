@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 type PickMatching<T, V> = { [K in keyof T as T[K] extends V ? K : never]: T[K] };
 
 export type PublicMethodsOf<T> = PickMatching<T, Function>;

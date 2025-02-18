@@ -1,5 +1,5 @@
-import { Music } from "#shared/models/musics";
 import { deepFreeze } from "#shared/utils/objects";
+import { Music } from "#musics/models";
 
 const DATE = new Date();
 const AOT4_COMMON = {
@@ -17,7 +17,6 @@ const AOT4_COMMON = {
   },
 };
 
-/* eslint-disable import/prefer-default-export */
 export const MUSICS_SAMPLES_IN_DISK: Music[] = deepFreeze([
   {
     id: "1",

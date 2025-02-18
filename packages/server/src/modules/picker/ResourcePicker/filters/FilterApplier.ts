@@ -1,7 +1,7 @@
-import { Pickable } from "#shared/models/resource";
-import Filter from "./Filter";
+import { Filter } from "./Filter";
+import { Pickable } from "#modules/resources/models";
 
-export default class FilterApplier<R extends Pickable = Pickable> {
+export class FilterApplier<R extends Pickable = Pickable> {
   #nonReversibleFilters: Filter<R>[] = [];
 
   #reversibleFilters: Filter<R>[] = [];
@@ -44,7 +44,10 @@ export default class FilterApplier<R extends Pickable = Pickable> {
   }
 }
 
-async function applyFiltersToResource<R extends Pickable>(resource: R, filters: Filter[]): Promise<boolean> {
+async function applyFiltersToResource<R extends Pickable>(
+  resource: R,
+  filters: Filter[],
+): Promise<boolean> {
   for (const f of filters) {
     if (!await f.filter(resource))
       return false;

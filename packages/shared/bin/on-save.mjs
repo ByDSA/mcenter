@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
-/* eslint-disable no-await-in-loop */
-const {workspaceFolder} = process.env;
+
+const { workspaceFolder } = process.env;
 
 cd(workspaceFolder);
 
@@ -29,6 +29,7 @@ async function debounce(action) {
     try {
       await action();
     } catch (e) {
+      console.error("Error", e);
     }
   } while (fs.existsSync(debounceRedoFile));
 

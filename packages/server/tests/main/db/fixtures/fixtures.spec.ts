@@ -1,12 +1,12 @@
-import { episodeDocOdmToModel } from "#modules/episodes";
-import { expectEpisodes } from "#modules/episodes/models/test";
-import { ModelOdm } from "#modules/episodes/repositories";
-import { SerieDocOdm, SerieModelOdm, serieDocOdmToModel } from "#modules/series";
-import { expectSerie } from "#sharedSrc/models/series/test";
-import TestDatabase from "../TestDatabase";
-import TestMongoDatabase from "../TestMongoDatabase";
+import { TestDatabase } from "../TestDatabase";
+import { TestMongoDatabase } from "../TestMongoDatabase";
 import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "./models";
 import { loadFixtureSimpsons } from "./sets";
+import { episodeDocOdmToModel } from "#episodes/index";
+import { expectEpisodes } from "#episodes/models/test";
+import { ModelOdm } from "#episodes/repositories";
+import { SerieDocOdm, SerieModelOdm, serieDocOdmToModel } from "#modules/series";
+import { expectSerie } from "#sharedSrc/models/series/test";
 
 let db: TestDatabase;
 
@@ -17,6 +17,7 @@ beforeAll(async () => {
   await db.connect();
   await db.drop();
 } );
+
 it("should load fixture simpsons", async () => {
   await loadFixtureSimpsons();
 

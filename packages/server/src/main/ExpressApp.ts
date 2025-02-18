@@ -1,26 +1,27 @@
-import { ActionController } from "#modules/actions";
-import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
-import { EpisodeRestController } from "#modules/episodes";
-import { HistoryListRestController } from "#modules/historyLists";
-import { MusicController } from "#modules/musics";
-import mediaServer from "#modules/musics/MediaServer";
-import { PlaySerieController, PlayStreamController } from "#modules/play";
-import { StreamRestController } from "#modules/streams";
+import { execSync } from "node:child_process";
+import fs from "node:fs";
+import { Server } from "node:http";
+import { showError } from "#shared/utils/errors/showError";
 import { ForbiddenError } from "#shared/utils/http";
 import { deepFreeze, deepMerge } from "#shared/utils/objects";
 import { OptionalPropsRecursive } from "#shared/utils/types";
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
-import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
-import { Database } from "#utils/layers/db";
-import { resolveRequired } from "#utils/layers/deps";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import schedule from "node-schedule";
-import { execSync } from "node:child_process";
-import fs from "node:fs";
-import { Server } from "node:http";
 import serveIndex from "serve-index";
+import { EpisodeRestController } from "#episodes/index";
+import { ActionController } from "#modules/actions";
+import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
+import { HistoryListRestController } from "#modules/historyLists";
+import { PlaySerieController, PlayStreamController } from "#modules/play";
+import { StreamRestController } from "#modules/streams";
+import { MusicController } from "#musics/index";
+import { nms as mediaServer } from "#musics/MediaServer";
+import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
+import { Database } from "#utils/layers/db";
+import { resolveRequired } from "#utils/layers/deps";
 
 export type ExpressAppDependencies = {
   db: {
@@ -38,7 +39,7 @@ const DEFAULT_DEPENDENCIES: OptionalPropsRecursive<ExpressAppDependencies> = dee
 } );
 
 // Necesario para poder replicarla para test
-export default class ExpressApp implements App {
+export class ExpressApp implements App {
   #instance: express.Express | null = null;
 
   #httpServer: Server | undefined;
@@ -48,7 +49,10 @@ export default class ExpressApp implements App {
   #httpServerRequirers: ((server: Server)=> void)[] = [];
 
   constructor(deps?: ExpressAppDependencies) {
-    this.#dependencies = deepMerge(DEFAULT_DEPENDENCIES as Required<ExpressAppDependencies>, deps) as Required<ExpressAppDependencies>;
+    this.#dependencies = deepMerge(
+      DEFAULT_DEPENDENCIES as Required<ExpressAppDependencies>,
+      deps,
+    ) as Required<ExpressAppDependencies>;
   }
 
   onHttpServerListen(requirer: (server: Server)=> void) {
@@ -65,7 +69,6 @@ export default class ExpressApp implements App {
 
     const app = express();
 
-    // eslint-disable-next-line global-require
     require("../scheduler");
 
     app.disable("x-powered-by");
@@ -75,7 +78,8 @@ export default class ExpressApp implements App {
     const requestLogger = (
       request: Request,
       _: Response,
-      next: NextFunction) => {
+      next: NextFunction,
+    ) => {
       console.log(`[${request.method}] ${request.url}`);
       next();
     };
@@ -83,7 +87,7 @@ export default class ExpressApp implements App {
     app.use(requestLogger);
 
     if (this.#dependencies.controllers.cors) {
-      const {FRONTEND_URL} = process.env;
+      const { FRONTEND_URL } = process.env;
 
       assertIsDefined(FRONTEND_URL);
       const whitelist: string[] = [FRONTEND_URL];
@@ -94,7 +98,10 @@ export default class ExpressApp implements App {
           const allowsAnyOrigin = true;
           const originUrl = origin ? new URL(origin) : null;
           const originIsLocal = originUrl && (originUrl.hostname === "localhost" || originUrl.hostname.startsWith("192.168."));
-          const allows = (origin && (whitelist.includes(origin) || originIsLocal)) || allowsAnyOrigin;
+          const allows = (
+            origin
+             && (whitelist.includes(origin) || originIsLocal)
+          ) || allowsAnyOrigin;
 
           if (allows)
             callback(null, true);
@@ -149,12 +156,12 @@ export default class ExpressApp implements App {
     // Config
     const configRoutes = express.Router();
 
-    configRoutes.get("/stop", (req: Request, res: Response) => {
+    configRoutes.get("/stop", (_req: Request, res: Response) => {
       fs.writeFileSync(".stop", "");
       res.send("stop");
     } );
 
-    configRoutes.get("/resume", (req: Request, res: Response) => {
+    configRoutes.get("/resume", (_req: Request, res: Response) => {
       if (fs.existsSync(".stop")) {
         fs.unlinkSync(".stop");
         res.send("resume");
@@ -186,7 +193,8 @@ export default class ExpressApp implements App {
   async close() {
     await this.#dependencies.db.instance.disconnect();
 
-    schedule.gracefulShutdown();
+    schedule.gracefulShutdown()
+      .catch(showError);
   }
 
   // eslint-disable-next-line require-await

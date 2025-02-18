@@ -1,5 +1,5 @@
 export {
-  default as Database,
+  Database,
 } from "./Database";
 
 export {
@@ -7,5 +7,5 @@ export {
 } from "./mongoose";
 
 export {
-  default as DatabaseNotConnectedError,
+  DatabaseNotConnectedError,
 } from "./NotConnectedError";

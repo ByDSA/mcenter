@@ -1,22 +1,22 @@
-import { EpisodeRepository } from "#modules/episodes";
+import { assertFound } from "#shared/utils/http/validation";
+import { Request, Response, Router } from "express";
+import { PlayService } from "./PlayService";
+import { EpisodeRepository } from "#episodes/index";
 import { HistoryListService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
-import { assertFound } from "#shared/utils/http/validation";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Request, Response, Router } from "express";
-import PlayService from "./PlayService";
 
-const DepsMap = {
+const DEPS_MAP = {
   serieRepository: SerieRepository,
   episodeRepository: EpisodeRepository,
   playService: PlayService,
   historyListService: HistoryListService,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class PlaySerieController implements Controller {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class PlaySerieController implements Controller {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {

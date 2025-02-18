@@ -12,7 +12,7 @@ const MATCHERS = [
   "head",
 ];
 
-export default function SecureRouter(): Router {
+export function SecureRouter(): Router {
   const router: any = Router();
 
   for (const matcher of MATCHERS) {
@@ -24,6 +24,7 @@ export default function SecureRouter(): Router {
   return router;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 function tryCatch(fn: Function) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {

@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /* eslint-disable no-continue */
 import { diff } from "just-diff";
 
@@ -6,14 +5,13 @@ type Settings = {
   ignoreNewUndefined?: boolean;
 };
 type Ret = any;// MusicPatchOneByIdReq["body"];
-export function getDiff<T extends Object>(old: T, neww: T, settings?: Settings): Ret {
-  const d: Partial<T> = {
-  };
+export function getDiff<T extends object>(old: T, neww: T, settings?: Settings): Ret {
+  const d: Partial<T> = {};
   const dTree = diff(old, neww);
   const unset: (number | string)[][] = [];
 
   for (const ops of dTree) {
-    const {value} = ops;
+    const { value } = ops;
 
     if (settings?.ignoreNewUndefined && ops.op === "add" && value === undefined)
       continue;
@@ -58,19 +56,18 @@ export function getDiff<T extends Object>(old: T, neww: T, settings?: Settings):
   return ret;
 }
 
-function set<T extends Object>(obj: Partial<T>, path: (number | string)[], value: any) {
+function set<T extends object>(obj: Partial<T>, path: (number | string)[], value: any) {
   let i: number;
 
   for (i = 0; i < path.length - 1; i++) {
-    obj[path[i]] ??= {
-    };
+    obj[path[i]] ??= {};
     obj = obj[path[i]];
   }
 
   obj[path[i]] = value;
 }
 
-function get<T extends Object>(obj: Partial<T>, path: (number | string)[]) {
+function get<T extends object>(obj: Partial<T>, path: (number | string)[]) {
   let i: number;
 
   for (i = 0; i < path.length - 1; i++) {
@@ -83,7 +80,7 @@ function get<T extends Object>(obj: Partial<T>, path: (number | string)[]) {
   return obj[path[i]];
 }
 
-export function isModified<T extends Object>(r1: T, r2: T, settings?: Settings) {
+export function isModified<T extends object>(r1: T, r2: T, settings?: Settings) {
   const diffs = getDiff(r1, r2, settings);
 
   return Object.keys(diffs).length > 1 || Object.keys(diffs.entity).length > 0;

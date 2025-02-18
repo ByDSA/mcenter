@@ -1,20 +1,20 @@
-/* eslint-disable import/prefer-default-export */
+import { assertIsMusicVO } from "#musics/models";
+import { MusicHistoryEntry } from "#musics/history/models";
+import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchResponse } from "#musics/history/models/transport";
 import { makeFetcher, makeUseRequest } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
-import { HistoryMusicEntry, HistoryMusicListGetManyEntriesBySearchRequest, assertIsHistoryMusicListGetManyEntriesBySearchResponse, assertIsMusicVO } from "#shared/models/musics";
 
-type ReqBody = HistoryMusicListGetManyEntriesBySearchRequest["body"];
+type ReqBody = MusicHistoryListGetManyEntriesBySearchRequest["body"];
 const body: ReqBody = {
-  "filter": {
+  filter: {},
+  sort: {
+    timestamp: "desc",
   },
-  "sort": {
-    "timestamp": "desc",
-  },
-  "limit": 10,
-  "expand": ["musics"],
+  limit: 10,
+  expand: ["musics"],
 };
-const validator = (data: Required<HistoryMusicEntry>[]) => {
-  assertIsHistoryMusicListGetManyEntriesBySearchResponse(data);
+const validator = (data: Required<MusicHistoryEntry>[]) => {
+  assertIsMusicHistoryListGetManyEntriesBySearchResponse(data);
 
   for (const d of data)
     assertIsMusicVO(d.resource);
@@ -28,11 +28,11 @@ const fetcher = makeFetcher( {
 
 export const backendUrls = {
   crud: {
-    search: ( {user} ) => `${rootBackendUrl}/api/musics/history/${user}/search`,
+    search: ( { user } ) => `${rootBackendUrl}/api/musics/history/${user}/search`,
   },
 };
 
-export const useRequest = makeUseRequest<ReqBody, Required<HistoryMusicEntry>[]>( {
+export const useRequest = makeUseRequest<ReqBody, Required<MusicHistoryEntry>[]>( {
   key:
   {
     url: backendUrls.crud.search( {

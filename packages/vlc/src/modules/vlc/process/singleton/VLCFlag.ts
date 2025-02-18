@@ -1,4 +1,4 @@
-enum VLCFlag {
+export enum VLCFlag {
   PLAY_AND_EXIT = "--play-and-exit",
   NO_VIDEO_TITLE = "--no-video-title-show",
   ASPECT_RATIO = "--aspect-ratio",
@@ -11,5 +11,3 @@ enum VLCFlag {
   HTTP_PORT = "--http-port",
   HTTP_PASSWORD = "--http-password"
 }
-
-export default VLCFlag;

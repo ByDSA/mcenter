@@ -1,6 +1,6 @@
 import { HttpStatusCode } from "#shared/utils/http";
-import { ExpressMiddleware } from "#utils/express";
 import { NextFunction, Request, Response } from "express";
+import { ExpressMiddleware } from "#utils/express";
 
 export type ResponseWithBody<T> = Response<T> & {
   body?: T;
@@ -13,7 +13,9 @@ export function validateReq<T>(assertFunc: AssertFunction<T>): ExpressMiddleware
       assertFunc(req as any);
 
       return next();
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error("Error in request validation:", error);
+
       return res.status(HttpStatusCode.UNPROCESSABLE_ENTITY).json( {
         errors: [error],
       } );
@@ -22,7 +24,7 @@ export function validateReq<T>(assertFunc: AssertFunction<T>): ExpressMiddleware
 }
 
 export function validateResBody<T>(assertFunc: AssertFunction<T>) {
-  return (req: Request, res: ResponseWithBody<T>, next: NextFunction) => {
+  return (_req: Request, res: ResponseWithBody<T>, next: NextFunction) => {
     assertFunc(res.body as any);
 
     return next();

@@ -1,7 +1,7 @@
-import loadFixtureSerieAndEpisodesSimpsons from "./SerieAndEpisodesSimpsons";
-import loadFixtureStreamAndHistoryListSimpsons from "./StreamAndHistoryListSimpsons";
+import { loadFixtureSerieAndEpisodesSimpsons } from "./SerieAndEpisodesSimpsons";
+import { loadFixtureStreamAndHistoryListSimpsons } from "./StreamAndHistoryListSimpsons";
 
-export default async () => {
+export const loadFixtureSimpsons = async () => {
   await loadFixtureSerieAndEpisodesSimpsons();
   await loadFixtureStreamAndHistoryListSimpsons();
 };

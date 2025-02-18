@@ -1,4 +1,4 @@
-import { Pickable } from "#shared/models/resource";
+import { Pickable } from "#modules/resources/models";
 
 type Params<R extends Pickable = Pickable> = {
   resource: R;
@@ -6,7 +6,7 @@ type Params<R extends Pickable = Pickable> = {
   currentWeight: number;
 };
 
-export default interface WeightFixer<R extends Pickable = Pickable> {
+export interface WeightFixer<R extends Pickable = Pickable> {
   fixWeight(params: Params<R>): Promise<number>;
 }
 

@@ -1,15 +1,17 @@
 /* eslint-disable require-await */
-/* eslint-disable import/prefer-default-export */
-import { makeFetcher } from "#modules/fetching";
+
 import { HistoryEntryId, HistoryListDeleteOneEntryByIdResBody, HistoryListId, assertIsHistoryListDeleteOneEntryByIdResBody } from "#shared/models/historyLists";
 import { backendUrls } from "./requestGetMany";
+import { makeFetcher } from "#modules/fetching";
 
 export {
   backendUrls, useRequest,
 } from "./requestGetMany";
 
-// eslint-disable-next-line require-await
-export async function fetchDelete(listId: HistoryListId, entryId: HistoryEntryId): Promise<HistoryListDeleteOneEntryByIdResBody | undefined> {
+export async function fetchDelete(
+  listId: HistoryListId,
+  entryId: HistoryEntryId,
+): Promise<HistoryListDeleteOneEntryByIdResBody | undefined> {
   const method = "DELETE";
   const URL = `${backendUrls.crud.get}/${listId}/entries/${entryId}`;
   const fetcher = makeFetcher<typeof undefined, HistoryListDeleteOneEntryByIdResBody>( {
@@ -19,7 +21,7 @@ export async function fetchDelete(listId: HistoryListId, entryId: HistoryEntryId
   } );
 
   return fetcher( {
-    url:URL,
+    url: URL,
     method,
     body: undefined,
   } );

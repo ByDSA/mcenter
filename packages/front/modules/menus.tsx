@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 type Data = Record<string, string>;
 
 type Params = {

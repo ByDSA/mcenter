@@ -1,19 +1,19 @@
-/* eslint-disable import/prefer-default-export */
+import { backendUrls as historyBackendUrls } from "./history/requests";
+import { MusicPatchOneByIdReq, MusicPatchOneByIdReqBody, MusicPatchOneByIdResBody, assertIsMusicPatchOneByIdReqBody, assertIsMusicPatchOneByIdResBody } from "#musics/models/transport";
+import { MusicId } from "#musics/models";
 import { makeFetcher } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
-import { MusicID, MusicPatchOneByIdReq, MusicPatchOneByIdReqBody, MusicPatchOneByIdResBody, assertIsMusicPatchOneByIdReqBody, assertIsMusicPatchOneByIdResBody } from "#shared/models/musics";
-import { backendUrls as historyBackendUrls } from "./history/requests";
 
 export const backendUrls = {
   crud: {
-    patch: ( {id} )=>`${rootBackendUrl}/api/musics/${id}`,
+    patch: ( { id } )=>`${rootBackendUrl}/api/musics/${id}`,
   },
   history: historyBackendUrls,
-  raw: ( {url} )=>`${rootBackendUrl}/api/musics/get/raw/${url}`,
+  raw: ( { url } )=>`${rootBackendUrl}/api/musics/get/raw/${url}`,
 };
 
 // eslint-disable-next-line require-await
-export async function fetchPatch(id: MusicID, body: MusicPatchOneByIdReq["body"]): Promise<MusicPatchOneByIdResBody> {
+export async function fetchPatch(id: MusicId, body: MusicPatchOneByIdReq["body"]): Promise<MusicPatchOneByIdResBody> {
   const method = "PATCH";
   const fetcher = makeFetcher<MusicPatchOneByIdReqBody, MusicPatchOneByIdResBody>( {
     method,

@@ -3,14 +3,13 @@ import { errorSliceStack } from "./stack";
 type FunctionToTry<R> = ()=> R;
 export function tryCatchLogError<R>(f: FunctionToTry<R>) {
   return tryCatch(f, (error) => {
-    // eslint-disable-next-line no-console
     console.error(error);
     throw errorSliceStack(error, 2, 2);
   } );
 }
 
 type ErrorHandler = (error: Error)=> any;
-// eslint-disable-next-line consistent-return
+
 export function tryCatch<R>(f: FunctionToTry<R>, errorHandler?: ErrorHandler): R | undefined {
   try {
     return f();
@@ -23,8 +22,10 @@ export function tryCatch<R>(f: FunctionToTry<R>, errorHandler?: ErrorHandler): R
   }
 }
 
-// eslint-disable-next-line consistent-return
-export async function tryCatchAsync<R>(f: FunctionToTry<R>, errorHandler?: ErrorHandler): Promise<R | undefined> {
+export async function tryCatchAsync<R>(
+  f: FunctionToTry<R>,
+  errorHandler?: ErrorHandler,
+): Promise<R | undefined> {
   try {
     return await f();
   } catch (error) {
@@ -38,7 +39,6 @@ export async function tryCatchAsync<R>(f: FunctionToTry<R>, errorHandler?: Error
 
 export function tryCatchLogErrorAsync<R>(f: FunctionToTry<R>): Promise<R | undefined> {
   return tryCatchAsync(f, (error) => {
-    // eslint-disable-next-line no-console
     console.error(error);
     throw errorSliceStack(error, 2, 2);
   } );

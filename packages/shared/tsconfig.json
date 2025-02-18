@@ -1,28 +1,28 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "strict": true,
+    "baseUrl": ".",
     "declaration": true,
-    "outDir": "build",
-    "sourceMap": true,
-    "inlineSources": true,
     "downlevelIteration": true,
+    "esModuleInterop": true,
     "experimentalDecorators": true,
+    "importHelpers": false, // Para no necesitar tslib en producción
+    "inlineSources": true,
+    "lib": ["es2023", "dom"],
     "module": "CommonJS",
     "moduleResolution": "node",
-    "esModuleInterop": true,
-    "importHelpers": false, // Para no necesitar tslib en producción
-    "target": "es2015",
     "noImplicitAny": true,
-    "typeRoots": ["node_modules/@types"],
-    "lib": ["es2023", "dom"],
-    "baseUrl": ".",
+    "outDir": "build",
     "paths": {
-      "#tests/*": ["tests/*"],
-      "#tests": ["tests"]
-    }
+      "#tests": ["tests"],
+      "#tests/*": ["tests/*"]
+    },
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2015",
+    "typeRoots": ["node_modules/@types"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "exclude": ["node_modules"],
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "types": ["node"]
 }

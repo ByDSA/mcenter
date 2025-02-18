@@ -1,3 +1,3 @@
 export {
-  default as HistoryList,
+  HistoryList,
 } from "./HistoryList";

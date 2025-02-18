@@ -2,9 +2,9 @@
 import fs from "fs";
 import path from "path";
 import { MediaElement } from "./MediaElement";
-import Playlist from "./Playlist";
+import { Playlist } from "./Playlist";
 
-export default class QueuePlaylistManager {
+export class QueuePlaylistManager {
   #currentNumber: number;
 
   #folder: string;
@@ -13,6 +13,7 @@ export default class QueuePlaylistManager {
     this.#folder = folder;
     let i;
 
+    // eslint-disable-next-line no-constant-condition
     for (i = 0; true; i++) {
       const file = this.getFullPathByNum(i);
 

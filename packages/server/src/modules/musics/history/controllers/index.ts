@@ -1,3 +1,3 @@
 export {
-  default as RestController,
+  MusicHistoryRestController,
 } from "./RestController";

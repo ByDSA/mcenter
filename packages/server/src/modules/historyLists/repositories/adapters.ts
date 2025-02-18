@@ -1,8 +1,7 @@
-/* eslint-disable import/prefer-default-export */
-import { Entry, EntryWithId, Model, ModelId } from "../models";
+import { HistoryEntry, HistoryEntryWithId, HistoryList, HistoryListId } from "../models";
 import { DocOdm } from "./odm";
 
-export function docOdmToModel(docOdm: DocOdm): Model {
+export function docOdmToModel(docOdm: DocOdm): HistoryList {
   return {
     id: docOdm.id,
     maxSize: docOdm.maxSize,
@@ -10,7 +9,7 @@ export function docOdmToModel(docOdm: DocOdm): Model {
   };
 }
 
-export function entryDocOdmToModel(entryDocOdm: DocOdm["entries"][0], historyListId: ModelId): EntryWithId {
+export function entryDocOdmToModel(entryDocOdm: DocOdm["entries"][0], historyListId: HistoryListId): HistoryEntryWithId {
   return {
     id: entryDocOdm.date.timestamp.toString(),
     historyListId,
@@ -27,7 +26,7 @@ export function entryDocOdmToModel(entryDocOdm: DocOdm["entries"][0], historyLis
   };
 }
 
-export function entryToDocOdm(entry: Entry): DocOdm["entries"][0] {
+export function entryToDocOdm(entry: HistoryEntry): DocOdm["entries"][0] {
   return {
     episodeId: entry.episodeId.innerId,
     serieId: entry.episodeId.serieId,
@@ -40,7 +39,7 @@ export function entryToDocOdm(entry: Entry): DocOdm["entries"][0] {
   };
 }
 
-export function modelToDocOdm(model: Model): DocOdm {
+export function modelToDocOdm(model: HistoryList): DocOdm {
   return {
     id: model.id,
     maxSize: model.maxSize,

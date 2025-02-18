@@ -1,7 +1,7 @@
+import { PageContainer } from "app/PageContainer";
 import { makeMenu } from "#modules/menus";
-import PageContainer from "app/PageContainer";
 
-export default function SeriesLayout( {children}: {
+export default function SeriesLayout( { children }: {
   children: React.ReactNode;
 } ) {
   const submenu = makeMenu( {

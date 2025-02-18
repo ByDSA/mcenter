@@ -1,13 +1,14 @@
-import { Resource } from "#shared/models/resource";
 import { isDefined } from "#shared/utils/validation";
-import Filter from "./Filter";
+import { Filter } from "./Filter";
 import { CompareIdFunc } from "./utils";
+import { Resource } from "#modules/resources/models";
 
 type Params<ID> = {
   lastId: ID | undefined;
   compareId: CompareIdFunc<ID>;
 };
-export default class PreventRepeatLastFilter<ID = string, R extends Resource<ID> = Resource<ID>> implements Filter<R>{
+export class PreventRepeatLastFilter<ID = string, R extends Resource<ID> = Resource<ID>>
+implements Filter<R> {
   #params: Params<ID>;
 
   constructor(params: Params<ID>) {

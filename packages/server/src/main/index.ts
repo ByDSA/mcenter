@@ -1,7 +1,5 @@
-import ExpressApp from "./ExpressApp";
-
 export {
   ExpressApp,
-};
+} from "./ExpressApp";
 
 export * from "./db";

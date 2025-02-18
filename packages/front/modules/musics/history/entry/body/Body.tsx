@@ -1,15 +1,17 @@
-import { secsToMmss } from "#modules/utils/dates";
-import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
-import { useResourceEdition } from "#modules/utils/resources";
-import { classes } from "#modules/utils/styles";
-import { HistoryMusicEntry, MusicPatchOneByIdReq, MusicVO, assertIsMusicVO } from "#shared/models/musics";
 import { PropInfo } from "#shared/utils/validation/zod";
-import { LinkAsyncAction, ResourceInput, ResourceInputArrayString, ResourceInputProps } from "#uikit/input";
 import { JSX, useState } from "react";
 import { fetchPatch, backendUrls as musicBackendUrls } from "../../../requests";
 import { MUSIC_PROPS } from "../utils";
-import LastestComponent from "./Lastest";
+import { LastestComponent } from "./Lastest";
 import style from "./style.module.css";
+import { MusicVO, assertIsMusicVO } from "#modules/musics/models";
+import { MusicPatchOneByIdReq } from "#modules/musics/models/transport";
+import { MusicHistoryEntry } from "#modules/musics/history/models";
+import { LinkAsyncAction, ResourceInput, ResourceInputArrayString, ResourceInputProps } from "#uikit/input";
+import { classes } from "#modules/utils/styles";
+import { useResourceEdition } from "#modules/utils/resources";
+import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
+import { secsToMmss } from "#modules/utils/dates";
 
 function generatePatchBody(entryResource: MusicVO, resource: MusicVO) {
   const patchBodyParams: MusicPatchOneByIdReq["body"] = getDiff(entryResource, resource);
@@ -18,10 +20,12 @@ function generatePatchBody(entryResource: MusicVO, resource: MusicVO) {
 }
 
 type Props = {
-  entry: Required<HistoryMusicEntry>;
+  entry: Required<MusicHistoryEntry>;
 };
-export default function Body( {entry}: Props) {
-  const {isModified, update:{action: update, isDoing: isUpdating}, errors, resourceState, reset} = useResourceEdition( {
+export function Body( { entry }: Props) {
+  const { isModified,
+    update: { action: update, isDoing: isUpdating }, errors,
+    resourceState, reset } = useResourceEdition( {
     calcIsModified,
     entry,
     assertionFn: assertIsMusicVO,
@@ -33,19 +37,18 @@ export default function Body( {entry}: Props) {
     },
   } );
   const [resource] = resourceState;
-  // eslint-disable-next-line require-await
-  const optionalProps: Record<keyof MusicVO, PropInfo> = Object.entries(MUSIC_PROPS).reduce((acc, [key, value]) => {
-    if (value.required)
+  const optionalProps: Record<keyof MusicVO, PropInfo> = Object.entries(MUSIC_PROPS)
+    .reduce((acc, [key, value]) => {
+      if (value.required)
+        return acc;
+
+      if (["lastTimePlayed", "album", "tags"].includes(key))
+        return acc;
+
+      acc[key as keyof MusicVO] = value;
+
       return acc;
-
-    if (["lastTimePlayed", "album", "tags"].includes(key))
-      return acc;
-
-    acc[key as keyof MusicVO] = value;
-
-    return acc;
-  }, {
-  } as Record<keyof MusicVO, PropInfo>);
+    }, {} as Record<keyof MusicVO, PropInfo>);
   const commonInputTextProps = {
     inputTextProps: {
       onPressEnter: ()=>update(),
@@ -60,13 +63,13 @@ export default function Body( {entry}: Props) {
   };
   const titleElement = ResourceInput( {
     caption: MUSIC_PROPS.title.caption,
-    prop:"title",
+    prop: "title",
     error: errors?.title,
     ...commonInputTextProps,
   } );
   const artistElement = ResourceInput( {
     caption: MUSIC_PROPS.artist.caption,
-    prop:"artist",
+    prop: "artist",
     error: errors?.artist,
     ...commonInputTextProps,
   } );
@@ -94,8 +97,8 @@ export default function Body( {entry}: Props) {
       </span>
       <span className={classes("height2", style.album)}>
         {ResourceInput( {
-          caption:MUSIC_PROPS.album.caption,
-          prop:"album",
+          caption: MUSIC_PROPS.album.caption,
+          prop: "album",
           ...commonInputTextProps,
         } )}
       </span>
@@ -112,15 +115,15 @@ export default function Body( {entry}: Props) {
     </span>
     <span className={classes("line", "height2")}>
       {ResourceInput( {
-        caption:MUSIC_PROPS.path.caption,
-        prop:"path",
+        caption: MUSIC_PROPS.path.caption,
+        prop: "path",
         ...commonInputTextProps,
       } )}
     </span>
     <span className={classes("line", "height2")}>
       {ResourceInput( {
         caption: <><a href={fullUrlOf(resource.url)}>Url</a>:</>,
-        prop:"url",
+        prop: "url",
         ...commonInputTextProps,
       } )}
     </span>
@@ -137,7 +140,9 @@ export default function Body( {entry}: Props) {
     <span className={"break"} />
     <span className="line">
       <span><a onClick={() => reset()}>Reset</a></span>
-      {isModified && <span className={style.update}>{<LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>}</span>}</span>
+      {isModified && <span className={style.update}>{
+        <LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>
+      }</span>}</span>
     <span className={"break"} />
     <LastestComponent resourceId={entry.resourceId} date={entry.date}/>
   </div>;
@@ -147,10 +152,11 @@ type OptionalPropsProps = Omit<ResourceInputProps<MusicVO>, "prop"> & {
   optionalProps: Record<keyof MusicVO, PropInfo>;
   errors?: Record<keyof MusicVO, string>;
 };
-function OptionalProps( {resourceState, optionalProps, errors, inputNumberProps, inputTextProps}: OptionalPropsProps) {
+function OptionalProps(
+  { resourceState, optionalProps, errors, inputNumberProps, inputTextProps }: OptionalPropsProps,
+) {
   const [isVisible, setIsVisible] = useState(false);
-  const ret: Record<string, JSX.Element> = {
-  };
+  const ret: Record<string, JSX.Element> = {};
 
   ret.top = (<>
     <span className={classes("line", "height2")}>
@@ -162,9 +168,8 @@ function OptionalProps( {resourceState, optionalProps, errors, inputNumberProps,
   const entries = Object.entries(optionalProps) as [keyof MusicVO, PropInfo][];
 
   for (const entry of entries) {
-    const prop = entry[0];
-    const propInfo = entry[1];
-    const {type, caption = prop} = propInfo;
+    const [prop, propInfo] = entry;
+    const { type, caption = prop } = propInfo;
 
     if (prop in resource || isVisible) {
       const t = type === "number" ? "number" : "string";
@@ -175,14 +180,21 @@ function OptionalProps( {resourceState, optionalProps, errors, inputNumberProps,
         default:
           ret[prop] = (<>
             <span className={classes("line", "height2")}>
-              <ResourceInput caption={caption} type={t} prop={prop} resourceState={resourceState} isOptional error={errors?.[prop]} inputTextProps={inputTextProps}/>
+              <ResourceInput caption={caption}
+                type={t} prop={prop}
+                resourceState={resourceState}
+                isOptional
+                error={errors?.[prop]} inputTextProps={inputTextProps}/>
             </span>
           </>);
           break;
         case "number":
           ret[prop] = (<>
             <span className={classes("line", "height2")}>
-              <ResourceInput caption={caption} type={t} prop={prop} resourceState={resourceState} isOptional error={errors?.[prop]} inputNumberProps={inputNumberProps}/>
+              <ResourceInput
+                caption={caption} type={t} prop={prop}
+                resourceState={resourceState}
+                isOptional error={errors?.[prop]} inputNumberProps={inputNumberProps}/>
             </span>
           </>);
       }

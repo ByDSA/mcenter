@@ -1,3 +1,3 @@
 export {
-  default as PlayerService,
+  Service as PlayerService,
 } from "./Service";

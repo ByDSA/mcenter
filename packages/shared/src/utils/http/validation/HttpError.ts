@@ -1,4 +1,4 @@
-export default abstract class HttpError extends Error {
+export abstract class HttpError extends Error {
   readonly code: number;
 
   constructor(code: number, message?: string) {

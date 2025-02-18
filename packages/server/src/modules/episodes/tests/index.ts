@@ -1,14 +1,4 @@
-import { LastTimePlayedService } from "#modules/historyLists";
-import { EpisodeId } from "#shared/models/episodes";
-import { PublicMethodsOf } from "#shared/utils/types";
-
-export class LastTimePlayedServiceMock implements PublicMethodsOf<LastTimePlayedService> {
-  getDaysFromLastPlayed = jest.fn();
-
-  updateEpisodeLastTimePlayedFromEntriesAndGet = jest.fn();
-
-  getLastTimePlayedFromHistory = jest.fn();
-}
+import { EpisodeId } from "#episodes/models";
 
 export function stringifyEpisodeId(episodeId: EpisodeId): string {
   return `(${episodeId.serieId}; ${episodeId.innerId})`;

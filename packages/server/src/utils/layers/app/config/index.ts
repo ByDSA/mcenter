@@ -3,5 +3,5 @@ export {
 } from "./common";
 
 export {
-  default as GlobalConfig,
+  GlobalConfig,
 } from "./GlobalConfig";

@@ -1,11 +1,10 @@
 import { getPortFromServer } from "#shared/utils/nodejs/http";
-import { assertIsNotEmpty } from "#shared/utils/validation";
 import request from "supertest";
-import App from "./App";
+import { App } from "./App";
 
-describe("App", () => {
-  describe("Sin parámetros", () => {
-    it("Se crea sin ningún error", () => {
+describe("app", () => {
+  describe("sin parámetros", () => {
+    it("se crea sin ningún error", () => {
       const app = App.create();
 
       expect(app).toBeTruthy();
@@ -17,6 +16,7 @@ describe("App", () => {
       beforeAll(() => {
         app = App.create();
       } );
+
       it("request a /", async () => {
         await request(app.getExpressApp())
           .get("/")
@@ -24,7 +24,7 @@ describe("App", () => {
           .expect("El servicio está en funcionamiento");
       } );
 
-      describe("Exposición del servidor", () => {
+      describe("exposición del servidor", () => {
         beforeAll(() => {
           app.run();
         } );
@@ -32,13 +32,13 @@ describe("App", () => {
         it("el servidor se ha añadido a la lista de servidores de la app", () => {
           const servers = app.getServers();
 
-          assertIsNotEmpty(servers);
+          expect(servers).not.toHaveLength(0);
         } );
 
         it("tiene un puerto asignado el servidor", () => {
           const servers = app.getServers();
 
-          assertIsNotEmpty(servers);
+          expect(servers).not.toHaveLength(0);
 
           const port = getPortFromServer(servers[0]);
 
@@ -46,7 +46,11 @@ describe("App", () => {
         } );
 
         it("se cierra el servidor sin ningún error", () => {
+          expect(app.getServers()).not.toHaveLength(0);
+
           app.close();
+
+          expect(app.getServers()).toHaveLength(0);
         } );
 
         afterAll(() => {

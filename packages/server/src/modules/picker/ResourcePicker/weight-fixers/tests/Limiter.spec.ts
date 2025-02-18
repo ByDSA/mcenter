@@ -1,5 +1,5 @@
-import { Pickable } from "#shared/models/resource";
-import LimiterWeightFixer from "../Limiter";
+import { LimiterWeightFixer } from "../Limiter";
+import { Pickable } from "#modules/resources/models";
 
 type Case = {
   limit: number;
@@ -28,7 +28,7 @@ const cases = [
   },
 ] as Case[];
 
-describe.each(cases)("LimiterWeightFixer", (testCase) => {
+describe.each(cases)("limiterWeightFixer", (testCase) => {
   it(`should return ${testCase.expectedWeight} when initialWeight = ${testCase.initialWeight} and limit = ${testCase.limit}`, async () => {
     const weightFixer = new LimiterWeightFixer(testCase.limit);
     const result = await weightFixer.fixWeight( {

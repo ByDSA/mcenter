@@ -1,18 +1,18 @@
 import { z } from "zod";
 
-const InfoElementSchema = z.object( {
+const infoElementSchema = z.object( {
   "#text": z.string()
     .or(z.number())
     .optional(),
   "@_name": z.string(),
 } ).strict();
-const CategoryObjectSchema = z.object( {
-  info: z.array(InfoElementSchema)
-    .or(InfoElementSchema)
+const categoryObjectSchema = z.object( {
+  info: z.array(infoElementSchema)
+    .or(infoElementSchema)
     .optional(), // cuando está parado, no hay info, o cuando solo hay una, a veces es un objeto
   "@_name": z.string(),
 } ).strict();
-const StatusResponseSchema = z.object( {
+const statusResponseSchema = z.object( {
   root: z.object( {
     length: z.number()
       .step(1)
@@ -21,6 +21,7 @@ const StatusResponseSchema = z.object( {
     position: z.number().nonnegative(),
     time: z.number(), // a veces con el seek se pueden poner valores negativos
     audiofilters: z.object( {
+      // eslint-disable-next-line camelcase
       filter_0: z.string(), // puede haber filter_1, filter_2, etc
     } ).optional(), // si no se está reproduciendo, no hay audiofilters
     rate: z.number().nonnegative(),
@@ -31,7 +32,7 @@ const StatusResponseSchema = z.object( {
     random: z.boolean(),
     equalizer: z.string(),
     repeat: z.boolean(),
-    state: z.enum([ "playing", "paused", "stopped" ]),
+    state: z.enum(["playing", "paused", "stopped"]),
     currentplid: z.number(), // -1 si no hay nada cargado
     version: z.string(),
     subtitledelay: z.number(),
@@ -45,7 +46,7 @@ const StatusResponseSchema = z.object( {
     } ).strict(),
     volume: z.number(),
     information: z.object( {
-      category: z.array(CategoryObjectSchema).or(CategoryObjectSchema),
+      category: z.array(categoryObjectSchema).or(categoryObjectSchema),
     } ).strict(),
     stats: z.object( {
       demuxdiscontinuity: z.number(),
@@ -72,15 +73,14 @@ const StatusResponseSchema = z.object( {
   } ),
 } ).strict();
 
-type StatusResponse = z.infer<typeof StatusResponseSchema>;
-export default StatusResponse;
+export type StatusResponse = z.infer<typeof statusResponseSchema>;
 
-export type InfoStatusResponse = z.infer<typeof InfoElementSchema>;
+export type InfoStatusResponse = z.infer<typeof infoElementSchema>;
 
-export type CategoryObject = z.infer<typeof CategoryObjectSchema>;
+export type CategoryObject = z.infer<typeof categoryObjectSchema>;
 
-export type InfoObject = z.infer<typeof InfoElementSchema>;
+export type InfoObject = z.infer<typeof infoElementSchema>;
 
 export function assertIsStatusResponse(obj: unknown): asserts obj is StatusResponse {
-  StatusResponseSchema.parse(obj);
+  statusResponseSchema.parse(obj);
 }

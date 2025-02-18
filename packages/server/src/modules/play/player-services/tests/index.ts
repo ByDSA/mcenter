@@ -1,7 +1,3 @@
 export {
-  default as PlayStatusControllerMock,
-} from "./ControllerMock";
-
-export {
-  default as WebSocketsServiceMock,
+  WebSocketsServiceMock,
 } from "./WebSocketsServiceMock";

@@ -13,7 +13,6 @@ RUN yarn global add pnpm
 
 WORKDIR /packages
 COPY package.json pnpm-lock.yaml* ./
-COPY ./.eslintrc* ./
 
 COPY $APP/package.json ./app/
 
@@ -58,7 +57,6 @@ RUN cd shared && pnpm build
 FROM base AS builder
 WORKDIR /packages
 COPY --from=deps-build /packages/node_modules ./node_modules
-COPY --from=deps-build /packages/.eslintrc* ./
 
 # Para mostrar la versión global en producción
 COPY ./package.json ./

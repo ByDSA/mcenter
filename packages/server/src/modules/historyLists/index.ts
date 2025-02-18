@@ -1,23 +1,18 @@
 export {
-  Entry as HistoryEntry, Model as HistoryList,
-  ModelId as HistoryListId,
-  assertIsEntry as assertIsHistoryEntry, assertIsModel as assertIsHistoryList, createHistoryEntryByEpisodeFullId,
-} from "./models";
-
-export {
-  EntryRepository as HistoryEntryRepository, DocOdm as HistoryListDocOdm,
-  ModelOdm as HistoryListModelOdm, ListRepository as HistoryListRepository, docOdmToModel as historyListDocOdmToModel,
+  HistoryListEntryRepository as HistoryEntryRepository,
+  DocOdm as HistoryListDocOdm, docOdmToModel as historyListDocOdmToModel,
+  ModelOdm as HistoryListModelOdm, HistoryListRepository,
   modelToDocOdm as historyListToDocOdm,
 } from "./repositories";
 
 export {
-  default as HistoryListService,
+  HistoryListService,
 } from "./Service";
 
 export {
-  RestController as HistoryListRestController,
+  HistoryListRestController,
 } from "./controllers";
 
 export {
-  default as LastTimePlayedService,
+  LastTimePlayedService,
 } from "./LastTimePlayedService";

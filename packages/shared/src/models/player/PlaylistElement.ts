@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { assertZod } from "../../utils/validation/zod";
 
-export const PlaylistElementSchema = z.object( {
+export const playlistElementSchema = z.object( {
   name: z.string(),
   uri: z.string(),
   duration: z.number(),
@@ -9,9 +9,8 @@ export const PlaylistElementSchema = z.object( {
   current: z.boolean().optional(),
 } ).strict();
 
-type PlaylistELement = z.infer<typeof PlaylistElementSchema>;
-export default PlaylistELement;
+export type PlayerPlaylistElement = z.infer<typeof playlistElementSchema>;
 
-export function assertIsPlaylistElement(o: unknown): asserts o is PlaylistELement {
-  assertZod(PlaylistElementSchema, o);
+export function assertIsPlaylistElement(o: unknown): asserts o is PlayerPlaylistElement {
+  assertZod(playlistElementSchema, o);
 }

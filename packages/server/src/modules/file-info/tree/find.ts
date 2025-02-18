@@ -1,7 +1,7 @@
-import { ErrorElementResponse, FullResponse } from "#shared/utils/http";
-import { deepMerge } from "#shared/utils/objects";
 import fs, { Dirent } from "node:fs";
 import path from "node:path";
+import { ErrorElementResponse, FullResponse } from "#shared/utils/http";
+import { deepMerge } from "#shared/utils/objects";
 import { GetEpisodeIdOptions, getEpisodeSeasonAndEpisodeNumberFromFilePath, getSeasonEpisodeFromEpisodeId } from "./idGetter";
 import { Episode, Season, Serie } from "./models";
 
@@ -12,7 +12,10 @@ const DEFAULT_OPTIONS: Required<Options> = {
   baseFolder: "",
 };
 
-export default function findAllSeriesTreeAt(folderFullPath: string, options?: Options): FullResponse<Serie[]> {
+export function findAllSerieFolderTreesAt(
+  folderFullPath: string,
+  options?: Options,
+): FullResponse<Serie[]> {
   const actualOptions = deepMerge(DEFAULT_OPTIONS, options);
   const errors: ErrorElementResponse[] = [];
   const seriesNames = readFolderNamesIn(folderFullPath);
@@ -40,8 +43,9 @@ export default function findAllSeriesTreeAt(folderFullPath: string, options?: Op
           // eslint-disable-next-line no-continue
           continue;
 
-        const {id: episodeId, season: seasonId} = seasonEpisodeId;
-        const filePath = actualOptions.baseFolder + fileFullPath.substring(folderFullPath.length + 1);
+        const { id: episodeId, season: seasonId } = seasonEpisodeId;
+        const filePath = actualOptions.baseFolder
+          + fileFullPath.substring(folderFullPath.length + 1);
         const episode: Episode = {
           content: {
             episodeId,
@@ -88,7 +92,7 @@ function isValidEpisodeDirent(dirent: Dirent): boolean {
   if (!dirent.isFile())
     return false;
 
-  const {name} = dirent;
+  const { name } = dirent;
 
   if (name.startsWith("."))
     return false;
@@ -133,7 +137,7 @@ function getSeasonEpisodeId(filePath: string, options: GetEpisodeIdOptions): Epi
 
   if (season === null) {
     return {
-      id:episodeStr,
+      id: episodeStr,
       season: "",
     };
   }
@@ -146,13 +150,12 @@ function getSeasonEpisodeId(filePath: string, options: GetEpisodeIdOptions): Epi
 
 type Ret = {[key: string]: Episode[]};
 function duplicateEpisodeIdSafeChecker(episodes: Episode[]): ErrorElementResponse[] {
-  const duplicatedEpisodes: Ret = {
-  };
+  const duplicatedEpisodes: Ret = {};
   const duplicatedIds: string[] = [];
 
   for (let i = 0; i < episodes.length; i++) {
     const episode = episodes[i];
-    const {episodeId} = episode.content;
+    const { episodeId } = episode.content;
 
     if (!duplicatedIds.includes(episodeId)) {
       for (let j = i + 1; j < episodes.length; j++) {
@@ -174,8 +177,7 @@ function duplicateEpisodeIdSafeChecker(episodes: Episode[]): ErrorElementRespons
       acc[episodeId] = eps.map(episode => episode.content.filePath);
 
       return acc;
-    }, {
-    } as {[key: string]: string[]} );
+    }, {} as {[key: string]: string[]} );
     const error: ErrorElementResponse = {
       message,
       type: "DuplicatedEpisodeId",

@@ -1,9 +1,9 @@
 export {
-  default as EpisodeWeightFixerApplier,
+  EpisodeWeightFixerApplier,
   genEpisodeWeightFixerApplier,
 } from "./WeightFixerApplier";
 
 export {
-  default as EpisodeFilterApplier,
+  EpisodeFilterApplier,
   genEpisodeFilterApplier,
 } from "./FilterApplier";

@@ -1,26 +1,28 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { z } from "zod";
 import { AssertZodSettings, assertZodPopStack } from "../../utils/validation/zod";
-import { VOSchema } from "./VO";
+import { musicVoSchema } from "./VO";
 
-export const IDSchema = z.string();
+export const idSchema = z.string();
 
-export type Id = z.infer<typeof IDSchema>;
+export type MusicId = z.infer<typeof idSchema>;
 
-export const EntitySchema = VOSchema.merge(z.object( {
-  id: IDSchema,
+export const entitySchema = musicVoSchema.merge(z.object( {
+  id: idSchema,
 } ));
 
-export type Entity = z.infer<typeof EntitySchema>;
+export type Music = z.infer<typeof entitySchema>;
 
-export function assertIsEntity(model: unknown, settings?: AssertZodSettings): asserts model is Entity {
-  assertZodPopStack(EntitySchema, model, settings);
+export function assertIsMusic(
+  model: unknown,
+  settings?: AssertZodSettings,
+): asserts model is Music {
+  assertZodPopStack(entitySchema, model, settings);
 }
 
-export function parse(model: unknown): Entity {
-  return EntitySchema.parse(model);
+export function parseMusic(model: unknown): Music {
+  return entitySchema.parse(model);
 }
 
-export function compareId(a: Id, b: Id): boolean {
+export function compareMusicId(a: MusicId, b: MusicId): boolean {
   return a === b;
 }

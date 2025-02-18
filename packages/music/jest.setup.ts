@@ -1,7 +1,7 @@
+import { existsSync } from "node:fs";
 import * as dotenv from "dotenv";
 import mongoose from "mongoose";
-import { existsSync } from "node:fs";
-// eslint-disable-next-line import/no-relative-packages
+
 import { isDebugging } from "../shared/src/utils/vscode";
 
 function loadEnvsFile(p: string): void {

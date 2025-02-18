@@ -1,3 +1,3 @@
 export {
-  default as UpdateController,
+  EpisodesUpdateController,
 } from "./Controller";

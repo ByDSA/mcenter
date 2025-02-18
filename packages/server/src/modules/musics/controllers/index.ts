@@ -1,3 +1,3 @@
 export {
-  default as Controller,
+  MusicController,
 } from "./Controller";

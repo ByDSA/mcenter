@@ -1,8 +1,6 @@
-/* eslint-disable require-await */
-
 "use client";
 
-import List from "./List";
+import { List } from "./List";
 
 export default function Play() {
   return (

@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import fs from "node:fs";
 
 export function readIfExistsSync(path: string) {

@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { rootBackendUrl } from "#modules/requests";
 
 export const backendUrls = {

@@ -1,15 +1,14 @@
 import { DateType, assertIsDateType } from ".";
 
 const assertIsModel: typeof assertIsDateType = assertIsDateType;
+const MODEL_VALID: DateType = Object.freeze( {
+  year: 2021,
+  month: 1,
+  day: 1,
+  timestamp: 1234567890,
+} );
 
 describe("assert", () => {
-  const MODEL_VALID: DateType = {
-    year: 2021,
-    month: 1,
-    day: 1,
-    timestamp: 1234567890,
-  };
-
   it("should not throw an error when asserting a valid object", () => {
     const model = MODEL_VALID;
 
@@ -50,6 +49,7 @@ describe("assert", () => {
         assertIsModel(entry);
       } ).toThrow();
     } );
+
     it("should throw an error when asserting an entry object with an invalid property type", () => {
       const entry = {
         ...MODEL_VALID,

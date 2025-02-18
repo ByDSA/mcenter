@@ -1,25 +1,24 @@
-import { HistoryMusicListGetManyEntriesBySearchRequest, assertIsHistoryMusicListGetManyEntriesBySearchRequest } from "#shared/models/musics";
+import express, { Request, Response, Router } from "express";
+import { MusicRepository } from "../../repositories";
+import { MusicHistoryRepository } from "../repositories";
+import { GetManyCriteria } from "../repositories/Repository";
+import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchRequest } from "#musics/history/models/transport";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
-import express, { Request, Response, Router } from "express";
-import { Repository as MusicRepository } from "../../repositories";
-import { Repository } from "../repositories";
-import { GetManyCriteria } from "../repositories/Repository";
 
-const DepsMap = {
-  historyRepository: Repository,
+const DEPS_MAP = {
+  historyRepository: MusicHistoryRepository,
   musicRepository: MusicRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class RestController
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class MusicHistoryRestController
 implements
     Controller,
-    CanGetAll<Request, Response>
-{
+    CanGetAll<Request, Response> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -27,13 +26,13 @@ implements
   }
 
   async getAll(_: Request, res: Response): Promise<void> {
-    const got = this.#deps.historyRepository.getAll();
+    const got = await this.#deps.historyRepository.getAll();
 
     res.send(got);
   }
 
   async getManyEntriesBySearch(
-    req: HistoryMusicListGetManyEntriesBySearchRequest,
+    req: MusicHistoryListGetManyEntriesBySearchRequest,
     res: Response,
   ): Promise<void> {
     const criteria = bodyToCriteria(req.body);
@@ -48,10 +47,10 @@ implements
     router.use(express.json());
     router.post(
       "/:user/search",
-      validateReq(assertIsHistoryMusicListGetManyEntriesBySearchRequest),
+      validateReq(assertIsMusicHistoryListGetManyEntriesBySearchRequest),
       this.getManyEntriesBySearch.bind(this),
     );
-    router.options("/:user/search", (req, res) => {
+    router.options("/:user/search", (_req, res) => {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "POST,DELETE,OPTIONS");
       res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
@@ -62,7 +61,7 @@ implements
   }
 }
 
-function bodyToCriteria(body: HistoryMusicListGetManyEntriesBySearchRequest["body"]): GetManyCriteria {
+function bodyToCriteria(body: MusicHistoryListGetManyEntriesBySearchRequest["body"]): GetManyCriteria {
   const ret: GetManyCriteria = {
     expand: body.expand,
     limit: body.limit,
@@ -70,8 +69,7 @@ function bodyToCriteria(body: HistoryMusicListGetManyEntriesBySearchRequest["bod
   };
 
   if (body.filter) {
-    ret.filter = {
-    };
+    ret.filter = {};
 
     if (body.filter.resourceId)
       ret.filter.resourceId = body.filter.resourceId;

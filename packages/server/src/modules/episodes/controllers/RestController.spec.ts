@@ -1,29 +1,30 @@
-import { Episode, episodeDtoToModel, EpisodeGetManyBySearchRequest } from "#shared/models/episodes";
-import HttpStatusCode from "#shared/utils/http/StatusCode";
+import { HttpStatusCode } from "#shared/utils/http/StatusCode";
+import { Application } from "express";
+import request from "supertest";
+import { container } from "tsyringe";
+import { EpisodeRepository } from "../repositories";
+import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
+import { EpisodesRestController } from "./RestController";
+import { Episode } from "#episodes/models";
+import { expectEpisode, expectEpisodes } from "#episodes/models/test";
+import { episodeDtoToModel, EpisodeGetManyBySearchRequest } from "#episodes/models/transport";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
 import { resolveRequired } from "#utils/layers/deps";
-import { Application } from "express";
-import request from "supertest";
-import { container } from "tsyringe";
-import { expectEpisode, expectEpisodes } from "../models/test";
-import { Repository } from "../repositories";
-import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
-import RestController from "./RestController";
 
-describe("RestController", () => {
+describe("restController", () => {
   let routerApp: Application;
   let episodeRepositoryMock: RepositoryMock;
-  let controller: RestController;
+  let controller: EpisodesRestController;
 
-  beforeAll(async () => {
-    registerSingletonIfNotAndGet(Repository, RepositoryMock);
-    episodeRepositoryMock = resolveRequired(Repository) as RepositoryMock;
+  beforeAll(() => {
+    registerSingletonIfNotAndGet(EpisodeRepository, RepositoryMock);
+    episodeRepositoryMock = resolveRequired(EpisodeRepository) as RepositoryMock;
 
-    container.registerSingleton(RestController);
+    container.registerSingleton(EpisodesRestController);
 
-    controller = container.resolve(RestController);
+    controller = container.resolve(EpisodesRestController);
 
     controller.getManyBySearch = jest.fn(controller.getManyBySearch);
     routerApp = RouterApp(controller.getRouter());
@@ -44,8 +45,8 @@ describe("RestController", () => {
         .get("/serieId")
         .send();
 
-      expect(episodeRepositoryMock.getAllBySerieId).toBeCalledTimes(1);
-      expect(episodeRepositoryMock.getAllBySerieId).toBeCalledWith("serieId");
+      expect(episodeRepositoryMock.getAllBySerieId).toHaveBeenCalledTimes(1);
+      expect(episodeRepositoryMock.getAllBySerieId).toHaveBeenCalledWith("serieId");
     } );
 
     it("should return [] if serieId is not found in repository", async () => {
@@ -82,8 +83,8 @@ describe("RestController", () => {
         .get(URL)
         .send();
 
-      expect(episodeRepositoryMock.getOneById).toBeCalledTimes(1);
-      expect(episodeRepositoryMock.getOneById).toBeCalledWith( {
+      expect(episodeRepositoryMock.getOneById).toHaveBeenCalledTimes(1);
+      expect(episodeRepositoryMock.getOneById).toHaveBeenCalledWith( {
         serieId: "serieId",
         innerId: "innerId",
       } );
@@ -100,7 +101,7 @@ describe("RestController", () => {
     } );
 
     it("should return same as repository returns", async () => {
-      const expectedEpisode = EPISODES_SIMPSONS[0];
+      const [expectedEpisode] = EPISODES_SIMPSONS;
 
       episodeRepositoryMock.getOneById.mockResolvedValueOnce(expectedEpisode);
 
@@ -141,8 +142,8 @@ describe("RestController", () => {
 
       await request(routerApp)
         .patch(URL)
-        .send(partial)
-        .expect(HttpStatusCode.UNPROCESSABLE_ENTITY);
+        .expect(HttpStatusCode.UNPROCESSABLE_ENTITY)
+        .send(partial);
     } );
 
     it("should call repository", async () => {
@@ -152,8 +153,8 @@ describe("RestController", () => {
           entity: validPartial,
         } );
 
-      expect(episodeRepositoryMock.patchOneByIdAndGet).toBeCalledTimes(1);
-      expect(episodeRepositoryMock.patchOneByIdAndGet).toBeCalledWith( {
+      expect(episodeRepositoryMock.patchOneByIdAndGet).toHaveBeenCalledTimes(1);
+      expect(episodeRepositoryMock.patchOneByIdAndGet).toHaveBeenCalledWith( {
         serieId: "serieId",
         innerId: "innerId",
       }, validPartial);
@@ -172,7 +173,7 @@ describe("RestController", () => {
     } );
 
     it("should return same as repository returns", async () => {
-      const expectedEpisode = EPISODES_SIMPSONS[0];
+      const [expectedEpisode] = EPISODES_SIMPSONS;
 
       episodeRepositoryMock.patchOneByIdAndGet.mockResolvedValueOnce(expectedEpisode);
 
@@ -207,7 +208,7 @@ describe("RestController", () => {
         .post(URL)
         .send(body);
 
-      expect(controller.getManyBySearch).toBeCalledTimes(1);
+      expect(controller.getManyBySearch).toHaveBeenCalledTimes(1);
     } );
 
     it("should call repository", async () => {
@@ -215,11 +216,12 @@ describe("RestController", () => {
         .post(URL)
         .send(body);
 
-      expect(episodeRepositoryMock.getOneByPath).toBeCalledTimes(1);
-      expect(episodeRepositoryMock.getOneByPath).toBeCalledWith(path);
+      expect(episodeRepositoryMock.getOneByPath).toHaveBeenCalledTimes(1);
+      expect(episodeRepositoryMock.getOneByPath).toHaveBeenCalledWith(path);
     } );
+
     it("should return valid episode", async () => {
-      const expectedEpisode = EPISODES_SIMPSONS[0];
+      const [expectedEpisode] = EPISODES_SIMPSONS;
 
       episodeRepositoryMock.getOneByPath.mockResolvedValueOnce(expectedEpisode);
       const response = await request(routerApp)
@@ -228,6 +230,7 @@ describe("RestController", () => {
       const dto = response.body;
 
       expect(dto).toHaveLength(1);
+
       const episode = episodeDtoToModel(dto[0]);
 
       expectEpisode(episode, expectedEpisode);

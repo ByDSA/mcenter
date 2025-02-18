@@ -1,7 +1,7 @@
 export {
-  default as PlaySerieControllerMock,
+  PlaySerieControllerMock,
 } from "./PlaySerieControllerMock";
 
 export {
-  default as PlayStreamControllerMock,
+  PlayStreamControllerMock,
 } from "./PlayStreamControllerMock";

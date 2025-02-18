@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { Request } from "express";
 import { parseQuery } from "./1-str-to-obj/QueryParser";
 import { ExpressionNode, IntersectionNode, TagNode, WeightNode } from "./QueryObject";
@@ -34,9 +33,9 @@ function oldForm(req: Request): ExpressionNode | null {
 
   if (min !== null && max !== null) {
     weightNode = {
-      type:"weight",
+      type: "weight",
       value: {
-        type:"range",
+        type: "range",
         min,
         minIncluded: true,
         max,
@@ -45,18 +44,18 @@ function oldForm(req: Request): ExpressionNode | null {
     };
   } else if (min !== null) {
     weightNode = {
-      type:"weight",
+      type: "weight",
       value: {
-        type:"range",
+        type: "range",
         min,
         minIncluded: true,
       },
     };
   } else if (max !== null) {
     weightNode = {
-      type:"weight",
+      type: "weight",
       value: {
-        type:"range",
+        type: "range",
         max,
         maxIncluded: true,
       },
@@ -65,7 +64,7 @@ function oldForm(req: Request): ExpressionNode | null {
 
   if (tagsNode && weightNode) {
     return {
-      type:"intersection",
+      type: "intersection",
       child1: tagsNode,
       child2: weightNode,
     } satisfies IntersectionNode;

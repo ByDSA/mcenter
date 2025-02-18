@@ -1,10 +1,8 @@
-/* eslint-disable import/prefer-default-export */
-// eslint-disable-next-line import/no-internal-modules
 import { TimestampsModel } from "#shared/models/utils/dtos/Timestamps";
 import mongoose from "mongoose";
 
 type DocOdm = TimestampsModel;
-export const TimestampsSchemaOdm = new mongoose.Schema<DocOdm>( {
+export const timestampsSchemaOdm = new mongoose.Schema<DocOdm>( {
   createdAt: {
     type: Date,
     required: true,

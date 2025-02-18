@@ -1,9 +1,9 @@
 export {
-  default as HttpStatusCode,
+  HttpStatusCode,
 } from "./StatusCode";
 
 export {
-  default as HttpMethod,
+  HttpMethod,
 } from "./HttpMethod";
 
 export * from "./responses";

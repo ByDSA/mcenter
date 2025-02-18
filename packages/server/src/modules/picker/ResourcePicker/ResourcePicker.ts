@@ -1,5 +1,5 @@
-import { ResourceVO } from "#shared/models/resource";
+import { ResourceVO } from "#modules/resources/models";
 
-export default interface ResourcePicker<R extends ResourceVO = ResourceVO> {
+export interface ResourcePicker<R extends ResourceVO = ResourceVO> {
   pick(n: number): Promise<R[]>;
 }

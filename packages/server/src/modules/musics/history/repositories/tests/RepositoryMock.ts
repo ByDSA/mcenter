@@ -1,7 +1,7 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import Repository from "../Repository";
+import { MusicHistoryRepository } from "../Repository";
 
-export default class RepositoryMock implements PublicMethodsOf<Repository> {
+export class MusicHistoryRepositoryMock implements PublicMethodsOf<MusicHistoryRepository> {
   getManyCriteria = jest.fn();
 
   getLast = jest.fn();

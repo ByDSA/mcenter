@@ -7,13 +7,14 @@ export type PropInfo = {
   caption?: string;
   };
 
-export function schemaToReadableFormat<T>(schema: z.ZodObject<Record<keyof T, z.ZodTypeAny>>): Record<keyof T, PropInfo> {
+export function schemaToReadableFormat<T>(
+  schema: z.ZodObject<Record<keyof T, z.ZodTypeAny>>,
+): Record<keyof T, PropInfo> {
   return Object.entries(schema.shape).reduce((acc, [k, v]) => {
     acc[k as keyof T] = zodTypeToPropInfo(v as any);
 
     return acc;
-  }, {
-  } as Record<keyof T, PropInfo>);
+  }, {} as Record<keyof T, PropInfo>);
 }
 
 function zodTypeToPropInfo(zodType: z.ZodTypeAny): PropInfo {
@@ -37,7 +38,7 @@ function calcNativeType(zodType: z.ZodTypeAny): string {
   if (innerType)
     return calcNativeType(innerType);
 
-  const {typeName} = zodType._def;
+  const { typeName } = zodType._def;
   const typeNameStr = typeName?.toString() as string | undefined;
 
   switch (typeNameStr) {

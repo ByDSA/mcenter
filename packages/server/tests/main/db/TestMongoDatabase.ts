@@ -1,8 +1,8 @@
-import { DatabaseOptions, RealMongoDatabase } from "#main";
 import { assertIsDefined } from "#shared/utils/validation";
-import TestDatabase from "./TestDatabase";
+import { TestDatabase } from "./TestDatabase";
+import { DatabaseOptions, RealMongoDatabase } from "#main";
 
-export default class TestMongoDatabase extends RealMongoDatabase implements TestDatabase {
+export class TestMongoDatabase extends RealMongoDatabase implements TestDatabase {
   constructor(options?: DatabaseOptions) {
     super( {
       ...options,

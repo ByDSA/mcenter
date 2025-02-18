@@ -1,31 +1,31 @@
 export {
-  default as DependencyFilter,
+  DependencyFilter,
 } from "./DependencyFilter";
 
 export {
-  default as Filter,
+  Filter,
 } from "./Filter";
 
 export {
-  default as PreventDisabledFilter,
+  PreventDisabledFilter,
 } from "./PreventDisabledFilter";
 
 export {
-  default as PreventRepeatInTimeFilter,
+  PreventRepeatInTimeFilter,
 } from "./PreventRepeatInTimeFilter";
 
 export {
-  default as PreventRepeatInDaysFilter,
+  PreventRepeatInDaysFilter,
 } from "./PreventRepeatInDaysFilter";
 
 export {
-  default as PreventRepeatLastFilter,
+  PreventRepeatLastFilter,
 } from "./PreventRepeatLastFilter";
 
 export {
-  default as RemoveWeightLowerOrEqualThanFilter,
+  RemoveWeightLowerOrEqualThanFilter,
 } from "./MinWeightFilter";
 
 export {
-  default as FilterApplier,
+  FilterApplier,
 } from "./FilterApplier";

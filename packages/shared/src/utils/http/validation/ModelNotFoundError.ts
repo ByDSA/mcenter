@@ -1,17 +1,17 @@
 import { NotFoundError } from "./found";
 
-export const ModelNotFoundErrorName = "ModelNotFoundError";
+export const MODEL_NOT_FOUND_ERROR_NAME = "ModelNotFoundError";
 
 type Params = {
   id: string;
   modelName?: string;
 };
-export default class ModelNotFoundError extends NotFoundError {
+export class ModelNotFoundError extends NotFoundError {
   constructor(params: Params) {
     const { id } = params;
     const msg = `${params.modelName ?? "Model"} with id '${id}' not found`;
 
     super(msg);
-    this.name = ModelNotFoundErrorName;
+    this.name = MODEL_NOT_FOUND_ERROR_NAME;
   }
 }

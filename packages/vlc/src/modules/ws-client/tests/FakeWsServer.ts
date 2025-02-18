@@ -1,16 +1,14 @@
 import { Server as HttpServer, createServer } from "node:http";
-import { Server, Socket } from "socket.io";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Server } from "socket.io";
 
 type StartParams = {
   port: number;
 };
-export default class FakeWSServer {
+export class FakeWsServer {
   #server: Server;
 
-  #socket: Socket | undefined;
-
-  #eventHandlers: Record<string, (data: any)=> void> = {
-  };
+  #eventHandlers: Record<string, (data: any)=> void> = {};
 
   httpServer: HttpServer | undefined;
 
@@ -24,7 +22,6 @@ export default class FakeWSServer {
     this.#server = this.#create();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   #create() {
     const fakeServer = new Server( {
       path: this.#path,
@@ -44,8 +41,8 @@ export default class FakeWSServer {
   async start(params?: StartParams): Promise<void> {
     this.httpServer = createServer();
     await new Promise<void>((resolve) => {
-      const PORT = params?.port ?? 0;
-      const listener = this.httpServer?.listen(PORT, () => {
+      const port = params?.port ?? 0;
+      const listener = this.httpServer?.listen(port, () => {
         const address = listener?.address();
 
         if (!address)
@@ -64,8 +61,6 @@ export default class FakeWSServer {
     this.#server.listen(this.httpServer);
 
     this.#server.on("connection", (socket) => {
-      this.#socket = socket;
-
       for (const [event, handler] of Object.entries(this.#eventHandlers))
         socket.on(event, handler);
     } );

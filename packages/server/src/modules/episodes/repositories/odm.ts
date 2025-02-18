@@ -1,9 +1,8 @@
-// eslint-disable-next-line import/no-internal-modules
-import { TimestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { isDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
+import { EpisodeId } from "../models";
 import { TimestampsModel } from "#sharedSrc/models/utils/dtos/Timestamps";
-import { ModelId } from "../models";
+import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 
 export interface DocOdm {
   _id?: mongoose.Types.ObjectId;
@@ -17,12 +16,12 @@ export interface DocOdm {
   tags?: string[];
   disabled?: boolean;
   lastTimePlayed?: number;
-  timestamps?: TimestampsModel; // TODO: cambiar a true y modificar episodes en db
+  timestamps?: TimestampsModel; // TODO: cambiar a obligado y modificar episodes en db
 }
 
 const NAME = "Episode";
 
-export const SchemaOdm = new mongoose.Schema<DocOdm>( {
+export const schemaOdm = new mongoose.Schema<DocOdm>( {
   episodeId: {
     type: String,
     required: true,
@@ -63,7 +62,7 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
     type: Number,
   },
   timestamps: {
-    type: TimestampsSchemaOdm,
+    type: timestampsSchemaOdm,
     required: false, // TODO: cambiar a true y modificar episodes en db
   },
 }, {
@@ -71,9 +70,9 @@ export const SchemaOdm = new mongoose.Schema<DocOdm>( {
   autoIndex: false,
 } );
 
-export const ModelOdm = mongoose.model<DocOdm>(NAME, SchemaOdm);
+export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);
 
-export async function getIdModelOdmFromId(fullId: ModelId) {
+export async function getIdModelOdmFromId(fullId: EpisodeId) {
   const episodeOdm = await ModelOdm.findOne( {
     serieId: fullId.serieId,
     episodeId: fullId.innerId,

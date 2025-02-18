@@ -1,8 +1,8 @@
 import { PublicMethodsOf } from "#shared/utils/types";
+import { PlaySerieController } from "../PlaySerieController";
 import { getRouterMock } from "#tests/main";
-import PlaySerieController from "../PlaySerieController";
 
-export default class PlaySerieControllerMock implements PublicMethodsOf<PlaySerieController> {
+export class PlaySerieControllerMock implements PublicMethodsOf<PlaySerieController> {
   playSerie = jest.fn();
 
   getRouter = getRouterMock;

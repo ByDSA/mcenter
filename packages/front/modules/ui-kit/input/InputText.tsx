@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { useEffect, useMemo, useRef } from "react";
 import { InputTextNumberCommonProps, InputTextNumberReturnType, keyDownHandlerGenerator } from "./InputTextNumberCommon";
 
@@ -7,7 +6,7 @@ export type InputTextProps = InputTextNumberCommonProps<InputElement, string> & 
   onEmptyPressEnter?: ()=> void;
 };
 
-export function useInputText<T extends string = string>( {disabled, value, onChange, onPressEnter = "nothing"}: InputTextProps): InputTextNumberReturnType<T, InputElement> {
+export function useInputText<T extends string = string>( { disabled, value, onChange, onPressEnter = "nothing" }: InputTextProps): InputTextNumberReturnType<T, InputElement> {
   const ref = useRef(null as InputElement | null);
   const updateH = useMemo(()=>() => ref?.current && updateHeight( {
     value: ref.current.value,
@@ -121,7 +120,10 @@ function splitIntoWords(str: string): string[] {
   return words;
 }
 
-function useFirstTimeVisible<E extends HTMLElement>(ref: React.RefObject<E | null>, callback: (current: E)=> void) {
+function useFirstTimeVisible<E extends HTMLElement>(
+  ref: React.RefObject<E | null>,
+  callback: (current: E)=> void,
+) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -145,17 +147,16 @@ function useFirstTimeVisible<E extends HTMLElement>(ref: React.RefObject<E | nul
 
     observer.observe(ref.current);
 
-    // eslint-disable-next-line consistent-return
     return () => observer.disconnect();
   }, []);
 }
 
-const updateHeight = ( {value, element}: {value: string; element: InputElement} ) => {
+const updateHeight = ( { value, element }: {value: string;
+element: InputElement;} ) => {
   const rows = getVisualLines(element, value) || 1;
   const paddingTop = +window.getComputedStyle(element).paddingTop.replace("px", "");
   const paddingBottom = +window.getComputedStyle(element).paddingBottom.replace("px", "");
   const paddingHeight = paddingTop + paddingBottom;
 
-  // eslint-disable-next-line no-param-reassign
   element.style.height = `calc(${rows * 1.3}em + ${paddingHeight}px)`; // Set the height to the scrollHeight
 };

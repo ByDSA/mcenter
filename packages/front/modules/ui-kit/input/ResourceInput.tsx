@@ -2,17 +2,24 @@ import { JSX } from "react";
 import { InputNumberProps } from "./InputNumber";
 import { InputTextProps } from "./InputText";
 import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
-import ResourceInputNumber from "./ResourceInputNumber";
-import ResourceInputText from "./ResourceInputText";
+import { ResourceInputNumber } from "./ResourceInputNumber";
+import { ResourceInputText } from "./ResourceInputText";
 
-export type ResourceInputProps<R extends Object> = ResourceInputCommonProps<R> & {
+export type ResourceInputProps<R extends object> = ResourceInputCommonProps<R> & {
   caption?: JSX.Element | string;
   type?: "number" | "string";
   inputTextProps?: InputTextProps;
   inputNumberProps?: InputNumberProps;
 };
 
-export default function ResourceInput<R extends Object>( {caption, prop, resourceState, isOptional = false, error, type, inputNumberProps, inputTextProps }: ResourceInputProps<R>) {
+export function ResourceInput<R extends object>(
+  { caption,
+    prop, resourceState,
+    isOptional = false,
+    error,
+    type, inputNumberProps,
+    inputTextProps }: ResourceInputProps<R>,
+) {
   let input: JSX.Element;
 
   if (type === "number") {

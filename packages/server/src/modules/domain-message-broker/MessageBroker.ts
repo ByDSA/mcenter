@@ -1,6 +1,6 @@
 import { Consumer, EventQueue, MessageBroker } from "#utils/message-broker";
 
-export default class Broker<P = any> implements MessageBroker<P> {
+export class Broker<P = any> implements MessageBroker<P> {
   #queues: Map<string, EventQueue>;
 
   constructor() {
@@ -24,8 +24,6 @@ export default class Broker<P = any> implements MessageBroker<P> {
       this.#queues.set(queueKey, queue);
     }
 
-    queue.subscribe(queueKey, callback);
-
-    return Promise.resolve();
+    return queue.subscribe(queueKey, callback);
   }
 }

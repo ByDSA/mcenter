@@ -1,14 +1,17 @@
-import { CategoryObject, InfoObject, InfoStatusResponse, PlaylistELement, PlaylistResponse as VlcPlaylistResponse, StatusResponse as VlcStatusResponse } from "#modules/vlc/http-interface/responses";
-import { PlayerPlaylistElement, PlayerStatusResponse, assertIsPlayerStatusResponse } from "#shared/models/player";
 import { assertIsDefined } from "#shared/utils/validation";
 import { decode } from "html-entities";
+import { PlayerPlaylistElement, PlayerStatusResponse, assertIsPlayerStatusResponse } from "#modules/models";
+import { CategoryObject, InfoObject, InfoStatusResponse, PlaylistELement, PlaylistResponse as VlcPlaylistResponse, StatusResponse as VlcStatusResponse } from "#modules/vlc/http-interface/responses";
 
 type Obj = {
   [key: string]: string;
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export function vlcResponsesToGenericResponses(isVlcOpen: boolean, vlcStatusResponse: VlcStatusResponse | null | undefined, vlcPlayListResponse: VlcPlaylistResponse | undefined): PlayerStatusResponse {
+export function vlcResponsesToGenericResponses(
+  isVlcOpen: boolean,
+  vlcStatusResponse: VlcStatusResponse | null | undefined,
+  vlcPlayListResponse: VlcPlaylistResponse | undefined,
+): PlayerStatusResponse {
   const remoteStatus: VlcStatusResponse | null | undefined = vlcStatusResponse;
   const remotePlaylist: VlcPlaylistResponse | undefined = vlcPlayListResponse;
   const status: PlayerStatusResponse = {
@@ -42,8 +45,7 @@ export function vlcResponsesToGenericResponses(isVlcOpen: boolean, vlcStatusResp
             acc[i["@_name"]] = i["#text"];
 
             return acc;
-          }, {
-          } ),
+          }, {} ),
         } ));
       } else
         meta = category;

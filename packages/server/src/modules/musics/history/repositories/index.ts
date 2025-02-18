@@ -1,10 +1,9 @@
 export {
-  default as Repository,
+  MusicHistoryRepository,
 } from "./Repository";
 
 export * from "./adapters";
 
 export {
-  DocOdm,
-  ModelOdm,
+  ModelOdm, type DocOdm,
 } from "./odm";

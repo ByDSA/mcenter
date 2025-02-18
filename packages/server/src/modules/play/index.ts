@@ -1,17 +1,16 @@
 export {
-  default as PlaySerieController,
+  PlaySerieController,
 } from "./PlaySerieController";
 
 export {
-  default as PlayStreamController,
+  PlayStreamController,
 } from "./PlayStreamController";
 
 export {
-  default as PlayService,
+  PlayService,
 } from "./PlayService";
 
 export {
-  RemoteFrontPlayerController as RemotePlayerController,
   FrontWebSocketsServerService as RemotePlayerWebSocketsServerService,
   VlcBackWebSocketsServerService,
 } from "./player-services";

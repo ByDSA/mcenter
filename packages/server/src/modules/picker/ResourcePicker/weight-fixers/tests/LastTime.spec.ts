@@ -1,10 +1,10 @@
+import { secondsElapsedFrom } from "../../utils";
+import { Fx, LastTimeWeightFixer } from "../LastTime";
 import { SECONDS_IN_DAY } from "#modules/resources";
+import { ResourceVO } from "#modules/resources/models";
 import { genLastTimePlayedAgo, genLastTimePlayedDaysAgo } from "#modules/resources/tests";
-import { ResourceVO } from "#shared/models/resource";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { useFakeTime } from "#tests/time";
-import { secondsElapsedFrom } from "../../utils";
-import LastTimeWeightFixer, { Fx } from "../LastTime";
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
@@ -110,7 +110,7 @@ const cases = [
   },
 ] as Case[];
 
-describe.each(cases)("LastTimeWeightFixer", (testCase) => {
+describe.each(cases)("lastTimeWeightFixer", (testCase) => {
   it(`should return ${testCase.expectedWeight} when initialWeight = ${testCase.initialWeight}, seconds ago = ${secondsElapsedFrom(testCase.resource.lastTimePlayed ?? 0)} and fx=${testCase.fx === fxDays ? "fxDays" : "fx"}`, async () => {
     const weightFixer = new LastTimeWeightFixer( {
       fx: testCase.fx,

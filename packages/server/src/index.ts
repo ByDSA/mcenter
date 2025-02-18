@@ -1,18 +1,19 @@
 import "reflect-metadata";
 
+import { container } from "tsyringe";
+import { ExpressApp, RealMongoDatabase } from "./main";
+import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController, SavedSerieTreeService } from "#episodes/index";
 import { ActionController } from "#modules/actions";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
-import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController, SavedSerieTreeService } from "#modules/episodes";
 import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
 import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
-import { MusicController, MusicHistoryRepository, MusicRepository } from "#modules/musics";
-import { PlaySerieController, PlayStreamController, RemotePlayerController, RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
+import { PlaySerieController, PlayStreamController, RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
 import { SerieRepository } from "#modules/series";
 import { StreamRestController } from "#modules/streams";
-import { container } from "tsyringe";
-import { ExpressApp, RealMongoDatabase } from "./main";
+import { MusicController, MusicHistoryRepository, MusicRepository } from "#musics/index";
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async function main() {
   container
     .registerSingleton(DomainMessageBroker)
@@ -33,7 +34,6 @@ import { ExpressApp, RealMongoDatabase } from "./main";
     .registerSingleton(VlcBackWebSocketsServerService)
     .registerSingleton(RemotePlayerWebSocketsServerService)
 
-    .registerSingleton(RemotePlayerController)
     .registerSingleton(PlaySerieController)
     .registerSingleton(EpisodeRestController)
     .registerSingleton(MusicController)
@@ -55,7 +55,8 @@ import { ExpressApp, RealMongoDatabase } from "./main";
     },
   } );
   const vlcBackWebSocketsServerService = container.resolve(VlcBackWebSocketsServerService);
-  const remotePlayerWebSocketsServerService = container.resolve(RemotePlayerWebSocketsServerService);
+  const remotePlayerWebSocketsServerService = container
+    .resolve(RemotePlayerWebSocketsServerService);
 
   app.onHttpServerListen((server) => {
     vlcBackWebSocketsServerService.startSocket(server);
@@ -65,5 +66,5 @@ import { ExpressApp, RealMongoDatabase } from "./main";
   container.registerInstance(ExpressApp, app);
 
   await app.init();
-  app.listen();
+  await app.listen();
 } )();

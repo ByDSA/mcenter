@@ -1,5 +1,5 @@
-import { Pickable } from "#shared/models/resource";
-import MinWeightFilter from "../MinWeightFilter";
+import { RemoveWeightLowerOrEqualThanFilter } from "../MinWeightFilter";
+import { Pickable } from "#modules/resources/models";
 
 const W3: Pickable = {
   weight: 3,
@@ -29,9 +29,9 @@ describe.each([
   [W3, 2, true],
   [W0, 0, true],
   [W7, 0, true],
-] as Case[])("MinWeightFilter", (self, num, expected) => {
+] as Case[])("minWeightFilter", (self, num, expected) => {
   it(`should return ${expected} when weight = ${self.weight} and min = ${num}`, async () => {
-    const filter = new MinWeightFilter(num);
+    const filter = new RemoveWeightLowerOrEqualThanFilter(num);
     const result = await filter.filter(self);
 
     expect(result).toBe(expected);

@@ -1,3 +1,3 @@
 export {
-  default as VlcBackWebSocketsServerService,
+  VlcBackWSService as VlcBackWebSocketsServerService,
 } from "./VlcBackWSServerService";

@@ -1,10 +1,10 @@
-import { ResourceVO } from "#shared/models/resource";
 import { assertIsDefined, assertIsNotEmpty } from "#shared/utils/validation";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
-import ResourcePicker from "./ResourcePicker";
+import { ResourcePicker } from "./ResourcePicker";
 import { FilterApplier } from "./filters";
 import { WeightFixerApplier } from "./weight-fixers";
+import { ResourceVO } from "#modules/resources/models";
 
 type Params<R extends ResourceVO> = {
   resources: R[];
@@ -12,7 +12,7 @@ type Params<R extends ResourceVO> = {
   filterApplier: FilterApplier<R>;
   weightFixerApplier: WeightFixerApplier<R>;
 };
-export default class RandomPicker<R extends ResourceVO> implements ResourcePicker<R> {
+export class ResourcePickerRandom<R extends ResourceVO> implements ResourcePicker<R> {
   #params: Params<R>;
 
   constructor(params: Params<R>) {
@@ -21,7 +21,7 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
 
   async pick(n: number): Promise<R[]> {
     const ret: R[] = [];
-    let {lastOne: lastEp} = this.#params;
+    let { lastOne: lastEp } = this.#params;
 
     for (let i = 0; i < n; i++) {
       const picker = await genRandomPickerWithData( {
@@ -44,7 +44,9 @@ export default class RandomPicker<R extends ResourceVO> implements ResourcePicke
   }
 }
 
-export async function genRandomPickerWithData<R extends ResourceVO>( {resources, filterApplier, weightFixerApplier }: Params<R>): Promise<Picker<R>> {
+export async function genRandomPickerWithData<R extends ResourceVO>(
+  { resources, filterApplier, weightFixerApplier }: Params<R>,
+): Promise<Picker<R>> {
   assertIsDefined(resources, "Undefined resources");
   assertIsNotEmpty(resources, "Empty resources");
 

@@ -1,26 +1,27 @@
+import { showError } from "#shared/utils/errors/showError";
+import { LogElementResponse } from "#shared/utils/http";
+import { Stream, StreamId, StreamMode, StreamOriginType } from "../models";
+import { streamDocOdmToModel, streamToDocOdm } from "./adapters";
+import { DocOdm, ModelOdm } from "./odm";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#modules/series";
-import { SERIES_QUEUE_NAME, assertIsSerie } from "#shared/models/series";
-import { LogElementResponse } from "#shared/utils/http";
+import { SERIES_QUEUE_NAME, assertIsSerie } from "#series/models";
 import { EventType } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
-import { Mode, Model, ModelId, OriginType } from "../models";
-import { docOdmToModel, modelToDocOdm } from "./adapters";
-import { DocOdm, ModelOdm } from "./odm";
 
-const DepsMap = {
+const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class Repository
-implements CanGetOneById<Model, ModelId>,
-CanUpdateOneById<Model, ModelId>,
-CanCreateOne<Model>, CanGetAll<Model> {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class StreamsRepository
+implements CanGetOneById<Stream, StreamId>,
+CanUpdateOneById<Stream, StreamId>,
+CanCreateOne<Stream>, CanGetAll<Stream> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -37,7 +38,7 @@ CanCreateOne<Model>, CanGetAll<Model> {
       }
 
       return Promise.resolve();
-    } );
+    } ).catch(showError);
   }
 
   async fixDefaultStreamForSerie(serieId: SerieId): Promise<LogElementResponse | null> {
@@ -55,22 +56,21 @@ CanCreateOne<Model>, CanGetAll<Model> {
     return null;
   }
 
-  async getAll(): Promise<Model[]> {
+  async getAll(): Promise<Stream[]> {
     const allStreamsDocOdm = await this.#getAllDocOdm();
 
-    return allStreamsDocOdm.map(docOdmToModel);
+    return allStreamsDocOdm.map(streamDocOdmToModel);
   }
 
   async #getAllDocOdm(): Promise<DocOdm[]> {
-    const allStreamsDocOdm = await ModelOdm.find( {
-    }, {
+    const allStreamsDocOdm = await ModelOdm.find( {}, {
       _id: 0,
     } );
 
     return allStreamsDocOdm;
   }
 
-  async getManyBySerieId(id: SerieId): Promise<Model[]> {
+  async getManyBySerieId(id: SerieId): Promise<Stream[]> {
     const allStreamsDocOdm = await this.#getAllDocOdm();
     const docsOdm = allStreamsDocOdm.filter(streamDocOdm => {
       const origins = streamDocOdm.group.origins.filter(o=>o.type === "serie" && o.id === id);
@@ -78,20 +78,20 @@ CanCreateOne<Model>, CanGetAll<Model> {
       return origins.length > 0;
     } );
 
-    return docsOdm.map(docOdmToModel);
+    return docsOdm.map(streamDocOdmToModel);
   }
 
   async createDefaultFromSerie(serieId: SerieId): Promise<void> {
-    const stream: Model = {
+    const stream: Stream = {
       group: {
         origins: [
           {
-            type: OriginType.SERIE,
+            type: StreamOriginType.SERIE,
             id: serieId,
           },
         ],
       },
-      mode: Mode.SEQUENTIAL,
+      mode: StreamMode.SEQUENTIAL,
       id: serieId,
     };
 
@@ -102,7 +102,7 @@ CanCreateOne<Model>, CanGetAll<Model> {
     const streamDocOdm = await ModelOdm.findOne( {
       "group.origins": {
         $elemMatch: {
-          type: OriginType.SERIE,
+          type: StreamOriginType.SERIE,
           id: serieId,
         },
       },
@@ -111,13 +111,13 @@ CanCreateOne<Model>, CanGetAll<Model> {
     return !!streamDocOdm;
   }
 
-  async createOne(stream: Model): Promise<void> {
-    const docOdm = modelToDocOdm(stream);
+  async createOne(stream: Stream): Promise<void> {
+    const docOdm = streamToDocOdm(stream);
 
     await ModelOdm.create(docOdm);
   }
 
-  async getOneById(id: ModelId): Promise<Model | null> {
+  async getOneById(id: StreamId): Promise<Stream | null> {
     const docOdm = await ModelOdm.findOne( {
       id,
     }, {
@@ -127,11 +127,11 @@ CanCreateOne<Model>, CanGetAll<Model> {
     if (!docOdm)
       return null;
 
-    return docOdmToModel(docOdm);
+    return streamDocOdmToModel(docOdm);
   }
 
-  async updateOneById(id: ModelId, stream: Model): Promise<void> {
-    const docOdm = modelToDocOdm(stream);
+  async updateOneById(id: StreamId, stream: Stream): Promise<void> {
+    const docOdm = streamToDocOdm(stream);
 
     await ModelOdm.findOneAndUpdate( {
       id,

@@ -1,9 +1,10 @@
-import { PlayerActions } from "#shared/models/player";
 import { FastRewind, Pause, SkipNext, SkipPrevious, Stop } from "@mui/icons-material";
 import FastForwardIcon from "@mui/icons-material/FastForward";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useState } from "react";
+import { showError } from "#shared/utils/errors/showError";
 import styles from "./MediaPlayer.module.css";
+import { PlayerActions } from "#modules/remote-player/models";
 
 enum TimeMode {
   FORWARD,
@@ -28,9 +29,12 @@ type Props = {
   player: PlayerActions;
 };
 
-export default function MediaPlayer( { meta:{title, artist}, state, volume, time:{current = 0, start = 0, length}, player }: Props) {
+export function MediaPlayer( { meta: { title, artist },
+  state, volume,
+  time: { current = 0, start = 0, length }, player }: Props) {
   const currentStartFixed = current - start;
-  const {current: currentTime, endsAt, remaining, length: lengthStr} = timeRepresentation(currentStartFixed, length);
+  const { current: currentTime, endsAt,
+    remaining, length: lengthStr } = timeRepresentation(currentStartFixed, length);
   const percentage = length !== undefined ? (currentStartFixed / length) * 100 : 0;
   const [mode, setMode] = useState(TimeMode.FORWARD);
   let time1;
@@ -62,7 +66,11 @@ export default function MediaPlayer( { meta:{title, artist}, state, volume, time
             <h3 className={styles.artist}>{artist}</h3>
           </header>
           <section>
-            <div className={styles.timeDiv}><span className={styles.time} onClick={onClickChangeMode}>{time1}</span>{progressBar(percentage, player.seek.bind(player), start, length)}<span className={styles.time} onClick={onClickChangeMode}>{time2}</span></div>
+            <div className={styles.timeDiv}><span className={styles.time}
+              onClick={onClickChangeMode}>{time1}</span>{
+              progressBar(percentage, player.seek.bind(player), start, length)
+            }<span className={styles.time} onClick={onClickChangeMode}>{time2}</span>
+            </div>
             <span className={styles.controls}>
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.previous()}><SkipPrevious fontSize="large"/></span>
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.seek(-10)}><FastRewind fontSize="large" /></span>
@@ -132,7 +140,8 @@ function progressBarOnClick(seek: SeekFunction, start: number, length: number) {
     const percentage = (x / width) * 100;
     const secs = Math.round((length) * (percentage / 100)) + start;
 
-    seek(secs);
+    seek(secs)
+      .catch(showError);
   };
 }
 
@@ -143,8 +152,8 @@ function secToHMS(sec: number): string {
     return TIME_UNDEFINED;
 
   const hours = Math.floor(sec / 3600);
-  const minutes = Math.floor((sec - hours * 3600) / 60);
-  const seconds = Math.floor(sec - hours * 3600 - minutes * 60);
+  const minutes = Math.floor((sec - (hours * 3600)) / 60);
+  const seconds = Math.floor(sec - (hours * 3600) - (minutes * 60));
 
   if (hours === 0)
     return `${padZero(minutes)}:${padZero(seconds)}`;
@@ -166,7 +175,7 @@ function timeRepresentation(time: number, length: number) {
   if (hasTime) {
     timeStr = secToHMS(time);
     remainingStr = secToHMS(length - time);
-    endsAtStr = new Date((new Date().getTime() + (length - time) * 1000)).toLocaleTimeString();
+    endsAtStr = new Date((new Date().getTime() + ((length - time) * 1000))).toLocaleTimeString();
   }
 
   return {
@@ -177,7 +186,10 @@ function timeRepresentation(time: number, length: number) {
   };
 }
 
-function playPauseButton(state: string | undefined, pauseToggle: ()=> Promise<void>): React.JSX.Element {
+function playPauseButton(
+  state: string | undefined,
+  pauseToggle: ()=> Promise<void>,
+): React.JSX.Element {
   let contentStr: React.JSX.Element;
 
   if (state === "playing")

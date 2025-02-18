@@ -8,11 +8,13 @@ type Result = {
   season: string | null;
   episode: number | string;
 };
-/* eslint-disable import/prefer-default-export */
-export function getEpisodeSeasonAndEpisodeNumberFromFilePath(filePath: string, options: GetEpisodeIdOptions): Result | null {
+
+export function getEpisodeSeasonAndEpisodeNumberFromFilePath(
+  filePath: string,
+  options: GetEpisodeIdOptions,
+): Result | null {
   const relativeToSerieFolderPath = path.relative(options.serieFolder, filePath);
-  const basename =
-  path.basename(relativeToSerieFolderPath);
+  const basename = path.basename(relativeToSerieFolderPath);
   let episodeNameWithoutExtension = basename.substring(0, basename.lastIndexOf("."));
 
   episodeNameWithoutExtension = removeInvalidStrings(episodeNameWithoutExtension).trim();
@@ -33,7 +35,10 @@ episodeIndex: number;
 } | {
 episodeTransform: (matches: RegExpMatchArray)=> string | null;
 } );
-function getFromBasenameAndFilePath(filePath: string, basenameWithoutExtension: string): Result | null {
+function getFromBasenameAndFilePath(
+  filePath: string,
+  basenameWithoutExtension: string,
+): Result | null {
   let seasonFolder: string | null = path.dirname(filePath);
 
   if (seasonFolder === ".")
@@ -45,7 +50,7 @@ function getFromBasenameAndFilePath(filePath: string, basenameWithoutExtension: 
       episodeIndex: 1,
     },
     {
-      pattern:/(\d+)x(\d+)-(\d+)/,
+      pattern: /(\d+)x(\d+)-(\d+)/,
       seasonIndex: 1,
       episodeTransform: (matches: RegExpMatchArray): string | null => {
         const epA = +matches[2];
@@ -54,11 +59,11 @@ function getFromBasenameAndFilePath(filePath: string, basenameWithoutExtension: 
         if (epA >= epB)
           return null;
 
-        return `${epA.toString().padStart(2,"0")}-${epB.toString().padStart(2,"0")}`;
+        return `${epA.toString().padStart(2, "0")}-${epB.toString().padStart(2, "0")}`;
       },
     },
     {
-      pattern:/(\d+)x(\d+)/,
+      pattern: /(\d+)x(\d+)/,
       seasonIndex: 1,
       episodeIndex: 2,
     },

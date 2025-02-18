@@ -1,18 +1,18 @@
 {
+  "files.exclude": {
+    ".vscode": true,
+    "bin": true,
+    "build": true,
+    "node_modules": true
+  },
   "runOnSave.commands": [
     {
-      "globMatch": "**/shared/**",
       "command": "workspaceFolder=${workspaceFolder} ${workspaceFolder}/bin/on-save.mjs &",
+      "finishStatusMessage": "${workspaceFolderBasename} compiled",
+      "globMatch": "**/shared/**",
       "runIn": "terminal",
       "runningStatusMessage": "Compiling ${workspaceFolderBasename}...",
-      "finishStatusMessage": "${workspaceFolderBasename} compiled",
       "terminalHideTimeout": 3000
     }
-  ],
-  "files.exclude": {
-    "node_modules": true,
-    "build": true,
-    ".vscode": true,
-    "bin": true
-  }
+  ]
 }

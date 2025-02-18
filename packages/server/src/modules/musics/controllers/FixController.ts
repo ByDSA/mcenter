@@ -1,21 +1,19 @@
-/* eslint-disable no-use-before-define */
 import { PublicMethodsOf } from "#shared/utils/types";
+import { Router } from "express";
+import { MusicRepository } from "../repositories";
 import { SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Router } from "express";
-import { MusicRepository } from "..";
-import { Repository } from "../repositories";
 
 const API = "/api";
 const CREATE = `${API}/create`;
 const ROUTE_CREATE_YT = `${CREATE}/yt`;
-const DepsMap = {
-  musicRepository: Repository,
+const DEPS_MAP = {
+  musicRepository: MusicRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class FixController {
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class MusicFixController {
   #musicRepository: PublicMethodsOf<MusicRepository>;
 
   constructor(deps?: Partial<Deps>) {

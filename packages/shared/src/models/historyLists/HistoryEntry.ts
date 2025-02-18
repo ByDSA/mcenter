@@ -1,32 +1,31 @@
 import { z } from "zod";
-import { DateTypeSchema } from "../../utils/time";
+import { dateTypeSchema } from "../../utils/time";
 import { assertZodPopStack } from "../../utils/validation/zod";
 import { EpisodeIdSchema, EpisodeSchema } from "../episodes";
 import { SerieSchema } from "../series";
 
-export const EntrySchema = z.object( {
+export const entrySchema = z.object( {
   episodeId: EpisodeIdSchema,
-  date: DateTypeSchema,
+  date: dateTypeSchema,
   serie: SerieSchema.optional(),
   episode: EpisodeSchema.optional(),
 } ).strict();
 
-export const EntryWithIdSchema = EntrySchema.extend( {
+export const entryWithIdSchema = entrySchema.extend( {
   id: z.string(),
   historyListId: z.string(),
 } ).strict();
 
-type Entry = z.infer<typeof EntrySchema>;
-export default Entry;
+export type HistoryEntry = z.infer<typeof entrySchema>;
 
 export type EntryId = string;
 
-export type EntryWithId = z.infer<typeof EntryWithIdSchema>;
+export type EntryWithId = z.infer<typeof entryWithIdSchema>;
 
-export function assertIsEntry(model: unknown): asserts model is Entry {
-  assertZodPopStack(EntrySchema, model);
+export function assertIsHistoryEntry(model: unknown): asserts model is HistoryEntry {
+  assertZodPopStack(entrySchema, model);
 }
 
-export function assertIsEntryWithId(model: unknown): asserts model is EntryWithId {
-  assertZodPopStack(EntryWithIdSchema, model);
+export function assertIsHistoryEntryWithId(model: unknown): asserts model is EntryWithId {
+  assertZodPopStack(entryWithIdSchema, model);
 }

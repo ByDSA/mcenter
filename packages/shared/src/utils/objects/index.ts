@@ -1,17 +1,17 @@
 export {
-  default as deepMerge,
+  deepMerge,
 } from "./ts-deepmerge";
 
 export {
-  default as mergeOpts,
+  mergeOpts,
 } from "./mergeOpts";
 
 export {
-  default as deepFreeze,
+  deepFreeze,
 } from "./deepFreeze";
 
 export {
-  default as removeUndefinedValues,
+  removeUndefinedValues,
 } from "./removeUndefinedValues";
 
 export * from "./types";

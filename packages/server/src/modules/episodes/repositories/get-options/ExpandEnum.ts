@@ -1,5 +1,3 @@
-enum ExpandEnum {
+export enum ExpandEnum {
   FileInfo = "fileInfo",
 }
-
-export default ExpandEnum;

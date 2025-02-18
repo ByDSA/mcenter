@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-conditional-expect */
 import { IntersectionNode, TagNode, UnionNode, WeightNode, YearNode } from "../QueryObject";
 import { parseQuery } from "./QueryParser";
 
@@ -304,6 +305,7 @@ it("double union operator", () => {
 
   expect(obj).toEqual(expected);
 } );
+
 it("double intersection operator", () => {
   const query = "tag:rock * tag:pop * tag:jazz";
   const obj = parseQuery(query);
@@ -437,11 +439,11 @@ it("difference operator", () => {
     root: {
       type: "difference",
       child1: {
-        type:"tag",
-        value:"rock",
+        type: "tag",
+        value: "rock",
       } satisfies TagNode,
       child2: {
-        type:"tag",
+        type: "tag",
         value: "pop",
       } satisfies TagNode,
     },

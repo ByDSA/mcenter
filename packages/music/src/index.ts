@@ -4,8 +4,8 @@ import { ENVS } from "./env";
 const app = express();
 
 app.get("/api/get/random", (req: Request, res: Response) => {
-  const {redirectServer} = ENVS;
-  const {tags} = req.query;
+  const { redirectServer } = ENVS;
+  const { tags } = req.query;
   let query = "";
 
   if (tags)

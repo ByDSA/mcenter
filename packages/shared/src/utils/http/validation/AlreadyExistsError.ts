@@ -1,11 +1,11 @@
-import HttpStatusCode from "../StatusCode";
-import HttpError from "./HttpError";
+import { HttpStatusCode } from "../StatusCode";
+import { HttpError } from "./HttpError";
 
-export const AlreadyExistsErrorName = "AlreadyExistsError";
+export const ERROR_NAME = "AlreadyExistsError";
 
-export default class AlreadyExistsError extends HttpError {
+export class AlreadyExistsError extends HttpError {
   constructor(message?: string) {
     super(HttpStatusCode.CONFLICT, message);
-    this.name = AlreadyExistsErrorName;
+    this.name = ERROR_NAME;
   }
 }

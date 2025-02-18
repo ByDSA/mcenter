@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 import fs from "node:fs";
 import { join } from "node:path";
-import Database from "../../../src/main/db/Database";
+import { RealDatabase as Database } from "../../../src/main/db/Database";
 import { ModelMigration } from "./ModelMigration";
 import { assertIsModel as assertIsFileInfo } from "./new/FileInfo/FileInfoVideo";
 import { docOdmToModel as fileInfoOdmToModel } from "./new/FileInfo/adapters";

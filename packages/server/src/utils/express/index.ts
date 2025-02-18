@@ -1,19 +1,19 @@
 export {
-  default as errorHandler,
+  errorHandler,
 } from "./errorHandler";
 
 export * from "./handlers";
 
 export {
-  default as App,
+  App,
 } from "./App";
 
 export {
-  default as SecureRouter,
+  SecureRouter,
 } from "./SecureRouter";
 
 export {
-  default as Controller,
+  Controller,
 } from "./Controller";
 
 export * from "./Middlewares";

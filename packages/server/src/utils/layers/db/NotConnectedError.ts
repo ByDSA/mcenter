@@ -1,4 +1,4 @@
-export default class NotConnectedError extends Error {
+export class DatabaseNotConnectedError extends Error {
   constructor(msg?: string) {
     super(msg ?? "Database is not connected");
   }

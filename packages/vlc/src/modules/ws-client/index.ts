@@ -1,3 +1,3 @@
 export {
-  default as WebSocketsService,
+  WebSocketsService,
 } from "./WebSocketsService";

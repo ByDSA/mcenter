@@ -1,3 +1,3 @@
 export {
-  default as VLCProcessService,
+  VLCProcessService,
 } from "./Service";

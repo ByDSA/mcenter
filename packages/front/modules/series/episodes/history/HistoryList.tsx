@@ -1,15 +1,15 @@
-import { FetchingRender } from "#modules/fetching";
-import { HistoryEntryWithId } from "#shared/models/historyLists";
 import { Fragment } from "react";
-import HistoryEntryElement from "./entry/HistoryEntry";
+import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { useRequest } from "./requests";
 import { getDateStr } from "./utils";
+import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
+import { FetchingRender } from "#modules/fetching";
 
 import "#styles/resources/history-entry.css";
 import "#styles/resources/history-episodes.css";
 import "#styles/resources/serie.css";
 
-export default function HistoryList() {
+export function HistoryList() {
   return FetchingRender<Required<HistoryEntryWithId>[]>( {
     useRequest,
     render: (data) => (
@@ -18,8 +18,11 @@ export default function HistoryList() {
           data && data.map((entry: HistoryEntryWithId, i: number) => {
             let dayTitle;
 
-            if (i === 0 || !isSameday(data[i - 1].date.timestamp, entry.date.timestamp))
-              dayTitle = <h2 key={getDateStr(new Date(entry.date.timestamp * 1000))}>{getDateStr(new Date(entry.date.timestamp * 1000))}</h2>;
+            if (i === 0 || !isSameday(data[i - 1].date.timestamp, entry.date.timestamp)) {
+              dayTitle = <h2 key={getDateStr(new Date(entry.date.timestamp * 1000))}>{
+                getDateStr(new Date(entry.date.timestamp * 1000))
+              }</h2>;
+            }
 
             return <Fragment key={`${entry.episodeId.serieId} ${entry.episodeId.innerId}`}>
               {dayTitle}
@@ -38,7 +41,7 @@ function isSameday(timestamp1: number, timestamp2: number) {
   const date1 = new Date(timestamp1 * 1000);
   const date2 = new Date(timestamp2 * 1000);
 
-  return date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate();
+  return date1.getFullYear() === date2.getFullYear()
+    && date1.getMonth() === date2.getMonth()
+    && date1.getDate() === date2.getDate();
 }

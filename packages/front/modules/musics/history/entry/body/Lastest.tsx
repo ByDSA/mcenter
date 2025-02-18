@@ -1,11 +1,13 @@
+import { backendUrls } from "../../requests";
+import { MusicHistoryEntry } from "#modules/musics/history/models";
+import { assertIsMusicVO } from "#modules/musics/models";
 import { LatestHistoryEntries } from "#modules/history";
 import { DateFormat } from "#modules/utils/dates";
-import { HistoryMusicEntry, HistoryMusicListGetManyEntriesBySearchRequest, assertIsHistoryMusicListGetManyEntriesBySearchResponse, assertIsMusicVO } from "#shared/models/musics";
-import { backendUrls } from "../../requests";
+import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchResponse } from "#modules/musics/history/models/transport";
 
 type Props = {
   resourceId: string;
-  date: HistoryMusicEntry["date"];
+  date: MusicHistoryEntry["date"];
   dateFormat?: DateFormat;
 };
 const DATE_FORMAT_DEFAULT: DateFormat = {
@@ -13,25 +15,27 @@ const DATE_FORMAT_DEFAULT: DateFormat = {
   ago: "yes",
 };
 
-type ReqBody = HistoryMusicListGetManyEntriesBySearchRequest["body"];
+type ReqBody = MusicHistoryListGetManyEntriesBySearchRequest["body"];
 
-export default function LastestComponent( {resourceId, date, dateFormat = DATE_FORMAT_DEFAULT}: Props) {
+export function LastestComponent(
+  { resourceId, date, dateFormat = DATE_FORMAT_DEFAULT }: Props,
+) {
   const url = backendUrls.crud.search( {
     user: "user",
   } );
   const body: ReqBody = {
-    "filter": {
+    filter: {
       resourceId,
       timestampMax: date.timestamp - 1,
     },
-    "sort": {
-      "timestamp": "desc",
+    sort: {
+      timestamp: "desc",
     },
-    "limit": 2,
-    "expand": ["musics"],
+    limit: 2,
+    expand: ["musics"],
   };
 
-  return LatestHistoryEntries<HistoryMusicEntry, ReqBody>( {
+  return LatestHistoryEntries<MusicHistoryEntry, ReqBody>( {
     url,
     body,
     validator,
@@ -39,8 +43,8 @@ export default function LastestComponent( {resourceId, date, dateFormat = DATE_F
   } );
 }
 
-const validator = (data: Required<HistoryMusicEntry>[]) => {
-  assertIsHistoryMusicListGetManyEntriesBySearchResponse(data);
+const validator = (data: Required<MusicHistoryEntry>[]) => {
+  assertIsMusicHistoryListGetManyEntriesBySearchResponse(data);
 
   for (const d of data)
     assertIsMusicVO(d.resource);

@@ -1,24 +1,16 @@
 import { z } from "zod";
-import { LogElementResponseSchema } from "./LogElement";
+import { logElementResponseSchema } from "./LogElement";
 
-const Schema = z.object( {
-  errors: z.array(LogElementResponseSchema).optional(),
-  warnings: z.array(LogElementResponseSchema).optional(),
+const fullResponseSchema = z.object( {
+  errors: z.array(logElementResponseSchema).optional(),
+  warnings: z.array(logElementResponseSchema).optional(),
   data: z.any().optional(),
 } ).strict();
 
-// export function createFullResponseSchemaWithData<T>(dataSchema: z.ZodSchema<T>) {
-//   return Schema.extend( {
-//     data: dataSchema,
-//   } );
-// }
-
-type Model<T = any> = z.infer<typeof Schema> & {
+export type FullResponse<T = any> = z.infer<typeof fullResponseSchema> & {
   data?: T;
 };
 
-export default Model;
-
-export function assertIsModel<T>(o: unknown): asserts o is Model<T> {
-  Schema.parse(o);
+export function assertIsModel<T>(o: unknown): asserts o is FullResponse<T> {
+  fullResponseSchema.parse(o);
 }

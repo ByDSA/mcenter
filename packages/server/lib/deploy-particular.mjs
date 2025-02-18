@@ -1,12 +1,5 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable object-curly-newline */
-/* eslint-disable space-in-parens */
+/* eslint-disable import/no-absolute-path */
 // @ts-check
-
-import { updateRemoteEnvs } from "./envs.mjs";
-
-// eslint-disable-next-line import/no-absolute-path
-import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 
 import {
   dockerImagePush,
@@ -15,6 +8,9 @@ import {
   remoteDockerImagePull,
   sshCmd,
 } from "../../../lib/index.mjs";
+import { updateRemoteEnvs } from "./envs.mjs";
+
+import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 
 /**
  * @param {import("../../../lib/projects/deploy/types.mjs").TreeEnvs} ENVS
@@ -26,13 +22,12 @@ export async function deployParticular(ENVS) {
   const imageName = `${ENVS.project.name}/${packageName}`;
   const imageNameEnv = `${imageName}_${ENVS.TARGET_ENV}`;
   const tag = packageVersion;
-  const imageNameEnvRemote =
-    ENVS.TARGET_ENV === "local"
-      ? imageNameEnv
-      : `${ENVS.docker.registryUrl}/${imageNameEnv}`;
+  const imageNameEnvRemote = ENVS.TARGET_ENV === "local"
+    ? imageNameEnv
+    : `${ENVS.docker.registryUrl}/${imageNameEnv}`;
 
   // Image Build
-  await packageBuild({
+  await packageBuild( {
     dockerPlatform: ENVS.docker.platform,
     projectRoot: ENVS.project.root,
     packageName,
@@ -40,54 +35,54 @@ export async function deployParticular(ENVS) {
     tag,
     targetEnv: ENVS.TARGET_ENV,
     replace: ENVS.docker.replaceImage,
-  });
+  } );
 
   if (ENVS.TARGET_ENV !== "local") {
     // Image Push
-    await dockerImagePush({
+    await dockerImagePush( {
       imageName: imageNameEnv,
       dockerRegistryUrl: ENVS.docker.registryUrl,
       tag,
-    });
+    } );
 
     // Pull image (remote)
-    await remoteDockerImagePull({
+    await remoteDockerImagePull( {
       ssh,
       imageName: imageNameEnvRemote,
       tag,
-    });
+    } );
 
     // Update image latest tag (remote)
     const taggedImageEnvRegistry = `${imageNameEnvRemote}:${tag}`;
 
+    // eslint-disable-next-line no-console
     console.log(
-      // eslint-disable-next-line comma-dangle
-      `Remote: docker image tag ${imageName} -> ${taggedImageEnvRegistry} ...`
+      `Remote: docker image tag ${imageName} -> ${taggedImageEnvRegistry} ...`,
     );
-    await sshCmd({
+    await sshCmd( {
       cmd: `sudo docker tag "${taggedImageEnvRegistry}" "${imageName}"`,
       ssh,
-    });
+    } );
 
     // Update envs (remote)
-    await updateRemoteEnvs({
+    await updateRemoteEnvs( {
       remoteProjectRoot: ENVS.REMOTE_PROJECT_ROOT,
       targetEnv: ENVS.TARGET_ENV,
       ssh,
       vault,
-    });
+    } );
   } else {
-    await dockerImageTag({
+    await dockerImageTag( {
       sourceImageName: imageNameEnv,
       targetImageName: imageName,
       sourceImageTag: tag,
-    });
+    } );
   }
 
-  await migrations({
+  await migrations( {
     targetEnv: ENVS.TARGET_ENV,
     projectRoot: ENVS.project.root,
-  });
+  } );
 }
 
 /**
@@ -95,6 +90,7 @@ export async function deployParticular(ENVS) {
  * @returns {Promise<void>}
  */
 async function migrations(params) {
+  // eslint-disable-next-line no-console
   console.log("Checking migrations ...");
   const verboseTmp = $.verbose;
 

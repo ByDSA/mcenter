@@ -1,13 +1,14 @@
-import { Resource } from "#shared/models/resource";
-import ResourcePicker from "./ResourcePicker";
+import { ResourcePicker } from "./ResourcePicker";
 import { CompareIdFunc } from "./filters/utils";
+import { Resource } from "#modules/resources/models";
 
 type Params<ID, R extends Resource<ID>> = {
   resources: R[];
   lastId?: ID;
   compareId: CompareIdFunc<ID>;
 };
-export default class SequentialPicker<ID = string, R extends Resource<ID> = Resource<ID>> implements ResourcePicker {
+export class ResourcePickerSequential<ID = string, R extends Resource<ID> = Resource<ID>>
+implements ResourcePicker {
   #params: Params<ID, R>;
 
   constructor(params: Params<ID, R>) {

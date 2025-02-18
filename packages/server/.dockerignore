@@ -4,6 +4,6 @@
 /.log
 /.git
 /.gitignore
-/.eslintrc.js
+/eslint.config.mjs
 /nodemon.json
 *.env*

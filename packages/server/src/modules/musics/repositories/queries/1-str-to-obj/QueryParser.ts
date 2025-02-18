@@ -1,13 +1,11 @@
-/* eslint-disable guard-for-in */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable @typescript-eslint/naming-convention */
 import { CstElement, CstNode, IToken } from "@chevrotain/types";
 import { BinaryOperationNode, DifferenceNode, FilterNode, IntersectionNode, NumberLiteral, QueryObject, RangeNumber, UnionNode, WeightNode, YearNode } from "../QueryObject";
-import { QueryLexer } from "./QueryLexer";
+import { queryLexer } from "./QueryLexer";
 import { QueryParser } from "./QueryParserChevrotain";
 
 export function parseQuery(query: string): QueryObject {
-  const lexingResult = QueryLexer.tokenize(query);
+  const lexingResult = queryLexer.tokenize(query);
 
   if (lexingResult.errors.length > 0)
     throw new Error("Error de tokenización");
@@ -48,12 +46,16 @@ const expressionToObj = (node: CstNode): any => {
   }
 };
 
-function additionExpressionToObj(node: CstNode): DifferenceNode | FilterNode | IntersectionNode | UnionNode {
+function additionExpressionToObj(
+  node: CstNode,
+): DifferenceNode | FilterNode | IntersectionNode | UnionNode {
   const multiplicationExpressionArray = node.children.multiplicationExpression as CstNode[];
 
   if (multiplicationExpressionArray.length > 1) {
     const AdditionOperatorArray = node.children.AdditionOperator as IToken[];
-    const filters = multiplicationExpressionArray.map(me=> atomicExpressionToObj(me.children.atomicExpression[0] as CstNode));
+    const filters = multiplicationExpressionArray.map(
+      me=> atomicExpressionToObj(me.children.atomicExpression[0] as CstNode),
+    );
 
     return arrayFilterToTree(filters, AdditionOperatorArray);
   }
@@ -131,7 +133,7 @@ function atomicExpressionToObj(node: CstNode): FilterNode {
     return filterObj;
   }
 
-  const {parenthesisExpression: parenthesisExpressions} = node.children;
+  const { parenthesisExpression: parenthesisExpressions } = node.children;
 
   if (parenthesisExpressions) {
     const parenthesisExpression = parenthesisExpressions[0] as CstNode;
@@ -146,7 +148,6 @@ function atomicExpressionToObj(node: CstNode): FilterNode {
 const filterToObj = (node: CstNode): FilterNode => {
   const childrenEntries = Object.entries(node.children);
 
-  // eslint-disable-next-line no-unreachable-loop
   for (const [filterType, childArray] of childrenEntries) {
     if (childArray.length !== 1)
       throw new Error("B");
@@ -224,13 +225,14 @@ function rangeToObj(rangeCst: CstElement[]): RangeNumber {
 
   if (NumberLiteralArray.length === 1) {
     const value = +(NumberLiteralArray[0] as IToken).image;
-    const isMin = (rangeCstChildren.Comma[0] as IToken).startOffset > (NumberLiteralArray[0] as IToken).startOffset;
+    const isMin = (rangeCstChildren.Comma[0] as IToken).startOffset
+      > (NumberLiteralArray[0] as IToken).startOffset;
 
     if (isMin) {
       return {
         type: "range",
         min: value,
-        minIncluded:true,
+        minIncluded: true,
       };
     }
 
@@ -254,7 +256,7 @@ function shortRangeToObj(shortRangeCst: CstElement[]): RangeNumber {
 
   if (shortRangeCstChildren.LessEqual) {
     return {
-      type:"range",
+      type: "range",
       max: value,
       maxIncluded: true,
     };
@@ -262,7 +264,7 @@ function shortRangeToObj(shortRangeCst: CstElement[]): RangeNumber {
 
   if (shortRangeCstChildren.LessThan) {
     return {
-      type:"range",
+      type: "range",
       max: value,
       maxIncluded: false,
     };
@@ -270,7 +272,7 @@ function shortRangeToObj(shortRangeCst: CstElement[]): RangeNumber {
 
   if (shortRangeCstChildren.GreaterThan) {
     return {
-      type:"range",
+      type: "range",
       min: value,
       minIncluded: false,
     };
@@ -278,7 +280,7 @@ function shortRangeToObj(shortRangeCst: CstElement[]): RangeNumber {
 
   if (shortRangeCstChildren.GreaterEqual) {
     return {
-      type:"range",
+      type: "range",
       min: value,
       minIncluded: true,
     };

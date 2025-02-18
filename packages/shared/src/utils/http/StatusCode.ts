@@ -1,4 +1,4 @@
-const enum HttpStatusCode {
+export const enum HttpStatusCode {
     OK = 200,
     CREATED = 201,
     BAD_REQUEST = 400,
@@ -11,5 +11,3 @@ const enum HttpStatusCode {
     INTERNAL_SERVER_ERROR = 500,
     SERVICE_UNAVAILABLE = 503,
 }
-
-export default HttpStatusCode;

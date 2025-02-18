@@ -9,7 +9,3 @@ export const SECONDS_IN_WEEK = 7 * SECONDS_IN_DAY;
 export const SECONDS_IN_MONTH = 30 * SECONDS_IN_DAY;
 
 export const SECONDS_IN_YEAR = 365 * SECONDS_IN_DAY;
-
-export {
-  Resource,
-} from "#shared/models/resource";

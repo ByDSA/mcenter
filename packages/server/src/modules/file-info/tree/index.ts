@@ -1,13 +1,16 @@
 export {
-  default as findAllSerieFolderTreesAt,
+  findAllSerieFolderTreesAt,
 } from "./find";
 
 export {
-  Episode as EpisodeFile, Season as SeasonFolder, Serie as SerieFolder, SerieTree as SerieFolderTree,
+  Episode as EpisodeFile,
+  Season as SeasonFolder,
+  Serie as SerieFolder,
+  SerieTree as SerieFolderTree,
 } from "./models";
 
 export {
-  OldNew as OldNewSerieTree, default as diffSerieTree,
+  diff as diffSerieTree, OldNew as OldNewSerieTree,
 } from "./diff";
 
 export {

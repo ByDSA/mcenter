@@ -1,7 +1,9 @@
 {
+  "private": true,
   "name": "mcenter",
-  "description": "Centro Multimedia",
   "version": "3.10.1",
+  "description": "Centro Multimedia",
+  "license": "UNLICENSED",
   "author": "Dani Sales",
   "contributors": [
     {
@@ -9,49 +11,53 @@
       "email": "danisales.es@gmail.com"
     }
   ],
-  "license": "UNLICENSED",
-  "private": true,
-  "workspaces": [],
-  "nohoist": [
-    "server"
-  ],
-  "dependencies": {
-    "esm": "3.2.25",
-    "tslib": "2.6.2"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "17.6.6",
-    "@commitlint/config-conventional": "17.6.6",
-    "@typescript-eslint/eslint-plugin": "5.61.0",
-    "@typescript-eslint/parser": "5.61.0",
-    "eslint": "8.44.0",
-    "eslint-config-airbnb-base": "15.0.0",
-    "eslint-config-prettier": "8.8.0",
-    "eslint-import-resolver-alias": "1.1.2",
-    "eslint-import-resolver-typescript": "3.5.5",
-    "eslint-plugin-import": "2.27.5",
-    "eslint-plugin-jest": "27.2.2",
-    "eslint-plugin-prettier": "4.2.1",
-    "husky": "8.0.3",
-    "prettier": "3.0.0",
-    "standard-version": "9.5.0",
-    "tsconfig-paths": "4.2.0",
-    "typescript": "5.2.2",
-    "jest": "29.6.4",
-    "ts-jest": "29.1.1",
-    "@types/jest": "29.5.4"
-  },
   "scripts": {
-    "release": "standard-version",
-    "prepare": "cd .. && husky install packages/.husky",
     "clean:modules": "rm -rf node_modules && cd server && npm clean:modules",
-    "lint:eslint": "eslint **/*.{ts,js,tsx,jsx}",
-    "lint:prettier": "prettier **/*.{json,jsonc,scss,yml}",
-    "lint:fix": "pnpm run lint:prettier --write && pnpm run lint:eslint --fix",
-    "version:release": "standard-version",
     "git:pr": "pnpm git:pr:create && pnpm git:pr:merge-delete",
     "git:pr:create": "gh pr create --base main --fill",
     "git:pr:merge": "gh pr merge --auto --rebase",
-    "git:pr:merge-delete": "gh pr merge --auto --rebase --delete-branch"
-  }
+    "git:pr:merge-delete": "gh pr merge --auto --rebase --delete-branch",
+    "lint": "bin/lint.mjs",
+    "lint:all": "bin/lint-all.mjs",
+    "prepare": "cd .. && husky install packages/.husky",
+    "release": "standard-version",
+    "version:release": "standard-version"
+  },
+  "workspaces": [],
+  "dependencies": {
+    "esm": "3.2.25",
+    "tslib": "2.8.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.6.1",
+    "@commitlint/config-conventional": "19.6.0",
+    "@stylistic/eslint-plugin": "2.13.0",
+    "@stylistic/eslint-plugin-ts": "2.13.0",
+    "@types/jest": "29.5.14",
+    "@typescript-eslint/eslint-plugin": "8.21.0",
+    "@typescript-eslint/parser": "8.21.0",
+    "daproj": "github:ByDSA/daproj",
+    "eslint": "9.18.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-prettier": "10.0.1",
+    "eslint-import-resolver-alias": "1.1.2",
+    "eslint-import-resolver-typescript": "3.7.0",
+    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-jest": "28.11.0",
+    "eslint-plugin-prettier": "5.2.3",
+    "globals": "15.14.0",
+    "husky": "9.1.7",
+    "jest": "29.7.0",
+    "prettier": "3.4.2",
+    "prettier-plugin-packagejson": "2.5.8",
+    "prettier-plugin-sort-json": "^4.1.1",
+    "standard-version": "9.5.0",
+    "ts-jest": "29.2.5",
+    "tsconfig-paths": "4.2.0",
+    "typescript": "5.7.3",
+    "typescript-eslint": "8.21.0"
+  },
+  "nohoist": [
+    "server"
+  ]
 }

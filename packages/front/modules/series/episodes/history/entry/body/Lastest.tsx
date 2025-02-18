@@ -1,8 +1,9 @@
-import { LatestHistoryEntries } from "#modules/history";
-import { DateFormat } from "#modules/utils/dates";
-import { EpisodeId } from "#shared/models/episodes";
-import { HistoryEntry, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
 import { backendUrls } from "../../requests";
+import { HistoryEntry } from "#modules/series/episodes/history/models";
+import { HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#modules/series/episodes/history/models/transport";
+import { EpisodeId } from "#modules/series/episodes/models";
+import { DateFormat } from "#modules/utils/dates";
+import { LatestHistoryEntries } from "#modules/history";
 
 type Props<ID> = {
   resourceId: ID;
@@ -16,21 +17,24 @@ const DATE_FORMAT_DEFAULT: DateFormat = {
 
 type ReqBody = HistoryListGetManyEntriesBySuperIdRequest["body"];
 
-export default function LastestComponent( {resourceId, date, dateFormat = DATE_FORMAT_DEFAULT}: Props<EpisodeId>) {
+export function LastestComponent(
+  { resourceId, date, dateFormat = DATE_FORMAT_DEFAULT }: Props<EpisodeId>,
+) {
   const URL = backendUrls.entries.crud.search;
   const body: ReqBody = {
-    "filter": {
-      "serieId": resourceId.serieId,
-      "episodeId": resourceId.innerId,
-      "timestampMax": date.timestamp - 1,
+    filter: {
+      serieId: resourceId.serieId,
+      episodeId: resourceId.innerId,
+      timestampMax: date.timestamp - 1,
     },
-    "sort": {
-      "timestamp": "desc",
+    sort: {
+      timestamp: "desc",
     },
-    "limit": 10,
+    limit: 10,
   };
 
-  return LatestHistoryEntries<any, ReqBody>( { // TODO: cambiar 'any' cuando HistoryEntry tenga 'resource' en vez de 'episode'
+  // TODO: cambiar 'any' cuando HistoryEntry tenga 'resource' en vez de 'episode'
+  return LatestHistoryEntries<any, ReqBody>( {
     url: URL,
     body,
     validator,

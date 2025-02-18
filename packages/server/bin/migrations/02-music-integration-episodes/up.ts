@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-underscore-dangle */
-import Database from "../../../src/main/db/Database";
+import { RealDatabase as Database } from "../../../src/main/db/Database";
 import { ModelMigration } from "../01-music-integration-fileinfos/ModelMigration";
 import { assertIsModel as assertIsEpisode } from "./new/Episode";
 import { docOdmToModel as episodeOdmToModel } from "./new/adapters";

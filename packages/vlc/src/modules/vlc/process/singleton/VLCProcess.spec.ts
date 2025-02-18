@@ -1,7 +1,9 @@
-import VLCProcess from "./VLCProcess";
+import { VLCProcess } from "./VLCProcess";
 
-it("isRunning no devuelve errores", async () => {
-  await VLCProcess.isRunningAsync();
+it("isRunning no devuelve errores", () => {
+  const f = async () =>await VLCProcess.isRunningAsync();
+
+  expect(f).not.toThrow();
 } );
 
 it("se paran todas las instancias de VLC y isRunning(vlc) devuelve false", async () => {

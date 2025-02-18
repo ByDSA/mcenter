@@ -1,51 +1,54 @@
+import { showError } from "#shared/utils/errors/showError";
+import { deepMerge } from "#shared/utils/objects";
+import { Episode, EpisodeId } from "../models";
+import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
+import { EPISODE_QUEUE_NAME } from "./events";
+import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
+import { DocOdm, ModelOdm } from "./odm";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
 import { logDomainEvent } from "#modules/log";
-import { SerieId } from "#shared/models/series";
-import { deepMerge } from "#shared/utils/objects";
+import { SerieId } from "#series/models";
 import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
-import { Model, ModelId } from "../models";
-import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
-import { QUEUE_NAME } from "./events";
-import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
-import { DocOdm, ModelOdm } from "./odm";
 
-type UpdateOneParams = Model;
+type UpdateOneParams = Episode;
 
 export type GetManyOptions = {
   sortById?: boolean;
 };
 
-const DepsMap = {
+const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,
   episodeFileInfoRepository: EpisodeFileInfoRepository,
 };
 
-type Deps = DepsFromMap<typeof DepsMap>;
-@injectDeps(DepsMap)
-export default class EpisodesRepository
-implements CanGetOneById<Model, ModelId>,
-CanUpdateOneByIdAndGet<Model, ModelId>,
-CanPatchOneByIdAndGet<Model, ModelId>,
-CanCreateManyAndGet<Model>,
-CanGetAll<Model>
-{
+type Deps = DepsFromMap<typeof DEPS_MAP>;
+@injectDeps(DEPS_MAP)
+export class EpisodeRepository
+implements CanGetOneById<Episode, EpisodeId>,
+CanUpdateOneByIdAndGet<Episode, EpisodeId>,
+CanPatchOneByIdAndGet<Episode, EpisodeId>,
+CanCreateManyAndGet<Episode>,
+CanGetAll<Episode> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
     this.#deps = deps as Deps;
 
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: Event<any>) => {
-      logDomainEvent(QUEUE_NAME, event);
+    this.#deps.domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, (event: Event<any>) => {
+      logDomainEvent(EPISODE_QUEUE_NAME, event);
 
       return Promise.resolve();
-    } );
+    } ).catch(showError);
   }
 
-  async patchOneByPathAndGet(path: string, episode: Partial<UpdateOneParams>): Promise<Model | null> {
+  async patchOneByPathAndGet(
+    path: string,
+    episode: Partial<UpdateOneParams>,
+  ): Promise<Episode | null> {
     const partialDocOdm = partialModelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
       path,
@@ -58,19 +61,19 @@ CanGetAll<Model>
     const ret = await this.getOneByPath(newPath);
 
     if (ret) {
-      const event = new PatchEvent<Model, ModelId>( {
+      const event = new PatchEvent<Episode, EpisodeId>( {
         entityId: ret.id,
         key: "path",
         value: newPath,
       } );
 
-      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
     return ret;
   }
 
-  async getAll(): Promise<Model[]> {
+  async getAll(): Promise<Episode[]> {
     const episodesOdm = await ModelOdm.find();
 
     if (episodesOdm.length === 0)
@@ -79,7 +82,7 @@ CanGetAll<Model>
     return episodesOdm.map(docOdmToModel);
   }
 
-  async getAllBySerieId(serieId: SerieId): Promise<Model[]> {
+  async getAllBySerieId(serieId: SerieId): Promise<Episode[]> {
     const episodesOdm = await ModelOdm.find( {
       serieId,
     } );
@@ -90,7 +93,7 @@ CanGetAll<Model>
     return episodesOdm.map(docOdmToModel);
   }
 
-  async getOneById(id: ModelId, opts?: GetOptions): Promise<Model | null> {
+  async getOneById(id: EpisodeId, opts?: GetOptions): Promise<Episode | null> {
     validateGetOptions(opts);
     const episodeOdm = await ModelOdm.findOne( {
       serieId: id.serieId,
@@ -115,7 +118,7 @@ CanGetAll<Model>
     return ret;
   }
 
-  async getOneByPath(path: string): Promise<Model | null> {
+  async getOneByPath(path: string): Promise<Episode | null> {
     const episodeOdm = await ModelOdm.findOne( {
       path,
     } );
@@ -126,7 +129,7 @@ CanGetAll<Model>
     return docOdmToModel(episodeOdm);
   }
 
-  async getManyBySerieId(serieId: string, options?: GetManyOptions): Promise<Model[]> {
+  async getManyBySerieId(serieId: string, options?: GetManyOptions): Promise<Episode[]> {
     const actualOptions = deepMerge( {
       sortById: true,
     }, options);
@@ -156,10 +159,10 @@ CanGetAll<Model>
     return episodesOdm.map(docOdmToModel);
   }
 
-  async updateOneByIdAndGet(fullId: ModelId, episode: UpdateOneParams): Promise<Model | null> {
+  async updateOneByIdAndGet(fullId: EpisodeId, episode: UpdateOneParams): Promise<Episode | null> {
     const docOdm: DocOdm = modelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
-      episodeId:fullId.innerId,
+      episodeId: fullId.innerId,
       serieId: fullId.serieId,
     }, docOdm);
 
@@ -170,15 +173,18 @@ CanGetAll<Model>
       entity: episode,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
 
     return this.getOneById(fullId);
   }
 
-  async patchOneByIdAndGet(fullId: ModelId, episode: Partial<UpdateOneParams>): Promise<Model | null> {
+  async patchOneByIdAndGet(
+    fullId: EpisodeId,
+    episode: Partial<UpdateOneParams>,
+  ): Promise<Episode | null> {
     const partialDocOdm = partialModelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
-      episodeId:fullId.innerId,
+      episodeId: fullId.innerId,
       serieId: fullId.serieId,
     }, partialDocOdm);
 
@@ -186,19 +192,19 @@ CanGetAll<Model>
       return null;
 
     for (const [key, value] of Object.entries(episode)) {
-      const event = new PatchEvent<Model, ModelId>( {
+      const event = new PatchEvent<Episode, EpisodeId>( {
         entityId: fullId,
-        key: key as keyof Model,
+        key: key as keyof Episode,
         value,
       } );
 
-      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
     return this.getOneById(fullId);
   }
 
-  async createManyAndGet(models: Model[]): Promise<Model[]> {
+  async createManyAndGet(models: Episode[]): Promise<Episode[]> {
     const docsOdm: DocOdm[] = models.map(modelToDocOdm);
     const inserted = await ModelOdm.insertMany(docsOdm);
     const ret = inserted.map(docOdmToModel);
@@ -208,7 +214,7 @@ CanGetAll<Model>
         entity: model,
       } );
 
-      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
     return ret;

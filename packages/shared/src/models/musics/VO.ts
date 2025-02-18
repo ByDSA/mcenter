@@ -1,11 +1,10 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { z } from "zod";
-import { AssertZodSettings, assertZodPopStack } from "../../utils/validation/zod";
+import { assertZodPopStack, AssertZodSettings } from "../../utils/validation/zod";
 import { FileInfoSchema } from "../episodes/fileinfo";
 import { ResourceVOSchema } from "../resource";
-import { LocalFileSchema, PickableSchema, TaggableSchema } from "../resource/PartialSchemas";
+import { localFileSchema, pickableSchema, taggableSchema } from "../resource/PartialSchemas";
 
-const OptionalPropsSchema = z.object( {
+const optionalPropsSchema = z.object( {
   album: z.string().optional(),
   game: z.string().optional(),
   year: z.number().int()
@@ -13,7 +12,7 @@ const OptionalPropsSchema = z.object( {
   country: z.string().optional(),
 } );
 
-export const VOSchema = OptionalPropsSchema.extend( {
+export const musicVoSchema = optionalPropsSchema.extend( {
   artist: z.string(),
   url: z.string(),
   mediaInfo: z.object( {
@@ -23,16 +22,19 @@ export const VOSchema = OptionalPropsSchema.extend( {
 // TODO: quitar FileInfo de aquí y ponerlo en un 'fileInfoAudio'
   .merge(FileInfoSchema)
   .merge(ResourceVOSchema)
-  .merge(PickableSchema)
-  .merge(LocalFileSchema)
-  .merge(TaggableSchema);
+  .merge(pickableSchema)
+  .merge(localFileSchema)
+  .merge(taggableSchema);
 
-export type VO = z.infer<typeof VOSchema>;
+export type MusicVO = z.infer<typeof musicVoSchema>;
 
-export function assertIsVO(model: unknown, settings?: AssertZodSettings): asserts model is VO {
-  assertZodPopStack(VOSchema, model, settings);
+export function assertIsMusicVO(
+  model: unknown,
+  settings?: AssertZodSettings,
+): asserts model is MusicVO {
+  assertZodPopStack(musicVoSchema, model, settings);
 }
 
-export function parseModel(model: unknown): VO {
-  return VOSchema.parse(model);
+export function parseModel(model: unknown): MusicVO {
+  return musicVoSchema.parse(model);
 }

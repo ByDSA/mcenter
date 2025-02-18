@@ -1,28 +1,33 @@
-import GlobalConfig from "./GlobalConfig";
+import { GlobalConfig } from "./GlobalConfig";
 
-describe("Config", () => {
-  it("Se crea sin errores", () => {
-    GlobalConfig.create();
+describe("config", () => {
+  it("se crea sin errores", () => {
+    const f = () =>GlobalConfig.create();
+
+    expect(f).not.toThrow();
   } );
 
-  describe("Configuración por defecto", () => {
+  describe("configuración por defecto", () => {
     let config: GlobalConfig;
 
     beforeAll(() => {
       config = GlobalConfig.create();
     } );
 
-    it("Se crea e inicializa sin errores", () => {
-      config.initialize();
+    it("se crea e inicializa sin errores", () => {
+      const f = () => config.initialize();
+
+      expect(f).not.toThrow();
     } );
 
-    describe("Comprobación de configuración por defecto", () => {
-      describe("Configuración de red", () => {
+    describe("comprobación de configuración por defecto", () => {
+      describe("configuración de red", () => {
         it("está definida", () => {
           const actual = config.net;
 
           expect(actual).toBeDefined();
         } );
+
         it("port=0", () => {
           expect(config.net.port).toBe(0);
         } );
@@ -33,6 +38,7 @@ describe("Config", () => {
 
             expect(actual).toBeDefined();
           } );
+
           it("enabled=false", () => {
             expect(config.net.ssl.enabled).toBeFalsy();
           } );
@@ -40,9 +46,11 @@ describe("Config", () => {
           it("required=false", () => {
             expect(config.net.ssl.required).toBeFalsy();
           } );
+
           it("cert=null", () => {
             expect(config.net.ssl.cert).toBeNull();
           } );
+
           it("key=null", () => {
             expect(config.net.ssl.key).toBeNull();
           } );

@@ -22,12 +22,13 @@ describe("tryCatchLogError", () => {
   } );
 
   it("console.error has been called", () => {
-    // eslint-disable-next-line no-console
     expect(console.error).toHaveBeenCalledTimes(1);
   } );
 
-  it("Error is instance of Error", () => {
-    assertIsInstanceOf(error, Error);
+  it("error is instance of Error", () => {
+    const f = () =>assertIsInstanceOf(error, Error);
+
+    expect(f).not.toThrow();
   } );
 
   it("expected stack for error", () => {
@@ -149,12 +150,13 @@ describe("tryCatchLogErrorAsync", () => {
   } );
 
   it("console.error has been called", () => {
-    // eslint-disable-next-line no-console
     expect(console.error).toHaveBeenCalledTimes(1);
   } );
 
-  it("Error is instance of Error", () => {
-    assertIsInstanceOf(error, Error);
+  it("error is instance of Error", () => {
+    const f = ()=>assertIsInstanceOf(error, Error);
+
+    expect(f).not.toThrow();
   } );
 
   it("expected stack for error", () => {

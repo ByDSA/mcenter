@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import fs from "node:fs";
 import { join } from "node:path";
 

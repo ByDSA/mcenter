@@ -1,8 +1,6 @@
-/* eslint-disable max-statements-per-line */
+import { additionOperator, colon, comma, greaterEqual, greaterThan, lBracket, lessEqual, lessThan, lParen, multiplicationOperator, numberLiteral, rBracket, rParen, stringLiteral, tagIdentifier, tokens, weightIdentifier, yearIdentifier } from "./QueryLexer";
 import { CstParser } from "chevrotain";
-import { AdditionOperator, Colon, Comma, GreaterEqual, GreaterThan, LBracket, LessEqual, LessThan, LParen, MultiplicationOperator, NumberLiteral, RBracket, RParen, StringLiteral, TagIdentifier, tokens, WeightIdentifier, YearIdentifier } from "./QueryLexer";
 
-// eslint-disable-next-line import/prefer-default-export
 export class QueryParser extends CstParser {
   constructor() {
     super(tokens);
@@ -16,7 +14,7 @@ export class QueryParser extends CstParser {
   private additionExpression = this.RULE("additionExpression", () => {
     this.SUBRULE(this.multiplicationExpression);
     this.MANY(() => {
-      this.CONSUME(AdditionOperator);
+      this.CONSUME(additionOperator);
       this.SUBRULE2(this.multiplicationExpression);
     } );
   } );
@@ -24,7 +22,7 @@ export class QueryParser extends CstParser {
   private multiplicationExpression = this.RULE("multiplicationExpression", () => {
     this.SUBRULE(this.atomicExpression);
     this.MANY(() => {
-      this.CONSUME(MultiplicationOperator);
+      this.CONSUME(multiplicationOperator);
       this.SUBRULE2(this.atomicExpression);
     } );
   } );
@@ -43,9 +41,9 @@ export class QueryParser extends CstParser {
   } );
 
   private parenthesisExpression = this.RULE("parenthesisExpression", () => {
-    this.CONSUME(LParen);
+    this.CONSUME(lParen);
     this.SUBRULE(this.expression);
-    this.CONSUME(RParen);
+    this.CONSUME(rParen);
   } );
 
   // private andOperation = this.RULE("andOperation", () => {
@@ -74,8 +72,8 @@ export class QueryParser extends CstParser {
   } );
 
   private yearFilter = this.RULE("yearFilter", () => {
-    this.CONSUME(YearIdentifier);
-    this.CONSUME(Colon);
+    this.CONSUME(yearIdentifier);
+    this.CONSUME(colon);
     this.OR([
       {
         ALT: () => this.SUBRULE(this.range),
@@ -84,14 +82,14 @@ export class QueryParser extends CstParser {
         ALT: () => this.SUBRULE(this.shortRange),
       }, // short range
       {
-        ALT: () => this.CONSUME(NumberLiteral),
+        ALT: () => this.CONSUME(numberLiteral),
       }, // exact value
     ]);
   } );
 
   private weightFilter = this.RULE("weightFilter", () => {
-    this.CONSUME(WeightIdentifier);
-    this.CONSUME(Colon);
+    this.CONSUME(weightIdentifier);
+    this.CONSUME(colon);
     this.OR([
       {
         ALT: () => this.SUBRULE(this.range),
@@ -100,68 +98,68 @@ export class QueryParser extends CstParser {
         ALT: () => this.SUBRULE(this.shortRange),
       }, // short range
       {
-        ALT: () => this.CONSUME(NumberLiteral),
+        ALT: () => this.CONSUME(numberLiteral),
       }, // exact value
     ]);
   } );
 
   private tagFilter = this.RULE("tagFilter", () => {
-    this.CONSUME(TagIdentifier); // tag
-    this.CONSUME(Colon);
-    this.CONSUME(StringLiteral); // tag value
+    this.CONSUME(tagIdentifier); // tag
+    this.CONSUME(colon);
+    this.CONSUME(stringLiteral); // tag value
   } );
 
   // Nueva regla para rangos
   private range = this.RULE("range", () => {
-    this.CONSUME1(LBracket);
+    this.CONSUME1(lBracket);
     this.OR([
       {
         ALT: () => {
-          this.CONSUME1(NumberLiteral); // min value
-          this.CONSUME1(Comma);
-          this.CONSUME2(NumberLiteral); // max value
+          this.CONSUME1(numberLiteral); // min value
+          this.CONSUME1(comma);
+          this.CONSUME2(numberLiteral); // max value
         },
       },
       {
         ALT: () => {
-          this.CONSUME2(Comma);
-          this.CONSUME3(NumberLiteral); // max value
+          this.CONSUME2(comma);
+          this.CONSUME3(numberLiteral); // max value
         },
       },
       {
         ALT: () => {
-          this.CONSUME4(NumberLiteral); // min value
-          this.CONSUME3(Comma);
+          this.CONSUME4(numberLiteral); // min value
+          this.CONSUME3(comma);
         },
       },
     ]);
-    this.CONSUME3(RBracket);
+    this.CONSUME3(rBracket);
   } );
 
   private shortRange = this.RULE("shortRange", () => {
     this.OR([
       {
         ALT: () => {
-          this.CONSUME(GreaterEqual);
-          this.CONSUME5(NumberLiteral); // min value
+          this.CONSUME(greaterEqual);
+          this.CONSUME5(numberLiteral); // min value
         },
       },
       {
         ALT: () => {
-          this.CONSUME(GreaterThan);
-          this.CONSUME6(NumberLiteral); // min value
+          this.CONSUME(greaterThan);
+          this.CONSUME6(numberLiteral); // min value
         },
       },
       {
         ALT: () => {
-          this.CONSUME(LessEqual);
-          this.CONSUME7(NumberLiteral); // max value
+          this.CONSUME(lessEqual);
+          this.CONSUME7(numberLiteral); // max value
         },
       },
       {
         ALT: () => {
-          this.CONSUME(LessThan);
-          this.CONSUME8(NumberLiteral); // max value
+          this.CONSUME(lessThan);
+          this.CONSUME8(numberLiteral); // max value
         },
       },
     ]);

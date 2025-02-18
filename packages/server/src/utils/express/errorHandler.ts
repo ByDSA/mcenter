@@ -2,14 +2,14 @@ import { HttpError } from "#shared/utils/http";
 import { isDebugging } from "#shared/utils/vscode";
 import { NextFunction, Request, Response } from "express";
 
-const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
-  if ((process.env.NODE_ENV !== "test" || (process.env.NODE_ENV === "test" && isDebugging())) && err instanceof Error && err.stack) {// TODO: usar enums
+export const errorHandler = (err: unknown, _req: Request, res: Response, next: NextFunction) => {
+  if ((process.env.NODE_ENV !== "test" || (process.env.NODE_ENV === "test" && isDebugging())) && err instanceof Error && err.stack) { // TODO: usar enums
     let output = `${ err.name }`;
 
     if (err.message)
       output += `: ${ err.message }`;
 
-    process.stderr.write(["\x1b[", "1;91", "m", output, "\x1b[", "0;30" , "m", "\n"].join(""));
+    process.stderr.write(["\x1b[", "1;91", "m", output, "\x1b[", "0;30", "m", "\n"].join(""));
     process.stderr.write(err.stack.split("\n").slice(1)
       .map(line => {
         // if (content) is not a path
@@ -37,10 +37,10 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
     res.sendStatus(500);
 
   next();
-} ;
+};
 
 function getStartIndex(line: string) {
-  const starts = [ " /", "(/", "(node:internal/" ];
+  const starts = [" /", "(/", "(node:internal/"];
 
   for (const start of starts) {
     const index = line.indexOf(start);
@@ -58,5 +58,3 @@ function getEndIndex(line: string) {
 
   return preLastIndex;
 }
-
-export default errorHandler;

@@ -1,4 +1,4 @@
-enum Events {
+export enum WebSocketsEvents {
   CONNECTION = "connection",
   CONNECT = "connect",
   DISCONNECT = "disconnect",
@@ -12,5 +12,3 @@ enum Events {
   PLAY_RESOURCE = "play-resource",
   FULLSCREEN_TOGGLE = "fullscreen-toggle",
 };
-
-export default Events;

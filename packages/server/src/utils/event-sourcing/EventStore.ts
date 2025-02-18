@@ -1,9 +1,8 @@
-import Event from "../message-broker/Event";
-import Message from "./Message";
+import { Event } from "../message-broker/Event";
+import { Message } from "./Message";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default interface EventStore<M extends Message, E extends Event<M>> {
-}
+export type EventStore<M extends Message, E extends Event<M>> = object;
 
 export interface CanCreateOne<M extends Message, E extends Event<M>> {
   createOne(event: E): Promise<void>;

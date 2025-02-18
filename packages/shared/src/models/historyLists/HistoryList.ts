@@ -1,18 +1,17 @@
 import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
-import { EntryWithIdSchema } from "./HistoryEntry";
+import { entryWithIdSchema } from "./HistoryEntry";
 
-const ModelSchema = z.object( {
+const modelSchema = z.object( {
   id: z.string(),
-  entries: z.array(EntryWithIdSchema),
+  entries: z.array(entryWithIdSchema),
   maxSize: z.number(),
 } ).strict();
 
-export type ModelId = string;
+export type HistoryListId = string;
 
-type Model = z.infer<typeof ModelSchema>;
-export default Model;
+export type HistoryList = z.infer<typeof modelSchema>;
 
-export function assertIsModel(model: Model): asserts model is Model {
-  assertZodPopStack(ModelSchema, model);
+export function assertIsHistoryList(model: HistoryList): asserts model is HistoryList {
+  assertZodPopStack(modelSchema, model);
 }
