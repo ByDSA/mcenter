@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.11.0](https://github.com/ByDSA/mcenter/compare/v3.10.1...v3.11.0) (2025-02-18)
+
+
+### Features
+
+* add PICKER_DAYS_EXP env variable ([1320be9](https://github.com/ByDSA/mcenter/commit/1320be99b5361dbe65442d05baa4fb3f39286156))
+
 ### [3.10.1](https://github.com/ByDSA/mcenter/compare/v3.10.0...v3.10.1) (2025-01-21)
 
 
