@@ -1,6 +1,5 @@
 /* eslint-disable import/no-absolute-path */
 // @ts-check
-
 import {
   dockerImagePush,
   dockerImageTag,
@@ -9,7 +8,6 @@ import {
   sshCmd,
 } from "../../../lib/index.mjs";
 import { updateRemoteEnvs } from "./envs.mjs";
-
 import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 
 /**

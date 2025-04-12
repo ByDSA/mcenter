@@ -1,5 +1,4 @@
-/* eslint-disable import/no-cycle */
-import { MusicRepository } from "./Repository";
+import type { MusicRepository } from "./Repository";
 import { ARTIST_EMPTY, Music } from "#musics/models";
 
 type Params = {

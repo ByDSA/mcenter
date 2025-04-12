@@ -2,13 +2,13 @@ import { HttpStatusCode } from "#shared/utils/http/StatusCode";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
-import { HistoryListRepository } from "../repositories";
-import { HistoryListRepositoryMock } from "../repositories/tests";
-import { HistoryListRestController } from "./RestController";
 import { resolveRequired } from "#utils/layers/deps";
 import { RouterApp } from "#utils/express/test";
 import { HISTORY_LIST_SIMPSONS, HISTORY_LIST_WITH_NO_ENTRIES } from "#tests/main/db/fixtures";
 import { registerSingletonIfNotAndGet } from "#tests/main";
+import { HistoryListRepositoryMock } from "../repositories/tests";
+import { HistoryListRepository } from "../repositories";
+import { HistoryListRestController } from "./RestController";
 
 describe("restController", () => {
   let routerApp: Application;

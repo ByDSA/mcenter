@@ -1,11 +1,11 @@
 import { statSync } from "node:fs";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { md5FileAsync } from "#utils/crypt";
+import { MusicVO } from "#musics/models";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
 import { MusicRepository } from "../../repositories";
 import { getFullPath } from "../../utils";
 import { ChangesDetector, FileWithStats } from "./ChangesDetector";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { md5FileAsync } from "#utils/crypt";
-import { MusicVO } from "#musics/models";
 
 export type UpdateResult = {
   new: MusicVO[];

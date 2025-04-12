@@ -5,10 +5,10 @@ import { Stream, assertIsStream, assertIsStreamGetManyResponse } from "#shared/m
 import { Fragment, MouseEventHandler, useState } from "react";
 import useSWR from "swr";
 import { showError } from "#shared/utils/errors/showError";
-import { fetcher } from "./fetcher";
 import { Loading } from "#modules/loading";
 import { seriesBackendUrls } from "#modules/series";
 import { rootBackendUrl } from "#modules/requests";
+import { fetcher } from "./fetcher";
 
 export const backendUrls = {
   stream: `${rootBackendUrl}/api/play/stream`,

@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { entryWithIdSchema } from "../HistoryEntry";
 
 export const getManyEntriesBySearchResponseSchema = z.array(entryWithIdSchema);

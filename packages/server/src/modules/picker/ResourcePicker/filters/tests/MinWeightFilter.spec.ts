@@ -1,5 +1,5 @@
-import { RemoveWeightLowerOrEqualThanFilter } from "../MinWeightFilter";
 import { Pickable } from "#modules/resources/models";
+import { RemoveWeightLowerOrEqualThanFilter } from "../MinWeightFilter";
 
 const W3: Pickable = {
   weight: 3,

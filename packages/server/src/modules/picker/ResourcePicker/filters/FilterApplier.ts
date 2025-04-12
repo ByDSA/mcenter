@@ -1,5 +1,5 @@
-import { Filter } from "./Filter";
 import { Pickable } from "#modules/resources/models";
+import { Filter } from "./Filter";
 
 export class FilterApplier<R extends Pickable = Pickable> {
   #nonReversibleFilters: Filter<R>[] = [];

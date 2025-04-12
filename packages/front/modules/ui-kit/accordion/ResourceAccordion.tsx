@@ -1,7 +1,6 @@
 import React, { JSX } from "react";
-
-import style from "./style.module.css";
 import { classes } from "#modules/utils/styles";
+import style from "./style.module.css";
 
 export type AccordionHeader = JSX.Element;
 

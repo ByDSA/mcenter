@@ -1,12 +1,12 @@
 import { assertFound } from "#shared/utils/http/validation";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Request, Response, Router } from "express";
-import { PlayService } from "./PlayService";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { HistoryListService } from "#modules/historyLists";
 import { StreamRepository } from "#modules/streams/repositories";
 import { Controller } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { PlayService } from "./PlayService";
 
 const DEPS_MAP = {
   playService: PlayService,

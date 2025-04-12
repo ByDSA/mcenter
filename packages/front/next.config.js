@@ -1,6 +1,4 @@
-
 /** @type {import('next').NextConfig} */
-
 const dev = {
   webpack: (config, { webpack } ) => {
     config.experiments = {

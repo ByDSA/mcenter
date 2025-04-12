@@ -1,6 +1,6 @@
+import { MusicHistoryEntry } from "#musics/history/models";
 import { SAMPLE1 as DATE_SAMPLE1 } from "../dates";
 import { MUSIC_FILE_SAMPLES, MUSIC_FILE_VO_SAMPLES } from "./music";
-import { MusicHistoryEntry } from "#musics/history/models";
 
 export const SAMPLES1: MusicHistoryEntry[] = [
   {

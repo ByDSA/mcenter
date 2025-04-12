@@ -1,7 +1,7 @@
 import { UpdateQuery } from "mongoose";
+import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 import { Episode, assertIsEpisode } from "../models";
 import { DocOdm } from "./odm";
-import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {
   const model: Episode = {

@@ -1,11 +1,11 @@
 import { Router } from "express";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Controller, SecureRouter } from "#utils/express";
 import { MusicHistoryRestController } from "../history";
 import { MusicFixController } from "./FixController";
 import { MusicGetController } from "./GetController";
 import { MusicRestController } from "./RestController";
 import { MusicUpdateRemoteController } from "./UpdateRemoteController";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { Controller, SecureRouter } from "#utils/express";
 
 const DEPS_MAP = {
   getController: MusicGetController,

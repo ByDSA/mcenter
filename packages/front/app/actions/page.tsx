@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import styles from "./Page.module.css";
 import { rootBackendUrl } from "#modules/requests";
+import styles from "./Page.module.css";
 
 const ACTIONS_URL = `${rootBackendUrl}/api/actions`;
 

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { join } from "path";
-import { FindOptions, findFiles } from ".";
 import { MUSIC_DATA_FOLDER } from "#tests/MusicData";
 import { AOT4_COPY, A_AOT4, DK, DRIFTVEIL } from "#tests/main/db/fixtures/models/music";
 import { md5FileAsync } from "#utils/crypt";
+import { FindOptions, findFiles } from ".";
 
 describe("getHashFromFile", () => {
   it("existing path", async () => {

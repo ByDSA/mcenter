@@ -1,7 +1,7 @@
 import { assertIsDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
-import { DocOdm } from "./odm";
 import { FileInfoVideo, FileInfoVideoWithSuperId, assertIsFileInfoVideo, assertIsFileInfoVideoWithSuperId } from "#modules/file-info/models";
+import { DocOdm } from "./odm";
 
 type Model = FileInfoVideo;
 type ModelWithSuperId = FileInfoVideoWithSuperId;

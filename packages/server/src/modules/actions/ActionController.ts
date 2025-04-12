@@ -2,11 +2,11 @@ import fs from "fs";
 import path from "path";
 import { Request, Response, Router } from "express";
 import { assertIsDefined } from "#shared/utils/validation";
-import { EpisodesUpdateLastTimePlayedController } from "./EpisodesUpdateLastTimePlayedController";
-import { FixerController } from "./FixerController";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Controller, SecureRouter } from "#utils/express";
 import { EpisodeAddNewFilesController, EpisodeUpdateController } from "#episodes/index";
+import { FixerController } from "./FixerController";
+import { EpisodesUpdateLastTimePlayedController } from "./EpisodesUpdateLastTimePlayedController";
 
 const DEPS_MAP = {
   episodesUpdateLastTimePlayedController: EpisodesUpdateLastTimePlayedController,

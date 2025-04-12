@@ -1,7 +1,6 @@
 #!/usr/bin/env zx
-/* eslint-disable no-continue */
-// @ts-check
 
+// @ts-check
 import { loadProjectEnvs } from "../../../../lib/projects/envs.mjs";
 
 (async () => {

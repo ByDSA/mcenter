@@ -1,14 +1,14 @@
 import { assertIsDefined } from "#shared/utils/validation";
 import { Application } from "express";
 import request from "supertest";
-import { MusicGetController } from "./controllers/GetController";
-import { HistoryMusicModelOdm } from "./history";
 import { Music, MusicVO } from "#musics/models";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import { ExpressAppMock } from "#tests/main/ExpressAppMock";
 import { MUSICS_WITH_TAGS_SAMPLES } from "#tests/main/db/fixtures/models/music";
 import { loadFixtureMusicsWithTags } from "#tests/main/db/fixtures/sets";
 import { RouterApp } from "#utils/express/test";
+import { HistoryMusicModelOdm } from "./history";
+import { MusicGetController } from "./controllers/GetController";
 
 let app: ExpressAppMock;
 const getController = registerSingletonIfNotAndGet(MusicGetController);

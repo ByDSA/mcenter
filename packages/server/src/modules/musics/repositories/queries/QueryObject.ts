@@ -1,5 +1,4 @@
 /* eslint-disable no-use-before-define */
-
 export type ExpressionNode = FilterNode | OperationNode;
 
 export type OperationNode = BinaryOperationNode | ComplementNode;

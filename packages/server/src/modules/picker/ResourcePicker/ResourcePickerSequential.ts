@@ -1,6 +1,6 @@
+import { Resource } from "#modules/resources/models";
 import { ResourcePicker } from "./ResourcePicker";
 import { CompareIdFunc } from "./filters/utils";
-import { Resource } from "#modules/resources/models";
 
 type Params<ID, R extends Resource<ID>> = {
   resources: R[];

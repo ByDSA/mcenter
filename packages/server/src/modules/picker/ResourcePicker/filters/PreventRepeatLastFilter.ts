@@ -1,7 +1,7 @@
 import { isDefined } from "#shared/utils/validation";
+import { Resource } from "#modules/resources/models";
 import { Filter } from "./Filter";
 import { CompareIdFunc } from "./utils";
-import { Resource } from "#modules/resources/models";
 
 type Params<ID> = {
   lastId: ID | undefined;

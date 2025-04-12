@@ -1,4 +1,3 @@
-/* eslint-disable no-continue */
 import { diff } from "just-diff";
 
 type Settings = {

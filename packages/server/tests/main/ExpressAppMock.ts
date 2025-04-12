@@ -1,6 +1,3 @@
-import { TestMongoDatabase } from "./db";
-import { TestDatabase } from "./db/TestDatabase";
-import { registerSingletonIfNotAndGet } from "./utils";
 import { EpisodeRestControllerMock } from "#episodes/controllers/test";
 import { EpisodeRestController } from "#episodes/index";
 import { ExpressApp } from "#main";
@@ -18,6 +15,9 @@ import { StreamRestController } from "#modules/streams";
 import { StreamRestControllerMock } from "#modules/streams/controllers/test";
 import { MusicControllerMock } from "#musics/controllers/tests";
 import { MusicController } from "#musics/index";
+import { registerSingletonIfNotAndGet } from "./utils";
+import { TestDatabase } from "./db/TestDatabase";
+import { TestMongoDatabase } from "./db";
 
 export class ExpressAppMock extends ExpressApp {
   #database: TestDatabase;

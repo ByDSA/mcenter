@@ -1,6 +1,6 @@
 import { assertIsDefined } from "#shared/utils/validation";
-import { UseResourceEditionProps, UseResourceEditionRet, useResourceEdition } from "../../utils/resources/useResourceEdition";
 import { useAsyncAction } from "#modules/ui-kit/input";
+import { UseResourceEditionProps, UseResourceEditionRet, useResourceEdition } from "../../utils/resources/useResourceEdition";
 
 type Props<T, ID, FetchPatchReqBody, FetchPatchResBody> = {
   resource: UseResourceEditionProps<T, ID, FetchPatchReqBody, FetchPatchResBody>;

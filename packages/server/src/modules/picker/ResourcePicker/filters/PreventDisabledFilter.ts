@@ -1,5 +1,5 @@
-import { Filter } from "./Filter";
 import { ResourceVO } from "#modules/resources/models";
+import { Filter } from "./Filter";
 
 export class PreventDisabledFilter implements Filter {
   // eslint-disable-next-line require-await

@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
+import { A_AOT4 } from "#tests/main/db/fixtures/models/music";
 import { Music } from "../models";
 import { musicDocOdmToModel, musicModelToDocOdm } from "./adapters";
 import { DocOdm } from "./odm";
-import { A_AOT4 } from "#tests/main/db/fixtures/models/music";
 
 function removeUndefinedProps(obj: Record<string, any>) {
   Object.keys(obj).forEach((key) => obj[key] === undefined && delete obj[key]);

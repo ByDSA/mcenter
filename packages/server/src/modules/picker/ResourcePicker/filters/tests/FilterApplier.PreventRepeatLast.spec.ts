@@ -1,7 +1,7 @@
-import { FilterApplier } from "../FilterApplier";
-import { PreventRepeatLastFilter } from "../PreventRepeatLastFilter";
 import { compareEpisodeId } from "#episodes/models";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
+import { FilterApplier } from "../FilterApplier";
+import { PreventRepeatLastFilter } from "../PreventRepeatLastFilter";
 
 const TWO_EPS = [
   EPISODES_SIMPSONS[0],

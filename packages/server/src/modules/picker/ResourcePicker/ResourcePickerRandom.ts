@@ -1,10 +1,10 @@
 import { assertIsDefined, assertIsNotEmpty } from "#shared/utils/validation";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
+import { ResourceVO } from "#modules/resources/models";
 import { ResourcePicker } from "./ResourcePicker";
 import { FilterApplier } from "./filters";
 import { WeightFixerApplier } from "./weight-fixers";
-import { ResourceVO } from "#modules/resources/models";
 
 type Params<R extends ResourceVO> = {
   resources: R[];

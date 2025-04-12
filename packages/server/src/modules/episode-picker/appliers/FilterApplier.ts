@@ -1,7 +1,7 @@
-import { Episode, EpisodeId, compareEpisodeId } from "../../episodes/models";
-import { DependenciesList } from "./Dependencies";
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { ResourceVO } from "#modules/resources/models";
+import { Episode, EpisodeId, compareEpisodeId } from "../../episodes/models";
+import { DependenciesList } from "./Dependencies";
 
 type Params<R extends ResourceVO = ResourceVO, ID = string> = {
   resources: R[];

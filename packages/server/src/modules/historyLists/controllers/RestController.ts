@@ -1,9 +1,6 @@
 import { showError } from "#shared/utils/errors/showError";
 import { assertFound } from "#shared/utils/http/validation";
 import express, { Request, Response, Router } from "express";
-import { LastTimePlayedService } from "../LastTimePlayedService";
-import { HistoryEntry, HistoryEntryWithId, HistoryList, assertIsHistoryEntryWithId } from "../models";
-import { HistoryListRepository } from "../repositories";
 import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#episodes/index";
 import { HistoryListDeleteOneEntryByIdRequest,
   HistoryListDeleteOneEntryByIdResBody,
@@ -20,6 +17,9 @@ import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
+import { HistoryListRepository } from "../repositories";
+import { HistoryEntry, HistoryEntryWithId, HistoryList, assertIsHistoryEntryWithId } from "../models";
+import { LastTimePlayedService } from "../LastTimePlayedService";
 
 const DEPS_MAP = {
   historyListRepository: HistoryListRepository,

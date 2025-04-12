@@ -3,8 +3,8 @@ import FastForwardIcon from "@mui/icons-material/FastForward";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useState } from "react";
 import { showError } from "#shared/utils/errors/showError";
-import styles from "./MediaPlayer.module.css";
 import { PlayerActions } from "#modules/remote-player/models";
+import styles from "./MediaPlayer.module.css";
 
 enum TimeMode {
   FORWARD,

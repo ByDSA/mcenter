@@ -2,10 +2,10 @@ import { showError } from "#shared/utils/errors/showError";
 import { deepCopy } from "#shared/utils/objects";
 import { DateType } from "#shared/utils/time";
 import { DateTime } from "luxon";
-import { HistoryList } from "./models";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Episode, EpisodeId, compareEpisodeId } from "#episodes/models";
 import { EpisodeRepository } from "#episodes/index";
+import { HistoryList } from "./models";
 
 function getTimestampFromDateType(date: DateType): number {
   if (date.timestamp)

@@ -1,9 +1,17 @@
-/* eslint-disable import/no-cycle */
-import { statSync } from "fs";
+import { statSync } from "node:fs";
 import path from "node:path";
 import NodeID3 from "node-id3";
 import { assertIsDefined } from "#shared/utils/validation";
 import { showError } from "#shared/utils/errors/showError";
+import { Event } from "#utils/message-broker";
+import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
+import { md5FileAsync } from "#utils/crypt";
+import { ARTIST_EMPTY, Music, MusicId, MusicVO } from "#musics/models";
+import { MusicHistoryEntry } from "#musics/history/models";
+import { logDomainEvent } from "#modules/log";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { AUDIO_EXTENSIONS } from "../files";
 import { QUEUE_NAME as HISTORY_QUEUE_NAME } from "../history/events";
 import { getFullPath } from "../utils";
@@ -15,15 +23,6 @@ import { findParamsToQueryParams } from "./queries/QueriesOdm";
 import { ExpressionNode } from "./queries/QueryObject";
 import { PatchOneParams } from "./types";
 import { MusicUrlGenerator } from "./UrlGenerator";
-import { Event } from "#utils/message-broker";
-import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
-import { md5FileAsync } from "#utils/crypt";
-import { ARTIST_EMPTY, Music, MusicId, MusicVO } from "#musics/models";
-import { MusicHistoryEntry } from "#musics/history/models";
-import { logDomainEvent } from "#modules/log";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 
 const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,

@@ -1,7 +1,7 @@
-import { docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
-import { ModelOdm } from "./odm";
 import { FileInfoVideo, FileInfoVideoSuperId, FileInfoVideoWithSuperId } from "#modules/file-info/models";
 import { CanGetAllBySuperId, CanUpdateMany, CanUpdateOneBySuperId } from "#utils/layers/repository";
+import { docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
+import { ModelOdm } from "./odm";
 
 type ModelWithSuperId = FileInfoVideoWithSuperId;
 type Model = FileInfoVideo;

@@ -1,5 +1,5 @@
-import style from "./style.module.css";
 import { classes } from "#modules/utils/styles";
+import style from "./style.module.css";
 
 type HeaderProps = {
   time: string;

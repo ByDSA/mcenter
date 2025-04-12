@@ -1,6 +1,6 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import { HistoryListRestController } from "../RestController";
 import { getRouterMock } from "#tests/main";
+import { HistoryListRestController } from "../RestController";
 
 export class HistoryListRestControllerMock implements PublicMethodsOf<HistoryListRestController> {
   deleteOneEntryById = jest.fn();

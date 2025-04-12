@@ -1,8 +1,7 @@
 /* eslint-disable require-await */
-
 import { HistoryEntryId, HistoryListDeleteOneEntryByIdResBody, HistoryListId, assertIsHistoryListDeleteOneEntryByIdResBody } from "#shared/models/historyLists";
-import { backendUrls } from "./requestGetMany";
 import { makeFetcher } from "#modules/fetching";
+import { backendUrls } from "./requestGetMany";
 
 export {
   backendUrls, useRequest,

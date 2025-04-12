@@ -1,6 +1,5 @@
 import { assertFound } from "#shared/utils/http/validation";
 import { neverCase } from "#shared/utils/validation";
-import { buildEpisodePicker } from "./EpisodePicker";
 import { Episode } from "#episodes/models";
 import { EpisodeRepository, EpisodeRepositoryGetManyOptions } from "#episodes/repositories";
 import { HistoryListRepository } from "#modules/historyLists";
@@ -8,6 +7,7 @@ import { PickMode, ResourcePicker } from "#modules/picker";
 import { Stream, StreamId, StreamMode } from "#modules/streams";
 import { StreamRepository } from "#modules/streams/repositories";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { buildEpisodePicker } from "./EpisodePicker";
 
 const DEPS_MAP = {
   streamRepository: StreamRepository,

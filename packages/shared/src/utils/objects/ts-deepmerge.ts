@@ -1,9 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
-
 // Source: https://github.com/voodoocreation/ts-deepmerge/blob/master/index.ts
 // Modificado para que acepte undefined como objeto a mergear
-
 type TAllKeys<T> = T extends any ? keyof T : never;
 
 type TIndexValue<T, K extends PropertyKey, D = never> = T extends any
@@ -88,6 +86,7 @@ export const deepMerge = <T extends IObject>(
 }, {} ) as any;
 
 interface IOptions {
+
   /**
    * When `true`, values explicitly provided as `undefined` will override existing values, though properties that are simply omitted won't affect anything.
    * When `false`, values explicitly provided as `undefined` won't override existing values.

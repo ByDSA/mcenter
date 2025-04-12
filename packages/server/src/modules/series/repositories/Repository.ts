@@ -1,14 +1,14 @@
 import { showError } from "#shared/utils/errors/showError";
-import { Serie, SerieId } from "../models";
-import { docOdmToModel } from "./adapters";
-import { QUEUE_NAME } from "./events";
-import { DocOdm, ModelOdm } from "./odm";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
+import { Serie, SerieId } from "../models";
+import { DocOdm, ModelOdm } from "./odm";
+import { QUEUE_NAME } from "./events";
+import { docOdmToModel } from "./adapters";
 
 const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,

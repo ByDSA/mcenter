@@ -1,9 +1,9 @@
 import { Fragment } from "react";
+import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
+import { FetchingRender } from "#modules/fetching";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { useRequest } from "./requests";
 import { getDateStr } from "./utils";
-import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
-import { FetchingRender } from "#modules/fetching";
 
 import "#styles/resources/history-entry.css";
 import "#styles/resources/history-episodes.css";

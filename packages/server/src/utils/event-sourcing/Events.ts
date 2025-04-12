@@ -1,7 +1,7 @@
+import { Event } from "#utils/message-broker";
 import { EventType } from "./EventType";
 import { Message as ModelMessage } from "./ModelMessage";
 import { PatchModelMessage } from "./PatchModelMessage";
-import { Event } from "#utils/message-broker";
 
 type ModelEventType = EventType.CREATED | EventType.DELETED | EventType.UPDATED;
 

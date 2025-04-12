@@ -1,7 +1,7 @@
 import { DateType } from "#shared/utils/time";
 import mongoose from "mongoose";
-import { HistoryList } from "../models";
 import { DateTypeOdmSchema } from "#utils/time";
+import { HistoryList } from "../models";
 
 export type EntryDocOdm = {
   date: DateType;

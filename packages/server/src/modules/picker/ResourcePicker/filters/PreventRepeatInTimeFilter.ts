@@ -1,6 +1,6 @@
+import { ResourceVO } from "#modules/resources/models";
 import { secondsElapsedFrom } from "../utils";
 import { Filter } from "./Filter";
-import { ResourceVO } from "#modules/resources/models";
 
 type Params = {
   minSecondsElapsed: number;

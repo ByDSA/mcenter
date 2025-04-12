@@ -40,7 +40,7 @@ export function findAllSerieFolderTreesAt(
         } );
 
         if (seasonEpisodeId === null || seasonEpisodeId.id === null)
-          // eslint-disable-next-line no-continue
+
           continue;
 
         const { id: episodeId, season: seasonId } = seasonEpisodeId;

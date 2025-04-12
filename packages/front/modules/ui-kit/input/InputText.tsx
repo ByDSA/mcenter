@@ -64,7 +64,6 @@ function getVisualLines(textarea: InputElement, sentence: string) {
       lineCount++;
       currentLine = "\n";
 
-      // eslint-disable-next-line no-continue
       continue;
     }
 
@@ -93,7 +92,7 @@ function splitIntoWords(str: string): string[] {
     if (l === "\n") {
       words.push(currentWord, "\n");
       currentWord = "";
-      // eslint-disable-next-line no-continue
+
       continue;
     }
 
@@ -101,7 +100,7 @@ function splitIntoWords(str: string): string[] {
       if (l === " " && lastLetter !== " ") {
         words.push(currentWord);
         currentWord = "";
-        // eslint-disable-next-line no-continue
+
         continue;
       }
     }

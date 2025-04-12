@@ -3,7 +3,6 @@ import "reflect-metadata";
 import { existsSync } from "node:fs";
 import * as dotenv from "dotenv";
 import mongoose from "mongoose";
-
 import { isDebugging } from "../shared/src/utils/vscode";
 
 function loadEnvsFile(p: string): void {

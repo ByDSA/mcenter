@@ -1,9 +1,5 @@
 import { PropInfo } from "#shared/utils/validation/zod";
 import { JSX, useState } from "react";
-import { fetchPatch, backendUrls as musicBackendUrls } from "../../../requests";
-import { MUSIC_PROPS } from "../utils";
-import { LastestComponent } from "./Lastest";
-import style from "./style.module.css";
 import { MusicVO, assertIsMusicVO } from "#modules/musics/models";
 import { MusicPatchOneByIdReq } from "#modules/musics/models/transport";
 import { MusicHistoryEntry } from "#modules/musics/history/models";
@@ -12,6 +8,10 @@ import { classes } from "#modules/utils/styles";
 import { useResourceEdition } from "#modules/utils/resources";
 import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
 import { secsToMmss } from "#modules/utils/dates";
+import { MUSIC_PROPS } from "../utils";
+import { fetchPatch, backendUrls as musicBackendUrls } from "../../../requests";
+import style from "./style.module.css";
+import { LastestComponent } from "./Lastest";
 
 function generatePatchBody(entryResource: MusicVO, resource: MusicVO) {
   const patchBodyParams: MusicPatchOneByIdReq["body"] = getDiff(entryResource, resource);

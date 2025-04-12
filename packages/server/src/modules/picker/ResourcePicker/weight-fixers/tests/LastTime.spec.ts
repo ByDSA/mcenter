@@ -1,10 +1,10 @@
-import { secondsElapsedFrom } from "../../utils";
-import { Fx, LastTimeWeightFixer } from "../LastTime";
 import { SECONDS_IN_DAY } from "#modules/resources";
 import { ResourceVO } from "#modules/resources/models";
 import { genLastTimePlayedAgo, genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { useFakeTime } from "#tests/time";
+import { Fx, LastTimeWeightFixer } from "../LastTime";
+import { secondsElapsedFrom } from "../../utils";
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 

@@ -2,6 +2,7 @@ const config = {
   plugins: ["prettier-plugin-sort-json", "prettier-plugin-packagejson"],
   jsonRecursiveSort: true,
   packageSortOrder: [
+
     /**
      * Details
      */

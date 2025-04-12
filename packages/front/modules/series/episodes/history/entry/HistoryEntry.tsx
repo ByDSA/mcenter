@@ -1,9 +1,9 @@
-import { backendUrls } from "../requests";
-import { Header } from "./Header";
-import { Body } from "./body/Body";
 import { HistoryEntry } from "#modules/series/episodes/history/models";
 import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#modules/series/episodes/history/models/transport";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
+import { backendUrls } from "../requests";
+import { Header } from "./Header";
+import { Body } from "./body/Body";
 
 type Props = {
   value: HistoryEntryWithId;

@@ -1,9 +1,4 @@
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
-import { fetchPatch } from "../../../requests";
-import { fetchDelete } from "../../requests";
-import { EPISODE_PROPS } from "../utils";
-import { LastestComponent } from "./Lastest";
-import style from "./style.module.css";
 import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
 import { EpisodePatchOneByIdRequest } from "#modules/series/episodes/models/transport";
 import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
@@ -13,6 +8,11 @@ import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
 import { secsToMmss } from "#modules/utils/dates";
 import { rootBackendUrl } from "#modules/requests";
 import { useHistoryEntryEdition } from "#modules/history";
+import { EPISODE_PROPS } from "../utils";
+import { fetchDelete } from "../../requests";
+import { fetchPatch } from "../../../requests";
+import style from "./style.module.css";
+import { LastestComponent } from "./Lastest";
 
 function generatePatchBody(entryResource: Episode, resource: Episode) {
   const patchBodyParams: EpisodePatchOneByIdRequest["body"] = getDiff(entryResource, resource);

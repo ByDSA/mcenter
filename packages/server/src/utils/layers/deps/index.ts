@@ -1,8 +1,6 @@
 import { PublicMethodsOf } from "#shared/utils/types";
 import { InjectionToken, container } from "tsyringe";
-
 import { DelayedConstructor } from "tsyringe/dist/typings/lazy-helpers";
-
 import { constructor } from "tsyringe/dist/typings/types";
 
 export type DEPS_MAPType = Record<string, constructor<any> | DelayedConstructor<any>>;

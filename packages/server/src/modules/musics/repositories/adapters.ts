@@ -173,9 +173,7 @@ export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<Do
 
     // updateQuery.$pull = params.unset.reduce((acc, path) => {
     //   const key = path.toSpliced(-1).join(".");
-
     //   acc[key] = null;
-
     //   return acc;
     // }, {
     // } );

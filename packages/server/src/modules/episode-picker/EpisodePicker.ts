@@ -1,9 +1,9 @@
 import { neverCase } from "#shared/utils/validation";
+import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
+import { compareEpisodeId } from "#episodes/models";
 import { Episode } from "../episodes/models";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 import { dependencies } from "./appliers/Dependencies";
-import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
-import { compareEpisodeId } from "#episodes/models";
 
 type Params = {
   episodes: Episode[];

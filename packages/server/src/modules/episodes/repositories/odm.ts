@@ -1,8 +1,8 @@
 import { isDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
+import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { EpisodeId } from "../models";
 import { TimestampsModel } from "#sharedSrc/models/utils/dtos/Timestamps";
-import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 
 export interface DocOdm {
   _id?: mongoose.Types.ObjectId;

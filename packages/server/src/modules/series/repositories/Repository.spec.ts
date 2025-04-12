@@ -1,10 +1,10 @@
-import { Serie, assertIsSerie } from "../models";
-import { SerieRepository } from "./Repository";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { Stream, StreamMode, StreamOriginType, assertIsStream } from "#modules/streams/models";
 import { StreamRepository } from "#modules/streams/repositories";
 import { TestMongoDatabase, registerSingletonIfNotAndGet } from "#tests/main";
 import { TestDatabase } from "#tests/main/db/TestDatabase";
+import { Serie, assertIsSerie } from "../models";
+import { SerieRepository } from "./Repository";
 
 let db: TestDatabase;
 let repository: SerieRepository;

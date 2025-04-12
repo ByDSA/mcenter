@@ -3,8 +3,6 @@ import { assertFound } from "#shared/utils/http/validation";
 import { assertIsDefined } from "#shared/utils/validation";
 import express, { Request, Response } from "express";
 import { Picker } from "rand-picker";
-import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
-import { dependencies } from "./appliers/Dependencies";
 import { EpisodeRepository } from "#episodes/index";
 import { Episode } from "#episodes/models";
 import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
@@ -13,6 +11,8 @@ import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams/repositories";
 import { Controller, SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { dependencies } from "./appliers/Dependencies";
+import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 
 type ResultType = Episode & {
   percentage: number;

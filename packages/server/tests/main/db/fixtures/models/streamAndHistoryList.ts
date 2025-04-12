@@ -1,7 +1,7 @@
 import { deepFreeze } from "#shared/utils/objects";
-import { SAMPLE1 as DATE_SAMPLE1 } from "./dates";
 import { HistoryEntry, HistoryList } from "#modules/historyLists/models";
 import { Stream, StreamMode, StreamOriginType } from "#modules/streams";
+import { SAMPLE1 as DATE_SAMPLE1 } from "./dates";
 
 export const HISTORY_LIST_WITH_NO_ENTRIES: HistoryList = deepFreeze( {
   id: "id",

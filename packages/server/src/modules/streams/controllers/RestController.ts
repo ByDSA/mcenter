@@ -1,6 +1,5 @@
 import { CriteriaSortDir } from "#shared/utils/criteria";
 import express, { Request, Response, Router } from "express";
-import { StreamRepository } from "../repositories";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { StreamCriteriaSort, StreamOriginType } from "#modules/streams/models";
@@ -9,6 +8,7 @@ import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetMany } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
+import { StreamRepository } from "../repositories";
 
 const DEPS_MAP = {
   streamRepository: StreamRepository,
@@ -43,7 +43,6 @@ implements
         for (const origin of stream.group.origins) {
           if (origin.type === StreamOriginType.SERIE) {
             // TODO: quitar await en for si se puede
-
             origin.serie = await this.#deps.serieRepository.getOneById(origin.id) ?? undefined;
           }
         }
@@ -58,7 +57,7 @@ implements
           const serieId = stream.group.origins[0]?.id;
 
           if (!serieId)
-            // eslint-disable-next-line no-continue
+
             continue;
 
           const historyList = await this.#deps.historyListRepository.getOneByIdOrCreate(stream.id);

@@ -1,8 +1,5 @@
 import { showError } from "#shared/utils/errors/showError";
 import { LogElementResponse } from "#shared/utils/http";
-import { Stream, StreamId, StreamMode, StreamOriginType } from "../models";
-import { streamDocOdmToModel, streamToDocOdm } from "./adapters";
-import { DocOdm, ModelOdm } from "./odm";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#modules/series";
@@ -11,6 +8,9 @@ import { EventType } from "#utils/event-sourcing";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
+import { Stream, StreamId, StreamMode, StreamOriginType } from "../models";
+import { DocOdm, ModelOdm } from "./odm";
+import { streamDocOdmToModel, streamToDocOdm } from "./adapters";
 
 const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,

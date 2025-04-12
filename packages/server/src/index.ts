@@ -1,7 +1,6 @@
 import "reflect-metadata";
 
 import { container } from "tsyringe";
-import { ExpressApp, RealMongoDatabase } from "./main";
 import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController, SavedSerieTreeService } from "#episodes/index";
 import { ActionController } from "#modules/actions";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
@@ -12,6 +11,7 @@ import { PlaySerieController, PlayStreamController, RemotePlayerWebSocketsServer
 import { SerieRepository } from "#modules/series";
 import { StreamRestController } from "#modules/streams";
 import { MusicController, MusicHistoryRepository, MusicRepository } from "#musics/index";
+import { ExpressApp, RealMongoDatabase } from "./main";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async function main() {

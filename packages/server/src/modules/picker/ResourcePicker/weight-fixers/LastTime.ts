@@ -1,6 +1,6 @@
+import { Pickable, ResourceVO } from "#modules/resources/models";
 import { secondsElapsedFrom } from "../utils";
 import { WeightFixer, WeightFixerParams } from "./WeightFixer";
-import { Pickable, ResourceVO } from "#modules/resources/models";
 
 export type Fx<R extends Pickable = Pickable> = (pickable: R, x: number)=> number;
 type Params<R extends Pickable> = {

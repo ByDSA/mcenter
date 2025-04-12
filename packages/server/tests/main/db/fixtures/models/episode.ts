@@ -1,6 +1,6 @@
 import { deepFreeze } from "#shared/utils/objects";
-import { DATEJS_SAMPLE1 } from "./dates";
 import { Episode } from "#episodes/models";
+import { DATEJS_SAMPLE1 } from "./dates";
 
 const timestamps = {
   createdAt: DATEJS_SAMPLE1,

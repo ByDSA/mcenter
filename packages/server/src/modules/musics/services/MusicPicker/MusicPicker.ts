@@ -1,7 +1,7 @@
 import { neverCase } from "#shared/utils/validation";
-import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./appliers";
 import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
 import { Music } from "#musics/models";
+import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./appliers";
 
 type Model = Music;
 type ModelId = string;

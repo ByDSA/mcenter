@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { entrySchema } from "../Entry";
 
 export const musicHistoryListGetManyEntriesBySearchResponseSchema = z.array(entrySchema);

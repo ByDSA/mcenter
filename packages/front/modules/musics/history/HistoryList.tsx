@@ -1,10 +1,10 @@
 import extend from "just-extend";
 import { Fragment } from "react";
-import { HistoryEntryElement } from "./entry/HistoryEntry";
-import { useRequest } from "./requests";
 import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { formatDate } from "#modules/utils/dates";
 import { FetchingRender } from "#modules/fetching";
+import { useRequest } from "./requests";
+import { HistoryEntryElement } from "./entry/HistoryEntry";
 
 import "#styles/resources/history-entry.css";
 import "#styles/resources/history-musics.css";

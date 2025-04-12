@@ -1,10 +1,9 @@
 // @ts-check
-
 import { Dependencies } from "daproj";
 import { generateConfigs } from "daproj/eslint";
 import { configs as projectConfigs } from "../lib/eslint.project.config.mjs";
 
-const generatedConfigs = generateConfigs( {
+const generatedConfigs = await generateConfigs( {
   [Dependencies.Jest]: true,
   [Dependencies.Eslint]: true,
   [Dependencies.Prettier]: true,
@@ -13,7 +12,7 @@ const generatedConfigs = generateConfigs( {
 } );
 const packageConfig = [
   {
-    ignores: [".next/**"],
+    ignores: [".next/**", "next-env.d.ts"],
   },
   {
     files: ["**/*.ts"],

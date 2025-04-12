@@ -3,11 +3,11 @@ import { Server as HttpServer } from "node:http";
 import { showError } from "#shared/utils/errors/showError";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Server, Socket } from "socket.io";
-import { EmptyPlayerEvent, PlayPlayerEvent, QUEUE_NAME, SeekPlayerEvent } from "../messaging";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { PlayerEvent as PlayerEventType, PlayerStatusResponse } from "#modules/play/player-services/models";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Event } from "#utils/message-broker";
+import { EmptyPlayerEvent, PlayPlayerEvent, QUEUE_NAME, SeekPlayerEvent } from "../messaging";
 
 const DEPS_MAP = {
   domainMessageBroker: DomainMessageBroker,

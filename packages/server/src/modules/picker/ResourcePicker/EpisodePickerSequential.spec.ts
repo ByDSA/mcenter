@@ -1,7 +1,7 @@
 /* eslint-disable prefer-destructuring */
-import { ResourcePickerSequential } from "./ResourcePickerSequential";
 import { Episode, compareEpisodeId } from "#episodes/models";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures/models/episode";
+import { ResourcePickerSequential } from "./ResourcePickerSequential";
 
 type Model = Episode;
 

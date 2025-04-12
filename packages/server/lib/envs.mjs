@@ -1,5 +1,4 @@
 // @ts-check
-
 import { remoteUpdateEnvs } from "../../../lib/packages/deploy/index.mjs";
 
 /**

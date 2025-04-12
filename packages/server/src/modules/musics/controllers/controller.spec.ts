@@ -1,14 +1,14 @@
 import { Application } from "express";
 import request from "supertest";
+import { RouterApp } from "#utils/express/test";
+import { registerSingletonIfNotAndGet } from "#tests/main";
+import { parseMusic } from "#musics/models";
 import { MusicHistoryRepository } from "../history";
 import { MusicHistoryRepositoryMock } from "../history/repositories/tests";
 import { MusicRepository } from "../repositories";
 import { MUSICS_SAMPLES_IN_DISK, MusicRepositoryMock } from "../repositories/tests";
 import { UpdateResult } from "../services";
 import { MusicController } from "./Controller";
-import { RouterApp } from "#utils/express/test";
-import { registerSingletonIfNotAndGet } from "#tests/main";
-import { parseMusic } from "#musics/models";
 
 describe("getAll", () => {
   let routerApp: Application;

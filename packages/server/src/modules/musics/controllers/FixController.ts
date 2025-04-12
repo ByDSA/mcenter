@@ -1,8 +1,8 @@
 import { PublicMethodsOf } from "#shared/utils/types";
 import { Router } from "express";
-import { MusicRepository } from "../repositories";
 import { SecureRouter } from "#utils/express";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { MusicRepository } from "../repositories";
 
 const API = "/api";
 const CREATE = `${API}/create`;

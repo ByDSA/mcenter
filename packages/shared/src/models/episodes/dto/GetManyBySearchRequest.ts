@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { searchSchema } from "./Criteria";
 
 export const getManyBySearchSchema = z.object( {

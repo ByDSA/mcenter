@@ -1,5 +1,5 @@
-import { additionOperator, colon, comma, greaterEqual, greaterThan, lBracket, lessEqual, lessThan, lParen, multiplicationOperator, numberLiteral, rBracket, rParen, stringLiteral, tagIdentifier, tokens, weightIdentifier, yearIdentifier } from "./QueryLexer";
 import { CstParser } from "chevrotain";
+import { additionOperator, colon, comma, greaterEqual, greaterThan, lBracket, lessEqual, lessThan, lParen, multiplicationOperator, numberLiteral, rBracket, rParen, stringLiteral, tagIdentifier, tokens, weightIdentifier, yearIdentifier } from "./QueryLexer";
 
 export class QueryParser extends CstParser {
   constructor() {
@@ -51,12 +51,10 @@ export class QueryParser extends CstParser {
   //   this.CONSUME(Plus);
   //   this.SUBRULE2(this.filter);
   // } );
-
   // private notOperation = this.RULE("notOperation", () => {
   //   this.CONSUME(Not);
   //   this.SUBRULE(this.filter);
   // } );
-
   private filter = this.RULE("filter", () => {
     this.OR([
       {

@@ -2,14 +2,14 @@ import { HttpStatusCode } from "#shared/utils/http/StatusCode";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
-import { MusicHistoryRepository } from "../repositories";
-import { MusicHistoryRepositoryMock as RepositoryMock } from "../repositories/tests";
-import { MusicHistoryRestController } from "./RestController";
 import { resolveRequired } from "#utils/layers/deps";
 import { RouterApp } from "#utils/express/test";
 import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import { assertIsMusicHistoryListGetManyEntriesBySearchResponse, musicHistoryListGetManyEntriesBySearchResponseSchema } from "#musics/history/models/transport";
+import { MusicHistoryRepositoryMock as RepositoryMock } from "../repositories/tests";
+import { MusicHistoryRepository } from "../repositories";
+import { MusicHistoryRestController } from "./RestController";
 
 describe("restController", () => {
   let routerApp: Application;

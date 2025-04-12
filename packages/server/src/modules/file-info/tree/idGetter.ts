@@ -103,7 +103,7 @@ function getFromBasenameAndFilePath(
     const matches = basenameWithoutExtension.match(pattern.pattern);
 
     if (matches === null)
-      // eslint-disable-next-line no-continue
+
       continue;
 
     let season: string | null = null;
@@ -123,7 +123,7 @@ function getFromBasenameAndFilePath(
       throw new Error("Invalid pattern");
 
     if (episode === null)
-      // eslint-disable-next-line no-continue
+
       continue;
 
     if (season && typeof season === "string") {

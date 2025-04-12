@@ -1,8 +1,8 @@
-import { backendUrls as historyBackendUrls } from "./history/requests";
 import { MusicPatchOneByIdReq, MusicPatchOneByIdReqBody, MusicPatchOneByIdResBody, assertIsMusicPatchOneByIdReqBody, assertIsMusicPatchOneByIdResBody } from "#musics/models/transport";
 import { MusicId } from "#musics/models";
 import { makeFetcher } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
+import { backendUrls as historyBackendUrls } from "./history/requests";
 
 export const backendUrls = {
   crud: {

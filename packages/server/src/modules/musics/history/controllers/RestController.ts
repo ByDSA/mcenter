@@ -1,12 +1,12 @@
 import express, { Request, Response, Router } from "express";
-import { MusicRepository } from "../../repositories";
-import { MusicHistoryRepository } from "../repositories";
-import { GetManyCriteria } from "../repositories/Repository";
 import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchRequest } from "#musics/history/models/transport";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
+import { GetManyCriteria } from "../repositories/Repository";
+import { MusicHistoryRepository } from "../repositories";
+import { MusicRepository } from "../../repositories";
 
 const DEPS_MAP = {
   historyRepository: MusicHistoryRepository,

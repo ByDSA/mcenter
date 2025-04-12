@@ -2,9 +2,6 @@ import { HttpStatusCode } from "#shared/utils/http/StatusCode";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
-import { EpisodeRepository } from "../repositories";
-import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
-import { EpisodesRestController } from "./RestController";
 import { Episode } from "#episodes/models";
 import { expectEpisode, expectEpisodes } from "#episodes/models/test";
 import { episodeDtoToModel, EpisodeGetManyBySearchRequest } from "#episodes/models/transport";
@@ -12,6 +9,9 @@ import { registerSingletonIfNotAndGet } from "#tests/main";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
 import { resolveRequired } from "#utils/layers/deps";
+import { EpisodeRepositoryMock as RepositoryMock } from "../repositories/tests";
+import { EpisodeRepository } from "../repositories";
+import { EpisodesRestController } from "./RestController";
 
 describe("restController", () => {
   let routerApp: Application;

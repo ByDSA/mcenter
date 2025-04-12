@@ -1,8 +1,8 @@
-import { backendUrls as historyBackendUrls } from "./history/requests";
 import { EpisodeId } from "#modules/series/episodes/models";
 import { EpisodePatchOneByIdReqBody, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodePatchOneByIdReqBody, assertIsEpisodePatchOneByIdResBody } from "#modules/series/episodes/models/transport";
 import { makeFetcher } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
+import { backendUrls as historyBackendUrls } from "./history/requests";
 
 export const backendUrls = {
   history: historyBackendUrls,

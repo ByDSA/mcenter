@@ -1,6 +1,6 @@
 import { PublicMethodsOf } from "#shared/utils/types";
-import { MusicHistoryRestController } from "../RestController";
 import { getRouterMock } from "#tests/main";
+import { MusicHistoryRestController } from "../RestController";
 
 export class MusicHistoryListRestControllerMock
 implements PublicMethodsOf<MusicHistoryRestController> {
