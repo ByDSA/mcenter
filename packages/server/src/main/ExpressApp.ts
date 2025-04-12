@@ -182,6 +182,12 @@ export class ExpressApp implements App {
           icons: true,
         } ));
       }
+
+      for (const item of ["docs"]) {
+        app.use(`/raw/${item}/`, express.static(`${mediaFolderPath}/${item}/`, {
+          acceptRanges: false, // Evita que a veces salga el error de "Range Not Satisfiable"
+        } ));
+      }
     } else
       console.warn("MEDIA_FOLDER_PATH not defined");
 
