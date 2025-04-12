@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.12.0](https://github.com/ByDSA/mcenter/compare/v3.11.0...v3.12.0) (2025-04-12)
+
+
+### Features
+
+* **server:** add docs folder ([5f1e620](https://github.com/ByDSA/mcenter/commit/5f1e62017b2dbad23a73b31832187f4bd782b9ae))
+
 ## [3.11.0](https://github.com/ByDSA/mcenter/compare/v3.10.1...v3.11.0) (2025-02-18)
 
 
