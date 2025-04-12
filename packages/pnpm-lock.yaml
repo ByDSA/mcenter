@@ -4,7 +4,7 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-pnpmfileChecksum: sha256-15zx3+I7Rt6SfAuTkrkdZlMqv7u4zWRIsDOUNtX4ytQ=
+pnpmfileChecksum: sha256-Q/Uex23dXk95daINx/0ENtSTRVjhi4XAgh4mSfQOQEg=
 
 importers:
 
@@ -98,6 +98,9 @@ importers:
       typescript-eslint:
         specifier: 8.21.0
         version: 8.21.0(eslint@9.18.0(jiti@2.4.2))(typescript@5.7.3)
+      zx:
+        specifier: 8.5.2
+        version: 8.5.2
 
   front:
     dependencies:
@@ -5222,6 +5225,11 @@ packages:
 
   zx@8.4.1:
     resolution: {integrity: sha512-1Cb+Tfwt/daKV6wckBeDbB6h3IMauqj9KWp+EcbYzi9doeJeIHCktxp/yWspXOXRdoUzBCQSKoUgm3g8r9fz5A==}
+    engines: {node: '>= 12.17.0'}
+    hasBin: true
+
+  zx@8.5.2:
+    resolution: {integrity: sha512-eIxjTkCtlzvDNRhw3RD1gGBPA4nxOTn6PafpKl+MW4eE2jR/u/R6mqq7oyUCXwarM5DSP96kWtq6XkrL2kSFrg==}
     engines: {node: '>= 12.17.0'}
     hasBin: true
 
@@ -11114,3 +11122,5 @@ snapshots:
   zod@3.24.1: {}
 
   zx@8.4.1: {}
+
+  zx@8.5.2: {}

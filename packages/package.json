@@ -55,7 +55,8 @@
     "ts-jest": "29.2.5",
     "tsconfig-paths": "4.2.0",
     "typescript": "5.7.3",
-    "typescript-eslint": "8.21.0"
+    "typescript-eslint": "8.21.0",
+    "zx": "8.5.2"
   },
   "nohoist": [
     "server"

@@ -7,7 +7,7 @@ RUN yarn global add pnpm
 FROM base-pnpm AS deps-common
 WORKDIR /packages
 
-COPY ./package.json ./*-lock.* ./
+COPY ./package.json ./*-lock.* .pnpmfile.cjs ./
 COPY <<EOF ./pnpm-workspace.yaml
 packages:
   - 'shared'
@@ -17,17 +17,42 @@ EOF
 COPY ./shared ./shared
 COPY ./$APP ./app
 
+RUN if [ -f .pnpmfile.cjs ]; then \
+  rm .pnpmfile.cjs; \
+  echo "PNPMFILE_EXISTS=true" >> /etc/environment; \
+  else \
+  echo "PNPMFILE_EXISTS=false" >> /etc/environment; \
+  fi
+
 FROM deps-common AS deps
 WORKDIR /packages
 
-RUN pnpm i --fix-lockfile --frozen-lockfile --ignore-scripts
+RUN apk add --no-cache git # Instalar git, para daproj y chevronatain
+
+RUN . /etc/environment && \
+  if [ "$PNPMFILE_EXISTS" = "true" ]; then \
+  echo ".pnpmfile.cjs existe"; \
+  pnpm i --fix-lockfile --no-frozen-lockfile --ignore-scripts; \
+  else \
+  echo ".pnpmfile.cjs no existe"; \
+  pnpm i --fix-lockfile --frozen-lockfile --ignore-scripts; \
+  fi
+
 RUN cd shared && pnpm build
 
-RUN apk add --no-cache git # Instalar git
 RUN sh ./app/lib/install_chevrotain.sh
 
 FROM deps-common AS deps-prod
-RUN pnpm i --prod --fix-lockfile --frozen-lockfile --ignore-scripts
+RUN apk add --no-cache git # Instalar git (no sé por qué, necesita resolver las devDependencies aunque no las instale)
+
+RUN . /etc/environment && \
+  if [ "$PNPMFILE_EXISTS" = "true" ]; then \
+  echo ".pnpmfile.cjs existe"; \
+  pnpm i --prod --fix-lockfile --no-frozen-lockfile --ignore-scripts; \
+  else \
+  echo ".pnpmfile.cjs no existe"; \
+  pnpm i --prod --fix-lockfile --frozen-lockfile --ignore-scripts; \
+  fi
 
 FROM deps AS builder
 WORKDIR /packages/app

@@ -10,11 +10,11 @@ import {
   packageBuild,
   remoteDockerImagePull,
   sshCmd,
-} from "../../../lib/index.mjs";
+} from "../../lib/index.mjs";
 import { updateRemoteEnvs } from "./envs.mjs";
 
 /**
- * @param {import("../../../lib/projects/deploy/types.mjs").TreeEnvs} ENVS
+ * @param {import("../../lib/projects/deploy/types.mjs").TreeEnvs} ENVS
  */
 export async function deployParticular(ENVS) {
   const packageName = "music";

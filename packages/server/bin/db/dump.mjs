@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 
 // @ts-check
-import { loadProjectEnvs } from "../../../../lib/projects/envs.mjs";
+import { loadProjectEnvs } from "../../../lib/projects/envs.mjs";
 
 (async () => {
   const from = getFromArgOrFail();

@@ -1,20 +1,18 @@
-#!/usr/bin/env node
+#!/usr/bin/env zx
+
 // @ts-check
-// eslint-disable-next-line import/no-absolute-path
-import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
-import { deployProjectBegin, deployProjectEnd } from "../../../lib/index.mjs";
+
+import { deployProjectBegin, deployProjectEnd } from "../../lib/index.mjs";
 import { deployParticular } from "../lib/deploy-particular.mjs";
 
-(async () => {
-  $.verbose = false;
+$.verbose = false;
 
-  const { ENVS } = await deployProjectBegin();
+const { ENVS } = await deployProjectBegin();
 
-  await deployParticular( {
-    ...ENVS,
-  } );
+await deployParticular( {
+  ...ENVS,
+} );
 
-  await deployProjectEnd( {
-    ...ENVS,
-  } );
-} )();
+await deployProjectEnd( {
+  ...ENVS,
+} );

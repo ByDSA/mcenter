@@ -1,12 +1,12 @@
 // @ts-check
-import { remoteUpdateEnvs } from "../../../lib/packages/deploy/index.mjs";
+import { remoteUpdateEnvs } from "../../lib/packages/deploy/index.mjs";
 
 /**
  * @param {{
  * remoteProjectRoot: string,
  * targetEnv: string,
- * ssh: import("../../../lib/ssh/types.mjs").SSH,
- * vault: import("../../../lib/secrets/types.mjs").Vault,
+ * ssh: import("../../lib/ssh/types.mjs").SSH,
+ * vault: import("../../lib/secrets/types.mjs").Vault,
  * }} params
  */
 export async function updateRemoteEnvs(params) {

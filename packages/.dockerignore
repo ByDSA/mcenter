@@ -12,7 +12,9 @@ front/.next
 !front/.env*
 front/.env
 
-server/build
 server/.log
 server/.eslint.config.js
 server/nodemon.json
+
+**/node_modules
+**/build

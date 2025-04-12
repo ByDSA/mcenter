@@ -1,7 +1,5 @@
 // @ts-check
-
-import { $, argv } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
-
+import { $, argv } from "zx";
 import { assertEnv, loadEnvsFile } from "../../envs/index.mjs";
 import {
   assertSshEnvs,
@@ -23,10 +21,10 @@ export async function loadDeployEnvs(TARGET_ENV) {
   await loadProjectEnvs();
 
   if (TARGET_ENV !== "local") {
-    const CI = process.env.CI;
+    const { CI } = process.env;
+
     if (CI === undefined) {
-      const TARGET_ENVS_PATH =
-        process.env.PROJECT_ROOT + "/bin/deploy.env." + TARGET_ENV;
+      const TARGET_ENVS_PATH = process.env.PROJECT_ROOT + "/bin/deploy.env." + TARGET_ENV;
 
       await loadEnvsFile(TARGET_ENVS_PATH);
     }
@@ -48,14 +46,14 @@ export async function deployProjectEnd(ENVS) {
     const { ssh } = ENVS;
 
     // Reload (remote)
-    console.log("Remote: runing (or reloading) container ...");
-    await sshCmd({
+    console.log("Remote: running (or reloading) container ...");
+    await sshCmd( {
       cmd: `${ENVS.REMOTE_PROJECT_ROOT}/bin/run`,
       ssh,
-    });
+    } );
   } else {
     // Reload
-    console.log("Runing (or reloading) container ...");
+    console.log("Running (or reloading) container ...");
     await $`${ENVS.project.root}/bin/run`;
   }
 
@@ -66,7 +64,13 @@ export async function deployProjectEnd(ENVS) {
  * @returns {Promise<{ENVS: import("./types.mjs").TreeEnvs}>}
  */
 export async function deployProjectBegin() {
-  const TARGET_ENV = argv._[0] ?? "local";
+  if (argv._[1] === undefined)
+    console.warn("Warning:", "No se ha especificado target env, se usará 'local'");
+
+  const TARGET_ENV = argv._[1] ?? "local";
+
+  console.debug("Target env:", TARGET_ENV);
+
   /** @type {import("./types.mjs").TreeEnvs} */
   let ENVS = await loadEnvs(TARGET_ENV);
 
@@ -74,12 +78,13 @@ export async function deployProjectBegin() {
 
   if (ENVS.TARGET_ENV !== "local") {
     const { ssh } = ENVS;
+
     // rsync infrastructure
-    await infraUp({
+    await infraUp( {
       projectRoot: ENVS.project.root,
       remoteProjectRoot: ENVS.REMOTE_PROJECT_ROOT,
       ssh,
-    });
+    } );
   }
 
   return {
@@ -95,16 +100,15 @@ export async function deployProjectBegin() {
 async function loadEnvs(targetEnv) {
   await loadDeployEnvs(targetEnv);
 
-  process.env = Object.freeze({
+  process.env = Object.freeze( {
     ...process.env,
-  });
+  } );
 
   const ssh = {
     host: process.env.SSH_HOST,
     user: process.env.SSH_USER,
     keyFile: process.env.SSH_KEYFILE,
   };
-
   const vault = {
     addr: process.env.VAULT_ADDR,
     username: process.env.VAULT_USERNAME,
