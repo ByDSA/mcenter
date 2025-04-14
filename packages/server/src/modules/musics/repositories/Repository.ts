@@ -233,6 +233,7 @@ CanGetOneById<Music, MusicId> {
   }
 
   async updateOneByUrl(url: string, data: Partial<Music>): Promise<void> {
+    setUpdatedAtNow(data);
     await ModelOdm.updateOne( {
       url,
     }, data);
@@ -248,6 +249,7 @@ CanGetOneById<Music, MusicId> {
   }
 
   async updateOneByHash(hash: string, data: Partial<Music>): Promise<void> {
+    setUpdatedAtNow(data);
     await ModelOdm.updateOne( {
       hash,
     }, data);
@@ -264,6 +266,7 @@ CanGetOneById<Music, MusicId> {
   }
 
   async updateOneByPath(relativePath: string, data: Partial<Music>): Promise<void> {
+    setUpdatedAtNow(data);
     await ModelOdm.updateOne( {
       path: relativePath,
     }, data);
@@ -302,4 +305,9 @@ function fixTitle(title: string): string {
   return title.replace(/ \((Official )?(Lyric|Music) Video\)/ig, "")
     .replace(/\(videoclip\)/ig, "")
     .replace(/ $/g, "");
+}
+
+function setUpdatedAtNow(data: Partial<Music>) {
+  data.timestamps ??= {} as Music["timestamps"];
+  data.timestamps.updatedAt = new Date();
 }
