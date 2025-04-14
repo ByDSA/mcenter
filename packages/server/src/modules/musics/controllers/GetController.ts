@@ -105,10 +105,7 @@ export class MusicGetController {
     const playlistsFolder = path.join(ENVS.mediaPath, "music", "playlists");
     const filePath = path.join(playlistsFolder, name);
 
-    res.download(filePath, (error) => {
-      if (error)
-        res.sendStatus(404);
-    } );
+    download(res, filePath);
 
     return Promise.resolve();
   }
@@ -151,10 +148,7 @@ export class MusicGetController {
     const relativePath = music.path;
     const fullpath = getFullPath(relativePath);
 
-    res.download(fullpath, (error) => {
-      if (error)
-        res.sendStatus(404);
-    } );
+    download(res, fullpath);
   }
 
   getRouter(): Router {
@@ -189,4 +183,15 @@ function generatePlaylist( { picked, nextUrl, server }: GenPlayListParams): stri
 
 function fixTxt(txt: string): string {
   return txt.replace(/,/g, "﹐");
+}
+
+function download(res: Response, fullpath: string) {
+  return res.download(fullpath, (error) => {
+    if (error) {
+      if (!res.headersSent)
+        res.sendStatus(404);
+      else
+        console.error(JSON.stringify(error, null, 2));
+    }
+  } );
 }
