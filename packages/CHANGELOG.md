@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.12.1](https://github.com/ByDSA/mcenter/compare/v3.12.0...v3.12.1) (2025-04-14)
+
+
+### Bug Fixes
+
+* **back:** no send headers after send to client ([2e7566b](https://github.com/ByDSA/mcenter/commit/2e7566bfed02656317df5f19736e03978b01ffa9))
+
 ## [3.12.0](https://github.com/ByDSA/mcenter/compare/v3.11.0...v3.12.0) (2025-04-12)
 
 
