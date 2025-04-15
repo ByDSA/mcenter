@@ -74,10 +74,13 @@ CanGetOneById<Music, MusicId> {
     const { entity } = params;
     const updateQuery = patchParamsToUpdateQuery(params);
 
-    updateQuery.$set = {
-      ...updateQuery.$set,
-      "timestamps.updatedAt": new Date(),
-    };
+    if (params.entity.hash) {
+      updateQuery.$set = {
+        ...updateQuery.$set,
+        "timestamps.updatedAt": new Date(),
+      };
+    }
+
     await ModelOdm.findByIdAndUpdate(id, updateQuery);
 
     for (const [k, value] of Object.entries(entity)) {
@@ -251,7 +254,11 @@ CanGetOneById<Music, MusicId> {
     query: NonNullable<Parameters<typeof ModelOdm.updateOne>[0]>,
     data: Partial<Music>,
   ) {
-    setUpdatedAtNow(data);
+    if (data.hash) {
+      data.timestamps ??= {} as Music["timestamps"];
+      data.timestamps.updatedAt = new Date();
+    }
+
     await ModelOdm.updateOne(query, data);
 
     const queryAfter = applyChangesToQuery(query, data);
@@ -295,11 +302,6 @@ function fixTitle(title: string): string {
   return title.replace(/ \((Official )?(Lyric|Music) Video\)/ig, "")
     .replace(/\(videoclip\)/ig, "")
     .replace(/ $/g, "");
-}
-
-function setUpdatedAtNow(data: Partial<Music>) {
-  data.timestamps ??= {} as Music["timestamps"];
-  data.timestamps.updatedAt = new Date();
 }
 
 function applyChangesToQuery<T extends object>(
