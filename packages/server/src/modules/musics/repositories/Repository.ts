@@ -74,9 +74,12 @@ CanGetOneById<Music, MusicId> {
     const { entity } = params;
     const updateQuery = patchParamsToUpdateQuery(params);
 
-    updateQuery.timestamps ??= {};
-    updateQuery.timestamps.updatedAt = new Date();
-
+    updateQuery.$set = {
+      ...updateQuery.$set,
+      timestamps: {
+        updatedAt: new Date(),
+      },
+    };
     await ModelOdm.findByIdAndUpdate(id, updateQuery);
 
     for (const [k, value] of Object.entries(entity)) {
