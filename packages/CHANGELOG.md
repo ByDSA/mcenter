@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.13.1](https://github.com/ByDSA/mcenter/compare/v3.13.0...v3.13.1) (2025-04-15)
+
+
+### Bug Fixes
+
+* **back:** update updatedAt on any call to update methods in Music repo ([19fe875](https://github.com/ByDSA/mcenter/commit/19fe8754b0d359f73462d4e59d9b42fa62966f8a))
+
 ## [3.13.0](https://github.com/ByDSA/mcenter/compare/v3.12.1...v3.13.0) (2025-04-14)
 
 
