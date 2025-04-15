@@ -131,7 +131,7 @@ export class MusicGetController {
   async rawAccess(req: Request, res: Response) {
     const { name } = req.params;
     // find in DB
-    const music = await this.#deps.musicRepository.findByUrl(name);
+    const music = await this.#deps.musicRepository.findOneByUrl(name);
 
     if (!music) {
       res.sendStatus(404);

@@ -25,7 +25,7 @@ export class MusicFixController {
 
     router.get(`${ROUTE_CREATE_YT}/:id`, async (req, res) => {
       const { id } = req.params;
-      const data = await this.#musicRepository.findOrCreateFromYoutube(id);
+      const data = await this.#musicRepository.findOrCreateOneFromYoutube(id);
 
       res.send(data);
     } );

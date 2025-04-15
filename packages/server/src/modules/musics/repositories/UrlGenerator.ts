@@ -17,7 +17,7 @@ export class MusicUrlGenerator {
     let i = 1;
 
     while (true) {
-      music = await this.#musicRepository.findByUrl(currentUrl);
+      music = await this.#musicRepository.findOneByUrl(currentUrl);
 
       if (!music)
         return currentUrl;

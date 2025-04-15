@@ -74,6 +74,9 @@ CanGetOneById<Music, MusicId> {
     const { entity } = params;
     const updateQuery = patchParamsToUpdateQuery(params);
 
+    updateQuery.timestamps ??= {};
+    updateQuery.timestamps.updatedAt = new Date();
+
     await ModelOdm.findByIdAndUpdate(id, updateQuery);
 
     for (const [k, value] of Object.entries(entity)) {
@@ -98,10 +101,8 @@ CanGetOneById<Music, MusicId> {
     }
   }
 
-  async findByHash(hash: string): Promise<Music | null> {
-    const musicOdm: DocOdm | null = await ModelOdm.findOne( {
-      hash,
-    } );
+  async #findOne(query: Parameters<typeof ModelOdm.findOne>[0]): Promise<Music | null> {
+    const musicOdm: DocOdm | null = await ModelOdm.findOne(query);
 
     if (!musicOdm)
       return null;
@@ -109,15 +110,16 @@ CanGetOneById<Music, MusicId> {
     return musicDocOdmToModel(musicOdm);
   }
 
-  async findByUrl(url: string): Promise<Music | null> {
-    const music: DocOdm | null = await ModelOdm.findOne( {
+  findOneByHash(hash: string): Promise<Music | null> {
+    return this.#findOne( {
+      hash,
+    } );
+  }
+
+  findOneByUrl(url: string): Promise<Music | null> {
+    return this.#findOne( {
       url,
     } );
-
-    if (!music)
-      return null;
-
-    return musicDocOdmToModel(music);
   }
 
   async findAll(): Promise<Music[]> {
@@ -135,18 +137,13 @@ CanGetOneById<Music, MusicId> {
     return ret;
   }
 
-  async findByPath(relativePath: string): Promise<Music | null> {
-    const docOdm = await ModelOdm.findOne( {
+  findOneByPath(relativePath: string): Promise<Music | null> {
+    return this.#findOne( {
       path: relativePath,
     } );
-
-    if (!docOdm)
-      return null;
-
-    return musicDocOdmToModel(docOdm);
   }
 
-  async createFromPath(relativePath: string): Promise<Music> {
+  async createOneFromPath(relativePath: string): Promise<Music> {
     const fullPath = getFullPath(relativePath);
     const id3Tags = NodeID3.read(fullPath);
     const title = id3Tags.title ?? getTitleFromFilenamePath(fullPath);
@@ -179,7 +176,12 @@ CanGetOneById<Music, MusicId> {
       },
       url: await urlPromise,
     };
-    const docOdm: DocOdm = await ModelOdm.create<MusicVO>(newDocOdm);
+
+    return this.#createOne(newDocOdm);
+  }
+
+  async #createOne(musicVo: MusicVO): Promise<Music> {
+    const docOdm: DocOdm = await ModelOdm.create<MusicVO>(musicVo);
     const ret = musicDocOdmToModel(docOdm);
     const event = new ModelEvent<MusicVO>(EventType.CREATED, {
       entity: ret,
@@ -201,19 +203,19 @@ CanGetOneById<Music, MusicId> {
     return hash;
   }
 
-  async findOrCreateFromPath(relativePath: string): Promise<Music> {
-    const read = await this.findByPath(relativePath);
+  async findOrCreateOneFromPath(relativePath: string): Promise<Music> {
+    const read = await this.findOneByPath(relativePath);
 
     if (read)
       return read;
 
-    return this.createFromPath(relativePath);
+    return this.createOneFromPath(relativePath);
   }
 
-  async findOrCreateFromYoutube(strId: string): Promise<Music> {
+  async findOrCreateOneFromYoutube(strId: string): Promise<Music> {
     const data = await download(strId);
 
-    return this.findOrCreateFromPath(data.file);
+    return this.findOrCreateOneFromPath(data.file);
   }
 
   async deleteOneByPath(relativePath: string) {
@@ -233,31 +235,28 @@ CanGetOneById<Music, MusicId> {
   }
 
   async updateOneByUrl(url: string, data: Partial<Music>): Promise<void> {
-    setUpdatedAtNow(data);
-    await ModelOdm.updateOne( {
+    return await this.#updateOne( {
       url,
     }, data);
-
-    const model = await this.findByUrl(url);
-
-    assertIsDefined(model);
-    const event = new ModelEvent<MusicVO>(EventType.UPDATED, {
-      entity: model,
-    } );
-
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
-  async updateOneByHash(hash: string, data: Partial<Music>): Promise<void> {
-    setUpdatedAtNow(data);
-    await ModelOdm.updateOne( {
+  updateOneByHash(hash: string, data: Partial<Music>): Promise<void> {
+    return this.#updateOne( {
       hash,
     }, data);
+  }
 
-    const model = await this.findByHash(hash);
+  async #updateOne(
+    query: NonNullable<Parameters<typeof ModelOdm.updateOne>[0]>,
+    data: Partial<Music>,
+  ) {
+    setUpdatedAtNow(data);
+    await ModelOdm.updateOne(query, data);
+
+    const queryAfter = applyChangesToQuery(query, data);
+    const model = await this.#findOne(queryAfter);
 
     assertIsDefined(model);
-
     const event = new ModelEvent<MusicVO>(EventType.UPDATED, {
       entity: model,
     } );
@@ -265,20 +264,10 @@ CanGetOneById<Music, MusicId> {
     await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
-  async updateOneByPath(relativePath: string, data: Partial<Music>): Promise<void> {
-    setUpdatedAtNow(data);
-    await ModelOdm.updateOne( {
+  updateOneByPath(relativePath: string, data: Partial<Music>): Promise<void> {
+    return this.#updateOne( {
       path: relativePath,
     }, data);
-
-    const model = await this.findByPath(data.path ?? relativePath);
-
-    assertIsDefined(model);
-    const event = new ModelEvent<MusicVO>(EventType.UPDATED, {
-      entity: model,
-    } );
-
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 }
 
@@ -310,4 +299,31 @@ function fixTitle(title: string): string {
 function setUpdatedAtNow(data: Partial<Music>) {
   data.timestamps ??= {} as Music["timestamps"];
   data.timestamps.updatedAt = new Date();
+}
+
+function applyChangesToQuery<T extends object>(
+  query: T,
+  changes: Record<string, unknown>,
+): T {
+  const result: any = Array.isArray(query)
+    ? [...query]
+    : {
+      ...query,
+    };
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key in query) {
+    if (key in changes) {
+      const value = changes[key];
+      const original = query[key];
+
+      if (key in changes && typeof value === "object"
+        && key in query && original !== null && typeof original === "object")
+        result[key] = applyChangesToQuery(original, value as any);
+      else
+        result[key] = value;
+    }
+  }
+
+  return result;
 }

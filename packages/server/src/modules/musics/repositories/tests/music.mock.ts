@@ -6,17 +6,17 @@ export class MusicRepositoryMock implements PublicMethodsOf<MusicRepository> {
 
   patchOneById = jest.fn();
 
-  findByHash = jest.fn();
+  findOneByHash = jest.fn();
 
-  findByUrl = jest.fn();
+  findOneByUrl = jest.fn();
 
   findAll = jest.fn();
 
-  findByPath = jest.fn();
+  findOneByPath = jest.fn();
 
-  findOrCreateFromPath = jest.fn();
+  findOrCreateOneFromPath = jest.fn();
 
-  findOrCreateFromYoutube = jest.fn();
+  findOrCreateOneFromYoutube = jest.fn();
 
   deleteOneByPath = jest.fn();
 
@@ -26,7 +26,7 @@ export class MusicRepositoryMock implements PublicMethodsOf<MusicRepository> {
 
   updateOneByPath = jest.fn();
 
-  createFromPath = jest.fn();
+  createOneFromPath = jest.fn();
 
   updateHashOf = jest.fn();
 

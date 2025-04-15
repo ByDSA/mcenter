@@ -37,7 +37,7 @@ export class UpdateRemoteTreeService {
     const updated: UpdateResult["updated"] = [];
 
     for (const localFileMusic of changes.new) {
-      const p = this.#deps.musicRepository.createFromPath(localFileMusic.path)
+      const p = this.#deps.musicRepository.createOneFromPath(localFileMusic.path)
         .then((music) => {
           created.push(music);
         } )

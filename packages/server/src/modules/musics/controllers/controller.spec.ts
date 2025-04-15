@@ -55,7 +55,7 @@ describe("getAll", () => {
     const musics = MUSICS_SAMPLES_IN_DISK;
 
     musicRepositoryMock.findAll = jest.fn().mockResolvedValueOnce(musics);
-    musicRepositoryMock.createFromPath = jest.fn((path: string) => {
+    musicRepositoryMock.createOneFromPath = jest.fn((path: string) => {
       const music = MUSICS_SAMPLES_IN_DISK.find((m) => m.path === path);
 
       return Promise.resolve(music);
@@ -78,7 +78,7 @@ describe("getAll", () => {
     const musics = MUSICS_SAMPLES_IN_DISK.toSpliced(1, 1);
 
     musicRepositoryMock.findAll = jest.fn().mockResolvedValueOnce(musics);
-    musicRepositoryMock.createFromPath = jest.fn((path: string) => {
+    musicRepositoryMock.createOneFromPath = jest.fn((path: string) => {
       const music = MUSICS_SAMPLES_IN_DISK.find((m) => m.path === path);
 
       return Promise.resolve(music);
