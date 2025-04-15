@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.13.2](https://github.com/ByDSA/mcenter/compare/v3.13.1...v3.13.2) (2025-04-15)
+
+
+### Bug Fixes
+
+* **back:** set updatedAt ([691da79](https://github.com/ByDSA/mcenter/commit/691da793b25965b45b7c81c0f31e273f0cbc9173))
+
 ### [3.13.1](https://github.com/ByDSA/mcenter/compare/v3.13.0...v3.13.1) (2025-04-15)
 
 
