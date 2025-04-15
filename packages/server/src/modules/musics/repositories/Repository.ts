@@ -76,9 +76,7 @@ CanGetOneById<Music, MusicId> {
 
     updateQuery.$set = {
       ...updateQuery.$set,
-      timestamps: {
-        updatedAt: new Date(),
-      },
+      "timestamps.updatedAt": new Date(),
     };
     await ModelOdm.findByIdAndUpdate(id, updateQuery);
 
