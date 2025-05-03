@@ -126,8 +126,6 @@ export class EpisodeAddNewFilesController implements Controller {
               serieId: serie.id,
             },
             path: episodeInTree.content.filePath,
-            end: -1,
-            start: -1,
             title: `${serie.name} ${episodeInTree.content.episodeId}`,
             weight: 0,
             timestamps: {
