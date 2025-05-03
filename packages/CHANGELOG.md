@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.13.4](https://github.com/ByDSA/mcenter/compare/v3.13.3...v3.13.4) (2025-05-03)
+
+
+### Bug Fixes
+
+* **back:** remove negative numbers ([204c865](https://github.com/ByDSA/mcenter/commit/204c865ff5d9e9934c5ced18e41742ed911c707a))
+
 ### [3.13.3](https://github.com/ByDSA/mcenter/compare/v3.13.2...v3.13.3) (2025-04-15)
 
 
