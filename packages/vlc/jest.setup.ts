@@ -1,6 +1,5 @@
 import { existsSync } from "node:fs";
 import * as dotenv from "dotenv";
-
 import { isDebugging } from "../shared/src/utils/vscode";
 
 if (!isDebugging()) {

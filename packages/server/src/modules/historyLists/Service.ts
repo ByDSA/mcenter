@@ -34,7 +34,7 @@ export class HistoryListService {
     let historyList: HistoryList;
 
     if ("historyList" in params)
-      // eslint-disable-next-line prefer-destructuring
+
       historyList = params.historyList;
     else if ("historyListId" in params) {
       const got = await this.#deps.historyListRepository.getOneByIdOrCreate(params.historyListId);
@@ -54,7 +54,7 @@ export class HistoryListService {
     if ("historyList" in params)
       historyListId = params.historyList.id;
     else if ("historyListId" in params)
-      // eslint-disable-next-line prefer-destructuring
+
       historyListId = params.historyListId;
     else
       throw new Error("No se ha especificado el historyList");
@@ -80,7 +80,7 @@ export class HistoryListService {
     let episode: Episode;
 
     if ("episode" in params)
-      // eslint-disable-next-line prefer-destructuring
+
       episode = params.episode;
     else if ("episodeFullId" in params) {
       const got = await this.#deps.episodeRepository.getOneById(params.episodeFullId);

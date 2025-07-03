@@ -1,6 +1,5 @@
 // @ts-check
-import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
-
+import { $ } from "../../../../../../.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 import { sshCmd } from "../ssh/index.mjs";
 
 /**
@@ -11,8 +10,7 @@ import { sshCmd } from "../ssh/index.mjs";
  */
 export async function imagePull(params) {
   const tag = params.tag ?? "latest";
-
-  const cmd = imagePullCmd({ ...params, tag });
+  const cmd = imagePullCmd( { ...params, tag } );
 
   console.log(`Pulling ${params.imageName}:${tag} ...`);
   await $`${cmd}`;
@@ -25,14 +23,13 @@ export async function imagePull(params) {
 export async function remoteImagePull(params) {
   const { tag: tagArg, ssh, imageName } = params;
   const tag = tagArg ?? "latest";
-
-  const cmd = imagePullCmd({ ...params, tag });
+  const cmd = imagePullCmd( { ...params, tag } );
 
   console.log(`Remote: pulling ${imageName}:${tag} ...`);
-  await sshCmd({
+  await sshCmd( {
     cmd: cmd.join(" "),
     ssh,
-  });
+  } );
 }
 
 /**
@@ -41,9 +38,7 @@ export async function remoteImagePull(params) {
  */
 function imagePullCmd(params) {
   const { imageName, tag } = params;
-
   const imageFull = `${imageName}:${tag}`;
-
   const localCmd = ["sudo", "docker", "pull", imageFull];
 
   return localCmd;

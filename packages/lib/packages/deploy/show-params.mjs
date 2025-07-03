@@ -1,5 +1,4 @@
 // @ts-check
-
 import { assertSshEnvs, assertVaultEnvs } from "../../index.mjs";
 
 /**

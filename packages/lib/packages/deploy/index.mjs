@@ -1,5 +1,4 @@
 // @ts-check
-
 import { sshCmd } from "../../index.mjs";
 import { getSecretsEnvFormat } from "../../secrets/index.mjs";
 
@@ -15,27 +14,27 @@ import { getSecretsEnvFormat } from "../../secrets/index.mjs";
  * @param {Params} params
  */
 export async function remoteUpdateEnvs(params) {
-  const { projectName, packageName, ssh, outEnvFile, targetEnv, vault } =
-    params;
+  const { projectName, packageName, ssh, outEnvFile, targetEnv, vault } = params;
+
   console.log("Remote: updating envs ...");
 
-  const SECRETS = await getSecretsEnvFormat({
+  const SECRETS = await getSecretsEnvFormat( {
     projectName,
     packageName,
     targetEnv,
     vault,
-  });
-
+  } );
   const SECRETS_ESCAPED = escapeEnvChars(SECRETS);
 
-  sshCmd({
+  sshCmd( {
     cmd: `echo "${SECRETS_ESCAPED}" > "${outEnvFile}"`,
     ssh,
-  });
+  } );
 }
 
 function escapeEnvChars(str) {
-  return str.replace(/"/g, '\\"').replace(/\$/g, "\\$").replace(/\`/g, "\\`");
+  return str.replace(/"/g, "\\\"").replace(/\$/g, "\\$")
+    .replace(/`/g, "\\`");
 }
 
 export { showParams } from "./show-params.mjs";

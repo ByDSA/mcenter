@@ -1,5 +1,4 @@
 import { Server as HttpServer, createServer } from "node:http";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Server } from "socket.io";
 
 type StartParams = {

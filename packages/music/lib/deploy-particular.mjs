@@ -1,9 +1,6 @@
-
 /* eslint-disable space-in-parens */
 // @ts-check
-
 // @ts-ignore
-
 import {
   dockerImagePush,
   dockerImageTag,

@@ -1,4 +1,3 @@
-/* eslint-disable prefer-destructuring */
 import { assertIsDefined } from "#shared/utils/validation";
 import { EpisodeId } from "#episodes/models";
 import { stringifyEpisodeId } from "#episodes/tests";

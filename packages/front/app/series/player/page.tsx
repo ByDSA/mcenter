@@ -143,7 +143,7 @@ function statusRepresentaton(status: PlayerStatusResponse, resource: Episode | n
   let title = "-";
 
   if (resource)
-    // eslint-disable-next-line prefer-destructuring
+
     title = resource.title;
   else if (status?.status?.meta?.title)
     title = status?.status?.meta?.title;

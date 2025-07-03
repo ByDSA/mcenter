@@ -62,7 +62,7 @@ async function getPageElements(
 
     row.querySelectorAll("td").forEach((column, index) => {
       if (index === 0)
-        // eslint-disable-next-line prefer-destructuring
+
         alt = (<HTMLImageElement>column.querySelector("img")).alt;
       else if (index === 1) {
         const anchor = <HTMLAnchorElement>column.querySelector("a");

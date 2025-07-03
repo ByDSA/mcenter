@@ -1,8 +1,8 @@
-import { VLCWebInterface } from "../vlc/http-interface";
-import { vlcResponsesToGenericResponses } from "./adapters";
 import { PlayerStatusResponse, PlayResourceMessage } from "#modules/models";
 import { PlayerProcessService } from "#modules/PlayerProcessService";
 import { PlayerService } from "#modules/PlayerService";
+import { VLCWebInterface } from "../vlc/http-interface";
+import { vlcResponsesToGenericResponses } from "./adapters";
 
 type OnStatusChangeCallback = (status: PlayerStatusResponse)=> void;
 

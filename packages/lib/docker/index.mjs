@@ -1,13 +1,13 @@
 // @ts-check
-
 export {
-  imageBuild as dockerImageBuild
+  imageBuild as dockerImageBuild,
 } from "./image-build.mjs";
+
 export { imagePush as dockerImagePush } from "./image-push.mjs";
 
 export {
   imagePull as dockerImagePull,
-  remoteImagePull as remoteDockerImagePull
+  remoteImagePull as remoteDockerImagePull,
 } from "./image-pull.mjs";
 
 export { loginIfNot as dockerLoginIfNot } from "./login.mjs";

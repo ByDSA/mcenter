@@ -1,6 +1,5 @@
 // @ts-check
-
-import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
+import { $ } from "../../../../../../.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 
 /**
  * @typedef {Object} Params
@@ -16,29 +15,30 @@ export async function login(params) {
     username: usernameArg,
   } = params;
 
-  if (!dockerRegistryUrl) {
+  if (!dockerRegistryUrl)
     throw new Error("DOCKER_REGISTRY_URL is required");
-  }
 
   // Username
   let username = usernameArg;
+
   if (!username) {
     console.log("Username: ");
     username = process.stdin.read();
   }
-  if (!username) {
+
+  if (!username)
     throw new Error("Username is empty");
-  }
 
   // Password
   let password = passwordArg;
+
   if (!password) {
     console.log("Password: ");
     password = process.stdin.read();
   }
-  if (!password) {
+
+  if (!password)
     throw new Error("Password is empty");
-  }
 
   await $`echo "${password}" | sudo docker login ${dockerRegistryUrl} -u "${username}" --password-stdin`;
 }
@@ -48,10 +48,10 @@ export async function login(params) {
  * @param {string} url
  */
 export async function isLoggedTo(url) {
-  if (!url) throw new Error("URL is required");
+  if (!url)
+    throw new Error("URL is required");
 
   const jsonFile = process.env.HOME + "/.docker/config.json";
-
   const cmd = [
     "sudo",
     "jq",
@@ -64,9 +64,12 @@ export async function isLoggedTo(url) {
   ];
   const ret = (await $`${cmd}`).stdout.trim();
 
-  if (ret === "true") return true;
-  else if (ret === "false") return false;
-  else throw new Error("Unexpected output: " + ret);
+  if (ret === "true")
+    return true;
+  else if (ret === "false")
+    return false;
+  else
+    throw new Error("Unexpected output: " + ret);
 }
 
 /**
@@ -76,13 +79,11 @@ export async function isLoggedTo(url) {
 export async function loginIfNot(params) {
   const { dockerRegistryUrl } = params;
 
-  if (!dockerRegistryUrl) {
+  if (!dockerRegistryUrl)
     throw new Error("DOCKER_REGISTRY_URL is required");
-  }
 
   const logged = await isLoggedTo(dockerRegistryUrl);
 
-  if (!logged) {
+  if (!logged)
     await login(params);
-  }
 }

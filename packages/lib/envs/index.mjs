@@ -1,7 +1,6 @@
 // @ts-check
-
 import { assertFileExists } from "../fs/index.mjs";
-import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
+import { $ } from "../../../../../../.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 
 /**
  * @param {string} name
@@ -20,11 +19,12 @@ function parseEnvs(txt) {
       const equalIndex = line.indexOf("=");
 
       return [line.slice(0, equalIndex), line.slice(equalIndex + 1)];
-    })
+    } )
     .reduce((acc, [key, value]) => {
       acc[key] = value;
+
       return acc;
-    }, {});
+    }, {} );
 
   return envObject;
 }
@@ -37,10 +37,10 @@ function addEnvsTxt(txt) {
   const envObject = parseEnvs(txt);
 
   // @ts-ignore
-  process.env = Object.freeze({
+  process.env = Object.freeze( {
     ...process.env,
     ...envObject,
-  });
+  } );
 }
 
 /**
@@ -52,11 +52,14 @@ function addEnvsTxt(txt) {
 export async function loadEnvsFile(envsFile, opts) {
   assertFileExists(envsFile);
 
-  const verbose = $.verbose;
+  const { verbose } = $;
+
   $.verbose = false;
   let exportEnvsCmd = [];
+
   if (opts?.envs) {
     let added = 0;
+
     for (const [key, value] of Object.entries(opts.envs)) {
       if (value !== undefined) {
         exportEnvsCmd.push(`${key}=${value}`);
@@ -64,17 +67,19 @@ export async function loadEnvsFile(envsFile, opts) {
       }
     }
 
-    if (added > 0) {
+    if (added > 0)
       exportEnvsCmd.unshift("export");
-    }
   }
 
   let out;
-  if (exportEnvsCmd.length > 0)
+
+  if (exportEnvsCmd.length > 0) {
     out = (
       await $`${exportEnvsCmd} && set -a && source ${envsFile} && env`
     ).stdout.toString();
-  else out = (await $`set -a && source ${envsFile} && env`).stdout.toString();
+  } else
+    out = (await $`set -a && source ${envsFile} && env`).stdout.toString();
+
   $.verbose = verbose;
   addEnvsTxt(out);
 }

@@ -1,11 +1,11 @@
 /* eslint-disable require-await */
 /* eslint-disable jest/no-done-callback */
 import { Socket } from "socket.io-client";
-import { FakeWsServer } from "./tests/FakeWsServer";
-import { WebSocketsService } from "./WebSocketsService";
 import { PlayerEvent } from "#modules/models";
 import { PlayerServiceMock } from "#modules/player-service/tests/PlayerServiceMock";
 import { PlayerService } from "#modules/PlayerService";
+import { WebSocketsService } from "./WebSocketsService";
+import { FakeWsServer } from "./tests/FakeWsServer";
 
 let client: WebSocketsService;
 let server: FakeWsServer;

@@ -1,6 +1,5 @@
 // @ts-check
-
-import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
+import { $ } from "../../../../../../.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 
 /**
  *
@@ -18,11 +17,10 @@ export async function imageTag(params) {
     sourceImageTag = "latest",
     targetImageTag = "latest",
   } = params;
-
   const targetImageName = targetImageNameArg ?? sourceImageName;
 
   console.log(
-    `Tagging image ${sourceImageName}:${sourceImageTag} <- ${targetImageName}:${targetImageTag} ...`
+    `Tagging image ${sourceImageName}:${sourceImageTag} <- ${targetImageName}:${targetImageTag} ...`,
   );
 
   const imageFull = `${sourceImageName}:${sourceImageTag}`;

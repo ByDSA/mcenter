@@ -48,7 +48,6 @@ function locatePathPackageJson(initialDir = __dirname) {
     if (fs.existsSync(packageJsonPath))
       return packageJsonPath;
 
-    // eslint-disable-next-line prefer-destructuring
     dir = path.parse(dir).dir;
   }
 

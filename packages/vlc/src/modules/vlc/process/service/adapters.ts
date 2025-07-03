@@ -1,6 +1,6 @@
 import { assertIsDefined } from "#shared/utils/validation";
-import { MediaElement } from "../../media";
 import { Episode } from "#modules/models/episodes";
+import { MediaElement } from "../../media";
 
 export function episodeToMediaElement(e: Episode): MediaElement {
   const { MEDIA_PATH } = process.env;

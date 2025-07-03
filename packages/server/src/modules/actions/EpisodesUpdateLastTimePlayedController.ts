@@ -29,7 +29,6 @@ export class EpisodesUpdateLastTimePlayedController implements Controller {
 
     for (const serie of series) {
       const promise = this.#deps.streamRepository.getManyBySerieId(serie.id).then(async streams => {
-        // eslint-disable-next-line prefer-destructuring
         const stream = streams[0];
 
         if (!stream) {

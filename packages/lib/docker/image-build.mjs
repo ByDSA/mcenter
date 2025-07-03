@@ -1,7 +1,5 @@
 // @ts-check
-
-import { $ } from "/home/prog/.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
-
+import { $ } from "../../../../../../.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 import { imageExists } from "./image-exists.mjs";
 
 /**
@@ -23,15 +21,16 @@ export async function imageBuild(params) {
     replace,
   } = params;
   let taggedImage = calcTaggedImageFromParams(params);
-
   let haveToBuild = true;
+
   if (!replace) {
-    haveToBuild = !await imageExists({
+    haveToBuild = !await imageExists( {
       taggedImage,
-    });
+    } );
 
     if (!haveToBuild) {
       console.log(`Image ${taggedImage} already exists. Not built.`);
+
       return;
     }
   }
@@ -42,9 +41,8 @@ export async function imageBuild(params) {
 
   const cmd = ["docker", "buildx", "build", buildContext, "--load"];
 
-  if (dockerfilePath) {
+  if (dockerfilePath)
     cmd.push("-f", dockerfilePath);
-  }
 
   cmd.push("-t", taggedImage);
 
@@ -55,7 +53,8 @@ export async function imageBuild(params) {
 
   if (buildArgs) {
     for (const [key, value] of Object.entries(buildArgs)) {
-      if (value !== undefined) cmd.push("--build-arg", `${key}=${value}`);
+      if (value !== undefined)
+        cmd.push("--build-arg", `${key}=${value}`);
     }
   }
 
@@ -70,10 +69,11 @@ export async function imageBuild(params) {
  * @returns string
  */
 function calcTaggedImageFromParams(params) {
-  if ("taggedImage" in params) {
+  if ("taggedImage" in params)
     return params.taggedImage;
-  } else {
+  else {
     const { imageName, tag } = params;
+
     return `${imageName}:${tag}`;
   }
 }

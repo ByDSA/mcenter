@@ -33,7 +33,6 @@ export function injectDeps(map: DEPS_MAPType) {
   return function f<T extends { new(...args: any[]): {} }>(clazz: T) {
     return class extends clazz {
       constructor(...args: any[]) {
-        // eslint-disable-next-line prefer-destructuring
         const deps = args[0];
         const newDeps = resolveDeps(map, deps);
 

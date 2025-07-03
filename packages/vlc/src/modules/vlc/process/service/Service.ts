@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import { assertIsDefined, assertIsNotEmpty } from "#shared/utils/validation";
+import { PlayResourceMessage } from "#modules/models";
 import { PlayerProcessService } from "../../../PlayerProcessService";
 import { MediaElement, QueuePlaylistManager } from "../../media";
 import { VLCFlag, VLCProcess } from "../singleton";
 import { episodeToMediaElement } from "./adapters";
-import { PlayResourceMessage } from "#modules/models";
 
 export class VLCProcessService implements PlayerProcessService {
   #queue: QueuePlaylistManager;

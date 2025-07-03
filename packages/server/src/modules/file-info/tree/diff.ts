@@ -34,9 +34,7 @@ export function diff(tree1: SerieTree, tree2: SerieTree): Return {
 
   for (const [branches, plainTreeEntry] of Object.entries(tree1BranchesMap)) {
     const branchesArray = branches.split("/");
-    // eslint-disable-next-line prefer-destructuring
     const serieId = branchesArray[0];
-    // eslint-disable-next-line prefer-destructuring
     const seasonId = branchesArray[1];
 
     if (tree2BranchesMap[branches] === undefined) { // si no está en el mismo sitio en el nuevo
@@ -71,9 +69,7 @@ export function diff(tree1: SerieTree, tree2: SerieTree): Return {
     if (tree1BranchesMap[branches] === undefined
       && tree1ContentMap[plainTreeEntry.content.filePath] === undefined) {
       const branchesArray = branches.split("/");
-      // eslint-disable-next-line prefer-destructuring
       const serieId = branchesArray[0];
-      // eslint-disable-next-line prefer-destructuring
       const seasonId = branchesArray[1];
 
       treePut(news, [serieId, seasonId], plainTreeEntry.id, plainTreeEntry.content);
