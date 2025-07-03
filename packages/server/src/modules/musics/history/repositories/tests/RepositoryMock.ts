@@ -9,4 +9,8 @@ export class MusicHistoryRepositoryMock implements PublicMethodsOf<MusicHistoryR
   createOne = jest.fn();
 
   getAll = jest.fn();
+
+  getOneById = jest.fn();
+
+  deleteOneById = jest.fn();
 }

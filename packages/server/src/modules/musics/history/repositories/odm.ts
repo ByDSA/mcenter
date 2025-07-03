@@ -4,6 +4,7 @@ import { MusicId } from "#musics/models";
 import { DateTypeOdmSchema } from "#utils/time";
 
 export type DocOdm = {
+  _id?: mongoose.Types.ObjectId;
   date: DateType;
   musicId: MusicId;
 };

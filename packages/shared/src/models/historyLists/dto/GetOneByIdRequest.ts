@@ -1,16 +1,7 @@
-import { z } from "zod";
+import { assertIsGetOneByStringIdRequest, getOneByStringIdRequestSchema, GetOneByStringIdRequest } from "../../utils/schemas/requests/GetOneById";
 
-export const getOneByIdSchema = z.object( {
-  params: z.object( {
-    id: z.string( {
-      // eslint-disable-next-line camelcase
-      required_error: "id is required",
-    } ),
-  } ),
-} );
-
-export type GetOneByIdRequest = z.infer<typeof getOneByIdSchema>;
-
-export function assertIsGetOneByIdRequest(o: unknown): asserts o is GetOneByIdRequest {
-  getOneByIdSchema.parse(o);
-}
+export {
+  getOneByStringIdRequestSchema as getOneByIdSchema,
+  type GetOneByStringIdRequest as GetOneByIdRequest,
+  assertIsGetOneByStringIdRequest as assertIsGetOneByIdRequest,
+};

@@ -1,5 +1,6 @@
 import express, { Request, Response, Router } from "express";
-import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchRequest } from "#musics/history/models/transport";
+import { assertIsDefined } from "#shared/utils/validation";
+import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchRequest, DeleteOneEntryByIdReq, DeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdReq } from "#musics/history/models/transport";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
@@ -41,6 +42,24 @@ implements
     res.send(got);
   }
 
+  async deleteOneEntryById(
+    req: DeleteOneEntryByIdReq,
+    res: Response,
+  ): Promise<void> {
+    const { id } = req.params;
+    const deleted = await this.#deps.historyRepository.deleteOneByIdAndGet(id);
+
+    assertIsDefined(deleted);
+
+    const body: DeleteOneEntryByIdResBody = {
+      entry: deleted,
+    };
+
+    assertIsDeleteOneEntryByIdResBody(body);
+
+    res.send(body);
+  }
+
   getRouter(): Router {
     const router = SecureRouter();
 
@@ -49,6 +68,11 @@ implements
       "/:user/search",
       validateReq(assertIsMusicHistoryListGetManyEntriesBySearchRequest),
       this.getManyEntriesBySearch.bind(this),
+    );
+    router.delete(
+      "/:user/:id", // entryId
+      validateReq(assertIsDeleteOneEntryByIdReq),
+      this.deleteOneEntryById.bind(this),
     );
     router.options("/:user/search", (_req, res) => {
       res.header("Access-Control-Allow-Origin", "*");

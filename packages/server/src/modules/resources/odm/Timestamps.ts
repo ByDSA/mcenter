@@ -1,4 +1,4 @@
-import { TimestampsModel } from "#shared/models/utils/dtos/Timestamps";
+import { TimestampsModel } from "#shared/models/utils/schemas/Timestamps";
 import mongoose from "mongoose";
 
 type DocOdm = TimestampsModel;

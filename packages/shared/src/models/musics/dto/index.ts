@@ -7,9 +7,10 @@ export {
 } from "./PatchOneByIdReq";
 
 export {
-  schema as GetOneByIdSchema, assert as assertIsGetOneByIdReq, type Type as GetOneByIdReq,
+  getOneByIdReqSchema, assertIsGetOneByIdReq, GetOneByIdReq,
 } from "./GetOneByIdReq";
 
 export {
-  assert as assertIsPatchOneByIdResBody, type Type as PatchOneByIdResBody,
+  assert as assertIsPatchOneByIdResBody,
+  type Type as PatchOneByIdResBody,
 } from "./PatchOneByIdResBody";

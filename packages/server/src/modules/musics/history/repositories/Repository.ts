@@ -2,7 +2,8 @@ import { showError } from "#shared/utils/errors/showError";
 import { isDefined } from "#shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { delay } from "tsyringe";
-import { CanCreateOne, CanGetAll, CanGetManyCriteria } from "#utils/layers/repository";
+import { assertFound } from "#shared/utils/http";
+import { CanCreateOne, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { MusicHistoryEntry } from "#musics/history/models";
@@ -10,6 +11,7 @@ import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { QUEUE_NAME } from "../events";
 import { MusicRepository } from "../../repositories/Repository";
+import { Entry } from "../models/transport";
 import { DocOdm, ModelOdm } from "./odm";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 
@@ -28,13 +30,17 @@ const DEPS_MAP = {
   musicRepository: delay(()=>MusicRepository),
 };
 
+type EntryId = Required<Entry["id"]>;
+
 type Deps = DepsFromMap<typeof DEPS_MAP>;
 @injectDeps(DEPS_MAP)
 export class MusicHistoryRepository
 implements
 CanCreateOne<MusicHistoryEntry>,
 CanGetManyCriteria<MusicHistoryEntry, GetManyCriteria>,
-CanGetAll<MusicHistoryEntry> {
+CanGetAll<MusicHistoryEntry>,
+CanGetOneById<MusicHistoryEntry, EntryId>,
+CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
   #deps: Deps;
 
   constructor(deps?: Partial<Deps>) {
@@ -45,6 +51,23 @@ CanGetAll<MusicHistoryEntry> {
 
       return Promise.resolve();
     } ).catch(showError);
+  }
+
+  async deleteOneByIdAndGet(id: EntryId): Promise<MusicHistoryEntry> {
+    const deleted = await ModelOdm.findByIdAndDelete(id);
+
+    assertFound(deleted);
+
+    return docOdmToModel(deleted);
+  }
+
+  async getOneById(id: EntryId): Promise<MusicHistoryEntry | null> {
+    const docOdm = await ModelOdm.findById(id);
+
+    if (docOdm)
+      return docOdmToModel(docOdm);
+
+    return null;
   }
 
   async getManyCriteria(criteria: GetManyCriteria): Promise<MusicHistoryEntry[]> {

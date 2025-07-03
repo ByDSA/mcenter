@@ -6,6 +6,7 @@ export function makeEntrySchema<T extends z.ZodTypeAny, U extends z.ZodTypeAny>(
   resource: U,
 ) {
   return z.object( {
+    id: z.string().optional(),
     resourceId,
     resource: resource.optional(),
     date: dateTypeSchema,

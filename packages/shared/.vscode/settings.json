@@ -4,15 +4,15 @@
     "bin": true,
     "build": true,
     "node_modules": true
-  },
-  "runOnSave.commands": [
-    {
-      "command": "workspaceFolder=${workspaceFolder} ${workspaceFolder}/bin/on-save.mjs &",
-      "finishStatusMessage": "${workspaceFolderBasename} compiled",
-      "globMatch": "**/shared/**",
-      "runIn": "terminal",
-      "runningStatusMessage": "Compiling ${workspaceFolderBasename}...",
-      "terminalHideTimeout": 3000
-    }
-  ]
+  }
+  // "runOnSave.commands": [
+  //   {
+  //     "command": "workspaceFolder=${workspaceFolder} ${workspaceFolder}/bin/on-save.mjs &",
+  //     "finishStatusMessage": "${workspaceFolderBasename} compiled",
+  //     "globMatch": "**/shared/**",
+  //     "runIn": "terminal",
+  //     "runningStatusMessage": "Compiling ${workspaceFolderBasename}...",
+  //     "terminalHideTimeout": 3000
+  //   }
+  // ]
 }

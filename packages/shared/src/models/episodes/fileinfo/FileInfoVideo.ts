@@ -1,5 +1,5 @@
 import z from "zod";
-import { timestampsFileSchema } from "../../utils/dtos/Timestamps";
+import { timestampsFileSchema } from "../../utils/schemas/Timestamps";
 import { schema as FileInfoSchema, compareModel as compareFileInfo } from "./FileInfo";
 
 export const schema = FileInfoSchema.extend( {

@@ -1,5 +1,5 @@
 export {
   assertIsMusicHistoryEntry,
   createMusicHistoryEntryById,
-  MusicHistoryEntry,
+  Entry as MusicHistoryEntry,
 } from "#shared/models/musics/history";

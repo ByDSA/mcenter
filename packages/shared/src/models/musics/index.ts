@@ -13,7 +13,7 @@ export {
   assertIsPatchOneByIdReq as assertIsMusicPatchOneByIdReq,
   assertIsPatchOneByIdReqBody as assertIsMusicPatchOneByIdReqBody,
   assertIsPatchOneByIdResBody as assertIsMusicPatchOneByIdResBody,
-  GetOneByIdSchema as MusicGetOneByIdSchema,
+  getOneByIdReqSchema as MusicGetOneByIdSchema,
   PatchOneByIdResBody as MusicPatchOneByIdResBody,
   PatchOneByIdSchema as MusicPatchOneByIdSchema, type GetOneByIdReq as MusicGetOneByIdReq,
   type PatchOneByIdReq as MusicPatchOneByIdReq,

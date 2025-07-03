@@ -5,11 +5,12 @@ import { MusicPatchOneByIdReq } from "#modules/musics/models/transport";
 import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { LinkAsyncAction, ResourceInput, ResourceInputArrayString, ResourceInputProps } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
-import { useResourceEdition } from "#modules/utils/resources";
 import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
 import { secsToMmss } from "#modules/utils/dates";
+import { useHistoryEntryEdition } from "#modules/history";
 import { MUSIC_PROPS } from "../utils";
 import { fetchPatch, backendUrls as musicBackendUrls } from "../../../requests";
+import { fetchDelete } from "../../requests";
 import style from "./style.module.css";
 import { LastestComponent } from "./Lastest";
 
@@ -23,19 +24,25 @@ type Props = {
   entry: Required<MusicHistoryEntry>;
 };
 export function Body( { entry }: Props) {
-  const { isModified,
-    update: { action: update, isDoing: isUpdating }, errors,
-    resourceState, reset } = useResourceEdition( {
-    calcIsModified,
-    entry,
-    assertionFn: assertIsMusicVO,
-    fetching: {
-      patch: {
-        fetch: fetchPatch,
-        generateBody: generatePatchBody,
+  const { resource: resourceRet, delete: deleteEntry } = useHistoryEntryEdition( {
+    resource: {
+      calcIsModified,
+      entry,
+      assertionFn: assertIsMusicVO,
+      fetching: {
+        patch: {
+          fetch: fetchPatch,
+          generateBody: generatePatchBody,
+        },
       },
     },
+    delete: {
+      fetch: (_: string, id: string) => fetchDelete(id),
+    },
   } );
+  const { isModified,
+    update: { action: update, isDoing: isUpdating }, errors,
+    resourceState, reset } = resourceRet;
   const [resource] = resourceState;
   const optionalProps: Record<keyof MusicVO, PropInfo> = Object.entries(MUSIC_PROPS)
     .reduce((acc, [key, value]) => {
@@ -143,6 +150,18 @@ export function Body( { entry }: Props) {
       {isModified && <span className={style.update}>{
         <LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>
       }</span>}</span>
+    <span className={"break"} />
+    {
+      deleteEntry
+    && <>
+      <span className={"line"}>
+        <LinkAsyncAction
+          action={deleteEntry.action}
+          isDoing={deleteEntry.isDoing}>Borrar</LinkAsyncAction>
+      </span>
+      <span className={"break"} />
+    </>
+    }
     <span className={"break"} />
     <LastestComponent resourceId={entry.resourceId} date={entry.date}/>
   </div>;

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { generatePatchBodySchema } from "../../utils/dtos";
+import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { entitySchema } from "../Entity";
 import { schema as GetOneByIdSchema } from "./GetOneByIdReq";
 

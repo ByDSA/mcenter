@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { assertZodPopStack } from "../../utils/validation/zod";
-import { timestampsSchema } from "../utils/dtos/Timestamps";
+import { timestampsSchema } from "../utils/schemas/Timestamps";
 import { localFileSchema, pickableSchema, taggableSchema } from "./PartialSchemas";
 
 export const valueObjectSchema = z.object( {

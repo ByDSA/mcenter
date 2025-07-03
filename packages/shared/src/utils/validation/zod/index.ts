@@ -34,6 +34,13 @@ export function assertZod<T>(
   }
 }
 
+export function genAssertZod<T>(
+  schema: ZodType<T>,
+  settings?: AssertZodSettings,
+) {
+  return (model: unknown): asserts model is T => assertZodPopStack(schema, model, settings);
+}
+
 export function assertZodPopStack<T>(
   schema: ZodType<T>,
   model: unknown,

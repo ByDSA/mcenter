@@ -29,7 +29,8 @@ export function useHistoryEntryEdition<T extends object, ID, FetchPatchReqBody, 
       const { entry } = params.resource;
 
       if (!confirm(`Borar esta entrada del historial?\n${ JSON.stringify( {
-        id: entry.resourceId,
+        entryId: entry.id,
+        resourceId: entry.resourceId,
         date: entry.date,
       }, null, 2)}`))
         return Promise.resolve();
@@ -41,8 +42,9 @@ export function useHistoryEntryEdition<T extends object, ID, FetchPatchReqBody, 
       const { historyListId } = entry;
 
       assertIsDefined(historyEntryId);
-      assertIsDefined(historyListId);
 
+      // Para músicas es undefined:
+      // assertIsDefined(historyListId);
       return params.delete?.fetch(historyListId, historyEntryId)
         .then(() => done());
     };
