@@ -12,5 +12,5 @@ export class MusicHistoryRepositoryMock implements PublicMethodsOf<MusicHistoryR
 
   getOneById = jest.fn();
 
-  deleteOneById = jest.fn();
+  deleteOneByIdAndGet = jest.fn();
 }

@@ -5,5 +5,5 @@ export {
   assertIsMusicHistoryListGetManyEntriesBySearchResponse,
   type DeleteOneEntryByIdResBody,
   assertIsDeleteOneEntryByIdResBody,
-  type EntryWithId,
+  type Entry,
 } from "#shared/models/musics/history";

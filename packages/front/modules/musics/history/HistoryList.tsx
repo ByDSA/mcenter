@@ -1,6 +1,6 @@
 import extend from "just-extend";
 import { Fragment } from "react";
-import { MusicHistoryEntry } from "#modules/musics/history/models";
+import { Entry } from "#modules/musics/history/models";
 import { formatDate } from "#modules/utils/dates";
 import { FetchingRender } from "#modules/fetching";
 import { useRequest } from "./requests";
@@ -20,7 +20,7 @@ const DEFAULT_PARAMS: Required<Props> = {
 export function HistoryList(props?: Props) {
   const params = extend(true, DEFAULT_PARAMS, props) as typeof DEFAULT_PARAMS;
 
-  return FetchingRender<Required<MusicHistoryEntry>[]>( {
+  return FetchingRender<Required<Entry>[]>( {
     useRequest,
     render: (data) => (
       <span className="history-list">
@@ -36,9 +36,9 @@ export function HistoryList(props?: Props) {
 }
 
 function dayTitle(
-  entry: Required<MusicHistoryEntry>,
+  entry: Required<Entry>,
   i: number,
-  array: Required<MusicHistoryEntry>[],
+  array: Required<Entry>[],
 ) {
   if (i === 0 || !isSameday(array[i - 1].date.timestamp, entry.date.timestamp)) {
     return <h3 key={entry.date.timestamp}>{formatDate(new Date(entry.date.timestamp * 1000), {

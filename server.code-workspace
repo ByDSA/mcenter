@@ -4,23 +4,20 @@
       "path": "./packages/server"
     },
     {
-      "path": "./packages/music"
-    },
-    {
       "path": "./packages/shared"
     }
   ],
   "settings": {
-    "runOnSave.commands": [
-      {
-        "globMatch": "**/shared/**",
-        "command": "workspaceFolder=${workspaceFolder} ${workspaceFolder}/bin/on-save.mjs &",
-        "runIn": "terminal",
-        "runningStatusMessage": "Compiling ${workspaceFolderBasename}...",
-        "finishStatusMessage": "${workspaceFolderBasename} compiled",
-        "terminalHideTimeout": 3000
-      }
-    ],
+    // "runOnSave.commands": [
+    //   {
+    //     "globMatch": "**/shared/**",
+    //     "command": "workspaceFolder=${workspaceFolder} ${workspaceFolder}/bin/on-save.mjs &",
+    //     "runIn": "terminal",
+    //     "runningStatusMessage": "Compiling ${workspaceFolderBasename}...",
+    //     "finishStatusMessage": "${workspaceFolderBasename} compiled",
+    //     "terminalHideTimeout": 3000
+    //   }
+    // ],
     "workbench.colorCustomizations": {
       "activityBar.activeBackground": "#006cd9",
       "activityBar.background": "#006cd9",

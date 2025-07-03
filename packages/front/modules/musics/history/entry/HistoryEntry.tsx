@@ -1,4 +1,4 @@
-import { MusicHistoryEntry } from "#modules/musics/history/models";
+import { Entry } from "#modules/musics/history/models";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { Body } from "./body/Body";
 import { Header } from "./Header";
@@ -8,7 +8,7 @@ type Props<T> = {
   showDate?: boolean;
 };
 export function HistoryEntryElement(
-  { value: entry, showDate = true }: Props<MusicHistoryEntry>,
+  { value: entry, showDate = true }: Props<Entry>,
 ) {
   return <span className="history-entry">
     {

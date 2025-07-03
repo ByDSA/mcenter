@@ -16,23 +16,27 @@ COPY package.json pnpm-lock.yaml* ./
 
 COPY $APP/package.json ./app/
 
+RUN apk --no-cache add jq
+
+# Quitar devDependencies que usen GitHub
+RUN jq 'if .devDependencies then .devDependencies |= with_entries(select(.value | startswith("github:") | not)) else . end' ./package.json > ./packageTmp.json && mv ./packageTmp.json ./package.json
+
 FROM deps-base AS deps-prod
 COPY <<EOF ./pnpm-workspace.yaml
 packages:
   - 'app'
 EOF
 
-RUN apk --no-cache add jq
 RUN jq '{ \
   dependencies: { \
   next: .dependencies.next, \
   react: .dependencies.react \
   } \
-  }' ./app/package.json > ./app/packageTmp.json
+  }' ./app/package.json > ./app/packageTmp.json \
+  && mv ./app/packageTmp.json ./app/package.json
+# Nota: si se usa el mismo archivo de entrada y de salida, genera un archivo vacío porque jq aún está leyendo el archivo de entrada cuando va a escribirlo.
 
-RUN mv ./app/packageTmp.json ./app/package.json
-
-RUN pnpm install --prod --fix-lockfile --ignore-scripts --frozen-lockfile
+RUN pnpm install --prod --fix-lockfile --ignore-scripts
 
 RUN rm -rf /packages/node_modules/.pnpm/@next+swc*
 
@@ -48,8 +52,7 @@ packages:
 EOF
 
 # Nota: si se intentan reaprovechar las dependencias instaladas de deps-prod, no instala el resto de dependencias con pnpm i. Mejor instalarlas todas de nuevo que copiarlas y usar luego el flag --force.
-
-RUN pnpm i --fix-lockfile --frozen-lockfile
+RUN pnpm i --fix-lockfile
 RUN cd shared && pnpm build
 # Nota: No se puede usar sin --fix-lockfile porque da error, porque el lockfile incluye las dependencias de todos los proyectos y sólo estamos usando dos
 

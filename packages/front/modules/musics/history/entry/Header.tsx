@@ -1,9 +1,9 @@
-import { MusicHistoryEntry } from "#modules/musics/history/models";
+import { Entry } from "#modules/musics/history/models";
 import { HistoryEntryHeader } from "#modules/history";
 import { formatDate, formatDateHHmm } from "#modules/utils/dates";
 
 type HeaderProps = {
-  entry: Required<MusicHistoryEntry>;
+  entry: Required<Entry>;
   showDate: boolean;
 };
 export function Header( { entry, showDate }: HeaderProps) {

@@ -1,4 +1,4 @@
-import { MusicHistoryEntry } from "#modules/musics/history/models";
+import { Entry } from "#modules/musics/history/models";
 import { assertIsMusicVO } from "#modules/musics/models";
 import { LatestHistoryEntries } from "#modules/history";
 import { DateFormat } from "#modules/utils/dates";
@@ -7,7 +7,7 @@ import { backendUrls } from "../../requests";
 
 type Props = {
   resourceId: string;
-  date: MusicHistoryEntry["date"];
+  date: Entry["date"];
   dateFormat?: DateFormat;
 };
 const DATE_FORMAT_DEFAULT: DateFormat = {
@@ -35,7 +35,7 @@ export function LastestComponent(
     expand: ["musics"],
   };
 
-  return LatestHistoryEntries<MusicHistoryEntry, ReqBody>( {
+  return LatestHistoryEntries<Entry, ReqBody>( {
     url,
     body,
     validator,
@@ -43,7 +43,7 @@ export function LastestComponent(
   } );
 }
 
-const validator = (data: Required<MusicHistoryEntry>[]) => {
+const validator = (data: Required<Entry>[]) => {
   assertIsMusicHistoryListGetManyEntriesBySearchResponse(data);
 
   for (const d of data)

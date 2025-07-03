@@ -91,7 +91,7 @@ describe("restController", () => {
         };
 
         repository.getOneById.mockResolvedValueOnce(entry);
-        repository.deleteOneById.mockResolvedValueOnce(undefined);
+        repository.deleteOneByIdAndGet.mockResolvedValueOnce(undefined);
 
         const response = await request(routerApp)
           .delete(URL)
@@ -100,7 +100,7 @@ describe("restController", () => {
         expect(response.body).not.toHaveProperty("errors");
 
         expect(repository.getOneById).toHaveBeenCalledWith(ENTRY_ID);
-        expect(repository.deleteOneById).toHaveBeenCalledWith(ENTRY_ID);
+        expect(repository.deleteOneByIdAndGet).toHaveBeenCalledWith(ENTRY_ID);
         expect(response.statusCode).toBe(HttpStatusCode.OK);
         expect(response.body).toHaveProperty("entry");
         expect(response.body.entry).toEqual(entry);
@@ -114,7 +114,7 @@ describe("restController", () => {
           .send();
 
         expect(repository.getOneById).toHaveBeenCalledWith(ENTRY_ID);
-        expect(repository.deleteOneById).not.toHaveBeenCalled();
+        expect(repository.deleteOneByIdAndGet).not.toHaveBeenCalled();
         expect(response.statusCode).toBe(HttpStatusCode.NOT_FOUND);
       } );
     } );

@@ -2,7 +2,7 @@ import { PropInfo } from "#shared/utils/validation/zod";
 import { JSX, useState } from "react";
 import { MusicVO, assertIsMusicVO } from "#modules/musics/models";
 import { MusicPatchOneByIdReq } from "#modules/musics/models/transport";
-import { MusicHistoryEntry } from "#modules/musics/history/models";
+import { Entry } from "#modules/musics/history/models";
 import { LinkAsyncAction, ResourceInput, ResourceInputArrayString, ResourceInputProps } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
 import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
@@ -21,7 +21,7 @@ function generatePatchBody(entryResource: MusicVO, resource: MusicVO) {
 }
 
 type Props = {
-  entry: Required<MusicHistoryEntry>;
+  entry: Required<Entry>;
 };
 export function Body( { entry }: Props) {
   const { resource: resourceRet, delete: deleteEntry } = useHistoryEntryEdition( {

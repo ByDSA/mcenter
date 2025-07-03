@@ -1,6 +1,6 @@
 import { assertIsMusicVO } from "#musics/models";
-import { MusicHistoryEntry } from "#musics/history/models";
-import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchResponse, DeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdResBody, EntryWithId } from "#musics/history/models/transport";
+import { Entry } from "#musics/history/models";
+import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchResponse, DeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdResBody } from "#musics/history/models/transport";
 import { makeFetcher, makeUseRequest } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
 
@@ -13,7 +13,7 @@ const body: ReqBody = {
   limit: 10,
   expand: ["musics"],
 };
-const searchValidator = (data: Required<MusicHistoryEntry>[]) => {
+const searchValidator = (data: Required<Entry>[]) => {
   assertIsMusicHistoryListGetManyEntriesBySearchResponse(data);
 
   for (const d of data)
@@ -33,7 +33,7 @@ export const backendUrls = {
   },
 };
 
-export const useRequest = makeUseRequest<ReqBody, Required<MusicHistoryEntry>[]>( {
+export const useRequest = makeUseRequest<ReqBody, Required<Entry>[]>( {
   key:
   {
     url: backendUrls.crud.search( {
@@ -47,7 +47,7 @@ export const useRequest = makeUseRequest<ReqBody, Required<MusicHistoryEntry>[]>
 } );
 
 export function fetchDelete(
-  entryId: EntryWithId["id"],
+  entryId: Entry["id"],
 ): Promise<DeleteOneEntryByIdResBody | undefined> {
   const method = "DELETE";
   const URL = backendUrls.crud.delete( {
