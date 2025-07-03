@@ -19,7 +19,7 @@
     "git:pr:merge-delete": "gh pr merge --auto --rebase --delete-branch",
     "lint": "bin/lint.mjs",
     "lint:all": "bin/lint-all.mjs",
-    "prepare": "cd .. && husky install packages/.husky",
+    "prepare": "cd .. && husky packages/.husky",
     "release": "standard-version",
     "version:release": "standard-version"
   },
