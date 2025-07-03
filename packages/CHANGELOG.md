@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.14.0](https://github.com/ByDSA/mcenter/compare/v3.13.4...v3.14.0) (2025-07-03)
+
+
+### Features
+
+* delete music history entry ([a18e0bf](https://github.com/ByDSA/mcenter/commit/a18e0bf4de1fba411f1ab2f907935f7c3e44745e))
+
 ### [3.13.4](https://github.com/ByDSA/mcenter/compare/v3.13.3...v3.13.4) (2025-05-03)
 
 
