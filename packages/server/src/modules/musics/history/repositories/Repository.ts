@@ -9,6 +9,7 @@ import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { MusicHistoryEntry } from "#musics/history/models";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { Event } from "#utils/message-broker";
 import { QUEUE_NAME } from "../events";
 import { MusicRepository } from "../../repositories/Repository";
 import { Entry } from "../models/transport";
@@ -51,6 +52,25 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
 
       return Promise.resolve();
     } ).catch(showError);
+
+    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, async (_ev: Event<unknown>) => {
+      const event = _ev as ModelEvent<MusicHistoryEntry>;
+
+      if (event.type !== EventType.DELETED)
+        return;
+
+      const deletedId = event.payload.entity.resourceId;
+      const deletedTimestamp = event.payload.entity.date.timestamp;
+      const actualLastTimePlayed = await this.calcLastTimePlayedOf(deletedId) ?? 0;
+
+      if (actualLastTimePlayed < deletedTimestamp) {
+        await this.#deps.musicRepository.patchOneById(deletedId, {
+          entity: {
+            lastTimePlayed: actualLastTimePlayed,
+          },
+        } ).catch(showError);
+      }
+    } ).catch(showError);
   }
 
   async deleteOneByIdAndGet(id: EntryId): Promise<MusicHistoryEntry> {
@@ -58,7 +78,14 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
 
     assertFound(deleted);
 
-    return docOdmToModel(deleted);
+    const ret = docOdmToModel(deleted);
+    const event = new ModelEvent<MusicHistoryEntry>(EventType.DELETED, {
+      entity: ret,
+    } );
+
+    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+
+    return ret;
   }
 
   async getOneById(id: EntryId): Promise<MusicHistoryEntry | null> {
@@ -68,6 +95,17 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
       return docOdmToModel(docOdm);
 
     return null;
+  }
+
+  async calcLastTimePlayedOf(id: Required<MusicHistoryEntry["id"]>): Promise<number | null> {
+    const docOdm = await ModelOdm.findOne( {
+      musicId: id,
+    } )
+      .sort( {
+        "date.timestamp": -1,
+      } );
+
+    return docOdm?.date?.timestamp ?? null;
   }
 
   async getManyCriteria(criteria: GetManyCriteria): Promise<MusicHistoryEntry[]> {
