@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.14.1](https://github.com/ByDSA/mcenter/compare/v3.14.0...v3.14.1) (2025-07-03)
+
+
+### Bug Fixes
+
+* **back:** update musicEntry.lastTimePlayed on delete music entry ([e1d30ec](https://github.com/ByDSA/mcenter/commit/e1d30ecbdc8e30d9e6b6045d7c0010207305db69))
+* changes to compile ([5dde6aa](https://github.com/ByDSA/mcenter/commit/5dde6aa5f984ea1723c1e943a4ade56558c1f4b4))
+
 ## [3.14.0](https://github.com/ByDSA/mcenter/compare/v3.13.4...v3.14.0) (2025-07-03)
 
 
