@@ -57,15 +57,13 @@ export class ExpressApp implements App {
     this.#httpServerRequirers.push(requirer);
   }
 
-  async init() {
+  async init(app: express.Express) {
     const db = this.#dependencies.db.instance;
 
     if (db) {
       db.init();
       await db.connect();
     }
-
-    const app = express();
 
     require("../scheduler");
 

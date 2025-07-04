@@ -2,7 +2,6 @@ import "reflect-metadata";
 
 import { Server } from "node:http";
 import { container } from "tsyringe";
-import { Request, Response, NextFunction } from "express";
 import { NestFactory } from "@nestjs/core";
 import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController, SavedSerieTreeService } from "#episodes/index";
 import { ActionController } from "#modules/actions";
@@ -70,43 +69,12 @@ import { ExpressApp, RealMongoDatabase } from "./main";
   container.registerInstance(ExpressApp, legacyApp);
 
   const app = await NestFactory.create(AppModule);
-
-  await legacyApp.init();
-  const legacyExpressApp = legacyApp.getExpressApp();
   const httpAdapter = app.getHttpAdapter();
 
-  // Middleware de proxy en el Express subyacente
-  httpAdapter.use((req: Request, res: Response, next: NextFunction) => {
-    const route = req.path;
-    // Lista de rutas ya migradas a NestJS
-    const migratedRoutes = [
-      "/api/health",
-      "/api/users/:id",
-    ];
-    const isMigrated = migratedRoutes.some(pattern => matchRoute(pattern, route));
-
-    if (!isMigrated && legacyExpressApp) {
-      // Delegar a la aplicación legacy
-      return legacyExpressApp(req, res, next);
-    }
-
-    // Continuar con NestJS
-    next();
-  } );
+  await legacyApp.init(httpAdapter.getInstance());
 
   const PORT: number = +(process.env.PORT ?? 8080);
   const httpServer = await app.listen(PORT) as Server;
 
   await legacyApp.listen(httpServer);
 } )();
-
-function matchRoute(pattern: string, route: string): boolean {
-  // Convertir patrón de Express a regex
-  const regexPattern = pattern
-    .replace(/:[^/]+/g, "[^/]+") // :id -> [^/]+
-    .replace(/\*/g, ".*") // * -> .*
-    .replace(/\//g, "\\/"); // / -> \/
-  const regex = new RegExp(`^${regexPattern}$`);
-
-  return regex.test(route);
-}
