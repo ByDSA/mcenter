@@ -42,8 +42,6 @@ const DEFAULT_DEPENDENCIES: OptionalPropsRecursive<ExpressAppDependencies> = dee
 export class ExpressApp implements App {
   #instance: express.Express | null = null;
 
-  #httpServer: Server | undefined;
-
   #dependencies: Required<ExpressAppDependencies>;
 
   #httpServerRequirers: ((server: Server)=> void)[] = [];
@@ -204,23 +202,14 @@ export class ExpressApp implements App {
   }
 
   // eslint-disable-next-line require-await
-  async listen() {
+  async listen(httpServer: Server) {
     assertIsDefined(this.#instance);
     const PORT: number = +(process.env.PORT ?? 8080);
 
     killProcessesUsingPort(PORT);
-    this.#httpServer = this.#instance.listen(PORT, () => {
-      const address = (this.#httpServer as Server).address();
-      let realPort = PORT;
-
-      if (address && typeof address !== "string")
-        realPort = address.port;
-
-      console.log(`Server Listening on http://localhost:${realPort}`);
-    } );
 
     this.#httpServerRequirers.forEach(requirer => {
-      requirer(this.#httpServer as Server);
+      requirer(httpServer);
     } );
 
     mediaServer.run();
