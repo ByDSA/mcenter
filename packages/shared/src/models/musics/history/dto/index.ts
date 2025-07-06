@@ -1,26 +1,11 @@
 export {
-  assertIsMusicHistoryListGetManyEntriesBySearchRequest,
-  MusicHistoryListGetManyEntriesBySearchRequest,
-  musicHistoryListGetManyEntriesBySearchSchema,
-} from "./GetManyEntriesBySearchRequest";
+  getManyEntriesBySearch,
+} from "./GetManyEntriesBySearch";
 
 export {
-  assertIsMusicHistoryListGetManyEntriesBySearchResponse,
-  MusicHistoryListGetManyEntriesBySearchResponse,
-  musicHistoryListGetManyEntriesBySearchResponseSchema,
-} from "./GetManyEntriesBySearchResponse";
+  getOneById,
+} from "./GetOneById";
 
 export {
-  GetOneByIdReq as MusicHistoryListGetOneByIdReq,
-  assertIsGetOneByIdReq as assertIsMusicHistoryListGetOneByIdReq,
-  getOneByIdReqSchema as musicHistoryListGetOneByIdReqSchema,
-} from "./GetOneByIdReq";
-
-export {
-  DeleteOneEntryByIdRequest,
-  assertIsDeleteOneEntryByIdReq,
-  deleteOneEntryByIdSchema,
-  DeleteOneEntryByIdResBody,
-  assertIsDeleteOneEntryByIdResBody,
-  deleteOneEntryByIdResBodySchema,
-} from "./DeleteOneEntryById";
+  deleteOneById as deleteOneEntryById,
+} from "./DeleteOneById";

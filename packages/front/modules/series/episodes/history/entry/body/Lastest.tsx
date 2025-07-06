@@ -1,10 +1,15 @@
+import { z } from "zod";
+import { assertZod } from "#shared/utils/validation/zod";
 import { HistoryEntry } from "#modules/series/episodes/history/models";
-import { HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#modules/series/episodes/history/models/transport";
+import { getManyEntriesBySuperId, getManyEntriesBySearch } from "#modules/series/episodes/history/models/dto";
 import { EpisodeId } from "#modules/series/episodes/models";
 import { DateFormat } from "#modules/utils/dates";
 import { LatestHistoryEntries } from "#modules/history";
 import { backendUrls } from "../../requests";
 
+type HistoryListGetManyEntriesBySuperIdRequest = {
+  body: z.infer<typeof getManyEntriesBySuperId.reqBodySchema>;
+};
 type Props<ID> = {
   resourceId: ID;
   date: HistoryEntry["date"];
@@ -43,5 +48,5 @@ export function LastestComponent(
 }
 
 const validator = (data: Required<HistoryEntry>[]) => {
-  assertIsHistoryListGetManyEntriesBySearchResponse(data);
+  assertZod(getManyEntriesBySearch.resSchema, data);
 };

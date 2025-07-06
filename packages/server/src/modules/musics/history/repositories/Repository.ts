@@ -1,10 +1,8 @@
 import { showError } from "#shared/utils/errors/showError";
 import { isDefined } from "#shared/utils/validation";
 import { FilterQuery } from "mongoose";
-import { delay } from "tsyringe";
-import { assertFound } from "#shared/utils/http";
-import { CanCreateOne, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Injectable } from "@nestjs/common";
+import { CanCreateOne, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { MusicHistoryEntry } from "#musics/history/models";
 import { logDomainEvent } from "#modules/log";
@@ -12,7 +10,6 @@ import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { Event } from "#utils/message-broker";
 import { QUEUE_NAME } from "../events";
 import { MusicRepository } from "../../repositories/Repository";
-import { Entry } from "../models/transport";
 import { DocOdm, ModelOdm } from "./odm";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 
@@ -26,34 +23,26 @@ export type GetManyCriteria = {
   };
   offset?: number;
 };
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-  musicRepository: delay(()=>MusicRepository),
-};
+type EntryId = Required<MusicHistoryEntry["id"]>;
 
-type EntryId = Required<Entry["id"]>;
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class MusicHistoryRepository
 implements
 CanCreateOne<MusicHistoryEntry>,
 CanGetManyCriteria<MusicHistoryEntry, GetManyCriteria>,
 CanGetAll<MusicHistoryEntry>,
-CanGetOneById<MusicHistoryEntry, EntryId>,
-CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
+CanGetOneById<MusicHistoryEntry, EntryId> {
+  constructor(
+    private readonly domainMessageBroker: DomainMessageBroker,
+    private readonly musicRepository: MusicRepository,
+  ) {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
       logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
     } ).catch(showError);
 
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, async (_ev: Event<unknown>) => {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, async (_ev: Event<unknown>) => {
       const event = _ev as ModelEvent<MusicHistoryEntry>;
 
       if (event.type !== EventType.DELETED)
@@ -64,7 +53,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
       const actualLastTimePlayed = await this.calcLastTimePlayedOf(deletedId) ?? 0;
 
       if (actualLastTimePlayed < deletedTimestamp) {
-        await this.#deps.musicRepository.patchOneById(deletedId, {
+        await this.musicRepository.patchOneById(deletedId, {
           entity: {
             lastTimePlayed: actualLastTimePlayed,
           },
@@ -73,17 +62,18 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     } ).catch(showError);
   }
 
-  async deleteOneByIdAndGet(id: EntryId): Promise<MusicHistoryEntry> {
+  async deleteOneByIdAndGet(id: EntryId): Promise<MusicHistoryEntry | null> {
     const deleted = await ModelOdm.findByIdAndDelete(id);
 
-    assertFound(deleted);
+    if (!deleted)
+      return null;
 
     const ret = docOdmToModel(deleted);
     const event = new ModelEvent<MusicHistoryEntry>(EventType.DELETED, {
       entity: ret,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
 
     return ret;
   }
@@ -144,7 +134,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     if (criteria.expand?.includes("musics")) {
       const promises = models.map(async (model) => {
         const { resourceId } = model;
-        const resource = await this.#deps.musicRepository.getOneById(resourceId);
+        const resource = await this.musicRepository.getOneById(resourceId);
 
         if (resource)
 
@@ -205,6 +195,6 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
       entity: model,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 }

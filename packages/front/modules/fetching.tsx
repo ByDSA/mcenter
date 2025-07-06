@@ -40,11 +40,12 @@ export function makeFetcher<ReqBody, ResBody>(
 
     try {
       const res = await fetch(params.url, options);
+      const text = await res.text();
 
       if (!res.ok)
-        throw new Error(await res.text());
+        throw new Error(text);
 
-      const value: ResBody = await res.json();
+      const value = text ? JSON.parse(text) : undefined;
 
       resBodyValidator(value);
 

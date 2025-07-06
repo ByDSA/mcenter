@@ -1,7 +1,8 @@
 import { PropInfo } from "#shared/utils/validation/zod";
 import { JSX, useState } from "react";
+import { z } from "zod";
 import { MusicVO, assertIsMusicVO } from "#modules/musics/models";
-import { MusicPatchOneByIdReq } from "#modules/musics/models/transport";
+import { patchOneById } from "#modules/musics/models/dto";
 import { Entry } from "#modules/musics/history/models";
 import { LinkAsyncAction, ResourceInput, ResourceInputArrayString, ResourceInputProps } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
@@ -15,7 +16,10 @@ import style from "./style.module.css";
 import { LastestComponent } from "./Lastest";
 
 function generatePatchBody(entryResource: MusicVO, resource: MusicVO) {
-  const patchBodyParams: MusicPatchOneByIdReq["body"] = getDiff(entryResource, resource);
+  const patchBodyParams = getDiff(
+    entryResource,
+    resource,
+  ) as z.infer<typeof patchOneById.reqBodySchema>;
 
   return patchBodyParams;
 }

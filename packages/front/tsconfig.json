@@ -6,20 +6,34 @@
     "incremental": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
     "paths": {
-      "#modules/*": ["modules/*"],
-      "#musics/*": ["modules/musics/*"],
-      "#shared/*": ["../shared/build/*"],
+      "#modules/*": [
+        "modules/*"
+      ],
+      "#musics/*": [
+        "modules/musics/*"
+      ],
+      "#shared/*": [
+        "../shared/build/*"
+      ],
       "#sharedSrc/*": [
         // quitar en producción
         "../shared/src/*"
       ],
-      "#styles/*": ["styles/*"],
-      "#uikit/*": ["modules/ui-kit/*"]
+      "#styles/*": [
+        "styles/*"
+      ],
+      "#uikit/*": [
+        "modules/ui-kit/*"
+      ]
     },
     "plugins": [
       {
@@ -29,8 +43,17 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "target": "ES2017"
   },
-  "exclude": [".next", "node_modules"],
-  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next-env.d.ts"]
+  "exclude": [
+    ".next",
+    "node_modules"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next-env.d.ts"
+  ]
 }

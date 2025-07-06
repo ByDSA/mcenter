@@ -183,6 +183,10 @@ CanGetAll<Episode> {
     episode: Partial<UpdateOneParams>,
   ): Promise<Episode | null> {
     const partialDocOdm = partialModelToDocOdm(episode);
+
+    if (Object.keys(partialDocOdm).length === 0)
+      throw new Error("Empty partialDocOdm, nothing to patch");
+
     const updateResult = await ModelOdm.updateOne( {
       episodeId: fullId.innerId,
       serieId: fullId.serieId,

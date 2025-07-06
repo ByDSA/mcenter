@@ -10,7 +10,7 @@ export function makeMenu(data: Data, params?: Params) {
     <nav className={navClassName}>
       <main>
         {Object.entries(data).map(([key, value]) => (
-          <a href={key}>{value}</a>
+          <a key={key} href={key}>{value}</a>
         ))}
       </main>
     </nav>

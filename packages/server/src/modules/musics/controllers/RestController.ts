@@ -1,90 +1,56 @@
-import { HttpStatusCode } from "#shared/utils/http";
-import express, { NextFunction, Router } from "express";
-import { Music, assertIsMusic } from "#musics/models";
-import { MusicGetOneByIdReq, MusicPatchOneByIdReq,
-  MusicPatchOneByIdResBody, assertIsMusicGetOneByIdReq,
-  assertIsMusicPatchOneByIdReq, assertIsMusicPatchOneByIdResBody } from "#musics/models/transport";
-import { Controller, SecureRouter } from "#utils/express";
-import { CanGetOneById, CanPatchOneById } from "#utils/layers/controller";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { ResponseWithBody, sendBody, validateReq, validateResBody } from "#utils/validation/zod-express";
+import { Body, Controller, Header, Options, Param } from "@nestjs/common";
+import { container } from "tsyringe";
+import { createZodDto } from "nestjs-zod";
+import { assertFound } from "#shared/utils/http";
+import { Music, MusicVoSchema } from "#musics/models";
+import { getOneById, patchOneById } from "#musics/models/dto";
+import { GetOne, PatchOne } from "#utils/nestjs/rest";
 import { PatchOneParams } from "../repositories/types";
 import { MusicRepository } from "../repositories";
 
-const DEPS_MAP = {
-  repo: MusicRepository,
-};
+class GetOneByIdParamsDto extends createZodDto(getOneById.paramsSchema) {}
+class PatchParamsDto extends createZodDto(patchOneById.reqParamsSchema) {}
+class PatchBodyDto extends createZodDto(patchOneById.reqBodySchema) {}
 
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
-export class MusicRestController
-implements
-    Controller,
-    CanGetOneById<MusicGetOneByIdReq, ResponseWithBody<Music | null>>,
-    CanPatchOneById<MusicPatchOneByIdReq, ResponseWithBody<MusicPatchOneByIdResBody>> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+@Controller("/")
+export class MusicRestController {
+  constructor(
+    private readonly musicRepo: MusicRepository = container.resolve(MusicRepository),
+  ) {
   }
 
+  @PatchOne(":id")
   async patchOneById(
-    req: MusicPatchOneByIdReq,
-    res: ResponseWithBody<MusicPatchOneByIdResBody>,
-    next: NextFunction,
-  ): Promise<void> {
-    const { id } = req.params;
-    const { entity, unset } = req.body;
+    @Param() params: PatchParamsDto,
+    @Body() body: PatchBodyDto,
+  ) {
+    const { id } = params;
+    const { entity, unset } = body;
     const patchParams: PatchOneParams = {
       entity,
       unset,
     };
 
-    await this.#deps.repo.patchOneById(id, patchParams);
-
-    res.body = {};
-
-    next();
+    await this.musicRepo.patchOneById(id, patchParams);
   }
 
+  @GetOne("/:id", MusicVoSchema)
   async getOneById(
-    req: MusicGetOneByIdReq,
-    res: ResponseWithBody<Music | null>,
-    next: NextFunction,
-  ): Promise<void> {
-    const { id } = req.params;
+    @Param() params: GetOneByIdParamsDto,
+  ): Promise<Music | null> {
+    const { id } = params;
+    const music = await this.musicRepo.getOneById(id);
 
-    res.body = await this.#deps.repo.getOneById(id);
+    assertFound(music);
 
-    next();
+    return music;
   }
 
-  getRouter(): Router {
-    const router = SecureRouter();
-
-    router.get(
-      "/:id",
-      validateReq(assertIsMusicGetOneByIdReq),
-      this.getOneById.bind(this),
-      validateResBody(assertIsMusic),
-      sendBody,
-    );
-
-    router.options("/:id", (_, res) => {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
-      res.sendStatus(HttpStatusCode.OK);
-    } );
-    router.use(express.json());
-    router.patch(
-      "/:id",
-      validateReq(assertIsMusicPatchOneByIdReq),
-      this.patchOneById.bind(this),
-      validateResBody(assertIsMusicPatchOneByIdResBody),
-      sendBody,
-    );
-
-    return router;
+  @Options(":id")
+  @Header("Access-Control-Allow-Origin", "*")
+  @Header("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS")
+  @Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With")
+  handleOptions(@Param("id") _id: string) {
+    return;
   }
 }

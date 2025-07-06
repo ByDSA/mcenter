@@ -1,4 +1,4 @@
 export {
-  assertIsStream, Stream, StreamCriteriaExpand, StreamCriteriaSort, StreamGroup, StreamId,
+  assertIsStream, Stream, StreamGroup, StreamId,
   StreamMode, StreamOrigin, StreamOriginType,
-} from "#shared/models/streams";
+} from "#shared/models/streams/";

@@ -1,8 +1,9 @@
 import { assertFound } from "#shared/utils/http/validation";
 import { neverCase } from "#shared/utils/validation";
 import express, { Response, Router } from "express";
+import { z } from "zod";
 import { Episode } from "#episodes/models";
-import { EpisodeGetAllRequest, EpisodeGetManyBySearchRequest, EpisodeGetOneByIdRequest, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodeGetAllRequest, assertIsEpisodeGetManyBySearchRequest, assertIsEpisodeGetOneByIdRequest, assertIsEpisodePatchOneByIdRequest, assertIsEpisodePatchOneByIdResBody } from "#episodes/models/transport";
+import { getAll, getManyBySearch, getOneById, patchOneById } from "#episodes/models/dto";
 import { SerieRepository } from "#modules/series";
 import { Serie } from "#modules/series/models";
 import { Controller, SecureRouter } from "#utils/express";
@@ -10,6 +11,26 @@ import { CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/c
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { ResponseWithBody, validateReq } from "#utils/validation/zod-express";
 import { EpisodeRepository } from "../repositories";
+import { assertZod } from "#sharedSrc/utils/validation/zod";
+
+type EpisodeGetOneByIdRequest = {
+  params: z.infer<typeof getOneById.paramsSchema>;
+};
+
+type EpisodeGetAllRequest = {
+  params: z.infer<typeof getAll.paramsSchema>;
+};
+
+type EpisodePatchOneByIdRequest = {
+  params: z.infer<typeof patchOneById.reqParamsSchema>;
+  body: z.infer<typeof patchOneById.reqBodySchema>;
+};
+
+type EpisodePatchOneByIdResBody = z.infer<typeof patchOneById.resSchema>;
+
+type EpisodeGetManyBySearchRequest = {
+  body: z.infer<typeof getManyBySearch.reqBodySchema>;
+};
 
 enum ResourceType {
   SERIES = "series",
@@ -55,7 +76,7 @@ implements
     };
 
     try {
-      assertIsEpisodePatchOneByIdResBody(body);
+      assertZod(patchOneById.resSchema, body);
     } catch {
       res.status(501).send(body);
     }
@@ -131,17 +152,6 @@ implements
   getRouter(): Router {
     const router = SecureRouter();
 
-    router.get(
-      "/:serieId",
-      validateReq(assertIsEpisodeGetAllRequest),
-      this.getAll.bind(this),
-    );
-    router.get(
-      "/:serieId/:episodeId",
-      validateReq(assertIsEpisodeGetOneByIdRequest),
-      this.getOneById.bind(this),
-    );
-
     router.options("/:serieId/:episodeId", (_, res) => {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS");
@@ -149,15 +159,44 @@ implements
       res.sendStatus(200);
     } );
     router.use(express.json());
+
+    router.get(
+      "/:serieId",
+      validateReq((req: EpisodeGetAllRequest) => {
+        assertZod(getAll.paramsSchema, req.params);
+
+        return req;
+      } ),
+      this.getAll.bind(this),
+    );
+    router.get(
+      "/:serieId/:episodeId",
+      validateReq((req: EpisodeGetOneByIdRequest) => {
+        assertZod(getOneById.paramsSchema, req.params);
+
+        return req;
+      } ),
+      this.getOneById.bind(this),
+    );
+
     router.patch(
       "/:serieId/:episodeId",
-      validateReq(assertIsEpisodePatchOneByIdRequest),
+      validateReq((req: EpisodePatchOneByIdRequest) => {
+        assertZod(patchOneById.reqParamsSchema, req.params);
+        assertZod(patchOneById.reqBodySchema, req.body);
+
+        return req;
+      } ),
       this.patchOneByIdAndGet.bind(this),
     );
 
     router.post(
       "/search",
-      validateReq(assertIsEpisodeGetManyBySearchRequest),
+      validateReq((req: EpisodeGetManyBySearchRequest) => {
+        assertZod(getManyBySearch.reqBodySchema, req.body);
+
+        return req;
+      } ),
       this.getManyBySearch.bind(this),
     );
 

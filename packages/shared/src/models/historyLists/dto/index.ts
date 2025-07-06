@@ -1,29 +1,18 @@
 export {
-  GetOneByIdRequest, getOneByIdSchema as GetOneByIdSchema,
-  assertIsGetOneByIdRequest,
-} from "./GetOneByIdRequest";
+  getOneByIdReqParamsSchema,
+} from "./GetOneById";
 
 export {
-  GetManyEntriesBySuperIdRequest,
-  assertIsGetManyEntriesBySuperIdRequest,
-} from "./GetManyEntriesBySuperIdRequest";
+  getManyEntriesBySuperId,
+} from "./GetManyEntriesBySuperId";
 
 export {
-  GetManyEntriesBySearchRequest,
-  assertIsGetManyEntriesBySearchRequest,
-} from "./GetManyEntriesBySearchRequest";
+  getManyEntriesBySearch,
+} from "./GetManyEntriesBySearch";
 
 export {
-  GetManyEntriesBySearchResponse,
-  assertIsGetManyEntriesBySearchResponse,
-} from "./GetManyEntriesBySearchResponse";
-
-export {
-  DeleteOneEntryByIdReqBody,
-  DeleteOneEntryByIdRequest,
-  DeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdRequest,
-  assertIsDeleteOneEntryByIdResBody,
-} from "./DeleteOneEntryByIdRequest";
+  deleteOneEntryById,
+} from "./DeleteOneEntryById";
 
 export {
   dtoToModel,

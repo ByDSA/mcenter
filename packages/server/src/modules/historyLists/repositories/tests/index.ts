@@ -1,3 +1,0 @@
-export {
-  HistoryListRepositoryMock,
-} from "./RepositoryMock";

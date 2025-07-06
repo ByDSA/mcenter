@@ -3,9 +3,10 @@ import path from "node:path";
 import NodeID3 from "node-id3";
 import { assertIsDefined } from "#shared/utils/validation";
 import { showError } from "#shared/utils/errors/showError";
+import { Injectable } from "@nestjs/common";
+import { container } from "tsyringe";
 import { Event } from "#utils/message-broker";
 import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
 import { md5FileAsync } from "#utils/crypt";
 import { ARTIST_EMPTY, Music, MusicId, MusicVO } from "#musics/models";
@@ -24,27 +25,21 @@ import { ExpressionNode } from "./queries/QueryObject";
 import { PatchOneParams } from "./types";
 import { MusicUrlGenerator } from "./UrlGenerator";
 
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class MusicRepository
 implements CanPatchOneById<Music, MusicId, PatchOneParams>,
 CanGetOneById<Music, MusicId> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
+  constructor(
+    // eslint-disable-next-line max-len
+    private readonly domainMessageBroker: DomainMessageBroker = container.resolve(DomainMessageBroker),
+  ) {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
       logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
     } ).catch(showError);
 
-    this.#deps.domainMessageBroker.subscribe(HISTORY_QUEUE_NAME, async (_ev: Event<unknown>) => {
+    this.domainMessageBroker.subscribe(HISTORY_QUEUE_NAME, async (_ev: Event<unknown>) => {
       const event = _ev as ModelEvent<MusicHistoryEntry>;
 
       if (event.type !== EventType.CREATED)
@@ -91,7 +86,7 @@ CanGetOneById<Music, MusicId> {
         value,
       } );
 
-      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(QUEUE_NAME, event);
     }
 
     for (const p of params.unset ?? []) {
@@ -101,7 +96,7 @@ CanGetOneById<Music, MusicId> {
         value: undefined,
       } );
 
-      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(QUEUE_NAME, event);
     }
   }
 
@@ -191,7 +186,7 @@ CanGetOneById<Music, MusicId> {
       entity: ret,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
 
     return ret;
   }
@@ -235,7 +230,7 @@ CanGetOneById<Music, MusicId> {
       entity: model,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
   async updateOneByUrl(url: string, data: Partial<Music>): Promise<void> {
@@ -269,7 +264,7 @@ CanGetOneById<Music, MusicId> {
       entity: model,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
   updateOneByPath(relativePath: string, data: Partial<Music>): Promise<void> {

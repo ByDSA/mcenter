@@ -1,31 +1,44 @@
-import { assertIsDefined } from "#shared/utils/validation";
 import { Application } from "express";
 import request from "supertest";
-import { registerSingletonIfNotAndGet } from "#tests/main";
-import { ExpressAppMock } from "#tests/main/ExpressAppMock";
-import { RouterApp } from "#utils/express/test";
+import { INestApplication } from "@nestjs/common";
+import { Test } from "@nestjs/testing";
+import { TestMongoDatabase } from "#tests/main";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { UpdateRemoteTreeService } from "../services";
+import { MusicRepository } from "../repositories";
 import { MusicUpdateRemoteController } from "./UpdateRemoteController";
 
-let app: ExpressAppMock;
-const updateRemoteController = registerSingletonIfNotAndGet(MusicUpdateRemoteController);
-let routerApp: Application;
-
 describe("updateRemoteController", () => {
-  app = new ExpressAppMock();
-  let expressApp: Application | null = null;
+  let app: INestApplication;
+  let routerApp: Application;
+  const db = new TestMongoDatabase();
 
   beforeAll(async () => {
+    const moduleFixture = await Test.createTestingModule( {
+      imports: [],
+      controllers: [MusicUpdateRemoteController],
+      providers: [
+        UpdateRemoteTreeService,
+        MusicRepository,
+        DomainMessageBroker,
+      ],
+    } ).compile();
+
+    app = moduleFixture.createNestApplication();
+
     await app.init();
-    expressApp = app.getExpressApp();
-    assertIsDefined(expressApp);
-    routerApp = RouterApp(updateRemoteController.getRouter());
+    routerApp = app.getHttpServer();
+
+    db.init();
+    await db.connect();
   } );
 
   beforeEach(async () => {
-    await app.dropDb();
+    await db.drop();
   } );
 
   afterAll(async () => {
+    await db.disconnect();
     await app.close();
   } );
 
@@ -34,7 +47,7 @@ describe("updateRemoteController", () => {
 
     beforeAll(async () => {
       response = await request(routerApp)
-        .get("/")
+        .get("/update/remote")
         .expect(200)
         .send();
     } );

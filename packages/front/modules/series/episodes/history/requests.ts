@@ -1,8 +1,12 @@
 /* eslint-disable require-await */
-import { HistoryEntryId, HistoryListDeleteOneEntryByIdResBody, HistoryListId, assertIsHistoryListDeleteOneEntryByIdResBody } from "#shared/models/historyLists";
+import { genAssertZod } from "#shared/utils/validation/zod";
+import { z } from "zod";
 import { makeFetcher } from "#modules/fetching";
+import { HistoryEntryId, HistoryListId } from "./models";
+import { deleteOneEntryById } from "./models/dto";
 import { backendUrls } from "./requestGetMany";
 
+type HistoryListDeleteOneEntryByIdResBody = z.infer<typeof deleteOneEntryById.resBodySchema>;
 export {
   backendUrls, useRequest,
 } from "./requestGetMany";
@@ -15,7 +19,7 @@ export async function fetchDelete(
   const URL = `${backendUrls.crud.get}/${listId}/entries/${entryId}`;
   const fetcher = makeFetcher<typeof undefined, HistoryListDeleteOneEntryByIdResBody>( {
     method,
-    resBodyValidator: assertIsHistoryListDeleteOneEntryByIdResBody,
+    resBodyValidator: genAssertZod(deleteOneEntryById.resBodySchema),
     body: undefined,
   } );
 

@@ -1,3 +1,3 @@
 export {
-  MusicHistoryRepositoryMock,
+  musicHistoryRepoMockProvider,
 } from "./RepositoryMock";

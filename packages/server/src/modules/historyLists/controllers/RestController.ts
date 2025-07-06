@@ -1,17 +1,10 @@
 import { showError } from "#shared/utils/errors/showError";
 import { assertFound } from "#shared/utils/http/validation";
-import express, { Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
+import z from "zod";
+import { assertZod } from "#shared/utils/validation/zod";
 import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#episodes/index";
-import { HistoryListDeleteOneEntryByIdRequest,
-  HistoryListDeleteOneEntryByIdResBody,
-  HistoryListGetManyEntriesBySearchRequest,
-  HistoryListGetManyEntriesBySuperIdRequest,
-  HistoryListGetOneByIdRequest,
-  assertIsHistoryListDeleteOneEntryByIdRequest,
-  assertIsHistoryListDeleteOneEntryByIdResBody,
-  assertIsHistoryListGetManyEntriesBySearchRequest,
-  assertIsHistoryListGetManyEntriesBySuperIdRequest,
-  assertIsHistoryListGetOneByIdRequest } from "#modules/historyLists/models/transport";
+import { deleteOneEntryById, getManyEntriesBySearch, getManyEntriesBySuperId, getOneByIdReqParamsSchema } from "#modules/historyLists/models/dto";
 import { SerieRepository } from "#modules/series";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
@@ -20,6 +13,27 @@ import { validateReq } from "#utils/validation/zod-express";
 import { HistoryListRepository } from "../repositories";
 import { HistoryEntry, HistoryEntryWithId, HistoryList, assertIsHistoryEntryWithId } from "../models";
 import { LastTimePlayedService } from "../LastTimePlayedService";
+
+type HistoryListGetOneByIdRequest = {
+  params: z.infer<typeof getOneByIdReqParamsSchema>;
+};
+
+type HistoryListGetManyEntriesBySuperIdRequest = {
+  params: z.infer<typeof getOneByIdReqParamsSchema>;
+  body: z.infer<typeof getManyEntriesBySuperId.reqBodySchema>;
+};
+
+type HistoryListGetManyEntriesBySearchRequest = {
+  body: z.infer<typeof getManyEntriesBySearch.reqBodySchema>;
+};
+
+type HistoryListDeleteOneEntryByIdRequest = {
+  params: z.infer<typeof deleteOneEntryById.reqParamsSchema>;
+};
+
+type HistoryListDeleteOneEntryByIdRes = {
+  body: z.infer<typeof deleteOneEntryById.resBodySchema>;
+};
 
 const DEPS_MAP = {
   historyListRepository: HistoryListRepository,
@@ -78,7 +92,7 @@ implements
 
   async #getEntriesWithCriteriaApplied(
     entries: HistoryEntryWithId[],
-    body: HistoryListGetManyEntriesBySuperIdRequest["body"],
+    body: HistoryListGetManyEntriesBySuperIdRequest["body"] = {},
   ) {
     let newEntries = entries;
 
@@ -210,11 +224,11 @@ implements
       entries: historyList.entries,
     } ).catch(showError);
 
-    const body: HistoryListDeleteOneEntryByIdResBody = {
-      entry: deleted,
+    const body: HistoryListDeleteOneEntryByIdRes["body"] = {
+      deleted: [deleted],
     };
 
-    assertIsHistoryListDeleteOneEntryByIdResBody(body);
+    assertZod(deleteOneEntryById.resBodySchema, body);
 
     res.send(body);
   }
@@ -222,28 +236,44 @@ implements
   getRouter(): Router {
     const router = SecureRouter();
 
-    router.get("/", this.getAll.bind(this));
     router.get(
       "/:id",
-      validateReq(assertIsHistoryListGetOneByIdRequest),
+      validateReq((req: HistoryListGetOneByIdRequest) => {
+        assertZod(getOneByIdReqParamsSchema, req.params);
+
+        return req;
+      } ),
       this.getOneById.bind(this),
     );
     router.get(
       "/:id/entries",
-      validateReq(assertIsHistoryListGetOneByIdRequest),
+      validateReq((req: HistoryListGetOneByIdRequest) => {
+        assertZod(getOneByIdReqParamsSchema, req.params);
+
+        return req;
+      } ),
       this.getManyEntriesByHistoryListId.bind(this),
     );
 
     router.delete(
       "/:id/entries/:entryId",
-      validateReq(assertIsHistoryListDeleteOneEntryByIdRequest),
+      validateReq((req: HistoryListDeleteOneEntryByIdRequest) => {
+        assertZod(deleteOneEntryById.reqParamsSchema, req.params);
+
+        return req;
+      } ),
       this.deleteOneEntryById.bind(this),
     );
 
-    router.use(express.json());
+    router.get("/", this.getAll.bind(this));
+
     router.post(
       "/entries/search",
-      validateReq(assertIsHistoryListGetManyEntriesBySearchRequest),
+      validateReq((req: HistoryListGetManyEntriesBySearchRequest) => {
+        assertZod(getManyEntriesBySearch.reqBodySchema, req.body);
+
+        return req;
+      } ),
       this.getManyEntriesBySearch.bind(this),
     );
     router.options("/entries/search", (_req, res) => {
@@ -254,7 +284,12 @@ implements
     } );
     router.post(
       "/:id/entries/search",
-      validateReq(assertIsHistoryListGetManyEntriesBySuperIdRequest),
+      validateReq((req: HistoryListGetManyEntriesBySuperIdRequest) => {
+        assertZod(getManyEntriesBySuperId.reqBodySchema, req.body);
+        assertZod(getOneByIdReqParamsSchema, req.params);
+
+        return req;
+      } ),
       this.getManyEntriesByHistoryListIdSearch.bind(this),
     );
 

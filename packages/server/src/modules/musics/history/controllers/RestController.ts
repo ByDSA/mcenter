@@ -1,92 +1,66 @@
-import express, { Request, Response, Router } from "express";
-import { assertIsDefined } from "#shared/utils/validation";
-import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchRequest, DeleteOneEntryByIdReq, DeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdReq } from "#musics/history/models/transport";
-import { Controller, SecureRouter } from "#utils/express";
+/* eslint-disable no-empty-function */
+import { Request, Response } from "express";
+import { Body, Controller, Header, HttpCode, HttpStatus, Inject, Options, Param } from "@nestjs/common";
+import { createZodDto } from "nestjs-zod";
+import { assertFound } from "#shared/utils/http";
+import { entrySchema } from "#shared/models/musics/history/Entry";
+import { getManyEntriesBySearch, deleteOneEntryById } from "#musics/history/models/dto";
 import { CanGetAll } from "#utils/layers/controller";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { validateReq } from "#utils/validation/zod-express";
-import { GetManyCriteria } from "../repositories/Repository";
+import { DeleteOne } from "#utils/nestjs/rest";
+import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/Get";
+import { GetManyCriteria as GetManyCriteriaProps } from "../repositories/Repository";
 import { MusicHistoryRepository } from "../repositories";
-import { MusicRepository } from "../../repositories";
 
-const DEPS_MAP = {
-  historyRepository: MusicHistoryRepository,
-  musicRepository: MusicRepository,
-};
+class GetManyEntriesBySearchReqBodyDto
+  extends createZodDto(getManyEntriesBySearch.reqBodySchema) {}
+class DeleteOneEntryByIdReqParamsDto
+  extends createZodDto(deleteOneEntryById.req.paramsSchema) {}
 
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
-export class MusicHistoryRestController
-implements
-    Controller,
-    CanGetAll<Request, Response> {
-  #deps: Deps;
+const schema = entrySchema;
 
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+@Controller()
+export class MusicHistoryRestController implements CanGetAll<Request, Response> {
+  constructor(
+    @Inject(MusicHistoryRepository) private readonly historyRepository: MusicHistoryRepository,
+  ) {}
+
+  @GetMany("/:user", schema)
+  getAll() {
+    return this.historyRepository.getAll();
   }
 
-  async getAll(_: Request, res: Response): Promise<void> {
-    const got = await this.#deps.historyRepository.getAll();
+  @GetManyCriteria("/:user/search", schema)
+  getManyEntriesBySearch(
+    @Body() body: GetManyEntriesBySearchReqBodyDto,
+  ) {
+    const criteria = bodyToCriteria(body);
 
-    res.send(got);
+    return this.historyRepository.getManyCriteria(criteria);
   }
 
-  async getManyEntriesBySearch(
-    req: MusicHistoryListGetManyEntriesBySearchRequest,
-    res: Response,
-  ): Promise<void> {
-    const criteria = bodyToCriteria(req.body);
-    const got = await this.#deps.historyRepository.getManyCriteria(criteria);
+  @DeleteOne("/:user/:id", schema)
+  async deleteOneByIdAndGet(
+    @Param() params: DeleteOneEntryByIdReqParamsDto,
+  ) {
+    const { id } = params;
+    const deleted = await this.historyRepository.deleteOneByIdAndGet(id);
 
-    res.send(got);
+    assertFound(deleted);
+
+    return deleted;
   }
 
-  async deleteOneEntryById(
-    req: DeleteOneEntryByIdReq,
-    res: Response,
-  ): Promise<void> {
-    const { id } = req.params;
-    const deleted = await this.#deps.historyRepository.deleteOneByIdAndGet(id);
-
-    assertIsDefined(deleted);
-
-    const body: DeleteOneEntryByIdResBody = {
-      entry: deleted,
-    };
-
-    assertIsDeleteOneEntryByIdResBody(body);
-
-    res.send(body);
-  }
-
-  getRouter(): Router {
-    const router = SecureRouter();
-
-    router.use(express.json());
-    router.post(
-      "/:user/search",
-      validateReq(assertIsMusicHistoryListGetManyEntriesBySearchRequest),
-      this.getManyEntriesBySearch.bind(this),
-    );
-    router.delete(
-      "/:user/:id", // entryId
-      validateReq(assertIsDeleteOneEntryByIdReq),
-      this.deleteOneEntryById.bind(this),
-    );
-    router.options("/:user/search", (_req, res) => {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Methods", "POST,DELETE,OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
-      res.sendStatus(200);
-    } );
-
-    return router;
+  @Options("/:user/search")
+  @Header("Access-Control-Allow-Origin", "*")
+  @Header("Access-Control-Allow-Methods", "POST,DELETE,OPTIONS")
+  @Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With")
+  @HttpCode(HttpStatus.OK)
+  async options(): Promise<void> {
   }
 }
 
-function bodyToCriteria(body: MusicHistoryListGetManyEntriesBySearchRequest["body"]): GetManyCriteria {
-  const ret: GetManyCriteria = {
+function bodyToCriteria(body: GetManyEntriesBySearchReqBodyDto): GetManyCriteriaProps {
+  const ret: GetManyCriteriaProps = {
     expand: body.expand,
     limit: body.limit,
     offset: body.offset,

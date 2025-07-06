@@ -1,32 +1,17 @@
-import { Request, Response, Router } from "express";
-import { SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { UpdateRemoteTreeService } from "../services";
+import { Controller, Get } from "@nestjs/common";
+import { container } from "tsyringe";
+import { UpdateRemoteTreeService, UpdateResult } from "../services";
 
-const DEPS_MAP = {
-  updateRemoteTreeService: UpdateRemoteTreeService,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Controller("/update/remote")
 export class MusicUpdateRemoteController {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+  constructor(
+    // eslint-disable-next-line max-len
+    private readonly updateRemoteTreeService: UpdateRemoteTreeService = container.resolve(UpdateRemoteTreeService),
+  ) {
   }
 
-  async all(_: Request, res: Response) {
-    const ret = await this.#deps.updateRemoteTreeService.update();
-
-    res.send(ret);
-  }
-
-  getRouter(): Router {
-    const router = SecureRouter();
-
-    router.get("/", this.all.bind(this));
-
-    return router;
+  @Get("/")
+  all(): Promise<UpdateResult> {
+    return this.updateRemoteTreeService.update();
   }
 }

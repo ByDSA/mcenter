@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import fs from "node:fs";
 import { Server } from "node:http";
 import { showError } from "#shared/utils/errors/showError";
@@ -17,7 +16,6 @@ import { EpisodePickerController, EpisodePickerService } from "#modules/episode-
 import { HistoryListRestController } from "#modules/historyLists";
 import { PlaySerieController, PlayStreamController } from "#modules/play";
 import { StreamRestController } from "#modules/streams";
-import { MusicController } from "#musics/index";
 import { nms as mediaServer } from "#musics/MediaServer";
 import { App, HELLO_WORLD_HANDLER, errorHandler } from "#utils/express";
 import { Database } from "#utils/layers/db";
@@ -137,10 +135,6 @@ export class ExpressApp implements App {
 
     app.use("/api/episodes", episodesRestController.getRouter());
 
-    const musicController = resolveRequired(MusicController);
-
-    app.use("/api/musics", musicController.getRouter());
-
     app.get("/api/test/picker/:idstream", async (req: Request, res: Response) => {
       const { idstream } = req.params;
       const episodePickerService = resolveRequired(EpisodePickerService);
@@ -202,9 +196,6 @@ export class ExpressApp implements App {
   // eslint-disable-next-line require-await
   async listen(httpServer: Server) {
     assertIsDefined(this.#instance);
-    const PORT: number = +(process.env.PORT ?? 8080);
-
-    killProcessesUsingPort(PORT);
 
     this.#httpServerRequirers.forEach(requirer => {
       requirer(httpServer);
@@ -215,21 +206,5 @@ export class ExpressApp implements App {
 
   getExpressApp(): express.Express | null {
     return this.#instance;
-  }
-}
-
-function killProcessesUsingPort(port: number): void {
-  // kill process which is using port PORT
-  const processes = execSync(`lsof -i :${port} | grep node || true`).toString()
-    .split("\n");
-
-  if (processes.length === 0)
-    return;
-
-  for (const p of processes) {
-    const pId = +p.split(" ")[1];
-
-    if (pId)
-      execSync(`kill -9 ${pId}`);
   }
 }

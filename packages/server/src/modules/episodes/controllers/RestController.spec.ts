@@ -2,9 +2,10 @@ import { HttpStatusCode } from "#shared/utils/http/StatusCode";
 import { Application } from "express";
 import request from "supertest";
 import { container } from "tsyringe";
+import z from "zod";
 import { Episode } from "#episodes/models";
 import { expectEpisode, expectEpisodes } from "#episodes/models/test";
-import { episodeDtoToModel, EpisodeGetManyBySearchRequest } from "#episodes/models/transport";
+import { episodeDtoToModel, getManyBySearch } from "#episodes/models/dto";
 import { registerSingletonIfNotAndGet } from "#tests/main";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { RouterApp } from "#utils/express/test";
@@ -197,7 +198,7 @@ describe("restController", () => {
   describe("get many episodes by search", () => {
     const URL = "/search";
     const path = "series/simpsons/1/1_80.mkv";
-    const body: EpisodeGetManyBySearchRequest["body"] = {
+    const body: z.infer<typeof getManyBySearch.reqBodySchema> = {
       filter: {
         path,
       },

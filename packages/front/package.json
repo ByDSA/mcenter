@@ -8,18 +8,19 @@
   },
   "dependencies": {
     "#shared": "workspace:../shared/build",
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.14.9",
-    "@mui/material": "^5.14.9",
-    "just-clone": "^6.2.0",
-    "just-diff": "^6.0.2",
+    "@emotion/react": "11.11.1",
+    "@emotion/styled": "11.11.0",
+    "@mui/icons-material": "5.14.9",
+    "@mui/material": "5.14.9",
+    "just-clone": "6.2.0",
+    "just-diff": "6.0.2",
     "just-extend": "6.2.0",
     "next": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "socket.io-client": "^4.7.2",
-    "swr": "^2.2.2"
+    "socket.io-client": "4.7.2",
+    "swr": "2.2.2",
+    "zod": "3.25.74"
   },
   "devDependencies": {
     "#sharedSrc": "workspace:../shared/src",

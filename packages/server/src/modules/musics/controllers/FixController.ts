@@ -1,35 +1,24 @@
-import { PublicMethodsOf } from "#shared/utils/types";
-import { Router } from "express";
-import { SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Controller, Param } from "@nestjs/common";
+import { container } from "tsyringe";
+import { musicVoSchema } from "#shared/models/musics/VO";
+import { GetOne } from "#utils/nestjs/rest";
 import { MusicRepository } from "../repositories";
 
 const API = "/api";
 const CREATE = `${API}/create`;
 const ROUTE_CREATE_YT = `${CREATE}/yt`;
-const DEPS_MAP = {
-  musicRepository: MusicRepository,
-};
 
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Controller("/update/fix")
 export class MusicFixController {
-  #musicRepository: PublicMethodsOf<MusicRepository>;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#musicRepository = (deps as Deps).musicRepository;
+  constructor(
+    private readonly musicRepository: MusicRepository = container.resolve(MusicRepository),
+  ) {
   }
 
-  getRouter(): Router {
-    const router = SecureRouter();
+  @GetOne(`${ROUTE_CREATE_YT}/:id`, musicVoSchema)
+  get(@Param() params: any) {
+    const { id } = params;
 
-    router.get(`${ROUTE_CREATE_YT}/:id`, async (req, res) => {
-      const { id } = req.params;
-      const data = await this.#musicRepository.findOrCreateOneFromYoutube(id);
-
-      res.send(data);
-    } );
-
-    return router;
+    return this.musicRepository.findOrCreateOneFromYoutube(id);
   }
 }

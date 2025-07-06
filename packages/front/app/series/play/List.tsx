@@ -1,10 +1,12 @@
 "use client";
 
-// eslint-disable-next-line no-restricted-imports
-import { Stream, assertIsStream, assertIsStreamGetManyResponse } from "#shared/models/streams";
+/* eslint-disable no-restricted-imports */
+import { Stream, assertIsStream } from "#shared/models/streams";
+import { getManyBySearch } from "#shared/models/streams/dto";
 import { Fragment, MouseEventHandler, useState } from "react";
 import useSWR from "swr";
 import { showError } from "#shared/utils/errors/showError";
+import { assertZod } from "#shared/utils/validation/zod";
 import { Loading } from "#modules/loading";
 import { seriesBackendUrls } from "#modules/series";
 import { rootBackendUrl } from "#modules/requests";
@@ -34,7 +36,7 @@ export function List() {
     return <Loading/>;
 
   if (streams === undefined) {
-    assertIsStreamGetManyResponse(data);
+    assertZod(getManyBySearch.resSchema, data);
     data.forEach((stream: Stream) => {
       assertIsStream(stream);
     } );

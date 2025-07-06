@@ -2,13 +2,18 @@
 
 import React, { useEffect } from "react";
 import { showError } from "#shared/utils/errors/showError";
+import { z } from "zod";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
 import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
-import { EpisodeGetManyBySearchRequest } from "#modules/series/episodes/models/transport";
+import { getManyBySearch } from "#modules/series/episodes/models/dto";
 import { Loading } from "#modules/loading";
 import { seriesBackendUrls } from "#modules/series";
 import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-player";
 import styles from "./Player.module.css";
+
+type EpisodeGetManyBySearchRequest = {
+  body: z.infer<typeof getManyBySearch.reqBodySchema>;
+};
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;
 const RESOURCES = [

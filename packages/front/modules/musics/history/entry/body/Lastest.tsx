@@ -1,8 +1,10 @@
+import z from "zod";
+import { assertZod } from "#shared/utils/validation/zod";
 import { Entry } from "#modules/musics/history/models";
 import { assertIsMusicVO } from "#modules/musics/models";
 import { LatestHistoryEntries } from "#modules/history";
 import { DateFormat } from "#modules/utils/dates";
-import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchResponse } from "#modules/musics/history/models/transport";
+import { getManyEntriesBySearch } from "#modules/musics/history/models/dto";
 import { backendUrls } from "../../requests";
 
 type Props = {
@@ -15,7 +17,7 @@ const DATE_FORMAT_DEFAULT: DateFormat = {
   ago: "yes",
 };
 
-type ReqBody = MusicHistoryListGetManyEntriesBySearchRequest["body"];
+type ReqBody = z.infer<typeof getManyEntriesBySearch.reqBodySchema>;
 
 export function LastestComponent(
   { resourceId, date, dateFormat = DATE_FORMAT_DEFAULT }: Props,
@@ -44,7 +46,7 @@ export function LastestComponent(
 }
 
 const validator = (data: Required<Entry>[]) => {
-  assertIsMusicHistoryListGetManyEntriesBySearchResponse(data);
+  assertZod(getManyEntriesBySearch.resSchema, data);
 
   for (const d of data)
     assertIsMusicVO(d.resource);

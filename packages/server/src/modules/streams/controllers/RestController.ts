@@ -1,14 +1,20 @@
 import { CriteriaSortDir } from "#shared/utils/criteria";
-import express, { Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
+import z from "zod";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
-import { StreamCriteriaSort, StreamOriginType } from "#modules/streams/models";
-import { StreamGetManyRequest, assertIsStreamGetManyRequest } from "#modules/streams/models/transport";
+import { StreamOriginType } from "#modules/streams/models";
+import { CriteriaSort, getManyBySearch } from "#modules/streams/models/dto";
 import { Controller, SecureRouter } from "#utils/express";
 import { CanGetAll, CanGetMany } from "#utils/layers/controller";
 import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { validateReq } from "#utils/validation/zod-express";
 import { StreamRepository } from "../repositories";
+import { assertZod } from "#sharedSrc/utils/validation/zod";
+
+type StreamGetManyRequest = {
+  body: z.infer<typeof getManyBySearch.reqBodySchema>;
+};
 
 const DEPS_MAP = {
   streamRepository: StreamRepository,
@@ -50,7 +56,7 @@ implements
     }
 
     if (req.body.sort) {
-      if (req.body.sort[StreamCriteriaSort.lastTimePlayed]) {
+      if (req.body.sort[CriteriaSort.lastTimePlayed]) {
         const lastTimePlayedDic: {[key: string]: number | undefined} = {};
 
         for (const stream of got) {
@@ -93,10 +99,13 @@ implements
     const router = SecureRouter();
 
     router.get("/", this.getAll.bind(this));
-    router.use(express.json());
     router.post(
       "/criteria",
-      validateReq(assertIsStreamGetManyRequest),
+      validateReq((req: StreamGetManyRequest) => {
+        assertZod(getManyBySearch.reqBodySchema, req.body);
+
+        return req;
+      } ),
       this.getMany.bind(this),
     );
 

@@ -1,7 +1,13 @@
-import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#shared/models/historyLists";
+import { z } from "zod";
+import { assertZod } from "#shared/utils/validation/zod";
 import { UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
+import { HistoryEntryWithId } from "./models";
+import { getManyEntriesBySuperId, getManyEntriesBySearch } from "./models/dto";
 
+type HistoryListGetManyEntriesBySuperIdRequest = {
+  body: z.infer<typeof getManyEntriesBySuperId.reqBodySchema>;
+};
 const body: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
   filter: {},
   sort: {
@@ -11,7 +17,7 @@ const body: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
   expand: ["episodes", "series"],
 };
 const validator = (data: Required<HistoryEntryWithId>[]) => {
-  assertIsHistoryListGetManyEntriesBySearchResponse(data);
+  assertZod(getManyEntriesBySearch.resSchema, data);
 };
 const method = "POST";
 const fetcher = makeFetcher( {

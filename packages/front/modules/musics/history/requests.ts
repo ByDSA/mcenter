@@ -1,10 +1,13 @@
+import { z } from "zod";
+import { assertZod, genAssertZod } from "#shared/utils/validation/zod";
 import { assertIsMusicVO } from "#musics/models";
 import { Entry } from "#musics/history/models";
-import { MusicHistoryListGetManyEntriesBySearchRequest, assertIsMusicHistoryListGetManyEntriesBySearchResponse, DeleteOneEntryByIdResBody, assertIsDeleteOneEntryByIdResBody } from "#musics/history/models/transport";
+import { deleteOneEntryById, getManyEntriesBySearch } from "#musics/history/models/dto";
 import { makeFetcher, makeUseRequest } from "#modules/fetching";
 import { rootBackendUrl } from "#modules/requests";
 
-type ReqBody = MusicHistoryListGetManyEntriesBySearchRequest["body"];
+type DeleteOneEntryByIdResBody = z.infer<typeof deleteOneEntryById.resSchema>;
+type ReqBody = z.infer<typeof getManyEntriesBySearch.reqBodySchema>;
 const body: ReqBody = {
   filter: {},
   sort: {
@@ -14,7 +17,7 @@ const body: ReqBody = {
   expand: ["musics"],
 };
 const searchValidator = (data: Required<Entry>[]) => {
-  assertIsMusicHistoryListGetManyEntriesBySearchResponse(data);
+  assertZod(getManyEntriesBySearch.resSchema, data);
 
   for (const d of data)
     assertIsMusicVO(d.resource);
@@ -56,7 +59,7 @@ export function fetchDelete(
   } );
   const deleteFetcher = makeFetcher<typeof undefined, DeleteOneEntryByIdResBody>( {
     method,
-    resBodyValidator: assertIsDeleteOneEntryByIdResBody,
+    resBodyValidator: genAssertZod(deleteOneEntryById.resSchema),
     body: undefined,
   } );
 

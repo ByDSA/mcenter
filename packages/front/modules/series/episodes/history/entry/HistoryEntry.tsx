@@ -1,9 +1,16 @@
+import { z } from "zod";
+import { assertZod } from "#shared/utils/validation/zod";
 import { HistoryEntry } from "#modules/series/episodes/history/models";
-import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#modules/series/episodes/history/models/transport";
+import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
+import { getManyEntriesBySuperId, getManyEntriesBySearch } from "#modules/series/episodes/history/models/dto";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { backendUrls } from "../requests";
 import { Header } from "./Header";
 import { Body } from "./body/Body";
+
+type HistoryListGetManyEntriesBySuperIdRequest = {
+  body: z.infer<typeof getManyEntriesBySuperId.reqBodySchema>;
+};
 
 type Props = {
   value: HistoryEntryWithId;
@@ -44,7 +51,7 @@ export function fetchLastestHistoryEntries(
     },
   } ).then((response) => response.json())
     .then((data: HistoryEntryWithId[]) => {
-      assertIsHistoryListGetManyEntriesBySearchResponse(data);
+      assertZod(getManyEntriesBySearch.resSchema, data);
 
       return data;
     } );

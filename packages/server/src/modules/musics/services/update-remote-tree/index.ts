@@ -1,5 +1,6 @@
 import { statSync } from "node:fs";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Injectable } from "@nestjs/common";
+import { container } from "tsyringe";
 import { md5FileAsync } from "#utils/crypt";
 import { MusicVO } from "#musics/models";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
@@ -16,28 +17,22 @@ newPath: string;}[];
 new: MusicVO;}[];
 };
 
-const DEPS_MAP = {
-  musicRepository: MusicRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class UpdateRemoteTreeService {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+  constructor(
+    private readonly musicRepository: MusicRepository = container.resolve(MusicRepository),
+  ) {
   }
 
   async update() {
-    const remoteMusic = await this.#deps.musicRepository.findAll();
+    const remoteMusic = await this.musicRepository.findAll();
     const changes = await detectChangesFromLocalFiles(remoteMusic);
     const promises = [];
     const created: UpdateResult["new"] = [];
     const updated: UpdateResult["updated"] = [];
 
     for (const localFileMusic of changes.new) {
-      const p = this.#deps.musicRepository.createOneFromPath(localFileMusic.path)
+      const p = this.musicRepository.createOneFromPath(localFileMusic.path)
         .then((music) => {
           created.push(music);
         } )
@@ -51,7 +46,7 @@ export class UpdateRemoteTreeService {
     }
 
     for (const deletedMusic of changes.deleted) {
-      const p = this.#deps.musicRepository.deleteOneByPath(deletedMusic.path)
+      const p = this.musicRepository.deleteOneByPath(deletedMusic.path)
         .catch((err) => {
           console.error(err.message, deletedMusic);
 
@@ -66,7 +61,7 @@ export class UpdateRemoteTreeService {
         ...original,
         path: newPath,
       };
-      const p = this.#deps.musicRepository.updateOneByPath(original.path, newMusic)
+      const p = this.musicRepository.updateOneByPath(original.path, newMusic)
         .catch((err) => {
           console.error(err.message, original, newMusic);
 
@@ -78,7 +73,7 @@ export class UpdateRemoteTreeService {
 
     for (const oldMusic of changes.updated) {
       const newMusic = await toUpdatedFileInfo(oldMusic);
-      const p = this.#deps.musicRepository.updateOneByPath(oldMusic.path, newMusic)
+      const p = this.musicRepository.updateOneByPath(oldMusic.path, newMusic)
         .catch((err: Error) => {
           console.error(err.message, newMusic);
 

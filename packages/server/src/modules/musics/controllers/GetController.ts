@@ -1,11 +1,13 @@
 import path from "node:path";
-import { Request, Response, Router } from "express";
+import { createReadStream } from "node:fs";
+import { Request } from "express";
 import { assertIsNotEmpty } from "#shared/utils/validation";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { SecureRouter } from "#utils/express";
-import { Music } from "#musics/models";
+import { Controller, Get, Inject, Param, Req, StreamableFile } from "@nestjs/common";
+import { assertFound } from "#shared/utils/http";
+import { Music, MusicVoSchema } from "#musics/models";
 import { createMusicHistoryEntryById } from "#musics/history/models";
 import { ResourcePickerRandom } from "#modules/picker";
+import { GetMany } from "#utils/nestjs/rest/Get";
 import { MusicHistoryRepository } from "../history";
 import { MusicRepository } from "../repositories";
 import { requestToFindMusicParams } from "../repositories/queries/Queries";
@@ -35,43 +37,38 @@ function getRootUrlFromRequest(req: Request): string {
   return `${req.protocol}://${req.get("host")}`;
 }
 
-const DEPS_MAP = {
-  musicRepository: MusicRepository,
-  historyMusicRepository: MusicHistoryRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Controller("/get")
 export class MusicGetController {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+  constructor(
+    @Inject(MusicHistoryRepository) private readonly musicHistoryRepository: MusicHistoryRepository,
+    @Inject(MusicRepository) private readonly musicRepository: MusicRepository,
+  ) {
   }
 
-  async getRandom(req: Request, res: Response): Promise<void> {
+  @Get("/random")
+  async getRandom(@Req() req: Request): Promise<string> {
     const musics = await this.#findMusics(req);
 
     assertIsNotEmpty(musics);
     const picked = await this.#randomPick(musics);
     const nextRootUrl = getRootUrlFromRequest(req);
-    const nextUrl = `${nextRootUrl}/${path.join("api/musics/get", req.url)}`;
+    const nextUrl = `${nextRootUrl}/${path.join("api/musics", req.url)}`;
     const ret = generatePlaylist( {
       picked,
       nextUrl,
       server: nextRootUrl,
     } );
 
-    res.send(ret);
+    return ret;
   }
 
   async #getLastMusicInHistory(): Promise<Music | null> {
-    const lastOneEntry = await this.#deps.historyMusicRepository.getLast();
+    const lastOneEntry = await this.musicHistoryRepository.getLast();
 
     if (!lastOneEntry)
       return null;
 
-    const lastOne = await this.#deps.musicRepository.getOneById(lastOneEntry.resourceId);
+    const lastOne = await this.musicRepository.getOneById(lastOneEntry.resourceId);
 
     return lastOne;
   }
@@ -93,30 +90,32 @@ export class MusicGetController {
     return picked;
   }
 
-  async getAll(req: Request, res: Response) {
+  @GetMany("/all", MusicVoSchema)
+  async getAll(@Req() req: Request) {
     const musics = await this.#findMusics(req);
 
     this.#sortMusics(musics);
-    res.send(musics);
+
+    return musics;
   }
 
-  getPlaylist(req: Request, res: Response): Promise<void> {
-    const { name } = req.params;
+  @Get("/playlist/:name")
+  getPlaylist(@Param() params: any) {
+    const { name } = params;
     const playlistsFolder = path.join(ENVS.mediaPath, "music", "playlists");
     const filePath = path.join(playlistsFolder, name);
+    const file = createReadStream(filePath);
 
-    download(res, filePath);
-
-    return Promise.resolve();
+    return new StreamableFile(file);
   }
 
   #findMusics(req: Request): Promise<Music[]> {
     const params = requestToFindMusicParams(req);
 
     if (params)
-      return this.#deps.musicRepository.find(params);
+      return this.musicRepository.find(params);
 
-    return this.#deps.musicRepository.findAll();
+    return this.musicRepository.findAll();
   }
 
   #sortMusics(musics: Music[]): Music[] {
@@ -128,38 +127,25 @@ export class MusicGetController {
     } );
   }
 
-  async rawAccess(req: Request, res: Response) {
-    const { name } = req.params;
+  @Get("/raw/:name")
+  async rawAccess(@Param() params: any) {
+    const { name } = params;
     // find in DB
-    const music = await this.#deps.musicRepository.findOneByUrl(name);
+    const music = await this.musicRepository.findOneByUrl(name);
 
-    if (!music) {
-      res.sendStatus(404);
-
-      return;
-    }
+    assertFound(music);
 
     // History
     const entry = createMusicHistoryEntryById(music.id);
 
-    await this.#deps.historyMusicRepository.createOne(entry);
+    await this.musicHistoryRepository.createOne(entry);
 
     // Download
     const relativePath = music.path;
     const fullpath = getFullPath(relativePath);
+    const file = createReadStream(fullpath);
 
-    download(res, fullpath);
-  }
-
-  getRouter(): Router {
-    const router = SecureRouter();
-
-    router.get("/random", this.getRandom.bind(this));
-    router.get("/all", this.getAll.bind(this));
-    router.get("/raw/:name", this.rawAccess.bind(this));
-    router.get("/playlist/:name", this.getPlaylist.bind(this));
-
-    return router;
+    return new StreamableFile(file);
   }
 }
 
@@ -183,15 +169,4 @@ function generatePlaylist( { picked, nextUrl, server }: GenPlayListParams): stri
 
 function fixTxt(txt: string): string {
   return txt.replace(/,/g, "﹐");
-}
-
-function download(res: Response, fullpath: string) {
-  return res.download(fullpath, (error) => {
-    if (error) {
-      if (!res.headersSent)
-        res.sendStatus(404);
-      else
-        console.error(JSON.stringify(error, null, 2));
-    }
-  } );
 }

@@ -13,8 +13,6 @@ import { WebSocketsServiceMock } from "#modules/play/player-services/tests";
 import { PlaySerieControllerMock, PlayStreamControllerMock } from "#modules/play/tests";
 import { StreamRestController } from "#modules/streams";
 import { StreamRestControllerMock } from "#modules/streams/controllers/test";
-import { MusicControllerMock } from "#musics/controllers/tests";
-import { MusicController } from "#musics/index";
 import { registerSingletonIfNotAndGet } from "./utils";
 import { TestDatabase } from "./db/TestDatabase";
 import { TestMongoDatabase } from "./db";
@@ -46,7 +44,6 @@ export class ExpressAppMock extends ExpressApp {
 function registerSingletons() {
   registerSingletonIfNotAndGet(EpisodePickerController, EpisodePickerControllerMock);
   registerSingletonIfNotAndGet(HistoryListRestController, HistoryListRestControllerMock);
-  registerSingletonIfNotAndGet(MusicController, MusicControllerMock);
   registerSingletonIfNotAndGet(PlaySerieController, PlaySerieControllerMock);
   registerSingletonIfNotAndGet(PlayStreamController, PlayStreamControllerMock);
   registerSingletonIfNotAndGet(WebSocketsFrontServerService, WebSocketsServiceMock);

@@ -1,9 +1,10 @@
 import { HttpError } from "#shared/utils/http";
 import { isDebugging } from "#shared/utils/vscode";
 import { NextFunction, Request, Response } from "express";
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from "@nestjs/common";
 
 export const errorHandler = (err: unknown, _req: Request, res: Response, next: NextFunction) => {
-  if ((process.env.NODE_ENV !== "test" || (process.env.NODE_ENV === "test" && isDebugging())) && err instanceof Error && err.stack) { // TODO: usar enums
+  if ((process.env.NODE_ENV !== "test" || (process.env.NODE_ENV === "test" && isDebugging())) && err instanceof Error && err.stack && !(err instanceof HttpError) && !(err instanceof HttpException)) { // TODO: usar enums
     let output = `${ err.name }`;
 
     if (err.message)
@@ -31,9 +32,14 @@ export const errorHandler = (err: unknown, _req: Request, res: Response, next: N
     process.stderr.write("\n\x1b[0m");
   }
 
-  if (err instanceof HttpError)
-    res.sendStatus(err.code);
-  else
+  if (typeof err === "object" && err !== null) {
+    if ("code" in err)
+      res.sendStatus((err as any).code);
+    else if ("status" in err)
+      res.sendStatus((err as any).status);
+    else
+      res.sendStatus(500);
+  } else
     res.sendStatus(500);
 
   next();
@@ -57,4 +63,19 @@ function getEndIndex(line: string) {
   const preLastIndex = line.lastIndexOf(":", lastIndex - 1);
 
   return preLastIndex;
+}
+
+@Catch()
+export class GlobalExceptionFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+    // Crear un mock de next para compatibilidad
+    // eslint-disable-next-line no-empty-function
+    const next = () => {};
+
+    // Llamar a tu función original
+    errorHandler(exception, request, response, next);
+  }
 }

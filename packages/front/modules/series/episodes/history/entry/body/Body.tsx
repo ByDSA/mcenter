@@ -1,6 +1,7 @@
 import { assertIsDefined, isDefined } from "#shared/utils/validation";
+import { z } from "zod";
 import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
-import { EpisodePatchOneByIdRequest } from "#modules/series/episodes/models/transport";
+import { patchOneById } from "#modules/series/episodes/models/dto";
 import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
 import { LinkAsyncAction, ResourceInput, ResourceInputArrayString } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
@@ -15,7 +16,10 @@ import style from "./style.module.css";
 import { LastestComponent } from "./Lastest";
 
 function generatePatchBody(entryResource: Episode, resource: Episode) {
-  const patchBodyParams: EpisodePatchOneByIdRequest["body"] = getDiff(entryResource, resource);
+  const patchBodyParams = getDiff(
+    entryResource,
+    resource,
+  ) as z.infer<typeof patchOneById.reqBodySchema>;
 
   return patchBodyParams;
 }

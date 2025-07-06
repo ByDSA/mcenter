@@ -1,21 +1,22 @@
-import { assertIsDefined } from "#shared/utils/validation";
 import { Application } from "express";
 import request from "supertest";
+import { INestApplication } from "@nestjs/common";
+import { Test } from "@nestjs/testing";
 import { Music, MusicVO } from "#musics/models";
-import { registerSingletonIfNotAndGet } from "#tests/main";
-import { ExpressAppMock } from "#tests/main/ExpressAppMock";
 import { MUSICS_WITH_TAGS_SAMPLES } from "#tests/main/db/fixtures/models/music";
 import { loadFixtureMusicsWithTags } from "#tests/main/db/fixtures/sets";
-import { RouterApp } from "#utils/express/test";
-import { HistoryMusicModelOdm } from "./history";
+import { TestMongoDatabase } from "#tests/main";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { HistoryMusicModelOdm, MusicHistoryRepository } from "./history";
 import { MusicGetController } from "./controllers/GetController";
+import { MusicRepository } from "./repositories";
 
-let app: ExpressAppMock;
-const getController = registerSingletonIfNotAndGet(MusicGetController);
+let app: INestApplication;
 let routerApp: Application;
+const db = new TestMongoDatabase();
 
 async function loadFixtures() {
-  await app.dropDb();
+  await db.drop();
   await loadFixtureMusicsWithTags();
 }
 
@@ -38,15 +39,25 @@ function expectNotEmpty(array: unknown[]) {
 }
 
 describe("picker", () => {
-  app = new ExpressAppMock();
-  let expressApp: Application | null = null;
-
   beforeAll(async () => {
+    const moduleFixture = await Test.createTestingModule( {
+      imports: [],
+      controllers: [MusicGetController],
+      providers: [
+        MusicRepository,
+        MusicHistoryRepository,
+        DomainMessageBroker,
+      ],
+    } ).compile();
+
+    app = moduleFixture.createNestApplication();
+
     await app.init();
-    expressApp = app.getExpressApp();
-    assertIsDefined(expressApp);
+    routerApp = app.getHttpServer();
+
+    db.init();
+    await db.connect();
     await loadFixtures();
-    routerApp = RouterApp(getController.getRouter());
   } );
 
   beforeEach(async () => {
@@ -54,12 +65,13 @@ describe("picker", () => {
   } );
 
   afterAll(async () => {
+    await db.disconnect();
     await app.close();
   } );
 
   it("should get random", async () => {
     const response = await request(routerApp)
-      .get("/random")
+      .get("/get/random")
       .expect(200)
       .send();
 
@@ -73,7 +85,7 @@ describe("picker", () => {
   describe("query", () => {
     it("should get a music if query is put", async () => {
       const response = await request(routerApp)
-        .get("/random?q=tag:t1")
+        .get("/get/random?q=tag:t1")
         .expect(200)
         .send();
 
@@ -89,7 +101,7 @@ describe("picker", () => {
 
       expectNotEmpty(possibleMusics);
       const response = await request(routerApp)
-        .get("/random?q=weight:>10")
+        .get("/get/random?q=weight:>10")
         .expect(200)
         .send();
 
@@ -102,7 +114,7 @@ describe("picker", () => {
 
       expectNotEmpty(musicsWithTagT1);
       const response = await request(routerApp)
-        .get(`/random?q=${query}`)
+        .get(`/get/random?q=${query}`)
         .expect(200)
         .send();
 
@@ -112,7 +124,7 @@ describe("picker", () => {
     it("should get a music with tag only-t2 using t2 query", async () => {
       const query = "tag:t2";
       const response = await request(routerApp)
-        .get(`/random?q=${query}`)
+        .get(`/get/random?q=${query}`)
         .expect(200)
         .send();
       const musicsWithTagT2Only = MUSICS_WITH_TAGS_SAMPLES.filter((music) => music.tags?.includes("only-t2"));
@@ -133,7 +145,7 @@ describe("picker", () => {
       const query = "tag:t4";
 
       await request(routerApp)
-        .get(`/random?q=${query}`)
+        .get(`/get/random?q=${query}`)
         .expect(500)
         .send();
     } );
