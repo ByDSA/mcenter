@@ -1,24 +1,37 @@
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { Stream, StreamMode, StreamOriginType, assertIsStream } from "#modules/streams/models";
 import { StreamRepository } from "#modules/streams/repositories";
-import { TestMongoDatabase, registerSingletonIfNotAndGet } from "#tests/main";
+import { TestMongoDatabase } from "#tests/main";
 import { TestDatabase } from "#tests/main/db/TestDatabase";
+import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { Serie, assertIsSerie } from "../models";
 import { SerieRepository } from "./Repository";
 
 let db: TestDatabase;
 let repository: SerieRepository;
 let streamRepository: StreamRepository;
+let testingSetup: TestingSetup;
 
 describe("repository", () => {
   beforeAll(async () => {
+    testingSetup = await createTestingAppModuleAndInit( {
+      controllers: [],
+      providers: [
+        DomainMessageBroker,
+        SerieRepository,
+        StreamRepository,
+      ],
+    } );
+
+    repository = testingSetup.module
+      .get<SerieRepository>(SerieRepository);
+    streamRepository = testingSetup.module
+      .get<StreamRepository>(StreamRepository);
+
     db = new TestMongoDatabase();
 
     db.init();
     await db.connect();
-    registerSingletonIfNotAndGet(DomainMessageBroker);
-    repository = registerSingletonIfNotAndGet(SerieRepository);
-    streamRepository = registerSingletonIfNotAndGet(StreamRepository);
   } );
 
   afterAll(async () => {

@@ -1,4 +1,3 @@
-import { container } from "tsyringe";
 import { Episode, EpisodeId } from "#episodes/models";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { TestMongoDatabase } from "#tests/main";
@@ -7,12 +6,15 @@ import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures/models";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { Consumer } from "#utils/message-broker";
+import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { EpisodeFileInfoRepository } from "#modules/file-info/repositories";
 import { EpisodeRepository } from "..";
 import { EPISODE_QUEUE_NAME } from "./events";
 
 let db: TestDatabase;
 let episodeRepository: EpisodeRepository;
 let domainMessageBroker: DomainMessageBroker<ModelMessage<Episode>>;
+let testingSetup: TestingSetup;
 
 beforeAll(async () => {
   db = new TestMongoDatabase();
@@ -22,11 +24,20 @@ beforeAll(async () => {
   await db.drop();
   await loadFixtureSimpsons();
 
-  container.registerInstance(DomainMessageBroker, new DomainMessageBroker<ModelMessage<Episode>>());
-  container.registerSingleton(EpisodeRepository);
+  testingSetup = await createTestingAppModuleAndInit( {
+    controllers: [],
+    providers: [
+      DomainMessageBroker<ModelMessage<Episode>>,
+      EpisodeRepository,
+      EpisodeFileInfoRepository,
+    ],
+  } );
 
-  domainMessageBroker = container.resolve(DomainMessageBroker<ModelMessage<Episode>>);
-  episodeRepository = container.resolve(EpisodeRepository);
+  domainMessageBroker = testingSetup.module
+    .get<DomainMessageBroker<ModelMessage<Episode>>>(DomainMessageBroker<ModelMessage<Episode>>);
+
+  episodeRepository = testingSetup.module
+    .get<EpisodeRepository>(EpisodeRepository);
 } );
 
 it("should emit Patch Event", async () => {

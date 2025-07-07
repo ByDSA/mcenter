@@ -1,13 +1,15 @@
 import { HttpStatusCode } from "#shared/utils/http/StatusCode";
 import { Application } from "express";
 import request from "supertest";
-import { container } from "tsyringe";
-import { resolveRequired } from "#utils/layers/deps";
-import { RouterApp } from "#utils/express/test";
 import { HISTORY_LIST_SIMPSONS, HISTORY_LIST_WITH_NO_ENTRIES } from "#tests/main/db/fixtures";
-import { registerSingletonIfNotAndGet } from "#tests/main";
 import { createMockClass } from "#tests/jest/mocking";
+import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { EpisodeRepository } from "#episodes/repositories";
+import { SerieRepository } from "#modules/series";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { EpisodeFileInfoRepository } from "#modules/file-info/repositories";
 import { HistoryListRepository } from "../repositories";
+import { LastTimePlayedService } from "../LastTimePlayedService";
 import { HistoryListRestController } from "./RestController";
 
 class HistoryListRepositoryMock extends createMockClass(HistoryListRepository) {}
@@ -17,14 +19,27 @@ const historyListSample = HISTORY_LIST_SIMPSONS;
 describe("restController", () => {
   let routerApp: Application;
   let repository: jest.Mocked<HistoryListRepository>;
+  let testingSetup: TestingSetup;
 
-  beforeAll(() => {
-    registerSingletonIfNotAndGet(HistoryListRepository, HistoryListRepositoryMock);
-    repository = resolveRequired(HistoryListRepository) as HistoryListRepositoryMock;
-    container.registerSingleton(HistoryListRestController);
-    const controller = resolveRequired(HistoryListRestController);
+  beforeAll(async () => {
+    testingSetup = await createTestingAppModuleAndInit( {
+      controllers: [HistoryListRestController],
+      providers: [
+        {
+          provide: HistoryListRepository,
+          useClass: HistoryListRepositoryMock,
+        },
+        DomainMessageBroker,
+        SerieRepository,
+        EpisodeFileInfoRepository,
+        EpisodeRepository,
+        LastTimePlayedService,
+      ],
+    } );
+    repository = testingSetup.module
+      .get<jest.Mocked<HistoryListRepository>>(HistoryListRepository);
 
-    routerApp = RouterApp(controller.getRouter());
+    routerApp = testingSetup.routerApp;
   } );
 
   beforeEach(() => {

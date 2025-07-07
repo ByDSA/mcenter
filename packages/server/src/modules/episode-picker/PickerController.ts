@@ -1,16 +1,15 @@
 import { asyncMap } from "#shared/utils/arrays";
 import { assertFound } from "#shared/utils/http/validation";
 import { assertIsDefined } from "#shared/utils/validation";
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { Picker } from "rand-picker";
+import { Controller, Get, Req, Res } from "@nestjs/common";
 import { EpisodeRepository } from "#episodes/index";
 import { Episode } from "#episodes/models";
 import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
 import { genRandomPickerWithData } from "#modules/picker";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams/repositories";
-import { Controller, SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { dependencies } from "./appliers/Dependencies";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 
@@ -19,44 +18,30 @@ type ResultType = Episode & {
   days: number;
 };
 
-const DEPS_MAP = {
-  streamRepository: StreamRepository,
-  episodeRepository: EpisodeRepository,
-  historyListRepository: HistoryListRepository,
-  serieRepository: SerieRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
-export class EpisodePickerController implements Controller {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = (deps as Deps);
+@Controller()
+export class EpisodePickerController {
+  constructor(
+     private streamRepository: StreamRepository,
+     private episodeRepository: EpisodeRepository,
+     private historyListRepository: HistoryListRepository,
+     private serieRepository: SerieRepository,
+  ) {
   }
 
-  getRouter(): express.Router {
-    const router = SecureRouter();
-
-    router.get("/:streamId", this.#showPicker.bind(this));
-
-    return router;
-  }
-
-  async #showPicker(req: Request, res: Response) {
-    const { serieRepository, historyListRepository, episodeRepository } = this.#deps;
+  @Get("/:streamId")
+  async showPicker(@Req() req: Request, @Res() res: Response) {
     const { streamId } = getParams(req, res);
-    const stream = await this.#deps.streamRepository.getOneById(streamId);
+    const stream = await this.streamRepository.getOneById(streamId);
 
     assertFound(stream);
-    const historyList = await historyListRepository.getOneByIdOrCreate(streamId);
+    const historyList = await this.historyListRepository.getOneByIdOrCreate(streamId);
 
     assertFound(historyList);
 
-    const seriePromise = serieRepository.getOneById(stream.group.origins[0].id);
+    const seriePromise = this.serieRepository.getOneById(stream.group.origins[0].id);
     const lastEpId = historyList.entries.at(-1)?.episodeId;
     const lastEpPromise = lastEpId
-      ? this.#deps.episodeRepository.getOneById(lastEpId)
+      ? this.episodeRepository.getOneById(lastEpId)
       : Promise.resolve(null);
 
     await Promise.all([seriePromise, lastEpPromise]);
@@ -65,7 +50,7 @@ export class EpisodePickerController implements Controller {
 
     assertFound(serie);
 
-    const episodes: Episode[] = await episodeRepository.getManyBySerieId(serie.id);
+    const episodes: Episode[] = await this.episodeRepository.getManyBySerieId(serie.id);
     const picker = await genRandomPickerWithData( {
       resources: episodes,
       lastOne: lastEp ?? undefined,
@@ -73,7 +58,7 @@ export class EpisodePickerController implements Controller {
       weightFixerApplier: genEpisodeWeightFixerApplier(),
     } );
     const pickerWeight = picker.weight;
-    const lastTimePlayedService = new LastTimePlayedService();
+    const lastTimePlayedService = new LastTimePlayedService(this.episodeRepository);
     const ret = (await asyncMap(
       "end" in picker.data[0]
         ? (picker as Picker<Episode>).data.filter(
@@ -95,7 +80,7 @@ export class EpisodePickerController implements Controller {
       },
     )).sort((a: ResultType, b: ResultType) => b.percentage - a.percentage);
 
-    res.send(ret);
+    return ret;
   }
 }
 

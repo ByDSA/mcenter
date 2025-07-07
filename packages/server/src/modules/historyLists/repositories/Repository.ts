@@ -1,7 +1,6 @@
 import { showError } from "#shared/utils/errors/showError";
-import { PublicMethodsOf } from "#shared/utils/types";
+import { Injectable } from "@nestjs/common";
 import { CanCreateOne, CanGetAll, CanGetOneByIdOrCreate, CanUpdateOneById } from "#utils/layers/repository";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
@@ -10,23 +9,14 @@ import { ModelOdm } from "./odm";
 import { LIST_QUEUE_NAME } from "./events";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class HistoryListRepository
 implements CanUpdateOneById<HistoryList, HistoryListId>,
 CanGetOneByIdOrCreate<HistoryList, HistoryListId>,
 CanCreateOne<HistoryList>,
 CanGetAll<HistoryList> {
-  #domainMessageBroker: PublicMethodsOf<DomainMessageBroker>;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#domainMessageBroker = (deps as Deps).domainMessageBroker;
-
-    this.#domainMessageBroker.subscribe(LIST_QUEUE_NAME, (event: any) => {
+  constructor(private domainMessageBroker: DomainMessageBroker) {
+    this.domainMessageBroker.subscribe(LIST_QUEUE_NAME, (event: any) => {
       logDomainEvent(LIST_QUEUE_NAME, event);
 
       return Promise.resolve();
@@ -53,7 +43,7 @@ CanGetAll<HistoryList> {
       entity: historyList,
     } );
 
-    await this.#domainMessageBroker.publish(LIST_QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(LIST_QUEUE_NAME, event);
   }
 
   async #createOneDefaultModelById(id: HistoryListId): Promise<HistoryList> {
@@ -92,6 +82,6 @@ CanGetAll<HistoryList> {
       entity: historyList,
     } );
 
-    await this.#domainMessageBroker.publish(LIST_QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(LIST_QUEUE_NAME, event);
   }
 }

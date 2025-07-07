@@ -1,6 +1,6 @@
 import { assertIsNotEmpty } from "#shared/utils/validation";
+import { Injectable } from "@nestjs/common";
 import { Episode } from "#episodes/models";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { VlcBackWebSocketsServerService } from "./player-services";
 
 type PlayParams = {
@@ -8,23 +8,15 @@ type PlayParams = {
   episodes: Episode[];
 };
 
-const DEPS_MAP = {
-  vlcBackWSServerService: VlcBackWebSocketsServerService,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class PlayService {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+  constructor(private vlcBackWSServerService: VlcBackWebSocketsServerService) {
   }
 
   async play( { episodes, force }: PlayParams): Promise<boolean> {
     assertIsNotEmpty(episodes);
 
-    await this.#deps.vlcBackWSServerService.emitPlayResource( {
+    await this.vlcBackWSServerService.emitPlayResource( {
       resources: episodes,
       force,
     } );

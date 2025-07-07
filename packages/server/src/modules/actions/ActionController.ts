@@ -1,12 +1,13 @@
 import fs from "fs";
 import path from "path";
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import { assertIsDefined } from "#shared/utils/validation";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Get } from "@nestjs/common";
 import { Controller, SecureRouter } from "#utils/express";
 import { EpisodeAddNewFilesController, EpisodeUpdateController } from "#episodes/index";
 import { FixerController } from "./FixerController";
 import { EpisodesUpdateLastTimePlayedController } from "./EpisodesUpdateLastTimePlayedController";
+import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
 const DEPS_MAP = {
   episodesUpdateLastTimePlayedController: EpisodesUpdateLastTimePlayedController,
@@ -24,6 +25,21 @@ export class ActionController implements Controller {
     this.#deps = deps as Deps;
   }
 
+  @Get("/log")
+  log() {
+    try {
+      const { TMP_PATH } = process.env;
+
+      assertIsDefined(TMP_PATH);
+      const pathFile = path.join(TMP_PATH, ".log");
+      const log = fs.readFileSync(pathFile, "utf-8");
+
+      return log;
+    } catch {
+      return "No log file";
+    }
+  }
+
   getRouter(): Router {
     const router = SecureRouter();
 
@@ -31,20 +47,6 @@ export class ActionController implements Controller {
     router.use("/episodes/file-info/update", this.#deps.episodesUpdateFileInfoController.getRouter());
     router.use("/episodes/add-new-files", this.#deps.episodesAddNewFilesController.getRouter());
     router.use("/fixer", this.#deps.fixerController.getRouter());
-
-    router.get("/log", (_req: Request, res: Response) => {
-      try {
-        const { TMP_PATH } = process.env;
-
-        assertIsDefined(TMP_PATH);
-        const pathFile = path.join(TMP_PATH, ".log");
-        const log = fs.readFileSync(pathFile, "utf-8");
-
-        res.send(log);
-      } catch {
-        res.send("No log file");
-      }
-    } );
 
     return router;
   }

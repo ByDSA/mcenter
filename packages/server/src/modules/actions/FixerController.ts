@@ -1,25 +1,18 @@
 import { FullResponse, LogElementResponse } from "#shared/utils/http";
-import { Request, Response, Router } from "express";
+import { Controller, Get } from "@nestjs/common";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams/repositories";
-import { Controller, SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
-const DEPS_MAP = {
-  serieRepository: SerieRepository,
-  streamRepository: StreamRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
-export class FixerController implements Controller {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+@Controller()
+export class FixerController {
+  constructor(
+    private serieRepository: SerieRepository,
+    private streamRepository: StreamRepository,
+  ) {
   }
 
-  async endpoint(_: Request, res: Response) {
+  @Get("/")
+  async endpoint() {
     const actions: LogElementResponse[] = [];
 
     actions.push(...await this.fixSeries());
@@ -28,16 +21,16 @@ export class FixerController implements Controller {
       data: actions,
     };
 
-    res.send(responseElement);
+    return responseElement;
   }
 
   async fixSeries(): Promise<LogElementResponse[]> {
     const actions: LogElementResponse[] = [];
-    const series = await this.#deps.serieRepository.getAll();
+    const series = await this.serieRepository.getAll();
     const promises: Promise<LogElementResponse | null>[] = [];
 
     for (const serie of series) {
-      const promise = this.#deps.streamRepository.fixDefaultStreamForSerie(serie.id);
+      const promise = this.streamRepository.fixDefaultStreamForSerie(serie.id);
 
       promises.push(promise);
     }
@@ -50,13 +43,5 @@ export class FixerController implements Controller {
     }
 
     return actions;
-  }
-
-  getRouter(): Router {
-    const router = SecureRouter();
-
-    router.get("/", this.endpoint.bind(this));
-
-    return router;
   }
 }

@@ -1,31 +1,25 @@
+import { Injectable } from "@nestjs/common";
 import { SerieFolderTree as SerieTree } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Episode } from "../models";
 import { EpisodeRepository } from "../repositories";
 import { putModelInSerieFolderTree } from "./adapters";
 
-const DEPS_MAP = {
-  episodeRepository: EpisodeRepository,
-  serieRepository: SerieRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class SavedSerieTreeService {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+  constructor(
+    private episodeRepository: EpisodeRepository,
+    private serieRepository: SerieRepository,
+  ) {
   }
 
   async getSavedSeriesTree(): Promise<SerieTree> {
     const serieFolderTree: SerieTree = {
       children: [],
     };
-    const series = await this.#deps.serieRepository.getAll();
+    const series = await this.serieRepository.getAll();
     const episodesOfSeriePromises = series.map(async serie => {
-      const serieEpisodes = await this.#deps.episodeRepository.getAllBySerieId(serie.id);
+      const serieEpisodes = await this.episodeRepository.getAllBySerieId(serie.id);
 
       return serieEpisodes;
     } );

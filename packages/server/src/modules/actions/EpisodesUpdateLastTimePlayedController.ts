@@ -1,34 +1,28 @@
-import { Request, Response, Router } from "express";
+import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
 import { EpisodeRepository } from "#episodes/index";
 import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { StreamRepository } from "#modules/streams/repositories";
-import { Controller, SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 
-const DEPS_MAP = {
-  lastTimePlayedService: LastTimePlayedService,
-  serieRepository: SerieRepository,
-  episodeRepository: EpisodeRepository,
-  historyListRepository: HistoryListRepository,
-  streamRepository: StreamRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
-export class EpisodesUpdateLastTimePlayedController implements Controller {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+@Controller()
+export class EpisodesUpdateLastTimePlayedController {
+  constructor(
+    private lastTimePlayedService: LastTimePlayedService,
+    private serieRepository: SerieRepository,
+    private episodeRepository: EpisodeRepository,
+    private historyListRepository: HistoryListRepository,
+    private streamRepository: StreamRepository,
+  ) {
   }
 
-  async #action(_req: Request, res: Response): Promise<void> {
-    const series = await this.#deps.serieRepository.getAll();
+  @Get("/")
+  @HttpCode(HttpStatus.OK)
+  async action(): Promise<void> {
+    const series = await this.serieRepository.getAll();
     const promisesToAwait = [];
 
     for (const serie of series) {
-      const promise = this.#deps.streamRepository.getManyBySerieId(serie.id).then(async streams => {
+      const promise = this.streamRepository.getManyBySerieId(serie.id).then(async streams => {
         const stream = streams[0];
 
         if (!stream) {
@@ -37,11 +31,11 @@ export class EpisodesUpdateLastTimePlayedController implements Controller {
           return;
         }
 
-        const historyList = await this.#deps.historyListRepository.getOneByIdOrCreate(stream.id);
+        const historyList = await this.historyListRepository.getOneByIdOrCreate(stream.id);
 
-        await this.#deps.episodeRepository.getAllBySerieId(serie.id).then(episodes => {
+        await this.episodeRepository.getAllBySerieId(serie.id).then(episodes => {
           for (const episode of episodes) {
-            const updatePromise = this.#deps.lastTimePlayedService
+            const updatePromise = this.lastTimePlayedService
               .updateEpisodeLastTimePlayedFromEntriesAndGet( {
                 episodeId: episode.id,
                 entries: historyList.entries,
@@ -56,15 +50,5 @@ export class EpisodesUpdateLastTimePlayedController implements Controller {
     }
 
     await Promise.all(promisesToAwait);
-
-    res.sendStatus(200);
-  }
-
-  getRouter(): Router {
-    const router = SecureRouter();
-
-    router.get("/", this.#action.bind(this));
-
-    return router;
   }
 }

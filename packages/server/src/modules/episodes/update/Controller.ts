@@ -1,27 +1,18 @@
 import { FullResponse } from "#shared/utils/http";
-import { Response, Router } from "express";
-import { Controller, SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { validateReq } from "#utils/validation/zod-express";
+import { Controller, Get, Req } from "@nestjs/common";
 import { UpdateEpisodesFileRequest, assertIsUpdateEpisodesFileRequest } from "./validation";
 import { UpdateMetadataProcess } from "./UpdateSavedProcess";
 
-const DEPS_MAP = {
-  updateMetadataProcess: UpdateMetadataProcess,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
-export class EpisodesUpdateController implements Controller {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+@Controller()
+export class EpisodesUpdateController {
+  constructor(private updateMetadataProcess: UpdateMetadataProcess) {
   }
 
-  async endpoint(req: UpdateEpisodesFileRequest, res: Response) {
+  @Get("/saved")
+  async endpoint(@Req() req: UpdateEpisodesFileRequest) {
+    assertIsUpdateEpisodesFileRequest(req);
     const { forceHash } = req.query;
-    const { errors, data } = await this.#deps.updateMetadataProcess.process( {
+    const { errors, data } = await this.updateMetadataProcess.process( {
       forceHash: forceHash === "1" || forceHash === "true",
     } );
     const responseObj: FullResponse = {
@@ -29,18 +20,6 @@ export class EpisodesUpdateController implements Controller {
       errors,
     };
 
-    res.send(responseObj);
-  }
-
-  getRouter(): Router {
-    const router = SecureRouter();
-
-    router.get(
-      "/saved",
-      validateReq(assertIsUpdateEpisodesFileRequest),
-      this.endpoint.bind(this),
-    );
-
-    return router;
+    return responseObj;
   }
 }

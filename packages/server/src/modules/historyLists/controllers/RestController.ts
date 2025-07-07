@@ -1,17 +1,18 @@
+/* eslint-disable no-empty-function */
 import { showError } from "#shared/utils/errors/showError";
 import { assertFound } from "#shared/utils/http/validation";
-import { Request, Response, Router } from "express";
+import { Request, Response } from "express";
 import z from "zod";
 import { assertZod } from "#shared/utils/validation/zod";
+import { Body, Controller, Header, HttpCode, HttpStatus, Options, Param } from "@nestjs/common";
 import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#episodes/index";
 import { deleteOneEntryById, getManyEntriesBySearch, getManyEntriesBySuperId, getOneByIdReqParamsSchema } from "#modules/historyLists/models/dto";
 import { SerieRepository } from "#modules/series";
-import { Controller, SecureRouter } from "#utils/express";
-import { CanGetAll, CanGetOneById } from "#utils/layers/controller";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { validateReq } from "#utils/validation/zod-express";
+import { CanGetAll } from "#utils/layers/controller";
+import { DeleteOne, GetOne } from "#utils/nestjs/rest";
+import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/Get";
 import { HistoryListRepository } from "../repositories";
-import { HistoryEntry, HistoryEntryWithId, HistoryList, assertIsHistoryEntryWithId } from "../models";
+import { HistoryEntry, HistoryEntryWithId, assertIsHistoryEntryWithId, historyListSchema, historyEntrySchema } from "../models";
 import { LastTimePlayedService } from "../LastTimePlayedService";
 
 type HistoryListGetOneByIdRequest = {
@@ -35,59 +36,45 @@ type HistoryListDeleteOneEntryByIdRes = {
   body: z.infer<typeof deleteOneEntryById.resBodySchema>;
 };
 
-const DEPS_MAP = {
-  historyListRepository: HistoryListRepository,
-  serieRepository: SerieRepository,
-  episodeRepository: EpisodeRepository,
-  lastTimePlayedService: LastTimePlayedService,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Controller()
 export class HistoryListRestController
 implements
-    Controller,
-    CanGetOneById<HistoryListGetOneByIdRequest, Response>,
     CanGetAll<Request, Response> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+  constructor(
+    private historyListRepository: HistoryListRepository,
+    private serieRepository: SerieRepository,
+    private episodeRepository: EpisodeRepository,
+    private lastTimePlayedService: LastTimePlayedService,
+  ) {
   }
 
-  async getAll(_: Request, res: Response): Promise<void> {
-    const got = await this.#deps.historyListRepository.getAll();
-
-    res.send(got);
+  @GetMany("/", historyListSchema)
+  async getAll() {
+    return await this.historyListRepository.getAll();
   }
 
-  async #getOneByIdByRequest(
-    req: HistoryListGetOneByIdRequest,
-  ): Promise<HistoryList> {
-    const { id } = req.params;
-    const got = await this.#deps.historyListRepository.getOneByIdOrCreate(id);
+  @GetOne("/:id", historyListSchema)
+  async getOneById(
+    @Param() params: HistoryListGetOneByIdRequest["params"],
+  ) {
+    //  assertZod(getOneByIdReqParamsSchema, req.params);
+    const got = await this.historyListRepository.getOneByIdOrCreate(params.id);
 
     assertFound(got);
 
     return got;
   }
 
-  async getOneById(
-    req: HistoryListGetOneByIdRequest,
-    res: Response,
-  ): Promise<void> {
-    const got = await this.#getOneByIdByRequest(req);
-
-    res.send(got);
-  }
-
+  @GetMany("/:id/entries", historyEntrySchema)
   async getManyEntriesByHistoryListId(
-    req: HistoryListGetOneByIdRequest,
-    res: Response,
-  ): Promise<void> {
-    const got = await this.#getOneByIdByRequest(req);
+    @Param() params: HistoryListGetOneByIdRequest["params"],
+  ) {
+    //  assertZod(getOneByIdReqParamsSchema, req.params);
+    const got = await this.historyListRepository.getOneByIdOrCreate(params.id);
 
-    res.send(got.entries);
+    assertFound(got);
+
+    return got.entries;
   }
 
   async #getEntriesWithCriteriaApplied(
@@ -135,7 +122,7 @@ implements
       if (body.expand.includes("series")) {
         const promises = newEntries.map(async (entry) => {
           const { episodeId: { serieId } } = entry;
-          const serie = await this.#deps.serieRepository.getOneById(serieId);
+          const serie = await this.serieRepository.getOneById(serieId);
 
           if (serie)
 
@@ -150,7 +137,7 @@ implements
       if (body.expand.includes("episodes")) {
         const promises = newEntries.map(async (entry) => {
           const { episodeId: { innerId, serieId } } = entry;
-          const episode = await this.#deps.episodeRepository.getOneById( {
+          const episode = await this.episodeRepository.getOneById( {
             innerId,
             serieId,
           }, {
@@ -171,39 +158,46 @@ implements
     return newEntries;
   }
 
+  @GetManyCriteria("/:id/entries/search", historyEntrySchema)
   async getManyEntriesByHistoryListIdSearch(
-    req: HistoryListGetManyEntriesBySuperIdRequest,
-    res: Response,
-  ): Promise<void> {
-    const got = await this.#getOneByIdByRequest(req);
+    @Body() body: HistoryListGetManyEntriesBySuperIdRequest["body"],
+    @Param() params: HistoryListGetManyEntriesBySuperIdRequest["params"],
+  ) {
+    // assertZod(getManyEntriesBySuperId.reqBodySchema, req.body);
+    // assertZod(getOneByIdReqParamsSchema, req.params);
+    const got = await this.historyListRepository.getOneByIdOrCreate(params.id);
+
+    assertFound(got);
     let { entries } = got;
 
-    entries = await this.#getEntriesWithCriteriaApplied(entries, req.body);
+    entries = await this.#getEntriesWithCriteriaApplied(entries, body);
 
-    res.send(entries);
+    return entries;
   }
 
+  @GetManyCriteria("/entries/search", historyEntrySchema)
   async getManyEntriesBySearch(
-    req: HistoryListGetManyEntriesBySearchRequest,
-    res: Response,
-  ): Promise<void> {
-    const got = await this.#deps.historyListRepository.getAll();
+    @Body() body: HistoryListGetManyEntriesBySearchRequest["body"],
+  ) {
+    //  assertZod(getManyEntriesBySearch.reqBodySchema, req.body);
+    const got = await this.historyListRepository.getAll();
     let entries: HistoryEntryWithId[] = [];
 
     for (const historyList of got)
       entries.push(...historyList.entries);
 
-    entries = await this.#getEntriesWithCriteriaApplied(entries, req.body);
+    entries = await this.#getEntriesWithCriteriaApplied(entries, body);
 
-    res.send(entries);
+    return entries;
   }
 
+  @DeleteOne("/:id/entries/:entryId")
   async deleteOneEntryById(
-    req: HistoryListDeleteOneEntryByIdRequest,
-    res: Response,
-  ): Promise<void> {
-    const { id, entryId } = req.params;
-    const historyList = await this.#deps.historyListRepository.getOneByIdOrCreate(id);
+    @Param() params: HistoryListDeleteOneEntryByIdRequest["params"],
+  ) {
+    // assertZod(deleteOneEntryById.reqParamsSchema, req.params);
+    const { id, entryId } = params;
+    const historyList = await this.historyListRepository.getOneByIdOrCreate(id);
 
     assertFound(historyList);
 
@@ -217,9 +211,9 @@ implements
 
     assertIsHistoryEntryWithId(deleted);
 
-    await this.#deps.historyListRepository.updateOneById(historyList.id, historyList);
+    await this.historyListRepository.updateOneById(historyList.id, historyList);
 
-    this.#deps.lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
+    this.lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
       episodeId: deleted.episodeId,
       entries: historyList.entries,
     } ).catch(showError);
@@ -230,69 +224,14 @@ implements
 
     assertZod(deleteOneEntryById.resBodySchema, body);
 
-    res.send(body);
+    return body;
   }
 
-  getRouter(): Router {
-    const router = SecureRouter();
-
-    router.get(
-      "/:id",
-      validateReq((req: HistoryListGetOneByIdRequest) => {
-        assertZod(getOneByIdReqParamsSchema, req.params);
-
-        return req;
-      } ),
-      this.getOneById.bind(this),
-    );
-    router.get(
-      "/:id/entries",
-      validateReq((req: HistoryListGetOneByIdRequest) => {
-        assertZod(getOneByIdReqParamsSchema, req.params);
-
-        return req;
-      } ),
-      this.getManyEntriesByHistoryListId.bind(this),
-    );
-
-    router.delete(
-      "/:id/entries/:entryId",
-      validateReq((req: HistoryListDeleteOneEntryByIdRequest) => {
-        assertZod(deleteOneEntryById.reqParamsSchema, req.params);
-
-        return req;
-      } ),
-      this.deleteOneEntryById.bind(this),
-    );
-
-    router.get("/", this.getAll.bind(this));
-
-    router.post(
-      "/entries/search",
-      validateReq((req: HistoryListGetManyEntriesBySearchRequest) => {
-        assertZod(getManyEntriesBySearch.reqBodySchema, req.body);
-
-        return req;
-      } ),
-      this.getManyEntriesBySearch.bind(this),
-    );
-    router.options("/entries/search", (_req, res) => {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Methods", "POST,DELETE,OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
-      res.sendStatus(200);
-    } );
-    router.post(
-      "/:id/entries/search",
-      validateReq((req: HistoryListGetManyEntriesBySuperIdRequest) => {
-        assertZod(getManyEntriesBySuperId.reqBodySchema, req.body);
-        assertZod(getOneByIdReqParamsSchema, req.params);
-
-        return req;
-      } ),
-      this.getManyEntriesByHistoryListIdSearch.bind(this),
-    );
-
-    return router;
+  @Options("/:user/search")
+  @Header("Access-Control-Allow-Origin", "*")
+  @Header("Access-Control-Allow-Methods", "POST,DELETE,OPTIONS")
+  @Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With")
+  @HttpCode(HttpStatus.OK)
+  async options(): Promise<void> {
   }
 }

@@ -7,4 +7,6 @@ export {
   HistoryEntryWithId,
   HistoryList,
   HistoryListId,
+  historyListSchema,
+  historyEntrySchema,
 } from "#shared/models/historyLists";

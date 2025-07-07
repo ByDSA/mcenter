@@ -3,11 +3,11 @@ import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from 
 import { deepMerge } from "#shared/utils/objects";
 import { assertIsDefined } from "#shared/utils/validation";
 import ffmpeg from "fluent-ffmpeg";
+import { Injectable } from "@nestjs/common";
 import { EpisodeId } from "#episodes/models";
 import { FileInfoRepository, SerieFolderTree } from "#modules/file-info";
 import { FileInfoVideo, FileInfoVideoWithSuperId, compareFileInfoVideo } from "#modules/file-info/models";
 import { md5FileAsync } from "#utils/crypt";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
 import { getIdModelOdmFromId } from "../repositories/odm";
 
@@ -21,20 +21,14 @@ type Options = {
   forceHash?: boolean;
 };
 
-const DEPS_MAP = {
-  savedSerieTreeService: SavedSerieTreeService,
-  episodeFileRepository: FileInfoRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class UpdateMetadataProcess {
-  #deps: Deps;
-
   #options!: Options;
 
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+  constructor(
+    private savedSerieTreeService: SavedSerieTreeService,
+    private episodeFileRepository: FileInfoRepository,
+  ) {
   }
 
   async genEpisodeFileInfoFromFilePathOrFail(filePath: string): Promise<Model | null> {
@@ -42,7 +36,7 @@ export class UpdateMetadataProcess {
 
     assertIsDefined(MEDIA_FOLDER);
 
-    const currentEpisodeFile = await this.#deps.episodeFileRepository.getOneByPath(filePath);
+    const currentEpisodeFile = await this.episodeFileRepository.getOneByPath(filePath);
 
     return new Promise((resolve, reject) =>{
       const fullFilePath = `${MEDIA_FOLDER}/${filePath}`;
@@ -103,7 +97,7 @@ export class UpdateMetadataProcess {
     this.#options = deepMerge( {
       forceHash: false,
     }, options);
-    const seriesTree: SerieFolderTree = await this.#deps.savedSerieTreeService.getSavedSeriesTree();
+    const seriesTree: SerieFolderTree = await this.savedSerieTreeService.getSavedSeriesTree();
 
     console.log("got paths");
     const fileInfos: ModelWithSuperId[] = [];
@@ -136,7 +130,7 @@ export class UpdateMetadataProcess {
               episodeId: episodeIdOdm.toString(),
             } as ModelWithSuperId;
 
-            await this.#deps.episodeFileRepository
+            await this.episodeFileRepository
               .updateOneBySuperId(episodeFileWithId.episodeId, episodeFileWithId);
 
             return episodeFileWithId;

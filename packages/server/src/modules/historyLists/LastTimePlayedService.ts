@@ -2,7 +2,7 @@ import { showError } from "#shared/utils/errors/showError";
 import { deepCopy } from "#shared/utils/objects";
 import { DateType } from "#shared/utils/time";
 import { DateTime } from "luxon";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Injectable } from "@nestjs/common";
 import { Episode, EpisodeId, compareEpisodeId } from "#episodes/models";
 import { EpisodeRepository } from "#episodes/index";
 import { HistoryList } from "./models";
@@ -21,17 +21,9 @@ type FuncParams = {
   entries: HistoryList["entries"];
 };
 
-const DEPS_MAP = {
-  episodeRepository: EpisodeRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class LastTimePlayedService {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+  constructor(private episodeRepository: EpisodeRepository) {
   }
 
   // eslint-disable-next-line require-await
@@ -43,7 +35,7 @@ export class LastTimePlayedService {
       entries,
     ) ?? undefined;
 
-    this.#deps.episodeRepository.patchOneByIdAndGet(episodeId, {
+    this.episodeRepository.patchOneByIdAndGet(episodeId, {
       lastTimePlayed,
     } ).catch(showError);
 
@@ -81,7 +73,7 @@ export class LastTimePlayedService {
         };
         const { id } = selfCopy;
 
-        await this.#deps.episodeRepository.updateOneByIdAndGet(id, selfCopy);
+        await this.episodeRepository.updateOneByIdAndGet(id, selfCopy);
       }
     }
 

@@ -1,33 +1,24 @@
 import { showError } from "#shared/utils/errors/showError";
 import { LogElementResponse } from "#shared/utils/http";
+import { Injectable } from "@nestjs/common";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#modules/series";
 import { SERIES_QUEUE_NAME, assertIsSerie } from "#series/models";
 import { EventType } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
 import { Stream, StreamId, StreamMode, StreamOriginType } from "../models";
 import { DocOdm, ModelOdm } from "./odm";
 import { streamDocOdmToModel, streamToDocOdm } from "./adapters";
 
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class StreamsRepository
 implements CanGetOneById<Stream, StreamId>,
 CanUpdateOneById<Stream, StreamId>,
 CanCreateOne<Stream>, CanGetAll<Stream> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(SERIES_QUEUE_NAME, async (event: Event<any>) => {
+  constructor(private domainMessageBroker: DomainMessageBroker) {
+    this.domainMessageBroker.subscribe(SERIES_QUEUE_NAME, async (event: Event<any>) => {
       logDomainEvent(SERIES_QUEUE_NAME, event);
 
       if (event.type === EventType.CREATED) {

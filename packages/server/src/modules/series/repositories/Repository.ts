@@ -1,8 +1,8 @@
 import { showError } from "#shared/utils/errors/showError";
+import { Injectable } from "@nestjs/common";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
 import { Serie, SerieId } from "../models";
@@ -10,23 +10,14 @@ import { DocOdm, ModelOdm } from "./odm";
 import { QUEUE_NAME } from "./events";
 import { docOdmToModel } from "./adapters";
 
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class SerieRepository
 implements CanGetOneById<Serie, SerieId>,
 CanUpdateOneByIdAndGet<Serie, SerieId>,
 CanCreateOneAndGet<Serie>,
 CanGetAll<Serie> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: Event<any>) => {
+  constructor(private domainMessageBroker: DomainMessageBroker) {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, (event: Event<any>) => {
       logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
@@ -46,7 +37,7 @@ CanGetAll<Serie> {
       entity: serie,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
 
     return serie;
   }
@@ -79,7 +70,7 @@ CanGetAll<Serie> {
       entity: ret,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
 
     return ret;
   }

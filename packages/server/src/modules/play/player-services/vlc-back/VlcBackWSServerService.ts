@@ -4,27 +4,18 @@ import { Server as HttpServer } from "node:http";
 import { showError } from "#shared/utils/errors/showError";
 import { assertIsDefined } from "#shared/utils/validation";
 import { Server, Socket } from "socket.io";
+import { Injectable } from "@nestjs/common";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { PlayerEvent, PlayResourceMessage } from "#modules/play/player-services/models";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { Event } from "#utils/message-broker";
 import { QUEUE_NAME, StatusPlayerEvent } from "../messaging";
 
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class VlcBackWSService {
   #io: Server | undefined;
 
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, async (event: Event<any>) => {
+  constructor(private domainMessageBroker: DomainMessageBroker) {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, async (event: Event<any>) => {
       switch (event.type) {
         case PlayerEvent.PAUSE_TOGGLE:
           await this.#emitPauseToggle();
@@ -76,7 +67,7 @@ export class VlcBackWSService {
       } );
 
       socket.on(PlayerEvent.STATUS, (status) => {
-        this.#deps.domainMessageBroker
+        this.domainMessageBroker
           .publish(QUEUE_NAME, new StatusPlayerEvent(status))
           .catch(showError);
       } );

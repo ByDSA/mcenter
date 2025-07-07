@@ -1,31 +1,24 @@
 import path from "path";
 import { ErrorElementResponse, errorToErrorElementResponse, FullResponse } from "#shared/utils/http";
 import { assertIsDefined } from "#shared/utils/validation";
-import { Request, Response, Router } from "express";
+import { Controller, Get } from "@nestjs/common";
 import { Episode } from "#episodes/models";
 import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew, SerieFolder as Serie } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
-import { Controller, SecureRouter } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
 import { EpisodeRepository } from "../repositories";
 
-const DEPS_MAP = {
-  serieRepository: SerieRepository,
-  episodeRepository: EpisodeRepository,
-  savedSerieTreeService: SavedSerieTreeService,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
-export class EpisodeAddNewFilesController implements Controller {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+@Controller()
+export class EpisodeAddNewFilesController {
+  constructor(
+    private serieRepository: SerieRepository,
+    private episodeRepository: EpisodeRepository,
+    private savedSerieTreeService: SavedSerieTreeService,
+  ) {
   }
 
-  async endpoint(_req: Request, res: Response) {
+  @Get("/")
+  async endpoint() {
     const { MEDIA_FOLDER_PATH } = process.env;
 
     assertIsDefined(MEDIA_FOLDER_PATH);
@@ -38,7 +31,7 @@ export class EpisodeAddNewFilesController implements Controller {
     if (filesSerieTreeResult.errors)
       errors.push(...filesSerieTreeResult.errors);
 
-    const savedSerieTree = await this.#deps.savedSerieTreeService.getSavedSeriesTree();
+    const savedSerieTree = await this.savedSerieTreeService.getSavedSeriesTree();
     const diff = diffSerieTree(
       savedSerieTree,
       {
@@ -71,15 +64,7 @@ export class EpisodeAddNewFilesController implements Controller {
       data,
     };
 
-    res.send(responseObj);
-  }
-
-  getRouter(): Router {
-    const router = SecureRouter();
-
-    router.get("/", this.endpoint.bind(this));
-
-    return router;
+    return responseObj;
   }
 
   async #updateEpisodes(oldNew: OldNew[]): Promise<Episode[]> {
@@ -89,7 +74,7 @@ export class EpisodeAddNewFilesController implements Controller {
     const promises: Promise<Episode | null>[] = [];
 
     for (const entry of oldNew) {
-      const p: Promise<Episode | null> = this.#deps.episodeRepository
+      const p: Promise<Episode | null> = this.episodeRepository
         .patchOneByPathAndGet(entry.old.content.filePath, {
           path: entry.new.content.filePath,
         } );
@@ -109,10 +94,10 @@ export class EpisodeAddNewFilesController implements Controller {
 
     // TODO: quitar await en for si se puede
     for (const serieInTree of seriesInTree) {
-      let serie = await this.#deps.serieRepository.getOneById(serieInTree.id);
+      let serie = await this.serieRepository.getOneById(serieInTree.id);
 
       if (!serie) {
-        serie = await this.#deps.serieRepository.createOneAndGet( {
+        serie = await this.serieRepository.createOneAndGet( {
           name: serieInTree.id,
           id: serieInTree.id,
         } );
@@ -140,7 +125,7 @@ export class EpisodeAddNewFilesController implements Controller {
       }
     }
 
-    await this.#deps.episodeRepository.createManyAndGet(episodes);
+    await this.episodeRepository.createManyAndGet(episodes);
 
     return episodes;
   }

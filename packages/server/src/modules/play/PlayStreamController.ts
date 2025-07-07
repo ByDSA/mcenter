@@ -1,58 +1,44 @@
 import { assertFound } from "#shared/utils/http/validation";
 import { assertIsDefined } from "#shared/utils/validation";
-import { Request, Response, Router } from "express";
+import { Request } from "express";
+import { Controller, Get, Req } from "@nestjs/common";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { HistoryListService } from "#modules/historyLists";
 import { StreamRepository } from "#modules/streams/repositories";
-import { Controller } from "#utils/express";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { PlayService } from "./PlayService";
 
-const DEPS_MAP = {
-  playService: PlayService,
-  episodePickerService: EpisodePickerService,
-  streamRepository: StreamRepository,
-  historyListService: HistoryListService,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
-export class PlayStreamController implements Controller {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+@Controller()
+export class PlayStreamController {
+  constructor(
+    private playService: PlayService,
+    private episodePickerService: EpisodePickerService,
+    private streamRepository: StreamRepository,
+    private historyListService: HistoryListService,
+  ) {
   }
 
-  async playStream(req: Request, res: Response) {
+  @Get("/:id/:number?")
+  async playStream(@Req() req: Request) {
     const { id, number, force } = validateParams(req);
-    const stream = await this.#deps.streamRepository.getOneById(id);
+    const stream = await this.streamRepository.getOneById(id);
 
     assertFound(stream);
 
-    const episodes = await this.#deps.episodePickerService.getByStream(stream, number);
-    const ok = await this.#deps.playService.play( {
+    const episodes = await this.episodePickerService.getByStream(stream, number);
+    const ok = await this.playService.play( {
       episodes,
       force,
     } );
 
     if (ok) {
-      await this.#deps.historyListService.addEpisodesToHistory( {
+      await this.historyListService.addEpisodesToHistory( {
         historyListId: stream.id,
         episodes,
       } );
     } else
       console.log("PlayService: Could not play");
 
-    res.send(episodes);
-  }
-
-  getRouter(): Router {
-    const router = Router();
-
-    router.get("/:id/:number?", this.playStream.bind(this));
-
-    return router;
+    return episodes;
   }
 }
 

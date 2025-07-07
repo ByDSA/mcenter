@@ -1,11 +1,11 @@
 import { showError } from "#shared/utils/errors/showError";
 import { deepMerge } from "#shared/utils/objects";
+import { Injectable } from "@nestjs/common";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#series/models";
 import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { Event } from "#utils/message-broker";
 import { Episode, EpisodeId } from "../models";
@@ -20,25 +20,18 @@ export type GetManyOptions = {
   sortById?: boolean;
 };
 
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-  episodeFileInfoRepository: EpisodeFileInfoRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class EpisodeRepository
 implements CanGetOneById<Episode, EpisodeId>,
 CanUpdateOneByIdAndGet<Episode, EpisodeId>,
 CanPatchOneByIdAndGet<Episode, EpisodeId>,
 CanCreateManyAndGet<Episode>,
 CanGetAll<Episode> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, (event: Event<any>) => {
+  constructor(
+    private domainMessageBroker: DomainMessageBroker,
+    private episodeFileInfoRepository: EpisodeFileInfoRepository,
+  ) {
+    this.domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, (event: Event<any>) => {
       logDomainEvent(EPISODE_QUEUE_NAME, event);
 
       return Promise.resolve();
@@ -67,7 +60,7 @@ CanGetAll<Episode> {
         value: newPath,
       } );
 
-      await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
     return ret;
@@ -107,7 +100,7 @@ CanGetAll<Episode> {
 
     if (opts?.expand?.includes(ExpandEnum.FileInfo)) {
       const _id = episodeOdm._id?.toString();
-      const fileInfo = await this.#deps.episodeFileInfoRepository.getAllBySuperId(_id);
+      const fileInfo = await this.episodeFileInfoRepository.getAllBySuperId(_id);
 
       if (!fileInfo)
         throw new Error("Episode has no file info");
@@ -173,7 +166,7 @@ CanGetAll<Episode> {
       entity: episode,
     } );
 
-    await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
 
     return this.getOneById(fullId);
   }
@@ -202,7 +195,7 @@ CanGetAll<Episode> {
         value,
       } );
 
-      await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
     return this.getOneById(fullId);
@@ -218,7 +211,7 @@ CanGetAll<Episode> {
         entity: model,
       } );
 
-      await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
     return ret;

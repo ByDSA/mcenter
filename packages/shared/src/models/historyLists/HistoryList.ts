@@ -15,3 +15,7 @@ export type HistoryList = z.infer<typeof modelSchema>;
 export function assertIsHistoryList(model: HistoryList): asserts model is HistoryList {
   assertZodPopStack(modelSchema, model);
 }
+
+export {
+  modelSchema as historyListSchema,
+};

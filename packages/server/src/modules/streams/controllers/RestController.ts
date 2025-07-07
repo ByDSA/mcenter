@@ -1,14 +1,14 @@
+/* eslint-disable no-empty-function */
 import { CriteriaSortDir } from "#shared/utils/criteria";
-import { Request, Response, Router } from "express";
+import { Request, Response } from "express";
 import z from "zod";
+import { Body, Controller, Get, Header, HttpCode, HttpStatus, Options } from "@nestjs/common";
 import { HistoryListRepository } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
-import { StreamOriginType } from "#modules/streams/models";
+import { StreamOriginType, streamSchema } from "#modules/streams/models";
 import { CriteriaSort, getManyBySearch } from "#modules/streams/models/dto";
-import { Controller, SecureRouter } from "#utils/express";
-import { CanGetAll, CanGetMany } from "#utils/layers/controller";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { validateReq } from "#utils/validation/zod-express";
+import { CanGetAll } from "#utils/layers/controller";
+import { GetManyCriteria } from "#utils/nestjs/rest/Get";
 import { StreamRepository } from "../repositories";
 import { assertZod } from "#sharedSrc/utils/validation/zod";
 
@@ -16,47 +16,42 @@ type StreamGetManyRequest = {
   body: z.infer<typeof getManyBySearch.reqBodySchema>;
 };
 
-const DEPS_MAP = {
-  streamRepository: StreamRepository,
-  serieRepository: SerieRepository,
-  historyListRepository: HistoryListRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Controller()
 export class StreamsRestController
 implements
-    Controller,
-    CanGetAll<Request, Response>,
-    CanGetMany<StreamGetManyRequest, Response> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+    CanGetAll<Request, Response> {
+  constructor(
+    private streamRepository: StreamRepository,
+    private serieRepository: SerieRepository,
+    private historyListRepository: HistoryListRepository,
+  ) {
   }
 
-  async getAll(_: Request, res: Response): Promise<void> {
-    const got = await this.#deps.streamRepository.getAll();
-
-    res.send(got);
+  @Get("/")
+  async getAll() {
+    return await this.streamRepository.getAll();
   }
 
-  async getMany(req: StreamGetManyRequest, res: Response): Promise<void> {
-    let got = await this.#deps.streamRepository.getAll();
+  @GetManyCriteria("/criteria", streamSchema)
+  async getMany(
+    @Body() body: StreamGetManyRequest["body"],
+  ) {
+    assertZod(getManyBySearch.reqBodySchema, body);
+    let got = await this.streamRepository.getAll();
 
-    if (req.body.expand) {
+    if (body.expand) {
       for (const stream of got) {
         for (const origin of stream.group.origins) {
           if (origin.type === StreamOriginType.SERIE) {
             // TODO: quitar await en for si se puede
-            origin.serie = await this.#deps.serieRepository.getOneById(origin.id) ?? undefined;
+            origin.serie = await this.serieRepository.getOneById(origin.id) ?? undefined;
           }
         }
       }
     }
 
-    if (req.body.sort) {
-      if (req.body.sort[CriteriaSort.lastTimePlayed]) {
+    if (body.sort) {
+      if (body.sort[CriteriaSort.lastTimePlayed]) {
         const lastTimePlayedDic: {[key: string]: number | undefined} = {};
 
         for (const stream of got) {
@@ -66,7 +61,7 @@ implements
 
             continue;
 
-          const historyList = await this.#deps.historyListRepository.getOneByIdOrCreate(stream.id);
+          const historyList = await this.historyListRepository.getOneByIdOrCreate(stream.id);
           const lastEntry = historyList?.entries.at(-1);
 
           if (lastEntry)
@@ -84,7 +79,7 @@ implements
           const lastTimePlayedA = lastTimePlayedDic[serieIdA] ?? 0;
           const lastTimePlayedB = lastTimePlayedDic[serieIdB] ?? 0;
 
-          if (req.body.sort?.lastTimePlayed === CriteriaSortDir.ASC)
+          if (body.sort?.lastTimePlayed === CriteriaSortDir.ASC)
             return lastTimePlayedA - lastTimePlayedB;
 
           return lastTimePlayedB - lastTimePlayedA;
@@ -92,36 +87,28 @@ implements
       }
     }
 
-    res.send(got);
+    return got;
   }
 
-  getRouter(): Router {
-    const router = SecureRouter();
+  @Options("/")
+  @Header("Access-Control-Allow-Origin", "*")
+  @Header("Access-Control-Allow-Methods", "GET,OPTIONS")
+  @Header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, Content-Length, X-Requested-With",
+  )
+  @HttpCode(HttpStatus.OK)
+  optionsRoot(): void {
+  }
 
-    router.get("/", this.getAll.bind(this));
-    router.post(
-      "/criteria",
-      validateReq((req: StreamGetManyRequest) => {
-        assertZod(getManyBySearch.reqBodySchema, req.body);
-
-        return req;
-      } ),
-      this.getMany.bind(this),
-    );
-
-    router.options("/", (_req, res) => {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Methods", "GET,OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
-      res.sendStatus(200);
-    } );
-    router.options("/criteria", (_req, res) => {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Methods", "POST,OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
-      res.sendStatus(200);
-    } );
-
-    return router;
+  @Options("criteria")
+  @Header("Access-Control-Allow-Origin", "*")
+  @Header("Access-Control-Allow-Methods", "POST,OPTIONS")
+  @Header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, Content-Length, X-Requested-With",
+  )
+  @HttpCode(HttpStatus.OK)
+  optionsCriteria(): void {
   }
 }
