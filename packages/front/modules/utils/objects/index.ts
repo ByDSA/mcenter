@@ -81,6 +81,8 @@ function get<T extends object>(obj: Partial<T>, path: (number | string)[]) {
 
 export function isModified<T extends object>(r1: T, r2: T, settings?: Settings) {
   const diffs = getDiff(r1, r2, settings);
+  const keysInDiff = Object.keys(diffs).length;
+  const keysInEntity = Object.keys(diffs.entity).length;
 
-  return Object.keys(diffs).length > 1 || Object.keys(diffs.entity).length > 0;
+  return keysInDiff > 1 || keysInEntity > 0;
 }

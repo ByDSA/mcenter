@@ -1,20 +1,20 @@
-import { showError } from "#shared/utils/errors/showError";
 import { Injectable } from "@nestjs/common";
+import { showError } from "$shared/utils/errors/showError";
 import { CanCreateOne, CanGetAll, CanGetOneByIdOrCreate, CanUpdateOneById } from "#utils/layers/repository";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { HistoryList, HistoryListId } from "../models";
+import { HistoryListEntity, HistoryListId } from "../models";
 import { ModelOdm } from "./odm";
 import { LIST_QUEUE_NAME } from "./events";
-import { docOdmToModel, modelToDocOdm } from "./adapters";
+import { docOdmToEntity, entityToDocOdm } from "./adapters";
 
 @Injectable()
 export class HistoryListRepository
-implements CanUpdateOneById<HistoryList, HistoryListId>,
-CanGetOneByIdOrCreate<HistoryList, HistoryListId>,
-CanCreateOne<HistoryList>,
-CanGetAll<HistoryList> {
+implements CanUpdateOneById<HistoryListEntity, HistoryListId>,
+CanGetOneByIdOrCreate<HistoryListEntity, HistoryListId>,
+CanCreateOne<HistoryListEntity>,
+CanGetAll<HistoryListEntity> {
   constructor(private domainMessageBroker: DomainMessageBroker) {
     this.domainMessageBroker.subscribe(LIST_QUEUE_NAME, (event: any) => {
       logDomainEvent(LIST_QUEUE_NAME, event);
@@ -23,7 +23,11 @@ CanGetAll<HistoryList> {
     } ).catch(showError);
   }
 
-  async getAll(): Promise<HistoryList[]> {
+  static providers = Object.freeze([
+    DomainMessageBroker,
+  ]);
+
+  async getAll(): Promise<HistoryListEntity[]> {
     const docsOdm = await ModelOdm.find( {}, {
       _id: 0,
     } );
@@ -31,23 +35,23 @@ CanGetAll<HistoryList> {
     if (docsOdm.length === 0)
       return [];
 
-    return docsOdm.map(docOdmToModel);
+    return docsOdm.map(docOdmToEntity);
   }
 
-  async createOne(historyList: HistoryList): Promise<void> {
-    const docOdm = modelToDocOdm(historyList);
+  async createOne(historyList: HistoryListEntity): Promise<void> {
+    const docOdm = entityToDocOdm(historyList);
 
     await ModelOdm.create(docOdm);
 
-    const event = new ModelEvent<HistoryList>(EventType.CREATED, {
+    const event = new ModelEvent<HistoryListEntity>(EventType.CREATED, {
       entity: historyList,
     } );
 
     await this.domainMessageBroker.publish(LIST_QUEUE_NAME, event);
   }
 
-  async #createOneDefaultModelById(id: HistoryListId): Promise<HistoryList> {
-    const historyList: HistoryList = {
+  async #createOneDefaultModelById(id: HistoryListId): Promise<HistoryListEntity> {
+    const historyList: HistoryListEntity = {
       id,
       entries: [],
       maxSize: -1,
@@ -58,7 +62,7 @@ CanGetAll<HistoryList> {
     return historyList;
   }
 
-  async getOneByIdOrCreate(id: HistoryListId): Promise<HistoryList> {
+  async getOneByIdOrCreate(id: HistoryListId): Promise<HistoryListEntity> {
     const docOdm = await ModelOdm.findOne( {
       id,
     }, {
@@ -66,19 +70,19 @@ CanGetAll<HistoryList> {
     } );
 
     if (docOdm)
-      return docOdmToModel(docOdm);
+      return docOdmToEntity(docOdm);
 
     return this.#createOneDefaultModelById(id);
   }
 
-  async updateOneById(id: HistoryListId, historyList: HistoryList): Promise<void> {
-    const docOdm = modelToDocOdm(historyList);
+  async updateOneById(id: HistoryListId, historyList: HistoryListEntity): Promise<void> {
+    const docOdm = entityToDocOdm(historyList);
 
     await ModelOdm.findOneAndUpdate( {
       id,
     }, docOdm);
 
-    const event = new ModelEvent<HistoryList>(EventType.UPDATED, {
+    const event = new ModelEvent<HistoryListEntity>(EventType.UPDATED, {
       entity: historyList,
     } );
 

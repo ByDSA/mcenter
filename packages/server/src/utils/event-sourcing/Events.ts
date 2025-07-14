@@ -1,11 +1,11 @@
-import { Event } from "#utils/message-broker";
+import { BrokerEvent } from "#utils/message-broker";
 import { EventType } from "./EventType";
 import { Message as ModelMessage } from "./ModelMessage";
 import { PatchModelMessage } from "./PatchModelMessage";
 
 type ModelEventType = EventType.CREATED | EventType.DELETED | EventType.UPDATED;
 
-export class ModelEvent<M extends object> implements Event<ModelMessage<M>> {
+export class ModelEvent<M extends object> implements BrokerEvent<ModelMessage<M>> {
   readonly type: ModelEventType;
 
   readonly payload: ModelMessage<M>;
@@ -17,7 +17,7 @@ export class ModelEvent<M extends object> implements Event<ModelMessage<M>> {
 }
 
 export class PatchEvent<M extends object, ID extends unknown>
-implements Event<PatchModelMessage<M, ID>> {
+implements BrokerEvent<PatchModelMessage<M, ID>> {
   readonly type: EventType.PATCHED;
 
   readonly payload: PatchModelMessage<M, ID>;

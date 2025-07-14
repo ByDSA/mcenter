@@ -1,14 +1,14 @@
 import { Module } from "@nestjs/common";
-import { TSYRINGE_PROVIDERS } from "#main/TSYRINGE_PROVIDERS";
 import { MusicRepository } from "#musics/repositories";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { MusicHistoryRepository } from "../repositories";
-import { MusicHistoryRestController } from "./RestController";
+import { MusicHistoryRestController } from "./rest.controller";
 
 @Module( {
   imports: [],
   controllers: [MusicHistoryRestController],
   providers: [
-    ...TSYRINGE_PROVIDERS,
+    DomainMessageBroker,
     MusicRepository,
     MusicHistoryRepository,
   ],

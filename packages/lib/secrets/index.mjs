@@ -1,6 +1,6 @@
 // @ts-check
+import { $ } from "zx";
 import { assertEnv } from "../envs/index.mjs";
-import { $ } from "../../../../../../.nvm/versions/node/v20.8.0/lib/node_modules/zx/build/index.js";
 
 /**
  *

@@ -1,10 +1,10 @@
 import { UpdateQuery } from "mongoose";
 import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
-import { Episode, assertIsEpisode } from "../models";
+import { Episode, EpisodeEntity, assertIsEpisode } from "../models";
 import { DocOdm } from "./odm";
 
-export function docOdmToModel(docOdm: DocOdm): Episode {
-  const model: Episode = {
+export function docOdmToEntity(docOdm: DocOdm): EpisodeEntity {
+  const model: EpisodeEntity = {
     id: {
       innerId: docOdm.episodeId,
       serieId: docOdm.serieId,
@@ -14,14 +14,8 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
     start: docOdm.start,
     end: docOdm.end,
     weight: docOdm.weight,
-    timestamps:
-      docOdm.timestamps
-        ? timestampsDocOdmToModel(docOdm.timestamps)
-        : {
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          addedAt: new Date(),
-        },
+    timestamps: timestampsDocOdmToModel(docOdm.timestamps),
+
   };
 
   if (docOdm.disabled !== undefined)
@@ -38,11 +32,18 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
   return model;
 }
 
+export function entityToDocOdm(entity: EpisodeEntity): DocOdm {
+  const ret = modelToDocOdm(entity);
+
+  ret.episodeId = entity.id.innerId;
+  ret.serieId = entity.id.serieId;
+
+  return ret;
+}
+
 export function modelToDocOdm(model: Episode): DocOdm {
   assertIsEpisode(model);
-  const ret: DocOdm = {
-    episodeId: model.id.innerId,
-    serieId: model.id.serieId,
+  const ret: Partial<DocOdm> = {
     path: model.path,
     title: model.title,
     start: model.start,
@@ -60,10 +61,10 @@ export function modelToDocOdm(model: Episode): DocOdm {
   if (model.lastTimePlayed !== undefined)
     ret.lastTimePlayed = model.lastTimePlayed;
 
-  return ret;
+  return ret as DocOdm;
 }
 
-export function partialModelToDocOdm(model: Partial<Episode>): UpdateQuery<Episode> {
+export function partialModelToDocOdm(model: Partial<EpisodeEntity>): UpdateQuery<Episode> {
   const ret: UpdateQuery<Episode> = {};
 
   if (model.id !== undefined) {

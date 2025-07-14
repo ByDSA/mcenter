@@ -1,17 +1,17 @@
 import request from "supertest";
 import { INestApplication } from "@nestjs/common";
-import { assertIsDefined } from "#shared/utils/validation";
 import { Application } from "express";
-import { parseMusic } from "#musics/models";
+import { assertIsDefined } from "$shared/utils/validation";
+import { musicEntitySchema } from "#musics/models";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { MusicRepository } from "../repositories";
 import { MUSICS_SAMPLES_IN_DISK } from "../repositories/tests";
 import { UpdateRemoteTreeService, UpdateResult } from "../services";
 import { musicRepoMockProvider } from "../repositories/tests";
 import { musicHistoryRepoMockProvider } from "../history/repositories/tests/RepositoryMock";
-import { MusicUpdateRemoteController } from "./UpdateRemoteController";
-import { MusicFixController } from "./FixController";
-import { MusicGetController } from "./GetController";
+import { MusicUpdateRemoteController } from "./update-remote.controller";
+import { MusicFixController } from "./fix.controller";
+import { MusicGetController } from "./get.controller";
 
 describe("getAll", () => {
   let musicRepoMock: MusicRepository;
@@ -68,7 +68,10 @@ describe("getAll", () => {
 
       assertIsDefined(music);
 
-      return Promise.resolve(music);
+      return Promise.resolve( {
+        ...music,
+        id: "id",
+      } );
     } );
     musicRepoMock.updateOneByPath = jest.fn().mockResolvedValue(undefined);
     musicRepoMock.deleteOneByPath = jest.fn().mockResolvedValue(undefined);
@@ -108,7 +111,7 @@ describe("getAll", () => {
     expect(body.moved).toHaveLength(0);
     expect(body.new).toHaveLength(1);
 
-    const newGotParsed = parseMusic(body.new[0]);
+    const newGotParsed = musicEntitySchema.parse(body.new[0]);
 
     expect(newGotParsed).toEqual(MUSICS_SAMPLES_IN_DISK[1]);
   } );

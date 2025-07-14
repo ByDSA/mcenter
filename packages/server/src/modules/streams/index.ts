@@ -1,7 +1,4 @@
-export {
-  assertIsStream, Stream, StreamId,
-  StreamMode, StreamOriginType,
-} from "./models";
+export * from "./models";
 
 export {
   StreamsRestController as StreamRestController,

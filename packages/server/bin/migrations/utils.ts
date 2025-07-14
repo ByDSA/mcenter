@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { z } from "zod";
+import z from "zod";
 
 export async function createCollectionIfNotExists(collectionName: string) {
   const collections = await mongoose.connection.db.listCollections().toArray();

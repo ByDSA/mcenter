@@ -1,59 +1,51 @@
 import { Server } from "node:http";
-import { container } from "tsyringe";
 import { HttpAdapterHost } from "@nestjs/core";
-import { ArgumentMetadata, INestApplication, Injectable, OnModuleInit, PipeTransform, UnprocessableEntityException } from "@nestjs/common";
-import { assertIsDefined } from "#shared/utils/validation";
+import { ArgumentMetadata, INestApplication, Injectable, OnModuleInit, PipeTransform } from "@nestjs/common";
 import helmet from "helmet";
 import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ZodSerializerInterceptor, ZodValidationException, ZodValidationPipe } from "nestjs-zod";
+import { assertIsDefined } from "$shared/utils/validation";
+import { CustomValidationError } from "$sharedSrc/utils/validation/zod";
 import { GlobalExceptionFilter } from "#utils/express/errorHandler";
-import { RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
+import { RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/player";
 import { ZodSerializerSchemaInterceptor } from "#utils/validation/zod-nestjs";
-import { ExpressApp, RealMongoDatabase } from "./index";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { Cleanup } from "./clean-up.service";
 
 @Injectable()
 export class InitService implements OnModuleInit {
-  private legacyApp!: ExpressApp;
-
-  constructor(private readonly adapterHost: HttpAdapterHost) {
+  constructor(
+    private readonly adapterHost: HttpAdapterHost,
+    private readonly vlcBackWebSocketsServerService: VlcBackWebSocketsServerService,
+    private readonly remotePlayerWebSocketsServerService: RemotePlayerWebSocketsServerService,
+  ) {
   }
 
-  async onModuleInit() {
-    console.log("Init service (before listen)");
+  static providers = Object.freeze([
+    DomainMessageBroker,
+    RemotePlayerWebSocketsServerService,
+  ]);
 
-    this.legacyApp = new ExpressApp( {
-      db: {
-        instance: new RealMongoDatabase(),
-      },
-      controllers: {
-        cors: true,
-      },
-    } );
-    const vlcBackWebSocketsServerService = container.resolve(VlcBackWebSocketsServerService);
-    const remotePlayerWebSocketsServerService = container
-      .resolve(RemotePlayerWebSocketsServerService);
-
-    this.legacyApp.onHttpServerListen((server) => {
-      vlcBackWebSocketsServerService.startSocket(server);
-      remotePlayerWebSocketsServerService.startSocket(server);
-    } );
-
-    container.registerInstance(ExpressApp, this.legacyApp);
-
+  onModuleInit() {
     const { httpAdapter } = this.adapterHost;
-
-    await this.legacyApp.init(httpAdapter.getInstance());
     const httpServer: Server = httpAdapter.getHttpServer?.() || httpAdapter.getInstance?.();
 
-    httpServer.on("listening", async () => {
-      console.log("Listening!");
-      await this.legacyApp.listen(httpServer);
+    httpServer.on("listening", () => {
+      console.log("Listening server http!");
+      this.vlcBackWebSocketsServerService.startSocket(httpServer);
+      this.remotePlayerWebSocketsServerService.startSocket(httpServer);
     } );
+
+    // Para streaming:
+    // mediaServer.run();
   }
 }
 
 export function addGlobalConfigToApp(app: INestApplication) {
+  Cleanup.register(app);
+
   app.use(helmet());
+  app.enableShutdownHooks(); // Para que se llame onModuleDestroy de services
   app.useGlobalFilters(new GlobalExceptionFilter());
   const { FRONTEND_URL } = process.env;
 
@@ -61,23 +53,31 @@ export function addGlobalConfigToApp(app: INestApplication) {
   const whitelist: string[] = [FRONTEND_URL];
 
   app.enableCors( {
-    preflightContinue: true,
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean)=> void) => {
-      const allowsAnyOrigin = true;
-      const originUrl = origin ? new URL(origin) : null;
-      const originIsLocal = originUrl && (
-        originUrl.hostname === "localhost"
-        || originUrl.hostname.startsWith("192.168.")
-      );
-      const allows = (
-        origin && (whitelist.includes(origin) || originIsLocal)
-      ) || allowsAnyOrigin;
+    // Permite requests sin origin (apps móviles, Postman, etc.)
+      if (!origin)
+        return callback(null, true);
 
-      if (allows)
-        callback(null, true);
-      else
-        callback(new Error("Not allowed by CORS"), false);
+      try {
+        const originUrl = new URL(origin);
+        // Desarrollo local
+        const isLocal = originUrl.hostname === "localhost"
+                     || originUrl.hostname.startsWith("192.168.")
+                     || originUrl.hostname.startsWith("127.0.0.1");
+        // Producción - lista blanca
+        const isWhitelisted = whitelist.includes(origin);
+
+        if (isLocal || isWhitelisted)
+          callback(null, true);
+        else
+          callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+      } catch {
+        callback(new Error(`Invalid origin: ${origin}`), false);
+      }
     },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   } );
 }
 
@@ -89,15 +89,8 @@ export class CustomZodValidationPipe extends ZodValidationPipe implements PipeTr
 
       return result;
     } catch (error: unknown) {
-      if (error instanceof ZodValidationException) {
-        const zodError = error.getZodError();
-
-        throw new UnprocessableEntityException( {
-          message: "Validation failed",
-          errors: zodError?.issues ?? [],
-          statusCode: 422,
-        } );
-      }
+      if (error instanceof ZodValidationException)
+        resendZodErrorWith422(error, value);
 
       throw error;
     }
@@ -120,3 +113,9 @@ export const globalValidationProviders = [
     useClass: ZodSerializerSchemaInterceptor,
   },
 ];
+
+export function resendZodErrorWith422(error: ZodValidationException, model: unknown) {
+  const zodError = error.getZodError();
+
+  throw CustomValidationError.fromZodError(zodError, model);
+}

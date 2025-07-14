@@ -1,10 +1,10 @@
-import { assertIsDefined } from "#shared/utils/validation";
+import { assertIsDefined } from "$shared/utils/validation";
+import { ResourceEntity } from "$sharedSrc/models/resource";
+import { compareEpisodeId } from "$sharedSrc/models/episodes/episode";
 import { EpisodeId } from "#episodes/models";
 import { stringifyEpisodeId } from "#episodes/tests";
-import { Resource } from "#modules/resources/models";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { PreventRepeatLastFilter } from "../PreventRepeatLastFilter";
-import { compareEpisodeId } from "#sharedSrc/models/episodes/Entity";
 
 const DEFAULT_EPISODE = EPISODES_SIMPSONS[0];
 const OTHER_EPISODE = EPISODES_SIMPSONS[1];
@@ -14,7 +14,7 @@ assertIsDefined(OTHER_EPISODE);
 
 type Case<ID> = {
   lastId: ID | undefined;
-  resource: Resource<ID>;
+  resource: ResourceEntity;
   expected: boolean;
 };
 

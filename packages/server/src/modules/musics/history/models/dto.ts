@@ -1,1 +1,1 @@
-export * from "#shared/models/musics/history/dto";
+export * from "$shared/models/musics/history/dto/domain";

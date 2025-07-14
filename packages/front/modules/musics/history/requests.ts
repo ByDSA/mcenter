@@ -1,13 +1,14 @@
 import { z } from "zod";
-import { assertZod, genAssertZod } from "#shared/utils/validation/zod";
-import { assertIsMusicVO } from "#musics/models";
-import { Entry } from "#musics/history/models";
-import { deleteOneEntryById, getManyEntriesBySearch } from "#musics/history/models/dto";
+import { musicHistoryEntryRestDto } from "$shared/models/musics/history/dto/transport";
+import { assertIsManyDataResponse, DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses/rest";
+import { musicHistoryEntrySchema } from "$shared/models/musics/history";
+import { PATH_ROUTES } from "$shared/routing";
+import { backendUrl } from "#modules/requests";
 import { makeFetcher, makeUseRequest } from "#modules/fetching";
-import { rootBackendUrl } from "#modules/requests";
+import { MusicHistoryEntry } from "#musics/history/models";
 
-type DeleteOneEntryByIdResBody = z.infer<typeof deleteOneEntryById.resSchema>;
-type ReqBody = z.infer<typeof getManyEntriesBySearch.reqBodySchema>;
+type DeleteOneEntryByIdResBody = DataResponse<MusicHistoryEntry>;
+type ReqBody = z.infer<typeof musicHistoryEntryRestDto.getManyEntriesByCriteria.reqBodySchema>;
 const body: ReqBody = {
   filter: {},
   sort: {
@@ -16,11 +17,8 @@ const body: ReqBody = {
   limit: 10,
   expand: ["musics"],
 };
-const searchValidator = (data: Required<Entry>[]) => {
-  assertZod(getManyEntriesBySearch.resSchema, data);
-
-  for (const d of data)
-    assertIsMusicVO(d.resource);
+const searchValidator = (data: DataResponse<Required<MusicHistoryEntry>[]>) => {
+  assertIsManyDataResponse(data, musicHistoryEntrySchema.required() as any);
 };
 const searchMethod = "POST";
 const searchFetcher = makeFetcher( {
@@ -29,19 +27,10 @@ const searchFetcher = makeFetcher( {
   resBodyValidator: searchValidator,
 } );
 
-export const backendUrls = {
-  crud: {
-    search: ( { user } ) => `${rootBackendUrl}/api/musics/history/${user}/search`,
-    delete: ( { user, id } ) => `${rootBackendUrl}/api/musics/history/${user}/${id}`,
-  },
-};
-
-export const useRequest = makeUseRequest<ReqBody, Required<Entry>[]>( {
+export const useRequest = makeUseRequest<ReqBody, DataResponse<Required<MusicHistoryEntry>[]>>( {
   key:
   {
-    url: backendUrls.crud.search( {
-      user: "user",
-    } ),
+    url: backendUrl(PATH_ROUTES.musics.history.search.path),
     method: searchMethod,
     body,
   },
@@ -50,16 +39,13 @@ export const useRequest = makeUseRequest<ReqBody, Required<Entry>[]>( {
 } );
 
 export function fetchDelete(
-  entryId: Entry["id"],
+  entryId: NonNullable<MusicHistoryEntry["id"]>,
 ): Promise<DeleteOneEntryByIdResBody | undefined> {
   const method = "DELETE";
-  const URL = backendUrls.crud.delete( {
-    user: "user",
-    id: entryId,
-  } );
+  const URL = backendUrl(PATH_ROUTES.musics.history.withParams(entryId));
   const deleteFetcher = makeFetcher<typeof undefined, DeleteOneEntryByIdResBody>( {
     method,
-    resBodyValidator: genAssertZod(deleteOneEntryById.resSchema),
+    resBodyValidator: genAssertIsOneDataResponse(musicHistoryEntrySchema),
     body: undefined,
   } );
 

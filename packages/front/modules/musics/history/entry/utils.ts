@@ -1,7 +1,7 @@
-import { PropInfo, zodSchemaToReadableFormat } from "#shared/utils/validation/zod";
-import { MusicVO, MusicVOSchema as VOSchema } from "#musics/models";
+import { Music, musicSchema as VOSchema } from "#musics/models";
+import { PropInfo, zodSchemaToReadableFormat } from "$shared/utils/validation/zod";
 
-export const MUSIC_PROPS = Object.entries(zodSchemaToReadableFormat<MusicVO>(VOSchema)).reduce(
+export const MUSIC_PROPS = Object.entries(zodSchemaToReadableFormat<Music>(VOSchema)).reduce(
   (acc, [k, v]) => {
     v.caption = (() => {
       switch (k) {
@@ -36,5 +36,5 @@ export const MUSIC_PROPS = Object.entries(zodSchemaToReadableFormat<MusicVO>(VOS
 
     return acc;
   },
- {} as Record<keyof MusicVO, PropInfo>,
+ {} as Record<keyof Music, PropInfo>,
 );

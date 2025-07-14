@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { assertIsDefined } from "#shared/utils/validation";
+import { assertIsDefined } from "$shared/utils/validation";
 import { Model as FileInfoVideo, assertIsModel as assertIsFileInfoVideo } from "./FileInfoVideo";
 import { DocOdm } from "./odm";
 

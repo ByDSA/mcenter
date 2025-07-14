@@ -1,6 +1,6 @@
-import { DateTypeSchema } from "#shared/utils/time";
-import { assertZodPopStack } from "#shared/utils/validation/zod";
-import { z } from "zod";
+import { DateTypeSchema } from "$shared/utils/time";
+import { assertZodPopStack } from "$shared/utils/validation/zod";
+import z from "zod";
 
 export const OldDateTypeSchema = DateTypeSchema.extend( {
   timestamp: z.number().optional(),

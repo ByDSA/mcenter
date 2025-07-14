@@ -1,5 +1,5 @@
-import { TimestampsModel } from "#shared/models/utils/schemas/Timestamps";
 import mongoose from "mongoose";
+import { TimestampsModel } from "$shared/models/utils/schemas/Timestamps";
 
 type DocOdm = TimestampsModel;
 export const timestampsSchemaOdm = new mongoose.Schema<DocOdm>( {

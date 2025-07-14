@@ -1,5 +1,5 @@
-import { showError } from "#shared/utils/errors/showError";
 import { Injectable } from "@nestjs/common";
+import { showError } from "$shared/utils/errors/showError";
 import { CanCreateOneBySuperId } from "#utils/layers/repository";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { logDomainEvent } from "#modules/log";
@@ -19,6 +19,10 @@ implements CanCreateOneBySuperId<HistoryEntry, HistoryListId> {
       return Promise.resolve();
     } ).catch(showError);
   }
+
+  static providers = Object.freeze([
+    DomainMessageBroker,
+  ]);
 
   async createOneBySuperId(id: HistoryListId, entry: HistoryEntry): Promise<void> {
     const entryDocOdm = entryToDocOdm(entry);

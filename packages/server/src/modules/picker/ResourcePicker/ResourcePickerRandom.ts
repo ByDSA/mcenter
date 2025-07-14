@@ -1,18 +1,18 @@
-import { assertIsDefined, assertIsNotEmpty } from "#shared/utils/validation";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
-import { ResourceVO } from "#modules/resources/models";
+import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
+import { Resource } from "#modules/resources/models";
 import { ResourcePicker } from "./ResourcePicker";
 import { FilterApplier } from "./filters";
 import { WeightFixerApplier } from "./weight-fixers";
 
-type Params<R extends ResourceVO> = {
+type Params<R extends Resource> = {
   resources: R[];
   lastOne?: R;
   filterApplier: FilterApplier<R>;
   weightFixerApplier: WeightFixerApplier<R>;
 };
-export class ResourcePickerRandom<R extends ResourceVO> implements ResourcePicker<R> {
+export class ResourcePickerRandom<R extends Resource> implements ResourcePicker<R> {
   #params: Params<R>;
 
   constructor(params: Params<R>) {
@@ -44,7 +44,7 @@ export class ResourcePickerRandom<R extends ResourceVO> implements ResourcePicke
   }
 }
 
-export async function genRandomPickerWithData<R extends ResourceVO>(
+export async function genRandomPickerWithData<R extends Resource>(
   { resources, filterApplier, weightFixerApplier }: Params<R>,
 ): Promise<Picker<R>> {
   assertIsDefined(resources, "Undefined resources");

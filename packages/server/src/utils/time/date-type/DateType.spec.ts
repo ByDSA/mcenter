@@ -1,4 +1,4 @@
-import { DateType, assertIsDateType } from "#shared/utils/time";
+import { DateType, assertIsDateType } from "$shared/utils/time";
 
 const assertIsModel: typeof assertIsDateType = assertIsDateType;
 const MODEL_VALID: DateType = {

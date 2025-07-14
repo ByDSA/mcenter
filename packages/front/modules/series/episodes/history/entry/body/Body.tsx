@@ -1,13 +1,13 @@
-import { assertIsDefined, isDefined } from "#shared/utils/validation";
 import { z } from "zod";
-import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
+import { assertIsDefined, isDefined } from "$shared/utils/validation";
+import { HistoryEntryEntity } from "#modules/series/episodes/history/models";
 import { patchOneById } from "#modules/series/episodes/models/dto";
 import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
 import { LinkAsyncAction, ResourceInput, ResourceInputArrayString } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
 import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
 import { secsToMmss } from "#modules/utils/dates";
-import { rootBackendUrl } from "#modules/requests";
+import { backendUrl } from "#modules/requests";
 import { useHistoryEntryEdition } from "#modules/history";
 import { EPISODE_PROPS } from "../utils";
 import { fetchDelete } from "../../requests";
@@ -25,7 +25,7 @@ function generatePatchBody(entryResource: Episode, resource: Episode) {
 }
 
 type Props = {
-  entry: HistoryEntryWithId;
+  entry: HistoryEntryEntity;
 };
 export function Body( { entry: entryEpisode }: Props) {
   const { episodeId: resourceId, episode: r, ...restEntryEpisode } = entryEpisode;
@@ -34,6 +34,7 @@ export function Body( { entry: entryEpisode }: Props) {
     ...restEntryEpisode,
     resourceId,
     resource: r,
+    id: restEntryEpisode.date.timestamp,
   };
 
   assertIsDefined(entry.resource, "entry.resource");
@@ -168,7 +169,7 @@ export function Body( { entry: entryEpisode }: Props) {
 }
 
 function fullUrlOf(resource: Episode) {
-  return `${rootBackendUrl}/raw/${resource.path}`;
+  return backendUrl(`/raw/${resource.path}`);
 }
 
 function calcIsModified(r1: Episode, r2: Episode) {

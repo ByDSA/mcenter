@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 import { assertZodPopStack } from "../../validation/zod";
 
 export const dateTypeSchema = z.object( {

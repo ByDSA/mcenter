@@ -1,14 +1,15 @@
-import path from "path";
-import { ErrorElementResponse, errorToErrorElementResponse, FullResponse } from "#shared/utils/http";
-import { assertIsDefined } from "#shared/utils/validation";
+import path from "node:path";
 import { Controller, Get } from "@nestjs/common";
-import { Episode } from "#episodes/models";
-import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew, SerieFolder as Serie } from "#modules/file-info";
+import { assertIsDefined } from "$shared/utils/validation";
+import { ErrorElementResponse, errorToErrorElementResponse, FullResponse } from "$shared/utils/http";
+import { Episode, EpisodeEntity } from "#episodes/models";
+import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
+import { Serie } from "#modules/file-info/tree/models";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
 import { EpisodeRepository } from "../repositories";
 
-@Controller()
+@Controller("/episodes/add-new-files")
 export class EpisodeAddNewFilesController {
   constructor(
     private serieRepository: SerieRepository,
@@ -88,8 +89,8 @@ export class EpisodeAddNewFilesController {
     return allNotNull;
   }
 
-  async #saveNewEpisodes(seriesInTree: Serie[]): Promise<Episode[]> {
-    const episodes: Episode[] = [];
+  async #saveNewEpisodes(seriesInTree: Serie[]): Promise<EpisodeEntity[]> {
+    const episodes: EpisodeEntity[] = [];
     const now = new Date();
 
     // TODO: quitar await en for si se puede
@@ -105,7 +106,7 @@ export class EpisodeAddNewFilesController {
 
       for (const seasonInTree of serieInTree.children) {
         for (const episodeInTree of seasonInTree.children) {
-          const episode: Episode = {
+          const episode: EpisodeEntity = {
             id: {
               innerId: episodeInTree.content.episodeId,
               serieId: serie.id,

@@ -1,11 +1,11 @@
-import { showError } from "#shared/utils/errors/showError";
-import { deepCopy } from "#shared/utils/objects";
-import { DateType } from "#shared/utils/time";
 import { DateTime } from "luxon";
 import { Injectable } from "@nestjs/common";
-import { Episode, EpisodeId, compareEpisodeId } from "#episodes/models";
+import { DateType } from "$shared/utils/time";
+import { deepCopy } from "$shared/utils/objects";
+import { showError } from "$shared/utils/errors/showError";
+import { EpisodeEntity, EpisodeId, compareEpisodeId } from "#episodes/models";
 import { EpisodeRepository } from "#episodes/index";
-import { HistoryList } from "./models";
+import { HistoryListEntity } from "./models";
 
 function getTimestampFromDateType(date: DateType): number {
   if (date.timestamp)
@@ -18,7 +18,7 @@ function getTimestampFromDateType(date: DateType): number {
 
 type FuncParams = {
   episodeId: EpisodeId;
-  entries: HistoryList["entries"];
+  entries: HistoryListEntity["entries"];
 };
 
 @Injectable()
@@ -36,13 +36,15 @@ export class LastTimePlayedService {
     ) ?? undefined;
 
     this.episodeRepository.patchOneByIdAndGet(episodeId, {
-      lastTimePlayed,
+      entity: {
+        lastTimePlayed,
+      },
     } ).catch(showError);
 
     return lastTimePlayed ?? null;
   }
 
-  getLastTimePlayedFromHistory(selfId: EpisodeId, entries: HistoryList["entries"]): number | null {
+  getLastTimePlayedFromHistory(selfId: EpisodeId, entries: HistoryListEntity["entries"]): number | null {
     let lastTimePlayed = 0;
 
     for (const historyEntry of entries) {
@@ -60,14 +62,17 @@ export class LastTimePlayedService {
     return lastTimePlayed;
   }
 
-  async getDaysFromLastPlayed(self: Episode, historyList: HistoryList): Promise<number> {
+  async getDaysFromLastPlayed(
+    self: EpisodeEntity,
+    historyList: HistoryListEntity,
+  ): Promise<number> {
     let lastTimePlayed = self.lastTimePlayed ?? null;
 
     if (!lastTimePlayed) {
       lastTimePlayed = this.getLastTimePlayedFromHistory(self.id, historyList.entries);
 
       if (lastTimePlayed) {
-        const selfCopy: Episode = {
+        const selfCopy: EpisodeEntity = {
           ...deepCopy(self),
           lastTimePlayed,
         };

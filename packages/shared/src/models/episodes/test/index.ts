@@ -1,12 +1,12 @@
-import { Episode } from "../Entity";
+import { Episode } from "../episode";
 
-export function expectEpisodes(episodes1: Episode[], episodes2: Episode[]) {
-  expect(episodes1).toHaveLength(episodes2.length);
+export function expectEpisodes(actual: Episode[], expected: Episode[]) {
+  expect(actual).toHaveLength(expected.length);
 
-  for (let i = 0; i < episodes1.length; i++)
-    expectEpisode(episodes1[i], episodes2[i]);
+  for (let i = 0; i < actual.length; i++)
+    expectEpisode(actual[i], expected[i]);
 }
 
-export function expectEpisode(episode1: Episode, episode2: Episode) {
-  expect(episode1).toEqual(episode2);
+export function expectEpisode(actual: Episode, expected: Episode) {
+  expect(actual).toEqual(expected);
 }

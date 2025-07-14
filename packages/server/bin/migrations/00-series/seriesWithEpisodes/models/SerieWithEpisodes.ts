@@ -1,5 +1,5 @@
-import { assertZodPopStack } from "#shared/utils/validation/zod";
-import { z } from "zod";
+import { assertZodPopStack } from "$shared/utils/validation/zod";
+import z from "zod";
 
 export const EpisodeInSerieSchema = z.object( {
   title: z.string().optional(),

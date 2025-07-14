@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { FileInfoVideo, FileInfoVideoSuperId, FileInfoVideoWithSuperId } from "#modules/file-info/models";
 import { CanGetAllBySuperId, CanUpdateMany, CanUpdateOneBySuperId } from "#utils/layers/repository";
-import { docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
 import { ModelOdm } from "./odm";
+import { docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
 
 type ModelWithSuperId = FileInfoVideoWithSuperId;
 type Model = FileInfoVideo;
@@ -12,7 +12,9 @@ type SuperId = FileInfoVideoSuperId;
 export class EpisodeFileInfoRepository
 implements CanGetAllBySuperId<Model, SuperId>,
 CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId> {
-  async updateOneBySuperId(id: string, model: ModelWithSuperId): Promise<void> {
+  static providers = Object.freeze([]);
+
+  async updateOneByEpisodeDbId(id: string, model: ModelWithSuperId): Promise<void> {
     const docOdm = modelWithSuperIdToDocOdm(model);
 
     await ModelOdm.updateOne( {
@@ -23,12 +25,12 @@ CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId
   }
 
   async updateMany(models: ModelWithSuperId[]): Promise<void> {
-    const promises = models.map(model =>this.updateOneBySuperId(model.episodeId, model));
+    const promises = models.map(model =>this.updateOneByEpisodeDbId(model.episodeId, model));
 
     await Promise.all(promises);
   }
 
-  async getAllBySuperId(id: SuperId): Promise<Model[]> {
+  async getAllByEpisodeDbId(id: SuperId): Promise<Model[]> {
     const modelsOdm = await ModelOdm.find( {
       episodeId: id,
     } );

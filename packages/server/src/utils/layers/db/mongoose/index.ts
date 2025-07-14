@@ -1,5 +1,5 @@
-import { throwErrorPopStack } from "#shared/utils/errors";
 import mongoose from "mongoose";
+import { throwErrorPopStack } from "$shared/utils/errors";
 import { DatabaseNotConnectedError } from "../NotConnectedError";
 
 export function assertConnected() {

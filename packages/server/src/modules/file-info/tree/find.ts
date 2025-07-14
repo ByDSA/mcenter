@@ -1,9 +1,9 @@
 import fs, { Dirent } from "node:fs";
 import path from "node:path";
-import { ErrorElementResponse, FullResponse } from "#shared/utils/http";
-import { deepMerge } from "#shared/utils/objects";
 import { GetEpisodeIdOptions, getEpisodeSeasonAndEpisodeNumberFromFilePath, getSeasonEpisodeFromEpisodeId } from "./idGetter";
 import { Episode, Season, Serie } from "./models";
+import { ErrorElementResponse, FullResponse } from "$shared/utils/http";
+import { deepMerge } from "$shared/utils/objects";
 
 type Options = {
   baseFolder?: string;

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 import { logElementResponseSchema } from "./LogElement";
 
 const schema = logElementResponseSchema.extend( {

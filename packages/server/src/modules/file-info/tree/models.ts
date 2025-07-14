@@ -1,4 +1,4 @@
-import { TreeBranchModel, TreeNodeModel, treePut } from "#shared/utils/trees";
+import { TreeBranchModel, TreeNodeModel, treePut } from "$shared/utils/trees";
 
 export type Episode = TreeNodeModel<string, {
   filePath: string;

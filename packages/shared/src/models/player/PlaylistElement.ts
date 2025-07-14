@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 import { assertZod } from "../../utils/validation/zod";
 
 export const playlistElementSchema = z.object( {

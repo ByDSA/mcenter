@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 import { atLeastOneDefinedRefinement, RefinementWithMessage } from "../../../utils/validation/zod";
 
 const pathSchema = z.array(z.string().or(z.number()));
@@ -24,3 +24,8 @@ export function generatePatchBodySchema<T extends z.ZodRawShape>(entitySchema: z
 
   return ret;
 }
+
+export type PatchOneParams<T> = {
+  entity: Partial<T>;
+  unset?: PatchPath[];
+};

@@ -1,5 +1,5 @@
-import { isDefined } from "#shared/utils/validation";
-import { Resource } from "#modules/resources/models";
+import { isDefined } from "$shared/utils/validation";
+import { ResourceEntity } from "$sharedSrc/models/resource";
 import { Filter } from "./Filter";
 import { CompareIdFunc } from "./utils";
 
@@ -9,7 +9,7 @@ type Params<ID> = {
   secondId: ID;
   compareId: CompareIdFunc<ID>;
 };
-export class DependencyFilter<ID = string, R extends Resource<ID> = Resource<ID>>
+export class DependencyFilter<ID = string, R extends ResourceEntity = ResourceEntity>
 implements Filter<R> {
   #params: Params<ID>;
 

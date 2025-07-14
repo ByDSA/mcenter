@@ -1,28 +1,24 @@
-import { showError } from "#shared/utils/errors/showError";
-import { isDefined } from "#shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { Injectable } from "@nestjs/common";
-import { CanCreateOne, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
+import { isDefined } from "$shared/utils/validation";
+import { showError } from "$shared/utils/errors/showError";
+import { musicHistoryEntryRestDto } from "$shared/models/musics/history/dto/transport";
+import { z } from "zod";
+import { assertFound } from "$shared/utils/http";
+import { CanCreateOne, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { MusicHistoryEntry } from "#musics/history/models";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { Event } from "#utils/message-broker";
+import { BrokerEvent } from "#utils/message-broker";
 import { QUEUE_NAME } from "../events";
 import { MusicRepository } from "../../repositories/Repository";
 import { DocOdm, ModelOdm } from "./odm";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 
-export type GetManyCriteria = {
-  limit?: number;
-  expand?: ("musics")[];
-  sort?: ("asc" | "desc");
-  filter?: {
-    resourceId?: string;
-    timestampMax?: number;
-  };
-  offset?: number;
-};
+export type GetManyCriteria = z.infer<
+  typeof musicHistoryEntryRestDto.getManyEntriesByCriteria.reqBodySchema
+>;
 type EntryId = Required<MusicHistoryEntry["id"]>;
 
 @Injectable()
@@ -31,7 +27,8 @@ implements
 CanCreateOne<MusicHistoryEntry>,
 CanGetManyCriteria<MusicHistoryEntry, GetManyCriteria>,
 CanGetAll<MusicHistoryEntry>,
-CanGetOneById<MusicHistoryEntry, EntryId> {
+CanGetOneById<MusicHistoryEntry, EntryId>,
+CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
   constructor(
     private readonly domainMessageBroker: DomainMessageBroker,
     private readonly musicRepository: MusicRepository,
@@ -42,7 +39,7 @@ CanGetOneById<MusicHistoryEntry, EntryId> {
       return Promise.resolve();
     } ).catch(showError);
 
-    this.domainMessageBroker.subscribe(QUEUE_NAME, async (_ev: Event<unknown>) => {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, async (_ev: BrokerEvent<unknown>) => {
       const event = _ev as ModelEvent<MusicHistoryEntry>;
 
       if (event.type !== EventType.DELETED)
@@ -62,11 +59,10 @@ CanGetOneById<MusicHistoryEntry, EntryId> {
     } ).catch(showError);
   }
 
-  async deleteOneByIdAndGet(id: EntryId): Promise<MusicHistoryEntry | null> {
+  async deleteOneByIdAndGet(id: EntryId): Promise<MusicHistoryEntry> {
     const deleted = await ModelOdm.findByIdAndDelete(id);
 
-    if (!deleted)
-      return null;
+    assertFound(deleted);
 
     const ret = docOdmToModel(deleted);
     const event = new ModelEvent<MusicHistoryEntry>(EventType.DELETED, {
@@ -112,9 +108,9 @@ CanGetOneById<MusicHistoryEntry, EntryId> {
 
     const query = ModelOdm.find(findParams);
 
-    if (criteria.sort) {
+    if (criteria.sort?.timestamp) {
       query.sort( {
-        "date.timestamp": criteria.sort?.[0] === "asc" ? 1 : -1,
+        "date.timestamp": criteria.sort.timestamp?.[0] === "asc" ? 1 : -1,
       } );
     }
 

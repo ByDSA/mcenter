@@ -1,5 +1,5 @@
-import { assertZodPopStack } from "#shared/utils/validation/zod";
-import { z } from "zod";
+import { assertZodPopStack } from "$shared/utils/validation/zod";
+import z from "zod";
 import { Schema as FileInfoSchemaVideo } from "./FileInfoVideo";
 
 /* Dependencias */

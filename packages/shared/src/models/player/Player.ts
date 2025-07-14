@@ -1,8 +1,8 @@
-import { Episode } from "../episodes";
+import { EpisodeEntity } from "../episodes";
 
 export type PlayResourceParams = {
   force?: boolean;
-  resources: Episode[];
+  resources: EpisodeEntity[];
 };
 
 export interface PlayerActions {

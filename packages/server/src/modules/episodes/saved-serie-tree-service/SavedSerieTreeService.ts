@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { SerieFolderTree as SerieTree } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
-import { Episode } from "../models";
+import { EpisodeEntity } from "../models";
 import { EpisodeRepository } from "../repositories";
 import { putModelInSerieFolderTree } from "./adapters";
 
@@ -23,7 +23,9 @@ export class SavedSerieTreeService {
 
       return serieEpisodes;
     } );
-    const episodesOfSerie: Episode[] = (await Promise.all(episodesOfSeriePromises)).flat().flat();
+    const episodesOfSerie: EpisodeEntity[] = (
+      await Promise.all(episodesOfSeriePromises)
+    ).flat().flat();
 
     for (const episode of episodesOfSerie)
       putModelInSerieFolderTree(episode, serieFolderTree);

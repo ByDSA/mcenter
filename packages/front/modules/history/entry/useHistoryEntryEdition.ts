@@ -1,4 +1,4 @@
-import { assertIsDefined } from "#shared/utils/validation";
+import { assertIsDefined } from "$shared/utils/validation";
 import { useAsyncAction } from "#modules/ui-kit/input";
 import { UseResourceEditionProps, UseResourceEditionRet, useResourceEdition } from "../../utils/resources/useResourceEdition";
 

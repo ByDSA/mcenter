@@ -1,15 +1,12 @@
-import { assertIsDefined } from "#shared/utils/validation";
 import mongoose, { ConnectOptions } from "mongoose";
-import { Database } from "#utils/layers/db";
+import { assertIsDefined } from "$shared/utils/validation";
 
 export type Options = ConnectOptions;
 
-export class RealDatabase implements Database {
+export class Database {
   #options: ConnectOptions;
 
   #dbConnectionURL: string;
-
-  #initialized: boolean;
 
   #connected: boolean;
 
@@ -19,11 +16,10 @@ export class RealDatabase implements Database {
     this.#options = options ?? {};
 
     this.#dbConnectionURL = "";
-    this.#initialized = false;
     this.#connected = false;
   }
 
-  init() {
+  #init() {
     // mongoose options
     this.#options = {
       autoIndex: false,
@@ -34,13 +30,6 @@ export class RealDatabase implements Database {
     };
 
     this.#dbConnectionURL = this.generateUrl();
-
-    this.#initialized = true;
-  }
-
-  #assertInitialized() {
-    if (!this.#initialized)
-      throw new Error("MongoDatabase not initialized");
   }
 
   #assertConnected() {
@@ -49,7 +38,7 @@ export class RealDatabase implements Database {
   }
 
   async connect() {
-    this.#assertInitialized();
+    this.#init();
     console.log(`Connecting to ${this.#dbConnectionURL} ...`);
     mongoose.set("strictQuery", false);
     const connectPromise = mongoose.connect(this.#dbConnectionURL, this.#options);

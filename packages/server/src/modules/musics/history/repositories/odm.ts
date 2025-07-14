@@ -1,7 +1,7 @@
-import { DateType } from "#shared/utils/time";
 import mongoose from "mongoose";
 import { MusicId } from "#musics/models";
 import { DateTypeOdmSchema } from "#utils/time";
+import { DateType } from "$shared/utils/time";
 
 export type DocOdm = {
   _id?: mongoose.Types.ObjectId;

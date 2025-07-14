@@ -1,18 +1,18 @@
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { ResourceVO } from "#modules/resources/models";
-import { Episode, EpisodeId, compareEpisodeId } from "../../episodes/models";
+import { Resource } from "#modules/resources/models";
+import { EpisodeEntity, EpisodeId, compareEpisodeId } from "../../episodes/models";
 import { DependenciesList } from "./Dependencies";
 
-type Params<R extends ResourceVO = ResourceVO, ID = string> = {
+type Params<R extends Resource = Resource, ID = string> = {
   resources: R[];
   lastEp: R | null;
   lastId: ID | undefined;
   dependencies: DependenciesList;
 };
-export class EpisodeFilterApplier extends FilterApplier<Episode> {
-  #params: Params<Episode, EpisodeId>;
+export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
+  #params: Params<EpisodeEntity, EpisodeId>;
 
-  constructor(params: Params<Episode, EpisodeId>) {
+  constructor(params: Params<EpisodeEntity, EpisodeId>) {
     super();
     this.#params = params;
 
@@ -33,7 +33,7 @@ export class EpisodeFilterApplier extends FilterApplier<Episode> {
           serieId,
         } )) as [EpisodeId, EpisodeId];
 
-        this.add(new DependencyFilter<EpisodeId, Episode>( {
+        this.add(new DependencyFilter<EpisodeId, EpisodeEntity>( {
           lastId,
           firstId: dependencyFullId[0],
           secondId: dependencyFullId[1],
@@ -75,9 +75,9 @@ export class EpisodeFilterApplier extends FilterApplier<Episode> {
 }
 
 export function genEpisodeFilterApplier(
-  resources: Episode[],
+  resources: EpisodeEntity[],
   deps: DependenciesList,
-  lastEp?: Episode,
+  lastEp?: EpisodeEntity,
 ) {
   return new EpisodeFilterApplier( {
     resources,

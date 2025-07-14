@@ -1,1 +1,1 @@
-export * from "#shared/models/episodes/dto";
+export * from "$shared/models/episodes/dto/domain";

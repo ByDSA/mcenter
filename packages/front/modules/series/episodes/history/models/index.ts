@@ -1,6 +1,1 @@
-export {
-  type HistoryEntryWithId,
-  type HistoryEntry,
-  type HistoryEntryId,
-  type HistoryListId,
-} from "#shared/models/historyLists";
+export * from "$shared/models/history-lists";

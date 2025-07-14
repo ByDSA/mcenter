@@ -15,7 +15,7 @@ function loadEnvsFile(p: string): void {
   } );
 }
 
-if (!isDebugging() && Math.random() > 1) {
+if (!isDebugging()) {
   global.console.log = jest.fn(); // Mockear console.log
   global.console.info = jest.fn(); // Mockear console.info
   global.console.debug = jest.fn(); // Mockear console.debug

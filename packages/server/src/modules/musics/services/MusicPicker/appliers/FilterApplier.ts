@@ -1,19 +1,19 @@
 import { FilterApplier, PreventDisabledFilter, PreventRepeatInTimeFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { Resource } from "#modules/resources/models";
-import { Music, compareMusicId } from "#musics/models";
+import { MusicEntity, compareMusicId } from "#musics/models";
 
-type Model = Music;
+type Entity = MusicEntity;
 type ModelId = string;
 
-type Params<ID, R extends Resource<ID> = Resource<ID>> = {
+type Params<ID, R extends Resource = Resource> = {
   resources: R[];
   lastEp: R | null;
   lastId: ID | undefined;
 };
-export class MusicFilterApplier extends FilterApplier<Model> {
-  #params: Params<ModelId, Model>;
+export class MusicFilterApplier extends FilterApplier<Entity> {
+  #params: Params<ModelId, Entity>;
 
-  constructor(params: Params<ModelId, Model>) {
+  constructor(params: Params<ModelId, Entity>) {
     super();
     this.#params = params;
 
@@ -27,7 +27,7 @@ export class MusicFilterApplier extends FilterApplier<Model> {
     this.add(new PreventDisabledFilter());
 
     if (lastEp) {
-      this.addReversible(new PreventRepeatLastFilter<ModelId, Model>(
+      this.addReversible(new PreventRepeatLastFilter<ModelId, Entity>(
         {
           lastId,
           compareId: compareMusicId,
@@ -45,7 +45,7 @@ export class MusicFilterApplier extends FilterApplier<Model> {
   }
 }
 
-export function genFilterApplier(resources: Model[], lastOne?: Model) {
+export function genFilterApplier(resources: Entity[], lastOne?: Entity) {
   return new MusicFilterApplier( {
     resources,
     lastEp: lastOne ?? null,

@@ -1,38 +1,38 @@
-import { PropInfo } from "#shared/utils/validation/zod";
 import { JSX, useState } from "react";
-import { z } from "zod";
-import { MusicVO, assertIsMusicVO } from "#modules/musics/models";
-import { patchOneById } from "#modules/musics/models/dto";
-import { Entry } from "#modules/musics/history/models";
+import { PropInfo } from "$shared/utils/validation/zod";
+import { PATH_ROUTES } from "$shared/routing";
+import { Music, assertIsMusic } from "#modules/musics/models";
+import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { LinkAsyncAction, ResourceInput, ResourceInputArrayString, ResourceInputProps } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
 import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
 import { secsToMmss } from "#modules/utils/dates";
 import { useHistoryEntryEdition } from "#modules/history";
+import { backendUrl } from "#modules/requests";
 import { MUSIC_PROPS } from "../utils";
-import { fetchPatch, backendUrls as musicBackendUrls } from "../../../requests";
+import { fetchPatch } from "../../../requests";
 import { fetchDelete } from "../../requests";
 import style from "./style.module.css";
 import { LastestComponent } from "./Lastest";
 
-function generatePatchBody(entryResource: MusicVO, resource: MusicVO) {
+function generatePatchBody(entryResource: Music, resource: Music) {
   const patchBodyParams = getDiff(
     entryResource,
     resource,
-  ) as z.infer<typeof patchOneById.reqBodySchema>;
+  );
 
   return patchBodyParams;
 }
 
 type Props = {
-  entry: Required<Entry>;
+  entry: Required<MusicHistoryEntry>;
 };
 export function Body( { entry }: Props) {
   const { resource: resourceRet, delete: deleteEntry } = useHistoryEntryEdition( {
     resource: {
       calcIsModified,
       entry,
-      assertionFn: assertIsMusicVO,
+      assertionFn: assertIsMusic,
       fetching: {
         patch: {
           fetch: fetchPatch,
@@ -48,7 +48,7 @@ export function Body( { entry }: Props) {
     update: { action: update, isDoing: isUpdating }, errors,
     resourceState, reset } = resourceRet;
   const [resource] = resourceState;
-  const optionalProps: Record<keyof MusicVO, PropInfo> = Object.entries(MUSIC_PROPS)
+  const optionalProps: Record<keyof Music, PropInfo> = Object.entries(MUSIC_PROPS)
     .reduce((acc, [key, value]) => {
       if (value.required)
         return acc;
@@ -56,10 +56,10 @@ export function Body( { entry }: Props) {
       if (["lastTimePlayed", "album", "tags"].includes(key))
         return acc;
 
-      acc[key as keyof MusicVO] = value;
+      acc[key as keyof Music] = value;
 
       return acc;
-    }, {} as Record<keyof MusicVO, PropInfo>);
+    }, {} as Record<keyof Music, PropInfo>);
   const commonInputTextProps = {
     inputTextProps: {
       onPressEnter: ()=>update(),
@@ -171,9 +171,9 @@ export function Body( { entry }: Props) {
   </div>;
 }
 
-type OptionalPropsProps = Omit<ResourceInputProps<MusicVO>, "prop"> & {
-  optionalProps: Record<keyof MusicVO, PropInfo>;
-  errors?: Record<keyof MusicVO, string>;
+type OptionalPropsProps = Omit<ResourceInputProps<Music>, "prop"> & {
+  optionalProps: Record<keyof Music, PropInfo>;
+  errors?: Record<keyof Music, string>;
 };
 function OptionalProps(
   { resourceState, optionalProps, errors, inputNumberProps, inputTextProps }: OptionalPropsProps,
@@ -188,7 +188,7 @@ function OptionalProps(
   </>);
 
   const [resource] = resourceState;
-  const entries = Object.entries(optionalProps) as [keyof MusicVO, PropInfo][];
+  const entries = Object.entries(optionalProps) as [keyof Music, PropInfo][];
 
   for (const entry of entries) {
     const [prop, propInfo] = entry;
@@ -230,12 +230,10 @@ function OptionalProps(
 }
 
 function fullUrlOf(url: string) {
-  return musicBackendUrls.raw( {
-    url,
-  } );
+  return backendUrl(PATH_ROUTES.musics.raw.withParams(url));
 }
 
-function calcIsModified(r1: MusicVO, r2: MusicVO) {
+function calcIsModified(r1: Music, r2: Music) {
   return isModifiedd(r1, r2, {
     ignoreNewUndefined: true,
   } );

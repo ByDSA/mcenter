@@ -1,13 +1,14 @@
-import { showError } from "#shared/utils/errors/showError";
-import { LogElementResponse } from "#shared/utils/http";
 import { Injectable } from "@nestjs/common";
+import { LogElementResponse } from "$shared/utils/http";
+import { showError } from "$shared/utils/errors/showError";
+import { assertIsSerieEntity } from "$sharedSrc/models/series";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#modules/series";
-import { SERIES_QUEUE_NAME, assertIsSerie } from "#series/models";
+import { SERIES_QUEUE_NAME } from "#series/models";
 import { EventType } from "#utils/event-sourcing";
 import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
-import { Event } from "#utils/message-broker";
+import { BrokerEvent } from "#utils/message-broker";
 import { Stream, StreamId, StreamMode, StreamOriginType } from "../models";
 import { DocOdm, ModelOdm } from "./odm";
 import { streamDocOdmToModel, streamToDocOdm } from "./adapters";
@@ -18,19 +19,23 @@ implements CanGetOneById<Stream, StreamId>,
 CanUpdateOneById<Stream, StreamId>,
 CanCreateOne<Stream>, CanGetAll<Stream> {
   constructor(private domainMessageBroker: DomainMessageBroker) {
-    this.domainMessageBroker.subscribe(SERIES_QUEUE_NAME, async (event: Event<any>) => {
+    this.domainMessageBroker.subscribe(SERIES_QUEUE_NAME, async (event: BrokerEvent<any>) => {
       logDomainEvent(SERIES_QUEUE_NAME, event);
 
       if (event.type === EventType.CREATED) {
         const serie = event.payload.entity;
 
-        assertIsSerie(serie);
+        assertIsSerieEntity(serie);
         await this.fixDefaultStreamForSerie(serie.id);
       }
 
       return Promise.resolve();
     } ).catch(showError);
   }
+
+  static providers = Object.freeze([
+    DomainMessageBroker,
+  ]);
 
   async fixDefaultStreamForSerie(serieId: SerieId): Promise<LogElementResponse | null> {
     const hasDefault = await this.hasDefaultForSerie(serieId);

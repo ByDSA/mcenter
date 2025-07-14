@@ -1,5 +1,5 @@
-import { deepFreeze } from "#shared/utils/objects";
-import { Episode } from "#episodes/models";
+import type { EpisodeEntity } from "#episodes/models";
+import { deepFreeze } from "$shared/utils/objects";
 import { DATEJS_SAMPLE1 } from "./dates";
 
 const timestamps = {
@@ -7,7 +7,7 @@ const timestamps = {
   updatedAt: DATEJS_SAMPLE1,
   addedAt: DATEJS_SAMPLE1,
 };
-const ep1x01: Episode = {
+const ep1x01: EpisodeEntity = {
   id: {
     innerId: "1x01",
     serieId: "simpsons",
@@ -23,7 +23,7 @@ const ep1x01: Episode = {
   timestamps,
 };
 
-export const EPISODES_SIMPSONS: Episode[] = deepFreeze([
+export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   ep1x01,
   {
     id: {

@@ -1,9 +1,9 @@
 /* eslint-disable require-await */
-import { assertIsDefined } from "#shared/utils/validation";
-import { AssertZodSettings } from "#shared/utils/validation/zod";
 import clone from "just-clone";
 import React, { useEffect, useState } from "react";
 import { useAsyncAction } from "#modules/ui-kit/input";
+import { AssertZodSettings } from "$shared/utils/validation/zod";
+import { assertIsDefined } from "$shared/utils/validation";
 
 type AssertionFn = (model: unknown, settings?: AssertZodSettings)=> void;
 

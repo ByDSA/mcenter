@@ -1,3 +1,7 @@
 export {
-  TestMongoDatabase,
-} from "./TestMongoDatabase";
+  TestRealDatabase,
+} from "./TestRealDatabase";
+
+export {
+  TestMemoryDatabase,
+} from "./TestMemoryDatabase";

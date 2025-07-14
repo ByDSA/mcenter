@@ -1,6 +1,28 @@
-import { applyDecorators, Get, HttpCode, HttpStatus, Post } from "@nestjs/common";
-import { z } from "zod";
-import { ZodSerializerSchema } from "#utils/validation/zod-nestjs";
+import { applyDecorators, Get, HttpCode, HttpStatus, NotFoundException, Post, UseInterceptors } from "@nestjs/common";
+import z from "zod";
+import { Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler } from "@nestjs/common";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { createManyDataResponseSchema, createOneDataResponseSchema } from "$shared/utils/http/responses/rest";
+import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
+import { ResponseFormatterInterceptor } from "./responses/ResponseFormatterInterceptor";
+
+@Injectable()
+export class NotFoundOnNullInterceptor implements NestInterceptor {
+  intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
+    return next.handle().pipe(
+      map((data) => {
+        if (data === null)
+          throw new NotFoundException();
+
+        return data;
+      } ),
+    );
+  }
+}
 
 type GetOneOptions = {
   _: 0;
@@ -8,7 +30,9 @@ type GetOneOptions = {
 export function GetOne(url: string, schema: z.ZodSchema, _options?: GetOneOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Get(url),
-    ZodSerializerSchema(schema.or(z.null())),
+    // los interceptors se ejecutan al revés:
+    UseInterceptors(ResponseFormatterInterceptor, NotFoundOnNullInterceptor),
+    ValidateResponseWithZodSchema(createOneDataResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
   ];
 
@@ -22,7 +46,8 @@ type GetManyOptions = {
 export function GetMany(url: string, schema: z.ZodSchema, _options?: GetManyOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Get(url),
-    ZodSerializerSchema(z.array(schema)),
+    UseInterceptors(ResponseFormatterInterceptor),
+    ValidateResponseWithZodSchema(createManyDataResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
   ];
 
@@ -39,7 +64,8 @@ export function GetManyCriteria(
 ) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Post(url),
-    ZodSerializerSchema(z.array(schema)),
+    UseInterceptors(ResponseFormatterInterceptor),
+    ValidateResponseWithZodSchema(createManyDataResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
   ];
 

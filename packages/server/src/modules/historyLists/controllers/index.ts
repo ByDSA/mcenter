@@ -1,3 +1,3 @@
 export {
   HistoryListRestController,
-} from "./RestController";
+} from "./rest.controller";

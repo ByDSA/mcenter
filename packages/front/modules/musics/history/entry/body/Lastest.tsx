@@ -1,15 +1,16 @@
 import z from "zod";
-import { assertZod } from "#shared/utils/validation/zod";
-import { Entry } from "#modules/musics/history/models";
-import { assertIsMusicVO } from "#modules/musics/models";
+import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
+import { PATH_ROUTES } from "$shared/routing";
+import { musicHistoryEntrySchema } from "#musics/history/models/index";
+import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { LatestHistoryEntries } from "#modules/history";
 import { DateFormat } from "#modules/utils/dates";
-import { getManyEntriesBySearch } from "#modules/musics/history/models/dto";
-import { backendUrls } from "../../requests";
+import { backendUrl } from "#modules/requests";
+import { musicHistoryEntryRestDto } from "../../models/dto";
 
 type Props = {
   resourceId: string;
-  date: Entry["date"];
+  date: MusicHistoryEntry["date"];
   dateFormat?: DateFormat;
 };
 const DATE_FORMAT_DEFAULT: DateFormat = {
@@ -17,14 +18,12 @@ const DATE_FORMAT_DEFAULT: DateFormat = {
   ago: "yes",
 };
 
-type ReqBody = z.infer<typeof getManyEntriesBySearch.reqBodySchema>;
+type ReqBody = z.infer<typeof musicHistoryEntryRestDto.getManyEntriesByCriteria.reqBodySchema>;
 
 export function LastestComponent(
   { resourceId, date, dateFormat = DATE_FORMAT_DEFAULT }: Props,
 ) {
-  const url = backendUrls.crud.search( {
-    user: "user",
-  } );
+  const url = backendUrl(PATH_ROUTES.musics.history.search.path);
   const body: ReqBody = {
     filter: {
       resourceId,
@@ -37,7 +36,7 @@ export function LastestComponent(
     expand: ["musics"],
   };
 
-  return LatestHistoryEntries<Entry, ReqBody>( {
+  return LatestHistoryEntries<MusicHistoryEntry, ReqBody>( {
     url,
     body,
     validator,
@@ -45,9 +44,6 @@ export function LastestComponent(
   } );
 }
 
-const validator = (data: Required<Entry>[]) => {
-  assertZod(getManyEntriesBySearch.resSchema, data);
-
-  for (const d of data)
-    assertIsMusicVO(d.resource);
+const validator = (res: DataResponse<Required<MusicHistoryEntry>[]>) => {
+  assertIsManyDataResponse(res, musicHistoryEntrySchema.required() as any);
 };

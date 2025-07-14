@@ -1,4 +1,4 @@
-import { isDefined } from "#shared/utils/validation";
+import { isDefined } from "$shared/utils/validation";
 import mongoose from "mongoose";
 import { ModelFullId } from "./Episode";
 

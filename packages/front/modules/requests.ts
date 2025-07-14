@@ -1,22 +1,26 @@
-import { assertIsDefined } from "#shared/utils/validation";
+import { assertIsDefined } from "$shared/utils/validation";
 
-export const rootBackendUrl = getRootBackendUrl();
+const rootBackendUrl = getRootBackendUrl();
 
 function getRootBackendUrl(): string {
   const envBackendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   assertIsDefined(envBackendUrl);
 
-  const backendUrl = new URL(envBackendUrl);
+  const backendRootUrl = new URL(envBackendUrl);
 
   // get current hostname
-  if (backendUrl.hostname === "localhost" && global.window !== undefined)
-    backendUrl.hostname = global.window.location.hostname;
+  if (backendRootUrl.hostname === "localhost" && global.window !== undefined)
+    backendRootUrl.hostname = global.window.location.hostname;
 
-  let ret = backendUrl.toString();
+  let ret = backendRootUrl.toString();
 
   if (ret.endsWith("/"))
     ret = ret.slice(0, -1);
 
   return ret;
+}
+
+export function backendUrl(path: string) {
+  return `${rootBackendUrl}${path}`;
 }

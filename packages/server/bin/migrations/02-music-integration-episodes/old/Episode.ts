@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { z } from "zod";
+import z from "zod";
 
 /* Dependencias */
 const resourceSchema = z.object( {

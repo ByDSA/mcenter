@@ -1,7 +1,7 @@
-import { deepFreeze } from "#shared/utils/objects";
-import { Serie } from "#modules/series";
+import { deepFreeze } from "$shared/utils/objects";
+import { SerieEntity } from "$sharedSrc/models/series";
 
-export const SERIE_SIMPSONS: Serie = deepFreeze( {
+export const SERIE_SIMPSONS: SerieEntity = deepFreeze( {
   id: "simpsons",
   name: "simpsons",
 } );

@@ -1,17 +1,20 @@
-import { HistoryEntry, HistoryEntryWithId, HistoryList, HistoryListId } from "../models";
+import { HistoryEntry, HistoryEntryEntity, HistoryListEntity, HistoryListId } from "../models";
 import { DocOdm } from "./odm";
 
-export function docOdmToModel(docOdm: DocOdm): HistoryList {
+export function docOdmToEntity(docOdm: DocOdm): HistoryListEntity {
   return {
     id: docOdm.id,
     maxSize: docOdm.maxSize,
-    entries: docOdm.entries.map((entry)=>entryDocOdmToModel(entry, docOdm.id)),
+    entries: docOdm.entries.map((entry)=>entryDocOdmToEntryEntity(entry, docOdm.id)),
   };
 }
 
-export function entryDocOdmToModel(entryDocOdm: DocOdm["entries"][0], historyListId: HistoryListId): HistoryEntryWithId {
+export function getIdFromEntry(entry: HistoryEntry): string {
+  return entry.date.timestamp.toString();
+}
+
+export function entryDocOdmToEntryEntity(entryDocOdm: DocOdm["entries"][0], historyListId: HistoryListId): HistoryEntryEntity {
   return {
-    id: entryDocOdm.date.timestamp.toString(),
     historyListId,
     episodeId: {
       innerId: entryDocOdm.episodeId,
@@ -39,7 +42,7 @@ export function entryToDocOdm(entry: HistoryEntry): DocOdm["entries"][0] {
   };
 }
 
-export function modelToDocOdm(model: HistoryList): DocOdm {
+export function entityToDocOdm(model: HistoryListEntity): DocOdm {
   return {
     id: model.id,
     maxSize: model.maxSize,

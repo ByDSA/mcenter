@@ -1,8 +1,8 @@
-import { stringToNumberOrUndefined } from "#shared/utils/data-types";
 import { ChangeEvent, useEffect, useMemo } from "react";
 import { InputNumberProps, useInputNumber } from "./InputNumber";
 import { ResourceOptionalCheckbox } from "./ResourceCheckboxOptional";
 import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
+import { stringToNumberOrUndefined } from "$shared/utils/data-types";
 
 export type ResourceInputNumberProps<R extends object> = ResourceInputCommonProps<R> & {
   inputNumberProps?: InputNumberProps;

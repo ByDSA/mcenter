@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
-import { MusicVO } from "#musics/models";
+import { Music } from "#musics/models";
 
-export interface DocOdm extends MusicVO {
+export interface DocOdm extends Omit<Music, "id"> {
   _id: mongoose.Types.ObjectId;
   onlyTags?: string[];
 }
@@ -82,4 +82,4 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
 } );
 
-export const ModelOdm = mongoose.model<MusicVO>(NAME, schemaOdm);
+export const ModelOdm = mongoose.model<Music>(NAME, schemaOdm);

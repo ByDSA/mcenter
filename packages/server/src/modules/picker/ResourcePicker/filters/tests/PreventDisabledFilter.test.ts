@@ -1,26 +1,26 @@
-import { ResourceVO } from "#modules/resources/models";
+import { Resource } from "#modules/resources/models";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { PreventDisabledFilter } from "../PreventDisabledFilter";
 
-const ENABLED_NO_DISABLED: ResourceVO = {
+const ENABLED_NO_DISABLED: Resource = {
   ...EPISODES_SIMPSONS[0],
 };
 
 delete ENABLED_NO_DISABLED.disabled;
-const DISABLED: ResourceVO = {
+const DISABLED: Resource = {
   ...ENABLED_NO_DISABLED,
   disabled: true,
 };
-const ENABLED_DISABLED_FALSE: ResourceVO = {
+const ENABLED_DISABLED_FALSE: Resource = {
   ...ENABLED_NO_DISABLED,
   disabled: false,
 };
-const ENABLED_DISABLED_UNDEFINED: ResourceVO = {
+const ENABLED_DISABLED_UNDEFINED: Resource = {
   ...ENABLED_NO_DISABLED,
   disabled: undefined,
 };
 
-type Case = [ResourceVO, boolean];
+type Case = [Resource, boolean];
 
 describe.each([
   [DISABLED, false],

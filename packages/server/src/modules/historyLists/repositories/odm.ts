@@ -1,7 +1,7 @@
-import { DateType } from "#shared/utils/time";
 import mongoose from "mongoose";
+import { DateType } from "$shared/utils/time";
 import { DateTypeOdmSchema } from "#utils/time";
-import { HistoryList } from "../models";
+import { HistoryListEntity } from "../models";
 
 export type EntryDocOdm = {
   date: DateType;
@@ -24,7 +24,7 @@ export const entrySchema = new mongoose.Schema<EntryDocOdm>( {
   },
 } );
 
-export type DocOdm = Omit<HistoryList, "entries"> & {
+export type DocOdm = Omit<HistoryListEntity, "entries"> & {
   entries: EntryDocOdm[];
 };
 

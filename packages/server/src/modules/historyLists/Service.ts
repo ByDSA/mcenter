@@ -1,16 +1,16 @@
-import { assertFound } from "#shared/utils/http/validation";
 import { Injectable } from "@nestjs/common";
+import { assertFound } from "$shared/utils/http/validation";
 import { EpisodeRepository } from "#episodes/index";
-import { Episode, EpisodeId, compareEpisodeId } from "#episodes/models";
+import { Episode, EpisodeEntity, EpisodeId, compareEpisodeId } from "#episodes/models";
 import { HistoryListEntryRepository, HistoryListRepository } from "./repositories";
-import { HistoryEntry, HistoryList, HistoryListId, createHistoryEntryByEpisodeFullId as createHistoryEntryByEpisodeId } from "./models";
+import { HistoryEntry, HistoryListEntity, HistoryListId, createHistoryEntryByEpisodeFullId as createHistoryEntryByEpisodeId } from "./models";
 
 type HistoryAndEpisodeParams = ( {
-  episode: Episode;
+  episode: EpisodeEntity;
 } | {
   episodeFullId: EpisodeId;
 } ) & ( {
-  historyList: HistoryList;
+  historyList: HistoryListEntity;
 } | {
   historyListId: HistoryListId;
 } );
@@ -24,8 +24,17 @@ export class HistoryListService {
   ) {
   }
 
-  async #getHistoryListFromParams(params: HistoryAndEpisodeParams): Promise<HistoryList> {
-    let historyList: HistoryList;
+  static providers = Object.freeze([
+    EpisodeRepository,
+    ...EpisodeRepository.providers,
+    HistoryListRepository,
+    ...HistoryListRepository.providers,
+    HistoryListEntryRepository,
+    ...HistoryListEntryRepository.providers,
+  ]);
+
+  async #getHistoryListFromParams(params: HistoryAndEpisodeParams): Promise<HistoryListEntity> {
+    let historyList: HistoryListEntity;
 
     if ("historyList" in params)
       historyList = params.historyList;
@@ -69,8 +78,8 @@ export class HistoryListService {
     return episodeId;
   }
 
-  async #getEpisodeFromParams(params: HistoryAndEpisodeParams): Promise<Episode> {
-    let episode: Episode;
+  async #getEpisodeFromParams(params: HistoryAndEpisodeParams): Promise<EpisodeEntity> {
+    let episode: EpisodeEntity;
 
     if ("episode" in params)
 
@@ -91,7 +100,7 @@ export class HistoryListService {
     params: HistoryAndEpisodeParams,
   ): Promise<HistoryEntry | null> {
     const episodeFullId: EpisodeId = await this.#getEpisodeIdFromParams(params);
-    const historyList: HistoryList = await this.#getHistoryListFromParams(params);
+    const historyList: HistoryListEntity = await this.#getHistoryListFromParams(params);
     const historyEntry = historyList.entries.findLast(
       (h) => compareEpisodeId(h.episodeId, episodeFullId),
     );
@@ -103,19 +112,21 @@ export class HistoryListService {
   }
 
   async addEpisodeToHistory(params: HistoryAndEpisodeParams) {
-    const episode: Episode = await this.#getEpisodeFromParams(params);
+    const episode: EpisodeEntity = await this.#getEpisodeFromParams(params);
     const newEntry: HistoryEntry = createHistoryEntryByEpisodeId(episode.id);
     const historyListId = this.#getHistoryListIdFromParams(params);
 
     await this.historyEntryRepository.createOneBySuperId(historyListId, newEntry);
 
     await this.episodeRepository.patchOneByIdAndGet(episode.id, {
-      lastTimePlayed: newEntry.date.timestamp,
+      entity: {
+        lastTimePlayed: newEntry.date.timestamp,
+      },
     } );
   }
 
   async addEpisodesToHistory(
-    { episodes, historyListId }: {episodes: Episode[];
+    { episodes, historyListId }: {episodes: EpisodeEntity[];
 historyListId: HistoryListId;},
   ) {
     // TODO: usar bulk insert (quitar await en for)
@@ -152,7 +163,9 @@ historyListId: HistoryListId;},
       } );
 
       await this.episodeRepository.patchOneByIdAndGet(episodeFullId, {
-        lastTimePlayed: lastTimeHistoryEntry?.date.timestamp,
+        entity: {
+          lastTimePlayed: lastTimeHistoryEntry?.date.timestamp,
+        },
       } );
     }
   }

@@ -1,3 +1,3 @@
 export {
   EpisodesRestController,
-} from "./RestController";
+} from "./rest.controller";

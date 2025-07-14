@@ -1,30 +1,28 @@
 "use client";
 
-/* eslint-disable no-restricted-imports */
-import { Stream, assertIsStream } from "#shared/models/streams";
-import { getManyBySearch } from "#shared/models/streams/dto";
 import { Fragment, MouseEventHandler, useState } from "react";
 import useSWR from "swr";
-import { showError } from "#shared/utils/errors/showError";
-import { assertZod } from "#shared/utils/validation/zod";
+import { showError } from "$shared/utils/errors/showError";
+import { Stream, streamSchema } from "$shared/models/streams";
+import { PATH_ROUTES } from "$shared/routing";
+import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
 import { Loading } from "#modules/loading";
-import { seriesBackendUrls } from "#modules/series";
-import { rootBackendUrl } from "#modules/requests";
+import { backendUrl } from "#modules/requests";
 import { fetcher } from "./fetcher";
 
 export const backendUrls = {
-  stream: `${rootBackendUrl}/api/play/stream`,
+  stream: backendUrl(PATH_ROUTES.player.play.stream.path),
 };
 
 export function List() {
-  const URL = seriesBackendUrls.streams.crud.search;
-  const { data, error, isLoading } = useSWR(
+  const URL = backendUrl(PATH_ROUTES.streams.search.path);
+  const { data: res, error, isLoading } = useSWR<DataResponse<Stream[]>>(
     URL,
     fetcher,
   );
-  const [streams, setStreams] = useState<Stream[]>(data);
+  const [streams, setStreams] = useState<Stream[] | undefined>(res?.data);
 
-  if (error) {
+  if (error || (res?.errors && res?.errors.length > 0)) {
     return <>
       <p>Failed to load.</p>
       <p>{URL}</p>
@@ -35,11 +33,10 @@ export function List() {
   if (!streams && isLoading)
     return <Loading/>;
 
-  if (streams === undefined) {
-    assertZod(getManyBySearch.resSchema, data);
-    data.forEach((stream: Stream) => {
-      assertIsStream(stream);
-    } );
+  if (streams === undefined && res) {
+    assertIsManyDataResponse(res, streamSchema);
+    const { data } = res;
+
     setStreams(data);
   }
 

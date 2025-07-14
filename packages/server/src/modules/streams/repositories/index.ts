@@ -1,5 +1,5 @@
 export {
-  StreamsRepository as StreamRepository,
+  StreamsRepository,
 } from "./Repository";
 
 export {

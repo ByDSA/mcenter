@@ -14,8 +14,18 @@
   color: var(--color-orange-darker);
 }
 
-.container .version {
-  color: var(--color-red-darker2);
+.container .stamp {
+  .version {
+    color: var(--color-red-darker2);
+    line-height: 1;
+    font-size: 1.5rem;
+    margin-bottom: 0;
+  }
+  .date {
+    margin-top: 0;
+    color: var(--color-primary-darker3);
+    font-size: 0.75rem;
+  }
 }
 
 .title a {
@@ -36,11 +46,7 @@
 }
 
 .title,
-.version {
+.version,
+.date {
   text-align: center;
-}
-
-.version {
-  line-height: 1.5;
-  font-size: 1.5rem;
 }

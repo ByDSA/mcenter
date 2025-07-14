@@ -1,11 +1,10 @@
-import { isDefined } from "#shared/utils/validation";
 import mongoose from "mongoose";
+import { TimestampsModel } from "$sharedSrc/models/utils/schemas/Timestamps";
 import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { EpisodeId } from "../models";
-import { TimestampsModel } from "#sharedSrc/models/utils/schemas/Timestamps";
 
 export interface DocOdm {
-  _id?: mongoose.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   episodeId: string;
   serieId: string;
   path: string;
@@ -16,7 +15,7 @@ export interface DocOdm {
   tags?: string[];
   disabled?: boolean;
   lastTimePlayed?: number;
-  timestamps?: TimestampsModel; // TODO: cambiar a obligado y modificar episodes en db
+  timestamps: TimestampsModel;
 }
 
 const NAME = "Episode";
@@ -82,9 +81,6 @@ export async function getIdModelOdmFromId(fullId: EpisodeId) {
     return null;
 
   const id = episodeOdm.toObject()._id as mongoose.Types.ObjectId;
-
-  if (!isDefined(id))
-    return null;
 
   return id;
 }

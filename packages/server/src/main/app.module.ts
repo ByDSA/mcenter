@@ -1,30 +1,34 @@
 import { Module, OnModuleInit } from "@nestjs/common";
 import { RouterModule } from "@nestjs/core";
-import { MusicsModule } from "#musics/module";
-import { MusicsHistoryModule } from "#musics/history/controllers/module";
+import { ConfigModule } from "#modules/config/config.module";
 import { globalValidationProviders, InitService } from "./init.service";
-import { TSYRINGE_PROVIDERS } from "./TSYRINGE_PROVIDERS";
+import { DevModule } from "./dev/module";
+import { DatabaseModule } from "./db/module";
+import { SchedulerModule } from "./scheduler/module";
+import { routeModules } from "./routes";
+
+const isDev = process.env.NODE_ENV === "development";
 
 @Module( {
   imports: [
-    MusicsModule,
-    RouterModule.register([
-      {
-        path: "/api/musics",
-        module: MusicsModule,
-        children: [
-          {
-            path: "history",
-            module: MusicsHistoryModule,
-          },
-        ],
-      },
-    ]),
+    ...(isDev
+      ? [
+        DevModule,
+        RouterModule.register([{
+          path: "/",
+          module: DevModule,
+        }]),
+      ]
+      : []),
+    SchedulerModule,
+    DatabaseModule,
+    ConfigModule,
+    ...routeModules,
   ],
   providers: [
-    ...TSYRINGE_PROVIDERS,
-    InitService,
     ...globalValidationProviders,
+    InitService,
+    ...InitService.providers,
   ],
 } )
 export class AppModule implements OnModuleInit {

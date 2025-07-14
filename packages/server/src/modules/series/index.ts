@@ -1,13 +1,9 @@
-export {
-  Serie,
-  SerieId,
-  SerieSchema,
-} from "./models";
+export * from "./models";
 
 export {
   DocOdm as SerieDocOdm,
-  docOdmToModel as serieDocOdmToModel,
+  docOdmToEntity as serieDocOdmToEntity,
   ModelOdm as SerieModelOdm,
   SerieRepository,
-  modelToDocOdm as serieToDocOdm,
+  entityToDocOdm as serieEntityToDocOdm,
 } from "./repositories";

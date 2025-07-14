@@ -5,7 +5,7 @@ export {
 export * from "./adapters";
 
 export {
-  EpisodeRepository,
+  EpisodesRepository as EpisodeRepository,
   GetManyOptions as EpisodeRepositoryGetManyOptions,
 } from "./Repository";
 

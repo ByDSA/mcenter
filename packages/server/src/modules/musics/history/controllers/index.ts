@@ -1,3 +1,3 @@
 export {
   MusicHistoryRestController,
-} from "./RestController";
+} from "./rest.controller";

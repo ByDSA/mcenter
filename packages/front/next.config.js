@@ -68,5 +68,7 @@ module.exports = {
 
       return version;
     } )(),
+    BUILD_DATE: new Date().toISOString()
+      .split("T")[0], // Formato YYYY-MM-DD
   },
 };

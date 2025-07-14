@@ -1,11 +1,11 @@
-import { ResourceVO } from "#modules/resources/models";
+import { Resource } from "#modules/resources/models";
 import { secondsElapsedFrom } from "../utils";
 import { Filter } from "./Filter";
 
 type Params = {
   minSecondsElapsed: number;
 };
-export class PreventRepeatInTimeFilter implements Filter<ResourceVO> {
+export class PreventRepeatInTimeFilter implements Filter<Resource> {
   #params: Params;
 
   constructor(params: Params) {
@@ -13,7 +13,7 @@ export class PreventRepeatInTimeFilter implements Filter<ResourceVO> {
   }
 
   // eslint-disable-next-line require-await
-  async filter(resource: ResourceVO): Promise<boolean> {
+  async filter(resource: Resource): Promise<boolean> {
     if (resource.lastTimePlayed === undefined || resource.lastTimePlayed <= 0)
       return true;
 

@@ -1,5 +1,5 @@
 export {
-  EpisodeFileInfoRepository as FileInfoRepository,
+  EpisodeFileInfoRepository,
 } from "./repositories";
 
 export * from "./tree";

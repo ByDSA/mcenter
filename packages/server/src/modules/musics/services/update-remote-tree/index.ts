@@ -1,26 +1,32 @@
 import { statSync } from "node:fs";
 import { Injectable } from "@nestjs/common";
-import { container } from "tsyringe";
+import z from "zod";
 import { md5FileAsync } from "#utils/crypt";
-import { MusicVO } from "#musics/models";
+import { MusicEntity, musicEntitySchema } from "#musics/models";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
 import { MusicRepository } from "../../repositories";
 import { getFullPath } from "../../utils";
 import { ChangesDetector, FileWithStats } from "./ChangesDetector";
 
-export type UpdateResult = {
-  new: MusicVO[];
-  deleted: MusicVO[];
-  moved: {original: MusicVO;
-newPath: string;}[];
-  updated: {old: MusicVO;
-new: MusicVO;}[];
-};
+export const updateResultSchema = z.object( {
+  new: z.array(musicEntitySchema),
+  deleted: z.array(musicEntitySchema),
+  moved: z.array(z.object( {
+    original: musicEntitySchema,
+    newPath: z.string(),
+  } )),
+  updated: z.array(z.object( {
+    old: musicEntitySchema,
+    new: musicEntitySchema,
+  } )),
+} );
+
+export type UpdateResult = z.infer<typeof updateResultSchema>;
 
 @Injectable()
 export class UpdateRemoteTreeService {
   constructor(
-    private readonly musicRepository: MusicRepository = container.resolve(MusicRepository),
+    private readonly musicRepository: MusicRepository,
   ) {
   }
 
@@ -100,7 +106,7 @@ export class UpdateRemoteTreeService {
     return ret;
   }
 }
-async function detectChangesFromLocalFiles(remoteMusics: MusicVO[]) {
+async function detectChangesFromLocalFiles(remoteMusics: MusicEntity[]) {
   const files = await findAllPathsOfValidMusicFiles();
   const filesWithMeta: FileWithStats[] = files.map((relativePath) => ( {
     path: relativePath,
@@ -111,10 +117,10 @@ async function detectChangesFromLocalFiles(remoteMusics: MusicVO[]) {
   return changesDetector.detectChanges();
 }
 
-async function toUpdatedFileInfo(music: MusicVO) {
+async function toUpdatedFileInfo(music: MusicEntity) {
   const fullPath = getFullPath(music.path);
   const { size } = statSync(fullPath);
-  const newMusic: MusicVO = {
+  const newMusic: MusicEntity = {
     ...music,
     size,
     timestamps: music.timestamps,

@@ -1,6 +1,6 @@
-import { numberToStringOrEmpty, stringToNumberOrUndefined } from "#shared/utils/data-types";
 import { useMemo, useRef } from "react";
 import { InputTextNumberCommonProps, keyDownHandlerGenerator } from "./InputTextNumberCommon";
+import { numberToStringOrEmpty, stringToNumberOrUndefined } from "$shared/utils/data-types";
 
 type InputElement = HTMLInputElement;
 

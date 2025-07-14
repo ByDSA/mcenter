@@ -1,10 +1,10 @@
-import { Episode } from "#episodes/models";
 import { LastTimeWeightFilterFx, LastTimeWeightFixer, LimiterSafeIntegerPerItems, TagWeightFixer, WeightFixerApplier } from "#modules/picker";
-import { Pickable, ResourceVO } from "#modules/resources/models";
+import { Pickable, Resource } from "#modules/resources/models";
+import { EpisodeEntity } from "#episodes/models";
 
 const SECONDS_IN_DAY = 24 * 60 * 60;
 
-export class EpisodeWeightFixerApplier<R extends ResourceVO = ResourceVO>
+export class EpisodeWeightFixerApplier<R extends Resource = Resource>
   extends WeightFixerApplier<R> {
   constructor() {
     super();
@@ -32,5 +32,5 @@ const fx: LastTimeWeightFilterFx = (r: Pickable, x: number): number => {
 };
 
 export function genEpisodeWeightFixerApplier() {
-  return new EpisodeWeightFixerApplier<Episode>();
+  return new EpisodeWeightFixerApplier<EpisodeEntity>();
 }

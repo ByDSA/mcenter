@@ -1,11 +1,11 @@
 "use client";
 
-import { CriteriaExpand, CriteriaSort, getManyBySearch } from "#shared/models/streams/dto";
-import { CriteriaSortDir } from "#shared/utils/criteria";
 import { z } from "zod";
+import { CriteriaSortDir } from "$shared/utils/criteria";
+import { CriteriaExpand, CriteriaSort, getManyByCriteria } from "$shared/models/streams/dto/rest/";
 
 type StreamGetManyRequest = {
-  body: z.infer<typeof getManyBySearch.reqBodySchema>;
+  body: z.infer<typeof getManyByCriteria.reqBodySchema>;
 };
 
 const bodyJson: StreamGetManyRequest["body"] = {

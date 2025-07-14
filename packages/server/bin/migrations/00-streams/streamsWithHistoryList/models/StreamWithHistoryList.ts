@@ -1,6 +1,6 @@
 import { StreamMode } from "#modules/streams";
-import { assertZodPopStack } from "#shared/utils/validation/zod";
-import { z } from "zod";
+import { assertZodPopStack } from "$shared/utils/validation/zod";
+import z from "zod";
 import { HistoryEntryInStreamSchema } from "./HistoryEntryInStream";
 
 export const StreamWithHistoryListSchema = z.object( {

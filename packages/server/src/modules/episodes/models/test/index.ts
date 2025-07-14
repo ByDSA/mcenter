@@ -1,3 +1,1 @@
-export {
-  expectEpisode, expectEpisodes,
-} from "#sharedSrc/models/episodes/test";
+export * from "$sharedSrc/models/episodes/test";

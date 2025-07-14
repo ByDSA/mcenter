@@ -1,11 +1,12 @@
 import { Module } from "@nestjs/common";
-import { TSYRINGE_PROVIDERS } from "#main/TSYRINGE_PROVIDERS";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { MusicsHistoryModule } from "./history/controllers/module";
-import { MusicGetController } from "./controllers/GetController";
-import { MusicFixController } from "./controllers/FixController";
+import { MusicGetController } from "./controllers/get.controller";
+import { MusicFixController } from "./controllers/fix.controller";
 import { UpdateRemoteTreeService } from "./services";
-import { MusicRestController } from "./controllers/RestController";
-import { MusicUpdateRemoteController } from "./controllers/UpdateRemoteController";
+import { MusicRestController } from "./controllers/rest.controller";
+import { MusicUpdateRemoteController } from "./controllers/update-remote.controller";
+import { MusicRepository } from "./repositories";
 
 @Module( {
   imports: [
@@ -18,8 +19,9 @@ import { MusicUpdateRemoteController } from "./controllers/UpdateRemoteControlle
     MusicUpdateRemoteController,
   ],
   providers: [
+    DomainMessageBroker,
+    MusicRepository,
     UpdateRemoteTreeService,
-    ...TSYRINGE_PROVIDERS,
   ],
   exports: [],
 } )
