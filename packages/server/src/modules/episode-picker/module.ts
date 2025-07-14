@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { EpisodesModule } from "#episodes/module";
-import { EpisodeHistoryListsModule } from "#modules/historyLists/module";
+import { EpisodeHistoryListsModule } from "#episodes/history/module";
 import { SeriesModule } from "#modules/series/module";
 import { StreamsModule } from "#modules/streams/module";
 import { EpisodePickerController } from "./controller";

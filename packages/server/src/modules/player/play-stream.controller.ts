@@ -3,7 +3,7 @@ import { assertFound } from "$shared/utils/http/validation";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { EpisodePickerService } from "#modules/episode-picker";
-import { HistoryListService } from "#modules/historyLists";
+import { EpisodeHistoryListService } from "#episodes/history";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { PlayService } from "./PlayService";
 
@@ -21,7 +21,7 @@ export class PlayStreamController {
     private playService: PlayService,
     private episodePickerService: EpisodePickerService,
     private streamRepository: StreamsRepository,
-    private historyListService: HistoryListService,
+    private historyListService: EpisodeHistoryListService,
   ) {
   }
 
@@ -32,8 +32,8 @@ export class PlayStreamController {
     ...EpisodePickerService.providers,
     StreamsRepository,
     ...StreamsRepository.providers,
-    HistoryListService,
-    ...HistoryListService.providers,
+    EpisodeHistoryListService,
+    ...EpisodeHistoryListService.providers,
   ]);
 
     @Get("/:id")

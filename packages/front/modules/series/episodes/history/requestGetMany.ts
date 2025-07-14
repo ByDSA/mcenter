@@ -3,12 +3,12 @@ import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/respo
 import { PATH_ROUTES } from "$shared/routing";
 import { UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
-import { HistoryEntryEntity, historyEntryEntitySchema } from "./models";
-import { historyListRestDto } from "./models/dto";
+import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "./models";
+import { episodeHistoryListRestDto } from "./models/dto";
 
-type Data = Required<HistoryEntryEntity>[];
+type Data = Required<EpisodeHistoryEntryEntity>[];
 type HistoryListGetManyEntriesBySuperIdRequest = {
-  body: z.infer<typeof historyListRestDto.getManyEntriesBySuperId.reqBodySchema>;
+  body: z.infer<typeof episodeHistoryListRestDto.getManyEntriesBySuperId.reqBodySchema>;
 };
 const body: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
   filter: {},
@@ -19,7 +19,7 @@ const body: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
   expand: ["episodes", "series"],
 };
 const validator = (res: DataResponse<Data>) => {
-  assertIsManyDataResponse(res, historyEntryEntitySchema.required() as any);
+  assertIsManyDataResponse(res, episodeHistoryEntryEntitySchema.required() as any);
 };
 const method = "POST";
 const fetcher = makeFetcher( {

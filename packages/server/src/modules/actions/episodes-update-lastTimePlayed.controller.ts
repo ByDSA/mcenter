@@ -1,8 +1,8 @@
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
 import { EpisodeRepository } from "#episodes/index";
-import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
 import { SerieRepository } from "#modules/series";
 import { StreamsRepository } from "#modules/streams/repositories";
+import { EpisodeHistoryListRepository, LastTimePlayedService } from "#episodes/history";
 
 @Controller("/episodes/updateLastTimePlayed")
 export class EpisodesUpdateLastTimePlayedController {
@@ -10,7 +10,7 @@ export class EpisodesUpdateLastTimePlayedController {
     private lastTimePlayedService: LastTimePlayedService,
     private serieRepository: SerieRepository,
     private episodeRepository: EpisodeRepository,
-    private historyListRepository: HistoryListRepository,
+    private historyListRepository: EpisodeHistoryListRepository,
     private streamRepository: StreamsRepository,
   ) {
   }

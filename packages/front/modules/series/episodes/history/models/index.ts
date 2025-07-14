@@ -1,1 +1,1 @@
-export * from "$shared/models/history-lists";
+export * from "$shared/models/episodes/history";

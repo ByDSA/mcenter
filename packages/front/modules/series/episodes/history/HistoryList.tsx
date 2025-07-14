@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
-import { HistoryEntryEntity, historyEntryEntitySchema } from "#modules/series/episodes/history/models";
+import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { FetchingRender } from "#modules/fetching";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { useRequest } from "./requests";
@@ -10,17 +10,17 @@ import "#styles/resources/history-entry.css";
 import "#styles/resources/history-episodes.css";
 import "#styles/resources/serie.css";
 
-type Data = Required<HistoryEntryEntity>[];
+type Data = Required<EpisodeHistoryEntryEntity>[];
 export function HistoryList() {
   return FetchingRender<DataResponse<Data>>( {
     useRequest,
     render: (res) => {
-      assertIsManyDataResponse(res, historyEntryEntitySchema);
+      assertIsManyDataResponse(res, episodeHistoryEntryEntitySchema);
 
       return (
         <span className="history-list">
           {
-            res && res.data.map((entry: HistoryEntryEntity, i: number) => {
+            res && res.data.map((entry: EpisodeHistoryEntryEntity, i: number) => {
               let dayTitle;
 
               if (i === 0 || !isSameday(res.data[i - 1].date.timestamp, entry.date.timestamp)) {

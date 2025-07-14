@@ -7,7 +7,7 @@ import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { EpisodeRepository } from "#episodes/index";
 import { Episode, EpisodeEntity } from "#episodes/models";
-import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
+import { EpisodeHistoryListRepository, LastTimePlayedService } from "#episodes/history";
 import { genRandomPickerWithData } from "#modules/picker";
 import { SerieRepository } from "#modules/series";
 import { StreamsRepository } from "#modules/streams/repositories";
@@ -28,7 +28,7 @@ export class EpisodePickerController {
   constructor(
      private streamRepository: StreamsRepository,
      private episodeRepository: EpisodeRepository,
-     private historyListRepository: HistoryListRepository,
+     private historyListRepository: EpisodeHistoryListRepository,
      private serieRepository: SerieRepository,
   ) {
   }

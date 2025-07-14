@@ -1,21 +1,21 @@
 import { z } from "zod";
 import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
 import { PATH_ROUTES } from "$shared/routing";
-import { HistoryEntry, historyEntryEntitySchema } from "#modules/series/episodes/history/models";
-import { HistoryEntryEntity } from "#modules/series/episodes/history/models";
-import { historyListRestDto } from "#modules/series/episodes/history/models/dto";
+import { EpisodeHistoryEntry, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
+import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
+import { episodeHistoryListRestDto } from "#modules/series/episodes/history/models/dto";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { backendUrl } from "#modules/requests";
 import { Header } from "./Header";
 import { Body } from "./body/Body";
 
 type HistoryListGetManyEntriesBySuperIdRequest = {
-  body: z.infer<typeof historyListRestDto.getManyEntriesBySuperId.reqBodySchema>;
+  body: z.infer<typeof episodeHistoryListRestDto.getManyEntriesBySuperId.reqBodySchema>;
 };
 
 type Props = {
-  value: HistoryEntryEntity;
-  onRemove?: (data: HistoryEntry)=> void;
+  value: EpisodeHistoryEntryEntity;
+  onRemove?: (data: EpisodeHistoryEntry)=> void;
 };
 export function HistoryEntryElement( { value }: Props) {
   return <span className="history-entry">
@@ -29,8 +29,8 @@ export function HistoryEntryElement( { value }: Props) {
 }
 
 export function fetchLastestHistoryEntries(
-  historyEntry: HistoryEntry,
-): Promise<HistoryEntryEntity[] | null> {
+  historyEntry: EpisodeHistoryEntry,
+): Promise<EpisodeHistoryEntryEntity[] | null> {
   const URL = backendUrl(PATH_ROUTES.episodes.history.entries.search.path);
   const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
     filter: {
@@ -51,8 +51,8 @@ export function fetchLastestHistoryEntries(
       "Content-Type": "application/json",
     },
   } ).then((response) => response.json())
-    .then((res: DataResponse<HistoryEntryEntity[]>) => {
-      assertIsManyDataResponse(res, z.array(historyEntryEntitySchema));
+    .then((res: DataResponse<EpisodeHistoryEntryEntity[]>) => {
+      assertIsManyDataResponse(res, z.array(episodeHistoryEntryEntitySchema));
 
       return res.data;
     } );

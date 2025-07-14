@@ -3,7 +3,7 @@ import { Body, Controller, Get } from "@nestjs/common";
 import { CriteriaSortDir } from "$shared/utils/criteria";
 import { CriteriaSort, getManyByCriteria } from "$shared/models/streams/dto/rest";
 import { createZodDto } from "nestjs-zod";
-import { HistoryListRepository } from "#modules/historyLists";
+import { EpisodeHistoryListRepository } from "#episodes/history";
 import { SerieRepository } from "#modules/series";
 import { Stream, StreamOriginType, streamSchema } from "#modules/streams/models";
 import { CanGetAll } from "#utils/layers/controller";
@@ -19,7 +19,7 @@ implements
   constructor(
     private streamRepository: StreamsRepository,
     private serieRepository: SerieRepository,
-    private historyListRepository: HistoryListRepository,
+    private historyListRepository: EpisodeHistoryListRepository,
   ) {
   }
 

@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeUpdateController, SavedSerieTreeService } from "#episodes/index";
-import { HistoryListRepository, LastTimePlayedService } from "#modules/historyLists";
+import { EpisodeHistoryListRepository, LastTimePlayedService } from "#episodes/history";
 import { SerieRepository } from "#modules/series";
 import { StreamsRepository } from "#modules/streams/repositories/Repository";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
@@ -25,7 +25,7 @@ import { ActionController } from "./main.controller";
     LastTimePlayedService,
     SerieRepository,
     EpisodeRepository,
-    HistoryListRepository,
+    EpisodeHistoryListRepository,
     StreamsRepository,
     // EpisodeRepository:
     DomainMessageBroker,

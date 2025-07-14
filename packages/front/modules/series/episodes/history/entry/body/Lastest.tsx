@@ -1,21 +1,21 @@
 import { z } from "zod";
 import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
 import { PATH_ROUTES } from "$shared/routing";
-import { HistoryEntry, HistoryEntryEntity, historyEntryEntitySchema } from "#modules/series/episodes/history/models";
-import { historyListRestDto } from "#modules/series/episodes/history/models/dto";
+import { EpisodeHistoryEntry, EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
+import { episodeHistoryListRestDto } from "#modules/series/episodes/history/models/dto";
 import { EpisodeId } from "#modules/series/episodes/models";
 import { DateFormat } from "#modules/utils/dates";
 import { LatestHistoryEntries } from "#modules/history";
 import { backendUrl } from "#modules/requests";
 
-type Data = HistoryEntryEntity[];
+type Data = EpisodeHistoryEntryEntity[];
 
 type HistoryListGetManyEntriesBySuperIdRequest = {
-  body: z.infer<typeof historyListRestDto.getManyEntriesBySuperId.reqBodySchema>;
+  body: z.infer<typeof episodeHistoryListRestDto.getManyEntriesBySuperId.reqBodySchema>;
 };
 type Props<ID> = {
   resourceId: ID;
-  date: HistoryEntry["date"];
+  date: EpisodeHistoryEntry["date"];
   dateFormat?: DateFormat;
 };
 const DATE_FORMAT_DEFAULT: DateFormat = {
@@ -41,7 +41,7 @@ export function LastestComponent(
     limit: 10,
   };
 
-  // TODO: cambiar 'any' cuando HistoryEntry tenga 'resource' en vez de 'episode'
+  // TODO: cambiar 'any' cuando EpisodeHistoryEntry tenga 'resource' en vez de 'episode'
   return LatestHistoryEntries<any, ReqBody>( {
     url: URL,
     body,
@@ -51,5 +51,5 @@ export function LastestComponent(
 }
 
 const validator = (res: DataResponse<Data>) => {
-  assertIsManyDataResponse(res, historyEntryEntitySchema as any);
+  assertIsManyDataResponse(res, episodeHistoryEntryEntitySchema as any);
 };

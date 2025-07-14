@@ -1,3 +1,3 @@
-export * from "$shared/models/history-lists/dto/domain";
+export * from "$shared/models/episodes/history/dto/domain";
 
-export * from "$shared/models/history-lists/dto/transport";
+export * from "$shared/models/episodes/history/dto/transport";

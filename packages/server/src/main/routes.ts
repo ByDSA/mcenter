@@ -4,7 +4,7 @@ import { MusicsModule } from "#musics/module";
 import { MusicsHistoryModule } from "#musics/history/controllers/module";
 import { ActionsModule } from "#modules/actions/actions.module";
 import { EpisodesModule } from "#episodes/module";
-import { EpisodeHistoryListsModule } from "#modules/historyLists/module";
+import { EpisodeHistoryListsModule } from "#episodes/history/module";
 import { EpisodePickerModule } from "#modules/episode-picker/module";
 import { StreamsModule } from "#modules/streams/module";
 import { PlayerModule } from "#modules/player/module";

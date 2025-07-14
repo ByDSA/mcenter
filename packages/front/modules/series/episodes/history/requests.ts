@@ -3,21 +3,21 @@ import { DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/res
 import { PATH_ROUTES } from "$shared/routing";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
-import { HistoryEntryEntity, historyEntryEntitySchema, HistoryEntryId, HistoryListId } from "./models";
+import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema, EpisodeHistoryEntryId, EpisodeHistoryListId } from "./models";
 
 export {
   useRequest,
 } from "./requestGetMany";
 
 export async function fetchDelete(
-  listId: HistoryListId,
-  entryId: HistoryEntryId,
-): Promise<DataResponse<HistoryEntryEntity> | undefined> {
+  listId: EpisodeHistoryListId,
+  entryId: EpisodeHistoryEntryId,
+): Promise<DataResponse<EpisodeHistoryEntryEntity> | undefined> {
   const method = "DELETE";
   const URL = backendUrl(PATH_ROUTES.episodes.history.entries.withParams(listId, entryId));
-  const fetcher = makeFetcher<typeof undefined, DataResponse<HistoryEntryEntity>>( {
+  const fetcher = makeFetcher<typeof undefined, DataResponse<EpisodeHistoryEntryEntity>>( {
     method,
-    resBodyValidator: genAssertIsOneDataResponse(historyEntryEntitySchema),
+    resBodyValidator: genAssertIsOneDataResponse(episodeHistoryEntryEntitySchema),
     body: undefined,
   } );
 

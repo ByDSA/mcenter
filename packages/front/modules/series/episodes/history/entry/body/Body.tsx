@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
-import { HistoryEntryEntity } from "#modules/series/episodes/history/models";
+import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
 import { patchOneById } from "#modules/series/episodes/models/dto";
 import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
 import { LinkAsyncAction, ResourceInput, ResourceInputArrayString } from "#uikit/input";
@@ -25,11 +25,11 @@ function generatePatchBody(entryResource: Episode, resource: Episode) {
 }
 
 type Props = {
-  entry: HistoryEntryEntity;
+  entry: EpisodeHistoryEntryEntity;
 };
 export function Body( { entry: entryEpisode }: Props) {
   const { episodeId: resourceId, episode: r, ...restEntryEpisode } = entryEpisode;
-  // TODO: modificar HistoryEntry para que sea 'resource' y no 'episode' y poder quitar esto
+  // TODO: modificar EpisodeHistoryEntry para que sea 'resource' y no 'episode' y poder quitar esto
   const entry = {
     ...restEntryEpisode,
     resourceId,

@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { SeriesModule } from "#modules/series/module";
-import { EpisodeHistoryListsModule } from "#modules/historyLists/module";
+import { EpisodeHistoryListsModule } from "#episodes/history/module";
 import { StreamsRepository } from "./repositories";
 import { StreamRestController } from ".";
 

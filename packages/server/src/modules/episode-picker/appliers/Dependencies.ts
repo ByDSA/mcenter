@@ -1,8 +1,9 @@
-import { HistoryListId } from "#modules/historyLists/models";
-import { SerieId } from "#series/models";
+import type { EpisodeHistoryListId } from "#episodes/history/models";
+import type { SerieId } from "#series/models";
 
-export type DependenciesList = {[key: SerieId]: [HistoryListId, HistoryListId][]};
+export type DependenciesList = {[key: SerieId]: [EpisodeHistoryListId, EpisodeHistoryListId][]};
 
+// TODO: mover a DB
 export const dependencies: DependenciesList = {
   simpsons: [
     ["6x25", "7x01"],
