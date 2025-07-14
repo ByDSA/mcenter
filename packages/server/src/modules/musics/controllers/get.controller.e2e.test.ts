@@ -5,9 +5,9 @@ import { MUSICS_WITH_TAGS_SAMPLES } from "#tests/main/db/fixtures/models/music";
 import { loadFixtureMusicsWithTags } from "#tests/main/db/fixtures/sets";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { HistoryMusicModelOdm, MusicHistoryRepository } from "./history";
-import { MusicGetController } from "./controllers/get.controller";
-import { MusicRepository } from "./repositories";
+import { HistoryMusicModelOdm, MusicHistoryRepository } from "../history";
+import { MusicRepository } from "../repositories";
+import { MusicGetController } from "./get.controller";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;
@@ -34,7 +34,7 @@ function expectNotEmpty(array: unknown[]) {
   expect(array.length).toBeGreaterThan(0);
 }
 
-describe("picker", () => {
+describe("musicGetController", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
       imports: [],
@@ -68,7 +68,7 @@ describe("picker", () => {
     expect(response.text).toBeDefined();
 
     expect(response.text.includes("api/musics/get/raw/")).toBeTruthy();
-    expect(response.text.includes("api/musics/get/random")).toBeTruthy();
+    expect(response.text.includes("get/random")).toBeTruthy();
   } );
 
   describe("query", () => {
@@ -82,7 +82,7 @@ describe("picker", () => {
       expect(response.text).toBeDefined();
 
       expect(response.text.includes("api/musics/get/raw/")).toBeTruthy();
-      expect(response.text.includes("api/musics/get/random")).toBeTruthy();
+      expect(response.text.includes("get/random")).toBeTruthy();
     } );
 
     it("should get a music if query weight is put", async () => {
