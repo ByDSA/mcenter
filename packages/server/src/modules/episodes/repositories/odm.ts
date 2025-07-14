@@ -62,7 +62,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
   timestamps: {
     type: timestampsSchemaOdm,
-    required: false, // TODO: cambiar a true y modificar episodes en db
+    required: true,
   },
 }, {
   _id: true,
