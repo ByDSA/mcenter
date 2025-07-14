@@ -1,44 +1,52 @@
-import { Application } from "express";
 import request from "supertest";
-import { RouterApp } from "#utils/express/test";
-import { registerSingletonIfNotAndGet } from "#tests/main";
-import { parseMusic } from "#musics/models";
-import { MusicHistoryRepository } from "../history";
-import { MusicHistoryRepositoryMock } from "../history/repositories/tests";
+import { INestApplication } from "@nestjs/common";
+import { Application } from "express";
+import { assertIsDefined } from "$shared/utils/validation";
+import { musicEntitySchema } from "#musics/models";
+import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { MusicRepository } from "../repositories";
-import { MUSICS_SAMPLES_IN_DISK, MusicRepositoryMock } from "../repositories/tests";
-import { UpdateResult } from "../services";
-import { MusicController } from "./Controller";
+import { MUSICS_SAMPLES_IN_DISK } from "../repositories/tests";
+import { UpdateRemoteTreeService, UpdateResult } from "../services";
+import { musicRepoMockProvider } from "../repositories/tests";
+import { musicHistoryRepoMockProvider } from "../history/repositories/tests/RepositoryMock";
+import { MusicUpdateRemoteController } from "./update-remote.controller";
+import { MusicFixController } from "./fix.controller";
+import { MusicGetController } from "./get.controller";
 
 describe("getAll", () => {
+  let musicRepoMock: MusicRepository;
+  let app: INestApplication;
   let routerApp: Application;
-  let musicRepositoryMock: MusicRepositoryMock;
-  let controller: MusicController;
+  let testingSetup: TestingSetup;
 
-  beforeAll(() => {
-    musicRepositoryMock = registerSingletonIfNotAndGet(
-      MusicRepository,
-      MusicRepositoryMock,
-    ) as unknown as MusicRepositoryMock;
-    registerSingletonIfNotAndGet(MusicHistoryRepository, MusicHistoryRepositoryMock);
-    controller = registerSingletonIfNotAndGet(MusicController);
+  beforeAll(async () => {
+    testingSetup = await createTestingAppModuleAndInit( {
+      controllers: [MusicGetController, MusicUpdateRemoteController, MusicFixController],
+      providers: [
+        musicRepoMockProvider,
+        musicHistoryRepoMockProvider,
+        UpdateRemoteTreeService,
+      ],
+    } );
 
-    routerApp = RouterApp(controller.getRouter());
+    app = testingSetup.app;
+    routerApp = testingSetup.routerApp;
+
+    musicRepoMock = testingSetup.module.get<MusicRepository>(MusicRepository);
+  } );
+
+  afterAll(async () => {
+    await app.close();
   } );
 
   beforeEach(() => {
     jest.clearAllMocks();
   } );
 
-  it("should be defined", () => {
-    expect(musicRepositoryMock).toBeDefined();
-    expect(routerApp).toBeDefined();
-  } );
-
   it("getRandom", async () => {
     const musics = MUSICS_SAMPLES_IN_DISK;
 
-    musicRepositoryMock.findAll = jest.fn().mockResolvedValueOnce(musics);
+    musicRepoMock.findAll = jest.fn().mockResolvedValueOnce(musics);
     const response = await request(routerApp)
       .get("/get/random")
       .expect(200);
@@ -54,14 +62,19 @@ describe("getAll", () => {
   it("fixAll no changes", async () => {
     const musics = MUSICS_SAMPLES_IN_DISK;
 
-    musicRepositoryMock.findAll = jest.fn().mockResolvedValueOnce(musics);
-    musicRepositoryMock.createOneFromPath = jest.fn((path: string) => {
+    musicRepoMock.findAll = jest.fn().mockResolvedValueOnce(musics);
+    musicRepoMock.createOneFromPath = jest.fn((path: string) => {
       const music = MUSICS_SAMPLES_IN_DISK.find((m) => m.path === path);
 
-      return Promise.resolve(music);
+      assertIsDefined(music);
+
+      return Promise.resolve( {
+        ...music,
+        id: "id",
+      } );
     } );
-    musicRepositoryMock.updateOneByPath = jest.fn().mockResolvedValue(undefined);
-    musicRepositoryMock.deleteOneByPath = jest.fn().mockResolvedValue(undefined);
+    musicRepoMock.updateOneByPath = jest.fn().mockResolvedValue(undefined);
+    musicRepoMock.deleteOneByPath = jest.fn().mockResolvedValue(undefined);
     const response = await request(routerApp)
       .get("/update/remote")
       .expect(200);
@@ -77,14 +90,16 @@ describe("getAll", () => {
   it("fixAll one new", async () => {
     const musics = MUSICS_SAMPLES_IN_DISK.toSpliced(1, 1);
 
-    musicRepositoryMock.findAll = jest.fn().mockResolvedValueOnce(musics);
-    musicRepositoryMock.createOneFromPath = jest.fn((path: string) => {
+    musicRepoMock.findAll = jest.fn().mockResolvedValueOnce(musics);
+    musicRepoMock.createOneFromPath = jest.fn((path: string) => {
       const music = MUSICS_SAMPLES_IN_DISK.find((m) => m.path === path);
+
+      assertIsDefined(music);
 
       return Promise.resolve(music);
     } );
-    musicRepositoryMock.updateOneByPath = jest.fn().mockResolvedValue(undefined);
-    musicRepositoryMock.deleteOneByPath = jest.fn().mockResolvedValue(undefined);
+    musicRepoMock.updateOneByPath = jest.fn().mockResolvedValue(undefined);
+    musicRepoMock.deleteOneByPath = jest.fn().mockResolvedValue(undefined);
     const response = await request(routerApp)
       .get("/update/remote")
       .expect(200);
@@ -96,7 +111,7 @@ describe("getAll", () => {
     expect(body.moved).toHaveLength(0);
     expect(body.new).toHaveLength(1);
 
-    const newGotParsed = parseMusic(body.new[0]);
+    const newGotParsed = musicEntitySchema.parse(body.new[0]);
 
     expect(newGotParsed).toEqual(MUSICS_SAMPLES_IN_DISK[1]);
   } );

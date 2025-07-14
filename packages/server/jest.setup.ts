@@ -17,8 +17,11 @@ function loadEnvsFile(p: string): void {
 
 if (!isDebugging()) {
   global.console.log = jest.fn(); // Mockear console.log
-  global.console.error = jest.fn(); // Mockear console.error
+  global.console.info = jest.fn(); // Mockear console.info
+  global.console.debug = jest.fn(); // Mockear console.debug
+  global.console.trace = jest.fn(); // Mockear console.trace
   global.console.warn = jest.fn(); // Mockear console.warn
+  global.console.error = jest.fn(); // Mockear console.error
 }
 
 loadEnvsFile(".env.dev");

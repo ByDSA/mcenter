@@ -1,14 +1,21 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { showError } from "#shared/utils/errors/showError";
+import { z } from "zod";
+import { showError } from "$shared/utils/errors/showError";
+import { PATH_ROUTES } from "$shared/routing";
+import { EpisodeEntity } from "#modules/series/episodes/models";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
 import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
-import { EpisodeGetManyBySearchRequest } from "#modules/series/episodes/models/transport";
+import { getManyByCriteria } from "#modules/series/episodes/models/dto";
 import { Loading } from "#modules/loading";
-import { seriesBackendUrls } from "#modules/series";
 import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-player";
+import { backendUrl } from "#modules/requests";
 import styles from "./Player.module.css";
+
+type EpisodeGetManyBySearchRequest = {
+  body: z.infer<typeof getManyByCriteria.reqBodySchema>;
+};
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;
 const RESOURCES = [
@@ -19,7 +26,7 @@ let fetchingResource = false;
 let previousUri = "";
 
 export default function Player() {
-  const [resource, setResource] = React.useState<Episode | null>(null);
+  const [resource, setResource] = React.useState<EpisodeEntity | null>(null);
   const socketInitializer = () => {
     webSockets = new (class A extends RemotePlayerWebSocketsClient {
       onStatus(status: PlayerStatusResponse) {
@@ -51,14 +58,14 @@ export default function Player() {
           const bodyStr = JSON.stringify(request.body);
 
           fetchingResource = true;
-          fetch(`${seriesBackendUrls.episodes.crud.search}`, {
+          fetch(backendUrl(PATH_ROUTES.episodes.search.path), {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: bodyStr,
           } ).then(r => r.json())
-            .then((episodes: Episode[]) => {
+            .then((episodes: EpisodeEntity[]) => {
               const [episode] = episodes;
 
               try {
@@ -138,7 +145,7 @@ function calcStartLength(statusLength: number | undefined, resource: Episode | n
   };
 }
 
-function statusRepresentaton(status: PlayerStatusResponse, resource: Episode | null = null) {
+function statusRepresentaton(status: PlayerStatusResponse, resource: EpisodeEntity | null = null) {
   const uri = status?.status?.playlist?.current?.uri;
   let title = "-";
 

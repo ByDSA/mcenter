@@ -1,7 +1,8 @@
 import mongoose, { UpdateQuery } from "mongoose";
+import { MusicEntity } from "$shared/models/musics";
+import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { Music, assertIsMusic } from "../models";
 import { DocOdm } from "./odm";
-import { PatchOneParams } from "./types";
 
 function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
   if (!docOdm.tags && !docOdm.onlyTags)
@@ -24,9 +25,8 @@ function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
   return tags;
 }
 
-export function musicDocOdmToModel(docOdm: DocOdm): Music {
-  const model: Music = {
-
+export function musicDocOdmToEntity(docOdm: DocOdm): MusicEntity {
+  const model: MusicEntity = {
     id: docOdm._id.toString(),
     hash: docOdm.hash,
     title: docOdm.title,
@@ -57,16 +57,12 @@ export function musicDocOdmToModel(docOdm: DocOdm): Music {
   return model;
 }
 
-export function musicModelToDocOdm(model: Music): DocOdm {
+export function musicToDocOdm(model: Music): DocOdm {
   const docOdm: Partial<DocOdm> = {
     hash: model.hash,
     title: model.title,
     url: model.url,
   };
-
-  if (model.id !== undefined)
-
-    docOdm._id = new mongoose.Types.ObjectId(model.id);
 
   if (model.path !== undefined)
     docOdm.path = model.path;
@@ -125,6 +121,14 @@ export function musicModelToDocOdm(model: Music): DocOdm {
   return docOdm as DocOdm;
 }
 
+export function musicEntityToDocOdm(entity: MusicEntity): DocOdm {
+  const docOdm: DocOdm = musicToDocOdm(entity);
+
+  docOdm._id = new mongoose.Types.ObjectId(entity.id);
+
+  return docOdm as DocOdm;
+}
+
 function modelTagsToDocOdmTags(
   tags: string[] | undefined,
 ): { tags?: string[];
@@ -141,7 +145,7 @@ onlyTags?: string[]; } {
   };
 }
 
-export function patchParamsToUpdateQuery(params: PatchOneParams): UpdateQuery<DocOdm> {
+export function patchParamsToUpdateQuery(params: PatchOneParams<Music>): UpdateQuery<DocOdm> {
   const { entity } = params;
   const docOdmTags = modelTagsToDocOdmTags(entity.tags);
   const updateQuery: UpdateQuery<DocOdm> = {

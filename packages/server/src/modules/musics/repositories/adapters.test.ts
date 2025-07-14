@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { A_AOT4 } from "#tests/main/db/fixtures/models/music";
-import { Music } from "../models";
-import { musicDocOdmToModel, musicModelToDocOdm } from "./adapters";
+import { MusicEntity } from "../models";
+import { musicDocOdmToEntity, musicEntityToDocOdm } from "./adapters";
 import { DocOdm } from "./odm";
 
 function removeUndefinedProps(obj: Record<string, any>) {
@@ -10,7 +10,7 @@ function removeUndefinedProps(obj: Record<string, any>) {
 
 describe("musicModelToDocOdm", () => {
   it("should convert Music model to DocOdm correctly", () => {
-    const music: Music = A_AOT4;
+    const music = A_AOT4;
     const expectedDocOdm: DocOdm = {
       _id: new mongoose.Types.ObjectId(music.id),
       hash: music.hash,
@@ -40,13 +40,13 @@ describe("musicModelToDocOdm", () => {
 
     removeUndefinedProps(expectedDocOdm);
 
-    const result = musicModelToDocOdm(music);
+    const result = musicEntityToDocOdm(music);
 
     expect(result).toEqual(expectedDocOdm);
   } );
 
   it("should handle undefined optional fields", () => {
-    const music: Music = {
+    const music: MusicEntity = {
       id: new mongoose.Types.ObjectId().toString(),
       hash: "hash123",
       title: "Test Title",
@@ -82,7 +82,7 @@ describe("musicModelToDocOdm", () => {
       size: music.size,
       weight: music.weight,
     };
-    const result = musicModelToDocOdm(music);
+    const result = musicEntityToDocOdm(music);
 
     expect(result).toEqual(expectedDocOdm);
   } );
@@ -116,7 +116,7 @@ describe("musicDocOdmToModel", () => {
       game: "Test Game",
       year: 2021,
     };
-    const expectedMusic: Music = {
+    const expectedMusic: MusicEntity = {
       id: docOdm._id.toString(),
       hash: docOdm.hash,
       title: docOdm.title,
@@ -141,7 +141,7 @@ describe("musicDocOdmToModel", () => {
       game: docOdm.game,
       year: docOdm.year,
     };
-    const result = musicDocOdmToModel(docOdm);
+    const result = musicDocOdmToEntity(docOdm);
 
     expect(result).toEqual(expectedMusic);
   } );
@@ -165,7 +165,7 @@ describe("musicDocOdmToModel", () => {
       size: 100,
       weight: 1,
     };
-    const expectedMusic: Music = {
+    const expectedMusic: MusicEntity = {
       id: docOdm._id.toString(),
       hash: docOdm.hash,
       title: docOdm.title,
@@ -183,7 +183,7 @@ describe("musicDocOdmToModel", () => {
       size: docOdm.size,
       weight: docOdm.weight,
     };
-    const result = musicDocOdmToModel(docOdm);
+    const result = musicDocOdmToEntity(docOdm);
 
     expect(result).toEqual(expectedMusic);
   } );
@@ -191,9 +191,9 @@ describe("musicDocOdmToModel", () => {
 
 describe("reversibility", () => {
   it("should be reversible: model->odm->model", () => {
-    const music: Music = A_AOT4;
-    const docOdm = musicModelToDocOdm(music);
-    const result = musicDocOdmToModel(docOdm);
+    const music: MusicEntity = A_AOT4;
+    const docOdm = musicEntityToDocOdm(music);
+    const result = musicDocOdmToEntity(docOdm);
 
     expect(result).toEqual(music);
   } );
@@ -219,8 +219,8 @@ describe("reversibility", () => {
       size: A_AOT4.size,
       weight: A_AOT4.weight,
     };
-    const music = musicDocOdmToModel(docOdm);
-    const result = musicModelToDocOdm(music);
+    const music = musicDocOdmToEntity(docOdm);
+    const result = musicEntityToDocOdm(music);
 
     expect(result).toEqual(docOdm);
   } );

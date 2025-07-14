@@ -1,3 +1,0 @@
-export {
-  ActionControllerMock,
-} from "./ActionControllerMock";

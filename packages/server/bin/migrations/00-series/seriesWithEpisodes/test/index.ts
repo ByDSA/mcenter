@@ -1,5 +1,5 @@
-import { throwErrorPopStack } from "#shared/utils/errors";
-import { assertIsInstanceOf } from "#shared/utils/validation";
+import { throwErrorPopStack } from "$shared/utils/errors";
+import { assertIsInstanceOf } from "$shared/utils/validation";
 import { Model } from "../models";
 
 export function expectSerieWithEpisodes(actual: Model, expected: Model) {

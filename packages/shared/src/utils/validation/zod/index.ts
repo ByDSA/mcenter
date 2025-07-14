@@ -1,10 +1,33 @@
-import { ZodType } from "zod";
+import z, { ZodType } from "zod";
 import { throwErrorPopStack } from "../../errors";
 
 export type AssertZodSettings = {
   msg?: string;
   useZodError?: boolean;
 };
+
+export class CustomValidationError extends Error {
+  static fromZodError(error: z.ZodError, model: unknown, msg?: string): CustomValidationError {
+    const plainErrors = error.issues.map((issue) => {
+      let ret = issue.message;
+
+      if (issue.path.length > 0)
+        ret = `at ${ issue.path.join(".") }: ${ ret}`;
+
+      return ret;
+    } );
+    const finalMsg = msg ?? plainErrors.join("\n");
+
+    return new CustomValidationError(model, finalMsg);
+  }
+
+  constructor(model: unknown, msg: string) {
+    const finalMsg = `${msg}\nValue: ${JSON.stringify(model, null, 2)}`;
+
+    super(finalMsg);
+    this.name = "CustomValidationError";
+  }
+}
 
 export function assertZod<T>(
   schema: ZodType<T>,
@@ -20,15 +43,7 @@ export function assertZod<T>(
   const result = schema.safeParse(model);
 
   if (!result.success) {
-    const plainErrors = result.error.issues.map((issue) => {
-      let ret = issue.message;
-
-      if (issue.path.length > 0)
-        ret = `at ${ issue.path.join(".") }: ${ ret}`;
-
-      return ret;
-    } );
-    const error = new Error(settings?.msg ?? `${plainErrors.join("\n")}\nValue: ${JSON.stringify(model, null, 2)}`);
+    const error = CustomValidationError.fromZodError(result.error, model, settings?.msg);
 
     throwErrorPopStack(error);
   }

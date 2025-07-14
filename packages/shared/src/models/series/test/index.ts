@@ -1,9 +1,13 @@
-import { Serie } from "../Serie";
+import { Serie, SerieEntity } from "../serie";
 
-export function expectSerie(serie1: Serie, serie2: Serie) {
-  if (serie1.id !== serie2.id)
-    throw new Error(`Serie id mismatch: ${serie1.id} !== ${serie2.id}`);
+export function expectSerie(actual: Serie, expeted: Serie) {
+  if (actual.name !== expeted.name)
+    throw new Error(`Serie name mismatch: ${actual.name} !== ${expeted.name}`);
+}
 
-  if (serie1.name !== serie2.name)
-    throw new Error(`Serie name mismatch: ${serie1.name} !== ${serie2.name}`);
+export function expectSerieEntity(actual: SerieEntity, expeted: SerieEntity) {
+  if (actual.id !== expeted.id)
+    throw new Error(`Serie id mismatch: ${actual.id} !== ${expeted.id}`);
+
+  expectSerie(actual, expeted);
 }

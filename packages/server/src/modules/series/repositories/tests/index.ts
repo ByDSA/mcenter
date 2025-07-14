@@ -1,12 +1,9 @@
-import { PublicMethodsOf } from "#shared/utils/types";
+import { createMockClass } from "#tests/jest/mocking";
 import { SerieRepository } from "../Repository";
 
-export class SerieRepositoryMock implements PublicMethodsOf<SerieRepository> {
-  getOneById = jest.fn();
+class SerieRepositoryMock extends createMockClass(SerieRepository) { }
 
-  getAll = jest.fn();
-
-  createOneAndGet = jest.fn();
-
-  updateOneByIdAndGet = jest.fn();
-}
+export const serieRepositoryMockProvider = {
+  provide: SerieRepository,
+  useClass: SerieRepositoryMock,
+};

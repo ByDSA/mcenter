@@ -1,10 +1,18 @@
-import { HistoryEntry } from "#modules/series/episodes/history/models";
-import { HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#modules/series/episodes/history/models/transport";
+import { z } from "zod";
+import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
+import { PATH_ROUTES } from "$shared/routing";
+import { HistoryEntry, HistoryEntryEntity, historyEntryEntitySchema } from "#modules/series/episodes/history/models";
+import { historyListRestDto } from "#modules/series/episodes/history/models/dto";
 import { EpisodeId } from "#modules/series/episodes/models";
 import { DateFormat } from "#modules/utils/dates";
 import { LatestHistoryEntries } from "#modules/history";
-import { backendUrls } from "../../requests";
+import { backendUrl } from "#modules/requests";
 
+type Data = HistoryEntryEntity[];
+
+type HistoryListGetManyEntriesBySuperIdRequest = {
+  body: z.infer<typeof historyListRestDto.getManyEntriesBySuperId.reqBodySchema>;
+};
 type Props<ID> = {
   resourceId: ID;
   date: HistoryEntry["date"];
@@ -20,7 +28,7 @@ type ReqBody = HistoryListGetManyEntriesBySuperIdRequest["body"];
 export function LastestComponent(
   { resourceId, date, dateFormat = DATE_FORMAT_DEFAULT }: Props<EpisodeId>,
 ) {
-  const URL = backendUrls.entries.crud.search;
+  const URL = backendUrl(PATH_ROUTES.episodes.history.entries.search.path);
   const body: ReqBody = {
     filter: {
       serieId: resourceId.serieId,
@@ -42,6 +50,6 @@ export function LastestComponent(
   } );
 }
 
-const validator = (data: Required<HistoryEntry>[]) => {
-  assertIsHistoryListGetManyEntriesBySearchResponse(data);
+const validator = (res: DataResponse<Data>) => {
+  assertIsManyDataResponse(res, historyEntryEntitySchema as any);
 };

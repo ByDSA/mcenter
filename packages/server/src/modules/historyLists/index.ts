@@ -1,8 +1,8 @@
 export {
   HistoryListEntryRepository as HistoryEntryRepository,
-  DocOdm as HistoryListDocOdm, docOdmToModel as historyListDocOdmToModel,
+  DocOdm as HistoryListDocOdm, docOdmToEntity as historyListDocOdmToModel,
   ModelOdm as HistoryListModelOdm, HistoryListRepository,
-  modelToDocOdm as historyListToDocOdm,
+  entityToDocOdm as historyListToDocOdm,
 } from "./repositories";
 
 export {

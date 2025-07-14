@@ -1,14 +1,14 @@
 import { Consumer } from "./Consumer";
-import { Event } from "./Event";
+import { BrokerEvent } from "./Event";
 
-export class EventQueue {
+export class BrokerEventQueue {
   #consumers: Consumer<any>[];
 
   constructor() {
     this.#consumers = [];
   }
 
-  async publish(event: Event<any>): Promise<void> {
+  async publish(event: BrokerEvent<any>): Promise<void> {
     const promises: Promise<void>[] = [];
 
     this.#consumers.forEach(consumer => {

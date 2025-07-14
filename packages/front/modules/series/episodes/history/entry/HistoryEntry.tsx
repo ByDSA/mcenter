@@ -1,12 +1,20 @@
-import { HistoryEntry } from "#modules/series/episodes/history/models";
-import { HistoryEntryWithId, HistoryListGetManyEntriesBySuperIdRequest, assertIsHistoryListGetManyEntriesBySearchResponse } from "#modules/series/episodes/history/models/transport";
+import { z } from "zod";
+import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
+import { PATH_ROUTES } from "$shared/routing";
+import { HistoryEntry, historyEntryEntitySchema } from "#modules/series/episodes/history/models";
+import { HistoryEntryEntity } from "#modules/series/episodes/history/models";
+import { historyListRestDto } from "#modules/series/episodes/history/models/dto";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
-import { backendUrls } from "../requests";
+import { backendUrl } from "#modules/requests";
 import { Header } from "./Header";
 import { Body } from "./body/Body";
 
+type HistoryListGetManyEntriesBySuperIdRequest = {
+  body: z.infer<typeof historyListRestDto.getManyEntriesBySuperId.reqBodySchema>;
+};
+
 type Props = {
-  value: HistoryEntryWithId;
+  value: HistoryEntryEntity;
   onRemove?: (data: HistoryEntry)=> void;
 };
 export function HistoryEntryElement( { value }: Props) {
@@ -22,8 +30,8 @@ export function HistoryEntryElement( { value }: Props) {
 
 export function fetchLastestHistoryEntries(
   historyEntry: HistoryEntry,
-): Promise<HistoryEntryWithId[] | null> {
-  const URL = backendUrls.entries.crud.search;
+): Promise<HistoryEntryEntity[] | null> {
+  const URL = backendUrl(PATH_ROUTES.episodes.history.entries.search.path);
   const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
     filter: {
       serieId: historyEntry.episodeId.serieId,
@@ -43,9 +51,9 @@ export function fetchLastestHistoryEntries(
       "Content-Type": "application/json",
     },
   } ).then((response) => response.json())
-    .then((data: HistoryEntryWithId[]) => {
-      assertIsHistoryListGetManyEntriesBySearchResponse(data);
+    .then((res: DataResponse<HistoryEntryEntity[]>) => {
+      assertIsManyDataResponse(res, z.array(historyEntryEntitySchema));
 
-      return data;
+      return res.data;
     } );
 }

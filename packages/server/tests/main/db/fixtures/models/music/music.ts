@@ -1,9 +1,9 @@
-import { Music, MusicVO } from "#shared/models/musics";
-import { deepFreeze } from "#shared/utils/objects";
 import mongoose from "mongoose";
+import { Music, MusicEntity } from "$shared/models/musics";
+import { deepFreeze } from "$shared/utils/objects";
 import { DATEJS_SAMPLE1 } from "../dates";
 
-export const A_AOT4_VO: MusicVO = {
+export const A_AOT4_VO: Music = {
   artist: "undefined",
   title: "undefined",
   url: "a_aot4",
@@ -22,23 +22,23 @@ export const A_AOT4_VO: MusicVO = {
   weight: 50,
 };
 
-export const A_AOT4: Music = {
+export const A_AOT4: MusicEntity = {
   id: new mongoose.Types.ObjectId().toString(),
   ...A_AOT4_VO,
 };
 
-export const AOT4_COPY_VO: MusicVO = {
+export const AOT4_COPY_VO: Music = {
   ...A_AOT4_VO,
   url: "aot4_copy",
   path: "aot4_copy.mp3",
 };
 
-export const AOT4_COPY: Music = {
+export const AOT4_COPY: MusicEntity = {
   id: new mongoose.Types.ObjectId().toString(),
   ...AOT4_COPY_VO,
 };
 
-export const DK_VO: MusicVO = {
+export const DK_VO: Music = {
   ...A_AOT4_VO,
   weight: 0,
   url: "dk",
@@ -46,12 +46,12 @@ export const DK_VO: MusicVO = {
   hash: "53cc4a37a3daa3ff0e283deac3d2f9b2",
 };
 
-export const DK: Music = {
+export const DK: MusicEntity = {
   ...DK_VO,
   id: new mongoose.Types.ObjectId().toString(),
 };
 
-export const DRIFTVEIL_VO: MusicVO = {
+export const DRIFTVEIL_VO: Music = {
   ...A_AOT4_VO,
   url: "driftveil",
   path: "Driftveil.mp3",
@@ -59,19 +59,19 @@ export const DRIFTVEIL_VO: MusicVO = {
   weight: -5,
 };
 
-export const DRIFTVEIL: Music = {
+export const DRIFTVEIL: MusicEntity = {
   id: new mongoose.Types.ObjectId().toString(),
   ...DRIFTVEIL_VO,
 };
 
-export const MUSIC_FILE_SAMPLES: Music[] = deepFreeze([
+export const MUSIC_FILE_SAMPLES: MusicEntity[] = deepFreeze([
   A_AOT4,
   AOT4_COPY,
   DK,
   DRIFTVEIL,
 ]);
 
-export const MUSIC_FILE_VO_SAMPLES: MusicVO[] = deepFreeze([
+export const MUSIC_FILE_VO_SAMPLES: Music[] = deepFreeze([
   A_AOT4_VO,
   AOT4_COPY_VO,
   DK_VO,

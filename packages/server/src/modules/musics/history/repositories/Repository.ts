@@ -1,40 +1,27 @@
-import { showError } from "#shared/utils/errors/showError";
-import { isDefined } from "#shared/utils/validation";
 import { FilterQuery } from "mongoose";
-import { delay } from "tsyringe";
-import { assertFound } from "#shared/utils/http";
+import { Injectable } from "@nestjs/common";
+import { isDefined } from "$shared/utils/validation";
+import { showError } from "$shared/utils/errors/showError";
+import { musicHistoryEntryRestDto } from "$shared/models/musics/history/dto/transport";
+import { z } from "zod";
+import { assertFound } from "$shared/utils/http";
 import { CanCreateOne, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { MusicHistoryEntry } from "#musics/history/models";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { Event } from "#utils/message-broker";
+import { BrokerEvent } from "#utils/message-broker";
 import { QUEUE_NAME } from "../events";
 import { MusicRepository } from "../../repositories/Repository";
-import { Entry } from "../models/transport";
 import { DocOdm, ModelOdm } from "./odm";
 import { docOdmToModel, modelToDocOdm } from "./adapters";
 
-export type GetManyCriteria = {
-  limit?: number;
-  expand?: ("musics")[];
-  sort?: ("asc" | "desc");
-  filter?: {
-    resourceId?: string;
-    timestampMax?: number;
-  };
-  offset?: number;
-};
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-  musicRepository: delay(()=>MusicRepository),
-};
+export type GetManyCriteria = z.infer<
+  typeof musicHistoryEntryRestDto.getManyEntriesByCriteria.reqBodySchema
+>;
+type EntryId = Required<MusicHistoryEntry["id"]>;
 
-type EntryId = Required<Entry["id"]>;
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class MusicHistoryRepository
 implements
 CanCreateOne<MusicHistoryEntry>,
@@ -42,18 +29,17 @@ CanGetManyCriteria<MusicHistoryEntry, GetManyCriteria>,
 CanGetAll<MusicHistoryEntry>,
 CanGetOneById<MusicHistoryEntry, EntryId>,
 CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
+  constructor(
+    private readonly domainMessageBroker: DomainMessageBroker,
+    private readonly musicRepository: MusicRepository,
+  ) {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
       logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
     } ).catch(showError);
 
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, async (_ev: Event<unknown>) => {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, async (_ev: BrokerEvent<unknown>) => {
       const event = _ev as ModelEvent<MusicHistoryEntry>;
 
       if (event.type !== EventType.DELETED)
@@ -64,7 +50,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
       const actualLastTimePlayed = await this.calcLastTimePlayedOf(deletedId) ?? 0;
 
       if (actualLastTimePlayed < deletedTimestamp) {
-        await this.#deps.musicRepository.patchOneById(deletedId, {
+        await this.musicRepository.patchOneById(deletedId, {
           entity: {
             lastTimePlayed: actualLastTimePlayed,
           },
@@ -83,7 +69,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
       entity: ret,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
 
     return ret;
   }
@@ -122,9 +108,9 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
 
     const query = ModelOdm.find(findParams);
 
-    if (criteria.sort) {
+    if (criteria.sort?.timestamp) {
       query.sort( {
-        "date.timestamp": criteria.sort?.[0] === "asc" ? 1 : -1,
+        "date.timestamp": criteria.sort.timestamp?.[0] === "asc" ? 1 : -1,
       } );
     }
 
@@ -144,7 +130,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     if (criteria.expand?.includes("musics")) {
       const promises = models.map(async (model) => {
         const { resourceId } = model;
-        const resource = await this.#deps.musicRepository.getOneById(resourceId);
+        const resource = await this.musicRepository.getOneById(resourceId);
 
         if (resource)
 
@@ -205,6 +191,6 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
       entity: model,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 }

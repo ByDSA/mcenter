@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { Music, assertIsMusic } from "#shared/models/musics";
+import { Music, assertIsMusic } from "$shared/models/musics";
 import { DocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Music {

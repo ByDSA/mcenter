@@ -1,9 +1,9 @@
 import { LastTimeWeightFilterFx, LastTimeWeightFixer, LimiterSafeIntegerPerItems, WeightFixerApplier } from "#modules/picker";
 import { SECONDS_IN_HOUR, SECONDS_IN_MONTH, SECONDS_IN_WEEK } from "#modules/resources";
-import { Pickable, ResourceVO } from "#modules/resources/models";
-import { Music } from "#musics/models";
+import { Pickable, Resource } from "#modules/resources/models";
+import { MusicEntity } from "#musics/models";
 
-export class MusicWeightFixerApplier<R extends ResourceVO = ResourceVO>
+export class MusicWeightFixerApplier<R extends Resource = Resource>
   extends WeightFixerApplier<R> {
   constructor() {
     super();
@@ -46,5 +46,5 @@ function timeFactorFx(secondsFromLastTime: number): number {
 }
 
 export function genWeightFixerApplier() {
-  return new MusicWeightFixerApplier<Music>();
+  return new MusicWeightFixerApplier<MusicEntity>();
 }

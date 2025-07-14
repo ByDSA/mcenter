@@ -1,5 +1,5 @@
 import { SECONDS_IN_DAY } from "#modules/resources";
-import { ResourceVO } from "#modules/resources/models";
+import { Resource } from "#modules/resources/models";
 import { genLastTimePlayedAgo, genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { useFakeTime } from "#tests/time";
@@ -8,40 +8,40 @@ import { secondsElapsedFrom } from "../../utils";
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
-const fx: Fx<ResourceVO> = (r: ResourceVO, x: number) => {
+const fx: Fx<Resource> = (r: Resource, x: number) => {
   if (r.lastTimePlayed === undefined)
     return Infinity;
 
   return x;
 };
-const fxDays: Fx<ResourceVO> = (_: ResourceVO, x: number) => Math.round(x / SECONDS_IN_DAY);
+const fxDays: Fx<Resource> = (_: Resource, x: number) => Math.round(x / SECONDS_IN_DAY);
 
 type Case = {
-  resource: ResourceVO;
-  resources: readonly ResourceVO[];
-  fx: Fx<ResourceVO>;
+  resource: Resource;
+  resources: readonly Resource[];
+  fx: Fx<Resource>;
   initialWeight: number;
   expectedWeight: number;
 };
 
-const RESOURCE_NEVER: ResourceVO = {
+const RESOURCE_NEVER: Resource = {
   ...EPISODES_SIMPSONS[0],
 };
 
 delete RESOURCE_NEVER.lastTimePlayed;
-const RESOURCE_THREE_DAYS_AGO: ResourceVO = {
+const RESOURCE_THREE_DAYS_AGO: Resource = {
   ...RESOURCE_NEVER,
   lastTimePlayed: genLastTimePlayedDaysAgo(3),
 };
-const RESOURCE_TWO_SECONDS_AGO: ResourceVO = {
+const RESOURCE_TWO_SECONDS_AGO: Resource = {
   ...RESOURCE_NEVER,
   lastTimePlayed: genLastTimePlayedAgo(2),
 };
-const RESOURCE_RIGHT_NOW: ResourceVO = {
+const RESOURCE_RIGHT_NOW: Resource = {
   ...RESOURCE_NEVER,
   lastTimePlayed: genLastTimePlayedAgo(),
 };
-const RESOURCE_TWO_SECONDS_IN_THE_FUTURE: ResourceVO = {
+const RESOURCE_TWO_SECONDS_IN_THE_FUTURE: Resource = {
   ...RESOURCE_NEVER,
   lastTimePlayed: genLastTimePlayedAgo(-2),
 };

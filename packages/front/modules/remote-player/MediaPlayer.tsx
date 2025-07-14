@@ -2,9 +2,9 @@ import { FastRewind, Pause, SkipNext, SkipPrevious, Stop } from "@mui/icons-mate
 import FastForwardIcon from "@mui/icons-material/FastForward";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useState } from "react";
-import { showError } from "#shared/utils/errors/showError";
 import { PlayerActions } from "#modules/remote-player/models";
 import styles from "./MediaPlayer.module.css";
+import { showError } from "$shared/utils/errors/showError";
 
 enum TimeMode {
   FORWARD,

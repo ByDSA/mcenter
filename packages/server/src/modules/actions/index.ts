@@ -1,3 +1,3 @@
 export {
   ActionController,
-} from "./ActionController";
+} from "./main.controller";

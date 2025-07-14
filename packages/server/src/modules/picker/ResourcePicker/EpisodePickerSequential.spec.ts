@@ -1,4 +1,4 @@
-import { Episode, compareEpisodeId } from "#episodes/models";
+import { Episode, EpisodeEntity, compareEpisodeId } from "#episodes/models";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures/models/episode";
 import { ResourcePickerSequential } from "./ResourcePickerSequential";
 
@@ -22,7 +22,7 @@ it("should pick 1x02 when lastEp is 1x01", async () => {
 
 it("should pick 1x01 (first one) when lastEp is undfined", async () => {
   const episodes = EPISODES_SIMPSONS;
-  const lastEp: Episode | undefined = undefined as Episode | undefined;
+  const lastEp: EpisodeEntity | undefined = undefined as EpisodeEntity | undefined;
   const expected = EPISODES_SIMPSONS[0];
   const seq = new ResourcePickerSequential( {
     resources: episodes,

@@ -1,9 +1,10 @@
-import { deepFreeze } from "#shared/utils/objects";
-import { HistoryEntry, HistoryList } from "#modules/historyLists/models";
-import { Stream, StreamMode, StreamOriginType } from "#modules/streams";
+import type { Stream } from "#modules/streams";
+import type { HistoryEntry, HistoryListEntity } from "#modules/historyLists/models";
+import { deepFreeze } from "$shared/utils/objects";
+import { StreamMode, StreamOriginType } from "#modules/streams";
 import { SAMPLE1 as DATE_SAMPLE1 } from "./dates";
 
-export const HISTORY_LIST_WITH_NO_ENTRIES: HistoryList = deepFreeze( {
+export const HISTORY_LIST_WITH_NO_ENTRIES: HistoryListEntity = deepFreeze( {
   id: "id",
   maxSize: 10,
   entries: [],
@@ -29,10 +30,10 @@ export const STREAM_SIMPSONS: Stream = deepFreeze( {
   mode: StreamMode.RANDOM,
 } as Stream);
 
-export const HISTORY_LIST_SIMPSONS: HistoryList = deepFreeze( {
+export const HISTORY_LIST_SIMPSONS: HistoryListEntity = deepFreeze( {
   id: "simpsons",
   maxSize: 99999,
   entries: [
     HISTORY_ENTRY_SIMPSONS1,
   ],
-} as HistoryList);
+} as HistoryListEntity);

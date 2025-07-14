@@ -1,5 +1,6 @@
 import { Fragment } from "react";
-import { HistoryEntryWithId } from "#modules/series/episodes/history/models";
+import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
+import { HistoryEntryEntity, historyEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { FetchingRender } from "#modules/fetching";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { useRequest } from "./requests";
@@ -9,31 +10,36 @@ import "#styles/resources/history-entry.css";
 import "#styles/resources/history-episodes.css";
 import "#styles/resources/serie.css";
 
+type Data = Required<HistoryEntryEntity>[];
 export function HistoryList() {
-  return FetchingRender<Required<HistoryEntryWithId>[]>( {
+  return FetchingRender<DataResponse<Data>>( {
     useRequest,
-    render: (data) => (
-      <span className="history-list">
-        {
-          data && data.map((entry: HistoryEntryWithId, i: number) => {
-            let dayTitle;
+    render: (res) => {
+      assertIsManyDataResponse(res, historyEntryEntitySchema);
 
-            if (i === 0 || !isSameday(data[i - 1].date.timestamp, entry.date.timestamp)) {
-              dayTitle = <h2 key={getDateStr(new Date(entry.date.timestamp * 1000))}>{
-                getDateStr(new Date(entry.date.timestamp * 1000))
-              }</h2>;
-            }
+      return (
+        <span className="history-list">
+          {
+            res && res.data.map((entry: HistoryEntryEntity, i: number) => {
+              let dayTitle;
 
-            return <Fragment key={`${entry.episodeId.serieId} ${entry.episodeId.innerId}`}>
-              {dayTitle}
-              <HistoryEntryElement value={entry} onRemove={() => {
+              if (i === 0 || !isSameday(res.data[i - 1].date.timestamp, entry.date.timestamp)) {
+                dayTitle = <h2 key={getDateStr(new Date(entry.date.timestamp * 1000))}>{
+                  getDateStr(new Date(entry.date.timestamp * 1000))
+                }</h2>;
+              }
+
+              return <Fragment key={`${entry.episodeId.serieId} ${entry.episodeId.innerId}`}>
+                {dayTitle}
+                <HistoryEntryElement value={entry} onRemove={() => {
                 // TODO: refresh fetch
-              }}/>
-            </Fragment>;
-          } )
-        }
-      </span>
-    ),
+                }}/>
+              </Fragment>;
+            } )
+          }
+        </span>
+      );
+    },
   } );
 }
 

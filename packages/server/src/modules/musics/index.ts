@@ -6,9 +6,5 @@ export {
 } from "./repositories";
 
 export {
-  MusicController,
-} from "./controllers";
-
-export {
   MusicHistoryRepository,
 } from "./history";

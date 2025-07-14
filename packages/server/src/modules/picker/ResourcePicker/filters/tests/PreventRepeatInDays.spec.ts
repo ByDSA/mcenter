@@ -1,5 +1,5 @@
 import { SECONDS_IN_DAY } from "#modules/resources";
-import { ResourceVO } from "#modules/resources/models";
+import { Resource } from "#modules/resources/models";
 import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { useFakeTime } from "#tests/time";
@@ -7,7 +7,7 @@ import { PreventRepeatInDaysFilter } from "../PreventRepeatInDaysFilter";
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
-const EP_BASE: ResourceVO = {
+const EP_BASE: Resource = {
   ...EPISODES_SIMPSONS[0],
 };
 

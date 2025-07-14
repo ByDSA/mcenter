@@ -1,34 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { rootBackendUrl } from "#modules/requests";
+import { PATH_ROUTES } from "$shared/routing";
+import { backendUrl } from "#modules/requests";
 import styles from "./Page.module.css";
 
-const ACTIONS_URL = `${rootBackendUrl}/api/actions`;
-
 type Action = {
-  url: string;
+  path: string;
   name?: string;
 };
 const ACTIONS: Action[] = [
   {
-    url: "episodes/updateLastTimePlayed",
+    path: PATH_ROUTES.actions.episodes.updateLastTimePlayed.path,
     name: "Episodes: updateLastTimePlayed",
   },
   {
-    url: "episodes/file-info/update/saved",
+    path: PATH_ROUTES.actions.episodes.fileInfoUpdateSaved.path,
     name: "Episodes: update file-info saved",
   },
   {
-    url: "episodes/add-new-files",
+    path: PATH_ROUTES.actions.episodes.addNewFiles.path,
     name: "Episodes: add new files",
   },
   {
-    url: "fixer",
+    path: PATH_ROUTES.actions.episodes.fixer.path,
     name: "Fixer: streams-series",
   },
   {
-    url: "log",
+    path: PATH_ROUTES.actions.episodes.log.path,
     name: "Log",
   },
 ];
@@ -41,11 +40,11 @@ export default function Page() {
       <h1>Actions</h1>
 
       <ul>
-        {ACTIONS.map(( { url, name }: Action) => (
-          <li key={url}><a onClick={()=>callAction( {
+        {ACTIONS.map(( { path, name }: Action) => (
+          <li key={path}><a onClick={()=>callAction( {
             useText,
-            url,
-          } )}>{name ?? url}</a></li>
+            path: path,
+          } )}>{name ?? path}</a></li>
         ))}
       </ul>
 
@@ -57,10 +56,10 @@ export default function Page() {
 
 type ActionParams = {
   useText: (text: string)=> void;
-  url: string;
+  path: string;
 };
-async function callAction( { useText, url }: ActionParams) {
-  const fullUrl = `${ACTIONS_URL}/${url}`;
+async function callAction( { useText, path }: ActionParams) {
+  const fullUrl = backendUrl(path);
 
   useText(`Loading: ${ fullUrl } ...`);
   const response = await fetch(fullUrl);

@@ -1,7 +1,7 @@
-import { Consumer, EventQueue, MessageBroker } from "#utils/message-broker";
+import { Consumer, BrokerEventQueue, MessageBroker } from "#utils/message-broker";
 
 export class Broker<P = any> implements MessageBroker<P> {
-  #queues: Map<string, EventQueue>;
+  #queues: Map<string, BrokerEventQueue>;
 
   constructor() {
     this.#queues = new Map();
@@ -20,7 +20,7 @@ export class Broker<P = any> implements MessageBroker<P> {
     let queue = this.#queues.get(queueKey);
 
     if (!queue) {
-      queue = new EventQueue();
+      queue = new BrokerEventQueue();
       this.#queues.set(queueKey, queue);
     }
 

@@ -1,5 +1,5 @@
-import { Music } from "#shared/models/musics";
-import { deepFreeze } from "#shared/utils/objects";
+import { MusicEntity } from "$shared/models/musics";
+import { deepFreeze } from "$shared/utils/objects";
 import { A_AOT4, DK, DRIFTVEIL } from "./music";
 
 const musicWithTag1 = {
@@ -15,7 +15,7 @@ const musicWithTag1And3 = {
   tags: ["t1", "t3"],
 };
 
-export const MUSICS_WITH_TAGS_SAMPLES: Music[] = deepFreeze([
+export const MUSICS_WITH_TAGS_SAMPLES: MusicEntity[] = deepFreeze([
   musicWithTag1,
   musicWithTag2Only,
   musicWithTag1And3,

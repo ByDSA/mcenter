@@ -1,8 +1,8 @@
 import assert from "node:assert";
-import { FileNotFoundError } from "#shared/utils/fs/errors";
-import { readIfExistsSync } from "#shared/utils/fs/operations";
-import { assertIsDefined } from "#shared/utils/validation";
 import { ConfigOptions, NetConfig, SSLMode, TextFile } from "./common";
+import { FileNotFoundError } from "$shared/utils/fs/errors";
+import { readIfExistsSync } from "$shared/utils/fs/operations";
+import { assertIsDefined } from "$shared/utils/validation";
 
 function initializeSSL(mode: SSLMode): NetConfig["ssl"] {
   if (mode === SSLMode.DISABLED) {

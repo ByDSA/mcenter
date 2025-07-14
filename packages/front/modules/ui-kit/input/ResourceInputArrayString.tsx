@@ -1,6 +1,6 @@
-import { isDefined } from "#shared/utils/validation";
 import { InputTextProps, useInputText } from "./InputText";
 import { ResourceInputProps } from "./ResourceInput";
+import { isDefined } from "$shared/utils/validation";
 
 export function ResourceInputArrayString<R extends object>(
   { resourceState, prop, inputTextProps }: ResourceInputProps<R>,

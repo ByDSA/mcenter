@@ -1,11 +1,11 @@
 export {
   DocOdm as EpisodeDocOdm,
-  docOdmToModel as episodeDocOdmToModel,
+  docOdmToEntity as episodeDocOdmToModel,
   ModelOdm as EpisodeModelOdm,
   EpisodeRepository,
   EpisodeRepositoryExpandEnum,
   SchemaOdm as EpisodeSchemaOdm,
-  modelToDocOdm as episodeToDocOdm,
+  entityToDocOdm as episodeToDocOdm,
 } from "./repositories";
 
 export {

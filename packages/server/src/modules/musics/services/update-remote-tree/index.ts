@@ -1,43 +1,44 @@
 import { statSync } from "node:fs";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { Injectable } from "@nestjs/common";
+import z from "zod";
 import { md5FileAsync } from "#utils/crypt";
-import { MusicVO } from "#musics/models";
+import { MusicEntity, musicEntitySchema } from "#musics/models";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
 import { MusicRepository } from "../../repositories";
 import { getFullPath } from "../../utils";
 import { ChangesDetector, FileWithStats } from "./ChangesDetector";
 
-export type UpdateResult = {
-  new: MusicVO[];
-  deleted: MusicVO[];
-  moved: {original: MusicVO;
-newPath: string;}[];
-  updated: {old: MusicVO;
-new: MusicVO;}[];
-};
+export const updateResultSchema = z.object( {
+  new: z.array(musicEntitySchema),
+  deleted: z.array(musicEntitySchema),
+  moved: z.array(z.object( {
+    original: musicEntitySchema,
+    newPath: z.string(),
+  } )),
+  updated: z.array(z.object( {
+    old: musicEntitySchema,
+    new: musicEntitySchema,
+  } )),
+} );
 
-const DEPS_MAP = {
-  musicRepository: MusicRepository,
-};
+export type UpdateResult = z.infer<typeof updateResultSchema>;
 
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class UpdateRemoteTreeService {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+  constructor(
+    private readonly musicRepository: MusicRepository,
+  ) {
   }
 
   async update() {
-    const remoteMusic = await this.#deps.musicRepository.findAll();
+    const remoteMusic = await this.musicRepository.findAll();
     const changes = await detectChangesFromLocalFiles(remoteMusic);
     const promises = [];
     const created: UpdateResult["new"] = [];
     const updated: UpdateResult["updated"] = [];
 
     for (const localFileMusic of changes.new) {
-      const p = this.#deps.musicRepository.createOneFromPath(localFileMusic.path)
+      const p = this.musicRepository.createOneFromPath(localFileMusic.path)
         .then((music) => {
           created.push(music);
         } )
@@ -51,7 +52,7 @@ export class UpdateRemoteTreeService {
     }
 
     for (const deletedMusic of changes.deleted) {
-      const p = this.#deps.musicRepository.deleteOneByPath(deletedMusic.path)
+      const p = this.musicRepository.deleteOneByPath(deletedMusic.path)
         .catch((err) => {
           console.error(err.message, deletedMusic);
 
@@ -66,7 +67,7 @@ export class UpdateRemoteTreeService {
         ...original,
         path: newPath,
       };
-      const p = this.#deps.musicRepository.updateOneByPath(original.path, newMusic)
+      const p = this.musicRepository.updateOneByPath(original.path, newMusic)
         .catch((err) => {
           console.error(err.message, original, newMusic);
 
@@ -78,7 +79,7 @@ export class UpdateRemoteTreeService {
 
     for (const oldMusic of changes.updated) {
       const newMusic = await toUpdatedFileInfo(oldMusic);
-      const p = this.#deps.musicRepository.updateOneByPath(oldMusic.path, newMusic)
+      const p = this.musicRepository.updateOneByPath(oldMusic.path, newMusic)
         .catch((err: Error) => {
           console.error(err.message, newMusic);
 
@@ -105,7 +106,7 @@ export class UpdateRemoteTreeService {
     return ret;
   }
 }
-async function detectChangesFromLocalFiles(remoteMusics: MusicVO[]) {
+async function detectChangesFromLocalFiles(remoteMusics: MusicEntity[]) {
   const files = await findAllPathsOfValidMusicFiles();
   const filesWithMeta: FileWithStats[] = files.map((relativePath) => ( {
     path: relativePath,
@@ -116,10 +117,10 @@ async function detectChangesFromLocalFiles(remoteMusics: MusicVO[]) {
   return changesDetector.detectChanges();
 }
 
-async function toUpdatedFileInfo(music: MusicVO) {
+async function toUpdatedFileInfo(music: MusicEntity) {
   const fullPath = getFullPath(music.path);
   const { size } = statSync(fullPath);
-  const newMusic: MusicVO = {
+  const newMusic: MusicEntity = {
     ...music,
     size,
     timestamps: music.timestamps,

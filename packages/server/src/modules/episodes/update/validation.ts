@@ -1,15 +1,9 @@
-import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
+import z from "zod";
 
 const updateEpisodesFileRequestSchema = z.object( {
-  query: z.object( {
-    forceHash: z.enum(["0", "1", "true", "false"]).optional(),
-  } ),
+  forceHash: z.enum(["0", "1", "true", "false"]).optional(),
 } );
 
-export type UpdateEpisodesFileRequest = z.infer<typeof updateEpisodesFileRequestSchema>;
-
-export function assertIsUpdateEpisodesFileRequest(
-  o: unknown,
-): asserts o is UpdateEpisodesFileRequest {
-  updateEpisodesFileRequestSchema.parse(o);
-}
+export class UpdateEpisodesFileReqQueryDto
+  extends createZodDto(updateEpisodesFileRequestSchema) {}

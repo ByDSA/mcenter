@@ -1,3 +1,3 @@
 export {
   StreamsRestController,
-} from "./RestController";
+} from "./rest.controller";

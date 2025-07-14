@@ -1,5 +1,5 @@
-import { deepFreeze } from "#shared/utils/objects";
-import { Music } from "#musics/models";
+import { deepFreeze } from "$shared/utils/objects";
+import { MusicEntity } from "$sharedSrc/models/musics/music";
 
 const DATE = new Date();
 const AOT4_COMMON = {
@@ -17,7 +17,7 @@ const AOT4_COMMON = {
   },
 };
 
-export const MUSICS_SAMPLES_IN_DISK: Music[] = deepFreeze([
+export const MUSICS_SAMPLES_IN_DISK: MusicEntity[] = deepFreeze([
   {
     id: "1",
     path: "aot4_copy.mp3",

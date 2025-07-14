@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { assertZodPopStack } from "#shared/utils/validation/zod";
-import { z } from "zod";
+import { assertZodPopStack } from "$shared/utils/validation/zod";
+import z from "zod";
 
 // Dependencies
 const LocalFileSchema = z.object( {

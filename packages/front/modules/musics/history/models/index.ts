@@ -1,5 +1,1 @@
-export {
-  type Entry,
-  assertIsMusicHistoryEntry as assertIsEntry,
-  createMusicHistoryEntryById as createEntryById,
-} from "#shared/models/musics/history";
+export * from "$shared/models/musics/history";

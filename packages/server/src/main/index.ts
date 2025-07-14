@@ -1,5 +1,3 @@
-export {
-  ExpressApp,
-} from "./ExpressApp";
-
 export * from "./db";
+
+export * from "./app.module";

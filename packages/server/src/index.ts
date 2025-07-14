@@ -1,70 +1,51 @@
 import "reflect-metadata";
 
-import { container } from "tsyringe";
-import { EpisodeAddNewFilesController, EpisodeRepository, EpisodeRestController, SavedSerieTreeService } from "#episodes/index";
-import { ActionController } from "#modules/actions";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { EpisodePickerController, EpisodePickerService } from "#modules/episode-picker";
-import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
-import { HistoryEntryRepository, HistoryListRepository, HistoryListRestController, HistoryListService } from "#modules/historyLists";
-import { PlaySerieController, PlayStreamController, RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/play";
-import { SerieRepository } from "#modules/series";
-import { StreamRestController } from "#modules/streams";
-import { MusicController, MusicHistoryRepository, MusicRepository } from "#musics/index";
-import { ExpressApp, RealMongoDatabase } from "./main";
+import { execSync } from "node:child_process";
+import { NestFactory } from "@nestjs/core";
+import { NextFunction } from "express";
+import { AppModule } from "#main/app.module";
+import { addGlobalConfigToApp } from "#main/init.service";
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
-(async function main() {
-  container
-    .registerSingleton(DomainMessageBroker)
-    .registerSingleton(EpisodeFileInfoRepository)
-    .registerSingleton(EpisodeRepository)
-    .registerSingleton(EpisodePickerService)
+(async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
 
-    .registerSingleton(MusicRepository)
-    .registerSingleton(MusicHistoryRepository)
+  addGlobalConfigToApp(app);
 
-    .registerSingleton(SerieRepository)
-    .registerSingleton(SavedSerieTreeService)
+  const PORT: number = +(process.env.PORT ?? 8080);
 
-    .registerSingleton(HistoryEntryRepository)
-    .registerSingleton(HistoryListRepository)
-    .registerSingleton(HistoryListService)
+  killProcessesUsingPort(PORT);
 
-    .registerSingleton(VlcBackWebSocketsServerService)
-    .registerSingleton(RemotePlayerWebSocketsServerService)
+  const requestLogger = (
+    request: Request,
+    _: Response,
+    next: NextFunction,
+  ) => {
+    console.log(`[${request.method}] ${request.url}`);
+    next();
+  };
 
-    .registerSingleton(PlaySerieController)
-    .registerSingleton(EpisodeRestController)
-    .registerSingleton(MusicController)
-    .registerSingleton(StreamRestController)
-    .registerSingleton(StreamRestController)
-    .registerSingleton(EpisodeAddNewFilesController)
-    .registerSingleton(ActionController)
-    .registerSingleton(HistoryListService)
-    .registerSingleton(PlayStreamController)
-    .registerSingleton(EpisodePickerController)
-    .registerSingleton(HistoryListRestController);
+  app.use(requestLogger);
 
-  const app: ExpressApp = new ExpressApp( {
-    db: {
-      instance: new RealMongoDatabase(),
-    },
-    controllers: {
-      cors: true,
-    },
-  } );
-  const vlcBackWebSocketsServerService = container.resolve(VlcBackWebSocketsServerService);
-  const remotePlayerWebSocketsServerService = container
-    .resolve(RemotePlayerWebSocketsServerService);
+  await app.listen(PORT);
+} )().catch((error) => {
+  console.error("Error starting application:", error);
+  process.exit(1);
+} );
 
-  app.onHttpServerListen((server) => {
-    vlcBackWebSocketsServerService.startSocket(server);
-    remotePlayerWebSocketsServerService.startSocket(server);
-  } );
+function killProcessesUsingPort(port: number): void {
+  // Get all PIDs using the port in a single command
+  const currentPid = process.pid.toString();
+  const pids = execSync(`lsof -ti tcp:${port} || true`).toString()
+    .split("\n")
+    .filter(Boolean)
+    .filter(pid=>pid !== currentPid);
 
-  container.registerInstance(ExpressApp, app);
+  if (pids.length === 0)
+    return;
 
-  await app.init();
-  await app.listen();
-} )();
+  console.log("Current pid:", currentPid);
+  console.log("Killing processes using port", port + ":", pids);
+
+  // Kill all found PIDs
+  execSync(`kill -9 ${pids.join(" ")}`);
+}

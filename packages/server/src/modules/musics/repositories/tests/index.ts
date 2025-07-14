@@ -1,5 +1,5 @@
 export * from "./fixtures";
 
 export {
-  MusicRepositoryMock,
+  musicRepoMockProvider,
 } from "./music.mock";

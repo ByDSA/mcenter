@@ -1,6 +1,6 @@
 import { Episode, assertIsEpisode } from "#modules/episodes";
 import { SerieId } from "#modules/series";
-import { OnlyWithRequiredKeys, OptionalKeys } from "#shared/utils/objects";
+import { OnlyWithRequiredKeys, OptionalKeys } from "$shared/utils/objects";
 import { EpisodeInSerie, Model } from "../models";
 import { assertIsEpisodeInSerie, assertIsSerieWithEpisodes } from "../models/SerieWithEpisodes";
 import { EpisodeInSerieDocOdm, SerieWithEpisodesDocODM, assertIsEpisodeInSerieDocOdm, assertIsSerieWithEpisodesDocOdm } from "./odm";

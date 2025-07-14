@@ -1,6 +1,6 @@
 import { MongoSchema } from "#main/db/migrations/utils";
-import { assertZodPopStack } from "#shared/utils/validation/zod";
-import { z } from "zod";
+import { assertZodPopStack } from "$shared/utils/validation/zod";
+import z from "zod";
 import { EpisodeInSerieSchema } from "../models/SerieWithEpisodes";
 
 const EpisodeInSerieSchemaOdm = EpisodeInSerieSchema.merge(MongoSchema).strict();

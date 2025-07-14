@@ -1,9 +1,11 @@
+import { PatchOneParams } from "$shared/models/utils/schemas/patch";
+
 export interface CanUpdateOneById<T, ID> {
   updateOneById(id: ID, model: T): Promise<void>;
 }
 
 export interface CanUpdateOneBySuperId<T, ID> {
-  updateOneBySuperId(id: ID, model: T): Promise<void>;
+  updateOneByEpisodeDbId(id: ID, model: T): Promise<void>;
 }
 
 export interface CanUpdateOneByIdAndGet<T, ID> {
@@ -16,10 +18,10 @@ export interface CanUpdateMany<T> {
   updateMany(models: T[]): Promise<void>;
 }
 
-export interface CanPatchOneById<T, ID, PARTIAL = Partial<T>> {
-  patchOneById(id: ID, partialModel: PARTIAL): Promise<void>;
+export interface CanPatchOneById<T, ID, E = Partial<T>> {
+  patchOneById(id: ID, patchParams: PatchOneParams<E>): Promise<void>;
 }
 
-export interface CanPatchOneByIdAndGet<T, ID, PARTIAL = Partial<T>> {
-  patchOneByIdAndGet(id: ID, partialModel: PARTIAL): Promise<T | null>;
+export interface CanPatchOneByIdAndGet<T, ID, E = Partial<T>> {
+  patchOneByIdAndGet(id: ID, patchParams: PatchOneParams<E>): Promise<T | null>;
 }

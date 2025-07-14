@@ -1,57 +1,52 @@
-import { showError } from "#shared/utils/errors/showError";
+import { Injectable } from "@nestjs/common";
+import { showError } from "$shared/utils/errors/showError";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
-import { Event } from "#utils/message-broker";
-import { Serie, SerieId } from "../models";
+import { BrokerEvent } from "#utils/message-broker";
+import { SerieEntity, SerieId } from "../models";
 import { DocOdm, ModelOdm } from "./odm";
 import { QUEUE_NAME } from "./events";
-import { docOdmToModel } from "./adapters";
+import { docOdmToEntity } from "./adapters";
 
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class SerieRepository
-implements CanGetOneById<Serie, SerieId>,
-CanUpdateOneByIdAndGet<Serie, SerieId>,
-CanCreateOneAndGet<Serie>,
-CanGetAll<Serie> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: Event<any>) => {
+implements CanGetOneById<SerieEntity, SerieId>,
+CanUpdateOneByIdAndGet<SerieEntity, SerieId>,
+CanCreateOneAndGet<SerieEntity>,
+CanGetAll<SerieEntity> {
+  constructor(private domainMessageBroker: DomainMessageBroker) {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, (event: BrokerEvent<any>) => {
       logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
     } ).catch(showError);
   }
 
-  async getAll(): Promise<Serie[]> {
+  static providers = [
+    DomainMessageBroker,
+  ];
+
+  async getAll(): Promise<SerieEntity[]> {
     const seriesDocOdm = await ModelOdm.find();
 
-    return seriesDocOdm.map(docOdmToModel);
+    return seriesDocOdm.map(docOdmToEntity) as SerieEntity[];
   }
 
-  async createOneAndGet(model: Serie): Promise<Serie> {
+  async createOneAndGet(model: SerieEntity): Promise<SerieEntity> {
     const serieOdm: DocOdm = await ModelOdm.create(model);
-    const serie = docOdmToModel(serieOdm);
+    const serie = docOdmToEntity(serieOdm);
     const event = new ModelEvent(EventType.CREATED, {
       entity: serie,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
 
-    return serie;
+    return serie as SerieEntity;
   }
 
-  async getOneById(id: SerieId): Promise<Serie | null> {
+  async getOneById(id: SerieId): Promise<SerieEntity | null> {
     const [serieDb]: DocOdm[] = await ModelOdm.find( {
       id,
     }, {
@@ -61,10 +56,10 @@ CanGetAll<Serie> {
     if (!serieDb)
       return null;
 
-    return docOdmToModel(serieDb);
+    return docOdmToEntity(serieDb) as SerieEntity;
   }
 
-  async updateOneByIdAndGet(id: SerieId, serie: Serie): Promise<Serie | null> {
+  async updateOneByIdAndGet(id: SerieId, serie: SerieEntity): Promise<SerieEntity | null> {
     const docOdm = await ModelOdm.findOneAndUpdate( {
       id,
     }, serie, {
@@ -74,13 +69,13 @@ CanGetAll<Serie> {
     if (!docOdm)
       return null;
 
-    const ret = docOdmToModel(docOdm);
+    const ret = docOdmToEntity(docOdm);
     const event = new ModelEvent(EventType.UPDATED, {
       entity: ret,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
 
-    return ret;
+    return ret as SerieEntity;
   }
 }

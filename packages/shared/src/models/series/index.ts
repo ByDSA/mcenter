@@ -1,8 +1,4 @@
-export {
-  Serie,
-  SerieId,
-  serieSchema as SerieSchema, assertIsSerie,
-} from "./Serie";
+export * from "./serie";
 
 export {
   SERIES_QUEUE_NAME,

@@ -22,3 +22,11 @@ export function compareTimestampsModel(a: TimestampsModel, b: TimestampsModel): 
 
   return sameCreateaAt && sameUpdatedAt && sameAddedAt;
 }
+
+export const timestampsDtoSchema = z.object( {
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  addedAt: z.string().datetime(),
+} ).strict();
+
+export type TimestampsDto = z.infer<typeof timestampsDtoSchema>;

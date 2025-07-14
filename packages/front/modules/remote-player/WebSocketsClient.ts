@@ -1,11 +1,11 @@
 /* eslint-disable require-await */
-import { PlayerEvent, PlayerStatusResponse, assertIsPlayerStatusResponse } from "#shared/models/player";
-import { PlayResourceParams, PlayerActions } from "#shared/models/player/Player";
 import { Socket, io } from "socket.io-client";
-import { rootBackendUrl } from "#modules/requests";
+import { PlayerEvent, PlayerStatusResponse, assertIsPlayerStatusResponse } from "$shared/models/player";
+import { PlayResourceParams, PlayerActions } from "$shared/models/player/Player";
+import { backendUrl } from "#modules/requests";
 
-export const backendUrl = {
-  url: rootBackendUrl,
+export const socketUrl = {
+  url: backendUrl(""),
   path: "/ws/",
 };
 
@@ -13,11 +13,11 @@ export abstract class RemotePlayerWebSocketsClient implements PlayerActions {
   socket: Socket;
 
   init() {
-    const SOCKET_URL = backendUrl.url;
+    const SOCKET_URL = socketUrl.url;
 
     console.log("connecting to", SOCKET_URL);
     this.socket = io(SOCKET_URL, {
-      path: backendUrl.path,
+      path: socketUrl.path,
     } );
 
     this.socket.on(PlayerEvent.CONNECT, () => {

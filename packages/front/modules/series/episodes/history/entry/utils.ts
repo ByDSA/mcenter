@@ -1,7 +1,7 @@
-import { EpisodeVO, EpisodeVOSchema as VOSchema } from "#shared/models/episodes";
-import { PropInfo, zodSchemaToReadableFormat } from "#shared/utils/validation/zod";
+import { Episode, episodeSchema as schema } from "$shared/models/episodes";
+import { PropInfo, zodSchemaToReadableFormat } from "$shared/utils/validation/zod";
 
-export const EPISODE_PROPS = Object.entries(zodSchemaToReadableFormat<EpisodeVO>(VOSchema)).reduce(
+export const EPISODE_PROPS = Object.entries(zodSchemaToReadableFormat<Episode>(schema)).reduce(
   (acc, [k, v]) => {
     v.caption = (() => {
       switch (k) {
@@ -28,5 +28,5 @@ export const EPISODE_PROPS = Object.entries(zodSchemaToReadableFormat<EpisodeVO>
 
     return acc;
   },
- {} as Record<keyof EpisodeVO, PropInfo>,
+ {} as Record<keyof Episode, PropInfo>,
 );

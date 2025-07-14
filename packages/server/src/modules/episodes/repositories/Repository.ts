@@ -1,54 +1,56 @@
-import { showError } from "#shared/utils/errors/showError";
-import { deepMerge } from "#shared/utils/objects";
+import { Injectable } from "@nestjs/common";
+import { deepMerge } from "$shared/utils/objects";
+import { showError } from "$shared/utils/errors/showError";
+import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { FileInfoRepository as EpisodeFileInfoRepository } from "#modules/file-info";
+import { EpisodeFileInfoRepository } from "#modules/file-info";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#series/models";
-import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
+import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
-import { Event } from "#utils/message-broker";
-import { Episode, EpisodeId } from "../models";
+import { BrokerEvent } from "#utils/message-broker";
+import { Episode, EpisodeEntity, EpisodeId } from "../models";
 import { DocOdm, ModelOdm } from "./odm";
 import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
 import { EPISODE_QUEUE_NAME } from "./events";
-import { docOdmToModel, modelToDocOdm, partialModelToDocOdm } from "./adapters";
+import { docOdmToEntity, entityToDocOdm, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 
 type UpdateOneParams = Episode;
+
+export type EpisodeEvent = BrokerEvent<ModelMessage<EpisodeEntity>>;
 
 export type GetManyOptions = {
   sortById?: boolean;
 };
 
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-  episodeFileInfoRepository: EpisodeFileInfoRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
-export class EpisodeRepository
-implements CanGetOneById<Episode, EpisodeId>,
-CanUpdateOneByIdAndGet<Episode, EpisodeId>,
-CanPatchOneByIdAndGet<Episode, EpisodeId>,
-CanCreateManyAndGet<Episode>,
-CanGetAll<Episode> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, (event: Event<any>) => {
+@Injectable()
+export class EpisodesRepository
+implements CanGetOneById<EpisodeEntity, EpisodeId>,
+CanUpdateOneByIdAndGet<EpisodeEntity, EpisodeId>,
+CanPatchOneByIdAndGet<EpisodeEntity, EpisodeId>,
+CanCreateManyAndGet<EpisodeEntity>,
+CanGetAll<EpisodeEntity> {
+  constructor(
+    private domainMessageBroker: DomainMessageBroker,
+    private episodeFileInfoRepository: EpisodeFileInfoRepository,
+  ) {
+    this.domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, (event: EpisodeEvent) => {
       logDomainEvent(EPISODE_QUEUE_NAME, event);
 
       return Promise.resolve();
     } ).catch(showError);
   }
 
+  static providers = Object.freeze([
+    DomainMessageBroker,
+    EpisodeFileInfoRepository,
+    ...EpisodeFileInfoRepository.providers,
+  ]);
+
   async patchOneByPathAndGet(
     path: string,
     episode: Partial<UpdateOneParams>,
-  ): Promise<Episode | null> {
+  ): Promise<EpisodeEntity | null> {
     const partialDocOdm = partialModelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
       path,
@@ -67,22 +69,22 @@ CanGetAll<Episode> {
         value: newPath,
       } );
 
-      await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
     return ret;
   }
 
-  async getAll(): Promise<Episode[]> {
-    const episodesOdm = await ModelOdm.find();
+  async getAll(): Promise<EpisodeEntity[]> {
+    const episodesOdm: DocOdm[] = await ModelOdm.find();
 
     if (episodesOdm.length === 0)
       return [];
 
-    return episodesOdm.map(docOdmToModel);
+    return episodesOdm.map(docOdmToEntity) as EpisodeEntity[];
   }
 
-  async getAllBySerieId(serieId: SerieId): Promise<Episode[]> {
+  async getAllBySerieId(serieId: SerieId): Promise<EpisodeEntity[]> {
     const episodesOdm = await ModelOdm.find( {
       serieId,
     } );
@@ -90,10 +92,10 @@ CanGetAll<Episode> {
     if (episodesOdm.length === 0)
       return [];
 
-    return episodesOdm.map(docOdmToModel);
+    return episodesOdm.map(docOdmToEntity) as EpisodeEntity[];
   }
 
-  async getOneById(id: EpisodeId, opts?: GetOptions): Promise<Episode | null> {
+  async getOneById(id: EpisodeId, opts?: GetOptions): Promise<EpisodeEntity | null> {
     validateGetOptions(opts);
     const episodeOdm = await ModelOdm.findOne( {
       serieId: id.serieId,
@@ -103,11 +105,11 @@ CanGetAll<Episode> {
     if (!episodeOdm)
       return null;
 
-    const ret = docOdmToModel(episodeOdm);
+    const ret = docOdmToEntity(episodeOdm) as EpisodeEntity;
 
     if (opts?.expand?.includes(ExpandEnum.FileInfo)) {
       const _id = episodeOdm._id?.toString();
-      const fileInfo = await this.#deps.episodeFileInfoRepository.getAllBySuperId(_id);
+      const fileInfo = await this.episodeFileInfoRepository.getAllByEpisodeDbId(_id);
 
       if (!fileInfo)
         throw new Error("Episode has no file info");
@@ -118,7 +120,7 @@ CanGetAll<Episode> {
     return ret;
   }
 
-  async getOneByPath(path: string): Promise<Episode | null> {
+  async getOneByPath(path: string): Promise<EpisodeEntity | null> {
     const episodeOdm = await ModelOdm.findOne( {
       path,
     } );
@@ -126,10 +128,10 @@ CanGetAll<Episode> {
     if (!episodeOdm)
       return null;
 
-    return docOdmToModel(episodeOdm);
+    return docOdmToEntity(episodeOdm) as EpisodeEntity;
   }
 
-  async getManyBySerieId(serieId: string, options?: GetManyOptions): Promise<Episode[]> {
+  async getManyBySerieId(serieId: string, options?: GetManyOptions): Promise<EpisodeEntity[]> {
     const actualOptions = deepMerge( {
       sortById: true,
     }, options);
@@ -156,10 +158,13 @@ CanGetAll<Episode> {
     if (episodesOdm.length === 0)
       return [];
 
-    return episodesOdm.map(docOdmToModel);
+    return episodesOdm.map(docOdmToEntity) as EpisodeEntity[];
   }
 
-  async updateOneByIdAndGet(fullId: EpisodeId, episode: UpdateOneParams): Promise<Episode | null> {
+  async updateOneByIdAndGet(
+    fullId: EpisodeId,
+    episode: UpdateOneParams,
+  ): Promise<EpisodeEntity | null> {
     const docOdm: DocOdm = modelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
       episodeId: fullId.innerId,
@@ -173,16 +178,21 @@ CanGetAll<Episode> {
       entity: episode,
     } );
 
-    await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
 
     return this.getOneById(fullId);
   }
 
   async patchOneByIdAndGet(
     fullId: EpisodeId,
-    episode: Partial<UpdateOneParams>,
-  ): Promise<Episode | null> {
+    patchParams: PatchOneParams<Episode>,
+  ): Promise<EpisodeEntity | null> {
+    const episode = patchParams.entity;
     const partialDocOdm = partialModelToDocOdm(episode);
+
+    if (Object.keys(partialDocOdm).length === 0)
+      throw new Error("Empty partialDocOdm, nothing to patch");
+
     const updateResult = await ModelOdm.updateOne( {
       episodeId: fullId.innerId,
       serieId: fullId.serieId,
@@ -198,25 +208,25 @@ CanGetAll<Episode> {
         value,
       } );
 
-      await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
     return this.getOneById(fullId);
   }
 
-  async createManyAndGet(models: Episode[]): Promise<Episode[]> {
-    const docsOdm: DocOdm[] = models.map(modelToDocOdm);
+  async createManyAndGet(models: EpisodeEntity[]): Promise<EpisodeEntity[]> {
+    const docsOdm: DocOdm[] = models.map(entityToDocOdm);
     const inserted = await ModelOdm.insertMany(docsOdm);
-    const ret = inserted.map(docOdmToModel);
+    const ret = inserted.map(docOdmToEntity);
 
     for (const model of ret) {
       const event = new ModelEvent(EventType.CREATED, {
         entity: model,
       } );
 
-      await this.#deps.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
-    return ret;
+    return ret as EpisodeEntity[];
   }
 }

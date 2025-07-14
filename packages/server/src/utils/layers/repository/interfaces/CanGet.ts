@@ -15,7 +15,7 @@ export interface CanGetAll<T> {
 }
 
 export interface CanGetAllBySuperId<T, SID> {
-  getAllBySuperId(superId: SID): Promise<T[]>;
+  getAllByEpisodeDbId(superId: SID): Promise<T[]>;
 }
 
 export interface CanGetMany<T, PARTIAL=Partial<T>> {

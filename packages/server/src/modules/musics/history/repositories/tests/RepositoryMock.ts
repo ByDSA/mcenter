@@ -1,18 +1,10 @@
-import { PublicMethodsOf } from "#shared/utils/types";
+import { createMockClass } from "#tests/jest/mocking";
 import { MusicHistoryRepository } from "../Repository";
 
-export class MusicHistoryRepositoryMock implements PublicMethodsOf<MusicHistoryRepository> {
-  getManyCriteria = jest.fn();
-
-  getLast = jest.fn();
-
-  createOne = jest.fn();
-
-  getAll = jest.fn();
-
-  getOneById = jest.fn();
-
-  deleteOneByIdAndGet = jest.fn();
-
-  calcLastTimePlayedOf = jest.fn();
+class MusicHistoryRepositoryMock extends createMockClass(MusicHistoryRepository) {
 }
+
+export const musicHistoryRepoMockProvider = {
+  provide: MusicHistoryRepository,
+  useClass: MusicHistoryRepositoryMock,
+};

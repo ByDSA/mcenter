@@ -1,9 +1,9 @@
 export {
-  EventQueue,
+  BrokerEventQueue,
 } from "./EventQueue";
 
 export {
-  Event,
+  BrokerEvent,
 } from "./Event";
 
 export {

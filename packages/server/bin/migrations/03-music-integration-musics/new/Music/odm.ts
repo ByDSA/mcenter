@@ -1,4 +1,4 @@
-import { Music } from "#shared/models/musics";
+import { Music } from "$shared/models/musics";
 import mongoose from "mongoose";
 
 export interface DocOdm extends Music {

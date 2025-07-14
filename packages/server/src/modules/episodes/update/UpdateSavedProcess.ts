@@ -1,15 +1,21 @@
 import fs, { existsSync } from "node:fs";
-import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "#shared/utils/http";
-import { deepMerge } from "#shared/utils/objects";
-import { assertIsDefined } from "#shared/utils/validation";
 import ffmpeg from "fluent-ffmpeg";
-import { EpisodeId } from "#episodes/models";
-import { FileInfoRepository, SerieFolderTree } from "#modules/file-info";
+import { Injectable } from "@nestjs/common";
+import { assertIsDefined } from "$shared/utils/validation";
+import { ErrorElementResponse, FullResponse, errorToErrorElementResponse } from "$shared/utils/http";
+import { showError } from "$shared/utils/errors/showError";
+import { EpisodeEntity, EpisodeId } from "#episodes/models";
+import { EpisodeFile, EpisodeFileInfoRepository, SerieFolderTree } from "#modules/file-info";
 import { FileInfoVideo, FileInfoVideoWithSuperId, compareFileInfoVideo } from "#modules/file-info/models";
 import { md5FileAsync } from "#utils/crypt";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { SavedSerieTreeService } from "../saved-serie-tree-service";
+import { EPISODE_QUEUE_NAME } from "#episodes/repositories";
+import { EpisodeEvent } from "#episodes/repositories/Repository";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { EventType, PatchEvent } from "#utils/event-sourcing";
+import { BrokerEvent } from "#utils/message-broker";
+import { episodeToEpisodeFile } from "#episodes/saved-serie-tree-service/adapters";
 import { getIdModelOdmFromId } from "../repositories/odm";
+import { SavedSerieTreeService } from "../saved-serie-tree-service";
 
 type Model = FileInfoVideo;
 type ModelWithSuperId = FileInfoVideoWithSuperId;
@@ -21,30 +27,61 @@ type Options = {
   forceHash?: boolean;
 };
 
-const DEPS_MAP = {
-  savedSerieTreeService: SavedSerieTreeService,
-  episodeFileRepository: FileInfoRepository,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+@Injectable()
 export class UpdateMetadataProcess {
-  #deps: Deps;
+  constructor(
+    private readonly savedSerieTreeService: SavedSerieTreeService,
+    private readonly episodeFileRepository: EpisodeFileInfoRepository,
+     private readonly domainMessageBroker: DomainMessageBroker,
+  ) {
+    this.domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, async (event: BrokerEvent<any>) => {
+      if (event.type === EventType.CREATED) {
+        const ev = event as EpisodeEvent;
+        const episode = ev.payload.entity;
+        const episodeFile: EpisodeFile = episodeToEpisodeFile(episode);
 
-  #options!: Options;
+        await this.genEpisodeFileInfoAndUpdateOrCreate(
+          episode.id.serieId,
+          episodeFile,
+          {
+            forceHash: true,
+          },
+        );
+      } else if (event.type === EventType.PATCHED) {
+        const ev = event as PatchEvent<EpisodeEntity, EpisodeId>;
 
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
+        if (ev.payload.key === "path") {
+          const episodeFile: EpisodeFile = episodeToEpisodeFile( {
+            id: ev.payload.entityId,
+            path: ev.payload.value as string,
+          } );
+
+          await this.genEpisodeFileInfoAndUpdateOrCreate(
+            ev.payload.entityId.serieId,
+            episodeFile,
+            {
+              forceHash: false,
+            },
+          );
+        }
+      }
+
+      return Promise.resolve();
+    } ).catch(showError);
   }
 
-  async genEpisodeFileInfoFromFilePathOrFail(filePath: string): Promise<Model | null> {
+  async genEpisodeFileInfoFromEpisodeOrFail(
+    serieId: string,
+    episode: EpisodeFile,
+    options: Options,
+  ): Promise<ModelWithSuperId | null> {
+    const { filePath, episodeId } = episode.content;
     const MEDIA_FOLDER = process.env.MEDIA_FOLDER_PATH;
 
     assertIsDefined(MEDIA_FOLDER);
 
-    const currentEpisodeFile = await this.#deps.episodeFileRepository.getOneByPath(filePath);
-
-    return new Promise((resolve, reject) =>{
+    const currentEpisodeFile = await this.episodeFileRepository.getOneByPath(filePath);
+    const episodeFileInfo = await new Promise((resolve, reject) =>{
       const fullFilePath = `${MEDIA_FOLDER}/${filePath}`;
 
       if (existsSync(fullFilePath)) {
@@ -78,7 +115,7 @@ export class UpdateMetadataProcess {
               fps,
             },
           };
-          const mustUpdate = this.#options.forceHash
+          const mustUpdate = options.forceHash
            || !currentEpisodeFile
            || !compareModel(ret, currentEpisodeFile);
 
@@ -97,52 +134,60 @@ export class UpdateMetadataProcess {
       } else
         resolve(null);
     } );
+
+    if (episodeFileInfo === null)
+      return null;
+
+    const fullId: EpisodeId = {
+      serieId,
+      innerId: episodeId,
+    };
+    const episodeDbId = await getIdModelOdmFromId(fullId);
+
+    if (!episodeDbId)
+      throw new Error(`episode with id ${fullId.innerId} in ${fullId.serieId} not found`);
+
+    const episodeFileWithId = {
+      ...episodeFileInfo,
+      episodeId: episodeDbId.toString(),
+    } as ModelWithSuperId;
+
+    return episodeFileWithId;
+  }
+
+  async genEpisodeFileInfoAndUpdateOrCreate(
+    serieId: string,
+    episode: EpisodeFile,
+    options: Options,
+  ): Promise<ModelWithSuperId | null> {
+    const episodeFileWithId = await this.genEpisodeFileInfoFromEpisodeOrFail(
+      serieId,
+      episode,
+      options,
+    );
+
+    if (episodeFileWithId === null)
+      return null;
+
+    await this.episodeFileRepository
+      .updateOneByEpisodeDbId(episodeFileWithId.episodeId, episodeFileWithId);
+
+    return episodeFileWithId;
   }
 
   async process(options?: Options): Promise<FullResponse<Data>> {
-    this.#options = deepMerge( {
-      forceHash: false,
-    }, options);
-    const seriesTree: SerieFolderTree = await this.#deps.savedSerieTreeService.getSavedSeriesTree();
+    const seriesTree: SerieFolderTree = await this.savedSerieTreeService.getSavedSeriesTree();
 
     console.log("got paths");
     const fileInfos: ModelWithSuperId[] = [];
     const errors: ErrorElementResponse[] = [];
 
     for (const serie of seriesTree.children) {
-      const serieId = serie.id;
-
       for (const season of serie.children) {
         for (const episode of season.children) {
-          const { episodeId } = episode.content;
-          const { filePath } = episode.content;
-          const fullId: EpisodeId = {
-            serieId,
-            innerId: episodeId,
-          };
-          const f = async () => {
-            const episodeIdOdm = await getIdModelOdmFromId(fullId);
-
-            if (!episodeIdOdm)
-              throw new Error(`episode with id ${fullId.innerId} in ${fullId.serieId} not found`);
-
-            const episodeFileInfo = await this.genEpisodeFileInfoFromFilePathOrFail(filePath);
-
-            if (episodeFileInfo === null)
-              return null;
-
-            const episodeFileWithId = {
-              ...episodeFileInfo,
-              episodeId: episodeIdOdm.toString(),
-            } as ModelWithSuperId;
-
-            await this.#deps.episodeFileRepository
-              .updateOneBySuperId(episodeFileWithId.episodeId, episodeFileWithId);
-
-            return episodeFileWithId;
-          };
-
-          await f()
+          await this.genEpisodeFileInfoAndUpdateOrCreate(serie.id, episode, {
+            forceHash: options?.forceHash ?? false,
+          } )
             .then((episodeFileWithId) => {
               if (episodeFileWithId)
                 fileInfos.push(episodeFileWithId);

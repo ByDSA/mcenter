@@ -1,76 +1,75 @@
 import { statSync } from "node:fs";
 import path from "node:path";
 import NodeID3 from "node-id3";
-import { assertIsDefined } from "#shared/utils/validation";
-import { showError } from "#shared/utils/errors/showError";
-import { Event } from "#utils/message-broker";
+import { Injectable } from "@nestjs/common";
+import { showError } from "$shared/utils/errors/showError";
+import { assertIsDefined } from "$shared/utils/validation";
+import { assertFound } from "$shared/utils/http";
+import { PatchOneParams } from "$shared/models/utils/schemas/patch";
+import { BrokerEvent } from "#utils/message-broker";
 import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
-import { DepsFromMap, injectDeps } from "#utils/layers/deps";
-import { EventType, ModelEvent, PatchEvent } from "#utils/event-sourcing";
+import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
 import { md5FileAsync } from "#utils/crypt";
-import { ARTIST_EMPTY, Music, MusicId, MusicVO } from "#musics/models";
+import { ARTIST_EMPTY, MusicEntity, Music, MusicId } from "#musics/models";
 import { MusicHistoryEntry } from "#musics/history/models";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { AUDIO_EXTENSIONS } from "../files";
-import { QUEUE_NAME as HISTORY_QUEUE_NAME } from "../history/events";
+import { QUEUE_NAME as MUSIC_HISTORY_QUEUE_NAME } from "../history/events";
 import { getFullPath } from "../utils";
 import { download } from "../youtube";
-import { musicDocOdmToModel, patchParamsToUpdateQuery } from "./adapters";
+import { musicDocOdmToEntity, patchParamsToUpdateQuery } from "./adapters";
 import { QUEUE_NAME } from "./events";
 import { DocOdm, ModelOdm } from "./odm";
 import { findParamsToQueryParams } from "./queries/QueriesOdm";
 import { ExpressionNode } from "./queries/QueryObject";
-import { PatchOneParams } from "./types";
 import { MusicUrlGenerator } from "./UrlGenerator";
 
-const DEPS_MAP = {
-  domainMessageBroker: DomainMessageBroker,
-};
-
-type Deps = DepsFromMap<typeof DEPS_MAP>;
-@injectDeps(DEPS_MAP)
+type MusicEvent = BrokerEvent<ModelMessage<MusicEntity>>;
+@Injectable()
 export class MusicRepository
-implements CanPatchOneById<Music, MusicId, PatchOneParams>,
-CanGetOneById<Music, MusicId> {
-  #deps: Deps;
-
-  constructor(deps?: Partial<Deps>) {
-    this.#deps = deps as Deps;
-
-    this.#deps.domainMessageBroker.subscribe(QUEUE_NAME, (event: any) => {
+implements
+CanPatchOneById<MusicEntity, MusicId, Music>,
+CanGetOneById<MusicEntity, MusicId> {
+  constructor(
+    private readonly domainMessageBroker: DomainMessageBroker,
+  ) {
+    this.domainMessageBroker.subscribe(QUEUE_NAME, (event: MusicEvent) => {
       logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
     } ).catch(showError);
 
-    this.#deps.domainMessageBroker.subscribe(HISTORY_QUEUE_NAME, async (_ev: Event<unknown>) => {
-      const event = _ev as ModelEvent<MusicHistoryEntry>;
+    this.domainMessageBroker.subscribe(
+      MUSIC_HISTORY_QUEUE_NAME,
+      async (_ev: BrokerEvent<unknown>) => {
+        const event = _ev as ModelEvent<MusicHistoryEntry>;
 
-      if (event.type !== EventType.CREATED)
-        return;
+        if (event.type !== EventType.CREATED)
+          return;
 
-      const id = event.payload.entity.resourceId;
-      const lastTimePlayed = event.payload.entity.date.timestamp;
+        const id = event.payload.entity.resourceId;
+        const lastTimePlayed = event.payload.entity.date.timestamp;
 
-      await this.patchOneById(id, {
-        entity: {
-          lastTimePlayed,
-        },
-      } ).catch(showError);
-    } ).catch(showError);
+        await this.patchOneById(id, {
+          entity: {
+            lastTimePlayed,
+          },
+        } ).catch(showError);
+      },
+    ).catch(showError);
   }
 
-  async getOneById(id: string): Promise<Music | null> {
+  async getOneById(id: string): Promise<MusicEntity | null> {
     const docOdm = await ModelOdm.findById(id);
 
     if (!docOdm)
       return null;
 
-    return musicDocOdmToModel(docOdm);
+    return musicDocOdmToEntity(docOdm);
   }
 
-  async patchOneById(id: string, params: PatchOneParams): Promise<void> {
+  async patchOneById(id: MusicId, params: PatchOneParams<Music>): Promise<void> {
     const { entity } = params;
     const updateQuery = patchParamsToUpdateQuery(params);
 
@@ -81,73 +80,75 @@ CanGetOneById<Music, MusicId> {
       };
     }
 
-    await ModelOdm.findByIdAndUpdate(id, updateQuery);
+    const ret = await ModelOdm.findByIdAndUpdate(id, updateQuery);
+
+    assertFound(ret);
 
     for (const [k, value] of Object.entries(entity)) {
-      const key = k as keyof Music;
-      const event = new PatchEvent<Music, MusicId>( {
+      const key = k as keyof MusicEntity;
+      const event = new PatchEvent<MusicEntity, MusicId>( {
         entityId: id,
         key,
         value,
       } );
 
-      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(QUEUE_NAME, event);
     }
 
     for (const p of params.unset ?? []) {
-      const event = new PatchEvent<Music, MusicId>( {
+      const event = new PatchEvent<MusicEntity, MusicId>( {
         entityId: id,
-        key: p.join(".") as keyof Music,
+        key: p.join(".") as keyof MusicEntity,
         value: undefined,
       } );
 
-      await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+      await this.domainMessageBroker.publish(QUEUE_NAME, event);
     }
   }
 
-  async #findOne(query: Parameters<typeof ModelOdm.findOne>[0]): Promise<Music | null> {
+  async #findOne(query: Parameters<typeof ModelOdm.findOne>[0]): Promise<MusicEntity | null> {
     const musicOdm: DocOdm | null = await ModelOdm.findOne(query);
 
     if (!musicOdm)
       return null;
 
-    return musicDocOdmToModel(musicOdm);
+    return musicDocOdmToEntity(musicOdm);
   }
 
-  findOneByHash(hash: string): Promise<Music | null> {
+  findOneByHash(hash: string): Promise<MusicEntity | null> {
     return this.#findOne( {
       hash,
     } );
   }
 
-  findOneByUrl(url: string): Promise<Music | null> {
+  findOneByUrl(url: string): Promise<MusicEntity | null> {
     return this.#findOne( {
       url,
     } );
   }
 
-  async findAll(): Promise<Music[]> {
+  async findAll(): Promise<MusicEntity[]> {
     const docOdms = await ModelOdm.find( {} );
-    const ret = docOdms.map((docOdm) => musicDocOdmToModel(docOdm));
+    const ret = docOdms.map(musicDocOdmToEntity);
 
     return ret;
   }
 
-  async find(params: ExpressionNode): Promise<Music[]> {
+  async find(params: ExpressionNode): Promise<MusicEntity[]> {
     const query = findParamsToQueryParams(params);
     const docOdms = await ModelOdm.find(query);
-    const ret = docOdms.map((docOdm) => musicDocOdmToModel(docOdm));
+    const ret = docOdms.map(musicDocOdmToEntity);
 
     return ret;
   }
 
-  findOneByPath(relativePath: string): Promise<Music | null> {
+  findOneByPath(relativePath: string): Promise<MusicEntity | null> {
     return this.#findOne( {
       path: relativePath,
     } );
   }
 
-  async createOneFromPath(relativePath: string): Promise<Music> {
+  async createOneFromPath(relativePath: string): Promise<MusicEntity> {
     const fullPath = getFullPath(relativePath);
     const id3Tags = NodeID3.read(fullPath);
     const title = id3Tags.title ?? getTitleFromFilenamePath(fullPath);
@@ -184,14 +185,14 @@ CanGetOneById<Music, MusicId> {
     return this.#createOne(newDocOdm);
   }
 
-  async #createOne(musicVo: MusicVO): Promise<Music> {
-    const docOdm: DocOdm = await ModelOdm.create<MusicVO>(musicVo);
-    const ret = musicDocOdmToModel(docOdm);
-    const event = new ModelEvent<MusicVO>(EventType.CREATED, {
+  async #createOne(music: Music): Promise<MusicEntity> {
+    const docOdm: DocOdm = await ModelOdm.create<MusicEntity>(music);
+    const ret = musicDocOdmToEntity(docOdm);
+    const event = new ModelEvent<MusicEntity>(EventType.CREATED, {
       entity: ret,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
 
     return ret;
   }
@@ -207,7 +208,7 @@ CanGetOneById<Music, MusicId> {
     return hash;
   }
 
-  async findOrCreateOneFromPath(relativePath: string): Promise<Music> {
+  async findOrCreateOneFromPath(relativePath: string): Promise<MusicEntity> {
     const read = await this.findOneByPath(relativePath);
 
     if (read)
@@ -216,7 +217,7 @@ CanGetOneById<Music, MusicId> {
     return this.createOneFromPath(relativePath);
   }
 
-  async findOrCreateOneFromYoutube(strId: string): Promise<Music> {
+  async findOrCreateOneFromYoutube(strId: string): Promise<MusicEntity> {
     const data = await download(strId);
 
     return this.findOrCreateOneFromPath(data.file);
@@ -230,12 +231,12 @@ CanGetOneById<Music, MusicId> {
     if (!docOdm)
       return;
 
-    const model = musicDocOdmToModel(docOdm);
-    const event = new ModelEvent<MusicVO>(EventType.DELETED, {
+    const model = musicDocOdmToEntity(docOdm);
+    const event = new ModelEvent<MusicEntity>(EventType.DELETED, {
       entity: model,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
   async updateOneByUrl(url: string, data: Partial<Music>): Promise<void> {
@@ -265,11 +266,11 @@ CanGetOneById<Music, MusicId> {
     const model = await this.#findOne(queryAfter);
 
     assertIsDefined(model);
-    const event = new ModelEvent<MusicVO>(EventType.UPDATED, {
+    const event = new ModelEvent<MusicEntity>(EventType.UPDATED, {
       entity: model,
     } );
 
-    await this.#deps.domainMessageBroker.publish(QUEUE_NAME, event);
+    await this.domainMessageBroker.publish(QUEUE_NAME, event);
   }
 
   updateOneByPath(relativePath: string, data: Partial<Music>): Promise<void> {

@@ -1,30 +1,28 @@
-import { EpisodeId } from "#modules/series/episodes/models";
-import { EpisodePatchOneByIdReqBody, EpisodePatchOneByIdRequest, EpisodePatchOneByIdResBody, assertIsEpisodePatchOneByIdReqBody, assertIsEpisodePatchOneByIdResBody } from "#modules/series/episodes/models/transport";
+import { z } from "zod";
+import { DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses/rest";
+import { genAssertZod } from "$shared/utils/validation/zod";
+import { PATH_ROUTES } from "$shared/routing";
+import { EpisodeEntity, episodeEntitySchema, EpisodeId } from "#modules/series/episodes/models";
+import { patchOneById } from "#modules/series/episodes/models/dto";
 import { makeFetcher } from "#modules/fetching";
-import { rootBackendUrl } from "#modules/requests";
-import { backendUrls as historyBackendUrls } from "./history/requests";
+import { backendUrl } from "#modules/requests";
 
-export const backendUrls = {
-  history: historyBackendUrls,
-  crud: {
-    get: `${rootBackendUrl}/api/episodes`,
-    patch: ( { id: { innerId, serieId } }: {id: EpisodeId} )=>`${rootBackendUrl}/api/episodes/${serieId}/${innerId}`,
-    search: `${rootBackendUrl}/api/episodes/search`,
-  },
+type EpisodePatchOneByIdReq = {
+  body: z.infer<typeof patchOneById.reqBodySchema>;
 };
 
 // eslint-disable-next-line require-await
-export async function fetchPatch(id: EpisodeId, body: EpisodePatchOneByIdRequest["body"]): Promise<EpisodePatchOneByIdResBody | undefined> {
+export async function fetchPatch(id: EpisodeId, body: EpisodePatchOneByIdReq["body"]): Promise<DataResponse<EpisodeEntity> | undefined> {
   const method = "PATCH";
-  const fetcher = makeFetcher<EpisodePatchOneByIdReqBody, EpisodePatchOneByIdResBody>( {
+  const fetcher = makeFetcher<EpisodePatchOneByIdReq["body"], DataResponse<EpisodeEntity>>( {
     method,
     body,
-    reqBodyValidator: assertIsEpisodePatchOneByIdReqBody,
-    resBodyValidator: assertIsEpisodePatchOneByIdResBody,
+    reqBodyValidator: genAssertZod(patchOneById.reqBodySchema),
+    resBodyValidator: genAssertIsOneDataResponse(episodeEntitySchema),
   } );
-  const URL = backendUrls.crud.patch( {
-    id,
-  } );
+  const URL = backendUrl(
+    PATH_ROUTES.episodes.withParams(id.serieId, id.innerId),
+  );
 
   return fetcher( {
     url: URL,

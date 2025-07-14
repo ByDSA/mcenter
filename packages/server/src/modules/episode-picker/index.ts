@@ -1,7 +1,7 @@
 export {
   EpisodePickerService,
-} from "./EpisodePickerService";
+} from "./service";
 
 export {
   EpisodePickerController,
-} from "./PickerController";
+} from "./controller";

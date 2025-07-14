@@ -1,8 +1,4 @@
 export {
-  Database,
-} from "./Database";
-
-export {
   assertConnected as assertMongooseConnected,
 } from "./mongoose";
 

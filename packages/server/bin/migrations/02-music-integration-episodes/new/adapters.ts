@@ -1,4 +1,4 @@
-import { Episode, assertIsEpisode } from "#shared/models/episodes";
+import { Episode, assertIsEpisode } from "$shared/models/episodes";
 import { UpdateQuery } from "mongoose";
 import { DocOdm } from "./odm";
 

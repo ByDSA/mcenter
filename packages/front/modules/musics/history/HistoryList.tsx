@@ -1,6 +1,7 @@
 import extend from "just-extend";
 import { Fragment } from "react";
-import { Entry } from "#modules/musics/history/models";
+import { DataResponse } from "$shared/utils/http/responses/rest";
+import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { formatDate } from "#modules/utils/dates";
 import { FetchingRender } from "#modules/fetching";
 import { useRequest } from "./requests";
@@ -20,12 +21,12 @@ const DEFAULT_PARAMS: Required<Props> = {
 export function HistoryList(props?: Props) {
   const params = extend(true, DEFAULT_PARAMS, props) as typeof DEFAULT_PARAMS;
 
-  return FetchingRender<Required<Entry>[]>( {
+  return FetchingRender<DataResponse<Required<MusicHistoryEntry>[]>>( {
     useRequest,
-    render: (data) => (
+    render: (res) => (
       <span className="history-list">
         {
-          data && data.map((entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
+          res && res.data.map((entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
             {params.showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
             <HistoryEntryElement showDate={params.showDate === "eachOne"} value={entry} />
           </Fragment>)
@@ -36,9 +37,9 @@ export function HistoryList(props?: Props) {
 }
 
 function dayTitle(
-  entry: Required<Entry>,
+  entry: Required<MusicHistoryEntry>,
   i: number,
-  array: Required<Entry>[],
+  array: Required<MusicHistoryEntry>[],
 ) {
   if (i === 0 || !isSameday(array[i - 1].date.timestamp, entry.date.timestamp)) {
     return <h3 key={entry.date.timestamp}>{formatDate(new Date(entry.date.timestamp * 1000), {

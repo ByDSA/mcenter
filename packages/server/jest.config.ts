@@ -18,6 +18,7 @@ const config = {
   setupFiles: ["./jest.setup.ts"],
   collectCoverageFrom: ["**/*.(t|j)s"],
   coverageDirectory: "./coverage",
+  testTimeout: 100 * 1000,
 };
 
 export default config;

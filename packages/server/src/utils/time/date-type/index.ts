@@ -1,5 +1,5 @@
-import { DateType } from "#shared/utils/time";
 import mongoose from "mongoose";
+import { DateType } from "$shared/utils/time";
 
 const schemaOdm = new mongoose.Schema<DateType>( {
   year: {

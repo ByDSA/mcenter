@@ -1,4 +1,4 @@
-import { Pickable, ResourceVO } from "#modules/resources/models";
+import { Pickable, Resource } from "#modules/resources/models";
 import { secondsElapsedFrom } from "../utils";
 import { WeightFixer, WeightFixerParams } from "./WeightFixer";
 
@@ -6,7 +6,7 @@ export type Fx<R extends Pickable = Pickable> = (pickable: R, x: number)=> numbe
 type Params<R extends Pickable> = {
   fx: Fx<R>;
 };
-export class LastTimeWeightFixer<R extends ResourceVO = ResourceVO> implements WeightFixer<R> {
+export class LastTimeWeightFixer<R extends Resource = Resource> implements WeightFixer<R> {
   #params: Params<R>;
 
   constructor(params: Params<R>) {
