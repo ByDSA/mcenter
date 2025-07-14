@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/ByDSA/mcenter/compare/v3.14.1...v4.0.0) (2025-07-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* fixes after nestjs migration
+
+### Bug Fixes
+
+* fixes after nestjs migration ([a118b27](https://github.com/ByDSA/mcenter/commit/a118b2774e391cc64a2b013ca820b5d04041f527))
+
 ### [3.14.1](https://github.com/ByDSA/mcenter/compare/v3.14.0...v3.14.1) (2025-07-03)
 
 
