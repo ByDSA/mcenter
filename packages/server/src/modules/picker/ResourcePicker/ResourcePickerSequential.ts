@@ -1,4 +1,4 @@
-import { ResourceEntity } from "$sharedSrc/models/resource";
+import { ResourceEntity } from "$shared/models/resource";
 import { Resource } from "#modules/resources/models";
 import { ResourcePicker } from "./ResourcePicker";
 import { CompareIdFunc } from "./filters/utils";

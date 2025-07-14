@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { z } from "zod";
 import { showError } from "$shared/utils/errors/showError";
 import { PATH_ROUTES } from "$shared/routing";
+import { DataResponse } from "$shared/utils/http/responses/rest";
 import { EpisodeEntity } from "#modules/series/episodes/models";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
 import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
@@ -65,7 +66,8 @@ export default function Player() {
             },
             body: bodyStr,
           } ).then(r => r.json())
-            .then((episodes: EpisodeEntity[]) => {
+            .then((res: DataResponse<EpisodeEntity[]>) => {
+              const episodes = res.data;
               const [episode] = episodes;
 
               try {

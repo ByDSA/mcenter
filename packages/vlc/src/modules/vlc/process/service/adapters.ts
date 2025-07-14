@@ -1,4 +1,4 @@
-import { assertIsDefined } from "#shared/utils/validation";
+import { assertIsDefined } from "$shared/utils/validation";
 import { Episode } from "#modules/models/episodes";
 import { MediaElement } from "../../media";
 

@@ -34,9 +34,9 @@ beforeEach(() => {
   jest.clearAllMocks();
 } );
 
-afterAll(() => {
+afterAll(async () => {
   client.stopSocket();
-  server.close();
+  await server.close();
 } );
 
 describe("server emissions", () => {

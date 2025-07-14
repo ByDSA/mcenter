@@ -13,7 +13,8 @@ import { addGlobalConfigToApp } from "#main/init.service";
 
   const PORT: number = +(process.env.PORT ?? 8080);
 
-  killProcessesUsingPort(PORT);
+  if (process.env.NODE_ENV === "development")
+    killProcessesUsingPort(PORT);
 
   const requestLogger = (
     request: Request,

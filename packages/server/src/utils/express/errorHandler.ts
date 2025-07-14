@@ -3,10 +3,11 @@ import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from
 import { ZodError } from "zod";
 import { isDebugging } from "$shared/utils/vscode";
 import { HttpError } from "$shared/utils/http";
-import { CustomValidationError } from "$sharedSrc/utils/validation/zod";
+import { CustomValidationError } from "$shared/utils/validation/zod";
 
 export const errorHandler = (err: unknown, _req: Request, res: Response, next: NextFunction) => {
-  if ((process.env.NODE_ENV !== "test" || (process.env.NODE_ENV === "test" && isDebugging())) && err instanceof Error && err.stack && !(err instanceof HttpError) && !(err instanceof HttpException)) { // TODO: usar enums
+  if ((process.env.NODE_ENV !== "test" || (process.env.NODE_ENV === "test" && isDebugging())) && err instanceof Error && err.stack && !(err instanceof HttpError) && (!(err instanceof HttpException) || err.getStatus().toString()
+    .startsWith("5"))) { // TODO: usar enums
     let output = `${ err.name }`;
 
     if (err.message)

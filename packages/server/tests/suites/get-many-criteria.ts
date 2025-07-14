@@ -1,4 +1,4 @@
-import { assertIsDefined } from "$sharedSrc/utils/validation";
+import { assertIsDefined } from "$shared/utils/validation";
 import { HttpStatus } from "@nestjs/common";
 import { autoProps, PatchTestsProps } from "./patch-one";
 import { generateCase } from "./generate-case";

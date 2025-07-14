@@ -1,5 +1,5 @@
 import { deepFreeze } from "$shared/utils/objects";
-import { SerieEntity } from "$sharedSrc/models/series";
+import { SerieEntity } from "$shared/models/series";
 
 export const SERIE_SIMPSONS: SerieEntity = deepFreeze( {
   id: "simpsons",

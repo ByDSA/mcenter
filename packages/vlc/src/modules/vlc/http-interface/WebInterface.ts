@@ -1,6 +1,6 @@
 import querystring from "node:querystring";
-import { UnauthorizedError, UnprocessableEntityError } from "#shared/utils/http";
 import { XMLParser } from "fast-xml-parser";
+import { UnauthorizedError, UnprocessableEntityError } from "$shared/utils/http";
 import { StatusQuery } from "./StatusQuery";
 import { PlaylistResponse, StatusResponse, assertIsPlaylistResponse, assertIsStatusResponse } from "./responses";
 
@@ -29,7 +29,6 @@ export class VLCWebInterface {
     this.#host = host ?? "127.0.0.1";
 
     this.#headers = new Headers( {
-
       Authorization: `Basic ${ btoa(`:${ this.#password }`) }`,
     } );
   }

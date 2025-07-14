@@ -1,5 +1,5 @@
 import { isDefined } from "$shared/utils/validation";
-import { ResourceEntity } from "$sharedSrc/models/resource";
+import { ResourceEntity } from "$shared/models/resource";
 import { Filter } from "./Filter";
 import { CompareIdFunc } from "./utils";
 

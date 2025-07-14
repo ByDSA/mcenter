@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { assertIsDefined, assertIsNotEmpty } from "#shared/utils/validation";
+import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { PlayResourceMessage } from "#modules/models";
 import { PlayerProcessService } from "../../../PlayerProcessService";
 import { MediaElement, QueuePlaylistManager } from "../../media";

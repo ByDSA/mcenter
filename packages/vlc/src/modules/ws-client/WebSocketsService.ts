@@ -1,5 +1,5 @@
-import { showError } from "#shared/utils/errors/showError";
 import { io, Socket } from "socket.io-client";
+import { showError } from "$shared/utils/errors/showError";
 import { PlayerEvent, PlayResourceMessage } from "#modules/models";
 import { PlayerService } from "../PlayerService";
 

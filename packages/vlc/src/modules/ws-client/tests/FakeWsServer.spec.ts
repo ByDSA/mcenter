@@ -24,8 +24,8 @@ beforeAll(async () => {
   } );
 }, 500);
 
-afterAll(() => {
-  fakeWsServer.close();
+afterAll(async () => {
+  await fakeWsServer.close();
 } );
 
 beforeEach((done) => {

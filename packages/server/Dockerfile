@@ -1,4 +1,4 @@
-FROM node:20.9.0-alpine3.18 AS base
+FROM node:22-alpine3.21 AS base
 ENV APP=server
 
 FROM base AS base-pnpm
@@ -59,6 +59,10 @@ WORKDIR /packages/app
 RUN pnpm build
 
 FROM base AS runner
+
+# Instalar ffmpeg y ffprobe
+RUN apk add --no-cache ffmpeg
+
 WORKDIR /packages
 COPY --from=builder /packages/shared/build ./shared/build
 COPY --from=deps-prod /packages/node_modules ./node_modules

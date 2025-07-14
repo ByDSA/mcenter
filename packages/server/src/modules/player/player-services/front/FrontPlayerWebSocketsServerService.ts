@@ -11,7 +11,7 @@ import { EmptyPlayerEvent, PlayPlayerEvent, QUEUE_NAME, SeekPlayerEvent } from "
 
 @Injectable()
 export class FrontWSServerService {
-  #io: Server | undefined;
+  private io: Server | undefined;
 
   #lastStatus: PlayerStatusResponse | undefined;
 
@@ -30,9 +30,9 @@ export class FrontWSServerService {
   }
 
   startSocket(httpServer: HttpServer) {
-    assert(!this.#io, "HttpServer ya definido");
+    assert(!this.io, "HttpServer ya definido");
 
-    this.#io = new Server(httpServer, {
+    this.io = new Server(httpServer, {
       path: "/ws/",
       cors: {
         origin: "*",
@@ -42,7 +42,7 @@ export class FrontWSServerService {
 
     console.log("[PLAYER-FRONT] Servidor WebSocket iniciado!");
 
-    this.#io.on(PlayerEventType.CONNECTION, (socket: Socket) => {
+    this.io.on(PlayerEventType.CONNECTION, (socket: Socket) => {
       console.log("[PLAYER-FRONT] a user connected");
 
       if (this.#lastStatus)
@@ -114,8 +114,8 @@ export class FrontWSServerService {
   }
 
   #emitStatus(status: PlayerStatusResponse) {
-    assertIsDefined(this.#io);
+    assertIsDefined(this.io);
 
-    this.#io.emit(PlayerEventType.STATUS, status);
+    this.io.emit(PlayerEventType.STATUS, status);
   }
 }

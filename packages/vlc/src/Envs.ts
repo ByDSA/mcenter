@@ -1,5 +1,5 @@
-import { assertIsDefined } from "#shared/utils/validation";
 import dotenv from "dotenv";
+import { assertIsDefined } from "$shared/utils/validation";
 
 export type Envs = Readonly<{
   VLC_HTTP_PORT: number;

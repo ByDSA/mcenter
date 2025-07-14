@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { LogElementResponse } from "$shared/utils/http";
 import { showError } from "$shared/utils/errors/showError";
-import { assertIsSerieEntity } from "$sharedSrc/models/series";
+import { assertIsSerieEntity } from "$shared/models/series";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { SerieId } from "#modules/series";

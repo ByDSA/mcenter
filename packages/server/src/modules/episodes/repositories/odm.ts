@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { TimestampsModel } from "$sharedSrc/models/utils/schemas/Timestamps";
+import { TimestampsModel } from "$shared/models/utils/schemas/Timestamps";
 import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { EpisodeId } from "../models";
 

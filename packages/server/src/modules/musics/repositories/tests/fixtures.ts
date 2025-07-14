@@ -1,5 +1,5 @@
 import { deepFreeze } from "$shared/utils/objects";
-import { MusicEntity } from "$sharedSrc/models/musics/music";
+import { MusicEntity } from "$shared/models/musics/music";
 
 const DATE = new Date();
 const AOT4_COMMON = {

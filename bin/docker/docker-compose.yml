@@ -22,17 +22,6 @@ services:
       - ../../packages/server/.schedule.js:/packages/app/.schedule.js:ro
       - ../../packages/server/.tag.js:/packages/app/.tag.js:ro
 
-  music:
-    image: mcenter/music:latest
-    container_name: mcenter_music
-    env_file:
-      - ../../packages/music/.env
-    ports:
-      - "${MCENTER_MUSIC_PORT}:8080"
-    restart: always
-    volumes:
-      - ${MCENTER_SERVER_MEDIA_PATH}:/home/node/media:ro
-
   mongo:
     profiles: ["local"]
     image: mongo:8.0

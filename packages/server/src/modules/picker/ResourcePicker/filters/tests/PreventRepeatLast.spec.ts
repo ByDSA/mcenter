@@ -1,6 +1,6 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { ResourceEntity } from "$sharedSrc/models/resource";
-import { compareEpisodeId } from "$sharedSrc/models/episodes/episode";
+import { ResourceEntity } from "$shared/models/resource";
+import { compareEpisodeId } from "$shared/models/episodes/episode";
 import { EpisodeId } from "#episodes/models";
 import { stringifyEpisodeId } from "#episodes/tests";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";

@@ -5,7 +5,7 @@ import helmet from "helmet";
 import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ZodSerializerInterceptor, ZodValidationException, ZodValidationPipe } from "nestjs-zod";
 import { assertIsDefined } from "$shared/utils/validation";
-import { CustomValidationError } from "$sharedSrc/utils/validation/zod";
+import { CustomValidationError } from "$shared/utils/validation/zod";
 import { GlobalExceptionFilter } from "#utils/express/errorHandler";
 import { RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/player";
 import { ZodSerializerSchemaInterceptor } from "#utils/validation/zod-nestjs";
@@ -23,7 +23,6 @@ export class InitService implements OnModuleInit {
 
   static providers = Object.freeze([
     DomainMessageBroker,
-    RemotePlayerWebSocketsServerService,
   ]);
 
   onModuleInit() {

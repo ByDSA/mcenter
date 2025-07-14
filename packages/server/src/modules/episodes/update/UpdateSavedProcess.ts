@@ -27,6 +27,12 @@ type Options = {
   forceHash?: boolean;
 };
 
+class FatalError extends Error {
+  static of(e: Error) {
+    return new FatalError(e.message);
+  }
+}
+
 @Injectable()
 export class UpdateMetadataProcess {
   constructor(
@@ -81,58 +87,65 @@ export class UpdateMetadataProcess {
     assertIsDefined(MEDIA_FOLDER);
 
     const currentEpisodeFile = await this.episodeFileRepository.getOneByPath(filePath);
+    const fullFilePath = `${MEDIA_FOLDER}/${filePath}`;
+
+    if (!existsSync(fullFilePath)) {
+      console.log("UpdateMetadataProcess: file '" + fullFilePath + "' not exists");
+
+      return null;
+    }
+
     const episodeFileInfo = await new Promise((resolve, reject) =>{
-      const fullFilePath = `${MEDIA_FOLDER}/${filePath}`;
+      ffmpeg.ffprobe(fullFilePath, async (err, metadata) => {
+        if (err) {
+          if (err.message === "Cannot find ffprobe")
+            return reject(FatalError.of(err));
 
-      if (existsSync(fullFilePath)) {
-        ffmpeg.ffprobe(fullFilePath, async (err, metadata) => {
-          if (err)
-            reject(err);
+          return reject(err);
+        }
 
-          const duration = metadata.format?.duration ?? null;
-          const resolution = {
-            width: metadata.streams[0].width ?? null,
-            height: metadata.streams[0].height ?? null,
-          };
-          const fps = metadata.streams[0].r_frame_rate ?? null;
-          const { mtime, ctime, size } = fs.statSync(fullFilePath);
-          const createdAt = new Date(ctime);
-          const updatedAt = new Date(mtime);
+        if (!metadata)
+          return;
 
-          console.log(`got metadata of ${filePath}`);
+        const duration = metadata.format?.duration ?? null;
+        const resolution = {
+          width: metadata.streams[0].width ?? null,
+          height: metadata.streams[0].height ?? null,
+        };
+        const fps = metadata.streams[0].r_frame_rate ?? null;
+        const { mtime, ctime, size } = fs.statSync(fullFilePath);
+        const createdAt = new Date(ctime);
+        const updatedAt = new Date(mtime);
 
-          const ret: Model = {
-            path: filePath,
-            hash: currentEpisodeFile?.hash ?? "null",
-            size,
-            timestamps: {
-              createdAt,
-              updatedAt,
-            },
-            mediaInfo: {
-              duration,
-              resolution,
-              fps,
-            },
-          };
-          const mustUpdate = options.forceHash
+        console.log(`UpdateMetadataProcess: got metadata of ${filePath}`);
+
+        const ret: Model = {
+          path: filePath,
+          hash: currentEpisodeFile?.hash ?? "null",
+          size,
+          timestamps: {
+            createdAt,
+            updatedAt,
+          },
+          mediaInfo: {
+            duration,
+            resolution,
+            fps,
+          },
+        };
+        const mustUpdate = options.forceHash
            || !currentEpisodeFile
            || !compareModel(ret, currentEpisodeFile);
 
-          if (!mustUpdate) {
-            resolve(null);
+        if (!mustUpdate)
+          return resolve(null);
 
-            return;
-          }
+        ret.hash = await md5FileAsync(fullFilePath);
 
-          ret.hash = await md5FileAsync(fullFilePath);
+        console.log(`UpdateMetadataProcess: got hash of ${filePath}`);
 
-          console.log(`got hash of ${filePath}`);
-
-          resolve(ret);
-        } );
-      } else
-        resolve(null);
+        return resolve(ret);
+      } );
     } );
 
     if (episodeFileInfo === null)
@@ -178,7 +191,7 @@ export class UpdateMetadataProcess {
   async process(options?: Options): Promise<FullResponse<Data>> {
     const seriesTree: SerieFolderTree = await this.savedSerieTreeService.getSavedSeriesTree();
 
-    console.log("got paths");
+    console.log("UpdateMetadataProcess: got paths");
     const fileInfos: ModelWithSuperId[] = [];
     const errors: ErrorElementResponse[] = [];
 
@@ -193,7 +206,9 @@ export class UpdateMetadataProcess {
                 fileInfos.push(episodeFileWithId);
             } )
             .catch((err) => {
-              if (err instanceof Error) {
+              if (err instanceof FatalError)
+                throw err;
+              else if (err instanceof Error) {
                 const error = errorToErrorElementResponse(err);
 
                 errors.push(error);

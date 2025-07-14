@@ -1,4 +1,4 @@
-import { PublicMethodsOf } from "#shared/utils/types";
+import { PublicMethodsOf } from "$shared/utils/types";
 import { VLCProcessService } from "../Service";
 
 export class PlayerServiceMock implements PublicMethodsOf<VLCProcessService> {

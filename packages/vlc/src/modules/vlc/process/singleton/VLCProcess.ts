@@ -1,5 +1,5 @@
 import * as cp from "child_process";
-import { execAndWaitUntilStarted, isRunning, killAll, killProcessByPid } from "#shared/utils/process";
+import { execAndWaitUntilStarted, isRunning, killAll, killProcessByPid } from "$shared/utils/process";
 
 type OnHandler = (code: number)=> void;
 

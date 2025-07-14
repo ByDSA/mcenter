@@ -1,6 +1,6 @@
 import { PlayerStatusResponse, PlayResourceMessage } from "#modules/models";
 import { PlayerProcessService } from "#modules/PlayerProcessService";
-import { PlayerService } from "#modules/PlayerService";
+import { PlayerService as IPlayerService } from "#modules/PlayerService";
 import { VLCWebInterface } from "../vlc/http-interface";
 import { vlcResponsesToGenericResponses } from "./adapters";
 
@@ -10,7 +10,7 @@ type Params = {
   playerWebInterfaceService: VLCWebInterface;
   playerProcessService: PlayerProcessService;
 };
-export class Service implements PlayerService {
+export class PlayerService implements IPlayerService {
   #playerWebInterfaceService: VLCWebInterface;
 
   #playerProcessService: PlayerProcessService;
