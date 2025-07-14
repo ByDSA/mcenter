@@ -15,6 +15,29 @@ import { requestToFindMusicParams } from "../repositories/queries/Queries";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
 
+function getRootUrlFromForwardedRequest(req: Request): string {
+  const protocol = req.get("x-forwarded-proto") ?? req.protocol;
+  const hostname = req.get("host") ?? req.get("x-forwarded-host") ?? req.hostname;
+  const portStr = req.get("x-forwarded-port");
+  let ret = `${protocol }://`;
+
+  ret += hostname;
+
+  if (portStr && ((protocol === "http" && +portStr !== 80) || (protocol === "https" && +portStr !== 443)))
+    ret += `:${portStr}`;
+
+  return ret;
+}
+
+function getRootUrlFromRequest(req: Request): string {
+  const isForwarded = req.get("x-forwarded-host") !== undefined;
+
+  if (isForwarded)
+    return getRootUrlFromForwardedRequest(req);
+
+  return `${req.protocol}://${req.get("host")}`;
+}
+
 @Controller("/get")
 export class MusicGetController {
   constructor(
@@ -29,7 +52,7 @@ export class MusicGetController {
 
     assertIsNotEmpty(musics);
     const picked = await this.#randomPick(musics);
-    const nextRootUrl = `${req.protocol}://${req.get("host")}`;
+    const nextRootUrl = getRootUrlFromRequest(req);
     const nextUrl = `${nextRootUrl}${req.url}`;
     const ret = generatePlaylist( {
       picked,
