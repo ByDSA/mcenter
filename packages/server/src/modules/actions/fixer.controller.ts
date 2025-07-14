@@ -1,5 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
-import { FullResponse, LogElementResponse } from "$shared/utils/http";
+import { DataResponse, LogElementResponse } from "$shared/utils/http";
 import { SerieRepository } from "#modules/series";
 import { StreamsRepository } from "#modules/streams/repositories";
 
@@ -17,7 +17,7 @@ export class FixerController {
 
     actions.push(...await this.fixSeries());
 
-    const responseElement: FullResponse<LogElementResponse[]> = {
+    const responseElement: DataResponse<LogElementResponse[]> = {
       data: actions,
     };
 

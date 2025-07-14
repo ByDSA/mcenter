@@ -4,7 +4,7 @@ import { isDefined } from "$shared/utils/validation";
 import { showError } from "$shared/utils/errors/showError";
 import { musicHistoryEntryRestDto } from "$shared/models/musics/history/dto/transport";
 import z from "zod";
-import { assertFound } from "$shared/utils/http";
+import { assertFound } from "#utils/validation/found";
 import { CanCreateOne, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { MusicHistoryEntry } from "#musics/history/models";

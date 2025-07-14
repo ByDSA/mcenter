@@ -1,6 +1,5 @@
 import { Body, Controller, Param } from "@nestjs/common";
 import { neverCase } from "$shared/utils/validation";
-import { assertFound } from "$shared/utils/http/validation";
 import { getAll } from "$shared/models/episodes/dto/rest/get-all";
 import { getOneById } from "$shared/models/episodes/dto/rest/get-one-by-id";
 import { getManyByCriteria } from "$shared/models/episodes/dto/rest/get-many-by-criteria";
@@ -11,6 +10,7 @@ import { SerieRepository } from "#modules/series";
 import { SerieEntity } from "#modules/series/models";
 import { GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest/Get";
 import { PatchOne } from "#utils/nestjs/rest";
+import { assertFound } from "#utils/validation/found";
 import { EpisodeRepository } from "../repositories";
 
 class GetOneByIdParamsDto extends createZodDto(getOneById.paramsSchema) {}

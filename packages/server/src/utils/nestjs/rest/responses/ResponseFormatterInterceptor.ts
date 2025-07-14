@@ -1,7 +1,7 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { DataResponse } from "$shared/utils/http/responses/rest";
+import { DataResponse } from "$shared/utils/http/responses";
 
 @Injectable()
 export class ResponseFormatterInterceptor implements NestInterceptor {

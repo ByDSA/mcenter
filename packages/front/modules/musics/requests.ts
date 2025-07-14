@@ -1,7 +1,7 @@
 import z from "zod";
 import { musicRestDto } from "$shared/models/musics/dto/transport";
 import { genAssertZod } from "$shared/utils/validation/zod";
-import { DataResponse } from "$shared/utils/http/responses/rest";
+import { DataResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicEntity, MusicId } from "#musics/models";
 import { makeFetcher } from "#modules/fetching";

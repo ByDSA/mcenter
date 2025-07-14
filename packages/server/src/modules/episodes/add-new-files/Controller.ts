@@ -1,7 +1,7 @@
 import path from "node:path";
 import { Controller, Get } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { ErrorElementResponse, errorToErrorElementResponse, FullResponse } from "$shared/utils/http";
+import { ErrorElementResponse, errorToErrorElementResponse, DataResponse } from "$shared/utils/http";
 import { Episode, EpisodeEntity } from "#episodes/models";
 import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
@@ -60,7 +60,7 @@ export class EpisodeAddNewFilesController {
         errors.push(error);
       }
     }
-    const responseObj: FullResponse<typeof data> = {
+    const responseObj: DataResponse<typeof data> = {
       errors,
       data,
     };

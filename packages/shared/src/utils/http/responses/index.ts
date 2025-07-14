@@ -9,7 +9,4 @@ export {
   errorToErrorElementResponse,
 } from "./ErrorElement";
 
-export {
-  FullResponse,
-  assertIsModel as assertIsFullResponse,
-} from "./FullResponse";
+export * from "./data-response";

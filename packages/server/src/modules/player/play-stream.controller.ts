@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
-import { assertFound } from "$shared/utils/http/validation";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
+import { assertFound } from "#utils/validation/found";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { EpisodeHistoryListService } from "#episodes/history";
 import { StreamsRepository } from "#modules/streams/repositories";

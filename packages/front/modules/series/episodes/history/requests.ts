@@ -1,6 +1,6 @@
 /* eslint-disable require-await */
-import { DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses/rest";
 import { PATH_ROUTES } from "$shared/routing";
+import { DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema, EpisodeHistoryEntryId, EpisodeHistoryListId } from "./models";

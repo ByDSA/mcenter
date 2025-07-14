@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
-import { assertFound } from "$shared/utils/http/validation";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { EpisodeRepository } from "#episodes/index";
 import { EpisodeHistoryListService } from "#episodes/history";
 import { SerieRepository } from "#modules/series";
+import { assertFound } from "#utils/validation/found";
 import { PlayService } from "./PlayService";
 
 class ParamsDto extends createZodDto(z.object( {

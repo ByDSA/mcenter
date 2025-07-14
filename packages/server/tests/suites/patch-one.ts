@@ -1,7 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
-import { assertFound } from "$shared/utils/http";
+import { assertFound } from "#utils/validation/found";
 import { ExpectedBody, generateCase, GenerateCaseProps } from "./generate-case";
 import { defaultResponse } from "./common";
 

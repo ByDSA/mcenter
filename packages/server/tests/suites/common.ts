@@ -1,5 +1,5 @@
 import type { PatchTestsProps } from "./patch-one";
-import { createSuccessDataResponse } from "$shared/utils/http/responses/rest";
+import { createSuccessDataResponse } from "$shared/utils/http/responses";
 
 export function defaultResponse<R>(props: PatchTestsProps<R>) {
   let { expectedBody, repo } = props;

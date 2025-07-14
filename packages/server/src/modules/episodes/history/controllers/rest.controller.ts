@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { Body, Controller, Param } from "@nestjs/common";
-import { assertFound } from "$shared/utils/http/validation";
 import { showError } from "$shared/utils/errors/showError";
 import { createZodDto } from "nestjs-zod";
 import { episodeHistoryListRestDto } from "$shared/models/episodes/history/dto/transport";
@@ -9,6 +8,7 @@ import { SerieRepository } from "#modules/series";
 import { CanGetAll } from "#utils/layers/controller";
 import { DeleteOne, GetOne } from "#utils/nestjs/rest";
 import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/Get";
+import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryListRepository } from "../repositories";
 import { EpisodeHistoryEntry, EpisodeHistoryEntryEntity, assertIsEpisodeHistoryEntryEntity, episodeHistoryListEntitySchema, episodeHistoryEntryEntitySchema, episodeHistoryEntrySchema, episodeHistoryEntryToEntity, getIdFromEntry } from "../models";
 import { LastTimePlayedService } from "../last-time-played.service";

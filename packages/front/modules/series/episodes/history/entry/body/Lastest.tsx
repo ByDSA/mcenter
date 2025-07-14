@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
+import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeHistoryEntry, EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { episodeHistoryListRestDto } from "#modules/series/episodes/history/models/dto";

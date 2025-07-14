@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { z } from "zod";
 import { showError } from "$shared/utils/errors/showError";
 import { PATH_ROUTES } from "$shared/routing";
-import { DataResponse } from "$shared/utils/http/responses/rest";
+import { DataResponse } from "$shared/utils/http/responses";
 import { EpisodeEntity } from "#modules/series/episodes/models";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
 import { Episode, assertIsEpisode } from "#modules/series/episodes/models";

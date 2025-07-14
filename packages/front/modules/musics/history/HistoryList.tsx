@@ -1,6 +1,6 @@
 import extend from "just-extend";
 import { Fragment } from "react";
-import { DataResponse } from "$shared/utils/http/responses/rest";
+import { DataResponse } from "$shared/utils/http/responses";
 import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { formatDate } from "#modules/utils/dates";
 import { FetchingRender } from "#modules/fetching";

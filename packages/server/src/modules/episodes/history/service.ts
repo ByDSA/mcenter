@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { assertFound } from "$shared/utils/http/validation";
 import { EpisodeRepository } from "#episodes/index";
 import { Episode, EpisodeEntity, EpisodeId, compareEpisodeId } from "#episodes/models";
+import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryListEntryRepository, EpisodeHistoryListRepository } from "./repositories";
 import { EpisodeHistoryEntry, EpisodeHistoryListEntity, EpisodeHistoryListId, createEpisodeHistoryEntryByEpisodeFullId } from "./models";
 

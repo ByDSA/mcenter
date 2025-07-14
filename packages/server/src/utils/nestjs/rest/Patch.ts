@@ -1,6 +1,6 @@
 import { applyDecorators, HttpCode, HttpStatus, Patch, UseInterceptors } from "@nestjs/common";
 import z from "zod";
-import { createOneDataResponseSchema } from "$shared/utils/http/responses/rest";
+import { createOneDataResponseSchema } from "$shared/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { ResponseFormatterInterceptor } from "./responses/ResponseFormatterInterceptor";
 

@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { DataResponse } from "$shared/utils/http/responses/rest";
+import { DataResponse } from "$shared/utils/http/responses";
 import { FetchingRender, UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { DateFormat, formatDate } from "#modules/utils/dates";
 import { Entry } from "#modules/utils/resources/useResourceEdition";

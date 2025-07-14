@@ -1,5 +1,5 @@
 import { HttpStatus, RequestMethod } from "@nestjs/common";
-import { createSuccessDataResponse } from "$shared/utils/http/responses/rest";
+import { createSuccessDataResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
 import { restTestsSuite } from "#tests/suites/rest-suite";

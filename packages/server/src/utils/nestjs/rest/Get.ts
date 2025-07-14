@@ -6,7 +6,7 @@ import { Injectable,
   CallHandler } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { createManyDataResponseSchema, createOneDataResponseSchema } from "$shared/utils/http/responses/rest";
+import { createManyDataResponseSchema, createOneDataResponseSchema } from "$shared/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { ResponseFormatterInterceptor } from "./responses/ResponseFormatterInterceptor";
 

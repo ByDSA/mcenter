@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { neverCase } from "$shared/utils/validation";
-import { assertFound } from "$shared/utils/http/validation";
 import { EpisodeEntity } from "#episodes/models";
 import { EpisodeRepository, EpisodeRepositoryGetManyOptions } from "#episodes/repositories";
 import { PickMode, ResourcePicker } from "#modules/picker";
 import { Stream, StreamId, StreamMode } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { EpisodeHistoryListRepository } from "#episodes/history";
+import { assertFound } from "#utils/validation/found";
 import { buildEpisodePicker } from "./EpisodePicker";
 
 @Injectable()

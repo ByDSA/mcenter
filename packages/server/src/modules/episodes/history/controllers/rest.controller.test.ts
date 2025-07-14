@@ -1,7 +1,7 @@
 import { Application } from "express";
 import request from "supertest";
-import { HttpStatusCode } from "$shared/utils/http/StatusCode";
-import { createSuccessDataResponse } from "$shared/utils/http/responses/rest";
+import { createSuccessDataResponse } from "$shared/utils/http/responses";
+import { HttpStatus } from "@nestjs/common";
 import { HISTORY_LIST_SIMPSONS, HISTORY_LIST_WITH_NO_ENTRIES } from "#tests/main/db/fixtures";
 import { createMockClass } from "#tests/jest/mocking";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
@@ -67,7 +67,7 @@ describe("restController", () => {
       repository.getOneByIdOrCreate.mockResolvedValueOnce(historyListSample);
       await request(routerApp)
         .get("/id")
-        .expect(HttpStatusCode.OK)
+        .expect(HttpStatus.OK)
         .send();
 
       expect(repository.getOneByIdOrCreate)
@@ -81,7 +81,7 @@ describe("restController", () => {
 
       const response = await request(routerApp)
         .get("/id")
-        .expect(HttpStatusCode.OK)
+        .expect(HttpStatus.OK)
         .send();
 
       expect(response.body).toEqual(createSuccessDataResponse(historyList));
@@ -103,7 +103,7 @@ describe("restController", () => {
         repository.getOneByIdOrCreate.mockResolvedValueOnce(historyListSample);
         await request(routerApp)
           .get("/id/entries")
-          .expect(HttpStatusCode.OK)
+          .expect(HttpStatus.OK)
           .send();
 
         expect(repository.getOneByIdOrCreate)
@@ -117,7 +117,7 @@ describe("restController", () => {
 
         const response = await request(routerApp)
           .get("/id/entries")
-          .expect(HttpStatusCode.OK)
+          .expect(HttpStatus.OK)
           .send();
 
         expect(response.body).toEqual(createSuccessDataResponse(historyList.entries));
@@ -138,7 +138,7 @@ describe("restController", () => {
         repository.getOneByIdOrCreate.mockResolvedValueOnce(historyListSample);
         await request(routerApp)
           .post("/id/entries/search")
-          .expect(HttpStatusCode.OK)
+          .expect(HttpStatus.OK)
           .send( {} );
 
         expect(repository.getOneByIdOrCreate)
@@ -148,7 +148,7 @@ describe("restController", () => {
       it("should throw 422 if provided unexpected property", async () => {
         await request(routerApp)
           .post("/id/entries/search")
-          .expect(HttpStatusCode.UNPROCESSABLE_ENTITY)
+          .expect(HttpStatus.UNPROCESSABLE_ENTITY)
           .send( {
             cosarara: "porquesi",
           } );
@@ -163,7 +163,7 @@ describe("restController", () => {
           .post("/id/entries/search")
           .send( {} );
 
-        expect(response.statusCode).toEqual(HttpStatusCode.OK);
+        expect(response.statusCode).toEqual(HttpStatus.OK);
         expect(response.body).toEqual(
           createSuccessDataResponse(
             historyList.entries.map(e=>episodeHistoryEntryToEntity(e, historyList)),
@@ -186,7 +186,7 @@ describe("restController", () => {
       it("should throw 422 if provided unexpected property", async () => {
         await request(routerApp)
           .post(URL)
-          .expect(HttpStatusCode.UNPROCESSABLE_ENTITY)
+          .expect(HttpStatus.UNPROCESSABLE_ENTITY)
           .send( {
             cosarara: "porquesi",
           } );
@@ -199,7 +199,7 @@ describe("restController", () => {
           .post(URL)
           .send();
 
-        expect(response.statusCode).toEqual(HttpStatusCode.OK);
+        expect(response.statusCode).toEqual(HttpStatus.OK);
         expect(response.body).toEqual(
           createSuccessDataResponse(HISTORY_LIST_SIMPSONS.entries
             .map(e=>episodeHistoryEntryToEntity(e, HISTORY_LIST_SIMPSONS))),

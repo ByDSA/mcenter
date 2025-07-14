@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { createSuccessDataResponse } from "$shared/utils/http/responses/rest";
+import { createSuccessDataResponse } from "$shared/utils/http/responses";
 import { autoProps, PatchTestsProps } from "./patch-one";
 import { generateCase } from "./generate-case";
 import { defaultResponse } from "./common";

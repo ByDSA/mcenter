@@ -51,7 +51,7 @@ export {
   assertIsEntity as assertIsEpisodeHistoryEntryEntity,
   Entity as EpisodeHistoryEntryEntity,
   Model as EpisodeHistoryEntry,
-  Id as EpisodeEpisodeHistoryEntryId,
+  Id as EpisodeHistoryEntryId,
   idSchema as episodeEpisodeHistoryEntryIdSchema,
   schema as episodeHistoryEntrySchema,
 };

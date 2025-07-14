@@ -11,6 +11,7 @@ export function createOneDataResponseSchema<T extends z.ZodSchema>(schema: T) {
   return z.object( {
     data: schema.or(z.null()),
     errors: z.array(z.any()).optional(),
+    warnings: z.array(z.any()).optional(),
   } ).strict();
 }
 

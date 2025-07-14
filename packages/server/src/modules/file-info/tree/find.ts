@@ -1,9 +1,9 @@
 import fs, { Dirent } from "node:fs";
 import path from "node:path";
+import { ErrorElementResponse, DataResponse } from "$shared/utils/http";
+import { deepMerge } from "$shared/utils/objects";
 import { GetEpisodeIdOptions, getEpisodeSeasonAndEpisodeNumberFromFilePath, getSeasonEpisodeFromEpisodeId } from "./idGetter";
 import { Episode, Season, Serie } from "./models";
-import { ErrorElementResponse, FullResponse } from "$shared/utils/http";
-import { deepMerge } from "$shared/utils/objects";
 
 type Options = {
   baseFolder?: string;
@@ -15,7 +15,7 @@ const DEFAULT_OPTIONS: Required<Options> = {
 export function findAllSerieFolderTreesAt(
   folderFullPath: string,
   options?: Options,
-): FullResponse<Serie[]> {
+): DataResponse<Serie[]> {
   const actualOptions = deepMerge(DEFAULT_OPTIONS, options);
   const errors: ErrorElementResponse[] = [];
   const seriesNames = readFolderNamesIn(folderFullPath);

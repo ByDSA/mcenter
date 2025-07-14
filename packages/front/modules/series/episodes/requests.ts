@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses/rest";
+import { DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses";
 import { genAssertZod } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeEntity, episodeEntitySchema, EpisodeId } from "#modules/series/episodes/models";

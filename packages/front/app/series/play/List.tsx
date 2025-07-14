@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { showError } from "$shared/utils/errors/showError";
 import { Stream, streamSchema } from "$shared/models/streams";
 import { PATH_ROUTES } from "$shared/routing";
-import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
+import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
 import { Loading } from "#modules/loading";
 import { backendUrl } from "#modules/requests";
 import { fetcher } from "./fetcher";

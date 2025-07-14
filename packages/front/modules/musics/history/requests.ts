@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { musicHistoryEntryRestDto } from "$shared/models/musics/history/dto/transport";
-import { assertIsManyDataResponse, DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses/rest";
+import { assertIsManyDataResponse, DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses";
 import { musicHistoryEntrySchema } from "$shared/models/musics/history";
 import { PATH_ROUTES } from "$shared/routing";
 import { backendUrl } from "#modules/requests";

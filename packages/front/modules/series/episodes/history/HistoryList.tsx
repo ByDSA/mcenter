@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
+import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { FetchingRender } from "#modules/fetching";
 import { HistoryEntryElement } from "./entry/HistoryEntry";

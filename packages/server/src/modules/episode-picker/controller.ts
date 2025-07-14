@@ -1,7 +1,6 @@
 import { Picker } from "rand-picker";
 import { Controller, Get, Param } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { assertFound } from "$shared/utils/http/validation";
 import { asyncMap } from "$shared/utils/arrays";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
@@ -11,6 +10,7 @@ import { EpisodeHistoryListRepository, LastTimePlayedService } from "#episodes/h
 import { genRandomPickerWithData } from "#modules/picker";
 import { SerieRepository } from "#modules/series";
 import { StreamsRepository } from "#modules/streams/repositories";
+import { assertFound } from "#utils/validation/found";
 import { dependencies } from "./appliers/Dependencies";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 

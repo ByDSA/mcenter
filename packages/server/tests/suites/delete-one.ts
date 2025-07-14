@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { assertFound } from "$shared/utils/http";
+import { assertFound } from "#utils/validation/found";
 import { generateCase } from "./generate-case";
 import { autoProps, PatchTestsProps } from "./patch-one";
 import { defaultResponse } from "./common";

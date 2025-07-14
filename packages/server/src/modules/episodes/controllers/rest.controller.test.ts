@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { createSuccessDataResponse } from "$shared/utils/http/responses/rest";
+import { createSuccessDataResponse } from "$shared/utils/http/responses";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { episodeFileInfoRepositoryMockProvider } from "#modules/file-info/repositories/tests";
 import { serieRepositoryMockProvider } from "#modules/series/repositories/tests";

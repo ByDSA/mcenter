@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses/rest";
+import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
