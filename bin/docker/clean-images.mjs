@@ -7,8 +7,8 @@ const project = "mcenter"
 
 console.log(`🔍 Buscando imágenes ${project}/ para limpiar...`)
 
-// Obtener todas las imágenes que empiecen por "project/"
-const images = await $`docker images --format "{{.Repository}}\t{{.Tag}}\t{{.ID}}" | grep "^${project}/"`.quiet()
+// Obtener todas las imágenes que empiecen por "project/" o contengan "/project/"
+const images = await $`docker images --format "{{.Repository}}\t{{.Tag}}\t{{.ID}}" | grep -E "(^${project}/|/${project}/)"`.quiet()
 
 if (images.stdout.trim() === '') {
   console.log(`❌ No se encontraron imágenes que empiecen por '${project}/'`)
