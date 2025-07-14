@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.2](https://github.com/ByDSA/mcenter/compare/v4.0.1...v4.0.2) (2025-07-14)
+
+
+### Bug Fixes
+
+* next music url ([05c080e](https://github.com/ByDSA/mcenter/commit/05c080e76c6977dffd90f43fc2cbddf7091f9126))
+
 ### [4.0.1](https://github.com/ByDSA/mcenter/compare/v4.0.0...v4.0.1) (2025-07-14)
 
 
