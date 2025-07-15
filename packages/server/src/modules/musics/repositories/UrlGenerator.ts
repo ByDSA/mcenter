@@ -136,6 +136,7 @@ const charMap: { [key: string]: string } = {
 export function fixUrl(url: string): string | null {
   let fixed: string = url
     .toLowerCase()
+    .replaceAll(" & ", " and ")
     .replaceAll(/(official-)?lyric-video/g, "");
   const fixedTmp = fixed;
 

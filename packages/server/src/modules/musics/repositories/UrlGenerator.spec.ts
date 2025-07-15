@@ -9,8 +9,8 @@ describe("fixUrl", () => {
     },
     {
       input: "Hello & World",
-      expected: "hello-world",
-      description: "remove special characters &",
+      expected: "hello-and-world",
+      description: "change special characters & by 'and'",
     },
     {
       input: "Hello [World]",
