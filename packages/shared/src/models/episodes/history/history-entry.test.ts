@@ -1,9 +1,9 @@
-import { assertIsEpisodeHistoryEntry } from "./history-entry";
+import { assertIsEpisodeHistoryEntry, EpisodeHistoryEntry } from "./history-entry";
 
 const assertIsModel: typeof assertIsEpisodeHistoryEntry = assertIsEpisodeHistoryEntry;
-const VALID_MODEL = {
+const VALID_MODEL: EpisodeHistoryEntry = {
   episodeId: {
-    innerId: "1x01",
+    code: "1x01",
     serieId: "serie",
   },
   date: {

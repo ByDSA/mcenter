@@ -1,3 +1,1 @@
-export const ENTRY_QUEUE_NAME = "EpisodeHistoryListEntry";
-
-export const LIST_QUEUE_NAME = "EpisodeHistoryList";
+export const EPISODE_HISTORY_ENTRIES_QUEUE_NAME = "EpisodeHistoryEntries";

@@ -28,7 +28,6 @@ const isDev = process.env.NODE_ENV === "development";
   providers: [
     ...globalValidationProviders,
     InitService,
-    ...InitService.providers,
   ],
 } )
 export class AppModule implements OnModuleInit {

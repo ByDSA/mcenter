@@ -153,12 +153,12 @@ export class UpdateMetadataProcess {
 
     const fullId: EpisodeId = {
       serieId,
-      innerId: episodeId,
+      code: episodeId,
     };
     const episodeDbId = await getIdModelOdmFromId(fullId);
 
     if (!episodeDbId)
-      throw new Error(`episode with id ${fullId.innerId} in ${fullId.serieId} not found`);
+      throw new Error(`episode with id ${fullId.code} in ${fullId.serieId} not found`);
 
     const episodeFileWithId = {
       ...episodeFileInfo,

@@ -1,13 +1,9 @@
 export {
-  DocOdm as HistoryListDocOdm,
-  schemaOdm,
-  EntryDocOdm,
-  ModelOdm as HistoryListModelOdm,
+  DocOdm as EpisodeHistoryEntriesDocOdm,
+  ModelOdm as EpisodeHistoryEntriesModelOdm,
 } from "./mongo";
 
 export {
-  docOdmToEntity as historyListDocOdmToEntity,
-  entityToDocOdm as historyListEntityToDocOdm,
-  entryDocOdmToEntryEntity,
+  docOdmToEntryEntity as entryDocOdmToEntryEntity,
   entryToDocOdm,
 } from "./adapters";

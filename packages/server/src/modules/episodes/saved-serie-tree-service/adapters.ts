@@ -6,8 +6,8 @@ export function putModelInSerieFolderTree(
   episode: EpisodeEntity,
   serieFolderTree: SerieFolderTree,
 ): SerieFolderTree {
-  const { id: { serieId, innerId } } = episode;
-  const seasonId = getSeasonFromInnerId(innerId) ?? "";
+  const { id: { serieId, code } } = episode;
+  const seasonId = getSeasonFromCode(code) ?? "";
   const episodeFile: EpisodeFile = episodeToEpisodeFile(episode);
 
   treePut(serieFolderTree, [serieId, seasonId], episodeFile.id, episodeFile.content);
@@ -15,8 +15,8 @@ export function putModelInSerieFolderTree(
   return serieFolderTree;
 }
 
-function getSeasonFromInnerId(innerId: string): string | null {
-  const match = innerId.match(/^(\d+)x/);
+function getSeasonFromCode(code: string): string | null {
+  const match = code.match(/^(\d+)x/);
 
   if (match)
     return match[1];
@@ -26,9 +26,9 @@ function getSeasonFromInnerId(innerId: string): string | null {
 
 export function episodeToEpisodeFile(episode: Pick<EpisodeEntity, "id" | "path">): EpisodeFile {
   const episodeFile: EpisodeFile = {
-    id: getSeasonEpisodeFromEpisodeId(episode.id.innerId).episode,
+    id: getSeasonEpisodeFromEpisodeId(episode.id.code).episode,
     content: {
-      episodeId: episode.id.innerId,
+      episodeId: episode.id.code,
       filePath: episode.path,
     },
   };

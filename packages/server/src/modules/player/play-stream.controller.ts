@@ -3,8 +3,8 @@ import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { assertFound } from "#utils/validation/found";
 import { EpisodePickerService } from "#modules/episode-picker";
-import { EpisodeHistoryListService } from "#episodes/history";
 import { StreamsRepository } from "#modules/streams/repositories";
+import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { PlayService } from "./PlayService";
 
 class ParamsDto extends createZodDto(z.object( {
@@ -18,23 +18,12 @@ class QueryDto extends createZodDto(z.object( {
 @Controller("play/stream")
 export class PlayStreamController {
   constructor(
-    private playService: PlayService,
-    private episodePickerService: EpisodePickerService,
-    private streamRepository: StreamsRepository,
-    private historyListService: EpisodeHistoryListService,
+    private readonly playService: PlayService,
+    private readonly episodePickerService: EpisodePickerService,
+    private readonly streamRepository: StreamsRepository,
+    private readonly episodeHistoryEntriesRepository: EpisodeHistoryEntriesRepository,
   ) {
   }
-
-  static providers = Object.freeze([
-    PlayService,
-    ...PlayService.providers,
-    EpisodePickerService,
-    ...EpisodePickerService.providers,
-    StreamsRepository,
-    ...StreamsRepository.providers,
-    EpisodeHistoryListService,
-    ...EpisodeHistoryListService.providers,
-  ]);
 
     @Get("/:id")
   async playStreamDefault(
@@ -70,12 +59,9 @@ export class PlayStreamController {
       force,
     } );
 
-    if (ok) {
-      await this.historyListService.addEpisodesToHistory( {
-        historyListId: stream.id,
-        episodes,
-      } );
-    } else
+    if (ok)
+      await this.episodeHistoryEntriesRepository.addEpisodesToHistory(episodes);
+    else
       console.log("PlayService: Could not play");
 
     return episodes;

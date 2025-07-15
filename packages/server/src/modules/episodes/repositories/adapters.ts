@@ -6,7 +6,7 @@ import { DocOdm } from "./odm";
 export function docOdmToEntity(docOdm: DocOdm): EpisodeEntity {
   const model: EpisodeEntity = {
     id: {
-      innerId: docOdm.episodeId,
+      code: docOdm.episodeId,
       serieId: docOdm.serieId,
     },
     path: docOdm.path,
@@ -35,7 +35,7 @@ export function docOdmToEntity(docOdm: DocOdm): EpisodeEntity {
 export function entityToDocOdm(entity: EpisodeEntity): DocOdm {
   const ret = modelToDocOdm(entity);
 
-  ret.episodeId = entity.id.innerId;
+  ret.episodeId = entity.id.code;
   ret.serieId = entity.id.serieId;
 
   return ret;
@@ -68,7 +68,7 @@ export function partialModelToDocOdm(model: Partial<EpisodeEntity>): UpdateQuery
   const ret: UpdateQuery<Episode> = {};
 
   if (model.id !== undefined) {
-    ret.episodeId = model.id.innerId;
+    ret.episodeId = model.id.code;
 
     ret.serieId = model.id.serieId;
   }

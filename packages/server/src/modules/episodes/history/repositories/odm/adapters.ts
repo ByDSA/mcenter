@@ -1,20 +1,14 @@
-import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as EntryEntity, EpisodeHistoryListEntity as ListEntity, EpisodeHistoryListId as HistoryListId } from "../../models";
-import { DocOdm } from "./mongo";
+import { docOdmToEntity as serieDocOdmToEntity } from "#series/repositories/adapters";
+import { docOdmToEntity as episodeDocOdmToEntity } from "#episodes/repositories/adapters";
+import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../models";
+import { DocOdm, ExpandedDocOdm } from "./mongo";
 
-function docOdmToEntity(docOdm: DocOdm): ListEntity {
-  return {
-    id: docOdm.id,
-    maxSize: docOdm.maxSize,
-    entries: docOdm.entries.map((entry)=>entryDocOdmToEntryEntity(entry, docOdm.id)),
-  };
-}
-
-function entryDocOdmToEntryEntity(entryDocOdm: DocOdm["entries"][0], historyListId: HistoryListId): EntryEntity {
-  return {
-    historyListId,
+function docOdmToEntity(entryDocOdm: ExpandedDocOdm): Entity {
+  const ret: Entity = {
+    id: entryDocOdm._id.toString(),
     episodeId: {
-      innerId: entryDocOdm.episodeId,
-      serieId: entryDocOdm.serieId,
+      code: entryDocOdm.episodeId.code,
+      serieId: entryDocOdm.episodeId.serieId,
     },
     date: {
       year: entryDocOdm.date.year,
@@ -23,32 +17,32 @@ function entryDocOdmToEntryEntity(entryDocOdm: DocOdm["entries"][0], historyList
       timestamp: entryDocOdm.date.timestamp,
     },
   };
+
+  if (entryDocOdm.serie)
+    ret.serie = serieDocOdmToEntity(entryDocOdm.serie);
+
+  if (entryDocOdm.episode)
+    ret.episode = episodeDocOdmToEntity(entryDocOdm.episode);
+
+  return ret;
 }
 
-function entryToDocOdm(entry: Entry): DocOdm["entries"][0] {
+function modelToDocOdm(entry: Entry): DocOdm {
   return {
-    episodeId: entry.episodeId.innerId,
-    serieId: entry.episodeId.serieId,
+    episodeId: {
+      code: entry.episodeId.code,
+      serieId: entry.episodeId.serieId,
+    },
     date: {
       year: entry.date.year,
       month: entry.date.month,
       day: entry.date.day,
       timestamp: entry.date.timestamp,
     },
-  };
-}
-
-function entityToDocOdm(model: ListEntity): DocOdm {
-  return {
-    id: model.id,
-    maxSize: model.maxSize,
-    entries: model.entries.map(entryToDocOdm),
-  };
+  } as DocOdm;
 }
 
 export {
-  docOdmToEntity,
-  entityToDocOdm,
-  entryDocOdmToEntryEntity,
-  entryToDocOdm,
+  docOdmToEntity as docOdmToEntryEntity,
+  modelToDocOdm as entryToDocOdm,
 };

@@ -1,41 +1,25 @@
 import { DateTime } from "luxon";
-import { Injectable } from "@nestjs/common";
-import { DateType } from "$shared/utils/time";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { deepCopy } from "$shared/utils/objects";
 import { showError } from "$shared/utils/errors/showError";
-import { EpisodeEntity, EpisodeId, compareEpisodeId } from "#episodes/models";
-import { EpisodeRepository } from "#episodes/index";
-import { EpisodeHistoryListEntity } from "./models";
-
-function getTimestampFromDateType(date: DateType): number {
-  if (date.timestamp)
-    return date.timestamp;
-
-  const d = new Date(date.year, date.month - 1, date.day);
-
-  return d.getTime() / 1000;
-}
-
-type FuncParams = {
-  episodeId: EpisodeId;
-  entries: EpisodeHistoryListEntity["entries"];
-};
+import { EpisodeEntity, EpisodeId } from "#episodes/models";
+import { EpisodesRepository } from "#episodes/index";
+import { EpisodeHistoryEntriesRepository } from "./repositories";
 
 @Injectable()
 export class LastTimePlayedService {
-  constructor(private episodeRepository: EpisodeRepository) {
+  constructor(
+    @Inject(forwardRef(() => EpisodesRepository))
+    private readonly episodesRepository: EpisodesRepository,
+    private readonly entriesRepository: EpisodeHistoryEntriesRepository,
+  ) {
   }
 
-  // eslint-disable-next-line require-await
-  async updateEpisodeLastTimePlayedFromEntriesAndGet(
-    { episodeId, entries }: FuncParams,
-  ): Promise<number | null> {
-    const lastTimePlayed = this.getLastTimePlayedFromHistory(
-      episodeId,
-      entries,
-    ) ?? undefined;
+  async updateEpisodeLastTimePlayed(episodeId: EpisodeId): Promise<number | null> {
+    const lastTimePlayed = await this.entriesRepository
+      .calcEpisodeLastTimePlayed(episodeId) ?? undefined;
 
-    this.episodeRepository.patchOneByIdAndGet(episodeId, {
+    this.episodesRepository.patchOneByIdAndGet(episodeId, {
       entity: {
         lastTimePlayed,
       },
@@ -44,41 +28,20 @@ export class LastTimePlayedService {
     return lastTimePlayed ?? null;
   }
 
-  getLastTimePlayedFromHistory(selfId: EpisodeId, entries: EpisodeHistoryListEntity["entries"]): number | null {
-    let lastTimePlayed = 0;
-
-    for (const historyEntry of entries) {
-      if (compareEpisodeId(historyEntry.episodeId, selfId)) {
-        const currentTimestamp = getTimestampFromDateType(historyEntry.date);
-
-        if (currentTimestamp > lastTimePlayed)
-          lastTimePlayed = currentTimestamp;
-      }
-    }
-
-    if (lastTimePlayed === 0)
-      return null;
-
-    return lastTimePlayed;
-  }
-
-  async getDaysFromLastPlayed(
-    self: EpisodeEntity,
-    historyList: EpisodeHistoryListEntity,
-  ): Promise<number> {
-    let lastTimePlayed = self.lastTimePlayed ?? null;
+  async getDaysFromLastPlayed(episode: EpisodeEntity): Promise<number> {
+    let lastTimePlayed = episode.lastTimePlayed ?? null;
 
     if (!lastTimePlayed) {
-      lastTimePlayed = this.getLastTimePlayedFromHistory(self.id, historyList.entries);
+      lastTimePlayed = await this.entriesRepository.calcEpisodeLastTimePlayed(episode.id);
 
       if (lastTimePlayed) {
         const selfCopy: EpisodeEntity = {
-          ...deepCopy(self),
+          ...deepCopy(episode),
           lastTimePlayed,
         };
         const { id } = selfCopy;
 
-        await this.episodeRepository.updateOneByIdAndGet(id, selfCopy);
+        await this.episodesRepository.updateOneByIdAndGet(id, selfCopy);
       }
     }
 

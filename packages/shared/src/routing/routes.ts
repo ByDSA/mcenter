@@ -6,6 +6,7 @@ const EPISODES = "/api/episodes";
 const PLAYER_PLAY_EPISODE = `${PLAYER}/play/episode`;
 const PLAYER_PLAY_STREAM = `${PLAYER}/play/stream`;
 const MUSICS_HISTORY = MUSICS + "/history";
+const EPISODES_HISTORY = EPISODES + "/history";
 
 export const PATH_ROUTES = {
   musics: {
@@ -44,16 +45,16 @@ export const PATH_ROUTES = {
   },
   episodes: {
     path: EPISODES,
-    withParams: (serieId: string, innerId: string) => `${EPISODES}/${serieId}/${innerId}`,
+    withParams: (serieId: string, code: string) => `${EPISODES}/${serieId}/${code}`,
     search: {
       path: "/api/episodes/search",
     },
     history: {
-      path: "/api/history-list",
+      path: EPISODES_HISTORY,
       entries: {
-        withParams: (listId: string, entryId: string) => `/api/history-list/${listId}/entries/${entryId}`,
+        withParams: (entryId: string) => `${EPISODES_HISTORY}/entries/${entryId}`,
         search: {
-          path: "/api/history-list/entries/search",
+          path: EPISODES_HISTORY + "/entries/search",
         },
       },
     },

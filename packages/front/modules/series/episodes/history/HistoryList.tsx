@@ -29,7 +29,7 @@ export function HistoryList() {
                 }</h2>;
               }
 
-              return <Fragment key={`${entry.episodeId.serieId} ${entry.episodeId.innerId}`}>
+              return <Fragment key={`${entry.episodeId.serieId} ${entry.episodeId.code}`}>
                 {dayTitle}
                 <HistoryEntryElement value={entry} onRemove={() => {
                 // TODO: refresh fetch

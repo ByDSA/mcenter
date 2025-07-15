@@ -5,12 +5,12 @@ export {
 export * from "./adapters";
 
 export {
-  EpisodesRepository as EpisodeRepository,
-  GetManyOptions as EpisodeRepositoryGetManyOptions,
+  EpisodesRepository,
+  GetManyOptions as EpisodesRepositoryGetManyOptions,
 } from "./Repository";
 
 export {
-  ExpandEnum as EpisodeRepositoryExpandEnum,
+  ExpandEnum as EpisodesRepositoryExpandEnum,
 } from "./get-options";
 
 export * from "./events";

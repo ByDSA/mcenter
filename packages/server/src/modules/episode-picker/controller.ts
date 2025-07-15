@@ -4,13 +4,14 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { asyncMap } from "$shared/utils/arrays";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
-import { EpisodeRepository } from "#episodes/index";
+import { EpisodesRepository } from "#episodes/index";
 import { Episode, EpisodeEntity } from "#episodes/models";
-import { EpisodeHistoryListRepository, LastTimePlayedService } from "#episodes/history";
+import { LastTimePlayedService } from "#episodes/history";
 import { genRandomPickerWithData } from "#modules/picker";
 import { SerieRepository } from "#modules/series";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { assertFound } from "#utils/validation/found";
+import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { dependencies } from "./appliers/Dependencies";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 
@@ -26,10 +27,11 @@ type ResultType = Episode & {
 @Controller()
 export class EpisodePickerController {
   constructor(
-     private streamRepository: StreamsRepository,
-     private episodeRepository: EpisodeRepository,
-     private historyListRepository: EpisodeHistoryListRepository,
-     private serieRepository: SerieRepository,
+     private readonly streamRepository: StreamsRepository,
+     private readonly episodeRepository: EpisodesRepository,
+     private readonly episodeHistoryEntriesRepository: EpisodeHistoryEntriesRepository,
+     private readonly serieRepository: SerieRepository,
+     private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
   }
 
@@ -39,12 +41,12 @@ export class EpisodePickerController {
     const stream = await this.streamRepository.getOneById(streamId);
 
     assertFound(stream);
-    const historyList = await this.historyListRepository.getOneByIdOrCreate(streamId);
+    const lastEntry = await this.episodeHistoryEntriesRepository.findLastForSerieId(streamId);
 
-    assertFound(historyList);
+    assertFound(lastEntry);
 
     const seriePromise = this.serieRepository.getOneById(stream.group.origins[0].id);
-    const lastEpId = historyList.entries.at(-1)?.episodeId;
+    const lastEpId = lastEntry.episodeId;
     const lastEpPromise = lastEpId
       ? this.episodeRepository.getOneById(lastEpId)
       : Promise.resolve(null);
@@ -63,7 +65,6 @@ export class EpisodePickerController {
       weightFixerApplier: genEpisodeWeightFixerApplier(),
     } );
     const pickerWeight = picker.weight;
-    const lastTimePlayedService = new LastTimePlayedService(this.episodeRepository);
     const ret = (await asyncMap(
       "end" in picker.data[0]
         ? (picker as Picker<EpisodeEntity>).data.filter(
@@ -75,7 +76,7 @@ export class EpisodePickerController {
 
         assertIsDefined(selfWeight);
         const percentage = (selfWeight * 100) / pickerWeight;
-        const days = Math.floor(await lastTimePlayedService.getDaysFromLastPlayed(e, historyList));
+        const days = Math.floor(await this.lastTimePlayedService.getDaysFromLastPlayed(e));
 
         return {
           ...e,

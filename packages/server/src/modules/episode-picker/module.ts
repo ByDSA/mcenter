@@ -1,22 +1,22 @@
 import { Module } from "@nestjs/common";
 import { EpisodesModule } from "#episodes/module";
-import { EpisodeHistoryListsModule } from "#episodes/history/module";
 import { SeriesModule } from "#modules/series/module";
 import { StreamsModule } from "#modules/streams/module";
 import { EpisodePickerController } from "./controller";
+import { EpisodePickerService } from "./service";
 
 @Module( {
   imports: [
     StreamsModule,
     EpisodesModule,
-    EpisodeHistoryListsModule,
     SeriesModule,
   ],
   controllers: [
     EpisodePickerController,
   ],
   providers: [
+    EpisodePickerService,
   ],
-  exports: [],
+  exports: [EpisodePickerService],
 } )
 export class EpisodePickerModule {}

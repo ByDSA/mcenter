@@ -74,7 +74,7 @@ export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);
 export async function getIdModelOdmFromId(fullId: EpisodeId) {
   const episodeOdm = await ModelOdm.findOne( {
     serieId: fullId.serieId,
-    episodeId: fullId.innerId,
+    episodeId: fullId.code,
   } );
 
   if (!episodeOdm)

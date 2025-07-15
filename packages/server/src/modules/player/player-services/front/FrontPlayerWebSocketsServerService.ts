@@ -15,7 +15,7 @@ export class FrontWSServerService {
 
   #lastStatus: PlayerStatusResponse | undefined;
 
-  constructor(private domainMessageBroker: DomainMessageBroker) {
+  constructor(private readonly domainMessageBroker: DomainMessageBroker) {
     this.domainMessageBroker.subscribe(QUEUE_NAME, (event: BrokerEvent<any>) => {
       if (event.type === PlayerEventType.STATUS) {
         this.#emitStatus(event.payload.status);

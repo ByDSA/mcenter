@@ -3,15 +3,11 @@ import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/respo
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeHistoryEntry, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
-import { episodeHistoryListRestDto } from "#modules/series/episodes/history/models/dto";
+import { EpisodeHistoryEntriesCriteria } from "#modules/series/episodes/history/models/dto";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { backendUrl } from "#modules/requests";
 import { Header } from "./Header";
 import { Body } from "./body/Body";
-
-type HistoryListGetManyEntriesBySuperIdRequest = {
-  body: z.infer<typeof episodeHistoryListRestDto.getManyEntriesBySuperId.reqBodySchema>;
-};
 
 type Props = {
   value: EpisodeHistoryEntryEntity;
@@ -32,10 +28,10 @@ export function fetchLastestHistoryEntries(
   historyEntry: EpisodeHistoryEntry,
 ): Promise<EpisodeHistoryEntryEntity[] | null> {
   const URL = backendUrl(PATH_ROUTES.episodes.history.entries.search.path);
-  const bodyJson: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
+  const bodyJson: EpisodeHistoryEntriesCriteria = {
     filter: {
       serieId: historyEntry.episodeId.serieId,
-      episodeId: historyEntry.episodeId.innerId,
+      episodeId: historyEntry.episodeId.code,
       timestampMax: historyEntry.date.timestamp - 1,
     },
     sort: {

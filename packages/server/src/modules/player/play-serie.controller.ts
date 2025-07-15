@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
-import { EpisodeRepository } from "#episodes/index";
-import { EpisodeHistoryListService } from "#episodes/history";
+import { EpisodesRepository } from "#episodes/index";
 import { SerieRepository } from "#modules/series";
 import { assertFound } from "#utils/validation/found";
+import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { PlayService } from "./PlayService";
 
 class ParamsDto extends createZodDto(z.object( {
@@ -18,23 +18,12 @@ class QueryDto extends createZodDto(z.object( {
 @Controller("play/episode")
 export class PlaySerieController {
   constructor(
-    private serieRepository: SerieRepository,
-    private episodeRepository: EpisodeRepository,
-    private playService: PlayService,
-    private historyListService: EpisodeHistoryListService,
+    private readonly serieRepository: SerieRepository,
+    private readonly episodeRepository: EpisodesRepository,
+    private readonly playService: PlayService,
+    private readonly entriesRepository: EpisodeHistoryEntriesRepository,
   ) {
   }
-
-  static providers = Object.freeze([
-    SerieRepository,
-    ...SerieRepository.providers,
-    EpisodeRepository,
-    ...EpisodeRepository.providers,
-    PlayService,
-    ...PlayService.providers,
-    EpisodeHistoryListService,
-    ...EpisodeHistoryListService.providers,
-  ]);
 
   @Get("/:serieId/:id")
   async playSerie(
@@ -42,14 +31,14 @@ export class PlaySerieController {
     @Query() query: QueryDto,
   ) {
     const { force } = query;
-    const { id: innerId, serieId } = params;
+    const { id: code, serieId } = params;
     const serie = await this.serieRepository.getOneById(serieId);
 
     assertFound(serie);
 
     const episode = await this.episodeRepository.getOneById( {
       serieId,
-      innerId,
+      code,
     } );
 
     assertFound(episode);
@@ -58,12 +47,9 @@ export class PlaySerieController {
       force,
     } );
 
-    if (ok) {
-      await this.historyListService.addEpisodesToHistory( {
-        historyListId: serie.id,
-        episodes: [episode],
-      } );
-    } else
+    if (ok)
+      await this.entriesRepository.createNewEntryNowFor(episode.id);
+    else
       console.log("PlayService: Could not play");
 
     return episode;

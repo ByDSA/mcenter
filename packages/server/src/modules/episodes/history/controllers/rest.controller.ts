@@ -2,212 +2,90 @@ import { Request, Response } from "express";
 import { Body, Controller, Param } from "@nestjs/common";
 import { showError } from "$shared/utils/errors/showError";
 import { createZodDto } from "nestjs-zod";
-import { episodeHistoryListRestDto } from "$shared/models/episodes/history/dto/transport";
-import { EpisodeRepository, EpisodeRepositoryExpandEnum } from "#episodes/index";
-import { SerieRepository } from "#modules/series";
-import { CanGetAll } from "#utils/layers/controller";
-import { DeleteOne, GetOne } from "#utils/nestjs/rest";
-import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/Get";
-import { assertFound } from "#utils/validation/found";
-import { EpisodeHistoryListRepository } from "../repositories";
-import { EpisodeHistoryEntry, EpisodeHistoryEntryEntity, assertIsEpisodeHistoryEntryEntity, episodeHistoryListEntitySchema, episodeHistoryEntryEntitySchema, episodeHistoryEntrySchema, episodeHistoryEntryToEntity, getIdFromEntry } from "../models";
+import { episodeHistoryEntriesRestDto } from "$shared/models/episodes/history/dto/transport";
+import z from "zod";
+import { EpisodeHistoryEntriesRepository } from "../repositories";
+import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 import { LastTimePlayedService } from "../last-time-played.service";
+import { CanGetAll } from "#utils/layers/controller";
+import { DeleteOne } from "#utils/nestjs/rest";
+import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/Get";
 
 namespace Dto {
-  export class GetManyEntriesByIdBody
-    extends createZodDto(episodeHistoryListRestDto.getManyEntriesBySuperId.reqBodySchema) {}
   export class GetManyEntriesByCriteriaBody
-    extends createZodDto(episodeHistoryListRestDto.getManyEntriesByCriteria.reqBodySchema) {}
-  export class GetOneByIdParams
-    extends createZodDto(episodeHistoryListRestDto.getOneByIdReqParamsSchema) {}
-  export class GetManyEntriesByIdParams
-    extends createZodDto(episodeHistoryListRestDto.getOneByIdReqParamsSchema) {}
-  export class DeleteOneEntryByIdParams
-    extends createZodDto(episodeHistoryListRestDto.deleteOneEntryById.reqParamsSchema) {}
+    extends createZodDto(episodeHistoryEntriesRestDto.getManyByCriteria.reqBodySchema) {}
+  export class SerieIdParams
+    extends createZodDto(z.object( {
+      serieId: z.string(),
+    } )) {}
+
+    export class IdParams extends createZodDto(z.object( {
+      id: z.string(),
+    } )) {}
 };
 
 @Controller()
-export class EpisodeHistoryListRestController
+export class EpisodeHistoryEntriesRestController
 implements
     CanGetAll<Request, Response> {
   constructor(
-    private historyListRepository: EpisodeHistoryListRepository,
-    private serieRepository: SerieRepository,
-    private episodeRepository: EpisodeRepository,
-    private lastTimePlayedService: LastTimePlayedService,
+    private readonly entriesRepository: EpisodeHistoryEntriesRepository,
+    private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
   }
 
-  @GetMany("/", episodeHistoryListEntitySchema)
+  @GetMany("/", episodeHistoryEntryEntitySchema)
   async getAll() {
-    return await this.historyListRepository.getAll();
+    return await this.entriesRepository.getAll();
   }
 
-  @GetOne("/:id", episodeHistoryListEntitySchema)
-  async getOneById(
-    @Param() params: Dto.GetOneByIdParams,
+  @GetMany("/:serieId", episodeHistoryEntryEntitySchema)
+  async getManyBySerieId(
+    @Param() params: Dto.SerieIdParams,
   ) {
-    const got = await this.historyListRepository.getOneByIdOrCreate(params.id);
-
-    assertFound(got);
-
-    return got;
+    return await this.entriesRepository.getManyBySerieId(params.serieId);
   }
 
-  @GetMany("/:id/entries", episodeHistoryEntrySchema)
-  async getManyEntriesByHistoryListId(
-    @Param() params: Dto.GetOneByIdParams,
+  @GetMany("/:serieId/entries", episodeHistoryEntryEntitySchema)
+  async getAllEntriesBySerieId(
+    @Param() params: Dto.SerieIdParams,
   ) {
-    const got = await this.historyListRepository.getOneByIdOrCreate(params.id);
-
-    assertFound(got);
-
-    return got.entries;
+    return await this.entriesRepository.getManyByCriteria( {
+      filter: {
+        serieId: params.serieId,
+      },
+    } );
   }
 
-  async #getEntriesWithCriteriaApplied(
-    entries: EpisodeHistoryEntryEntity[],
-    body: Dto.GetManyEntriesByIdBody = {},
-  ): Promise<EpisodeHistoryEntryEntity[]> {
-    let newEntries = entries;
-
-    if (body.filter) {
-      newEntries = newEntries.filter((entry) => {
-        const { episodeId: { serieId, innerId } } = entry;
-
-        if (body.filter?.serieId && serieId !== body.filter.serieId)
-          return false;
-
-        if (body.filter?.episodeId && innerId !== body.filter.episodeId)
-          return false;
-
-        if (body.filter?.timestampMax !== undefined
-           && entry.date.timestamp > body.filter.timestampMax)
-          return false;
-
-        return true;
-      } );
-    }
-
-    if (body.sort) {
-      const { timestamp } = body.sort;
-      const descSort = (
-        a: EpisodeHistoryEntry,
-        b: EpisodeHistoryEntry,
-      ) => b.date.timestamp - a.date.timestamp;
-      const ascSort = (
-        a: EpisodeHistoryEntry,
-        b: EpisodeHistoryEntry,
-      ) => a.date.timestamp - b.date.timestamp;
-
-      if (timestamp === "asc")
-        newEntries = newEntries.toSorted(ascSort);
-      else if (timestamp === "desc")
-        newEntries = newEntries.toSorted(descSort);
-    }
-
-    if (body.offset)
-      newEntries = newEntries.slice(body.offset);
-
-    if (body.limit)
-      newEntries = newEntries.slice(0, body.limit);
-
-    if (body.expand) {
-      if (body.expand.includes("series")) {
-        const promises = newEntries.map(async (entry) => {
-          const { episodeId: { serieId } } = entry;
-          const serie = await this.serieRepository.getOneById(serieId);
-
-          if (serie)
-            entry.serie = serie;
-
-          return entry;
-        } );
-
-        newEntries = await Promise.all(promises);
-      }
-
-      if (body.expand.includes("episodes")) {
-        const promises = newEntries.map(async (entry) => {
-          const { episodeId: { innerId, serieId } } = entry;
-          const episode = await this.episodeRepository.getOneById( {
-            innerId,
-            serieId,
-          }, {
-            expand: [EpisodeRepositoryExpandEnum.FileInfo],
-          } );
-
-          if (episode)
-            entry.episode = episode;
-
-          return entry;
-        } );
-
-        newEntries = await Promise.all(promises);
-      }
-    }
-
-    return newEntries;
-  }
-
-  @GetManyCriteria("/:id/entries/search", episodeHistoryEntryEntitySchema)
-  async getManyEntriesByHistoryListIdSearch(
-    @Body() body: Dto.GetManyEntriesByIdBody,
-    @Param() params: Dto.GetManyEntriesByIdParams,
+  @GetManyCriteria("/:serieId/entries/search", episodeHistoryEntryEntitySchema)
+  async getManyEntriesBySerieAndCriteria(
+    @Body() body: Dto.GetManyEntriesByCriteriaBody,
+    @Param() params: Dto.SerieIdParams,
   ) {
-    const got = await this.historyListRepository.getOneByIdOrCreate(params.id);
-
-    assertFound(got);
-    let entries = got.entries.map(e=>episodeHistoryEntryToEntity(e, got));
-
-    entries = await this.#getEntriesWithCriteriaApplied(entries, body);
-
-    return entries;
+    return await this.entriesRepository.getManyByCriteria( {
+      ...body,
+      filter: {
+        ...body.filter,
+        serieId: params.serieId,
+      },
+    } );
   }
 
   @GetManyCriteria("/entries/search", episodeHistoryEntryEntitySchema)
-  async getManyEntriesBySearch(
+  async getManyEntriesByCriteria(
     @Body() body: Dto.GetManyEntriesByCriteriaBody,
   ) {
-    const got = await this.historyListRepository.getAll();
-    let entries: EpisodeHistoryEntryEntity[] = [];
-
-    for (const historyList of got)
-      entries.push(...historyList.entries.map(e=>episodeHistoryEntryToEntity(e, historyList)));
-
-    entries = await this.#getEntriesWithCriteriaApplied(entries, body);
-
-    return entries;
+    return await this.entriesRepository.getManyByCriteria(body);
   }
 
-  @DeleteOne("/:id/entries/:entryId", episodeHistoryEntryEntitySchema)
+  @DeleteOne("/entries/:id", episodeHistoryEntryEntitySchema)
   async deleteOneEntryByIdAndGet(
-    @Param() params: Dto.DeleteOneEntryByIdParams,
+    @Param() params: Dto.IdParams,
   ): Promise<EpisodeHistoryEntryEntity> {
-    const { id, entryId } = params;
-    const historyList = await this.historyListRepository.getOneByIdOrCreate(id);
+    const { id } = params;
+    const deleted = await this.entriesRepository.deleteOneByIdAndGet(id);
 
-    assertFound(historyList);
-
-    // eslint-disable-next-line max-len
-    // TODO: igual ejecutar esto en paralelo, usando el índice, hace que elimine índices que no toca.
-    const entryIndex = historyList.entries.findIndex(
-      (entry: EpisodeHistoryEntry) => getIdFromEntry(entry) === entryId,
-    );
-    const found = entryIndex > 0 ? true : undefined;
-
-    assertFound(found);
-
-    const [deleted] = historyList.entries.splice(entryIndex, 1);
-
-    assertIsEpisodeHistoryEntryEntity(deleted);
-
-    await this.historyListRepository.updateOneById(historyList.id, historyList);
-
-    this.lastTimePlayedService.updateEpisodeLastTimePlayedFromEntriesAndGet( {
-      episodeId: deleted.episodeId,
-      entries: historyList.entries,
-    } ).catch(showError);
+    this.lastTimePlayedService.updateEpisodeLastTimePlayed(deleted.episodeId).catch(showError);
 
     return deleted;
   }

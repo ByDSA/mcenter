@@ -7,14 +7,14 @@ import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } f
 import { SerieRepository } from "#modules/series";
 import { Serie } from "#modules/file-info/tree/models";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
-import { EpisodeRepository } from "../repositories";
+import { EpisodesRepository } from "../repositories";
 
 @Controller("/episodes/add-new-files")
 export class EpisodeAddNewFilesController {
   constructor(
-    private serieRepository: SerieRepository,
-    private episodeRepository: EpisodeRepository,
-    private savedSerieTreeService: SavedSerieTreeService,
+    private readonly serieRepository: SerieRepository,
+    private readonly episodeRepository: EpisodesRepository,
+    private readonly savedSerieTreeService: SavedSerieTreeService,
   ) {
   }
 
@@ -108,7 +108,7 @@ export class EpisodeAddNewFilesController {
         for (const episodeInTree of seasonInTree.children) {
           const episode: EpisodeEntity = {
             id: {
-              innerId: episodeInTree.content.episodeId,
+              code: episodeInTree.content.episodeId,
               serieId: serie.id,
             },
             path: episodeInTree.content.filePath,

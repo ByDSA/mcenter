@@ -9,7 +9,6 @@ import { CustomValidationError } from "$shared/utils/validation/zod";
 import { GlobalExceptionFilter } from "#main/errorHandler";
 import { RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/player";
 import { ZodSerializerSchemaInterceptor } from "#utils/validation/zod-nestjs";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { Cleanup } from "./clean-up.service";
 
 @Injectable()
@@ -20,10 +19,6 @@ export class InitService implements OnModuleInit {
     private readonly remotePlayerWebSocketsServerService: RemotePlayerWebSocketsServerService,
   ) {
   }
-
-  static providers = Object.freeze([
-    DomainMessageBroker,
-  ]);
 
   onModuleInit() {
     const { httpAdapter } = this.adapterHost;

@@ -3,11 +3,11 @@ import { Body, Controller, Get } from "@nestjs/common";
 import { CriteriaSortDir } from "$shared/utils/criteria";
 import { CriteriaSort, getManyByCriteria } from "$shared/models/streams/dto/rest";
 import { createZodDto } from "nestjs-zod";
-import { EpisodeHistoryListRepository } from "#episodes/history";
 import { SerieRepository } from "#modules/series";
 import { Stream, StreamOriginType, streamSchema } from "#modules/streams/models";
 import { CanGetAll } from "#utils/layers/controller";
 import { GetManyCriteria } from "#utils/nestjs/rest/Get";
+import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { StreamsRepository } from "../repositories";
 
 class CriteriaBodyDto extends createZodDto(getManyByCriteria.reqBodySchema) {}
@@ -17,9 +17,9 @@ export class StreamsRestController
 implements
     CanGetAll<Request, Response> {
   constructor(
-    private streamRepository: StreamsRepository,
-    private serieRepository: SerieRepository,
-    private historyListRepository: EpisodeHistoryListRepository,
+    private readonly streamRepository: StreamsRepository,
+    private readonly serieRepository: SerieRepository,
+    private readonly episodeHistoryEntriesRepository: EpisodeHistoryEntriesRepository,
   ) {
   }
 
@@ -56,15 +56,14 @@ implements
 
             continue;
 
-          const historyList = await this.historyListRepository.getOneByIdOrCreate(stream.id);
-          const lastEntry = historyList?.entries.at(-1);
+          const lastEntry = await this.episodeHistoryEntriesRepository
+            .findLastForSerieId(stream.id);
 
           if (lastEntry)
             lastTimePlayedDic[serieId] = lastEntry.date.timestamp;
         }
 
-        // cambiar por toSorted en node 20
-        got = got.sort((a, b) => {
+        got = got.toSorted((a, b) => {
           const serieIdA = a.group.origins[0]?.id;
           const serieIdB = b.group.origins[0]?.id;
 

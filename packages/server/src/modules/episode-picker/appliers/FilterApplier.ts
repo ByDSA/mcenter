@@ -25,11 +25,11 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
 
     if (lastId && serieId && serieId in dependencies) {
       const serieDependencies = dependencies[serieId];
-      const dependency = serieDependencies.find(([a]) => a === lastId.innerId);
+      const dependency = serieDependencies.find(([a]) => a === lastId.code);
 
       if (dependency) {
         const dependencyFullId: [EpisodeId, EpisodeId] = dependency.map((episodeId) => ( {
-          innerId: episodeId,
+          code: episodeId,
           serieId,
         } )) as [EpisodeId, EpisodeId];
 

@@ -1,14 +1,9 @@
 export {
-  EpisodeHistoryListEntryRepository as EpisodeHistoryEntryRepository,
-  EpisodeHistoryListRepository,
+  EpisodeHistoryEntriesRepository,
 } from "./repositories";
 
 export {
-  EpisodeHistoryListService,
-} from "./service";
-
-export {
-  EpisodeHistoryListRestController as HistoryListRestController,
+  EpisodeHistoryEntriesRestController,
 } from "./controllers";
 
 export {

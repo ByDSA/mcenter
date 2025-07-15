@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { RealDatabase as Database } from "../../src/main/db/Database";
+import { Database } from "../../src/main/db/Database";
 
 (async () => {
   const lastMigration = +process.argv[2];
@@ -10,8 +10,6 @@ import { RealDatabase as Database } from "../../src/main/db/Database";
   // eslint-disable-next-line no-empty-function, no-console
   console.log = () => {};
   const database = new Database();
-
-  database.init();
 
   await database.connect();
 

@@ -21,7 +21,7 @@ export async function fetchPatch(id: EpisodeId, body: EpisodePatchOneByIdReq["bo
     resBodyValidator: genAssertIsOneDataResponse(episodeEntitySchema),
   } );
   const URL = backendUrl(
-    PATH_ROUTES.episodes.withParams(id.serieId, id.innerId),
+    PATH_ROUTES.episodes.withParams(id.serieId, id.code),
   );
 
   return fetcher( {

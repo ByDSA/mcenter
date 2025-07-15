@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { MusicsHistoryModule } from "./history/controllers/module";
+import { MusicsHistoryModule } from "./history/module";
 import { MusicGetController } from "./controllers/get.controller";
 import { MusicFixController } from "./controllers/fix.controller";
 import { UpdateRemoteTreeService } from "./services";

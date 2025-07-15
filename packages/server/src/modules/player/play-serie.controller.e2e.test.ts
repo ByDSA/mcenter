@@ -5,9 +5,12 @@ import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { testRoute } from "#tests/main/routing";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { SeriesModule } from "#modules/series/module";
+import { EpisodesModule } from "#episodes/module";
 import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests/PlayerBackWebSocketsServiceMock";
 import { VlcBackWebSocketsServerService } from "./player-services";
 import { PlaySerieController } from "./play-serie.controller";
+import { PlayService } from "./PlayService";
 
 testRoute(PATH_ROUTES.player.play.episode.withParams("serieId", "episodeId"));
 
@@ -17,14 +20,14 @@ describe("playSerieController", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [],
+      imports: [SeriesModule, EpisodesModule],
       controllers: [PlaySerieController],
       providers: [
-        ...PlaySerieController.providers,
         {
           provide: VlcBackWebSocketsServerService,
           useClass: PlayerBackWebSocketsServiceMock,
         },
+        PlayService,
       ],
     }, {
       db: {
@@ -45,14 +48,14 @@ describe("playSerieController", () => {
     } );
 
     it("should return 404 if serie not found", async () => {
-      const response = await request(routerApp).get(`/play/episode/simpson/${ EPISODES_SIMPSONS[0].id.innerId}`)
+      const response = await request(routerApp).get(`/play/episode/simpson/${ EPISODES_SIMPSONS[0].id.code}`)
         .expect(404);
 
       expect(response).toBeDefined();
     } );
 
     it("should return 200 if episode found", async () => {
-      const response = await request(routerApp).get(`/play/episode/simpsons/${ EPISODES_SIMPSONS[0].id.innerId}`)
+      const response = await request(routerApp).get(`/play/episode/simpsons/${ EPISODES_SIMPSONS[0].id.code}`)
         .expect(200);
 
       expect(response).toBeDefined();

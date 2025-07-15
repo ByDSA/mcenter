@@ -1,17 +1,16 @@
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
-import { EpisodeRepository } from "#episodes/index";
+import { EpisodesRepository } from "#episodes/index";
 import { SerieRepository } from "#modules/series";
 import { StreamsRepository } from "#modules/streams/repositories";
-import { EpisodeHistoryListRepository, LastTimePlayedService } from "#episodes/history";
+import { LastTimePlayedService } from "#episodes/history";
 
 @Controller("/episodes/updateLastTimePlayed")
 export class EpisodesUpdateLastTimePlayedController {
   constructor(
-    private lastTimePlayedService: LastTimePlayedService,
-    private serieRepository: SerieRepository,
-    private episodeRepository: EpisodeRepository,
-    private historyListRepository: EpisodeHistoryListRepository,
-    private streamRepository: StreamsRepository,
+    private readonly lastTimePlayedService: LastTimePlayedService,
+    private readonly serieRepository: SerieRepository,
+    private readonly episodeRepository: EpisodesRepository,
+    private readonly streamRepository: StreamsRepository,
   ) {
   }
 
@@ -31,15 +30,10 @@ export class EpisodesUpdateLastTimePlayedController {
           return;
         }
 
-        const historyList = await this.historyListRepository.getOneByIdOrCreate(stream.id);
-
         await this.episodeRepository.getAllBySerieId(serie.id).then(episodes => {
           for (const episode of episodes) {
             const updatePromise = this.lastTimePlayedService
-              .updateEpisodeLastTimePlayedFromEntriesAndGet( {
-                episodeId: episode.id,
-                entries: historyList.entries,
-              } );
+              .updateEpisodeLastTimePlayed(episode.id);
 
             promisesToAwait.push(updatePromise);
           }

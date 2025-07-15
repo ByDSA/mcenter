@@ -1,58 +1,45 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { DateType } from "$shared/utils/time";
 import { DateTypeOdmSchema } from "#utils/time";
-import { EpisodeHistoryListEntity } from "../../models";
+import { SerieDocOdm } from "#modules/series";
+import { EpisodeDocOdm } from "#episodes/index";
 
-type EntryDocOdm = {
+type DocOdm = {
+  _id: Types.ObjectId;
   date: DateType;
-  episodeId: string;
-  serieId: string;
+  episodeId: {
+    code: string;
+    serieId: string;
+  };
 };
 
-export const entrySchema = new mongoose.Schema<EntryDocOdm>( {
+type ExpandedDocOdm = DocOdm & {
+  serie?: SerieDocOdm;
+  episode?: EpisodeDocOdm;
+};
+
+const schemaOdm = new mongoose.Schema<DocOdm>( {
   date: {
     type: DateTypeOdmSchema,
     required: true,
   },
   episodeId: {
-    type: String,
-    required: true,
-  },
-  serieId: {
-    type: String,
-    required: true,
-  },
-} );
-
-type DocOdm = Omit<EpisodeHistoryListEntity, "entries"> & {
-  entries: EntryDocOdm[];
-};
-
-const NAME = "HistoryList";
-const schemaOdm = new mongoose.Schema<DocOdm>(
-  {
-    id: {
+    code: {
       type: String,
       required: true,
     },
-    entries: {
-      type: [entrySchema],
-      required: true,
-    },
-    maxSize: {
-      type: Number,
+    serieId: {
+      type: String,
       required: true,
     },
   },
-  {
-    collection: "historyLists",
-  },
-);
+} );
+const NAME = "EpisodeHistoryEntry";
 const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);
 
 export {
   DocOdm,
   schemaOdm,
-  EntryDocOdm,
   ModelOdm,
+  ExpandedDocOdm,
 };

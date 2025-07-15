@@ -1,3 +1,3 @@
 export {
-  EpisodeHistoryListRestController,
+  EpisodeHistoryEntriesRestController,
 } from "./rest.controller";

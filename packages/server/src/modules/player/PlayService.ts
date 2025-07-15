@@ -10,12 +10,8 @@ type PlayParams = {
 
 @Injectable()
 export class PlayService {
-  constructor(private vlcBackWSServerService: VlcBackWebSocketsServerService) {
+  constructor(private readonly vlcBackWSServerService: VlcBackWebSocketsServerService) {
   }
-
-  static providers = [
-    VlcBackWebSocketsServerService,
-  ];
 
   async play( { episodes, force }: PlayParams): Promise<boolean> {
     assertIsNotEmpty(episodes);

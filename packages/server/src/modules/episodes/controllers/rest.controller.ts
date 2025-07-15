@@ -11,7 +11,7 @@ import { SerieEntity } from "#modules/series/models";
 import { GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest/Get";
 import { PatchOne } from "#utils/nestjs/rest";
 import { assertFound } from "#utils/validation/found";
-import { EpisodeRepository } from "../repositories";
+import { EpisodesRepository } from "../repositories";
 
 class GetOneByIdParamsDto extends createZodDto(getOneById.paramsSchema) {}
 class GetAllParamsDto extends createZodDto(getAll.paramsSchema) {}
@@ -28,12 +28,12 @@ const schema = episodeEntitySchema;
 @Controller()
 export class EpisodesRestController {
   constructor(
-    private episodeRepository: EpisodeRepository,
-    private serieRepo: SerieRepository,
+    private readonly episodeRepository: EpisodesRepository,
+    private readonly serieRepo: SerieRepository,
   ) {
   }
 
-  @PatchOne("/:serieId/:innerId", schema)
+  @PatchOne("/:serieId/:code", schema)
   async patchOneByIdAndGet(
     @Param() params: PatchOneByIdParamsDto,
     @Body() body: PatchOneByIdBodyDto,
@@ -56,7 +56,7 @@ export class EpisodesRestController {
     return await this.episodeRepository.getAllBySerieId(serieId);
   }
 
-  @GetOne("/:serieId/:innerId", schema)
+  @GetOne("/:serieId/:code", schema)
   async getOneById(
     @Param() params: GetOneByIdParamsDto,
   ) {

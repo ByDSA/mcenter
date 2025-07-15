@@ -1,31 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { neverCase } from "$shared/utils/validation";
 import { EpisodeEntity } from "#episodes/models";
-import { EpisodeRepository, EpisodeRepositoryGetManyOptions } from "#episodes/repositories";
+import { EpisodesRepository, EpisodesRepositoryGetManyOptions } from "#episodes/repositories";
 import { PickMode, ResourcePicker } from "#modules/picker";
 import { Stream, StreamId, StreamMode } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/repositories";
-import { EpisodeHistoryListRepository } from "#episodes/history";
 import { assertFound } from "#utils/validation/found";
+import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { buildEpisodePicker } from "./EpisodePicker";
 
 @Injectable()
 export class EpisodePickerService {
   constructor(
-    private streamRepository: StreamsRepository,
-    private episodeRepository: EpisodeRepository,
-    private historyListRepository: EpisodeHistoryListRepository,
+    private readonly streamRepository: StreamsRepository,
+    private readonly episodeRepository: EpisodesRepository,
+    private readonly historyEntriesRepository: EpisodeHistoryEntriesRepository,
   ) {
   }
-
-  static providers = Object.freeze([
-    StreamsRepository,
-    ...StreamsRepository.providers,
-    EpisodeRepository,
-    ...EpisodeRepository.providers,
-    EpisodeHistoryListRepository,
-    ...EpisodeHistoryListRepository.providers,
-  ]);
 
   async getByStreamId(streamId: StreamId, n = 1): Promise<EpisodeEntity[]> {
     const stream = await this.streamRepository.getOneById(streamId);
@@ -43,15 +34,15 @@ export class EpisodePickerService {
 
   async getByStream(stream: Stream, n = 1): Promise<EpisodeEntity[]> {
     const serieId: string = stream.group.origins[0].id;
-    const options: EpisodeRepositoryGetManyOptions = {
+    const options: EpisodesRepositoryGetManyOptions = {
       sortById: stream.mode === StreamMode.SEQUENTIAL,
     };
     const allEpisodesInSerie = await this.episodeRepository
       .getManyBySerieId(serieId, options);
-    const historyList = await this.historyListRepository.getOneByIdOrCreate(stream.id);
+    const lastEntry = await this.historyEntriesRepository.findLastForSerieId(stream.id);
 
-    assertFound(historyList, `Cannot get history list from stream '${stream.id}'`);
-    const lastPlayedEpInSerieId = historyList.entries.at(-1)?.episodeId;
+    assertFound(lastEntry, `Cannot get last history entry list from stream '${stream.id}'`);
+    const lastPlayedEpInSerieId = lastEntry.episodeId;
     const lastPlayedEpInSerie = lastPlayedEpInSerieId
       ? await this.episodeRepository.getOneById(lastPlayedEpInSerieId)
       : null;

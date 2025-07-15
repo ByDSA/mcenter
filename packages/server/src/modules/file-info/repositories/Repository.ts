@@ -12,8 +12,6 @@ type SuperId = FileInfoVideoSuperId;
 export class EpisodeFileInfoRepository
 implements CanGetAllBySuperId<Model, SuperId>,
 CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId> {
-  static providers = Object.freeze([]);
-
   async updateOneByEpisodeDbId(id: string, model: ModelWithSuperId): Promise<void> {
     const docOdm = modelWithSuperIdToDocOdm(model);
 

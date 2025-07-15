@@ -1,24 +1,25 @@
-import { Module } from "@nestjs/common";
+/* eslint-disable import/no-cycle */
+import { forwardRef, Module } from "@nestjs/common";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
-import { EpisodeHistoryListRestController } from "./controllers";
-import { EpisodeHistoryListRepository } from "./repositories";
+import { EpisodeHistoryEntriesRestController } from "./controllers";
+import { EpisodeHistoryEntriesRepository } from "./repositories";
 import { LastTimePlayedService } from "./last-time-played.service";
 
 @Module( {
   imports: [
     SeriesModule,
-    EpisodesModule,
+    forwardRef(() => EpisodesModule),
   ],
   controllers: [
-    EpisodeHistoryListRestController,
+    EpisodeHistoryEntriesRestController,
   ],
   providers: [
     DomainMessageBroker,
-    EpisodeHistoryListRepository,
+    EpisodeHistoryEntriesRepository,
     LastTimePlayedService,
   ],
-  exports: [EpisodeHistoryListRepository],
+  exports: [EpisodeHistoryEntriesRepository, LastTimePlayedService],
 } )
-export class EpisodeHistoryListsModule {}
+export class EpisodeHistoryEntriesModule {}

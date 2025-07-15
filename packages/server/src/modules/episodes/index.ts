@@ -2,14 +2,14 @@ export {
   DocOdm as EpisodeDocOdm,
   docOdmToEntity as episodeDocOdmToModel,
   ModelOdm as EpisodeModelOdm,
-  EpisodeRepository,
-  EpisodeRepositoryExpandEnum,
+  EpisodesRepository,
+  EpisodesRepositoryExpandEnum,
   SchemaOdm as EpisodeSchemaOdm,
   entityToDocOdm as episodeToDocOdm,
 } from "./repositories";
 
 export {
-  EpisodesRestController as EpisodeRestController,
+  EpisodesRestController,
 } from "./controllers";
 
 export {
@@ -17,7 +17,7 @@ export {
 } from "./add-new-files";
 
 export {
-  EpisodesUpdateController as EpisodeUpdateController,
+  EpisodesUpdateController,
 } from "./update";
 
 export * from "./saved-serie-tree-service";

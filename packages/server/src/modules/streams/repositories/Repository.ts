@@ -18,7 +18,7 @@ export class StreamsRepository
 implements CanGetOneById<Stream, StreamId>,
 CanUpdateOneById<Stream, StreamId>,
 CanCreateOne<Stream>, CanGetAll<Stream> {
-  constructor(private domainMessageBroker: DomainMessageBroker) {
+  constructor(private readonly domainMessageBroker: DomainMessageBroker) {
     this.domainMessageBroker.subscribe(SERIES_QUEUE_NAME, async (event: BrokerEvent<any>) => {
       logDomainEvent(SERIES_QUEUE_NAME, event);
 
@@ -32,10 +32,6 @@ CanCreateOne<Stream>, CanGetAll<Stream> {
       return Promise.resolve();
     } ).catch(showError);
   }
-
-  static providers = Object.freeze([
-    DomainMessageBroker,
-  ]);
 
   async fixDefaultStreamForSerie(serieId: SerieId): Promise<LogElementResponse | null> {
     const hasDefault = await this.hasDefaultForSerie(serieId);

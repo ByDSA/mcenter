@@ -9,7 +9,7 @@
     "experimentalDecorators": true,
     "importHelpers": false, // Para no necesitar tslib en producción
     "inlineSources": true,
-    "lib": ["dom", "es2023"],
+    "lib": ["dom", "es2024"],
     "module": "CommonJS",
     "moduleResolution": "node",
     "noImplicitAny": true,

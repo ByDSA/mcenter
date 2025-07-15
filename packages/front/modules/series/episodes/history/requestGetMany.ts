@@ -1,16 +1,12 @@
-import { z } from "zod";
 import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "./models";
-import { episodeHistoryListRestDto } from "./models/dto";
+import { EpisodeHistoryEntriesCriteria } from "./models/dto";
 
 type Data = Required<EpisodeHistoryEntryEntity>[];
-type HistoryListGetManyEntriesBySuperIdRequest = {
-  body: z.infer<typeof episodeHistoryListRestDto.getManyEntriesBySuperId.reqBodySchema>;
-};
-const body: HistoryListGetManyEntriesBySuperIdRequest["body"] = {
+const body: EpisodeHistoryEntriesCriteria = {
   filter: {},
   sort: {
     timestamp: "desc",
@@ -28,12 +24,15 @@ const fetcher = makeFetcher( {
   resBodyValidator: validator,
 } );
 
-export const useRequest: UseRequest<DataResponse<Data>> = makeUseRequest<HistoryListGetManyEntriesBySuperIdRequest["body"], DataResponse<Data>>( {
-  key: {
-    url: backendUrl(PATH_ROUTES.episodes.history.entries.search.path),
-    method,
-    body,
-  },
-  fetcher,
-  refreshInterval: 5 * 1000,
-} );
+export const useRequest: UseRequest<DataResponse<Data>> = makeUseRequest<
+  EpisodeHistoryEntriesCriteria,
+  DataResponse<Data>
+ >( {
+   key: {
+     url: backendUrl(PATH_ROUTES.episodes.history.entries.search.path),
+     method,
+     body,
+   },
+   fetcher,
+   refreshInterval: 5 * 1000,
+ } );

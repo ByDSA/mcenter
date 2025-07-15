@@ -5,7 +5,7 @@ import { UpdateMetadataProcess } from "./UpdateSavedProcess";
 
 @Controller("/episodes/file-info/update")
 export class EpisodesUpdateController {
-  constructor(private updateMetadataProcess: UpdateMetadataProcess) {
+  constructor(private readonly updateMetadataProcess: UpdateMetadataProcess) {
   }
 
   @Get("/saved")

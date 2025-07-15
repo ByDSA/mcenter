@@ -5,9 +5,9 @@ import { serieEntitySchema } from "../series";
 import { fileInfoVideoSchema } from "./fileinfo";
 import { EpisodeId, episodeSchema } from "./episode";
 
-export const episodeInnerIdSchema = z.string();
+export const episodeCodeSchema = z.string();
 const modelIdSchema = z.object( {
-  innerId: episodeInnerIdSchema,
+  code: episodeCodeSchema,
   serieId: z.string(),
 } ).strict();
 
@@ -39,7 +39,7 @@ export const episodeEntitySchema = episodeSchema
 export type EpisodeEntity = z.infer<typeof episodeEntitySchema>;
 
 export function compareEpisodeId(a: EpisodeId, b: EpisodeId): boolean {
-  return a.innerId === b.innerId && a.serieId === b.serieId;
+  return a.code === b.code && a.serieId === b.serieId;
 }
 
 export {

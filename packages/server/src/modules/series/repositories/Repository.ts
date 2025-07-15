@@ -16,17 +16,13 @@ implements CanGetOneById<SerieEntity, SerieId>,
 CanUpdateOneByIdAndGet<SerieEntity, SerieId>,
 CanCreateOneAndGet<SerieEntity>,
 CanGetAll<SerieEntity> {
-  constructor(private domainMessageBroker: DomainMessageBroker) {
+  constructor(private readonly domainMessageBroker: DomainMessageBroker) {
     this.domainMessageBroker.subscribe(QUEUE_NAME, (event: BrokerEvent<any>) => {
       logDomainEvent(QUEUE_NAME, event);
 
       return Promise.resolve();
     } ).catch(showError);
   }
-
-  static providers = [
-    DomainMessageBroker,
-  ];
 
   async getAll(): Promise<SerieEntity[]> {
     const seriesDocOdm = await ModelOdm.find();

@@ -5,7 +5,7 @@ import { episodeFileInfoRepositoryMockProvider } from "#modules/file-info/reposi
 import { serieRepositoryMockProvider } from "#modules/series/repositories/tests";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { restTestsSuite } from "#tests/suites/rest-suite";
-import { EpisodeRepository } from "#episodes/repositories";
+import { EpisodesRepository } from "#episodes/repositories";
 import { episodeRepositoryMockProvider } from "../repositories/tests";
 import { EpisodesRestController } from "./rest.controller";
 
@@ -20,7 +20,7 @@ restTestsSuite( {
         serieRepositoryMockProvider,
       ],
     }],
-  repositoryClass: EpisodeRepository,
+  repositoryClass: EpisodesRepository,
   testsConfig: {
     getAll: {
       repo: {
@@ -35,18 +35,18 @@ restTestsSuite( {
         getFn: (repo)=>repo.getOneById,
         params: [{
           serieId: "serieId",
-          innerId: "innerId",
+          code: "code",
         }],
         returned: EPISODES_SIMPSONS[0],
       },
-      url: "/serieId/innerId",
+      url: "/serieId/code",
     },
     patchOne: {
       repo: {
         getFn: (repo)=>repo.patchOneByIdAndGet,
         params: [{
           serieId: "serieId",
-          innerId: "innerId",
+          code: "code",
         }, {
           entity: {
             title: "new title",
@@ -54,7 +54,7 @@ restTestsSuite( {
         }],
         returned: EPISODES_SIMPSONS[0],
       },
-      url: "/serieId/innerId",
+      url: "/serieId/code",
     },
     getManyCriteria: {
       repo: {

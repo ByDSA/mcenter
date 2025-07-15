@@ -6,20 +6,27 @@ import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { Consumer } from "#utils/message-broker";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { EpisodeFileInfoRepository } from "#modules/file-info/repositories";
-import { EpisodeRepository } from "..";
+import { EpisodeHistoryEntriesRepository, LastTimePlayedService } from "#episodes/history";
+import { EpisodesRepository } from "..";
 import { EPISODE_QUEUE_NAME } from "./events";
 
-let episodeRepository: EpisodeRepository;
-let domainMessageBroker: DomainMessageBroker<ModelMessage<Episode>>;
+let episodeRepository: EpisodesRepository;
+let domainMessageBroker: DomainMessageBroker<ModelMessage<EpisodeEntity>>;
 let testingSetup: TestingSetup;
 
 beforeAll(async () => {
   testingSetup = await createTestingAppModuleAndInit( {
+    imports: [],
     controllers: [],
     providers: [
-      DomainMessageBroker<ModelMessage<Episode>>,
-      EpisodeRepository,
+      DomainMessageBroker<ModelMessage<EpisodeEntity>>,
       EpisodeFileInfoRepository,
+      // EpisodesModule:
+      EpisodeHistoryEntriesRepository,
+      LastTimePlayedService,
+      EpisodesRepository,
+      // TODO: pasar MessageBroker a modulo e importar tanto EpisodesModule como BrokerModule
+      // y quitar los providers
     ],
   }, {
     db: {
@@ -29,16 +36,18 @@ beforeAll(async () => {
   await loadFixtureSimpsons();
 
   domainMessageBroker = testingSetup.module
-    .get<DomainMessageBroker<ModelMessage<Episode>>>(DomainMessageBroker<ModelMessage<Episode>>);
+    .get<DomainMessageBroker<ModelMessage<EpisodeEntity>>>(
+      DomainMessageBroker<ModelMessage<EpisodeEntity>>,
+    );
 
   episodeRepository = testingSetup.module
-    .get<EpisodeRepository>(EpisodeRepository);
+    .get<EpisodesRepository>(EpisodesRepository);
 } );
 
 it("should emit Patch Event", async () => {
   const episodeId: EpisodeId = {
     serieId: "simpsons",
-    innerId: "1x01",
+    code: "1x01",
   };
   const fn = jest.fn();
 
@@ -67,7 +76,7 @@ it("should emit Create Event", async () => {
   const fn = jest.fn((event: ModelEvent<EpisodeEntity>) => {
     expect(event.type).toBe(EventType.CREATED);
     expect(event.payload.entity.id?.serieId).toBe("simpsons");
-    expect(event.payload.entity.id?.innerId.startsWith("X")).toBeTruthy();
+    expect(event.payload.entity.id?.code.startsWith("X")).toBeTruthy();
 
     return Promise.resolve();
   } ) as Consumer<any>;
@@ -77,7 +86,7 @@ it("should emit Create Event", async () => {
   const models = EPISODES_SIMPSONS.slice(0, 10).map(episode => ( {
     ...episode,
     id: {
-      innerId: `X${episode.id?.innerId}`,
+      code: `X${episode.id?.code}`,
       serieId: episode.id?.serieId,
     } as EpisodeId,
   } ) as EpisodeEntity);

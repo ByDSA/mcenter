@@ -2,13 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { SerieFolderTree as SerieTree } from "#modules/file-info";
 import { SerieRepository } from "#modules/series";
 import { EpisodeEntity } from "../models";
-import { EpisodeRepository } from "../repositories";
+import { EpisodesRepository } from "../repositories";
 import { putModelInSerieFolderTree } from "./adapters";
 
 @Injectable()
 export class SavedSerieTreeService {
   constructor(
-    private episodeRepository: EpisodeRepository,
+    private episodeRepository: EpisodesRepository,
     private serieRepository: SerieRepository,
   ) {
   }

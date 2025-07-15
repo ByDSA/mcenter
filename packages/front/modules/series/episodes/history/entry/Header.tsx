@@ -12,9 +12,9 @@ export function Header( { entry, showDate }: HeaderProps) {
 
   assertIsDefined(episode);
   assertIsDefined(serie);
-  const title = episode.title ? `${episode.title}` : episode.id.innerId ?? "(Sin título)";
+  const title = episode.title ? `${episode.title}` : episode.id.code ?? "(Sin título)";
   const subtitle = serie.name ?? episode.id.serieId;
-  const right = episode.id.innerId;
+  const right = episode.id.code;
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return <HistoryEntryHeader

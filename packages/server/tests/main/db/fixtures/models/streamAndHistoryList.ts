@@ -1,17 +1,15 @@
 import type { Stream } from "#modules/streams";
-import type { EpisodeHistoryEntry, EpisodeHistoryListEntity } from "#episodes/history/models";
+import type { EpisodeHistoryEntryEntity } from "#episodes/history/models";
 import { deepFreeze } from "$shared/utils/objects";
-import { StreamMode, StreamOriginType } from "#modules/streams";
 import { SAMPLE1 as DATE_SAMPLE1 } from "./dates";
+import { StreamMode, StreamOriginType } from "#modules/streams";
 
-export const HISTORY_LIST_WITH_NO_ENTRIES: EpisodeHistoryListEntity = deepFreeze( {
-  id: "id",
-  maxSize: 10,
-  entries: [],
-} );
-const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntry = {
+export const HISTORY_ENTRIES_WITH_NO_ENTRIES: EpisodeHistoryEntryEntity[] = deepFreeze([]);
+
+export const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntryEntity = {
+  id: "1",
   episodeId: {
-    innerId: "1x01",
+    code: "1x01",
     serieId: "simpsons",
   },
   date: DATE_SAMPLE1,
@@ -28,12 +26,8 @@ export const STREAM_SIMPSONS: Stream = deepFreeze( {
     ],
   },
   mode: StreamMode.RANDOM,
-} as Stream);
+} satisfies Stream);
 
-export const HISTORY_LIST_SIMPSONS: EpisodeHistoryListEntity = deepFreeze( {
-  id: "simpsons",
-  maxSize: 99999,
-  entries: [
-    HISTORY_ENTRY_SIMPSONS1,
-  ],
-} as EpisodeHistoryListEntity);
+export const HISTORY_ENTRIES_SIMPSONS: EpisodeHistoryEntryEntity[] = deepFreeze([
+  HISTORY_ENTRY_SIMPSONS1,
+] satisfies EpisodeHistoryEntryEntity[]);

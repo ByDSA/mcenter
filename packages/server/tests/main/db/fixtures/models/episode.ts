@@ -9,7 +9,7 @@ const timestamps = {
 };
 const ep1x01: EpisodeEntity = {
   id: {
-    innerId: "1x01",
+    code: "1x01",
     serieId: "simpsons",
   },
   title: "Sin Blanca Navidad",
@@ -27,7 +27,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   ep1x01,
   {
     id: {
-      innerId: "1x02",
+      code: "1x02",
       serieId: "simpsons",
     },
     path: "series/simpsons/1/2_80.mkv",
@@ -39,7 +39,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x03",
+      code: "1x03",
       serieId: "simpsons",
     },
     path: "series/simpsons/1/3_80.mkv",
@@ -51,7 +51,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x04",
+      code: "1x04",
       serieId: "simpsons",
     },
     path: "series/simpsons/1/4_80.mkv",
@@ -63,7 +63,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x05",
+      code: "1x05",
       serieId: "simpsons",
     },
     path: "series/simpsons/1/5_80.mkv",
@@ -75,7 +75,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x06",
+      code: "1x06",
       serieId: "simpsons",
     },
     path: "series/simpsons/1/6_80.mkv",
@@ -87,7 +87,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x07",
+      code: "1x07",
       serieId: "simpsons",
     },
     path: "series/simpsons/1/7_80_+cat.mkv",
@@ -99,7 +99,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x08",
+      code: "1x08",
       serieId: "simpsons",
     },
     path: "series/simpsons/1/8_80.mkv",
@@ -111,7 +111,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x09",
+      code: "1x09",
       serieId: "simpsons",
     },
     path: "series/simpsons/1/9_80.mkv",
@@ -123,7 +123,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x10",
+      code: "1x10",
       serieId: "simpsons",
     },
     path: "series/simpsons/1/10_80.mkv",
@@ -135,7 +135,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x11",
+      code: "1x11",
       serieId: "simpsons",
     },
     title: "Viva la vendimia",
@@ -147,7 +147,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x12",
+      code: "1x12",
       serieId: "simpsons",
     },
     title: "Krusty entra en chirona",
@@ -159,7 +159,7 @@ export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   },
   {
     id: {
-      innerId: "1x13",
+      code: "1x13",
       serieId: "simpsons",
     },
     title: "La baby siter ataca de nuevo",

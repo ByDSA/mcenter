@@ -1,6 +1,6 @@
-import { HistoryListDocOdm, HistoryListModelOdm, historyListEntityToDocOdm } from "#episodes/history/repositories/odm";
+import { HISTORY_ENTRIES_SIMPSONS, STREAM_SIMPSONS } from "../models";
+import { EpisodeHistoryEntriesModelOdm, EpisodeHistoryEntriesDocOdm, entryToDocOdm } from "#episodes/history/repositories/odm";
 import { StreamDocOdm, StreamModelOdm, streamToDocOdm } from "#modules/streams/repositories";
-import { HISTORY_LIST_SIMPSONS, STREAM_SIMPSONS } from "../models";
 
 export const loadFixtureStreamAndHistoryListSimpsons = async () => {
   // Streams
@@ -8,8 +8,9 @@ export const loadFixtureStreamAndHistoryListSimpsons = async () => {
 
   await StreamModelOdm.insertMany(streamsDocOdm);
 
-  // History List
-  const historyList: HistoryListDocOdm[] = [HISTORY_LIST_SIMPSONS].map(historyListEntityToDocOdm);
+  // Episode History Entries
+  const entriesOdm: EpisodeHistoryEntriesDocOdm[] = HISTORY_ENTRIES_SIMPSONS
+    .map(entryToDocOdm);
 
-  await HistoryListModelOdm.insertMany(historyList);
+  await EpisodeHistoryEntriesModelOdm.insertMany(entriesOdm);
 };

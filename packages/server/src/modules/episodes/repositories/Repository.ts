@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { deepMerge } from "$shared/utils/objects";
 import { showError } from "$shared/utils/errors/showError";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
@@ -9,6 +9,9 @@ import { SerieId } from "#series/models";
 import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { BrokerEvent } from "#utils/message-broker";
+import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "#episodes/history/repositories/events";
+import { EpisodeHistoryEntryEvent } from "#episodes/history/repositories";
+import { LastTimePlayedService } from "#episodes/history";
 import { Episode, EpisodeEntity, EpisodeId } from "../models";
 import { DocOdm, ModelOdm } from "./odm";
 import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
@@ -31,21 +34,34 @@ CanPatchOneByIdAndGet<EpisodeEntity, EpisodeId>,
 CanCreateManyAndGet<EpisodeEntity>,
 CanGetAll<EpisodeEntity> {
   constructor(
-    private domainMessageBroker: DomainMessageBroker,
-    private episodeFileInfoRepository: EpisodeFileInfoRepository,
+    private readonly domainMessageBroker: DomainMessageBroker,
+    private readonly episodeFileInfoRepository: EpisodeFileInfoRepository,
+    @Inject(forwardRef(() => LastTimePlayedService))
+    private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
     this.domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, (event: EpisodeEvent) => {
       logDomainEvent(EPISODE_QUEUE_NAME, event);
 
       return Promise.resolve();
     } ).catch(showError);
-  }
+    this.domainMessageBroker.subscribe(
+      EPISODE_HISTORY_ENTRIES_QUEUE_NAME,
+      async (event: EpisodeHistoryEntryEvent) => {
+        const { entity } = event.payload;
 
-  static providers = Object.freeze([
-    DomainMessageBroker,
-    EpisodeFileInfoRepository,
-    ...EpisodeFileInfoRepository.providers,
-  ]);
+        if (event.type === EventType.CREATED) {
+          await this.patchOneByIdAndGet(entity.episodeId, {
+            entity: {
+              lastTimePlayed: entity.date.timestamp,
+            },
+          } );
+        } else if (event.type === EventType.DELETED)
+          await this.lastTimePlayedService.updateEpisodeLastTimePlayed(entity.episodeId);
+
+        return Promise.resolve();
+      },
+    ).catch(showError);
+  }
 
   async patchOneByPathAndGet(
     path: string,
@@ -99,7 +115,7 @@ CanGetAll<EpisodeEntity> {
     validateGetOptions(opts);
     const episodeOdm = await ModelOdm.findOne( {
       serieId: id.serieId,
-      episodeId: id.innerId,
+      episodeId: id.code,
     } );
 
     if (!episodeOdm)
@@ -167,7 +183,7 @@ CanGetAll<EpisodeEntity> {
   ): Promise<EpisodeEntity | null> {
     const docOdm: DocOdm = modelToDocOdm(episode);
     const updateResult = await ModelOdm.updateOne( {
-      episodeId: fullId.innerId,
+      episodeId: fullId.code,
       serieId: fullId.serieId,
     }, docOdm);
 
@@ -194,7 +210,7 @@ CanGetAll<EpisodeEntity> {
       throw new Error("Empty partialDocOdm, nothing to patch");
 
     const updateResult = await ModelOdm.updateOne( {
-      episodeId: fullId.innerId,
+      episodeId: fullId.code,
       serieId: fullId.serieId,
     }, partialDocOdm);
 
