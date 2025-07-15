@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.4](https://github.com/ByDSA/mcenter/compare/v4.0.3...v4.0.4) (2025-07-15)
+
+
+### Bug Fixes
+
+* **back:** replace '&' by 'and' ([6a6a2f3](https://github.com/ByDSA/mcenter/commit/6a6a2f367c4ebc8a090cab4818d82b553076ee00))
+
 ### [4.0.3](https://github.com/ByDSA/mcenter/compare/v4.0.2...v4.0.3) (2025-07-14)
 
 
