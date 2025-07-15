@@ -23,7 +23,7 @@ import { QUEUE_NAME } from "./events";
 import { DocOdm, ModelOdm } from "./odm";
 import { findParamsToQueryParams } from "./queries/QueriesOdm";
 import { ExpressionNode } from "./queries/QueryObject";
-import { MusicUrlGenerator } from "./UrlGenerator";
+import { fixUrl, MusicUrlGenerator } from "./UrlGenerator";
 
 type MusicEvent = BrokerEvent<ModelMessage<MusicEntity>>;
 @Injectable()
@@ -69,11 +69,18 @@ CanGetOneById<MusicEntity, MusicId> {
     return musicDocOdmToEntity(docOdm);
   }
 
+  #fixUrlIfHave(partialMusic: Partial<Music>) {
+    if (partialMusic.url)
+      partialMusic.url = fixUrl(partialMusic.url) ?? undefined;
+  }
+
   async patchOneById(id: MusicId, params: PatchOneParams<Music>): Promise<void> {
     const { entity } = params;
     const updateQuery = patchParamsToUpdateQuery(params);
 
-    if (params.entity.hash) {
+    this.#fixUrlIfHave(entity);
+
+    if (entity.hash) {
       updateQuery.$set = {
         ...updateQuery.$set,
         "timestamps.updatedAt": new Date(),
@@ -84,6 +91,7 @@ CanGetOneById<MusicEntity, MusicId> {
 
     assertFound(ret);
 
+    // Emite un evento por cada propiedad cambiada
     for (const [k, value] of Object.entries(entity)) {
       const key = k as keyof MusicEntity;
       const event = new PatchEvent<MusicEntity, MusicId>( {
@@ -186,6 +194,7 @@ CanGetOneById<MusicEntity, MusicId> {
   }
 
   async #createOne(music: Music): Promise<MusicEntity> {
+    this.#fixUrlIfHave(music);
     const docOdm: DocOdm = await ModelOdm.create<MusicEntity>(music);
     const ret = musicDocOdmToEntity(docOdm);
     const event = new ModelEvent<MusicEntity>(EventType.CREATED, {

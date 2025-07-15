@@ -1,9 +1,9 @@
 import z from "zod";
 import { atLeastOneDefinedRefinement, RefinementWithMessage } from "../../../utils/validation/zod";
 
-const pathSchema = z.array(z.string().or(z.number()));
+const patchSchema = z.array(z.string().or(z.number()));
 
-export type PatchPath = z.infer<typeof pathSchema>;
+export type PatchPath = z.infer<typeof patchSchema>;
 
 const customRefinement: RefinementWithMessage<Record<any, any>> = [
   (o=>{
@@ -19,7 +19,7 @@ const customRefinement: RefinementWithMessage<Record<any, any>> = [
 export function generatePatchBodySchema<T extends z.ZodRawShape>(entitySchema: z.ZodObject<T>) {
   const ret = z.object( {
     entity: entitySchema.partial().strict(),
-    unset: z.array(pathSchema).optional(),
+    unset: z.array(patchSchema).optional(),
   } ).refine(...customRefinement);
 
   return ret;
