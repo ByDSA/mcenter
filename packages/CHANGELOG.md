@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.6](https://github.com/ByDSA/mcenter/compare/v4.0.5...v4.0.6) (2025-07-15)
+
+
+### Bug Fixes
+
+* migrate from historylist to episode history entries ([ad6d238](https://github.com/ByDSA/mcenter/commit/ad6d2382b6199bf23de5d9ad40489b3f42e9ffcc))
+
 ### [4.0.5](https://github.com/ByDSA/mcenter/compare/v4.0.4...v4.0.5) (2025-07-15)
 
 
