@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.8](https://github.com/ByDSA/mcenter/compare/v4.0.7...v4.0.8) (2025-07-16)
+
+
+### Bug Fixes
+
+* collection name ([ad427e8](https://github.com/ByDSA/mcenter/commit/ad427e8d612eb9359bdc7368f34908326f041bc0))
+* rename collection musicHistoryEntries ([2117eb6](https://github.com/ByDSA/mcenter/commit/2117eb6d23e984b6570354f582709933226bf6ab))
+
 ### [4.0.7](https://github.com/ByDSA/mcenter/compare/v4.0.6...v4.0.7) (2025-07-16)
 
 
