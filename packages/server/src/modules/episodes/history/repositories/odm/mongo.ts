@@ -33,6 +33,8 @@ const schemaOdm = new mongoose.Schema<DocOdm>( {
       required: true,
     },
   },
+}, {
+  collection: "episodeHistoryEntries",
 } );
 const NAME = "EpisodeHistoryEntry";
 const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);
