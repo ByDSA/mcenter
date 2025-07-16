@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 import { forwardRef, Module } from "@nestjs/common";
 import { SerieRepository } from "#modules/series/repositories";
-import { EpisodeFileInfoRepository } from "#modules/file-info/repositories";
+import { EpisodeFileInfoRepository } from "#episodes/file-info/repositories";
 import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesUpdateLastTimePlayedController } from "./controllers/episodes-update-lastTimePlayed.controller";

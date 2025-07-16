@@ -3,9 +3,9 @@ import { Controller, Get } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { ErrorElementResponse, errorToErrorElementResponse, DataResponse } from "$shared/utils/http";
 import { Episode, EpisodeEntity } from "#episodes/models";
-import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "#modules/file-info";
+import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "#episodes/file-info";
 import { SerieRepository } from "#modules/series/repositories";
-import { Serie } from "#modules/file-info/tree/models";
+import { Serie } from "#episodes/file-info/tree/models";
 import { EpisodesRepository } from "../repositories";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
 

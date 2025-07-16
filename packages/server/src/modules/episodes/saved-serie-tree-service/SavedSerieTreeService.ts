@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { SerieRepository } from "#modules/series/repositories";
-import { SerieFolderTree as SerieTree } from "#modules/file-info";
+import { SerieFolderTree as SerieTree } from "#episodes/file-info";
 import { EpisodeEntity } from "../models";
 import { EpisodesRepository } from "../repositories";
 import { putModelInSerieFolderTree } from "./adapters";
