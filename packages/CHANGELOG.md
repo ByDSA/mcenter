@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.10](https://github.com/ByDSA/mcenter/compare/v4.0.9...v4.0.10) (2025-07-16)
+
+
+### Bug Fixes
+
+* some change names, and fix $shared import ([45ffecc](https://github.com/ByDSA/mcenter/commit/45ffecc14b8c8f492f6846b305b87a61ab67472e))
+
 ### [4.0.9](https://github.com/ByDSA/mcenter/compare/v4.0.8...v4.0.9) (2025-07-16)
 
 
