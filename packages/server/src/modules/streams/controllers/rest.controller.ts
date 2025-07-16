@@ -57,7 +57,7 @@ implements
             continue;
 
           const lastEntry = await this.episodeHistoryEntriesRepository
-            .findLastForSerieId(stream.id);
+            .findLastForSerieKey(stream.id);
 
           if (lastEntry)
             lastTimePlayedDic[serieId] = lastEntry.date.timestamp;

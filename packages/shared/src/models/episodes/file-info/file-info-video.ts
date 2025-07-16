@@ -2,6 +2,12 @@ import z from "zod";
 import { timestampsFileSchema } from "../../utils/schemas/Timestamps";
 import { fileInfoSchema, compareFileInfo } from "./file-info";
 
+const mongoDbIdRefining = [
+  ((id: any) => /^[a-f0-9]{24}$/.test(id)),
+  {
+    message: "id must be a mongodb id",
+  },
+] as const;
 const schema = fileInfoSchema.extend( {
   mediaInfo: z.object( {
     duration: z.number().nullable(),
@@ -11,31 +17,31 @@ const schema = fileInfoSchema.extend( {
     } ).strict(),
     fps: z.string().nullable(),
   } ).strict(),
+  episodeId: z.string()
+    .refine(...mongoDbIdRefining),
   // eslint-disable-next-line max-len
   timestamps: timestampsFileSchema, // TODO: quitarlo de aquí y ponerlo en FileInfo común cuando se cree FileInfoMusic
 } ).strict();
-const schemaWithSuperId = schema.extend( {
-  episodeId: z.string()
-    .refine((id) => /^[a-f0-9]{24}$/.test(id), {
-      message: "episodeId must be a mongodb id",
-    } ),
+const entitySchema = schema.extend( {
+  id: z.string()
+    .refine(...mongoDbIdRefining),
 } ).strict();
 
 type Model = z.infer<typeof schema>;
 
-type ModelWithSuperId = z.infer<typeof schemaWithSuperId>;
-
-type SuperId = ModelWithSuperId["episodeId"];
+type Entity = z.infer<typeof entitySchema>;
 
 function assertIsModel(model: unknown): asserts model is Model {
   schema.parse(model);
 }
 
-function assertIsModelWithSuperId(model: unknown): asserts model is ModelWithSuperId {
-  schemaWithSuperId.parse(model);
+function assertIsEntity(model: unknown): asserts model is Entity {
+  entitySchema.parse(model);
 }
 
-function compareModel(a: Model, b: Model): boolean {
+type ModelOmitEpisodeId = Omit<Model, "episodeId">;
+
+function compareModelOmitEpisodeId(a: ModelOmitEpisodeId, b: ModelOmitEpisodeId): boolean {
   const sameMediaInfo = a.mediaInfo.duration === b.mediaInfo.duration
    && a.mediaInfo.resolution?.width === b.mediaInfo.resolution?.width
    && a.mediaInfo.resolution?.height === b.mediaInfo.resolution?.height
@@ -46,10 +52,10 @@ function compareModel(a: Model, b: Model): boolean {
 
 export {
   schema as fileInfoVideoSchema,
+  entitySchema as fileInfoVideoEntitySchema,
   Model as FileInfoVideo,
-  ModelWithSuperId as FileInfoVideoWithSuperId,
-  SuperId as FileInfoVideoSuperId,
+  Entity as FileInfoVideoEntity,
   assertIsModel as assertIsFileInfoVideo,
-  assertIsModelWithSuperId as assertIsFileInfoVideoWithSuperId,
-  compareModel as compareFileInfoVideo,
+  assertIsEntity as assertIsFileInfoVideoEntity,
+  compareModelOmitEpisodeId as compareFileInfoVideoOmitEpisodeId,
 };

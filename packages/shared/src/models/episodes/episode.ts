@@ -2,7 +2,7 @@ import z from "zod";
 import { AssertZodSettings, assertZodPopStack } from "../../utils/validation/zod";
 import { resourceSchema, timeRangeSchema } from "../resource";
 import { serieEntitySchema } from "../series";
-import { fileInfoVideoSchema } from "./fileinfo";
+import { fileInfoVideoSchema } from "./file-info";
 import { EpisodeId, episodeSchema } from "./episode";
 
 export const episodeCodeSchema = z.string();

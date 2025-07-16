@@ -1,1 +1,1 @@
-export * from "$shared/models/episodes/fileinfo";
+export * from "$shared/models/episodes/file-info";

@@ -126,7 +126,7 @@ CanGetAll<EpisodeEntity> {
 
     if (opts?.expand?.includes(ExpandEnum.FileInfo)) {
       const _id = episodeOdm._id?.toString();
-      const fileInfo = await this.episodeFileInfoRepository.getAllByEpisodeDbId(_id);
+      const fileInfo = await this.episodeFileInfoRepository.getAllByEpisodeId(_id);
 
       if (!fileInfo)
         throw new Error("Episode has no file info");
@@ -148,7 +148,7 @@ CanGetAll<EpisodeEntity> {
     return episodeDocOdmToModel(episodeOdm) as EpisodeEntity;
   }
 
-  async getManyBySerieId(serieId: string, options?: GetManyOptions): Promise<EpisodeEntity[]> {
+  async getManyBySerieKey(serieKey: string, options?: GetManyOptions): Promise<EpisodeEntity[]> {
     const actualOptions = deepMerge( {
       sortById: true,
     }, options);
@@ -156,7 +156,7 @@ CanGetAll<EpisodeEntity> {
 
     if (actualOptions.sortById) {
       episodesOdm = await ModelOdm.find( {
-        serieId,
+        serieId: serieKey,
       } )
         .sort( {
           episodeId: 1,
@@ -168,7 +168,7 @@ CanGetAll<EpisodeEntity> {
         .exec();
     } else {
       episodesOdm = await ModelOdm.find( {
-        serieId,
+        serieId: serieKey,
       } );
     }
 

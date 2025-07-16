@@ -109,7 +109,7 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return docOdmToEntryEntity(last);
   }
 
-  async findLastForSerieId(serieId: SerieId): Promise<Entity | null> {
+  async findLastForSerieKey(serieId: SerieId): Promise<Entity | null> {
     const last = await ModelOdm.findOne( {
       "episodeId.serieId": serieId,
     }, {}, {

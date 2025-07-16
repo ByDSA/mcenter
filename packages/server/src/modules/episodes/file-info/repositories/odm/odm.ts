@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface DocOdm {
-  _id?: mongoose.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   episodeId: mongoose.Types.ObjectId;
   path: string;
   hash: string;

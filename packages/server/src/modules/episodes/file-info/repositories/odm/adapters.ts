@@ -1,18 +1,19 @@
 import mongoose from "mongoose";
 import { assertIsDefined } from "$shared/utils/validation";
-import { FileInfoVideo, FileInfoVideoWithSuperId, assertIsFileInfoVideo, assertIsFileInfoVideoWithSuperId } from "#episodes/file-info/models";
+import { FileInfoVideo, FileInfoVideoEntity, assertIsFileInfoVideoEntity } from "#episodes/file-info/models";
 import { DocOdm } from "../odm";
 
+type Entity = FileInfoVideoEntity;
+
 type Model = FileInfoVideo;
-type ModelWithSuperId = FileInfoVideoWithSuperId;
 
-const assertIsModel: typeof assertIsFileInfoVideo = assertIsFileInfoVideo;
-// eslint-disable-next-line max-len
-const assertIsModelWithSuperId: typeof assertIsFileInfoVideoWithSuperId = assertIsFileInfoVideoWithSuperId;
+const assertIsEntity: typeof assertIsFileInfoVideoEntity = assertIsFileInfoVideoEntity;
 
-export function docOdmToModel(docOdm: DocOdm): Model {
+export function docOdmToEntity(docOdm: DocOdm): Entity {
   assertIsDefined(docOdm);
-  const model: Model = {
+  const model: Entity = {
+    id: docOdm._id.toString(),
+    episodeId: docOdm.episodeId.toString(),
     path: docOdm.path ?? null,
     hash: docOdm.hash,
     size: docOdm.size,
@@ -28,28 +29,26 @@ export function docOdmToModel(docOdm: DocOdm): Model {
       },
       fps: docOdm.mediaInfo?.fps ?? null,
     },
-  };
-
-  assertIsModel(model);
+  } satisfies Entity;
 
   return model;
 }
 
-export function docOdmToModelWithSuperId(docOdm: DocOdm): ModelWithSuperId {
+export function docOdmToModelWithSuperId(docOdm: DocOdm): Entity {
   assertIsDefined(docOdm);
-  const model: ModelWithSuperId = {
-    ...docOdmToModel(docOdm),
+  const model: Entity = {
+    ...docOdmToEntity(docOdm),
     episodeId: docOdm.episodeId?.toString(),
   };
 
-  assertIsModelWithSuperId(model);
+  assertIsEntity(model);
 
   return model;
 }
 
-export function modelWithSuperIdToDocOdm(model: ModelWithSuperId): DocOdm {
-  assertIsModelWithSuperId(model);
-  const ret: DocOdm = {
+export function modelToDocOdm(model: Model): DocOdm {
+  assertIsEntity(model);
+  const ret: Omit<DocOdm, "_id"> = {
     episodeId: new mongoose.Types.ObjectId(model.episodeId),
     path: model.path,
     hash: model.hash,
@@ -68,5 +67,5 @@ export function modelWithSuperIdToDocOdm(model: ModelWithSuperId): DocOdm {
     },
   };
 
-  return ret;
+  return ret as DocOdm;
 }

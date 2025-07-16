@@ -1,18 +1,18 @@
 import { Injectable } from "@nestjs/common";
-import { FileInfoVideo, FileInfoVideoSuperId, FileInfoVideoWithSuperId } from "#episodes/file-info/models";
-import { CanGetAllBySuperId, CanUpdateMany, CanUpdateOneBySuperId } from "#utils/layers/repository";
-import { ModelOdm, docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./odm";
+import { FileInfoVideoEntity } from "#episodes/file-info/models";
+import { CanGetAllBySuperId, CanUpdateMany, } from "#utils/layers/repository";
+import { ModelOdm, docOdmToModelWithSuperId, modelToDocOdm } from "./odm";
 
-type ModelWithSuperId = FileInfoVideoWithSuperId;
-type Model = FileInfoVideo;
-type SuperId = FileInfoVideoSuperId;
+type Entity = FileInfoVideoEntity;
+type EpisodeId = string;
 
 @Injectable()
 export class EpisodeFileInfoRepository
-implements CanGetAllBySuperId<Model, SuperId>,
-CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId> {
-  async updateOneByEpisodeDbId(id: string, model: ModelWithSuperId): Promise<void> {
-    const docOdm = modelWithSuperIdToDocOdm(model);
+implements
+CanGetAllBySuperId<Entity, EpisodeId>,
+CanUpdateMany<Entity> {
+  async updateOneByEpisodeId(id: string, model: Entity): Promise<void> {
+    const docOdm = modelToDocOdm(model);
 
     await ModelOdm.updateOne( {
       episodeId: id,
@@ -21,13 +21,13 @@ CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId
     } );
   }
 
-  async updateMany(models: ModelWithSuperId[]): Promise<void> {
-    const promises = models.map(model =>this.updateOneByEpisodeDbId(model.episodeId, model));
+  async updateMany(models: Entity[]): Promise<void> {
+    const promises = models.map(model =>this.updateOneByEpisodeId(model.episodeId, model));
 
     await Promise.all(promises);
   }
 
-  async getAllByEpisodeDbId(id: SuperId): Promise<Model[]> {
+  async getAllByEpisodeId(id: EpisodeId): Promise<Entity[]> {
     const modelsOdm = await ModelOdm.find( {
       episodeId: id,
     } );
@@ -35,10 +35,10 @@ CanUpdateMany<ModelWithSuperId>, CanUpdateOneBySuperId<ModelWithSuperId, SuperId
     if (modelsOdm.length === 0)
       return [];
 
-    return modelsOdm.map(docOdmToModel);
+    return modelsOdm.map(docOdmToModelWithSuperId);
   }
 
-  async getOneByPath(path: string): Promise<ModelWithSuperId | null> {
+  async getOneByPath(path: string): Promise<Entity | null> {
     const modelOdm = await ModelOdm.findOne( {
       path,
     } );
