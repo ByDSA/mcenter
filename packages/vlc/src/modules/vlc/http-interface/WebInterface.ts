@@ -1,6 +1,6 @@
 import querystring from "node:querystring";
 import { XMLParser } from "fast-xml-parser";
-import { UnauthorizedError, UnprocessableEntityError } from "$shared/utils/http";
+import { UnauthorizedError, UnprocessableEntityError } from "./utils";
 import { StatusQuery } from "./StatusQuery";
 import { PlaylistResponse, StatusResponse, assertIsPlaylistResponse, assertIsStatusResponse } from "./responses";
 

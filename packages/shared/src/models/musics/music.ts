@@ -1,6 +1,6 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
-import { fileInfoSchema } from "../episodes/fileinfo";
+import { fileInfoSchema } from "../episodes/file-info";
 import { resourceSchema } from "../resource";
 import { localFileSchema, pickableSchema, taggableSchema } from "../resource/partial-schemas";
 
