@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.7](https://github.com/ByDSA/mcenter/compare/v4.0.6...v4.0.7) (2025-07-16)
+
+
+### Bug Fixes
+
+* use DomainMessageBrokes as a module (and some import fixes) ([71978fd](https://github.com/ByDSA/mcenter/commit/71978fdfaf468689abad92d69b0ca91ead01f5f2))
+
 ### [4.0.6](https://github.com/ByDSA/mcenter/compare/v4.0.5...v4.0.6) (2025-07-15)
 
 
