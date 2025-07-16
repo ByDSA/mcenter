@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.9](https://github.com/ByDSA/mcenter/compare/v4.0.8...v4.0.9) (2025-07-16)
+
+
+### Bug Fixes
+
+* **back:** can play series with key different to stream key ([702e34e](https://github.com/ByDSA/mcenter/commit/702e34ecead864cc8aa6b177b4b34a9a1bc96acf))
+* **front:** delete episode history entry ([51eb693](https://github.com/ByDSA/mcenter/commit/51eb69312a736cfa989dcc652cba63ed52ea49e0))
+* **vlc:** readd deleted but actually used files ([8d0f637](https://github.com/ByDSA/mcenter/commit/8d0f637a07fbfd6432eb9336d681d6b87e0350b9))
+
 ### [4.0.8](https://github.com/ByDSA/mcenter/compare/v4.0.7...v4.0.8) (2025-07-16)
 
 
