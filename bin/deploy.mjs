@@ -2,8 +2,8 @@
 // @ts-check
 
 import {
-  deployProjectBegin,
-  deployProjectEnd,
+    readAndCheckEnvs,
+    deployProjectEnd,
 } from "../packages/lib/projects/deploy/index.mjs";
 import { frontPackageDeployParticular } from "../packages/front/lib/index.mjs";
 import { serverPackageDeployParticular } from "../packages/server/lib/index.mjs";
@@ -11,7 +11,7 @@ import { serverPackageDeployParticular } from "../packages/server/lib/index.mjs"
 (async () => {
   $.verbose = false;
 
-  const { ENVS } = await deployProjectBegin();
+  const { ENVS } = await readAndCheckEnvs();
 
   await serverPackageDeployParticular({
     ...ENVS,

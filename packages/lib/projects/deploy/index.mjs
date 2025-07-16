@@ -3,9 +3,7 @@ import { $, argv } from "zx";
 import { assertEnv, loadEnvsFile } from "../../envs/index.mjs";
 import {
   assertSshEnvs,
-  assertVaultEnvs,
-  infraUp,
-  showParams,
+  assertVaultEnvs, showParams,
   sshCmd,
 } from "../../index.mjs";
 import { loadProjectEnvs } from "../../projects/envs.mjs";
@@ -24,7 +22,7 @@ export async function loadDeployEnvs(TARGET_ENV) {
     const { CI } = process.env;
 
     if (CI === undefined) {
-      const TARGET_ENVS_PATH = process.env.PROJECT_ROOT + "/bin/deploy.env." + TARGET_ENV;
+      const TARGET_ENVS_PATH = process.env.PROJECT_ROOT + "/bin/deploy/deploy.env." + TARGET_ENV;
 
       await loadEnvsFile(TARGET_ENVS_PATH);
     }
@@ -63,7 +61,7 @@ export async function deployProjectEnd(ENVS) {
 /**
  * @returns {Promise<{ENVS: import("./types.mjs").TreeEnvs}>}
  */
-export async function deployProjectBegin() {
+export async function readAndCheckEnvs() {
   if (argv._[1] === undefined)
     console.warn("Warning:", "No se ha especificado target env, se usará 'local'");
 
@@ -75,17 +73,6 @@ export async function deployProjectBegin() {
   let ENVS = await loadEnvs(TARGET_ENV);
 
   showParams(ENVS);
-
-  if (ENVS.TARGET_ENV !== "local") {
-    const { ssh } = ENVS;
-
-    // rsync infrastructure
-    await infraUp( {
-      projectRoot: ENVS.project.root,
-      remoteProjectRoot: ENVS.REMOTE_PROJECT_ROOT,
-      ssh,
-    } );
-  }
 
   return {
     ENVS,
