@@ -9,7 +9,7 @@ import { Serie } from "#modules/file-info/tree/models";
 import { EpisodesRepository } from "../repositories";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
 
-@Controller("/episodes/add-new-files")
+@Controller("/actions/add-new-files")
 export class EpisodeAddNewFilesController {
   constructor(
     private readonly serieRepository: SerieRepository,

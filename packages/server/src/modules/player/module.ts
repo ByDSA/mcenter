@@ -4,6 +4,7 @@ import { EpisodesModule } from "#episodes/module";
 import { SeriesModule } from "#modules/series/module";
 import { StreamsModule } from "#modules/streams/module";
 import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { PlaySerieController } from "./play-serie.controller";
 import { PlayStreamController } from "./play-stream.controller";
 import { VlcBackWSService } from "./player-services/vlc-back/VlcBackWSServerService";
@@ -17,6 +18,7 @@ import { PlayService } from "./PlayService";
     StreamsModule,
     SeriesModule,
     EpisodesModule,
+    EpisodeHistoryEntriesModule,
     EpisodePickerModule,
   ],
   controllers: [

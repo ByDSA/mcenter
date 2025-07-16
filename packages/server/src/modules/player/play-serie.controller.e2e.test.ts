@@ -7,6 +7,7 @@ import { testRoute } from "#tests/main/routing";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
+import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { PlayService } from "./PlayService";
 import { PlaySerieController } from "./play-serie.controller";
 import { VlcBackWebSocketsServerService } from "./player-services";
@@ -20,7 +21,7 @@ describe("playSerieController", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [SeriesModule, EpisodesModule],
+      imports: [SeriesModule, EpisodesModule, EpisodeHistoryEntriesModule],
       controllers: [PlaySerieController],
       providers: [
         {

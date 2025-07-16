@@ -1,3 +1,3 @@
 export {
   EpisodesUpdateController,
-} from "./Controller";
+} from "./controller";

@@ -1,9 +1,9 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { DataResponse } from "$shared/utils/http";
 import { UpdateEpisodesFileReqQueryDto } from "./validation";
-import { UpdateMetadataProcess } from "./UpdateSavedProcess";
+import { UpdateMetadataProcess } from "./update-saved-process";
 
-@Controller("/episodes/file-info/update")
+@Controller("/actions/file-info/update")
 export class EpisodesUpdateController {
   constructor(private readonly updateMetadataProcess: UpdateMetadataProcess) {
   }

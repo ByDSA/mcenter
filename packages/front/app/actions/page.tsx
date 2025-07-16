@@ -11,23 +11,23 @@ type Action = {
 };
 const ACTIONS: Action[] = [
   {
-    path: PATH_ROUTES.actions.episodes.updateLastTimePlayed.path,
+    path: PATH_ROUTES.episodes.actions.updateLastTimePlayed.path,
     name: "Episodes: updateLastTimePlayed",
   },
   {
-    path: PATH_ROUTES.actions.episodes.fileInfoUpdateSaved.path,
+    path: PATH_ROUTES.episodes.actions.fileInfoUpdateSaved.path,
     name: "Episodes: update file-info saved",
   },
   {
-    path: PATH_ROUTES.actions.episodes.addNewFiles.path,
+    path: PATH_ROUTES.episodes.actions.addNewFiles.path,
     name: "Episodes: add new files",
   },
   {
-    path: PATH_ROUTES.actions.episodes.fixer.path,
+    path: PATH_ROUTES.actions.fixer.path,
     name: "Fixer: streams-series",
   },
   {
-    path: PATH_ROUTES.actions.episodes.log.path,
+    path: PATH_ROUTES.actions.log.path,
     name: "Log",
   },
 ];

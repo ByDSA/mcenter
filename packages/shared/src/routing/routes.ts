@@ -7,6 +7,7 @@ const PLAYER_PLAY_EPISODE = `${PLAYER}/play/episode`;
 const PLAYER_PLAY_STREAM = `${PLAYER}/play/stream`;
 const MUSICS_HISTORY = MUSICS + "/history";
 const EPISODES_HISTORY = EPISODES + "/history";
+const EPISODES_ACTIONS = EPISODES + "/actions";
 
 export const PATH_ROUTES = {
   musics: {
@@ -25,22 +26,11 @@ export const PATH_ROUTES = {
   },
   actions: {
     path: "/api/actions",
-    episodes: {
-      updateLastTimePlayed: {
-        path: "/api/actions/episodes/updateLastTimePlayed",
-      },
-      fileInfoUpdateSaved: {
-        path: "/api/actions/episodes/file-info/update/saved",
-      },
-      addNewFiles: {
-        path: "/api/actions/episodes/add-new-files",
-      },
-      fixer: {
-        path: "/api/actions/fixer",
-      },
-      log: {
-        path: "/api/actions/episodes/log",
-      },
+    fixer: {
+      path: "/api/actions/fixer",
+    },
+    log: {
+      path: "/api/actions/log",
     },
   },
   episodes: {
@@ -56,6 +46,17 @@ export const PATH_ROUTES = {
         search: {
           path: EPISODES_HISTORY + "/entries/search",
         },
+      },
+    },
+    actions: {
+      updateLastTimePlayed: {
+        path: EPISODES_ACTIONS + "/update-last-time-played",
+      },
+      fileInfoUpdateSaved: {
+        path: EPISODES_ACTIONS + "/file-info/update/saved",
+      },
+      addNewFiles: {
+        path: EPISODES_ACTIONS + "/add-new-files",
       },
     },
     picker: {

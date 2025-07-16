@@ -1,7 +1,8 @@
 import { Module } from "@nestjs/common";
-import { EpisodesModule } from "#episodes/module";
 import { SeriesModule } from "#modules/series/module";
 import { StreamsModule } from "#modules/streams/module";
+import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
+import { EpisodesModule } from "#episodes/module";
 import { EpisodePickerController } from "./controller";
 import { EpisodePickerService } from "./service";
 
@@ -9,6 +10,7 @@ import { EpisodePickerService } from "./service";
   imports: [
     StreamsModule,
     EpisodesModule,
+    EpisodeHistoryEntriesModule,
     SeriesModule,
   ],
   controllers: [

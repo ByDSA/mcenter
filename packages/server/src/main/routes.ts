@@ -13,6 +13,7 @@ export const routeModules = [
   MusicsModule,
   ActionsModule,
   EpisodesModule,
+  EpisodeHistoryEntriesModule,
   EpisodePickerModule,
   StreamsModule,
   PlayerModule,
