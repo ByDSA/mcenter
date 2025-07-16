@@ -34,7 +34,6 @@ export function Body( { entry: entryEpisode }: Props) {
     ...restEntryEpisode,
     resourceId,
     resource: r,
-    id: restEntryEpisode.date.timestamp,
   };
 
   assertIsDefined(entry.resource, "entry.resource");

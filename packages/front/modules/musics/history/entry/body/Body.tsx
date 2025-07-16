@@ -41,7 +41,7 @@ export function Body( { entry }: Props) {
       },
     },
     delete: {
-      fetch: (_: string, id: string) => fetchDelete(id),
+      fetch: (id: string) => fetchDelete(id),
     },
   } );
   const { isModified,

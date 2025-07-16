@@ -24,9 +24,9 @@ export function HistoryList() {
               let dayTitle;
 
               if (i === 0 || !isSameday(res.data[i - 1].date.timestamp, entry.date.timestamp)) {
-                dayTitle = <h2 key={getDateStr(new Date(entry.date.timestamp * 1000))}>{
-                  getDateStr(new Date(entry.date.timestamp * 1000))
-                }</h2>;
+                const dateStr = getDateStr(new Date(entry.date.timestamp * 1000));
+
+                dayTitle = <h2 key={dateStr}>{dateStr}</h2>;
               }
 
               return <Fragment key={`${entry.episodeId.serieId} ${entry.episodeId.code}`}>

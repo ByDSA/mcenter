@@ -5,7 +5,7 @@ import { UseResourceEditionProps, UseResourceEditionRet, useResourceEdition } fr
 type Props<T, ID, FetchPatchReqBody, FetchPatchResBody> = {
   resource: UseResourceEditionProps<T, ID, FetchPatchReqBody, FetchPatchResBody>;
   delete?: {
-    fetch: (historyListId: any, historyEntryId: any)=> Promise<any>;
+    fetch: (entryId: any)=> Promise<any>;
   };
 };
 type Ret<T> = {
@@ -39,13 +39,10 @@ export function useHistoryEntryEdition<T extends object, ID, FetchPatchReqBody, 
 
       start();
       const historyEntryId = entry.id;
-      const { historyListId } = entry;
 
       assertIsDefined(historyEntryId);
 
-      // Para músicas es undefined:
-      // assertIsDefined(historyListId);
-      return params.delete?.fetch(historyListId, historyEntryId)
+      return params.delete!.fetch(historyEntryId)
         .then(() => done());
     };
 
