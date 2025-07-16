@@ -1,6 +1,6 @@
+import { assertIsDefined } from "$shared/utils/validation";
 import { ConfigOptions, NetConfig } from "./common";
 import { getInitializedNetConfig } from "./initialization";
-import { assertIsDefined } from "$shared/utils/validation";
 
 export class GlobalConfig {
   #options?: ConfigOptions;

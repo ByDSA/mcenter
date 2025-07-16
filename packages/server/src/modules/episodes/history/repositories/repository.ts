@@ -9,16 +9,16 @@ import type { Criteria } from "$shared/models/episodes/history/dto/transport/res
 import { showError } from "$shared/utils/errors/showError";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
+import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
+import { logDomainEvent } from "#modules/log";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { assertFound } from "#utils/validation/found";
 import { createEpisodeHistoryEntryByEpisodeFullId } from "../models";
 import { EpisodeHistoryEntriesModelOdm as ModelOdm } from "./odm";
 import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "./events";
 import { entryToDocOdm } from "./odm";
 import { docOdmToEntryEntity } from "./odm/adapters";
 import { DocOdm } from "./odm/mongo";
-import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
-import { logDomainEvent } from "#modules/log";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { assertFound } from "#utils/validation/found";
 
 export type EpisodeHistoryEntryEvent = BrokerEvent<ModelMessage<EpisodeHistoryEntryEntity>>;
 

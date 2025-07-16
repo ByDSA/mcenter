@@ -14,7 +14,7 @@ import { QUEUE_NAME, StatusPlayerEvent } from "../messaging";
 export class VlcBackWSService {
   io: Server | undefined;
 
-  constructor(private domainMessageBroker: DomainMessageBroker) {
+  constructor(private readonly domainMessageBroker: DomainMessageBroker) {
     this.domainMessageBroker.subscribe(QUEUE_NAME, async (event: BrokerEvent<any>) => {
       switch (event.type) {
         case PlayerEvent.PAUSE_TOGGLE:

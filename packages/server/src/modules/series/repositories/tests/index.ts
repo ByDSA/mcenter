@@ -1,5 +1,5 @@
-import { SerieRepository } from "../Repository";
 import { createMockClass } from "#tests/jest/mocking";
+import { SerieRepository } from "../Repository";
 
 class SerieRepositoryMock extends createMockClass(SerieRepository) { }
 

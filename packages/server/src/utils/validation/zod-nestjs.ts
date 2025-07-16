@@ -10,7 +10,7 @@ export const ValidateResponseWithZodSchema = (schema: z.ZodSchema) => SetMetadat
 
 @Injectable()
 export class ZodSerializerSchemaInterceptor implements NestInterceptor {
-  constructor(private reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const schema = this.reflector.get<z.ZodSchema>("zodSerializerSchema", context.getHandler());

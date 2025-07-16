@@ -1,6 +1,5 @@
-/* eslint-disable no-use-before-define */
-import { Episode, Season, Serie, SerieTree } from "./models";
 import { treePut } from "$shared/utils/trees";
+import { Episode, Season, Serie, SerieTree } from "./models";
 
 export type OldNew = {
   old: Episode;

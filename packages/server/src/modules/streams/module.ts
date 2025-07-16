@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
-import { StreamsRepository } from "./repositories";
-import { StreamRestController } from ".";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { StreamsRepository } from "./repositories";
+import { StreamRestController } from ".";
 
 @Module( {
   imports: [

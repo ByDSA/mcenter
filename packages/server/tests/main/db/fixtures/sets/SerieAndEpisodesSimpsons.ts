@@ -1,7 +1,7 @@
-import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "../models";
 import { episodeEntityToDocOdm } from "#episodes/repositories/adapters";
 import { EpisodeDocOdm, EpisodeModelOdm } from "#episodes/repositories";
 import { SerieDocOdm, SerieModelOdm, serieEntityToDocOdm } from "#modules/series/repositories/odm";
+import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "../models";
 
 export const loadFixtureSerieAndEpisodesSimpsons = async () => {
   // Series

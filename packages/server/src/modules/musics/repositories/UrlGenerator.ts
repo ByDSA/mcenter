@@ -27,7 +27,6 @@ export class MusicUrlGenerator {
     }
   }
 
-  // eslint-disable-next-line no-use-before-define
   async generateAvailableUrlFrom(params: GenerateUrlParams) {
     const url = generateUrl(params);
     const availableUrl = await this.getAvailableUrlFromUrl(url);

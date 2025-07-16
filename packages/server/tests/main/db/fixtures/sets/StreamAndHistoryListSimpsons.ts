@@ -1,6 +1,6 @@
-import { HISTORY_ENTRIES_SIMPSONS, STREAM_SIMPSONS } from "../models";
 import { EpisodeHistoryEntriesModelOdm, EpisodeHistoryEntriesDocOdm, entryToDocOdm } from "#episodes/history/repositories/odm";
 import { StreamDocOdm, StreamModelOdm, streamToDocOdm } from "#modules/streams/repositories";
+import { HISTORY_ENTRIES_SIMPSONS, STREAM_SIMPSONS } from "../models";
 
 export const loadFixtureStreamAndHistoryListSimpsons = async () => {
   // Streams

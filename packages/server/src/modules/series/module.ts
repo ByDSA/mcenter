@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { SerieRepository } from "./repositories";
 import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { SerieRepository } from "./repositories";
 
 @Module( {
   imports: [

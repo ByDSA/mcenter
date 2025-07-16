@@ -1,11 +1,11 @@
 import { expectSerie } from "$sharedSrc/models/series/test";
-import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "./models";
-import { loadFixtureSimpsons } from "./sets";
 import { episodeDocOdmToModel } from "#episodes/repositories";
 import { expectEpisodes } from "#episodes/models/test";
 import { EpisodeModelOdm } from "#episodes/repositories";
 import { SerieDocOdm, SerieModelOdm, serieDocOdmToEntity } from "#modules/series/repositories/odm";
 import { createTestingAppModuleAndInit } from "#tests/nestjs/app";
+import { loadFixtureSimpsons } from "./sets";
+import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "./models";
 
 beforeAll(async () => {
   await createTestingAppModuleAndInit( {

@@ -4,8 +4,6 @@ import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { ErrorElementResponse, DataResponse, errorToErrorElementResponse } from "$shared/utils/http";
 import { showError } from "$shared/utils/errors/showError";
-import { getIdModelOdmFromId } from "../repositories/odm";
-import { SavedSerieTreeService } from "../saved-serie-tree-service";
 import { EpisodeEntity, EpisodeId } from "#episodes/models";
 import { EpisodeFile, EpisodeFileInfoRepository, SerieFolderTree } from "#modules/file-info";
 import { FileInfoVideo, FileInfoVideoWithSuperId, compareFileInfoVideo } from "#modules/file-info/models";
@@ -16,6 +14,8 @@ import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EventType, PatchEvent } from "#utils/event-sourcing";
 import { BrokerEvent } from "#utils/message-broker";
 import { episodeToEpisodeFile } from "#episodes/saved-serie-tree-service/adapters";
+import { SavedSerieTreeService } from "../saved-serie-tree-service";
+import { getIdModelOdmFromId } from "../repositories/odm";
 
 type Model = FileInfoVideo;
 type ModelWithSuperId = FileInfoVideoWithSuperId;

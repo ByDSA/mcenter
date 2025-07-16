@@ -1,16 +1,16 @@
 import { Application } from "express";
 import request from "supertest";
 import { PATH_ROUTES } from "$shared/routing";
-import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests/PlayerBackWebSocketsServiceMock";
-import { VlcBackWebSocketsServerService } from "./player-services";
-import { PlaySerieController } from "./play-serie.controller";
-import { PlayService } from "./PlayService";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { testRoute } from "#tests/main/routing";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
+import { PlayService } from "./PlayService";
+import { PlaySerieController } from "./play-serie.controller";
+import { VlcBackWebSocketsServerService } from "./player-services";
+import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests/PlayerBackWebSocketsServiceMock";
 
 testRoute(PATH_ROUTES.player.play.episode.withParams("serieId", "episodeId"));
 

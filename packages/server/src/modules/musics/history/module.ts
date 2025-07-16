@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
-import { MusicHistoryRepository } from "./repositories";
-import { MusicHistoryRestController } from "./controllers/rest.controller";
 import { MusicRepository } from "#musics/repositories";
 import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { MusicHistoryRepository } from "./repositories";
+import { MusicHistoryRestController } from "./controllers/rest.controller";
 
 @Module( {
   imports: [DomainMessageBrokerModule],

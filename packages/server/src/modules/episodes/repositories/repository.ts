@@ -1,7 +1,15 @@
+/* eslint-disable import/no-cycle */
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { deepMerge } from "$shared/utils/objects";
 import { showError } from "$shared/utils/errors/showError";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { EpisodeFileInfoRepository } from "#modules/file-info";
+import { logDomainEvent } from "#modules/log";
+import { SerieId } from "#series/models";
+import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
+import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import { BrokerEvent } from "#utils/message-broker";
 import { Episode, EpisodeEntity, EpisodeId } from "../models";
 import { LastTimePlayedService } from "../history/last-time-played.service";
 import { EpisodeHistoryEntryEvent } from "../history/repositories";
@@ -10,13 +18,6 @@ import { DocOdm, ModelOdm } from "./odm";
 import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
 import { EPISODE_QUEUE_NAME } from "./events";
 import { episodeDocOdmToModel, episodeEntityToDocOdm, modelToDocOdm, partialModelToDocOdm } from "./adapters";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { EpisodeFileInfoRepository } from "#modules/file-info";
-import { logDomainEvent } from "#modules/log";
-import { SerieId } from "#series/models";
-import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
-import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
-import { BrokerEvent } from "#utils/message-broker";
 
 type UpdateOneParams = Episode;
 

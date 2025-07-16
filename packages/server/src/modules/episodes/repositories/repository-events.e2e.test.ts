@@ -1,5 +1,3 @@
-import { EpisodesRepository } from "../repositories";
-import { EPISODE_QUEUE_NAME } from "./events";
 import { Episode, EpisodeEntity, EpisodeId } from "#episodes/models";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures/models";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
@@ -9,6 +7,8 @@ import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodesModule } from "#episodes/module";
+import { EpisodesRepository } from "../repositories";
+import { EPISODE_QUEUE_NAME } from "./events";
 
 let episodeRepository: EpisodesRepository;
 let domainMessageBroker: DomainMessageBroker<ModelMessage<EpisodeEntity>>;

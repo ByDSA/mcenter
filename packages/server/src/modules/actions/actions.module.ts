@@ -1,13 +1,13 @@
 import { Module } from "@nestjs/common";
-import { FixerController } from "./fixer.controller";
-import { EpisodesUpdateLastTimePlayedController } from "./episodes-update-lastTimePlayed.controller";
-import { ActionController } from "./main.controller";
 import { SavedSerieTreeService } from "#episodes/saved-serie-tree-service";
 import { EpisodeAddNewFilesController } from "#episodes/add-new-files";
 import { EpisodesUpdateController } from "#episodes/update";
 import { EpisodesModule } from "#episodes/module";
 import { SeriesModule } from "#modules/series/module";
 import { StreamsModule } from "#modules/streams/module";
+import { ActionController } from "./main.controller";
+import { EpisodesUpdateLastTimePlayedController } from "./episodes-update-lastTimePlayed.controller";
+import { FixerController } from "./fixer.controller";
 
 @Module( {
   imports: [

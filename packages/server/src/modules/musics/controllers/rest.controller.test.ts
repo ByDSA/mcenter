@@ -1,10 +1,10 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { musicRepoMockProvider, MUSICS_SAMPLES_IN_DISK } from "../repositories/tests";
-import { MusicRepository } from "../repositories";
-import { MusicRestController } from "./rest.controller";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { restTestsSuite } from "#tests/suites/rest-suite";
 import { testRoute } from "#tests/main/routing/routing";
+import { musicRepoMockProvider, MUSICS_SAMPLES_IN_DISK } from "../repositories/tests";
+import { MusicRepository } from "../repositories";
+import { MusicRestController } from "./rest.controller";
 
 testRoute(PATH_ROUTES.musics.withParams("id"));
 
