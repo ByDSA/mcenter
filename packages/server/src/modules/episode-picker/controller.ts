@@ -41,7 +41,7 @@ export class EpisodePickerController {
     const stream = await this.streamRepository.getOneById(streamId);
 
     assertFound(stream);
-    const lastEntry = await this.episodeHistoryEntriesRepository.findLastForSerieId(streamId);
+    const lastEntry = await this.episodeHistoryEntriesRepository.findLastForSerieKey(streamId);
 
     assertFound(lastEntry);
 
@@ -57,7 +57,7 @@ export class EpisodePickerController {
 
     assertFound(serie);
 
-    const episodes: EpisodeEntity[] = await this.episodeRepository.getManyBySerieId(serie.id);
+    const episodes: EpisodeEntity[] = await this.episodeRepository.getManyBySerieKey(serie.id);
     const picker = await genRandomPickerWithData<EpisodeEntity>( {
       resources: episodes,
       lastOne: lastEp ?? undefined,

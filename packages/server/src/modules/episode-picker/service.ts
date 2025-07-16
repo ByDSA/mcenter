@@ -33,14 +33,16 @@ export class EpisodePickerService {
   }
 
   async getByStream(stream: Stream, n = 1): Promise<EpisodeEntity[]> {
-    const serieId: string = stream.group.origins[0].id;
+    const serieKey: string = stream.group.origins[0].id;
     const options: EpisodesRepositoryGetManyOptions = {
       sortById: stream.mode === StreamMode.SEQUENTIAL,
     };
     const allEpisodesInSerie = await this.episodeRepository
-      .getManyBySerieId(serieId, options);
-    const lastEntry = await this.historyEntriesRepository.findLastForSerieId(stream.id);
+      .getManyBySerieKey(serieKey, options);
+    const lastEntry = await this.historyEntriesRepository.findLastForSerieKey(serieKey);
 
+    // eslint-disable-next-line max-len
+    // TODO: debería añadirse "stream" al historial de episodes, y obtener aquí la última entrada de ese stream. Ej: para un stream secuencial no debería interferir los capítulos de la misma serie con otro stream.
     assertFound(lastEntry, `Cannot get last history entry list from stream '${stream.id}'`);
     const lastPlayedEpInSerieId = lastEntry.episodeId;
     const lastPlayedEpInSerie = lastPlayedEpInSerieId
