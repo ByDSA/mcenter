@@ -1,8 +1,8 @@
 export {
   DocOdm, ModelOdm, schemaOdm as SchemaOdm,
-} from "./odm";
+} from "./odm/odm";
 
-export * from "./adapters";
+export * from "./odm/adapters";
 
 export {
   EpisodeFileInfoRepository,

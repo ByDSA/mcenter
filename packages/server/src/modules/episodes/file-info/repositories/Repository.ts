@@ -1,8 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { FileInfoVideo, FileInfoVideoSuperId, FileInfoVideoWithSuperId } from "#episodes/file-info/models";
 import { CanGetAllBySuperId, CanUpdateMany, CanUpdateOneBySuperId } from "#utils/layers/repository";
-import { ModelOdm } from "./odm";
-import { docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./adapters";
+import { ModelOdm, docOdmToModel, docOdmToModelWithSuperId, modelWithSuperIdToDocOdm } from "./odm";
 
 type ModelWithSuperId = FileInfoVideoWithSuperId;
 type Model = FileInfoVideo;
