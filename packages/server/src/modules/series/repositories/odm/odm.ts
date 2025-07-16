@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { SerieId } from "../models";
+import { SerieId } from "../../models";
 
 export interface DocOdm {
   id: SerieId;

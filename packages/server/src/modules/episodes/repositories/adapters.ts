@@ -1,9 +1,9 @@
 import { UpdateQuery } from "mongoose";
-import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 import { Episode, EpisodeEntity, assertIsEpisode } from "../models";
 import { DocOdm } from "./odm";
+import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 
-export function docOdmToEntity(docOdm: DocOdm): EpisodeEntity {
+export function episodeDocOdmToModel(docOdm: DocOdm): EpisodeEntity {
   const model: EpisodeEntity = {
     id: {
       code: docOdm.episodeId,
@@ -32,7 +32,7 @@ export function docOdmToEntity(docOdm: DocOdm): EpisodeEntity {
   return model;
 }
 
-export function entityToDocOdm(entity: EpisodeEntity): DocOdm {
+export function episodeEntityToDocOdm(entity: EpisodeEntity): DocOdm {
   const ret = modelToDocOdm(entity);
 
   ret.episodeId = entity.id.code;

@@ -2,8 +2,6 @@ import request from "supertest";
 import { INestApplication } from "@nestjs/common";
 import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
-import { musicEntitySchema } from "#musics/models";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { MusicRepository } from "../repositories";
 import { MUSICS_SAMPLES_IN_DISK } from "../repositories/tests";
 import { UpdateRemoteTreeService, UpdateResult } from "../services";
@@ -12,6 +10,8 @@ import { musicHistoryRepoMockProvider } from "../history/repositories/tests/Repo
 import { MusicUpdateRemoteController } from "./update-remote.controller";
 import { MusicFixController } from "./fix.controller";
 import { MusicGetController } from "./get.controller";
+import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { musicEntitySchema } from "#musics/models";
 
 describe("getAll", () => {
   let musicRepoMock: MusicRepository;

@@ -1,13 +1,13 @@
 import { Controller, Get } from "@nestjs/common";
 import { DataResponse, LogElementResponse } from "$shared/utils/http";
-import { SerieRepository } from "#modules/series";
+import { SerieRepository } from "#modules/series/repositories";
 import { StreamsRepository } from "#modules/streams/repositories";
 
 @Controller("/fixer")
 export class FixerController {
   constructor(
-    private serieRepository: SerieRepository,
-    private streamRepository: StreamsRepository,
+    private readonly serieRepository: SerieRepository,
+    private readonly streamRepository: StreamsRepository,
   ) {
   }
 

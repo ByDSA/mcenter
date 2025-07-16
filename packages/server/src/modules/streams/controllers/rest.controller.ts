@@ -3,12 +3,12 @@ import { Body, Controller, Get } from "@nestjs/common";
 import { CriteriaSortDir } from "$shared/utils/criteria";
 import { CriteriaSort, getManyByCriteria } from "$shared/models/streams/dto/rest";
 import { createZodDto } from "nestjs-zod";
-import { SerieRepository } from "#modules/series";
+import { StreamsRepository } from "../repositories";
+import { SerieRepository } from "#modules/series/repositories";
 import { Stream, StreamOriginType, streamSchema } from "#modules/streams/models";
 import { CanGetAll } from "#utils/layers/controller";
 import { GetManyCriteria } from "#utils/nestjs/rest/Get";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
-import { StreamsRepository } from "../repositories";
 
 class CriteriaBodyDto extends createZodDto(getManyByCriteria.reqBodySchema) {}
 

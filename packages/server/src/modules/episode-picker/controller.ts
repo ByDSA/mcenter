@@ -4,16 +4,16 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { asyncMap } from "$shared/utils/arrays";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
-import { EpisodesRepository } from "#episodes/index";
+import { dependencies } from "./appliers/Dependencies";
+import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
+import { EpisodesRepository } from "#episodes/repositories";
 import { Episode, EpisodeEntity } from "#episodes/models";
 import { LastTimePlayedService } from "#episodes/history";
 import { genRandomPickerWithData } from "#modules/picker";
-import { SerieRepository } from "#modules/series";
+import { SerieRepository } from "#series/repositories";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
-import { dependencies } from "./appliers/Dependencies";
-import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 
 class ShowPickerParamsDto extends createZodDto(z.object( {
   streamId: z.string(),

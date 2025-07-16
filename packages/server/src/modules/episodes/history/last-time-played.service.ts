@@ -1,10 +1,10 @@
+import type { EpisodeEntity, EpisodeId } from "#episodes/models";
 import { DateTime } from "luxon";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { deepCopy } from "$shared/utils/objects";
 import { showError } from "$shared/utils/errors/showError";
-import { EpisodeEntity, EpisodeId } from "#episodes/models";
-import { EpisodesRepository } from "#episodes/index";
-import { EpisodeHistoryEntriesRepository } from "./repositories";
+import { EpisodeHistoryEntriesRepository } from "./repositories/repository";
+import { EpisodesRepository } from "#episodes/repositories/repository";
 
 @Injectable()
 export class LastTimePlayedService {

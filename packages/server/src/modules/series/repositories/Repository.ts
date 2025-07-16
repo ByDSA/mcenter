@@ -6,9 +6,9 @@ import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { BrokerEvent } from "#utils/message-broker";
 import { SerieEntity, SerieId } from "../models";
-import { DocOdm, ModelOdm } from "./odm";
+import { DocOdm, ModelOdm } from "./odm/odm";
 import { QUEUE_NAME } from "./events";
-import { docOdmToEntity } from "./adapters";
+import { serieDocOdmToEntity as docOdmToEntity } from "./odm";
 
 @Injectable()
 export class SerieRepository

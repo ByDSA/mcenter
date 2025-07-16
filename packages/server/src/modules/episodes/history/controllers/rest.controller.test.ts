@@ -3,17 +3,10 @@ import request from "supertest";
 import { createSuccessDataResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
 import { EpisodeHistoryEntriesRepository } from "../repositories";
-import { LastTimePlayedService } from "../last-time-played.service";
+import { episodeHistoryEntriesRepositoryMockProvider, lastTimePlayedServiceMockProvider } from "../repositories/tests";
 import { EpisodeHistoryEntriesRestController } from "./rest.controller";
 import { HISTORY_ENTRY_SIMPSONS1 } from "#tests/main/db/fixtures";
-import { createMockClass } from "#tests/jest/mocking";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { EpisodesRepository } from "#episodes/repositories";
-import { SerieRepository } from "#modules/series";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { EpisodeFileInfoRepository } from "#modules/file-info/repositories";
-
-class HistoryEntriesRepositoryMock extends createMockClass(EpisodeHistoryEntriesRepository) {}
+import { createTestingAppModuleAndInit, type TestingSetup } from "#tests/nestjs/app";
 
 describe("restController", () => {
   let routerApp: Application;
@@ -22,17 +15,11 @@ describe("restController", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
+      imports: [],
       controllers: [EpisodeHistoryEntriesRestController],
       providers: [
-        {
-          provide: EpisodeHistoryEntriesRepository,
-          useClass: HistoryEntriesRepositoryMock,
-        },
-        DomainMessageBroker,
-        SerieRepository,
-        EpisodeFileInfoRepository,
-        EpisodesRepository,
-        LastTimePlayedService,
+        episodeHistoryEntriesRepositoryMockProvider,
+        lastTimePlayedServiceMockProvider,
       ],
     } );
     repository = testingSetup.module

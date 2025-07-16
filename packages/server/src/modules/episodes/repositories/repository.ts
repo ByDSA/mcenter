@@ -2,6 +2,14 @@ import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { deepMerge } from "$shared/utils/objects";
 import { showError } from "$shared/utils/errors/showError";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
+import { Episode, EpisodeEntity, EpisodeId } from "../models";
+import { LastTimePlayedService } from "../history/last-time-played.service";
+import { EpisodeHistoryEntryEvent } from "../history/repositories";
+import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "../history/repositories/events";
+import { DocOdm, ModelOdm } from "./odm";
+import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
+import { EPISODE_QUEUE_NAME } from "./events";
+import { episodeDocOdmToModel, episodeEntityToDocOdm, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeFileInfoRepository } from "#modules/file-info";
 import { logDomainEvent } from "#modules/log";
@@ -9,14 +17,6 @@ import { SerieId } from "#series/models";
 import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
 import { BrokerEvent } from "#utils/message-broker";
-import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "#episodes/history/repositories/events";
-import { EpisodeHistoryEntryEvent } from "#episodes/history/repositories";
-import { LastTimePlayedService } from "#episodes/history";
-import { Episode, EpisodeEntity, EpisodeId } from "../models";
-import { DocOdm, ModelOdm } from "./odm";
-import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
-import { EPISODE_QUEUE_NAME } from "./events";
-import { docOdmToEntity, entityToDocOdm, modelToDocOdm, partialModelToDocOdm } from "./adapters";
 
 type UpdateOneParams = Episode;
 
@@ -97,7 +97,7 @@ CanGetAll<EpisodeEntity> {
     if (episodesOdm.length === 0)
       return [];
 
-    return episodesOdm.map(docOdmToEntity) as EpisodeEntity[];
+    return episodesOdm.map(episodeDocOdmToModel) as EpisodeEntity[];
   }
 
   async getAllBySerieId(serieId: SerieId): Promise<EpisodeEntity[]> {
@@ -108,7 +108,7 @@ CanGetAll<EpisodeEntity> {
     if (episodesOdm.length === 0)
       return [];
 
-    return episodesOdm.map(docOdmToEntity) as EpisodeEntity[];
+    return episodesOdm.map(episodeDocOdmToModel) as EpisodeEntity[];
   }
 
   async getOneById(id: EpisodeId, opts?: GetOptions): Promise<EpisodeEntity | null> {
@@ -121,7 +121,7 @@ CanGetAll<EpisodeEntity> {
     if (!episodeOdm)
       return null;
 
-    const ret = docOdmToEntity(episodeOdm) as EpisodeEntity;
+    const ret = episodeDocOdmToModel(episodeOdm) as EpisodeEntity;
 
     if (opts?.expand?.includes(ExpandEnum.FileInfo)) {
       const _id = episodeOdm._id?.toString();
@@ -144,7 +144,7 @@ CanGetAll<EpisodeEntity> {
     if (!episodeOdm)
       return null;
 
-    return docOdmToEntity(episodeOdm) as EpisodeEntity;
+    return episodeDocOdmToModel(episodeOdm) as EpisodeEntity;
   }
 
   async getManyBySerieId(serieId: string, options?: GetManyOptions): Promise<EpisodeEntity[]> {
@@ -174,7 +174,7 @@ CanGetAll<EpisodeEntity> {
     if (episodesOdm.length === 0)
       return [];
 
-    return episodesOdm.map(docOdmToEntity) as EpisodeEntity[];
+    return episodesOdm.map(episodeDocOdmToModel) as EpisodeEntity[];
   }
 
   async updateOneByIdAndGet(
@@ -231,9 +231,9 @@ CanGetAll<EpisodeEntity> {
   }
 
   async createManyAndGet(models: EpisodeEntity[]): Promise<EpisodeEntity[]> {
-    const docsOdm: DocOdm[] = models.map(entityToDocOdm);
+    const docsOdm: DocOdm[] = models.map(episodeEntityToDocOdm);
     const inserted = await ModelOdm.insertMany(docsOdm);
-    const ret = inserted.map(docOdmToEntity);
+    const ret = inserted.map(episodeDocOdmToModel);
 
     for (const model of ret) {
       const event = new ModelEvent(EventType.CREATED, {

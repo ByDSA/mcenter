@@ -1,7 +1,7 @@
-import { episodeToDocOdm } from "#episodes/index";
-import { DocOdm, ModelOdm } from "#episodes/repositories";
-import { SerieDocOdm, SerieModelOdm, serieEntityToDocOdm } from "#modules/series";
 import { EPISODES_SIMPSONS, SERIE_SIMPSONS } from "../models";
+import { episodeEntityToDocOdm } from "#episodes/repositories/adapters";
+import { EpisodeDocOdm, EpisodeModelOdm } from "#episodes/repositories";
+import { SerieDocOdm, SerieModelOdm, serieEntityToDocOdm } from "#modules/series/repositories/odm";
 
 export const loadFixtureSerieAndEpisodesSimpsons = async () => {
   // Series
@@ -10,7 +10,7 @@ export const loadFixtureSerieAndEpisodesSimpsons = async () => {
   await SerieModelOdm.insertMany(seriesDocOdm);
 
   // Episodes
-  const episodesDocOdm: DocOdm[] = EPISODES_SIMPSONS.map(episodeToDocOdm);
+  const episodesDocOdm: EpisodeDocOdm[] = EPISODES_SIMPSONS.map(episodeEntityToDocOdm);
 
-  await ModelOdm.insertMany(episodesDocOdm);
+  await EpisodeModelOdm.insertMany(episodesDocOdm);
 };

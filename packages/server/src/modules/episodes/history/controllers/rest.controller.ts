@@ -1,15 +1,14 @@
+import type { CanGetAll } from "#utils/layers/controller";
 import { Request, Response } from "express";
-import { Body, Controller, Param } from "@nestjs/common";
+import { Body, Controller, Inject, Param } from "@nestjs/common";
 import { showError } from "$shared/utils/errors/showError";
 import { createZodDto } from "nestjs-zod";
 import { episodeHistoryEntriesRestDto } from "$shared/models/episodes/history/dto/transport";
 import z from "zod";
-import { EpisodeHistoryEntriesRepository } from "../repositories";
-import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
+import { EpisodeHistoryEntriesRepository } from "../repositories/repository";
+import { type EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 import { LastTimePlayedService } from "../last-time-played.service";
-import { CanGetAll } from "#utils/layers/controller";
-import { DeleteOne } from "#utils/nestjs/rest";
-import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/Get";
+import { DeleteOne, GetMany, GetManyCriteria } from "#utils/nestjs/rest";
 
 namespace Dto {
   export class GetManyEntriesByCriteriaBody
@@ -30,6 +29,7 @@ implements
     CanGetAll<Request, Response> {
   constructor(
     private readonly entriesRepository: EpisodeHistoryEntriesRepository,
+    @Inject(LastTimePlayedService)
     private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
   }

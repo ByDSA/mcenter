@@ -1,21 +1,18 @@
 import { HttpStatus } from "@nestjs/common";
 import { createSuccessDataResponse } from "$shared/utils/http/responses";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { episodeFileInfoRepositoryMockProvider } from "#modules/file-info/repositories/tests";
+import { episodeRepositoryMockProvider } from "../repositories/tests";
+import { EpisodesRestController } from "./rest.controller";
 import { serieRepositoryMockProvider } from "#modules/series/repositories/tests";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { restTestsSuite } from "#tests/suites/rest-suite";
 import { EpisodesRepository } from "#episodes/repositories";
-import { episodeRepositoryMockProvider } from "../repositories/tests";
-import { EpisodesRestController } from "./rest.controller";
 
 restTestsSuite( {
   appModule: [
     {
+      imports: [],
       controllers: [EpisodesRestController],
       providers: [
-        DomainMessageBroker,
-        episodeFileInfoRepositoryMockProvider,
         episodeRepositoryMockProvider,
         serieRepositoryMockProvider,
       ],

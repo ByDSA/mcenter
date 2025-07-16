@@ -1,18 +1,19 @@
 import { Global, Module } from "@nestjs/common";
-import { StreamsModule } from "#modules/streams/module";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { SeriesModule } from "#modules/series/module";
-import { EpisodesModule } from "#episodes/module";
-import { EpisodePickerModule } from "#modules/episode-picker/module";
 import { PlaySerieController } from "./play-serie.controller";
 import { PlayStreamController } from "./play-stream.controller";
 import { VlcBackWSService } from "./player-services/vlc-back/VlcBackWSServerService";
 import { FrontWSServerService } from "./player-services/front/FrontPlayerWebSocketsServerService";
 import { PlayService } from "./PlayService";
+import { EpisodePickerModule } from "#modules/episode-picker/module";
+import { EpisodesModule } from "#episodes/module";
+import { SeriesModule } from "#modules/series/module";
+import { StreamsModule } from "#modules/streams/module";
+import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
 
 @Global() // Para que use sólo una instancia de servicio backend de web sockets
 @Module( {
   imports: [
+    DomainMessageBrokerModule,
     StreamsModule,
     SeriesModule,
     EpisodesModule,
@@ -23,7 +24,6 @@ import { PlayService } from "./PlayService";
     PlayStreamController,
   ],
   providers: [
-    DomainMessageBroker,
     FrontWSServerService,
     PlayService,
     VlcBackWSService,

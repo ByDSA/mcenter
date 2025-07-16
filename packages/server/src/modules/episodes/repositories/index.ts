@@ -1,5 +1,5 @@
 export {
-  DocOdm, ModelOdm, schemaOdm as SchemaOdm,
+  DocOdm as EpisodeDocOdm, ModelOdm as EpisodeModelOdm, schemaOdm as EpisodeSchemaOdm,
 } from "./odm";
 
 export * from "./adapters";
@@ -7,7 +7,7 @@ export * from "./adapters";
 export {
   EpisodesRepository,
   GetManyOptions as EpisodesRepositoryGetManyOptions,
-} from "./Repository";
+} from "./repository";
 
 export {
   ExpandEnum as EpisodesRepositoryExpandEnum,

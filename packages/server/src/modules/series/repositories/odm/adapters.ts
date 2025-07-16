@@ -1,4 +1,4 @@
-import { SerieEntity } from "../models";
+import { SerieEntity } from "../../models";
 import { DocOdm } from "./odm";
 
 export function docOdmToEntity(serieDocOdm: DocOdm): SerieEntity {

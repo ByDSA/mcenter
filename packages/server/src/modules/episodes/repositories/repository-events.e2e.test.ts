@@ -1,14 +1,14 @@
+import { EpisodesRepository } from "../repositories";
+import { EPISODE_QUEUE_NAME } from "./events";
 import { Episode, EpisodeEntity, EpisodeId } from "#episodes/models";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures/models";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { Consumer } from "#utils/message-broker";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { EpisodeFileInfoRepository } from "#modules/file-info/repositories";
-import { EpisodeHistoryEntriesRepository, LastTimePlayedService } from "#episodes/history";
-import { EpisodesRepository } from "..";
-import { EPISODE_QUEUE_NAME } from "./events";
+import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { EpisodesModule } from "#episodes/module";
 
 let episodeRepository: EpisodesRepository;
 let domainMessageBroker: DomainMessageBroker<ModelMessage<EpisodeEntity>>;
@@ -16,17 +16,9 @@ let testingSetup: TestingSetup;
 
 beforeAll(async () => {
   testingSetup = await createTestingAppModuleAndInit( {
-    imports: [],
+    imports: [DomainMessageBrokerModule, EpisodesModule],
     controllers: [],
     providers: [
-      DomainMessageBroker<ModelMessage<EpisodeEntity>>,
-      EpisodeFileInfoRepository,
-      // EpisodesModule:
-      EpisodeHistoryEntriesRepository,
-      LastTimePlayedService,
-      EpisodesRepository,
-      // TODO: pasar MessageBroker a modulo e importar tanto EpisodesModule como BrokerModule
-      // y quitar los providers
     ],
   }, {
     db: {

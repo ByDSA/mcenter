@@ -1,23 +1,24 @@
-import { Injectable } from "@nestjs/common";
+import type { SerieId } from "#modules/series";
+import type { EpisodeEntity, EpisodeId } from "#episodes/models";
+import type { BrokerEvent } from "#utils/message-broker";
+import type { CanCreateOne, CanDeleteOneByIdAndGet } from "#utils/layers/repository";
+import type { EpisodeHistoryEntryId as Id, EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity, EpisodeHistoryEntryEntity } from "../models";
+import type { EpisodeHistoryEntriesCriteria } from "$shared/models/episodes/history/dto/transport";
+import type { FilterQuery, PipelineStage } from "mongoose";
+import type { Criteria } from "$shared/models/episodes/history/dto/transport/rest/get-many-by-criteria";
 import { showError } from "$shared/utils/errors/showError";
-import { EpisodeHistoryEntriesCriteria } from "$shared/models/episodes/history/dto/transport";
-import { FilterQuery, PipelineStage } from "mongoose";
-import { Criteria } from "$shared/models/episodes/history/dto/transport/rest/get-many-by-criteria";
+import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { EpisodeHistoryEntryId as Id, EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity, createEpisodeHistoryEntryByEpisodeFullId, EpisodeHistoryEntryEntity } from "../models";
+import { createEpisodeHistoryEntryByEpisodeFullId } from "../models";
 import { EpisodeHistoryEntriesModelOdm as ModelOdm } from "./odm";
 import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "./events";
 import { entryToDocOdm } from "./odm";
 import { docOdmToEntryEntity } from "./odm/adapters";
 import { DocOdm } from "./odm/mongo";
-import { CanCreateOne, CanDeleteOneByIdAndGet } from "#utils/layers/repository";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { assertFound } from "#utils/validation/found";
-import { EpisodeEntity, EpisodeId } from "#episodes/models";
-import { BrokerEvent } from "#utils/message-broker";
-import { SerieId } from "#modules/series";
 
 export type EpisodeHistoryEntryEvent = BrokerEvent<ModelMessage<EpisodeHistoryEntryEntity>>;
 

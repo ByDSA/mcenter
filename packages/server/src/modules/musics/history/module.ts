@@ -1,14 +1,13 @@
 import { Module } from "@nestjs/common";
-import { MusicRepository } from "#musics/repositories";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { MusicHistoryRepository } from "./repositories";
 import { MusicHistoryRestController } from "./controllers/rest.controller";
+import { MusicRepository } from "#musics/repositories";
+import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
 
 @Module( {
-  imports: [],
+  imports: [DomainMessageBrokerModule],
   controllers: [MusicHistoryRestController],
   providers: [
-    DomainMessageBroker,
     MusicRepository,
     MusicHistoryRepository,
   ],

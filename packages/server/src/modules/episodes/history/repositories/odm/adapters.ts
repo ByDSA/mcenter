@@ -1,7 +1,7 @@
-import { docOdmToEntity as serieDocOdmToEntity } from "#series/repositories/adapters";
-import { docOdmToEntity as episodeDocOdmToEntity } from "#episodes/repositories/adapters";
 import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../models";
 import { DocOdm, ExpandedDocOdm } from "./mongo";
+import { serieDocOdmToEntity } from "#series/repositories/odm";
+import { episodeDocOdmToModel as episodeDocOdmToEntity } from "#episodes/repositories/adapters";
 
 function docOdmToEntity(entryDocOdm: ExpandedDocOdm): Entity {
   const ret: Entity = {

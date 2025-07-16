@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
-import { EpisodesRepository } from "#episodes/index";
-import { SerieRepository } from "#modules/series";
+import { EpisodesRepository } from "#episodes/repositories";
+import { SerieRepository } from "#series/repositories";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { LastTimePlayedService } from "#episodes/history";
 

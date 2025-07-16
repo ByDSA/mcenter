@@ -5,13 +5,13 @@ import { getOneById } from "$shared/models/episodes/dto/rest/get-one-by-id";
 import { getManyByCriteria } from "$shared/models/episodes/dto/rest/get-many-by-criteria";
 import { patchOneById } from "$shared/models/episodes/dto/rest/patch-one-by-id";
 import { createZodDto } from "nestjs-zod";
+import { EpisodesRepository } from "../repositories";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
-import { SerieRepository } from "#modules/series";
+import { SerieRepository } from "#modules/series/repositories";
 import { SerieEntity } from "#modules/series/models";
 import { GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest/Get";
 import { PatchOne } from "#utils/nestjs/rest";
 import { assertFound } from "#utils/validation/found";
-import { EpisodesRepository } from "../repositories";
 
 class GetOneByIdParamsDto extends createZodDto(getOneById.paramsSchema) {}
 class GetAllParamsDto extends createZodDto(getAll.paramsSchema) {}
