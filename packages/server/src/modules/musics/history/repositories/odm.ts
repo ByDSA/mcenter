@@ -23,7 +23,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>(
     },
   },
   {
-    collection: "musicHistory",
+    collection: "musicHistoryEntries",
   },
 );
 
