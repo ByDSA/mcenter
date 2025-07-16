@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
 
 . "$(dirname -- "$0")/assert_can_edit_current_brach.sh"
 

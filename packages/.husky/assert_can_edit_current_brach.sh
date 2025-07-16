@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-. "$(dirname -- "$0")/_/husky.sh"
-
 . "$(dirname -- "$0")/shared-imports.sh"
 
 fatal_error() {
