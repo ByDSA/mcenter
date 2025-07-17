@@ -27,5 +27,11 @@ export async function infraUp(params) {
   }
 
   console.log("Updating infrastrcuture to remote ...");
-  await $`${cmd}`;
+  const verbose = $.verbose;
+  $.verbose = true;
+
+  const process = $`${cmd}`;
+
+  $.verbose = verbose;
+  console.log("Updated infrastrcuture!");
 }

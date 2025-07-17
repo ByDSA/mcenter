@@ -6,8 +6,6 @@ import {
 } from "../../packages/lib/projects/deploy/index.mjs";
 import { infraUp } from "../../packages/lib/index.mjs";
 
-(async () => {
-  $.verbose = false;
 
   const { ENVS } = await readAndCheckEnvs();
 
@@ -23,4 +21,4 @@ import { infraUp } from "../../packages/lib/index.mjs";
     remoteProjectRoot: ENVS.REMOTE_PROJECT_ROOT,
     ssh,
   } );
-})();
+
