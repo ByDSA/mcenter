@@ -1,8 +1,9 @@
-import { assertIsSerie, assertIsSerieEntity } from ".";
+import { assertIsSerie, assertIsSerieEntity, SerieEntity } from ".";
 
-const VALID_MODEL = {
-  id: "1x01",
-  name: "name",
+const VALID_MODEL: SerieEntity = {
+  _id: "1",
+  key: "serie",
+  name: "Serie Name",
 };
 
 describe("assertIsModel", () => {
@@ -25,18 +26,21 @@ describe("assertIsModel", () => {
     } ).toThrow();
   } );
 
-  it("should throw an error when asserting an entry object with a missing required property", () => {
-    const obj = {
-      ...VALID_MODEL,
-    };
+  it(
+    "should throw an error when asserting an entry object with a missing required property",
+    () => {
+      const obj = {
+        ...VALID_MODEL,
+      };
 
-    // @ts-ignore
-    delete obj.name;
+      // @ts-ignore
+      delete obj.name;
 
-    expect(() => {
-      assertIsSerie(obj);
-    } ).toThrow();
-  } );
+      expect(() => {
+        assertIsSerie(obj);
+      } ).toThrow();
+    },
+  );
 
   describe("domain tests", () => {
     it("should throw an error when asserting a non-object value", () => {

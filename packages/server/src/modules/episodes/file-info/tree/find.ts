@@ -99,14 +99,17 @@ function isValidEpisodeDirent(dirent: Dirent): boolean {
 
   const ext = path.extname(name);
 
-  return ext === ".mp4" || ext === ".mkv" || ext === ".avi" || ext === ".wmv" || ext === ".flv" || ext === ".mov";
+  return ext === ".mp4" || ext === ".mkv" || ext === ".avi" || ext === ".wmv" || ext === ".flv"
+    || ext === ".mov";
 }
 
 function readFolderNamesIn(folderFullPath: string): string[] {
   const folderContent = fs.readdirSync(folderFullPath, {
     withFileTypes: true,
   } );
-  const folders = folderContent.filter(folder => folder.isDirectory() && !folder.name.startsWith("."));
+  const folders = folderContent.filter(
+    folder => folder.isDirectory() && !folder.name.startsWith("."),
+  );
   const foldersPaths = folders.map(serie => serie.name);
 
   return foldersPaths;

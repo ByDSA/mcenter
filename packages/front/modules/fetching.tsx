@@ -2,6 +2,7 @@ import React, { JSX } from "react";
 import useSWR from "swr";
 import style from "./fetching.style.module.css";
 import { Spinner } from "./ui-kit/spinner";
+import { getDiff } from "./utils/objects";
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
 type FetcherParams<ReqBody> = {
@@ -118,7 +119,9 @@ export function FetchingRender<T, U = undefined>(
 
     return <>
       <p>Failed to request.</p>
-      {error && <p>{JSON.stringify(errorShown, null, 2)}</p>}
+      {error && <pre>{errorShown.message?.split("\n").map(e=><pre style={{
+        margin: 0,
+      }}>{e}</pre>)}</pre>}
     </>;
   }
 
@@ -129,4 +132,29 @@ export function FetchingRender<T, U = undefined>(
     return <span>Empty data.</span>;
 
   return render(data, hooksRet);
+}
+
+export function generatePatchBody<T extends object>(
+  initial: T,
+  current: T,
+  allowedProps: readonly (keyof T)[],
+) {
+  const filteredInitial = allowedProps.reduce((acc, prop) => {
+    if (prop in initial)
+      (acc as any)[prop] = initial[prop];
+
+    return acc;
+  }, {} as Partial<T>);
+  const filteredCurrent = allowedProps.reduce((acc, prop) => {
+    if (prop in current)
+      (acc as any)[prop] = current[prop];
+
+    return acc;
+  }, {} as Partial<T>);
+  const patchBodyParams = getDiff(
+    filteredInitial,
+    filteredCurrent,
+  );
+
+  return patchBodyParams;
 }

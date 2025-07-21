@@ -5,8 +5,12 @@ import { isDebugging } from "$shared/utils/vscode";
 import { CustomValidationError } from "$shared/utils/validation/zod";
 
 export const errorHandler = (err: unknown, _req: Request, res: Response, next: NextFunction) => {
-  if ((process.env.NODE_ENV !== "test" || (process.env.NODE_ENV === "test" && isDebugging())) && err instanceof Error && err.stack && (!(err instanceof HttpException) || err.getStatus().toString()
-    .startsWith("5"))) {
+  if (
+    (process.env.NODE_ENV !== "test" || (process.env.NODE_ENV === "test" && isDebugging()))
+    && err instanceof Error && err.stack
+    && (!(err instanceof HttpException) || err.getStatus().toString()
+      .startsWith("5"))
+  ) {
     let output = `${ err.name }`;
 
     if (err.message)
@@ -28,7 +32,8 @@ export const errorHandler = (err: unknown, _req: Request, res: Response, next: N
         const cyan = line.slice(cyanStartIndex, cyanEndIndex);
 
         // construct full line with cyan
-        return `${line.slice(0, cyanStartIndex) }\x1b[0;36m${ cyan }\x1b[0;30m${ line.slice(cyanEndIndex)}`;
+        return `${line.slice(0, cyanStartIndex) }\x1b[0;36m${ cyan }\
+\x1b[0;30m${ line.slice(cyanEndIndex) }`;
       } )
       .join("\n"));
     process.stderr.write("\n\x1b[0m");

@@ -1,12 +1,16 @@
-import { InputTextProps, useInputText } from "./InputText";
-import { ResourceInputProps } from "./ResourceInput";
 import { isDefined } from "$shared/utils/validation";
+import { InputTextProps, useInputText } from "./InputText";
+import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
+
+export type ResourceInputTextArrayProps<R> = ResourceInputCommonProps<R, string[] | undefined> & {
+  inputTextProps?: InputTextProps;
+};
 
 export function ResourceInputArrayString<R extends object>(
-  { resourceState, prop, inputTextProps }: ResourceInputProps<R>,
+  { resourceState, setResource: calcUpdatedResource, getValue: getResourceValue,
+    inputTextProps }: ResourceInputTextArrayProps<R>,
 ) {
-  const [resource] = resourceState;
-  const array = (resource[prop] ?? []) as string[];
+  const array = (getResourceValue(resourceState[0]) ?? []) as string[];
 
   return <>
     <span className="ui-kit-resource-input-array-string">
@@ -16,7 +20,8 @@ export function ResourceInputArrayString<R extends object>(
 
           return <Item
             key={key}
-            prop={prop}
+            calcUpdatedResource={calcUpdatedResource}
+            getResourceValue={getResourceValue}
             index={i}
             resourceState={resourceState}
             name={t}
@@ -25,7 +30,8 @@ export function ResourceInputArrayString<R extends object>(
       {
         AddIcon( {
           resourceState,
-          prop,
+          calcUpdatedResource,
+          getResourceValue,
           inputTextProps,
         } )
       }
@@ -35,32 +41,39 @@ export function ResourceInputArrayString<R extends object>(
 
 type ItemProps<R extends object> = {
   name: string;
-  resourceState: ResourceInputProps<R>["resourceState"];
-  prop: ResourceInputProps<R>["prop"];
+  resourceState: ResourceInputTextArrayProps<R>["resourceState"];
+  calcUpdatedResource: ResourceInputTextArrayProps<R>["setResource"];
+  getResourceValue: ResourceInputTextArrayProps<R>["getValue"];
   index: number;
 };
-function Item<R extends object>( { name, prop, resourceState, index }: ItemProps<R>) {
+function Item<R extends object>( { name,
+  calcUpdatedResource, getResourceValue,
+  resourceState, index }: ItemProps<R>) {
   return <span className="ui-kit-array-item">
     <span>{name}</span> {
       DeleteIcon( {
         resourceState,
-        prop,
+        calcUpdatedResource,
+        getResourceValue,
         index,
       } )
     }</span>;
 }
 
 type AddDeleteIconProps<R extends object> = {
-  resourceState: ResourceInputProps<R>["resourceState"];
-  prop: ResourceInputProps<R>["prop"];
+  resourceState: ResourceInputTextArrayProps<R>["resourceState"];
+  calcUpdatedResource: ResourceInputTextArrayProps<R>["setResource"];
+  getResourceValue: ResourceInputTextArrayProps<R>["getValue"];
 };
 type DeleteIconProps<R extends object> = AddDeleteIconProps<R> & {
   index: number;
 };
-function DeleteIcon<R extends object>( { resourceState, prop, index }: DeleteIconProps<R>) {
+function DeleteIcon<R extends object>( { resourceState, calcUpdatedResource,
+  getResourceValue, index }: DeleteIconProps<R>) {
   return <span className="ui-kit-delete-button">
     <a onClick={() => deleteIconOnClickHandler( {
-      prop,
+      calcUpdatedResource,
+      getResourceValue,
       index,
       resourceState,
     } )}
@@ -68,15 +81,12 @@ function DeleteIcon<R extends object>( { resourceState, prop, index }: DeleteIco
   </span>;
 }
 const deleteIconOnClickHandler = <R extends object>(
-  { prop, resourceState, index }: DeleteIconProps<R>,
+  { calcUpdatedResource, getResourceValue, resourceState, index }: DeleteIconProps<R>,
 ) => {
   const [resource, setResource] = resourceState;
-  const array = (resource[prop] ?? []) as string[];
+  const array = (getResourceValue(resourceState[0]) ?? []) as string[];
 
-  setResource( {
-    ...resource,
-    [prop]: array.toSpliced(index, 1),
-  } );
+  setResource(calcUpdatedResource(array.toSpliced(index, 1), resource));
 };
 
 type AddIconProps<R extends object> = AddDeleteIconProps<R> & {
@@ -84,10 +94,11 @@ type AddIconProps<R extends object> = AddDeleteIconProps<R> & {
 };
 
 function AddIcon<R extends object, T extends string>(
-  { resourceState, prop, inputTextProps }: AddIconProps<R>,
+  { resourceState, calcUpdatedResource, getResourceValue, inputTextProps }: AddIconProps<R>,
 ) {
   const add = ()=>addIconOnClickHandler( {
-    prop,
+    calcUpdatedResource,
+    getResourceValue,
     resourceState,
     setInputText,
     inputText: getInputText(),
@@ -121,10 +132,11 @@ type AddIconHandlerProps<R extends object> = AddDeleteIconProps<R> & {
   setInputText: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 const addIconOnClickHandler = <R extends object>(
-  { prop, resourceState, inputText, setInputText }: AddIconHandlerProps<R>,
+  { calcUpdatedResource, getResourceValue,
+    resourceState, inputText, setInputText }: AddIconHandlerProps<R>,
 ) => {
   const [resource, setResource] = resourceState;
-  let array = (resource[prop] ?? []) as string[];
+  let array = (getResourceValue(resourceState[0]) ?? []) as string[];
 
   array = [...array];
   const newTag = inputText?.trim();
@@ -136,10 +148,7 @@ const addIconOnClickHandler = <R extends object>(
     return;
 
   array.push(newTag);
-  setResource( {
-    ...resource,
-    [prop]: array,
-  } );
+  setResource(calcUpdatedResource(array, resource));
 
   setInputText("");
 };

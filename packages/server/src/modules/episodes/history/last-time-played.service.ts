@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import type { EpisodeEntity, EpisodeId } from "#episodes/models";
+import type { EpisodeCompKey, EpisodeEntity, EpisodeId } from "#episodes/models";
 import { DateTime } from "luxon";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { deepCopy } from "$shared/utils/objects";
@@ -16,11 +16,28 @@ export class LastTimePlayedService {
   ) {
   }
 
-  async updateEpisodeLastTimePlayed(episodeId: EpisodeId): Promise<number | null> {
+  async updateEpisodeLastTimePlayedByEpisodeId(
+    episodeId: EpisodeId,
+  ): Promise<number | null> {
     const lastTimePlayed = await this.entriesRepository
-      .calcEpisodeLastTimePlayed(episodeId) ?? undefined;
+      .calcEpisodeLastTimePlayedByEpisodeId(episodeId) ?? undefined;
 
     this.episodesRepository.patchOneByIdAndGet(episodeId, {
+      entity: {
+        lastTimePlayed,
+      },
+    } ).catch(showError);
+
+    return lastTimePlayed ?? null;
+  }
+
+  async updateEpisodeLastTimePlayedByCompKey(
+    episodeCompKey: EpisodeCompKey,
+  ): Promise<number | null> {
+    const lastTimePlayed = await this.entriesRepository
+      .calcEpisodeLastTimePlayedByCompKey(episodeCompKey) ?? undefined;
+
+    this.episodesRepository.patchOneByCompKeyAndGet(episodeCompKey, {
       entity: {
         lastTimePlayed,
       },
@@ -33,7 +50,8 @@ export class LastTimePlayedService {
     let lastTimePlayed = episode.lastTimePlayed ?? null;
 
     if (!lastTimePlayed) {
-      lastTimePlayed = await this.entriesRepository.calcEpisodeLastTimePlayed(episode.id);
+      lastTimePlayed = await this.entriesRepository
+        .calcEpisodeLastTimePlayedByEpisodeId(episode.id);
 
       if (lastTimePlayed) {
         const selfCopy: EpisodeEntity = {

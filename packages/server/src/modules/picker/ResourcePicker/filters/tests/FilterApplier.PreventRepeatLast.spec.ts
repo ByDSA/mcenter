@@ -1,8 +1,9 @@
-import { compareEpisodeId } from "#episodes/models";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
+import { compareEpisodeCompKey, Episode, EpisodeCompKey } from "#episodes/models";
+import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { FilterApplier } from "../FilterApplier";
 import { PreventRepeatLastFilter } from "../PreventRepeatLastFilter";
 
+const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 const TWO_EPS = [
   EPISODES_SIMPSONS[0],
   EPISODES_SIMPSONS[1],
@@ -15,9 +16,10 @@ describe("preventRepeatLastFilter", () => {
   describe("with lastEp = 0", () => {
     const filterApplierWithLastEp0 = new FilterApplier();
 
-    filterApplierWithLastEp0.add(new PreventRepeatLastFilter( {
-      compareId: compareEpisodeId,
-      lastId: EPISODES_SIMPSONS[0].id,
+    filterApplierWithLastEp0.add(new PreventRepeatLastFilter<EpisodeCompKey, Episode>( {
+      compareId: compareEpisodeCompKey,
+      lastId: EPISODES_SIMPSONS[0].compKey,
+      getResourceId: e=>e.compKey,
     } ));
 
     it("with empty list", async () => {

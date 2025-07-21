@@ -7,11 +7,6 @@ export {
 } from "./ResourceInputNumber";
 
 export {
-  ResourceInput,
-  type ResourceInputProps,
-} from "./ResourceInput";
-
-export {
   ResourceInputArrayString,
 } from "./ResourceInputArrayString";
 

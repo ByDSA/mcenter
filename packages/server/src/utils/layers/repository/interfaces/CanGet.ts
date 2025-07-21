@@ -10,10 +10,6 @@ export interface CanGetAll<T> {
   getAll(): Promise<T[]>;
 }
 
-export interface CanGetAllBySuperId<T, SID> {
-  getAllByEpisodeId(superId: SID): Promise<T[]>;
-}
-
 export interface CanGetMany<T, PARTIAL=Partial<T>> {
   getMany(partial: PARTIAL): Promise<T[]>;
 }

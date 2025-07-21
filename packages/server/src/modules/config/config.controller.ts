@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { Controller, Get } from "@nestjs/common";
 
-@Controller("config")
+@Controller()
 export class ConfigController {
   @Get("stop")
   stop() {

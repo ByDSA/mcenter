@@ -2,8 +2,9 @@ import { PATH_ROUTES } from "$shared/routing";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { restTestsSuite } from "#tests/suites/rest-suite";
 import { testRoute } from "#tests/main/routing/routing";
-import { musicRepoMockProvider, MUSICS_SAMPLES_IN_DISK } from "../repositories/tests";
+import { musicRepoMockProvider } from "../repositories/tests";
 import { MusicRepository } from "../repositories";
+import { fixtureMusics } from "../tests/fixtures";
 import { MusicRestController } from "./rest.controller";
 
 testRoute(PATH_ROUTES.musics.withParams("id"));
@@ -23,7 +24,7 @@ restTestsSuite( {
     getOne: {
       repo: {
         getFn: (repo)=>repo.getOneById,
-        returned: MUSICS_SAMPLES_IN_DISK[0],
+        returned: fixtureMusics.Disk.List[0],
       },
     },
     patchOne: {

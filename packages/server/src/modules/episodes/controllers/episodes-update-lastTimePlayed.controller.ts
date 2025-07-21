@@ -18,7 +18,7 @@ export class EpisodesUpdateLastTimePlayedController {
 
     for (const episode of allEpisodes) {
       const updatePromise = this.lastTimePlayedService
-        .updateEpisodeLastTimePlayed(episode.id);
+        .updateEpisodeLastTimePlayedByCompKey(episode.compKey);
 
       promisesToAwait.push(updatePromise);
     }

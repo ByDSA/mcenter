@@ -1,6 +1,6 @@
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { Resource } from "#modules/resources/models";
-import { EpisodeEntity, EpisodeId, compareEpisodeId } from "../../episodes/models";
+import { Episode, EpisodeCompKey, EpisodeEntity, compareEpisodeCompKey } from "../../episodes/models";
 import { DependenciesList } from "./Dependencies";
 
 type Params<R extends Resource = Resource, ID = string> = {
@@ -10,9 +10,9 @@ type Params<R extends Resource = Resource, ID = string> = {
   dependencies: DependenciesList;
 };
 export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
-  #params: Params<EpisodeEntity, EpisodeId>;
+  #params: Params<EpisodeEntity, EpisodeCompKey>;
 
-  constructor(params: Params<EpisodeEntity, EpisodeId>) {
+  constructor(params: Params<EpisodeEntity, EpisodeCompKey>) {
     super();
     this.#params = params;
 
@@ -21,23 +21,24 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
 
   #addDependencyFilter(): boolean {
     const { dependencies, lastId } = this.#params;
-    const serieId = lastId?.serieId;
+    const seriesKey = lastId?.seriesKey;
 
-    if (lastId && serieId && serieId in dependencies) {
-      const serieDependencies = dependencies[serieId];
-      const dependency = serieDependencies.find(([a]) => a === lastId.code);
+    if (lastId && seriesKey && seriesKey in dependencies) {
+      const serieDependencies = dependencies[seriesKey];
+      const dependency = serieDependencies.find(([a]) => a === lastId.episodeKey);
 
       if (dependency) {
-        const dependencyFullId: [EpisodeId, EpisodeId] = dependency.map((episodeId) => ( {
-          code: episodeId,
-          serieId,
-        } )) as [EpisodeId, EpisodeId];
+        const dependencyFullId: [EpisodeCompKey, EpisodeCompKey] = dependency
+          .map((episodeKey) => ( {
+            episodeKey: episodeKey,
+            seriesKey: seriesKey,
+          } )) as [EpisodeCompKey, EpisodeCompKey];
 
-        this.add(new DependencyFilter<EpisodeId, EpisodeEntity>( {
+        this.add(new DependencyFilter<EpisodeCompKey, EpisodeEntity>( {
           lastId,
           firstId: dependencyFullId[0],
           secondId: dependencyFullId[1],
-          compareId: compareEpisodeId,
+          compareId: compareEpisodeCompKey,
         } ));
 
         return true;
@@ -58,10 +59,11 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
     this.add(new PreventDisabledFilter());
 
     if (lastEp) {
-      this.add(new PreventRepeatLastFilter(
+      this.add(new PreventRepeatLastFilter<EpisodeCompKey, Episode>(
         {
           lastId,
-          compareId: compareEpisodeId,
+          compareId: compareEpisodeCompKey,
+          getResourceId: e=>e.compKey,
         },
       ));
     }
@@ -82,7 +84,7 @@ export function genEpisodeFilterApplier(
   return new EpisodeFilterApplier( {
     resources,
     lastEp: lastEp ?? null,
-    lastId: lastEp?.id,
+    lastId: lastEp?.compKey,
     dependencies: deps,
   } );
 }

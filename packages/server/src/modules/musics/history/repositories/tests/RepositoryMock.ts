@@ -1,5 +1,5 @@
 import { createMockClass } from "#tests/jest/mocking";
-import { MusicHistoryRepository } from "../Repository";
+import { MusicHistoryRepository } from "../repository";
 
 class MusicHistoryRepositoryMock extends createMockClass(MusicHistoryRepository) {
 }

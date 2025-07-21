@@ -1,6 +1,6 @@
-import type { SerieId } from "#series/models";
+import type { SeriesKey } from "#series/models";
 
-export type DependenciesList = {[key: SerieId]: [string, string][]};
+export type DependenciesList = {[key: SeriesKey]: [string, string][]};
 
 // TODO: mover a DB
 export const dependencies: DependenciesList = {

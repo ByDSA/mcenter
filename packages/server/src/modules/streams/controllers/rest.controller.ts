@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Body, Controller, Get } from "@nestjs/common";
 import { CriteriaSortDir } from "$shared/utils/criteria";
-import { CriteriaSort, getManyByCriteria } from "$shared/models/streams/dto/rest";
+import { StreamRestDtos } from "$shared/models/streams/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { SerieRepository } from "#modules/series/repositories";
 import { Stream, StreamOriginType, streamSchema } from "#modules/streams/models";
@@ -10,7 +10,7 @@ import { GetManyCriteria } from "#utils/nestjs/rest/Get";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { StreamsRepository } from "../repositories";
 
-class CriteriaBodyDto extends createZodDto(getManyByCriteria.reqBodySchema) {}
+class CriteriaBodyDto extends createZodDto(StreamRestDtos.GetManyByCriteria.bodySchema) {}
 
 @Controller()
 export class StreamsRestController
@@ -39,20 +39,20 @@ implements
         for (const origin of stream.group.origins) {
           if (origin.type === StreamOriginType.SERIE) {
             // TODO: quitar await en for si se puede
-            origin.serie = await this.serieRepository.getOneById(origin.id) ?? undefined;
+            origin.serie = await this.serieRepository.getOneByKey(origin.id) ?? undefined;
           }
         }
       }
     }
 
     if (body.sort) {
-      if (body.sort[CriteriaSort.lastTimePlayed]) {
+      if (body.sort[StreamRestDtos.GetManyByCriteria.CriteriaSort.lastTimePlayed]) {
         const lastTimePlayedDic: {[key: string]: number | undefined} = {};
 
         for (const stream of got) {
-          const serieId = stream.group.origins[0]?.id;
+          const seriesKey = stream.group.origins[0]?.id;
 
-          if (!serieId)
+          if (!seriesKey)
 
             continue;
 
@@ -60,18 +60,18 @@ implements
             .findLastForSerieKey(stream.id);
 
           if (lastEntry)
-            lastTimePlayedDic[serieId] = lastEntry.date.timestamp;
+            lastTimePlayedDic[seriesKey] = lastEntry.date.timestamp;
         }
 
         got = got.toSorted((a, b) => {
-          const serieIdA = a.group.origins[0]?.id;
-          const serieIdB = b.group.origins[0]?.id;
+          const seriesKeyA = a.group.origins[0]?.id;
+          const seriesKeyB = b.group.origins[0]?.id;
 
-          if (!serieIdA || !serieIdB)
+          if (!seriesKeyA || !seriesKeyB)
             return -1;
 
-          const lastTimePlayedA = lastTimePlayedDic[serieIdA] ?? 0;
-          const lastTimePlayedB = lastTimePlayedDic[serieIdB] ?? 0;
+          const lastTimePlayedA = lastTimePlayedDic[seriesKeyA] ?? 0;
+          const lastTimePlayedB = lastTimePlayedDic[seriesKeyB] ?? 0;
 
           if (body.sort?.lastTimePlayed === CriteriaSortDir.ASC)
             return lastTimePlayedA - lastTimePlayedB;

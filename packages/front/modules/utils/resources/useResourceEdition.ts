@@ -1,9 +1,9 @@
 /* eslint-disable require-await */
 import clone from "just-clone";
 import React, { useEffect, useState } from "react";
-import { useAsyncAction } from "#modules/ui-kit/input";
 import { AssertZodSettings } from "$shared/utils/validation/zod";
 import { assertIsDefined } from "$shared/utils/validation";
+import { useAsyncAction } from "#modules/ui-kit/input";
 
 type AssertionFn = (model: unknown, settings?: AssertZodSettings)=> void;
 
@@ -11,16 +11,20 @@ type FetchPatch<ID, ReqBody, ResBody> = (id: ID, body: ReqBody)=> Promise<ResBod
 
 export type Entry<T, ID> = {
   id?: any;
-  historyListId?: any;
-  resource?: T;
-  resourceId: ID;
   date: {
     timestamp: number;
   };
-}; // TODO: cambiar por una clase real o ponerla en otro sitio común
+  resourceId: ID;
+} & ( {
+   music?: T;
+} | {
+   resource?: T;
+} ); // TODO: cambiar por una clase real o ponerla en otro sitio común
 
-export type UseResourceEditionProps<T, ID, FetchPatchReqBody, FetchPatchResBody> = {
-  entry: Entry<T, ID>;
+export type UseResourceEditionProps<
+T, ID, E extends Entry<T, ID>, FetchPatchReqBody, FetchPatchResBody
+> = {
+  entry: E;
   calcIsModified: (base: T, current: T)=> boolean;
   assertionFn: AssertionFn;
   fetching: {
@@ -49,11 +53,39 @@ export type UseResourceEditionRet<T> = {
   resourceState: [T, React.Dispatch<React.SetStateAction<T>>];
 };
 
-export function useResourceEdition<T extends object, ID, FetchPatchReqBody, FetchPatchResBody>(
+export function resourceOrMusic<T, ID>(entry: Entry<T, ID>): T {
+  if ("resource" in entry && entry.resource)
+    return entry.resource;
+
+  if ("music" in entry && entry.music)
+    return entry.music;
+
+  throw new Error("");
+}
+
+export function setResourceOrMusic<T, ID>(entry: Entry<T, ID>, resource: T): void {
+  if ("resource" in entry) {
+    entry.resource = resource;
+
+    return;
+  }
+
+  if ("music" in entry) {
+    entry.music = resource;
+
+    return;
+  }
+
+  throw new Error("");
+}
+
+export function useResourceEdition<
+T extends object, ID, E extends Entry<T, ID>, FetchPatchReqBody, FetchPatchResBody
+>(
   { entry,
     calcIsModified,
     assertionFn,
-    fetching }: UseResourceEditionProps<T, ID, FetchPatchReqBody, FetchPatchResBody>,
+    fetching }: UseResourceEditionProps<T, ID, E, FetchPatchReqBody, FetchPatchResBody>,
 ): UseResourceEditionRet<T> {
   const resourceBase = useResourceBase(entry, calcIsModified);
   const resourceState = useState(clone(resourceBase));
@@ -61,7 +93,7 @@ export function useResourceEdition<T extends object, ID, FetchPatchReqBody, Fetc
   const isModified = useIsModified(resourceBase, resource, calcIsModified);
   const asyncUpdateAction = useAsyncAction();
   const reset = async () => {
-    const entryResource = entry.resource;
+    const entryResource = resourceOrMusic(entry);
 
     assertIsDefined(entryResource);
     setResource(entryResource);
@@ -78,12 +110,12 @@ export function useResourceEdition<T extends object, ID, FetchPatchReqBody, Fetc
     const { patch: { fetch: fetchPatch,
       generateBody: generatePatchBody } } = fetching;
 
-    assertIsDefined(entry.resource);
-    const patchBodyParams = generatePatchBody(entry.resource, resource);
+    assertIsDefined(resourceOrMusic(entry));
+    const patchBodyParams = generatePatchBody(resourceOrMusic(entry), resource);
 
     return fetchPatch(id, patchBodyParams)
       .then(() => {
-        entry.resource = resource;
+        setResourceOrMusic(entry, resource);
       } )
       .then(()=>done());
   };
@@ -103,7 +135,7 @@ export function useResourceEdition<T extends object, ID, FetchPatchReqBody, Fetc
 
 type CompareFn<T> = (r1: T, r2: T)=> boolean;
 function useResourceBase<T, ID, E extends Entry<T, ID>>(entry: E, compare: CompareFn<T>) {
-  const entryResource = entry.resource;
+  const entryResource = resourceOrMusic(entry);
 
   assertIsDefined(entryResource);
   const [resourceBase, setResourceBase] = React.useState(entryResource as T);

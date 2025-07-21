@@ -1,172 +1,303 @@
 import type { EpisodeEntity } from "#episodes/models";
 import { deepFreeze } from "$shared/utils/objects";
+import { Types } from "mongoose";
+import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { DATEJS_SAMPLE1 } from "./dates";
+import { generateRandomMD5 } from "./hash";
 
 const timestamps = {
   createdAt: DATEJS_SAMPLE1,
   updatedAt: DATEJS_SAMPLE1,
   addedAt: DATEJS_SAMPLE1,
 };
+const fileInfoTimestamps = {
+  createdAt: DATEJS_SAMPLE1,
+  updatedAt: DATEJS_SAMPLE1,
+};
 const ep1x01: EpisodeEntity = {
-  id: {
-    code: "1x01",
-    serieId: "simpsons",
+  id: new Types.ObjectId().toString(),
+  compKey: {
+    episodeKey: "1x01",
+    seriesKey: "simpsons",
   },
   title: "Sin Blanca Navidad",
-  path: "series/simpsons/1/1_80.mkv",
   weight: -6,
-  start: 2,
-  end: 1326,
   tags: [
     "navidad",
   ],
   timestamps,
 };
-
-export const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
+const ep1x01FileInfo: EpisodeFileInfoEntity = {
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/1_80.mkv",
+  start: 2,
+  end: 1326,
+  episodeId: ep1x01.id,
+  timestamps: fileInfoTimestamps,
+  hash: generateRandomMD5(),
+  size: 1234,
+  mediaInfo: {
+    duration: 123,
+    fps: "24",
+    resolution: {
+      width: 1440,
+      height: 1080,
+    },
+  },
+} satisfies EpisodeFileInfoEntity;
+// FileInfo entities
+const ep1x02FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/2_80.mkv",
+  start: 90,
+  end: 1337,
+  hash: generateRandomMD5(),
+};
+const ep1x03FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/3_80.mkv",
+  start: 90,
+  end: 1320,
+  hash: generateRandomMD5(),
+};
+const ep1x04FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/4_80.mkv",
+  start: 90,
+  end: 1277.5,
+  hash: generateRandomMD5(),
+};
+const ep1x05FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/5_80.mkv",
+  start: 11,
+  end: 1289,
+  hash: generateRandomMD5(),
+};
+const ep1x06FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/6_80.mkv",
+  start: 89,
+  end: 1316,
+  hash: generateRandomMD5(),
+};
+const ep1x07FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/7_80_+cat.mkv",
+  start: 89.5,
+  end: 1315,
+  hash: generateRandomMD5(),
+};
+const ep1x08FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/8_80.mkv",
+  start: 88.5,
+  end: 1307,
+  hash: generateRandomMD5(),
+};
+const ep1x09FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/9_80.mkv",
+  start: 13.5,
+  end: 1333,
+  hash: generateRandomMD5(),
+};
+const ep1x10FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/10_80.mkv",
+  start: 90,
+  end: 1331.5,
+  hash: generateRandomMD5(),
+};
+const ep1x11FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/11_80.mkv",
+  start: 87,
+  end: 1366,
+  hash: generateRandomMD5(),
+};
+const ep1x12FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/12_80.mkv",
+  start: 86,
+  end: 1381,
+  hash: generateRandomMD5(),
+};
+const ep1x13FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/13_80.mkv",
+  start: 87,
+  end: 1366.5,
+  hash: generateRandomMD5(),
+} satisfies EpisodeFileInfoEntity;
+const EPISODE_FILE_INFO_SIMPSONS: EpisodeFileInfoEntity[] = deepFreeze([
+  ep1x01FileInfo,
+  ep1x02FileInfo,
+  ep1x03FileInfo,
+  ep1x04FileInfo,
+  ep1x05FileInfo,
+  ep1x06FileInfo,
+  ep1x07FileInfo,
+  ep1x08FileInfo,
+  ep1x09FileInfo,
+  ep1x10FileInfo,
+  ep1x11FileInfo,
+  ep1x12FileInfo,
+  ep1x13FileInfo,
+]);
+// Episode entities
+const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   ep1x01,
   {
-    id: {
-      code: "1x02",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x02",
+      seriesKey: "simpsons",
     },
-    path: "series/simpsons/1/2_80.mkv",
     title: "Bart, el genio",
     weight: -30,
-    start: 90,
-    end: 1337,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x03",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x03",
+      seriesKey: "simpsons",
     },
-    path: "series/simpsons/1/3_80.mkv",
     title: "La odisea de Homer",
     weight: -4,
-    start: 90,
-    end: 1320,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x04",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x04",
+      seriesKey: "simpsons",
     },
-    path: "series/simpsons/1/4_80.mkv",
     title: "Hogar, agridulce hogar",
     weight: -2,
-    start: 90,
-    end: 1277.5,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x05",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x05",
+      seriesKey: "simpsons",
     },
-    path: "series/simpsons/1/5_80.mkv",
     title: "Bart, el general",
     weight: -8,
-    start: 11,
-    end: 1289,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x06",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x06",
+      seriesKey: "simpsons",
     },
-    path: "series/simpsons/1/6_80.mkv",
     title: "El blues de la Mona Lisa",
     weight: 0,
-    start: 89,
-    end: 1316,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x07",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x07",
+      seriesKey: "simpsons",
     },
-    path: "series/simpsons/1/7_80_+cat.mkv",
     title: "El abominable hombre del bosque",
     weight: -8,
-    start: 89.5,
-    end: 1315,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x08",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x08",
+      seriesKey: "simpsons",
     },
-    path: "series/simpsons/1/8_80.mkv",
     title: "La cabeza chiflada",
     weight: -4,
-    start: 88.5,
-    end: 1307,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x09",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x09",
+      seriesKey: "simpsons",
     },
-    path: "series/simpsons/1/9_80.mkv",
     title: "Jacques, el rompecorazones",
     weight: -8,
-    start: 13.5,
-    end: 1333,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x10",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x10",
+      seriesKey: "simpsons",
     },
-    path: "series/simpsons/1/10_80.mkv",
     title: "Homer se va de juerga",
     weight: -16,
-    start: 90,
-    end: 1331.5,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x11",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x11",
+      seriesKey: "simpsons",
     },
     title: "Viva la vendimia",
-    path: "series/simpsons/1/11_80.mkv",
     weight: -8,
-    start: 87,
-    end: 1366,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x12",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x12",
+      seriesKey: "simpsons",
     },
     title: "Krusty entra en chirona",
-    path: "series/simpsons/1/12_80.mkv",
     weight: 0,
-    start: 86,
-    end: 1381,
     timestamps,
-  },
+  } as EpisodeEntity,
   {
-    id: {
-      code: "1x13",
-      serieId: "simpsons",
+    id: new Types.ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x13",
+      seriesKey: "simpsons",
     },
     title: "La baby siter ataca de nuevo",
-    path: "series/simpsons/1/13_80.mkv",
     weight: -6,
-    start: 87,
-    end: 1366.5,
     timestamps,
-  },
+  } as EpisodeEntity,
 ]);
+
+export const fixtureEpisodes = {
+  Simpsons: {
+    Samples: {
+      EP1x01: ep1x01,
+      EP1x02: EPISODES_SIMPSONS[1],
+    },
+    List: EPISODES_SIMPSONS,
+  },
+};
+
+export const fixtureEpisodeFileInfos = {
+  Simpsons: {
+    Samples: {
+      EP1x01: EPISODE_FILE_INFO_SIMPSONS[0],
+      EP1x02: EPISODE_FILE_INFO_SIMPSONS[1],
+    },
+    List: EPISODE_FILE_INFO_SIMPSONS,
+  },
+};

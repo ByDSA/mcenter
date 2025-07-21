@@ -1,10 +1,10 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
 import { HistoryEntryHeader } from "#modules/history";
 import { formatDateDDMMYYY, formatDateHHmm } from "#modules/utils/dates";
+import { EpisodeHistoryEntryFetching } from "../requests";
 
 type HeaderProps = {
-  entry: EpisodeHistoryEntryEntity;
+  entry: EpisodeHistoryEntryFetching.GetMany.Data;
   showDate: boolean;
 };
 export function Header( { entry, showDate }: HeaderProps) {
@@ -12,9 +12,9 @@ export function Header( { entry, showDate }: HeaderProps) {
 
   assertIsDefined(episode);
   assertIsDefined(serie);
-  const title = episode.title ? `${episode.title}` : episode.id.code ?? "(Sin título)";
-  const subtitle = serie.name ?? episode.id.serieId;
-  const right = episode.id.code;
+  const title = episode.title ? `${episode.title}` : episode.compKey.episodeKey ?? "(Sin título)";
+  const subtitle = serie.name ?? episode.compKey.seriesKey;
+  const right = episode.compKey.episodeKey;
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return <HistoryEntryHeader

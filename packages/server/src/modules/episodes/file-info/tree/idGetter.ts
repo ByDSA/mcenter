@@ -78,11 +78,15 @@ function getFromBasenameAndFilePath(
     },
     {
       pattern: /^(\d+)-(\d+)/,
-      episodeTransform: (matches: RegExpMatchArray): string => `${matches[1].padStart(2, "0") }-${matches[2].padStart(2, "0")}`,
+      episodeTransform: (
+        matches: RegExpMatchArray,
+      ): string => `${matches[1].padStart(2, "0") }-${matches[2].padStart(2, "0")}`,
     },
     {
       pattern: /^(\d+)\.(\d+)/,
-      episodeTransform: (matches: RegExpMatchArray): string => `${matches[1].padStart(2, "0") }.${matches[2]}`,
+      episodeTransform: (
+        matches: RegExpMatchArray,
+      ): string => `${matches[1].padStart(2, "0") }.${matches[2]}`,
     },
     {
       pattern: /(\d+)(\s)?-(\s)?(\d+)/,
@@ -148,7 +152,9 @@ function isValidSeason(season: number | string | null): boolean {
   if (season === null)
     return true;
 
-  return (typeof season === "number" && !Number.isNaN(season) && season < 50) || typeof season === "string";
+  return (
+    typeof season === "number" && !Number.isNaN(season) && season < 50)
+      || typeof season === "string";
 }
 
 function isValidEpisode(episode: number | string): boolean {

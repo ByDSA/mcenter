@@ -1,3 +1,3 @@
 export {
   SerieRepository,
-} from "./Repository";
+} from "./repository";

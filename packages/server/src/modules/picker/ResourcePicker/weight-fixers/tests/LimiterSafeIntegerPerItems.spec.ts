@@ -50,14 +50,18 @@ const cases = [
 ] as Case[];
 
 describe.each(cases)("limiterSafeIntegerPerItemsWeightFixer", (testCase) => {
-  it(`should return ${testCase.expectedWeight} when initialWeight = ${testCase.initialWeight} and resources length = ${testCase.resources.length}`, async () => {
-    const weightFixer = new LimiterSafeIntegerPerItems();
-    const result = await weightFixer.fixWeight( {
-      resource: RESOURCE_BASE,
-      resources: testCase.resources,
-      currentWeight: testCase.initialWeight,
-    } );
+  it(
+    `should return ${testCase.expectedWeight} when initialWeight = \
+${testCase.initialWeight} and resources length = ${testCase.resources.length}`,
+    async () => {
+      const weightFixer = new LimiterSafeIntegerPerItems();
+      const result = await weightFixer.fixWeight( {
+        resource: RESOURCE_BASE,
+        resources: testCase.resources,
+        currentWeight: testCase.initialWeight,
+      } );
 
-    expect(result).toBe(testCase.expectedWeight);
-  } );
+      expect(result).toBe(testCase.expectedWeight);
+    },
+  );
 } );

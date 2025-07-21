@@ -1,7 +1,7 @@
 /* eslint-disable accessor-pairs */
 import fs from "fs";
 import path from "path";
-import { MediaElement } from "./MediaElement";
+import { MediaElement } from "#modules/models";
 import { Playlist } from "./Playlist";
 
 export class QueuePlaylistManager {

@@ -1,5 +1,3 @@
-export {
-  WebSocketsEvents,
-} from "./Events";
+export * from "./player-event";
 
-export * from "./Messages";
+export * from "./message";

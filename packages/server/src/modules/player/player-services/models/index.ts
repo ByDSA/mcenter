@@ -1,3 +1,1 @@
-export {
-  PlayerEvent, PlayerStatusResponse, PlayResourceMessage,
-} from "$shared/models/player";
+export * from "$shared/models/player";

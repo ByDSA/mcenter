@@ -1,11 +1,16 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
+import { assertZod } from "$shared/utils/validation/zod";
 import { assertFound } from "#utils/validation/found";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
+import { episodeEntityWithFileInfosSchema } from "#episodes/models";
+import { EpisodeEntityWithFileInfo } from "#episodes/saved-serie-tree-service/SavedSerieTreeService";
+import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { PlayService } from "./PlayService";
+import { episodeWithFileInfosToMediaElement } from "./player-services/models";
 
 class ParamsDto extends createZodDto(z.object( {
   id: z.string(),
@@ -22,6 +27,7 @@ export class PlayStreamController {
     private readonly episodePickerService: EpisodePickerService,
     private readonly streamRepository: StreamsRepository,
     private readonly episodeHistoryEntriesRepository: EpisodeHistoryEntriesRepository,
+    private readonly episodeFileInfosRepo: EpisodeFileInfoRepository,
   ) {
   }
 
@@ -49,21 +55,35 @@ export class PlayStreamController {
     query: QueryDto,
   ) {
     const { force } = query;
-    const stream = await this.streamRepository.getOneById(id);
+    const stream = await this.streamRepository.getOneByKey(id);
 
     assertFound(stream);
 
     const episodes = await this.episodePickerService.getByStream(stream, number);
+    const promises: Promise<any>[] = [];
+
+    for (const e of episodes) {
+      const p = this.episodeFileInfosRepo.getAllByEpisodeId(e.id)
+        .then(fileInfos=>e.fileInfos = fileInfos);
+
+      promises.push(p);
+    }
+
+    await Promise.all(promises);
+    const episodesWithFileInfos = episodes as EpisodeEntityWithFileInfo[];
+
+    assertZod(z.array(episodeEntityWithFileInfosSchema), episodesWithFileInfos);
+    const mediaElements = episodesWithFileInfos.map(episodeWithFileInfosToMediaElement);
     const ok = await this.playService.play( {
-      episodes,
+      mediaElements,
       force,
     } );
 
     if (ok)
-      await this.episodeHistoryEntriesRepository.addEpisodesToHistory(episodes);
+      await this.episodeHistoryEntriesRepository.addEpisodesToHistory(episodesWithFileInfos);
     else
       console.log("PlayService: Could not play");
 
-    return episodes;
+    return episodesWithFileInfos;
   }
 }

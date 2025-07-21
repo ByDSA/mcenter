@@ -1,28 +1,53 @@
 import z from "zod";
+import { genAssertZod } from "../../../utils/validation/zod";
+import { timeRangeSchema } from "../../resource";
+import { fileInfoSchema, compareFileInfo } from "../../file-info-common/file-info";
+import { mongoDbIdRefining } from "../../resource/partial-schemas";
 
-const md5HashSchema = z.string()
-  .refine((hash) => (hash && /^[a-f0-9]{32}$/.test(hash)) || !hash, {
-    message: "hash must be a md5 hash",
-  } );
-const schema = z.object( {
-  path: z.string(),
-  hash: md5HashSchema,
-  size: z.number(),
+const schema = fileInfoSchema
+  .merge(timeRangeSchema)
+  .extend( {
+    mediaInfo: z.object( {
+      duration: z.number().nullable(),
+      resolution: z.object( {
+        width: z.number().nullable(),
+        height: z.number().nullable(),
+      } ).strict(),
+      fps: z.string().nullable(),
+    } ).strict(),
+    episodeId: z.string()
+      .refine(...mongoDbIdRefining),
+  } )
+  .strict();
+const entitySchema = schema.extend( {
+  id: z.string()
+    .refine(...mongoDbIdRefining),
 } ).strict();
 
 type Model = z.infer<typeof schema>;
 
-function assertIsModel(model: unknown): asserts model is Model {
-  schema.parse(model);
-}
+type Entity = z.infer<typeof entitySchema>;
 
-function compareModel(a: Model, b: Model): boolean {
-  return a.path === b.path && a.hash === b.hash && a.size === b.size;
+const assertIsModel = genAssertZod(schema);
+const assertIsEntity = genAssertZod(entitySchema);
+
+type ModelOmitEpisodeId = Omit<Model, "episodeId">;
+
+function compareModelOmitEpisodeId(a: ModelOmitEpisodeId, b: ModelOmitEpisodeId): boolean {
+  const sameMediaInfo = a.mediaInfo.duration === b.mediaInfo.duration
+   && a.mediaInfo.resolution?.width === b.mediaInfo.resolution?.width
+   && a.mediaInfo.resolution?.height === b.mediaInfo.resolution?.height
+   && a.mediaInfo.fps === b.mediaInfo.fps;
+
+  return compareFileInfo(a, b) && sameMediaInfo;
 }
 
 export {
-  schema as fileInfoSchema,
-  Model as FileInfo,
-  assertIsModel as assertIsFileInfo,
-  compareModel as compareFileInfo,
+  schema as episodeFileInfoSchema,
+  entitySchema as episodeFileInfoEntitySchema,
+  Model as EpisodeFileInfo,
+  Entity as EpisodeFileInfoEntity,
+  assertIsModel as assertIsEpisodeFileInfo,
+  assertIsEntity as assertIsEpisodeFileInfoEntity,
+  compareModelOmitEpisodeId as compareEpisodeFileInfoOmitEpisodeId,
 };

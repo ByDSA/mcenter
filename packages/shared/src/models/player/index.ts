@@ -1,16 +1,9 @@
-export {
-  PlayerStatusResponse,
-  assertIsPlayerStatusResponse,
-} from "./StatusResponse";
+export * from "./status-response";
 
-export {
-  PlayerPlaylistElement,
-} from "./PlaylistElement";
+export * from "./media-element";
 
-export {
-  PlayResourceMessage, WebSocketsEvents as PlayerEvent,
-} from "./web-sockets";
+export * from "./playlist-element";
 
-export {
-  PlayerService as Player, PlayerActions,
-} from "./Player";
+export * from "./web-sockets";
+
+export * from "./player";

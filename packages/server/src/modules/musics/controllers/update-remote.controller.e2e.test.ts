@@ -1,8 +1,11 @@
 import request from "supertest";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
 import { UpdateRemoteTreeService } from "../services";
 import { MusicRepository } from "../repositories";
+import { MusicFileInfoRepository } from "../file-info/repositories/repository";
+import { MusicBuilderService } from "../builder/music-builder.service";
+import { MusicUrlGeneratorService } from "../builder/url-generator.service";
 import { MusicUpdateRemoteController } from "./update-remote.controller";
 
 describe("updateRemoteController", () => {
@@ -10,12 +13,14 @@ describe("updateRemoteController", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [],
+      imports: [DomainMessageBrokerModule],
       controllers: [MusicUpdateRemoteController],
       providers: [
         UpdateRemoteTreeService,
         MusicRepository,
-        DomainMessageBroker,
+        MusicBuilderService,
+        MusicUrlGeneratorService,
+        MusicFileInfoRepository,
       ],
     }, {
       db: {
@@ -24,14 +29,14 @@ describe("updateRemoteController", () => {
     } );
   } );
 
-  beforeEach(async () => {
-    await testingSetup.db!.drop();
-  } );
-
   describe("should update remote tree", () => {
     let response: request.Response;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
+      if (response)
+        return;
+
+      await testingSetup.db!.drop();
       response = await request(testingSetup.routerApp)
         .get("/update/remote")
         .expect(200)

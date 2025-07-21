@@ -2,19 +2,23 @@ import path from "node:path";
 import { Controller, Get } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { ErrorElementResponse, errorToErrorElementResponse, DataResponse } from "$shared/utils/http";
-import { Episode, EpisodeEntity } from "#episodes/models";
-import { diffSerieTree, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "#episodes/file-info";
+import { Episode } from "#episodes/models";
+import { diffSerieTree, EpisodeFileInfoRepository, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "#episodes/file-info";
 import { SerieRepository } from "#modules/series/repositories";
 import { Serie } from "#episodes/file-info/tree/models";
+import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
+import { UpdateMetadataProcess } from "#episodes/file-info/update/update-saved-process";
 import { EpisodesRepository } from "../repositories";
 import { SavedSerieTreeService } from "../saved-serie-tree-service";
 
 @Controller("/actions/add-new-files")
 export class EpisodeAddNewFilesController {
   constructor(
-    private readonly serieRepository: SerieRepository,
-    private readonly episodeRepository: EpisodesRepository,
+    private readonly seriesRepo: SerieRepository,
+    private readonly episodesRepo: EpisodesRepository,
     private readonly savedSerieTreeService: SavedSerieTreeService,
+    private readonly fileInfoRepo: EpisodeFileInfoRepository,
+    private readonly updateMetadataProcess: UpdateMetadataProcess,
   ) {
   }
 
@@ -43,15 +47,15 @@ export class EpisodeAddNewFilesController {
     diff.moved = diff.moved.filter(move => move.old.content.filePath !== move.new.content.filePath);
 
     const data: {
-      new: Episode[];
-      updated: Episode[];
+      new: EpisodeFileInfo[];
+      updated: EpisodeFileInfo[];
     } = {
       new: [],
       updated: [],
     };
 
     try {
-      data.new.push(...await this.#saveNewEpisodes(diff.new.children));
+      data.new.push(...await this.#saveNewFileInfosAndEpisode(diff.new.children));
       data.updated.push(...await this.#updateEpisodes([...diff.updated, ...diff.moved]));
     } catch (err) {
       if (err instanceof Error) {
@@ -68,50 +72,51 @@ export class EpisodeAddNewFilesController {
     return responseObj;
   }
 
-  async #updateEpisodes(oldNew: OldNew[]): Promise<Episode[]> {
+  async #updateEpisodes(oldNew: OldNew[]): Promise<EpisodeFileInfoEntity[]> {
     if (oldNew.length === 0)
       return [];
 
-    const promises: Promise<Episode | null>[] = [];
+    const promises: Promise<EpisodeFileInfoEntity | null>[] = [];
 
     for (const entry of oldNew) {
-      const p: Promise<Episode | null> = this.episodeRepository
+      const p: Promise<EpisodeFileInfoEntity | null> = this.fileInfoRepo
         .patchOneByPathAndGet(entry.old.content.filePath, {
-          path: entry.new.content.filePath,
+          entity: {
+            path: entry.new.content.filePath,
+          },
         } );
 
       promises.push(p);
     }
 
     const all = await Promise.all(promises);
-    const allNotNull = all.filter(e => e !== null) as Episode[];
+    const allNotNull = all.filter(Boolean);
 
-    return allNotNull;
+    return allNotNull as EpisodeFileInfoEntity[];
   }
 
-  async #saveNewEpisodes(seriesInTree: Serie[]): Promise<EpisodeEntity[]> {
-    const episodes: EpisodeEntity[] = [];
+  async #saveNewFileInfosAndEpisode(seriesInTree: Serie[]): Promise<EpisodeFileInfoEntity[]> {
+    const fileInfos: EpisodeFileInfoEntity[] = [];
     const now = new Date();
 
     // TODO: quitar await en for si se puede
     for (const serieInTree of seriesInTree) {
-      let serie = await this.serieRepository.getOneById(serieInTree.id);
+      let serie = await this.seriesRepo.getOneByKey(serieInTree.id);
 
       if (!serie) {
-        serie = await this.serieRepository.createOneAndGet( {
+        serie = await this.seriesRepo.createOneAndGet( {
           name: serieInTree.id,
-          id: serieInTree.id,
+          key: serieInTree.id,
         } );
       }
 
       for (const seasonInTree of serieInTree.children) {
         for (const episodeInTree of seasonInTree.children) {
-          const episode: EpisodeEntity = {
-            id: {
-              code: episodeInTree.content.episodeId,
-              serieId: serie.id,
+          const episode: Episode = {
+            compKey: {
+              episodeKey: episodeInTree.content.episodeId,
+              seriesKey: serie.key,
             },
-            path: episodeInTree.content.filePath,
             title: `${serie.name} ${episodeInTree.content.episodeId}`,
             weight: 0,
             timestamps: {
@@ -120,14 +125,18 @@ export class EpisodeAddNewFilesController {
               addedAt: now,
             },
           };
+          const gotEpisode = await this.episodesRepo.createOneAndGet(episode);
+          const fileInfo: EpisodeFileInfo = {
+            ...await this.updateMetadataProcess.episodeFileToFileInfoOmitEpisodeId(episodeInTree),
+            episodeId: gotEpisode.id,
+          };
+          const gotFileInfo = await this.fileInfoRepo.createOneAndGet(fileInfo);
 
-          episodes.push(episode);
+          fileInfos.push(gotFileInfo);
         }
       }
     }
 
-    await this.episodeRepository.createManyAndGet(episodes);
-
-    return episodes;
+    return fileInfos;
   }
 }

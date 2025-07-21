@@ -1,8 +1,7 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { Episode } from "#modules/models/episodes";
-import { MediaElement } from "../../media";
+import { MediaElement } from "#modules/models";
 
-export function episodeToMediaElement(e: Episode): MediaElement {
+export function completeMediaElement(e: MediaElement): MediaElement {
   const { MEDIA_PATH } = process.env;
 
   assertIsDefined(MEDIA_PATH);
@@ -12,16 +11,16 @@ export function episodeToMediaElement(e: Episode): MediaElement {
   return {
     path: `${MEDIA_PATH}/${e.path}`,
     title: e.title,
-    startTime: e.start,
-    stopTime: e.end,
+    startTime: e.startTime,
+    stopTime: e.stopTime,
     length,
   };
 }
 
-function calculateLength(e: Episode): number {
+function calculateLength(e: MediaElement): number {
   let length = -1;
-  const end = e.end ?? -1;
-  const start = e.start ?? 0;
+  const end = e.stopTime ?? -1;
+  const start = e.startTime ?? 0;
 
   if (end === -1)
     return -1;

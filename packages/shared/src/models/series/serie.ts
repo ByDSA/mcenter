@@ -1,29 +1,28 @@
 import z from "zod";
-import { assertZodPopStack } from "../../utils/validation/zod";
+import { genAssertZod } from "../../utils/validation/zod";
+
+const seriesKeySchema = z.string();
+
+type SeriesKey = z.infer<typeof seriesKeySchema>;
 
 export const serieSchema = z.object( {
   name: z.string(),
+  key: seriesKeySchema,
 } ).strict();
 
 export type Serie = z.infer<typeof serieSchema>;
 
-export function assertIsSerie(model: unknown): asserts model is Serie {
-  assertZodPopStack(serieSchema, model);
-}
-const modelIdSchema = z.string();
-
-export type SerieId = z.infer<typeof modelIdSchema>;
+export const assertIsSerie = genAssertZod(serieSchema);
 
 export const serieEntitySchema = serieSchema.extend( {
-  id: modelIdSchema,
+  _id: z.string(), // TODO: cambiar a "id" cuando se cambie la DB
 } );
 
 export type SerieEntity = z.infer<typeof serieEntitySchema>;
 
-export function assertIsSerieEntity(model: unknown): asserts model is SerieEntity {
-  assertZodPopStack(serieEntitySchema, model);
-}
+export const assertIsSerieEntity = genAssertZod(serieEntitySchema);
 
 export {
-  modelIdSchema as serieIdSchema,
+  type SeriesKey,
+  seriesKeySchema,
 };

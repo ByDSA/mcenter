@@ -1,5 +1,5 @@
 import z from "zod";
-import { assertZodPopStack } from "../../validation/zod";
+import { genAssertZod } from "../../validation/zod";
 
 export const dateTypeSchema = z.object( {
   year: z.number().min(1970),
@@ -15,9 +15,7 @@ export const dateTypeSchema = z.object( {
 
 export type DateType = z.infer<typeof dateTypeSchema>;
 
-export function assertIsDateType(model: unknown): asserts model is DateType {
-  assertZodPopStack(dateTypeSchema, model);
-}
+export const assertIsDateType = genAssertZod(dateTypeSchema);
 
 export function getDateNow(): DateType {
   const now = new Date();

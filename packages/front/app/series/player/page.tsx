@@ -1,22 +1,19 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { z } from "zod";
 import { showError } from "$shared/utils/errors/showError";
 import { PATH_ROUTES } from "$shared/routing";
 import { DataResponse } from "$shared/utils/http/responses";
 import { EpisodeEntity } from "#modules/series/episodes/models";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
 import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
-import { getManyByCriteria } from "#modules/series/episodes/models/dto";
+import { EpisodesRestDtos } from "#modules/series/episodes/models/dto";
 import { Loading } from "#modules/loading";
 import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-player";
 import { backendUrl } from "#modules/requests";
 import styles from "./Player.module.css";
 
-type EpisodeGetManyBySearchRequest = {
-  body: z.infer<typeof getManyByCriteria.reqBodySchema>;
-};
+type EpisodeGetManyBySearchRequestBody = EpisodesRestDtos.GetManyByCriteria.Criteria;
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;
 const RESOURCES = [
@@ -46,17 +43,15 @@ export default function Player() {
           if (!path)
             return;
 
-          const request: EpisodeGetManyBySearchRequest = {
-            body: {
-              filter: {
-                path,
-              },
-              expand: [
-                "series",
-              ],
+          const body: EpisodeGetManyBySearchRequestBody = {
+            filter: {
+              path,
             },
+            expand: [
+              "series",
+            ],
           };
-          const bodyStr = JSON.stringify(request.body);
+          const bodyStr = JSON.stringify(body);
 
           fetchingResource = true;
           fetch(backendUrl(PATH_ROUTES.episodes.search.path), {
@@ -125,19 +120,28 @@ function getPathFromUri(uri: string) {
   return null;
 }
 
-function calcStartLength(statusLength: number | undefined, resource: Episode | null = null) {
+function calcStartLength(statusLength: number | undefined, resource: EpisodeEntity | null = null) {
   let resourceEnd;
   let resourceStart;
+  const fileInfo = resource?.fileInfos?.[0];
 
-  if (typeof resource?.end !== "number" || resource?.end < 0 || (resource.start !== undefined && resource.end < resource.start))
+  if (
+    typeof fileInfo?.end !== "number" || fileInfo.end < 0 || (fileInfo.start !== undefined
+    && fileInfo.end < fileInfo.start
+    )
+  )
     resourceEnd = statusLength;
   else
-    resourceEnd = resource.end;
+    resourceEnd = fileInfo.end;
 
-  if (typeof resource?.start !== "number" || resource?.start < 0 || (resource.end !== undefined && resource.start > resource.end))
+  if (
+    typeof fileInfo?.start !== "number" || fileInfo?.start < 0
+    || (fileInfo.end !== undefined && fileInfo.start > fileInfo.end
+    )
+  )
     resourceStart = 0;
   else
-    resourceStart = resource.start;
+    resourceStart = fileInfo.start;
 
   const length = resourceEnd - resourceStart;
 
@@ -160,7 +164,7 @@ function statusRepresentaton(status: PlayerStatusResponse, resource: EpisodeEnti
   let artist = "-";
 
   if (resource)
-    artist = `${resource.id.code}, ${ resource?.serie?.name}`;
+    artist = `${resource.compKey.episodeKey}, ${ resource?.serie?.name}`;
   else
     artist = uri?.slice(uri.lastIndexOf("/") + 1) ?? "-";
 

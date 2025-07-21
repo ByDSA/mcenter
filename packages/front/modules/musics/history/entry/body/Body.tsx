@@ -1,53 +1,88 @@
 import { JSX, useState } from "react";
 import { PropInfo } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
-import { Music, assertIsMusic } from "#modules/musics/models";
-import { MusicHistoryEntry } from "#modules/musics/history/models";
-import { LinkAsyncAction, ResourceInput, ResourceInputArrayString, ResourceInputProps } from "#uikit/input";
+import { Music } from "#modules/musics/models";
+import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
-import { getDiff, isModified as isModifiedd } from "#modules/utils/objects";
+import { isModified as isModifiedd } from "#modules/utils/objects";
 import { secsToMmss } from "#modules/utils/dates";
 import { useHistoryEntryEdition } from "#modules/history";
 import { backendUrl } from "#modules/requests";
+import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
+import { InputNumberProps } from "#modules/ui-kit/input/InputNumber";
+import { InputTextProps } from "#modules/ui-kit/input/InputText";
+import { generatePatchBody } from "#modules/fetching";
+import { MusicFetching } from "#modules/musics/requests";
+import { MusicFileInfoFetching } from "#modules/musics/file-info/requests";
 import { MUSIC_PROPS } from "../utils";
-import { fetchPatch } from "../../../requests";
-import { fetchDelete } from "../../requests";
+import { MusicHistoryEntryEntity } from "../../models";
+import { MusicHistoryEntryFetching } from "../../requests";
 import style from "./style.module.css";
 import { LastestComponent } from "./Lastest";
 
-function generatePatchBody(entryResource: Music, resource: Music) {
-  const patchBodyParams = getDiff(
-    entryResource,
-    resource,
-  );
-
-  return patchBodyParams;
+function getAndUpdateMusicByProp<V>(
+  prop: string,
+): Pick<ResourceInputCommonProps<Data, V>, "getValue" | "name" | "setResource"> {
+  return {
+    setResource: (v, r) => ( {
+      ...r,
+      music: {
+        ...r.music,
+        [prop]: v,
+      },
+    } ),
+    getValue: (r)=>r.music[prop],
+    name: prop,
+  };
 }
 
+type Data = MusicHistoryEntryFetching.GetManyByCriteria.Data;
+
 type Props = {
-  entry: Required<MusicHistoryEntry>;
+  data: Data;
 };
-export function Body( { entry }: Props) {
-  const { resource: resourceRet, delete: deleteEntry } = useHistoryEntryEdition( {
-    resource: {
-      calcIsModified,
-      entry,
-      assertionFn: assertIsMusic,
-      fetching: {
-        patch: {
-          fetch: fetchPatch,
-          generateBody: generatePatchBody,
-        },
-      },
-    },
-    delete: {
-      fetch: (id: string) => fetchDelete(id),
-    },
-  } );
-  const { isModified,
-    update: { action: update, isDoing: isUpdating }, errors,
-    resourceState, reset } = resourceRet;
-  const [resource] = resourceState;
+export function Body( { data }: Props) {
+  const { state, remove, isModified, reset, update } = useHistoryEntryEdition<
+ Data
+   >( {
+     data,
+     isModifiedFn: calcIsModified,
+     fetchRemove: async ()=> {
+       const res = await MusicHistoryEntryFetching.DeleteOneById.fetch(data.id);
+
+       return res.data as Data;
+     },
+     fetchUpdate: async () => {
+       const body = generatePatchBody(
+         data.music,
+         state[0].music,
+         ["title", "weight", "disabled", "tags"],
+       );
+       const promises: Promise<any>[] = [];
+
+       if (Object.entries(body.entity).length > 0) {
+         const p1 = MusicFetching.Patch.fetch(data.id, body);
+
+         promises.push(p1);
+       }
+
+       const dataFileInfo = data.music.fileInfos[0];
+       const stateFileInfo = state[0].music.fileInfos[0];
+       const fileInfoBody = generatePatchBody(
+         dataFileInfo,
+         stateFileInfo,
+         ["path"],
+       );
+
+       if (Object.entries(fileInfoBody.entity).length > 0) {
+         const p2 = MusicFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody);
+
+         promises.push(p2);
+       }
+
+       await Promise.all(promises);
+     },
+   } );
   const optionalProps: Record<keyof Music, PropInfo> = Object.entries(MUSIC_PROPS)
     .reduce((acc, [key, value]) => {
       if (value.required)
@@ -62,26 +97,24 @@ export function Body( { entry }: Props) {
     }, {} as Record<keyof Music, PropInfo>);
   const commonInputTextProps = {
     inputTextProps: {
-      onPressEnter: ()=>update(),
+      onPressEnter: ()=>update.action(),
     },
-    resourceState,
+    resourceState: state,
   };
   const commonInputNumberProps = {
     inputNumberProps: {
-      onPressEnter: ()=>update(),
+      onPressEnter: ()=>update.action(),
     },
-    resourceState,
+    resourceState: state,
   };
-  const titleElement = ResourceInput( {
+  const titleElement = ResourceInputText( {
     caption: MUSIC_PROPS.title.caption,
-    prop: "title",
-    error: errors?.title,
+    ...getAndUpdateMusicByProp("title"),
     ...commonInputTextProps,
   } );
-  const artistElement = ResourceInput( {
+  const artistElement = ResourceInputText( {
     caption: MUSIC_PROPS.artist.caption,
-    prop: "artist",
-    error: errors?.artist,
+    ...getAndUpdateMusicByProp("artist"),
     ...commonInputTextProps,
   } );
   const titleArtist = <span className={classes("line", style.titleArtist)}>
@@ -92,24 +125,24 @@ export function Body( { entry }: Props) {
       {artistElement}
     </span>
   </span>;
+  const { music } = state[0];
+  const fileInfo = music.fileInfos[0];
 
   return <div className={style.container}>
-    {errors && Object.entries(errors).length > 0 && Object.entries(errors).map(([key, value]) => <span key={key} className="line">{key}: {value}</span>)}
     {titleArtist}
 
     <span className={classes("line", style.weightAlbum)}>
       <span className={classes("height2", style.weight)}>
-        {ResourceInput( {
+        {ResourceInputNumber( {
           caption: MUSIC_PROPS.weight.caption,
-          type: "number",
-          prop: "weight",
+          ...getAndUpdateMusicByProp<number>("weight"),
           ...commonInputNumberProps,
         } )}
       </span>
       <span className={classes("height2", style.album)}>
-        {ResourceInput( {
+        {ResourceInputText( {
           caption: MUSIC_PROPS.album.caption,
-          prop: "album",
+          ...getAndUpdateMusicByProp<string>("album"),
           ...commonInputTextProps,
         } )}
       </span>
@@ -117,33 +150,25 @@ export function Body( { entry }: Props) {
     <span className={classes("line", "height2", style.tags)}>
       <span>{MUSIC_PROPS.tags.caption}</span>
       {ResourceInputArrayString( {
-        prop: "tags",
-        resourceState,
+        ...getAndUpdateMusicByProp<string[]>("tags"),
+        resourceState: state,
         inputTextProps: {
           onEmptyPressEnter: commonInputTextProps.inputTextProps.onPressEnter,
         },
       } )}
     </span>
     <span className={classes("line", "height2")}>
-      {ResourceInput( {
-        caption: MUSIC_PROPS.path.caption,
-        prop: "path",
+      {ResourceInputText( {
+        caption: <><a href={fullUrlOf(music.url)}>Url</a>:</>,
+        ...getAndUpdateMusicByProp<string>("url"),
         ...commonInputTextProps,
       } )}
     </span>
-    <span className={classes("line", "height2")}>
-      {ResourceInput( {
-        caption: <><a href={fullUrlOf(resource.url)}>Url</a>:</>,
-        prop: "url",
-        ...commonInputTextProps,
-      } )}
-    </span>
-    {(resource.mediaInfo.duration && resource.mediaInfo.duration > 0 && <>
-      <span className="line">Duration : {secsToMmss(resource.mediaInfo.duration)}</span>
+    {(fileInfo.mediaInfo.duration !== null && <>
+      <span className="line">Duration : {secsToMmss(fileInfo.mediaInfo.duration)}</span>
     </>) || null}
     {OptionalProps( {
       optionalProps,
-      errors,
       ...commonInputTextProps,
       ...commonInputNumberProps,
     } )}
@@ -152,38 +177,47 @@ export function Body( { entry }: Props) {
     <span className="line">
       <span><a onClick={() => reset()}>Reset</a></span>
       {isModified && <span className={style.update}>{
-        <LinkAsyncAction action={update} isDoing={isUpdating}>Update</LinkAsyncAction>
+        <LinkAsyncAction
+          action={update.action as ()=> Promise<void>}
+          isDoing={update.isDoing}
+        >Update</LinkAsyncAction>
       }</span>}</span>
     <span className={"break"} />
     {
-      deleteEntry
+      remove
     && <>
       <span className={"line"}>
         <LinkAsyncAction
-          action={deleteEntry.action}
-          isDoing={deleteEntry.isDoing}>Borrar</LinkAsyncAction>
+          action={remove.action as ()=> Promise<void>}
+          isDoing={remove.isDoing}>Borrar</LinkAsyncAction>
       </span>
       <span className={"break"} />
     </>
     }
     <span className={"break"} />
-    <LastestComponent resourceId={entry.resourceId} date={entry.date}/>
+    <LastestComponent resourceId={data.resourceId} date={data.date}/>
   </div>;
 }
 
-type OptionalPropsProps = Omit<ResourceInputProps<Music>, "prop"> & {
+type OptionalPropsProps = Omit<ResourceInputCommonProps<Data, string>, "getValue" | "name" |
+  "setResource"> & {
   optionalProps: Record<keyof Music, PropInfo>;
-  errors?: Record<keyof Music, string>;
+  inputNumberProps: InputNumberProps;
+  inputTextProps: InputTextProps;
 };
 function OptionalProps(
-  { resourceState, optionalProps, errors, inputNumberProps, inputTextProps }: OptionalPropsProps,
+  { resourceState, optionalProps, inputNumberProps, inputTextProps }: OptionalPropsProps,
 ) {
   const [isVisible, setIsVisible] = useState(false);
   const ret: Record<string, JSX.Element> = {};
 
   ret.top = (<>
     <span className={classes("line", "height2")}>
-      <a onClick={() => setIsVisible(!isVisible)}>{!isVisible ? "Mostrar" : "Ocultar"} todas las propiedades opcionales</a>
+      <a onClick={() => setIsVisible(!isVisible)}>{!isVisible
+
+        ? "Mostrar"
+
+        : "Ocultar"} todas las propiedades opcionales</a>
     </span>
   </>);
 
@@ -203,21 +237,30 @@ function OptionalProps(
         default:
           ret[prop] = (<>
             <span className={classes("line", "height2")}>
-              <ResourceInput caption={caption}
-                type={t} prop={prop}
-                resourceState={resourceState}
-                isOptional
-                error={errors?.[prop]} inputTextProps={inputTextProps}/>
+              {
+                ResourceInputText( {
+                  caption,
+                  ...getAndUpdateMusicByProp(prop),
+                  resourceState,
+                  isOptional: true,
+                  inputTextProps,
+                } )
+              }
             </span>
           </>);
           break;
         case "number":
           ret[prop] = (<>
             <span className={classes("line", "height2")}>
-              <ResourceInput
-                caption={caption} type={t} prop={prop}
-                resourceState={resourceState}
-                isOptional error={errors?.[prop]} inputNumberProps={inputNumberProps}/>
+              {
+                ResourceInputNumber( {
+                  caption,
+                  ...getAndUpdateMusicByProp<number>(prop),
+                  resourceState,
+                  isOptional: true,
+                  inputNumberProps,
+                } )
+              }
             </span>
           </>);
       }
@@ -233,7 +276,7 @@ function fullUrlOf(url: string) {
   return backendUrl(PATH_ROUTES.musics.raw.withParams(url));
 }
 
-function calcIsModified(r1: Music, r2: Music) {
+function calcIsModified(r1: MusicHistoryEntryEntity, r2: MusicHistoryEntryEntity) {
   return isModifiedd(r1, r2, {
     ignoreNewUndefined: true,
   } );

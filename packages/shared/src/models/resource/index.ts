@@ -1,5 +1,4 @@
 export {
-  LocalFile,
   Pickable, Taggable, TimeRange, timeRangeSchema,
 } from "./partial-schemas";
 

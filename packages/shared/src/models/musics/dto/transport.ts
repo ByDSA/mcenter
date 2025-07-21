@@ -1,7 +1,15 @@
-import { getOneById } from "./rest/get-one-by-id";
-import { patchOneById } from "./rest/patch-one-by-id";
+import z from "zod";
+import { idParamsSchema } from "../../utils/schemas/requests";
+import { generatePatchBodySchema } from "../../utils/schemas/patch";
+import { musicEntitySchema } from "../music";
 
-export const musicRestDto = {
-  getOneById,
-  patchOneById,
-};
+export namespace MusicRestDtos {
+  export namespace GetOneById {
+    export const paramsSchema = idParamsSchema;
+  }
+  export namespace PatchOneById {
+    export const bodySchema = generatePatchBodySchema(musicEntitySchema);
+    export type Body = z.infer<typeof bodySchema>;
+    export const paramsSchema = idParamsSchema;
+  }
+}

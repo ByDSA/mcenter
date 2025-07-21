@@ -3,5 +3,5 @@ export {
 } from "./history";
 
 export {
-  fetchPatch as patchMusicRequest,
+  MusicFetching,
 } from "./requests";

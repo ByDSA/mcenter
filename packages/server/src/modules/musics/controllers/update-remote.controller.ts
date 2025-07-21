@@ -5,7 +5,6 @@ import { UpdateRemoteTreeService, UpdateResult, updateResultSchema } from "../se
 @Controller("/update/remote")
 export class MusicUpdateRemoteController {
   constructor(
-
     private readonly updateRemoteTreeService: UpdateRemoteTreeService,
   ) {
   }

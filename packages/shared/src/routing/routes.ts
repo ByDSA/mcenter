@@ -7,6 +7,7 @@ const PLAYER_PLAY_EPISODE = `${PLAYER}/play/episode`;
 const PLAYER_PLAY_STREAM = `${PLAYER}/play/stream`;
 const MUSICS_HISTORY = MUSICS + "/history";
 const EPISODES_HISTORY = EPISODES + "/history";
+const EPISODES_FILE_INFO = EPISODES + "/file-info";
 const EPISODES_ACTIONS = EPISODES + "/actions";
 
 export const PATH_ROUTES = {
@@ -35,9 +36,13 @@ export const PATH_ROUTES = {
   },
   episodes: {
     path: EPISODES,
-    withParams: (serieId: string, code: string) => `${EPISODES}/${serieId}/${code}`,
+    withParams: (seriesKey: string, episodeKey: string) => `${EPISODES}/${seriesKey}/${episodeKey}`,
     search: {
       path: "/api/episodes/search",
+    },
+    fileInfo: {
+      path: EPISODES_FILE_INFO,
+      withParams: (id: string) => `${EPISODES_FILE_INFO}/${id}`,
     },
     history: {
       path: EPISODES_HISTORY,
@@ -74,7 +79,7 @@ export const PATH_ROUTES = {
     play: {
       episode: {
         path: PLAYER_PLAY_EPISODE,
-        withParams: (serieId: string, episodeId: string) => `${PLAYER_PLAY_EPISODE}/${serieId}/${episodeId}`,
+        withParams: (seriesKey: string, episodeKey: string) => `${PLAYER_PLAY_EPISODE}/${seriesKey}/${episodeKey}`,
       },
       stream: {
         path: PLAYER_PLAY_STREAM,

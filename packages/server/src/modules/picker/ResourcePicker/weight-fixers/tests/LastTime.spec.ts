@@ -1,13 +1,14 @@
 import { SECONDS_IN_DAY } from "#modules/resources";
 import { Resource } from "#modules/resources/models";
 import { genLastTimePlayedAgo, genLastTimePlayedDaysAgo } from "#modules/resources/tests";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { useFakeTime } from "#tests/time";
+import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { Fx, LastTimeWeightFixer } from "../LastTime";
 import { secondsElapsedFrom } from "../../utils";
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
+const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 const fx: Fx<Resource> = (r: Resource, x: number) => {
   if (r.lastTimePlayed === undefined)
     return Infinity;
@@ -111,7 +112,10 @@ const cases = [
 ] as Case[];
 
 describe.each(cases)("lastTimeWeightFixer", (testCase) => {
-  it(`should return ${testCase.expectedWeight} when initialWeight = ${testCase.initialWeight}, seconds ago = ${secondsElapsedFrom(testCase.resource.lastTimePlayed ?? 0)} and fx=${testCase.fx === fxDays ? "fxDays" : "fx"}`, async () => {
+  const elapsed = secondsElapsedFrom(testCase.resource.lastTimePlayed ?? 0);
+
+  it(`should return ${testCase.expectedWeight} when initialWeight = ${testCase.initialWeight}, \
+    seconds ago = ${elapsed} and fx=${testCase.fx === fxDays ? "fxDays" : "fx"}`, async () => {
     const weightFixer = new LastTimeWeightFixer( {
       fx: testCase.fx,
     } );

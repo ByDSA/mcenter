@@ -1,9 +1,11 @@
 import { SECONDS_IN_DAY } from "#modules/resources";
 import { Resource } from "#modules/resources/models";
 import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
+import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { useFakeTime } from "#tests/time";
 import { PreventRepeatInDaysFilter } from "../PreventRepeatInDaysFilter";
+
+const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
@@ -36,18 +38,22 @@ const casesDaysAgo = [
 ] as CaseDaysAgo[];
 
 describe.each(casesDaysAgo)("preventRepeatInDaysFilter", (testCase) => {
-  it(`should return ${testCase.expected} when lastTimePlayedDaysAgo = ${testCase.lastTimePlayedDaysAgo} days ago and minDays = ${testCase.minDays}`, async () => {
-    const params = {
-      minDays: testCase.minDays,
-    };
-    const filter = new PreventRepeatInDaysFilter(params);
-    const result = await filter.filter( {
-      ...EP_BASE,
-      lastTimePlayed: genLastTimePlayedDaysAgo(testCase.lastTimePlayedDaysAgo),
-    } );
+  it(
+    `should return ${testCase.expected} when lastTimePlayedDaysAgo = \
+${testCase.lastTimePlayedDaysAgo} days ago and minDays = ${testCase.minDays}`,
+    async () => {
+      const params = {
+        minDays: testCase.minDays,
+      };
+      const filter = new PreventRepeatInDaysFilter(params);
+      const result = await filter.filter( {
+        ...EP_BASE,
+        lastTimePlayed: genLastTimePlayedDaysAgo(testCase.lastTimePlayedDaysAgo),
+      } );
 
-    expect(result).toBe(testCase.expected);
-  } );
+      expect(result).toBe(testCase.expected);
+    },
+  );
 } );
 
 type CaseLastTimePlayed = {
@@ -80,16 +86,20 @@ const casesLastTimePlayed = [
 ] as CaseLastTimePlayed[];
 
 describe.each(casesLastTimePlayed)("preventRepeatInDaysFilter", (testCase) => {
-  it(`should return ${testCase.expected} when lastTimePlayed = ${testCase.lastTimePlayed} and minDays = ${testCase.minDays}`, async () => {
-    const params = {
-      minDays: testCase.minDays,
-    };
-    const filter = new PreventRepeatInDaysFilter(params);
-    const result = await filter.filter( {
-      ...EP_BASE,
-      lastTimePlayed: testCase.lastTimePlayed,
-    } );
+  it(
+    `should return ${testCase.expected} when lastTimePlayed =
+    ${testCase.lastTimePlayed} and minDays = ${testCase.minDays}`,
+    async () => {
+      const params = {
+        minDays: testCase.minDays,
+      };
+      const filter = new PreventRepeatInDaysFilter(params);
+      const result = await filter.filter( {
+        ...EP_BASE,
+        lastTimePlayed: testCase.lastTimePlayed,
+      } );
 
-    expect(result).toBe(testCase.expected);
-  } );
+      expect(result).toBe(testCase.expected);
+    },
+  );
 } );

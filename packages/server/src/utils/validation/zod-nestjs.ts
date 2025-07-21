@@ -6,7 +6,9 @@ import { Observable } from "rxjs";
 import { isDebugging } from "$shared/utils/vscode";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const ValidateResponseWithZodSchema = (schema: z.ZodSchema) => SetMetadata("zodSerializerSchema", schema);
+export const ValidateResponseWithZodSchema = (
+  schema: z.ZodSchema,
+) => SetMetadata("zodSerializerSchema", schema);
 
 @Injectable()
 export class ZodSerializerSchemaInterceptor implements NestInterceptor {

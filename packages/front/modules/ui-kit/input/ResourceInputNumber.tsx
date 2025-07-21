@@ -1,30 +1,30 @@
 import { ChangeEvent, useEffect, useMemo } from "react";
+import { stringToNumberOrUndefined } from "$shared/utils/data-types";
 import { InputNumberProps, useInputNumber } from "./InputNumber";
 import { ResourceOptionalCheckbox } from "./ResourceCheckboxOptional";
 import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
-import { stringToNumberOrUndefined } from "$shared/utils/data-types";
 
-export type ResourceInputNumberProps<R extends object> = ResourceInputCommonProps<R> & {
+type V = number | undefined;
+
+export type ResourceInputNumberProps<R extends object> = ResourceInputCommonProps<R, V> & {
   inputNumberProps?: InputNumberProps;
 };
 
 export function ResourceInputNumber<R extends object>(
-  { prop, resourceState, isOptional, inputNumberProps }: ResourceInputNumberProps<R>,
+  { setResource: calcUpdatedResource, getValue: getResourceValue,
+    resourceState, isOptional, name, caption,
+    inputNumberProps }: ResourceInputNumberProps<R>,
 ) {
   const [resource, setResource] = resourceState;
-  const calcFinalValue = (v?: number) => v;
   const resourceValue = useMemo(
-    ()=>calcFinalValue(stringToNumberOrUndefined(resource[prop]?.toString())),
+    ()=>stringToNumberOrUndefined(getResourceValue(resourceState[0])?.toString()),
     [resource],
   );
   const handleChange = useMemo(()=>(e: ChangeEvent<HTMLInputElement>) => {
     const { value: targetValue } = e.target;
-    const finalValue = calcFinalValue(stringToNumberOrUndefined(targetValue));
+    const finalValue = stringToNumberOrUndefined(targetValue);
 
-    setResource( {
-      ...resource,
-      [prop]: finalValue,
-    } );
+    setResource(calcUpdatedResource(finalValue, resource));
   }, [resource]);
   const { element: inputNumber, setValue, getValue } = useInputNumber( {
     value: resourceValue,
@@ -33,7 +33,7 @@ export function ResourceInputNumber<R extends object>(
   } );
 
   useEffect(() => {
-    const currentValue = calcFinalValue(getValue());
+    const currentValue = getValue();
 
     if (resourceValue === currentValue)
       return;
@@ -41,17 +41,30 @@ export function ResourceInputNumber<R extends object>(
     setValue(resourceValue ?? undefined);
   }, [resource]);
 
-  return <span className="ui-kit-resource-input-number"
+  const input = (<span className="ui-kit-resource-input-number"
   >
     <span>
       {inputNumber}
     </span>
     <span>
       {isOptional && ResourceOptionalCheckbox( {
-        prop,
-        name: `${prop.toString()}-Checkbox`,
+        setResource: (
+          newValue: boolean | undefined,
+          old,
+        ) => newValue ? old : !!getResourceValue(resourceState[0]),
+        getValue: () => !!getResourceValue(resourceState[0]),
         resourceState,
+        name: `${name.toString()}-Checkbox`,
       } )}
     </span>
-  </span>;
+  </span>);
+
+  if (caption) {
+    return <span className="ui-kit-resource-input">
+      <span>{caption}</span>
+      {input}
+    </span>;
+  }
+
+  return input;
 }

@@ -1,5 +1,5 @@
 import { createMockClass } from "#tests/jest/mocking";
-import { EpisodeFileInfoRepository } from "../Repository";
+import { EpisodeFileInfoRepository } from "../repository";
 
 class EpisodeFileInfoRepositoryMock extends createMockClass(EpisodeFileInfoRepository) { }
 

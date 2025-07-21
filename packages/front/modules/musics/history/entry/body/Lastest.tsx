@@ -1,12 +1,11 @@
-import z from "zod";
-import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
+import { genAssertIsManyDataResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
-import { musicHistoryEntrySchema } from "#musics/history/models/index";
+import { MusicHistoryEntryEntity, musicHistoryEntrySchema } from "#musics/history/models/index";
 import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { LatestHistoryEntries } from "#modules/history";
 import { DateFormat } from "#modules/utils/dates";
 import { backendUrl } from "#modules/requests";
-import { musicHistoryEntryRestDto } from "../../models/dto";
+import { MusicHistoryEntryRestDtos } from "../../models/dto";
 
 type Props = {
   resourceId: string;
@@ -18,13 +17,13 @@ const DATE_FORMAT_DEFAULT: DateFormat = {
   ago: "yes",
 };
 
-type ReqBody = z.infer<typeof musicHistoryEntryRestDto.getManyEntriesByCriteria.reqBodySchema>;
+type Body = MusicHistoryEntryRestDtos.GetManyByCriteria.Criteria;
 
 export function LastestComponent(
   { resourceId, date, dateFormat = DATE_FORMAT_DEFAULT }: Props,
 ) {
   const url = backendUrl(PATH_ROUTES.musics.history.search.path);
-  const body: ReqBody = {
+  const body: Body = {
     filter: {
       resourceId,
       timestampMax: date.timestamp - 1,
@@ -33,17 +32,13 @@ export function LastestComponent(
       timestamp: "desc",
     },
     limit: 2,
-    expand: ["musics"],
+    expand: [],
   };
 
-  return LatestHistoryEntries<MusicHistoryEntry, ReqBody>( {
+  return LatestHistoryEntries<MusicHistoryEntryEntity, Body>( {
     url,
     body,
-    validator,
+    validator: genAssertIsManyDataResponse(musicHistoryEntrySchema),
     dateFormat,
   } );
 }
-
-const validator = (res: DataResponse<Required<MusicHistoryEntry>[]>) => {
-  assertIsManyDataResponse(res, musicHistoryEntrySchema.required() as any);
-};

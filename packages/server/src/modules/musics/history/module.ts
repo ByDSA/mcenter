@@ -1,14 +1,17 @@
-import { Module } from "@nestjs/common";
-import { MusicRepository } from "#musics/repositories";
+/* eslint-disable import/no-cycle */
+import { forwardRef, Module } from "@nestjs/common";
 import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { MusicsModule } from "../module";
 import { MusicHistoryRepository } from "./repositories";
 import { MusicHistoryRestController } from "./controllers/rest.controller";
 
 @Module( {
-  imports: [DomainMessageBrokerModule],
+  imports: [
+    DomainMessageBrokerModule,
+    forwardRef(() => MusicsModule),
+  ],
   controllers: [MusicHistoryRestController],
   providers: [
-    MusicRepository,
     MusicHistoryRepository,
   ],
   exports: [MusicHistoryRepository],

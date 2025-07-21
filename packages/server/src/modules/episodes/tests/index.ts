@@ -1,5 +1,5 @@
-import { EpisodeId } from "#episodes/models";
+import { EpisodeCompKey } from "#episodes/models";
 
-export function stringifyEpisodeId(episodeId: EpisodeId): string {
-  return `(${episodeId.serieId}; ${episodeId.code})`;
+export function stringifyEpisodeCompKey(episodeCompKey: EpisodeCompKey): string {
+  return `(${episodeCompKey.seriesKey}; ${episodeCompKey.episodeKey})`;
 }

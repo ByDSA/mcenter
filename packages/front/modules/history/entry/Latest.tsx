@@ -4,10 +4,10 @@ import { FetchingRender, UseRequest, makeFetcher, makeUseRequest } from "#module
 import { DateFormat, formatDate } from "#modules/utils/dates";
 import { Entry } from "#modules/utils/resources/useResourceEdition";
 
-type Props<ReqBody, ResBody> = {
+type Props<Req, Res> = {
   url: string;
-  body: ReqBody;
-  validator: (resBody: ResBody)=> void;
+  body: Req;
+  validator: (resBody: Res)=> void;
   dateFormat?: DateFormat;
 };
 const DATE_FORMAT_DEFAULT: DateFormat = {

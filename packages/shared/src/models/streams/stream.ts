@@ -1,5 +1,5 @@
 import z from "zod";
-import { assertZodPopStack } from "../../utils/validation/zod";
+import { genAssertZod } from "../../utils/validation/zod";
 import { serieEntitySchema } from "../series";
 
 enum Mode {
@@ -43,9 +43,7 @@ const modelSchema = z.object( {
 
 type Model = z.infer<typeof modelSchema>;
 
-function assertIsModel(model: unknown): asserts model is Model {
-  assertZodPopStack(modelSchema, model);
-}
+const assertIsModel = genAssertZod(modelSchema);
 
 export {
   ModelId as StreamId,

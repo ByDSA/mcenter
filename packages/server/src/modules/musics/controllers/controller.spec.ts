@@ -3,36 +3,49 @@ import { INestApplication } from "@nestjs/common";
 import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { musicEntitySchema } from "#musics/models";
+import { musicEntitySchema, MusicId } from "#musics/models";
+import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
 import { MusicRepository } from "../repositories";
-import { MUSICS_SAMPLES_IN_DISK } from "../repositories/tests";
 import { UpdateRemoteTreeService, UpdateResult } from "../services";
 import { musicRepoMockProvider } from "../repositories/tests";
 import { musicHistoryRepoMockProvider } from "../history/repositories/tests/RepositoryMock";
+import { fixtureMusics } from "../tests/fixtures";
+import { fixtureMusicFileInfos } from "../file-info/tests/fixtures";
+import { MusicFileInfoRepository } from "../file-info/repositories/repository";
+import { musicFileInfoRepositoryMockProvider } from "../file-info/repositories/tests";
+import { musicFileInfoEntitySchema } from "../file-info/models";
 import { MusicUpdateRemoteController } from "./update-remote.controller";
 import { MusicFixController } from "./fix.controller";
 import { MusicGetController } from "./get.controller";
 
+const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
+
 describe("getAll", () => {
-  let musicRepoMock: MusicRepository;
+  let musicRepoMock: jest.Mocked<MusicRepository>;
+  let musicFileInfoRepoMock: jest.Mocked<MusicFileInfoRepository>;
   let app: INestApplication;
   let routerApp: Application;
   let testingSetup: TestingSetup;
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
+      imports: [DomainMessageBrokerModule],
       controllers: [MusicGetController, MusicUpdateRemoteController, MusicFixController],
       providers: [
         musicRepoMockProvider,
         musicHistoryRepoMockProvider,
         UpdateRemoteTreeService,
+        musicFileInfoRepositoryMockProvider,
       ],
     } );
 
     app = testingSetup.app;
     routerApp = testingSetup.routerApp;
 
-    musicRepoMock = testingSetup.module.get<MusicRepository>(MusicRepository);
+    musicRepoMock = testingSetup.module.get<jest.Mocked<MusicRepository>>(MusicRepository);
+    musicFileInfoRepoMock = testingSetup.module.get<jest.Mocked<MusicFileInfoRepository>>(
+      MusicFileInfoRepository,
+    );
   } );
 
   afterAll(async () => {
@@ -41,12 +54,20 @@ describe("getAll", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    musicFileInfoRepoMock.getOneByMusicId.mockImplementation(
+      // eslint-disable-next-line require-await
+      async (musicId: MusicId) => {
+        return fixtureMusicFileInfos.Disk.List.find(mf=>mf.musicId === musicId) ?? null;
+      },
+    );
+    musicFileInfoRepoMock.getAll.mockResolvedValue(fixtureMusicFileInfos.Disk.List);
+    musicRepoMock.getAll.mockResolvedValue(fixtureMusics.Disk.List);
   } );
 
   it("getRandom", async () => {
     const musics = MUSICS_SAMPLES_IN_DISK;
 
-    musicRepoMock.findAll = jest.fn().mockResolvedValueOnce(musics);
+    musicRepoMock.getAll.mockResolvedValueOnce(fixtureMusics.Disk.List);
     const response = await request(routerApp)
       .get("/get/random")
       .expect(200);
@@ -60,11 +81,9 @@ describe("getAll", () => {
   } );
 
   it("fixAll no changes", async () => {
-    const musics = MUSICS_SAMPLES_IN_DISK;
-
-    musicRepoMock.findAll = jest.fn().mockResolvedValueOnce(musics);
     musicRepoMock.createOneFromPath = jest.fn((path: string) => {
-      const music = MUSICS_SAMPLES_IN_DISK.find((m) => m.path === path);
+      const musicFileInfo = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
+      const music = MUSICS_SAMPLES_IN_DISK.find(m=>m.id === musicFileInfo.musicId);
 
       assertIsDefined(music);
 
@@ -73,8 +92,6 @@ describe("getAll", () => {
         id: "id",
       } );
     } );
-    musicRepoMock.updateOneByPath = jest.fn().mockResolvedValue(undefined);
-    musicRepoMock.deleteOneByPath = jest.fn().mockResolvedValue(undefined);
     const response = await request(routerApp)
       .get("/update/remote")
       .expect(200);
@@ -88,18 +105,26 @@ describe("getAll", () => {
   } );
 
   it("fixAll one new", async () => {
-    const musics = MUSICS_SAMPLES_IN_DISK.toSpliced(1, 1);
+    // Remove one music in remote
+    const musics = [...MUSICS_SAMPLES_IN_DISK];
+    const deletedMusic = musics.splice(2, 1)[0];
+    const musicFileInfos = [...fixtureMusicFileInfos.Disk.List];
+    const deletedMusicFileInfo = musicFileInfos.splice(
+      musicFileInfos.findIndex(mf=>mf.musicId === deletedMusic.id),
+      1,
+    )[0];
 
-    musicRepoMock.findAll = jest.fn().mockResolvedValueOnce(musics);
+    musicRepoMock.getAll.mockResolvedValue(musics);
+    musicFileInfoRepoMock.getAll.mockResolvedValue(musicFileInfos);
+    musicFileInfoRepoMock.upsertOneByPathAndGet.mockResolvedValue(deletedMusicFileInfo);
     musicRepoMock.createOneFromPath = jest.fn((path: string) => {
-      const music = MUSICS_SAMPLES_IN_DISK.find((m) => m.path === path);
+      const musicFileInfo = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
+      const music = MUSICS_SAMPLES_IN_DISK.find(m=>m.id === musicFileInfo.musicId);
 
       assertIsDefined(music);
 
       return Promise.resolve(music);
     } );
-    musicRepoMock.updateOneByPath = jest.fn().mockResolvedValue(undefined);
-    musicRepoMock.deleteOneByPath = jest.fn().mockResolvedValue(undefined);
     const response = await request(routerApp)
       .get("/update/remote")
       .expect(200);
@@ -111,8 +136,12 @@ describe("getAll", () => {
     expect(body.moved).toHaveLength(0);
     expect(body.new).toHaveLength(1);
 
-    const newGotParsed = musicEntitySchema.parse(body.new[0]);
+    const newGotParsedMusic = musicEntitySchema.parse(body.new[0].music);
 
-    expect(newGotParsed).toEqual(MUSICS_SAMPLES_IN_DISK[1]);
+    expect(newGotParsedMusic).toEqual(deletedMusic);
+
+    const newGotParsedMusicFileInfo = musicFileInfoEntitySchema.parse(body.new[0].fileInfo);
+
+    expect(newGotParsedMusicFileInfo).toEqual(deletedMusicFileInfo);
   } );
 } );

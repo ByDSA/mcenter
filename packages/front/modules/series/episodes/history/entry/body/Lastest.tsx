@@ -1,8 +1,8 @@
 import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
-import { EpisodeHistoryEntry, EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
-import { EpisodeHistoryEntriesCriteria } from "#modules/series/episodes/history/models/dto";
-import { EpisodeId } from "#modules/series/episodes/models";
+import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
+import { EpisodeHistoryEntryRestDtos } from "#modules/series/episodes/history/models/dto";
+import { EpisodeCompKey } from "#modules/series/episodes/models";
 import { DateFormat } from "#modules/utils/dates";
 import { LatestHistoryEntries } from "#modules/history";
 import { backendUrl } from "#modules/requests";
@@ -11,7 +11,7 @@ type Data = EpisodeHistoryEntryEntity[];
 
 type Props<ID> = {
   resourceId: ID;
-  date: EpisodeHistoryEntry["date"];
+  timestamp: EpisodeHistoryEntryEntity["date"]["timestamp"];
   dateFormat?: DateFormat;
 };
 const DATE_FORMAT_DEFAULT: DateFormat = {
@@ -19,17 +19,17 @@ const DATE_FORMAT_DEFAULT: DateFormat = {
   ago: "yes",
 };
 
-type ReqBody = EpisodeHistoryEntriesCriteria;
+type Criteria = EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria;
 
 export function LastestComponent(
-  { resourceId, date, dateFormat = DATE_FORMAT_DEFAULT }: Props<EpisodeId>,
+  { resourceId: compKey, timestamp, dateFormat = DATE_FORMAT_DEFAULT }: Props<EpisodeCompKey>,
 ) {
   const URL = backendUrl(PATH_ROUTES.episodes.history.entries.search.path);
-  const body: ReqBody = {
+  const body: Criteria = {
     filter: {
-      serieId: resourceId.serieId,
-      episodeId: resourceId.code,
-      timestampMax: date.timestamp - 1,
+      seriesKey: compKey.seriesKey,
+      episodeKey: compKey.episodeKey,
+      timestampMax: timestamp - 1,
     },
     sort: {
       timestamp: "desc",
@@ -38,7 +38,7 @@ export function LastestComponent(
   };
 
   // TODO: cambiar 'any' cuando EpisodeHistoryEntry tenga 'resource' en vez de 'episode'
-  return LatestHistoryEntries<any, ReqBody>( {
+  return LatestHistoryEntries<any, Criteria>( {
     url: URL,
     body,
     validator,

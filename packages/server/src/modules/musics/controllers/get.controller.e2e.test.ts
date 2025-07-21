@@ -1,19 +1,23 @@
 import { Application } from "express";
 import request from "supertest";
 import { MusicEntity, Music } from "#musics/models";
-import { MUSICS_WITH_TAGS_SAMPLES } from "#tests/main/db/fixtures/models/music";
-import { loadFixtureMusicsWithTags } from "#tests/main/db/fixtures/sets";
+import { loadFixtureMusicsInDisk } from "#tests/main/db/fixtures/sets";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { HistoryMusicModelOdm, MusicHistoryRepository } from "../history";
+import { MusicHistoryRepository } from "../history";
 import { MusicRepository } from "../repositories";
+import { fixtureMusics } from "../tests/fixtures";
+import { musicBuilderServiceMockProvicer } from "../builder/tests";
+import { MusicFileInfoRepository } from "../file-info/repositories/repository";
+import { MusicHistoryEntryOdm } from "../history/repositories/odm";
 import { MusicGetController } from "./get.controller";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;
+const MUSICS_WITH_TAGS_SAMPLES = fixtureMusics.Disk.List;
 
 async function loadFixtures() {
-  await loadFixtureMusicsWithTags();
+  await loadFixtureMusicsInDisk();
 }
 
 function expectResponseIncludeAnyOfMusics(response: request.Response, musics: Music[]) {
@@ -41,6 +45,8 @@ describe("musicGetController", () => {
       controllers: [MusicGetController],
       providers: [
         MusicRepository,
+        MusicFileInfoRepository,
+        musicBuilderServiceMockProvicer,
         MusicHistoryRepository,
         DomainMessageBroker,
       ],
@@ -55,7 +61,7 @@ describe("musicGetController", () => {
   } );
 
   beforeEach(async () => {
-    await HistoryMusicModelOdm.deleteMany( {} );
+    await MusicHistoryEntryOdm.Model.deleteMany( {} );
   } );
 
   it("should get random", async () => {
@@ -100,7 +106,8 @@ describe("musicGetController", () => {
 
     it("should get a music with tag t1", async () => {
       const query = "tag:t1";
-      const musicsWithTagT1 = MUSICS_WITH_TAGS_SAMPLES.filter((music) => music.tags?.includes("t1"));
+      const musicsWithTagT1 = MUSICS_WITH_TAGS_SAMPLES
+        .filter((music) => music.tags?.includes("t1"));
 
       expectNotEmpty(musicsWithTagT1);
       const response = await request(routerApp)
@@ -117,7 +124,9 @@ describe("musicGetController", () => {
         .get(`/get/random?q=${query}`)
         .expect(200)
         .send();
-      const musicsWithTagT2Only = MUSICS_WITH_TAGS_SAMPLES.filter((music) => music.tags?.includes("only-t2"));
+      const musicsWithTagT2Only = MUSICS_WITH_TAGS_SAMPLES.filter(
+        (music) => music.tags?.includes("only-t2"),
+      );
       const expectedPossibleUrls = musicsWithTagT2Only.map((music) => music.url);
       let found = false;
 

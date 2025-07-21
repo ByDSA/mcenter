@@ -1,10 +1,13 @@
-import mongoose, { Schema } from "mongoose";
-import { SerieId } from "../../models";
+import mongoose, { Schema, Types } from "mongoose";
+import { SeriesKey } from "../../models";
 
 export interface DocOdm {
-  id: SerieId;
+  _id?: Types.ObjectId;
+  id: SeriesKey;
   name: string;
 }
+
+export type FullDocOdm = DocOdm & Required<Pick<DocOdm, "_id">>;
 
 const NAME = "series";
 

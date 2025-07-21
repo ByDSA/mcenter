@@ -1,24 +1,29 @@
 import z from "zod";
+import { mongoDbId } from "../../../models/resource/partial-schemas";
 import { getDateNow } from "../../../utils/time";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { makeHistoryEntrySchema } from "../../history-lists-common";
 import { musicIdSchema, MusicId, musicEntitySchema } from "../music";
 import { musicSchema } from "../music";
 
-export const musicHistoryEntrySchema = makeHistoryEntrySchema(musicIdSchema, musicSchema)
+const modelSchema = makeHistoryEntrySchema(musicIdSchema, musicSchema)
   .omit( {
     resource: true,
-  } )
-  .extend( {
-    resource: musicEntitySchema.optional(),
   } );
 
-export type MusicHistoryEntry = z.infer<typeof musicHistoryEntrySchema>;
+  type Model = z.infer<typeof modelSchema>;
+const entitySchema = modelSchema.extend( {
+  id: mongoDbId,
+  music: musicEntitySchema.optional(),
+} );
 
-export const assertIsMusicHistoryEntry = genAssertZod(musicHistoryEntrySchema);
+type Entity = z.infer<typeof entitySchema>;
 
-export function createMusicHistoryEntryById(musicId: MusicId): MusicHistoryEntry {
-  const newEntry: MusicHistoryEntry = {
+const assertIsModel = genAssertZod(modelSchema);
+const assertIsEntity = genAssertZod(entitySchema);
+
+function createByMusicId(musicId: MusicId): Model {
+  const newEntry: Model = {
     date: getDateNow(),
     resourceId: musicId,
   };
@@ -26,4 +31,15 @@ export function createMusicHistoryEntryById(musicId: MusicId): MusicHistoryEntry
   return newEntry;
 }
 
-export type EntryId = string;
+type EntryId = string;
+
+export {
+  EntryId,
+  createByMusicId as createMusicHistoryEntryById,
+  assertIsEntity as assertIsMusicHistoryEntryEntity,
+  assertIsModel as assertIsMusicHistoryEntry,
+  Model as MusicHistoryEntry,
+  Entity as MusicHistoryEntryEntity,
+  modelSchema as musicHistoryEntrySchema,
+  entitySchema as musicHistoryEntryEntitySchema,
+};

@@ -1,11 +1,14 @@
 import mongoose from "mongoose";
+import { SchemaDef } from "#utils/layers/db/mongoose";
 
 export interface DocOdm {
-  _id: mongoose.Types.ObjectId;
+  _id?: mongoose.Types.ObjectId;
   episodeId: mongoose.Types.ObjectId;
   path: string;
   hash: string;
   size: number;
+  start?: number;
+  end?: number;
   timestamps: {
     createdAt: Date;
     updatedAt: Date;
@@ -20,6 +23,8 @@ export interface DocOdm {
   };
 }
 
+export type FullDocOdm = DocOdm & Required<Pick<DocOdm, "_id">>;
+
 const NAME = "EpisodeFileInfo";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
@@ -32,6 +37,14 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     unique: true,
   },
   size: Number,
+  start: {
+    type: Number,
+    required: false,
+  },
+  end: {
+    type: Number,
+    required: false,
+  },
   timestamps: {
     createdAt: Date,
     updatedAt: Date,
@@ -48,7 +61,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     },
     fps: String,
   },
-}, {
+} satisfies SchemaDef<DocOdm>, {
   autoIndex: false,
 } );
 

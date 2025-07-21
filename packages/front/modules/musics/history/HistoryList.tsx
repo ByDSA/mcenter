@@ -1,10 +1,9 @@
 import extend from "just-extend";
 import { Fragment } from "react";
-import { DataResponse } from "$shared/utils/http/responses";
 import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { formatDate } from "#modules/utils/dates";
 import { FetchingRender } from "#modules/fetching";
-import { useRequest } from "./requests";
+import { MusicHistoryEntryFetching } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 
 import "#styles/resources/history-entry.css";
@@ -21,15 +20,17 @@ const DEFAULT_PARAMS: Required<Props> = {
 export function HistoryList(props?: Props) {
   const params = extend(true, DEFAULT_PARAMS, props) as typeof DEFAULT_PARAMS;
 
-  return FetchingRender<DataResponse<Required<MusicHistoryEntry>[]>>( {
-    useRequest,
+  return FetchingRender<MusicHistoryEntryFetching.GetManyByCriteria.Res>( {
+    useRequest: MusicHistoryEntryFetching.GetManyByCriteria.useRequest,
     render: (res) => (
       <span className="history-list">
         {
-          res && res.data.map((entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
-            {params.showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
-            <HistoryEntryElement showDate={params.showDate === "eachOne"} value={entry} />
-          </Fragment>)
+          res && res.data.map(
+            (entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
+              {params.showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
+              <HistoryEntryElement showDate={params.showDate === "eachOne"} value={entry} />
+            </Fragment>,
+          )
         }
       </span>
     ),

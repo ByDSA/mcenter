@@ -1,5 +1,6 @@
-import fs from "fs";
-import { MediaElement, render } from "./MediaElement";
+import fs from "node:fs";
+import { MediaElement } from "#modules/models";
+import { render } from "./render-media-element";
 
 export class Playlist {
   #elements: MediaElement[] = [];

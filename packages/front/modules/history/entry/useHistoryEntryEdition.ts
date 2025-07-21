@@ -1,56 +1,27 @@
-import { assertIsDefined } from "$shared/utils/validation";
-import { useAsyncAction } from "#modules/ui-kit/input";
-import { UseResourceEditionProps, UseResourceEditionRet, useResourceEdition } from "../../utils/resources/useResourceEdition";
+import { useCrud, UseCrudProps, UseCrudRet } from "#modules/utils/resources/useCrud";
 
-type Props<T, ID, FetchPatchReqBody, FetchPatchResBody> = {
-  resource: UseResourceEditionProps<T, ID, FetchPatchReqBody, FetchPatchResBody>;
-  delete?: {
-    fetch: (entryId: any)=> Promise<any>;
-  };
-};
-type Ret<T> = {
- resource: UseResourceEditionRet<T>;
- delete?: {
-    action: ()=> Promise<any>;
-    isDoing: boolean;
-  };
-};
-export function useHistoryEntryEdition<T extends object, ID, FetchPatchReqBody, FetchPatchResBody>(
-  params: Props<T, ID, FetchPatchReqBody, FetchPatchResBody>,
+type Props<T> = UseCrudProps<T>;
+type Ret<T> = UseCrudRet<T>;
+export function useHistoryEntryEdition<T>(
+  params: Props<T>,
 ): Ret<T> {
-  const resourceRet = useResourceEdition(params.resource);
-  const ret: Ret<T> = {
-    resource: resourceRet,
-  };
-
-  if (params.delete) {
-    const asyncDeleteAction = useAsyncAction();
-    const remove = () => {
-      const { entry } = params.resource;
-
-      if (!confirm(`Borar esta entrada del historial?\n${ JSON.stringify( {
-        entryId: entry.id,
-        resourceId: entry.resourceId,
-        date: entry.date,
-      }, null, 2)}`))
+  const { isModified, remove, reset, state, update } = useCrud<T>( {
+    data: params.data,
+    fetchRemove: async () => {
+      if (!confirm(`Borar esta entrada del historial?\n${ JSON.stringify(params.data, null, 2)}`))
         return Promise.resolve();
 
-      const { done, start } = asyncDeleteAction;
+      return await params.fetchRemove();
+    },
+    fetchUpdate: params.fetchUpdate,
+    isModifiedFn: params.isModifiedFn,
+  } );
 
-      start();
-      const historyEntryId = entry.id;
-
-      assertIsDefined(historyEntryId);
-
-      return params.delete!.fetch(historyEntryId)
-        .then(() => done());
-    };
-
-    ret.delete = {
-      action: remove as ()=> Promise<any>,
-      isDoing: asyncDeleteAction.isDoing,
-    };
-  }
-
-  return ret;
+  return {
+    isModified,
+    remove,
+    reset,
+    state,
+    update,
+  };
 }

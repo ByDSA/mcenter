@@ -8,9 +8,9 @@ export const HISTORY_ENTRIES_WITH_NO_ENTRIES: EpisodeHistoryEntryEntity[] = deep
 
 export const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntryEntity = {
   id: "1",
-  episodeId: {
-    code: "1x01",
-    serieId: "simpsons",
+  episodeCompKey: {
+    episodeKey: "1x01",
+    seriesKey: "simpsons",
   },
   date: DATE_SAMPLE1,
 };

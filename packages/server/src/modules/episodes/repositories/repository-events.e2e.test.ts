@@ -1,5 +1,5 @@
-import { Episode, EpisodeEntity, EpisodeId } from "#episodes/models";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures/models";
+import { Episode, EpisodeCompKey, EpisodeEntity } from "#episodes/models";
+import { fixtureEpisodes } from "#tests/main/db/fixtures/models";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { Consumer } from "#utils/message-broker";
@@ -37,9 +37,9 @@ beforeAll(async () => {
 } );
 
 it("should emit Patch Event", async () => {
-  const episodeId: EpisodeId = {
-    serieId: "simpsons",
-    code: "1x01",
+  const episodeCompKey: EpisodeCompKey = {
+    seriesKey: "simpsons",
+    episodeKey: "1x01",
   };
   const fn = jest.fn();
 
@@ -49,7 +49,7 @@ it("should emit Patch Event", async () => {
     title: "new title",
   };
 
-  await episodeRepository.patchOneByIdAndGet(episodeId, {
+  await episodeRepository.patchOneByCompKeyAndGet(episodeCompKey, {
     entity: partialModel,
   } );
 
@@ -57,7 +57,7 @@ it("should emit Patch Event", async () => {
   expect(fn).toHaveBeenCalledWith( {
     type: EventType.PATCHED,
     payload: {
-      entityId: episodeId,
+      entityId: fixtureEpisodes.Simpsons.Samples.EP1x01.id,
       key: "title",
       value: partialModel.title,
     },
@@ -67,22 +67,23 @@ it("should emit Patch Event", async () => {
 it("should emit Create Event", async () => {
   const fn = jest.fn((event: ModelEvent<EpisodeEntity>) => {
     expect(event.type).toBe(EventType.CREATED);
-    expect(event.payload.entity.id?.serieId).toBe("simpsons");
-    expect(event.payload.entity.id?.code.startsWith("X")).toBeTruthy();
+    expect(event.payload.entity.compKey?.seriesKey).toBe("simpsons");
+    expect(event.payload.entity.compKey?.episodeKey.startsWith("X")).toBeTruthy();
 
     return Promise.resolve();
   } ) as Consumer<any>;
 
   await domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, fn);
 
-  const models = EPISODES_SIMPSONS.slice(0, 10).map(episode => ( {
+  const models = fixtureEpisodes.Simpsons.List.slice(0, 10).map(episode => ( {
     ...episode,
-    id: {
-      code: `X${episode.id?.code}`,
-      serieId: episode.id?.serieId,
-    } as EpisodeId,
+    compKey: {
+      episodeKey: `X${episode.compKey?.episodeKey}`,
+      seriesKey: episode.compKey?.seriesKey,
+    } as EpisodeCompKey,
   } ) as EpisodeEntity);
 
+  await testingSetup.db?.drop();
   await episodeRepository.createManyAndGet(models);
 
   expect(fn).toHaveBeenCalledTimes(models.length);

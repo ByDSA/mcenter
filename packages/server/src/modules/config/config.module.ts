@@ -1,9 +1,8 @@
 import { Module } from "@nestjs/common";
 import { ConfigController } from "./config.controller";
-import { StaticFilesModule } from "./static-files.module";
 
 @Module( {
-  imports: [StaticFilesModule],
+  imports: [],
   controllers: [ConfigController],
 } )
 export class ConfigModule {}

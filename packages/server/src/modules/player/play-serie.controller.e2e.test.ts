@@ -1,19 +1,21 @@
 import { Application } from "express";
 import request from "supertest";
 import { PATH_ROUTES } from "$shared/routing";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
 import { testRoute } from "#tests/main/routing";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
+import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { PlayService } from "./PlayService";
 import { PlaySerieController } from "./play-serie.controller";
 import { VlcBackWebSocketsServerService } from "./player-services";
 import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests/PlayerBackWebSocketsServiceMock";
 
-testRoute(PATH_ROUTES.player.play.episode.withParams("serieId", "episodeId"));
+testRoute(PATH_ROUTES.player.play.episode.withParams("seriesKey", "episodeKey"));
+
+const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
 describe("playSerieController", () => {
   let routerApp: Application;
@@ -49,14 +51,14 @@ describe("playSerieController", () => {
     } );
 
     it("should return 404 if serie not found", async () => {
-      const response = await request(routerApp).get(`/play/episode/simpson/${ EPISODES_SIMPSONS[0].id.code}`)
+      const response = await request(routerApp).get(`/play/episode/simpson/${ EPISODES_SIMPSONS[0].compKey.episodeKey}`)
         .expect(404);
 
       expect(response).toBeDefined();
     } );
 
     it("should return 200 if episode found", async () => {
-      const response = await request(routerApp).get(`/play/episode/simpsons/${ EPISODES_SIMPSONS[0].id.code}`)
+      const response = await request(routerApp).get(`/play/episode/simpsons/${ EPISODES_SIMPSONS[0].compKey.episodeKey}`)
         .expect(200);
 
       expect(response).toBeDefined();

@@ -10,12 +10,6 @@ export const timeRangeSchema = z.object( {
 
 export type TimeRange = z.infer<typeof timeRangeSchema>;
 
-export const localFileSchema = z.object( {
-  path: z.string(),
-} );
-
-export type LocalFile = z.infer<typeof localFileSchema>;
-
 export const pickableSchema = z.object( {
   weight: z.number(),
 } );
@@ -27,3 +21,13 @@ export const taggableSchema = z.object( {
 } );
 
 export type Taggable = z.infer<typeof taggableSchema>;
+
+export const mongoDbIdRefining = [
+  ((id: any) => /^[a-f0-9]{24}$/.test(id)),
+  {
+    message: "id must be a mongodb id",
+  },
+] as const;
+
+export const mongoDbId = z.string()
+  .refine(...mongoDbIdRefining);

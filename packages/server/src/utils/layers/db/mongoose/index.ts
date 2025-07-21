@@ -6,3 +6,5 @@ export function assertConnected() {
   if (!mongoose.connection.readyState)
     throwErrorPopStack(new DatabaseNotConnectedError("Mongoose database is not connected"));
 }
+
+export * from "./docs";

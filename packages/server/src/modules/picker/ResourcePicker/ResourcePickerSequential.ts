@@ -7,6 +7,7 @@ type Params<ID, R extends Resource> = {
   resources: R[];
   lastId?: ID;
   compareId: CompareIdFunc<ID>;
+  getId: (r: R)=> ID;
 };
 export class ResourcePickerSequential<ID = string, R extends ResourceEntity = ResourceEntity>
 implements ResourcePicker {
@@ -34,7 +35,10 @@ implements ResourcePicker {
   }
 
   #findIndexById(id: ID): number {
-    return this.#params.resources.findIndex((e) => this.#params.compareId(e.id, id));
+    return this.#params.resources.findIndex((e) => this.#params.compareId(
+      this.#params.getId(e),
+      id,
+    ));
   }
 
   #calcNextIndex(index: number): number {

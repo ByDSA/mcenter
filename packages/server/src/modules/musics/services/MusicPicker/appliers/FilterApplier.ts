@@ -31,6 +31,7 @@ export class MusicFilterApplier extends FilterApplier<Entity> {
         {
           lastId,
           compareId: compareMusicId,
+          getResourceId: (m)=>m.id,
         },
       ));
     }

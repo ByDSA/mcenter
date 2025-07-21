@@ -1,6 +1,8 @@
-import { Episode, EpisodeEntity, compareEpisodeId } from "#episodes/models";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures/models/episode";
+import { Episode, EpisodeEntity, compareEpisodeCompKey } from "#episodes/models";
+import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { ResourcePickerSequential } from "./ResourcePickerSequential";
+
+const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
 type Model = Episode;
 
@@ -10,8 +12,9 @@ it("should pick 1x02 when lastEp is 1x01", async () => {
   const expected = EPISODES_SIMPSONS[1];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp.id,
-    compareId: compareEpisodeId,
+    lastId: lastEp.compKey,
+    compareId: compareEpisodeCompKey,
+    getId: e=>e.compKey,
   } );
   const actualEpisodes: Model[] = await seq.pick();
 
@@ -26,8 +29,9 @@ it("should pick 1x01 (first one) when lastEp is undfined", async () => {
   const expected = EPISODES_SIMPSONS[0];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp?.id,
-    compareId: compareEpisodeId,
+    lastId: lastEp?.compKey,
+    compareId: compareEpisodeCompKey,
+    getId: e=>e.compKey,
   } );
   const actualEpisodes: Model[] = await seq.pick();
 
@@ -42,8 +46,9 @@ it("should pick 1x01 (first one) when lastEp is last", async () => {
   const expected = EPISODES_SIMPSONS[0];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp?.id,
-    compareId: compareEpisodeId,
+    lastId: lastEp?.compKey,
+    compareId: compareEpisodeCompKey,
+    getId: e=>e.compKey,
   } );
   const actualEpisodes: Model[] = await seq.pick();
 
@@ -52,14 +57,16 @@ it("should pick 1x01 (first one) when lastEp is last", async () => {
   expect(actualEpisodes[0]).toEqual(expected);
 } );
 
-it("should pick last and 1x01 (first one) when lastEp is previous to last and pick 2 episodes", async () => {
+it("should pick last and 1x01 (first one) when lastEp\
+is previous to last and pick 2 episodes", async () => {
   const episodes = EPISODES_SIMPSONS;
   const lastEp = EPISODES_SIMPSONS.at(-2);
   const expected = [EPISODES_SIMPSONS.at(-1), EPISODES_SIMPSONS[0]];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp?.id,
-    compareId: compareEpisodeId,
+    lastId: lastEp?.compKey,
+    compareId: compareEpisodeCompKey,
+    getId: e=>e.compKey,
   } );
   const actualEpisodes: Model[] = await seq.pick(2);
 

@@ -30,7 +30,7 @@ export class FixerController {
     const promises: Promise<LogElementResponse | null>[] = [];
 
     for (const serie of series) {
-      const promise = this.streamRepository.fixDefaultStreamForSerie(serie.id);
+      const promise = this.streamRepository.fixDefaultStreamForSerie(serie.key);
 
       promises.push(promise);
     }

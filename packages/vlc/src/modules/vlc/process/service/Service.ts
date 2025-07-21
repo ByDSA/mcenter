@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
-import { PlayResourceMessage } from "#modules/models";
+import { MediaElement, PlayResourceMessage } from "#modules/models";
 import { PlayerProcessService } from "../../../PlayerProcessService";
-import { MediaElement, QueuePlaylistManager } from "../../media";
+import { QueuePlaylistManager } from "../../media";
 import { VLCFlag, VLCProcess } from "../singleton";
-import { episodeToMediaElement } from "./adapters";
+import { completeMediaElement } from "./adapters";
 
 export class VLCProcessService implements PlayerProcessService {
   #queue: QueuePlaylistManager;
@@ -54,10 +54,10 @@ export class VLCProcessService implements PlayerProcessService {
     this.#isRunningAnyInstance = isRunning;
   }
 
-  async playResource( { resources: episodes, force }: PlayResourceMessage): Promise<boolean> {
-    assertIsNotEmpty(episodes);
+  async playResource( { mediaElements, force }: PlayResourceMessage): Promise<boolean> {
+    assertIsNotEmpty(mediaElements);
 
-    const elements: MediaElement[] = episodes.map(episodeToMediaElement);
+    const elements: MediaElement[] = mediaElements.map(completeMediaElement);
 
     this.#openNewInstance = force ?? false;
     await this.#updateIsRunningAnyInstanceAsync();

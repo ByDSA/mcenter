@@ -1,38 +1,38 @@
 /* eslint-disable import/no-cycle */
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { deepMerge } from "$shared/utils/objects";
 import { showError } from "$shared/utils/errors/showError";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
+import { assertIsNotEmpty } from "$shared/utils/validation";
+import { FilterQuery } from "mongoose";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
-import { SerieId } from "#series/models";
 import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
-import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet, CanUpdateOneByIdAndGet } from "#utils/layers/repository";
+import { CanCreateManyAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { BrokerEvent } from "#utils/message-broker";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
-import { Episode, EpisodeEntity, EpisodeId } from "../models";
+import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
+import { assertFound } from "#utils/validation/found";
+import { SeriesKey } from "#modules/series";
+import { Episode, EpisodeCompKey, EpisodeEntity, EpisodeId } from "../models";
 import { LastTimePlayedService } from "../history/last-time-played.service";
 import { EpisodeHistoryEntryEvent } from "../history/repositories";
 import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "../history/repositories/events";
-import { DocOdm, ModelOdm } from "./odm";
-import { ExpandEnum, GetOptions, validateGetOptions } from "./get-options";
+import { Criteria } from "./criteria";
 import { EPISODE_QUEUE_NAME } from "./events";
-import { episodeDocOdmToModel, episodeEntityToDocOdm, modelToDocOdm, partialModelToDocOdm } from "./adapters";
+import { EpisodeOdm } from "./odm";
+import { CriteriaOne } from "./criteria/validation";
 
 type UpdateOneParams = Episode;
 
 export type EpisodeEvent = BrokerEvent<ModelMessage<EpisodeEntity>>;
 
-export type GetManyOptions = {
-  sortById?: boolean;
-};
-
 @Injectable()
 export class EpisodesRepository
-implements CanGetOneById<EpisodeEntity, EpisodeId>,
-CanUpdateOneByIdAndGet<EpisodeEntity, EpisodeId>,
-CanPatchOneByIdAndGet<EpisodeEntity, EpisodeId>,
+implements
 CanCreateManyAndGet<EpisodeEntity>,
+CanGetOneById<EpisodeEntity, EpisodeId>,
+CanPatchOneByIdAndGet<Episode, EpisodeId>,
+CanGetManyCriteria<EpisodeEntity, Criteria>,
 CanGetAll<EpisodeEntity> {
   constructor(
     private readonly domainMessageBroker: DomainMessageBroker,
@@ -51,113 +51,30 @@ CanGetAll<EpisodeEntity> {
         const { entity } = event.payload;
 
         if (event.type === EventType.CREATED) {
-          await this.patchOneByIdAndGet(entity.episodeId, {
+          await this.patchOneByCompKeyAndGet(entity.episodeCompKey, {
             entity: {
               lastTimePlayed: entity.date.timestamp,
             },
           } );
-        } else if (event.type === EventType.DELETED)
-          await this.lastTimePlayedService.updateEpisodeLastTimePlayed(entity.episodeId);
+        } else if (event.type === EventType.DELETED) {
+          await this.lastTimePlayedService
+            .updateEpisodeLastTimePlayedByCompKey(entity.episodeCompKey);
+        }
 
         return Promise.resolve();
       },
     ).catch(showError);
   }
 
-  async patchOneByPathAndGet(
-    path: string,
-    episode: Partial<UpdateOneParams>,
-  ): Promise<EpisodeEntity | null> {
-    const partialDocOdm = partialModelToDocOdm(episode);
-    const updateResult = await ModelOdm.updateOne( {
-      path,
-    }, partialDocOdm);
+  async getManyCriteria(criteria: Criteria): Promise<EpisodeEntity[]> {
+    let episodesOdm: EpisodeOdm.FullDoc[];
+    const filter: FilterQuery<EpisodeOdm.Doc> = {};
 
-    if (updateResult.matchedCount === 0 || updateResult.acknowledged === false)
-      return null;
+    if (criteria.filter?.seriesKey)
+      filter.serieId = criteria.filter.seriesKey;
 
-    const newPath = episode.path ?? path;
-    const ret = await this.getOneByPath(newPath);
-
-    if (ret) {
-      const event = new PatchEvent<Episode, EpisodeId>( {
-        entityId: ret.id,
-        key: "path",
-        value: newPath,
-      } );
-
-      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
-    }
-
-    return ret;
-  }
-
-  async getAll(): Promise<EpisodeEntity[]> {
-    const episodesOdm: DocOdm[] = await ModelOdm.find();
-
-    if (episodesOdm.length === 0)
-      return [];
-
-    return episodesOdm.map(episodeDocOdmToModel) as EpisodeEntity[];
-  }
-
-  async getAllBySerieId(serieId: SerieId): Promise<EpisodeEntity[]> {
-    const episodesOdm = await ModelOdm.find( {
-      serieId,
-    } );
-
-    if (episodesOdm.length === 0)
-      return [];
-
-    return episodesOdm.map(episodeDocOdmToModel) as EpisodeEntity[];
-  }
-
-  async getOneById(id: EpisodeId, opts?: GetOptions): Promise<EpisodeEntity | null> {
-    validateGetOptions(opts);
-    const episodeOdm = await ModelOdm.findOne( {
-      serieId: id.serieId,
-      episodeId: id.code,
-    } );
-
-    if (!episodeOdm)
-      return null;
-
-    const ret = episodeDocOdmToModel(episodeOdm) as EpisodeEntity;
-
-    if (opts?.expand?.includes(ExpandEnum.FileInfo)) {
-      const _id = episodeOdm._id?.toString();
-      const fileInfo = await this.episodeFileInfoRepository.getAllByEpisodeId(_id);
-
-      if (!fileInfo)
-        throw new Error("Episode has no file info");
-
-      ret.fileInfo = fileInfo.at(0);
-    }
-
-    return ret;
-  }
-
-  async getOneByPath(path: string): Promise<EpisodeEntity | null> {
-    const episodeOdm = await ModelOdm.findOne( {
-      path,
-    } );
-
-    if (!episodeOdm)
-      return null;
-
-    return episodeDocOdmToModel(episodeOdm) as EpisodeEntity;
-  }
-
-  async getManyBySerieKey(serieKey: string, options?: GetManyOptions): Promise<EpisodeEntity[]> {
-    const actualOptions = deepMerge( {
-      sortById: true,
-    }, options);
-    let episodesOdm: DocOdm[];
-
-    if (actualOptions.sortById) {
-      episodesOdm = await ModelOdm.find( {
-        serieId: serieKey,
-      } )
+    if (criteria?.sort?.episodeKey ?? true) {
+      episodesOdm = await EpisodeOdm.Model.find(filter)
         .sort( {
           episodeId: 1,
         } )
@@ -166,27 +83,150 @@ CanGetAll<EpisodeEntity> {
           numericOrdering: true,
         } )
         .exec();
-    } else {
-      episodesOdm = await ModelOdm.find( {
-        serieId: serieKey,
+    } else
+      episodesOdm = await EpisodeOdm.Model.find(filter);
+
+    return episodesOdm.map(EpisodeOdm.docToEntity);
+  }
+
+  async patchOneByIdAndGet(
+    id: EpisodeId,
+    patchParams: PatchOneParams<Partial<Episode>>,
+  ): Promise<EpisodeEntity> {
+    const episode = patchParams.entity;
+    const partialDocOdm = EpisodeOdm.partialToDoc(episode);
+
+    if (Object.keys(partialDocOdm).length === 0)
+      throw new Error("Empty partialDocOdm, nothing to patch");
+
+    const updateResult = await EpisodeOdm.Model.updateOne( {
+      _id: id,
+    }, partialDocOdm);
+
+    if (updateResult.matchedCount === 0 || updateResult.acknowledged === false)
+      assertFound(null);
+
+    const episodeId = updateResult.upsertedId!.toString();
+
+    for (const [key, value] of Object.entries(episode)) {
+      const event = new PatchEvent<Episode, EpisodeId>( {
+        entityId: episodeId,
+        key: key as keyof Episode,
+        value,
       } );
+
+      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
+
+    const ret = await this.getOneById(id);
+
+    assertFound(ret);
+
+    return ret;
+  }
+
+  async getOneById(
+    id: EpisodeId,
+    criteria?: Pick<Criteria, "expand">,
+  ): Promise<EpisodeEntity | null> {
+    const episodeOdm = await EpisodeOdm.Model.findById(id);
+
+    if (!episodeOdm)
+      return null;
+
+    const ret = EpisodeOdm.docToEntity(episodeOdm);
+
+    if (criteria?.expand?.includes("fileInfos"))
+      ret.fileInfos = await this.#expandFileInfos(episodeOdm);
+
+    return ret;
+  }
+
+  async getAll(): Promise<EpisodeEntity[]> {
+    const episodesOdm: EpisodeOdm.FullDoc[] = await EpisodeOdm.Model.find();
 
     if (episodesOdm.length === 0)
       return [];
 
-    return episodesOdm.map(episodeDocOdmToModel) as EpisodeEntity[];
+    return episodesOdm.map(EpisodeOdm.docToEntity);
+  }
+
+  async getAllBySeriesKey(seriesKey: SeriesKey): Promise<EpisodeEntity[]> {
+    const episodesOdm = await EpisodeOdm.Model.find( {
+      serieId: seriesKey,
+    } );
+
+    if (episodesOdm.length === 0)
+      return [];
+
+    return episodesOdm.map(EpisodeOdm.docToEntity);
+  }
+
+  async getOneByCriteria(criteria: CriteriaOne): Promise<EpisodeEntity | null> {
+    const filterQuery: FilterQuery<EpisodeOdm.Doc> = {};
+
+    // TODO: cambiar cuando DB
+    if (criteria.filter?.seriesKey)
+      filterQuery.serieId = criteria.filter.seriesKey;
+
+    if (criteria.filter?.episodeKey)
+      filterQuery.episodeId = criteria.filter.episodeKey;
+
+    const episodeOdm = await EpisodeOdm.Model.findOne(filterQuery);
+
+    if (!episodeOdm)
+      return null;
+
+    const ret = EpisodeOdm.docToEntity(episodeOdm);
+
+    if (criteria?.expand?.includes("fileInfos"))
+      ret.fileInfos = await this.#expandFileInfos(episodeOdm);
+
+    return ret;
+  }
+
+  async getOneByCompKey(
+    compKey: EpisodeCompKey,
+    criteria?: Omit<CriteriaOne, "filter">,
+  ): Promise<EpisodeEntity | null> {
+    return await this.getOneByCriteria( {
+      ...criteria,
+      filter: {
+        episodeKey: compKey.episodeKey,
+        seriesKey: compKey.seriesKey,
+      },
+    } );
+  }
+
+  async #expandFileInfos(episodeOdm: EpisodeOdm.FullDoc): Promise<EpisodeFileInfoEntity[]> {
+    const _id = episodeOdm._id.toString();
+    const fileInfos = await this.episodeFileInfoRepository.getAllByEpisodeId(_id);
+
+    assertIsNotEmpty(fileInfos, "Episode has no file info");
+
+    return fileInfos;
+  }
+
+  async getManyBySerieKey(
+    seriesKey: SeriesKey,
+    criteria?: Omit<Criteria, "filter">,
+  ): Promise<EpisodeEntity[]> {
+    return await this.getManyCriteria( {
+      ...criteria,
+      filter: {
+        seriesKey,
+      },
+    } );
   }
 
   async updateOneByIdAndGet(
-    fullId: EpisodeId,
+    episodeId: EpisodeId,
     episode: UpdateOneParams,
   ): Promise<EpisodeEntity | null> {
-    const docOdm: DocOdm = modelToDocOdm(episode);
-    const updateResult = await ModelOdm.updateOne( {
-      episodeId: fullId.code,
-      serieId: fullId.serieId,
-    }, docOdm);
+    const doc: EpisodeOdm.Doc = EpisodeOdm.toDoc(episode);
+    const updateResult = await EpisodeOdm.Model.updateOne( {
+      _id: episodeId,
+    }, doc);
 
     if (updateResult.matchedCount === 0)
       return null;
@@ -197,30 +237,31 @@ CanGetAll<EpisodeEntity> {
 
     await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
 
-    return this.getOneById(fullId);
+    return this.getOneById(episodeId);
   }
 
-  async patchOneByIdAndGet(
-    fullId: EpisodeId,
+  async patchOneByCompKeyAndGet(
+    compKey: EpisodeCompKey,
     patchParams: PatchOneParams<Episode>,
-  ): Promise<EpisodeEntity | null> {
+  ): Promise<EpisodeEntity> {
     const episode = patchParams.entity;
-    const partialDocOdm = partialModelToDocOdm(episode);
+    const partialDocOdm = EpisodeOdm.partialToDoc(episode);
 
     if (Object.keys(partialDocOdm).length === 0)
       throw new Error("Empty partialDocOdm, nothing to patch");
 
-    const updateResult = await ModelOdm.updateOne( {
-      episodeId: fullId.code,
-      serieId: fullId.serieId,
+    const updateResult = await EpisodeOdm.Model.findOneAndUpdate( {
+      episodeId: compKey.episodeKey,
+      serieId: compKey.seriesKey,
     }, partialDocOdm);
 
-    if (updateResult.matchedCount === 0 || updateResult.acknowledged === false)
-      return null;
+    assertFound(updateResult);
+
+    const episodeId = updateResult._id.toString();
 
     for (const [key, value] of Object.entries(episode)) {
       const event = new PatchEvent<Episode, EpisodeId>( {
-        entityId: fullId,
+        entityId: episodeId,
         key: key as keyof Episode,
         value,
       } );
@@ -228,13 +269,30 @@ CanGetAll<EpisodeEntity> {
       await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
-    return this.getOneById(fullId);
+    const ret = await this.getOneByCompKey(compKey);
+
+    assertFound(ret);
+
+    return ret;
   }
 
-  async createManyAndGet(models: EpisodeEntity[]): Promise<EpisodeEntity[]> {
-    const docsOdm: DocOdm[] = models.map(episodeEntityToDocOdm);
-    const inserted = await ModelOdm.insertMany(docsOdm);
-    const ret = inserted.map(episodeDocOdmToModel);
+  async createOneAndGet(model: Episode): Promise<EpisodeEntity> {
+    const doc: EpisodeOdm.Doc = EpisodeOdm.toDoc(model);
+    const created = await EpisodeOdm.Model.create(doc);
+    const ret = EpisodeOdm.docToEntity(created);
+    const event = new ModelEvent(EventType.CREATED, {
+      entity: ret,
+    } );
+
+    await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+
+    return ret;
+  }
+
+  async createManyAndGet(models: Episode[]): Promise<EpisodeEntity[]> {
+    const docsOdm: EpisodeOdm.Doc[] = models.map(EpisodeOdm.toDoc);
+    const inserted = await EpisodeOdm.Model.insertMany(docsOdm);
+    const ret = inserted.map(EpisodeOdm.docToEntity);
 
     for (const model of ret) {
       const event = new ModelEvent(EventType.CREATED, {
@@ -244,6 +302,6 @@ CanGetAll<EpisodeEntity> {
       await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
     }
 
-    return ret as EpisodeEntity[];
+    return ret;
   }
 }

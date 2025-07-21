@@ -1,23 +1,20 @@
 import z from "zod";
-import { assertZodPopStack } from "../../utils/validation/zod";
-import { timestampsSchema } from "../utils/schemas/Timestamps";
-import { localFileSchema, pickableSchema, taggableSchema } from "./partial-schemas";
+import { genAssertZod } from "../../utils/validation/zod";
+import { timestampsSchema } from "../utils/schemas/timestamps";
+import { pickableSchema, taggableSchema } from "./partial-schemas";
 
 const modelSchema = z.object( {
   title: z.string(),
   disabled: z.boolean().optional(),
   lastTimePlayed: z.number().optional(),
   timestamps: timestampsSchema,
-} ).merge(localFileSchema)
+} )
   .merge(pickableSchema)
   .merge(taggableSchema);
 
 type Model = z.infer<typeof modelSchema>;
 
-function assertIsModel(model: unknown): asserts model is Model {
-  assertZodPopStack(modelSchema, model);
-}
-
+const assertIsModel = genAssertZod(modelSchema);
 const entitySchema = modelSchema.extend( {
   id: z.any(),
 } );

@@ -1,7 +1,7 @@
 import path from "node:path";
 import { createReadStream } from "node:fs";
 import { Request } from "express";
-import { Controller, Get, Inject, Param, Req, StreamableFile } from "@nestjs/common";
+import { Controller, Get, Param, Req, StreamableFile } from "@nestjs/common";
 import { assertIsNotEmpty } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicEntity, musicSchema } from "#musics/models";
@@ -14,6 +14,7 @@ import { MusicRepository } from "../repositories";
 import { requestToFindMusicParams } from "../repositories/queries/Queries";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
+import { MusicFileInfoRepository } from "../file-info/repositories/repository";
 
 function getRootUrlFromForwardedRequest(req: Request): string {
   const protocol = req.get("x-forwarded-proto") ?? req.protocol;
@@ -23,7 +24,8 @@ function getRootUrlFromForwardedRequest(req: Request): string {
 
   ret += hostname;
 
-  if (portStr && ((protocol === "http" && +portStr !== 80) || (protocol === "https" && +portStr !== 443)))
+  if (portStr
+    && ((protocol === "http" && +portStr !== 80) || (protocol === "https" && +portStr !== 443)))
     ret += `:${portStr}`;
 
   return ret;
@@ -41,8 +43,9 @@ function getRootUrlFromRequest(req: Request): string {
 @Controller("/get")
 export class MusicGetController {
   constructor(
-    @Inject(MusicHistoryRepository) private readonly musicHistoryRepository: MusicHistoryRepository,
-    @Inject(MusicRepository) private readonly musicRepository: MusicRepository,
+    private readonly musicHistoryRepository: MusicHistoryRepository,
+    private readonly musicRepository: MusicRepository,
+    private readonly musicFileInfoRepo: MusicFileInfoRepository,
   ) {
   }
 
@@ -116,7 +119,7 @@ export class MusicGetController {
     if (params)
       return this.musicRepository.find(params);
 
-    return this.musicRepository.findAll();
+    return this.musicRepository.getAll();
   }
 
   #sortMusics(musics: MusicEntity[]): MusicEntity[] {
@@ -132,9 +135,12 @@ export class MusicGetController {
   async rawAccess(@Param() params: any) {
     const { name } = params;
     // find in DB
-    const music = await this.musicRepository.findOneByUrl(name);
+    const music = await this.musicRepository.getOneByUrl(name);
+    // TODO: fusionar en una sola consulta de db.
+    const fileInfo = await this.musicFileInfoRepo.getOneByMusicId(name);
 
     assertFound(music);
+    assertFound(fileInfo);
 
     // History
     const entry = createMusicHistoryEntryById(music.id);
@@ -142,7 +148,7 @@ export class MusicGetController {
     await this.musicHistoryRepository.createOne(entry);
 
     // Download
-    const relativePath = music.path;
+    const relativePath = fileInfo.path;
     const fullpath = getFullPath(relativePath);
     const file = createReadStream(fullpath);
 

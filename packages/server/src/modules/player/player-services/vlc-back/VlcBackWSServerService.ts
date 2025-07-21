@@ -119,7 +119,7 @@ export class VlcBackWSService {
   async emitPlayResource(params: PlayResourceMessage) {
     assertIsDefined(this.io);
     const msg: PlayResourceMessage = {
-      resources: params.resources,
+      mediaElements: params.mediaElements,
       force: params.force,
     };
 

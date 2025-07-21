@@ -1,4 +1,3 @@
-import { Picker } from "rand-picker";
 import { Controller, Get, Param } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { asyncMap } from "$shared/utils/arrays";
@@ -38,17 +37,17 @@ export class EpisodePickerController {
   @Get("/:streamId")
   async showPicker(@Param() params: ShowPickerParamsDto) {
     const { streamId } = params;
-    const stream = await this.streamRepository.getOneById(streamId);
+    const stream = await this.streamRepository.getOneByKey(streamId);
 
     assertFound(stream);
     const lastEntry = await this.episodeHistoryEntriesRepository.findLastForSerieKey(streamId);
 
     assertFound(lastEntry);
 
-    const seriePromise = this.serieRepository.getOneById(stream.group.origins[0].id);
-    const lastEpId = lastEntry.episodeId;
-    const lastEpPromise = lastEpId
-      ? this.episodeRepository.getOneById(lastEpId)
+    const seriePromise = this.serieRepository.getOneByKey(stream.group.origins[0].id);
+    const lastEpCompKey = lastEntry.episodeCompKey;
+    const lastEpPromise = lastEpCompKey
+      ? this.episodeRepository.getOneByCompKey(lastEpCompKey)
       : Promise.resolve(null);
 
     await Promise.all([seriePromise, lastEpPromise]);
@@ -57,7 +56,7 @@ export class EpisodePickerController {
 
     assertFound(serie);
 
-    const episodes: EpisodeEntity[] = await this.episodeRepository.getManyBySerieKey(serie.id);
+    const episodes: EpisodeEntity[] = await this.episodeRepository.getManyBySerieKey(serie.key);
     const picker = await genRandomPickerWithData<EpisodeEntity>( {
       resources: episodes,
       lastOne: lastEp ?? undefined,
@@ -66,11 +65,7 @@ export class EpisodePickerController {
     } );
     const pickerWeight = picker.weight;
     const ret = (await asyncMap(
-      "end" in picker.data[0]
-        ? (picker as Picker<EpisodeEntity>).data.filter(
-          (e) => e.end === undefined || e.end < 100,
-        )
-        : picker.data,
+      picker.data,
       async (e: EpisodeEntity) => {
         const selfWeight = picker.getWeight(e);
 

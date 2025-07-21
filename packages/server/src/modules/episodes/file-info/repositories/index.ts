@@ -6,4 +6,4 @@ export * from "./odm/adapters";
 
 export {
   EpisodeFileInfoRepository,
-} from "./Repository";
+} from "./repository";

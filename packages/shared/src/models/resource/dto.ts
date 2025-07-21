@@ -1,5 +1,5 @@
 import z from "zod";
-import { TimestampsDto, timestampsDtoSchema, TimestampsModel, timestampsSchema } from "../utils/schemas/Timestamps";
+import { TimestampsDto, timestampsDtoSchema, TimestampsModel, timestampsSchema } from "../utils/schemas/timestamps";
 
 type InputSchemaType<T extends z.ZodRawShape> = z.ZodObject<
   T & {
@@ -7,7 +7,6 @@ type InputSchemaType<T extends z.ZodRawShape> = z.ZodObject<
   }
 >;
 
-// Tipo para el schema de salida - preserva todos los campos T excepto timestamps
 type OutputSchemaType<T extends z.ZodRawShape> = z.ZodObject<
   Omit<T, "timestamps"> & {
     timestamps: z.ZodObject<{

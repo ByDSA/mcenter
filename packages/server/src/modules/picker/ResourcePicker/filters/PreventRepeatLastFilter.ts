@@ -3,15 +3,16 @@ import { ResourceEntity } from "$shared/models/resource";
 import { Filter } from "./Filter";
 import { CompareIdFunc } from "./utils";
 
-type Params<ID> = {
+type Params<ID, R extends ResourceEntity = ResourceEntity> = {
   lastId: ID | undefined;
   compareId: CompareIdFunc<ID>;
+  getResourceId: (r: R)=> ID;
 };
 export class PreventRepeatLastFilter<ID = string, R extends ResourceEntity = ResourceEntity>
 implements Filter<R> {
-  #params: Params<ID>;
+  #params: Params<ID, R>;
 
-  constructor(params: Params<ID>) {
+  constructor(params: Params<ID, R>) {
     this.#params = params;
   }
 
@@ -20,7 +21,7 @@ implements Filter<R> {
     if (!isDefined(this.#params.lastId))
       return true;
 
-    if (!this.#params.compareId(resource.id, this.#params.lastId))
+    if (!this.#params.compareId(this.#params.getResourceId(resource), this.#params.lastId))
       return true;
 
     return false;

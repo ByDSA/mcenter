@@ -37,20 +37,20 @@ describe("restController", () => {
     expect(routerApp).toBeDefined();
   } );
 
-  describe("getOneBySerieId", () => {
+  describe("getOneBySeriesKey", () => {
     it("should call historyList repository", async () => {
       await request(routerApp)
-        .get("/serieId")
+        .get("/seriesKey")
         .send();
 
-      expect(repository.getManyBySerieId).toHaveBeenCalledTimes(1);
-      expect(repository.getManyBySerieId).toHaveBeenCalledWith("serieId");
+      expect(repository.getManyBySeriesKey).toHaveBeenCalledTimes(1);
+      expect(repository.getManyBySeriesKey).toHaveBeenCalledWith("seriesKey");
     } );
 
     it("should return empty array and 200 if 'id' is not found in repository", async () => {
-      repository.getManyBySerieId.mockResolvedValueOnce([]);
+      repository.getManyBySeriesKey.mockResolvedValueOnce([]);
       await request(routerApp)
-        .get("/serieId")
+        .get("/seriesKey")
         .expect(HttpStatus.OK)
         .send();
     } );
@@ -58,10 +58,10 @@ describe("restController", () => {
     it("should return same as repository returns", async () => {
       const entries = [HISTORY_ENTRY_SIMPSONS1];
 
-      repository.getManyBySerieId.mockResolvedValueOnce(entries);
+      repository.getManyBySeriesKey.mockResolvedValueOnce(entries);
 
       const response = await request(routerApp)
-        .get("/serieId")
+        .get("/seriesKey")
         .expect(HttpStatus.OK)
         .send();
 
@@ -70,16 +70,16 @@ describe("restController", () => {
   } );
 
   describe("entries", () => {
-    describe("getAllEntriesBySerieId", () => {
+    describe("getAllEntriesBySeriesKey", () => {
       it("should call historyList repository", async () => {
         await request(routerApp)
-          .get("/serieId/entries")
+          .get("/seriesKey/entries")
           .send();
 
         expect(repository.getManyByCriteria).toHaveBeenCalledTimes(1);
         expect(repository.getManyByCriteria).toHaveBeenCalledWith( {
           filter: {
-            serieId: "serieId",
+            seriesKey: "seriesKey",
           },
         } );
       } );
@@ -90,7 +90,7 @@ describe("restController", () => {
         repository.getManyByCriteria.mockResolvedValueOnce(entries);
 
         const response = await request(routerApp)
-          .get("/serieId/entries")
+          .get("/seriesKey/entries")
           .expect(HttpStatus.OK)
           .send();
 
@@ -101,13 +101,13 @@ describe("restController", () => {
     describe("getManyEntriesBySerieAndCriteria", () => {
       it("should call historyList repository", async () => {
         await request(routerApp)
-          .post("/serieId/entries/search")
+          .post("/seriesKey/entries/search")
           .send( {} );
 
         expect(repository.getManyByCriteria).toHaveBeenCalledTimes(1);
         expect(repository.getManyByCriteria).toHaveBeenCalledWith( {
           filter: {
-            serieId: "serieId",
+            seriesKey: "seriesKey",
           },
         } );
       } );
@@ -127,7 +127,7 @@ describe("restController", () => {
         repository.getManyByCriteria.mockResolvedValueOnce(entries);
 
         const response = await request(routerApp)
-          .post("/serieId/entries/search")
+          .post("/seriesKey/entries/search")
           .send( {} );
 
         expect(response.statusCode).toEqual(HttpStatus.OK);

@@ -1,24 +1,22 @@
-import type { SerieId } from "#modules/series";
-import type { EpisodeEntity, EpisodeId } from "#episodes/models";
+import type { EpisodeCompKey, EpisodeEntity, EpisodeId } from "#episodes/models";
 import type { BrokerEvent } from "#utils/message-broker";
 import type { CanCreateOne, CanDeleteOneByIdAndGet } from "#utils/layers/repository";
 import type { EpisodeHistoryEntryId as Id, EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity, EpisodeHistoryEntryEntity } from "../models";
-import type { EpisodeHistoryEntriesCriteria } from "$shared/models/episodes/history/dto/transport";
-import type { FilterQuery, PipelineStage } from "mongoose";
-import type { Criteria } from "$shared/models/episodes/history/dto/transport/rest/get-many-by-criteria";
+import type { EpisodeHistoryEntryRestDtos } from "$shared/models/episodes/history/dto/transport";
 import { showError } from "$shared/utils/errors/showError";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
+import { createEpisodeHistoryEntryByEpisodeCompKey } from "$shared/models/episodes/history/utils";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { assertFound } from "#utils/validation/found";
-import { createEpisodeHistoryEntryByEpisodeFullId } from "../models";
+import { SeriesKey } from "#modules/series";
 import { EpisodeHistoryEntriesModelOdm as ModelOdm } from "./odm";
 import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "./events";
 import { entryToDocOdm } from "./odm";
 import { docOdmToEntryEntity } from "./odm/adapters";
-import { DocOdm } from "./odm/mongo";
+import { getCriteriaPipeline } from "./criteria-pipeline";
 
 export type EpisodeHistoryEntryEvent = BrokerEvent<ModelMessage<EpisodeHistoryEntryEntity>>;
 
@@ -62,15 +60,17 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return docsOdm.map(docOdmToEntryEntity);
   }
 
-  async getManyBySerieId(serieId: SerieId): Promise<Entity[]> {
+  async getManyBySeriesKey(seriesKey: SeriesKey): Promise<Entity[]> {
     return await this.getManyByCriteria( {
       filter: {
-        serieId,
+        seriesKey,
       },
     } );
   }
 
-  async getManyByCriteria(criteria: EpisodeHistoryEntriesCriteria): Promise<Entity[]> {
+  async getManyByCriteria(
+    criteria: EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria,
+  ): Promise<Entity[]> {
     const pipeline = getCriteriaPipeline(criteria);
     const docsOdm = await ModelOdm.aggregate(pipeline);
 
@@ -83,6 +83,9 @@ CanDeleteOneByIdAndGet<Model, Id> {
     if (criteria.expand?.includes("episodes"))
       assertIsDefined(docsOdm[0].episode, "Lookup episode failed");
 
+    if (criteria.expand?.includes("episode-file-infos"))
+      assertIsDefined(docsOdm[0].episode.fileInfos, "Lookup episode file info failed");
+
     return docsOdm.map(docOdmToEntryEntity);
   }
 
@@ -94,9 +97,25 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return docOdmToEntryEntity(docOdm);
   }
 
-  async findLastForEpisodeId(episodeId: EpisodeId): Promise<Entity | null> {
+  async findLastByEpisodeId(episodeId: EpisodeId): Promise<Entity | null> {
+    const last = await ModelOdm.findById(episodeId, {}, {
+      sort: {
+        "date.timestamp": -1,
+      },
+    } );
+
+    if (!last)
+      return null;
+
+    return docOdmToEntryEntity(last);
+  }
+
+  async findLastByEpisodeCompKey(episodeCompKey: EpisodeCompKey): Promise<Entity | null> {
     const last = await ModelOdm.findOne( {
-      episodeId,
+      episodeId: {
+        code: episodeCompKey.episodeKey,
+        serieId: episodeCompKey.seriesKey,
+      },
     }, {}, {
       sort: {
         "date.timestamp": -1,
@@ -109,9 +128,9 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return docOdmToEntryEntity(last);
   }
 
-  async findLastForSerieKey(serieId: SerieId): Promise<Entity | null> {
+  async findLastForSerieKey(seriesKey: SeriesKey): Promise<Entity | null> {
     const last = await ModelOdm.findOne( {
-      "episodeId.serieId": serieId,
+      "episodeId.serieId": seriesKey,
     }, {}, {
       sort: {
         "date.timestamp": -1,
@@ -124,8 +143,8 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return docOdmToEntryEntity(last);
   }
 
-  async createNewEntryNowFor(episodeId: EpisodeId) {
-    const newEntry: Model = createEpisodeHistoryEntryByEpisodeFullId(episodeId);
+  async createNewEntryNowFor(episodeCompKey: EpisodeCompKey) {
+    const newEntry: Model = createEpisodeHistoryEntryByEpisodeCompKey(episodeCompKey);
 
     await this.createOne(newEntry);
   }
@@ -133,11 +152,11 @@ CanDeleteOneByIdAndGet<Model, Id> {
   async addEpisodesToHistory(episodes: EpisodeEntity[]) {
     // TODO: usar bulk insert (quitar await en for)
     for (const episode of episodes)
-      await this.createNewEntryNowFor(episode.id);
+      await this.createNewEntryNowFor(episode.compKey);
   }
 
-  async calcEpisodeLastTimePlayed(episodeId: EpisodeId): Promise<number | null> {
-    const last = await this.findLastForEpisodeId(episodeId);
+  async calcEpisodeLastTimePlayedByCompKey(episodeCompKey: EpisodeCompKey): Promise<number | null> {
+    const last = await this.findLastByEpisodeCompKey(episodeCompKey);
 
     if (last === null)
       return null;
@@ -149,124 +168,18 @@ CanDeleteOneByIdAndGet<Model, Id> {
 
     return lastTimePlayed;
   }
-}
 
-function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
-  if (!body.sort?.timestamp)
-    return undefined;
+  async calcEpisodeLastTimePlayedByEpisodeId(episodeId: EpisodeId): Promise<number | null> {
+    const last = await this.findLastByEpisodeId(episodeId);
 
-  return {
-    "date.timestamp": body.sort.timestamp === "asc" ? 1 : -1,
-  };
-}
+    if (last === null)
+      return null;
 
-function buildMongooseFilter(criteria: Criteria): FilterQuery<DocOdm> {
-  const filter: FilterQuery<DocOdm> = {};
+    let lastTimePlayed = last.date.timestamp;
 
-  if (criteria.filter) {
-    if (criteria.filter.serieId)
-      filter["episodeId.serieId"] = criteria.filter.serieId;
+    if (lastTimePlayed <= 0)
+      return null;
 
-    if (criteria.filter.episodeId)
-      filter["episodeId.code"] = criteria.filter.episodeId;
-
-    if (criteria.filter.timestampMax !== undefined) {
-      filter["date.timestamp"] = {
-        $lte: criteria.filter.timestampMax,
-      };
-    }
+    return lastTimePlayed;
   }
-
-  return filter;
-}
-
-function getCriteriaPipeline(criteria: Criteria) {
-  const filter = buildMongooseFilter(criteria);
-  const sort = buildMongooseSort(criteria);
-  const pipeline: PipelineStage[] = [
-    {
-      $match: filter,
-    },
-  ];
-
-  if (sort) {
-    pipeline.push( {
-      $sort: sort,
-    } );
-  }
-
-  if (criteria.offset) {
-    pipeline.push( {
-      $skip: criteria.offset,
-    } );
-  }
-
-  if (criteria.limit) {
-    pipeline.push( {
-      $limit: criteria.limit,
-    } );
-  }
-
-  // Agregar lookups para expand
-  if (criteria.expand) {
-    if (criteria.expand.includes("series")) {
-      pipeline.push( {
-        $lookup: {
-          from: "series", // nombre de la colección de series
-          localField: "episodeId.serieId",
-          foreignField: "id",
-          as: "serie",
-        },
-      } );
-
-      // Convertir el array a objeto único
-      pipeline.push( {
-        $addFields: {
-          serie: {
-            $arrayElemAt: ["$serie", 0],
-          },
-        },
-      } );
-    }
-
-    if (criteria.expand.includes("episodes")) {
-      pipeline.push( {
-        $lookup: {
-          from: "episodes", // nombre de la colección de episodios
-          let: {
-            serieId: "$episodeId.serieId",
-            code: "$episodeId.code",
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    {
-                      $eq: ["$serieId", "$$serieId"],
-                    },
-                    {
-                      $eq: ["$episodeId", "$$code"],
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "episode",
-        },
-      } );
-
-      // Convertir el array a objeto único
-      pipeline.push( {
-        $addFields: {
-          episode: {
-            $arrayElemAt: ["$episode", 0],
-          },
-        },
-      } );
-    }
-  }
-
-  return pipeline;
 }

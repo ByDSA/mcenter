@@ -1,16 +1,16 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
+import { assertZod } from "$shared/utils/validation/zod";
 import { EpisodesRepository } from "#episodes/repositories";
 import { SerieRepository } from "#series/repositories";
 import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
+import { episodeCompKeySchema, episodeEntityWithFileInfosSchema } from "#episodes/models";
 import { PlayService } from "./PlayService";
+import { episodeWithFileInfosToMediaElement } from "./player-services/models";
 
-class ParamsDto extends createZodDto(z.object( {
-  id: z.string(),
-  serieId: z.string(),
-} )) {}
+class ParamsDto extends createZodDto(episodeCompKeySchema) {}
 class QueryDto extends createZodDto(z.object( {
   force: z.boolean().optional(),
 } )) {}
@@ -25,33 +25,39 @@ export class PlaySerieController {
   ) {
   }
 
-  @Get("/:serieId/:id")
+  @Get("/:seriesKey/:episodeKey")
   async playSerie(
     @Param() params: ParamsDto,
     @Query() query: QueryDto,
   ) {
     const { force } = query;
-    const { id: code, serieId } = params;
-    const serie = await this.serieRepository.getOneById(serieId);
+    const { episodeKey, seriesKey } = params;
+    const serie = await this.serieRepository.getOneByKey(seriesKey);
 
     assertFound(serie);
 
-    const episode = await this.episodeRepository.getOneById( {
-      serieId,
-      code,
-    } );
+    const episodeWithFileInfos = await this.episodeRepository
+      .getOneByCompKey( {
+        seriesKey,
+        episodeKey,
+      }, {
+        expand: ["fileInfos"],
+      } );
 
-    assertFound(episode);
+    assertFound(episodeWithFileInfos);
+    assertZod(episodeEntityWithFileInfosSchema, episodeWithFileInfos);
+
+    const mediaElement = episodeWithFileInfosToMediaElement(episodeWithFileInfos);
     const ok = await this.playService.play( {
-      episodes: [episode],
+      mediaElements: [mediaElement],
       force,
     } );
 
     if (ok)
-      await this.entriesRepository.createNewEntryNowFor(episode.id);
+      await this.entriesRepository.createNewEntryNowFor(episodeWithFileInfos.compKey);
     else
       console.log("PlayService: Could not play");
 
-    return episode;
+    return episodeWithFileInfos;
   }
 }

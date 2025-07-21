@@ -1,7 +1,7 @@
 import z from "zod";
 import { dateTypeSchema } from "../../../utils/time";
-import { assertZodPopStack } from "../../../utils/validation/zod";
-import { episodeEntitySchema, episodeIdSchema } from "..";
+import { genAssertZod } from "../../../utils/validation/zod";
+import { episodeEntitySchema, episodeCompKeySchema } from "..";
 import { serieEntitySchema } from "../../series";
 
 const idSchema = z.string();
@@ -9,16 +9,13 @@ const idSchema = z.string();
 type Id = z.infer<typeof idSchema>;
 
 const schema = z.object( {
-  episodeId: episodeIdSchema,
+  episodeCompKey: episodeCompKeySchema,
   date: dateTypeSchema,
 } ).strict();
 
 type Model = z.infer<typeof schema>;
 
-function assertIsModel(model: unknown): asserts model is Model {
-  assertZodPopStack(schema, model);
-}
-
+const assertIsModel = genAssertZod(schema);
 const entitySchema = schema
   .extend( {
     id: idSchema,
@@ -29,9 +26,7 @@ const entitySchema = schema
 
 type Entity = z.infer<typeof entitySchema>;
 
-function assertIsEntity(model: unknown): asserts model is Entity {
-  assertZodPopStack(entitySchema, model);
-}
+const assertIsEntity = genAssertZod(entitySchema);
 
 export {
   entitySchema as episodeHistoryEntryEntitySchema,

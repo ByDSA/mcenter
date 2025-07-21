@@ -1,21 +1,20 @@
 import { Injectable } from "@nestjs/common";
 import { LogElementResponse } from "$shared/utils/http";
 import { showError } from "$shared/utils/errors/showError";
-import { assertIsSerieEntity } from "$shared/models/series";
+import { assertIsSerieEntity, SeriesKey } from "$shared/models/series";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
-import { SerieId } from "#modules/series";
 import { SERIES_QUEUE_NAME } from "#series/models";
 import { EventType } from "#utils/event-sourcing";
-import { CanCreateOne, CanGetAll, CanGetOneById, CanUpdateOneById } from "#utils/layers/repository";
+import { CanCreateOne, CanGetAll, CanUpdateOneById } from "#utils/layers/repository";
 import { BrokerEvent } from "#utils/message-broker";
 import { Stream, StreamId, StreamMode, StreamOriginType } from "../models";
-import { DocOdm, ModelOdm } from "./odm";
-import { streamDocOdmToModel, streamToDocOdm } from "./adapters";
+import { DocOdm, ModelOdm } from "./odm/odm";
+import { streamDocOdmToModel, streamToDocOdm } from "./odm/adapters";
 
 @Injectable()
 export class StreamsRepository
-implements CanGetOneById<Stream, StreamId>,
+implements
 CanUpdateOneById<Stream, StreamId>,
 CanCreateOne<Stream>, CanGetAll<Stream> {
   constructor(private readonly domainMessageBroker: DomainMessageBroker) {
@@ -26,21 +25,21 @@ CanCreateOne<Stream>, CanGetAll<Stream> {
         const serie = event.payload.entity;
 
         assertIsSerieEntity(serie);
-        await this.fixDefaultStreamForSerie(serie.id);
+        await this.fixDefaultStreamForSerie(serie.key);
       }
 
       return Promise.resolve();
     } ).catch(showError);
   }
 
-  async fixDefaultStreamForSerie(serieId: SerieId): Promise<LogElementResponse | null> {
-    const hasDefault = await this.hasDefaultForSerie(serieId);
+  async fixDefaultStreamForSerie(seriesKey: SeriesKey): Promise<LogElementResponse | null> {
+    const hasDefault = await this.hasDefaultForSerie(seriesKey);
 
     if (!hasDefault) {
-      await this.createDefaultFromSerie(serieId);
+      await this.createDefaultFromSerie(seriesKey);
 
       return {
-        message: `Created default stream for serie ${serieId}`,
+        message: `Created default stream for serie ${seriesKey}`,
         type: "StreamCreated",
       };
     }
@@ -62,7 +61,7 @@ CanCreateOne<Stream>, CanGetAll<Stream> {
     return allStreamsDocOdm;
   }
 
-  async getManyBySerieId(id: SerieId): Promise<Stream[]> {
+  async getManyBySeriesKey(id: SeriesKey): Promise<Stream[]> {
     const allStreamsDocOdm = await this.#getAllDocOdm();
     const docsOdm = allStreamsDocOdm.filter(streamDocOdm => {
       const origins = streamDocOdm.group.origins.filter(o=>o.type === "serie" && o.id === id);
@@ -73,29 +72,29 @@ CanCreateOne<Stream>, CanGetAll<Stream> {
     return docsOdm.map(streamDocOdmToModel);
   }
 
-  async createDefaultFromSerie(serieId: SerieId): Promise<void> {
+  async createDefaultFromSerie(seriesKey: SeriesKey): Promise<void> {
     const stream: Stream = {
       group: {
         origins: [
           {
             type: StreamOriginType.SERIE,
-            id: serieId,
+            id: seriesKey,
           },
         ],
       },
       mode: StreamMode.SEQUENTIAL,
-      id: serieId,
+      id: seriesKey,
     };
 
     await this.createOne(stream);
   }
 
-  async hasDefaultForSerie(serieId: SerieId): Promise<boolean> {
+  async hasDefaultForSerie(seriesKey: SeriesKey): Promise<boolean> {
     const streamDocOdm = await ModelOdm.findOne( {
       "group.origins": {
         $elemMatch: {
           type: StreamOriginType.SERIE,
-          id: serieId,
+          id: seriesKey,
         },
       },
     } );
@@ -109,7 +108,7 @@ CanCreateOne<Stream>, CanGetAll<Stream> {
     await ModelOdm.create(docOdm);
   }
 
-  async getOneById(id: StreamId): Promise<Stream | null> {
+  async getOneByKey(id: StreamId): Promise<Stream | null> {
     const docOdm = await ModelOdm.findOne( {
       id,
     }, {

@@ -1,6 +1,6 @@
 import { neverCase } from "$shared/utils/validation";
 import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
-import { compareEpisodeId, EpisodeEntity } from "#episodes/models";
+import { compareEpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 import { dependencies } from "./appliers/Dependencies";
 
@@ -18,8 +18,9 @@ export function buildEpisodePicker(
     case PickMode.SEQUENTIAL:
       picker = new ResourcePickerSequential( {
         resources: episodes,
-        lastId: lastEp?.id,
-        compareId: compareEpisodeId,
+        lastId: lastEp?.compKey,
+        compareId: compareEpisodeCompKey,
+        getId: e=>e.compKey,
       } );
       break;
     case PickMode.RANDOM:

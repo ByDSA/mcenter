@@ -1,6 +1,7 @@
 import { decode } from "html-entities";
 import { assertIsDefined } from "$shared/utils/validation";
-import { PlayerPlaylistElement, PlayerStatusResponse, assertIsPlayerStatusResponse } from "#modules/models";
+import { assertZod } from "$shared/utils/validation/zod";
+import { PlayerPlaylistElement, PlayerStatusResponse, playerStatusResponseSchema } from "#modules/models";
 import { CategoryObject, InfoObject, InfoStatusResponse, PlaylistELement, PlaylistResponse as VlcPlaylistResponse, StatusResponse as VlcStatusResponse } from "#modules/vlc/http-interface/responses";
 
 type Obj = {
@@ -113,7 +114,7 @@ export function vlcResponsesToGenericResponses(
     };
   }
 
-  assertIsPlayerStatusResponse(status);
+  assertZod(playerStatusResponseSchema, status);
 
   return status;
 }

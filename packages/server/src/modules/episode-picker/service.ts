@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { neverCase } from "$shared/utils/validation";
 import { EpisodeEntity } from "#episodes/models";
-import { EpisodesRepository, EpisodesRepositoryGetManyOptions } from "#episodes/repositories";
+import { EpisodesRepository } from "#episodes/repositories";
 import { PickMode, ResourcePicker } from "#modules/picker";
 import { Stream, StreamId, StreamMode } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/repositories";
@@ -19,7 +19,7 @@ export class EpisodePickerService {
   }
 
   async getByStreamId(streamId: StreamId, n = 1): Promise<EpisodeEntity[]> {
-    const stream = await this.streamRepository.getOneById(streamId);
+    const stream = await this.streamRepository.getOneByKey(streamId);
 
     if (!stream)
       return [];
@@ -34,19 +34,25 @@ export class EpisodePickerService {
 
   async getByStream(stream: Stream, n = 1): Promise<EpisodeEntity[]> {
     const serieKey: string = stream.group.origins[0].id;
-    const options: EpisodesRepositoryGetManyOptions = {
-      sortById: stream.mode === StreamMode.SEQUENTIAL,
-    };
+    const criteria: Parameters<typeof this.episodeRepository
+      .getManyBySerieKey>[1] = {};
+
+    if (stream.mode === StreamMode.SEQUENTIAL) {
+      criteria.sort = {
+        episodeKey: "desc",
+      };
+    }
+
     const allEpisodesInSerie = await this.episodeRepository
-      .getManyBySerieKey(serieKey, options);
+      .getManyBySerieKey(serieKey, criteria);
     const lastEntry = await this.historyEntriesRepository.findLastForSerieKey(serieKey);
 
-    // eslint-disable-next-line max-len
+    // eslint-disable-next-line daproj/max-len
     // TODO: debería añadirse "stream" al historial de episodes, y obtener aquí la última entrada de ese stream. Ej: para un stream secuencial no debería interferir los capítulos de la misma serie con otro stream.
     assertFound(lastEntry, `Cannot get last history entry list from stream '${stream.id}'`);
-    const lastPlayedEpInSerieId = lastEntry.episodeId;
-    const lastPlayedEpInSerie = lastPlayedEpInSerieId
-      ? await this.episodeRepository.getOneById(lastPlayedEpInSerieId)
+    const lastPlayedEpInSerieCompKey = lastEntry.episodeCompKey;
+    const lastPlayedEpInSerie = lastPlayedEpInSerieCompKey
+      ? await this.episodeRepository.getOneByCompKey(lastPlayedEpInSerieCompKey)
       : null;
     const picker: ResourcePicker<EpisodeEntity> = buildEpisodePicker( {
       mode: streamModeToPickerMode(stream.mode),

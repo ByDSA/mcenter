@@ -7,7 +7,7 @@ export {
 } from "./Simpsons";
 
 export {
-  loadFixtureMusicsWithTags,
+  loadFixtureMusicsInDisk,
 } from "./Musics1";
 
 export {

@@ -3,22 +3,23 @@ import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/respo
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeHistoryEntry, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
-import { EpisodeHistoryEntriesCriteria } from "#modules/series/episodes/history/models/dto";
+import { EpisodeHistoryEntryRestDtos } from "#modules/series/episodes/history/models/dto";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { backendUrl } from "#modules/requests";
+import { EpisodeHistoryEntryFetching } from "../requests";
 import { Header } from "./Header";
 import { Body } from "./body/Body";
 
 type Props = {
-  value: EpisodeHistoryEntryEntity;
-  onRemove?: (data: EpisodeHistoryEntry)=> void;
+  value: EpisodeHistoryEntryFetching.GetMany.Data;
+  showDate?: boolean;
 };
-export function HistoryEntryElement( { value }: Props) {
+export function HistoryEntryElement( { value, showDate = false }: Props) {
   return <span className="history-entry">
     {
       ResourceAccordion( {
-        headerContent: <Header entry={value} showDate={false}/>,
-        bodyContent: <Body entry={value}/>,
+        headerContent: <Header entry={value} showDate={showDate}/>,
+        bodyContent: <Body data={value}/>,
       } )
     }
   </span>;
@@ -28,10 +29,10 @@ export function fetchLastestHistoryEntries(
   historyEntry: EpisodeHistoryEntry,
 ): Promise<EpisodeHistoryEntryEntity[] | null> {
   const URL = backendUrl(PATH_ROUTES.episodes.history.entries.search.path);
-  const bodyJson: EpisodeHistoryEntriesCriteria = {
+  const bodyJson: EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria = {
     filter: {
-      serieId: historyEntry.episodeId.serieId,
-      episodeId: historyEntry.episodeId.code,
+      seriesKey: historyEntry.episodeCompKey.seriesKey,
+      episodeKey: historyEntry.episodeCompKey.episodeKey,
       timestampMax: historyEntry.date.timestamp - 1,
     },
     sort: {

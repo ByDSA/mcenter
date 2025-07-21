@@ -1,16 +1,16 @@
-import { MusicHistoryEntry } from "#modules/musics/history/models";
+import { MusicHistoryEntryEntity } from "#modules/musics/history/models";
 import { HistoryEntryHeader } from "#modules/history";
 import { formatDate, formatDateHHmm } from "#modules/utils/dates";
 
 type HeaderProps = {
-  entry: Required<MusicHistoryEntry>;
+  entry: Required<MusicHistoryEntryEntity>;
   showDate: boolean;
 };
 export function Header( { entry, showDate }: HeaderProps) {
-  const { resource } = entry;
-  const { title } = resource;
-  const subtitle = resource.game ?? resource.artist;
-  const right = resource.weight.toString();
+  const { music } = entry;
+  const { title } = music;
+  const subtitle = music.game ?? music.artist;
+  const right = music.weight.toString();
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return HistoryEntryHeader( {

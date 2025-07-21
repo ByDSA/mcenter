@@ -34,7 +34,7 @@ export function assertIsOneDataResponse<T>(
   assertZodPopStack(modelSchema, res);
 }
 
-export function genAssertIsOneDataResponse<T, R>(dataSchema: z.ZodType<T>) {
+export function genAssertIsOneDataResponse<T, R>(dataSchema: z.ZodSchema<T>) {
   return (res: R) => assertIsOneDataResponse(res, dataSchema);
 }
 
@@ -47,7 +47,7 @@ export function assertIsManyDataResponse<T>(
   assertZodPopStack(modelSchema, res);
 }
 
-export function genAssertIsManyDataResponse<T, R>(dataSchema: z.ZodType<T[]>) {
+export function genAssertIsManyDataResponse<T, R>(dataSchema: z.ZodSchema<T>) {
   return (res: R) => assertIsManyDataResponse(res, dataSchema);
 }
 

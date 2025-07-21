@@ -1,11 +1,15 @@
-import { HttpStatus } from "@nestjs/common";
-import { createSuccessDataResponse } from "$shared/utils/http/responses";
+import { PATH_ROUTES } from "$shared/routing";
 import { serieRepositoryMockProvider } from "#modules/series/repositories/tests";
-import { EPISODES_SIMPSONS } from "#tests/main/db/fixtures";
 import { restTestsSuite } from "#tests/suites/rest-suite";
 import { EpisodesRepository } from "#episodes/repositories";
+import { fixtureEpisodes } from "#tests/main/db/fixtures";
+import { testRoute } from "#tests/main/routing";
 import { episodeRepositoryMockProvider } from "../repositories/tests";
 import { EpisodesRestController } from "./rest.controller";
+
+testRoute(PATH_ROUTES.episodes.withParams("seriesKey", "episodeKey"));
+
+const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
 restTestsSuite( {
   appModule: [
@@ -21,29 +25,29 @@ restTestsSuite( {
   testsConfig: {
     getAll: {
       repo: {
-        getFn: (repo)=>repo.getAllBySerieId,
-        params: ["serieId"],
+        getFn: (repo)=>repo.getAllBySeriesKey,
+        params: ["seriesKey"],
         returned: EPISODES_SIMPSONS,
       },
-      url: "/serieId",
+      url: "/seriesKey",
     },
     getOne: {
       repo: {
-        getFn: (repo)=>repo.getOneById,
+        getFn: (repo)=>repo.getOneByCompKey,
         params: [{
-          serieId: "serieId",
-          code: "code",
+          seriesKey: "seriesKey",
+          episodeKey: "episodeKey",
         }],
         returned: EPISODES_SIMPSONS[0],
       },
-      url: "/serieId/code",
+      url: "/seriesKey/episodeKey",
     },
     patchOne: {
       repo: {
-        getFn: (repo)=>repo.patchOneByIdAndGet,
+        getFn: (repo)=>repo.patchOneByCompKeyAndGet,
         params: [{
-          serieId: "serieId",
-          code: "code",
+          seriesKey: "seriesKey",
+          episodeKey: "episodeKey",
         }, {
           entity: {
             title: "new title",
@@ -51,41 +55,7 @@ restTestsSuite( {
         }],
         returned: EPISODES_SIMPSONS[0],
       },
-      url: "/serieId/code",
-    },
-    getManyCriteria: {
-      repo: {
-        getFn: (repo)=>repo.getOneByPath,
-        params: ["series/simpsons/1/1_80.mkv"],
-        returned: EPISODES_SIMPSONS[0],
-      },
-      url: "/search",
-      data: {
-        validInput: {
-          filter: {
-            path: "series/simpsons/1/1_80.mkv",
-          },
-        },
-      },
-      expectedBody: createSuccessDataResponse(JSON.parse(JSON.stringify([EPISODES_SIMPSONS[0]]))),
-      customCases: [(props) => ( {
-        name: "empty array case",
-        method: "post",
-        url: props.url!,
-        body: props.data?.validInput,
-        expected: {
-          body: createSuccessDataResponse([]),
-          statusCode: HttpStatus.OK,
-        },
-        getExpressApp: props.getExpressApp,
-        mock: {
-          fn: [{
-            getFn: ()=>props.repo.getFn(props.repo.getRepo()),
-            params: props.repo.params,
-            returned: null,
-          }],
-        },
-      } )],
+      url: "/seriesKey/episodeKey",
     },
   },
 } );

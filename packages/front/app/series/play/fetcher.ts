@@ -1,14 +1,13 @@
 "use client";
 
-import { z } from "zod";
+/* eslint-disable @typescript-eslint/naming-convention */
 import { CriteriaSortDir } from "$shared/utils/criteria";
-import { CriteriaExpand, CriteriaSort, getManyByCriteria } from "$shared/models/streams/dto/rest/";
+import { StreamRestDtos } from "$shared/models/streams/dto/transport";
 
-type StreamGetManyRequest = {
-  body: z.infer<typeof getManyByCriteria.reqBodySchema>;
-};
-
-const bodyJson: StreamGetManyRequest["body"] = {
+type Body = StreamRestDtos.GetManyByCriteria.Body;
+const { CriteriaExpand } = StreamRestDtos.GetManyByCriteria;
+const { CriteriaSort } = StreamRestDtos.GetManyByCriteria;
+const body: Body = {
   expand: [CriteriaExpand.series],
   sort: {
     [CriteriaSort.lastTimePlayed]: CriteriaSortDir.DESC,
@@ -19,7 +18,7 @@ const bodyJson: StreamGetManyRequest["body"] = {
 export const fetcher = async (url: string) => {
   const options = {
     method: "POST",
-    body: JSON.stringify(bodyJson),
+    body: JSON.stringify(body),
     cors: "no-cors",
     headers: {
       accept: "application/json",

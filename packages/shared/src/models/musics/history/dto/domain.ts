@@ -1,47 +1,40 @@
 import z from "zod";
 import { replaceSchemaTimestampsToStrings } from "../../../../models/resource/dto";
-import { musicHistoryEntrySchema, MusicHistoryEntry } from "../history-entry";
-import { musicDto } from "../../dto/domain";
+import { musicHistoryEntryEntitySchema, MusicHistoryEntryEntity } from "../history-entry";
+import { MusicDtos } from "../../dto/domain";
 import { musicEntitySchema } from "../../music";
 
-const dtoSchema = musicHistoryEntrySchema
-  .omit( {
-    resource: true,
-  } )
-  .extend( {
-    resource: replaceSchemaTimestampsToStrings(musicEntitySchema).optional(),
-  } );
+export namespace MusicHistoryEntryDtos {
+  export namespace Entity {
+    export const schema = musicHistoryEntryEntitySchema
+      .omit( {
+        music: true,
+      } )
+      .extend( {
+        music: replaceSchemaTimestampsToStrings(musicEntitySchema).optional(),
+      } );
+  export type Dto = z.infer<typeof schema>;
+    export const toEntity = (dto: Dto): MusicHistoryEntryEntity => {
+      let music;
 
-type Dto = z.infer<typeof dtoSchema>;
+      if (dto.music)
+        music = MusicDtos.Entity.fromDto(dto.music);
 
-function toModel(dto: Dto): MusicHistoryEntry {
-  let resource;
+      return {
+        ...dto,
+        music: music,
+      };
+    };
+    export const toDto = (model: MusicHistoryEntryEntity): Dto=> {
+      let music;
 
-  if (dto.resource)
-    resource = musicDto.entity.toModel(dto.resource);
+      if (model.music)
+        music = MusicDtos.Entity.toDto(model.music);
 
-  return {
-    ...dto,
-    resource,
-  };
-}
-
-function toDto(model: MusicHistoryEntry): Dto {
-  let resource;
-
-  if (model.resource)
-    resource = musicDto.entity.toDto(model.resource);
-
-  return {
-    ...model,
-    resource,
-  };
-}
-
-export const musicHistoryDto = {
-  entry: {
-    schema: dtoSchema,
-    toModel,
-    toDto,
-  },
+      return {
+        ...model,
+        music,
+      };
+    };
+  }
 };

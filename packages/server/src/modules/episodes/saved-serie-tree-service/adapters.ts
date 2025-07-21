@@ -1,16 +1,17 @@
+import type { EpisodeEntityWithFileInfo } from "./SavedSerieTreeService";
 import { treePut } from "$shared/utils/trees";
-import { EpisodeEntity } from "#episodes/models";
 import { EpisodeFile, SerieFolderTree, getSeasonEpisodeFromEpisodeId } from "#episodes/file-info";
 
 export function putModelInSerieFolderTree(
-  episode: EpisodeEntity,
+  episodeEntity: EpisodeEntityWithFileInfo,
   serieFolderTree: SerieFolderTree,
 ): SerieFolderTree {
-  const { id: { serieId, code } } = episode;
-  const seasonId = getSeasonFromCode(code) ?? "";
-  const episodeFile: EpisodeFile = episodeToEpisodeFile(episode);
+  const { compKey: { seriesKey, episodeKey } } = episodeEntity;
+  const seasonId = getSeasonFromCode(episodeKey) ?? "";
+  const episodeFiles: EpisodeFile[] = episodeToEpisodeFiles(episodeEntity);
 
-  treePut(serieFolderTree, [serieId, seasonId], episodeFile.id, episodeFile.content);
+  for (const episodeFile of episodeFiles)
+    treePut(serieFolderTree, [seriesKey, seasonId], episodeFile.id, episodeFile.content);
 
   return serieFolderTree;
 }
@@ -24,14 +25,18 @@ function getSeasonFromCode(code: string): string | null {
   return null;
 }
 
-export function episodeToEpisodeFile(episode: Pick<EpisodeEntity, "id" | "path">): EpisodeFile {
-  const episodeFile: EpisodeFile = {
-    id: getSeasonEpisodeFromEpisodeId(episode.id.code).episode,
+export function episodeToEpisodeFiles(
+  episode: Pick<EpisodeEntityWithFileInfo, "compKey" | "fileInfos">,
+): EpisodeFile[] {
+  const id = getSeasonEpisodeFromEpisodeId(episode.compKey.episodeKey).episode;
+  const episodeId = episode.compKey.episodeKey;
+  const episodeFiles: EpisodeFile[] = episode.fileInfos.map(f =>( {
+    id,
     content: {
-      episodeId: episode.id.code,
-      filePath: episode.path,
+      episodeId,
+      filePath: f.path,
     },
-  };
+  } ));
 
-  return episodeFile;
+  return episodeFiles;
 }

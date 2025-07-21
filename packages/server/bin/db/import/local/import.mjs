@@ -26,8 +26,10 @@ console.log("DB_PASSWORD: ", DB_PASSWORD);
 console.log("DB_HOST: ", DB_HOST);
 console.log("DB_PORT: ", DB_PORT);
 
-const containerId = (await $`(sudo docker ps | grep mongo | grep "${DB_PORT}/tcp" | awk '{print $1}')`).stdout.trim();
-const internalCmd = `mongorestore --host=${DB_HOST} --port=${DB_PORT} --username=${DB_USERNAME} --password=${DB_PASSWORD} --authenticationDatabase=admin --archive --drop`;
+const containerId = (await $`(sudo docker ps | grep mongo | grep "${DB_PORT}/tcp" |
+  awk '{print $1}')`).stdout.trim();
+const internalCmd = `mongorestore --host=${DB_HOST} --port=${DB_PORT} --username=${DB_USERNAME} \
+--password=${DB_PASSWORD} --authenticationDatabase=admin --archive --drop`;
 const inputFile = argv._[0];
 
 if (inputFile === undefined) {

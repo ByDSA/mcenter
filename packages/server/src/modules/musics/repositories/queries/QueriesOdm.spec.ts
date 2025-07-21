@@ -386,20 +386,23 @@ describe.each([
     },
     ],
   }],
-] as [string, FindQueryParams | null][])("tests", (query: string, expected: FindQueryParams | null) => {
-  it(`query=${query}`, () => {
-    const f = (q: string) => {
-      const obj = parseQuery(q);
+] as [string, FindQueryParams | null][])(
+  "tests",
+  (query: string, expected: FindQueryParams | null) => {
+    it(`query=${query}`, () => {
+      const f = (q: string) => {
+        const obj = parseQuery(q);
 
-      return findParamsToQueryParams(obj.root);
-    };
+        return findParamsToQueryParams(obj.root);
+      };
 
-    if (expected === null)
-      expect(() => f(query)).toThrow();
-    else {
-      const actual = f(query);
+      if (expected === null)
+        expect(() => f(query)).toThrow();
+      else {
+        const actual = f(query);
 
-      expect(actual).toEqual(expected);
-    }
-  } );
-} );
+        expect(actual).toEqual(expected);
+      }
+    } );
+  },
+);

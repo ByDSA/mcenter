@@ -1,28 +1,28 @@
 import { serieDocOdmToEntity } from "#series/repositories/odm";
-import { episodeDocOdmToModel as episodeDocOdmToEntity } from "#episodes/repositories/adapters";
+import { EpisodeOdm } from "#episodes/repositories/odm";
 import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../models";
-import { DocOdm, ExpandedDocOdm } from "./mongo";
+import { DocOdm, FullDocOdm } from "./mongo";
 
-function docOdmToEntity(entryDocOdm: ExpandedDocOdm): Entity {
+function docOdmToEntity(docOdm: FullDocOdm): Entity {
   const ret: Entity = {
-    id: entryDocOdm._id.toString(),
-    episodeId: {
-      code: entryDocOdm.episodeId.code,
-      serieId: entryDocOdm.episodeId.serieId,
+    id: docOdm._id.toString(),
+    episodeCompKey: {
+      episodeKey: docOdm.episodeId.code,
+      seriesKey: docOdm.episodeId.serieId,
     },
     date: {
-      year: entryDocOdm.date.year,
-      month: entryDocOdm.date.month,
-      day: entryDocOdm.date.day,
-      timestamp: entryDocOdm.date.timestamp,
+      year: docOdm.date.year,
+      month: docOdm.date.month,
+      day: docOdm.date.day,
+      timestamp: docOdm.date.timestamp,
     },
   };
 
-  if (entryDocOdm.serie)
-    ret.serie = serieDocOdmToEntity(entryDocOdm.serie);
+  if (docOdm.serie)
+    ret.serie = serieDocOdmToEntity(docOdm.serie);
 
-  if (entryDocOdm.episode)
-    ret.episode = episodeDocOdmToEntity(entryDocOdm.episode);
+  if (docOdm.episode)
+    ret.episode = EpisodeOdm.docToEntity(docOdm.episode);
 
   return ret;
 }
@@ -30,8 +30,8 @@ function docOdmToEntity(entryDocOdm: ExpandedDocOdm): Entity {
 function modelToDocOdm(entry: Entry): DocOdm {
   return {
     episodeId: {
-      code: entry.episodeId.code,
-      serieId: entry.episodeId.serieId,
+      code: entry.episodeCompKey.episodeKey,
+      serieId: entry.episodeCompKey.seriesKey,
     },
     date: {
       year: entry.date.year,

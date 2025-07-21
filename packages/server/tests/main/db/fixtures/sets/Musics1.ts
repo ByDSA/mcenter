@@ -1,11 +1,10 @@
-import { MusicDocOdm, MusicModelOdm } from "#musics/index";
+import { MusicOdm } from "#musics/repositories/odm";
 import { Music } from "#musics/models";
-import { musicToDocOdm } from "#musics/repositories/adapters";
-import { MUSICS_WITH_TAGS_SAMPLES } from "../models/music";
+import { fixtureMusics } from "#musics/tests/fixtures";
 
-export const loadFixtureMusicsWithTags = async () => {
-  const musicsOdm: MusicDocOdm[] = MUSICS_WITH_TAGS_SAMPLES
-    .map((music: Music) => musicToDocOdm(music));
+export const loadFixtureMusicsInDisk = async () => {
+  const musicsOdm: MusicOdm.Doc[] = fixtureMusics.Disk.List
+    .map((music: Music) => MusicOdm.toDocOdm(music));
 
-  await MusicModelOdm.insertMany(musicsOdm);
+  await MusicOdm.Model.insertMany(musicsOdm);
 };

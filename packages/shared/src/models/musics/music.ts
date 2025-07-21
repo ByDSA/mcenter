@@ -1,8 +1,8 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
-import { fileInfoSchema } from "../episodes/file-info";
 import { resourceSchema } from "../resource";
-import { localFileSchema, pickableSchema, taggableSchema } from "../resource/partial-schemas";
+import { pickableSchema, taggableSchema } from "../resource/partial-schemas";
+import { musicFileInfoEntitySchema } from "./file-info";
 
 const optionalPropsSchema = z.object( {
   album: z.string().optional(),
@@ -10,6 +10,7 @@ const optionalPropsSchema = z.object( {
   year: z.number().int()
     .optional(),
   country: z.string().optional(),
+  spotifyId: z.string().optional(),
 } );
 const idSchema = z.string();
 
@@ -18,21 +19,16 @@ type Id = z.infer<typeof idSchema>;
 const modelSchema = optionalPropsSchema.extend( {
   artist: z.string(),
   url: z.string(),
-  mediaInfo: z.object( {
-    duration: z.number().nullable(),
-  } ).strict(),
 } )
-// TODO: quitar FileInfo de aquí y ponerlo en un 'fileInfoAudio'
-  .merge(fileInfoSchema)
   .merge(resourceSchema)
   .merge(pickableSchema)
-  .merge(localFileSchema)
   .merge(taggableSchema);
 
 type Model = z.infer<typeof modelSchema>;
 
 const entitySchema = modelSchema.extend( {
   id: idSchema,
+  fileInfos: z.array(musicFileInfoEntitySchema).optional(),
 } );
 
 type Entity = z.infer<typeof entitySchema>;
@@ -41,7 +37,13 @@ function compareId(a: Id, b: Id): boolean {
   return a === b;
 }
 
-const assertIs = genAssertZod(modelSchema);
+const assertIsModel = genAssertZod(modelSchema);
+const assertIsEntity = genAssertZod(entitySchema);
+const entityWithFileInfosSchema = entitySchema.required( {
+  fileInfos: true,
+} );
+
+type EntityWithFileInfos = z.infer<typeof entityWithFileInfosSchema>;
 
 export {
   idSchema as musicIdSchema,
@@ -50,6 +52,9 @@ export {
   Id as MusicId,
   modelSchema as musicSchema,
   Model as Music,
-  assertIs as assertIsMusic,
+  EntityWithFileInfos as MusicEntityWithFileInfos,
+  entityWithFileInfosSchema as musicEntityWithFileInfosSchema,
+  assertIsModel as assertIsMusic,
+  assertIsEntity as assertIsMusicEntity,
   compareId as compareMusicId,
 };

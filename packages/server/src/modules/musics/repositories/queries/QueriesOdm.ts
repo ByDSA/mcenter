@@ -279,7 +279,9 @@ function mergeWeightYear(w1: WeightYear, w2: WeightYear): WeightYear {
   return ret;
 }
 
-function copyOfTags(tags: NonNullable<FindQueryParams["tags"]>): NonNullable<FindQueryParams["tags"]> {
+function copyOfTags(
+  tags: NonNullable<FindQueryParams["tags"]>,
+): NonNullable<FindQueryParams["tags"]> {
   const ret: FindQueryParams["tags"] = {};
 
   if (tags.$all)

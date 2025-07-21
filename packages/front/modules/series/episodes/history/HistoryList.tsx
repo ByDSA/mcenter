@@ -1,26 +1,25 @@
 import { Fragment } from "react";
-import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
-import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
+import { assertIsManyDataResponse } from "$shared/utils/http/responses";
+import { episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { FetchingRender } from "#modules/fetching";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
-import { useRequest } from "./requests";
+import { EpisodeHistoryEntryFetching } from "./requests";
 import { getDateStr } from "./utils";
 
 import "#styles/resources/history-entry.css";
 import "#styles/resources/history-episodes.css";
 import "#styles/resources/serie.css";
 
-type Data = Required<EpisodeHistoryEntryEntity>[];
 export function HistoryList() {
-  return FetchingRender<DataResponse<Data>>( {
-    useRequest,
+  return FetchingRender<EpisodeHistoryEntryFetching.GetMany.Res>( {
+    useRequest: EpisodeHistoryEntryFetching.GetMany.useRequest,
     render: (res) => {
       assertIsManyDataResponse(res, episodeHistoryEntryEntitySchema);
 
       return (
         <span className="history-list">
           {
-            res && res.data.map((entry: EpisodeHistoryEntryEntity, i: number) => {
+            res && res.data.map((entry: EpisodeHistoryEntryFetching.GetMany.Data, i: number) => {
               let dayTitle;
 
               if (i === 0 || !isSameday(res.data[i - 1].date.timestamp, entry.date.timestamp)) {
@@ -29,11 +28,10 @@ export function HistoryList() {
                 dayTitle = <h2 key={dateStr}>{dateStr}</h2>;
               }
 
-              return <Fragment key={`${entry.episodeId.serieId} ${entry.episodeId.code}`}>
+              return <Fragment
+                key={`${entry.episodeCompKey.seriesKey} ${entry.episodeCompKey.episodeKey}`}>
                 {dayTitle}
-                <HistoryEntryElement value={entry} onRemove={() => {
-                // TODO: refresh fetch
-                }}/>
+                <HistoryEntryElement value={entry}/>
               </Fragment>;
             } )
           }

@@ -1,5 +1,5 @@
 export {
-  ModelOdm as HistoryMusicModelOdm, MusicHistoryRepository,
+  MusicHistoryRepository,
 } from "./repositories";
 
 export {

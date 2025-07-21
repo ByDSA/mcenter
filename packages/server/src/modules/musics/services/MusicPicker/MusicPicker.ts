@@ -21,6 +21,7 @@ export function buildMusicPicker(
         resources: episodes,
         lastId: lastOne ? lastOne.url : undefined,
         compareId: (a, b) => a === b,
+        getId: e=>e.id,
       } );
       break;
     case PickMode.RANDOM:

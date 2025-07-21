@@ -68,7 +68,10 @@ module.exports = {
 
       return version;
     } )(),
-    BUILD_DATE: new Date().toISOString()
+    BUILD_DATE: new Date(
+      new Date().getTime() - (new Date().getTimezoneOffset() * 60000), // Tiempo local
+    )
+      .toISOString()
       .split("T")[0], // Formato YYYY-MM-DD
   },
 };

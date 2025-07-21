@@ -1,11 +1,12 @@
 import mongoose, { Types } from "mongoose";
 import { DateType } from "$shared/utils/time";
 import { DateTypeOdmSchema } from "#utils/time";
-import { SerieDocOdm } from "#series/repositories/odm";
-import { EpisodeDocOdm } from "#episodes/repositories";
+import { SerieFullDocOdm } from "#series/repositories/odm";
+import { EpisodeOdm } from "#episodes/repositories/odm";
+import { RequireId } from "#utils/layers/db/mongoose";
 
 type DocOdm = {
-  _id: Types.ObjectId;
+  _id?: Types.ObjectId;
   date: DateType;
   episodeId: {
     code: string;
@@ -13,9 +14,9 @@ type DocOdm = {
   };
 };
 
-type ExpandedDocOdm = DocOdm & {
-  serie?: SerieDocOdm;
-  episode?: EpisodeDocOdm;
+type FullDocOdm = RequireId<DocOdm> & {
+  serie?: SerieFullDocOdm;
+  episode?: EpisodeOdm.FullDoc;
 };
 
 const schemaOdm = new mongoose.Schema<DocOdm>( {
@@ -43,5 +44,5 @@ export {
   DocOdm,
   schemaOdm,
   ModelOdm,
-  ExpandedDocOdm,
+  FullDocOdm,
 };

@@ -2,9 +2,9 @@ import { assertIsEpisodeHistoryEntry, EpisodeHistoryEntry } from "./history-entr
 
 const assertIsModel: typeof assertIsEpisodeHistoryEntry = assertIsEpisodeHistoryEntry;
 const VALID_MODEL: EpisodeHistoryEntry = {
-  episodeId: {
-    code: "1x01",
-    serieId: "serie",
+  episodeCompKey: {
+    episodeKey: "1x01",
+    seriesKey: "serie",
   },
   date: {
     year: 2021,
@@ -40,7 +40,7 @@ describe("assertIsModel", () => {
     };
 
     // @ts-ignore
-    delete obj.episodeId;
+    delete obj.episodeCompKey;
 
     expect(() => {
       assertIsModel(obj);

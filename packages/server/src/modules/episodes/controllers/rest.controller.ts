@@ -1,27 +1,16 @@
 import { Body, Controller, Param } from "@nestjs/common";
-import { neverCase } from "$shared/utils/validation";
-import { getAll } from "$shared/models/episodes/dto/rest/get-all";
-import { getOneById } from "$shared/models/episodes/dto/rest/get-one-by-id";
-import { getManyByCriteria } from "$shared/models/episodes/dto/rest/get-many-by-criteria";
-import { patchOneById } from "$shared/models/episodes/dto/rest/patch-one-by-id";
+import { EpisodesRestDtos } from "$shared/models/episodes/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
-import { SerieRepository } from "#modules/series/repositories";
-import { SerieEntity } from "#modules/series/models";
-import { GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest/Get";
+import { GetMany, GetOne } from "#utils/nestjs/rest/Get";
 import { PatchOne } from "#utils/nestjs/rest";
 import { assertFound } from "#utils/validation/found";
 import { EpisodesRepository } from "../repositories";
 
-class GetOneByIdParamsDto extends createZodDto(getOneById.paramsSchema) {}
-class GetAllParamsDto extends createZodDto(getAll.paramsSchema) {}
-class GetManyByCriteriaBodyDto extends createZodDto(getManyByCriteria.reqBodySchema) {}
-class PatchOneByIdParamsDto extends createZodDto(patchOneById.reqParamsSchema) {}
-class PatchOneByIdBodyDto extends createZodDto(patchOneById.reqBodySchema) {}
-
-enum ResourceType {
-  SERIES = "series",
-}
+class GetOneByIdParamsDto extends createZodDto(EpisodesRestDtos.GetOneById.paramsSchema) {}
+class GetAllParamsDto extends createZodDto(EpisodesRestDtos.GetAll.paramsSchema) {}
+class PatchOneByIdParamsDto extends createZodDto(EpisodesRestDtos.PatchOneById.paramsSchema) {}
+class PatchOneByIdBodyDto extends createZodDto(EpisodesRestDtos.PatchOneById.bodySchema) {}
 
 const schema = episodeEntitySchema;
 
@@ -29,84 +18,40 @@ const schema = episodeEntitySchema;
 export class EpisodesRestController {
   constructor(
     private readonly episodeRepository: EpisodesRepository,
-    private readonly serieRepo: SerieRepository,
   ) {
   }
 
-  @PatchOne("/:serieId/:code", schema)
+  @PatchOne("/:seriesKey/:episodeKey", schema)
   async patchOneByIdAndGet(
     @Param() params: PatchOneByIdParamsDto,
     @Body() body: PatchOneByIdBodyDto,
   ): Promise<EpisodeEntity> {
     const episodePartial = body;
-    const id = params;
-    const got = await this.episodeRepository.patchOneByIdAndGet(id, episodePartial);
+    const compKey = params;
+    const got = await this.episodeRepository.patchOneByCompKeyAndGet(compKey, episodePartial);
 
     assertFound(got);
 
     return got;
   }
 
-  @GetMany("/:serieId", schema)
+  @GetMany("/:seriesKey", schema)
   async getAll(
     @Param() params: GetAllParamsDto,
   ) {
-    const { serieId } = params;
+    const { seriesKey } = params;
 
-    return await this.episodeRepository.getAllBySerieId(serieId);
+    return await this.episodeRepository.getAllBySeriesKey(seriesKey);
   }
 
-  @GetOne("/:serieId/:code", schema)
+  @GetOne("/:seriesKey/:episodeKey", schema)
   async getOneById(
     @Param() params: GetOneByIdParamsDto,
   ) {
-    const got = await this.episodeRepository.getOneById(params);
+    const got = await this.episodeRepository.getOneByCompKey(params);
 
     assertFound(got);
 
     return got;
-  }
-
-  @GetManyCriteria("/search", schema)
-  async getManyBySearch(
-    @Body() body: GetManyByCriteriaBodyDto,
-  ) {
-    const episodes = [];
-    const filterPath = body.filter?.path;
-
-    if (filterPath) {
-      const splitted = filterPath.split("/");
-      const type: ResourceType = splitted[0] as ResourceType;
-
-      switch (type) {
-        case ResourceType.SERIES: {
-          const episode: EpisodeEntity | null = await this.episodeRepository
-            .getOneByPath(filterPath);
-
-          if (episode)
-            episodes.push(episode);
-
-          break;
-        }
-        default:
-          neverCase(type);
-      }
-    }
-
-    if (body.expand?.includes(ResourceType.SERIES)) {
-      const series: {[serieId: string]: SerieEntity} = {};
-
-      for (const ep of episodes) {
-        const { serieId } = ep.id;
-        // TODO: quitar await en for
-        const serie = series[serieId] ?? await this.serieRepo.getOneById(serieId);
-
-        ep.serie = serie;
-
-        series[serieId] = serie;
-      }
-    }
-
-    return episodes;
   }
 }

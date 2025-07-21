@@ -1,15 +1,13 @@
-import { MusicHistoryEntry } from "#musics/history/models";
+import { Types } from "mongoose";
+import { fixtureMusics } from "#musics/tests/fixtures";
+import { MusicHistoryEntryEntity } from "#musics/history/models";
 import { SAMPLE1 as DATE_SAMPLE1 } from "../dates";
-import { MUSIC_FILE_SAMPLES } from "./music";
 
-export const SAMPLES1: MusicHistoryEntry[] = [
+export const SAMPLES1: MusicHistoryEntryEntity[] = [
   {
+    id: new Types.ObjectId().toString(),
     date: DATE_SAMPLE1,
-    resourceId: MUSIC_FILE_SAMPLES[0].id,
-    resource: MUSIC_FILE_SAMPLES[0],
-  },
-  {
-    date: DATE_SAMPLE1,
-    resourceId: MUSIC_FILE_SAMPLES[0].id,
+    resourceId: fixtureMusics.Disk.List[0].id,
+    music: fixtureMusics.Disk.List[0],
   },
 ];

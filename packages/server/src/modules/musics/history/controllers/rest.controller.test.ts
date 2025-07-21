@@ -6,8 +6,8 @@ import { restTestsSuite } from "#tests/suites/rest-suite";
 import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
 import { MusicHistoryRepository } from "../repositories";
 import { musicHistoryRepoMockProvider } from "../repositories/tests";
-import { musicHistoryDto } from "../models/dto";
-import { GetManyCriteria } from "../repositories/Repository";
+import { MusicHistoryEntryDtos } from "../models/dto";
+import { GetManyCriteria } from "../repositories/repository";
 import { MusicHistoryRestController } from "./rest.controller";
 
 describe("global routes", () => {
@@ -69,7 +69,9 @@ restTestsSuite( {
         },
         getExpressApp: props.getExpressApp,
         expected: {
-          body: createSuccessDataResponse(HISTORY_MUSIC_SAMPLES1.map(musicHistoryDto.entry.toDto)),
+          body: createSuccessDataResponse(
+            HISTORY_MUSIC_SAMPLES1.map(MusicHistoryEntryDtos.Entity.toDto),
+          ),
           statusCode: HttpStatus.OK,
         },
       } ),

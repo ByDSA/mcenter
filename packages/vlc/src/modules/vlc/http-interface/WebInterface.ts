@@ -40,7 +40,8 @@ export class VLCWebInterface {
       headers: this.#headers,
     } )
       .catch(e => {
-        if (e instanceof TypeError && e.cause instanceof Error && JSON.stringify(e.cause).includes("ECONNREFUSED"))
+        if (e instanceof TypeError && e.cause instanceof Error
+            && JSON.stringify(e.cause).includes("ECONNREFUSED"))
           return null;
 
         console.error(JSON.stringify(e, null, 2));
