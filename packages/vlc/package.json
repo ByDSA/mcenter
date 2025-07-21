@@ -8,8 +8,10 @@
     "build:clean": "rm -rf build",
     "build:raw": "tsc -p tsconfig-build.json && tsc-alias -p tsconfig-build.json",
     "lint": "bin/lint.mjs",
+    "rebuild": "bin/rebuild.mjs",
     "start": "NODE_ENV=production node build/index.js",
     "start:watch": "NODE_ENV=development nodemon",
+    "stop": "bin/stop.mjs",
     "test": "NODE_ENV=test jest --maxWorkers=1 --testPathIgnorePatterns=VLCProcess*",
     "test:coverage": "pnpm run test --coverage",
     "test:coverage:clean": "rm -rf coverage",
@@ -24,9 +26,9 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "$sharedSrc": "workspace:../shared/src",
     "@types/jest": "30.0.0",
     "@types/node": "24.0.13",
+    "$sharedSrc": "workspace:../shared/src",
     "jest": "workspace:../node_modules/jest",
     "nodemon": "3.1.10",
     "socket.io": "4.8.1",
