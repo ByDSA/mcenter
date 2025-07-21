@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.11](https://github.com/ByDSA/mcenter/compare/v4.0.10...v4.0.11) (2025-07-21)
+
+
+### Bug Fixes
+
+* migration file-info-episodes-music ([9e6947a](https://github.com/ByDSA/mcenter/commit/9e6947a19ef53220dcc5905b873daf6eae3a2f69))
+
 ### [4.0.10](https://github.com/ByDSA/mcenter/compare/v4.0.9...v4.0.10) (2025-07-16)
 
 
