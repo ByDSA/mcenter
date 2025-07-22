@@ -13,6 +13,5 @@ export namespace EpisodeHistoryEntryRestDtos {
       expandKeys: ["series", "episodes", "episode-file-infos"],
     } );
     export type Criteria = z.infer<typeof criteriaSchema>;
-    export const bodySchema = criteriaSchema.default( {} );
   }
 };

@@ -45,5 +45,5 @@ export const createCriteriaSchema = <
     expand: createExpandSchema(expandKeys),
     limit: z.number().optional(),
     offset: z.number().optional(),
-  } );
+  } ).strict();
 };

@@ -28,8 +28,27 @@ export class ZodSerializerSchemaInterceptor implements NestInterceptor {
           if (e instanceof ZodError) {
             let msg;
 
-            if (isDebugging())
-              msg = JSON.stringify(e.issues, null, 2);
+            if (isDebugging()) {
+              const req = context.getArgs()?.[0];
+              const msgObj = {
+                ctx: {
+                  request: {
+                    body: req?.body,
+                    method: req?.method,
+                    url: req?.originalUrl,
+                  },
+                  response: {
+                    data,
+                  },
+                  expected: {
+                    schema,
+                  },
+                },
+                issues: e.issues,
+              };
+
+              msg = JSON.stringify(msgObj, null, 2);
+            }
 
             throw new Error(msg);
           }

@@ -27,136 +27,6 @@ const ep1x01: EpisodeEntity = {
   ],
   timestamps,
 };
-const ep1x01FileInfo: EpisodeFileInfoEntity = {
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/1_80.mkv",
-  start: 2,
-  end: 1326,
-  episodeId: ep1x01.id,
-  timestamps: fileInfoTimestamps,
-  hash: generateRandomMD5(),
-  size: 1234,
-  mediaInfo: {
-    duration: 123,
-    fps: "24",
-    resolution: {
-      width: 1440,
-      height: 1080,
-    },
-  },
-} satisfies EpisodeFileInfoEntity;
-// FileInfo entities
-const ep1x02FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/2_80.mkv",
-  start: 90,
-  end: 1337,
-  hash: generateRandomMD5(),
-};
-const ep1x03FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/3_80.mkv",
-  start: 90,
-  end: 1320,
-  hash: generateRandomMD5(),
-};
-const ep1x04FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/4_80.mkv",
-  start: 90,
-  end: 1277.5,
-  hash: generateRandomMD5(),
-};
-const ep1x05FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/5_80.mkv",
-  start: 11,
-  end: 1289,
-  hash: generateRandomMD5(),
-};
-const ep1x06FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/6_80.mkv",
-  start: 89,
-  end: 1316,
-  hash: generateRandomMD5(),
-};
-const ep1x07FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/7_80_+cat.mkv",
-  start: 89.5,
-  end: 1315,
-  hash: generateRandomMD5(),
-};
-const ep1x08FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/8_80.mkv",
-  start: 88.5,
-  end: 1307,
-  hash: generateRandomMD5(),
-};
-const ep1x09FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/9_80.mkv",
-  start: 13.5,
-  end: 1333,
-  hash: generateRandomMD5(),
-};
-const ep1x10FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/10_80.mkv",
-  start: 90,
-  end: 1331.5,
-  hash: generateRandomMD5(),
-};
-const ep1x11FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/11_80.mkv",
-  start: 87,
-  end: 1366,
-  hash: generateRandomMD5(),
-};
-const ep1x12FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/12_80.mkv",
-  start: 86,
-  end: 1381,
-  hash: generateRandomMD5(),
-};
-const ep1x13FileInfo: EpisodeFileInfoEntity = {
-  ...ep1x01FileInfo,
-  id: new Types.ObjectId().toString(),
-  path: "series/simpsons/1/13_80.mkv",
-  start: 87,
-  end: 1366.5,
-  hash: generateRandomMD5(),
-} satisfies EpisodeFileInfoEntity;
-const EPISODE_FILE_INFO_SIMPSONS: EpisodeFileInfoEntity[] = deepFreeze([
-  ep1x01FileInfo,
-  ep1x02FileInfo,
-  ep1x03FileInfo,
-  ep1x04FileInfo,
-  ep1x05FileInfo,
-  ep1x06FileInfo,
-  ep1x07FileInfo,
-  ep1x08FileInfo,
-  ep1x09FileInfo,
-  ep1x10FileInfo,
-  ep1x11FileInfo,
-  ep1x12FileInfo,
-  ep1x13FileInfo,
-]);
 // Episode entities
 const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   ep1x01,
@@ -279,7 +149,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     title: "La baby siter ataca de nuevo",
     weight: -6,
     timestamps,
-  } as EpisodeEntity,
+  } satisfies EpisodeEntity,
 ]);
 
 export const fixtureEpisodes = {
@@ -291,6 +161,149 @@ export const fixtureEpisodes = {
     List: EPISODES_SIMPSONS,
   },
 };
+
+const ep1x01FileInfo: EpisodeFileInfoEntity = {
+  id: new Types.ObjectId().toString(),
+  path: "series/simpsons/1/1_80.mkv",
+  start: 2,
+  end: 1326,
+  episodeId: ep1x01.id,
+  timestamps: fileInfoTimestamps,
+  hash: generateRandomMD5(),
+  size: 1234,
+  mediaInfo: {
+    duration: 123,
+    fps: "24",
+    resolution: {
+      width: 1440,
+      height: 1080,
+    },
+  },
+} satisfies EpisodeFileInfoEntity;
+// FileInfo entities
+const ep1x02FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[1].id,
+  path: "series/simpsons/1/2_80.mkv",
+  start: 90,
+  end: 1337,
+  hash: generateRandomMD5(),
+};
+const ep1x03FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[2].id,
+  path: "series/simpsons/1/3_80.mkv",
+  start: 90,
+  end: 1320,
+  hash: generateRandomMD5(),
+};
+const ep1x04FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[3].id,
+  path: "series/simpsons/1/4_80.mkv",
+  start: 90,
+  end: 1277.5,
+  hash: generateRandomMD5(),
+};
+const ep1x05FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[4].id,
+  path: "series/simpsons/1/5_80.mkv",
+  start: 11,
+  end: 1289,
+  hash: generateRandomMD5(),
+};
+const ep1x06FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[5].id,
+  path: "series/simpsons/1/6_80.mkv",
+  start: 89,
+  end: 1316,
+  hash: generateRandomMD5(),
+};
+const ep1x07FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[6].id,
+  path: "series/simpsons/1/7_80_+cat.mkv",
+  start: 89.5,
+  end: 1315,
+  hash: generateRandomMD5(),
+};
+const ep1x08FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[7].id,
+  path: "series/simpsons/1/8_80.mkv",
+  start: 88.5,
+  end: 1307,
+  hash: generateRandomMD5(),
+};
+const ep1x09FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[8].id,
+  path: "series/simpsons/1/9_80.mkv",
+  start: 13.5,
+  end: 1333,
+  hash: generateRandomMD5(),
+};
+const ep1x10FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[9].id,
+  path: "series/simpsons/1/10_80.mkv",
+  start: 90,
+  end: 1331.5,
+  hash: generateRandomMD5(),
+};
+const ep1x11FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[10].id,
+  path: "series/simpsons/1/11_80.mkv",
+  start: 87,
+  end: 1366,
+  hash: generateRandomMD5(),
+};
+const ep1x12FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[11].id,
+  path: "series/simpsons/1/12_80.mkv",
+  start: 86,
+  end: 1381,
+  hash: generateRandomMD5(),
+};
+const ep1x13FileInfo: EpisodeFileInfoEntity = {
+  ...ep1x01FileInfo,
+  id: new Types.ObjectId().toString(),
+  episodeId: fixtureEpisodes.Simpsons.List[12].id,
+  path: "series/simpsons/1/13_80.mkv",
+  start: 87,
+  end: 1366.5,
+  hash: generateRandomMD5(),
+} satisfies EpisodeFileInfoEntity;
+const EPISODE_FILE_INFO_SIMPSONS: EpisodeFileInfoEntity[] = deepFreeze([
+  ep1x01FileInfo,
+  ep1x02FileInfo,
+  ep1x03FileInfo,
+  ep1x04FileInfo,
+  ep1x05FileInfo,
+  ep1x06FileInfo,
+  ep1x07FileInfo,
+  ep1x08FileInfo,
+  ep1x09FileInfo,
+  ep1x10FileInfo,
+  ep1x11FileInfo,
+  ep1x12FileInfo,
+  ep1x13FileInfo,
+]);
 
 export const fixtureEpisodeFileInfos = {
   Simpsons: {

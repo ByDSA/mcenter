@@ -137,7 +137,7 @@ CanGetAll<EpisodeEntity> {
     const ret = EpisodeOdm.docToEntity(episodeOdm);
 
     if (criteria?.expand?.includes("fileInfos"))
-      ret.fileInfos = await this.#expandFileInfos(episodeOdm);
+      ret.fileInfos = await this.expandFileInfos(episodeOdm);
 
     return ret;
   }
@@ -180,7 +180,7 @@ CanGetAll<EpisodeEntity> {
     const ret = EpisodeOdm.docToEntity(episodeOdm);
 
     if (criteria?.expand?.includes("fileInfos"))
-      ret.fileInfos = await this.#expandFileInfos(episodeOdm);
+      ret.fileInfos = await this.expandFileInfos(episodeOdm);
 
     return ret;
   }
@@ -198,7 +198,7 @@ CanGetAll<EpisodeEntity> {
     } );
   }
 
-  async #expandFileInfos(episodeOdm: EpisodeOdm.FullDoc): Promise<EpisodeFileInfoEntity[]> {
+  private async expandFileInfos(episodeOdm: EpisodeOdm.FullDoc): Promise<EpisodeFileInfoEntity[]> {
     const _id = episodeOdm._id.toString();
     const fileInfos = await this.episodeFileInfoRepository.getAllByEpisodeId(_id);
 

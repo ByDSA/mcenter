@@ -29,12 +29,16 @@ restTestsSuite( {
     },
     patchOne: {
       repo: {
-        getFn: (repo)=>repo.patchOneById,
+        getFn: (repo)=>repo.patchOneByIdAndGet,
         params: ["id", {
           entity: {
             title: "new title",
           },
         }],
+        returned: {
+          ...fixtureMusics.Disk.List[0],
+          title: "new title",
+        },
       },
     },
   },

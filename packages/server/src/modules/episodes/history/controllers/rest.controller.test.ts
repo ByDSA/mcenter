@@ -145,7 +145,7 @@ describe("restController", () => {
       it("should call historyList repository", async () => {
         await request(routerApp)
           .post(URL)
-          .send();
+          .send( {} );
 
         expect(repository.getManyByCriteria).toHaveBeenCalledTimes(1);
       } );
@@ -159,14 +159,14 @@ describe("restController", () => {
           } );
       } );
 
-      it("should return all entries if no criteria provided", async () => {
+      it("should return all entries if empty criteria provided", async () => {
         const entries = [HISTORY_ENTRY_SIMPSONS1];
 
         repository.getManyByCriteria.mockResolvedValueOnce(entries);
 
         const response = await request(routerApp)
           .post(URL)
-          .send();
+          .send( {} );
 
         expect(response.statusCode).toEqual(HttpStatus.OK);
         expect(response.body).toEqual(

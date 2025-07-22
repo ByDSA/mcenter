@@ -11,7 +11,7 @@ import { type EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from 
 import { LastTimePlayedService } from "../last-time-played.service";
 
 class GetManyByCriteriaBodyDto
-  extends createZodDto(EpisodeHistoryEntryRestDtos.GetManyByCriteria.bodySchema) {}
+  extends createZodDto(EpisodeHistoryEntryRestDtos.GetManyByCriteria.criteriaSchema) {}
 
 class SeriesKeyParamsDto extends createZodDto(
   z.object( {
