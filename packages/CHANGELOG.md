@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.12](https://github.com/ByDSA/mcenter/compare/v4.0.11...v4.0.12) (2025-07-22)
+
+
+### Bug Fixes
+
+* **back:** get raw music ([a4d135a](https://github.com/ByDSA/mcenter/commit/a4d135a1530783c42bd1219e7ceeca1be50f3a6e))
+* **back:** update resources ([69512f8](https://github.com/ByDSA/mcenter/commit/69512f823067d46c8596bc79a12484c82aa9b2ba))
+* **front:** removed imports ([3a17907](https://github.com/ByDSA/mcenter/commit/3a17907347062e9943db307219199734f1268bdd))
+
 ### [4.0.11](https://github.com/ByDSA/mcenter/compare/v4.0.10...v4.0.11) (2025-07-21)
 
 
