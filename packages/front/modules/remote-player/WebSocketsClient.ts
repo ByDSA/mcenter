@@ -1,7 +1,8 @@
 /* eslint-disable require-await */
 import { Socket, io } from "socket.io-client";
-import { PlayerEvent, PlayerStatusResponse, assertIsPlayerStatusResponse } from "$shared/models/player";
-import { PlayResourceParams, PlayerActions } from "$shared/models/player/Player";
+import { PlayerEvent, PlayerStatusResponse, playerStatusResponseSchema } from "$shared/models/player";
+import { assertZod } from "$shared/utils/validation/zod";
+import { PlayResourceParams, PlayerActions } from "$shared/models/player";
 import { backendUrl } from "#modules/requests";
 
 export const socketUrl = {
@@ -26,7 +27,7 @@ export abstract class RemotePlayerWebSocketsClient implements PlayerActions {
     } );
 
     this.socket.on(PlayerEvent.STATUS, (data: PlayerStatusResponse) => {
-      assertIsPlayerStatusResponse(data);
+      assertZod(playerStatusResponseSchema, data);
       this.onStatus(data);
     } );
   }
