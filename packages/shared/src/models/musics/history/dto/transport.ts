@@ -1,22 +1,17 @@
 import z from "zod";
 import { idParamsSchema } from "../../../utils/schemas/requests";
+import { createCriteriaSchema } from "../../../utils/schemas/requests/criteria";
 
 export namespace MusicHistoryEntryRestDtos {
   export namespace GetManyByCriteria {
-    export const criteriaSchema = z.object( {
-      filter: z.object( {
+    export const criteriaSchema = createCriteriaSchema( {
+      filterShape: {
         resourceId: z.string().optional(),
         timestampMax: z.number().optional(),
-      } ).strict()
-        .optional(),
-      sort: z.object( {
-        timestamp: z.enum(["asc", "desc"]).optional(),
-      } ).strict()
-        .optional(),
-      limit: z.number().optional(),
-      offset: z.number().optional(),
-      expand: z.array(z.enum(["musics", "music-file-infos"])).optional(),
-    } ).strict();
+      },
+      sortKeys: ["timestamp"],
+      expandKeys: ["musics", "music-file-infos"],
+    } );
     export type Criteria = z.infer<typeof criteriaSchema>;
     export const bodySchema = criteriaSchema.default( {} );
   }

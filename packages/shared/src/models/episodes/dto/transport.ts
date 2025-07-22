@@ -2,6 +2,7 @@ import z from "zod";
 import { episodeCompKeySchema } from "../episode";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { episodeEntitySchema } from "../episode";
+import { createCriteriaSchema } from "../../utils/schemas/requests/criteria";
 
 export namespace EpisodesRestDtos {
   export namespace GetOneById {
@@ -14,17 +15,13 @@ export namespace EpisodesRestDtos {
       .required();
   }
   export namespace GetManyByCriteria {
-    export const criteriaSchema = z.object( {
-      filter: z.object( {
+    export const criteriaSchema = createCriteriaSchema( {
+      filterShape: {
         path: z.string().optional(),
-      } ).strict()
-        .optional(),
-      sort: z.object( {} ).strict()
-        .optional(),
-      limit: z.number().optional(),
-      offset: z.number().optional(),
-      expand: z.array(z.enum(["series"])).optional(),
-    } ).strict();
+      },
+      sortKeys: [],
+      expandKeys: ["series"],
+    } );
     export type Criteria = z.infer<typeof criteriaSchema>;
   }
   export namespace PatchOneById {

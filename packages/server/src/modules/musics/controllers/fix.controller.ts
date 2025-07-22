@@ -16,8 +16,9 @@ export class MusicFixController {
 
   @GetOne(`${ROUTE_CREATE_YT}/:id`, musicSchema)
   get(@Param() params: any) {
-    const { id } = params;
+    const { id: _ } = params;
 
-    return this.musicRepository.findOrCreateOneFromYoutube(id);
+    // TODO:
+    // return this.musicRepository.findOrCreateOneFromYoutube(id);
   }
 }

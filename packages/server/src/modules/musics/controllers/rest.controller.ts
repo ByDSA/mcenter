@@ -5,7 +5,7 @@ import { MusicEntity, musicEntitySchema } from "#musics/models";
 import { GetOne, PatchOne } from "#utils/nestjs/rest";
 import { MusicRepository } from "../repositories";
 
-class GetOneByIdParamsDto extends createZodDto(MusicRestDtos.GetOneById.paramsSchema) {}
+class GetOneByIdParamsDto extends createZodDto(MusicRestDtos.GetOne.ById.paramsSchema) {}
 class PatchParamsDto extends createZodDto(MusicRestDtos.PatchOneById.paramsSchema) {}
 class PatchBodyDto extends createZodDto(MusicRestDtos.PatchOneById.bodySchema) {}
 

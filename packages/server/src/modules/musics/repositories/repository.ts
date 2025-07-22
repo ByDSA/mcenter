@@ -2,6 +2,7 @@ import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { showError } from "$shared/utils/errors/showError";
 import { assertIsDefined } from "$shared/utils/validation";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
+import { MusicRestDtos } from "$shared/models/musics/dto/transport";
 import { assertFound } from "#utils/validation/found";
 import { BrokerEvent } from "#utils/message-broker";
 import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
@@ -11,7 +12,6 @@ import { MusicHistoryEntry } from "#musics/history/models";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { QUEUE_NAME as MUSIC_HISTORY_QUEUE_NAME } from "../history/events";
-import { download } from "../youtube";
 import { fixUrl } from "../builder/fix-url";
 import { MusicBuilderService } from "../builder/music-builder.service";
 import { MusicOdm } from "./odm";
@@ -19,6 +19,8 @@ import { patchParamsToUpdateQuery } from "./odm/adapters";
 import { QUEUE_NAME } from "./events";
 import { findParamsToQueryParams } from "./queries/QueriesOdm";
 import { ExpressionNode } from "./queries/QueryObject";
+
+type CriteriaOne = MusicRestDtos.GetOne.Criteria;
 
 type MusicEvent = BrokerEvent<ModelMessage<MusicEntity>>;
 @Injectable()
@@ -109,25 +111,31 @@ CanGetOneById<MusicEntity, MusicId> {
     }
   }
 
-  async getOne(query: Parameters<typeof MusicOdm.Model.findOne>[0]): Promise<MusicEntity | null> {
-    const musicOdm: MusicOdm.FullDoc | null = await MusicOdm.Model.findOne(query);
+  async getOne(criteria: CriteriaOne): Promise<MusicEntity | null> {
+    const pipeline = MusicOdm.getCriteriaPipeline(criteria);
+    const docs: MusicOdm.FullDoc[] = await MusicOdm.Model.aggregate(pipeline);
 
-    if (!musicOdm)
+    if (docs.length === 0)
       return null;
 
-    return MusicOdm.toEntity(musicOdm);
+    const doc = docs[0];
+
+    if (criteria?.expand?.includes("fileInfos"))
+      assertIsDefined(doc.fileInfos, "Lookup file infos failed");
+
+    return MusicOdm.toEntity(doc);
   }
 
-  getOneByHash(hash: string): Promise<MusicEntity | null> {
-    return this.getOne( {
+  async getOneByHash(hash: string, criteria?: CriteriaOne): Promise<MusicEntity | null> {
+    return await this.getOneByFilter( {
       hash,
-    } );
+    }, criteria);
   }
 
-  async getOneByUrl(url: string): Promise<MusicEntity | null> {
-    return await this.getOne( {
+  async getOneByUrl(url: string, criteria?: CriteriaOne): Promise<MusicEntity | null> {
+    return await this.getOneByFilter( {
       url,
-    } );
+    }, criteria);
   }
 
   async getAll(): Promise<MusicEntity[]> {
@@ -145,9 +153,13 @@ CanGetOneById<MusicEntity, MusicId> {
     return ret;
   }
 
-  findOneByPath(relativePath: string): Promise<MusicEntity | null> {
-    return this.getOne( {
-      path: relativePath,
+  private async getOneByFilter(filter: CriteriaOne["filter"], criteria?: CriteriaOne) {
+    return await this.getOne( {
+      ...criteria,
+      filter: {
+        ...criteria?.filter,
+        ...filter,
+      },
     } );
   }
 
@@ -170,21 +182,6 @@ CanGetOneById<MusicEntity, MusicId> {
     return entity;
   }
 
-  async findOrCreateOneFromPath(relativePath: string): Promise<MusicEntity> {
-    const read = await this.findOneByPath(relativePath);
-
-    if (read)
-      return read;
-
-    return this.createOneFromPath(relativePath);
-  }
-
-  async findOrCreateOneFromYoutube(strId: string): Promise<MusicEntity> {
-    const data = await download(strId);
-
-    return this.findOrCreateOneFromPath(data.file);
-  }
-
   async deleteOneByPath(relativePath: string) {
     const docOdm = await MusicOdm.Model.findOneAndDelete( {
       path: relativePath,
@@ -202,28 +199,31 @@ CanGetOneById<MusicEntity, MusicId> {
   }
 
   async updateOneByUrl(url: string, data: Partial<Music>): Promise<void> {
-    return await this.#updateOne( {
+    return await this.#updateOneAndGet(data, {
       url,
-    }, data);
+    } );
   }
 
-  updateOneByHash(hash: string, data: Partial<Music>): Promise<void> {
-    return this.#updateOne( {
+  async updateOneByHash(hash: string, data: Partial<Music>): Promise<void> {
+    return await this.#updateOneAndGet(data, {
       hash,
-    }, data);
+    } );
   }
 
-  async #updateOne(
-    query: NonNullable<Parameters<typeof MusicOdm.Model.updateOne>[0]>,
+  async #updateOneAndGet(
     data: Partial<Music>,
+    filterCriteria: CriteriaOne["filter"],
   ) {
     data.timestamps ??= {} as Music["timestamps"];
     data.timestamps.updatedAt = new Date();
 
-    await MusicOdm.Model.updateOne(query, data);
+    const filter = filterCriteria; // TODO
 
-    const queryAfter = applyChangesToQuery(query, data);
-    const model = await this.getOne(queryAfter);
+    await MusicOdm.Model.updateOne(filter, data);
+
+    const model = await this.getOne( {
+      filter: filterCriteria,
+    } );
 
     assertIsDefined(model);
     const event = new ModelEvent<MusicEntity>(EventType.UPDATED, {
@@ -234,35 +234,8 @@ CanGetOneById<MusicEntity, MusicId> {
   }
 
   updateOneByPath(relativePath: string, data: Partial<Music>): Promise<void> {
-    return this.#updateOne( {
+    return this.#updateOneAndGet(data, {
       path: relativePath,
-    }, data);
+    } );
   }
-}
-
-function applyChangesToQuery<T extends object>(
-  query: T,
-  changes: Record<string, unknown>,
-): T {
-  const result: any = Array.isArray(query)
-    ? [...query]
-    : {
-      ...query,
-    };
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const key in query) {
-    if (key in changes) {
-      const value = changes[key];
-      const original = query[key];
-
-      if (key in changes && typeof value === "object"
-        && key in query && original !== null && typeof original === "object")
-        result[key] = applyChangesToQuery(original, value as any);
-      else
-        result[key] = value;
-    }
-  }
-
-  return result;
 }

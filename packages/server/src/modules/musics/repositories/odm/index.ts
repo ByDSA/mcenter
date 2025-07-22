@@ -6,6 +6,7 @@ import { DocOdm,
 import { musicDocOdmToEntity,
   musicEntityToDocOdm,
   musicToDocOdm } from "./adapters";
+import { getCriteriaPipeline as _getCriteriaPipeline } from "./criteria-pipeline";
 
 export namespace MusicOdm {
   export const Model = ModelOdm;
@@ -15,4 +16,5 @@ export namespace MusicOdm {
   export const toEntity = musicDocOdmToEntity;
   export const entityToDocOdm = musicEntityToDocOdm;
   export const toDocOdm = musicToDocOdm;
+  export const getCriteriaPipeline = _getCriteriaPipeline;
 };

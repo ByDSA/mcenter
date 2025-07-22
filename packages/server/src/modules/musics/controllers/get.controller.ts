@@ -2,8 +2,10 @@ import path from "node:path";
 import { createReadStream } from "node:fs";
 import { Request } from "express";
 import { Controller, Get, Param, Req, StreamableFile } from "@nestjs/common";
-import { assertIsNotEmpty } from "$shared/utils/validation";
+import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
+import { createZodDto } from "nestjs-zod";
+import z from "zod";
 import { MusicEntity, musicSchema } from "#musics/models";
 import { createMusicHistoryEntryById } from "#musics/history/models";
 import { ResourcePickerRandom } from "#modules/picker";
@@ -15,6 +17,10 @@ import { requestToFindMusicParams } from "../repositories/queries/Queries";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
 import { MusicFileInfoRepository } from "../file-info/repositories/repository";
+
+class GetRawDto extends createZodDto(z.object( {
+  url: z.string(),
+} ).strict()) {}
 
 function getRootUrlFromForwardedRequest(req: Request): string {
   const protocol = req.get("x-forwarded-proto") ?? req.protocol;
@@ -131,16 +137,18 @@ export class MusicGetController {
     } );
   }
 
-  @Get("/raw/:name")
-  async rawAccess(@Param() params: any) {
-    const { name } = params;
-    // find in DB
-    const music = await this.musicRepository.getOneByUrl(name);
-    // TODO: fusionar en una sola consulta de db.
-    const fileInfo = await this.musicFileInfoRepo.getOneByMusicId(name);
+  @Get("/raw/:url")
+  async rawAccess(@Param() params: GetRawDto) {
+    const { url } = params;
+    const music = await this.musicRepository.getOneByUrl(url, {
+      expand: ["fileInfos"],
+    } );
 
     assertFound(music);
-    assertFound(fileInfo);
+    assertFound(music.fileInfos);
+    const fileInfo = music.fileInfos![0];
+
+    assertIsDefined(fileInfo);
 
     // History
     const entry = createMusicHistoryEntryById(music.id);
