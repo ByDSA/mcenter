@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.13](https://github.com/ByDSA/mcenter/compare/v4.0.12...v4.0.13) (2025-07-22)
+
+
+### Bug Fixes
+
+* **back:** fix criteria validation and fix some tests ([9f9923a](https://github.com/ByDSA/mcenter/commit/9f9923a7e0f934095b6ba9b966c03d0f152cbbe9))
+
 ### [4.0.12](https://github.com/ByDSA/mcenter/compare/v4.0.11...v4.0.12) (2025-07-22)
 
 
