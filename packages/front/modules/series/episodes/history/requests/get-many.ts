@@ -13,8 +13,8 @@ export const dataSchema = episodeHistoryEntryEntitySchema
     episode: true,
   } )
   .extend( {
-    episode: episodeEntitySchema.extend( {
-      fileInfos: episodeEntitySchema.shape.fileInfos.unwrap(),
+    episode: episodeEntitySchema.required( {
+      fileInfos: true,
     } ),
   } );
 

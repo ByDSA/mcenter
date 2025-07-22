@@ -9,7 +9,8 @@ export type ResourceInputTextProps<R> = ResourceInputCommonProps<R, string | und
 
 export function ResourceInputText<R extends object>(
   { resourceState, setResource: calcUpdatedResource, caption,
-    getValue: getResourceValue, isOptional, error, inputTextProps, name }: ResourceInputTextProps<R>,
+    getValue: getResourceValue, isOptional,
+    error, inputTextProps, name }: ResourceInputTextProps<R>,
 ) {
   const [resource, setResource] = resourceState;
   const calcFinalValue = (v?: string) => {

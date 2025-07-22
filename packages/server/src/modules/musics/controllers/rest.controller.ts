@@ -16,14 +16,14 @@ export class MusicRestController {
   ) {
   }
 
-  @PatchOne(":id")
-  async patchOneById(
+  @PatchOne(":id", musicEntitySchema)
+  async patchOneByIdAndGet(
     @Param() params: PatchParamsDto,
     @Body() body: PatchBodyDto,
   ) {
     const { id } = params;
 
-    await this.musicRepo.patchOneById(id, body);
+    return await this.musicRepo.patchOneByIdAndGet(id, body);
   }
 
   @GetOne("/:id", musicEntitySchema)

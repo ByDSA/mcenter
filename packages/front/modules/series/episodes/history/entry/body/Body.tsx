@@ -1,5 +1,6 @@
-import { isDefined } from "$shared/utils/validation";
+import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { EpisodeFileInfo } from "$shared/models/episodes/file-info";
+import { EpisodeEntity } from "$shared/models/episodes";
 import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
@@ -57,7 +58,7 @@ type Props = {
   data: Data;
 };
 export function Body( { data }: Props) {
-  const { state, remove, isModified, reset, update } = useHistoryEntryEdition<
+  const { state, remove, isModified, reset, update, initialState } = useHistoryEntryEdition<
 Data
   >( {
     data,
@@ -76,21 +77,47 @@ Data
       const promises: Promise<any>[] = [];
 
       if (Object.entries(episodeBody.entity).length > 0) {
-        const p1 = EpisodeFetching.Patch.fetch(data.episodeCompKey, episodeBody);
+        const p1 = EpisodeFetching.Patch.fetch(data.episodeCompKey, episodeBody)
+          .then(res=>{
+            const episode: EpisodeEntity & Required<Pick<EpisodeEntity, "fileInfos">> = {
+              ...res.data,
+              fileInfos: state[0].episode.fileInfos,
+            };
+
+            assertIsDefined(episode.fileInfos);
+
+            const newData: Data = {
+              ...state[0],
+              episode,
+            };
+
+            initialState[1](newData);
+          } );
 
         promises.push(p1);
       }
 
       const dataFileInfo = data.episode.fileInfos[0];
       const stateFileInfo = state[0].episode.fileInfos[0];
-      const fileInfoBody = generatePatchBody(
+      const fileInfoBody: EpisodeFileInfoFetching.Patch.Body = generatePatchBody(
         dataFileInfo,
         stateFileInfo,
         ["end", "path", "start"],
       );
 
       if (Object.entries(fileInfoBody.entity).length > 0) {
-        const p2 = EpisodeFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody);
+        const p2 = EpisodeFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody)
+          .then(res=>{
+            const episodefileInfo: Data = {
+              ...state[0],
+              episode: {
+                ...state[0].episode,
+                fileInfos: [res.data],
+              },
+            };
+
+            initialState[1](episodefileInfo);
+          } );
 
         promises.push(p2);
       }

@@ -5,7 +5,7 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { MusicRestDtos } from "$shared/models/musics/dto/transport";
 import { assertFound } from "#utils/validation/found";
 import { BrokerEvent } from "#utils/message-broker";
-import { CanGetOneById, CanPatchOneById } from "#utils/layers/repository";
+import { CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
 import { MusicEntity, Music, MusicId } from "#musics/models";
 import { MusicHistoryEntry } from "#musics/history/models";
@@ -26,7 +26,7 @@ type MusicEvent = BrokerEvent<ModelMessage<MusicEntity>>;
 @Injectable()
 export class MusicRepository
 implements
-CanPatchOneById<MusicEntity, MusicId, Music>,
+CanPatchOneByIdAndGet<MusicEntity, MusicId, Music>,
 CanGetOneById<MusicEntity, MusicId> {
   constructor(
     private readonly domainMessageBroker: DomainMessageBroker,
@@ -50,7 +50,7 @@ CanGetOneById<MusicEntity, MusicId> {
         const id = event.payload.entity.resourceId;
         const lastTimePlayed = event.payload.entity.date.timestamp;
 
-        await this.patchOneById(id, {
+        await this.patchOneByIdAndGet(id, {
           entity: {
             lastTimePlayed,
           },
@@ -68,25 +68,29 @@ CanGetOneById<MusicEntity, MusicId> {
     return MusicOdm.toEntity(docOdm);
   }
 
-  #fixUrlIfHave(partialMusic: Partial<Music>) {
+  private fixUrlIfHave(partialMusic: Partial<Music>) {
     if (partialMusic.url)
       partialMusic.url = fixUrl(partialMusic.url) ?? undefined;
   }
 
-  async patchOneById(id: MusicId, params: PatchOneParams<Music>): Promise<void> {
+  async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {
     const { entity } = params;
     const updateQuery = patchParamsToUpdateQuery(params);
 
-    this.#fixUrlIfHave(entity);
+    this.fixUrlIfHave(entity);
 
     updateQuery.$set = {
       ...updateQuery.$set,
       "timestamps.updatedAt": new Date(),
     };
 
-    const ret = await MusicOdm.Model.findByIdAndUpdate(id, updateQuery);
+    const gotDoc = await MusicOdm.Model.findByIdAndUpdate(id, updateQuery, {
+      new: true,
+    } );
 
-    assertFound(ret);
+    assertFound(gotDoc);
+
+    const ret = MusicOdm.toEntity(gotDoc);
 
     // Emite un evento por cada propiedad cambiada
     for (const [k, value] of Object.entries(entity)) {
@@ -109,6 +113,8 @@ CanGetOneById<MusicEntity, MusicId> {
 
       await this.domainMessageBroker.publish(QUEUE_NAME, event);
     }
+
+    return ret;
   }
 
   async getOne(criteria: CriteriaOne): Promise<MusicEntity | null> {

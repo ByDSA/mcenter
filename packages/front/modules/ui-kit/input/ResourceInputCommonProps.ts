@@ -1,6 +1,6 @@
 import { JSX } from "react";
 
-type ResourceState<R> = [R, React.Dispatch<React.SetStateAction<R>>];
+export type ResourceState<R> = readonly [R, React.Dispatch<React.SetStateAction<R>>];
 
 type CalcUpdatedResource<R, V> = (newValue: V, oldResource: R)=> R;
 

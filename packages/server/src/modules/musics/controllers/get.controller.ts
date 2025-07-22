@@ -1,11 +1,13 @@
 import path from "node:path";
-import { createReadStream } from "node:fs";
+import { createReadStream, statSync } from "node:fs";
 import { Request } from "express";
-import { Controller, Get, Param, Req, StreamableFile } from "@nestjs/common";
+import { Controller, Get, Param, Req, Res, StreamableFile } from "@nestjs/common";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
+import { Response } from "express";
+import mime from "mime-types";
 import { MusicEntity, musicSchema } from "#musics/models";
 import { createMusicHistoryEntryById } from "#musics/history/models";
 import { ResourcePickerRandom } from "#modules/picker";
@@ -138,7 +140,12 @@ export class MusicGetController {
   }
 
   @Get("/raw/:url")
-  async rawAccess(@Param() params: GetRawDto) {
+  async rawAccess(
+    @Param() params: GetRawDto,
+     @Res( {
+       passthrough: true,
+     } ) res: Response,
+  ) {
     const { url } = params;
     const music = await this.musicRepository.getOneByUrl(url, {
       expand: ["fileInfos"],
@@ -155,9 +162,20 @@ export class MusicGetController {
 
     await this.musicHistoryRepository.createOne(entry);
 
-    // Download
+    // Para obtener la duración desde VLC
     const relativePath = fileInfo.path;
     const fullpath = getFullPath(relativePath);
+    const stats = statSync(fullpath);
+    const mimeType = mime.lookup(fullpath) || "application/octet-stream";
+
+    // Headers mínimos necesarios
+    res.set( {
+      "Content-Type": mimeType,
+      "Content-Length": stats.size.toString(),
+      "Accept-Ranges": "bytes",
+    } );
+
+    // Download
     const file = createReadStream(fullpath);
 
     return new StreamableFile(file);

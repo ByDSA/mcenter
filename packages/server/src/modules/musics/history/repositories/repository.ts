@@ -50,7 +50,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
       const actualLastTimePlayed = await this.calcLastTimePlayedOf(deletedId) ?? 0;
 
       if (actualLastTimePlayed < deletedTimestamp) {
-        await this.musicRepository.patchOneById(deletedId, {
+        await this.musicRepository.patchOneByIdAndGet(deletedId, {
           entity: {
             lastTimePlayed: actualLastTimePlayed,
           },

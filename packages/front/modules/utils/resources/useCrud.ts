@@ -1,6 +1,7 @@
 import clone from "just-clone";
 import React, { useEffect, useState } from "react";
 import { useAsyncAction } from "#modules/ui-kit/input";
+import { ResourceState } from "#modules/ui-kit/input/ResourceInputCommonProps";
 
 type FetchFn<T> = ()=> Promise<T | void>;
 
@@ -21,16 +22,22 @@ export type UseCrudRet<T> = {
   update: CrudOp<T>;
   remove: CrudOp<T>;
   reset: ()=> Promise<void>;
-  state: [T, React.Dispatch<React.SetStateAction<T>>];
+  state: ResourceState<T>;
+  initialState: ResourceState<T>;
 };
 
 export function useCrud<T>(
   { data, isModifiedFn, fetchRemove, fetchUpdate }: UseCrudProps<T>,
 ): UseCrudRet<T> {
-  const initialData = useResourceBase(data, isModifiedFn);
-  const dataState = useState(typeof initialData === "object" && initialData !== null ? clone(initialData) : initialData);
+  const initialDataState = useInitialData(data, isModifiedFn);
+  const [initialData] = initialDataState;
+  const dataState = useState(
+    typeof initialData === "object" && initialData !== null
+      ? clone(initialData)
+      : initialData,
+  );
   const [currentData, setData] = dataState;
-  const isModified = useIsModified(initialData, currentData, isModifiedFn);
+  const [isModified] = useIsModified(initialData, currentData, isModifiedFn);
   const asyncUpdateAction = useAsyncAction();
   const asyncRemoveAction = useAsyncAction();
   // eslint-disable-next-line require-await
@@ -76,21 +83,25 @@ export function useCrud<T>(
     },
     reset,
     state: dataState,
+    initialState: initialDataState,
   };
 
   return ret;
 }
 
 type CompareFn<T> = (r1: T, r2: T)=> boolean;
-function useResourceBase<T>(data: T, compare: CompareFn<T>) {
-  const [resourceBase, setResourceBase] = React.useState(data);
+function useInitialData<T>(data: T, compare: CompareFn<T>) {
+  const [initialData, setInitialData] = React.useState(data);
 
   useEffect(() => {
-    if (compare(data, resourceBase))
-      setResourceBase(data);
+    if (compare(data, initialData))
+      setInitialData(data);
   }, [data]);
 
-  return resourceBase;
+  return [
+    initialData,
+    setInitialData,
+  ] as const;
 }
 
 function useIsModified<T>(base: T, current: T, compare: CompareFn<T>) {
@@ -102,5 +113,8 @@ function useIsModified<T>(base: T, current: T, compare: CompareFn<T>) {
     setIsModified(v);
   }, [base, current]);
 
-  return isModified;
+  return [
+    isModified,
+    setIsModified,
+  ] as const;
 }

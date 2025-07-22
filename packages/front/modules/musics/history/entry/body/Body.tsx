@@ -1,6 +1,7 @@
 import { JSX, useState } from "react";
 import { PropInfo } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
+import { assertIsDefined } from "$shared/utils/validation";
 import { Music } from "#modules/musics/models";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
@@ -42,7 +43,7 @@ type Props = {
   data: Data;
 };
 export function Body( { data }: Props) {
-  const { state, remove, isModified, reset, update } = useHistoryEntryEdition<
+  const { state, remove, isModified, reset, update, initialState } = useHistoryEntryEdition<
  Data
    >( {
      data,
@@ -61,7 +62,22 @@ export function Body( { data }: Props) {
        const promises: Promise<any>[] = [];
 
        if (Object.entries(body.entity).length > 0) {
-         const p1 = MusicFetching.Patch.fetch(data.id, body);
+         const p1 = MusicFetching.Patch.fetch(data.music.id, body)
+           .then(res=>{
+             const music = {
+               ...res.data,
+               fileInfos: state[0].music.fileInfos,
+             };
+
+             assertIsDefined(music.fileInfos);
+
+             const newData = {
+               ...state[0],
+               music,
+             };
+
+             initialState[1](newData);
+           } );
 
          promises.push(p1);
        }
@@ -279,5 +295,20 @@ function fullUrlOf(url: string) {
 function calcIsModified(r1: MusicHistoryEntryEntity, r2: MusicHistoryEntryEntity) {
   return isModifiedd(r1, r2, {
     ignoreNewUndefined: true,
+    shouldMatch: {
+      music: {
+        title: true,
+        album: true,
+        artist: true,
+        country: true,
+        disabled: true,
+        game: true,
+        tags: true,
+        url: true,
+        weight: true,
+        year: true,
+        fileInfos: true,
+      },
+    },
   } );
 }

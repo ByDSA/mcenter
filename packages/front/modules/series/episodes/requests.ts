@@ -9,13 +9,14 @@ import { backendUrl } from "#modules/requests";
 export namespace EpisodeFetching {
   export namespace Patch {
     export type Body = EpisodesRestDtos.PatchOneById.Body;
+    export type Res = DataResponse<EpisodeEntity>;
     // eslint-disable-next-line require-await
     export async function fetch(
       episodeCompKey: EpisodeCompKey,
       body: Body,
-    ): Promise<DataResponse<EpisodeEntity> | undefined> {
+    ): Promise<Res> {
       const method = "PATCH";
-      const fetcher = makeFetcher<Body, DataResponse<EpisodeEntity>>( {
+      const fetcher = makeFetcher<Body, Res>( {
         method,
         body,
         reqBodyValidator: genAssertZod(EpisodesRestDtos.PatchOneById.bodySchema),
