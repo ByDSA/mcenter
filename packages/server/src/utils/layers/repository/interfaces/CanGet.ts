@@ -1,9 +1,11 @@
-export interface CanGetOneById<T, ID> {
-  getOneById(id: ID): Promise<T | null>;
-}
-
+/* Find: lanza excepción si no lo encuentra */
 export interface CanFindOneById<T, ID> {
   findOneById(id: ID): Promise<T>;
+}
+
+/* Get: permite null como resultado */
+export interface CanGetOneById<T, ID> {
+  getOneById(id: ID): Promise<T | null>;
 }
 
 export interface CanGetAll<T> {

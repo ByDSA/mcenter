@@ -3,7 +3,7 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { FilterQuery } from "mongoose";
 import { showError } from "$shared/utils/errors/showError";
 import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
-import { CanCreateOneAndGet, CanGetAll, CanUpdateMany } from "#utils/layers/repository";
+import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { ModelMessage, PatchEvent } from "#utils/event-sourcing";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { EpisodeEntity } from "#episodes/models";
@@ -23,7 +23,6 @@ export type MessageEvent = BrokerEvent<ModelMessage<Entity>>;
 @Injectable()
 export class EpisodeFileInfoRepository
 implements
-CanUpdateMany<Entity>,
 CanCreateOneAndGet<Model>,
 CanGetAll<Entity> {
   constructor(
@@ -51,12 +50,6 @@ CanGetAll<Entity> {
     }, docOdm, {
       upsert: true,
     } );
-  }
-
-  async patchMany(models: Entity[]): Promise<void> {
-    const promises = models.map(model =>this.updateOneByEpisodeId(model.episodeId, model));
-
-    await Promise.all(promises);
   }
 
   async getAll(): Promise<Entity[]> {

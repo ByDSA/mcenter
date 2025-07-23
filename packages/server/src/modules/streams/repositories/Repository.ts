@@ -6,7 +6,7 @@ import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { SERIES_QUEUE_NAME } from "#series/models";
 import { EventType } from "#utils/event-sourcing";
-import { CanCreateOne, CanGetAll, CanUpdateOneById } from "#utils/layers/repository";
+import { CanCreateOne, CanGetAll } from "#utils/layers/repository";
 import { BrokerEvent } from "#utils/message-broker";
 import { Stream, StreamId, StreamMode, StreamOriginType } from "../models";
 import { DocOdm, ModelOdm } from "./odm/odm";
@@ -15,8 +15,8 @@ import { streamDocOdmToModel, streamToDocOdm } from "./odm/adapters";
 @Injectable()
 export class StreamsRepository
 implements
-CanUpdateOneById<Stream, StreamId>,
-CanCreateOne<Stream>, CanGetAll<Stream> {
+CanCreateOne<Stream>,
+CanGetAll<Stream> {
   constructor(private readonly domainMessageBroker: DomainMessageBroker) {
     this.domainMessageBroker.subscribe(SERIES_QUEUE_NAME, async (event: BrokerEvent<any>) => {
       logDomainEvent(SERIES_QUEUE_NAME, event);
@@ -119,13 +119,5 @@ CanCreateOne<Stream>, CanGetAll<Stream> {
       return null;
 
     return streamDocOdmToModel(docOdm);
-  }
-
-  async updateOneById(id: StreamId, stream: Stream): Promise<void> {
-    const docOdm = streamToDocOdm(stream);
-
-    await ModelOdm.findOneAndUpdate( {
-      id,
-    }, docOdm);
   }
 }

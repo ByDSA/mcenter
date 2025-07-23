@@ -13,11 +13,3 @@ export interface CanCreateOne<T> {
 export interface CanCreateOneAndGet<T> {
   createOneAndGet(model: T): Promise<T>;
 }
-
-export interface CanCreateOneBySuperId<T, SUPERID> {
-  createOneBySuperId(id: SUPERID, model: T): Promise<void>;
-}
-
-export interface CanCreateOneBySuperIdAndGet<T, SUPERID> {
-  createOneBySuperIdAndGet(id: SUPERID, model: T): Promise<T>;
-}

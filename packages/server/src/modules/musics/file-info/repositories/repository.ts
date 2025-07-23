@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { MusicEntity, MusicId } from "$shared/models/musics";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { FilterQuery } from "mongoose";
-import { CanCreateOneAndGet, CanGetAll, CanUpdateMany } from "#utils/layers/repository";
+import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { PatchEvent } from "#utils/event-sourcing";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { getFullPath } from "#musics/utils";
@@ -21,7 +21,6 @@ type UpdateOneParams = Model;
 @Injectable()
 export class MusicFileInfoRepository
 implements
-CanUpdateMany<Entity>,
 CanCreateOneAndGet<Model>,
 CanGetAll<Entity> {
   constructor(
@@ -61,12 +60,6 @@ CanGetAll<Entity> {
     await MusicFileInfoOdm.Model.deleteOne( {
       path,
     } );
-  }
-
-  async patchMany(models: Entity[]): Promise<void> {
-    const promises = models.map(model =>this.patchOneByPath(model.path, model));
-
-    await Promise.all(promises);
   }
 
   async getAll(): Promise<Entity[]> {
