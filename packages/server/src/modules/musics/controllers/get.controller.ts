@@ -9,7 +9,6 @@ import z from "zod";
 import { Response } from "express";
 import mime from "mime-types";
 import { MusicEntity, musicSchema } from "#musics/models";
-import { createMusicHistoryEntryById } from "#musics/history/models";
 import { ResourcePickerRandom } from "#modules/picker";
 import { GetMany } from "#utils/nestjs/rest/Get";
 import { assertFound } from "#utils/validation/found";
@@ -18,7 +17,6 @@ import { MusicRepository } from "../repositories";
 import { requestToFindMusicParams } from "../repositories/queries/Queries";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
 import { ENVS, getFullPath } from "../utils";
-import { MusicFileInfoRepository } from "../file-info/repositories/repository";
 
 class GetRawDto extends createZodDto(z.object( {
   url: z.string(),
@@ -53,7 +51,6 @@ export class MusicGetController {
   constructor(
     private readonly musicHistoryRepository: MusicHistoryRepository,
     private readonly musicRepository: MusicRepository,
-    private readonly musicFileInfoRepo: MusicFileInfoRepository,
   ) {
   }
 
@@ -158,9 +155,10 @@ export class MusicGetController {
     assertIsDefined(fileInfo);
 
     // History
-    const entry = createMusicHistoryEntryById(music.id);
+    const isLast = await this.musicHistoryRepository.isLast(music.id);
 
-    await this.musicHistoryRepository.createOne(entry);
+    if (!isLast)
+      await this.musicHistoryRepository.createOneByMusicId(music.id);
 
     // Para obtener la duración desde VLC
     const relativePath = fileInfo.path;

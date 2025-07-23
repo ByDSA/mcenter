@@ -2,8 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { showError } from "$shared/utils/errors/showError";
 import { MusicHistoryEntryRestDtos } from "$shared/models/musics/history/dto/transport";
+import { MusicId } from "$shared/models/musics";
+import { getDateNow } from "$shared/utils/time";
 import { assertFound } from "#utils/validation/found";
-import { CanCreateOne, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
+import { CanCreateOne, CanCreateOneAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { MusicHistoryEntry, MusicHistoryEntryEntity } from "#musics/history/models";
 import { logDomainEvent } from "#modules/log";
@@ -14,21 +16,26 @@ import { MusicRepository } from "../../repositories/repository";
 import { docOdmToEntity, docOdmToModel, modelToDocOdm } from "./odm/adapters";
 import { getCriteriaPipeline } from "./criteria-pipeline";
 import { MusicHistoryEntryOdm } from "./odm";
+import { FullDocOdm } from "./odm/odm";
+
+type Model = MusicHistoryEntry;
+type Entity = MusicHistoryEntryEntity;
 
 type DocOdm = MusicHistoryEntryOdm.Doc;
 const ModelOdm = MusicHistoryEntryOdm.Model;
 
 export type GetManyCriteria = MusicHistoryEntryRestDtos.GetManyByCriteria.Criteria;
-type EntryId = Required<MusicHistoryEntry["id"]>;
+type EntryId = Required<Model["id"]>;
 
 @Injectable()
 export class MusicHistoryRepository
 implements
-CanCreateOne<MusicHistoryEntry>,
-CanGetManyCriteria<MusicHistoryEntry, GetManyCriteria>,
-CanGetAll<MusicHistoryEntry>,
-CanGetOneById<MusicHistoryEntry, EntryId>,
-CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
+CanCreateOne<Model>,
+CanCreateOneAndGet<Model>,
+CanGetManyCriteria<Model, GetManyCriteria>,
+CanGetAll<Model>,
+CanGetOneById<Model, EntryId>,
+CanDeleteOneByIdAndGet<Model, EntryId> {
   constructor(
     private readonly domainMessageBroker: DomainMessageBroker,
     private readonly musicRepository: MusicRepository,
@@ -40,7 +47,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     } ).catch(showError);
 
     this.domainMessageBroker.subscribe(QUEUE_NAME, async (_ev: BrokerEvent<unknown>) => {
-      const event = _ev as ModelEvent<MusicHistoryEntry>;
+      const event = _ev as ModelEvent<Model>;
 
       if (event.type !== EventType.DELETED)
         return;
@@ -59,13 +66,30 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     } ).catch(showError);
   }
 
-  async deleteOneByIdAndGet(id: EntryId): Promise<MusicHistoryEntry> {
+  async isLast(id: MusicId): Promise<boolean> {
+    const lastOdm = await ModelOdm.findOne( {} ).sort( {
+      "date.timestamp": -1,
+    } );
+
+    return lastOdm?.musicId === id;
+  }
+
+  async createOneByMusicId(musicId: MusicId): Promise<Model> {
+    const newEntry: Model = {
+      date: getDateNow(),
+      resourceId: musicId,
+    };
+
+    return await this.createOneAndGet(newEntry);
+  }
+
+  async deleteOneByIdAndGet(id: EntryId): Promise<Model> {
     const deleted = await ModelOdm.findByIdAndDelete(id);
 
     assertFound(deleted);
 
     const ret = docOdmToModel(deleted);
-    const event = new ModelEvent<MusicHistoryEntry>(EventType.DELETED, {
+    const event = new ModelEvent<Model>(EventType.DELETED, {
       entity: ret,
     } );
 
@@ -74,7 +98,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     return ret;
   }
 
-  async getOneById(id: EntryId): Promise<MusicHistoryEntry | null> {
+  async getOneById(id: EntryId): Promise<Model | null> {
     const docOdm = await ModelOdm.findById(id);
 
     if (docOdm)
@@ -83,7 +107,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     return null;
   }
 
-  async calcLastTimePlayedOf(id: Required<MusicHistoryEntry["id"]>): Promise<number | null> {
+  async calcLastTimePlayedOf(id: Required<Model["id"]>): Promise<number | null> {
     const docOdm = await ModelOdm.findOne( {
       musicId: id,
     } )
@@ -94,7 +118,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     return docOdm?.date?.timestamp ?? null;
   }
 
-  async getManyCriteria(criteria: GetManyCriteria): Promise<MusicHistoryEntryEntity[]> {
+  async getManyCriteria(criteria: GetManyCriteria): Promise<Entity[]> {
     const pipeline = getCriteriaPipeline(criteria);
     const docsOdm: MusicHistoryEntryOdm.FullDoc[] = await ModelOdm.aggregate(pipeline);
 
@@ -111,7 +135,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     return docsOdm.map(docOdmToEntity);
   }
 
-  async getAll(): Promise<MusicHistoryEntry[]> {
+  async getAll(): Promise<Model[]> {
     const docsOdm = await ModelOdm.find( {}, {
       _id: 0,
     } );
@@ -136,7 +160,7 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     return docsOdm[0];
   }
 
-  async getLast(): Promise<MusicHistoryEntry | null> {
+  async getLast(): Promise<Model | null> {
     const docOdm = await this.#getLastOdm();
 
     if (!docOdm)
@@ -145,20 +169,25 @@ CanDeleteOneByIdAndGet<MusicHistoryEntry, EntryId> {
     return docOdmToModel(docOdm);
   }
 
-  async createOne(model: MusicHistoryEntry): Promise<void> {
-    const lastOdm = await this.#getLastOdm();
+  async createOne(model: Model): Promise<void> {
+    await this.#createOneAndGetOdm(model);
+  }
 
-    if (lastOdm?.musicId === model.resourceId)
-      return;
-
+  async #createOneAndGetOdm(model: Model): Promise<FullDocOdm> {
     const docOdm = modelToDocOdm(model);
-
-    await ModelOdm.create(docOdm);
-
-    const event = new ModelEvent<MusicHistoryEntry>(EventType.CREATED, {
+    const ret = await ModelOdm.create(docOdm);
+    const event = new ModelEvent<Model>(EventType.CREATED, {
       entity: model,
     } );
 
     await this.domainMessageBroker.publish(QUEUE_NAME, event);
+
+    return ret;
+  }
+
+  async createOneAndGet(model: Model): Promise<Entity> {
+    const docOdm = await this.#createOneAndGetOdm(model);
+
+    return MusicHistoryEntryOdm.toEntity(docOdm);
   }
 }
