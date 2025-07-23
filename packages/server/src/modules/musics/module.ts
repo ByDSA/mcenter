@@ -11,6 +11,7 @@ import { MusicRepository } from "./repositories";
 import { MusicBuilderService } from "./builder/music-builder.service";
 import { MusicFileInfoRepository } from "./file-info/repositories/repository";
 import { MusicUrlGeneratorService } from "./builder/url-generator.service";
+import { RawHandlerService } from "./controllers/raw-handler.service";
 
 @Module( {
   imports: [
@@ -29,6 +30,7 @@ import { MusicUrlGeneratorService } from "./builder/url-generator.service";
     MusicBuilderService,
     MusicUrlGeneratorService,
     UpdateRemoteTreeService,
+    RawHandlerService,
   ],
   exports: [MusicRepository],
 } )

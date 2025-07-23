@@ -151,7 +151,7 @@ CanGetOneById<MusicEntity, MusicId> {
     return ret;
   }
 
-  async find(params: ExpressionNode): Promise<MusicEntity[]> {
+  async getManyByQuery(params: ExpressionNode): Promise<MusicEntity[]> {
     const query = findParamsToQueryParams(params);
     const docOdms = await MusicOdm.Model.find(query);
     const ret = docOdms.map(MusicOdm.toEntity);

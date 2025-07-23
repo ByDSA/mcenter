@@ -1,22 +1,22 @@
 import path from "node:path";
-import { createReadStream, statSync } from "node:fs";
+import { createReadStream } from "node:fs";
 import { Request } from "express";
 import { Controller, Get, Param, Req, Res, StreamableFile } from "@nestjs/common";
-import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
+import { assertIsNotEmpty } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { Response } from "express";
-import mime from "mime-types";
+import { Headers } from "@nestjs/common";
 import { MusicEntity, musicSchema } from "#musics/models";
 import { ResourcePickerRandom } from "#modules/picker";
 import { GetMany } from "#utils/nestjs/rest/Get";
-import { assertFound } from "#utils/validation/found";
 import { MusicHistoryRepository } from "../history";
 import { MusicRepository } from "../repositories";
 import { requestToFindMusicParams } from "../repositories/queries/Queries";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
-import { ENVS, getFullPath } from "../utils";
+import { ENVS } from "../utils";
+import { RawHandlerService } from "./raw-handler.service";
 
 class GetRawDto extends createZodDto(z.object( {
   url: z.string(),
@@ -51,6 +51,7 @@ export class MusicGetController {
   constructor(
     private readonly musicHistoryRepository: MusicHistoryRepository,
     private readonly musicRepository: MusicRepository,
+    private readonly rawHandler: RawHandlerService,
   ) {
   }
 
@@ -122,7 +123,7 @@ export class MusicGetController {
     const params = requestToFindMusicParams(req);
 
     if (params)
-      return this.musicRepository.find(params);
+      return this.musicRepository.getManyByQuery(params);
 
     return this.musicRepository.getAll();
   }
@@ -137,46 +138,15 @@ export class MusicGetController {
   }
 
   @Get("/raw/:url")
-  async rawAccess(
+  async getRaw(
     @Param() params: GetRawDto,
+    @Headers("if-none-match") ifNoneMatch: string,
+    @Headers("range") range: string,
      @Res( {
        passthrough: true,
      } ) res: Response,
   ) {
-    const { url } = params;
-    const music = await this.musicRepository.getOneByUrl(url, {
-      expand: ["fileInfos"],
-    } );
-
-    assertFound(music);
-    assertFound(music.fileInfos);
-    const fileInfo = music.fileInfos![0];
-
-    assertIsDefined(fileInfo);
-
-    // History
-    const isLast = await this.musicHistoryRepository.isLast(music.id);
-
-    if (!isLast)
-      await this.musicHistoryRepository.createOneByMusicId(music.id);
-
-    // Para obtener la duración desde VLC
-    const relativePath = fileInfo.path;
-    const fullpath = getFullPath(relativePath);
-    const stats = statSync(fullpath);
-    const mimeType = mime.lookup(fullpath) || "application/octet-stream";
-
-    // Headers mínimos necesarios
-    res.set( {
-      "Content-Type": mimeType,
-      "Content-Length": stats.size.toString(),
-      "Accept-Ranges": "bytes",
-    } );
-
-    // Download
-    const file = createReadStream(fullpath);
-
-    return new StreamableFile(file);
+    return await this.rawHandler.handle(params.url, ifNoneMatch, range, res);
   }
 }
 
@@ -188,8 +158,9 @@ type GenPlayListParams = {
 function generatePlaylist( { picked, nextUrl, server }: GenPlayListParams): string {
   const artist = fixTxt(picked.artist);
   const title = fixTxt(picked.title);
+  const duration = Math.round(picked.fileInfos?.[0].mediaInfo.duration ?? -1);
   const ret = `#EXTM3U
-  #EXTINF:317,${artist},${title}
+  #EXTINF:${duration},${artist},${title}
   ${server}${PATH_ROUTES.musics.raw.withParams(picked.url)}
   #EXTINF:-1,NEXT
   ${nextUrl}`;
