@@ -137,7 +137,7 @@ function AddIcon<R extends object, T extends string>(
   return <span className="ui-kit-array-add-item">
     {mainInputElement}
     <a className="ui-kit-add-button"
-      onClick={()=>add}
+      onClick={add}
     >+</a>
   </span>;
 }
