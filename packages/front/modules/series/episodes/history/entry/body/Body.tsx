@@ -21,9 +21,9 @@ type Data = EpisodeHistoryEntryFetching.GetMany.Data;
 
 function getAndUpdateEpisodeByProp<V>(
   prop: string,
-): Pick<ResourceInputCommonProps<Data, V>, "getValue" | "name" | "setResource"> {
+): Pick<ResourceInputCommonProps<Data, V>, "getUpdatedResource" | "getValue" | "name"> {
   return {
-    setResource: (v, r) => ( {
+    getUpdatedResource: (v, r) => ( {
       ...r,
       episode: {
         ...r.episode,
@@ -36,9 +36,9 @@ function getAndUpdateEpisodeByProp<V>(
 }
 function getAndUpdateFileInfoByProp<V>(
   prop: string,
-): Pick<ResourceInputCommonProps<Data, V>, "getValue" | "name" | "setResource"> {
+): Pick<ResourceInputCommonProps<Data, V>, "getUpdatedResource" | "getValue" | "name"> {
   return {
-    setResource: (v, r) => ( {
+    getUpdatedResource: (v, r) => ( {
       ...r,
       episode: {
         ...r.episode,
@@ -58,7 +58,9 @@ type Props = {
   data: Data;
 };
 export function Body( { data }: Props) {
-  const { state, remove, isModified, reset, update, initialState } = useHistoryEntryEdition<
+  const { state, remove, isModified,
+    reset, addOnReset,
+    update, initialState } = useHistoryEntryEdition<
 Data
   >( {
     data,
@@ -130,12 +132,14 @@ Data
       onPressEnter: ()=>update.action(),
     },
     resourceState: state,
+    addOnReset,
   };
   const commonInputNumberProps = {
     inputNumberProps: {
       onPressEnter: ()=>update.action(),
     },
     resourceState: state,
+    addOnReset,
   };
   const titleElement = ResourceInputText( {
     caption: EPISODE_PROPS.title.caption,
@@ -192,6 +196,7 @@ Data
       {ResourceInputArrayString( {
         ...getAndUpdateEpisodeByProp("tags"),
         resourceState: state,
+        addOnReset,
         inputTextProps: {
           onEmptyPressEnter: commonEpisodeInputTextProps.inputTextProps.onPressEnter,
         },

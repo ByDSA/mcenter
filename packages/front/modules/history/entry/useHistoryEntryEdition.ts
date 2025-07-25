@@ -1,11 +1,11 @@
 import { useCrud, UseCrudProps, UseCrudRet } from "#modules/utils/resources/useCrud";
 
-type Props<T> = UseCrudProps<T>;
+type Props<T> = UseCrudProps<T> ;
 type Ret<T> = UseCrudRet<T>;
 export function useHistoryEntryEdition<T>(
   params: Props<T>,
 ): Ret<T> {
-  const { isModified, remove, reset, state, update, initialState } = useCrud<T>( {
+  const { isModified, remove, reset, addOnReset, state, update, initialState } = useCrud<T>( {
     data: params.data,
     fetchRemove: async () => {
       if (!confirm(`Borar esta entrada del historial?\n${ JSON.stringify(params.data, null, 2)}`))
@@ -21,6 +21,7 @@ export function useHistoryEntryEdition<T>(
     initialState,
     isModified,
     remove,
+    addOnReset,
     reset,
     state,
     update,

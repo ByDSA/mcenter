@@ -1,56 +1,38 @@
 import { useMemo } from "react";
 import { ResourceInputProps, ResourceInputView } from "./ResourceInput";
-import { OnPressEnter, useInputText, UseInputTextProps } from "./UseInputText";
+import { useInputBoolean } from "./UseInputBoolean";
 import { useOptional } from "./UseOptional";
 import { UseResourceInputProps, useResourceState, useResourceSync } from "./UseResourceInput";
 
-export type ResourceInputTextProps<R extends object> =
-  ResourceInputProps<R, string> & {
-    inputTextProps?: UseInputTextProps;
-  };
+export type ResourceInputBooleanProps<R extends object> = ResourceInputProps<R, boolean>;
 
-export function ResourceInputText<R extends object>(
-  { resourceState,
-    originalResource,
-    getUpdatedResource,
-    caption,
-    addOnReset,
-    isOptional = false,
-    getValue,
-    isHidden = false,
-    disabled = false,
-    inputTextProps }: ResourceInputTextProps<R>,
+export function ResourceInputBoolean<R extends object>(
+  { getUpdatedResource, getValue, resourceState, originalResource, addOnReset, caption, disabled =
+  false, isHidden = false, isOptional = false }: ResourceInputBooleanProps<R>,
 ) {
-  const { checkboxOptionalElement, mainInputElement } = useResourceInputText<R>( {
+  const { checkboxOptionalElement, mainInputElement } = useResourceInputBoolean( {
     disabled,
     getUpdatedResource,
-    onPressEnter: inputTextProps?.onPressEnter,
     getValue,
     addOnReset,
     isOptional,
-    defaultDefinedValue: "",
+    defaultDefinedValue: false,
     resourceState,
     originalResource,
   } );
 
   return ResourceInputView( {
     inputElement: mainInputElement,
-    type: "text",
+    type: "boolean",
     caption,
     checkboxOptionalElement,
     isVisible: !isHidden,
   } );
 }
-type UseResourceInputTextProps<R extends object> = Omit<
-  UseResourceInputProps<R, string>,
-  "visualValueState"
-> & {
-    onPressEnter?: OnPressEnter<string>;
-  };
 
-function useResourceInputText<R extends object>(
-  props: UseResourceInputTextProps<R>,
-) {
+type UseResourceInputBooleanProps<R extends object> =
+  Omit<UseResourceInputProps<R, boolean>, "visualValueState">;
+function useResourceInputBoolean<R extends object>(props: UseResourceInputBooleanProps<R>) {
   const { resourceValue,
     setResourceValue } = useResourceState( {
     resourceState: props.resourceState,
@@ -64,9 +46,8 @@ function useResourceInputText<R extends object>(
     isOptional: props.isOptional,
   } );
   const { element: mainInputElement,
-    setValue: setVisualValue, value: visualValue, addOnChange } = useInputText( {
+    setValue: setVisualValue, value: visualValue, addOnChange } = useInputBoolean( {
     defaultValue: props.defaultDefinedValue,
-    onPressEnter: props.onPressEnter,
     disabled: props.disabled || nullChecked,
   } );
   const originalResourceValue = useMemo(
@@ -77,8 +58,8 @@ function useResourceInputText<R extends object>(
   useResourceSync( {
     resourceValue,
     originalResourceValue,
-    setResourceValue,
     addOnReset: props.addOnReset,
+    setResourceValue,
     visualValue,
     setVisualValue,
     addOnOptionalChange,

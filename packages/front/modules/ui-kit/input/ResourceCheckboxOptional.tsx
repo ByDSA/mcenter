@@ -1,20 +1,32 @@
 import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
 
-type InputResourceProps<T> = ResourceInputCommonProps<T, boolean | undefined> & {
+type InputResourceProps<T, V> = Omit<ResourceInputCommonProps<T, V | undefined>, "getValue"> & {
   name: string;
+  setDisabled: (value: boolean)=> void;
+  isChecked: boolean;
+  setChecked: (value: boolean)=> void;
 };
-export function ResourceOptionalCheckbox(
-  { name: checkboxName, getValue: getResourceValue,
-    setResource: calcUpdatedResource, resourceState }: InputResourceProps<any>,
+export function ResourceOptionalCheckbox<R, V>(
+  { name: checkboxName,
+    getUpdatedResource, resourceState,
+    setDisabled, isChecked, setChecked }: InputResourceProps<R, V>,
 ) {
   const [resource, setResource] = resourceState;
-  const resourceValue = getResourceValue(resourceState[0]);
 
   return <>
-    <input type="checkbox" disabled={resourceValue === undefined} name={checkboxName} checked={resourceValue === undefined} onChange={(e) => {
-      if (e.target.checked)
-        setResource(calcUpdatedResource(undefined, resource));
-    }}/>
+    <input type="checkbox"
+      name={checkboxName}
+      checked={isChecked}
+      onChange={(e) => {
+        if (e.target.checked) {
+          const newResource = getUpdatedResource(undefined, resource);
+
+          setResource(newResource);
+        }
+
+        setDisabled(e.target.checked);
+        setChecked(!isChecked);
+      }}/>
     <label htmlFor={checkboxName}>Sin valor</label>
   </>;
 }

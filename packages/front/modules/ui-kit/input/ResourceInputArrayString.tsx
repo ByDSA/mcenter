@@ -1,14 +1,20 @@
 import { isDefined } from "$shared/utils/validation";
-import { InputTextProps, useInputText } from "./InputText";
+import { useEffect } from "react";
+import { AddOnReset } from "#modules/utils/resources/useCrud";
 import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
+import { OnPressEnter, useInputText } from "./UseInputText";
 
-export type ResourceInputTextArrayProps<R> = ResourceInputCommonProps<R, string[] | undefined> & {
-  inputTextProps?: InputTextProps;
+type EnterProps = {
+  onPressEnter?: OnPressEnter<string>;
+  onEmptyPressEnter?: ()=> void;
 };
 
+export type ResourceInputTextArrayProps<R> = EnterProps & ResourceInputCommonProps<R, string[] |
+  undefined>;
+
 export function ResourceInputArrayString<R extends object>(
-  { resourceState, setResource: calcUpdatedResource, getValue: getResourceValue,
-    inputTextProps }: ResourceInputTextArrayProps<R>,
+  { resourceState, getUpdatedResource: calcUpdatedResource, getValue: getResourceValue, addOnReset,
+    onEmptyPressEnter, onPressEnter }: ResourceInputTextArrayProps<R>,
 ) {
   const array = (getResourceValue(resourceState[0]) ?? []) as string[];
 
@@ -32,7 +38,9 @@ export function ResourceInputArrayString<R extends object>(
           resourceState,
           calcUpdatedResource,
           getResourceValue,
-          inputTextProps,
+          onEmptyPressEnter,
+          onPressEnter,
+          addOnReset,
         } )
       }
     </span>
@@ -42,7 +50,7 @@ export function ResourceInputArrayString<R extends object>(
 type ItemProps<R extends object> = {
   name: string;
   resourceState: ResourceInputTextArrayProps<R>["resourceState"];
-  calcUpdatedResource: ResourceInputTextArrayProps<R>["setResource"];
+  calcUpdatedResource: ResourceInputTextArrayProps<R>["getUpdatedResource"];
   getResourceValue: ResourceInputTextArrayProps<R>["getValue"];
   index: number;
 };
@@ -62,7 +70,7 @@ function Item<R extends object>( { name,
 
 type AddDeleteIconProps<R extends object> = {
   resourceState: ResourceInputTextArrayProps<R>["resourceState"];
-  calcUpdatedResource: ResourceInputTextArrayProps<R>["setResource"];
+  calcUpdatedResource: ResourceInputTextArrayProps<R>["getUpdatedResource"];
   getResourceValue: ResourceInputTextArrayProps<R>["getValue"];
 };
 type DeleteIconProps<R extends object> = AddDeleteIconProps<R> & {
@@ -89,38 +97,45 @@ const deleteIconOnClickHandler = <R extends object>(
   setResource(calcUpdatedResource(array.toSpliced(index, 1), resource));
 };
 
-type AddIconProps<R extends object> = AddDeleteIconProps<R> & {
-  inputTextProps?: InputTextProps;
+type AddIconProps<R extends object> = AddDeleteIconProps<R> & EnterProps & {
+  addOnReset: AddOnReset<R>;
 };
 
+const EMPTY_VALUE = "";
+
 function AddIcon<R extends object, T extends string>(
-  { resourceState, calcUpdatedResource, getResourceValue, inputTextProps }: AddIconProps<R>,
+  { resourceState, calcUpdatedResource, getResourceValue,
+    onEmptyPressEnter, onPressEnter, addOnReset }: AddIconProps<R>,
 ) {
+  const { element: mainInputElement, value, setValue } = useInputText( {
+    defaultValue: EMPTY_VALUE,
+    onPressEnter: (text: T) => {
+      if (text === EMPTY_VALUE)
+        onEmptyPressEnter?.();
+      else {
+        add();
+
+        if (typeof onPressEnter === "function")
+          onPressEnter?.(text);
+      }
+    },
+  } );
+
+  useEffect(() => {
+    addOnReset(()=> {
+      setValue(EMPTY_VALUE);
+    } );
+  }, []);
   const add = ()=>addIconOnClickHandler( {
     calcUpdatedResource,
     getResourceValue,
     resourceState,
-    setInputText,
-    inputText: getInputText(),
+    setInputText: setValue,
+    inputText: value,
   } );
-  const props: InputTextProps = {
-    ...inputTextProps,
-    onPressEnter: (text: T) => {
-      if (text === "") {
-        if (inputTextProps?.onEmptyPressEnter)
-          inputTextProps?.onEmptyPressEnter?.();
-      } else {
-        add();
-
-        if (typeof inputTextProps?.onPressEnter === "function")
-          inputTextProps?.onPressEnter?.(text);
-      }
-    },
-  };
-  const { setValue: setInputText, getValue: getInputText, element } = useInputText(props);
 
   return <span className="ui-kit-array-add-item">
-    {element}
+    {mainInputElement}
     <a className="ui-kit-add-button"
       onClick={()=>add}
     >+</a>

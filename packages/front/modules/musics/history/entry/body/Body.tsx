@@ -10,11 +10,12 @@ import { secsToMmss } from "#modules/utils/dates";
 import { useHistoryEntryEdition } from "#modules/history";
 import { backendUrl } from "#modules/requests";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
-import { InputNumberProps } from "#modules/ui-kit/input/InputNumber";
-import { InputTextProps } from "#modules/ui-kit/input/InputText";
+import { UseInputNumberProps } from "#modules/ui-kit/input/UseInputNumber";
 import { generatePatchBody } from "#modules/fetching";
 import { MusicFetching } from "#modules/musics/requests";
 import { MusicFileInfoFetching } from "#modules/musics/file-info/requests";
+import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
+import { UseInputTextProps } from "#modules/ui-kit/input/UseInputText";
 import { MUSIC_PROPS } from "../utils";
 import { MusicHistoryEntryEntity } from "../../models";
 import { MusicHistoryEntryFetching } from "../../requests";
@@ -23,9 +24,9 @@ import { LastestComponent } from "./Lastest";
 
 function getAndUpdateMusicByProp<V>(
   prop: string,
-): Pick<ResourceInputCommonProps<Data, V>, "getValue" | "name" | "setResource"> {
+): Pick<ResourceInputCommonProps<Data, V>, "getUpdatedResource" | "getValue" | "name"> {
   return {
-    setResource: (v, r) => ( {
+    getUpdatedResource: (v, r) => ( {
       ...r,
       music: {
         ...r.music,
@@ -34,6 +35,7 @@ function getAndUpdateMusicByProp<V>(
     } ),
     getValue: (r)=>r.music[prop],
     name: prop,
+
   };
 }
 
@@ -43,62 +45,76 @@ type Props = {
   data: Data;
 };
 export function Body( { data }: Props) {
-  const { state, remove, isModified, reset, update, initialState } = useHistoryEntryEdition<
- Data
-   >( {
-     data,
-     isModifiedFn: calcIsModified,
-     fetchRemove: async ()=> {
-       const res = await MusicHistoryEntryFetching.DeleteOneById.fetch(data.id);
+  const { state, remove, isModified,
+    reset, addOnReset,
+    update, initialState } = useHistoryEntryEdition<Data>( {
+      data,
+      isModifiedFn: calcIsModified,
+      fetchRemove: async ()=> {
+        const res = await MusicHistoryEntryFetching.DeleteOneById.fetch(data.id);
 
-       return res.data as Data;
-     },
-     fetchUpdate: async () => {
-       const body = generatePatchBody(
-         data.music,
-         state[0].music,
-         ["title", "weight", "disabled", "tags"],
-       );
-       const promises: Promise<any>[] = [];
+        return res.data as Data;
+      },
+      fetchUpdate: async () => {
+        const body = generatePatchBody(
+          data.music,
+          state[0].music,
+          [
+            "title",
+            "weight",
+            "disabled",
+            "tags",
+            "album",
+            "artist",
+            "country",
+            "game",
+            "spotifyId",
+            "url",
+            "year",
+          ],
+        );
+        const promises: Promise<any>[] = [];
 
-       if (Object.entries(body.entity).length > 0) {
-         const p1 = MusicFetching.Patch.fetch(data.music.id, body)
-           .then(res=>{
-             const music = {
-               ...res.data,
-               fileInfos: state[0].music.fileInfos,
-             };
+        if (
+          Object.entries(body.entity).length > 0 || Object.entries(body.unset ?? {} ).length > 0
+        ) {
+          const p1 = MusicFetching.Patch.fetch(data.music.id, body)
+            .then(res=>{
+              const music = {
+                ...res.data,
+                fileInfos: state[0].music.fileInfos,
+              };
 
-             assertIsDefined(music.fileInfos);
+              assertIsDefined(music.fileInfos);
 
-             const newData = {
-               ...state[0],
-               music,
-             };
+              const newData = {
+                ...state[0],
+                music,
+              };
 
-             initialState[1](newData);
-           } );
+              initialState[1](newData);
+            } );
 
-         promises.push(p1);
-       }
+          promises.push(p1);
+        }
 
-       const dataFileInfo = data.music.fileInfos[0];
-       const stateFileInfo = state[0].music.fileInfos[0];
-       const fileInfoBody = generatePatchBody(
-         dataFileInfo,
-         stateFileInfo,
-         ["path"],
-       );
+        const dataFileInfo = data.music.fileInfos[0];
+        const stateFileInfo = state[0].music.fileInfos[0];
+        const fileInfoBody = generatePatchBody(
+          dataFileInfo,
+          stateFileInfo,
+          ["path"],
+        );
 
-       if (Object.entries(fileInfoBody.entity).length > 0) {
-         const p2 = MusicFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody);
+        if (Object.entries(fileInfoBody.entity).length > 0) {
+          const p2 = MusicFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody);
 
-         promises.push(p2);
-       }
+          promises.push(p2);
+        }
 
-       await Promise.all(promises);
-     },
-   } );
+        await Promise.all(promises);
+      },
+    } );
   const optionalProps: Record<keyof Music, PropInfo> = Object.entries(MUSIC_PROPS)
     .reduce((acc, [key, value]) => {
       if (value.required)
@@ -114,23 +130,27 @@ export function Body( { data }: Props) {
   const commonInputTextProps = {
     inputTextProps: {
       onPressEnter: ()=>update.action(),
-    },
+    } as UseInputTextProps,
     resourceState: state,
+    originalResource: initialState[0],
+    addOnReset,
   };
   const commonInputNumberProps = {
     inputNumberProps: {
       onPressEnter: ()=>update.action(),
     },
     resourceState: state,
+    originalResource: initialState[0],
+    addOnReset,
   };
   const titleElement = ResourceInputText( {
     caption: MUSIC_PROPS.title.caption,
-    ...getAndUpdateMusicByProp("title"),
+    ...getAndUpdateMusicByProp<string>("title"),
     ...commonInputTextProps,
   } );
   const artistElement = ResourceInputText( {
     caption: MUSIC_PROPS.artist.caption,
-    ...getAndUpdateMusicByProp("artist"),
+    ...getAndUpdateMusicByProp<string>("artist"),
     ...commonInputTextProps,
   } );
   const titleArtist = <span className={classes("line", style.titleArtist)}>
@@ -168,8 +188,12 @@ export function Body( { data }: Props) {
       {ResourceInputArrayString( {
         ...getAndUpdateMusicByProp<string[]>("tags"),
         resourceState: state,
-        inputTextProps: {
-          onEmptyPressEnter: commonInputTextProps.inputTextProps.onPressEnter,
+        addOnReset,
+        onEmptyPressEnter: ()=>{
+          const o = commonInputTextProps.inputTextProps.onPressEnter;
+
+          if (typeof o === "function")
+            return o("");
         },
       } )}
     </span>
@@ -187,6 +211,8 @@ export function Body( { data }: Props) {
       optionalProps,
       ...commonInputTextProps,
       ...commonInputNumberProps,
+      initialResource: initialState[0],
+      addOnReset,
     } )}
 
     <span className={"break"} />
@@ -215,14 +241,16 @@ export function Body( { data }: Props) {
   </div>;
 }
 
-type OptionalPropsProps = Omit<ResourceInputCommonProps<Data, string>, "getValue" | "name" |
-  "setResource"> & {
+type OptionalPropsProps = Omit<ResourceInputCommonProps<Data, string>, "getUpdatedResource" |
+  "getValue" | "name"> & {
   optionalProps: Record<keyof Music, PropInfo>;
-  inputNumberProps: InputNumberProps;
-  inputTextProps: InputTextProps;
+  inputNumberProps: UseInputNumberProps;
+  inputTextProps: UseInputTextProps;
+  initialResource: Data;
 };
 function OptionalProps(
-  { resourceState, optionalProps, inputNumberProps, inputTextProps }: OptionalPropsProps,
+  { resourceState, optionalProps, initialResource,
+    inputNumberProps, addOnReset, inputTextProps }: OptionalPropsProps,
 ) {
   const [isVisible, setIsVisible] = useState(false);
   const ret: Record<string, JSX.Element> = {};
@@ -237,49 +265,71 @@ function OptionalProps(
     </span>
   </>);
 
-  const [resource] = resourceState;
   const entries = Object.entries(optionalProps) as [keyof Music, PropInfo][];
+  const commonProps = {
+    resourceState,
+    originalResource: initialResource,
+    addOnReset,
+    isOptional: true,
+  };
 
   for (const entry of entries) {
     const [prop, propInfo] = entry;
     const { type, caption = prop } = propInfo;
-
-    if (prop in resource || isVisible) {
-      const t = type === "number" ? "number" : "string";
-
-      switch (t) {
-        case "string":
-        // eslint-disable-next-line default-case-last, no-fallthrough
-        default:
-          ret[prop] = (<>
-            <span className={classes("line", "height2")}>
-              {
-                ResourceInputText( {
-                  caption,
-                  ...getAndUpdateMusicByProp(prop),
-                  resourceState,
-                  isOptional: true,
-                  inputTextProps,
-                } )
-              }
-            </span>
-          </>);
-          break;
-        case "number":
-          ret[prop] = (<>
-            <span className={classes("line", "height2")}>
-              {
-                ResourceInputNumber( {
-                  caption,
-                  ...getAndUpdateMusicByProp<number>(prop),
-                  resourceState,
-                  isOptional: true,
-                  inputNumberProps,
-                } )
-              }
-            </span>
-          </>);
+    const isHidden = !(initialResource.music[prop] !== undefined
+      || resourceState[0].music[prop] !== undefined || isVisible);
+    const hiddenStyle = isHidden
+      ? {
+        display: "none",
       }
+      : undefined;
+
+    switch (type) {
+      case "string":
+        // eslint-disable-next-line default-case-last, no-fallthrough
+      default:
+        ret[prop] = (<>
+          <span className={classes("line", "height2")} style={hiddenStyle}>
+            {
+              ResourceInputText( {
+                ...commonProps,
+                ...getAndUpdateMusicByProp<string>(prop),
+                caption,
+                inputTextProps,
+                isHidden,
+              } )
+            }
+          </span>
+        </>);
+        break;
+      case "number":
+        ret[prop] = (<>
+          <span className={classes("line", "height2")} style={hiddenStyle}>
+            {
+              ResourceInputNumber( {
+                ...commonProps,
+                ...getAndUpdateMusicByProp<number>(prop),
+                caption,
+                inputNumberProps,
+                isHidden,
+              } )
+            }
+          </span>
+        </>);
+        break;
+      case "boolean":
+        ret[prop] = (<>
+          <span className={classes("line", "height2")} style={hiddenStyle}>
+            {
+              ResourceInputBoolean( {
+                ...commonProps,
+                ...getAndUpdateMusicByProp<boolean>(prop),
+                caption,
+                isHidden,
+              } )
+            }
+          </span>
+        </>);
     }
   }
 

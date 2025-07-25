@@ -3,6 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useAsyncAction } from "#modules/ui-kit/input";
 import { ResourceState } from "#modules/ui-kit/input/ResourceInputCommonProps";
 
+export type AddOnReset<R> = (fn: OnReset<R>)=> void;
+
+type OnReset<R> = (resource: R)=> void;
+
 type FetchFn<T> = ()=> Promise<T | void>;
 
 export type UseCrudProps<T> = {
@@ -21,6 +25,7 @@ export type UseCrudRet<T> = {
   isModified: boolean;
   update: CrudOp<T>;
   remove: CrudOp<T>;
+  addOnReset: AddOnReset<T>;
   reset: ()=> Promise<void>;
   state: ResourceState<T>;
   initialState: ResourceState<T>;
@@ -40,10 +45,7 @@ export function useCrud<T>(
   const [isModified] = useIsModified(initialData, currentData, isModifiedFn);
   const asyncUpdateAction = useAsyncAction();
   const asyncRemoveAction = useAsyncAction();
-  // eslint-disable-next-line require-await
-  const reset = async () => {
-    setData(data);
-  };
+  const [onReset, setOnReset] = useState([] as OnReset<T>[]);
   const update = async () => {
     if (!isModified)
       return;
@@ -81,7 +83,19 @@ export function useCrud<T>(
       action: remove,
       isDoing: asyncRemoveAction.isDoing,
     },
-    reset,
+    // eslint-disable-next-line require-await
+    reset: async () => {
+      setData(data);
+
+      for (const fn of onReset)
+        fn(data);
+    },
+    addOnReset: (fn: OnReset<T>) => {
+      setOnReset((oldOnReset)=>([
+        ...oldOnReset,
+        fn,
+      ]));
+    },
     state: dataState,
     initialState: initialDataState,
   };
