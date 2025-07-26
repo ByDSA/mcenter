@@ -1,5 +1,6 @@
-import mongoose, { Types, UpdateQuery } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { assertIsDefined } from "$shared/utils/validation";
+import { AllKeysOf } from "$shared/utils/types";
 import { EpisodeFileInfo, EpisodeFileInfoEntity, assertIsEpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { DocOdm, FullDocOdm } from "./odm";
 
@@ -71,49 +72,28 @@ export function entityToDocOdm(entity: Entity): FullDocOdm {
   };
 }
 
-export function partialModelToDocOdm(model: Partial<Model>): UpdateQuery<Model> {
-  const ret: UpdateQuery<Model> = {};
-
-  if (model.start !== undefined)
-    ret.start = model.start;
-
-  if (model.end !== undefined)
-    ret.end = model.end;
-
-  if (model.hash !== undefined)
-    ret.hash = model.hash;
-
-  if (model.episodeId !== undefined)
-    ret.episodeId = model.episodeId;
-
-  if (model.mediaInfo !== undefined) {
-    ret.mediaInfo = {};
-
-    if (model.mediaInfo.duration !== undefined)
-      ret.mediaInfo.duration = model.mediaInfo.duration;
-
-    if (model.mediaInfo.fps !== undefined)
-      ret.mediaInfo.fps = model.mediaInfo.fps;
-
-    if (model.mediaInfo.resolution !== undefined)
-      ret.mediaInfo.resolution = model.mediaInfo.resolution;
-  }
-
-  if (model.path !== undefined)
-    ret.path = model.path;
-
-  if (model.size !== undefined)
-    ret.size = model.size;
-
-  if (model.timestamps !== undefined) {
-    ret.timestamps = {};
-
-    if (model.timestamps.createdAt !== undefined)
-      ret.timestamps.createdAt = model.timestamps.createdAt;
-
-    if (model.timestamps.updatedAt !== undefined)
-      ret.timestamps.updatedAt = model.timestamps.updatedAt;
-  }
+export function partialModelToDocOdm(model: Partial<Model>): Partial<DocOdm> {
+  const ret: Partial<DocOdm> = {
+    start: model.start,
+    end: model.end,
+    hash: model.hash,
+    episodeId: model.episodeId ? new Types.ObjectId(model.episodeId) : undefined,
+    path: model.path,
+    size: model.size,
+    mediaInfo: model.mediaInfo !== undefined
+      ? {
+        duration: model.mediaInfo.duration,
+        fps: model.mediaInfo.fps,
+        resolution: model.mediaInfo.resolution,
+      }
+      : undefined,
+    timestamps: model.timestamps !== undefined
+      ? {
+        createdAt: model.timestamps.createdAt,
+        updatedAt: model.timestamps.updatedAt,
+      }
+      : undefined,
+  } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return ret;
 }

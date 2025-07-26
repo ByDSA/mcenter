@@ -10,7 +10,7 @@ import { secsToMmss } from "#modules/utils/dates";
 import { useHistoryEntryEdition } from "#modules/history";
 import { backendUrl } from "#modules/requests";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
-import { generatePatchBody } from "#modules/fetching";
+import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
 import { MusicFetching } from "#modules/musics/requests";
 import { MusicFileInfoFetching } from "#modules/musics/file-info/requests";
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
@@ -74,9 +74,7 @@ export function Body( { data }: Props) {
         );
         const promises: Promise<any>[] = [];
 
-        if (
-          Object.entries(body.entity).length > 0 || Object.entries(body.unset ?? {} ).length > 0
-        ) {
+        if (shouldSendPatchWithBody(body)) {
           const p1 = MusicFetching.Patch.fetch(data.music.id, body)
             .then(res=>{
               const music = {

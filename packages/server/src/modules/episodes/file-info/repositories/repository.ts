@@ -10,6 +10,7 @@ import { EpisodeEntity } from "#episodes/models";
 import { assertFound } from "#utils/validation/found";
 import { BrokerEvent } from "#utils/message-broker";
 import { logDomainEvent } from "#modules/log";
+import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { EpisodeFileInfoOdm } from "./odm";
 import { EPISODE_FILE_INFOS_QUEUE_NAME } from "./events";
 
@@ -97,10 +98,10 @@ CanGetAll<Entity> {
 
   async #patchOneAndGet(
     query: FilterQuery<Model>,
-    patchParams: PatchOneParams<Partial<Model>>,
+    params: PatchOneParams<Model>,
   ): Promise<EpisodeFileInfoEntity | null> {
-    const partialDocOdm = EpisodeFileInfoOdm.partialToDoc(patchParams.entity);
-    const updateResult = await EpisodeFileInfoOdm.Model.findOneAndUpdate(query, partialDocOdm, {
+    const updateQuery = patchParamsToUpdateQuery(params, EpisodeFileInfoOdm.partialToDoc);
+    const updateResult = await EpisodeFileInfoOdm.Model.findOneAndUpdate(query, updateQuery, {
       new: true,
     } );
 
@@ -108,7 +109,7 @@ CanGetAll<Entity> {
 
     const id = updateResult._id.toString();
 
-    for (const [key, value] of Object.entries(patchParams.entity)) {
+    for (const [key, value] of Object.entries(params.entity)) {
       const event = new PatchEvent<Model, EpisodeFileInfoEntity["id"]>( {
         entityId: id,
         key: key as keyof Model,

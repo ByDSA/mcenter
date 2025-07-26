@@ -11,11 +11,11 @@ import { MusicEntity, Music, MusicId } from "#musics/models";
 import { MusicHistoryEntry } from "#musics/history/models";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { QUEUE_NAME as MUSIC_HISTORY_QUEUE_NAME } from "../history/events";
 import { fixUrl } from "../builder/fix-url";
 import { MusicBuilderService } from "../builder/music-builder.service";
 import { MusicOdm } from "./odm";
-import { patchParamsToUpdateQuery } from "./odm/adapters";
 import { QUEUE_NAME } from "./events";
 import { findParamsToQueryParams } from "./queries/QueriesOdm";
 import { ExpressionNode } from "./queries/QueryObject";
@@ -68,16 +68,13 @@ CanGetOneById<MusicEntity, MusicId> {
     return MusicOdm.toEntity(docOdm);
   }
 
-  private fixUrlIfHave(partialMusic: Partial<Music>) {
-    if (partialMusic.url)
-      partialMusic.url = fixUrl(partialMusic.url) ?? undefined;
-  }
-
   async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {
     const { entity } = params;
-    const updateQuery = patchParamsToUpdateQuery(params);
 
-    this.fixUrlIfHave(entity);
+    if (entity.url)
+      entity.url = fixUrl(entity.url) ?? undefined;
+
+    const updateQuery = patchParamsToUpdateQuery(params, MusicOdm.partialToDoc);
 
     updateQuery.$set = {
       ...updateQuery.$set,

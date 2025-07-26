@@ -10,7 +10,7 @@ import { backendUrl } from "#modules/requests";
 import { useHistoryEntryEdition } from "#modules/history";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
 import { EpisodeFileInfoFetching } from "#modules/series/episodes/file-info/requests";
-import { generatePatchBody } from "#modules/fetching";
+import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
 import { EPISODE_FILE_INFO_PROPS, EPISODE_PROPS } from "../utils";
 import { EpisodeHistoryEntryFetching } from "../../requests";
 import { EpisodeFetching } from "../../../requests";
@@ -78,7 +78,7 @@ Data
       );
       const promises: Promise<any>[] = [];
 
-      if (Object.entries(episodeBody.entity).length > 0) {
+      if (shouldSendPatchWithBody(episodeBody)) {
         const p1 = EpisodeFetching.Patch.fetch(data.episodeCompKey, episodeBody)
           .then(res=>{
             const episode: EpisodeEntity & Required<Pick<EpisodeEntity, "fileInfos">> = {
@@ -107,7 +107,7 @@ Data
         ["end", "path", "start"],
       );
 
-      if (Object.entries(fileInfoBody.entity).length > 0) {
+      if (shouldSendPatchWithBody(fileInfoBody)) {
         const p2 = EpisodeFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody)
           .then(res=>{
             const episodefileInfo: Data = {

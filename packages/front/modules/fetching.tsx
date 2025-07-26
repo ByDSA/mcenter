@@ -134,6 +134,16 @@ export function FetchingRender<T, U = undefined>(
   return render(data, hooksRet);
 }
 
+export function shouldSendPatchWithBody(body: ReturnType<typeof generatePatchBody>): boolean {
+  if (Object.entries(body.entity).length > 0)
+    return true;
+
+  if (body.unset && Object.entries(body.unset).length > 0)
+    return true;
+
+  return false;
+}
+
 export function generatePatchBody<T extends object>(
   initial: T,
   current: T,

@@ -1,6 +1,5 @@
-import mongoose, { UpdateQuery } from "mongoose";
+import mongoose from "mongoose";
 import { assertIsMusicEntity, MusicEntity } from "$shared/models/musics";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { AllKeysOf } from "$shared/utils/types";
 import { MusicFileInfoOdm } from "#musics/file-info/repositories/odm";
 import { timestampsModelToDocOdm } from "#modules/resources/odm/Timestamps";
@@ -101,47 +100,30 @@ onlyTags?: string[]; } {
   };
 }
 
-export function patchParamsToUpdateQuery(params: PatchOneParams<Music>): UpdateQuery<DocOdm> {
-  const { entity } = params;
-  const docOdmTags = modelTagsToDocOdmTags(entity.tags);
-  const updateQuery: UpdateQuery<DocOdm> = {
-    title: entity.title,
-    url: entity.url,
-    weight: entity.weight,
-    artist: entity.artist,
+export function partialToDocOdm(partial: Partial<Music>): Partial<DocOdm> {
+  const docOdmTags = modelTagsToDocOdmTags(partial.tags);
+  const ret: Partial<DocOdm> = {
+    title: partial.title,
+    url: partial.url,
+    weight: partial.weight,
+    artist: partial.artist,
     tags: docOdmTags.tags,
     onlyTags: docOdmTags.onlyTags,
-    disabled: entity.disabled,
-    lastTimePlayed: entity.lastTimePlayed,
-    album: entity.album,
-    country: entity.country,
-    game: entity.game,
-    year: entity.year,
-    spotifyId: entity.spotifyId,
-  } satisfies Partial<DocOdm>;
+    disabled: partial.disabled,
+    lastTimePlayed: partial.lastTimePlayed,
+    album: partial.album,
+    country: partial.country,
+    game: partial.game,
+    year: partial.year,
+    spotifyId: partial.spotifyId,
+    timestamps: partial.timestamps
+      ? {
+        createdAt: partial.timestamps.createdAt,
+        updatedAt: partial.timestamps.updatedAt,
+        addedAt: partial.timestamps.addedAt,
+      }
+      : undefined,
+  } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
-  if (params.unset && params.unset.length > 0) {
-    updateQuery.$unset = params.unset.reduce((acc, path) => {
-      const key = path.join(".");
-
-      acc[key] = 1;
-
-      return acc;
-    }, {} as Record<string, 1>);
-  }
-
-  if (entity.timestamps) {
-    updateQuery.timestamps = {
-      createdAt: entity.timestamps.createdAt,
-      updatedAt: entity.timestamps.updatedAt,
-    };
-  }
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const key in updateQuery) {
-    if ((updateQuery as any)[key] === undefined)
-      delete (updateQuery as any)[key];
-  }
-
-  return updateQuery;
+  return ret;
 }

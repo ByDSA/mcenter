@@ -5,7 +5,7 @@ import { DocOdm,
   schemaOdm } from "./odm";
 import { musicDocOdmToEntity,
   musicEntityToDocOdm,
-  musicToDocOdm } from "./adapters";
+  musicToDocOdm, partialToDocOdm } from "./adapters";
 import { getCriteriaPipeline as _getCriteriaPipeline } from "./criteria-pipeline";
 
 export namespace MusicOdm {
@@ -17,4 +17,5 @@ export namespace MusicOdm {
   export const entityToDocOdm = musicEntityToDocOdm;
   export const toDocOdm = musicToDocOdm;
   export const getCriteriaPipeline = _getCriteriaPipeline;
+  export const partialToDoc = partialToDocOdm;
 };
