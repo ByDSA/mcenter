@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.15](https://github.com/ByDSA/mcenter/compare/v4.0.14...v4.0.15) (2025-07-26)
+
+
+### Bug Fixes
+
+* add streamId to episodeHistoryEntry ([afb050a](https://github.com/ByDSA/mcenter/commit/afb050a685018da5e34d109a689b6191307739a2))
+
 ### [4.0.14](https://github.com/ByDSA/mcenter/compare/v4.0.13...v4.0.14) (2025-07-26)
 
 
