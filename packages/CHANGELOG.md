@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.14](https://github.com/ByDSA/mcenter/compare/v4.0.13...v4.0.14) (2025-07-26)
+
+
+### Bug Fixes
+
+* **back:** get musics by file streaming range ([a975e55](https://github.com/ByDSA/mcenter/commit/a975e555334134868876f60ba97e0756b6ad9a67))
+* **back:** spotifyId ([51d2427](https://github.com/ByDSA/mcenter/commit/51d2427aaa59184522088b2d45a570567a9f6bcb))
+* **front:** "+" icon behavior in string arrays input ([09f78d5](https://github.com/ByDSA/mcenter/commit/09f78d520aa0e6198a9acb6c8cde5a6cbf04bf5f))
+* **front:** input elements (1) ([1bf2ba8](https://github.com/ByDSA/mcenter/commit/1bf2ba841df5f15ae78181de6d82907a15822a4d))
+* **front:** input elements (2) ([e3b609d](https://github.com/ByDSA/mcenter/commit/e3b609d42fc6bb207f13dd780eb1575301cbac1c))
+* patch fetching ([2f98447](https://github.com/ByDSA/mcenter/commit/2f984474b77c4c6a9401471939a18dab346e844d))
+* remote player time and info ([01cea44](https://github.com/ByDSA/mcenter/commit/01cea44a62e30b5f32ac87da7d0229a831301540))
+
 ### [4.0.13](https://github.com/ByDSA/mcenter/compare/v4.0.12...v4.0.13) (2025-07-22)
 
 
