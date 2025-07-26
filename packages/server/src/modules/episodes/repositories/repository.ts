@@ -14,12 +14,13 @@ import { SeriesKey } from "#modules/series";
 import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "../history/repositories/events";
 import { EpisodeHistoryEntryEvent } from "../history/repositories";
 import { LastTimePlayedService } from "../history/last-time-played.service";
-import { Episode, EpisodeCompKey, EpisodeEntity, EpisodeId } from "../models";
+import { Episode, EpisodeCompKey, EpisodeEntity } from "../models";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { EpisodeOdm } from "./odm";
 import { EPISODE_QUEUE_NAME } from "./events";
 
 type UpdateOneParams = Episode;
+type EpisodeId = EpisodeEntity["id"];
 
 export type EpisodeEvent = BrokerEvent<ModelMessage<EpisodeEntity>>;
 
@@ -77,7 +78,7 @@ CanGetAll<EpisodeEntity> {
       } ),
     } );
 
-    return episodesOdm.map(EpisodeOdm.docToEntity);
+    return episodesOdm.map(EpisodeOdm.toEntity);
   }
 
   async patchOneByIdAndGet(
@@ -124,7 +125,7 @@ CanGetAll<EpisodeEntity> {
     if (!criteria?.expand || Object.keys(criteria.expand).length === 0) {
       const episodeOdm = await EpisodeOdm.Model.findById(id);
 
-      return episodeOdm ? EpisodeOdm.docToEntity(episodeOdm) : null;
+      return episodeOdm ? EpisodeOdm.toEntity(episodeOdm) : null;
     }
 
     // Si hay expand, usar aggregate para poder aplicar las transformaciones
@@ -145,7 +146,7 @@ CanGetAll<EpisodeEntity> {
     if (episodesOdm.length === 0)
       return [];
 
-    return episodesOdm.map(EpisodeOdm.docToEntity);
+    return episodesOdm.map(EpisodeOdm.toEntity);
   }
 
   async getAllBySeriesKey(seriesKey: SeriesKey): Promise<EpisodeEntity[]> {
@@ -156,7 +157,7 @@ CanGetAll<EpisodeEntity> {
     if (episodesOdm.length === 0)
       return [];
 
-    return episodesOdm.map(EpisodeOdm.docToEntity);
+    return episodesOdm.map(EpisodeOdm.toEntity);
   }
 
   async getOneByCriteria(criteria: CriteriaOne): Promise<EpisodeEntity | null> {
@@ -253,7 +254,7 @@ CanGetAll<EpisodeEntity> {
   async createOneAndGet(model: Episode): Promise<EpisodeEntity> {
     const doc: EpisodeOdm.Doc = EpisodeOdm.toDoc(model);
     const created = await EpisodeOdm.Model.create(doc);
-    const ret = EpisodeOdm.docToEntity(created);
+    const ret = EpisodeOdm.toEntity(created);
     const event = new ModelEvent(EventType.CREATED, {
       entity: ret,
     } );
@@ -266,7 +267,7 @@ CanGetAll<EpisodeEntity> {
   async createManyAndGet(models: Episode[]): Promise<EpisodeEntity[]> {
     const docsOdm: EpisodeOdm.Doc[] = models.map(EpisodeOdm.toDoc);
     const inserted = await EpisodeOdm.Model.insertMany(docsOdm);
-    const ret = inserted.map(EpisodeOdm.docToEntity);
+    const ret = inserted.map(EpisodeOdm.toEntity);
 
     for (const model of ret) {
       const event = new ModelEvent(EventType.CREATED, {

@@ -1,10 +1,10 @@
 import z from "zod";
 import { idParamsSchema } from "../../../utils/schemas/requests";
-import { createCriteriaSchema } from "../../../utils/schemas/requests/criteria";
+import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 
 export namespace MusicHistoryEntryRestDtos {
   export namespace GetManyByCriteria {
-    export const criteriaSchema = createCriteriaSchema( {
+    export const criteriaSchema = createCriteriaManySchema( {
       filterShape: {
         resourceId: z.string().optional(),
         timestampMax: z.number().optional(),

@@ -14,8 +14,8 @@ export namespace MusicOdm {
   export type Doc = DocOdm;
   export type FullDoc = FullDocOdm;
   export const toEntity = musicDocOdmToEntity;
-  export const entityToDocOdm = musicEntityToDocOdm;
-  export const toDocOdm = musicToDocOdm;
+  export const toFullDoc = musicEntityToDocOdm;
+  export const toDoc = musicToDocOdm;
   export const getCriteriaPipeline = _getCriteriaPipeline;
   export const partialToDoc = partialToDocOdm;
 };

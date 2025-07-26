@@ -13,8 +13,8 @@ export namespace EpisodeFileInfoOdm {
   export type FullDoc = FullDocOdm;
   export const Model = ModelOdm;
   export const schema = schemaOdm;
-  export const docToEntity = docOdmToEntity;
+  export const toEntity = docOdmToEntity;
   export const toDoc = modelToDocOdm;
-  export const entityToDoc = entityToDocOdm;
+  export const toFullDoc = entityToDocOdm;
   export const partialToDoc = partialModelToDocOdm;
 }

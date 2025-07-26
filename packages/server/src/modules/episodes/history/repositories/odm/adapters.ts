@@ -1,5 +1,8 @@
+import { AllKeysOf } from "$shared/utils/types";
+import { Types } from "mongoose";
 import { EpisodeOdm } from "#episodes/repositories/odm";
 import { SeriesOdm } from "#modules/series/repositories/odm";
+import { StreamOdm } from "#modules/streams/repositories/odm";
 import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../models";
 import { DocOdm, FullDocOdm } from "./mongo";
 
@@ -16,33 +19,40 @@ function docOdmToEntity(docOdm: FullDocOdm): Entity {
       day: docOdm.date.day,
       timestamp: docOdm.date.timestamp,
     },
-  };
-
-  if (docOdm.serie)
-    ret.serie = SeriesOdm.docToEntity(docOdm.serie);
-
-  if (docOdm.episode)
-    ret.episode = EpisodeOdm.docToEntity(docOdm.episode);
+    streamId: docOdm.streamId.toString(),
+    serie: docOdm.serie ? SeriesOdm.toEntity(docOdm.serie) : undefined,
+    episode: docOdm.episode ? EpisodeOdm.toEntity(docOdm.episode) : undefined,
+    stream: docOdm.stream ? StreamOdm.toEntity(docOdm.stream) : undefined,
+  } satisfies AllKeysOf<Entity>;
 
   return ret;
 }
 
-function modelToDocOdm(entry: Entry): DocOdm {
+function modelToDocOdm(model: Entry): DocOdm {
   return {
     episodeId: {
-      code: entry.episodeCompKey.episodeKey,
-      serieId: entry.episodeCompKey.seriesKey,
+      code: model.episodeCompKey.episodeKey,
+      serieId: model.episodeCompKey.seriesKey,
     },
     date: {
-      year: entry.date.year,
-      month: entry.date.month,
-      day: entry.date.day,
-      timestamp: entry.date.timestamp,
+      year: model.date.year,
+      month: model.date.month,
+      day: model.date.day,
+      timestamp: model.date.timestamp,
     },
-  } as DocOdm;
+    streamId: new Types.ObjectId(model.streamId),
+  } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
+}
+
+function entityToFullDocOdm(entry: Entity): FullDocOdm {
+  return {
+    ...modelToDocOdm(entry),
+    _id: new Types.ObjectId(entry.id),
+  } as FullDocOdm;
 }
 
 export {
-  docOdmToEntity as docOdmToEntryEntity,
-  modelToDocOdm as entryToDocOdm,
+  docOdmToEntity,
+  modelToDocOdm,
+  entityToFullDocOdm,
 };

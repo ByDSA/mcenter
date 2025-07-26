@@ -1,9 +1,10 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { DateType } from "$shared/utils/time";
 import { DateTypeOdmSchema } from "#utils/time";
 import { SeriesOdm } from "#series/repositories/odm";
 import { EpisodeOdm } from "#episodes/repositories/odm";
-import { RequireId } from "#utils/layers/db/mongoose";
+import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
+import { StreamOdm } from "#modules/streams/repositories/odm";
 
 type DocOdm = {
   _id?: Types.ObjectId;
@@ -12,11 +13,13 @@ type DocOdm = {
     code: string;
     serieId: string;
   };
+  streamId: Types.ObjectId;
 };
 
 type FullDocOdm = RequireId<DocOdm> & {
   serie?: SeriesOdm.FullDoc;
   episode?: EpisodeOdm.FullDoc;
+  stream?: StreamOdm.FullDoc;
 };
 
 const schemaOdm = new mongoose.Schema<DocOdm>( {
@@ -34,7 +37,11 @@ const schemaOdm = new mongoose.Schema<DocOdm>( {
       required: true,
     },
   },
-}, {
+  streamId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+  },
+} satisfies SchemaDef<DocOdm>, {
   collection: "episodeHistoryEntries",
 } );
 const NAME = "EpisodeHistoryEntry";

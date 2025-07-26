@@ -2,7 +2,7 @@ import z from "zod";
 import { idParamsSchema } from "../../utils/schemas/requests";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { musicEntitySchema } from "../music";
-import { createCriteriaOneSchema, createCriteriaSchema } from "../../utils/schemas/requests/criteria";
+import { createCriteriaOneSchema, createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
 
 const criteriaConfig = {
   filterShape: {
@@ -17,7 +17,7 @@ const criteriaConfig = {
 
 export namespace MusicRestDtos {
   export namespace GetMany {
-    export const criteriaSchema = createCriteriaSchema(criteriaConfig);
+    export const criteriaSchema = createCriteriaManySchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;
   }
 

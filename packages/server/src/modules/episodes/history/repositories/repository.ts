@@ -1,25 +1,40 @@
-import type { EpisodeCompKey, EpisodeEntity, EpisodeId } from "#episodes/models";
+import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import type { BrokerEvent } from "#utils/message-broker";
 import type { CanCreateOne, CanDeleteOneByIdAndGet } from "#utils/layers/repository";
-import type { EpisodeHistoryEntryId as Id, EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity, EpisodeHistoryEntryEntity } from "../models";
+import type { EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity, EpisodeHistoryEntryEntity } from "../models";
 import type { EpisodeHistoryEntryRestDtos } from "$shared/models/episodes/history/dto/transport";
 import { showError } from "$shared/utils/errors/showError";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { createEpisodeHistoryEntryByEpisodeCompKey } from "$shared/models/episodes/history/utils";
+import { createEpisodeHistoryEntry } from "$shared/models/episodes/history/utils";
 import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
-import { EpisodeHistoryEntriesModelOdm as ModelOdm } from "./odm";
+import { StreamEntity } from "#modules/streams";
+import { EpisodeHistoryEntryOdm } from "./odm";
 import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "./events";
-import { entryToDocOdm } from "./odm";
-import { docOdmToEntryEntity } from "./odm/adapters";
 import { getCriteriaPipeline } from "./criteria-pipeline";
+
+type FindLastProps = {
+  seriesKey: SeriesKey;
+  streamId: StreamEntity["id"];
+};
 
 export type EpisodeHistoryEntryEvent = BrokerEvent<ModelMessage<EpisodeHistoryEntryEntity>>;
 
+type Id = EpisodeHistoryEntryEntity["id"];
+type EpisodeId = EpisodeEntity["id"];
+
+type AddEpisodesToHistoryProps = {
+  episodes: EpisodeEntity[];
+  streamId: StreamEntity["id"];
+};
+type CreateNewEntryNowForProps = {
+  episodeCompKey: EpisodeCompKey;
+  streamId: StreamEntity["id"];
+};
 @Injectable()
 export class EpisodeHistoryEntriesRepository implements
 CanCreateOne<Model>,
@@ -38,9 +53,9 @@ CanDeleteOneByIdAndGet<Model, Id> {
   }
 
   async createOne(entry: Model): Promise<void> {
-    const entryDocOdm = entryToDocOdm(entry);
+    const entryDocOdm = EpisodeHistoryEntryOdm.toDoc(entry);
 
-    await ModelOdm.create(entryDocOdm);
+    await EpisodeHistoryEntryOdm.Model.create(entryDocOdm);
 
     const event = new ModelEvent<Model>(EventType.CREATED, {
       entity: entry,
@@ -50,14 +65,14 @@ CanDeleteOneByIdAndGet<Model, Id> {
   }
 
   async getAll(): Promise<Entity[]> {
-    const docsOdm = await ModelOdm.find( {}, {
+    const docsOdm = await EpisodeHistoryEntryOdm.Model.find( {}, {
       _id: 0,
     } );
 
     if (docsOdm.length === 0)
       return [];
 
-    return docsOdm.map(docOdmToEntryEntity);
+    return docsOdm.map(EpisodeHistoryEntryOdm.toEntity);
   }
 
   async getManyBySeriesKey(seriesKey: SeriesKey): Promise<Entity[]> {
@@ -72,7 +87,9 @@ CanDeleteOneByIdAndGet<Model, Id> {
     criteria: EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria,
   ): Promise<Entity[]> {
     const pipeline = getCriteriaPipeline(criteria);
-    const docsOdm = await ModelOdm.aggregate(pipeline);
+    const docsOdm: EpisodeHistoryEntryOdm.FullDoc[] = await EpisodeHistoryEntryOdm.Model.aggregate(
+      pipeline,
+    );
 
     if (docsOdm.length === 0)
       return [];
@@ -84,21 +101,21 @@ CanDeleteOneByIdAndGet<Model, Id> {
       assertIsDefined(docsOdm[0].episode, "Lookup episode failed");
 
     if (criteria.expand?.includes("episode-file-infos"))
-      assertIsDefined(docsOdm[0].episode.fileInfos, "Lookup episode file info failed");
+      assertIsDefined(docsOdm[0].episode!.fileInfos, "Lookup episode file info failed");
 
-    return docsOdm.map(docOdmToEntryEntity);
+    return docsOdm.map(EpisodeHistoryEntryOdm.toEntity);
   }
 
   async deleteOneByIdAndGet(id: Id): Promise<Entity> {
-    const docOdm = await ModelOdm.findByIdAndDelete(id);
+    const docOdm = await EpisodeHistoryEntryOdm.Model.findByIdAndDelete(id);
 
     assertFound(docOdm);
 
-    return docOdmToEntryEntity(docOdm);
+    return EpisodeHistoryEntryOdm.toEntity(docOdm);
   }
 
   async findLastByEpisodeId(episodeId: EpisodeId): Promise<Entity | null> {
-    const last = await ModelOdm.findById(episodeId, {}, {
+    const last = await EpisodeHistoryEntryOdm.Model.findById(episodeId, {}, {
       sort: {
         "date.timestamp": -1,
       },
@@ -107,11 +124,11 @@ CanDeleteOneByIdAndGet<Model, Id> {
     if (!last)
       return null;
 
-    return docOdmToEntryEntity(last);
+    return EpisodeHistoryEntryOdm.toEntity(last);
   }
 
   async findLastByEpisodeCompKey(episodeCompKey: EpisodeCompKey): Promise<Entity | null> {
-    const last = await ModelOdm.findOne( {
+    const last = await EpisodeHistoryEntryOdm.Model.findOne( {
       episodeId: {
         code: episodeCompKey.episodeKey,
         serieId: episodeCompKey.seriesKey,
@@ -125,12 +142,13 @@ CanDeleteOneByIdAndGet<Model, Id> {
     if (!last)
       return null;
 
-    return docOdmToEntryEntity(last);
+    return EpisodeHistoryEntryOdm.toEntity(last);
   }
 
-  async findLastForSerieKey(seriesKey: SeriesKey): Promise<Entity | null> {
-    const last = await ModelOdm.findOne( {
+  async findLast( { seriesKey, streamId }: FindLastProps): Promise<Entity | null> {
+    const last = await EpisodeHistoryEntryOdm.Model.findOne( {
       "episodeId.serieId": seriesKey,
+      streamId,
     }, {}, {
       sort: {
         "date.timestamp": -1,
@@ -140,19 +158,23 @@ CanDeleteOneByIdAndGet<Model, Id> {
     if (!last)
       return null;
 
-    return docOdmToEntryEntity(last);
+    return EpisodeHistoryEntryOdm.toEntity(last);
   }
 
-  async createNewEntryNowFor(episodeCompKey: EpisodeCompKey) {
-    const newEntry: Model = createEpisodeHistoryEntryByEpisodeCompKey(episodeCompKey);
+  async createNewEntryNowFor( { episodeCompKey, streamId }: CreateNewEntryNowForProps) {
+    const newEntry: Model = createEpisodeHistoryEntry(episodeCompKey, streamId);
 
     await this.createOne(newEntry);
   }
 
-  async addEpisodesToHistory(episodes: EpisodeEntity[]) {
+  async addEpisodesToHistory( { episodes, streamId }: AddEpisodesToHistoryProps) {
     // TODO: usar bulk insert (quitar await en for)
-    for (const episode of episodes)
-      await this.createNewEntryNowFor(episode.compKey);
+    for (const episode of episodes) {
+      await this.createNewEntryNowFor( {
+        episodeCompKey: episode.compKey,
+        streamId,
+      } );
+    }
   }
 
   async calcEpisodeLastTimePlayedByCompKey(episodeCompKey: EpisodeCompKey): Promise<number | null> {

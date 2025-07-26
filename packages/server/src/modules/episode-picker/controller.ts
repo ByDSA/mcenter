@@ -15,7 +15,7 @@ import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./applier
 import { dependencies } from "./appliers/Dependencies";
 
 class ShowPickerParamsDto extends createZodDto(z.object( {
-  streamId: z.string(),
+  streamKey: z.string(),
 } )) {}
 
 type ResultType = Episode & {
@@ -34,13 +34,16 @@ export class EpisodePickerController {
   ) {
   }
 
-  @Get("/:streamId")
+  @Get("/:streamKey")
   async showPicker(@Param() params: ShowPickerParamsDto) {
-    const { streamId } = params;
-    const stream = await this.streamRepository.getOneByKey(streamId);
+    const { streamKey } = params;
+    const stream = await this.streamRepository.getOneByKey(streamKey);
 
     assertFound(stream);
-    const lastEntry = await this.episodeHistoryEntriesRepository.findLastForSerieKey(streamId);
+    const lastEntry = await this.episodeHistoryEntriesRepository.findLast( {
+      seriesKey: stream.key,
+      streamId: stream.id,
+    } );
 
     assertFound(lastEntry);
 

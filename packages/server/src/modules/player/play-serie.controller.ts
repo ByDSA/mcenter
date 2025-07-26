@@ -7,6 +7,7 @@ import { SerieRepository } from "#series/repositories";
 import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { episodeCompKeySchema, episodeEntityWithFileInfosSchema } from "#episodes/models";
+import { StreamsRepository } from "#modules/streams/repositories";
 import { PlayService } from "./PlayService";
 import { episodeWithFileInfosToMediaElement } from "./player-services/models";
 
@@ -18,10 +19,11 @@ class QueryDto extends createZodDto(z.object( {
 @Controller("play/episode")
 export class PlaySerieController {
   constructor(
-    private readonly serieRepository: SerieRepository,
-    private readonly episodeRepository: EpisodesRepository,
+    private readonly seriesRepo: SerieRepository,
+    private readonly episodesRepo: EpisodesRepository,
     private readonly playService: PlayService,
-    private readonly entriesRepository: EpisodeHistoryEntriesRepository,
+    private readonly historyEntriesRepo: EpisodeHistoryEntriesRepository,
+    private readonly streamsRepo: StreamsRepository,
   ) {
   }
 
@@ -32,11 +34,11 @@ export class PlaySerieController {
   ) {
     const { force } = query;
     const { episodeKey, seriesKey } = params;
-    const serie = await this.serieRepository.getOneByKey(seriesKey);
+    const serie = await this.seriesRepo.getOneByKey(seriesKey);
 
     assertFound(serie);
 
-    const episodeWithFileInfos = await this.episodeRepository
+    const episodeWithFileInfos = await this.episodesRepo
       .getOneByCompKey( {
         seriesKey,
         episodeKey,
@@ -53,9 +55,14 @@ export class PlaySerieController {
       force,
     } );
 
-    if (ok)
-      await this.entriesRepository.createNewEntryNowFor(episodeWithFileInfos.compKey);
-    else
+    if (ok) {
+      const stream = await this.streamsRepo.getOneOrCreateBySeriesKey(seriesKey);
+
+      await this.historyEntriesRepo.createNewEntryNowFor( {
+        episodeCompKey: episodeWithFileInfos.compKey,
+        streamId: stream.id,
+      } );
+    } else
       console.log("PlayService: Could not play");
 
     return episodeWithFileInfos;

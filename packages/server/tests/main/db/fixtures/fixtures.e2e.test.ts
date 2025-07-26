@@ -1,8 +1,8 @@
 import { expectSerie } from "$sharedSrc/models/series/test";
 import { EpisodeOdm } from "#episodes/repositories/odm";
 import { expectEpisodes } from "#episodes/models/test";
-import { SerieFullDocOdm, SerieModelOdm, serieDocOdmToEntity } from "#modules/series/repositories/odm";
 import { createTestingAppModuleAndInit } from "#tests/nestjs/app";
+import { SeriesOdm } from "#modules/series/repositories/odm";
 import { loadFixtureSimpsons } from "./sets";
 import { fixtureEpisodes, SERIE_SIMPSONS } from "./models";
 
@@ -23,13 +23,13 @@ beforeAll(async () => {
 it("should load fixture simpsons", async () => {
   await loadFixtureSimpsons();
 
-  const seriesDocOdm: SerieFullDocOdm[] = await SerieModelOdm.find();
-  const serie = serieDocOdmToEntity(seriesDocOdm[0]);
+  const seriesDocOdm: SeriesOdm.FullDoc[] = await SeriesOdm.Model.find();
+  const serie = SeriesOdm.toEntity(seriesDocOdm[0]);
 
   expectSerie(serie, SERIE_SIMPSONS);
 
   const episodesDocOdm = await EpisodeOdm.Model.find();
-  const episodes = episodesDocOdm.map(EpisodeOdm.docToEntity);
+  const episodes = episodesDocOdm.map(EpisodeOdm.toEntity);
 
   expectEpisodes(episodes, EPISODES_SIMPSONS);
 } );

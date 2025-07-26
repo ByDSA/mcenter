@@ -3,7 +3,7 @@ import { mongoDbId } from "../../resource/partial-schemas";
 import { episodeCompKeySchema } from "../episode";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { episodeEntitySchema } from "../episode";
-import { createCriteriaConfig, createCriteriaOneSchema, createCriteriaSchema } from "../../utils/schemas/requests/criteria";
+import { createCriteriaConfig, createCriteriaOneSchema, createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
 
 const criteriaConfig = createCriteriaConfig( {
   filterShape: {
@@ -26,7 +26,7 @@ export namespace EpisodesRestDtos {
       .required();
   }
   export namespace GetManyByCriteria {
-    export const criteriaSchema = createCriteriaSchema(criteriaConfig);
+    export const criteriaSchema = createCriteriaManySchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;
   }
 

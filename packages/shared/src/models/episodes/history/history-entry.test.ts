@@ -1,6 +1,7 @@
-import { assertIsEpisodeHistoryEntry, EpisodeHistoryEntry } from "./history-entry";
+import { genAssertZod } from "src/utils/validation/zod";
+import { EpisodeHistoryEntry, episodeHistoryEntrySchema } from "./history-entry";
 
-const assertIsModel: typeof assertIsEpisodeHistoryEntry = assertIsEpisodeHistoryEntry;
+const assertIsModel: ReturnType<typeof genAssertZod> = genAssertZod(episodeHistoryEntrySchema);
 const VALID_MODEL: EpisodeHistoryEntry = {
   episodeCompKey: {
     episodeKey: "1x01",
@@ -12,6 +13,7 @@ const VALID_MODEL: EpisodeHistoryEntry = {
     day: 1,
     timestamp: 1234567890,
   },
+  streamId: "streamId",
 };
 
 describe("assertIsModel", () => {

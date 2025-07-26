@@ -2,7 +2,7 @@ import z from "zod";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { timeRangeSchema } from "../../resource";
 import { fileInfoSchema, compareFileInfo } from "../../file-info-common/file-info";
-import { mongoDbIdRefining } from "../../resource/partial-schemas";
+import { mongoDbId } from "../../resource/partial-schemas";
 
 const schema = fileInfoSchema
   .merge(timeRangeSchema)
@@ -15,13 +15,11 @@ const schema = fileInfoSchema
       } ).strict(),
       fps: z.string().nullable(),
     } ).strict(),
-    episodeId: z.string()
-      .refine(...mongoDbIdRefining),
+    episodeId: mongoDbId,
   } )
   .strict();
 const entitySchema = schema.extend( {
-  id: z.string()
-    .refine(...mongoDbIdRefining),
+  id: mongoDbId,
 } ).strict();
 
 type Model = z.infer<typeof schema>;

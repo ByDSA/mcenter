@@ -1,8 +1,12 @@
-import mongoose from "mongoose";
-import { SchemaDef } from "#utils/layers/db/mongoose";
+import mongoose, { Types } from "mongoose";
+import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { Stream, StreamGroup, StreamOrigin } from "../../models";
 
-export type DocOdm = Stream;
+export type DocOdm = Stream & {
+  _id?: Types.ObjectId;
+};
+
+export type FullDocOdm = RequireId<DocOdm>;
 
 const NAME = "Stream";
 const originSchema = new mongoose.Schema<StreamOrigin>( {
@@ -23,7 +27,7 @@ const groupSchema = new mongoose.Schema<StreamGroup>( {
 } satisfies SchemaDef<StreamGroup>);
 
 export const schema = new mongoose.Schema<DocOdm>( {
-  id: {
+  key: {
     type: String,
     required: true,
   },

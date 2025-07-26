@@ -79,9 +79,12 @@ export class PlayStreamController {
       force,
     } );
 
-    if (ok)
-      await this.episodeHistoryEntriesRepository.addEpisodesToHistory(episodesWithFileInfos);
-    else
+    if (ok) {
+      await this.episodeHistoryEntriesRepository.addEpisodesToHistory( {
+        episodes: episodesWithFileInfos,
+        streamId: stream.id,
+      } );
+    } else
       console.log("PlayService: Could not play");
 
     return episodesWithFileInfos;

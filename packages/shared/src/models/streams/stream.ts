@@ -1,13 +1,11 @@
 import z from "zod";
-import { genAssertZod } from "../../utils/validation/zod";
 import { serieEntitySchema } from "../series";
+import { mongoDbId } from "../resource/partial-schemas";
 
 enum Mode {
   SEQUENTIAL = "SEQUENTIAL",
   RANDOM = "RANDOM"
 }
-
-type ModelId = string;
 
 enum OriginType {
   SERIE = "serie",
@@ -16,7 +14,7 @@ enum OriginType {
 
 const originSerieSchema = z.object( {
   type: z.literal(OriginType.SERIE),
-  id: z.string(),
+  id: z.string(), // seriesKey
   serie: serieEntitySchema.optional(),
 } ).strict();
 const originStreamSchema = z.object( {
@@ -36,22 +34,26 @@ const groupSchema = z.object( {
 type Group = z.infer<typeof groupSchema>;
 
 const modelSchema = z.object( {
-  id: z.string(),
+  key: z.string(),
   group: groupSchema,
   mode: z.nativeEnum(Mode),
 } ).strict();
 
 type Model = z.infer<typeof modelSchema>;
 
-const assertIsModel = genAssertZod(modelSchema);
+const entitySchema = modelSchema.extend( {
+  id: mongoDbId,
+} );
+
+type Entity = z.infer<typeof entitySchema>;
 
 export {
-  ModelId as StreamId,
   Model as Stream,
   modelSchema as streamSchema,
   OriginType as StreamOriginType,
   Group as StreamGroup,
   Origin as StreamOrigin,
   Mode as StreamMode,
-  assertIsModel as assertIsStream,
+  entitySchema as streamEntitySchema,
+  Entity as StreamEntity,
 };

@@ -40,7 +40,7 @@ CanGetAll<Entity> {
     const docOdm = EpisodeFileInfoOdm.toDoc(model);
     const got = await EpisodeFileInfoOdm.Model.create(docOdm);
 
-    return EpisodeFileInfoOdm.docToEntity(got);
+    return EpisodeFileInfoOdm.toEntity(got);
   }
 
   async updateOneByEpisodeId(id: string, model: Entity): Promise<void> {
@@ -56,7 +56,7 @@ CanGetAll<Entity> {
   async getAll(): Promise<Entity[]> {
     const modelsOdm = await EpisodeFileInfoOdm.Model.find();
 
-    return modelsOdm.map(EpisodeFileInfoOdm.docToEntity);
+    return modelsOdm.map(EpisodeFileInfoOdm.toEntity);
   }
 
   async getAllByEpisodeId(id: EpisodeId): Promise<Entity[]> {
@@ -64,7 +64,7 @@ CanGetAll<Entity> {
       episodeId: id,
     } );
 
-    return modelsOdm.map(EpisodeFileInfoOdm.docToEntity);
+    return modelsOdm.map(EpisodeFileInfoOdm.toEntity);
   }
 
   async getOneByPath(path: EpisodeFileInfoEntity["path"]): Promise<Entity | null> {
@@ -75,7 +75,7 @@ CanGetAll<Entity> {
     if (!doc)
       return null;
 
-    return EpisodeFileInfoOdm.docToEntity(doc);
+    return EpisodeFileInfoOdm.toEntity(doc);
   }
 
   async patchOneByPathAndGet(
@@ -119,6 +119,6 @@ CanGetAll<Entity> {
       await this.domainMessageBroker.publish(EPISODE_FILE_INFOS_QUEUE_NAME, event);
     }
 
-    return EpisodeFileInfoOdm.docToEntity(updateResult);
+    return EpisodeFileInfoOdm.toEntity(updateResult);
   }
 }

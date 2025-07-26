@@ -50,7 +50,7 @@ export function createCriteriaConfig<
   return config;
 }
 
-export const createCriteriaSchema = <
+export const createCriteriaManySchema = <
   TFilter extends z.ZodRawShape,
   const TSortKeys extends readonly string[],
   const TExpand extends readonly string[]

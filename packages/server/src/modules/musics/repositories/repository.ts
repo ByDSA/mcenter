@@ -173,7 +173,7 @@ CanGetOneById<MusicEntity, MusicId> {
   }
 
   async createOneAndGet(music: Music): Promise<MusicEntity> {
-    const docOdm = MusicOdm.toDocOdm(music);
+    const docOdm = MusicOdm.toDoc(music);
     const gotDocOdm = await MusicOdm.Model.create(docOdm);
     const entity = MusicOdm.toEntity(gotDocOdm);
     const event = new ModelEvent<MusicEntity>(EventType.CREATED, {

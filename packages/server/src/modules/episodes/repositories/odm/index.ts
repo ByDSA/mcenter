@@ -9,9 +9,9 @@ export namespace EpisodeOdm {
   export const Model = ModelOdm;
   export const schema = schemaOdm;
   export const getIdFromCompKey = getIdOdmFromCompKey;
-  export const docToEntity = docOdmToEntity;
-  export const docToModel = docOdmToModel;
-  export const entityToDoc = entityToDocOdm;
+  export const toEntity = docOdmToEntity;
+  export const toModel = docOdmToModel;
+  export const toFullDoc = entityToDocOdm;
   export const toDoc = episodeToDocOdm;
   export const partialToDoc = partialModelToDocOdm;
 }

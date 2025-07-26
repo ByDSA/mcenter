@@ -8,6 +8,7 @@ import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { fixtureEpisodes } from "#tests/main/db/fixtures";
+import { StreamsRepository } from "#modules/streams/repositories";
 import { PlayService } from "./PlayService";
 import { PlaySerieController } from "./play-serie.controller";
 import { VlcBackWebSocketsServerService } from "./player-services";
@@ -31,6 +32,7 @@ describe("playSerieController", () => {
           useClass: PlayerBackWebSocketsServiceMock,
         },
         PlayService,
+        StreamsRepository,
       ],
     }, {
       db: {

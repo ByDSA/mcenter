@@ -26,13 +26,13 @@ CanGetAll<SerieEntity> {
   async getAll(): Promise<SerieEntity[]> {
     const seriesDocOdm = await ModelOdm.find();
 
-    return seriesDocOdm.map(SeriesOdm.docToEntity);
+    return seriesDocOdm.map(SeriesOdm.toEntity);
   }
 
   async createOneAndGet(model: Serie): Promise<SerieEntity> {
     const serieOdm = SeriesOdm.toDoc(model);
     const gotOdm = await ModelOdm.create(serieOdm);
-    const serie = SeriesOdm.docToEntity(gotOdm);
+    const serie = SeriesOdm.toEntity(gotOdm);
     const event = new ModelEvent(EventType.CREATED, {
       entity: serie,
     } );
@@ -50,7 +50,7 @@ CanGetAll<SerieEntity> {
     if (!serieDb)
       return null;
 
-    return SeriesOdm.docToEntity(serieDb);
+    return SeriesOdm.toEntity(serieDb);
   }
 
   async updateOneByKeyAndGet(key: SeriesKey, serie: SerieEntity): Promise<SerieEntity | null> {
@@ -63,7 +63,7 @@ CanGetAll<SerieEntity> {
     if (!docOdm)
       return null;
 
-    const ret = SeriesOdm.docToEntity(docOdm);
+    const ret = SeriesOdm.toEntity(docOdm);
     const event = new ModelEvent(EventType.UPDATED, {
       entity: ret,
     } );

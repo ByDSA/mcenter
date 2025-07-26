@@ -1,5 +1,5 @@
 export * from "./history-entry";
 
 export {
-  createEpisodeHistoryEntryByEpisodeCompKey as createEpisodeHistoryEntryByEpisodeFullId,
+  createEpisodeHistoryEntry,
 } from "./utils";

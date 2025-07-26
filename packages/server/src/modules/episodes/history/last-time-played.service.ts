@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import type { EpisodeCompKey, EpisodeEntity, EpisodeId } from "#episodes/models";
+import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { DateTime } from "luxon";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { deepCopy } from "$shared/utils/objects";
@@ -17,7 +17,7 @@ export class LastTimePlayedService {
   }
 
   async updateEpisodeLastTimePlayedByEpisodeId(
-    episodeId: EpisodeId,
+    episodeId: EpisodeEntity["id"],
   ): Promise<number | null> {
     const lastTimePlayed = await this.entriesRepository
       .calcEpisodeLastTimePlayedByEpisodeId(episodeId) ?? undefined;

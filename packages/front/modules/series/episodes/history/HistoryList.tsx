@@ -1,6 +1,4 @@
 import { Fragment } from "react";
-import { assertIsManyDataResponse } from "$shared/utils/http/responses";
-import { episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { FetchingRender } from "#modules/fetching";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { EpisodeHistoryEntryFetching } from "./requests";
@@ -14,8 +12,6 @@ export function HistoryList() {
   return FetchingRender<EpisodeHistoryEntryFetching.GetMany.Res>( {
     useRequest: EpisodeHistoryEntryFetching.GetMany.useRequest,
     render: (res) => {
-      assertIsManyDataResponse(res, episodeHistoryEntryEntitySchema);
-
       return (
         <span className="history-list">
           {

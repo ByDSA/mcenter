@@ -12,7 +12,7 @@ export namespace SeriesOdm {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   export const Model = ModelOdm;
   export const schema = schemaOdm;
-  export const docToEntity = docOdmToEntity;
-  export const entityToDoc = entityToDocOdm;
+  export const toEntity = docOdmToEntity;
+  export const toFullDoc = entityToDocOdm;
   export const toDoc = modelToDocOdm;
 }

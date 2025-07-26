@@ -1,16 +1,15 @@
 import z from "zod";
+import { mongoDbId } from "../../resource/partial-schemas";
 import { dateTypeSchema } from "../../../utils/time";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { episodeEntitySchema, episodeCompKeySchema } from "..";
 import { serieEntitySchema } from "../../series";
-
-const idSchema = z.string();
-
-type Id = z.infer<typeof idSchema>;
+import { streamEntitySchema } from "../../streams";
 
 const schema = z.object( {
   episodeCompKey: episodeCompKeySchema,
   date: dateTypeSchema,
+  streamId: mongoDbId,
 } ).strict();
 
 type Model = z.infer<typeof schema>;
@@ -18,9 +17,10 @@ type Model = z.infer<typeof schema>;
 const assertIsModel = genAssertZod(schema);
 const entitySchema = schema
   .extend( {
-    id: idSchema,
+    id: mongoDbId,
     serie: serieEntitySchema.optional(),
     episode: episodeEntitySchema.optional(),
+    stream: streamEntitySchema.optional(),
   } )
   .strict();
 
@@ -34,7 +34,5 @@ export {
   assertIsEntity as assertIsEpisodeHistoryEntryEntity,
   Entity as EpisodeHistoryEntryEntity,
   Model as EpisodeHistoryEntry,
-  Id as EpisodeHistoryEntryId,
-  idSchema as episodeEpisodeHistoryEntryIdSchema,
   schema as episodeHistoryEntrySchema,
 };

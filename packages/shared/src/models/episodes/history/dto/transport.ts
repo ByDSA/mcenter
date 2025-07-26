@@ -1,9 +1,9 @@
 import z from "zod";
-import { createCriteriaSchema } from "../../../utils/schemas/requests/criteria";
+import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 
 export namespace EpisodeHistoryEntryRestDtos {
   export namespace GetManyByCriteria {
-    export const criteriaSchema = createCriteriaSchema( {
+    export const criteriaSchema = createCriteriaManySchema( {
       filterShape: {
         seriesKey: z.string().optional(),
         episodeKey: z.string().optional(),

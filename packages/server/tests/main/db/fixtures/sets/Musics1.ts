@@ -4,7 +4,7 @@ import { fixtureMusics } from "#musics/tests/fixtures";
 
 export const loadFixtureMusicsInDisk = async () => {
   const musicsOdm: MusicOdm.Doc[] = fixtureMusics.Disk.List
-    .map((music: Music) => MusicOdm.toDocOdm(music));
+    .map((music: Music) => MusicOdm.toDoc(music));
 
   await MusicOdm.Model.insertMany(musicsOdm);
 };

@@ -5,14 +5,14 @@ import { genAssertZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
-import { episodeHistoryEntryEntitySchema, EpisodeHistoryEntryId } from "../models";
+import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 
 const responseSchema = createOneDataResponseSchema(episodeHistoryEntryEntitySchema);
 
 export type Response = z.infer<typeof responseSchema>;
 
 export async function fetch(
-  entryId: EpisodeHistoryEntryId,
+  entryId: EpisodeHistoryEntryEntity["id"],
 ): Promise<Response> {
   const method = "DELETE";
   const URL = backendUrl(PATH_ROUTES.episodes.history.entries.withParams(entryId));

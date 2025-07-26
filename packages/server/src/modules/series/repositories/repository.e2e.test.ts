@@ -1,5 +1,6 @@
+import { assertZod } from "$shared/utils/validation/zod";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { Stream, StreamMode, StreamOriginType, assertIsStream } from "#modules/streams/models";
+import { StreamEntity, streamEntitySchema, StreamMode, StreamOriginType } from "#modules/streams/models";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#tests/nestjs/app";
 import { type SerieEntity, assertIsSerieEntity } from "../models";
@@ -78,8 +79,9 @@ describe("repository", () => {
       } );
 
       it("should be stream in db", async () => {
-        const streamExpected: Stream = {
-          id: newModel.key,
+        const streamExpected: StreamEntity = {
+          id: "id",
+          key: newModel.key,
           mode: StreamMode.SEQUENTIAL,
           group: {
             origins: [{
@@ -88,9 +90,11 @@ describe("repository", () => {
             }],
           },
         };
-        const got = await streamRepository.getOneByKey(streamExpected.id);
+        const got = await streamRepository.getOneByKey(streamExpected.key);
 
-        assertIsStream(got);
+        assertZod(streamEntitySchema, got);
+
+        streamExpected.id = got.id;
 
         expect(got).toStrictEqual(streamExpected);
       } );

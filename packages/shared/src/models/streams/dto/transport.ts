@@ -1,25 +1,14 @@
 import z from "zod";
-import { CriteriaSortDir } from "../../../utils/criteria";
+import { createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
 
 export namespace StreamRestDtos {
   export namespace GetManyByCriteria {
-    export enum CriteriaSort {
-      lastTimePlayed = "lastTimePlayed",
-    }
+    export const criteriaSchema = createCriteriaManySchema( {
+      sortKeys: ["lastTimePlayed"],
+      expandKeys: ["series"],
+      filterShape: {},
+    } );
 
-    export enum CriteriaExpand {
-      series = "series",
-    }
-
-    export const criteriaSchema = z.object( {
-      expand: z.array(z.nativeEnum(CriteriaExpand)).optional(),
-      sort: z.object( {
-        [CriteriaSort.lastTimePlayed]: z.nativeEnum(CriteriaSortDir).optional(),
-      } ).optional(),
-    } ).strict();
-
-    export const bodySchema = criteriaSchema;
-
-    export type Body = z.infer<typeof bodySchema>;
+    export type Criteria = z.infer<typeof criteriaSchema>;
   }
 }
