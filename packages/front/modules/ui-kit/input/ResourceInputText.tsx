@@ -1,13 +1,11 @@
 import { useMemo } from "react";
-import { ResourceInputProps, ResourceInputView } from "./ResourceInput";
+import { defaultValuesMap, ResourceInputProps, ResourceInputType, ResourceInputView } from "./ResourceInput";
 import { OnPressEnter, useInputText, UseInputTextProps } from "./UseInputText";
 import { useOptional } from "./UseOptional";
 import { UseResourceInputProps, useResourceState, useResourceSync } from "./UseResourceInput";
 
 export type ResourceInputTextProps<R extends object> =
-  ResourceInputProps<R, string> & {
-    inputTextProps?: UseInputTextProps;
-  };
+  Pick<UseInputTextProps, "onPressEnter"> & ResourceInputProps<R, string>;
 
 export function ResourceInputText<R extends object>(
   { resourceState,
@@ -19,23 +17,23 @@ export function ResourceInputText<R extends object>(
     getValue,
     isHidden = false,
     disabled = false,
-    inputTextProps }: ResourceInputTextProps<R>,
+    onPressEnter }: ResourceInputTextProps<R>,
 ) {
   const { checkboxOptionalElement, mainInputElement } = useResourceInputText<R>( {
     disabled,
     getUpdatedResource,
-    onPressEnter: inputTextProps?.onPressEnter,
+    onPressEnter,
     getValue,
     addOnReset,
     isOptional,
-    defaultDefinedValue: "",
+    defaultDefinedValue: defaultValuesMap[ResourceInputType.Text],
     resourceState,
     originalResource,
   } );
 
   return ResourceInputView( {
     inputElement: mainInputElement,
-    type: "text",
+    type: ResourceInputType.Text,
     caption,
     checkboxOptionalElement,
     isVisible: !isHidden,
@@ -79,6 +77,7 @@ function useResourceInputText<R extends object>(
     originalResourceValue,
     setResourceValue,
     addOnReset: props.addOnReset,
+    type: ResourceInputType.Text,
     visualValue,
     setVisualValue,
     addOnOptionalChange,

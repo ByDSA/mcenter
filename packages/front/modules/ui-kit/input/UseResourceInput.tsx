@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AddOnReset } from "#modules/utils/resources/useCrud";
-import { ResourceInputProps } from "./ResourceInput";
+import { defaultValuesMap, ResourceInputProps, ResourceInputType } from "./ResourceInput";
 import { useOptional } from "./UseOptional";
 import { AddOnChange, OnChange } from "./InputCommon";
 
@@ -94,7 +94,7 @@ type UseResourceSyncProps<T> = {
   originalResourceValue: T;
   setResourceValue: (value: T | undefined)=> void;
   visualValue: T;
-  isNumber?: boolean;
+  type: ResourceInputType;
   setVisualValue: (value: T)=> void;
   addOnChange: AddOnChange<T>;
   addOnOptionalChange: AddOnChange<boolean>;
@@ -107,12 +107,12 @@ export function useResourceSync<T>( { resourceValue,
   addOnReset,
   addOnChange,
   addOnOptionalChange,
-  isNumber = false,
+  type,
   originalResourceValue,
   setVisualValue }: UseResourceSyncProps<T>) {
   useEffect(() => {
     onChangeRef.current = (newValue) => {
-      if (newValue === null && isNumber) {
+      if (newValue === null && type === ResourceInputType.Number) {
         setResourceValue(originalResourceValue);
 
         return;
@@ -120,24 +120,26 @@ export function useResourceSync<T>( { resourceValue,
 
       setResourceValue(newValue);
     };
-  }, [setResourceValue, originalResourceValue, isNumber]);
+  }, [setResourceValue, originalResourceValue, type]);
 
   useEffect(() => {
     onOptionalChangeRef.current = (nullChecked) => {
       if (nullChecked)
         setResourceValue(undefined);
-      else
-        setResourceValue(visualValue);
+      else {
+        const v = visualValue ?? defaultValuesMap[type] as T;
+
+        setVisualValue(v);
+        setResourceValue(v);
+      }
     };
-  }, [setResourceValue, visualValue]);
+  }, [setResourceValue, setVisualValue, visualValue, type]);
 
   const originalResourceValueRef = useRef<T>(originalResourceValue);
 
-  // Sincronizar recurso → visual
   useEffect(() => {
-    if (
-      visualValue !== resourceValue && resourceValue !== undefined
-    )
+    // Initial Visual State
+    if (visualValue !== resourceValue && resourceValue !== undefined)
       setVisualValue(resourceValue);
 
     addOnReset?.(() => {
@@ -154,8 +156,7 @@ export function useResourceSync<T>( { resourceValue,
 
   useEffect(()=> {
     addOnChange((newValue, oldValue)=> {
-      if (onChangeRef.current)
-        onChangeRef.current(newValue, oldValue);
+      onChangeRef.current?.(newValue, oldValue);
     } );
   }, []);
 
@@ -163,8 +164,7 @@ export function useResourceSync<T>( { resourceValue,
 
   useEffect(()=> {
     addOnOptionalChange((newValue, oldValue)=> {
-      if (onOptionalChangeRef.current)
-        onOptionalChangeRef.current(newValue, oldValue);
+      onOptionalChangeRef.current?.(newValue, oldValue);
     } );
   }, []);
 }

@@ -127,24 +127,16 @@ Data
       await Promise.all(promises);
     },
   } );
-  const commonEpisodeInputTextProps = {
-    inputTextProps: {
-      onPressEnter: ()=>update.action(),
-    },
+  const commonEpisodeInputProps = {
+    onPressEnter: ()=>update.action(),
     resourceState: state,
-    addOnReset,
-  };
-  const commonInputNumberProps = {
-    inputNumberProps: {
-      onPressEnter: ()=>update.action(),
-    },
-    resourceState: state,
+    originalResource: initialState[0],
     addOnReset,
   };
   const titleElement = ResourceInputText( {
     caption: EPISODE_PROPS.title.caption,
-    ...getAndUpdateEpisodeByProp("title"),
-    ...commonEpisodeInputTextProps,
+    ...getAndUpdateEpisodeByProp<string>("title"),
+    ...commonEpisodeInputProps,
 
   } );
   const titleArtist = <span className={classes("line", "height2")}>
@@ -162,7 +154,7 @@ Data
         {ResourceInputNumber( {
           caption: EPISODE_PROPS.weight.caption,
           ...getAndUpdateEpisodeByProp<number>("weight"),
-          ...commonInputNumberProps,
+          ...commonEpisodeInputProps,
         } )}
       </span>
     </span>
@@ -171,17 +163,21 @@ Data
         {ResourceInputNumber( {
           caption: EPISODE_FILE_INFO_PROPS.start.caption,
           ...getAndUpdateFileInfoByProp<number>("start"),
-          ...commonEpisodeInputTextProps,
+          ...commonEpisodeInputProps,
+          isOptional: true,
         } )}
         <span>
           {fileInfo.start && fileInfo.start > 0 ? secsToMmss(fileInfo.start) : "-"}
         </span>
       </span>
+    </span>
+    <span className={classes("line", style.startEnd)}>
       <span className={classes("height2", style.end)}>
         {ResourceInputNumber( {
           caption: EPISODE_FILE_INFO_PROPS.end.caption,
           ...getAndUpdateFileInfoByProp<number>("end"),
-          ...commonEpisodeInputTextProps,
+          ...commonEpisodeInputProps,
+          isOptional: true,
         } )}
         <span>
           {fileInfo.end && fileInfo.end > 0 ? secsToMmss(fileInfo.end) : "-"}
@@ -197,16 +193,14 @@ Data
         ...getAndUpdateEpisodeByProp("tags"),
         resourceState: state,
         addOnReset,
-        inputTextProps: {
-          onEmptyPressEnter: commonEpisodeInputTextProps.inputTextProps.onPressEnter,
-        },
+        onEmptyPressEnter: commonEpisodeInputProps.onPressEnter,
       } )}
     </span>
     <span className={classes("line", "height2")}>
       {ResourceInputText( {
         caption: EPISODE_FILE_INFO_PROPS.path.caption,
         ...getAndUpdateFileInfoByProp<string>("path"),
-        ...commonEpisodeInputTextProps,
+        ...commonEpisodeInputProps,
       } )}
     </span>
     <span className={classes("line", "height2", style.url)}>

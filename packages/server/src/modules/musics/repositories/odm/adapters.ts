@@ -135,6 +135,7 @@ export function patchParamsToUpdateQuery(params: PatchOneParams<Music>): UpdateQ
     country: entity.country,
     game: entity.game,
     year: entity.year,
+
   };
 
   if (params.unset && params.unset.length > 0) {

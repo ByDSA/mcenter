@@ -1,14 +1,12 @@
 import { useMemo } from "react";
-import { ResourceInputProps, ResourceInputView } from "./ResourceInput";
+import { defaultValuesMap, ResourceInputProps, ResourceInputType, ResourceInputView } from "./ResourceInput";
 import { useInputNumber, UseInputNumberProps } from "./UseInputNumber";
 import { OnPressEnter } from "./UseInputText";
 import { useOptional } from "./UseOptional";
 import { UseResourceInputProps, useResourceState, useResourceSync } from "./UseResourceInput";
 
 export type ResourceInputNumberProps<R extends object> =
-  ResourceInputProps<R, number> & {
-    inputNumberProps?: UseInputNumberProps;
-  };
+  Pick<UseInputNumberProps, "onPressEnter"> & ResourceInputProps<R, number>;
 
 export function ResourceInputNumber<R extends object>(
   { resourceState,
@@ -20,23 +18,23 @@ export function ResourceInputNumber<R extends object>(
     getValue,
     isHidden = false,
     disabled = false,
-    inputNumberProps }: ResourceInputNumberProps<R>,
+    onPressEnter }: ResourceInputNumberProps<R>,
 ) {
   const { checkboxOptionalElement, mainInputElement } = useResourceInputNumber( {
     disabled,
     getUpdatedResource,
-    onPressEnter: inputNumberProps?.onPressEnter,
+    onPressEnter,
     addOnReset,
     getValue,
     isOptional,
-    defaultDefinedValue: 1,
+    defaultDefinedValue: defaultValuesMap[ResourceInputType.Number],
     resourceState,
     originalResource,
   } );
 
   return ResourceInputView( {
     inputElement: mainInputElement,
-    type: "number",
+    type: ResourceInputType.Number,
     caption,
     checkboxOptionalElement,
     isVisible: !isHidden,
@@ -64,9 +62,10 @@ function useResourceInputNumber<R extends object>(props: UseResourceInputNumberP
   } );
   const { element: mainInputElement,
     setValue: setVisualValue, value: visualValue, addOnChange } = useInputNumber( {
+    isOptional: props.isOptional,
     defaultValue: props.defaultDefinedValue,
     onPressEnter: props.onPressEnter,
-    disabled: props.disabled || nullChecked,
+    disabled: props.disabled || (props.isOptional && nullChecked),
   } );
   const originalResourceValue = useMemo(
     ()=>props.getValue(props.originalResource),
@@ -78,7 +77,7 @@ function useResourceInputNumber<R extends object>(props: UseResourceInputNumberP
     originalResourceValue,
     setResourceValue,
     visualValue,
-    isNumber: true,
+    type: ResourceInputType.Number,
     addOnReset: props.addOnReset,
     setVisualValue,
     addOnOptionalChange,

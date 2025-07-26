@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ResourceInputProps, ResourceInputView } from "./ResourceInput";
+import { defaultValuesMap, ResourceInputProps, ResourceInputType, ResourceInputView } from "./ResourceInput";
 import { useInputBoolean } from "./UseInputBoolean";
 import { useOptional } from "./UseOptional";
 import { UseResourceInputProps, useResourceState, useResourceSync } from "./UseResourceInput";
@@ -16,14 +16,14 @@ export function ResourceInputBoolean<R extends object>(
     getValue,
     addOnReset,
     isOptional,
-    defaultDefinedValue: false,
+    defaultDefinedValue: defaultValuesMap[ResourceInputType.Boolean],
     resourceState,
     originalResource,
   } );
 
   return ResourceInputView( {
     inputElement: mainInputElement,
-    type: "boolean",
+    type: ResourceInputType.Boolean,
     caption,
     checkboxOptionalElement,
     isVisible: !isHidden,
@@ -60,6 +60,7 @@ function useResourceInputBoolean<R extends object>(props: UseResourceInputBoolea
     originalResourceValue,
     addOnReset: props.addOnReset,
     setResourceValue,
+    type: ResourceInputType.Boolean,
     visualValue,
     setVisualValue,
     addOnOptionalChange,

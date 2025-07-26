@@ -1,11 +1,11 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { keyDownHandlerGenerator, UseInputProps, useOnChanges } from "./InputCommon";
 import { updateHeight, useFirstTimeVisible } from "./height";
+import { defaultValuesMap, ResourceInputType } from "./ResourceInput";
 
 type InputElement = HTMLTextAreaElement;
 export type UseInputTextProps = UseInputProps<string> & {
   onPressEnter?: OnPressEnter<string>;
-  onEmptyPressEnter?: ()=> void;
 };
 
 type OnPressEnterFn<T> = (value: T | undefined)=> void;
@@ -14,7 +14,7 @@ export type OnPressEnter<T> = OnPressEnterFn<T> | "newLine" | "nothing";
 export function useInputText(props: UseInputTextProps) {
   const { onPressEnter, defaultValue, disabled = false } = props;
   const id = useId();
-  const [value, setValue] = useState(defaultValue ?? "");
+  const [value, setValue] = useState(defaultValue ?? defaultValuesMap[ResourceInputType.Text]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const updateH = useMemo(() => () => textareaRef?.current && updateHeight( {
     value: textareaRef.current.value,

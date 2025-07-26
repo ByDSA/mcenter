@@ -85,10 +85,10 @@ export function useCrud<T>(
     },
     // eslint-disable-next-line require-await
     reset: async () => {
-      setData(data);
+      setData(initialData);
 
       for (const fn of onReset)
-        fn(data);
+        fn(initialData);
     },
     addOnReset: (fn: OnReset<T>) => {
       setOnReset((oldOnReset)=>([

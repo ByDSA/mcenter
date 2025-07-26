@@ -13,13 +13,26 @@ export type ResourceInputProps<R extends object, V> = {
   disabled?: boolean;
 };
 
+export enum ResourceInputType {
+  Boolean = "boolean",
+  Number = "number",
+  Text = "text"
+}
+
 type ResourceInputViewProps = {
-  type: "boolean" | "number" | "text";
+  type: ResourceInputType;
   caption?: React.JSX.Element | string;
   inputElement: React.ReactNode;
   checkboxOptionalElement?: React.ReactNode;
   isVisible?: boolean;
 };
+
+export const defaultValuesMap = Object.freeze( {
+  [ResourceInputType.Boolean]: false,
+  [ResourceInputType.Number]: 0,
+  [ResourceInputType.Text]: "",
+} as const);
+
 export function ResourceInputView( { caption,
   inputElement: mainInputElement,
   type,

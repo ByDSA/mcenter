@@ -10,12 +10,11 @@ import { secsToMmss } from "#modules/utils/dates";
 import { useHistoryEntryEdition } from "#modules/history";
 import { backendUrl } from "#modules/requests";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
-import { UseInputNumberProps } from "#modules/ui-kit/input/UseInputNumber";
 import { generatePatchBody } from "#modules/fetching";
 import { MusicFetching } from "#modules/musics/requests";
 import { MusicFileInfoFetching } from "#modules/musics/file-info/requests";
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
-import { UseInputTextProps } from "#modules/ui-kit/input/UseInputText";
+import { OnPressEnter } from "#modules/ui-kit/input/UseInputText";
 import { MUSIC_PROPS } from "../utils";
 import { MusicHistoryEntryEntity } from "../../models";
 import { MusicHistoryEntryFetching } from "../../requests";
@@ -127,18 +126,8 @@ export function Body( { data }: Props) {
 
       return acc;
     }, {} as Record<keyof Music, PropInfo>);
-  const commonInputTextProps = {
-    inputTextProps: {
-      onPressEnter: ()=>update.action(),
-    } as UseInputTextProps,
-    resourceState: state,
-    originalResource: initialState[0],
-    addOnReset,
-  };
-  const commonInputNumberProps = {
-    inputNumberProps: {
-      onPressEnter: ()=>update.action(),
-    },
+  const commonInputProps = {
+    onPressEnter: ()=>update.action(),
     resourceState: state,
     originalResource: initialState[0],
     addOnReset,
@@ -146,12 +135,12 @@ export function Body( { data }: Props) {
   const titleElement = ResourceInputText( {
     caption: MUSIC_PROPS.title.caption,
     ...getAndUpdateMusicByProp<string>("title"),
-    ...commonInputTextProps,
+    ...commonInputProps,
   } );
   const artistElement = ResourceInputText( {
     caption: MUSIC_PROPS.artist.caption,
     ...getAndUpdateMusicByProp<string>("artist"),
-    ...commonInputTextProps,
+    ...commonInputProps,
   } );
   const titleArtist = <span className={classes("line", style.titleArtist)}>
     <span className={`${"height2"} ${style.title}`}>
@@ -172,14 +161,14 @@ export function Body( { data }: Props) {
         {ResourceInputNumber( {
           caption: MUSIC_PROPS.weight.caption,
           ...getAndUpdateMusicByProp<number>("weight"),
-          ...commonInputNumberProps,
+          ...commonInputProps,
         } )}
       </span>
       <span className={classes("height2", style.album)}>
         {ResourceInputText( {
           caption: MUSIC_PROPS.album.caption,
           ...getAndUpdateMusicByProp<string>("album"),
-          ...commonInputTextProps,
+          ...commonInputProps,
         } )}
       </span>
     </span>
@@ -189,19 +178,14 @@ export function Body( { data }: Props) {
         ...getAndUpdateMusicByProp<string[]>("tags"),
         resourceState: state,
         addOnReset,
-        onEmptyPressEnter: ()=>{
-          const o = commonInputTextProps.inputTextProps.onPressEnter;
-
-          if (typeof o === "function")
-            return o("");
-        },
+        onEmptyPressEnter: commonInputProps.onPressEnter,
       } )}
     </span>
     <span className={classes("line", "height2")}>
       {ResourceInputText( {
         caption: <><a href={fullUrlOf(music.url)}>Url</a>:</>,
         ...getAndUpdateMusicByProp<string>("url"),
-        ...commonInputTextProps,
+        ...commonInputProps,
       } )}
     </span>
     {(fileInfo.mediaInfo.duration !== null && <>
@@ -209,8 +193,8 @@ export function Body( { data }: Props) {
     </>) || null}
     {OptionalProps( {
       optionalProps,
-      ...commonInputTextProps,
-      ...commonInputNumberProps,
+      ...commonInputProps,
+      ...commonInputProps,
       initialResource: initialState[0],
       addOnReset,
     } )}
@@ -243,14 +227,13 @@ export function Body( { data }: Props) {
 
 type OptionalPropsProps = Omit<ResourceInputCommonProps<Data, string>, "getUpdatedResource" |
   "getValue" | "name"> & {
+  onPressEnter?: OnPressEnter<unknown>;
   optionalProps: Record<keyof Music, PropInfo>;
-  inputNumberProps: UseInputNumberProps;
-  inputTextProps: UseInputTextProps;
   initialResource: Data;
 };
 function OptionalProps(
   { resourceState, optionalProps, initialResource,
-    inputNumberProps, addOnReset, inputTextProps }: OptionalPropsProps,
+    addOnReset, onPressEnter }: OptionalPropsProps,
 ) {
   const [isVisible, setIsVisible] = useState(false);
   const ret: Record<string, JSX.Element> = {};
@@ -295,7 +278,7 @@ function OptionalProps(
                 ...commonProps,
                 ...getAndUpdateMusicByProp<string>(prop),
                 caption,
-                inputTextProps,
+                onPressEnter,
                 isHidden,
               } )
             }
@@ -310,7 +293,7 @@ function OptionalProps(
                 ...commonProps,
                 ...getAndUpdateMusicByProp<number>(prop),
                 caption,
-                inputNumberProps,
+                onPressEnter,
                 isHidden,
               } )
             }
@@ -358,6 +341,7 @@ function calcIsModified(r1: MusicHistoryEntryEntity, r2: MusicHistoryEntryEntity
         weight: true,
         year: true,
         fileInfos: true,
+        spotifyId: true,
       },
     },
   } );
