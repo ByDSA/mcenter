@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.16](https://github.com/ByDSA/mcenter/compare/v4.0.15...v4.0.16) (2025-07-26)
+
+
+### Bug Fixes
+
+* **back:** play stream sorting ([8da107c](https://github.com/ByDSA/mcenter/commit/8da107cfc33900522b4a9ab379224584b3cd8d22))
+
 ### [4.0.15](https://github.com/ByDSA/mcenter/compare/v4.0.14...v4.0.15) (2025-07-26)
 
 
