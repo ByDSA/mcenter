@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
+import { EpisodeCompKey } from "../../models";
 import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
-import { SerieFullDocOdm } from "#modules/series/repositories/odm";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/repositories/odm";
 import { RequireId } from "#utils/layers/db/mongoose";
-import { EpisodeCompKey } from "../../models";
+import { SeriesOdm } from "#modules/series/repositories/odm";
 
 export interface DocOdm {
   _id?: mongoose.Types.ObjectId;
@@ -19,7 +19,7 @@ export interface DocOdm {
 }
 
 export type FullDocOdm = RequireId<DocOdm> & {
-  serie?: SerieFullDocOdm;
+  serie?: SeriesOdm.FullDoc;
   fileInfos?: EpisodeFileInfoOdm.FullDoc[];
 };
 

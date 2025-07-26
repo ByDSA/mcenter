@@ -27,7 +27,18 @@ const createSortSchema = <T extends readonly string[]>(
 };
 
 // Función que fuerza la inferencia de tipos literales
-export const createCriteriaSchema = <
+export type CriteriaConfig<
+  TFilter extends z.ZodRawShape,
+  TSortKeys extends readonly string[],
+  TExpand extends readonly string[]
+> = {
+  filterShape: TFilter;
+  sortKeys: TSortKeys;
+  expandKeys: TExpand;
+};
+
+// Para inferencia de tipos
+export function createCriteriaConfig<
   TFilter extends z.ZodRawShape,
   const TSortKeys extends readonly string[],
   const TExpand extends readonly string[]
@@ -35,7 +46,15 @@ export const createCriteriaSchema = <
   filterShape: TFilter;
   sortKeys: TSortKeys;
   expandKeys: TExpand;
-} ) => {
+} ) {
+  return config;
+}
+
+export const createCriteriaSchema = <
+  TFilter extends z.ZodRawShape,
+  const TSortKeys extends readonly string[],
+  const TExpand extends readonly string[]
+>(config: CriteriaConfig<TFilter, TSortKeys, TExpand>) => {
   const { expandKeys, filterShape, sortKeys } = config;
 
   return z.object( {
@@ -45,5 +64,20 @@ export const createCriteriaSchema = <
     expand: createExpandSchema(expandKeys),
     limit: z.number().optional(),
     offset: z.number().optional(),
+  } ).strict();
+};
+
+export const createCriteriaOneSchema = <
+  TFilter extends z.ZodRawShape,
+  const TSortKeys extends readonly string[],
+  const TExpand extends readonly string[]
+>(config: CriteriaConfig<TFilter, TSortKeys, TExpand>) => {
+  const { expandKeys, filterShape, sortKeys } = config;
+
+  return z.object( {
+    filter: z.object(filterShape).strict()
+      .optional(),
+    sort: createSortSchema(sortKeys),
+    expand: createExpandSchema(expandKeys),
   } ).strict();
 };

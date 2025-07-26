@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { showError } from "$shared/utils/errors/showError";
+import { Serie, SerieEntity, SeriesKey } from "../models";
+import { FullDocOdm, ModelOdm } from "./odm/odm";
+import { QUEUE_NAME } from "./events";
+import { SeriesOdm } from "./odm";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { BrokerEvent } from "#utils/message-broker";
-import { Serie, SerieEntity, SeriesKey } from "../models";
-import { FullDocOdm, ModelOdm } from "./odm/odm";
-import { QUEUE_NAME } from "./events";
-import { serieDocOdmToEntity as docOdmToEntity, serieToDocOdm } from "./odm";
 
 @Injectable()
 export class SerieRepository
@@ -26,13 +26,13 @@ CanGetAll<SerieEntity> {
   async getAll(): Promise<SerieEntity[]> {
     const seriesDocOdm = await ModelOdm.find();
 
-    return seriesDocOdm.map(docOdmToEntity);
+    return seriesDocOdm.map(SeriesOdm.docToEntity);
   }
 
   async createOneAndGet(model: Serie): Promise<SerieEntity> {
-    const serieOdm = serieToDocOdm(model);
+    const serieOdm = SeriesOdm.toDoc(model);
     const gotOdm = await ModelOdm.create(serieOdm);
-    const serie = docOdmToEntity(gotOdm);
+    const serie = SeriesOdm.docToEntity(gotOdm);
     const event = new ModelEvent(EventType.CREATED, {
       entity: serie,
     } );
@@ -50,7 +50,7 @@ CanGetAll<SerieEntity> {
     if (!serieDb)
       return null;
 
-    return docOdmToEntity(serieDb);
+    return SeriesOdm.docToEntity(serieDb);
   }
 
   async updateOneByKeyAndGet(key: SeriesKey, serie: SerieEntity): Promise<SerieEntity | null> {
@@ -63,7 +63,7 @@ CanGetAll<SerieEntity> {
     if (!docOdm)
       return null;
 
-    const ret = docOdmToEntity(docOdm);
+    const ret = SeriesOdm.docToEntity(docOdm);
     const event = new ModelEvent(EventType.UPDATED, {
       entity: ret,
     } );

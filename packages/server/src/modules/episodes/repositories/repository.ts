@@ -1,30 +1,29 @@
-/* eslint-disable import/no-cycle */
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { showError } from "$shared/utils/errors/showError";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
-import { assertIsNotEmpty } from "$shared/utils/validation";
-import { FilterQuery } from "mongoose";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { logDomainEvent } from "#modules/log";
-import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
-import { CanCreateManyAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
-import { BrokerEvent } from "#utils/message-broker";
-import { EpisodeFileInfoRepository } from "#episodes/file-info";
-import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
-import { assertFound } from "#utils/validation/found";
-import { SeriesKey } from "#modules/series";
+import { EpisodesRestDtos } from "$shared/models/episodes/dto/transport";
 import { Episode, EpisodeCompKey, EpisodeEntity, EpisodeId } from "../models";
 import { LastTimePlayedService } from "../history/last-time-played.service";
 import { EpisodeHistoryEntryEvent } from "../history/repositories";
 import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "../history/repositories/events";
-import { Criteria } from "./criteria";
 import { EPISODE_QUEUE_NAME } from "./events";
 import { EpisodeOdm } from "./odm";
-import { CriteriaOne } from "./criteria/validation";
+import { getCriteriaPipeline } from "./odm/criteria-pipeline";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { logDomainEvent } from "#modules/log";
+import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
+import { CanCreateManyAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { BrokerEvent } from "#utils/message-broker";
+import { EpisodeFileInfoRepository } from "#episodes/file-info";
+import { assertFound } from "#utils/validation/found";
+import { SeriesKey } from "#modules/series";
 
 type UpdateOneParams = Episode;
 
 export type EpisodeEvent = BrokerEvent<ModelMessage<EpisodeEntity>>;
+
+type Criteria = EpisodesRestDtos.GetManyByCriteria.Criteria;
+type CriteriaOne = EpisodesRestDtos.GetOne.Criteria;
 
 @Injectable()
 export class EpisodesRepository
@@ -32,7 +31,7 @@ implements
 CanCreateManyAndGet<EpisodeEntity>,
 CanGetOneById<EpisodeEntity, EpisodeId>,
 CanPatchOneByIdAndGet<Episode, EpisodeId>,
-CanGetManyCriteria<EpisodeEntity, Criteria>,
+CanGetManyByCriteria<EpisodeEntity, Criteria>,
 CanGetAll<EpisodeEntity> {
   constructor(
     private readonly domainMessageBroker: DomainMessageBroker,
@@ -66,25 +65,16 @@ CanGetAll<EpisodeEntity> {
     ).catch(showError);
   }
 
-  async getManyCriteria(criteria: Criteria): Promise<EpisodeEntity[]> {
-    let episodesOdm: EpisodeOdm.FullDoc[];
-    const filter: FilterQuery<EpisodeOdm.Doc> = {};
-
-    if (criteria.filter?.seriesKey)
-      filter.serieId = criteria.filter.seriesKey;
-
-    if (criteria?.sort?.episodeKey ?? true) {
-      episodesOdm = await EpisodeOdm.Model.find(filter)
-        .sort( {
-          episodeId: 1,
-        } )
-        .collation( {
+  async getManyByCriteria(criteria: Criteria): Promise<EpisodeEntity[]> {
+    const pipeline = getCriteriaPipeline(criteria);
+    const episodesOdm = await EpisodeOdm.Model.aggregate(pipeline, {
+      ...(criteria.sort?.episodeCompKey && {
+        collation: {
           locale: "en_US",
           numericOrdering: true,
-        } )
-        .exec();
-    } else
-      episodesOdm = await EpisodeOdm.Model.find(filter);
+        },
+      } ),
+    } );
 
     return episodesOdm.map(EpisodeOdm.docToEntity);
   }
@@ -127,19 +117,25 @@ CanGetAll<EpisodeEntity> {
 
   async getOneById(
     id: EpisodeId,
-    criteria?: Pick<Criteria, "expand">,
+    criteria?: Pick<CriteriaOne, "expand">,
   ): Promise<EpisodeEntity | null> {
-    const episodeOdm = await EpisodeOdm.Model.findById(id);
+  // Si no hay criteria, usar findById (más eficiente)
+    if (!criteria?.expand || Object.keys(criteria.expand).length === 0) {
+      const episodeOdm = await EpisodeOdm.Model.findById(id);
 
-    if (!episodeOdm)
-      return null;
+      return episodeOdm ? EpisodeOdm.docToEntity(episodeOdm) : null;
+    }
 
-    const ret = EpisodeOdm.docToEntity(episodeOdm);
+    // Si hay expand, usar aggregate para poder aplicar las transformaciones
+    const [episode] = await this.getManyByCriteria( {
+      ...criteria,
+      filter: {
+        id,
+      },
+      limit: 1,
+    } );
 
-    if (criteria?.expand?.includes("fileInfos"))
-      ret.fileInfos = await this.expandFileInfos(episodeOdm);
-
-    return ret;
+    return episode;
   }
 
   async getAll(): Promise<EpisodeEntity[]> {
@@ -163,26 +159,12 @@ CanGetAll<EpisodeEntity> {
   }
 
   async getOneByCriteria(criteria: CriteriaOne): Promise<EpisodeEntity | null> {
-    const filterQuery: FilterQuery<EpisodeOdm.Doc> = {};
+    const [episode] = await this.getManyByCriteria( {
+      ...criteria,
+      limit: 1,
+    } );
 
-    // TODO: cambiar cuando DB
-    if (criteria.filter?.seriesKey)
-      filterQuery.serieId = criteria.filter.seriesKey;
-
-    if (criteria.filter?.episodeKey)
-      filterQuery.episodeId = criteria.filter.episodeKey;
-
-    const episodeOdm = await EpisodeOdm.Model.findOne(filterQuery);
-
-    if (!episodeOdm)
-      return null;
-
-    const ret = EpisodeOdm.docToEntity(episodeOdm);
-
-    if (criteria?.expand?.includes("fileInfos"))
-      ret.fileInfos = await this.expandFileInfos(episodeOdm);
-
-    return ret;
+    return episode;
   }
 
   async getOneByCompKey(
@@ -198,20 +180,11 @@ CanGetAll<EpisodeEntity> {
     } );
   }
 
-  private async expandFileInfos(episodeOdm: EpisodeOdm.FullDoc): Promise<EpisodeFileInfoEntity[]> {
-    const _id = episodeOdm._id.toString();
-    const fileInfos = await this.episodeFileInfoRepository.getAllByEpisodeId(_id);
-
-    assertIsNotEmpty(fileInfos, "Episode has no file info");
-
-    return fileInfos;
-  }
-
   async getManyBySerieKey(
     seriesKey: SeriesKey,
     criteria?: Omit<Criteria, "filter">,
   ): Promise<EpisodeEntity[]> {
-    return await this.getManyCriteria( {
+    return await this.getManyByCriteria( {
       ...criteria,
       filter: {
         seriesKey,

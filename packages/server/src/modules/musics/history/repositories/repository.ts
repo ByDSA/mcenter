@@ -4,19 +4,19 @@ import { showError } from "$shared/utils/errors/showError";
 import { MusicHistoryEntryRestDtos } from "$shared/models/musics/history/dto/transport";
 import { MusicId } from "$shared/models/musics";
 import { getDateNow } from "$shared/utils/time";
-import { assertFound } from "#utils/validation/found";
-import { CanCreateOne, CanCreateOneAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyCriteria, CanGetOneById } from "#utils/layers/repository";
-import { EventType, ModelEvent } from "#utils/event-sourcing";
-import { MusicHistoryEntry, MusicHistoryEntryEntity } from "#musics/history/models";
-import { logDomainEvent } from "#modules/log";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { BrokerEvent } from "#utils/message-broker";
 import { QUEUE_NAME } from "../events";
 import { MusicRepository } from "../../repositories/repository";
 import { docOdmToEntity, docOdmToModel, modelToDocOdm } from "./odm/adapters";
 import { getCriteriaPipeline } from "./criteria-pipeline";
 import { MusicHistoryEntryOdm } from "./odm";
 import { FullDocOdm } from "./odm/odm";
+import { assertFound } from "#utils/validation/found";
+import { CanCreateOne, CanCreateOneAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById } from "#utils/layers/repository";
+import { EventType, ModelEvent } from "#utils/event-sourcing";
+import { MusicHistoryEntry, MusicHistoryEntryEntity } from "#musics/history/models";
+import { logDomainEvent } from "#modules/log";
+import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { BrokerEvent } from "#utils/message-broker";
 
 type Model = MusicHistoryEntry;
 type Entity = MusicHistoryEntryEntity;
@@ -32,7 +32,7 @@ export class MusicHistoryRepository
 implements
 CanCreateOne<Model>,
 CanCreateOneAndGet<Model>,
-CanGetManyCriteria<Model, GetManyCriteria>,
+CanGetManyByCriteria<Model, GetManyCriteria>,
 CanGetAll<Model>,
 CanGetOneById<Model, EntryId>,
 CanDeleteOneByIdAndGet<Model, EntryId> {
@@ -118,7 +118,7 @@ CanDeleteOneByIdAndGet<Model, EntryId> {
     return docOdm?.date?.timestamp ?? null;
   }
 
-  async getManyCriteria(criteria: GetManyCriteria): Promise<Entity[]> {
+  async getManyByCriteria(criteria: GetManyCriteria): Promise<Entity[]> {
     const pipeline = getCriteriaPipeline(criteria);
     const docsOdm: MusicHistoryEntryOdm.FullDoc[] = await ModelOdm.aggregate(pipeline);
 

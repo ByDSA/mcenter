@@ -1,7 +1,7 @@
 import mongoose, { Types } from "mongoose";
 import { DateType } from "$shared/utils/time";
 import { DateTypeOdmSchema } from "#utils/time";
-import { SerieFullDocOdm } from "#series/repositories/odm";
+import { SeriesOdm } from "#series/repositories/odm";
 import { EpisodeOdm } from "#episodes/repositories/odm";
 import { RequireId } from "#utils/layers/db/mongoose";
 
@@ -15,7 +15,7 @@ type DocOdm = {
 };
 
 type FullDocOdm = RequireId<DocOdm> & {
-  serie?: SerieFullDocOdm;
+  serie?: SeriesOdm.FullDoc;
   episode?: EpisodeOdm.FullDoc;
 };
 

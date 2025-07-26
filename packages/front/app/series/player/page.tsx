@@ -2,18 +2,13 @@
 
 import React, { useEffect } from "react";
 import { showError } from "$shared/utils/errors/showError";
-import { PATH_ROUTES } from "$shared/routing";
-import { DataResponse } from "$shared/utils/http/responses";
 import { EpisodeEntity } from "#modules/series/episodes/models";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
-import { Episode, assertIsEpisode } from "#modules/series/episodes/models";
-import { EpisodesRestDtos } from "#modules/series/episodes/models/dto";
+import { Episode } from "#modules/series/episodes/models";
 import { Loading } from "#modules/loading";
 import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-player";
-import { backendUrl } from "#modules/requests";
+import { EpisodeFetching } from "#modules/series/episodes/requests";
 import styles from "./Player.module.css";
-
-type EpisodeGetManyBySearchRequestBody = EpisodesRestDtos.GetManyByCriteria.Criteria;
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;
 const RESOURCES = [
@@ -43,31 +38,22 @@ export default function Player() {
           if (!path)
             return;
 
-          const body: EpisodeGetManyBySearchRequestBody = {
+          const body: EpisodeFetching.GetManyByCriteria.Body = {
             filter: {
               path,
             },
             expand: [
-              "series",
+              "series", "fileInfos",
             ],
           };
-          const bodyStr = JSON.stringify(body);
 
           fetchingResource = true;
-          fetch(backendUrl(PATH_ROUTES.episodes.search.path), {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: bodyStr,
-          } ).then(r => r.json())
-            .then((res: DataResponse<EpisodeEntity[]>) => {
+          EpisodeFetching.GetManyByCriteria.fetch(body)
+            .then((res: EpisodeFetching.GetManyByCriteria.Res) => {
               const episodes = res.data;
               const [episode] = episodes;
 
               try {
-                assertIsEpisode(episode);
-
                 uriToResource[uri] = episode ?? null;
                 setResource(episode);
               } catch {

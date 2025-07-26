@@ -1,7 +1,7 @@
-import { serieDocOdmToEntity } from "#series/repositories/odm";
-import { EpisodeOdm } from "#episodes/repositories/odm";
 import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../models";
 import { DocOdm, FullDocOdm } from "./mongo";
+import { EpisodeOdm } from "#episodes/repositories/odm";
+import { SeriesOdm } from "#modules/series/repositories/odm";
 
 function docOdmToEntity(docOdm: FullDocOdm): Entity {
   const ret: Entity = {
@@ -19,7 +19,7 @@ function docOdmToEntity(docOdm: FullDocOdm): Entity {
   };
 
   if (docOdm.serie)
-    ret.serie = serieDocOdmToEntity(docOdm.serie);
+    ret.serie = SeriesOdm.docToEntity(docOdm.serie);
 
   if (docOdm.episode)
     ret.episode = EpisodeOdm.docToEntity(docOdm.episode);
