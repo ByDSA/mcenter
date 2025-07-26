@@ -13,6 +13,7 @@ import { EpisodeHistoryEntriesRepository } from "#episodes/history";
 import { SerieRepository } from "#modules/series/repositories";
 import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../models";
 import { StreamOdm } from "./odm";
+import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
 
 type CriteriaMany = StreamRestDtos.GetManyByCriteria.Criteria;
 @Injectable()
@@ -40,59 +41,11 @@ private readonly domainMessageBroker: DomainMessageBroker,
     } ).catch(showError);
   }
 
-  async getManyByCriteria(body: CriteriaMany) {
-    let got = await this.getAll();
+  async getManyByCriteria(criteria: CriteriaMany) {
+    const pipeline = buildCriteriaPipeline(criteria);
+    let got = await StreamOdm.Model.aggregate(pipeline);
 
-    if (body.expand) {
-      const promises: Promise<any>[] = [];
-
-      for (const stream of got) {
-        for (const origin of stream.group.origins) {
-          if (origin.type === StreamOriginType.SERIE) {
-            const p = this.serieRepository.getOneByKey(origin.id)
-              .then(serie => {
-                origin.serie = serie ?? undefined;
-              } );
-
-            promises.push(p);
-          }
-        }
-      }
-
-      await Promise.all(promises);
-    }
-
-    if (body.sort?.lastTimePlayed) {
-      const lastTimePlayedDic: Record<string, number> = {};
-
-      for (const stream of got) {
-        const lastEntry = await this.episodeHistoryEntriesRepository
-          .findLast( {
-            seriesKey: stream.group.origins[0].id,
-            streamId: stream.id,
-          } );
-
-        lastTimePlayedDic[stream.id] = lastEntry ? lastEntry.date.timestamp : 0;
-      }
-
-      got = got.toSorted((a, b) => {
-        const streamIdA = a.id;
-        const streamIdB = b.id;
-
-        if (!streamIdA || !streamIdB)
-          return -1;
-
-        const lastTimePlayedA = lastTimePlayedDic[streamIdA] ?? 0;
-        const lastTimePlayedB = lastTimePlayedDic[streamIdB] ?? 0;
-
-        if (body.sort!.lastTimePlayed === "asc")
-          return lastTimePlayedA - lastTimePlayedB;
-
-        return lastTimePlayedB - lastTimePlayedA;
-      } );
-    }
-
-    return got;
+    return got.map(StreamOdm.toEntity);
   }
 
   async fixDefaultStreamForSerie(seriesKey: SeriesKey): Promise<LogElementResponse | null> {
