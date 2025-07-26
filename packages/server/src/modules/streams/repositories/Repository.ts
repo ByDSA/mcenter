@@ -68,7 +68,7 @@ private readonly domainMessageBroker: DomainMessageBroker,
       for (const stream of got) {
         const lastEntry = await this.episodeHistoryEntriesRepository
           .findLast( {
-            seriesKey: stream.key,
+            seriesKey: stream.group.origins[0].id,
             streamId: stream.id,
           } );
 
@@ -111,24 +111,9 @@ private readonly domainMessageBroker: DomainMessageBroker,
   }
 
   async getAll(): Promise<StreamEntity[]> {
-    const docs = await this.#getAllDocOdm();
+    const docs = await StreamOdm.Model.find();
 
     return docs.map(StreamOdm.toEntity);
-  }
-
-  async #getAllDocOdm(): Promise<StreamOdm.FullDoc[]> {
-    return await StreamOdm.Model.find();
-  }
-
-  async getManyBySeriesKey(id: SeriesKey): Promise<Stream[]> {
-    const allStreamsDocOdm = await this.#getAllDocOdm();
-    const docsOdm = allStreamsDocOdm.filter(streamDocOdm => {
-      const origins = streamDocOdm.group.origins.filter(o=>o.type === "serie" && o.id === id);
-
-      return origins.length > 0;
-    } );
-
-    return docsOdm.map(StreamOdm.toModel);
   }
 
   private async createDefaultFromSerie(seriesKey: SeriesKey): Promise<StreamEntity> {

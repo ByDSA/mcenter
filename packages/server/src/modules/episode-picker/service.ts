@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { neverCase } from "$shared/utils/validation";
+import { assertIsDefined, neverCase } from "$shared/utils/validation";
 import { EpisodeEntity } from "#episodes/models";
 import { EpisodesRepository } from "#episodes/repositories";
 import { PickMode, ResourcePicker } from "#modules/picker";
-import { StreamEntity, StreamMode } from "#modules/streams";
+import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { buildEpisodePicker } from "./EpisodePicker";
@@ -32,7 +32,9 @@ export class EpisodePickerService {
   }
 
   async getByStream(stream: StreamEntity, n = 1): Promise<EpisodeEntity[]> {
-    const seriesKey: string = stream.group.origins[0].id;
+    const seriesKey = getSeriesKeyFromStream(stream);
+
+    assertIsDefined(seriesKey);
     const criteria: Parameters<typeof this.episodeRepository
       .getManyBySerieKey>[1] = {};
 

@@ -47,6 +47,19 @@ const entitySchema = modelSchema.extend( {
 
 type Entity = z.infer<typeof entitySchema>;
 
+function getSeriesKeyFromStream(stream: Model): string | null {
+  let firstSerie;
+
+  for (const o of stream.group.origins) {
+    if (o.type === "serie") {
+      firstSerie = o.id;
+      break;
+    }
+  }
+
+  return firstSerie ?? null;
+}
+
 export {
   Model as Stream,
   modelSchema as streamSchema,
@@ -56,4 +69,5 @@ export {
   Mode as StreamMode,
   entitySchema as streamEntitySchema,
   Entity as StreamEntity,
+  getSeriesKeyFromStream,
 };

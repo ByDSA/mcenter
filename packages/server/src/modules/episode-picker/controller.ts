@@ -11,6 +11,7 @@ import { SerieRepository } from "#series/repositories";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
+import { getSeriesKeyFromStream } from "#modules/streams";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 import { dependencies } from "./appliers/Dependencies";
 
@@ -47,7 +48,10 @@ export class EpisodePickerController {
 
     assertFound(lastEntry);
 
-    const seriePromise = this.serieRepository.getOneByKey(stream.group.origins[0].id);
+    const seriesKey = getSeriesKeyFromStream(stream);
+
+    assertIsDefined(seriesKey);
+    const seriePromise = this.serieRepository.getOneByKey(seriesKey);
     const lastEpCompKey = lastEntry.episodeCompKey;
     const lastEpPromise = lastEpCompKey
       ? this.episodeRepository.getOneByCompKey(lastEpCompKey)
