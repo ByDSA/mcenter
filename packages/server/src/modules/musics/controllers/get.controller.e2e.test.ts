@@ -11,6 +11,7 @@ import { musicBuilderServiceMockProvicer } from "../builder/tests";
 import { MusicFileInfoRepository } from "../file-info/repositories/repository";
 import { MusicHistoryEntryOdm } from "../history/repositories/odm";
 import { MusicGetController } from "./get.controller";
+import { RawHandlerService } from "./raw-handler.service";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;
@@ -49,6 +50,7 @@ describe("musicGetController", () => {
         musicBuilderServiceMockProvicer,
         MusicHistoryRepository,
         DomainMessageBroker,
+        RawHandlerService,
       ],
     }, {
       db: {

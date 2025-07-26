@@ -17,6 +17,7 @@ import { musicFileInfoEntitySchema } from "../file-info/models";
 import { MusicUpdateRemoteController } from "./update-remote.controller";
 import { MusicFixController } from "./fix.controller";
 import { MusicGetController } from "./get.controller";
+import { RawHandlerService } from "./raw-handler.service";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 
@@ -36,6 +37,7 @@ describe("getAll", () => {
         musicHistoryRepoMockProvider,
         UpdateRemoteTreeService,
         musicFileInfoRepositoryMockProvider,
+        RawHandlerService,
       ],
     } );
 
