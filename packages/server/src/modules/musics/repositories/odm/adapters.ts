@@ -1,6 +1,7 @@
 import mongoose, { UpdateQuery } from "mongoose";
 import { assertIsMusicEntity, MusicEntity } from "$shared/models/musics";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
+import { AllKeysOf } from "$shared/utils/types";
 import { MusicFileInfoOdm } from "#musics/file-info/repositories/odm";
 import { timestampsModelToDocOdm } from "#modules/resources/odm/Timestamps";
 import { Music } from "../../models";
@@ -46,10 +47,9 @@ export function musicDocOdmToEntity(docOdm: FullDocOdm): MusicEntity {
     country: docOdm.country,
     game: docOdm.game,
     year: docOdm.year,
-  };
-
-  if (docOdm.fileInfos)
-    entity.fileInfos = docOdm.fileInfos.map(MusicFileInfoOdm.toEntity);
+    spotifyId: docOdm.spotifyId,
+    fileInfos: docOdm.fileInfos?.map(MusicFileInfoOdm.toEntity),
+  } satisfies AllKeysOf<MusicEntity>;
 
   assertIsMusicEntity(entity);
 
@@ -57,41 +57,23 @@ export function musicDocOdmToEntity(docOdm: FullDocOdm): MusicEntity {
 }
 
 export function musicToDocOdm(model: Music): DocOdm {
+  const docOdmTags = model.tags ? modelTagsToDocOdmTags(model.tags) : undefined;
   const docOdm: DocOdm = {
     title: model.title,
     url: model.url,
     weight: model.weight,
     artist: model.artist,
     timestamps: timestampsModelToDocOdm(model.timestamps),
-  };
-
-  if (model.tags !== undefined) {
-    const docOdmTags = modelTagsToDocOdmTags(model.tags);
-
-    if (docOdmTags.tags)
-      docOdm.tags = docOdmTags.tags;
-
-    if (docOdmTags.onlyTags)
-      docOdm.onlyTags = docOdmTags.onlyTags;
-  }
-
-  if (model.disabled !== undefined)
-    docOdm.disabled = model.disabled;
-
-  if (model.lastTimePlayed !== undefined)
-    docOdm.lastTimePlayed = model.lastTimePlayed;
-
-  if (model.album !== undefined)
-    docOdm.album = model.album;
-
-  if (model.country !== undefined)
-    docOdm.country = model.country;
-
-  if (model.game !== undefined)
-    docOdm.game = model.game;
-
-  if (model.year !== undefined)
-    docOdm.year = model.year;
+    disabled: model.disabled,
+    lastTimePlayed: model.lastTimePlayed,
+    album: model.album,
+    country: model.country,
+    game: model.game,
+    year: model.year,
+    spotifyId: model.spotifyId,
+    tags: docOdmTags?.tags,
+    onlyTags: docOdmTags?.onlyTags,
+  } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return docOdm;
 }
@@ -135,8 +117,8 @@ export function patchParamsToUpdateQuery(params: PatchOneParams<Music>): UpdateQ
     country: entity.country,
     game: entity.game,
     year: entity.year,
-
-  };
+    spotifyId: entity.spotifyId,
+  } satisfies Partial<DocOdm>;
 
   if (params.unset && params.unset.length > 0) {
     updateQuery.$unset = params.unset.reduce((acc, path) => {
