@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.17](https://github.com/ByDSA/mcenter/compare/v4.0.16...v4.0.17) (2025-07-26)
+
+
+### Bug Fixes
+
+* **back:** use pipeline aggregate (speed up) ([bdbd5d8](https://github.com/ByDSA/mcenter/commit/bdbd5d841de54cc2c4b62e04bbf7862fd6fb59fe))
+
 ### [4.0.16](https://github.com/ByDSA/mcenter/compare/v4.0.15...v4.0.16) (2025-07-26)
 
 
