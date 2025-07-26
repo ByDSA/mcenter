@@ -11,11 +11,11 @@ import { useHistoryEntryEdition } from "#modules/history";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
 import { EpisodeFileInfoFetching } from "#modules/series/episodes/file-info/requests";
 import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
-import { EPISODE_FILE_INFO_PROPS, EPISODE_PROPS } from "../utils";
-import { EpisodeHistoryEntryFetching } from "../../requests";
 import { EpisodeFetching } from "../../../requests";
-import style from "./style.module.css";
+import { EpisodeHistoryEntryFetching } from "../../requests";
+import { EPISODE_FILE_INFO_PROPS, EPISODE_PROPS } from "../utils";
 import { LastestComponent } from "./Lastest";
+import style from "./style.module.css";
 
 type Data = EpisodeHistoryEntryFetching.GetMany.Data;
 

@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { neverCase } from "$shared/utils/validation";
-import { buildEpisodePicker } from "./EpisodePicker";
 import { EpisodeEntity } from "#episodes/models";
 import { EpisodesRepository } from "#episodes/repositories";
 import { PickMode, ResourcePicker } from "#modules/picker";
@@ -8,6 +7,7 @@ import { Stream, StreamId, StreamMode } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
+import { buildEpisodePicker } from "./EpisodePicker";
 
 @Injectable()
 export class EpisodePickerService {

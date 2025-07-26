@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
-import { EpisodeCompKey } from "../../models";
 import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/repositories/odm";
 import { RequireId } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#modules/series/repositories/odm";
+import { EpisodeCompKey } from "../../models";
 
 export interface DocOdm {
   _id?: mongoose.Types.ObjectId;

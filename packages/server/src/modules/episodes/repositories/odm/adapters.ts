@@ -1,9 +1,9 @@
 import { Types, UpdateQuery } from "mongoose";
-import { Episode, EpisodeEntity, assertIsEpisode } from "../../models";
-import { DocOdm, FullDocOdm } from "./odm";
 import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/repositories/odm";
 import { SeriesOdm } from "#modules/series/repositories/odm";
+import { Episode, EpisodeEntity, assertIsEpisode } from "../../models";
+import { DocOdm, FullDocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {
   const model: Episode = {

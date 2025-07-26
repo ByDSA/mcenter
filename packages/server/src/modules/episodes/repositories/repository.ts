@@ -1,14 +1,8 @@
+/* eslint-disable import/no-cycle */
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { showError } from "$shared/utils/errors/showError";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesRestDtos } from "$shared/models/episodes/dto/transport";
-import { Episode, EpisodeCompKey, EpisodeEntity, EpisodeId } from "../models";
-import { LastTimePlayedService } from "../history/last-time-played.service";
-import { EpisodeHistoryEntryEvent } from "../history/repositories";
-import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "../history/repositories/events";
-import { EPISODE_QUEUE_NAME } from "./events";
-import { EpisodeOdm } from "./odm";
-import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
@@ -17,6 +11,13 @@ import { BrokerEvent } from "#utils/message-broker";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
+import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "../history/repositories/events";
+import { EpisodeHistoryEntryEvent } from "../history/repositories";
+import { LastTimePlayedService } from "../history/last-time-played.service";
+import { Episode, EpisodeCompKey, EpisodeEntity, EpisodeId } from "../models";
+import { getCriteriaPipeline } from "./odm/criteria-pipeline";
+import { EpisodeOdm } from "./odm";
+import { EPISODE_QUEUE_NAME } from "./events";
 
 type UpdateOneParams = Episode;
 

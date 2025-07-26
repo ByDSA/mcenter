@@ -59,7 +59,11 @@ export function secsToMmss(secs: number) {
   const secondsInt = Math.floor(seconds);
   const secondsDecimal = seconds - secondsInt;
 
-  return `${pad2(minutes)}:${pad2(secondsInt)}${ secondsDecimal ? secondsDecimal.toFixed(2).substring(1) : ""}`;
+  return `${pad2(minutes)}:${pad2(secondsInt)}${
+    secondsDecimal
+      ? secondsDecimal.toFixed(2).substring(1)
+      : ""
+  }`;
 }
 
 function pad2(n: number | string) {

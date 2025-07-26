@@ -34,18 +34,21 @@ describe("assertIsModel", () => {
     } ).toThrow();
   } );
 
-  it("should throw an error when asserting an entry object with a missing required property", () => {
-    const obj = {
-      ...VALID_MODEL,
-    };
+  it(
+    "should throw an error when asserting an entry object with a missing required property",
+    () => {
+      const obj = {
+        ...VALID_MODEL,
+      };
 
-    // @ts-ignore
-    delete obj.episodeCompKey;
+      // @ts-ignore
+      delete obj.episodeCompKey;
 
-    expect(() => {
-      assertIsModel(obj);
-    } ).toThrow();
-  } );
+      expect(() => {
+        assertIsModel(obj);
+      } ).toThrow();
+    },
+  );
 
   describe("domain tests", () => {
     it("should throw an error when asserting a non-object value", () => {

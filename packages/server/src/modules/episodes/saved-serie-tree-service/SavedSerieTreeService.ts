@@ -1,8 +1,8 @@
 import type { EpisodeEntity } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
-import { putModelInSerieFolderTree } from "./adapters";
 import { SerieFolderTree as SerieTree } from "#episodes/file-info";
 import { EpisodesRepository } from "#episodes/repositories";
+import { putModelInSerieFolderTree } from "./adapters";
 
 export type EpisodeEntityWithFileInfo = EpisodeEntity & Required<Pick<EpisodeEntity, "fileInfos">>;
 

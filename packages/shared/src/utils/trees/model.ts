@@ -7,7 +7,7 @@ export type TreeNodeModel<ID, C> = TreeCommonModel<ID> & {
 };
 
 type TreeRootModel<ID, C> = {
-  // eslint-disable-next-line no-use-before-define
+
   children: (TreeBranchModel<ID, C> | TreeNodeModel<ID, C>)[];
 };
 

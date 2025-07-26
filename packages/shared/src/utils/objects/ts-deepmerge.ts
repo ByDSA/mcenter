@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
 // Source: https://github.com/voodoocreation/ts-deepmerge/blob/master/index.ts
 // Modificado para que acepte undefined como objeto a mergear
@@ -88,7 +87,8 @@ export const deepMerge = <T extends IObject>(
 interface IOptions {
 
   /**
-   * When `true`, values explicitly provided as `undefined` will override existing values, though properties that are simply omitted won't affect anything.
+   * When `true`, values explicitly provided as `undefined` will override existing values,
+   * though properties that are simply omitted won't affect anything.
    * When `false`, values explicitly provided as `undefined` won't override existing values.
    *
    * Default: `true`
@@ -97,7 +97,8 @@ interface IOptions {
 
   /**
    * When `true` it will merge array properties.
-   * When `false` it will replace array properties with the last instance entirely instead of merging their contents.
+   * When `false` it will replace array properties with the last instance
+   * entirely instead of merging their contents.
    *
    * Default: `true`
    */

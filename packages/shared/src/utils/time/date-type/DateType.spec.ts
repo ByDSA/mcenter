@@ -28,18 +28,21 @@ describe("assert", () => {
     } ).toThrow();
   } );
 
-  it("should throw an error when asserting an entry object with a missing required property", () => {
-    const entry = {
-      ...MODEL_VALID,
-    };
+  it(
+    "should throw an error when asserting an entry object with a missing required property",
+    () => {
+      const entry = {
+        ...MODEL_VALID,
+      };
 
-    // @ts-ignore
-    delete entry.day;
+      // @ts-ignore
+      delete entry.day;
 
-    expect(() => {
-      assertIsModel(entry);
-    } ).toThrow();
-  } );
+      expect(() => {
+        assertIsModel(entry);
+      } ).toThrow();
+    },
+  );
 
   describe("domain tests", () => {
     it("should throw an error when asserting a non-object value", () => {

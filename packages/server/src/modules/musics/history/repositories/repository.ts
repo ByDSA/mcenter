@@ -4,12 +4,6 @@ import { showError } from "$shared/utils/errors/showError";
 import { MusicHistoryEntryRestDtos } from "$shared/models/musics/history/dto/transport";
 import { MusicId } from "$shared/models/musics";
 import { getDateNow } from "$shared/utils/time";
-import { QUEUE_NAME } from "../events";
-import { MusicRepository } from "../../repositories/repository";
-import { docOdmToEntity, docOdmToModel, modelToDocOdm } from "./odm/adapters";
-import { getCriteriaPipeline } from "./criteria-pipeline";
-import { MusicHistoryEntryOdm } from "./odm";
-import { FullDocOdm } from "./odm/odm";
 import { assertFound } from "#utils/validation/found";
 import { CanCreateOne, CanCreateOneAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById } from "#utils/layers/repository";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
@@ -17,6 +11,12 @@ import { MusicHistoryEntry, MusicHistoryEntryEntity } from "#musics/history/mode
 import { logDomainEvent } from "#modules/log";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { BrokerEvent } from "#utils/message-broker";
+import { MusicRepository } from "../../repositories/repository";
+import { QUEUE_NAME } from "../events";
+import { FullDocOdm } from "./odm/odm";
+import { MusicHistoryEntryOdm } from "./odm";
+import { getCriteriaPipeline } from "./criteria-pipeline";
+import { docOdmToEntity, docOdmToModel, modelToDocOdm } from "./odm/adapters";
 
 type Model = MusicHistoryEntry;
 type Entity = MusicHistoryEntryEntity;

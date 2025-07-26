@@ -18,7 +18,11 @@ it("put", () => {
   const used: typeof root = deepCopy(root);
 
   treePut(used, ["serieA", "seasonB"], "episodeD", "content");
-  const actualD = used.children.find((node) => node.id === "serieA")?.children.find((node) => node.id === "seasonB")?.children.find((node) => node.id === "episodeD");
+  const actualD = used.children.find(
+    (node) => node.id === "serieA",
+  )?.children.find(
+    (node) => node.id === "seasonB",
+  )?.children.find((node) => node.id === "episodeD");
 
   expect(actualD).toBeDefined();
   expect(actualD?.id).toBe("episodeD");

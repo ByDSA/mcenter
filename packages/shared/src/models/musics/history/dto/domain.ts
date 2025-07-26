@@ -13,7 +13,7 @@ export namespace MusicHistoryEntryDtos {
       .extend( {
         music: replaceSchemaTimestampsToStrings(musicEntitySchema).optional(),
       } );
-  export type Dto = z.infer<typeof schema>;
+    export type Dto = z.infer<typeof schema>;
     export const toEntity = (dto: Dto): MusicHistoryEntryEntity => {
       let music;
 

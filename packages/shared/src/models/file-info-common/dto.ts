@@ -30,14 +30,18 @@ export function replaceSchemaTimestampsFileToStrings<T extends z.ZodRawShape>(
   return ret as OutputSchemaType<T>;
 }
 
-export function transformDtoTimestampsFileToDates(timestamps: TimestampsFileDto): TimestampsFileModel {
+export function transformDtoTimestampsFileToDates(
+  timestamps: TimestampsFileDto,
+): TimestampsFileModel {
   return {
     createdAt: new Date(timestamps.createdAt),
     updatedAt: new Date(timestamps.updatedAt),
   };
 }
 
-export function transformDateTimestampsFileToDto(timestamps: TimestampsFileModel): TimestampsFileDto {
+export function transformDateTimestampsFileToDto(
+  timestamps: TimestampsFileModel,
+): TimestampsFileDto {
   return {
     createdAt: timestamps.createdAt.toISOString(),
     updatedAt: timestamps.updatedAt.toISOString(),

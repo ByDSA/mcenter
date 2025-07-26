@@ -1,14 +1,14 @@
 import { HttpStatus, RequestMethod } from "@nestjs/common";
 import { createSuccessDataResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
+import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
+import { restTestsSuite } from "#tests/suites/rest-suite";
+import { testRoute } from "#tests/main/routing";
 import { MusicHistoryRepository } from "../repositories";
 import { musicHistoryRepoMockProvider } from "../repositories/tests";
 import { MusicHistoryEntryDtos } from "../models/dto";
 import { GetManyCriteria } from "../repositories/repository";
 import { MusicHistoryRestController } from "./rest.controller";
-import { HISTORY_MUSIC_SAMPLES1 } from "#tests/main/db/fixtures/models/music";
-import { restTestsSuite } from "#tests/suites/rest-suite";
-import { testRoute } from "#tests/main/routing";
 
 describe("global routes", () => {
   testRoute(PATH_ROUTES.musics.history.path);

@@ -18,7 +18,9 @@ export function useAsyncAction() {
   };
 }
 
-export function LinkAsyncAction( { isDoing, action, spinnerSide = "right", children }: LabelAsyncActionProps) {
+export function LinkAsyncAction(
+  { isDoing, action, spinnerSide = "right", children }: LabelAsyncActionProps,
+) {
   const element = (<span>
     {spinnerSide === "left" && isDoing && <Spinner/> }
     <a style={{

@@ -3,10 +3,10 @@ import { episodeFileInfoEntitySchema, episodeFileInfoSchema } from "../../file-i
 
 export namespace EpisodeFileInfoDtos {
   export namespace Model {
-  export const schema = episodeFileInfoSchema;
-  export type Dto = z.infer<typeof schema>;
+    export const schema = episodeFileInfoSchema;
+    export type Dto = z.infer<typeof schema>;
   }
   export namespace Entity {
-  export const schema = episodeFileInfoEntitySchema;
+    export const schema = episodeFileInfoEntitySchema;
   }
 };

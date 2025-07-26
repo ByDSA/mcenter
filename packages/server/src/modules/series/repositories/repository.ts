@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { showError } from "$shared/utils/errors/showError";
-import { Serie, SerieEntity, SeriesKey } from "../models";
-import { FullDocOdm, ModelOdm } from "./odm/odm";
-import { QUEUE_NAME } from "./events";
-import { SeriesOdm } from "./odm";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { logDomainEvent } from "#modules/log";
 import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { BrokerEvent } from "#utils/message-broker";
+import { Serie, SerieEntity, SeriesKey } from "../models";
+import { SeriesOdm } from "./odm";
+import { QUEUE_NAME } from "./events";
+import { FullDocOdm, ModelOdm } from "./odm/odm";
 
 @Injectable()
 export class SerieRepository

@@ -13,7 +13,8 @@ export function ResourceAccordion( { headerContent, bodyContent }: Props) {
 
   return (
     <div className={classes(style.container, "ui-kit-accordion")}>
-      <div className={classes(style.header, "header", "noselect")} onClick={()=>setBodyVisible(!isBodyVisible)}>
+      <div className={classes(style.header, "header", "noselect")}
+        onClick={()=>setBodyVisible(!isBodyVisible)}>
         {headerContent}
       </div>
       <div className={classes(style.body, "body")} style={

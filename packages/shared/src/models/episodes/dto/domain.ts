@@ -15,12 +15,12 @@ export namespace EpisodeDtos {
   }
   export namespace Entity {
     export const schemaDto = replaceSchemaTimestampsToStrings(episodeEntitySchema);
-  export type Dto = z.infer<typeof schemaDto>;
-  export const toModel = (dto: Dto): Episode =>{
-    return {
-      ...dto,
-      timestamps: transformDtoTimestampsToDates(dto.timestamps),
+    export type Dto = z.infer<typeof schemaDto>;
+    export const toModel = (dto: Dto): Episode =>{
+      return {
+        ...dto,
+        timestamps: transformDtoTimestampsToDates(dto.timestamps),
+      };
     };
-  };
   }
 };

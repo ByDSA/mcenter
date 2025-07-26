@@ -7,11 +7,11 @@
     "start": "[ -e .env ] && set -a && . ./.env; next start"
   },
   "dependencies": {
-    "$shared": "workspace:../shared/build",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.14.9",
     "@mui/material": "5.14.9",
+    "$shared": "workspace:../shared/build",
     "just-clone": "6.2.0",
     "just-diff": "6.0.2",
     "just-extend": "6.2.0",
@@ -23,10 +23,10 @@
     "zod": "3.25.74"
   },
   "devDependencies": {
-    "$sharedSrc": "workspace:../shared/src",
     "@next/eslint-plugin-next": "^13.5.4",
     "@types/node": "18.17.14",
-    "@types/react": "18.2.21"
+    "@types/react": "18.2.21",
+    "$sharedSrc": "workspace:../shared/src"
   },
   "engines": {
     "node": ">=18"
