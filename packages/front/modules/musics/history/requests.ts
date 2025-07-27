@@ -1,13 +1,12 @@
 import { MusicHistoryEntryRestDtos } from "$shared/models/musics/history/dto/transport";
-import { createManyDataResponseSchema, DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses";
-import { musicHistoryEntryEntitySchema, musicHistoryEntrySchema } from "$shared/models/musics/history";
+import { createManyResultResponseSchema, genAssertIsOneResultResponse, ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { genAssertZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher, makeUseRequest } from "#modules/fetching";
-import { MusicHistoryEntryEntity } from "#musics/history/models";
 import { musicEntitySchema } from "../models";
+import { musicHistoryEntryEntitySchema, musicHistoryEntrySchema, MusicHistoryEntryEntity } from "./models";
 
 namespace _GetManyByCriteria {
   export type Req = MusicHistoryEntryRestDtos.GetManyByCriteria.Criteria;
@@ -32,7 +31,7 @@ namespace _GetManyByCriteria {
 
   export type Data = z.infer<typeof dataSchema>;
 
-  const resSchema = createManyDataResponseSchema(dataSchema);
+  const resSchema = createManyResultResponseSchema(dataSchema);
   export type Res = z.infer<typeof resSchema>;
   const method = "POST";
   const fetcher = makeFetcher<Req, Res>( {
@@ -43,7 +42,7 @@ namespace _GetManyByCriteria {
 
   export const useRequest = makeUseRequest<
     Req,
-    DataResponse<Data[]>
+    ResultResponse<Data[]>
   >( {
     key:
   {
@@ -57,7 +56,7 @@ namespace _GetManyByCriteria {
 }
 
 namespace _DeleteOneById {
-  export type Response = DataResponse<MusicHistoryEntryEntity>;
+  export type Response = ResultResponse<MusicHistoryEntryEntity>;
   export function fetch(
     id: MusicHistoryEntryEntity["id"],
   ): Promise<Response> {
@@ -65,7 +64,7 @@ namespace _DeleteOneById {
     const URL = backendUrl(PATH_ROUTES.musics.history.withParams(id));
     const fetcher = makeFetcher<typeof undefined, Response>( {
       method,
-      resBodyValidator: genAssertIsOneDataResponse(musicHistoryEntrySchema),
+      resBodyValidator: genAssertIsOneResultResponse(musicHistoryEntrySchema),
       body: undefined,
     } );
 

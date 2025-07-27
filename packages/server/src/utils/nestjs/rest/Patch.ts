@@ -1,6 +1,6 @@
 import { applyDecorators, HttpCode, HttpStatus, Patch, UseInterceptors } from "@nestjs/common";
 import z from "zod";
-import { createOneDataResponseSchema } from "$shared/utils/http/responses";
+import { createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { ResponseFormatterInterceptor } from "./responses/ResponseFormatterInterceptor";
 
@@ -35,7 +35,7 @@ export function getOptionalResponseDecorators(dataSchema?: z.ZodSchema) {
     );
   } else {
     decorators.push(
-      ValidateResponseWithZodSchema(createOneDataResponseSchema(usingSchema)),
+      ValidateResponseWithZodSchema(createOneResultResponseSchema(usingSchema)),
       HttpCode(HttpStatus.OK),
     );
   }

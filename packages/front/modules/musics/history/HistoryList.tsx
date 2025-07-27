@@ -1,6 +1,6 @@
+import type { MusicHistoryEntry } from "#modules/musics/history/models";
 import extend from "just-extend";
 import { Fragment } from "react";
-import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { formatDate } from "#modules/utils/dates";
 import { FetchingRender } from "#modules/fetching";
 import { MusicHistoryEntryFetching } from "./requests";

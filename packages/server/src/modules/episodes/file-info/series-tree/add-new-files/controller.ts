@@ -1,5 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
-import { DataResponse } from "$shared/utils/http";
+import { ResultResponse } from "$shared/utils/http";
 import { safeOneConcurrent, safeSequential } from "$shared/utils/errors";
 import { diffSerieTree as diffSeriesTree, EpisodeFileInfoRepository, OldNewSerieTree as OldNew } from "#episodes/file-info";
 import { SerieRepository } from "#modules/series/repositories";
@@ -79,7 +79,7 @@ export class EpisodeAddNewFilesController {
     };
   }
 
-  async #safeUpdateEpisodes(oldNew: OldNew[]): Promise<DataResponse<EpisodeFileInfoEntity[]>> {
+  async #safeUpdateEpisodes(oldNew: OldNew[]): Promise<ResultResponse<EpisodeFileInfoEntity[]>> {
     const got = await safeOneConcurrent(oldNew.map(entry=>()=> {
       return this.fileInfoRepo
         .patchOneByPathAndGet(entry.old.content.filePath, {

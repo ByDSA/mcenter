@@ -1,6 +1,6 @@
 "use client";
 
-import { MusicHistoryList } from "#modules/musics";
+import { HistoryList as MusicHistoryList } from "#modules/musics/history/HistoryList";
 
 export default function History() {
   return (

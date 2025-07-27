@@ -1,8 +1,10 @@
+import type { Music } from "#modules/musics/models";
+import type { MusicHistoryEntryEntity } from "../../models";
+import type { PropInfo } from "$shared/utils/validation/zod";
+import type { OnPressEnter } from "#modules/ui-kit/input/UseInputText";
 import { JSX, useState } from "react";
-import { PropInfo } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined } from "$shared/utils/validation";
-import { Music } from "#modules/musics/models";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
 import { isModified as isModifiedd } from "#modules/utils/objects";
@@ -14,12 +16,10 @@ import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
 import { MusicFetching } from "#modules/musics/requests";
 import { MusicFileInfoFetching } from "#modules/musics/file-info/requests";
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
-import { OnPressEnter } from "#modules/ui-kit/input/UseInputText";
 import { MUSIC_PROPS } from "../utils";
-import { MusicHistoryEntryEntity } from "../../models";
 import { MusicHistoryEntryFetching } from "../../requests";
-import style from "./style.module.css";
 import { LastestComponent } from "./Lastest";
+import style from "./style.module.css";
 
 function getAndUpdateMusicByProp<V>(
   prop: string,

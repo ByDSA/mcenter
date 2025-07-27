@@ -1,8 +1,8 @@
-import { DataResponse, ErrorElementResponse, errorToErrorElementResponse } from "../http";
+import { ResultResponse, ErrorElementResponse, errorToErrorElementResponse } from "../http";
 
 export async function safeArray<T>(
   operation: ()=> Promise<T[]>,
-): Promise<DataResponse<T[]>> {
+): Promise<ResultResponse<T[]>> {
   try {
     const data = await operation();
 
@@ -20,7 +20,7 @@ export async function safeArray<T>(
 
 export async function safeOne<T>(
   operation: ()=> Promise<T | null>,
-): Promise<DataResponse<T | null>> {
+): Promise<ResultResponse<T | null>> {
   try {
     const data = await operation();
 
@@ -43,11 +43,11 @@ type Options = {
 // Función común para ejecutar operaciones secuencialmente
 async function executeSequential<T, R>(
   operations: (()=> Promise<T>)[],
-  safeExecutor: (operation: ()=> Promise<T>)=> Promise<DataResponse<T>>,
+  safeExecutor: (operation: ()=> Promise<T>)=> Promise<ResultResponse<T>>,
   dataAccumulator: (allData: R, newData: T)=> R,
   initialData: R,
   options?: Options,
-): Promise<DataResponse<R>> {
+): Promise<ResultResponse<R>> {
   const stopOnError = options?.stopOnError ?? false;
   let allData: R = initialData;
   const allErrors: ErrorElementResponse[] = [];
@@ -75,7 +75,7 @@ async function executeSequential<T, R>(
 export async function safeArraySequential<T>(
   operations: (()=> Promise<T[]>)[],
   options?: Options,
-): Promise<DataResponse<T[]>> {
+): Promise<ResultResponse<T[]>> {
   return await executeSequential(
     operations,
     safeArray,
@@ -88,7 +88,7 @@ export async function safeArraySequential<T>(
 export async function safeOneSequential<T>(
   operations: (()=> Promise<T | null>)[],
   options?: Options,
-): Promise<DataResponse<(T | null)[]>> {
+): Promise<ResultResponse<(T | null)[]>> {
   return await executeSequential(
     operations,
     safeOne,
@@ -101,10 +101,10 @@ export async function safeOneSequential<T>(
 // Función común para ejecutar operaciones concurrentemente
 async function executeConcurrent<T, R>(
   operations: (()=> Promise<T>)[],
-  safeExecutor: (operation: ()=> Promise<T>)=> Promise<DataResponse<T>>,
+  safeExecutor: (operation: ()=> Promise<T>)=> Promise<ResultResponse<T>>,
   dataAccumulator: (allData: R, newData: T, index: number)=> R,
   initialData: R,
-): Promise<DataResponse<R>> {
+): Promise<ResultResponse<R>> {
   // Ejecutar todas las operaciones concurrentemente
   const results = await Promise.all(
     operations.map(operation => safeExecutor(operation)),
@@ -128,7 +128,7 @@ async function executeConcurrent<T, R>(
 
 export async function safeArrayConcurrent<T>(
   operations: (()=> Promise<T[]>)[],
-): Promise<DataResponse<T[]>> {
+): Promise<ResultResponse<T[]>> {
   return await executeConcurrent(
     operations,
     safeArray,
@@ -139,7 +139,7 @@ export async function safeArrayConcurrent<T>(
 
 export async function safeOneConcurrent<T>(
   operations: (()=> Promise<T | null>)[],
-): Promise<DataResponse<(T | null)[]>> {
+): Promise<ResultResponse<(T | null)[]>> {
   return await executeConcurrent(
     operations,
     safeOne,
@@ -149,9 +149,9 @@ export async function safeOneConcurrent<T>(
 }
 
 export async function safeSequential(
-  operations: (()=> Promise<DataResponse<any> | void>)[],
+  operations: (()=> Promise<ResultResponse<any> | void>)[],
   options?: Options,
-): Promise<DataResponse<null>> {
+): Promise<ResultResponse<null>> {
   const stopOnError = options?.stopOnError ?? false;
   const allErrors: ErrorElementResponse[] = [];
 
@@ -159,7 +159,7 @@ export async function safeSequential(
     try {
       const result = await operation();
 
-      // Si la operación devuelve un DataResponse, procesamos sus errores
+      // Si la operación devuelve un ResultResponse, procesamos sus errores
       if (result && typeof result === "object" && "errors" in result) {
         if (result.errors && result.errors.length > 0) {
           allErrors.push(...result.errors);

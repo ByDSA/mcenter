@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
+import { assertIsManyResultResponse, ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeHistoryEntry, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
@@ -48,8 +48,8 @@ export function fetchLastestHistoryEntries(
       "Content-Type": "application/json",
     },
   } ).then((response) => response.json())
-    .then((res: DataResponse<EpisodeHistoryEntryEntity[]>) => {
-      assertIsManyDataResponse(res, z.array(episodeHistoryEntryEntitySchema));
+    .then((res: ResultResponse<EpisodeHistoryEntryEntity[]>) => {
+      assertIsManyResultResponse(res, z.array(episodeHistoryEntryEntitySchema));
 
       return res.data;
     } );

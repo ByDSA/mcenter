@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { DataResponse } from "$shared/utils/http";
+import { ResultResponse } from "$shared/utils/http";
 import { UpdateEpisodesFileReqQueryDto } from "./validation";
 import { UpdateMetadataProcess } from "./update-saved-process";
 
@@ -14,7 +14,7 @@ export class EpisodesUpdateController {
     const { errors, data } = await this.updateMetadataProcess.process( {
       forceHash: forceHash === "1" || forceHash === "true",
     } );
-    const responseObj: DataResponse = {
+    const responseObj: ResultResponse = {
       data,
       errors,
     };

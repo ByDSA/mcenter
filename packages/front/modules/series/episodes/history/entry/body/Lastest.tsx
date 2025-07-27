@@ -1,4 +1,4 @@
-import { assertIsManyDataResponse, DataResponse } from "$shared/utils/http/responses";
+import { assertIsManyResultResponse, ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { EpisodeHistoryEntryRestDtos } from "#modules/series/episodes/history/models/dto";
@@ -46,6 +46,6 @@ export function LastestComponent(
   } );
 }
 
-const validator = (res: DataResponse<Data>) => {
-  assertIsManyDataResponse(res, episodeHistoryEntryEntitySchema as any);
+const validator = (res: ResultResponse<Data>) => {
+  assertIsManyResultResponse(res, episodeHistoryEntryEntitySchema as any);
 };

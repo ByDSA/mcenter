@@ -2,7 +2,7 @@ import fs, { existsSync } from "node:fs";
 import ffmpeg from "fluent-ffmpeg";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { ErrorElementResponse, DataResponse, errorToErrorElementResponse } from "$shared/utils/http";
+import { ErrorElementResponse, ResultResponse, errorToErrorElementResponse } from "$shared/utils/http";
 import { compareEpisodeFileInfoOmitEpisodeId } from "$shared/models/episodes/file-info";
 import { EpisodeCompKey } from "#episodes/models";
 import { EpisodeFile, EpisodeFileInfoRepository, SerieFolderTree } from "#episodes/file-info";
@@ -212,7 +212,7 @@ export class UpdateMetadataProcess {
     return episodeFileWithId;
   }
 
-  async process(options?: Options): Promise<DataResponse<Data>> {
+  async process(options?: Options): Promise<ResultResponse<Data>> {
     const seriesTree: SerieFolderTree = await this.savedSerieTreeService.getRemoteSeriesTree();
 
     console.log("UpdateMetadataProcess: got paths");

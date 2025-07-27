@@ -1,5 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
-import { DataResponse, errorToErrorElementResponse } from "$shared/utils/http";
+import { ResultResponse, errorToErrorElementResponse } from "$shared/utils/http";
 import { SerieRepository } from "#modules/series/repositories";
 import { StreamsRepository } from "#modules/streams/repositories";
 
@@ -16,8 +16,8 @@ export class FixerController {
     return await this.createAllDefaultForSerieIfNeeded();
   }
 
-  async createAllDefaultForSerieIfNeeded(): Promise<DataResponse<string[]>> {
-    const response: DataResponse<string[]> = {
+  async createAllDefaultForSerieIfNeeded(): Promise<ResultResponse<string[]>> {
+    const response: ResultResponse<string[]> = {
       data: [],
       errors: [],
     };

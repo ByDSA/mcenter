@@ -1,6 +1,6 @@
 import { Application } from "express";
 import request from "supertest";
-import { createSuccessDataResponse } from "$shared/utils/http/responses";
+import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
 import { HISTORY_ENTRY_SIMPSONS1 } from "#tests/main/db/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#tests/nestjs/app";
@@ -65,7 +65,7 @@ describe("restController", () => {
         .expect(HttpStatus.OK)
         .send();
 
-      expect(response.body).toEqual(createSuccessDataResponse(entries));
+      expect(response.body).toEqual(createSuccessResultResponse(entries));
     } );
   } );
 
@@ -94,7 +94,7 @@ describe("restController", () => {
           .expect(HttpStatus.OK)
           .send();
 
-        expect(response.body).toEqual(createSuccessDataResponse(entries));
+        expect(response.body).toEqual(createSuccessResultResponse(entries));
       } );
     } );
 
@@ -132,7 +132,7 @@ describe("restController", () => {
 
         expect(response.statusCode).toEqual(HttpStatus.OK);
         expect(response.body).toEqual(
-          createSuccessDataResponse(
+          createSuccessResultResponse(
             entries,
           ),
         );
@@ -170,7 +170,7 @@ describe("restController", () => {
 
         expect(response.statusCode).toEqual(HttpStatus.OK);
         expect(response.body).toEqual(
-          createSuccessDataResponse(entries),
+          createSuccessResultResponse(entries),
         );
       } );
     } );

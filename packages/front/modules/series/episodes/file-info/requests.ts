@@ -1,5 +1,5 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { DataResponse, genAssertIsOneDataResponse } from "$shared/utils/http/responses";
+import { genAssertIsOneResultResponse, ResultResponse } from "$shared/utils/http/responses";
 import { genAssertZod } from "$shared/utils/validation/zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching";
@@ -9,7 +9,7 @@ import { EpisodeFileInfoDtos, EpisodeFileInfoRestDtos } from "./models/dto";
 export namespace EpisodeFileInfoFetching {
   export namespace Patch {
     export type Body = EpisodeFileInfoRestDtos.PatchOneById.Body;
-    export type Response = DataResponse<EpisodeFileInfoEntity>;
+    export type Response = ResultResponse<EpisodeFileInfoEntity>;
   // eslint-disable-next-line require-await
     export async function fetch(
       id: EpisodeFileInfoEntity["id"],
@@ -20,7 +20,7 @@ export namespace EpisodeFileInfoFetching {
         method,
         body,
         reqBodyValidator: genAssertZod(EpisodeFileInfoRestDtos.PatchOneById.bodySchema),
-        resBodyValidator: genAssertIsOneDataResponse(EpisodeFileInfoDtos.Entity.schema),
+        resBodyValidator: genAssertIsOneResultResponse(EpisodeFileInfoDtos.Entity.schema),
       } );
       const URL = backendUrl(
         PATH_ROUTES.episodes.fileInfo.withParams(id),

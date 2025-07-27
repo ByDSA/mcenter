@@ -1,4 +1,4 @@
-import { createManyDataResponseSchema, DataResponse } from "$shared/utils/http/responses";
+import { createManyResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
 import { genAssertZod } from "$shared/utils/validation/zod";
@@ -11,7 +11,7 @@ export const dataSchema = streamEntitySchema;
 
 export type Data = z.infer<typeof dataSchema>;
 
-const resSchema = createManyDataResponseSchema(dataSchema);
+const resSchema = createManyResultResponseSchema(dataSchema);
 
 export type Res = z.infer<typeof resSchema>;
 
@@ -32,9 +32,9 @@ const fetcher = makeFetcher<Req, Res>( {
   resBodyValidator: genAssertZod(resSchema),
 } );
 
-export const useRequest: UseRequest<DataResponse<Data[]>> = makeUseRequest<
+export const useRequest: UseRequest<ResultResponse<Data[]>> = makeUseRequest<
   StreamRestDtos.GetManyByCriteria.Criteria,
-  DataResponse<Data[]>
+  ResultResponse<Data[]>
  >( {
    key: {
      url: backendUrl(PATH_ROUTES.streams.search.path),

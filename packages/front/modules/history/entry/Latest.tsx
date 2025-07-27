@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { DataResponse } from "$shared/utils/http/responses";
+import { ResultResponse } from "$shared/utils/http/responses";
 import { FetchingRender, UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { DateFormat, formatDate } from "#modules/utils/dates";
 import { Entry } from "#modules/utils/resources/useResourceEdition";
@@ -22,7 +22,7 @@ type HooksRet = {
 export function Lastest<
 T extends Entry<any, any>,
  ReqBody,
- ResBody extends DataResponse<T[]> = DataResponse<T[]>
+ ResBody extends ResultResponse<T[]> = ResultResponse<T[]>
  >(
   { validator, url, body, dateFormat = DATE_FORMAT_DEFAULT }: Props<ReqBody, ResBody>,
 ) {

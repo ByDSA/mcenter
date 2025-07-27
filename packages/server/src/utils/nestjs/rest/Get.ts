@@ -6,7 +6,7 @@ import { Injectable,
   CallHandler } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { createManyDataResponseSchema, createOneDataResponseSchema } from "$shared/utils/http/responses";
+import { createManyResultResponseSchema, createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { ResponseFormatterInterceptor } from "./responses/ResponseFormatterInterceptor";
 
@@ -32,7 +32,7 @@ export function GetOne(url: string, schema: z.ZodSchema, _options?: GetOneOption
     Get(url),
     // los interceptors se ejecutan al revés:
     UseInterceptors(ResponseFormatterInterceptor, NotFoundOnNullInterceptor),
-    ValidateResponseWithZodSchema(createOneDataResponseSchema(schema)),
+    ValidateResponseWithZodSchema(createOneResultResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
   ];
 
@@ -47,7 +47,7 @@ export function GetMany(url: string, schema: z.ZodSchema, _options?: GetManyOpti
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Get(url),
     UseInterceptors(ResponseFormatterInterceptor),
-    ValidateResponseWithZodSchema(createManyDataResponseSchema(schema)),
+    ValidateResponseWithZodSchema(createManyResultResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
   ];
 
@@ -65,7 +65,7 @@ export function GetManyCriteria(
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Post(url),
     UseInterceptors(ResponseFormatterInterceptor),
-    ValidateResponseWithZodSchema(createManyDataResponseSchema(schema)),
+    ValidateResponseWithZodSchema(createManyResultResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
   ];
 

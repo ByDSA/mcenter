@@ -2,14 +2,13 @@ import z from "zod";
 import { assertZodPopStack } from "../../validation/zod";
 import { errorElementResponseSchema } from "./error-element";
 
-// TODO: renombrar todo a "ResultResponse" o similar,
-export type DataResponse<T = any> = Omit<z.infer<
-ReturnType<typeof createOneDataResponseSchema<any>>
+export type ResultResponse<T = any> = Omit<z.infer<
+ReturnType<typeof createOneResultResponseSchema<any>>
 >, "data"> & {
   data: T;
 };
 
-export function createOneDataResponseSchema<T extends z.ZodSchema>(schema: T) {
+export function createOneResultResponseSchema<T extends z.ZodSchema>(schema: T) {
   return z.object( {
     data: schema.or(z.null()),
     errors: z.array(errorElementResponseSchema).optional(),
@@ -17,8 +16,8 @@ export function createOneDataResponseSchema<T extends z.ZodSchema>(schema: T) {
   } ).strict();
 }
 
-export function createManyDataResponseSchema<T extends z.ZodSchema>(schema: T) {
-  return createOneDataResponseSchema(schema)
+export function createManyResultResponseSchema<T extends z.ZodSchema>(schema: T) {
+  return createOneResultResponseSchema(schema)
     .omit( {
       data: true,
     } )
@@ -27,34 +26,34 @@ export function createManyDataResponseSchema<T extends z.ZodSchema>(schema: T) {
     } );
 }
 
-export function assertIsOneDataResponse<T>(
+export function assertIsOneResultResponse<T>(
   res: unknown,
   dataSchema: z.ZodSchema<T>,
-): asserts res is DataResponse<T> {
-  const modelSchema = createOneDataResponseSchema(dataSchema);
+): asserts res is ResultResponse<T> {
+  const modelSchema = createOneResultResponseSchema(dataSchema);
 
   assertZodPopStack(modelSchema, res);
 }
 
-export function genAssertIsOneDataResponse<T, R>(dataSchema: z.ZodSchema<T>) {
-  return (res: R) => assertIsOneDataResponse(res, dataSchema);
+export function genAssertIsOneResultResponse<T, R>(dataSchema: z.ZodSchema<T>) {
+  return (res: R) => assertIsOneResultResponse(res, dataSchema);
 }
 
-export function assertIsManyDataResponse<T>(
+export function assertIsManyResultResponse<T>(
   res: unknown,
   dataSchema: z.ZodSchema<T>,
-): asserts res is DataResponse<T[]> {
-  const modelSchema = createManyDataResponseSchema(dataSchema);
+): asserts res is ResultResponse<T[]> {
+  const modelSchema = createManyResultResponseSchema(dataSchema);
 
   assertZodPopStack(modelSchema, res);
 }
 
-export function genAssertIsManyDataResponse<T, R>(dataSchema: z.ZodSchema<T>) {
-  return (res: R) => assertIsManyDataResponse(res, dataSchema);
+export function genAssertIsManyResultResponse<T, R>(dataSchema: z.ZodSchema<T>) {
+  return (res: R) => assertIsManyResultResponse(res, dataSchema);
 }
 
-export function createSuccessDataResponse<T>(data: T): DataResponse<T> {
+export function createSuccessResultResponse<T>(data: T): ResultResponse<T> {
   return {
     data,
-  } satisfies DataResponse<T>;
+  } satisfies ResultResponse<T>;
 }

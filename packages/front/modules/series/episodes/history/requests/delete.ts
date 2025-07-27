@@ -1,13 +1,13 @@
 /* eslint-disable require-await */
 import { PATH_ROUTES } from "$shared/routing";
-import { createOneDataResponseSchema } from "$shared/utils/http/responses";
 import { genAssertZod } from "$shared/utils/validation/zod";
 import z from "zod";
+import { createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 
-const responseSchema = createOneDataResponseSchema(episodeHistoryEntryEntitySchema);
+const responseSchema = createOneResultResponseSchema(episodeHistoryEntryEntitySchema);
 
 export type Response = z.infer<typeof responseSchema>;
 

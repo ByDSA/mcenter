@@ -1,4 +1,4 @@
-import React, { JSX } from "react";
+import { JSX, useState } from "react";
 import useSWR from "swr";
 import style from "./fetching.style.module.css";
 import { Spinner } from "./ui-kit/spinner";
@@ -78,7 +78,7 @@ export function makeUseRequest<R, T>(
   { key, fetcher, refreshInterval }: MakeUseRequestParams<R, T>,
 ): UseRequest<T> {
   const ret: UseRequest<T> = () => {
-    const [data, setData] = React.useState<T | undefined>(undefined);
+    const [data, setData] = useState<T | undefined>(undefined);
     const { error, isLoading } = useSWR(
       key,
       fetcher,
