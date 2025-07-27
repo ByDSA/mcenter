@@ -33,7 +33,7 @@ describe("repository", () => {
 
   describe("create", () => {
     const newModel: SerieEntity = {
-      _id: "serieId",
+      id: "serieId",
       name: "title",
       key: "key",
     };
@@ -62,7 +62,7 @@ describe("repository", () => {
 
       assertIsSerieEntity(got);
 
-      newModel._id = got._id;
+      newModel.id = got.id;
 
       expect(got).toStrictEqual(newModel);
     } );
@@ -73,7 +73,7 @@ describe("repository", () => {
 
         assertIsSerieEntity(got);
 
-        newModel._id = got._id;
+        newModel.id = got.id;
 
         expect(got).toStrictEqual(newModel);
       } );

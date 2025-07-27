@@ -1,7 +1,8 @@
+import { Types } from "mongoose";
 import { assertIsSerie, assertIsSerieEntity, SerieEntity } from ".";
 
 const VALID_MODEL: SerieEntity = {
-  _id: "1",
+  id: new Types.ObjectId().toString(),
   key: "serie",
   name: "Serie Name",
 };

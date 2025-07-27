@@ -3,7 +3,7 @@ import { SerieEntity } from "$shared/models/series";
 import { Types } from "mongoose";
 
 export const SERIE_SIMPSONS: SerieEntity = deepFreeze( {
-  _id: new Types.ObjectId().toString(),
+  id: new Types.ObjectId().toString(),
   key: "simpsons",
   name: "simpsons",
 } );

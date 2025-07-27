@@ -6,8 +6,8 @@ export function expectSerie(actual: Serie, expeted: Serie) {
 }
 
 export function expectSerieEntity(actual: SerieEntity, expeted: SerieEntity) {
-  if (actual._id !== expeted._id)
-    throw new Error(`Serie id mismatch: ${actual._id} !== ${expeted._id}`);
+  if (actual.id !== expeted.id)
+    throw new Error(`Serie id mismatch: ${actual.id} !== ${expeted.id}`);
 
   expectSerie(actual, expeted);
 }

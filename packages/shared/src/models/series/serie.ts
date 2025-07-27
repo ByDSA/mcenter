@@ -1,5 +1,6 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
+import { mongoDbId } from "../resource/partial-schemas";
 
 const seriesKeySchema = z.string();
 
@@ -15,7 +16,7 @@ export type Serie = z.infer<typeof serieSchema>;
 export const assertIsSerie = genAssertZod(serieSchema);
 
 export const serieEntitySchema = serieSchema.extend( {
-  _id: z.string(), // TODO: cambiar a "id" cuando se cambie la DB
+  id: mongoDbId,
 } );
 
 export type SerieEntity = z.infer<typeof serieEntitySchema>;
