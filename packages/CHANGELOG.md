@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.19](https://github.com/ByDSA/mcenter/compare/v4.0.18...v4.0.19) (2025-07-27)
+
+
+### Bug Fixes
+
+* **back:** only update when create ([394f1c1](https://github.com/ByDSA/mcenter/commit/394f1c1e75ae03089f2b045b9ac6d7fef47c0e94))
+* **front:** possible cyclic dependency ([37e8f22](https://github.com/ByDSA/mcenter/commit/37e8f222a836ae7815990a2d8a53c69df74e4e87))
+
 ### [4.0.18](https://github.com/ByDSA/mcenter/compare/v4.0.17...v4.0.18) (2025-07-27)
 
 
