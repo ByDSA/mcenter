@@ -60,7 +60,9 @@ CanGetAll<SerieEntity> {
       // TODO: cambiar cuando DB
         id: model.key,
       },
-      SeriesOdm.toDoc(model),
+      {
+        $setOnInsert: SeriesOdm.toDoc(model), // Solo se aplica en la creación
+      },
       {
         upsert: true, // crea si no existe
         new: true, // retorna el documento actualizado
