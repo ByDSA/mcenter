@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
-import { ResultResponse } from "$shared/utils/http";
 import { safeOneConcurrent, safeSequential } from "$shared/utils/errors";
+import { ResultResponse } from "$shared/utils/http/responses";
 import { diffSerieTree as diffSeriesTree, EpisodeFileInfoRepository, OldNewSerieTree as OldNew } from "#episodes/file-info";
 import { SerieRepository } from "#modules/series/repositories";
 import { SerieNode, SerieTree, EpisodeNode } from "#episodes/file-info/series-tree/local/models";

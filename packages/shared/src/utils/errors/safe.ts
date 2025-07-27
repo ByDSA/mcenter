@@ -1,4 +1,4 @@
-import { ResultResponse, ErrorElementResponse, errorToErrorElementResponse } from "../http";
+import { ResultResponse, ErrorElementResponse, errorToErrorElementResponse } from "../http/responses";
 
 export async function safeArray<T>(
   operation: ()=> Promise<T[]>,

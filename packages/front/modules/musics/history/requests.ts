@@ -1,12 +1,12 @@
 import { MusicHistoryEntryRestDtos } from "$shared/models/musics/history/dto/transport";
-import { createManyResultResponseSchema, genAssertIsOneResultResponse, ResultResponse } from "$shared/utils/http/responses";
+import { createManyResultResponseSchema, genAssertIsOneResultResponse, type ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { genAssertZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher, makeUseRequest } from "#modules/fetching";
 import { musicEntitySchema } from "../models";
-import { musicHistoryEntryEntitySchema, musicHistoryEntrySchema, MusicHistoryEntryEntity } from "./models";
+import { musicHistoryEntryEntitySchema, musicHistoryEntrySchema, type MusicHistoryEntryEntity } from "./models";
 
 namespace _GetManyByCriteria {
   export type Req = MusicHistoryEntryRestDtos.GetManyByCriteria.Criteria;

@@ -2,7 +2,7 @@ import fs, { existsSync } from "node:fs";
 import ffmpeg from "fluent-ffmpeg";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { ErrorElementResponse, ResultResponse, errorToErrorElementResponse } from "$shared/utils/http";
+import { ErrorElementResponse, ResultResponse, errorToErrorElementResponse } from "$shared/utils/http/responses";
 import { compareEpisodeFileInfoOmitEpisodeId } from "$shared/models/episodes/file-info";
 import { EpisodeCompKey } from "#episodes/models";
 import { EpisodeFile, EpisodeFileInfoRepository, SerieFolderTree } from "#episodes/file-info";

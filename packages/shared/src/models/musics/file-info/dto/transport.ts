@@ -1,5 +1,5 @@
 import z from "zod";
-import { createOneResultResponseSchema } from "../../../../utils/http";
+import { createOneResultResponseSchema } from "../../../../utils/http/responses";
 import { generatePatchBodySchema } from "../../../utils/schemas/patch";
 import { idParamsSchema } from "../../../utils/schemas/requests";
 import { musicFileInfoEntitySchema } from "../file-info";

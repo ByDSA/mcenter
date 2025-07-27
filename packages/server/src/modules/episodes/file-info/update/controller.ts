@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { ResultResponse } from "$shared/utils/http";
+import { ResultResponse } from "$shared/utils/http/responses";
 import { UpdateEpisodesFileReqQueryDto } from "./validation";
 import { UpdateMetadataProcess } from "./update-saved-process";
 
