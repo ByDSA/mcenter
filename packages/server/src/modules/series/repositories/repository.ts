@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import { Injectable } from "@nestjs/common";
 import { showError } from "$shared/utils/errors/showError";
 import { DomainMessageBroker } from "#modules/domain-message-broker";
@@ -53,23 +54,34 @@ CanGetAll<SerieEntity> {
     return SeriesOdm.toEntity(serieDb);
   }
 
-  async updateOneByKeyAndGet(key: SeriesKey, serie: SerieEntity): Promise<SerieEntity | null> {
-    const docOdm = await ModelOdm.findOneAndUpdate( {
-      id: key,
-    }, serie, {
-      new: true,
-    } );
+  async getOneOrCreate(model: Serie): Promise<SerieEntity> {
+    const result = await SeriesOdm.Model.findOneAndUpdate(
+      {
+      // TODO: cambiar cuando DB
+        id: model.key,
+      },
+      SeriesOdm.toDoc(model),
+      {
+        upsert: true, // crea si no existe
+        new: true, // retorna el documento actualizado
+        setDefaultsOnInsert: true, // aplica defaults solo en inserción
+        includeResultMetadata: true, // para separar value y upserted
+      },
+    );
 
-    if (!docOdm)
-      return null;
+    assert(result.value !== null);
 
-    const ret = SeriesOdm.toEntity(docOdm);
-    const event = new ModelEvent(EventType.UPDATED, {
-      entity: ret,
-    } );
+    const gotOdm = result.value;
+    const serie = SeriesOdm.toEntity(gotOdm);
 
-    await this.domainMessageBroker.publish(QUEUE_NAME, event);
+    if (result.lastErrorObject?.upserted) {
+      const event = new ModelEvent(EventType.CREATED, {
+        entity: serie,
+      } );
 
-    return ret;
+      await this.domainMessageBroker.publish(QUEUE_NAME, event);
+    }
+
+    return serie;
   }
 }

@@ -27,9 +27,6 @@ export const PATH_ROUTES = {
   },
   actions: {
     path: "/api/actions",
-    fixer: {
-      path: "/api/actions/fixer",
-    },
     log: {
       path: "/api/actions/log",
     },
@@ -72,6 +69,9 @@ export const PATH_ROUTES = {
     path: "/api/streams",
     search: {
       path: "/api/streams/criteria",
+    },
+    fixer: {
+      path: "/api/streams/fixer",
     },
   },
   player: {

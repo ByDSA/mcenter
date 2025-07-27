@@ -1,4 +1,4 @@
-import { genAssertZod } from "src/utils/validation/zod";
+import { genAssertZod } from "../../../utils/validation/zod";
 import { EpisodeHistoryEntry, episodeHistoryEntrySchema } from "./history-entry";
 
 const assertIsModel: ReturnType<typeof genAssertZod> = genAssertZod(episodeHistoryEntrySchema);

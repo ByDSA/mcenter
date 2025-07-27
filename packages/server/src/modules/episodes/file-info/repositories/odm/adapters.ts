@@ -40,7 +40,6 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
 }
 
 export function modelToDocOdm(model: Model): DocOdm {
-  assertIsEntity(model);
   const ret: DocOdm = {
     episodeId: new mongoose.Types.ObjectId(model.episodeId),
     path: model.path,

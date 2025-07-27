@@ -23,8 +23,8 @@ const ACTIONS: Action[] = [
     name: "Episodes: add new files",
   },
   {
-    path: PATH_ROUTES.actions.fixer.path,
-    name: "Fixer: streams-series",
+    path: PATH_ROUTES.streams.fixer.path,
+    name: "Streams: fixer (ensure all series have default stream)",
   },
   {
     path: PATH_ROUTES.actions.log.path,

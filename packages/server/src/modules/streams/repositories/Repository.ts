@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { LogElementResponse } from "$shared/utils/http";
 import { showError } from "$shared/utils/errors/showError";
 import { assertIsSerieEntity, Serie, SeriesKey } from "$shared/models/series";
 import { StreamRestDtos } from "$shared/models/streams/dto/transport";
@@ -9,8 +8,6 @@ import { SERIES_QUEUE_NAME } from "#series/models";
 import { EventType } from "#utils/event-sourcing";
 import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
 import { BrokerEvent } from "#utils/message-broker";
-import { EpisodeHistoryEntriesRepository } from "#episodes/history";
-import { SerieRepository } from "#modules/series/repositories";
 import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../models";
 import { StreamOdm } from "./odm";
 import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
@@ -23,9 +20,7 @@ CanGetManyByCriteria<StreamEntity, CriteriaMany>,
 CanCreateOneAndGet<StreamEntity>,
 CanGetAll<StreamEntity> {
   constructor(
-private readonly domainMessageBroker: DomainMessageBroker,
-    private readonly serieRepository: SerieRepository,
-    private readonly episodeHistoryEntriesRepository: EpisodeHistoryEntriesRepository,
+    private readonly domainMessageBroker: DomainMessageBroker,
   ) {
     this.domainMessageBroker.subscribe(SERIES_QUEUE_NAME, async (event: BrokerEvent<any>) => {
       logDomainEvent(SERIES_QUEUE_NAME, event);
@@ -34,7 +29,7 @@ private readonly domainMessageBroker: DomainMessageBroker,
         const serie = event.payload.entity;
 
         assertIsSerieEntity(serie);
-        await this.fixDefaultStreamForSerie(serie.key);
+        await this.createDefaultForSerie(serie.key);
       }
 
       return Promise.resolve();
@@ -48,17 +43,11 @@ private readonly domainMessageBroker: DomainMessageBroker,
     return got.map(StreamOdm.toEntity);
   }
 
-  async fixDefaultStreamForSerie(seriesKey: SeriesKey): Promise<LogElementResponse | null> {
+  async createDefaultForSerieIfNeeded(seriesKey: SeriesKey): Promise<StreamEntity | null> {
     const hasDefault = await this.hasDefaultForSerie(seriesKey);
 
-    if (!hasDefault) {
-      await this.createDefaultFromSerie(seriesKey);
-
-      return {
-        message: `Created default stream for serie ${seriesKey}`,
-        type: "StreamCreated",
-      };
-    }
+    if (!hasDefault)
+      return await this.createDefaultForSerie(seriesKey);
 
     return null;
   }
@@ -69,7 +58,7 @@ private readonly domainMessageBroker: DomainMessageBroker,
     return docs.map(StreamOdm.toEntity);
   }
 
-  private async createDefaultFromSerie(seriesKey: SeriesKey): Promise<StreamEntity> {
+  private async createDefaultForSerie(seriesKey: SeriesKey): Promise<StreamEntity> {
     const stream: Stream = {
       group: {
         origins: [
@@ -125,7 +114,7 @@ private readonly domainMessageBroker: DomainMessageBroker,
     } );
 
     if (!docOdm)
-      return this.createDefaultFromSerie(seriesKey);
+      return this.createDefaultForSerie(seriesKey);
 
     return StreamOdm.toEntity(docOdm);
   }

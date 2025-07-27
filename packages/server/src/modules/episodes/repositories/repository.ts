@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import assert from "node:assert";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { showError } from "$shared/utils/errors/showError";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
@@ -20,6 +21,7 @@ import { EpisodeOdm } from "./odm";
 import { EPISODE_QUEUE_NAME } from "./events";
 
 type UpdateOneParams = Episode;
+type CreateOneDto = Omit<Episode, "timestamps">;
 type EpisodeId = EpisodeEntity["id"];
 
 export type EpisodeEvent = BrokerEvent<ModelMessage<EpisodeEntity>>;
@@ -251,7 +253,52 @@ CanGetAll<EpisodeEntity> {
     return ret;
   }
 
-  async createOneAndGet(model: Episode): Promise<EpisodeEntity> {
+  async getOneOrCreate(createDto: CreateOneDto): Promise<EpisodeEntity> {
+    const model = this.createDtoToModel(createDto);
+    const result = await EpisodeOdm.Model.findOneAndUpdate(
+      {
+        serieId: model.compKey.seriesKey,
+        episodeId: model.compKey.episodeKey,
+      }, // criterio de búsqueda
+      EpisodeOdm.toDoc(model),
+      {
+        upsert: true, // crea si no existe
+        new: true, // retorna el documento actualizado
+        setDefaultsOnInsert: true, // aplica defaults solo en inserción
+        includeResultMetadata: true, // para separar value y upserted
+      },
+    );
+
+    assert(result.value !== null);
+    const ret = EpisodeOdm.toEntity(result.value);
+
+    if (result.lastErrorObject?.upserted) {
+      const event = new ModelEvent(EventType.CREATED, {
+        entity: ret,
+      } );
+
+      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
+    }
+
+    return ret;
+  }
+
+  private createDtoToModel(createDto: CreateOneDto): Episode {
+    const now = new Date();
+    const model = {
+      ...createDto,
+      timestamps: {
+        createdAt: now,
+        updatedAt: now,
+        addedAt: now,
+      },
+    };
+
+    return model;
+  }
+
+  async createOneAndGet(createDto: CreateOneDto): Promise<EpisodeEntity> {
+    const model = this.createDtoToModel(createDto);
     const doc: EpisodeOdm.Doc = EpisodeOdm.toDoc(model);
     const created = await EpisodeOdm.Model.create(doc);
     const ret = EpisodeOdm.toEntity(created);

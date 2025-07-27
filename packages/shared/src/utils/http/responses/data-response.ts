@@ -1,6 +1,8 @@
 import z from "zod";
 import { assertZodPopStack } from "../../validation/zod";
+import { errorElementResponseSchema } from "./error-element";
 
+// TODO: renombrar todo a "ResultResponse" o similar,
 export type DataResponse<T = any> = Omit<z.infer<
 ReturnType<typeof createOneDataResponseSchema<any>>
 >, "data"> & {
@@ -10,7 +12,7 @@ ReturnType<typeof createOneDataResponseSchema<any>>
 export function createOneDataResponseSchema<T extends z.ZodSchema>(schema: T) {
   return z.object( {
     data: schema.or(z.null()),
-    errors: z.array(z.any()).optional(),
+    errors: z.array(errorElementResponseSchema).optional(),
     warnings: z.array(z.any()).optional(),
   } ).strict();
 }

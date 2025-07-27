@@ -81,7 +81,7 @@ CanGetAll<Entity> {
   async patchOneByPathAndGet(
     path: Entity["path"],
     patchParams: PatchOneParams<Partial<Model>>,
-  ): Promise<EpisodeFileInfoEntity | null> {
+  ): Promise<EpisodeFileInfoEntity> {
     return await this.#patchOneAndGet( {
       path,
     }, patchParams);
@@ -90,7 +90,7 @@ CanGetAll<Entity> {
   async patchOneByIdAndGet(
     id: Entity["id"],
     patchParams: PatchOneParams<Partial<Model>>,
-  ): Promise<EpisodeFileInfoEntity | null> {
+  ): Promise<EpisodeFileInfoEntity> {
     return await this.#patchOneAndGet( {
       _id: id,
     }, patchParams);
@@ -99,7 +99,7 @@ CanGetAll<Entity> {
   async #patchOneAndGet(
     query: FilterQuery<Model>,
     params: PatchOneParams<Model>,
-  ): Promise<EpisodeFileInfoEntity | null> {
+  ): Promise<EpisodeFileInfoEntity> {
     const updateQuery = patchParamsToUpdateQuery(params, EpisodeFileInfoOdm.partialToDoc);
     const updateResult = await EpisodeFileInfoOdm.Model.findOneAndUpdate(query, updateQuery, {
       new: true,

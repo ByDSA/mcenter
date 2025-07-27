@@ -7,7 +7,7 @@ import { EpisodePickerService } from "#modules/episode-picker";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { episodeEntityWithFileInfosSchema } from "#episodes/models";
-import { EpisodeEntityWithFileInfo } from "#episodes/saved-serie-tree-service/SavedSerieTreeService";
+import { EpisodeEntityWithFileInfos } from "#episodes/file-info/series-tree/remote/service";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { PlayService } from "./PlayService";
 import { episodeWithFileInfosToMediaElement } from "./player-services/models";
@@ -70,7 +70,7 @@ export class PlayStreamController {
     }
 
     await Promise.all(promises);
-    const episodesWithFileInfos = episodes as EpisodeEntityWithFileInfo[];
+    const episodesWithFileInfos = episodes as EpisodeEntityWithFileInfos[];
 
     assertZod(z.array(episodeEntityWithFileInfosSchema), episodesWithFileInfos);
     const mediaElements = episodesWithFileInfos.map(episodeWithFileInfosToMediaElement);

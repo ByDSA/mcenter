@@ -8,9 +8,9 @@ import { EpisodeCompKey } from "#episodes/models";
 import { EpisodeFile, EpisodeFileInfoRepository, SerieFolderTree } from "#episodes/file-info";
 import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { md5FileAsync } from "#utils/crypt";
-import { SavedSerieTreeService } from "../../saved-serie-tree-service";
+import { RemoteSeriesTreeService } from "../series-tree/remote";
 import { EpisodeOdm } from "../../repositories/odm";
-import { Serie } from "../tree/models";
+import { SerieNode } from "../series-tree/local/models";
 
 type Model = EpisodeFileInfo;
 type Entity = EpisodeFileInfoEntity;
@@ -33,7 +33,7 @@ class FatalError extends Error {
 @Injectable()
 export class UpdateMetadataProcess {
   constructor(
-    private readonly savedSerieTreeService: SavedSerieTreeService,
+    private readonly savedSerieTreeService: RemoteSeriesTreeService,
     private readonly episodeFileRepository: EpisodeFileInfoRepository,
   ) {
   }
@@ -98,7 +98,7 @@ export class UpdateMetadataProcess {
   }
 
   async genEpisodeFileInfoFromEpisodeOrFail(
-    serieId: Serie["id"],
+    serieId: SerieNode["id"],
     episode: EpisodeFile,
     options: Options,
   ): Promise<Entity | null> {
@@ -213,7 +213,7 @@ export class UpdateMetadataProcess {
   }
 
   async process(options?: Options): Promise<DataResponse<Data>> {
-    const seriesTree: SerieFolderTree = await this.savedSerieTreeService.getSavedSeriesTree();
+    const seriesTree: SerieFolderTree = await this.savedSerieTreeService.getRemoteSeriesTree();
 
     console.log("UpdateMetadataProcess: got paths");
     const fileInfos: Entity[] = [];

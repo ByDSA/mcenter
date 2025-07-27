@@ -1,3 +1,0 @@
-export {
-  SavedSerieTreeService,
-} from "./SavedSerieTreeService";

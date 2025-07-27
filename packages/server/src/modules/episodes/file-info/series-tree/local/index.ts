@@ -3,9 +3,9 @@ export {
 } from "./find";
 
 export {
-  Episode as EpisodeFile,
-  Season as SeasonFolder,
-  Serie as SerieFolder,
+  EpisodeNode as EpisodeFile,
+  SeasonNode as SeasonFolder,
+  SerieNode as SerieFolder,
   SerieTree as SerieFolderTree,
 } from "./models";
 

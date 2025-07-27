@@ -8,11 +8,12 @@ import { EpisodesUpdateLastTimePlayedController } from "./controllers/episodes-u
 import { EpisodesRestController } from "./controllers/rest.controller";
 import { EpisodesRepository } from "./repositories/repository";
 import { UpdateMetadataProcess } from "./file-info/update/update-saved-process";
-import { SavedSerieTreeService } from "./saved-serie-tree-service/SavedSerieTreeService";
-import { EpisodeAddNewFilesController } from "./add-new-files/controller";
+import { RemoteSeriesTreeService } from "./file-info/series-tree/remote/service";
+import { EpisodeAddNewFilesController } from "./file-info/series-tree/add-new-files/controller";
 import { EpisodesUpdateController } from "./file-info/update/controller";
 import { EpisodeHistoryEntriesModule } from "./history/module";
 import { EpisodeFileInfosModule } from "./file-info/module";
+import { AddNewFilesRepository } from "./file-info/series-tree/add-new-files/repository";
 
 @Module( {
   imports: [
@@ -31,8 +32,9 @@ import { EpisodeFileInfosModule } from "./file-info/module";
     EpisodesRepository,
     EpisodeFileInfoRepository,
     SerieRepository,
-    SavedSerieTreeService,
+    RemoteSeriesTreeService,
     UpdateMetadataProcess,
+    AddNewFilesRepository,
   ],
   exports: [EpisodesRepository],
 } )

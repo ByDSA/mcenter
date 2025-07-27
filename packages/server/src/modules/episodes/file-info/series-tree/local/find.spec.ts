@@ -8,7 +8,9 @@ beforeAll(() => {
 } );
 
 it("should read all episodes correctly", () => {
-  const actual = findAllSerieFolderTreesAt(path.join(MEDIA_FOLDER_PATH, "series"));
+  const seriesPath = path.join(MEDIA_FOLDER_PATH, "series");
 
-  expect(actual.errors).toHaveLength(0);
+  expect(() => {
+    findAllSerieFolderTreesAt(seriesPath);
+  } ).not.toThrow();
 } );

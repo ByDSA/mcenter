@@ -1,12 +1,7 @@
 export {
-  LogElementResponse,
-  assertIsLogElement,
-} from "./LogElement";
-
-export {
   ErrorElementResponse,
-  assertIsErrorElementResponse,
+  errorElementResponseSchema,
   errorToErrorElementResponse,
-} from "./ErrorElement";
+} from "./error-element";
 
 export * from "./data-response";

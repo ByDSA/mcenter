@@ -2,4 +2,4 @@ export {
   EpisodeFileInfoRepository,
 } from "./repositories";
 
-export * from "./tree";
+export * from "./series-tree/local";

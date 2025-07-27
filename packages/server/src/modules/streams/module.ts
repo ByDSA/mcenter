@@ -3,6 +3,7 @@ import { SeriesModule } from "#modules/series/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
 import { StreamsRepository } from "./repositories";
+import { FixerController } from "./controllers/fixer.controller";
 import { StreamRestController } from ".";
 
 @Module( {
@@ -13,6 +14,7 @@ import { StreamRestController } from ".";
   ],
   controllers: [
     StreamRestController,
+    FixerController,
   ],
   providers: [
     StreamsRepository,
