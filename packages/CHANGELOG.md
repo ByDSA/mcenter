@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.18](https://github.com/ByDSA/mcenter/compare/v4.0.17...v4.0.18) (2025-07-27)
+
+
+### Bug Fixes
+
+* add new files and stream fixer ([423c36c](https://github.com/ByDSA/mcenter/commit/423c36c736f55afefcd2b917203387bef96ad059))
+
 ### [4.0.17](https://github.com/ByDSA/mcenter/compare/v4.0.16...v4.0.17) (2025-07-26)
 
 
