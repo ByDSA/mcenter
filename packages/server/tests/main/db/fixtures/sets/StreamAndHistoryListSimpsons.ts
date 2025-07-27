@@ -4,7 +4,7 @@ import { HISTORY_ENTRIES_SIMPSONS, STREAM_SIMPSONS } from "../models";
 
 export const loadFixtureStreamAndHistoryListSimpsons = async () => {
   // Streams
-  const streamsDocOdm: StreamOdm.Doc[] = [STREAM_SIMPSONS].map(StreamOdm.toDoc);
+  const streamsDocOdm: StreamOdm.FullDoc[] = [STREAM_SIMPSONS].map(StreamOdm.toFullDoc);
 
   await StreamOdm.Model.insertMany(streamsDocOdm);
 

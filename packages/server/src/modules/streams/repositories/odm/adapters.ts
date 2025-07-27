@@ -1,4 +1,5 @@
 import { AllKeysOf } from "$shared/utils/types";
+import { Types } from "mongoose";
 import { Stream, StreamEntity } from "../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
@@ -32,4 +33,11 @@ export function streamToDocOdm(model: Stream): DocOdm {
     group: model.group,
     mode: model.mode,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
+}
+
+export function entityToFullDoc(entity: StreamEntity): FullDocOdm {
+  return {
+    _id: new Types.ObjectId(entity.id),
+    ...streamToDocOdm(entity),
+  } satisfies AllKeysOf<FullDocOdm>;
 }
