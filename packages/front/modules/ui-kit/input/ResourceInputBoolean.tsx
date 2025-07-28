@@ -61,6 +61,7 @@ function useResourceInputBoolean<R extends object>(props: UseResourceInputBoolea
     originalResourceValue,
     addOnReset: props.addOnReset,
     setResourceValue,
+    getValue: props.getValue,
     isOptional: props.isOptional,
     type: ResourceInputType.Boolean,
     visualValue,

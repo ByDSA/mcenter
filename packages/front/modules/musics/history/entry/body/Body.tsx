@@ -1,4 +1,4 @@
-import type { Music } from "#modules/musics/models";
+import type { Music, MusicEntity } from "#modules/musics/models";
 import type { MusicHistoryEntryEntity } from "../../models";
 import type { PropInfo } from "$shared/utils/validation/zod";
 import type { OnPressEnter } from "#modules/ui-kit/input/UseInputText";
@@ -72,10 +72,10 @@ export function Body( { data }: Props) {
             "year",
           ],
         );
-        const promises: Promise<any>[] = [];
+        let musicPromise: Promise<MusicEntity> = Promise.resolve() as Promise<any>;
 
         if (shouldSendPatchWithBody(body)) {
-          const p1 = MusicFetching.Patch.fetch(data.music.id, body)
+          musicPromise = MusicFetching.Patch.fetch(data.music.id, body)
             .then(res=>{
               const music = {
                 ...res.data,
@@ -84,15 +84,8 @@ export function Body( { data }: Props) {
 
               assertIsDefined(music.fileInfos);
 
-              const newData = {
-                ...state[0],
-                music,
-              };
-
-              initialState[1](newData);
+              return music;
             } );
-
-          promises.push(p1);
         }
 
         const dataFileInfo = data.music.fileInfos[0];
@@ -102,14 +95,26 @@ export function Body( { data }: Props) {
           stateFileInfo,
           ["path"],
         );
+        let fileInfoPromise: ReturnType<
+          typeof MusicFileInfoFetching.Patch.fetch
+        > = Promise.resolve() as Promise<any>;
 
-        if (Object.entries(fileInfoBody.entity).length > 0) {
-          const p2 = MusicFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody);
+        if (Object.entries(fileInfoBody.entity).length > 0)
+          fileInfoPromise = MusicFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody);
 
-          promises.push(p2);
-        }
+        await Promise.all([musicPromise, fileInfoPromise]);
 
-        await Promise.all(promises);
+        const newData = {
+          ...state[0],
+        };
+
+        if (await musicPromise)
+          newData.music = await musicPromise;
+
+        if (await fileInfoPromise)
+          newData.music.fileInfos = [(await fileInfoPromise).data];
+
+        return newData;
       },
     } );
   const optionalProps: Record<keyof Music, PropInfo> = Object.entries(MUSIC_PROPS)

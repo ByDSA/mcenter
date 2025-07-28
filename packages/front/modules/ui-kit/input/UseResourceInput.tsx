@@ -89,7 +89,7 @@ export function useResourceState<R extends object, V>( { resourceState: [resourc
     setResourceValue,
   };
 }
-type UseResourceSyncProps<T> = {
+type UseResourceSyncProps<R, T> = {
   resourceValue: T | undefined;
   originalResourceValue: T;
   setResourceValue: (value: T | undefined)=> void;
@@ -97,23 +97,25 @@ type UseResourceSyncProps<T> = {
   type: ResourceInputType;
   setVisualValue: (value: T)=> void;
   addOnChange: AddOnChange<T>;
+  getValue: (resource: R)=> T;
   addOnOptionalChange: AddOnChange<boolean>;
   addOnReset?: AddOnReset<unknown>;
   addOnBlur?: (fn: ()=> void)=> void;
   isOptional?: boolean;
 };
 
-export function useResourceSync<T>( { resourceValue,
+export function useResourceSync<R, T>( { resourceValue,
   visualValue,
   setResourceValue,
   addOnReset,
   addOnChange,
   addOnOptionalChange,
   addOnBlur,
+  getValue,
   isOptional = false,
   type,
   originalResourceValue,
-  setVisualValue }: UseResourceSyncProps<T>) {
+  setVisualValue }: UseResourceSyncProps<R, T>) {
   useEffect(() => {
     onChangeRef.current = (newValue) => {
       if (newValue === null && type === ResourceInputType.Number) {
@@ -161,9 +163,13 @@ export function useResourceSync<T>( { resourceValue,
     if (visualValue !== resourceValue && resourceValue !== undefined)
       setVisualValue(resourceValue);
 
-    addOnReset?.(() => {
-      if (originalResourceValueRef.current !== undefined)
-        setVisualValue(originalResourceValueRef.current);
+    addOnReset?.((newResource: R) => {
+      if (newResource !== undefined) {
+        const value = getValue(newResource);
+
+        if (value !== undefined)
+          setVisualValue(value);
+      }
     } );
     addOnBlur?.(() => {
       if (visualValueRef.current === null && type === ResourceInputType.Number) {

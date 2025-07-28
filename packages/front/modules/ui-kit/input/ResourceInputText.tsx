@@ -77,6 +77,7 @@ function useResourceInputText<R extends object>(
     resourceValue,
     originalResourceValue,
     setResourceValue,
+    getValue: props.getValue,
     addOnReset: props.addOnReset,
     type: ResourceInputType.Text,
     visualValue,

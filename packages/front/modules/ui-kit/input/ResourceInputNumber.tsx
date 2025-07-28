@@ -80,6 +80,7 @@ function useResourceInputNumber<R extends object>(props: UseResourceInputNumberP
     setResourceValue,
     visualValue,
     isOptional: props.isOptional,
+    getValue: props.getValue,
     type: ResourceInputType.Number,
     addOnReset: props.addOnReset,
     setVisualValue,

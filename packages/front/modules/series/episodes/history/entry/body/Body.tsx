@@ -1,5 +1,5 @@
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
-import { EpisodeFileInfo } from "$shared/models/episodes/file-info";
+import { EpisodeFileInfo, EpisodeFileInfoEntity } from "$shared/models/episodes/file-info";
 import { EpisodeEntity } from "$shared/models/episodes";
 import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
@@ -76,27 +76,22 @@ Data
         state[0].episode,
         ["title", "weight", "disabled", "tags"],
       );
-      const promises: Promise<any>[] = [];
+
+      type ResEpisode = EpisodeEntity & Required<Pick<EpisodeEntity, "fileInfos">>;
+      let episodePromise: Promise<ResEpisode> = Promise.resolve() as Promise<any>;
 
       if (shouldSendPatchWithBody(episodeBody)) {
-        const p1 = EpisodeFetching.Patch.fetch(data.episodeCompKey, episodeBody)
+        episodePromise = EpisodeFetching.Patch.fetch(data.episodeCompKey, episodeBody)
           .then(res=>{
-            const episode: EpisodeEntity & Required<Pick<EpisodeEntity, "fileInfos">> = {
+            const episode: ResEpisode = {
               ...res.data,
               fileInfos: state[0].episode.fileInfos,
             };
 
             assertIsDefined(episode.fileInfos);
 
-            const newData: Data = {
-              ...state[0],
-              episode,
-            };
-
-            initialState[1](newData);
+            return episode;
           } );
-
-        promises.push(p1);
       }
 
       const dataFileInfo = data.episode.fileInfos[0];
@@ -106,25 +101,28 @@ Data
         stateFileInfo,
         ["end", "path", "start"],
       );
+      let fileInfoPromise: Promise<EpisodeFileInfoEntity> = Promise.resolve() as Promise<any>;
 
       if (shouldSendPatchWithBody(fileInfoBody)) {
-        const p2 = EpisodeFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody)
+        fileInfoPromise = EpisodeFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody)
           .then(res=>{
-            const episodefileInfo: Data = {
-              ...state[0],
-              episode: {
-                ...state[0].episode,
-                fileInfos: [res.data],
-              },
-            };
-
-            initialState[1](episodefileInfo);
+            return res.data;
           } );
-
-        promises.push(p2);
       }
 
-      await Promise.all(promises);
+      await Promise.all([episodePromise, fileInfoPromise]);
+
+      const newData: Data = {
+        ...state[0],
+      };
+
+      if (await episodePromise)
+        newData.episode = await episodePromise;
+
+      if (await fileInfoPromise)
+        newData.episode.fileInfos = [await fileInfoPromise];
+
+      return newData;
     },
   } );
   const commonEpisodeInputProps = {

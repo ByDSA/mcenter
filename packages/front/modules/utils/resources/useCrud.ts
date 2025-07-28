@@ -47,6 +47,12 @@ export function useCrud<T>(
   const asyncUpdateAction = useAsyncAction();
   const asyncRemoveAction = useAsyncAction();
   const { addObserver: addOnReset, handle: handleOnReset } = useObserver<[T]>();
+  // eslint-disable-next-line require-await
+  const genReset = (initData: T) => async () => {
+    setData(initData);
+
+    handleOnReset(initData);
+  };
   const update = async () => {
     if (!isModified)
       return;
@@ -56,7 +62,12 @@ export function useCrud<T>(
     start();
 
     return await fetchUpdate()
-      .then((r)=>{
+      .then(async (r)=>{
+        if (r) {
+          initialDataState[1](r);
+          await genReset(r)();
+        }
+
         done();
 
         return r;
@@ -84,12 +95,8 @@ export function useCrud<T>(
       action: remove,
       isDoing: asyncRemoveAction.isDoing,
     },
-    // eslint-disable-next-line require-await
-    reset: async () => {
-      setData(initialData);
 
-      handleOnReset(initialData);
-    },
+    reset: genReset(initialData),
     addOnReset,
     state: dataState,
     initialState: initialDataState,
