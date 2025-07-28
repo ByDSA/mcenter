@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.20](https://github.com/ByDSA/mcenter/compare/v4.0.19...v4.0.20) (2025-07-28)
+
+
+### Bug Fixes
+
+* **front:** album optional button ([31f7703](https://github.com/ByDSA/mcenter/commit/31f770313f92e545407f8fe80967856f4c7add4e))
+* **front:** autofix url after update ([3f3e9b9](https://github.com/ByDSA/mcenter/commit/3f3e9b98632755dcd3e6ac621529f95a60c0eb58))
+* **front:** nullish values behaivor ([c8b5d2f](https://github.com/ByDSA/mcenter/commit/c8b5d2f0ec80eca53e645c4965269a5e37e2aded))
+* **front:** set path as only readable ([f15da2f](https://github.com/ByDSA/mcenter/commit/f15da2ff5cae2cf5d77582d192bcad27d802bf40))
+
 ### [4.0.19](https://github.com/ByDSA/mcenter/compare/v4.0.18...v4.0.19) (2025-07-27)
 
 
