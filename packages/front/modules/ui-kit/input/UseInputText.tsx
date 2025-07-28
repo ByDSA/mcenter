@@ -1,4 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { classes } from "#modules/utils/styles";
 import { keyDownHandlerGenerator, UseInputProps, useOnChanges } from "./InputCommon";
 import { updateHeight, useFirstTimeVisible } from "./height";
 import { defaultValuesMap, ResourceInputType } from "./ResourceInput";
@@ -45,7 +46,7 @@ export function useInputText(props: UseInputTextProps) {
     <textarea
       ref={textareaRef}
       id={id}
-      className="ui-kit-input-text"
+      className={classes("ui-kit-input-text", props.nullChecked ? "is-null" : "")}
       disabled={disabled}
       value={value}
       onChange={handleChange}

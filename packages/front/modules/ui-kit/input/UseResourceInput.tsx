@@ -99,6 +99,8 @@ type UseResourceSyncProps<T> = {
   addOnChange: AddOnChange<T>;
   addOnOptionalChange: AddOnChange<boolean>;
   addOnReset?: AddOnReset<unknown>;
+  addOnBlur?: (fn: ()=> void)=> void;
+  isOptional?: boolean;
 };
 
 export function useResourceSync<T>( { resourceValue,
@@ -107,6 +109,8 @@ export function useResourceSync<T>( { resourceValue,
   addOnReset,
   addOnChange,
   addOnOptionalChange,
+  addOnBlur,
+  isOptional = false,
   type,
   originalResourceValue,
   setVisualValue }: UseResourceSyncProps<T>) {
@@ -114,6 +118,12 @@ export function useResourceSync<T>( { resourceValue,
     onChangeRef.current = (newValue) => {
       if (newValue === null && type === ResourceInputType.Number) {
         setResourceValue(originalResourceValue);
+
+        return;
+      }
+
+      if (newValue === "" && type === ResourceInputType.Text && isOptional) {
+        setResourceValue(undefined);
 
         return;
       }
@@ -138,6 +148,15 @@ export function useResourceSync<T>( { resourceValue,
   const originalResourceValueRef = useRef<T>(originalResourceValue);
 
   useEffect(() => {
+    originalResourceValueRef.current = originalResourceValue;
+  }, [originalResourceValue]);
+  const visualValueRef = useRef<T>(visualValue);
+
+  useEffect(() => {
+    visualValueRef.current = visualValue;
+  }, [visualValue]);
+
+  useEffect(() => {
     // Initial Visual State
     if (visualValue !== resourceValue && resourceValue !== undefined)
       setVisualValue(resourceValue);
@@ -146,11 +165,13 @@ export function useResourceSync<T>( { resourceValue,
       if (originalResourceValueRef.current !== undefined)
         setVisualValue(originalResourceValueRef.current);
     } );
+    addOnBlur?.(() => {
+      if (visualValueRef.current === null && type === ResourceInputType.Number) {
+        if (originalResourceValueRef.current !== undefined)
+          setVisualValue(originalResourceValueRef.current);
+      }
+    } );
   }, []);
-
-  useEffect(() => {
-    originalResourceValueRef.current = originalResourceValue;
-  }, [originalResourceValue]);
 
   const onChangeRef = useRef<OnChange<T> | null>(null);
 

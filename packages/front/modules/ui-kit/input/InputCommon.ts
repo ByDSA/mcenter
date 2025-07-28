@@ -8,6 +8,7 @@ export type OnChange<T> = (newValue: T, oldValue: T)=> void;
 export type AddOnChange<T> = (newOnChange: OnChange<T>)=> void;
 
 export type UseInputProps<T> = {
+  nullChecked: boolean;
   defaultValue?: T;
   onChange?: OnChange<T>;
   disabled?: boolean;
@@ -22,10 +23,7 @@ type UseOnChangesProps<T, E extends Element> = {
 export function useOnChanges<T, E extends Element>( { value,
   setValue,
   inputToValue }: UseOnChangesProps<T, E>) {
-  const [onChanges, setOnChanges] = useState<OnChange<T>[]>([]);
-  const addOnChange: AddOnChange<T> = useCallback((newOnChange: OnChange<T>) => {
-    setOnChanges((old) => ([...old, newOnChange]));
-  }, [setOnChanges]);
+  const { addObserver: addOnChange, handle } = useObserver<[T, T]>();
   const handleChange: ChangeEventHandler<E> = useMemo(() => {
     return (e: ChangeEvent<E>) => {
       const newValue = inputToValue(e.target);
@@ -33,14 +31,30 @@ export function useOnChanges<T, E extends Element>( { value,
 
       setValue(newValue);
 
-      for (const o of onChanges)
-        o(newValue, oldValue);
+      handle(newValue, oldValue);
     };
-  }, [value, onChanges]);
+  }, [value, handle]);
 
   return {
     addOnChange,
     handleChange,
+  };
+}
+
+type Observer<Args extends unknown[]> = (...params: Args)=> void;
+
+export function useObserver<Args extends unknown[]>() {
+  const [observers, setObservers] = useState<Observer<Args>[]>([]);
+  const addObserver = useCallback((observer: Observer<Args>) => {
+    setObservers(prev => [...prev, observer]);
+  }, []);
+  const handle = useCallback((...params: Args) => {
+    observers.forEach(observer => observer(...params));
+  }, [observers]);
+
+  return {
+    handle,
+    addObserver,
   };
 }
 

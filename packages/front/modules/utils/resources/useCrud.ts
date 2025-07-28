@@ -2,6 +2,7 @@ import clone from "just-clone";
 import React, { useEffect, useState } from "react";
 import { useAsyncAction } from "#modules/ui-kit/input";
 import { ResourceState } from "#modules/ui-kit/input/ResourceInputCommonProps";
+import { useObserver } from "#modules/ui-kit/input/InputCommon";
 
 export type AddOnReset<R> = (fn: OnReset<R>)=> void;
 
@@ -45,7 +46,7 @@ export function useCrud<T>(
   const [isModified] = useIsModified(initialData, currentData, isModifiedFn);
   const asyncUpdateAction = useAsyncAction();
   const asyncRemoveAction = useAsyncAction();
-  const [onReset, setOnReset] = useState([] as OnReset<T>[]);
+  const { addObserver: addOnReset, handle: handleOnReset } = useObserver<[T]>();
   const update = async () => {
     if (!isModified)
       return;
@@ -87,15 +88,9 @@ export function useCrud<T>(
     reset: async () => {
       setData(initialData);
 
-      for (const fn of onReset)
-        fn(initialData);
+      handleOnReset(initialData);
     },
-    addOnReset: (fn: OnReset<T>) => {
-      setOnReset((oldOnReset)=>([
-        ...oldOnReset,
-        fn,
-      ]));
-    },
+    addOnReset,
     state: dataState,
     initialState: initialDataState,
   };

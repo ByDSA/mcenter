@@ -63,9 +63,10 @@ function useResourceInputText<R extends object>(
   } );
   const { element: mainInputElement,
     setValue: setVisualValue, value: visualValue, addOnChange } = useInputText( {
+    nullChecked,
     defaultValue: props.defaultDefinedValue,
     onPressEnter: props.onPressEnter,
-    disabled: props.disabled || nullChecked,
+    disabled: props.disabled,
   } );
   const originalResourceValue = useMemo(
     ()=>props.getValue(props.originalResource),
@@ -79,6 +80,7 @@ function useResourceInputText<R extends object>(
     addOnReset: props.addOnReset,
     type: ResourceInputType.Text,
     visualValue,
+    isOptional: props.isOptional,
     setVisualValue,
     addOnOptionalChange,
     addOnChange,

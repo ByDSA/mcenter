@@ -61,11 +61,13 @@ function useResourceInputNumber<R extends object>(props: UseResourceInputNumberP
     isOptional: props.isOptional,
   } );
   const { element: mainInputElement,
-    setValue: setVisualValue, value: visualValue, addOnChange } = useInputNumber( {
+    setValue: setVisualValue, value: visualValue,
+    addOnChange, addOnBlur } = useInputNumber( {
     isOptional: props.isOptional,
+    nullChecked,
     defaultValue: props.defaultDefinedValue,
     onPressEnter: props.onPressEnter,
-    disabled: props.disabled || (props.isOptional && nullChecked),
+    disabled: props.disabled,
   } );
   const originalResourceValue = useMemo(
     ()=>props.getValue(props.originalResource),
@@ -77,11 +79,13 @@ function useResourceInputNumber<R extends object>(props: UseResourceInputNumberP
     originalResourceValue,
     setResourceValue,
     visualValue,
+    isOptional: props.isOptional,
     type: ResourceInputType.Number,
     addOnReset: props.addOnReset,
     setVisualValue,
     addOnOptionalChange,
     addOnChange,
+    addOnBlur,
   } );
 
   return {

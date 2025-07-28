@@ -47,6 +47,7 @@ function useResourceInputBoolean<R extends object>(props: UseResourceInputBoolea
   } );
   const { element: mainInputElement,
     setValue: setVisualValue, value: visualValue, addOnChange } = useInputBoolean( {
+    nullChecked,
     defaultValue: props.defaultDefinedValue,
     disabled: props.disabled || nullChecked,
   } );
@@ -60,6 +61,7 @@ function useResourceInputBoolean<R extends object>(props: UseResourceInputBoolea
     originalResourceValue,
     addOnReset: props.addOnReset,
     setResourceValue,
+    isOptional: props.isOptional,
     type: ResourceInputType.Boolean,
     visualValue,
     setVisualValue,

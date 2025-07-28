@@ -108,6 +108,7 @@ function AddIcon<R extends object, T extends string>(
     onEmptyPressEnter, onPressEnter, addOnReset }: AddIconProps<R>,
 ) {
   const { element: mainInputElement, value, setValue } = useInputText( {
+    nullChecked: false,
     defaultValue: EMPTY_VALUE,
     onPressEnter: (text: T) => {
       if (text === EMPTY_VALUE)

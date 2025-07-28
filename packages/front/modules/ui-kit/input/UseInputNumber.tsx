@@ -1,5 +1,6 @@
-import { useId, useMemo, useState } from "react";
-import { UseInputProps, keyDownHandlerGenerator, useOnChanges } from "./InputCommon";
+import { FocusEventHandler, useId, useMemo, useState } from "react";
+import { classes } from "#modules/utils/styles";
+import { UseInputProps, keyDownHandlerGenerator, useObserver, useOnChanges } from "./InputCommon";
 import { OnPressEnter } from "./UseInputText";
 import { defaultValuesMap, ResourceInputType } from "./ResourceInput";
 
@@ -9,8 +10,7 @@ export type UseInputNumberProps = UseInputProps<number> & {
   onPressEnter?: OnPressEnter<number>;
   isOptional?: boolean;
 };
-const stringValueToNumber = (value: string | undefined) => value === ""
-  || value === undefined
+const stringValueToNumber = (value: string | undefined) => value === "" || value === undefined
   ? null
   : +value;
 const numberValueToString = (value: number | null)=> {
@@ -38,6 +38,10 @@ export function useInputNumber(props: UseInputNumberProps) {
     setValue: (newValue: number | null) => setValue(numberValueToString(newValue)),
     value: stringValueToNumber(value),
   } );
+  const { addObserver: addOnBlur, handle: innerHandleBlur } = useObserver<void[]>();
+  const handleBlur: FocusEventHandler<HTMLInputElement> = (_e) => {
+    innerHandleBlur();
+  };
   const keyDownHandler = useMemo(() => keyDownHandlerGenerator<number | null, InputElement>( {
     onPressEnter,
     value: stringValueToNumber(value),
@@ -47,9 +51,10 @@ export function useInputNumber(props: UseInputNumberProps) {
     type="number"
     disabled={disabled}
     value={value}
-    className="ui-kit-input-number"
+    className={classes("ui-kit-input-number", props.nullChecked ? "is-null" : "")}
     onChange={handleChange}
     onKeyDown={keyDownHandler}
+    onBlur={handleBlur}
   />;
 
   return {
@@ -57,5 +62,6 @@ export function useInputNumber(props: UseInputNumberProps) {
     value: stringValueToNumber(value),
     setValue: (newValue: number | null) => setValue(numberValueToString(newValue)),
     addOnChange,
+    addOnBlur,
   };
 }
