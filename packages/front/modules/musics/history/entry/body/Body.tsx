@@ -167,6 +167,7 @@ export function Body( { data }: Props) {
           caption: MUSIC_PROPS.album.caption,
           ...getAndUpdateMusicByProp<string>("album"),
           ...commonInputProps,
+          isOptional: true,
         } )}
       </span>
     </span>
