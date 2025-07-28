@@ -5,7 +5,7 @@ import type { OnPressEnter } from "#modules/ui-kit/input/UseInputText";
 import type { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
 import { JSX, useState } from "react";
 import { PATH_ROUTES } from "$shared/routing";
-import { assertIsDefined } from "$shared/utils/validation";
+import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { MusicFileInfoFetching } from "#modules/musics/file-info/requests";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
@@ -16,7 +16,7 @@ import { backendUrl } from "#modules/requests";
 import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
 import { MusicFetching } from "#modules/musics/requests";
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
-import { MUSIC_PROPS } from "../utils";
+import { MUSIC_FILE_INFO_PROPS, MUSIC_PROPS } from "../utils";
 import { MusicHistoryEntryFetching } from "../../requests";
 import { LastestComponent } from "./Lastest";
 import style from "./style.module.css";
@@ -155,6 +155,7 @@ export function Body( { data }: Props) {
   </span>;
   const { music } = state[0];
   const fileInfo = music.fileInfos[0];
+  const { duration } = fileInfo.mediaInfo;
 
   return <div className={style.container}>
     {titleArtist}
@@ -192,9 +193,14 @@ export function Body( { data }: Props) {
         ...commonInputProps,
       } )}
     </span>
-    {(fileInfo.mediaInfo.duration !== null && <>
-      <span className="line">Duration : {secsToMmss(fileInfo.mediaInfo.duration)}</span>
-    </>) || null}
+    <span className={classes("line", "height2", style.duration)}>
+      <span>Duration:</span>
+      <span>{(isDefined(duration) && <>{secsToMmss(duration)} ({duration} s)</>) || "-"}</span>
+    </span>
+    <span className={classes("line", "height2")}>
+      <span>{MUSIC_FILE_INFO_PROPS.path.caption}</span>
+      <span>{data.music.fileInfos[0].path}</span>
+    </span>
     {OptionalProps( {
       optionalProps,
       ...commonInputProps,

@@ -182,9 +182,6 @@ Data
         </span>
       </span>
     </span>
-    <span className={classes("line", "height2", style.duration)}>
-      <span>Duration:</span><span>{(isDefined(duration) && <>{secsToMmss(duration)} ({duration} s)</>) || "-"}</span>
-    </span>
     <span className={classes("line", "height2", style.tags)}>
       <span>{EPISODE_PROPS.tags.caption}</span>
       {ResourceInputArrayString( {
@@ -194,16 +191,17 @@ Data
         onEmptyPressEnter: commonEpisodeInputProps.onPressEnter,
       } )}
     </span>
-    <span className={classes("line", "height2")}>
-      {ResourceInputText( {
-        caption: EPISODE_FILE_INFO_PROPS.path.caption,
-        ...getAndUpdateFileInfoByProp<string>("path"),
-        ...commonEpisodeInputProps,
-      } )}
-    </span>
     <span className={classes("line", "height2", style.url)}>
       <span>
     Url:</span><a href={fullUrlOf(fileInfo)}>{fullUrlOf(fileInfo)}</a>
+    </span>
+    <span className={classes("line", "height2", style.duration)}>
+      <span>Duration:</span>
+      <span>{(isDefined(duration) && <>{secsToMmss(duration)} ({duration} s)</>) || "-"}</span>
+    </span>
+    <span className={classes("line", "height2")}>
+      <span>{EPISODE_FILE_INFO_PROPS.path.caption}</span>
+      <span>{data.episode.fileInfos[0].path}</span>
     </span>
 
     <span className={"break"} />
