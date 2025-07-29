@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.22](https://github.com/ByDSA/mcenter/compare/v4.0.21...v4.0.22) (2025-07-29)
+
+
+### Bug Fixes
+
+* change db fields (episodeId -> episodeKey, etc.) ([ab13ccc](https://github.com/ByDSA/mcenter/commit/ab13ccc003cf1f76a5aeb3df635001d4600dc622))
+* **front:** breaking lines ([47b4d7e](https://github.com/ByDSA/mcenter/commit/47b4d7e5e7bd35bf3812c0fc85b7f9099efbb244))
+
 ### [4.0.21](https://github.com/ByDSA/mcenter/compare/v4.0.20...v4.0.21) (2025-07-29)
 
 
