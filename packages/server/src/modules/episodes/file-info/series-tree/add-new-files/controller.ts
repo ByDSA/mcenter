@@ -96,20 +96,20 @@ export class EpisodeAddNewFilesController {
   }
 
   private async saveNewFileInfosAndEpisode(
-    seriesInTree: SerieNode[],
+    seriesNodes: SerieNode[],
   ): Promise<EpisodeFileInfoEntity[]> {
     const allPromises: Promise<EpisodeFileInfoEntity>[] = [];
 
     // Recopilar todas las promesas para procesarlas en paralelo
-    for (const serieInTree of seriesInTree) {
+    for (const seriesNode of seriesNodes) {
     // Crear la promesa de la serie una vez
       const seriePromise = this.seriesRepo.getOneOrCreate( {
-        name: serieInTree.id,
-        key: serieInTree.id,
+        name: seriesNode.key,
+        key: seriesNode.key,
       } );
 
       // Para cada temporada y episodio, crear las promesas que dependen de la serie
-      for (const seasonInTree of serieInTree.children) {
+      for (const seasonInTree of seriesNode.children) {
         for (const episodeInTree of seasonInTree.children) {
           const episodePromise = seriePromise.then(
             serie => this.createFileInfoFromLocalEpisode(episodeInTree, serie),
@@ -127,10 +127,10 @@ export class EpisodeAddNewFilesController {
   private async createFileInfoFromLocalEpisode(localEpisode: EpisodeNode, serie: Serie) {
     const episode = {
       compKey: {
-        episodeKey: localEpisode.content.episodeId,
+        episodeKey: localEpisode.content.episodeKey,
         seriesKey: serie.key,
       },
-      title: `${serie.name} ${localEpisode.content.episodeId}`,
+      title: `${serie.name} ${localEpisode.content.episodeKey}`,
       weight: 0,
     };
     const gotEpisode = await this.episodesRepo.getOneOrCreate(episode);

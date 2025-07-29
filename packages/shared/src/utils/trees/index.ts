@@ -18,7 +18,7 @@ export abstract class TreeMap<C> implements Tree<TreeMapId, C> {
 
   constructor(root: C) {
     this.#rootNode = {
-      id: this.getIdFromContent(root),
+      key: this.getIdFromContent(root),
       children: [],
     };
   }

@@ -2,7 +2,7 @@ import { TreeBranchModel, TreeNodeModel, treePut } from "$shared/utils/trees";
 
 export type EpisodeNode = TreeNodeModel<string, {
   filePath: string;
-  episodeId: string;
+  episodeKey: string;
 }>;
 
 export type SeasonNode = TreeBranchModel<string, EpisodeNode> & {
@@ -19,15 +19,15 @@ export type SerieTree = {
 
 type EpisodeParam = {
   episode: EpisodeNode;
-  seasonId: SeasonNode["id"];
-  serieId: SerieNode["id"];
+  seasonKey: SeasonNode["key"];
+  seriesKey: SerieNode["key"];
 };
 
 export function putEpisodeInSerie(
-  { episode, seasonId }: EpisodeParam,
+  { episode, seasonKey }: EpisodeParam,
   serie: SerieNode,
 ): SerieNode {
-  treePut(serie, [seasonId], episode.id, episode);
+  treePut(serie, [seasonKey], episode.key, episode);
 
   return serie;
 }

@@ -1,10 +1,11 @@
 import type { EpisodeHistoryEntryRestDtos } from "$shared/models/episodes/history/dto/transport";
-import type { FilterQuery, PipelineStage } from "mongoose";
+import type { PipelineStage } from "mongoose";
+import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { DocOdm } from "./odm/mongo";
 
 function buildMongooseSort(
   body: EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria,
-): Record<string, -1 | 1> | undefined {
+): MongoSortQuery<DocOdm> | undefined {
   if (!body.sort?.timestamp)
     return undefined;
 
@@ -15,15 +16,15 @@ function buildMongooseSort(
 
 function buildMongooseFilter(
   criteria: EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria,
-): FilterQuery<DocOdm> {
-  const filter: FilterQuery<DocOdm> = {};
+): MongoFilterQuery<DocOdm> {
+  const filter: MongoFilterQuery<DocOdm> = {};
 
   if (criteria.filter) {
     if (criteria.filter.seriesKey)
-      filter["episodeId.serieId"] = criteria.filter.seriesKey;
+      filter["episodeCompKey.seriesKey"] = criteria.filter.seriesKey;
 
     if (criteria.filter.episodeKey)
-      filter["episodeId.code"] = criteria.filter.episodeKey;
+      filter["episodeCompKey.episodeKey"] = criteria.filter.episodeKey;
 
     if (criteria.filter.timestampMax !== undefined) {
       filter["date.timestamp"] = {
@@ -70,8 +71,8 @@ export function getCriteriaPipeline(
       pipeline.push( {
         $lookup: {
           from: "series", // nombre de la colección de series
-          localField: "episodeId.serieId",
-          foreignField: "id",
+          localField: "episodeCompKey.seriesKey",
+          foreignField: "key",
           as: "serie",
         },
       } );
@@ -91,8 +92,8 @@ export function getCriteriaPipeline(
         $lookup: {
           from: "episodes", // nombre de la colección de episodios
           let: {
-            serieId: "$episodeId.serieId",
-            code: "$episodeId.code",
+            seriesKey: "$episodeCompKey.seriesKey",
+            episodeKey: "$episodeCompKey.episodeKey",
           },
           pipeline: [
             {
@@ -100,10 +101,10 @@ export function getCriteriaPipeline(
                 $expr: {
                   $and: [
                     {
-                      $eq: ["$serieId", "$$serieId"],
+                      $eq: ["$seriesKey", "$$seriesKey"],
                     },
                     {
-                      $eq: ["$episodeId", "$$code"],
+                      $eq: ["$episodeKey", "$$episodeKey"],
                     },
                   ],
                 },

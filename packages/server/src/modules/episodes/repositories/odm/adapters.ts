@@ -1,16 +1,17 @@
-import { Types, UpdateQuery } from "mongoose";
+import { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/repositories/odm";
 import { SeriesOdm } from "#modules/series/repositories/odm";
+import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { Episode, EpisodeEntity } from "../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {
   const model: Episode = {
     compKey: {
-      episodeKey: docOdm.episodeId,
-      seriesKey: docOdm.serieId,
+      episodeKey: docOdm.episodeKey,
+      seriesKey: docOdm.seriesKey,
     },
     title: docOdm.title,
     weight: docOdm.weight,
@@ -45,21 +46,21 @@ export function episodeToDocOdm(model: Episode): DocOdm {
     title: model.title,
     weight: model.weight,
     timestamps: model.timestamps,
-    episodeId: model.compKey.episodeKey,
-    serieId: model.compKey.seriesKey,
+    episodeKey: model.compKey.episodeKey,
+    seriesKey: model.compKey.seriesKey,
     disabled: model.disabled,
     tags: model.tags,
     lastTimePlayed: model.lastTimePlayed,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 }
 
-export function partialModelToDocOdm(model: Partial<EpisodeEntity>): UpdateQuery<Episode> {
-  const ret: UpdateQuery<Episode> = {};
+export function partialModelToDocOdm(model: Partial<EpisodeEntity>): MongoUpdateQuery<DocOdm> {
+  const ret: MongoUpdateQuery<DocOdm> = {};
 
   if (model.compKey !== undefined) {
-    ret.episodeId = model.compKey.episodeKey;
+    ret.episodeKey = model.compKey.episodeKey;
 
-    ret.serieId = model.compKey.seriesKey;
+    ret.seriesKey = model.compKey.seriesKey;
   }
 
   if (model.title !== undefined)

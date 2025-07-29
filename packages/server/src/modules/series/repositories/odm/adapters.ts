@@ -5,22 +5,21 @@ import { DocOdm, FullDocOdm } from "./odm";
 export function docOdmToEntity(docOdm: FullDocOdm): SerieEntity {
   return {
     id: docOdm._id.toString(),
-    key: docOdm.id,
+    key: docOdm.key,
     name: docOdm.name,
   };
 }
 
 export function modelToDocOdm(model: Serie): DocOdm {
   return {
-    id: model.key,
+    key: model.key,
     name: model.name,
-  };
+  } satisfies DocOdm;
 }
 
 export function entityToDocOdm(entity: SerieEntity): FullDocOdm {
   return {
     _id: new Types.ObjectId(entity.id),
-    id: entity.key,
-    name: entity.name,
-  };
+    ...modelToDocOdm(entity),
+  } satisfies FullDocOdm;
 }

@@ -3,7 +3,7 @@ import { SeriesKey } from "../../models";
 
 export interface DocOdm {
   _id?: Types.ObjectId;
-  id: SeriesKey;
+  key: SeriesKey;
   name: string;
 }
 
@@ -12,7 +12,7 @@ export type FullDocOdm = DocOdm & Required<Pick<DocOdm, "_id">>;
 const NAME = "series";
 
 export const schema = new Schema<DocOdm>( {
-  id: {
+  key: {
     type: String,
     required: true,
   },

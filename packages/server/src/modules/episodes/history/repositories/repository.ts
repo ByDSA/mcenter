@@ -13,6 +13,7 @@ import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { StreamEntity } from "#modules/streams";
+import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EpisodeHistoryEntryOdm } from "./odm";
 import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "./events";
 import { getCriteriaPipeline } from "./criteria-pipeline";
@@ -115,10 +116,11 @@ CanDeleteOneByIdAndGet<Model, Id> {
   }
 
   async findLastByEpisodeId(episodeId: EpisodeId): Promise<Entity | null> {
+    const sort = {
+      "date.timestamp": -1,
+    } satisfies MongoSortQuery<EpisodeHistoryEntryOdm.Doc>;
     const last = await EpisodeHistoryEntryOdm.Model.findById(episodeId, {}, {
-      sort: {
-        "date.timestamp": -1,
-      },
+      sort,
     } );
 
     if (!last)
@@ -128,16 +130,22 @@ CanDeleteOneByIdAndGet<Model, Id> {
   }
 
   async findLastByEpisodeCompKey(episodeCompKey: EpisodeCompKey): Promise<Entity | null> {
-    const last = await EpisodeHistoryEntryOdm.Model.findOne( {
-      episodeId: {
-        code: episodeCompKey.episodeKey,
-        serieId: episodeCompKey.seriesKey,
+    const filter = {
+      episodeCompKey: {
+        episodeKey: episodeCompKey.episodeKey,
+        seriesKey: episodeCompKey.seriesKey,
       },
-    }, {}, {
-      sort: {
-        "date.timestamp": -1,
+    } satisfies MongoFilterQuery<EpisodeHistoryEntryOdm.Doc>;
+    const sort = {
+      "date.timestamp": -1,
+    } satisfies MongoSortQuery<EpisodeHistoryEntryOdm.Doc>;
+    const last = await EpisodeHistoryEntryOdm.Model.findOne(
+      filter,
+      {},
+      {
+        sort,
       },
-    } );
+    );
 
     if (!last)
       return null;
@@ -146,13 +154,15 @@ CanDeleteOneByIdAndGet<Model, Id> {
   }
 
   async findLast( { seriesKey, streamId }: FindLastProps): Promise<Entity | null> {
-    const last = await EpisodeHistoryEntryOdm.Model.findOne( {
-      "episodeId.serieId": seriesKey,
+    const filter = {
+      "episodeCompKey.seriesKey": seriesKey,
       streamId,
-    }, {}, {
-      sort: {
-        "date.timestamp": -1,
-      },
+    } satisfies MongoFilterQuery<EpisodeHistoryEntryOdm.Doc>;
+    const sort = {
+      "date.timestamp": -1,
+    } satisfies MongoSortQuery<EpisodeHistoryEntryOdm.Doc>;
+    const last = await EpisodeHistoryEntryOdm.Model.findOne(filter, {}, {
+      sort,
     } );
 
     if (!last)

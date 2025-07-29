@@ -12,6 +12,7 @@ import { BrokerEvent } from "#utils/message-broker";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
+import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "../history/repositories/events";
 import { EpisodeHistoryEntryEvent } from "../history/repositories";
 import { LastTimePlayedService } from "../history/last-time-played.service";
@@ -152,9 +153,10 @@ CanGetAll<EpisodeEntity> {
   }
 
   async getAllBySeriesKey(seriesKey: SeriesKey): Promise<EpisodeEntity[]> {
-    const episodesOdm = await EpisodeOdm.Model.find( {
-      serieId: seriesKey,
-    } );
+    const filter = {
+      seriesKey,
+    } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
+    const episodesOdm = await EpisodeOdm.Model.find(filter);
 
     if (episodesOdm.length === 0)
       return [];
@@ -227,10 +229,11 @@ CanGetAll<EpisodeEntity> {
     if (Object.keys(partialDocOdm).length === 0)
       throw new Error("Empty partialDocOdm, nothing to patch");
 
-    const updateResult = await EpisodeOdm.Model.findOneAndUpdate( {
-      episodeId: compKey.episodeKey,
-      serieId: compKey.seriesKey,
-    }, partialDocOdm);
+    const filter = {
+      episodeKey: compKey.episodeKey,
+      seriesKey: compKey.seriesKey,
+    } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
+    const updateResult = await EpisodeOdm.Model.findOneAndUpdate(filter, partialDocOdm);
 
     assertFound(updateResult);
 
@@ -255,14 +258,16 @@ CanGetAll<EpisodeEntity> {
 
   async getOneOrCreate(createDto: CreateOneDto): Promise<EpisodeEntity> {
     const model = this.createDtoToModel(createDto);
+    const filter = {
+      seriesKey: model.compKey.seriesKey,
+      episodeKey: model.compKey.episodeKey,
+    } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
+    const update = {
+      $setOnInsert: EpisodeOdm.toDoc(model), // Solo se aplica en la creación
+    } satisfies MongoUpdateQuery<EpisodeOdm.Doc>;
     const result = await EpisodeOdm.Model.findOneAndUpdate(
-      {
-        serieId: model.compKey.seriesKey,
-        episodeId: model.compKey.episodeKey,
-      },
-      {
-        $setOnInsert: EpisodeOdm.toDoc(model), // Solo se aplica en la creación
-      },
+      filter,
+      update,
       {
         upsert: true, // crea si no existe
         new: true, // retorna el documento actualizado

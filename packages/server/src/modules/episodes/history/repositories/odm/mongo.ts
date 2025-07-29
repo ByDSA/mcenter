@@ -9,9 +9,9 @@ import { StreamOdm } from "#modules/streams/repositories/odm";
 type DocOdm = {
   _id?: Types.ObjectId;
   date: DateType;
-  episodeId: {
-    code: string;
-    serieId: string;
+  episodeCompKey: {
+    episodeKey: string;
+    seriesKey: string;
   };
   streamId: Types.ObjectId;
 };
@@ -27,12 +27,12 @@ const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: DateTypeOdmSchema,
     required: true,
   },
-  episodeId: {
-    code: {
+  episodeCompKey: {
+    episodeKey: {
       type: String,
       required: true,
     },
-    serieId: {
+    seriesKey: {
       type: String,
       required: true,
     },

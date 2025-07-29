@@ -10,8 +10,8 @@ function docOdmToEntity(docOdm: FullDocOdm): Entity {
   const ret: Entity = {
     id: docOdm._id.toString(),
     episodeCompKey: {
-      episodeKey: docOdm.episodeId.code,
-      seriesKey: docOdm.episodeId.serieId,
+      episodeKey: docOdm.episodeCompKey.episodeKey,
+      seriesKey: docOdm.episodeCompKey.seriesKey,
     },
     date: {
       year: docOdm.date.year,
@@ -30,9 +30,9 @@ function docOdmToEntity(docOdm: FullDocOdm): Entity {
 
 function modelToDocOdm(model: Entry): DocOdm {
   return {
-    episodeId: {
-      code: model.episodeCompKey.episodeKey,
-      serieId: model.episodeCompKey.seriesKey,
+    episodeCompKey: {
+      episodeKey: model.episodeCompKey.episodeKey,
+      seriesKey: model.episodeCompKey.seriesKey,
     },
     date: {
       year: model.date.year,

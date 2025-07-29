@@ -44,6 +44,7 @@ export {
   schema as episodeFileInfoSchema,
   entitySchema as episodeFileInfoEntitySchema,
   Model as EpisodeFileInfo,
+  ModelOmitEpisodeId as EpisodeFileInfoOmitEpisodeId,
   Entity as EpisodeFileInfoEntity,
   assertIsModel as assertIsEpisodeFileInfo,
   assertIsEntity as assertIsEpisodeFileInfoEntity,

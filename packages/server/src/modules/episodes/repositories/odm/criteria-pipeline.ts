@@ -1,21 +1,21 @@
 import type { EpisodesRestDtos } from "$shared/models/episodes/dto/transport";
 import type { FilterQuery, PipelineStage } from "mongoose";
+import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { DocOdm as EpisodeDocOdm } from "./odm";
 
 // Asumiendo que tienes un ODM para Episode
 function buildMongooseSort(
   body: EpisodesRestDtos.GetManyByCriteria.Criteria,
-): Record<string, -1 | 1> | undefined {
+): MongoSortQuery<EpisodeDocOdm> | undefined {
   if (!body.sort)
     return undefined;
 
-  const sortObj: Record<string, -1 | 1> = {};
+  const sortObj: MongoSortQuery<EpisodeDocOdm> = {};
 
   // Ejemplo de ordenación por diferentes campos
-  // TODO: cambiar cuando db
   if (body.sort.episodeCompKey) {
-    sortObj["serieId"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
-    sortObj["episodeId"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
+    sortObj["seriesKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
+    sortObj["episodeKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
   }
 
   if (body.sort.createdAt)
@@ -24,31 +24,31 @@ function buildMongooseSort(
   if (body.sort.updatedAt)
     sortObj["timestamps.updatedAt"] = body.sort.updatedAt === "asc" ? 1 : -1;
 
-  return Object.keys(sortObj).length > 0 ? sortObj : undefined;
+  return Object.keys(sortObj).length > 0 ? sortObj as Record<string, -1 | 1> : undefined;
 }
 
 function buildMongooseFilter(
   criteria: EpisodesRestDtos.GetManyByCriteria.Criteria,
 ): FilterQuery<EpisodeDocOdm> {
-  const filter: FilterQuery<EpisodeDocOdm> = {};
+  const filter: MongoFilterQuery<EpisodeDocOdm> = {};
 
   if (criteria.filter) {
     if (criteria.filter.seriesKey)
-      filter["serieId"] = criteria.filter.seriesKey;
+      filter["seriesKey"] = criteria.filter.seriesKey;
 
     if (criteria.filter.episodeKey)
-      filter["episodeId"] = criteria.filter.episodeKey;
+      filter["episodeKey"] = criteria.filter.episodeKey;
 
     if (
       criteria.filter.episodeKeys && criteria.filter.episodeKeys.length > 0
     ) {
-      filter["episodeId"] = {
+      filter["episodeKey"] = {
         $in: criteria.filter.episodeKeys,
       };
     }
 
     if (criteria.filter.seriesKeys && criteria.filter.seriesKeys.length > 0) {
-      filter["serieId"] = {
+      filter["seriesKey"] = {
         $in: criteria.filter.seriesKeys,
       };
     }
@@ -128,8 +128,8 @@ export function getCriteriaPipeline(
       pipeline.push( {
         $lookup: {
           from: "series", // nombre de la colección de series
-          localField: "serieId",
-          foreignField: "id",
+          localField: "seriesKey",
+          foreignField: "key",
           as: "serie",
         },
       } );
@@ -151,7 +151,7 @@ export function getCriteriaPipeline(
         $lookup: {
           from: "seriefileinfos",
           localField: "serie._id",
-          foreignField: "serieId",
+          foreignField: "seriesKey",
           as: "serieFileInfos",
         },
       } );

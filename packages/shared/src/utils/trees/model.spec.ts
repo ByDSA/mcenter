@@ -3,11 +3,11 @@ import { treePut } from "./model";
 
 const root = {
   children: [{
-    id: "serieA",
+    key: "serieA",
     children: [{
-      id: "seasonB",
+      key: "seasonB",
       children: [{
-        id: "episodeC",
+        key: "episodeC",
         content: "content",
       }],
     }],
@@ -19,12 +19,12 @@ it("put", () => {
 
   treePut(used, ["serieA", "seasonB"], "episodeD", "content");
   const actualD = used.children.find(
-    (node) => node.id === "serieA",
+    (node) => node.key === "serieA",
   )?.children.find(
-    (node) => node.id === "seasonB",
-  )?.children.find((node) => node.id === "episodeD");
+    (node) => node.key === "seasonB",
+  )?.children.find((node) => node.key === "episodeD");
 
   expect(actualD).toBeDefined();
-  expect(actualD?.id).toBe("episodeD");
+  expect(actualD?.key).toBe("episodeD");
   expect(actualD?.content).toBe("content");
 } );

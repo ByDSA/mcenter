@@ -40,7 +40,7 @@ export function putModelInSerieFolderTree(
   const episodeFiles: EpisodeFile[] = episodeToEpisodeFiles(episodeEntity);
 
   for (const episodeFile of episodeFiles)
-    treePut(serieFolderTree, [seriesKey, seasonId], episodeFile.id, episodeFile.content);
+    treePut(serieFolderTree, [seriesKey, seasonId], episodeFile.key, episodeFile.content);
 
   return serieFolderTree;
 }

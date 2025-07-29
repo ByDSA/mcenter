@@ -4,17 +4,17 @@ import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { ErrorElementResponse, ResultResponse, errorToErrorElementResponse } from "$shared/utils/http/responses";
 import { compareEpisodeFileInfoOmitEpisodeId } from "$shared/models/episodes/file-info";
+import { EpisodeFileInfoOmitEpisodeId } from "$shared/models/episodes/file-info";
 import { EpisodeCompKey } from "#episodes/models";
 import { EpisodeFile, EpisodeFileInfoRepository, SerieFolderTree } from "#episodes/file-info";
-import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
+import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { md5FileAsync } from "#utils/crypt";
 import { RemoteSeriesTreeService } from "../series-tree/remote";
 import { EpisodeOdm } from "../../repositories/odm";
 import { SerieNode } from "../series-tree/local/models";
 
-type Model = EpisodeFileInfo;
 type Entity = EpisodeFileInfoEntity;
-type ModelOmitEpisodeId = Omit<Model, "episodeId">;
+type ModelOmitEpisodeId = EpisodeFileInfoOmitEpisodeId;
 const compareModelOmitEpisodeId:
  typeof compareEpisodeFileInfoOmitEpisodeId = compareEpisodeFileInfoOmitEpisodeId;
 
@@ -98,11 +98,11 @@ export class UpdateMetadataProcess {
   }
 
   async genEpisodeFileInfoFromEpisodeOrFail(
-    serieId: SerieNode["id"],
+    seriesKey: SerieNode["key"],
     episode: EpisodeFile,
     options: Options,
   ): Promise<Entity | null> {
-    const { filePath, episodeId: episodeKey } = episode.content;
+    const { filePath, episodeKey } = episode.content;
     const MEDIA_FOLDER = process.env.MEDIA_FOLDER_PATH;
 
     assertIsDefined(MEDIA_FOLDER);
@@ -140,7 +140,7 @@ export class UpdateMetadataProcess {
 
         console.log(`UpdateMetadataProcess: got metadata of ${filePath}`);
 
-        const ret: Omit<Model, "episodeId"> = {
+        const ret: ModelOmitEpisodeId = {
           path: filePath,
           hash: currentEpisodeFile?.hash ?? "null",
           size,
@@ -173,16 +173,15 @@ export class UpdateMetadataProcess {
       return null;
 
     const episodeCompKey: EpisodeCompKey = {
-      seriesKey: serieId,
+      seriesKey: seriesKey,
       episodeKey: episodeKey,
     };
     const episodeId = await EpisodeOdm.getIdFromCompKey(episodeCompKey);
 
-    if (!episodeId) {
-      throw new Error(
-        `episode with id ${episodeCompKey.episodeKey} in ${episodeCompKey.seriesKey} not found`,
-      );
-    }
+    assertIsDefined(
+      episodeId,
+      `episode with id ${episodeCompKey.episodeKey} in ${episodeCompKey.seriesKey} not found`,
+    );
 
     const episodeFileWithId = {
       ...episodeFileInfo,
@@ -193,12 +192,12 @@ export class UpdateMetadataProcess {
   }
 
   async genEpisodeFileInfoAndUpdateOrCreate(
-    serieId: string,
+    seriesKey: string,
     episode: EpisodeFile,
     options: Options,
   ): Promise<Entity | null> {
     const episodeFileWithId = await this.genEpisodeFileInfoFromEpisodeOrFail(
-      serieId,
+      seriesKey,
       episode,
       options,
     );
@@ -222,7 +221,7 @@ export class UpdateMetadataProcess {
     for (const serie of seriesTree.children) {
       for (const season of serie.children) {
         for (const episode of season.children) {
-          await this.genEpisodeFileInfoAndUpdateOrCreate(serie.id, episode, {
+          await this.genEpisodeFileInfoAndUpdateOrCreate(serie.key, episode, {
             forceHash: options?.forceHash ?? false,
           } )
             .then((episodeFileWithId) => {

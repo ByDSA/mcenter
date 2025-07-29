@@ -14,5 +14,5 @@ export {
 } from "./diff";
 
 export {
-  getSeasonEpisodeFromEpisodeId,
+  splitSeasonEpisodeFromEpisodeKey as getSeasonEpisodeFromEpisodeId,
 } from "./idGetter";

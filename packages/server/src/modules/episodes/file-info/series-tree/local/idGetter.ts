@@ -167,15 +167,15 @@ function removeInvalidStrings(original: string): string {
   return result;
 }
 
-export function getSeasonEpisodeFromEpisodeId(episodeId: string): {
+export function splitSeasonEpisodeFromEpisodeKey(episodeKey: string): {
   season?: string;
   episode: string;
 } {
-  const match = episodeId.match(/(\d+)x(\d+)/);
+  const match = episodeKey.match(/(\d+)x(\d+)/);
 
   if (match === null) {
     return {
-      episode: episodeId,
+      episode: episodeKey,
     };
   }
 

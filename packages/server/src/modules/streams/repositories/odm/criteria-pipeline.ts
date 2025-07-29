@@ -27,7 +27,7 @@ export function buildCriteriaPipeline(criteria: CriteriaMany): PipelineStage[] {
                     $eq: ["$streamId", "$$streamId"],
                   },
                   {
-                    $eq: ["$episodeId.serieId", "$$seriesKey"],
+                    $eq: ["$episodeCompKey.seriesKey", "$$seriesKey"],
                   },
                 ],
               },

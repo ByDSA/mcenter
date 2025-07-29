@@ -33,8 +33,8 @@ export function diff(tree1: SerieTree, tree2: SerieTree): Return {
 
   for (const [branches, plainTreeEntry] of Object.entries(tree1BranchesMap)) {
     const branchesArray = branches.split("/");
-    const serieId = branchesArray[0];
-    const seasonId = branchesArray[1];
+    const seriesKey = branchesArray[0];
+    const seasonKey = branchesArray[1];
 
     if (tree2BranchesMap[branches] === undefined) { // si no está en el mismo sitio en el nuevo
       if (
@@ -42,8 +42,8 @@ export function diff(tree1: SerieTree, tree2: SerieTree): Return {
       ) { // ni el filePath lo tiene otro nodo
         treePut(
           removed,
-          [serieId, seasonId],
-          plainTreeEntry.id,
+          [seriesKey, seasonKey],
+          plainTreeEntry.key,
           plainTreeEntry.content,
         ); // se ha eliminado
       } else {
@@ -55,7 +55,7 @@ export function diff(tree1: SerieTree, tree2: SerieTree): Return {
     } else if (
       compareContentNode(tree2BranchesMap[branches], plainTreeEntry)
     ) // si está en ambos sitios y son iguales en contenido
-      treePut(both, [serieId, seasonId], plainTreeEntry.id, plainTreeEntry.content);
+      treePut(both, [seriesKey, seasonKey], plainTreeEntry.key, plainTreeEntry.content);
     else { // si está en ambos sitios y son diferentes en contenido
       updated.push( {
         old: plainTreeEntry,
@@ -68,10 +68,10 @@ export function diff(tree1: SerieTree, tree2: SerieTree): Return {
     if (tree1BranchesMap[branches] === undefined
       && tree1ContentMap[plainTreeEntry.content.filePath] === undefined) {
       const branchesArray = branches.split("/");
-      const serieId = branchesArray[0];
-      const seasonId = branchesArray[1];
+      const seriesKey = branchesArray[0];
+      const seasonKey = branchesArray[1];
 
-      treePut(news, [serieId, seasonId], plainTreeEntry.id, plainTreeEntry.content);
+      treePut(news, [seriesKey, seasonKey], plainTreeEntry.key, plainTreeEntry.content);
     }
   }
 
@@ -85,7 +85,7 @@ export function diff(tree1: SerieTree, tree2: SerieTree): Return {
 }
 
 type Hash = string;
-type Branches = [SerieNode["id"], SeasonNode["id"], EpisodeNode["id"]];
+type Branches = [SerieNode["key"], SeasonNode["key"], EpisodeNode["key"]];
 type TreeNode = EpisodeNode;
 function plainTreeMaps(serieTree: SerieTree) {
   const branchesMap: {[key: string]: TreeNode} = {};
@@ -94,7 +94,7 @@ function plainTreeMaps(serieTree: SerieTree) {
   for (const serie of serieTree.children) {
     for (const season of serie.children) {
       for (const episode of season.children) {
-        const branches: Branches = [serie.id, season.id, episode.id];
+        const branches: Branches = [serie.key, season.key, episode.key];
         const key = branches.join("/");
 
         branchesMap[key] = episode;

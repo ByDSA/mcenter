@@ -1,6 +1,6 @@
 import fs, { Dirent } from "node:fs";
 import path from "node:path";
-import { GetEpisodeIdOptions, getEpisodeSeasonAndEpisodeNumberFromFilePath, getSeasonEpisodeFromEpisodeId } from "./idGetter";
+import { GetEpisodeIdOptions, getEpisodeSeasonAndEpisodeNumberFromFilePath, splitSeasonEpisodeFromEpisodeKey } from "./idGetter";
 import { EpisodeNode, SeasonNode, SerieNode, SerieTree } from "./models";
 
 type Options = {
@@ -17,7 +17,7 @@ export function findAllSerieFolderTreesAt(
 
   seriesNames.forEach(serieFolderName => {
     const serieFolderFullPath = path.join(folderFullPath, serieFolderName);
-    const seasonsNames: SeasonNode["id"][] = readFolderNamesIn(serieFolderFullPath);
+    const seasonsNames: SeasonNode["key"][] = readFolderNamesIn(serieFolderFullPath);
 
     seasonsNames.push("");
     const seasonsInSerie: SeasonNode[] = [];
@@ -29,31 +29,31 @@ export function findAllSerieFolderTreesAt(
 
       for (const episodeFile of episodesDirents) {
         const fileFullPath = path.join(seasonFolderPath, episodeFile.name);
-        const seasonEpisodeId = getSeasonEpisodeId(fileFullPath, {
+        const seasonEpisodeCompKey = getSeasonEpisodeCompKey(fileFullPath, {
           serieFolder: serieFolderFullPath,
         } );
 
-        if (seasonEpisodeId === null || seasonEpisodeId.id === null)
+        if (seasonEpisodeCompKey === null || seasonEpisodeCompKey.key === null)
 
           continue;
 
-        const { id: episodeId, season: seasonId } = seasonEpisodeId;
+        const { key: episodeKey, season: seasonId } = seasonEpisodeCompKey;
         const filePath = baseFolder
           + fileFullPath.substring(folderFullPath.length + 1);
         const episode: EpisodeNode = {
           content: {
-            episodeId,
+            episodeKey: episodeKey,
             filePath,
           },
-          id: getSeasonEpisodeFromEpisodeId(episodeId).episode,
+          key: splitSeasonEpisodeFromEpisodeKey(episodeKey).episode,
         };
 
         episodesInSerie.push(episode);
-        let seasonObj = seasonsInSerie.find(s => s.id === seasonId);
+        let seasonObj = seasonsInSerie.find(s => s.key === seasonId);
 
         if (!seasonObj) {
           seasonObj = {
-            id: seasonId,
+            key: seasonId,
             children: [],
           };
           seasonsInSerie.push(seasonObj);
@@ -66,7 +66,7 @@ export function findAllSerieFolderTreesAt(
     checkDuplicatedEpisodeId(episodesInSerie);
 
     const serie: SerieNode = {
-      id: serieFolderName,
+      key: serieFolderName,
       children: seasonsInSerie,
     };
 
@@ -112,10 +112,13 @@ function readEpisodeFilesIn(folderFullPath: string): Dirent[] {
 }
 
 type EpisodeIdRet = {
-  id: string ;
-  season: SeasonNode["id"];
+  key: string ;
+  season: SeasonNode["key"];
 };
-function getSeasonEpisodeId(filePath: string, options: GetEpisodeIdOptions): EpisodeIdRet | null {
+function getSeasonEpisodeCompKey(
+  filePath: string,
+  options: GetEpisodeIdOptions,
+): EpisodeIdRet | null {
   const seasonEpisode = getEpisodeSeasonAndEpisodeNumberFromFilePath(filePath, options);
 
   if (seasonEpisode === null)
@@ -130,13 +133,13 @@ function getSeasonEpisodeId(filePath: string, options: GetEpisodeIdOptions): Epi
 
   if (season === null) {
     return {
-      id: episodeStr,
+      key: episodeStr,
       season: "",
     };
   }
 
   return {
-    id: `${season}x${episodeStr}`,
+    key: `${season}x${episodeStr}`,
     season,
   };
 }
@@ -148,28 +151,28 @@ function checkDuplicatedEpisodeId(episodes: EpisodeNode[]): void {
 
   for (let i = 0; i < episodes.length; i++) {
     const episode = episodes[i];
-    const { episodeId } = episode.content;
+    const { episodeKey } = episode.content;
 
-    if (!duplicatedIds.includes(episodeId)) {
+    if (!duplicatedIds.includes(episodeKey)) {
       for (let j = i + 1; j < episodes.length; j++) {
         const otherEpisode = episodes[j];
 
-        if (episodeId === otherEpisode.content.episodeId) {
-          duplicatedEpisodes[episodeId] = [episode];
-          duplicatedIds.push(episodeId);
+        if (episodeKey === otherEpisode.content.episodeKey) {
+          duplicatedEpisodes[episodeKey] = [episode];
+          duplicatedIds.push(episodeKey);
           break;
         }
       }
     } else
-      duplicatedEpisodes[episodeId].push(episode);
+      duplicatedEpisodes[episodeKey].push(episode);
   }
 
   if (Object.entries(duplicatedEpisodes).length > 0) {
     let message = "Duplicated episodes: ";
 
     message += JSON.stringify(
-      Object.entries(duplicatedEpisodes).reduce((acc, [episodeId, eps]) => {
-        acc[episodeId] = eps.map(episode => episode.content.filePath);
+      Object.entries(duplicatedEpisodes).reduce((acc, [episodeKey, eps]) => {
+        acc[episodeKey] = eps.map(episode => episode.content.filePath);
 
         return acc;
       }, {} as {[key: string]: string[]} ),

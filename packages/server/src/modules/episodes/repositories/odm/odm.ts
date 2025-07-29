@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
 import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/repositories/odm";
-import { RequireId } from "#utils/layers/db/mongoose";
+import { MongoFilterQuery, RequireId } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#modules/series/repositories/odm";
 import { EpisodeCompKey } from "../../models";
 
 export interface DocOdm {
   _id?: mongoose.Types.ObjectId;
-  episodeId: string;
-  serieId: string;
+  episodeKey: string;
+  seriesKey: string;
   title: string;
   weight: number;
   tags?: string[];
@@ -26,12 +26,12 @@ export type FullDocOdm = RequireId<DocOdm> & {
 const NAME = "Episode";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
-  episodeId: {
+  episodeKey: {
     type: String,
     required: true,
     unique: true,
   },
-  serieId: {
+  seriesKey: {
     type: String,
     required: true,
     unique: true,
@@ -66,10 +66,11 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);
 
 export async function getIdOdmFromCompKey(compKey: EpisodeCompKey) {
-  const episodeOdm = await ModelOdm.findOne( {
-    serieId: compKey.seriesKey,
-    episodeId: compKey.episodeKey,
-  } );
+  const filter = {
+    seriesKey: compKey.seriesKey,
+    episodeKey: compKey.episodeKey,
+  } satisfies MongoFilterQuery<DocOdm>;
+  const episodeOdm = await ModelOdm.findOne(filter);
 
   if (!episodeOdm)
     return null;

@@ -10,6 +10,8 @@ export function assertConnected() {
 
 export * from "./docs";
 
+export * from "./filter-types";
+
 export function patchParamsToUpdateQuery<T, D>(
   params: PatchOneParams<T>,
   partialToDoc: (partial: Partial<T>)=> Partial<D>,

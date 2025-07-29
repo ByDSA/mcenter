@@ -4,12 +4,12 @@ import { EpisodeFile, getSeasonEpisodeFromEpisodeId } from "#episodes/file-info"
 export function episodeToEpisodeFiles(
   episode: EpisodeEntityWithFileInfos,
 ): EpisodeFile[] {
-  const id = getSeasonEpisodeFromEpisodeId(episode.compKey.episodeKey).episode;
-  const episodeId = episode.compKey.episodeKey;
+  const key = getSeasonEpisodeFromEpisodeId(episode.compKey.episodeKey).episode;
+  const { episodeKey } = episode.compKey;
   const episodeFiles: EpisodeFile[] = episode.fileInfos.map(f =>( {
-    id,
+    key,
     content: {
-      episodeId,
+      episodeKey,
       filePath: f.path,
     },
   } ));

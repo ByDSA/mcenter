@@ -114,8 +114,18 @@ export function FetchingRender<T, U = undefined>(
 
   if (error) {
     const errorShown = {
-      message: error instanceof Error ? error.message : undefined,
+      message: error instanceof Error
+        ? error.message
+          .replaceAll("\\n", "\n")
+          .replaceAll("\\\"", "\"")
+        : undefined,
     };
+
+    try {
+      errorShown.message = JSON.parse(errorShown.message ?? "{}");
+    } catch {
+      // Ignore JSON parse errors
+    }
 
     return <>
       <p>Failed to request.</p>

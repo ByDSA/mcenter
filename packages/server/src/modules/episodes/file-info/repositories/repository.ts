@@ -10,7 +10,7 @@ import { EpisodeEntity } from "#episodes/models";
 import { assertFound } from "#utils/validation/found";
 import { BrokerEvent } from "#utils/message-broker";
 import { logDomainEvent } from "#modules/log";
-import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
+import { MongoFilterQuery, patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { EpisodeFileInfoOdm } from "./odm";
 import { EPISODE_FILE_INFOS_QUEUE_NAME } from "./events";
 
@@ -45,10 +45,11 @@ CanGetAll<Entity> {
 
   async updateOneByEpisodeId(id: string, model: Entity): Promise<void> {
     const docOdm = EpisodeFileInfoOdm.toDoc(model);
-
-    await EpisodeFileInfoOdm.Model.updateOne( {
+    const filter = {
       episodeId: id,
-    }, docOdm, {
+    } satisfies MongoFilterQuery<EpisodeFileInfoOdm.Doc>;
+
+    await EpisodeFileInfoOdm.Model.updateOne(filter, docOdm, {
       upsert: true,
     } );
   }
@@ -60,9 +61,10 @@ CanGetAll<Entity> {
   }
 
   async getAllByEpisodeId(id: EpisodeId): Promise<Entity[]> {
-    const modelsOdm = await EpisodeFileInfoOdm.Model.find( {
+    const filter = {
       episodeId: id,
-    } );
+    } satisfies MongoFilterQuery<EpisodeFileInfoOdm.Doc>;
+    const modelsOdm = await EpisodeFileInfoOdm.Model.find(filter);
 
     return modelsOdm.map(EpisodeFileInfoOdm.toEntity);
   }
