@@ -118,11 +118,15 @@ export function getVisualLines(
   for (let i = 0; i < words.length; i++) {
     const word = words[i];
     const testLine = currentLine === "" ? word : currentLine + " " + word;
-    const testWidth = getTextWidth(ctx, fontSpec, maxWidth, testLine);
+    // El -1 se ha puesto de forma empírica:
+    const testWidth = getTextWidth(ctx, fontSpec, maxWidth, testLine) - 1;
 
-    if (testWidth > maxWidth && currentLine !== "") {
-      // La palabra no cabe en la línea actual, comenzar nueva línea
-      visualLineCount++;
+    if (testWidth > maxWidth) {
+      // Si hay contenido en la línea actual, necesitamos una nueva línea
+      if (currentLine !== "") {
+        visualLineCount++;
+        currentLine = "";
+      }
 
       // Verificar si la palabra sola es más ancha que el contenedor
       const wordWidth = getTextWidth(ctx, fontSpec, maxWidth, word);
