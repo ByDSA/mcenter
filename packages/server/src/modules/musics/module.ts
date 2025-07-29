@@ -4,9 +4,9 @@ import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module
 import { MusicsHistoryModule } from "./history/module";
 import { MusicGetController } from "./controllers/get.controller";
 import { MusicFixController } from "./controllers/fix.controller";
-import { UpdateRemoteTreeService } from "./services";
+import { UpdateRemoteTreeService } from "./update-remote/service";
 import { MusicRestController } from "./controllers/rest.controller";
-import { MusicUpdateRemoteController } from "./controllers/update-remote.controller";
+import { MusicUpdateRemoteController } from "./update-remote/controller";
 import { MusicRepository } from "./repositories";
 import { MusicBuilderService } from "./builder/music-builder.service";
 import { MusicFileInfoRepository } from "./file-info/repositories/repository";

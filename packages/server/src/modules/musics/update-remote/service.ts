@@ -5,9 +5,9 @@ import { MusicFileInfo, MusicFileInfoEntity, musicFileInfoEntitySchema } from "$
 import { musicEntitySchema } from "#musics/models";
 import { MusicFileInfoRepository } from "#musics/file-info/repositories/repository";
 import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
-import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
-import { MusicRepository } from "../../repositories";
-import { getFullPath } from "../../utils";
+import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../files";
+import { MusicRepository } from "../repositories";
+import { getFullPath } from "../utils";
 import { ChangesDetector, FileWithStats } from "./ChangesDetector";
 
 export const updateResultSchema = z.object( {
@@ -31,13 +31,13 @@ export type UpdateResult = z.infer<typeof updateResultSchema>;
 @Injectable()
 export class UpdateRemoteTreeService {
   constructor(
-    private readonly musicFileInfoRepo: MusicFileInfoRepository,
+    private readonly fileInfoRepo: MusicFileInfoRepository,
     private readonly musicRepo: MusicRepository,
   ) {
   }
 
   async update() {
-    const remoteMusic = await this.musicFileInfoRepo.getAll();
+    const remoteMusic = await this.fileInfoRepo.getAll();
     const changes = await detectChangesFromLocalFiles(remoteMusic);
     const promises = [];
     const created: UpdateResult["new"] = [];
@@ -48,7 +48,7 @@ export class UpdateRemoteTreeService {
       const fileInfoOmitMusicId = await new MusicFileInfoOmitMusicIdBuilder()
         .withFileWithStats(localFileMusic)
         .build();
-      const p = await this.musicFileInfoRepo.upsertOneByPathAndGet(localFileMusic.path, {
+      const p = await this.fileInfoRepo.upsertOneByPathAndGet(localFileMusic.path, {
         ...fileInfoOmitMusicId,
         musicId: newMusic.id,
       } )
@@ -68,7 +68,7 @@ export class UpdateRemoteTreeService {
     }
 
     for (const deletedMusic of changes.deleted) {
-      const p = this.musicFileInfoRepo.deleteOneByPath(deletedMusic.path)
+      const p = this.fileInfoRepo.deleteOneByPath(deletedMusic.path)
         .catch((err) => {
           console.error(err.message, deletedMusic);
 
@@ -83,7 +83,7 @@ export class UpdateRemoteTreeService {
         ...original,
         path: newPath,
       };
-      const p = this.musicFileInfoRepo.upsertOneByPathAndGet(original.path, newFileInfo)
+      const p = this.fileInfoRepo.upsertOneByPathAndGet(original.path, newFileInfo)
         .catch((err) => {
           console.error(err.message, original, newFileInfo);
 
@@ -102,7 +102,7 @@ export class UpdateRemoteTreeService {
           } )
           .build(),
       };
-      const p = this.musicFileInfoRepo.upsertOneByPathAndGet(
+      const p = this.fileInfoRepo.upsertOneByPathAndGet(
         oldMusicFileInfo.path,
         newMusicFileInfo,
       )

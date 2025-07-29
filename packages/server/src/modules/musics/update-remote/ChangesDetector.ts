@@ -1,7 +1,7 @@
 import { Stats } from "node:fs";
 import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { md5FileAsync } from "#utils/crypt";
-import { getFullPath } from "../../utils";
+import { getFullPath } from "../utils";
 
 export type FileWithStats = {
   path: string;

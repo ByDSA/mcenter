@@ -1,6 +1,7 @@
 import path from "node:path";
 import NodeID3 from "node-id3";
 import { Injectable } from "@nestjs/common";
+import { deepCopy } from "$shared/utils/objects";
 import { ARTIST_EMPTY, assertIsMusic, Music } from "../models";
 import { getFullPath } from "../utils";
 import { AUDIO_EXTENSIONS } from "../files";
@@ -8,19 +9,13 @@ import { MusicUrlGeneratorService } from "./url-generator.service";
 
 @Injectable()
 export class MusicBuilderService {
-  private doc: Partial<Music> = {};
-
   constructor(
     private readonly musicUrlGenerator: MusicUrlGeneratorService,
-  ) {}
-
-  withPartial(partial: Partial<Music>) {
-    Object.assign(this.doc, partial);
-
-    return this;
+  ) {
   }
 
-  async build(relativePath: string): Promise<Music> {
+  async build(relativePath: string, partial?: Partial<Music>): Promise<Music> {
+    const doc: Partial<Music> = partial ? deepCopy(partial) : {};
     // 2. Lectura de tags ID3 si no vienen en partial
     let title: string;
     let artist: string;
@@ -29,13 +24,13 @@ export class MusicBuilderService {
 
     title = tags.title ?? getTitleFromFilenamePath(fullPath);
     artist = tags.artist ?? ARTIST_EMPTY;
-    this.doc.title ??= title;
-    this.doc.artist ??= artist;
-    this.doc.album ??= tags.album;
+    doc.title ??= title;
+    doc.artist ??= artist;
+    doc.album ??= tags.album;
 
     // 3. URL generator si no está definido
-    if (!this.doc.url) {
-      this.doc.url = await this.musicUrlGenerator.generateAvailableUrlFrom( {
+    if (!doc.url) {
+      doc.url = await this.musicUrlGenerator.generateAvailableUrlFrom( {
         title,
         artist,
       } );
@@ -44,18 +39,18 @@ export class MusicBuilderService {
     // 4. Timestamps
     const now = new Date();
 
-    this.doc.timestamps ??= {
+    doc.timestamps ??= {
       createdAt: now,
       updatedAt: now,
       addedAt: now,
     };
 
     // 5. Peso inicial si no existe
-    this.doc.weight ??= 0;
+    doc.weight ??= 0;
 
-    assertIsMusic(this.doc);
+    assertIsMusic(doc);
 
-    return this.doc;
+    return doc;
   }
 }
 

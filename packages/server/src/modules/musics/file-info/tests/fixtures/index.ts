@@ -55,7 +55,7 @@ const SAMPLES_IN_DISK: MusicFileInfoEntity[] = deepFreeze([
   AOT4_COPY,
   DK,
   DRIFTVEIL,
-  AOT4_COPY,
+  A_AOT4,
 ]);
 
 export const fixtureMusicFileInfos = {
