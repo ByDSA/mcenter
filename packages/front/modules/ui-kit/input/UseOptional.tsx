@@ -1,6 +1,8 @@
 import { useEffect, useId, useState } from "react";
 import { useOnChanges } from "./InputCommon";
 
+import "./UseChekboxOptional.css";
+
 export type UseOptionalProps = {
   isUndefined: boolean;
   isOptional?: boolean;
@@ -22,7 +24,7 @@ export function useOptional( { isUndefined,
     value: checked,
   } );
   const checkboxOptionalElement: React.ReactNode = (
-    <span>
+    <span className="checkbox-optional">
       <input
         id={optionalId}
         type="checkbox"
