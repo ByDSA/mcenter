@@ -1,22 +1,21 @@
 import { Episode, EpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { fixtureEpisodes } from "#tests/main/db/fixtures/models";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
-import { EventType, ModelEvent, ModelMessage } from "#utils/event-sourcing";
-import { Consumer } from "#utils/message-broker";
+import { EntityEvent } from "#modules/domain-event-emitter";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
+import { DomainEventEmitter } from "#modules/domain-event-emitter";
 import { EpisodesModule } from "#episodes/module";
-import { EpisodesRepository } from "../repositories";
-import { EPISODE_QUEUE_NAME } from "./events";
+import { EpisodesRepository } from "../episodes/repositories";
+import { EpisodeEvents } from "../episodes/repositories/events";
 
 let episodeRepository: EpisodesRepository;
-let domainMessageBroker: DomainMessageBroker<ModelMessage<EpisodeEntity>>;
+let domainEventEmitter: DomainEventEmitter;
 let testingSetup: TestingSetup;
 
 beforeAll(async () => {
   testingSetup = await createTestingAppModuleAndInit( {
-    imports: [DomainMessageBrokerModule, EpisodesModule],
+    imports: [DomainEventEmitterModule, EpisodesModule],
     controllers: [],
     providers: [
     ],
@@ -27,10 +26,8 @@ beforeAll(async () => {
   } );
   await loadFixtureSimpsons();
 
-  domainMessageBroker = testingSetup.module
-    .get<DomainMessageBroker<ModelMessage<EpisodeEntity>>>(
-      DomainMessageBroker<ModelMessage<EpisodeEntity>>,
-    );
+  domainEventEmitter = testingSetup.module
+    .get<DomainEventEmitter>(DomainEventEmitter);
 
   episodeRepository = testingSetup.module
     .get<EpisodesRepository>(EpisodesRepository);
@@ -43,7 +40,7 @@ it("should emit Patch Event", async () => {
   };
   const fn = jest.fn();
 
-  await domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, fn);
+  domainEventEmitter.subscribe(EpisodeEvents.Patched.TYPE, fn);
 
   const partialModel: Partial<Episode> = {
     title: "new title",
@@ -55,7 +52,7 @@ it("should emit Patch Event", async () => {
 
   expect(fn).toHaveBeenCalledTimes(1);
   expect(fn).toHaveBeenCalledWith( {
-    type: EventType.PATCHED,
+    type: EpisodeEvents.Patched.TYPE,
     payload: {
       entityId: fixtureEpisodes.Simpsons.Samples.EP1x01.id,
       key: "title",
@@ -65,15 +62,15 @@ it("should emit Patch Event", async () => {
 } );
 
 it("should emit Create Event", async () => {
-  const fn = jest.fn((event: ModelEvent<EpisodeEntity>) => {
-    expect(event.type).toBe(EventType.CREATED);
+  const fn = jest.fn((event: EntityEvent<EpisodeEntity>) => {
+    expect(event.type).toBe(EpisodeEvents.Created.TYPE);
     expect(event.payload.entity.compKey?.seriesKey).toBe("simpsons");
     expect(event.payload.entity.compKey?.episodeKey.startsWith("X")).toBeTruthy();
 
     return Promise.resolve();
-  } ) as Consumer<any>;
+  } );
 
-  await domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, fn);
+  domainEventEmitter.subscribe(EpisodeEvents.Created.TYPE, fn);
 
   const models = fixtureEpisodes.Simpsons.List.slice(0, 10).map(episode => ( {
     ...episode,

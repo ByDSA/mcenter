@@ -9,6 +9,7 @@ import { CustomValidationError } from "$shared/utils/validation/zod";
 import { GlobalExceptionFilter } from "#main/errorHandler";
 import { RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/player";
 import { ZodSerializerSchemaInterceptor } from "#utils/validation/zod-nestjs";
+import { setupEventEmitterDecorators } from "#modules/domain-event-emitter/get-event-emitter";
 import { Cleanup } from "./clean-up.service";
 
 @Injectable()
@@ -41,6 +42,7 @@ export function addGlobalConfigToApp(app: INestApplication) {
   app.use(helmet());
   app.enableShutdownHooks(); // Para que se llame onModuleDestroy de services
   app.useGlobalFilters(new GlobalExceptionFilter());
+  setupEventEmitterDecorators(app);
   const { FRONTEND_URL } = process.env;
 
   assertIsDefined(FRONTEND_URL);

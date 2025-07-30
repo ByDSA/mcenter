@@ -3,11 +3,11 @@ import { Server as HttpServer } from "node:http";
 import { Server, Socket } from "socket.io";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { showError } from "$shared/utils/errors/showError";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { OnEvent } from "@nestjs/event-emitter";
+import { DomainEventEmitter } from "#modules/domain-event-emitter";
 import { PlayerEvent as PlayerEventType, PlayerStatusResponse } from "#modules/player/player-services/models";
-import { BrokerEvent } from "#utils/message-broker";
-import { EmptyPlayerEvent, PlayPlayerEvent, QUEUE_NAME, SeekPlayerEvent } from "../messaging";
+import { DomainEvent } from "#modules/domain-event-emitter";
+import { PlayerEvents } from "../events";
 
 @Injectable()
 export class FrontWSServerService {
@@ -15,18 +15,18 @@ export class FrontWSServerService {
 
   #lastStatus: PlayerStatusResponse | undefined;
 
-  constructor(private readonly domainMessageBroker: DomainMessageBroker) {
-    this.domainMessageBroker.subscribe(QUEUE_NAME, (event: BrokerEvent<any>) => {
-      if (event.type === PlayerEventType.STATUS) {
-        this.#emitStatus(event.payload.status);
-        this.#lastStatus = event.payload.status;
-      } else if (event instanceof EmptyPlayerEvent)
-        console.log("[PLAYER]", event.type);
-      else
-        console.log("[PLAYER]", `${event.type}: `, event.payload);
+  constructor(private readonly domainEventEmitter: DomainEventEmitter) {
+  }
 
-      return Promise.resolve();
-    } ).catch(showError);
+  @OnEvent(PlayerEvents.WILDCARD)
+  handleEvents(event: DomainEvent<any>) {
+    if (event.type === PlayerEvents.Status.TYPE) {
+      this.#emitStatus(event.payload.status);
+      this.#lastStatus = event.payload.status;
+    } else if (event.payload === null)
+      console.log("[PLAYER]", event.type);
+    else
+      console.log("[PLAYER]", `${event.type}: `, event.payload);
   }
 
   startSocket(httpServer: HttpServer) {
@@ -53,57 +53,50 @@ export class FrontWSServerService {
       } );
 
       socket.on(PlayerEventType.PAUSE_TOGGLE, () => {
-        this.domainMessageBroker.publish(
-          QUEUE_NAME,
-          new EmptyPlayerEvent(PlayerEventType.PAUSE_TOGGLE),
-        ).catch(showError);
+        this.domainEventEmitter.publish(
+          PlayerEvents.Empty.create(PlayerEventType.PAUSE_TOGGLE),
+        );
       } );
 
       socket.on(PlayerEventType.NEXT, () => {
-        this.domainMessageBroker.publish(
-          QUEUE_NAME,
-          new EmptyPlayerEvent(PlayerEventType.NEXT),
-        ).catch(showError);
+        this.domainEventEmitter.publish(
+          PlayerEvents.Empty.create(PlayerEventType.NEXT),
+        );
       } );
 
       socket.on(PlayerEventType.PREVIOUS, () => {
-        this.domainMessageBroker.publish(
-          QUEUE_NAME,
-          new EmptyPlayerEvent(PlayerEventType.PREVIOUS),
-        ).catch(showError);
+        this.domainEventEmitter.publish(
+          PlayerEvents.Empty.create(PlayerEventType.PREVIOUS),
+        );
       } );
 
       socket.on(PlayerEventType.STOP, () => {
-        this.domainMessageBroker.publish(
-          QUEUE_NAME,
-          new EmptyPlayerEvent(PlayerEventType.STOP),
-        ).catch(showError);
+        this.domainEventEmitter.publish(
+          PlayerEvents.Empty.create(PlayerEventType.STOP),
+        );
       } );
 
       socket.on(PlayerEventType.PLAY, (id: number) => {
-        this.domainMessageBroker.publish(
-          QUEUE_NAME,
-          new PlayPlayerEvent(id),
-        ).catch(showError);
+        this.domainEventEmitter.publish(
+          PlayerEvents.Play.create(id),
+        );
       } );
 
       socket.on(PlayerEventType.SEEK, (val: number | string) => {
         if (!(typeof val === "string" || typeof val === "number"))
           throw new Error("val is not string or number");
 
-        this.domainMessageBroker.publish(
-          QUEUE_NAME,
-          new SeekPlayerEvent(val),
-        ).catch(showError);
+        this.domainEventEmitter.publish(
+          PlayerEvents.Seek.create(val),
+        );
       } );
 
       socket.on(PlayerEventType.FULLSCREEN_TOGGLE, () => {
         console.log("[FRONT] fullscreen toggle");
 
-        this.domainMessageBroker.publish(
-          QUEUE_NAME,
-          new EmptyPlayerEvent(PlayerEventType.FULLSCREEN_TOGGLE),
-        ).catch(showError);
+        this.domainEventEmitter.publish(
+          PlayerEvents.Empty.create(PlayerEventType.FULLSCREEN_TOGGLE),
+        );
       } );
     } );
   }

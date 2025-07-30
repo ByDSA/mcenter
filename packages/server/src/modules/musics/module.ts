@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { forwardRef, Module } from "@nestjs/common";
-import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
 import { MusicsHistoryModule } from "./history/module";
 import { MusicGetController } from "./controllers/get.controller";
 import { MusicFixController } from "./controllers/fix.controller";
@@ -15,7 +15,7 @@ import { RawHandlerService } from "./controllers/raw-handler.service";
 
 @Module( {
   imports: [
-    DomainMessageBrokerModule,
+    DomainEventEmitterModule,
     forwardRef(() => MusicsHistoryModule),
   ],
   controllers: [

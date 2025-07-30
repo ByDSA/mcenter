@@ -1,31 +1,26 @@
 /* eslint-disable import/no-cycle */
 import assert from "node:assert";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { showError } from "$shared/utils/errors/showError";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesRestDtos } from "$shared/models/episodes/dto/transport";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
-import { logDomainEvent } from "#modules/log";
-import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
+import { OnEvent } from "@nestjs/event-emitter";
+import { DomainEventEmitter } from "#modules/domain-event-emitter";
 import { CanCreateManyAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
-import { BrokerEvent } from "#utils/message-broker";
-import { EpisodeFileInfoRepository } from "#episodes/file-info";
+import { DomainEvent } from "#modules/domain-event-emitter";
 import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
-import { EPISODE_HISTORY_ENTRIES_QUEUE_NAME } from "../history/repositories/events";
-import { EpisodeHistoryEntryEvent } from "../history/repositories";
+import { logDomainEvent } from "#modules/log";
+import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
+import { EpisodeHistoryEntryEvents } from "../history/repositories/events";
 import { LastTimePlayedService } from "../history/last-time-played.service";
 import { Episode, EpisodeCompKey, EpisodeEntity } from "../models";
+import { EpisodeEvents } from "./events";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { EpisodeOdm } from "./odm";
-import { EPISODE_QUEUE_NAME } from "./events";
 
-type UpdateOneParams = Episode;
 type CreateOneDto = Omit<Episode, "timestamps">;
 type EpisodeId = EpisodeEntity["id"];
-
-export type EpisodeEvent = BrokerEvent<ModelMessage<EpisodeEntity>>;
 
 type Criteria = EpisodesRestDtos.GetManyByCriteria.Criteria;
 type CriteriaOne = EpisodesRestDtos.GetOne.Criteria;
@@ -39,35 +34,35 @@ CanPatchOneByIdAndGet<Episode, EpisodeId>,
 CanGetManyByCriteria<EpisodeEntity, Criteria>,
 CanGetAll<EpisodeEntity> {
   constructor(
-    private readonly domainMessageBroker: DomainMessageBroker,
-    private readonly episodeFileInfoRepository: EpisodeFileInfoRepository,
+    private readonly domainEventEmitter: DomainEventEmitter,
     @Inject(forwardRef(() => LastTimePlayedService))
     private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
-    this.domainMessageBroker.subscribe(EPISODE_QUEUE_NAME, (event: EpisodeEvent) => {
-      logDomainEvent(EPISODE_QUEUE_NAME, event);
+  }
 
-      return Promise.resolve();
-    } ).catch(showError);
-    this.domainMessageBroker.subscribe(
-      EPISODE_HISTORY_ENTRIES_QUEUE_NAME,
-      async (event: EpisodeHistoryEntryEvent) => {
-        const { entity } = event.payload;
+  @OnEvent(EpisodeEvents.WILDCARD)
+  handleEvents(ev: DomainEvent<unknown>) {
+    logDomainEvent(ev);
+  }
 
-        if (event.type === EventType.CREATED) {
-          await this.patchOneByCompKeyAndGet(entity.episodeCompKey, {
-            entity: {
-              lastTimePlayed: entity.date.timestamp,
-            },
-          } );
-        } else if (event.type === EventType.DELETED) {
-          await this.lastTimePlayedService
-            .updateEpisodeLastTimePlayedByCompKey(entity.episodeCompKey);
-        }
+  @OnEvent(EpisodeHistoryEntryEvents.Created.TYPE)
+  async handleCreateHistoryEntryEvents(event: EpisodeHistoryEntryEvents.Created.Event) {
+    const { entity } = event.payload;
 
-        return Promise.resolve();
+    await this.patchOneByCompKeyAndGet(entity.episodeCompKey, {
+      entity: {
+        lastTimePlayed: entity.date.timestamp,
       },
-    ).catch(showError);
+    } );
+  }
+
+  @OnEvent(EpisodeHistoryEntryEvents.Deleted.TYPE)
+  async handleDeleteHistoryEntryEvents(event: EpisodeHistoryEntryEvents.Deleted.Event) {
+    const { entity } = event.payload;
+
+    await this.lastTimePlayedService
+      .updateEpisodeLastTimePlayedByCompKey(entity.episodeCompKey);
+    ;
   }
 
   async getManyByCriteria(criteria: Criteria): Promise<EpisodeEntity[]> {
@@ -103,15 +98,10 @@ CanGetAll<EpisodeEntity> {
 
     const episodeId = updateResult.upsertedId!.toString();
 
-    for (const [key, value] of Object.entries(episode)) {
-      const event = new PatchEvent<Episode, EpisodeId>( {
-        entityId: episodeId,
-        key: key as keyof Episode,
-        value,
-      } );
-
-      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
-    }
+    this.domainEventEmitter.emitPatch(EpisodeEvents.Patched.TYPE, {
+      entity: episode,
+      id: episodeId,
+    } );
 
     const ret = await this.getOneById(id);
 
@@ -198,27 +188,6 @@ CanGetAll<EpisodeEntity> {
     } );
   }
 
-  async updateOneByIdAndGet(
-    episodeId: EpisodeId,
-    episode: UpdateOneParams,
-  ): Promise<EpisodeEntity | null> {
-    const doc: EpisodeOdm.Doc = EpisodeOdm.toDoc(episode);
-    const updateResult = await EpisodeOdm.Model.updateOne( {
-      _id: episodeId,
-    }, doc);
-
-    if (updateResult.matchedCount === 0)
-      return null;
-
-    const event = new ModelEvent(EventType.UPDATED, {
-      entity: episode,
-    } );
-
-    await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
-
-    return this.getOneById(episodeId);
-  }
-
   async patchOneByCompKeyAndGet(
     compKey: EpisodeCompKey,
     patchParams: PatchOneParams<Episode>,
@@ -239,15 +208,10 @@ CanGetAll<EpisodeEntity> {
 
     const episodeId = updateResult._id.toString();
 
-    for (const [key, value] of Object.entries(episode)) {
-      const event = new PatchEvent<Episode, EpisodeId>( {
-        entityId: episodeId,
-        key: key as keyof Episode,
-        value,
-      } );
-
-      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
-    }
+    this.domainEventEmitter.emitPatch(EpisodeEvents.Patched.TYPE, {
+      entity: episode,
+      id: episodeId,
+    } );
 
     const ret = await this.getOneByCompKey(compKey);
 
@@ -279,13 +243,8 @@ CanGetAll<EpisodeEntity> {
     assert(result.value !== null);
     const ret = EpisodeOdm.toEntity(result.value);
 
-    if (result.lastErrorObject?.upserted) {
-      const event = new ModelEvent(EventType.CREATED, {
-        entity: ret,
-      } );
-
-      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
-    }
+    if (result.lastErrorObject?.upserted)
+      this.domainEventEmitter.emitEntity(EpisodeEvents.Created.TYPE, ret);
 
     return ret;
   }
@@ -304,32 +263,20 @@ CanGetAll<EpisodeEntity> {
     return model;
   }
 
+  @EmitEntityEvent(EpisodeEvents.Created.TYPE)
   async createOneAndGet(createDto: CreateOneDto): Promise<EpisodeEntity> {
     const model = this.createDtoToModel(createDto);
     const doc: EpisodeOdm.Doc = EpisodeOdm.toDoc(model);
     const created = await EpisodeOdm.Model.create(doc);
-    const ret = EpisodeOdm.toEntity(created);
-    const event = new ModelEvent(EventType.CREATED, {
-      entity: ret,
-    } );
 
-    await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
-
-    return ret;
+    return EpisodeOdm.toEntity(created);
   }
 
+  @EmitEntityEvent(EpisodeEvents.Created.TYPE)
   async createManyAndGet(models: Episode[]): Promise<EpisodeEntity[]> {
     const docsOdm: EpisodeOdm.Doc[] = models.map(EpisodeOdm.toDoc);
     const inserted = await EpisodeOdm.Model.insertMany(docsOdm);
     const ret = inserted.map(EpisodeOdm.toEntity);
-
-    for (const model of ret) {
-      const event = new ModelEvent(EventType.CREATED, {
-        entity: model,
-      } );
-
-      await this.domainMessageBroker.publish(EPISODE_QUEUE_NAME, event);
-    }
 
     return ret;
   }

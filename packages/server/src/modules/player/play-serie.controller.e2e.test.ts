@@ -60,7 +60,7 @@ describe("playSerieController", () => {
     } );
 
     it("should return 200 if episode found", async () => {
-      const response = await request(routerApp).get(`/play/episode/simpsons/${ EPISODES_SIMPSONS[0].compKey.episodeKey}`)
+      const response = await request(routerApp).get(`/play/episode/${ EPISODES_SIMPSONS[0].compKey.seriesKey}/${ EPISODES_SIMPSONS[0].compKey.episodeKey}`)
         .expect(200);
 
       expect(response).toBeDefined();

@@ -3,60 +3,50 @@ import { showError } from "$shared/utils/errors/showError";
 import { assertIsDefined } from "$shared/utils/validation";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { MusicRestDtos } from "$shared/models/musics/dto/transport";
+import { OnEvent } from "@nestjs/event-emitter";
 import { assertFound } from "#utils/validation/found";
-import { BrokerEvent } from "#utils/message-broker";
+import { DomainEvent } from "#modules/domain-event-emitter";
 import { CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
-import { EventType, ModelEvent, ModelMessage, PatchEvent } from "#utils/event-sourcing";
 import { MusicEntity, Music, MusicId } from "#musics/models";
-import { MusicHistoryEntry } from "#musics/history/models";
-import { logDomainEvent } from "#modules/log";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { DomainEventEmitter } from "#modules/domain-event-emitter";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
-import { QUEUE_NAME as MUSIC_HISTORY_QUEUE_NAME } from "../history/events";
+import { logDomainEvent } from "#modules/log";
+import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
 import { fixUrl } from "../builder/fix-url";
 import { MusicBuilderService } from "../builder/music-builder.service";
+import { MusicHistoryEntryEvents } from "../history/repositories/events";
 import { MusicOdm } from "./odm";
-import { QUEUE_NAME } from "./events";
+import { MusicEvents } from "./events";
 import { findParamsToQueryParams } from "./queries/QueriesOdm";
 import { ExpressionNode } from "./queries/QueryObject";
 
 type CriteriaOne = MusicRestDtos.GetOne.Criteria;
 
-type MusicEvent = BrokerEvent<ModelMessage<MusicEntity>>;
 @Injectable()
 export class MusicRepository
 implements
 CanPatchOneByIdAndGet<MusicEntity, MusicId, Music>,
 CanGetOneById<MusicEntity, MusicId> {
   constructor(
-    private readonly domainMessageBroker: DomainMessageBroker,
+    private readonly domainEventEmitter: DomainEventEmitter,
     @Inject(forwardRef(()=>MusicBuilderService))
     private readonly musicBuilder: MusicBuilderService,
-  ) {
-    this.domainMessageBroker.subscribe(QUEUE_NAME, (event: MusicEvent) => {
-      logDomainEvent(QUEUE_NAME, event);
+  ) { }
 
-      return Promise.resolve();
-    } ).catch(showError);
+  @OnEvent(MusicEvents.WILDCARD)
+  handleEvents(ev: DomainEvent<unknown>) {
+    logDomainEvent(ev);
+  }
 
-    this.domainMessageBroker.subscribe(
-      MUSIC_HISTORY_QUEUE_NAME,
-      async (_ev: BrokerEvent<unknown>) => {
-        const event = _ev as ModelEvent<MusicHistoryEntry>;
+  @OnEvent(MusicHistoryEntryEvents.Created.TYPE)
+  async handleCreateHistoryEntryEvents(event: MusicHistoryEntryEvents.Created.Event) {
+    const { entity } = event.payload;
 
-        if (event.type !== EventType.CREATED)
-          return;
-
-        const id = event.payload.entity.resourceId;
-        const lastTimePlayed = event.payload.entity.date.timestamp;
-
-        await this.patchOneByIdAndGet(id, {
-          entity: {
-            lastTimePlayed,
-          },
-        } ).catch(showError);
+    await this.patchOneByIdAndGet(entity.resourceId, {
+      entity: {
+        lastTimePlayed: entity.date.timestamp,
       },
-    ).catch(showError);
+    } ).catch(showError);
   }
 
   async getOneById(id: string): Promise<MusicEntity | null> {
@@ -89,27 +79,11 @@ CanGetOneById<MusicEntity, MusicId> {
 
     const ret = MusicOdm.toEntity(gotDoc);
 
-    // Emite un evento por cada propiedad cambiada
-    for (const [k, value] of Object.entries(entity)) {
-      const key = k as keyof MusicEntity;
-      const event = new PatchEvent<MusicEntity, MusicId>( {
-        entityId: id,
-        key,
-        value,
-      } );
-
-      await this.domainMessageBroker.publish(QUEUE_NAME, event);
-    }
-
-    for (const p of params.unset ?? []) {
-      const event = new PatchEvent<MusicEntity, MusicId>( {
-        entityId: id,
-        key: p.join(".") as keyof MusicEntity,
-        value: undefined,
-      } );
-
-      await this.domainMessageBroker.publish(QUEUE_NAME, event);
-    }
+    this.domainEventEmitter.emitPatch(MusicEvents.Patched.TYPE, {
+      entity,
+      id,
+      unset: params.unset,
+    } );
 
     return ret;
   }
@@ -172,73 +146,22 @@ CanGetOneById<MusicEntity, MusicId> {
     return await this.createOneAndGet(music);
   }
 
+  @EmitEntityEvent(MusicEvents.Created.TYPE)
   async createOneAndGet(music: Music): Promise<MusicEntity> {
     const docOdm = MusicOdm.toDoc(music);
     const gotDocOdm = await MusicOdm.Model.create(docOdm);
-    const entity = MusicOdm.toEntity(gotDocOdm);
-    const event = new ModelEvent<MusicEntity>(EventType.CREATED, {
-      entity: entity,
-    } );
 
-    await this.domainMessageBroker.publish(QUEUE_NAME, event);
-
-    return entity;
+    return MusicOdm.toEntity(gotDocOdm);
   }
 
-  async deleteOneByPath(relativePath: string) {
+  @EmitEntityEvent(MusicEvents.Deleted.TYPE)
+  async deleteOneByPath(relativePath: string): Promise<MusicEntity | null> {
     const docOdm = await MusicOdm.Model.findOneAndDelete( {
       path: relativePath,
     } );
 
-    if (!docOdm)
-      return;
+    assertFound(docOdm, "Music not found");
 
-    const entity = MusicOdm.toEntity(docOdm);
-    const event = new ModelEvent<MusicEntity>(EventType.DELETED, {
-      entity,
-    } );
-
-    await this.domainMessageBroker.publish(QUEUE_NAME, event);
-  }
-
-  async updateOneByUrl(url: string, data: Partial<Music>): Promise<void> {
-    return await this.#updateOneAndGet(data, {
-      url,
-    } );
-  }
-
-  async updateOneByHash(hash: string, data: Partial<Music>): Promise<void> {
-    return await this.#updateOneAndGet(data, {
-      hash,
-    } );
-  }
-
-  async #updateOneAndGet(
-    data: Partial<Music>,
-    filterCriteria: CriteriaOne["filter"],
-  ) {
-    data.timestamps ??= {} as Music["timestamps"];
-    data.timestamps.updatedAt = new Date();
-
-    const filter = filterCriteria; // TODO
-
-    await MusicOdm.Model.updateOne(filter, data);
-
-    const model = await this.getOne( {
-      filter: filterCriteria,
-    } );
-
-    assertIsDefined(model);
-    const event = new ModelEvent<MusicEntity>(EventType.UPDATED, {
-      entity: model,
-    } );
-
-    await this.domainMessageBroker.publish(QUEUE_NAME, event);
-  }
-
-  updateOneByPath(relativePath: string, data: Partial<Music>): Promise<void> {
-    return this.#updateOneAndGet(data, {
-      path: relativePath,
-    } );
+    return MusicOdm.toEntity(docOdm);
   }
 }

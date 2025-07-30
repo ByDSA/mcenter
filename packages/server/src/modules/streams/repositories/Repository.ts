@@ -1,16 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { showError } from "$shared/utils/errors/showError";
 import { assertIsSerieEntity, Serie, SeriesKey } from "$shared/models/series";
 import { StreamRestDtos } from "$shared/models/streams/dto/transport";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { OnEvent } from "@nestjs/event-emitter";
 import { logDomainEvent } from "#modules/log";
-import { SERIES_QUEUE_NAME } from "#series/models";
-import { EventType } from "#utils/event-sourcing";
 import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
-import { BrokerEvent } from "#utils/message-broker";
+import { DomainEvent } from "#modules/domain-event-emitter";
+import { SeriesEvents } from "#modules/series/repositories/events";
+import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
 import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../models";
 import { StreamOdm } from "./odm";
 import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
+import { StreamEvents } from "./events";
 
 type CriteriaMany = StreamRestDtos.GetManyByCriteria.Criteria;
 @Injectable()
@@ -19,21 +19,19 @@ implements
 CanGetManyByCriteria<StreamEntity, CriteriaMany>,
 CanCreateOneAndGet<StreamEntity>,
 CanGetAll<StreamEntity> {
-  constructor(
-    private readonly domainMessageBroker: DomainMessageBroker,
-  ) {
-    this.domainMessageBroker.subscribe(SERIES_QUEUE_NAME, async (event: BrokerEvent<any>) => {
-      logDomainEvent(SERIES_QUEUE_NAME, event);
+  constructor() { }
 
-      if (event.type === EventType.CREATED) {
-        const serie = event.payload.entity;
+  @OnEvent(StreamEvents.WILDCARD)
+  handleEvents(ev: DomainEvent<unknown>) {
+    logDomainEvent(ev);
+  }
 
-        assertIsSerieEntity(serie);
-        await this.createDefaultForSerie(serie.key);
-      }
+  @OnEvent(SeriesEvents.Created.TYPE)
+  async handleCreateSerieEvent(event: SeriesEvents.Created.Event) {
+    const serie = event.payload.entity;
 
-      return Promise.resolve();
-    } ).catch(showError);
+    assertIsSerieEntity(serie);
+    await this.createDefaultForSerie(serie.key);
   }
 
   async getManyByCriteria(criteria: CriteriaMany) {
@@ -88,6 +86,7 @@ CanGetAll<StreamEntity> {
     return !!streamDocOdm;
   }
 
+  @EmitEntityEvent(StreamEvents.Created.TYPE)
   async createOneAndGet(stream: Stream): Promise<StreamEntity> {
     const docOdm = StreamOdm.toDoc(stream);
     const [got]: StreamOdm.FullDoc[] = await StreamOdm.Model.create([docOdm], {

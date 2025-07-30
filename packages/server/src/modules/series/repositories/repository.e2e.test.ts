@@ -1,8 +1,8 @@
 import { assertZod } from "$shared/utils/validation/zod";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { StreamEntity, streamEntitySchema, StreamMode, StreamOriginType } from "#modules/streams/models";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#tests/nestjs/app";
+import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
 import { type SerieEntity, assertIsSerieEntity } from "../models";
 import { SerieRepository } from "./repository";
 
@@ -13,9 +13,9 @@ let testingSetup: TestingSetup;
 describe("repository", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
+      imports: [DomainEventEmitterModule],
       controllers: [],
       providers: [
-        DomainMessageBroker,
         SerieRepository,
         StreamsRepository,
       ],

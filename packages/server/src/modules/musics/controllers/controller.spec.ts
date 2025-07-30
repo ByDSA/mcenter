@@ -3,7 +3,7 @@ import { INestApplication } from "@nestjs/common";
 import { Application } from "express";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { MusicId } from "#musics/models";
-import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
 import { MusicRepository } from "../repositories";
 import { musicRepoMockProvider } from "../repositories/tests";
 import { musicHistoryRepoMockProvider } from "../history/repositories/tests/RepositoryMock";
@@ -26,7 +26,7 @@ describe("getAll", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [DomainMessageBrokerModule],
+      imports: [DomainEventEmitterModule],
       controllers: [MusicGetController, MusicFixController],
       providers: [
         musicRepoMockProvider,

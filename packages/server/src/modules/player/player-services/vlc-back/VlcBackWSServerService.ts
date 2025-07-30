@@ -4,46 +4,47 @@ import { Server as HttpServer } from "node:http";
 import { Server, Socket } from "socket.io";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { showError } from "$shared/utils/errors/showError";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { OnEvent } from "@nestjs/event-emitter";
+import { DomainEventEmitter } from "#modules/domain-event-emitter";
 import { PlayerEvent, PlayResourceMessage } from "#modules/player/player-services/models";
-import { BrokerEvent } from "#utils/message-broker";
-import { QUEUE_NAME, StatusPlayerEvent } from "../messaging";
+import { DomainEvent } from "#modules/domain-event-emitter";
+import { PlayerEvents } from "../events";
 
 @Injectable()
 export class VlcBackWSService {
   io: Server | undefined;
 
-  constructor(private readonly domainMessageBroker: DomainMessageBroker) {
-    this.domainMessageBroker.subscribe(QUEUE_NAME, async (event: BrokerEvent<any>) => {
-      switch (event.type) {
-        case PlayerEvent.PAUSE_TOGGLE:
-          await this.#emitPauseToggle();
-          break;
-        case PlayerEvent.NEXT:
-          await this.#emitNext();
-          break;
-        case PlayerEvent.PREVIOUS:
-          await this.#emitPrevious();
-          break;
-        case PlayerEvent.STOP:
-          await this.#emitStop();
-          break;
-        case PlayerEvent.SEEK:
-          await this.#emitSeek(event.payload.value);
-          break;
-        case PlayerEvent.PLAY:
-          await this.#emitPlay(event.payload.id);
-          break;
-        case PlayerEvent.FULLSCREEN_TOGGLE:
-          await this.#emitFullscreenToggle();
-          break;
-        default:
-          break;
-      }
+  constructor(private readonly domainEventEmitter: DomainEventEmitter) { }
 
-      return Promise.resolve();
-    } ).catch(showError);
+  @OnEvent(PlayerEvents.WILDCARD)
+  async handleEvents(event: DomainEvent<unknown>) {
+    switch (event.type) {
+      case PlayerEvents.getEventEmitterType(PlayerEvent.PAUSE_TOGGLE):
+        await this.#emitPauseToggle();
+        break;
+      case PlayerEvents.getEventEmitterType(PlayerEvent.NEXT):
+        await this.#emitNext();
+        break;
+      case PlayerEvents.getEventEmitterType(PlayerEvent.PREVIOUS):
+        await this.#emitPrevious();
+        break;
+      case PlayerEvents.getEventEmitterType(PlayerEvent.STOP):
+        await this.#emitStop();
+        break;
+      case PlayerEvents.getEventEmitterType(PlayerEvent.SEEK):
+        await this.#emitSeek((event as PlayerEvents.Seek.Event).payload.value);
+        break;
+      case PlayerEvents.getEventEmitterType(PlayerEvent.PLAY):
+        await this.#emitPlay((event as PlayerEvents.Play.Event).payload.id);
+        break;
+      case PlayerEvents.getEventEmitterType(PlayerEvent.FULLSCREEN_TOGGLE):
+        await this.#emitFullscreenToggle();
+        break;
+      default:
+        break;
+    }
+
+    return Promise.resolve();
   }
 
   startSocket(httpServer: HttpServer) {
@@ -67,9 +68,7 @@ export class VlcBackWSService {
       } );
 
       socket.on(PlayerEvent.STATUS, (status) => {
-        this.domainMessageBroker
-          .publish(QUEUE_NAME, new StatusPlayerEvent(status))
-          .catch(showError);
+        this.domainEventEmitter.publish(PlayerEvents.Status.create(status));
       } );
     } );
   }

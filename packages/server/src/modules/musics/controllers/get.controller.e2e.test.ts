@@ -2,8 +2,8 @@ import { Application } from "express";
 import request from "supertest";
 import { MusicEntity, Music } from "#musics/models";
 import { loadFixtureMusicsInDisk } from "#tests/main/db/fixtures/sets";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
 import { MusicHistoryRepository } from "../history";
 import { MusicRepository } from "../repositories";
 import { fixtureMusics } from "../tests/fixtures";
@@ -42,14 +42,13 @@ function expectNotEmpty(array: unknown[]) {
 describe("musicGetController", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [],
+      imports: [DomainEventEmitterModule],
       controllers: [MusicGetController],
       providers: [
         MusicRepository,
         MusicFileInfoRepository,
         musicBuilderServiceMockProvicer,
         MusicHistoryRepository,
-        DomainMessageBroker,
         RawHandlerService,
       ],
     }, {

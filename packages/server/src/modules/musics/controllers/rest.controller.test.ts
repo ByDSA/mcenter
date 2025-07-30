@@ -1,7 +1,7 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
 import { restTestsSuite } from "#tests/suites/rest-suite";
 import { testRoute } from "#tests/main/routing/routing";
+import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
 import { musicRepoMockProvider } from "../repositories/tests";
 import { MusicRepository } from "../repositories";
 import { fixtureMusics } from "../tests/fixtures";
@@ -13,9 +13,9 @@ restTestsSuite( {
   name: MusicRestController.name,
   appModule: [
     {
+      imports: [DomainEventEmitterModule],
       controllers: [MusicRestController],
       providers: [
-        DomainMessageBroker,
         musicRepoMockProvider,
       ],
     }],

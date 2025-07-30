@@ -2,14 +2,15 @@ import { Injectable } from "@nestjs/common";
 import { MusicEntity, MusicId } from "$shared/models/musics";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { FilterQuery } from "mongoose";
+import { OnEvent } from "@nestjs/event-emitter";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
-import { PatchEvent } from "#utils/event-sourcing";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { DomainEvent, DomainEventEmitter } from "#modules/domain-event-emitter";
 import { getFullPath } from "#musics/utils";
 import { md5FileAsync } from "#utils/crypt";
+import { logDomainEvent } from "#modules/log";
 import { MusicFileInfo, MusicFileInfoEntity } from "../models";
 import { MusicFileInfoOdm } from "./odm";
-import { MUSIC_FILE_INFOS_QUEUE_NAME } from "./events";
+import { MusicFileInfoEvents } from "./events";
 import { partialModelToDocOdm } from "./odm/adapters";
 import { DocOdm } from "./odm/odm";
 
@@ -24,8 +25,13 @@ implements
 CanCreateOneAndGet<Model>,
 CanGetAll<Entity> {
   constructor(
-    private readonly domainMessageBroker: DomainMessageBroker,
+    private readonly domainEventEmitter: DomainEventEmitter,
   ) {}
+
+  @OnEvent(MusicFileInfoEvents.WILDCARD)
+  handleEvents(ev: DomainEvent<unknown>) {
+    logDomainEvent(ev);
+  }
 
   async updateHashOfMusic(music: MusicEntity) {
     const currentFileInfos = await this.getAllByMusicId(music.id);
@@ -136,13 +142,16 @@ CanGetAll<Entity> {
     const ret = await this.getOneByPath(newPath);
 
     if (ret) {
-      const event = new PatchEvent<Model, MusicId>( {
-        entityId: ret.id,
-        key: "path",
-        value: newPath,
-      } );
-
-      await this.domainMessageBroker.publish(MUSIC_FILE_INFOS_QUEUE_NAME, event);
+      this.domainEventEmitter.emitPatch(
+        MusicFileInfoEvents.Patched.TYPE,
+        {
+          entity:
+        {
+          path: newPath,
+        },
+          id: ret.id,
+        },
+      );
     }
 
     return ret;

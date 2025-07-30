@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
-import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
 import { SerieRepository } from "./repositories";
 
 @Module( {
   imports: [
-    DomainMessageBrokerModule,
+    DomainEventEmitterModule,
   ],
   controllers: [
   ],

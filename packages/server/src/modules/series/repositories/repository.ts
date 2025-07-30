@@ -1,14 +1,15 @@
 import assert from "node:assert";
 import { Injectable } from "@nestjs/common";
-import { showError } from "$shared/utils/errors/showError";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { OnEvent } from "@nestjs/event-emitter";
+import { DomainEventEmitter } from "#modules/domain-event-emitter";
 import { logDomainEvent } from "#modules/log";
-import { EventType, ModelEvent } from "#utils/event-sourcing";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
-import { BrokerEvent } from "#utils/message-broker";
+import { DomainEvent } from "#modules/domain-event-emitter";
+import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
+import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { Serie, SerieEntity, SeriesKey } from "../models";
+import { SeriesEvents } from "./events";
 import { SeriesOdm } from "./odm";
-import { QUEUE_NAME } from "./events";
 import { FullDocOdm, ModelOdm } from "./odm/odm";
 
 @Injectable()
@@ -16,12 +17,11 @@ export class SerieRepository
 implements
 CanCreateOneAndGet<SerieEntity>,
 CanGetAll<SerieEntity> {
-  constructor(private readonly domainMessageBroker: DomainMessageBroker) {
-    this.domainMessageBroker.subscribe(QUEUE_NAME, (event: BrokerEvent<any>) => {
-      logDomainEvent(QUEUE_NAME, event);
+  constructor(private readonly domainEventEmitter: DomainEventEmitter) { }
 
-      return Promise.resolve();
-    } ).catch(showError);
+  @OnEvent(SeriesEvents.WILDCARD)
+  handleEvents(ev: DomainEvent<unknown>) {
+    logDomainEvent(ev);
   }
 
   async getAll(): Promise<SerieEntity[]> {
@@ -30,22 +30,17 @@ CanGetAll<SerieEntity> {
     return seriesDocOdm.map(SeriesOdm.toEntity);
   }
 
+  @EmitEntityEvent(SeriesEvents.Created.TYPE)
   async createOneAndGet(model: Serie): Promise<SerieEntity> {
     const serieOdm = SeriesOdm.toDoc(model);
     const gotOdm = await ModelOdm.create(serieOdm);
-    const serie = SeriesOdm.toEntity(gotOdm);
-    const event = new ModelEvent(EventType.CREATED, {
-      entity: serie,
-    } );
 
-    await this.domainMessageBroker.publish(QUEUE_NAME, event);
-
-    return serie;
+    return SeriesOdm.toEntity(gotOdm);
   }
 
   async getOneByKey(key: SeriesKey): Promise<SerieEntity | null> {
     const [serieDb]: FullDocOdm[] = await ModelOdm.find( {
-      id: key,
+      key,
     } );
 
     if (!serieDb)
@@ -55,14 +50,15 @@ CanGetAll<SerieEntity> {
   }
 
   async getOneOrCreate(model: Serie): Promise<SerieEntity> {
+    const filter: MongoFilterQuery<FullDocOdm> = {
+      key: model.key,
+    };
+    const update: MongoUpdateQuery<FullDocOdm> = {
+      $setOnInsert: SeriesOdm.toDoc(model), // Solo se aplica en la creación
+    };
     const result = await SeriesOdm.Model.findOneAndUpdate(
-      {
-      // TODO: cambiar cuando DB
-        id: model.key,
-      },
-      {
-        $setOnInsert: SeriesOdm.toDoc(model), // Solo se aplica en la creación
-      },
+      filter,
+      update,
       {
         upsert: true, // crea si no existe
         new: true, // retorna el documento actualizado
@@ -70,19 +66,13 @@ CanGetAll<SerieEntity> {
         includeResultMetadata: true, // para separar value y upserted
       },
     );
-
-    assert(result.value !== null);
-
     const gotOdm = result.value;
+
+    assert(gotOdm !== null);
     const serie = SeriesOdm.toEntity(gotOdm);
 
-    if (result.lastErrorObject?.upserted) {
-      const event = new ModelEvent(EventType.CREATED, {
-        entity: serie,
-      } );
-
-      await this.domainMessageBroker.publish(QUEUE_NAME, event);
-    }
+    if (result.lastErrorObject?.upserted)
+      this.domainEventEmitter.emitEntity(SeriesEvents.Created.TYPE, serie);
 
     return serie;
   }

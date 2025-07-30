@@ -1,9 +1,9 @@
 import { EntityEvent, PatchEvent } from "#modules/domain-event-emitter";
-import { SerieEntity } from "../models";
+import { StreamEntity } from "../models";
 
-type Entity = SerieEntity;
-export namespace SeriesEvents {
-  const MAIN_TYPE = "series";
+type Entity = StreamEntity;
+export namespace StreamEvents {
+  const MAIN_TYPE = "stream";
   export const WILDCARD = `${MAIN_TYPE}.*`;
 
   export namespace Patched {

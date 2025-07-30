@@ -2,7 +2,6 @@
 import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { DateTime } from "luxon";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { deepCopy } from "$shared/utils/objects";
 import { showError } from "$shared/utils/errors/showError";
 import { EpisodesRepository } from "#episodes/repositories/repository";
 import { EpisodeHistoryEntriesRepository } from "./repositories/repository";
@@ -54,13 +53,11 @@ export class LastTimePlayedService {
         .calcEpisodeLastTimePlayedByEpisodeId(episode.id);
 
       if (lastTimePlayed) {
-        const selfCopy: EpisodeEntity = {
-          ...deepCopy(episode),
-          lastTimePlayed,
-        };
-        const { id } = selfCopy;
-
-        await this.episodesRepository.updateOneByIdAndGet(id, selfCopy);
+        await this.episodesRepository.patchOneByIdAndGet(episode.id, {
+          entity: {
+            lastTimePlayed,
+          },
+        } );
       }
     }
 

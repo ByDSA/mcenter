@@ -1,7 +1,7 @@
 import request from "supertest";
 import { assertIsDefined } from "$shared/utils/validation";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
 import { MusicRepository } from "../repositories";
 import { MusicFileInfoRepository } from "../file-info/repositories/repository";
 import { MusicBuilderService } from "../builder/music-builder.service";
@@ -24,7 +24,7 @@ describe("updateRemoteController", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [DomainMessageBrokerModule],
+      imports: [DomainEventEmitterModule],
       controllers: [MusicUpdateRemoteController],
       providers: [
         UpdateRemoteTreeService,

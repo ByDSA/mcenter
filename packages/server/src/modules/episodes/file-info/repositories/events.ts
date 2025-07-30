@@ -1,1 +1,12 @@
-export const EPISODE_FILE_INFOS_QUEUE_NAME = "episode-file-infos";
+import { PatchEvent } from "#modules/domain-event-emitter";
+import { EpisodeFileInfoEntity } from "../models";
+
+export namespace EpisodeFileInfoEvents {
+  const MAIN_TYPE = "episodeFileInfos";
+  export const WILDCARD = `${MAIN_TYPE}.*`;
+
+  export namespace Patch {
+    export const TYPE = `${MAIN_TYPE}.patch`;
+    export type Event = PatchEvent<EpisodeFileInfoEntity, EpisodeFileInfoEntity["id"]>;
+  }
+}

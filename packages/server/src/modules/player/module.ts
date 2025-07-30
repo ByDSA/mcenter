@@ -3,7 +3,7 @@ import { EpisodePickerModule } from "#modules/episode-picker/module";
 import { EpisodesModule } from "#episodes/module";
 import { SeriesModule } from "#modules/series/module";
 import { StreamsModule } from "#modules/streams/module";
-import { DomainMessageBrokerModule } from "#modules/domain-message-broker/module";
+import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { PlaySerieController } from "./play-serie.controller";
@@ -15,7 +15,7 @@ import { PlayService } from "./PlayService";
 @Global() // Para que use sólo una instancia de servicio backend de web sockets
 @Module( {
   imports: [
-    DomainMessageBrokerModule,
+    DomainEventEmitterModule,
     StreamsModule,
     SeriesModule,
     EpisodesModule,

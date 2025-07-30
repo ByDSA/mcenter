@@ -1,25 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { FilterQuery } from "mongoose";
-import { showError } from "$shared/utils/errors/showError";
+import { OnEvent } from "@nestjs/event-emitter";
 import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
-import { ModelMessage, PatchEvent } from "#utils/event-sourcing";
-import { DomainMessageBroker } from "#modules/domain-message-broker";
+import { DomainEvent, DomainEventEmitter } from "#modules/domain-event-emitter";
 import { EpisodeEntity } from "#episodes/models";
 import { assertFound } from "#utils/validation/found";
-import { BrokerEvent } from "#utils/message-broker";
-import { logDomainEvent } from "#modules/log";
 import { MongoFilterQuery, patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
+import { logDomainEvent } from "#modules/log";
+import { EpisodeFileInfoEvents } from "./events";
 import { EpisodeFileInfoOdm } from "./odm";
-import { EPISODE_FILE_INFOS_QUEUE_NAME } from "./events";
 
 type Entity = EpisodeFileInfoEntity;
 type Model = EpisodeFileInfo;
 
 type EpisodeId = EpisodeEntity["id"];
-
-export type MessageEvent = BrokerEvent<ModelMessage<Entity>>;
 
 @Injectable()
 export class EpisodeFileInfoRepository
@@ -27,13 +23,13 @@ implements
 CanCreateOneAndGet<Model>,
 CanGetAll<Entity> {
   constructor(
-    private readonly domainMessageBroker: DomainMessageBroker,
+    private readonly domainEventEmitter: DomainEventEmitter,
   ) {
-    this.domainMessageBroker.subscribe(EPISODE_FILE_INFOS_QUEUE_NAME, (event: MessageEvent) => {
-      logDomainEvent(EPISODE_FILE_INFOS_QUEUE_NAME, event);
+  }
 
-      return Promise.resolve();
-    } ).catch(showError);
+  @OnEvent(EpisodeFileInfoEvents.WILDCARD)
+  handleLog(event: DomainEvent<unknown>): void {
+    logDomainEvent(event);
   }
 
   async createOneAndGet(model: Model): Promise<Entity> {
@@ -111,15 +107,14 @@ CanGetAll<Entity> {
 
     const id = updateResult._id.toString();
 
-    for (const [key, value] of Object.entries(params.entity)) {
-      const event = new PatchEvent<Model, EpisodeFileInfoEntity["id"]>( {
-        entityId: id,
-        key: key as keyof Model,
-        value,
-      } );
-
-      await this.domainMessageBroker.publish(EPISODE_FILE_INFOS_QUEUE_NAME, event);
-    }
+    this.domainEventEmitter.emitPatch(
+      EpisodeFileInfoEvents.Patch.TYPE,
+      {
+        entity: params.entity,
+        id,
+        unset: params.unset,
+      },
+    );
 
     return EpisodeFileInfoOdm.toEntity(updateResult);
   }
