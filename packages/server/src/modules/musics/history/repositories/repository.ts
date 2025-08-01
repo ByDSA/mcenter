@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { showError } from "$shared/utils/errors/showError";
 import { MusicHistoryEntryRestDtos } from "$shared/models/musics/history/dto/transport";
 import { MusicId } from "$shared/models/musics";
 import { getDateNow } from "$shared/utils/time";
@@ -11,6 +10,7 @@ import { MusicHistoryEntry, MusicHistoryEntryEntity } from "#musics/history/mode
 import { DomainEvent } from "#modules/domain-event-emitter";
 import { logDomainEvent } from "#modules/log";
 import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
+import { showError } from "#main/logging/show-error";
 import { MusicRepository } from "../../repositories/repository";
 import { MusicHistoryEntryEvents } from "./events";
 import { FullDocOdm } from "./odm/odm";

@@ -1,5 +1,5 @@
 import { join } from "path";
-import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
+import { Module, NestModule, MiddlewareConsumer, Logger } from "@nestjs/common";
 import express from "express";
 import serveIndex from "serve-index";
 
@@ -7,9 +7,11 @@ const mediaFolderPath = process.env.MEDIA_FOLDER_PATH;
 
 @Module( {} )
 export class StaticFilesModule implements NestModule {
+  private readonly logger = new Logger(StaticFilesModule.name);
+
   configure(consumer: MiddlewareConsumer) {
     if (!mediaFolderPath) {
-      console.warn("MEDIA_FOLDER_PATH not defined");
+      this.logger.warn("MEDIA_FOLDER_PATH not defined");
 
       return;
     }

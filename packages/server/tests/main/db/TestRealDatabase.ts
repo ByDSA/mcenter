@@ -1,4 +1,5 @@
 import { assertIsDefined } from "$shared/utils/validation";
+import { Logger } from "@nestjs/common";
 import { DatabaseOptions, Database } from "#main";
 
 export class TestRealDatabase extends Database {
@@ -15,7 +16,7 @@ export class TestRealDatabase extends Database {
 
   async drop() {
     assertIsDefined(this.connection);
-    console.log("Dropping database ...");
+    new Logger().log("Dropping database ...");
     await this.connection.db.dropDatabase();
   }
 }

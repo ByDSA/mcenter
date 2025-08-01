@@ -1,6 +1,6 @@
 import fs, { existsSync } from "node:fs";
 import ffmpeg from "fluent-ffmpeg";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { ErrorElementResponse, ResultResponse, errorToErrorElementResponse } from "$shared/utils/http/responses";
 import { compareEpisodeFileInfoOmitEpisodeId } from "$shared/models/episodes/file-info";
@@ -32,6 +32,8 @@ class FatalError extends Error {
 
 @Injectable()
 export class UpdateMetadataProcess {
+  private readonly logger = new Logger(UpdateMetadataProcess.name);
+
   constructor(
     private readonly savedSerieTreeService: RemoteSeriesTreeService,
     private readonly episodeFileRepository: EpisodeFileInfoRepository,
@@ -73,7 +75,7 @@ export class UpdateMetadataProcess {
         const createdAt = new Date(ctime);
         const updatedAt = new Date(mtime);
 
-        console.log(`UpdateMetadataProcess: got metadata of ${filePath}`);
+        this.logger.log(`got metadata of ${filePath}`);
 
         const ret: ModelOmitEpisodeId = {
           path: filePath,
@@ -111,7 +113,7 @@ export class UpdateMetadataProcess {
     const fullFilePath = `${MEDIA_FOLDER}/${filePath}`;
 
     if (!existsSync(fullFilePath)) {
-      console.log("UpdateMetadataProcess: file '" + fullFilePath + "' not exists");
+      this.logger.log("file '" + fullFilePath + "' not exists");
 
       return null;
     }
@@ -138,7 +140,7 @@ export class UpdateMetadataProcess {
         const createdAt = new Date(ctime);
         const updatedAt = new Date(mtime);
 
-        console.log(`UpdateMetadataProcess: got metadata of ${filePath}`);
+        this.logger.log(`got metadata of ${filePath}`);
 
         const ret: ModelOmitEpisodeId = {
           path: filePath,
@@ -163,7 +165,7 @@ export class UpdateMetadataProcess {
 
         ret.hash = await md5FileAsync(fullFilePath);
 
-        console.log(`UpdateMetadataProcess: got hash of ${filePath}`);
+        this.logger.log(`got hash of ${filePath}`);
 
         return resolve(ret);
       } );
@@ -214,7 +216,7 @@ export class UpdateMetadataProcess {
   async process(options?: Options): Promise<ResultResponse<Data>> {
     const seriesTree: SerieFolderTree = await this.savedSerieTreeService.getRemoteSeriesTree();
 
-    console.log("UpdateMetadataProcess: got paths");
+    this.logger.log("got paths");
     const fileInfos: Entity[] = [];
     const errors: ErrorElementResponse[] = [];
 

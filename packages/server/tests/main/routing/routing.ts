@@ -1,5 +1,5 @@
 /* eslint-disable jest/no-export */
-import { RequestMethod } from "@nestjs/common";
+import { Logger, RequestMethod } from "@nestjs/common";
 import { routeModules } from "#main/routes";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { getRoutes, GotRoute } from "./get";
@@ -22,7 +22,7 @@ export function testRoute(url: string, options?: Options) {
     try {
       expect(matchingRoute).toBeDefined();
     } catch (e) {
-      console.log(routes);
+      new Logger().log(routes);
       throw e;
     }
   } );

@@ -1,18 +1,20 @@
+import { Logger } from "@nestjs/common";
 import { DomainEvent, Entity, EntityEvent, PatchEvent } from "#modules/domain-event-emitter";
 
 export function logDomainEvent(
   event: DomainEvent<unknown>,
 ) {
   const queueKey = event.type;
+  const logger = new Logger();
 
   if (isEntityEvent(event))
-    console.log(`[${queueKey}]`, event.type, event.payload.entity);
+    logger.log(`[${queueKey}]`, event.type, event.payload.entity);
   else if (isPatchEvent(event)) {
     const key = (event.payload.key as any).toString();
     const { value } = event.payload;
     const showedValue = typeof value === "string" ? `'${ value }'` : value;
 
-    console.log(`[${queueKey}]`, event.type, event.payload.entityId, `${key}:`, showedValue);
+    logger.log(`[${queueKey}]`, event.type, event.payload.entityId, `${key}:`, showedValue);
   } else
     throw new Error("Unknown event type: " + event.type);
 }

@@ -1,4 +1,4 @@
-import { INestApplication, RequestMethod } from "@nestjs/common";
+import { INestApplication, Logger, RequestMethod } from "@nestjs/common";
 import { Application } from "express";
 
 export type GotRoute = {
@@ -102,5 +102,5 @@ export function printRoutes(nestApp: INestApplication) {
   const expressApp = nestApp.getHttpAdapter().getInstance() as Application;
   const routes = getRoutes(expressApp);
 
-  console.log(routes);
+  nestApp.get(Logger).log(routes);
 }

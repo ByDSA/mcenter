@@ -1,11 +1,11 @@
 import type { CanGetAll } from "#utils/layers/controller";
 import { Request, Response } from "express";
 import { Body, Controller, Inject, Param } from "@nestjs/common";
-import { showError } from "$shared/utils/errors/showError";
 import { createZodDto } from "nestjs-zod";
 import { EpisodeHistoryEntryRestDtos } from "$shared/models/episodes/history/dto/transport";
 import z from "zod";
 import { DeleteOne, GetMany, GetManyCriteria } from "#utils/nestjs/rest";
+import { showError } from "#main/logging/show-error";
 import { EpisodeHistoryEntriesRepository } from "../repositories/repository";
 import { type EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 import { LastTimePlayedService } from "../last-time-played.service";
@@ -87,8 +87,8 @@ implements
     const { id } = params;
     const deleted = await this.entriesRepository.deleteOneByIdAndGet(id);
 
-    this.lastTimePlayedService
-      .updateEpisodeLastTimePlayedByCompKey(deleted.episodeCompKey).catch(showError);
+    this.lastTimePlayedService.updateEpisodeLastTimePlayedByCompKey(deleted.episodeCompKey)
+      .catch(showError);
 
     return deleted;
   }

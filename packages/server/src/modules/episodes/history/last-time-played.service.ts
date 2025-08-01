@@ -2,8 +2,8 @@
 import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { DateTime } from "luxon";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { showError } from "$shared/utils/errors/showError";
 import { EpisodesRepository } from "#episodes/repositories/repository";
+import { showError } from "#main/logging/show-error";
 import { EpisodeHistoryEntriesRepository } from "./repositories/repository";
 
 @Injectable()

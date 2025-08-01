@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from "@nestjs/common";
+import { Controller, Get, Logger, Param, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { assertZod } from "$shared/utils/validation/zod";
@@ -18,6 +18,8 @@ class QueryDto extends createZodDto(z.object( {
 
 @Controller("play/episode")
 export class PlaySerieController {
+  private readonly logger = new Logger(PlaySerieController.name);
+
   constructor(
     private readonly seriesRepo: SerieRepository,
     private readonly episodesRepo: EpisodesRepository,
@@ -63,7 +65,7 @@ export class PlaySerieController {
         streamId: stream.id,
       } );
     } else
-      console.log("PlayService: Could not play");
+      this.logger.log("Could not play");
 
     return episodeWithFileInfos;
   }

@@ -3,7 +3,6 @@ import { RouterModule } from "@nestjs/core";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { MusicsModule } from "#musics/module";
 import { MusicsHistoryModule } from "#musics/history/module";
-import { ActionsModule } from "#modules/actions/actions.module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { EpisodePickerModule } from "#modules/episode-picker/module";
@@ -11,6 +10,7 @@ import { StreamsModule } from "#modules/streams/module";
 import { PlayerModule } from "#modules/player/module";
 import { ConfigModule } from "#modules/config/config.module";
 import { StaticFilesModule } from "#modules/config/static-files.module";
+import { LoggingModule } from "./logging/module";
 
 export const routeModules = [
   // No hace falta poner todos los modules porque hay imports internos
@@ -19,7 +19,6 @@ export const routeModules = [
   ConfigModule,
   EpisodeFileInfosModule,
   MusicsHistoryModule,
-  ActionsModule,
   PlayerModule,
 
   /* Importante: el orden de las rutas aquí en el Register es irrelevante.
@@ -32,6 +31,10 @@ export const routeModules = [
     {
       path: "/config",
       module: ConfigModule,
+    },
+    {
+      path: PATH_ROUTES.logs.path,
+      module: LoggingModule,
     },
     {
       path: PATH_ROUTES.episodes.path,
@@ -64,10 +67,6 @@ export const routeModules = [
     {
       path: PATH_ROUTES.player.path,
       module: PlayerModule,
-    },
-    {
-      path: PATH_ROUTES.actions.path,
-      module: ActionsModule,
     },
   ]),
 ];

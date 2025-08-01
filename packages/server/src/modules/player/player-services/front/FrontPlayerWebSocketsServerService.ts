@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { Server as HttpServer } from "node:http";
 import { Server, Socket } from "socket.io";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { OnEvent } from "@nestjs/event-emitter";
 import { DomainEventEmitter } from "#modules/domain-event-emitter";
@@ -15,7 +15,13 @@ export class FrontWSServerService {
 
   #lastStatus: PlayerStatusResponse | undefined;
 
-  constructor(private readonly domainEventEmitter: DomainEventEmitter) {
+  private readonly playerLogger: Logger = new Logger("Player");
+
+  private readonly logger: Logger = new Logger("Player-Front");
+
+  constructor(
+    private readonly domainEventEmitter: DomainEventEmitter,
+  ) {
   }
 
   @OnEvent(PlayerEvents.WILDCARD)
@@ -24,9 +30,9 @@ export class FrontWSServerService {
       this.#emitStatus(event.payload.status);
       this.#lastStatus = event.payload.status;
     } else if (event.payload === null)
-      console.log("[PLAYER]", event.type);
+      this.playerLogger.log(event.type);
     else
-      console.log("[PLAYER]", `${event.type}: `, event.payload);
+      this.playerLogger.log(`${event.type}: `, event.payload);
   }
 
   startSocket(httpServer: HttpServer) {
@@ -40,16 +46,16 @@ export class FrontWSServerService {
       },
     } );
 
-    console.log("[PLAYER-FRONT] Servidor WebSocket iniciado!");
+    this.logger.log("Servidor WebSocket iniciado!");
 
     this.io.on(PlayerEventType.CONNECTION, (socket: Socket) => {
-      console.log("[PLAYER-FRONT] a user connected");
+      this.logger.log("a user connected");
 
       if (this.#lastStatus)
         this.#emitLastStatus();
 
       socket.on(PlayerEventType.DISCONNECT, () => {
-        console.log("[PLAYER-FRONT] user disconnected");
+        this.logger.log("user disconnected");
       } );
 
       socket.on(PlayerEventType.PAUSE_TOGGLE, () => {
@@ -92,7 +98,7 @@ export class FrontWSServerService {
       } );
 
       socket.on(PlayerEventType.FULLSCREEN_TOGGLE, () => {
-        console.log("[FRONT] fullscreen toggle");
+        this.logger.log("fullscreen toggle");
 
         this.domainEventEmitter.publish(
           PlayerEvents.Empty.create(PlayerEventType.FULLSCREEN_TOGGLE),

@@ -1,5 +1,6 @@
 import mongoose, { ConnectOptions } from "mongoose";
 import { assertIsDefined } from "$shared/utils/validation";
+import { Logger } from "@nestjs/common";
 
 export type Options = ConnectOptions;
 
@@ -12,88 +13,90 @@ export class Database {
 
   protected connection: mongoose.Connection | null = null;
 
-  constructor(options?: Options) {
-    this.#options = options ?? {};
+   private readonly logger = new Logger(Database.name);
 
-    this.#dbConnectionURL = "";
-    this.#connected = false;
-  }
+   constructor(options?: Options) {
+     this.#options = options ?? {};
 
-  #init() {
-    // mongoose options
-    this.#options = {
-      autoIndex: false,
-      maxPoolSize: 10,
-      bufferCommands: false, // Para que lance error si no hay una conexión a la DB
-      autoCreate: false, // disable `autoCreate` since `bufferCommands` is false, value)
-      ...this.#options,
-    };
+     this.#dbConnectionURL = "";
+     this.#connected = false;
+   }
 
-    this.#dbConnectionURL = this.generateUrl();
-  }
+   #init() {
+     // mongoose options
+     this.#options = {
+       autoIndex: false,
+       maxPoolSize: 10,
+       bufferCommands: false, // Para que lance error si no hay una conexión a la DB
+       autoCreate: false, // disable `autoCreate` since `bufferCommands` is false, value)
+       ...this.#options,
+     };
 
-  #assertConnected() {
-    if (!this.#connected)
-      throw new Error("MongoDatabase not connected");
-  }
+     this.#dbConnectionURL = this.generateUrl();
+   }
 
-  async connect() {
-    this.#init();
-    console.log(`Connecting to ${this.#dbConnectionURL} ...`);
-    mongoose.set("strictQuery", false);
-    const connectPromise = mongoose.connect(this.#dbConnectionURL, this.#options);
-    const { connection } = mongoose;
+   #assertConnected() {
+     if (!this.#connected)
+       throw new Error("MongoDatabase not connected");
+   }
 
-    connection.on(
-      "error",
-      console.error.bind(console, `Mongodb Connection Error: ${this.#dbConnectionURL}\n`),
-    );
-    connection.once("open", () => {
-      console.log("Mongodb Connection Successful!");
+   async connect() {
+     this.#init();
+     this.logger.log(`Connecting to ${this.#dbConnectionURL} ...`);
+     mongoose.set("strictQuery", false);
+     const connectPromise = mongoose.connect(this.#dbConnectionURL, this.#options);
+     const { connection } = mongoose;
 
-      this.#connected = true;
-    } );
-    connection.once("close", () => {
-      console.log("Mongodb Connection Closed!");
+     connection.on(
+       "error",
+       ()=>this.logger.error(`Mongodb Connection Error: ${this.#dbConnectionURL}\n`),
+     );
+     connection.once("open", () => {
+       this.logger.log("Mongodb Connection Successful!");
 
-      this.#connected = false;
-    } );
+       this.#connected = true;
+     } );
+     connection.once("close", () => {
+       this.logger.log("Mongodb Connection Closed!");
 
-    this.connection = connection;
+       this.#connected = false;
+     } );
 
-    await connectPromise;
-  }
+     this.connection = connection;
 
-  async disconnect() {
-    console.log("Disconnecting from mongodb ...");
-    this.#assertConnected();
-    await mongoose.disconnect();
-  }
+     await connectPromise;
+   }
 
-  protected generateUrl() {
-    // mongodb environment variables
-    const { MONGO_HOSTNAME,
-      MONGO_DB,
-      MONGO_PORT,
-      MONGO_USER,
-      MONGO_PASSWORD } = process.env;
+   async disconnect() {
+     this.logger.log("Disconnecting from mongodb ...");
+     this.#assertConnected();
+     await mongoose.disconnect();
+   }
 
-    assertIsDefined(MONGO_HOSTNAME);
+   protected generateUrl() {
+     // mongodb environment variables
+     const { MONGO_HOSTNAME,
+       MONGO_DB,
+       MONGO_PORT,
+       MONGO_USER,
+       MONGO_PASSWORD } = process.env;
 
-    const isLocal = (MONGO_PORT !== undefined || (MONGO_HOSTNAME === "localhost"
+     assertIsDefined(MONGO_HOSTNAME);
+
+     const isLocal = (MONGO_PORT !== undefined || (MONGO_HOSTNAME === "localhost"
       || MONGO_HOSTNAME === "127.0.0.1")) && !MONGO_HOSTNAME.includes("mongodb.net");
-    let ret = `${isLocal ? "mongodb" : "mongodb+srv"}://`;
+     let ret = `${isLocal ? "mongodb" : "mongodb+srv"}://`;
 
-    if (MONGO_USER && MONGO_PASSWORD)
-      ret += `${MONGO_USER}:${MONGO_PASSWORD}@`;
+     if (MONGO_USER && MONGO_PASSWORD)
+       ret += `${MONGO_USER}:${MONGO_PASSWORD}@`;
 
-    ret += MONGO_HOSTNAME;
+     ret += MONGO_HOSTNAME;
 
-    if (MONGO_PORT)
-      ret += `:${MONGO_PORT}`;
+     if (MONGO_PORT)
+       ret += `:${MONGO_PORT}`;
 
-    ret += `/${MONGO_DB}`;
+     ret += `/${MONGO_DB}`;
 
-    return ret;
-  }
+     return ret;
+   }
 }

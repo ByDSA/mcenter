@@ -1,5 +1,5 @@
 import { statSync } from "node:fs";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import z from "zod";
 import { MusicFileInfo, MusicFileInfoEntity, musicFileInfoEntitySchema } from "$shared/models/musics/file-info";
 import { musicEntitySchema } from "#musics/models";
@@ -30,6 +30,8 @@ export type UpdateResult = z.infer<typeof updateResultSchema>;
 
 @Injectable()
 export class UpdateRemoteTreeService {
+  private readonly logger = new Logger(UpdateRemoteTreeService.name);
+
   constructor(
     private readonly fileInfoRepo: MusicFileInfoRepository,
     private readonly musicRepo: MusicRepository,
@@ -59,7 +61,7 @@ export class UpdateRemoteTreeService {
           } );
         } )
         .catch((err) => {
-          console.error(err.message, localFileMusic);
+          this.logger.error(err.message, localFileMusic);
 
           throw err;
         } );
@@ -70,7 +72,7 @@ export class UpdateRemoteTreeService {
     for (const deletedMusic of changes.deleted) {
       const p = this.fileInfoRepo.deleteOneByPath(deletedMusic.path)
         .catch((err) => {
-          console.error(err.message, deletedMusic);
+          this.logger.error(err.message, deletedMusic);
 
           throw err;
         } );
@@ -85,7 +87,7 @@ export class UpdateRemoteTreeService {
       };
       const p = this.fileInfoRepo.upsertOneByPathAndGet(original.path, newFileInfo)
         .catch((err) => {
-          console.error(err.message, original, newFileInfo);
+          this.logger.error(err.message, original, newFileInfo);
 
           throw err;
         } );
@@ -113,7 +115,7 @@ export class UpdateRemoteTreeService {
           } );
         } )
         .catch((err: Error) => {
-          console.error(err.message, oldMusicFileInfo);
+          this.logger.error(err.message, oldMusicFileInfo);
 
           throw err;
         } );

@@ -1,6 +1,6 @@
 import { Server } from "node:http";
 import { HttpAdapterHost } from "@nestjs/core";
-import { ArgumentMetadata, INestApplication, Injectable, OnModuleInit, PipeTransform } from "@nestjs/common";
+import { ArgumentMetadata, INestApplication, Injectable, OnModuleInit, PipeTransform, Logger } from "@nestjs/common";
 import helmet from "helmet";
 import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ZodSerializerInterceptor, ZodValidationException, ZodValidationPipe } from "nestjs-zod";
@@ -11,9 +11,12 @@ import { RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } f
 import { ZodSerializerSchemaInterceptor } from "#utils/validation/zod-nestjs";
 import { setupEventEmitterDecorators } from "#modules/domain-event-emitter/get-event-emitter";
 import { Cleanup } from "./clean-up.service";
+import { LoggingInterceptor } from "./logging/interceptor";
 
 @Injectable()
 export class InitService implements OnModuleInit {
+  private readonly logger = new Logger(InitService.name);
+
   constructor(
     private readonly adapterHost: HttpAdapterHost,
     private readonly vlcBackWebSocketsServerService: VlcBackWebSocketsServerService,
@@ -26,7 +29,7 @@ export class InitService implements OnModuleInit {
     const httpServer: Server = httpAdapter.getHttpServer?.() || httpAdapter.getInstance?.();
 
     httpServer.on("listening", () => {
-      console.log("Listening server http!");
+      this.logger.log("Listening server http!");
       this.vlcBackWebSocketsServerService.startSocket(httpServer);
       this.remotePlayerWebSocketsServerService.startSocket(httpServer);
     } );
@@ -39,6 +42,10 @@ export class InitService implements OnModuleInit {
 export function addGlobalConfigToApp(app: INestApplication) {
   Cleanup.register(app);
 
+  const logger = app.get(Logger);
+
+  app.useLogger(logger);
+  app.useGlobalInterceptors(new LoggingInterceptor());
   app.use(helmet());
   app.enableShutdownHooks(); // Para que se llame onModuleDestroy de services
   app.useGlobalFilters(new GlobalExceptionFilter());

@@ -6,3 +6,5 @@
 .log
 *.m3u8
 coverage/
+/logs/
+/tests/logs/

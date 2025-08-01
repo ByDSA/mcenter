@@ -25,11 +25,8 @@ export const PATH_ROUTES = {
       withParams: (musicUrl: string) => `${MUSICS}/get/raw/${musicUrl}`,
     },
   },
-  actions: {
-    path: "/api/actions",
-    log: {
-      path: "/api/actions/log",
-    },
+  logs: {
+    path: "/api/logs",
   },
   episodes: {
     path: EPISODES,

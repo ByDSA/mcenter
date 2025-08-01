@@ -2,7 +2,7 @@ import "reflect-metadata";
 
 import { execSync } from "node:child_process";
 import { NestFactory } from "@nestjs/core";
-import { NextFunction } from "express";
+import { Logger, LoggerService } from "@nestjs/common";
 import { AppModule } from "#main/app.module";
 import { addGlobalConfigToApp } from "#main/init.service";
 
@@ -10,22 +10,11 @@ import { addGlobalConfigToApp } from "#main/init.service";
   const app = await NestFactory.create(AppModule);
 
   addGlobalConfigToApp(app);
-
+  const logger = app.get(Logger);
   const PORT: number = +(process.env.PORT ?? 8080);
 
   if (process.env.NODE_ENV === "development")
-    killProcessesUsingPort(PORT);
-
-  const requestLogger = (
-    request: Request,
-    _: Response,
-    next: NextFunction,
-  ) => {
-    console.log(`[${request.method}] ${request.url}`);
-    next();
-  };
-
-  app.use(requestLogger);
+    killProcessesUsingPort(PORT, logger);
 
   await app.listen(PORT);
 } )().catch((error) => {
@@ -33,7 +22,7 @@ import { addGlobalConfigToApp } from "#main/init.service";
   process.exit(1);
 } );
 
-function killProcessesUsingPort(port: number): void {
+function killProcessesUsingPort(port: number, logger: LoggerService): void {
   // Get all PIDs using the port in a single command
   const currentPid = process.pid.toString();
   const pids = execSync(`lsof -ti tcp:${port} || true`).toString()
@@ -44,8 +33,8 @@ function killProcessesUsingPort(port: number): void {
   if (pids.length === 0)
     return;
 
-  console.log("Current pid:", currentPid);
-  console.log("Killing processes using port", port + ":", pids);
+  logger.log("Current pid:", currentPid);
+  logger.log("Killing processes using port", port + ":", pids);
 
   // Kill all found PIDs
   execSync(`kill -9 ${pids.join(" ")}`);

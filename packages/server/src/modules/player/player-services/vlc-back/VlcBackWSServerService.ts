@@ -2,7 +2,7 @@
 import assert from "node:assert";
 import { Server as HttpServer } from "node:http";
 import { Server, Socket } from "socket.io";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { OnEvent } from "@nestjs/event-emitter";
 import { DomainEventEmitter } from "#modules/domain-event-emitter";
@@ -14,7 +14,11 @@ import { PlayerEvents } from "../events";
 export class VlcBackWSService {
   io: Server | undefined;
 
-  constructor(private readonly domainEventEmitter: DomainEventEmitter) { }
+  private readonly logger = new Logger("Player-VLC");
+
+  constructor(
+    private readonly domainEventEmitter: DomainEventEmitter,
+  ) { }
 
   @OnEvent(PlayerEvents.WILDCARD)
   async handleEvents(event: DomainEvent<unknown>) {
@@ -58,13 +62,13 @@ export class VlcBackWSService {
       },
     } );
 
-    console.log("[PLAYER-VLC] WebSocket iniciado!");
+    this.logger.log("WebSocket iniciado!");
 
     this.io.on(PlayerEvent.CONNECTION, (socket: Socket) => {
-      console.log("[PLAYER-VLC] a user connected");
+      this.logger.log("a user connected");
 
       socket.on(PlayerEvent.DISCONNECT, () => {
-        console.log("[PLAYER-VLC] user disconnected");
+        this.logger.log("user disconnected");
       } );
 
       socket.on(PlayerEvent.STATUS, (status) => {

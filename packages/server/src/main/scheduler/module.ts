@@ -1,11 +1,12 @@
-import { Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { Logger, Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { DateTime } from "luxon";
 import schedule from "node-schedule";
-import { showError } from "$shared/utils/errors/showError";
 import { dynamicLoadScriptFromEnvVar } from "../../DynamicLoad";
 
 @Module( {} )
 export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(SchedulerModule.name);
+
   onModuleInit() {
     schedule.scheduleJob("* * * * * *", async (dateArg: Date) => {
       const date = DateTime.fromJSDate(dateArg);
@@ -18,17 +19,20 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
       const calendar = calendarFunc();
       const scheduleFunc = await dynamicLoadScriptFromEnvVar("SCHEDULE_FILE");
 
+      this.logger.log("Checking schedule...");
       scheduleFunc(date, calendar);
     } );
 
-    console.log("Scheduler initialized!");
+    this.logger.log("Scheduler initialized!");
   }
 
   onModuleDestroy() {
     schedule.gracefulShutdown()
       .then(()=> {
-        console.log("Scheduler stopped!");
+        this.logger.log("Scheduler stopped!");
       } )
-      .catch(showError);
+      .catch(e=> {
+        this.logger.error(e);
+      } );
   }
 }

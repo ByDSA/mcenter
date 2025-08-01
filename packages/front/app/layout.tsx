@@ -6,7 +6,7 @@ export default function RootLayout( { children }: {
 } ) {
   const menu = makeMenu( {
     "/": "Inicio",
-    "/actions": "Actions",
+    "/admin": "Admin",
     "/series/history": "Series",
     "/music/history": "Música",
   } );

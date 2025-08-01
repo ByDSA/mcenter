@@ -1,5 +1,4 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { showError } from "$shared/utils/errors/showError";
 import { assertIsDefined } from "$shared/utils/validation";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { MusicRestDtos } from "$shared/models/musics/dto/transport";
@@ -12,6 +11,7 @@ import { DomainEventEmitter } from "#modules/domain-event-emitter";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { logDomainEvent } from "#modules/log";
 import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
+import { showError } from "#main/logging/show-error";
 import { fixUrl } from "../builder/fix-url";
 import { MusicBuilderService } from "../builder/music-builder.service";
 import { MusicHistoryEntryEvents } from "../history/repositories/events";

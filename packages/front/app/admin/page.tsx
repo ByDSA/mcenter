@@ -27,8 +27,8 @@ const ACTIONS: Action[] = [
     name: "Streams: fixer (ensure all series have default stream)",
   },
   {
-    path: PATH_ROUTES.actions.log.path,
-    name: "Log",
+    path: PATH_ROUTES.logs.path,
+    name: "Get logs",
   },
 ];
 
@@ -37,8 +37,6 @@ export default function Page() {
 
   return (
     <>
-      <h1>Actions</h1>
-
       <ul>
         {ACTIONS.map(( { path, name }: Action) => (
           <li key={path}><a onClick={()=>callAction( {
@@ -74,8 +72,23 @@ async function callAction( { useText, path }: ActionParams) {
     txt = responseText;
   }
   useText(txt);
+
+  // Text area con scroll bottom:
+  const tArea = document.querySelector("textarea");
+
+  setTimeout(()=>{
+    if (tArea)
+      tArea.scrollTop = tArea.scrollHeight;
+  }, 1);
 }
 
 function textArea(txt: string) {
-  return (<textarea className={styles.log} rows={20} cols={60} readOnly value={txt} />);
+  return (
+    <textarea className={styles.log} rows={20} style={{
+      width: "100%",
+      margin: "0.5em 1em",
+      overflowX: "auto",
+      whiteSpace: "nowrap",
+    }} readOnly value={txt} />
+  );
 }

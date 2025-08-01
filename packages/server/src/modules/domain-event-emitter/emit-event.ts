@@ -1,5 +1,6 @@
 /* eslint-disable func-names */
 import { isDefined } from "$shared/utils/validation";
+import { Logger } from "@nestjs/common";
 import { Entity, EntityEvent } from "./events";
 import { getEventEmitter } from "./get-event-emitter";
 
@@ -27,7 +28,7 @@ export function EmitEvent<TResult = unknown, TArgs extends readonly unknown[] = 
 
         eventEmitter.emit(eventType, eventData);
       } else {
-        console.warn(
+        new Logger().error(
           `⚠️ EventEmitter2 no encontrado en ${this.constructor.name} para evento: ${eventType}`,
         );
       }
@@ -90,7 +91,7 @@ export function EmitEntityEvent<T>(
           await eventEmitter.emitAsync(eventType, eventData);
         }
       } else {
-        console.warn(
+        new Logger().error(
           `⚠️ EventEmitter2 no encontrado en ${this.constructor.name} para evento: ${eventType}`,
         );
       }

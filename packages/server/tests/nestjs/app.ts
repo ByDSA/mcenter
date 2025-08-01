@@ -5,6 +5,8 @@ import { addGlobalConfigToApp, globalValidationProviders } from "#main/init.serv
 import { TestRealDatabase, TestMemoryDatabase } from "#tests/main";
 import { Database } from "#main/db/Database";
 import { DatabaseModule } from "#main/db/module";
+import { LoggingModule } from "#main/logging/module";
+import { GlobalErrorHandlerModule } from "#main/global-error-handler";
 
 export type TestingSetup = {
   app: INestApplication;
@@ -24,6 +26,8 @@ export async function createTestingAppModule(
   const moduleBuilder = Test.createTestingModule( {
     ...metadata,
     imports: [
+      LoggingModule.forRoot(),
+      GlobalErrorHandlerModule,
       ...(metadata.imports ?? []),
       ...(options?.db.using ? [DatabaseModule] : []),
     ],

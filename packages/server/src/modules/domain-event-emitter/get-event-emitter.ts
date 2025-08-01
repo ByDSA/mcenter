@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { ModuleRef } from "@nestjs/core";
+import { Logger } from "@nestjs/common";
 
 // Variable global para almacenar la referencia al ModuleRef
 let globalModuleRef: ModuleRef | null = null;
@@ -8,7 +9,6 @@ let globalModuleRef: ModuleRef | null = null;
 // Función para establecer el ModuleRef globalmente (llamar desde main.ts o app.module.ts)
 export function setGlobalModuleRef(moduleRef: ModuleRef) {
   globalModuleRef = moduleRef;
-  console.log("🔧 ModuleRef global establecido para EventEmitter fallback");
 }
 
 // Función para obtener EventEmitter2 desde el inyector de dependencias
@@ -20,8 +20,6 @@ function getEventEmitterFromDI(): EventEmitter2 | null {
     const eventEmitter = globalModuleRef.get(EventEmitter2, {
       strict: false,
     } );
-
-    console.log("🎯 EventEmitter2 obtenido desde el inyector de dependencias");
 
     return eventEmitter;
   } catch {
@@ -41,8 +39,6 @@ function getEventEmitterFromInstanceDI(instance: any): EventEmitter2 | null {
     const eventEmitter = moduleRef.get(EventEmitter2, {
       strict: false,
     } );
-
-    console.log("🎯 EventEmitter2 obtenido desde ModuleRef de la instancia");
 
     return eventEmitter;
   } catch {
@@ -69,11 +65,8 @@ path: string; }> = [{
     visited.add(obj);
 
     // Verificar si el objeto actual es un ModuleRef
-    if (obj && obj.constructor && obj.constructor.name === "ModuleRef") {
-      console.log(`🎯 ModuleRef encontrado en: ${path}`);
-
+    if (obj && obj.constructor && obj.constructor.name === "ModuleRef")
       return obj;
-    }
 
     if (!obj || typeof obj !== "object")
       continue;
@@ -139,7 +132,6 @@ path: string; }> = [{
 
     // Verificar si el objeto actual es un EventEmitter2
     if (obj && obj instanceof EventEmitter2) {
-      console.log(`🎯 EventEmitter2 encontrado en: ${path}`);
       eventEmitterCache.set(instance, obj);
 
       return obj;
@@ -211,7 +203,9 @@ export function getEventEmitter(instance: any): EventEmitter2 | null {
 
     return null;
   } catch (error) {
-    console.warn("Error durante la búsqueda del EventEmitter2:", error);
+    const logger = new Logger("GetEventEmitter");
+
+    logger.error("Error durante la búsqueda del EventEmitter2:", error);
 
     return null;
   }
@@ -219,6 +213,8 @@ export function getEventEmitter(instance: any): EventEmitter2 | null {
 
 // Nueva función para configurar fácilmente el ModuleRef global
 export function setupEventEmitterDecorators(app: any) {
+  const logger = new Logger("SetupEventEmitterDecorators");
+
   try {
     const moduleRef = app.get(ModuleRef);
 
@@ -232,12 +228,12 @@ export function setupEventEmitterDecorators(app: any) {
     if (eventEmitter)
       return true;
     else {
-      console.warn("⚠️ EventEmitter2 no está registrado en el contenedor de dependencias");
+      logger.warn("⚠️ EventEmitter2 no está registrado en el contenedor de dependencias");
 
       return false;
     }
   } catch (error) {
-    console.error("❌ Error configurando EventEmitter decorators:", error);
+    logger.error("❌ Error configurando EventEmitter decorators:", error);
 
     return false;
   }
