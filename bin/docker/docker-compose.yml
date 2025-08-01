@@ -18,6 +18,7 @@ services:
     restart: always
     volumes:
       - ${MCENTER_SERVER_MEDIA_PATH}:/home/node/media:ro
+      - ../../packages/server/logs:/packages/app/logs
       - ../../packages/server/.calendar.js:/packages/app/.calendar.js:ro
       - ../../packages/server/.schedule.js:/packages/app/.schedule.js:ro
       - ../../packages/server/.tag.js:/packages/app/.tag.js:ro

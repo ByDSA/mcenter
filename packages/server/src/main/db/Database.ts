@@ -2,10 +2,13 @@ import mongoose, { ConnectOptions } from "mongoose";
 import { assertIsDefined } from "$shared/utils/validation";
 import { Logger } from "@nestjs/common";
 
-export type Options = ConnectOptions;
+export type Options = {
+  silent?: boolean;
+  connectOptions?: ConnectOptions;
+};
 
 export class Database {
-  #options: ConnectOptions;
+  #options: Options;
 
   #dbConnectionURL: string;
 
@@ -16,7 +19,14 @@ export class Database {
    private readonly logger = new Logger(Database.name);
 
    constructor(options?: Options) {
-     this.#options = options ?? {};
+     this.#options = {
+       connectOptions: options?.connectOptions ?? {},
+     };
+
+     if (options?.silent) {
+       this.logger.log = ()=>undefined;
+       this.logger.error = ()=>undefined;
+     }
 
      this.#dbConnectionURL = "";
      this.#connected = false;
@@ -24,12 +34,12 @@ export class Database {
 
    #init() {
      // mongoose options
-     this.#options = {
+     this.#options.connectOptions = {
        autoIndex: false,
        maxPoolSize: 10,
        bufferCommands: false, // Para que lance error si no hay una conexión a la DB
        autoCreate: false, // disable `autoCreate` since `bufferCommands` is false, value)
-       ...this.#options,
+       ...this.#options.connectOptions,
      };
 
      this.#dbConnectionURL = this.generateUrl();
@@ -44,7 +54,7 @@ export class Database {
      this.#init();
      this.logger.log(`Connecting to ${this.#dbConnectionURL} ...`);
      mongoose.set("strictQuery", false);
-     const connectPromise = mongoose.connect(this.#dbConnectionURL, this.#options);
+     const connectPromise = mongoose.connect(this.#dbConnectionURL, this.#options.connectOptions);
      const { connection } = mongoose;
 
      connection.on(

@@ -7,7 +7,9 @@ import { Database } from "../../src/main/db/Database";
 
   // eslint-disable-next-line no-empty-function, no-console
   console.log = () => {};
-  const database = new Database();
+  const database = new Database({
+    silent: true,
+  });
 
   await database.connect();
 
