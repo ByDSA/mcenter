@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.24](https://github.com/ByDSA/mcenter/compare/v4.0.22...v4.0.24) (2025-08-01)
+
+
+### Bug Fixes
+
+* some deploy config ([09fa80f](https://github.com/ByDSA/mcenter/commit/09fa80f5f35de51541be5e3defc9f6f3a1a808af))
+* use winston logging and works get from frontend ([2809f56](https://github.com/ByDSA/mcenter/commit/2809f56e4e906381f48a82af1c99479084d04635))
+
 ### [4.0.23](https://github.com/ByDSA/mcenter/compare/v4.0.22...v4.0.23) (2025-08-01)
 
 
