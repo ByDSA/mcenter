@@ -8,7 +8,7 @@ import { assertFound } from "#utils/validation/found";
 import { CanCreateOne, CanCreateOneAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById } from "#utils/layers/repository";
 import { MusicHistoryEntry, MusicHistoryEntryEntity } from "#musics/history/models";
 import { DomainEvent } from "#modules/domain-event-emitter";
-import { logDomainEvent } from "#modules/log";
+import { logDomainEvent } from "#main/logging/log-domain-event";
 import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
 import { showError } from "#main/logging/show-error";
 import { MusicRepository } from "../../repositories/repository";

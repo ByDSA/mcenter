@@ -9,7 +9,7 @@ import { CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { MusicEntity, Music, MusicId } from "#musics/models";
 import { DomainEventEmitter } from "#modules/domain-event-emitter";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
-import { logDomainEvent } from "#modules/log";
+import { logDomainEvent } from "#main/logging/log-domain-event";
 import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
 import { showError } from "#main/logging/show-error";
 import { fixUrl } from "../builder/fix-url";

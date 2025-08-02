@@ -11,7 +11,7 @@ import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { StreamEntity } from "#modules/streams";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
-import { logDomainEvent } from "#modules/log";
+import { logDomainEvent } from "#main/logging/log-domain-event";
 import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
 import { EpisodeHistoryEntryOdm } from "./odm";
 import { EpisodeHistoryEntryEvents } from "./events";

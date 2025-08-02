@@ -6,7 +6,7 @@ import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { EpisodeCompKey } from "#episodes/models";
 import { assertFound } from "#utils/validation/found";
-import { logDomainEvent } from "#modules/log";
+import { logDomainEvent } from "#main/logging/log-domain-event";
 import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
 import { EpisodeDependencyOdm } from "./odm";
 import { EpisodeDependencyEvents } from "./events";

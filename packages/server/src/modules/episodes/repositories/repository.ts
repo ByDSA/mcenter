@@ -10,7 +10,7 @@ import { DomainEvent } from "#modules/domain-event-emitter";
 import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
-import { logDomainEvent } from "#modules/log";
+import { logDomainEvent } from "#main/logging/log-domain-event";
 import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
 import { EpisodeHistoryEntryEvents } from "../history/repositories/events";
 import { LastTimePlayedService } from "../history/last-time-played.service";

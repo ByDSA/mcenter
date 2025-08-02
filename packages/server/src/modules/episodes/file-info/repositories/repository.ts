@@ -8,7 +8,7 @@ import { DomainEvent, DomainEventEmitter } from "#modules/domain-event-emitter";
 import { EpisodeEntity } from "#episodes/models";
 import { assertFound } from "#utils/validation/found";
 import { MongoFilterQuery, patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
-import { logDomainEvent } from "#modules/log";
+import { logDomainEvent } from "#main/logging/log-domain-event";
 import { EpisodeFileInfoEvents } from "./events";
 import { EpisodeFileInfoOdm } from "./odm";
 

@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { assertIsSerieEntity, Serie, SeriesKey } from "$shared/models/series";
 import { StreamRestDtos } from "$shared/models/streams/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
-import { logDomainEvent } from "#modules/log";
+import { logDomainEvent } from "#main/logging/log-domain-event";
 import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
 import { DomainEvent } from "#modules/domain-event-emitter";
 import { SeriesEvents } from "#modules/series/repositories/events";

@@ -7,7 +7,7 @@ import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { DomainEvent, DomainEventEmitter } from "#modules/domain-event-emitter";
 import { getFullPath } from "#musics/utils";
 import { md5FileAsync } from "#utils/crypt";
-import { logDomainEvent } from "#modules/log";
+import { logDomainEvent } from "#main/logging/log-domain-event";
 import { MusicFileInfo, MusicFileInfoEntity } from "../models";
 import { MusicFileInfoOdm } from "./odm";
 import { MusicFileInfoEvents } from "./events";
