@@ -1,10 +1,10 @@
 import { SERIE_SIMPSONS } from "$sharedSrc/models/series/tests/fixtures";
-import { SeriesOdm } from "#modules/series/repositories/odm";
-import { EpisodeFileInfoOdm } from "#episodes/file-info/repositories/odm";
-import { EpisodeOdm } from "#episodes/repositories/odm";
+import { SeriesOdm } from "#modules/series/rest/repository/odm";
+import { EpisodeFileInfoOdm } from "#episodes/file-info/rest/repository/odm";
+import { EpisodeOdm } from "#episodes/rest/repository/odm";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
-import { EpisodeHistoryEntryOdm } from "#episodes/history/repositories/odm";
-import { StreamOdm } from "#modules/streams/repositories/odm";
+import { EpisodeHistoryEntryOdm } from "#episodes/history/rest/repository/odm";
+import { StreamOdm } from "#modules/streams/rest/repository/odm";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { HISTORY_ENTRIES_SIMPSONS } from "#episodes/history/tests";

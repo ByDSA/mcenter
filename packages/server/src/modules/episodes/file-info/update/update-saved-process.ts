@@ -10,7 +10,7 @@ import { EpisodeFile, EpisodeFileInfoRepository, SerieFolderTree } from "#episod
 import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { md5FileAsync } from "#utils/crypt";
 import { RemoteSeriesTreeService } from "../series-tree/remote";
-import { EpisodeOdm } from "../../repositories/odm";
+import { EpisodeOdm } from "../../rest/repository/odm";
 import { SerieNode } from "../series-tree/local/models";
 
 type Entity = EpisodeFileInfoEntity;

@@ -7,7 +7,7 @@ import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
-import { StreamsRepository } from "#modules/streams/repositories";
+import { StreamsRepository } from "#modules/streams/rest/repository";
 import { PlayService } from "./PlayService";
 import { PlaySerieController } from "./play-serie.controller";
 import { VlcBackWebSocketsServerService } from "./player-services";

@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
-import { EpisodeFileInfosRestController } from "./controllers/rest.controller";
-import { EpisodeFileInfoRepository } from "./repositories/repository";
 import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
+import { EpisodeFileInfosRestController } from "./rest/controller";
+import { EpisodeFileInfoRepository } from "./rest/repository/repository";
 
 @Module( {
   imports: [

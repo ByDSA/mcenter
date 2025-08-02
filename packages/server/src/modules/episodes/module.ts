@@ -1,8 +1,11 @@
 /* eslint-disable import/no-cycle */
 import { forwardRef, Module } from "@nestjs/common";
-import { EpisodesUpdateLastTimePlayedController } from "./controllers/episodes-update-lastTimePlayed.controller";
-import { EpisodesRestController } from "./controllers/rest.controller";
-import { EpisodesRepository } from "./repositories/repository";
+import { SeriesModule } from "#modules/series/module";
+import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
+import { SerieRepository } from "#modules/series/rest/repository";
+import { EpisodesUpdateLastTimePlayedController } from "./actions/episodes-update-lastTimePlayed.controller";
+import { EpisodesRestController } from "./rest/controller";
+import { EpisodesRepository } from "./rest/repository";
 import { UpdateMetadataProcess } from "./file-info/update/update-saved-process";
 import { RemoteSeriesTreeService } from "./file-info/series-tree/remote/service";
 import { EpisodeAddNewFilesController } from "./file-info/series-tree/add-new-files/controller";
@@ -11,9 +14,6 @@ import { EpisodeHistoryEntriesModule } from "./history/module";
 import { EpisodeFileInfosModule } from "./file-info/module";
 import { AddNewFilesRepository } from "./file-info/series-tree/add-new-files/repository";
 import { EpisodeDependenciesModule } from "./dependencies/module";
-import { SeriesModule } from "#modules/series/module";
-import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
-import { SerieRepository } from "#modules/series/repositories";
 
 @Module( {
   imports: [

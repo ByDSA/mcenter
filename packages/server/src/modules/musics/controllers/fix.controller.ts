@@ -1,7 +1,7 @@
 import { Controller, Param } from "@nestjs/common";
 import { musicSchema } from "$shared/models/musics/music";
 import { GetOne } from "#utils/nestjs/rest";
-import { MusicRepository } from "../repositories";
+import { MusicRepository } from "../rest/repository";
 
 const API = "/api";
 const CREATE = `${API}/create`;

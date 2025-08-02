@@ -1,10 +1,9 @@
-/* eslint-disable import/no-cycle */
 import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { DateTime } from "luxon";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { EpisodesRepository } from "#episodes/repositories/repository";
+import { EpisodesRepository } from "#episodes/rest/repository";
 import { showError } from "#main/logging/show-error";
-import { EpisodeHistoryEntriesRepository } from "./repositories/repository";
+import { EpisodeHistoryEntriesRepository } from "./rest/repository";
 
 @Injectable()
 export class LastTimePlayedService {

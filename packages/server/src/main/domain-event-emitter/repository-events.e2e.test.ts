@@ -5,8 +5,8 @@ import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
 import { DomainEventEmitter } from "#main/domain-event-emitter";
 import { EpisodesModule } from "#episodes/module";
-import { EpisodesRepository } from "#episodes/repositories";
-import { EpisodeEvents } from "#episodes/repositories/events";
+import { EpisodesRepository } from "#episodes/rest/repository";
+import { EpisodeEvents } from "#episodes/rest/repository/events";
 import { fixtureEpisodes } from "#episodes/tests";
 
 let episodeRepository: EpisodesRepository;

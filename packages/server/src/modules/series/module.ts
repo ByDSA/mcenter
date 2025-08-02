@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { SerieRepository } from "./repositories";
 import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
+import { SerieRepository } from "./rest/repository";
 
 @Module( {
   imports: [

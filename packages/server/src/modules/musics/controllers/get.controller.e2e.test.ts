@@ -1,11 +1,11 @@
 import { Application } from "express";
 import request from "supertest";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
-import { MusicHistoryRepository } from "../history";
-import { MusicRepository } from "../repositories";
+import { MusicHistoryRepository } from "../history/rest/repository";
+import { MusicRepository } from "../rest/repository";
 import { musicBuilderServiceMockProvicer } from "../builder/tests";
-import { MusicFileInfoRepository } from "../file-info/repositories/repository";
-import { MusicHistoryEntryOdm } from "../history/repositories/odm";
+import { MusicFileInfoRepository } from "../file-info/rest/repository";
+import { MusicHistoryEntryOdm } from "../history/rest/repository/odm";
 import { MusicGetController } from "./get.controller";
 import { RawHandlerService } from "./raw-handler.service";
 import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";

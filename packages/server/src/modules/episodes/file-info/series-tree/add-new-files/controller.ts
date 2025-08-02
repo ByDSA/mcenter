@@ -2,12 +2,12 @@ import { Controller, Get } from "@nestjs/common";
 import { safeOneConcurrent, safeSequential } from "$shared/utils/errors";
 import { ResultResponse } from "$shared/utils/http/responses";
 import { diffSerieTree as diffSeriesTree, EpisodeFileInfoRepository, OldNewSerieTree as OldNew } from "#episodes/file-info";
-import { SerieRepository } from "#modules/series/repositories";
+import { SerieRepository } from "#modules/series/rest/repository";
 import { SerieNode, SerieTree, EpisodeNode } from "#episodes/file-info/series-tree/local/models";
 import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { UpdateMetadataProcess } from "#episodes/file-info/update/update-saved-process";
 import { Serie } from "#modules/series";
-import { EpisodesRepository } from "../../../repositories";
+import { EpisodesRepository } from "../../../rest/repository";
 import { RemoteSeriesTreeService } from "../remote";
 import { AddNewFilesRepository } from "./repository";
 

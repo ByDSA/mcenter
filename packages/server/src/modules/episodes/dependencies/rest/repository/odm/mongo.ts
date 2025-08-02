@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
-import { EpisodeOdm } from "#episodes/repositories/odm";
+import { EpisodeOdm } from "#episodes/rest/repository/odm";
 import { OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
-import { EpisodeCompKeyOdm } from "#episodes/repositories/odm/odm";
 
 type DocOdm = OptionalId & {
-  lastCompKey: EpisodeCompKeyOdm;
-  nextCompKey: EpisodeCompKeyOdm;
+  lastCompKey: EpisodeOdm.EpisodeCompKey;
+  nextCompKey: EpisodeOdm.EpisodeCompKey;
 };
 
 type FullDocOdm = RequireId<DocOdm> & {
