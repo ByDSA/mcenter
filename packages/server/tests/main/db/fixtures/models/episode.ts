@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { EpisodeEntity } from "#episodes/models";
 import { deepFreeze } from "$shared/utils/objects";
 import { Types } from "mongoose";
@@ -26,6 +27,26 @@ const ep1x01: EpisodeEntity = {
     "navidad",
   ],
   timestamps,
+};
+const EP6x25: EpisodeEntity = {
+  id: new Types.ObjectId().toString(),
+  title: "Quién disparó al señor Burns (1ª parte)",
+  weight: 4,
+  timestamps,
+  compKey: {
+    episodeKey: "6x25",
+    seriesKey: "simpsons",
+  },
+};
+const EP7x01: EpisodeEntity = {
+  id: new Types.ObjectId().toString(),
+  title: "Quién disparó al señor Burns (2ª parte)",
+  weight: 4,
+  timestamps,
+  compKey: {
+    episodeKey: "7x01",
+    seriesKey: "simpsons",
+  },
 };
 // Episode entities
 const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
@@ -150,6 +171,8 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     weight: -6,
     timestamps,
   } satisfies EpisodeEntity,
+  EP6x25,
+  EP7x01,
 ]);
 
 export const fixtureEpisodes = {
@@ -157,6 +180,10 @@ export const fixtureEpisodes = {
     Samples: {
       EP1x01: ep1x01,
       EP1x02: EPISODES_SIMPSONS[1],
+      Dependency: {
+        last: EP6x25,
+        next: EP7x01,
+      },
     },
     List: EPISODES_SIMPSONS,
   },

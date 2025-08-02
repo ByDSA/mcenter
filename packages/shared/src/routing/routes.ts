@@ -1,3 +1,4 @@
+import { EpisodeCompKey } from "../models/episodes";
 import { PathRoutes } from "./routes.types";
 
 const MUSICS = "/api/musics";
@@ -8,6 +9,7 @@ const PLAYER_PLAY_STREAM = `${PLAYER}/play/stream`;
 const MUSICS_HISTORY = MUSICS + "/history";
 const EPISODES_HISTORY = EPISODES + "/history";
 const EPISODES_FILE_INFO = EPISODES + "/file-info";
+const EPISODES_DEPENDENCIES = EPISODES + "/dependencies";
 const EPISODES_ACTIONS = EPISODES + "/actions";
 
 export const PATH_ROUTES = {
@@ -33,6 +35,13 @@ export const PATH_ROUTES = {
     withParams: (seriesKey: string, episodeKey: string) => `${EPISODES}/${seriesKey}/${episodeKey}`,
     search: {
       path: "/api/episodes/search",
+    },
+    dependencies: {
+      path: EPISODES_DEPENDENCIES,
+      withParams: (
+        seriesKey: EpisodeCompKey["seriesKey"],
+        episodeKey: EpisodeCompKey["episodeKey"],
+      ) => `${EPISODES_DEPENDENCIES}/${seriesKey}/${episodeKey}`,
     },
     fileInfo: {
       path: EPISODES_FILE_INFO,

@@ -33,6 +33,7 @@
     "glob": "11.0.3",
     "helmet": "8.1.0",
     "jsdom": "26.1.0",
+    "just-clone": "^6.2.0",
     "luxon": "3.7.1",
     "mime-types": "3.0.1",
     "mongoose": "7.5.0",

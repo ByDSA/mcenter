@@ -13,6 +13,7 @@ import { EpisodesUpdateController } from "./file-info/update/controller";
 import { EpisodeHistoryEntriesModule } from "./history/module";
 import { EpisodeFileInfosModule } from "./file-info/module";
 import { AddNewFilesRepository } from "./file-info/series-tree/add-new-files/repository";
+import { EpisodeDependenciesModule } from "./dependencies/module";
 
 @Module( {
   imports: [
@@ -20,6 +21,7 @@ import { AddNewFilesRepository } from "./file-info/series-tree/add-new-files/rep
     SeriesModule,
     forwardRef(() => EpisodeHistoryEntriesModule),
     EpisodeFileInfosModule,
+    EpisodeDependenciesModule,
   ],
   controllers: [
     EpisodesUpdateLastTimePlayedController,

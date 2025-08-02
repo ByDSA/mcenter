@@ -20,6 +20,7 @@
   "devDependencies": {
     "@types/jest": "29.5.4",
     "@types/node": "22.14.1",
-    "jest": "workspace:../node_modules/jest"
+    "jest": "workspace:../node_modules/jest",
+    "mongodb": "6.18.0"
   }
 }

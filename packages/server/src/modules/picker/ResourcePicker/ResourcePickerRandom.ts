@@ -1,9 +1,11 @@
+import type { FilterApplier } from "./filters";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { Resource } from "#modules/resources/models";
+import { EpisodeFilterApplier } from "#modules/episode-picker/appliers/FilterApplier";
+import { EpisodeEntity } from "#episodes/models";
 import { ResourcePicker } from "./ResourcePicker";
-import { FilterApplier } from "./filters";
 import { WeightFixerApplier } from "./weight-fixers";
 
 type Params<R extends Resource> = {
@@ -21,12 +23,12 @@ export class ResourcePickerRandom<R extends Resource> implements ResourcePicker<
 
   async pick(n: number): Promise<R[]> {
     const ret: R[] = [];
-    let { lastOne: lastEp } = this.#params;
+    let { lastOne } = this.#params;
 
     for (let i = 0; i < n; i++) {
       const picker = await genRandomPickerWithData( {
         ...this.#params,
-        lastOne: lastEp,
+        lastOne,
       } );
       const resource: R | undefined = picker.pickOne();
 
@@ -34,7 +36,7 @@ export class ResourcePickerRandom<R extends Resource> implements ResourcePicker<
 
       if (i < n - 1) {
         resource.lastTimePlayed = Math.floor(DateTime.now().toSeconds());
-        lastEp = resource;
+        lastOne = resource;
       }
 
       ret.push(resource);
@@ -45,12 +47,23 @@ export class ResourcePickerRandom<R extends Resource> implements ResourcePicker<
 }
 
 export async function genRandomPickerWithData<R extends Resource>(
-  { resources, filterApplier, weightFixerApplier }: Params<R>,
+  { resources, lastOne, filterApplier, weightFixerApplier }: Params<R>,
 ): Promise<Picker<R>> {
   assertIsDefined(resources, "Undefined resources");
   assertIsNotEmpty(resources, "Empty resources");
 
-  const dataToAdd = await filterApplier.apply(resources);
+  let newFilterApplier = filterApplier;
+
+  if (filterApplier instanceof EpisodeFilterApplier) {
+    newFilterApplier = new EpisodeFilterApplier( {
+      dependencies: filterApplier.dependencies,
+      lastEp: lastOne as EpisodeEntity | undefined ?? null,
+      lastId: (lastOne as unknown as EpisodeEntity).compKey,
+      resources: resources as unknown as EpisodeEntity[],
+    } ) as unknown as FilterApplier<R>;
+  }
+
+  const dataToAdd = await newFilterApplier.apply(resources);
 
   // default case
   if (dataToAdd.length === 0)

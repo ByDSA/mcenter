@@ -1,3 +1,4 @@
+/* eslint-disable accessor-pairs */
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { Resource } from "#modules/resources/models";
 import { Episode, EpisodeCompKey, EpisodeEntity, compareEpisodeCompKey } from "../../episodes/models";
@@ -17,6 +18,14 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
     this.#params = params;
 
     this.#createFilters();
+  }
+
+  get resources() {
+    return this.#params.resources;
+  }
+
+  get dependencies() {
+    return this.#params.dependencies;
   }
 
   #addDependencyFilter(): boolean {
@@ -39,6 +48,7 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
           firstId: dependencyFullId[0],
           secondId: dependencyFullId[1],
           compareId: compareEpisodeCompKey,
+          getId: (e)=>e.compKey,
         } ));
 
         return true;
