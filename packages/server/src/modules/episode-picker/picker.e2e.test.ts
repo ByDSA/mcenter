@@ -1,7 +1,7 @@
 import request from "supertest";
 import { Application } from "express";
-import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { loadFixtureSimpsons } from "#main/db/tests/fixtures/sets";
+import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { EpisodePickerModule } from "./module";
 
 async function loadFixtures() {

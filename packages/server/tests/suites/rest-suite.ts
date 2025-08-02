@@ -1,6 +1,6 @@
 /* eslint-disable jest/no-export */
 import { Application } from "express";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { getOneTests } from "#tests/suites/get-one";
 import { patchOneTests, PatchTestsProps } from "#tests/suites/patch-one";
 import { getManyCriteriaTests } from "#tests/suites/get-many-criteria";

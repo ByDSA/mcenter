@@ -3,7 +3,7 @@ import { fixtureEpisodes } from "$sharedSrc/models/episodes/tests/fixtures";
 import { SERIE_SIMPSONS } from "$sharedSrc/models/series/tests/fixtures";
 import { expectEpisodes } from "$sharedSrc/models/episodes/tests";
 import { EpisodeOdm } from "#episodes/rest/repository/odm";
-import { createTestingAppModuleAndInit } from "#tests/nestjs/app";
+import { createTestingAppModuleAndInit } from "#main/app/tests/app";
 import { SeriesOdm } from "#series/rest/repository/odm";
 import { loadFixtureSimpsons } from "./sets";
 

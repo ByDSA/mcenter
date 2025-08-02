@@ -1,3 +1,3 @@
 export * from "./db";
 
-export * from "./app.module";
+export * from "./app/app.module";

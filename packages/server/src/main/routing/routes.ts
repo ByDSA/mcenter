@@ -11,7 +11,7 @@ import { PlayerModule } from "#modules/player/module";
 import { ConfigModule } from "#modules/config/config.module";
 import { StaticFilesModule } from "#modules/config/static-files.module";
 import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
-import { LoggingModule } from "./logging/module";
+import { LoggingModule } from "../logging/module";
 
 export const routeModules = [
   // No hace falta poner todos los modules porque hay imports internos

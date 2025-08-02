@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
 import { RouterModule } from "@nestjs/core";
+import { DevModule } from "../dev/module";
+import { DatabaseModule } from "../db/module";
+import { SchedulerModule } from "../scheduler/module";
+import { routeModules } from "../routing/routes";
+import { LoggingModule } from "../logging/module";
+import { GlobalErrorHandlerModule } from "../error-handlers/global-error-handler";
 import { globalValidationProviders, InitService } from "./init.service";
-import { DevModule } from "./dev/module";
-import { DatabaseModule } from "./db/module";
-import { SchedulerModule } from "./scheduler/module";
-import { routeModules } from "./routes";
-import { LoggingModule } from "./logging/module";
-import { GlobalErrorHandlerModule } from "./global-error-handler";
 
 const isDev = process.env.NODE_ENV === "development";
 

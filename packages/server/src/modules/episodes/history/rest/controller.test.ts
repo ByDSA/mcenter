@@ -2,7 +2,7 @@ import { Application } from "express";
 import request from "supertest";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
-import { createTestingAppModuleAndInit, type TestingSetup } from "#tests/nestjs/app";
+import { createTestingAppModuleAndInit, type TestingSetup } from "#main/app/tests/app";
 import { EpisodeHistoryEntriesRepository } from "../rest/repository";
 import { episodeHistoryEntriesRepositoryMockProvider, lastTimePlayedServiceMockProvider } from "../rest/repository/tests";
 import { EpisodeHistoryEntriesRestController } from "./controller";

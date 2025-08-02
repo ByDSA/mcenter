@@ -13,7 +13,7 @@ import { MusicGetController } from "./get.controller";
 import { RawHandlerService } from "./raw-handler.service";
 import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
 import { MusicId } from "#musics/models";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 

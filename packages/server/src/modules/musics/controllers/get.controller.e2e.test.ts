@@ -9,8 +9,8 @@ import { MusicHistoryEntryOdm } from "../history/rest/repository/odm";
 import { MusicGetController } from "./get.controller";
 import { RawHandlerService } from "./raw-handler.service";
 import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { loadFixtureMusicsInDisk } from "#tests/main/db/fixtures/sets";
+import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
+import { loadFixtureMusicsInDisk } from "#main/db/tests/fixtures/sets";
 import { MusicEntity, Music } from "#musics/models";
 
 let routerApp: Application;

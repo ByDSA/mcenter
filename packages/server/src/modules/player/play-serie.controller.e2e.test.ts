@@ -1,9 +1,9 @@
 import { Application } from "express";
 import request from "supertest";
 import { PATH_ROUTES } from "$shared/routing";
-import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
-import { testRoute } from "#tests/main/routing";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { loadFixtureSimpsons } from "#main/db/tests/fixtures/sets";
+import { testRoute } from "#main/routing/test";
+import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";

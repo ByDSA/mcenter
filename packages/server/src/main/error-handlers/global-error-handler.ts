@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnApplicationBootstrap } from "@nestjs/common";
 import { Module } from "@nestjs/common";
-import { genOutputStackError } from "./logging/interceptor";
+import { genOutputStackError } from "../logging/interceptor";
 
 @Injectable()
 export class GlobalErrorHandlerService implements OnApplicationBootstrap {

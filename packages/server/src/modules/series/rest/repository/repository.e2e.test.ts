@@ -3,7 +3,7 @@ import { type SerieEntity, assertIsSerieEntity } from "../../models";
 import { SerieRepository } from "./repository";
 import { StreamEntity, streamEntitySchema, StreamMode, StreamOriginType } from "#modules/streams/models";
 import { StreamsRepository } from "#modules/streams/rest/repository";
-import { createTestingAppModuleAndInit, type TestingSetup } from "#tests/nestjs/app";
+import { createTestingAppModuleAndInit, type TestingSetup } from "#main/app/tests/app";
 import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
 
 let repository: SerieRepository;

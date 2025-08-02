@@ -7,7 +7,7 @@ import { episodeRepositoryMockProvider } from "#episodes/rest/repository/tests";
 import { StreamEntity } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/rest/repository";
 import { streamsRepositoryMockProvider } from "#modules/streams/rest/repository/tests";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { episodeDependenciesRepositoryMockProvider } from "#episodes/dependencies/rest/repository/tests";
 import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";

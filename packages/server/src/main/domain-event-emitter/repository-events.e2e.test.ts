@@ -1,7 +1,7 @@
 import { Episode, EpisodeCompKey, EpisodeEntity } from "#episodes/models";
-import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
+import { loadFixtureSimpsons } from "#main/db/tests/fixtures/sets";
 import { EntityEvent } from "#main/domain-event-emitter";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
 import { DomainEventEmitter } from "#main/domain-event-emitter";
 import { EpisodesModule } from "#episodes/module";
