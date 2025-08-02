@@ -1,10 +1,10 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { restTestsSuite } from "#tests/suites/rest-suite";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
-import { testRoute } from "#main/routing/test";
 import { episodeFileInfoRepositoryMockProvider } from "./repository/tests";
 import { EpisodeFileInfoRepository } from "./repository";
 import { EpisodeFileInfosRestController } from "./controller";
+import { testRoute } from "#core/routing/test";
 
 testRoute(PATH_ROUTES.episodes.fileInfo.path);
 

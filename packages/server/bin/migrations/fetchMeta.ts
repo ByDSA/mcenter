@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Database } from "../../src/main/db/Database";
+import { Database } from "../../src/core/db/database";
 
 (async () => {
   // eslint-disable-next-line no-console

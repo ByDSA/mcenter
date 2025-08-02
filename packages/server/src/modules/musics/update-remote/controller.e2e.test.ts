@@ -12,8 +12,8 @@ import { musicFileInfoRepositoryMockProvider } from "../file-info/rest/repositor
 import { musicRepoMockProvider } from "../rest/repository/tests";
 import { MusicUpdateRemoteController } from "./controller";
 import { UpdateRemoteTreeService, UpdateResult } from "./service";
-import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
-import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 

@@ -1,13 +1,13 @@
 import { Episode, EpisodeCompKey, EpisodeEntity } from "#episodes/models";
-import { loadFixtureSimpsons } from "#main/db/tests/fixtures/sets";
-import { EntityEvent } from "#main/domain-event-emitter";
-import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
-import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
-import { DomainEventEmitter } from "#main/domain-event-emitter";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodesRepository } from "#episodes/rest/repository";
 import { EpisodeEvents } from "#episodes/rest/repository/events";
 import { fixtureEpisodes } from "#episodes/tests";
+import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
+import { EntityEvent } from "#core/domain-event-emitter";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { DomainEventEmitter } from "#core/domain-event-emitter";
 
 let episodeRepository: EpisodesRepository;
 let domainEventEmitter: DomainEventEmitter;

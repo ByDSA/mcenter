@@ -1,8 +1,8 @@
 /* eslint-disable jest/no-export */
 import { Logger, RequestMethod } from "@nestjs/common";
-import { routeModules } from "#main/routing/routes";
-import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { getRoutes, GotRoute } from "./get";
+import { routeModules } from "#core/routing/routes";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 let testingSetup: TestingSetup;
 let routes: GotRoute[];

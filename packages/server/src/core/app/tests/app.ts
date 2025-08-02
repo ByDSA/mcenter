@@ -1,12 +1,12 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, ModuleMetadata } from "@nestjs/common";
 import { Application } from "express";
-import { addGlobalConfigToApp, globalValidationProviders } from "#main/app/init.service";
-import { Database } from "#main/db/database";
-import { DatabaseModule } from "#main/db/module";
-import { LoggingModule } from "#main/logging/module";
-import { GlobalErrorHandlerModule } from "#main/error-handlers/global-error-handler";
-import { TestRealDatabase, TestMemoryDatabase } from "#main/db/tests";
+import { addGlobalConfigToApp, globalValidationProviders } from "#core/app/init.service";
+import { Database } from "#core/db/database";
+import { DatabaseModule } from "#core/db/module";
+import { LoggingModule } from "#core/logging/module";
+import { GlobalErrorHandlerModule } from "#core/error-handlers/global-error-handler";
+import { TestRealDatabase, TestMemoryDatabase } from "#core/db/tests";
 
 export type TestingSetup = {
   app: INestApplication;

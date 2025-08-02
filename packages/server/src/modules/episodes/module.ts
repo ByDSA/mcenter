@@ -1,7 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { forwardRef, Module } from "@nestjs/common";
 import { SeriesModule } from "#modules/series/module";
-import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
 import { SerieRepository } from "#modules/series/rest/repository";
 import { EpisodesUpdateLastTimePlayedController } from "./actions/episodes-update-lastTimePlayed.controller";
 import { EpisodesRestController } from "./rest/controller";
@@ -14,6 +13,7 @@ import { EpisodeHistoryEntriesModule } from "./history/module";
 import { EpisodeFileInfosModule } from "./file-info/module";
 import { AddNewFilesRepository } from "./file-info/series-tree/add-new-files/repository";
 import { EpisodeDependenciesModule } from "./dependencies/module";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 
 @Module( {
   imports: [

@@ -1,18 +1,18 @@
 import { Application } from "express";
 import request from "supertest";
 import { PATH_ROUTES } from "$shared/routing";
-import { loadFixtureSimpsons } from "#main/db/tests/fixtures/sets";
-import { testRoute } from "#main/routing/test";
-import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { StreamsRepository } from "#modules/streams/rest/repository";
+import { fixtureEpisodes } from "#episodes/tests";
 import { PlayService } from "./play.service";
 import { PlaySerieController } from "./play-serie.controller";
 import { VlcBackWebSocketsServerService } from "./player-services";
 import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests";
-import { fixtureEpisodes } from "#episodes/tests";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { testRoute } from "#core/routing/test";
+import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 
 testRoute(PATH_ROUTES.player.play.episode.withParams("seriesKey", "episodeKey"));
 

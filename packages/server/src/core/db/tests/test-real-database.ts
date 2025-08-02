@@ -1,6 +1,6 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { Logger } from "@nestjs/common";
-import { DatabaseOptions, Database } from "#main";
+import { DatabaseOptions, Database } from "#core";
 
 export class TestRealDatabase extends Database {
   constructor(options?: DatabaseOptions) {

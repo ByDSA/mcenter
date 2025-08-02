@@ -4,15 +4,15 @@ import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
-import { DomainEvent, DomainEventEmitter } from "#main/domain-event-emitter";
 import { getFullPath } from "#musics/utils";
 import { md5FileAsync } from "#utils/crypt";
-import { logDomainEvent } from "#main/logging/log-domain-event";
 import { MusicFileInfo, MusicFileInfoEntity } from "../../models";
 import { MusicFileInfoOdm } from "./odm";
 import { MusicFileInfoEvents } from "./events";
 import { partialModelToDocOdm } from "./odm/adapters";
 import { DocOdm } from "./odm/odm";
+import { logDomainEvent } from "#core/logging/log-domain-event";
+import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 
 type Entity = MusicFileInfoEntity;
 type Model = MusicFileInfo;

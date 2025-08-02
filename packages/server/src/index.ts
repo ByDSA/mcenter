@@ -3,8 +3,8 @@ import "reflect-metadata";
 import { execSync } from "node:child_process";
 import { NestFactory } from "@nestjs/core";
 import { Logger, LoggerService } from "@nestjs/common";
-import { AppModule } from "#main/app/app.module";
-import { addGlobalConfigToApp } from "#main/app/init.service";
+import { AppModule } from "#core/app/app.module";
+import { addGlobalConfigToApp } from "#core/app/init.service";
 
 (async function bootstrap() {
   const app = await NestFactory.create(AppModule);

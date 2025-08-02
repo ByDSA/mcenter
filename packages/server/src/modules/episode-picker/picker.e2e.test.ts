@@ -1,8 +1,8 @@
 import request from "supertest";
 import { Application } from "express";
-import { loadFixtureSimpsons } from "#main/db/tests/fixtures/sets";
-import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { EpisodePickerModule } from "./module";
+import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 async function loadFixtures() {
   await loadFixtureSimpsons();

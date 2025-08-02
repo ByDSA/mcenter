@@ -7,14 +7,14 @@ import { episodeRepositoryMockProvider } from "#episodes/rest/repository/tests";
 import { StreamEntity } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/rest/repository";
 import { streamsRepositoryMockProvider } from "#modules/streams/rest/repository/tests";
-import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { episodeDependenciesRepositoryMockProvider } from "#episodes/dependencies/rest/repository/tests";
 import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/rest/repository";
-import { EpisodePickerService } from "./service";
 import { fixtureEpisodes } from "#episodes/tests";
 import { HISTORY_ENTRY_SIMPSONS_6_25 } from "#episodes/history/tests";
+import { EpisodePickerService } from "./service";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 describe("tests", () => {
   let testingSetup: TestingSetup;

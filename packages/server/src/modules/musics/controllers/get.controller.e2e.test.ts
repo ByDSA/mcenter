@@ -1,6 +1,7 @@
 import { Application } from "express";
 import request from "supertest";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
+import { MusicEntity, Music } from "#musics/models";
 import { MusicHistoryRepository } from "../history/rest/repository";
 import { MusicRepository } from "../rest/repository";
 import { musicBuilderServiceMockProvicer } from "../builder/tests";
@@ -8,10 +9,9 @@ import { MusicFileInfoRepository } from "../file-info/rest/repository";
 import { MusicHistoryEntryOdm } from "../history/rest/repository/odm";
 import { MusicGetController } from "./get.controller";
 import { RawHandlerService } from "./raw-handler.service";
-import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
-import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
-import { loadFixtureMusicsInDisk } from "#main/db/tests/fixtures/sets";
-import { MusicEntity, Music } from "#musics/models";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;

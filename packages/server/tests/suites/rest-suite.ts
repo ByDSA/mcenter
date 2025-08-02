@@ -1,11 +1,11 @@
 /* eslint-disable jest/no-export */
 import { Application } from "express";
-import { createTestingAppModuleAndInit, TestingSetup } from "#main/app/tests/app";
 import { getOneTests } from "#tests/suites/get-one";
 import { patchOneTests, PatchTestsProps } from "#tests/suites/patch-one";
 import { getManyCriteriaTests } from "#tests/suites/get-many-criteria";
 import { getAllTests } from "#tests/suites/get-all";
 import { deleteOneTests } from "./delete-one";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 type OmitGetRepo<T> = T extends { repo: infer R }
   ? Omit<T, "repo"> & {

@@ -1,16 +1,16 @@
 import assert from "node:assert";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { DomainEventEmitter } from "#main/domain-event-emitter";
-import { logDomainEvent } from "#main/logging/log-domain-event";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
-import { DomainEvent } from "#main/domain-event-emitter";
-import { EmitEntityEvent } from "#main/domain-event-emitter/emit-event";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { Serie, SerieEntity, SeriesKey } from "../../models";
 import { FullDocOdm, ModelOdm } from "./odm/odm";
 import { SeriesOdm } from "./odm";
 import { SeriesEvents } from "./events";
+import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
+import { DomainEvent } from "#core/domain-event-emitter";
+import { logDomainEvent } from "#core/logging/log-domain-event";
+import { DomainEventEmitter } from "#core/domain-event-emitter";
 
 @Injectable()
 export class SerieRepository

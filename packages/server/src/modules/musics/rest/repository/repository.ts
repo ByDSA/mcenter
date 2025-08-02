@@ -4,14 +4,9 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { MusicRestDtos } from "$shared/models/musics/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { assertFound } from "#utils/validation/found";
-import { DomainEvent } from "#main/domain-event-emitter";
 import { CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { MusicEntity, Music, MusicId } from "#musics/models";
-import { DomainEventEmitter } from "#main/domain-event-emitter";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
-import { logDomainEvent } from "#main/logging/log-domain-event";
-import { EmitEntityEvent } from "#main/domain-event-emitter/emit-event";
-import { showError } from "#main/logging/show-error";
 import { MusicHistoryEntryEvents } from "../../history/rest/repository/events";
 import { MusicBuilderService } from "../../builder/music-builder.service";
 import { fixUrl } from "../../builder/fix-url";
@@ -19,6 +14,11 @@ import { ExpressionNode } from "./queries/query-object";
 import { findParamsToQueryParams } from "./queries/queries-odm";
 import { MusicEvents } from "./events";
 import { MusicOdm } from "./odm";
+import { showError } from "#core/logging/show-error";
+import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
+import { logDomainEvent } from "#core/logging/log-domain-event";
+import { DomainEventEmitter } from "#core/domain-event-emitter";
+import { DomainEvent } from "#core/domain-event-emitter";
 
 type CriteriaOne = MusicRestDtos.GetOne.Criteria;
 

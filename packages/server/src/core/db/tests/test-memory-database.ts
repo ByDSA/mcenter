@@ -1,6 +1,6 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { DatabaseOptions } from "#main";
 import { TestRealDatabase } from "./test-real-database";
+import { DatabaseOptions } from "#core";
 
 export class TestMemoryDatabase extends TestRealDatabase {
   #mongoServer!: MongoMemoryServer;

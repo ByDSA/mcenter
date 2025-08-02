@@ -15,9 +15,9 @@
     "noImplicitAny": true,
     "outDir": "build",
     "paths": {
+      "#core": ["src/core"],
+      "#core/*": ["src/core/*"],
       "#episodes/*": ["src/modules/episodes/*"],
-      "#main": ["src/main"],
-      "#main/*": ["src/main/*"],
       "#modules/*": ["src/modules/*"],
       "#musics/*": ["src/modules/musics/*"],
       "#series/*": ["src/modules/series/*"],

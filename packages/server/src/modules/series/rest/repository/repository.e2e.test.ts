@@ -1,10 +1,10 @@
 import { assertZod } from "$shared/utils/validation/zod";
-import { type SerieEntity, assertIsSerieEntity } from "../../models";
-import { SerieRepository } from "./repository";
 import { StreamEntity, streamEntitySchema, StreamMode, StreamOriginType } from "#modules/streams/models";
 import { StreamsRepository } from "#modules/streams/rest/repository";
-import { createTestingAppModuleAndInit, type TestingSetup } from "#main/app/tests/app";
-import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
+import { type SerieEntity, assertIsSerieEntity } from "../../models";
+import { SerieRepository } from "./repository";
+import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 
 let repository: SerieRepository;
 let streamRepository: StreamsRepository;

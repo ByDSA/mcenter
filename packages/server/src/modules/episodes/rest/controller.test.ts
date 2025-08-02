@@ -1,11 +1,11 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { serieRepositoryMockProvider } from "#series/rest/repository/tests";
 import { restTestsSuite } from "#tests/suites/rest-suite";
+import { fixtureEpisodes } from "#episodes/tests";
 import { EpisodesRepository } from "./repository";
-import { testRoute } from "#main/routing/test";
 import { episodeRepositoryMockProvider } from "./repository/tests";
 import { EpisodesRestController } from "./controller";
-import { fixtureEpisodes } from "#episodes/tests";
+import { testRoute } from "#core/routing/test";
 
 testRoute(PATH_ROUTES.episodes.withParams("seriesKey", "episodeKey"));
 

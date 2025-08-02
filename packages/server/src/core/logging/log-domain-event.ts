@@ -1,5 +1,5 @@
 import { Logger } from "@nestjs/common";
-import { DomainEvent, Entity, EntityEvent, PatchEvent } from "#main/domain-event-emitter";
+import { DomainEvent, Entity, EntityEvent, PatchEvent } from "#core/domain-event-emitter";
 
 export function logDomainEvent(
   event: DomainEvent<unknown>,

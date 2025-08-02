@@ -1,5 +1,5 @@
 import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
-import type { DomainEvent } from "#main/domain-event-emitter";
+import type { DomainEvent } from "#core/domain-event-emitter";
 import type { CanCreateOne, CanDeleteOneByIdAndGet } from "#utils/layers/repository";
 import type { EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity, EpisodeHistoryEntryEntity } from "../../models";
 import type { EpisodeHistoryEntryRestDtos } from "$shared/models/episodes/history/dto/transport";
@@ -11,11 +11,11 @@ import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { StreamEntity } from "#modules/streams";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
-import { logDomainEvent } from "#main/logging/log-domain-event";
-import { EmitEntityEvent } from "#main/domain-event-emitter/emit-event";
 import { getCriteriaPipeline } from "./criteria-pipeline";
 import { EpisodeHistoryEntryEvents } from "./events";
 import { EpisodeHistoryEntryOdm } from "./odm";
+import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
+import { logDomainEvent } from "#core/logging/log-domain-event";
 
 type FindLastProps = {
   seriesKey: SeriesKey;

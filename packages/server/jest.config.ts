@@ -12,7 +12,7 @@ const config = {
     "^#musics($|/.*)$": "<rootDir>/src/modules/musics/$1",
     "^#episodes($|/.*)$": "<rootDir>/src/modules/episodes/$1",
     "^#series($|/.*)$": "<rootDir>/src/modules/series/$1",
-    "^#main($|/.*)$": "<rootDir>/src/main/$1",
+    "^#core($|/.*)$": "<rootDir>/src/core/$1",
     "^#utils($|/.*)$": "<rootDir>/src/utils/$1",
   },
   setupFiles: ["./jest.setup.ts"],
