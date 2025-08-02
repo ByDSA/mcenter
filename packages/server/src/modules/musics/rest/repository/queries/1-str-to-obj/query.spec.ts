@@ -1,6 +1,6 @@
 /* eslint-disable jest/no-conditional-expect */
-import { IntersectionNode, TagNode, UnionNode, WeightNode, YearNode } from "../QueryObject";
-import { parseQuery } from "./QueryParser";
+import { IntersectionNode, TagNode, UnionNode, WeightNode, YearNode } from "../query-object";
+import { parseQuery } from "./query-parser";
 
 const YEAR_1999_OBJ = {
   root: {

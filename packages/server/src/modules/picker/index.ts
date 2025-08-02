@@ -1,1 +1,1 @@
-export * from "./ResourcePicker";
+export * from "./resource-picker";

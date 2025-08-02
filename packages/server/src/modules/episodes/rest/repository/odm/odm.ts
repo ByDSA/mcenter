@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
-import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
+import { timestampsSchemaOdm } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/rest/repository/odm";
 import { MongoFilterQuery, OptionalId, RequireId } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#modules/series/rest/repository/odm";

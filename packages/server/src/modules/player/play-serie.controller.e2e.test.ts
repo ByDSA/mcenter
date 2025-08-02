@@ -8,10 +8,10 @@ import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { StreamsRepository } from "#modules/streams/rest/repository";
-import { PlayService } from "./PlayService";
+import { PlayService } from "./play.service";
 import { PlaySerieController } from "./play-serie.controller";
 import { VlcBackWebSocketsServerService } from "./player-services";
-import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests/PlayerBackWebSocketsServiceMock";
+import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 
 testRoute(PATH_ROUTES.player.play.episode.withParams("seriesKey", "episodeKey"));

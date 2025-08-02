@@ -1,7 +1,7 @@
-export * from "./CanCreate";
+export * from "./can-create";
 
-export * from "./CanUpdate";
+export * from "./can-update";
 
-export * from "./CanGet";
+export * from "./can-get";
 
-export * from "./CanDelete";
+export * from "./can-delete";

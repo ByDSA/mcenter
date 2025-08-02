@@ -1,3 +1,3 @@
 export {
   VlcBackWSService as VlcBackWebSocketsServerService,
-} from "./VlcBackWSServerService";
+} from "./vlc-back-ws-server.service";

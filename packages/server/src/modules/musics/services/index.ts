@@ -1,1 +1,1 @@
-export * from "./MusicPicker";
+export * from "./music-picker";

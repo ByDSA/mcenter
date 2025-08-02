@@ -4,7 +4,7 @@ import { StreamRestDtos } from "$shared/models/streams/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { Stream, streamEntitySchema } from "#modules/streams/models";
 import { CanGetAll } from "#utils/layers/controller";
-import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/Get";
+import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/get";
 import { StreamsRepository } from "../rest/repository";
 
 const schema = streamEntitySchema;

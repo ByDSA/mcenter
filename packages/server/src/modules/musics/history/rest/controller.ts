@@ -4,7 +4,7 @@ import { createZodDto } from "nestjs-zod";
 import { MusicHistoryEntryRestDtos } from "$shared/models/musics/history/dto/transport";
 import { CanGetAll } from "#utils/layers/controller";
 import { DeleteOne } from "#utils/nestjs/rest";
-import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/Get";
+import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/get";
 import { musicHistoryEntryEntitySchema } from "../models";
 import { MusicHistoryRepository } from "./repository";
 

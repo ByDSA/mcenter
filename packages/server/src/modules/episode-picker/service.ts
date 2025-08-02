@@ -3,13 +3,13 @@ import type { EpisodeEntity } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined, neverCase } from "$shared/utils/validation";
 import { EpisodesRepository } from "#episodes/rest/repository";
-import { PickMode } from "#modules/picker/ResourcePicker/PickMode";
+import { PickMode } from "#modules/picker/resource-picker/pick-mode";
 import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/rest/repository";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/rest/repository";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/rest/repository";
-import { buildEpisodePicker } from "./EpisodePicker";
-import { DependenciesList, dependenciesToList } from "./appliers/Dependencies";
+import { buildEpisodePicker } from "./episode-picker";
+import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
 
 @Injectable()
 export class EpisodePickerService {

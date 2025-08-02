@@ -1,7 +1,7 @@
 import mongoose, { UpdateQuery } from "mongoose";
 import { throwErrorPopStack } from "$shared/utils/errors";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
-import { DatabaseNotConnectedError } from "../NotConnectedError";
+import { DatabaseNotConnectedError } from "../not-connected-error";
 
 export function assertConnected() {
   if (!mongoose.connection.readyState)

@@ -8,7 +8,7 @@ import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../files";
 import { MusicRepository } from "../rest/repository";
 import { getFullPath } from "../utils";
-import { ChangesDetector, FileWithStats } from "./ChangesDetector";
+import { ChangesDetector, FileWithStats } from "./changes-detector";
 
 export const updateResultSchema = z.object( {
   new: z.array(z.object( {

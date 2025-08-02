@@ -1,9 +1,9 @@
 export {
   EpisodeWeightFixerApplier,
   genEpisodeWeightFixerApplier,
-} from "./WeightFixerApplier";
+} from "./weight-fixer-applier";
 
 export {
   EpisodeFilterApplier,
   genEpisodeFilterApplier,
-} from "./FilterApplier";
+} from "./filter-applier";

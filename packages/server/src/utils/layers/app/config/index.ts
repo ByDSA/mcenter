@@ -4,4 +4,4 @@ export {
 
 export {
   GlobalConfig,
-} from "./GlobalConfig";
+} from "./global-config";

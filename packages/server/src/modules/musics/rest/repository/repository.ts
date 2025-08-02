@@ -15,8 +15,8 @@ import { showError } from "#main/logging/show-error";
 import { MusicHistoryEntryEvents } from "../../history/rest/repository/events";
 import { MusicBuilderService } from "../../builder/music-builder.service";
 import { fixUrl } from "../../builder/fix-url";
-import { ExpressionNode } from "./queries/QueryObject";
-import { findParamsToQueryParams } from "./queries/QueriesOdm";
+import { ExpressionNode } from "./queries/query-object";
+import { findParamsToQueryParams } from "./queries/queries-odm";
 import { MusicEvents } from "./events";
 import { MusicOdm } from "./odm";
 

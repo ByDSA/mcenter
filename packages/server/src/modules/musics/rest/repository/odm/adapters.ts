@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { assertIsMusicEntity, MusicEntity } from "$shared/models/musics";
 import { AllKeysOf } from "$shared/utils/types";
 import { MusicFileInfoOdm } from "#musics/file-info/rest/repository/odm";
-import { timestampsModelToDocOdm } from "#modules/resources/odm/Timestamps";
+import { timestampsModelToDocOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 

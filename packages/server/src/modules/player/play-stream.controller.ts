@@ -9,7 +9,7 @@ import { EpisodeHistoryEntriesRepository } from "#episodes/history/rest/reposito
 import { episodeEntityWithFileInfosSchema } from "#episodes/models";
 import { EpisodeEntityWithFileInfos } from "#episodes/file-info/series-tree/remote/service";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
-import { PlayService } from "./PlayService";
+import { PlayService } from "./play.service";
 import { episodeWithFileInfosToMediaElement } from "./player-services/models";
 
 class ParamsDto extends createZodDto(z.object( {

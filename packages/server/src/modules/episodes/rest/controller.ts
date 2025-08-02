@@ -2,7 +2,7 @@ import { Body, Controller, Param } from "@nestjs/common";
 import { EpisodesRestDtos } from "$shared/models/episodes/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
-import { GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest/Get";
+import { GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest/get";
 import { PatchOne } from "#utils/nestjs/rest";
 import { assertFound } from "#utils/validation/found";
 import { EpisodesRepository } from "./repository";

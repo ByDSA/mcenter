@@ -4,4 +4,4 @@ export {
 
 export {
   DatabaseNotConnectedError,
-} from "./NotConnectedError";
+} from "./not-connected-error";

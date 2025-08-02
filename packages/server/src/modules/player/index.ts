@@ -8,7 +8,7 @@ export {
 
 export {
   PlayService,
-} from "./PlayService";
+} from "./play.service";
 
 export {
   FrontWebSocketsServerService as RemotePlayerWebSocketsServerService,

@@ -1,7 +1,7 @@
 import { Logger, Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { DateTime } from "luxon";
 import schedule from "node-schedule";
-import { dynamicLoadScriptFromEnvVar } from "../../DynamicLoad";
+import { dynamicLoadScriptFromEnvVar } from "../../dynamic-load";
 
 @Module( {} )
 export class SchedulerModule implements OnModuleInit, OnModuleDestroy {

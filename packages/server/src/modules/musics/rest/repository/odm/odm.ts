@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
+import { timestampsSchemaOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "#musics/models";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/rest/repository/odm";

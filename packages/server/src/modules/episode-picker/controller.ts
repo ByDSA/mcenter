@@ -12,9 +12,9 @@ import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/rest/repository";
 import { getSeriesKeyFromStream } from "#modules/streams";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/rest/repository";
-import { genRandomPickerWithData } from "#modules/picker/ResourcePicker/ResourcePickerRandom";
+import { genRandomPickerWithData } from "#modules/picker/resource-picker/resource-picker-random";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
-import { dependenciesToList } from "./appliers/Dependencies";
+import { dependenciesToList } from "./appliers/dependencies";
 
 class ShowPickerParamsDto extends createZodDto(z.object( {
   streamKey: z.string(),

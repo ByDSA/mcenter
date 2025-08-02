@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
-import { timestampsDocOdmToModel } from "#modules/resources/odm/Timestamps";
+import { timestampsDocOdmToModel } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/rest/repository/odm";
 import { SeriesOdm } from "#modules/series/rest/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";

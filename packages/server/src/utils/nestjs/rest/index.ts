@@ -1,11 +1,11 @@
 import { applyDecorators, Delete } from "@nestjs/common";
 import z from "zod";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
-import { getCommonCommandDecorators } from "./Patch";
+import { getCommonCommandDecorators } from "./patch";
 
-export * from "./Get";
+export * from "./get";
 
-export * from "./Patch";
+export * from "./patch";
 
 export function DeleteOne(url: string, dataSchema?: z.ZodSchema) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [

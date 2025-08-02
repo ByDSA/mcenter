@@ -3,7 +3,7 @@ import { INestApplication, ModuleMetadata } from "@nestjs/common";
 import { Application } from "express";
 import { addGlobalConfigToApp, globalValidationProviders } from "#main/init.service";
 import { TestRealDatabase, TestMemoryDatabase } from "#tests/main";
-import { Database } from "#main/db/Database";
+import { Database } from "#main/db/database";
 import { DatabaseModule } from "#main/db/module";
 import { LoggingModule } from "#main/logging/module";
 import { GlobalErrorHandlerModule } from "#main/global-error-handler";

@@ -5,7 +5,7 @@ import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { MusicRepository } from "../rest/repository";
 import { musicRepoMockProvider } from "../rest/repository/tests";
-import { musicHistoryRepoMockProvider } from "../history/rest/repository/tests/RepositoryMock";
+import { musicHistoryRepoMockProvider } from "../history/rest/repository/tests";
 import { MusicFileInfoRepository } from "../file-info/rest/repository";
 import { musicFileInfoRepositoryMockProvider } from "../file-info/rest/repository/tests";
 import { MusicFixController } from "./fix.controller";

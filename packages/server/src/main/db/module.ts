@@ -1,5 +1,5 @@
 import { Module, Global, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
-import { Database } from "./Database";
+import { Database } from "./database";
 
 @Global()
 @Module( {
