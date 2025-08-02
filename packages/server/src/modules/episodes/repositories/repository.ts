@@ -1,23 +1,22 @@
-/* eslint-disable import/no-cycle */
 import assert from "node:assert";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesRestDtos } from "$shared/models/episodes/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
-import { DomainEventEmitter } from "#modules/domain-event-emitter";
-import { CanCreateManyAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
-import { DomainEvent } from "#modules/domain-event-emitter";
-import { assertFound } from "#utils/validation/found";
-import { SeriesKey } from "#modules/series";
-import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
-import { logDomainEvent } from "#main/logging/log-domain-event";
-import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
 import { EpisodeHistoryEntryEvents } from "../history/repositories/events";
 import { LastTimePlayedService } from "../history/last-time-played.service";
 import { Episode, EpisodeCompKey, EpisodeEntity } from "../models";
 import { EpisodeEvents } from "./events";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { EpisodeOdm } from "./odm";
+import { DomainEventEmitter } from "#main/domain-event-emitter";
+import { CanCreateManyAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { DomainEvent } from "#main/domain-event-emitter";
+import { assertFound } from "#utils/validation/found";
+import { SeriesKey } from "#modules/series";
+import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
+import { logDomainEvent } from "#main/logging/log-domain-event";
+import { EmitEntityEvent } from "#main/domain-event-emitter/emit-event";
 
 type CreateOneDto = Omit<Episode, "timestamps">;
 type EpisodeId = EpisodeEntity["id"];

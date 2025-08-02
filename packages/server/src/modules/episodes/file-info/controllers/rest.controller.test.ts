@@ -1,6 +1,6 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { restTestsSuite } from "#tests/suites/rest-suite";
-import { fixtureEpisodeFileInfos } from "#tests/main/db/fixtures";
+import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { testRoute } from "#tests/main/routing";
 import { episodeFileInfoRepositoryMockProvider } from "../repositories/tests";
 import { EpisodeFileInfoRepository } from "../repositories";

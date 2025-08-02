@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { fixtureMusics } from "#musics/tests/fixtures";
+import { fixtureMusics } from "#musics/tests";
 import { MusicEntity } from "../../models";
 import { musicDocOdmToEntity, musicEntityToDocOdm } from "./adapters";
 import { DocOdm, FullDocOdm } from "./odm";

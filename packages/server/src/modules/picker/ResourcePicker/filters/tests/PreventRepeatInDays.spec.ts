@@ -1,9 +1,9 @@
 import { SECONDS_IN_DAY } from "#modules/resources";
 import { Resource } from "#modules/resources/models";
 import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
-import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { useFakeTime } from "#tests/time";
 import { PreventRepeatInDaysFilter } from "../PreventRepeatInDaysFilter";
+import { fixtureEpisodes } from "#episodes/tests";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 

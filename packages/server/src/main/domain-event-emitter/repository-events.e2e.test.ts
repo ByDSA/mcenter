@@ -1,13 +1,13 @@
 import { Episode, EpisodeCompKey, EpisodeEntity } from "#episodes/models";
-import { fixtureEpisodes } from "#tests/main/db/fixtures/models";
 import { loadFixtureSimpsons } from "#tests/main/db/fixtures/sets";
-import { EntityEvent } from "#modules/domain-event-emitter";
+import { EntityEvent } from "#main/domain-event-emitter";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
-import { DomainEventEmitter } from "#modules/domain-event-emitter";
+import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
+import { DomainEventEmitter } from "#main/domain-event-emitter";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodesRepository } from "#episodes/repositories";
 import { EpisodeEvents } from "#episodes/repositories/events";
+import { fixtureEpisodes } from "#episodes/tests";
 
 let episodeRepository: EpisodesRepository;
 let domainEventEmitter: DomainEventEmitter;

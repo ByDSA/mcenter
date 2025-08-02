@@ -7,12 +7,12 @@ import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
-import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { PlayService } from "./PlayService";
 import { PlaySerieController } from "./play-serie.controller";
 import { VlcBackWebSocketsServerService } from "./player-services";
 import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests/PlayerBackWebSocketsServiceMock";
+import { fixtureEpisodes } from "#episodes/tests";
 
 testRoute(PATH_ROUTES.player.play.episode.withParams("seriesKey", "episodeKey"));
 

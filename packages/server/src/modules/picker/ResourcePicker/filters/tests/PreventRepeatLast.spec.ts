@@ -1,8 +1,7 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { compareEpisodeCompKey, Episode, EpisodeCompKey, EpisodeEntity } from "$shared/models/episodes/episode";
-import { stringifyEpisodeCompKey } from "#episodes/tests";
-import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { PreventRepeatLastFilter } from "../PreventRepeatLastFilter";
+import { stringifyEpisodeCompKey, fixtureEpisodes } from "$sharedSrc/models/episodes/tests";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 const DEFAULT_EPISODE = EPISODES_SIMPSONS[0];

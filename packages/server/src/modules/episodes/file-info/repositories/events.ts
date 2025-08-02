@@ -1,5 +1,5 @@
-import { PatchEvent } from "#modules/domain-event-emitter";
 import { EpisodeFileInfoEntity } from "../models";
+import { PatchEvent } from "#main/domain-event-emitter";
 
 export namespace EpisodeFileInfoEvents {
   const MAIN_TYPE = "episodeFileInfos";

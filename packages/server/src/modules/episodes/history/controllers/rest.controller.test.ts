@@ -2,11 +2,11 @@ import { Application } from "express";
 import request from "supertest";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
-import { HISTORY_ENTRY_SIMPSONS1 } from "#tests/main/db/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#tests/nestjs/app";
 import { EpisodeHistoryEntriesRepository } from "../repositories";
 import { episodeHistoryEntriesRepositoryMockProvider, lastTimePlayedServiceMockProvider } from "../repositories/tests";
 import { EpisodeHistoryEntriesRestController } from "./rest.controller";
+import { HISTORY_ENTRY_SIMPSONS1 } from "#episodes/history/tests";
 
 describe("restController", () => {
   let routerApp: Application;

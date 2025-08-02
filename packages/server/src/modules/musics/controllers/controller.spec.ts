@@ -1,19 +1,19 @@
 import request from "supertest";
 import { INestApplication } from "@nestjs/common";
 import { Application } from "express";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { MusicId } from "#musics/models";
-import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
+import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
+import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { MusicRepository } from "../repositories";
 import { musicRepoMockProvider } from "../repositories/tests";
 import { musicHistoryRepoMockProvider } from "../history/repositories/tests/RepositoryMock";
-import { fixtureMusics } from "../tests/fixtures";
-import { fixtureMusicFileInfos } from "../file-info/tests/fixtures";
 import { MusicFileInfoRepository } from "../file-info/repositories/repository";
 import { musicFileInfoRepositoryMockProvider } from "../file-info/repositories/tests";
 import { MusicFixController } from "./fix.controller";
 import { MusicGetController } from "./get.controller";
 import { RawHandlerService } from "./raw-handler.service";
+import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
+import { MusicId } from "#musics/models";
+import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 

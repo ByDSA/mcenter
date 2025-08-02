@@ -1,7 +1,7 @@
-import { deepFreeze } from "$shared/utils/objects";
-import { MusicEntity } from "$shared/models/musics/music";
-import { Types } from "mongoose";
-import { DATEJS_SAMPLE1 } from "#tests/main/db/fixtures/models/dates";
+import { ObjectId } from "mongodb";
+import { deepFreeze } from "../../../utils/objects";
+import { MusicEntity } from "../music";
+import { DATEJS_SAMPLE1 } from "../../../../tests/other-fixtures/dates";
 
 const AOT4_COMMON = {
   artist: "artist",
@@ -14,7 +14,7 @@ const AOT4_COMMON = {
 };
 
 export const A_AOT4: MusicEntity = {
-  id: new Types.ObjectId().toString(),
+  id: new ObjectId().toString(),
   title: "undefined",
   url: "a_aot4",
   tags: ["t1", "only-t2"],
@@ -23,7 +23,7 @@ export const A_AOT4: MusicEntity = {
 
 const AOT4_COPY: MusicEntity = {
   ...AOT4_COMMON,
-  id: new Types.ObjectId().toString(),
+  id: new ObjectId().toString(),
   title: "aot4_copy",
   url: "aot4_copy",
   tags: ["t1", "t3"],
@@ -32,13 +32,13 @@ const DK: MusicEntity = {
   ...AOT4_COMMON,
   weight: 50,
   url: "dk",
-  id: new Types.ObjectId().toString(),
+  id: new ObjectId().toString(),
   title: "DK",
   tags: ["t1"],
 };
 const DRIFTVEIL: MusicEntity = {
   ...AOT4_COMMON,
-  id: new Types.ObjectId().toString(),
+  id: new ObjectId().toString(),
   url: "driftveil",
   weight: -5,
   artist: "artist",

@@ -1,17 +1,17 @@
 import { Application } from "express";
 import request from "supertest";
-import { MusicEntity, Music } from "#musics/models";
-import { loadFixtureMusicsInDisk } from "#tests/main/db/fixtures/sets";
-import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
-import { DomainEventEmitterModule } from "#modules/domain-event-emitter/module";
+import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { MusicHistoryRepository } from "../history";
 import { MusicRepository } from "../repositories";
-import { fixtureMusics } from "../tests/fixtures";
 import { musicBuilderServiceMockProvicer } from "../builder/tests";
 import { MusicFileInfoRepository } from "../file-info/repositories/repository";
 import { MusicHistoryEntryOdm } from "../history/repositories/odm";
 import { MusicGetController } from "./get.controller";
 import { RawHandlerService } from "./raw-handler.service";
+import { DomainEventEmitterModule } from "#main/domain-event-emitter/module";
+import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
+import { loadFixtureMusicsInDisk } from "#tests/main/db/fixtures/sets";
+import { MusicEntity, Music } from "#musics/models";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;

@@ -271,6 +271,9 @@ importers:
       $sharedSrc:
         specifier: workspace:../shared/src
         version: link:../shared/src
+      $sharedTests:
+        specifier: workspace:../shared/tests
+        version: link:../shared/tests
       '@chevrotain/types':
         specifier: 11.0.3
         version: 11.0.3

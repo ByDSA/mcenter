@@ -1,6 +1,6 @@
 import { Episode, EpisodeEntity, compareEpisodeCompKey } from "#episodes/models";
-import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { ResourcePickerSequential } from "./ResourcePickerSequential";
+import { fixtureEpisodes } from "#episodes/tests";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 

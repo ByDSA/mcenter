@@ -5,10 +5,10 @@ import { Server, Socket } from "socket.io";
 import { Injectable, Logger } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { OnEvent } from "@nestjs/event-emitter";
-import { DomainEventEmitter } from "#modules/domain-event-emitter";
-import { PlayerEvent, PlayResourceMessage } from "#modules/player/player-services/models";
-import { DomainEvent } from "#modules/domain-event-emitter";
 import { PlayerEvents } from "../events";
+import { DomainEventEmitter } from "#main/domain-event-emitter";
+import { PlayerEvent, PlayResourceMessage } from "#modules/player/player-services/models";
+import { DomainEvent } from "#main/domain-event-emitter";
 
 @Injectable()
 export class VlcBackWSService {

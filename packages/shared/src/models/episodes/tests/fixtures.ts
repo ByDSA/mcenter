@@ -1,0 +1,184 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import type { EpisodeEntity } from "../";
+import { ObjectId } from "mongodb";
+import { deepFreeze } from "../../../utils/objects";
+import { DATEJS_SAMPLE1 } from "../../../../tests/other-fixtures/dates";
+
+const timestamps = {
+  createdAt: DATEJS_SAMPLE1,
+  updatedAt: DATEJS_SAMPLE1,
+  addedAt: DATEJS_SAMPLE1,
+};
+const ep1x01: EpisodeEntity = {
+  id: new ObjectId().toString(),
+  compKey: {
+    episodeKey: "1x01",
+    seriesKey: "simpsons",
+  },
+  title: "Sin Blanca Navidad",
+  weight: -6,
+  tags: [
+    "navidad",
+  ],
+  timestamps,
+};
+const EP6x25: EpisodeEntity = {
+  id: new ObjectId().toString(),
+  title: "Quién disparó al señor Burns (1ª parte)",
+  weight: 4,
+  timestamps,
+  compKey: {
+    episodeKey: "6x25",
+    seriesKey: "simpsons",
+  },
+};
+const EP7x01: EpisodeEntity = {
+  id: new ObjectId().toString(),
+  title: "Quién disparó al señor Burns (2ª parte)",
+  weight: 4,
+  timestamps,
+  compKey: {
+    episodeKey: "7x01",
+    seriesKey: "simpsons",
+  },
+};
+// Episode entities
+const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
+  ep1x01,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x02",
+      seriesKey: "simpsons",
+    },
+    title: "Bart, el genio",
+    weight: -30,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x03",
+      seriesKey: "simpsons",
+    },
+    title: "La odisea de Homer",
+    weight: -4,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x04",
+      seriesKey: "simpsons",
+    },
+    title: "Hogar, agridulce hogar",
+    weight: -2,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x05",
+      seriesKey: "simpsons",
+    },
+    title: "Bart, el general",
+    weight: -8,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x06",
+      seriesKey: "simpsons",
+    },
+    title: "El blues de la Mona Lisa",
+    weight: 0,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x07",
+      seriesKey: "simpsons",
+    },
+    title: "El abominable hombre del bosque",
+    weight: -8,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x08",
+      seriesKey: "simpsons",
+    },
+    title: "La cabeza chiflada",
+    weight: -4,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x09",
+      seriesKey: "simpsons",
+    },
+    title: "Jacques, el rompecorazones",
+    weight: -8,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x10",
+      seriesKey: "simpsons",
+    },
+    title: "Homer se va de juerga",
+    weight: -16,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x11",
+      seriesKey: "simpsons",
+    },
+    title: "Viva la vendimia",
+    weight: -8,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x12",
+      seriesKey: "simpsons",
+    },
+    title: "Krusty entra en chirona",
+    weight: 0,
+    timestamps,
+  } as EpisodeEntity,
+  {
+    id: new ObjectId().toString(),
+    compKey: {
+      episodeKey: "1x13",
+      seriesKey: "simpsons",
+    },
+    title: "La baby siter ataca de nuevo",
+    weight: -6,
+    timestamps,
+  } satisfies EpisodeEntity,
+  EP6x25,
+  EP7x01,
+]);
+
+export const fixtureEpisodes = {
+  Simpsons: {
+    Samples: {
+      EP1x01: ep1x01,
+      EP1x02: EPISODES_SIMPSONS[1],
+      Dependency: {
+        last: EP6x25,
+        next: EP7x01,
+      },
+    },
+    List: EPISODES_SIMPSONS,
+  },
+};

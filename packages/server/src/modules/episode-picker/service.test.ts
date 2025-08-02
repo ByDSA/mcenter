@@ -7,12 +7,14 @@ import { EpisodesRepository } from "#episodes/repositories";
 import { episodeRepositoryMockProvider } from "#episodes/repositories/tests";
 import { StreamEntity } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/repositories";
-import { streamsRepositoryMockProvider } from "#modules/streams/tests";
-import { fixtureEpisodes, HISTORY_ENTRY_SIMPSONS_6_25, STREAM_SIMPSONS } from "#tests/main/db/fixtures";
+import { streamsRepositoryMockProvider } from "#modules/streams/repositories/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#tests/nestjs/app";
 import { episodeDependenciesRepositoryMockProvider } from "#episodes/dependencies/rest/repository/tests";
 import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
+import { STREAM_SIMPSONS } from "#modules/streams/tests";
 import { EpisodePickerService } from "./service";
+import { fixtureEpisodes } from "#episodes/tests";
+import { HISTORY_ENTRY_SIMPSONS_6_25 } from "#episodes/history/tests";
 
 describe("tests", () => {
   let testingSetup: TestingSetup;

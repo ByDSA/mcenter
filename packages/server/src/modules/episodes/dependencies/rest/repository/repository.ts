@@ -1,16 +1,16 @@
-import type { DomainEvent } from "#modules/domain-event-emitter";
+import type { DomainEvent } from "#main/domain-event-emitter";
 import type { CanCreateOne, CanDeleteOneByIdAndGet } from "#utils/layers/repository";
 import type { EpisodeDependency as Model, EpisodeDependencyEntity as Entity } from "../../models";
 import type { EpisodeDependencyRestDtos } from "$shared/models/episodes/dependencies/dto/transport";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { EpisodeCompKey } from "#episodes/models";
-import { assertFound } from "#utils/validation/found";
-import { logDomainEvent } from "#main/logging/log-domain-event";
-import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
 import { EpisodeDependencyOdm } from "./odm";
 import { EpisodeDependencyEvents } from "./events";
 import { getCriteriaPipeline } from "./criteria-pipeline";
+import { EpisodeCompKey } from "#episodes/models";
+import { assertFound } from "#utils/validation/found";
+import { logDomainEvent } from "#main/logging/log-domain-event";
+import { EmitEntityEvent } from "#main/domain-event-emitter/emit-event";
 
 type Id = Entity["id"];
 

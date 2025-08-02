@@ -1,7 +1,7 @@
 import { compareEpisodeCompKey, Episode, EpisodeCompKey } from "#episodes/models";
-import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { FilterApplier } from "../FilterApplier";
 import { PreventRepeatLastFilter } from "../PreventRepeatLastFilter";
+import { fixtureEpisodes } from "#episodes/tests";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 const TWO_EPS = [

@@ -1,6 +1,6 @@
 import { MusicOdm } from "#musics/repositories/odm";
 import { Music } from "#musics/models";
-import { fixtureMusics } from "#musics/tests/fixtures";
+import { fixtureMusics } from "#musics/tests";
 
 export const loadFixtureMusicsInDisk = async () => {
   const musicsOdm: MusicOdm.Doc[] = fixtureMusics.Disk.List

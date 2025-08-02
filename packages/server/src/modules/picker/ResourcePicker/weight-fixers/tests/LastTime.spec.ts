@@ -2,9 +2,9 @@ import { SECONDS_IN_DAY } from "#modules/resources";
 import { Resource } from "#modules/resources/models";
 import { genLastTimePlayedAgo, genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { useFakeTime } from "#tests/time";
-import { fixtureEpisodes } from "#tests/main/db/fixtures";
 import { Fx, LastTimeWeightFixer } from "../LastTime";
 import { secondsElapsedFrom } from "../../utils";
+import { fixtureEpisodes } from "#episodes/tests";
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 

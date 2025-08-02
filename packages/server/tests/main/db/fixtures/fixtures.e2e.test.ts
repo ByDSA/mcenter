@@ -1,10 +1,11 @@
-import { expectSerie } from "$sharedSrc/models/series/test";
+import { expectSerie } from "$sharedSrc/models/series/tests";
+import { fixtureEpisodes } from "$sharedSrc/models/episodes/tests/fixtures";
+import { SERIE_SIMPSONS } from "$sharedSrc/models/series/tests/fixtures";
+import { expectEpisodes } from "$sharedSrc/models/episodes/tests";
 import { EpisodeOdm } from "#episodes/repositories/odm";
-import { expectEpisodes } from "#episodes/models/test";
 import { createTestingAppModuleAndInit } from "#tests/nestjs/app";
 import { SeriesOdm } from "#modules/series/repositories/odm";
 import { loadFixtureSimpsons } from "./sets";
-import { fixtureEpisodes, SERIE_SIMPSONS } from "./models";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 

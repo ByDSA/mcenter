@@ -1,5 +1,5 @@
 import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
-import type { DomainEvent } from "#modules/domain-event-emitter";
+import type { DomainEvent } from "#main/domain-event-emitter";
 import type { CanCreateOne, CanDeleteOneByIdAndGet } from "#utils/layers/repository";
 import type { EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity, EpisodeHistoryEntryEntity } from "../models";
 import type { EpisodeHistoryEntryRestDtos } from "$shared/models/episodes/history/dto/transport";
@@ -7,15 +7,15 @@ import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { createEpisodeHistoryEntry } from "$shared/models/episodes/history/utils";
 import { OnEvent } from "@nestjs/event-emitter";
+import { EpisodeHistoryEntryOdm } from "./odm";
+import { EpisodeHistoryEntryEvents } from "./events";
+import { getCriteriaPipeline } from "./criteria-pipeline";
 import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { StreamEntity } from "#modules/streams";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { logDomainEvent } from "#main/logging/log-domain-event";
-import { EmitEntityEvent } from "#modules/domain-event-emitter/emit-event";
-import { EpisodeHistoryEntryOdm } from "./odm";
-import { EpisodeHistoryEntryEvents } from "./events";
-import { getCriteriaPipeline } from "./criteria-pipeline";
+import { EmitEntityEvent } from "#main/domain-event-emitter/emit-event";
 
 type FindLastProps = {
   seriesKey: SeriesKey;

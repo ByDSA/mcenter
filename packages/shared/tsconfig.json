@@ -13,10 +13,7 @@
     "moduleResolution": "node",
     "noImplicitAny": true,
     "outDir": "build",
-    "paths": {
-      "#tests": ["tests"],
-      "#tests/*": ["tests/*"]
-    },
+    "paths": {},
     "sourceMap": true,
     "strict": true,
     "target": "es2015",
