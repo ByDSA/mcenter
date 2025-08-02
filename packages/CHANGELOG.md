@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.25](https://github.com/ByDSA/mcenter/compare/v4.0.24...v4.0.25) (2025-08-02)
+
+
+### Bug Fixes
+
+* use episode dependency from db ([41ebf48](https://github.com/ByDSA/mcenter/commit/41ebf48304807a20cae5f7acc03cde469458df49))
+
 ### [4.0.24](https://github.com/ByDSA/mcenter/compare/v4.0.22...v4.0.24) (2025-08-01)
 
 
