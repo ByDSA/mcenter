@@ -2,7 +2,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { serieRepositoryMockProvider } from "#series/rest/repository/tests";
 import { restTestsSuite } from "#tests/suites/rest-suite";
 import { EpisodesRepository } from "./repository";
-import { testRoute } from "#tests/main/routing";
+import { testRoute } from "#main/routing/test";
 import { episodeRepositoryMockProvider } from "./repository/tests";
 import { EpisodesRestController } from "./controller";
 import { fixtureEpisodes } from "#episodes/tests";
