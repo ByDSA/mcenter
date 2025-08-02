@@ -2,21 +2,23 @@ import mongoose from "mongoose";
 import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
 import { timestampsSchemaOdm } from "#modules/resources/odm/Timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/repositories/odm";
-import { MongoFilterQuery, RequireId } from "#utils/layers/db/mongoose";
+import { MongoFilterQuery, OptionalId, RequireId } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#modules/series/repositories/odm";
 import { EpisodeCompKey } from "../../models";
 
-export interface DocOdm {
-  _id?: mongoose.Types.ObjectId;
+export type EpisodeCompKeyOdm = {
   episodeKey: string;
   seriesKey: string;
+};
+
+export type DocOdm = EpisodeCompKeyOdm & OptionalId & {
   title: string;
   weight: number;
   tags?: string[];
   disabled?: boolean;
   lastTimePlayed?: number;
   timestamps: TimestampsModel;
-}
+};
 
 export type FullDocOdm = RequireId<DocOdm> & {
   serie?: SeriesOdm.FullDoc;

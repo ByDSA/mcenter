@@ -3,17 +3,18 @@ import { ResourceEntity } from "$shared/models/resource";
 import { Filter } from "./Filter";
 import { CompareIdFunc } from "./utils";
 
-type Params<ID> = {
+type Params<ID, R> = {
   lastId: ID | null;
   firstId: ID;
   secondId: ID;
+  getId: (r: R)=> ID;
   compareId: CompareIdFunc<ID>;
 };
 export class DependencyFilter<ID = string, R extends ResourceEntity = ResourceEntity>
 implements Filter<R> {
-  #params: Params<ID>;
+  #params: Params<ID, R>;
 
-  constructor(params: Params<ID>) {
+  constructor(params: Params<ID, R>) {
     this.#params = params;
   }
 
@@ -23,7 +24,7 @@ implements Filter<R> {
       return true;
 
     if (this.#params.compareId(this.#params.lastId, this.#params.firstId))
-      return this.#params.compareId(self.id, this.#params.secondId);
+      return this.#params.compareId(this.#params.getId(self), this.#params.secondId);
 
     return true;
   }

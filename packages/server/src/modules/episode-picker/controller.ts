@@ -6,14 +6,15 @@ import z from "zod";
 import { EpisodesRepository } from "#episodes/repositories";
 import { Episode, EpisodeEntity } from "#episodes/models";
 import { LastTimePlayedService } from "#episodes/history";
-import { genRandomPickerWithData } from "#modules/picker";
 import { SerieRepository } from "#series/repositories";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
 import { getSeriesKeyFromStream } from "#modules/streams";
+import { EpisodeDependenciesRepository } from "#episodes/dependencies/rest/repository";
+import { genRandomPickerWithData } from "#modules/picker/ResourcePicker/ResourcePickerRandom";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
-import { dependencies } from "./appliers/Dependencies";
+import { dependenciesToList } from "./appliers/Dependencies";
 
 class ShowPickerParamsDto extends createZodDto(z.object( {
   streamKey: z.string(),
@@ -29,6 +30,7 @@ export class EpisodePickerController {
   constructor(
      private readonly streamRepository: StreamsRepository,
      private readonly episodeRepository: EpisodesRepository,
+     private readonly dependenciesRepo: EpisodeDependenciesRepository,
      private readonly episodeHistoryEntriesRepository: EpisodeHistoryEntriesRepository,
      private readonly serieRepository: SerieRepository,
      private readonly lastTimePlayedService: LastTimePlayedService,
@@ -63,6 +65,7 @@ export class EpisodePickerController {
 
     assertFound(serie);
 
+    const dependencies = dependenciesToList(await this.dependenciesRepo.getAll());
     const episodes: EpisodeEntity[] = await this.episodeRepository.getManyBySerieKey(serie.key);
     const picker = await genRandomPickerWithData<EpisodeEntity>( {
       resources: episodes,

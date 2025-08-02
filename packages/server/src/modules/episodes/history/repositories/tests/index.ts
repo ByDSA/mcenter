@@ -5,14 +5,14 @@ import { LastTimePlayedService } from "../../last-time-played.service";
 
 const episodeHistoryEntriesRepositoryMock = createMockInstance(EpisodeHistoryEntriesRepository);
 
-export const episodeHistoryEntriesRepositoryMockProvider: Provider = {
+export const episodeHistoryEntriesRepositoryMockProvider = {
   provide: EpisodeHistoryEntriesRepository,
   useValue: episodeHistoryEntriesRepositoryMock,
-};
+} satisfies Provider;
 
 const lastTimePlayedServiceMock = createMockInstance(LastTimePlayedService);
 
-export const lastTimePlayedServiceMockProvider: Provider = {
+export const lastTimePlayedServiceMockProvider = {
   provide: LastTimePlayedService,
   useValue: lastTimePlayedServiceMock,
-};
+} satisfies Provider;

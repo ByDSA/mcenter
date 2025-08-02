@@ -31,6 +31,16 @@ export const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntryEntity = {
   streamId: STREAM_SIMPSONS.id,
 };
 
+export const HISTORY_ENTRY_SIMPSONS_6_25: EpisodeHistoryEntryEntity = {
+  id: new Types.ObjectId().toString(),
+  episodeCompKey: {
+    episodeKey: "6x25",
+    seriesKey: "simpsons",
+  },
+  date: DATE_SAMPLE1,
+  streamId: STREAM_SIMPSONS.id,
+};
+
 export const HISTORY_ENTRIES_SIMPSONS: EpisodeHistoryEntryEntity[] = deepFreeze([
   HISTORY_ENTRY_SIMPSONS1,
 ] satisfies EpisodeHistoryEntryEntity[]);

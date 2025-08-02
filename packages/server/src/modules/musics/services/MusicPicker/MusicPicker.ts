@@ -1,6 +1,7 @@
 import { neverCase } from "$shared/utils/validation";
-import { PickMode, ResourcePicker, ResourcePickerRandom, ResourcePickerSequential } from "#modules/picker";
+import { PickMode, ResourcePicker, ResourcePickerSequential } from "#modules/picker";
 import { MusicEntity } from "#musics/models";
+import { ResourcePickerRandom } from "#modules/picker/ResourcePicker/ResourcePickerRandom";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./appliers";
 
 type Entity = MusicEntity;

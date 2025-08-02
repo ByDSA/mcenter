@@ -1,12 +1,15 @@
+import type { ResourcePicker } from "#modules/picker";
+import type { EpisodeEntity } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined, neverCase } from "$shared/utils/validation";
-import { EpisodeEntity } from "#episodes/models";
 import { EpisodesRepository } from "#episodes/repositories";
-import { PickMode, ResourcePicker } from "#modules/picker";
+import { PickMode } from "#modules/picker/ResourcePicker/PickMode";
 import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/repositories";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/repositories";
+import { EpisodeDependenciesRepository } from "#episodes/dependencies/rest/repository";
 import { buildEpisodePicker } from "./EpisodePicker";
+import { DependenciesList, dependenciesToList } from "./appliers/Dependencies";
 
 @Injectable()
 export class EpisodePickerService {
@@ -14,6 +17,7 @@ export class EpisodePickerService {
     private readonly streamRepository: StreamsRepository,
     private readonly episodeRepository: EpisodesRepository,
     private readonly historyEntriesRepository: EpisodeHistoryEntriesRepository,
+    private readonly dependenciesRepo: EpisodeDependenciesRepository,
   ) {
   }
 
@@ -54,10 +58,17 @@ export class EpisodePickerService {
     const lastPlayedEpInSerie = lastPlayedEpInSerieCompKey
       ? await this.episodeRepository.getOneByCompKey(lastPlayedEpInSerieCompKey)
       : null;
+    const mode = streamModeToPickerMode(stream.mode);
+    let dependencies: DependenciesList | undefined;
+
+    if (mode === PickMode.RANDOM)
+      dependencies = dependenciesToList(await this.dependenciesRepo.getAll());
+
     const picker: ResourcePicker<EpisodeEntity> = buildEpisodePicker( {
-      mode: streamModeToPickerMode(stream.mode),
+      mode,
       episodes: allEpisodesInSerie,
       lastEp: lastPlayedEpInSerie ?? undefined,
+      dependencies,
     } );
     const episodes = await picker.pick(n);
 

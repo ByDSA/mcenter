@@ -1,18 +1,16 @@
 import type { SeriesKey } from "#series/models";
+import { EpisodeDependency } from "#episodes/dependencies/models";
 
 export type DependenciesList = {[key: SeriesKey]: [string, string][]};
 
-// TODO: mover a DB
-export const dependencies: DependenciesList = {
-  simpsons: [
-    ["6x25", "7x01"],
-    ["31x19", "31x20"],
-  ],
-  fguy: [
-    ["6x04", "6x05"],
-    ["4x28", "4x29"],
-    ["4x29", "4x30"],
-    ["12x06", "12x07"],
-    ["12x07", "12x08"],
-  ],
-};
+export function dependenciesToList(dependencies: EpisodeDependency[]) {
+  return dependencies.reduce((acc, d)=> {
+    const { seriesKey: s } = d.lastCompKey;
+
+    acc[s] ??= [];
+
+    acc[s].push([d.lastCompKey.episodeKey, d.nextCompKey.episodeKey]);
+
+    return acc;
+  }, {} as DependenciesList);
+}

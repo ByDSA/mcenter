@@ -10,6 +10,7 @@ import { StreamsModule } from "#modules/streams/module";
 import { PlayerModule } from "#modules/player/module";
 import { ConfigModule } from "#modules/config/config.module";
 import { StaticFilesModule } from "#modules/config/static-files.module";
+import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
 import { LoggingModule } from "./logging/module";
 
 export const routeModules = [
@@ -51,6 +52,10 @@ export const routeModules = [
     {
       path: PATH_ROUTES.episodes.fileInfo.path,
       module: EpisodeFileInfosModule,
+    },
+    {
+      path: PATH_ROUTES.episodes.dependencies.path,
+      module: EpisodeDependenciesModule,
     },
     {
       path: PATH_ROUTES.musics.path,
