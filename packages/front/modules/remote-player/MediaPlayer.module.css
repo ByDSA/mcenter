@@ -1,9 +1,9 @@
 .playerBox {
-  border: px solid gray;
+  border: 1px solid rgba(0, 0, 0, 0.25);
   border-radius: 1em;
   background-color: var(--color-primary2-light);
   width: 100%;
-  max-width: 30em;
+  min-width: 338px;
   padding: 1em 1em;
   color: black;
   box-shadow: 0 0 0.25em gray inset;
@@ -34,7 +34,6 @@
 @media (width > 600px) {
   .outContainer {
     margin: 1em 2em;
-    width: calc(100% - 2 * 2em);
   }
 }
 
@@ -108,16 +107,17 @@
   color: var(--color-primary2-light4);
 }
 
-.title {
-  margin: 0;
+.title,
+.artist {
+  display: flow;
   text-align: center;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .artist {
   margin: 0;
   margin-top: 0.5em;
-  text-align: center;
-  font-weight: normal;
 }
 
 .timeDiv {

@@ -4,7 +4,9 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
 import { PlayerActions } from "#modules/remote-player/models";
+import { classes } from "#modules/utils/styles";
 import styles from "./MediaPlayer.module.css";
+import { AutoFitText } from "./AutoFitText";
 
 enum TimeMode {
   FORWARD,
@@ -62,8 +64,18 @@ export function MediaPlayer( { meta: { title, artist },
       <div className={styles.outContainer}>
         <div className={styles.playerBox}>
           <header>
-            <h2 className={styles.title}>{title}</h2>
-            <h3 className={styles.artist}>{artist}</h3>
+            <AutoFitText
+              className={classes(styles.title, "ellipsis")}
+              title={title}
+              maxSize={30}
+              minSize={20}
+            ></AutoFitText>
+            <AutoFitText
+              className={classes(styles.artist, "ellipsis")}
+              title={artist}
+              maxSize={20}
+              minSize={15}
+            ></AutoFitText>
           </header>
           <section>
             <div className={styles.timeDiv}><span className={styles.time}
