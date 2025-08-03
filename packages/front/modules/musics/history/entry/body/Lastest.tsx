@@ -31,7 +31,7 @@ export function LastestComponent(
     sort: {
       timestamp: "desc",
     },
-    limit: 2,
+    limit: 4,
     expand: [],
   };
 

@@ -34,7 +34,7 @@ export function LastestComponent(
     sort: {
       timestamp: "desc",
     },
-    limit: 10,
+    limit: 4,
   };
 
   // TODO: cambiar 'any' cuando EpisodeHistoryEntry tenga 'resource' en vez de 'episode'
