@@ -2,18 +2,14 @@ import z from "zod";
 import { mongoDbId } from "../../../models/resource/partial-schemas";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { makeHistoryEntrySchema } from "../../history-lists-common";
-import { musicIdSchema, musicEntitySchema } from "../music";
-import { musicSchema } from "../music";
+import { musicEntitySchema, musicIdSchema } from "../music";
 
-const modelSchema = makeHistoryEntrySchema(musicIdSchema, musicSchema)
-  .omit( {
-    resource: true,
-  } );
+const modelSchema = makeHistoryEntrySchema(musicIdSchema);
 
-  type Model = z.infer<typeof modelSchema>;
+type Model = z.infer<typeof modelSchema>;
 const entitySchema = modelSchema.extend( {
   id: mongoDbId,
-  music: musicEntitySchema.optional(),
+  resource: musicEntitySchema.optional(),
 } );
 
 type Entity = z.infer<typeof entitySchema>;

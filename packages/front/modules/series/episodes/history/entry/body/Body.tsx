@@ -26,12 +26,12 @@ function getAndUpdateEpisodeByProp<V>(
   return {
     getUpdatedResource: (v, r) => ( {
       ...r,
-      episode: {
-        ...r.episode,
+      resource: {
+        ...r.resource,
         [prop]: v,
       },
     } ),
-    getValue: (r)=>r.episode[prop],
+    getValue: (r)=>r.resource[prop],
     name: prop,
   };
 }
@@ -41,16 +41,16 @@ function getAndUpdateFileInfoByProp<V>(
   return {
     getUpdatedResource: (v, r) => ( {
       ...r,
-      episode: {
-        ...r.episode,
+      resource: {
+        ...r.resource,
         fileInfos: [{
-          ...r.episode.fileInfos[0],
+          ...r.resource.fileInfos[0],
           [prop]: v,
         },
-        ...r.episode.fileInfos.slice(1)],
+        ...r.resource.fileInfos.slice(1)],
       },
     } ),
-    getValue: (r)=>r.episode.fileInfos[0][prop],
+    getValue: (r)=>r.resource.fileInfos[0][prop],
     name: prop,
   };
 }
@@ -61,32 +61,30 @@ type Props = {
 export function Body( { data }: Props) {
   const { state, remove, isModified,
     reset, addOnReset,
-    update, initialState } = useHistoryEntryEdition<
-Data
-  >( {
-    data,
-    isModifiedFn: calcIsModified,
-    fetchRemove: async ()=> {
-      const res = await EpisodeHistoryEntryFetching.Delete.fetch(data.id);
+    update, initialState } = useHistoryEntryEdition<Data>( {
+      data,
+      isModifiedFn: calcIsModified,
+      fetchRemove: async ()=> {
+        const res = await EpisodeHistoryEntryFetching.Delete.fetch(data.id);
 
-      return res.data as Data;
-    },
-    fetchUpdate: async () => {
-      const episodeBody = generatePatchBody(
-        data.episode,
-        state[0].episode,
-        ["title", "weight", "disabled", "tags"],
-      );
+        return res.data as Data;
+      },
+      fetchUpdate: async () => {
+        const episodeBody = generatePatchBody(
+          data.resource,
+          state[0].resource,
+          ["title", "weight", "disabled", "tags"],
+        );
 
       type ResEpisode = EpisodeEntity & Required<Pick<EpisodeEntity, "fileInfos">>;
       let episodePromise: Promise<ResEpisode> = Promise.resolve() as Promise<any>;
 
       if (shouldSendPatchWithBody(episodeBody)) {
-        episodePromise = EpisodeFetching.Patch.fetch(data.episodeCompKey, episodeBody)
+        episodePromise = EpisodeFetching.Patch.fetch(data.resourceId, episodeBody)
           .then(res=>{
             const episode: ResEpisode = {
               ...res.data,
-              fileInfos: state[0].episode.fileInfos,
+              fileInfos: state[0].resource.fileInfos,
             };
 
             assertIsDefined(episode.fileInfos);
@@ -95,8 +93,8 @@ Data
           } );
       }
 
-      const dataFileInfo = data.episode.fileInfos[0];
-      const stateFileInfo = state[0].episode.fileInfos[0];
+      const dataFileInfo = data.resource.fileInfos[0];
+      const stateFileInfo = state[0].resource.fileInfos[0];
       const fileInfoBody: EpisodeFileInfoFetching.Patch.Body = generatePatchBody(
         dataFileInfo,
         stateFileInfo,
@@ -118,14 +116,14 @@ Data
       };
 
       if (await episodePromise)
-        newData.episode = await episodePromise;
+        newData.resource = await episodePromise;
 
       if (await fileInfoPromise)
-        newData.episode.fileInfos = [await fileInfoPromise];
+        newData.resource.fileInfos = [await fileInfoPromise];
 
       return newData;
-    },
-  } );
+      },
+    } );
   const commonEpisodeInputProps = {
     onPressEnter: ()=>update.action(),
     resourceState: state,
@@ -141,8 +139,8 @@ Data
   const titleArtist = <span className={classes("line", "height2")}>
     {titleElement}
   </span>;
-  const { episode } = state[0];
-  const fileInfo = episode.fileInfos[0];
+  const { resource } = state[0];
+  const fileInfo = resource.fileInfos[0];
   const { duration } = fileInfo.mediaInfo;
   const url = fullUrlOf(fileInfo);
 
@@ -203,7 +201,7 @@ Data
     </span>
     <span className={classes("line", "height2", commonStyle.url)}>
       <span>{EPISODE_FILE_INFO_PROPS.path.caption}</span>
-      <span className={commonStyle.content}>{data.episode.fileInfos[0].path}</span>
+      <span className={commonStyle.content}>{data.resource.fileInfos[0].path}</span>
     </span>
 
     <span className={"break"} />
@@ -225,7 +223,7 @@ Data
       <span className={"break"} />
     </>
     }
-    <LastestComponent resourceId={episode.compKey} timestamp={state[0].date.timestamp}/>
+    <LastestComponent resourceId={resource.compKey} timestamp={state[0].date.timestamp}/>
   </div>;
 }
 
@@ -236,5 +234,19 @@ function fullUrlOf(resource: EpisodeFileInfo) {
 function calcIsModified(r1: EpisodeHistoryEntryEntity, r2: EpisodeHistoryEntryEntity) {
   return isModifiedd(r1, r2, {
     ignoreNewUndefined: true,
+    shouldMatch: {
+      resource: {
+        fileInfos: [
+          {
+            start: true,
+            end: true,
+          },
+        ],
+        disabled: true,
+        tags: true,
+        title: true,
+        weight: true,
+      },
+    },
   } );
 }

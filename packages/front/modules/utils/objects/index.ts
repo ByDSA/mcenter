@@ -3,8 +3,8 @@ import { diff } from "just-diff";
 // Tipo recursivo para definir qué propiedades considerar
 type PropsToConsider<T> = T extends object ? {
   [K in keyof T]?: true | (
-    T[K] extends []
-      ? true
+    T[K] extends (infer U)[]
+      ? [PropsToConsider<U>]
       : T[K] extends object | null | undefined
         ? PropsToConsider<NonNullable<T[K]>>
         : true
@@ -83,9 +83,14 @@ function shouldConsiderPath(path: (number | string)[], propsToConsider: any): bo
   for (let i = 0; i < path.length; i++) {
     const key = path[i];
 
-    // Si llegamos a un índice numérico (array), continuamos con el mismo nivel
-    if (typeof key === "number")
+    // Si llegamos a un índice numérico (array)
+    if (typeof key === "number") {
+      // Si current es un array (tupla), tomamos el primer elemento como estructura
+      if (Array.isArray(current) && current.length > 0)
+        current = current[0];
+
       continue;
+    }
 
     // Si la propiedad actual no existe en la configuración, no debe considerarse
     if (!(key in current))
@@ -98,11 +103,16 @@ function shouldConsiderPath(path: (number | string)[], propsToConsider: any): bo
     if (value === true)
       return true;
 
+    // Si el valor es un array (tupla), continuamos con su estructura
+    if (Array.isArray(value) && value.length > 0)
+      current = value[0];
+
     // Si el valor es un objeto, continuamos navegando
-    if (typeof value === "object" && value !== null)
+    else if (typeof value === "object" && value !== null)
       current = value;
+
     else {
-      // Si no es true ni un objeto, no debe considerarse
+      // Si no es true, ni un objeto, ni un array, no debe considerarse
       return false;
     }
   }

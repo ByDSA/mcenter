@@ -42,9 +42,24 @@ export function makeFetcher<ReqBody, ResBody>(
     try {
       const res = await fetch(params.url, options);
       const text = await res.text();
+      let json;
 
-      if (!res.ok)
-        throw new Error(text);
+      if (!res.ok) {
+        try {
+          const clearedText = text
+            .replaceAll("\\\\", "\\");
+
+          json = JSON.parse(clearedText);
+
+          if (json.message && typeof json.message === "string"
+        && json.message.startsWith("{"))
+            json.message = JSON.parse(json.message);
+        } catch {
+          throw new Error(text);
+        }
+
+        throw new Error(JSON.stringify(json, null, 2));
+      }
 
       const value = text ? JSON.parse(text) : undefined;
 

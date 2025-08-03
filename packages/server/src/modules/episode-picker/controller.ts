@@ -54,7 +54,7 @@ export class EpisodePickerController {
 
     assertIsDefined(seriesKey);
     const seriePromise = this.serieRepository.getOneByKey(seriesKey);
-    const lastEpCompKey = lastEntry.episodeCompKey;
+    const lastEpCompKey = lastEntry.resourceId;
     const lastEpPromise = lastEpCompKey
       ? this.episodeRepository.getOneByCompKey(lastEpCompKey)
       : Promise.resolve(null);

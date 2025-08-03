@@ -1,7 +1,6 @@
 import { AllKeysOf } from "$shared/utils/types";
 import { Types } from "mongoose";
 import { EpisodeOdm } from "#episodes/rest/repository/odm";
-import { SeriesOdm } from "#modules/series/rest/repository/odm";
 import { StreamOdm } from "#modules/streams/rest/repository/odm";
 import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./mongo";
@@ -9,7 +8,7 @@ import { DocOdm, FullDocOdm } from "./mongo";
 function docOdmToEntity(docOdm: FullDocOdm): Entity {
   const ret: Entity = {
     id: docOdm._id.toString(),
-    episodeCompKey: {
+    resourceId: {
       episodeKey: docOdm.episodeCompKey.episodeKey,
       seriesKey: docOdm.episodeCompKey.seriesKey,
     },
@@ -20,8 +19,7 @@ function docOdmToEntity(docOdm: FullDocOdm): Entity {
       timestamp: docOdm.date.timestamp,
     },
     streamId: docOdm.streamId.toString(),
-    serie: docOdm.serie ? SeriesOdm.toEntity(docOdm.serie) : undefined,
-    episode: docOdm.episode ? EpisodeOdm.toEntity(docOdm.episode) : undefined,
+    resource: docOdm.episode ? EpisodeOdm.toEntity(docOdm.episode) : undefined,
     stream: docOdm.stream ? StreamOdm.toEntity(docOdm.stream) : undefined,
   } satisfies AllKeysOf<Entity>;
 
@@ -31,8 +29,8 @@ function docOdmToEntity(docOdm: FullDocOdm): Entity {
 function modelToDocOdm(model: Entry): DocOdm {
   return {
     episodeCompKey: {
-      episodeKey: model.episodeCompKey.episodeKey,
-      seriesKey: model.episodeCompKey.seriesKey,
+      episodeKey: model.resourceId.episodeKey,
+      seriesKey: model.resourceId.seriesKey,
     },
     date: {
       year: model.date.year,

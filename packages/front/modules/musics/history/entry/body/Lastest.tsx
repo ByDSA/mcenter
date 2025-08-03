@@ -1,6 +1,6 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { genAssertIsManyResultResponse } from "$shared/utils/http/responses";
-import { MusicHistoryEntryEntity, musicHistoryEntrySchema } from "#musics/history/models/index";
+import { MusicHistoryEntryEntity, musicHistoryEntryEntitySchema } from "#musics/history/models/index";
 import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { LatestHistoryEntries } from "#modules/history";
 import { DateFormat } from "#modules/utils/dates";
@@ -38,7 +38,7 @@ export function LastestComponent(
   return LatestHistoryEntries<MusicHistoryEntryEntity, Body>( {
     url,
     body,
-    validator: genAssertIsManyResultResponse(musicHistoryEntrySchema),
+    validator: genAssertIsManyResultResponse(musicHistoryEntryEntitySchema),
     dateFormat,
   } );
 }

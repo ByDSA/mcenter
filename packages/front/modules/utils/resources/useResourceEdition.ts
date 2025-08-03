@@ -14,12 +14,9 @@ export type Entry<T, ID> = {
   date: {
     timestamp: number;
   };
+  resource?: T;
   resourceId: ID;
-} & ( {
-   music?: T;
-} | {
-   resource?: T;
-} ); // TODO: cambiar por una clase real o ponerla en otro sitio común
+};
 
 export type UseResourceEditionProps<
 T, ID, E extends Entry<T, ID>, FetchPatchReqBody, FetchPatchResBody
@@ -53,32 +50,6 @@ export type UseResourceEditionRet<T> = {
   resourceState: [T, React.Dispatch<React.SetStateAction<T>>];
 };
 
-export function resourceOrMusic<T, ID>(entry: Entry<T, ID>): T {
-  if ("resource" in entry && entry.resource)
-    return entry.resource;
-
-  if ("music" in entry && entry.music)
-    return entry.music;
-
-  throw new Error("");
-}
-
-export function setResourceOrMusic<T, ID>(entry: Entry<T, ID>, resource: T): void {
-  if ("resource" in entry) {
-    entry.resource = resource;
-
-    return;
-  }
-
-  if ("music" in entry) {
-    entry.music = resource;
-
-    return;
-  }
-
-  throw new Error("");
-}
-
 export function useResourceEdition<
 T extends object, ID, E extends Entry<T, ID>, FetchPatchReqBody, FetchPatchResBody
 >(
@@ -93,7 +64,7 @@ T extends object, ID, E extends Entry<T, ID>, FetchPatchReqBody, FetchPatchResBo
   const isModified = useIsModified(resourceBase, resource, calcIsModified);
   const asyncUpdateAction = useAsyncAction();
   const reset = async () => {
-    const entryResource = resourceOrMusic(entry);
+    const entryResource = entry.resource;
 
     assertIsDefined(entryResource);
     setResource(entryResource);
@@ -110,12 +81,12 @@ T extends object, ID, E extends Entry<T, ID>, FetchPatchReqBody, FetchPatchResBo
     const { patch: { fetch: fetchPatch,
       generateBody: generatePatchBody } } = fetching;
 
-    assertIsDefined(resourceOrMusic(entry));
-    const patchBodyParams = generatePatchBody(resourceOrMusic(entry), resource);
+    assertIsDefined(entry.resource);
+    const patchBodyParams = generatePatchBody(entry.resource, resource);
 
     return fetchPatch(id, patchBodyParams)
       .then(() => {
-        setResourceOrMusic(entry, resource);
+        entry.resource = resource;
       } )
       .then(()=>done());
   };
@@ -135,7 +106,7 @@ T extends object, ID, E extends Entry<T, ID>, FetchPatchReqBody, FetchPatchResBo
 
 type CompareFn<T> = (r1: T, r2: T)=> boolean;
 function useResourceBase<T, ID, E extends Entry<T, ID>>(entry: E, compare: CompareFn<T>) {
-  const entryResource = resourceOrMusic(entry);
+  const entryResource = entry.resource;
 
   assertIsDefined(entryResource);
   const [resourceBase, setResourceBase] = React.useState(entryResource as T);

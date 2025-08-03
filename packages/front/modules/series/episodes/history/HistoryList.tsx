@@ -25,7 +25,7 @@ export function HistoryList() {
               }
 
               return <Fragment
-                key={`${entry.episodeCompKey.seriesKey} ${entry.episodeCompKey.episodeKey}`}>
+                key={`${entry.resourceId.seriesKey} ${entry.resourceId.episodeKey}`}>
                 {dayTitle}
                 <HistoryEntryElement value={entry}/>
               </Fragment>;

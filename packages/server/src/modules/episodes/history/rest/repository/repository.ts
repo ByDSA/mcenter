@@ -11,11 +11,11 @@ import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { StreamEntity } from "#modules/streams";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
+import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
+import { logDomainEvent } from "#core/logging/log-domain-event";
 import { getCriteriaPipeline } from "./criteria-pipeline";
 import { EpisodeHistoryEntryEvents } from "./events";
 import { EpisodeHistoryEntryOdm } from "./odm";
-import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
-import { logDomainEvent } from "#core/logging/log-domain-event";
 
 type FindLastProps = {
   seriesKey: SeriesKey;
@@ -82,7 +82,7 @@ CanDeleteOneByIdAndGet<Model, Id> {
       return [];
 
     if (criteria.expand?.includes("series"))
-      assertIsDefined(docsOdm[0].serie, "Lookup serie failed");
+      assertIsDefined(docsOdm[0].episode?.serie, "Lookup serie failed");
 
     if (criteria.expand?.includes("episodes"))
       assertIsDefined(docsOdm[0].episode, "Lookup episode failed");

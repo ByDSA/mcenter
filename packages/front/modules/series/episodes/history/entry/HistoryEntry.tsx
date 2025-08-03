@@ -31,8 +31,8 @@ export function fetchLastestHistoryEntries(
   const URL = backendUrl(PATH_ROUTES.episodes.history.entries.search.path);
   const bodyJson: EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria = {
     filter: {
-      seriesKey: historyEntry.episodeCompKey.seriesKey,
-      episodeKey: historyEntry.episodeCompKey.episodeKey,
+      seriesKey: historyEntry.resourceId.seriesKey,
+      episodeKey: historyEntry.resourceId.episodeKey,
       timestampMax: historyEntry.date.timestamp - 1,
     },
     sort: {

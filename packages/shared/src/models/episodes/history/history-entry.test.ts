@@ -3,7 +3,7 @@ import { EpisodeHistoryEntry, episodeHistoryEntrySchema } from "./history-entry"
 
 const assertIsModel: ReturnType<typeof genAssertZod> = genAssertZod(episodeHistoryEntrySchema);
 const VALID_MODEL: EpisodeHistoryEntry = {
-  episodeCompKey: {
+  resourceId: {
     episodeKey: "1x01",
     seriesKey: "serie",
   },

@@ -8,7 +8,7 @@ export const HISTORY_ENTRIES_WITH_NO_ENTRIES: EpisodeHistoryEntryEntity[] = deep
 
 export const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntryEntity = {
   id: new ObjectId().toString(),
-  episodeCompKey: {
+  resourceId: {
     episodeKey: "1x01",
     seriesKey: "simpsons",
   },
@@ -18,7 +18,7 @@ export const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntryEntity = {
 
 export const HISTORY_ENTRY_SIMPSONS_6_25: EpisodeHistoryEntryEntity = {
   id: new ObjectId().toString(),
-  episodeCompKey: {
+  resourceId: {
     episodeKey: "6x25",
     seriesKey: "simpsons",
   },

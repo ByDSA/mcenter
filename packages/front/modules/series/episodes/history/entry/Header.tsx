@@ -8,13 +8,17 @@ type HeaderProps = {
   showDate: boolean;
 };
 export function Header( { entry, showDate }: HeaderProps) {
-  const { episode, serie } = entry;
+  const { resource } = entry;
+  const { serie } = resource;
 
-  assertIsDefined(episode);
+  assertIsDefined(resource);
   assertIsDefined(serie);
-  const title = episode.title ? `${episode.title}` : episode.compKey.episodeKey ?? "(Sin título)";
-  const subtitle = serie.name ?? episode.compKey.seriesKey;
-  const right = episode.compKey.episodeKey;
+  const title = resource.title
+    ? `${resource.title}`
+    : resource.compKey.episodeKey
+    ?? "(Sin título)";
+  const subtitle = serie.name ?? resource.compKey.seriesKey;
+  const right = resource.compKey.episodeKey;
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return <HistoryEntryHeader

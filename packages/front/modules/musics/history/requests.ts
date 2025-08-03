@@ -6,7 +6,7 @@ import z from "zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher, makeUseRequest } from "#modules/fetching";
 import { musicEntitySchema } from "../models";
-import { musicHistoryEntryEntitySchema, musicHistoryEntrySchema, type MusicHistoryEntryEntity } from "./models";
+import { musicHistoryEntryEntitySchema, type MusicHistoryEntryEntity } from "./models";
 
 namespace _GetManyByCriteria {
   export type Req = MusicHistoryEntryRestDtos.GetManyByCriteria.Criteria;
@@ -20,12 +20,12 @@ namespace _GetManyByCriteria {
   };
 
   export const dataSchema = musicHistoryEntryEntitySchema
-    .omit( {
-      music: true,
+    .required( {
+      resource: true,
     } )
     .extend( {
-      music: musicEntitySchema.extend( {
-        fileInfos: musicEntitySchema.shape.fileInfos.unwrap(),
+      resource: musicEntitySchema.required( {
+        fileInfos: true,
       } ),
     } );
 
@@ -64,7 +64,7 @@ namespace _DeleteOneById {
     const URL = backendUrl(PATH_ROUTES.musics.history.withParams(id));
     const fetcher = makeFetcher<typeof undefined, Response>( {
       method,
-      resBodyValidator: genAssertIsOneResultResponse(musicHistoryEntrySchema),
+      resBodyValidator: genAssertIsOneResultResponse(musicHistoryEntryEntitySchema),
       body: undefined,
     } );
 

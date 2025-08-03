@@ -8,10 +8,10 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { CustomValidationError } from "$shared/utils/validation/zod";
 import { RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/player";
 import { ZodSerializerSchemaInterceptor } from "#utils/validation/zod-nestjs";
-import { LoggingInterceptor } from "../logging/interceptor";
-import { Cleanup } from "./clean-up.service";
 import { setupEventEmitterDecorators } from "#core/domain-event-emitter/get-event-emitter";
 import { GlobalExceptionFilter } from "#core/error-handlers/http-error-handler";
+import { LoggingInterceptor } from "../logging/interceptor";
+import { Cleanup } from "./clean-up.service";
 
 @Injectable()
 export class InitService implements OnModuleInit {

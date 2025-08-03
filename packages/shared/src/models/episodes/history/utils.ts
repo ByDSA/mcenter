@@ -9,7 +9,7 @@ export function createEpisodeHistoryEntry(
 ): EpisodeHistoryEntry {
   const newEntry: EpisodeHistoryEntry = {
     date: getDateNow(),
-    episodeCompKey,
+    resourceId: episodeCompKey,
     streamId,
   };
 

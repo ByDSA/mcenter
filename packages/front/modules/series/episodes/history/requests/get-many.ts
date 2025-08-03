@@ -10,10 +10,10 @@ import { episodeHistoryEntryEntitySchema } from "../models";
 
 export const dataSchema = episodeHistoryEntryEntitySchema
   .omit( {
-    episode: true,
+    resource: true,
   } )
   .extend( {
-    episode: episodeEntitySchema.required( {
+    resource: episodeEntitySchema.required( {
       fileInfos: true,
     } ),
   } );

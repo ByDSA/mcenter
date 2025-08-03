@@ -38,7 +38,7 @@ export function LastestComponent(
   };
 
   // TODO: cambiar 'any' cuando EpisodeHistoryEntry tenga 'resource' en vez de 'episode'
-  return LatestHistoryEntries<any, Criteria>( {
+  return LatestHistoryEntries<EpisodeHistoryEntryEntity, Criteria>( {
     url: URL,
     body,
     validator,

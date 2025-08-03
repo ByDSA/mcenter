@@ -67,26 +67,6 @@ export function getCriteriaPipeline(
 
   // Agregar lookups para expand
   if (criteria.expand) {
-    if (criteria.expand.includes("series")) {
-      pipeline.push( {
-        $lookup: {
-          from: "series", // nombre de la colección de series
-          localField: "episodeCompKey.seriesKey",
-          foreignField: "key",
-          as: "serie",
-        },
-      } );
-
-      // Convertir el array a objeto único
-      pipeline.push( {
-        $addFields: {
-          serie: {
-            $arrayElemAt: ["$serie", 0],
-          },
-        },
-      } );
-    }
-
     if (criteria.expand.includes("episodes")) {
       pipeline.push( {
         $lookup: {
@@ -122,6 +102,57 @@ export function getCriteriaPipeline(
             $arrayElemAt: ["$episode", 0],
           },
         },
+      } );
+
+      // Si también se solicita series, agregarlo al episode
+      if (criteria.expand.includes("series")) {
+        pipeline.push( {
+          $lookup: {
+            from: "series", // nombre de la colección de series
+            localField: "episodeCompKey.seriesKey",
+            foreignField: "key",
+            as: "serieTemp",
+          },
+        } );
+
+        // Añadir la serie al episode
+        pipeline.push( {
+          $addFields: {
+            "episode.serie": {
+              $arrayElemAt: ["$serieTemp", 0],
+            },
+          },
+        } );
+
+        // Limpiar el campo temporal
+        pipeline.push( {
+          $unset: "serieTemp",
+        } );
+      }
+    } else if (criteria.expand.includes("series")) {
+      // Si solo se solicita series sin episodes, crear un episode vacío solo con la serie
+      pipeline.push( {
+        $lookup: {
+          from: "series", // nombre de la colección de series
+          localField: "episodeCompKey.seriesKey",
+          foreignField: "key",
+          as: "serieTemp",
+        },
+      } );
+
+      pipeline.push( {
+        $addFields: {
+          episode: {
+            serie: {
+              $arrayElemAt: ["$serieTemp", 0],
+            },
+          },
+        },
+      } );
+
+      // Limpiar el campo temporal
+      pipeline.push( {
+        $unset: "serieTemp",
       } );
     }
 

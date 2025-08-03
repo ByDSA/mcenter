@@ -8,32 +8,32 @@ export namespace MusicHistoryEntryDtos {
   export namespace Entity {
     export const schema = musicHistoryEntryEntitySchema
       .omit( {
-        music: true,
+        resource: true,
       } )
       .extend( {
-        music: replaceSchemaTimestampsToStrings(musicEntitySchema).optional(),
+        resource: replaceSchemaTimestampsToStrings(musicEntitySchema).optional(),
       } );
     export type Dto = z.infer<typeof schema>;
     export const toEntity = (dto: Dto): MusicHistoryEntryEntity => {
-      let music;
+      let resource;
 
-      if (dto.music)
-        music = MusicDtos.Entity.fromDto(dto.music);
+      if (dto.resource)
+        resource = MusicDtos.Entity.fromDto(dto.resource);
 
       return {
         ...dto,
-        music: music,
+        resource,
       };
     };
     export const toDto = (model: MusicHistoryEntryEntity): Dto=> {
-      let music;
+      let resource;
 
-      if (model.music)
-        music = MusicDtos.Entity.toDto(model.music);
+      if (model.resource)
+        resource = MusicDtos.Entity.toDto(model.resource);
 
       return {
         ...model,
-        music,
+        resource,
       };
     };
   }

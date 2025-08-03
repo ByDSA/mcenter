@@ -28,12 +28,12 @@ function getAndUpdateMusicByProp<V>(
   return {
     getUpdatedResource: (v, r) => ( {
       ...r,
-      music: {
-        ...r.music,
+      resource: {
+        ...r.resource,
         [prop]: v,
       },
     } ),
-    getValue: (r)=>r.music[prop],
+    getValue: (r)=>r.resource[prop],
     name: prop,
 
   };
@@ -57,8 +57,8 @@ export function Body( { data }: Props) {
       },
       fetchUpdate: async () => {
         const body = generatePatchBody(
-          data.music,
-          state[0].music,
+          data.resource,
+          state[0].resource,
           [
             "title",
             "weight",
@@ -76,11 +76,11 @@ export function Body( { data }: Props) {
         let musicPromise: Promise<MusicEntity> = Promise.resolve() as Promise<any>;
 
         if (shouldSendPatchWithBody(body)) {
-          musicPromise = MusicFetching.Patch.fetch(data.music.id, body)
+          musicPromise = MusicFetching.Patch.fetch(data.resource.id, body)
             .then(res=>{
               const music = {
                 ...res.data,
-                fileInfos: state[0].music.fileInfos,
+                fileInfos: state[0].resource.fileInfos,
               };
 
               assertIsDefined(music.fileInfos);
@@ -89,8 +89,8 @@ export function Body( { data }: Props) {
             } );
         }
 
-        const dataFileInfo = data.music.fileInfos[0];
-        const stateFileInfo = state[0].music.fileInfos[0];
+        const dataFileInfo = data.resource.fileInfos[0];
+        const stateFileInfo = state[0].resource.fileInfos[0];
         const fileInfoBody = generatePatchBody(
           dataFileInfo,
           stateFileInfo,
@@ -154,8 +154,8 @@ export function Body( { data }: Props) {
       {artistElement}
     </span>
   </span>;
-  const { music } = state[0];
-  const fileInfo = music.fileInfos[0];
+  const { resource } = state[0];
+  const fileInfo = resource.fileInfos[0];
   const { duration } = fileInfo.mediaInfo;
 
   return <div className={classes(style.container, commonStyle.container)}>
@@ -189,7 +189,7 @@ export function Body( { data }: Props) {
     </span>
     <span className={classes("line", "height2")}>
       {ResourceInputText( {
-        caption: <><a href={fullUrlOf(music.url)}>Url</a>:</>,
+        caption: <><a href={fullUrlOf(resource.url)}>Url</a>:</>,
         ...getAndUpdateMusicByProp<string>("url"),
         ...commonInputProps,
       } )}
@@ -200,7 +200,7 @@ export function Body( { data }: Props) {
     </span>
     <span className={classes("line", "height2", commonStyle.url)}>
       <span>{MUSIC_FILE_INFO_PROPS.path.caption}</span>
-      <span className={commonStyle.content}>{data.music.fileInfos[0].path}</span>
+      <span className={commonStyle.content}>{data.resource.fileInfos[0].path}</span>
     </span>
     {OptionalProps( {
       optionalProps,
@@ -270,8 +270,8 @@ function OptionalProps(
   for (const entry of entries) {
     const [prop, propInfo] = entry;
     const { type, caption = prop } = propInfo;
-    const isHidden = !(initialResource.music[prop] !== undefined
-      || resourceState[0].music[prop] !== undefined || isVisible);
+    const isHidden = !(initialResource.resource[prop] !== undefined
+      || resourceState[0].resource[prop] !== undefined || isVisible);
     const hiddenStyle = isHidden
       ? {
         display: "none",
@@ -340,7 +340,7 @@ function calcIsModified(r1: MusicHistoryEntryEntity, r2: MusicHistoryEntryEntity
   return isModifiedd(r1, r2, {
     ignoreNewUndefined: true,
     shouldMatch: {
-      music: {
+      resource: {
         title: true,
         album: true,
         artist: true,

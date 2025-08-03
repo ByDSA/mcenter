@@ -8,6 +8,6 @@ export const HISTORY_MUSIC_SAMPLES1: MusicHistoryEntryEntity[] = [
     id: new ObjectId().toString(),
     date: DATE_SAMPLE1,
     resourceId: fixtureMusics.Disk.List[0].id,
-    music: fixtureMusics.Disk.List[0],
+    resource: fixtureMusics.Disk.List[0],
   },
 ];

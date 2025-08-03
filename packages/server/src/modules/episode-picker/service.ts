@@ -54,7 +54,7 @@ export class EpisodePickerService {
       seriesKey,
       streamId: stream.id,
     } );
-    const lastPlayedEpInSerieCompKey = lastEntry?.episodeCompKey;
+    const lastPlayedEpInSerieCompKey = lastEntry?.resourceId;
     const lastPlayedEpInSerie = lastPlayedEpInSerieCompKey
       ? await this.episodeRepository.getOneByCompKey(lastPlayedEpInSerieCompKey)
       : null;

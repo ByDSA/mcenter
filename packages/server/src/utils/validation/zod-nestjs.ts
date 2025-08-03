@@ -40,14 +40,11 @@ export class ZodSerializerSchemaInterceptor implements NestInterceptor {
                   response: {
                     data,
                   },
-                  expected: {
-                    schema,
-                  },
                 },
                 issues: e.issues,
               };
 
-              msg = JSON.stringify(msgObj, null, 2);
+              msg = JSON.stringify(msgObj);
             }
 
             throw new Error(msg);

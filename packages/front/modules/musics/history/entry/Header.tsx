@@ -7,10 +7,10 @@ type HeaderProps = {
   showDate: boolean;
 };
 export function Header( { entry, showDate }: HeaderProps) {
-  const { music } = entry;
-  const { title } = music;
-  const subtitle = music.game ?? music.artist;
-  const right = music.weight.toString();
+  const { resource } = entry;
+  const { title } = resource;
+  const subtitle = resource.game ?? resource.artist;
+  const right = resource.weight.toString();
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return HistoryEntryHeader( {

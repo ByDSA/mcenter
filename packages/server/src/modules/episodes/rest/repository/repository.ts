@@ -7,16 +7,16 @@ import { CanCreateManyAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById, Ca
 import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
+import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
+import { logDomainEvent } from "#core/logging/log-domain-event";
+import { DomainEvent } from "#core/domain-event-emitter";
+import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { Episode, EpisodeCompKey, EpisodeEntity } from "../../models";
 import { LastTimePlayedService } from "../../history/last-time-played.service";
 import { EpisodeHistoryEntryEvents } from "../../history/rest/repository/events";
 import { EpisodeOdm } from "./odm";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { EpisodeEvents } from "./events";
-import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
-import { logDomainEvent } from "#core/logging/log-domain-event";
-import { DomainEvent } from "#core/domain-event-emitter";
-import { DomainEventEmitter } from "#core/domain-event-emitter";
 
 type CreateOneDto = Omit<Episode, "timestamps">;
 type EpisodeId = EpisodeEntity["id"];
@@ -48,7 +48,7 @@ CanGetAll<EpisodeEntity> {
   async handleCreateHistoryEntryEvents(event: EpisodeHistoryEntryEvents.Created.Event) {
     const { entity } = event.payload;
 
-    await this.patchOneByCompKeyAndGet(entity.episodeCompKey, {
+    await this.patchOneByCompKeyAndGet(entity.resourceId, {
       entity: {
         lastTimePlayed: entity.date.timestamp,
       },
@@ -60,7 +60,7 @@ CanGetAll<EpisodeEntity> {
     const { entity } = event.payload;
 
     await this.lastTimePlayedService
-      .updateEpisodeLastTimePlayedByCompKey(entity.episodeCompKey);
+      .updateEpisodeLastTimePlayedByCompKey(entity.resourceId);
     ;
   }
 

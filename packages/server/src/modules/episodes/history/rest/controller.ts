@@ -5,10 +5,10 @@ import { createZodDto } from "nestjs-zod";
 import { EpisodeHistoryEntryRestDtos } from "$shared/models/episodes/history/dto/transport";
 import z from "zod";
 import { DeleteOne, GetMany, GetManyCriteria } from "#utils/nestjs/rest";
+import { showError } from "#core/logging/show-error";
 import { EpisodeHistoryEntriesRepository } from "../rest/repository";
 import { type EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 import { LastTimePlayedService } from "../last-time-played.service";
-import { showError } from "#core/logging/show-error";
 
 class GetManyByCriteriaBodyDto
   extends createZodDto(EpisodeHistoryEntryRestDtos.GetManyByCriteria.criteriaSchema) {}
@@ -87,7 +87,7 @@ implements
     const { id } = params;
     const deleted = await this.entriesRepository.deleteOneByIdAndGet(id);
 
-    this.lastTimePlayedService.updateEpisodeLastTimePlayedByCompKey(deleted.episodeCompKey)
+    this.lastTimePlayedService.updateEpisodeLastTimePlayedByCompKey(deleted.resourceId)
       .catch(showError);
 
     return deleted;
