@@ -84,7 +84,12 @@ export function MediaPlayer( { meta: { title, artist },
             }<span className={styles.time} onClick={onClickChangeMode}>{time2}</span>
             </div>
             <span className={styles.controls}>
-              <span className={`${styles.btn} btnClickable`} onClick={()=>player.previous()}><SkipPrevious fontSize="large"/></span>
+              <span className={`${styles.btn} btnClickable`} onClick={async ()=>{
+                if (currentStartFixed > 0.5)
+                  await player.seek(start);
+                else
+                  await player.previous();
+              }}><SkipPrevious fontSize="large"/></span>
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.seek(-10)}><FastRewind fontSize="large" /></span>
               {playPauseButton(state, () =>player.pauseToggle())}
               <span className={`${styles.btn} btnClickable`} onClick={()=>player.seek("+10")}><FastForwardIcon fontSize="large"/></span>
