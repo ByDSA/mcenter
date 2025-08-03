@@ -4,8 +4,8 @@ import { SERIE_SIMPSONS } from "$sharedSrc/models/series/tests/fixtures";
 import { expectEpisodes } from "$sharedSrc/models/episodes/tests";
 import { EpisodeOdm } from "#episodes/rest/repository/odm";
 import { SeriesOdm } from "#series/rest/repository/odm";
-import { loadFixtureSimpsons } from "./sets";
 import { createTestingAppModuleAndInit } from "#core/app/tests/app";
+import { loadFixtureSimpsons } from "./sets";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 

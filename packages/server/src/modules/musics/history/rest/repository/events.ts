@@ -1,5 +1,5 @@
-import { MusicHistoryEntryEntity } from "../../models";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
+import { MusicHistoryEntryEntity } from "../../models";
 
 type Entity = MusicHistoryEntryEntity;
 export namespace MusicHistoryEntryEvents {

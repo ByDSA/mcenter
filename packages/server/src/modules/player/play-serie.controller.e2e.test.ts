@@ -6,13 +6,13 @@ import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { StreamsRepository } from "#modules/streams/rest/repository";
 import { fixtureEpisodes } from "#episodes/tests";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { testRoute } from "#core/routing/test";
+import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 import { PlayService } from "./play.service";
 import { PlaySerieController } from "./play-serie.controller";
 import { VlcBackWebSocketsServerService } from "./player-services";
 import { PlayerBackWebSocketsServiceMock } from "./player-services/vlc-back/tests";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { testRoute } from "#core/routing/test";
-import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 
 testRoute(PATH_ROUTES.player.play.episode.withParams("seriesKey", "episodeKey"));
 

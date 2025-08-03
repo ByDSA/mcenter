@@ -1,9 +1,9 @@
 /* eslint-disable import/no-cycle */
 import { forwardRef, Module } from "@nestjs/common";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MusicsModule } from "../module";
 import { MusicHistoryRepository } from "./rest/repository";
 import { MusicHistoryRestController } from "./rest/controller";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 
 @Module( {
   imports: [

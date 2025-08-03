@@ -3,7 +3,7 @@ import { DateType } from "$shared/utils/time";
 import { MusicId } from "#musics/models";
 import { DateTypeOdmSchema } from "#utils/time";
 import { RequireId } from "#utils/layers/db/mongoose";
-import { MusicOdm } from "#modules/musics/rest/repository/odm";
+import { MusicOdm } from "#musics/rest/repository/odm";
 
 export type DocOdm = {
   _id?: mongoose.Types.ObjectId;

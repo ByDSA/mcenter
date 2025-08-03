@@ -2,6 +2,8 @@ import request from "supertest";
 import { assertIsDefined } from "$shared/utils/validation";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { MusicRepository } from "../rest/repository";
 import { MusicFileInfoRepository } from "../file-info/rest/repository";
 import { MusicBuilderService } from "../builder/music-builder.service";
@@ -12,8 +14,6 @@ import { musicFileInfoRepositoryMockProvider } from "../file-info/rest/repositor
 import { musicRepoMockProvider } from "../rest/repository/tests";
 import { MusicUpdateRemoteController } from "./controller";
 import { UpdateRemoteTreeService, UpdateResult } from "./service";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 

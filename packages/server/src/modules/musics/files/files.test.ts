@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { join } from "path";
+import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { MUSIC_DATA_FOLDER } from "#tests/MusicData";
 import { md5FileAsync } from "#utils/crypt";
-import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { FindOptions, findFiles } from ".";
 
 const { DK, AOT4_COPY, A_AOT4, DRIFTVEIL } = fixtureMusicFileInfos.Disk.Samples;

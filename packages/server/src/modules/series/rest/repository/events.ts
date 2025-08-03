@@ -1,5 +1,5 @@
-import { SerieEntity } from "../../models";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
+import { SerieEntity } from "../../models";
 
 type Entity = SerieEntity;
 export namespace SeriesEvents {

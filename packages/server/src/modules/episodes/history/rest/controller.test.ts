@@ -3,10 +3,10 @@ import request from "supertest";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
 import { HISTORY_ENTRY_SIMPSONS1 } from "#episodes/history/tests";
+import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { EpisodeHistoryEntriesRepository } from "../rest/repository";
 import { episodeHistoryEntriesRepositoryMockProvider, lastTimePlayedServiceMockProvider } from "../rest/repository/tests";
 import { EpisodeHistoryEntriesRestController } from "./controller";
-import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 
 describe("restController", () => {
   let routerApp: Application;

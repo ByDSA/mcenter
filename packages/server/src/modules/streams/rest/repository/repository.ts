@@ -4,13 +4,13 @@ import { StreamRestDtos } from "$shared/models/streams/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
 import { SeriesEvents } from "#modules/series/rest/repository/events";
+import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
+import { DomainEvent } from "#core/domain-event-emitter";
+import { logDomainEvent } from "#core/logging/log-domain-event";
 import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
 import { StreamEvents } from "./events";
 import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
 import { StreamOdm } from "./odm";
-import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
-import { DomainEvent } from "#core/domain-event-emitter";
-import { logDomainEvent } from "#core/logging/log-domain-event";
 
 type CriteriaMany = StreamRestDtos.GetManyByCriteria.Criteria;
 @Injectable()

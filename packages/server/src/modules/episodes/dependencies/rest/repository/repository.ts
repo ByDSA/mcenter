@@ -6,11 +6,11 @@ import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { EpisodeCompKey } from "#episodes/models";
 import { assertFound } from "#utils/validation/found";
+import { logDomainEvent } from "#core/logging/log-domain-event";
+import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { EpisodeDependencyOdm } from "./odm";
 import { EpisodeDependencyEvents } from "./events";
 import { getCriteriaPipeline } from "./criteria-pipeline";
-import { logDomainEvent } from "#core/logging/log-domain-event";
-import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 
 type Id = Entity["id"];
 

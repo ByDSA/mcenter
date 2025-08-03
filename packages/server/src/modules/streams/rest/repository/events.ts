@@ -1,5 +1,5 @@
-import { StreamEntity } from "../../models";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
+import { StreamEntity } from "../../models";
 
 type Entity = StreamEntity;
 export namespace StreamEvents {

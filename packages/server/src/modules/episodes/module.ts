@@ -2,6 +2,7 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { SeriesModule } from "#modules/series/module";
 import { SerieRepository } from "#modules/series/rest/repository";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { EpisodesUpdateLastTimePlayedController } from "./actions/episodes-update-lastTimePlayed.controller";
 import { EpisodesRestController } from "./rest/controller";
 import { EpisodesRepository } from "./rest/repository";
@@ -13,7 +14,6 @@ import { EpisodeHistoryEntriesModule } from "./history/module";
 import { EpisodeFileInfosModule } from "./file-info/module";
 import { AddNewFilesRepository } from "./file-info/series-tree/add-new-files/repository";
 import { EpisodeDependenciesModule } from "./dependencies/module";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 
 @Module( {
   imports: [

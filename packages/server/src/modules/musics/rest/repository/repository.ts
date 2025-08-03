@@ -7,6 +7,11 @@ import { assertFound } from "#utils/validation/found";
 import { CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { MusicEntity, Music, MusicId } from "#musics/models";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
+import { showError } from "#core/logging/show-error";
+import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
+import { logDomainEvent } from "#core/logging/log-domain-event";
+import { DomainEventEmitter } from "#core/domain-event-emitter";
+import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicHistoryEntryEvents } from "../../history/rest/repository/events";
 import { MusicBuilderService } from "../../builder/music-builder.service";
 import { fixUrl } from "../../builder/fix-url";
@@ -14,11 +19,6 @@ import { ExpressionNode } from "./queries/query-object";
 import { findParamsToQueryParams } from "./queries/queries-odm";
 import { MusicEvents } from "./events";
 import { MusicOdm } from "./odm";
-import { showError } from "#core/logging/show-error";
-import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
-import { logDomainEvent } from "#core/logging/log-domain-event";
-import { DomainEventEmitter } from "#core/domain-event-emitter";
-import { DomainEvent } from "#core/domain-event-emitter";
 
 type CriteriaOne = MusicRestDtos.GetOne.Criteria;
 

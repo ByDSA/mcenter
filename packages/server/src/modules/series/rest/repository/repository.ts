@@ -3,14 +3,14 @@ import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
-import { Serie, SerieEntity, SeriesKey } from "../../models";
-import { FullDocOdm, ModelOdm } from "./odm/odm";
-import { SeriesOdm } from "./odm";
-import { SeriesEvents } from "./events";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
+import { Serie, SerieEntity, SeriesKey } from "../../models";
+import { FullDocOdm, ModelOdm } from "./odm/odm";
+import { SeriesOdm } from "./odm";
+import { SeriesEvents } from "./events";
 
 @Injectable()
 export class SerieRepository

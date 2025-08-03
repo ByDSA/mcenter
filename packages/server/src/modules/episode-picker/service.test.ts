@@ -13,8 +13,8 @@ import { STREAM_SIMPSONS } from "#modules/streams/tests";
 import { EpisodeHistoryEntriesRepository } from "#episodes/history/rest/repository";
 import { fixtureEpisodes } from "#episodes/tests";
 import { HISTORY_ENTRY_SIMPSONS_6_25 } from "#episodes/history/tests";
-import { EpisodePickerService } from "./service";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { EpisodePickerService } from "./service";
 
 describe("tests", () => {
   let testingSetup: TestingSetup;

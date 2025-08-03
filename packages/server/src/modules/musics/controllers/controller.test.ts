@@ -4,6 +4,8 @@ import { Application } from "express";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { MusicId } from "#musics/models";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { MusicRepository } from "../rest/repository";
 import { musicRepoMockProvider } from "../rest/repository/tests";
 import { musicHistoryRepoMockProvider } from "../history/rest/repository/tests";
@@ -12,8 +14,6 @@ import { musicFileInfoRepositoryMockProvider } from "../file-info/rest/repositor
 import { MusicFixController } from "./fix.controller";
 import { MusicGetController } from "./get.controller";
 import { RawHandlerService } from "./raw-handler.service";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 

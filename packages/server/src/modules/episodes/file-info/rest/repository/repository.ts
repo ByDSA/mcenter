@@ -7,10 +7,10 @@ import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { EpisodeEntity } from "#episodes/models";
 import { assertFound } from "#utils/validation/found";
 import { MongoFilterQuery, patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
-import { EpisodeFileInfoOdm } from "./odm";
-import { EpisodeFileInfoEvents } from "./events";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
+import { EpisodeFileInfoOdm } from "./odm";
+import { EpisodeFileInfoEvents } from "./events";
 
 type Entity = EpisodeFileInfoEntity;
 type Model = EpisodeFileInfo;

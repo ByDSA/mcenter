@@ -5,11 +5,11 @@ import { HttpStatus } from "@nestjs/common";
 import { PATH_ROUTES } from "$shared/routing";
 import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
 import { EpisodeCompKey } from "$shared/models/episodes";
+import { testRoute } from "#core/routing/test";
+import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { EpisodeDependenciesRepository } from "./repository";
 import { episodeDependenciesRepositoryMockProvider } from "./repository/tests";
 import { EpisodeDependenciesRestController } from "./controller";
-import { testRoute } from "#core/routing/test";
-import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 
 testRoute(PATH_ROUTES.episodes.dependencies.withParams("serie", "episode"));
 

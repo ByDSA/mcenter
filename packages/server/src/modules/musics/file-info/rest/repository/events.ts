@@ -1,5 +1,5 @@
-import { MusicFileInfoEntity } from "../../models";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
+import { MusicFileInfoEntity } from "../../models";
 
 type Entity = MusicFileInfoEntity;
 export namespace MusicFileInfoEvents {

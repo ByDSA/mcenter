@@ -4,11 +4,11 @@ import { PATH_ROUTES } from "$shared/routing";
 import { Application } from "express";
 import request from "supertest";
 import { Controller, Get, HttpStatus, InternalServerErrorException, UnprocessableEntityException } from "@nestjs/common";
-import { LoggingModule } from "./module";
-import { LOGS_FOLDER } from "./config";
 import { testRoute } from "#core/routing/test";
 import { TestingSetup, createTestingAppModuleAndInit } from "#core/app/tests/app";
 import { GlobalErrorHandlerService } from "#core/error-handlers/global-error-handler";
+import { LOGS_FOLDER } from "./config";
+import { LoggingModule } from "./module";
 
 testRoute(PATH_ROUTES.logs.path);
 

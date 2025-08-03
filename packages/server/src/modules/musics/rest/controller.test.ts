@@ -1,11 +1,11 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { restTestsSuite } from "#tests/suites/rest-suite";
+import { testRoute } from "#core/routing/test/routing";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MusicRepository } from "../rest/repository";
 import { MusicRestController } from "./controller";
 import { musicRepoMockProvider } from "./repository/tests";
-import { testRoute } from "#core/routing/test/routing";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 
 testRoute(PATH_ROUTES.musics.withParams("id"));
 

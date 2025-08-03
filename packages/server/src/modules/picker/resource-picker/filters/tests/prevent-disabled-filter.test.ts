@@ -1,6 +1,6 @@
 import { Resource } from "#modules/resources/models";
-import { PreventDisabledFilter } from "../prevent-disabled-filter";
 import { fixtureEpisodes } from "#episodes/tests";
+import { PreventDisabledFilter } from "../prevent-disabled-filter";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 const ENABLED_NO_DISABLED: Resource = {
