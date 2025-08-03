@@ -13,8 +13,4 @@
   .titleArtist {
     flex-wrap: wrap !important;
   }
-
-  .update {
-    margin-left: 1em;
-  }
 }

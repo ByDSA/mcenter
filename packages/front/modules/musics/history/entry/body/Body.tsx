@@ -18,6 +18,7 @@ import { MusicFetching } from "#modules/musics/requests";
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
 import { MUSIC_FILE_INFO_PROPS, MUSIC_PROPS } from "../utils";
 import { MusicHistoryEntryFetching } from "../../requests";
+import commonStyle from "../../../../history/entry/body-common.module.css";
 import { LastestComponent } from "./Lastest";
 import style from "./style.module.css";
 
@@ -157,7 +158,7 @@ export function Body( { data }: Props) {
   const fileInfo = music.fileInfos[0];
   const { duration } = fileInfo.mediaInfo;
 
-  return <div className={style.container}>
+  return <div className={classes(style.container, commonStyle.container)}>
     {titleArtist}
 
     <span className={classes("line", style.weightAlbum)}>
@@ -197,9 +198,9 @@ export function Body( { data }: Props) {
       <span>Duration:</span>
       <span>{(isDefined(duration) && <>{secsToMmss(duration)} ({duration} s)</>) || "-"}</span>
     </span>
-    <span className={classes("line", "height2")}>
+    <span className={classes("line", "height2", commonStyle.url)}>
       <span>{MUSIC_FILE_INFO_PROPS.path.caption}</span>
-      <span>{data.music.fileInfos[0].path}</span>
+      <span className={commonStyle.content}>{data.music.fileInfos[0].path}</span>
     </span>
     {OptionalProps( {
       optionalProps,
@@ -212,7 +213,7 @@ export function Body( { data }: Props) {
     <span className={"break"} />
     <span className="line">
       <span><a onClick={() => reset()}>Reset</a></span>
-      {isModified && <span className={style.update}>{
+      {isModified && <span className={commonStyle.update}>{
         <LinkAsyncAction
           action={update.action as ()=> Promise<void>}
           isDoing={update.isDoing}

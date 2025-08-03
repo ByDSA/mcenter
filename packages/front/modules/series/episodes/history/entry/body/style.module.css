@@ -30,19 +30,7 @@
     }
   }
 
-  .url * {
-    margin: 0.25em 0;
-  }
-
-  .url a {
-    text-wrap: wrap;
-  }
-
   .duration {
     text-wrap: nowrap;
-  }
-
-  .update {
-    margin-left: 1em;
   }
 }

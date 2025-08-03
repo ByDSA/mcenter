@@ -14,6 +14,7 @@ import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
 import { EpisodeFetching } from "../../../requests";
 import { EpisodeHistoryEntryFetching } from "../../requests";
 import { EPISODE_FILE_INFO_PROPS, EPISODE_PROPS } from "../utils";
+import commonStyle from "../../../../../history/entry/body-common.module.css";
 import { LastestComponent } from "./Lastest";
 import style from "./style.module.css";
 
@@ -143,8 +144,9 @@ Data
   const { episode } = state[0];
   const fileInfo = episode.fileInfos[0];
   const { duration } = fileInfo.mediaInfo;
+  const url = fullUrlOf(fileInfo);
 
-  return <div className={style.container}>
+  return <div className={classes(style.container, commonStyle.container)}>
     {titleArtist}
 
     <span className={`${"line"}`}>
@@ -191,23 +193,23 @@ Data
         onEmptyPressEnter: commonEpisodeInputProps.onPressEnter,
       } )}
     </span>
-    <span className={classes("line", "height2", style.url)}>
+    <span className={classes("line", "height2", commonStyle.url)}>
       <span>
-    Url:</span><a href={fullUrlOf(fileInfo)}>{fullUrlOf(fileInfo)}</a>
+        <a href={url}>Url</a>:</span><span className={commonStyle.content}>{url}</span>
     </span>
     <span className={classes("line", "height2", style.duration)}>
       <span>Duration:</span>
       <span>{(isDefined(duration) && <>{secsToMmss(duration)} ({duration} s)</>) || "-"}</span>
     </span>
-    <span className={classes("line", "height2")}>
+    <span className={classes("line", "height2", commonStyle.url)}>
       <span>{EPISODE_FILE_INFO_PROPS.path.caption}</span>
-      <span>{data.episode.fileInfos[0].path}</span>
+      <span className={commonStyle.content}>{data.episode.fileInfos[0].path}</span>
     </span>
 
     <span className={"break"} />
     <span className="line">
       <span><a onClick={() => reset()}>Reset</a></span>
-      {isModified && <span className={style.update}>{
+      {isModified && <span className={commonStyle.update}>{
         <LinkAsyncAction action={update.action as ()=> Promise<void>}
           isDoing={update.isDoing}>Update</LinkAsyncAction>}</span>
       }</span>
