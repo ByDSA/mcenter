@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { assertIsMusicEntity, MusicEntity } from "$shared/models/musics";
 import { AllKeysOf } from "$shared/utils/types";
-import { MusicFileInfoOdm } from "#modules/musics/file-info/crud/repository/odm";
+import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { timestampsModelToDocOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
@@ -31,7 +31,7 @@ export function musicDocOdmToEntity(docOdm: FullDocOdm): MusicEntity {
   const entity: MusicEntity = {
     id: docOdm._id.toString(),
     title: docOdm.title,
-    url: docOdm.url,
+    slug: docOdm.url,
     weight: docOdm.weight,
     artist: docOdm.artist,
     tags: docOdmToModelTags(docOdm),
@@ -59,7 +59,7 @@ export function musicToDocOdm(model: Music): DocOdm {
   const docOdmTags = model.tags ? modelTagsToDocOdmTags(model.tags) : undefined;
   const docOdm: DocOdm = {
     title: model.title,
-    url: model.url,
+    url: model.slug,
     weight: model.weight,
     artist: model.artist,
     timestamps: timestampsModelToDocOdm(model.timestamps),
@@ -104,7 +104,7 @@ export function partialToDocOdm(partial: Partial<Music>): Partial<DocOdm> {
   const docOdmTags = modelTagsToDocOdmTags(partial.tags);
   const ret: Partial<DocOdm> = {
     title: partial.title,
-    url: partial.url,
+    url: partial.slug,
     weight: partial.weight,
     artist: partial.artist,
     tags: docOdmTags.tags,

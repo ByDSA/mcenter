@@ -7,7 +7,7 @@ import { createCriteriaOneSchema, createCriteriaManySchema } from "../../utils/s
 const criteriaConfig = {
   filterShape: {
     id: z.string().optional(),
-    url: z.string().optional(),
+    slug: z.string().optional(),
     hash: z.string().optional(),
     path: z.string().optional(),
   },

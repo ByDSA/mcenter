@@ -2,12 +2,13 @@ import mongoose from "mongoose";
 import { timestampsSchemaOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "#musics/models";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
-import { MusicFileInfoOdm } from "#modules/musics/file-info/crud/repository/odm";
+import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 
-export interface DocOdm extends Omit<Music, "id"> {
+export type DocOdm = Omit<Music, "id" | "slug"> & {
   _id?: mongoose.Types.ObjectId;
   onlyTags?: string[];
-}
+  url: string;
+};
 
 export type FullDocOdm = RequireId<DocOdm> & {
   fileInfos?: MusicFileInfoOdm.FullDoc[];
@@ -71,4 +72,4 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
 } satisfies SchemaDef<DocOdm>);
 
-export const ModelOdm = mongoose.model<Music>(NAME, schemaOdm);
+export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

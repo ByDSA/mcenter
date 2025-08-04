@@ -3,7 +3,7 @@ import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { testRoute } from "#core/routing/test/routing";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { MusicRepository } from "./repository";
+import { MusicsRepository } from "./repository";
 import { MusicCrudController } from "./controller";
 import { musicRepoMockProvider } from "./repository/tests";
 
@@ -19,7 +19,7 @@ crudTestsSuite( {
         musicRepoMockProvider,
       ],
     }],
-  repositoryClass: MusicRepository,
+  repositoryClass: MusicsRepository,
   testsConfig: {
     getOne: {
       repo: {

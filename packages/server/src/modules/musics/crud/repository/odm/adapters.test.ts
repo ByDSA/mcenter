@@ -14,7 +14,7 @@ describe("musicModelToDocOdm", () => {
     const expectedDocOdm: DocOdm = {
       _id: new mongoose.Types.ObjectId(music.id),
       title: music.title,
-      url: music.url,
+      url: music.slug,
       weight: music.weight,
       artist: music.artist,
       tags: ["t1"],
@@ -43,7 +43,7 @@ describe("musicModelToDocOdm", () => {
     const music: MusicEntity = {
       id: new mongoose.Types.ObjectId().toString(),
       title: "Test Title",
-      url: "http://test.url",
+      slug: "http://test.url",
       timestamps: {
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -55,7 +55,7 @@ describe("musicModelToDocOdm", () => {
     const expectedDocOdm: DocOdm = {
       _id: new mongoose.Types.ObjectId(music.id),
       title: music.title,
-      url: music.url,
+      url: music.slug,
       timestamps: {
         createdAt: music.timestamps.createdAt,
         updatedAt: music.timestamps.updatedAt,
@@ -95,7 +95,7 @@ describe("musicDocOdmToModel", () => {
     const expectedMusic: MusicEntity = {
       id: docOdm._id.toString(),
       title: docOdm.title,
-      url: docOdm.url,
+      slug: docOdm.url,
       weight: docOdm.weight,
       artist: docOdm.artist,
       tags: ["tag1", "only-tag2"],
@@ -132,7 +132,7 @@ describe("musicDocOdmToModel", () => {
     const expectedMusic: MusicEntity = {
       id: docOdm._id.toString(),
       title: docOdm.title,
-      url: docOdm.url,
+      slug: docOdm.url,
       timestamps: {
         createdAt: docOdm.timestamps.createdAt,
         updatedAt: docOdm.timestamps.updatedAt,
@@ -160,7 +160,7 @@ describe("reversibility", () => {
     const docOdm: FullDocOdm = {
       _id: new mongoose.Types.ObjectId(),
       title: fixtureMusics.Disk.Samples.A_AOT4.title,
-      url: fixtureMusics.Disk.Samples.A_AOT4.url,
+      url: fixtureMusics.Disk.Samples.A_AOT4.slug,
       artist: fixtureMusics.Disk.Samples.A_AOT4.artist,
       tags: ["t1", "t3"],
       onlyTags: ["t2", "t3"],

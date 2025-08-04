@@ -18,7 +18,7 @@ type Id = z.infer<typeof idSchema>;
 
 const modelSchema = optionalPropsSchema.extend( {
   artist: z.string(),
-  url: z.string(),
+  slug: z.string(),
 } )
   .merge(resourceSchema)
   .merge(pickableSchema)

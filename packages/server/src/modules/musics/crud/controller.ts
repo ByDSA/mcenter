@@ -3,7 +3,7 @@ import { createZodDto } from "nestjs-zod";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { MusicEntity, musicEntitySchema } from "#musics/models";
 import { GetOne, PatchOne } from "#utils/nestjs/rest";
-import { MusicRepository } from "./repository";
+import { MusicsRepository } from "./repository";
 
 class GetOneByIdParamsDto extends createZodDto(MusicCrudDtos.GetOne.ById.paramsSchema) {}
 class PatchParamsDto extends createZodDto(MusicCrudDtos.PatchOneById.paramsSchema) {}
@@ -12,7 +12,7 @@ class PatchBodyDto extends createZodDto(MusicCrudDtos.PatchOneById.bodySchema) {
 @Controller("/")
 export class MusicCrudController {
   constructor(
-    private readonly musicRepo: MusicRepository,
+    private readonly musicRepo: MusicsRepository,
   ) {
   }
 

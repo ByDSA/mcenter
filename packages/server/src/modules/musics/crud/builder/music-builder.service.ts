@@ -5,12 +5,12 @@ import { deepCopy } from "$shared/utils/objects";
 import { ARTIST_EMPTY, assertIsMusic, Music } from "../../models";
 import { getFullPath } from "../../utils";
 import { AUDIO_EXTENSIONS } from "../../files";
-import { MusicUrlGeneratorService } from "./url-generator.service";
+import { MusicSlugGeneratorService } from "./slug-generator.service";
 
 @Injectable()
 export class MusicBuilderService {
   constructor(
-    private readonly musicUrlGenerator: MusicUrlGeneratorService,
+    private readonly musicSlugGenerator: MusicSlugGeneratorService,
   ) {
   }
 
@@ -28,9 +28,9 @@ export class MusicBuilderService {
     doc.artist ??= artist;
     doc.album ??= tags.album;
 
-    // 3. URL generator si no está definido
-    if (!doc.url) {
-      doc.url = await this.musicUrlGenerator.generateAvailableUrlFrom( {
+    // 3. Slug generator si no está definido
+    if (!doc.slug) {
+      doc.slug = await this.musicSlugGenerator.generateAvailableSlugFrom( {
         title,
         artist,
       } );

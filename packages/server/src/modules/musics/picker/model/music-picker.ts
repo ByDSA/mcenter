@@ -20,7 +20,7 @@ export function buildMusicPicker(
     case PickMode.SEQUENTIAL:
       picker = new ResourcePickerSequential<ModelId, Entity>( {
         resources: episodes,
-        lastId: lastOne ? lastOne.url : undefined,
+        lastId: lastOne ? lastOne.slug : undefined,
         compareId: (a, b) => a === b,
         getId: e=>e.id,
       } );

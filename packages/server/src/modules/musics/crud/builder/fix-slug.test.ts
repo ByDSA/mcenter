@@ -1,6 +1,6 @@
-import { fixUrl } from "./fix-url";
+import { fixSlug } from "./fix-slug";
 
-describe("fixUrl", () => {
+describe("fixSlug", () => {
   const testCases = [
     {
       input: "Hello World",
@@ -131,7 +131,7 @@ describe("fixUrl", () => {
 
   testCases.forEach(( { input, expected, description } ) => {
     it(`should ${description}`, () => {
-      expect(fixUrl(input)).toBe(expected);
+      expect(fixSlug(input)).toBe(expected);
     } );
   } );
 } );

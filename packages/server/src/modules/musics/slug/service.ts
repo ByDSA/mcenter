@@ -6,7 +6,7 @@ import * as mime from "mime-types";
 import { assertIsDefined } from "$shared/utils/validation";
 import { assertFound } from "#utils/validation/found";
 import { MusicHistoryRepository } from "../history/crud/repository";
-import { MusicRepository } from "../crud/repository";
+import { MusicsRepository } from "../crud/repository";
 import { getFullPath } from "../utils";
 import { Music } from "../models";
 
@@ -18,19 +18,19 @@ type RangeContentProps = {
 };
 
 @Injectable()
-export class RawHandlerService {
+export class SlugHandlerService {
   constructor(
-    private readonly musicRepo: MusicRepository,
+    private readonly musicRepo: MusicsRepository,
     private readonly historyRepo: MusicHistoryRepository,
   ) {}
 
   async handle(
-    url: string,
+    slug: string,
     ifNoneMatch: string,
     range: string,
     res: Response,
   ): Promise<StreamableFile | void> {
-    const music = await this.musicRepo.getOneByUrl(url, {
+    const music = await this.musicRepo.getOneBySlug(slug, {
       expand: ["fileInfos"],
     } );
 

@@ -4,7 +4,7 @@ import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { MusicRepository } from "../crud/repository";
+import { MusicsRepository } from "../crud/repository";
 import { MusicFileInfoRepository } from "../file-info/crud/repository";
 import { musicFileInfoEntitySchema } from "../file-info/models";
 import { musicEntitySchema } from "../models";
@@ -17,7 +17,7 @@ const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 
 describe("updateRemoteController", () => {
   let testingSetup: TestingSetup;
-  let musicRepoMock: jest.Mocked<MusicRepository>;
+  let musicRepoMock: jest.Mocked<MusicsRepository>;
   let musicFileInfoRepoMock: jest.Mocked<MusicFileInfoRepository>;
 
   beforeAll(async () => {
@@ -35,7 +35,7 @@ describe("updateRemoteController", () => {
       },
     } );
 
-    musicRepoMock = testingSetup.module.get<jest.Mocked<MusicRepository>>(MusicRepository);
+    musicRepoMock = testingSetup.module.get<jest.Mocked<MusicsRepository>>(MusicsRepository);
     musicFileInfoRepoMock = testingSetup.module.get<jest.Mocked<MusicFileInfoRepository>>(
       MusicFileInfoRepository,
     );

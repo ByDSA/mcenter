@@ -9,7 +9,7 @@ import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
 import { MusicHistoryEntryOdm } from "../history/crud/repository/odm";
 import { MusicHistoryModule } from "../history/module";
 import { MusicsCrudModule } from "../crud/module";
-import { MusicGetRandomController } from "./get.controller";
+import { MusicGetRandomController } from "./controller";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;
@@ -20,11 +20,11 @@ async function loadFixtures() {
 }
 
 function expectResponseIncludeAnyOfMusics(response: request.Response, musics: Music[]) {
-  const expectedPossibleUrls = musics.map((music) => music.url);
+  const expectedPossibleSlugs = musics.map((music) => music.slug);
   let found = false;
 
-  for (const url of expectedPossibleUrls) {
-    if (response.text.includes(`api/musics/get/raw/${url}`)) {
+  for (const slug of expectedPossibleSlugs) {
+    if (response.text.includes(PATH_ROUTES.musics.slug.withParams(slug))) {
       found = true;
       break;
     }
@@ -37,7 +37,7 @@ function expectNotEmpty(array: unknown[]) {
   expect(array.length).toBeGreaterThan(0);
 }
 
-describe("musicGetController", () => {
+describe("controller", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
       imports: [DomainEventEmitterModule, MusicHistoryModule, MusicsCrudModule],
@@ -60,27 +60,24 @@ describe("musicGetController", () => {
 
   it("should get random", async () => {
     const response = await request(routerApp)
-      .get("/")
+      .get("/?format=m3u8")
       .expect(200)
       .send();
 
-    expect(response.body).toBeDefined();
-    expect(response.text).toBeDefined();
-
-    expect(response.text.includes(PATH_ROUTES.musics.raw.path)).toBeTruthy();
+    expect(response.text.includes(PATH_ROUTES.musics.slug.path)).toBeTruthy();
   } );
 
   describe("query", () => {
     it("should get a music if query is put", async () => {
       const response = await request(routerApp)
-        .get("/?q=tag:t1")
+        .get("/?format=m3u8&q=tag:t1")
         .expect(200)
         .send();
 
       expect(response.body).toBeDefined();
       expect(response.text).toBeDefined();
 
-      expect(response.text.includes(PATH_ROUTES.musics.raw.path)).toBeTruthy();
+      expect(response.text.includes(PATH_ROUTES.musics.slug.path)).toBeTruthy();
     } );
 
     it("should get a music if query weight is put", async () => {
@@ -89,7 +86,7 @@ describe("musicGetController", () => {
 
       expectNotEmpty(possibleMusics);
       const response = await request(routerApp)
-        .get("/?q=weight:>10")
+        .get("/?format=m3u8&q=weight:>10")
         .expect(200)
         .send();
 
@@ -103,7 +100,7 @@ describe("musicGetController", () => {
 
       expectNotEmpty(musicsWithTagT1);
       const response = await request(routerApp)
-        .get(`/?q=${query}`)
+        .get(`/?format=m3u8&q=${query}`)
         .expect(200)
         .send();
 
@@ -113,17 +110,17 @@ describe("musicGetController", () => {
     it("should get a music with tag only-t2 using t2 query", async () => {
       const query = "tag:t2";
       const response = await request(routerApp)
-        .get(`/?q=${query}`)
+        .get(`/?format=m3u8&q=${query}`)
         .expect(200)
         .send();
       const musicsWithTagT2Only = MUSICS_WITH_TAGS_SAMPLES.filter(
         (music) => music.tags?.includes("only-t2"),
       );
-      const expectedPossibleUrls = musicsWithTagT2Only.map((music) => music.url);
+      const expectedPossibleSlugs = musicsWithTagT2Only.map((music) => music.slug);
       let found = false;
 
-      for (const url of expectedPossibleUrls) {
-        if (response.text.includes(`api/musics/get/raw/${url}`)) {
+      for (const slug of expectedPossibleSlugs) {
+        if (response.text.includes(PATH_ROUTES.musics.slug.withParams(slug))) {
           found = true;
           break;
         }

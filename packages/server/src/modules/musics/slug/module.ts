@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
 import { MusicHistoryModule } from "../history/module";
 import { MusicsCrudModule } from "../crud/module";
-import { RawHandlerService } from "./service";
-import { MusicGetRawController } from "./controller";
+import { SlugHandlerService } from "./service";
+import { MusicsSlugController } from "./controller";
 
 @Module( {
   imports: [
@@ -10,11 +10,11 @@ import { MusicGetRawController } from "./controller";
     MusicsCrudModule,
   ],
   controllers: [
-    MusicGetRawController,
+    MusicsSlugController,
   ],
   providers: [
-    RawHandlerService,
+    SlugHandlerService,
   ],
   exports: [],
 } )
-export class MusicsGetRawModule {}
+export class MusicsSlugModule {}

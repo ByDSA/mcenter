@@ -1,5 +1,6 @@
 import type { FilterQuery, PipelineStage } from "mongoose";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
+import { MongoFilterQuery } from "#utils/layers/db/mongoose";
 
 type Criteria = MusicCrudDtos.GetMany.Criteria;
 
@@ -71,14 +72,14 @@ function buildMongooseFilterWithFileInfos(
   criteria: MusicCrudDtos.GetMany.Criteria,
   hasFileInfoLookup: boolean,
 ): FilterQuery<any> {
-  const filter: FilterQuery<any> = {};
+  const filter: MongoFilterQuery<any> = {};
 
   if (criteria.filter) {
     if (criteria.filter.id)
       filter["_id"] = criteria.filter.id;
 
-    if (criteria.filter.url)
-      filter["url"] = criteria.filter.url;
+    if (criteria.filter.slug)
+      filter["url"] = criteria.filter.slug;
 
     // Solo aplicar estos filtros si tenemos el lookup
     if (hasFileInfoLookup) {

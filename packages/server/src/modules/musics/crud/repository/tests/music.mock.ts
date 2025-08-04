@@ -1,10 +1,10 @@
 import { createMockClass } from "#tests/jest/mocking";
-import { MusicRepository } from "../repository";
+import { MusicsRepository } from "../repository";
 
-class MusicRepositoryMock extends createMockClass(MusicRepository) {
+class MusicRepositoryMock extends createMockClass(MusicsRepository) {
 }
 
 export const musicRepoMockProvider = {
-  provide: MusicRepository,
+  provide: MusicsRepository,
   useClass: MusicRepositoryMock,
 };

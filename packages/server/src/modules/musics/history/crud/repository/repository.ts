@@ -11,7 +11,7 @@ import { showError } from "#core/logging/show-error";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent } from "#core/domain-event-emitter";
-import { MusicRepository } from "../../../crud/repository";
+import { MusicsRepository } from "../../../crud/repository";
 import { docOdmToEntity, docOdmToModel } from "./odm/adapters";
 import { getCriteriaPipeline } from "./criteria-pipeline";
 import { MusicHistoryEntryOdm } from "./odm";
@@ -36,7 +36,7 @@ CanGetAll<Entity>,
 CanGetOneById<Entity, EntryId>,
 CanDeleteOneByIdAndGet<Entity, EntryId> {
   constructor(
-    private readonly musicRepo: MusicRepository,
+    private readonly musicRepo: MusicsRepository,
   ) { }
 
   @OnEvent(MusicHistoryEntryEvents.WILDCARD)

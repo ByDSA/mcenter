@@ -4,8 +4,8 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicBuilderService } from "./builder/music-builder.service";
 import { MusicCrudController } from "./controller";
-import { MusicRepository } from "./repository";
-import { MusicUrlGeneratorService } from "./builder/url-generator.service";
+import { MusicsRepository } from "./repository";
+import { MusicSlugGeneratorService } from "./builder/slug-generator.service";
 
 @Module( {
   imports: [
@@ -16,10 +16,10 @@ import { MusicUrlGeneratorService } from "./builder/url-generator.service";
     MusicCrudController,
   ],
   providers: [
-    MusicRepository,
-    MusicUrlGeneratorService,
+    MusicsRepository,
+    MusicSlugGeneratorService,
     MusicBuilderService,
   ],
-  exports: [MusicRepository],
+  exports: [MusicsRepository],
 } )
 export class MusicsCrudModule {}

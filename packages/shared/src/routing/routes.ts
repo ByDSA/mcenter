@@ -2,9 +2,9 @@ import { EpisodeCompKey } from "../models/episodes";
 import { PathRoutes } from "./routes.types";
 
 const MUSICS = "/api/musics";
-const MUSICS_RAW = `${MUSICS}/get/raw`;
-const MUSICS_PLAYLISTS = `${MUSICS}/get/playlists`;
-const MUSICS_RANDOM = `${MUSICS}/get/random`;
+const MUSICS_SLUG = `${MUSICS}/slug`;
+const MUSICS_PLAYLISTS = `${MUSICS}/playlists`;
+const MUSICS_RANDOM = `${MUSICS}/random`;
 const PLAYER = "/api/player";
 const EPISODES = "/api/episodes";
 const PLAYER_PLAY_EPISODE = `${PLAYER}/play/episode`;
@@ -26,9 +26,9 @@ export const PATH_ROUTES = {
         path: MUSICS_HISTORY + "/search",
       },
     },
-    raw: {
-      path: MUSICS_RAW,
-      withParams: (musicUrl: string) => `${MUSICS_RAW}/${musicUrl}`,
+    slug: {
+      path: MUSICS_SLUG,
+      withParams: (slug: string) => `${MUSICS_SLUG}/${slug}`,
     },
     playlists: {
       path: MUSICS_PLAYLISTS,

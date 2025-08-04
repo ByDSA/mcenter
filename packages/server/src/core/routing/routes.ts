@@ -12,7 +12,7 @@ import { StaticFilesModule } from "#modules/config/static-files.module";
 import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
 import { MusicsGetRandomModule } from "#musics/picker/module";
 import { MusicsGetPlaylistsModule } from "#musics/playlists/module";
-import { MusicsGetRawModule } from "#musics/raw/module";
+import { MusicsSlugModule } from "#musics/slug/module";
 import { MusicsCrudModule } from "#musics/crud/module";
 import { LoggingModule } from "../logging/module";
 
@@ -27,7 +27,7 @@ export const routeModules = [
 
   MusicsGetRandomModule,
   MusicsGetPlaylistsModule,
-  MusicsGetRawModule,
+  MusicsSlugModule,
 
   /* Importante: el orden de las rutas aquí en el Register es irrelevante.
   Si hay colisiones en el acceso, cargar el módulo específico primero fuera del Register */
@@ -69,8 +69,8 @@ export const routeModules = [
       module: MusicsCrudModule,
     },
     {
-      path: PATH_ROUTES.musics.raw.path,
-      module: MusicsGetRawModule,
+      path: PATH_ROUTES.musics.slug.path,
+      module: MusicsSlugModule,
     },
     {
       path: PATH_ROUTES.musics.pickRandom.path,

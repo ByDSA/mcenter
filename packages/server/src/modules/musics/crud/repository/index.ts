@@ -1,3 +1,3 @@
 export {
-  MusicRepository,
+  MusicsRepository,
 } from "./repository";

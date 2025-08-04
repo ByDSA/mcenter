@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { MusicHistoryModule } from "../history/module";
 import { MusicsCrudModule } from "../crud/module";
-import { MusicGetRandomController } from "./get.controller";
+import { MusicGetRandomController } from "./controller";
 
 @Module( {
   imports: [

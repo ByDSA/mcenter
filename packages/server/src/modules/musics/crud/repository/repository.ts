@@ -14,7 +14,7 @@ import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicHistoryEntryEvents } from "../../history/crud/repository/events";
 import { MusicBuilderService } from "../builder/music-builder.service";
-import { fixUrl } from "../builder/fix-url";
+import { fixSlug } from "../builder/fix-slug";
 import { ExpressionNode } from "./queries/query-object";
 import { findParamsToQueryParams } from "./queries/queries-odm";
 import { MusicEvents } from "./events";
@@ -23,7 +23,7 @@ import { MusicOdm } from "./odm";
 type CriteriaOne = MusicCrudDtos.GetOne.Criteria;
 
 @Injectable()
-export class MusicRepository
+export class MusicsRepository
 implements
 CanPatchOneByIdAndGet<MusicEntity, MusicId, Music>,
 CanGetOneById<MusicEntity, MusicId> {
@@ -50,19 +50,19 @@ CanGetOneById<MusicEntity, MusicId> {
   }
 
   async getOneById(id: string): Promise<MusicEntity | null> {
-    const docOdm = await MusicOdm.Model.findById(id);
+    const doc = await MusicOdm.Model.findById(id);
 
-    if (!docOdm)
+    if (!doc)
       return null;
 
-    return MusicOdm.toEntity(docOdm);
+    return MusicOdm.toEntity(doc);
   }
 
   async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {
     const { entity } = params;
 
-    if (entity.url)
-      entity.url = fixUrl(entity.url) ?? undefined;
+    if (entity.slug)
+      entity.slug = fixSlug(entity.slug) ?? undefined;
 
     const updateQuery = patchParamsToUpdateQuery(params, MusicOdm.partialToDoc);
 
@@ -71,13 +71,17 @@ CanGetOneById<MusicEntity, MusicId> {
       "timestamps.updatedAt": new Date(),
     };
 
-    const gotDoc = await MusicOdm.Model.findByIdAndUpdate(id, updateQuery, {
-      new: true,
-    } );
+    const doc = await MusicOdm.Model.findByIdAndUpdate(
+      id,
+      updateQuery,
+      {
+        new: true,
+      },
+    );
 
-    assertFound(gotDoc);
+    assertFound(doc);
 
-    const ret = MusicOdm.toEntity(gotDoc);
+    const ret = MusicOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(MusicEvents.Patched.TYPE, {
       entity,
@@ -90,7 +94,7 @@ CanGetOneById<MusicEntity, MusicId> {
 
   async getOne(criteria: CriteriaOne): Promise<MusicEntity | null> {
     const pipeline = MusicOdm.getCriteriaPipeline(criteria);
-    const docs: MusicOdm.FullDoc[] = await MusicOdm.Model.aggregate(pipeline);
+    const docs = await MusicOdm.Model.aggregate(pipeline);
 
     if (docs.length === 0)
       return null;
@@ -109,23 +113,23 @@ CanGetOneById<MusicEntity, MusicId> {
     }, criteria);
   }
 
-  async getOneByUrl(url: string, criteria?: CriteriaOne): Promise<MusicEntity | null> {
+  async getOneBySlug(slug: string, criteria?: CriteriaOne): Promise<MusicEntity | null> {
     return await this.getOneByFilter( {
-      url,
+      slug,
     }, criteria);
   }
 
   async getAll(): Promise<MusicEntity[]> {
-    const docOdms = await MusicOdm.Model.find( {} );
-    const ret = docOdms.map(MusicOdm.toEntity);
+    const docs = await MusicOdm.Model.find( {} );
+    const ret = docs.map(MusicOdm.toEntity);
 
     return ret;
   }
 
   async getManyByQuery(params: ExpressionNode): Promise<MusicEntity[]> {
     const query = findParamsToQueryParams(params);
-    const docOdms = await MusicOdm.Model.find(query);
-    const ret = docOdms.map(MusicOdm.toEntity);
+    const docs = await MusicOdm.Model.find(query);
+    const ret = docs.map(MusicOdm.toEntity);
 
     return ret;
   }
@@ -149,9 +153,9 @@ CanGetOneById<MusicEntity, MusicId> {
   @EmitEntityEvent(MusicEvents.Created.TYPE)
   async createOneAndGet(music: Music): Promise<MusicEntity> {
     const docOdm = MusicOdm.toDoc(music);
-    const gotDocOdm = await MusicOdm.Model.create(docOdm);
+    const gotDoc = await MusicOdm.Model.create(docOdm);
 
-    return MusicOdm.toEntity(gotDocOdm);
+    return MusicOdm.toEntity(gotDoc);
   }
 
   @EmitEntityEvent(MusicEvents.Deleted.TYPE)

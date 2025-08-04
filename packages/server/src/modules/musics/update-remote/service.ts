@@ -6,7 +6,7 @@ import { musicEntitySchema } from "#musics/models";
 import { MusicFileInfoRepository } from "#modules/musics/file-info/crud/repository";
 import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../files";
-import { MusicRepository } from "../crud/repository";
+import { MusicsRepository } from "../crud/repository";
 import { getFullPath } from "../utils";
 import { ChangesDetector, FileWithStats } from "./changes-detector";
 
@@ -34,7 +34,7 @@ export class UpdateRemoteTreeService {
 
   constructor(
     private readonly fileInfoRepo: MusicFileInfoRepository,
-    private readonly musicRepo: MusicRepository,
+    private readonly musicRepo: MusicsRepository,
   ) {
   }
 

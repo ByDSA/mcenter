@@ -82,8 +82,8 @@ const charMap: { [key: string]: string } = {
   ...cyrillicToLatinMap,
 };
 
-export function fixUrl(url: string): string | null {
-  let fixed: string = url
+export function fixSlug(slug: string): string | null {
+  let fixed: string = slug
     .toLowerCase()
     .replaceAll(" & ", " and ")
     .replaceAll(/(official-)?lyric-video/g, "");

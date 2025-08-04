@@ -333,7 +333,7 @@ function OptionalProps(
 }
 
 function fullUrlOf(url: string) {
-  return backendUrl(PATH_ROUTES.musics.raw.withParams(url));
+  return backendUrl(PATH_ROUTES.musics.slug.withParams(url));
 }
 
 function calcIsModified(r1: MusicHistoryEntryEntity, r2: MusicHistoryEntryEntity) {
@@ -348,7 +348,7 @@ function calcIsModified(r1: MusicHistoryEntryEntity, r2: MusicHistoryEntryEntity
         disabled: true,
         game: true,
         tags: true,
-        url: true,
+        slug: true,
         weight: true,
         year: true,
         fileInfos: true,

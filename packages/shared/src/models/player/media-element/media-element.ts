@@ -2,6 +2,7 @@ import z from "zod";
 
 export const mediaElementSchema = z.object( {
   title: z.string().optional(),
+  artist: z.string().optional(),
   path: z.string(),
   type: z.enum(["video", "audio"]).optional(),
   startTime: z.number().optional(),
