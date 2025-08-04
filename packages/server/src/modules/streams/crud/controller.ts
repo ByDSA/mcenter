@@ -16,19 +16,19 @@ export class StreamsCrudController
 implements
     CanGetAll<Request, Response> {
   constructor(
-    private readonly streamRepository: StreamsRepository,
+    private readonly repo: StreamsRepository,
   ) {
   }
 
   @GetMany("/", schema)
   async getAll() {
-    return await this.streamRepository.getAll();
+    return await this.repo.getAll();
   }
 
   @GetManyCriteria("/criteria", schema)
   async getMany(
     @Body() body: CriteriaBodyDto,
   ): Promise<Stream[]> {
-    return await this.streamRepository.getManyByCriteria(body);
+    return await this.repo.getManyByCriteria(body);
   }
 }

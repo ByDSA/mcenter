@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { EpisodeFileInfosCrudController } from "./crud/controller";
-import { EpisodeFileInfoRepository } from "./crud/repository/repository";
+import { EpisodeFileInfosRepository } from "./crud/repository/repository";
 
 @Module( {
   imports: [
@@ -11,8 +11,8 @@ import { EpisodeFileInfoRepository } from "./crud/repository/repository";
     EpisodeFileInfosCrudController,
   ],
   providers: [
-    EpisodeFileInfoRepository,
+    EpisodeFileInfosRepository,
   ],
-  exports: [EpisodeFileInfoRepository],
+  exports: [EpisodeFileInfosRepository],
 } )
 export class EpisodeFileInfosModule {}

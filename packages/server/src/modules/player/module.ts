@@ -3,7 +3,7 @@ import { EpisodePickerModule } from "#modules/episode-picker/module";
 import { EpisodesModule } from "#episodes/module";
 import { SeriesModule } from "#modules/series/module";
 import { StreamsModule } from "#modules/streams/module";
-import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
+import { EpisodeHistoryModule } from "#episodes/history/module";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { PlayService } from "./play.service";
@@ -19,7 +19,7 @@ import { PlaySerieController } from "./play-serie.controller";
     StreamsModule,
     SeriesModule,
     EpisodesModule,
-    EpisodeHistoryEntriesModule,
+    EpisodeHistoryModule,
     EpisodePickerModule,
     EpisodeFileInfosModule,
   ],

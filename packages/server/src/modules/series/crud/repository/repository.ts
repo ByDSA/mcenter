@@ -13,7 +13,7 @@ import { SeriesOdm } from "./odm";
 import { SeriesEvents } from "./events";
 
 @Injectable()
-export class SerieRepository
+export class SeriesRepository
 implements
 CanCreateOneAndGet<SerieEntity>,
 CanGetAll<SerieEntity> {

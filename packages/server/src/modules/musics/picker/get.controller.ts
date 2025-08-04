@@ -36,8 +36,8 @@ function getRootUrlFromRequest(req: Request): string {
 @Controller("/")
 export class MusicGetRandomController {
   constructor(
-    private readonly musicHistoryRepository: MusicHistoryRepository,
-    private readonly musicRepository: MusicRepository,
+    private readonly musicHistoryRepo: MusicHistoryRepository,
+    private readonly musicRepo: MusicRepository,
   ) {
   }
 
@@ -59,12 +59,12 @@ export class MusicGetRandomController {
   }
 
   async #getLastMusicInHistory(): Promise<MusicEntity | null> {
-    const lastOneEntry = await this.musicHistoryRepository.getLast();
+    const lastOneEntry = await this.musicHistoryRepo.getLast();
 
     if (!lastOneEntry)
       return null;
 
-    const lastOne = await this.musicRepository.getOneById(lastOneEntry.resourceId);
+    const lastOne = await this.musicRepo.getOneById(lastOneEntry.resourceId);
 
     return lastOne;
   }
@@ -90,9 +90,9 @@ export class MusicGetRandomController {
     const params = requestToFindMusicParams(req);
 
     if (params)
-      return this.musicRepository.getManyByQuery(params);
+      return this.musicRepo.getManyByQuery(params);
 
-    return this.musicRepository.getAll();
+    return this.musicRepo.getAll();
   }
 }
 

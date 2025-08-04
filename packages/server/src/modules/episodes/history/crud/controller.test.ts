@@ -4,26 +4,26 @@ import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
 import { HISTORY_ENTRY_SIMPSONS1 } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
-import { EpisodeHistoryEntriesRepository } from "./repository";
-import { episodeHistoryEntriesRepositoryMockProvider, lastTimePlayedServiceMockProvider } from "./repository/tests";
-import { EpisodeHistoryEntriesCrudController } from "./controller";
+import { EpisodeHistoryRepository } from "./repository";
+import { episodeHistoryRepositoryMockProvider, lastTimePlayedServiceMockProvider } from "./repository/tests";
+import { EpisodeHistoryCrudController } from "./controller";
 
 describe("crudController", () => {
   let routerApp: Application;
-  let repository: jest.Mocked<EpisodeHistoryEntriesRepository>;
+  let repository: jest.Mocked<EpisodeHistoryRepository>;
   let testingSetup: TestingSetup;
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
       imports: [],
-      controllers: [EpisodeHistoryEntriesCrudController],
+      controllers: [EpisodeHistoryCrudController],
       providers: [
-        episodeHistoryEntriesRepositoryMockProvider,
+        episodeHistoryRepositoryMockProvider,
         lastTimePlayedServiceMockProvider,
       ],
     } );
     repository = testingSetup.module
-      .get<jest.Mocked<EpisodeHistoryEntriesRepository>>(EpisodeHistoryEntriesRepository);
+      .get<jest.Mocked<EpisodeHistoryRepository>>(EpisodeHistoryRepository);
 
     routerApp = testingSetup.routerApp;
   } );

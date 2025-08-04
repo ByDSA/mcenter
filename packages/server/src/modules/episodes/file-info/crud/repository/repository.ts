@@ -18,7 +18,7 @@ type Model = EpisodeFileInfo;
 type EpisodeId = EpisodeEntity["id"];
 
 @Injectable()
-export class EpisodeFileInfoRepository
+export class EpisodeFileInfosRepository
 implements
 CanCreateOneAndGet<Model>,
 CanGetAll<Entity> {

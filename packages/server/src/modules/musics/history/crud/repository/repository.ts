@@ -36,7 +36,7 @@ CanGetAll<Entity>,
 CanGetOneById<Entity, EntryId>,
 CanDeleteOneByIdAndGet<Entity, EntryId> {
   constructor(
-    private readonly musicRepository: MusicRepository,
+    private readonly musicRepo: MusicRepository,
   ) { }
 
   @OnEvent(MusicHistoryEntryEvents.WILDCARD)
@@ -51,7 +51,7 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
     const actualLastTimePlayed = await this.calcLastTimePlayedOf(deletedId) ?? 0;
 
     if (actualLastTimePlayed < deletedTimestamp) {
-      await this.musicRepository.patchOneByIdAndGet(deletedId, {
+      await this.musicRepo.patchOneByIdAndGet(deletedId, {
         entity: {
           lastTimePlayed: actualLastTimePlayed,
         },

@@ -3,7 +3,7 @@ import { RouterModule } from "@nestjs/core";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesModule } from "#episodes/module";
-import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
+import { EpisodeHistoryModule } from "#episodes/history/module";
 import { EpisodePickerModule } from "#modules/episode-picker/module";
 import { StreamsModule } from "#modules/streams/module";
 import { PlayerModule } from "#modules/player/module";
@@ -50,7 +50,7 @@ export const routeModules = [
     },
     {
       path: PATH_ROUTES.episodes.history.path,
-      module: EpisodeHistoryEntriesModule,
+      module: EpisodeHistoryModule,
     },
     {
       path: PATH_ROUTES.episodes.picker.path,

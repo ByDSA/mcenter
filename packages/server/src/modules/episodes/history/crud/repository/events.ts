@@ -3,7 +3,7 @@ import { EpisodeHistoryEntryEntity } from "../../models";
 
 type Entity = EpisodeHistoryEntryEntity;
 export namespace EpisodeHistoryEntryEvents {
-  const MAIN_TYPE = "episodeHistoryEntries";
+  const MAIN_TYPE = "episodeHistory";
   export const WILDCARD = `${MAIN_TYPE}.*`;
 
   export namespace Patched {

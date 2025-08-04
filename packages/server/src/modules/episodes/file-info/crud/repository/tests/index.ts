@@ -1,9 +1,9 @@
 import { createMockClass } from "#tests/jest/mocking";
-import { EpisodeFileInfoRepository } from "../repository";
+import { EpisodeFileInfosRepository } from "../repository";
 
-class EpisodeFileInfoRepositoryMock extends createMockClass(EpisodeFileInfoRepository) { }
+class EpisodeFileInfoRepositoryMock extends createMockClass(EpisodeFileInfosRepository) { }
 
 export const episodeFileInfoRepositoryMockProvider = {
-  provide: EpisodeFileInfoRepository,
+  provide: EpisodeFileInfosRepository,
   useClass: EpisodeFileInfoRepositoryMock,
 };

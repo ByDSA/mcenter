@@ -6,7 +6,7 @@ import { EpisodesRepository } from "#episodes/crud/repository";
 import { PickMode } from "#modules/picker/resource-picker/pick-mode";
 import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/crud/repository";
-import { EpisodeHistoryEntriesRepository } from "#episodes/history/crud/repository";
+import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { buildEpisodePicker } from "./episode-picker";
 import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
@@ -14,15 +14,15 @@ import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
 @Injectable()
 export class EpisodePickerService {
   constructor(
-    private readonly streamRepository: StreamsRepository,
-    private readonly episodeRepository: EpisodesRepository,
-    private readonly historyEntriesRepository: EpisodeHistoryEntriesRepository,
+    private readonly streamsRepo: StreamsRepository,
+    private readonly episodesRepo: EpisodesRepository,
+    private readonly historyRepo: EpisodeHistoryRepository,
     private readonly dependenciesRepo: EpisodeDependenciesRepository,
   ) {
   }
 
   async getByStreamKey(streamKey: StreamEntity["key"], n = 1): Promise<EpisodeEntity[]> {
-    const stream = await this.streamRepository.getOneByKey(streamKey);
+    const stream = await this.streamsRepo.getOneByKey(streamKey);
 
     if (!stream)
       return [];
@@ -39,7 +39,7 @@ export class EpisodePickerService {
     const seriesKey = getSeriesKeyFromStream(stream);
 
     assertIsDefined(seriesKey);
-    const criteria: Parameters<typeof this.episodeRepository
+    const criteria: Parameters<typeof this.episodesRepo
       .getManyBySerieKey>[1] = {};
 
     if (stream.mode === StreamMode.SEQUENTIAL) {
@@ -48,15 +48,15 @@ export class EpisodePickerService {
       };
     }
 
-    const allEpisodesInSerie = await this.episodeRepository
+    const allEpisodesInSerie = await this.episodesRepo
       .getManyBySerieKey(seriesKey, criteria);
-    const lastEntry = await this.historyEntriesRepository.findLast( {
+    const lastEntry = await this.historyRepo.findLast( {
       seriesKey,
       streamId: stream.id,
     } );
     const lastPlayedEpInSerieCompKey = lastEntry?.resourceId;
     const lastPlayedEpInSerie = lastPlayedEpInSerieCompKey
-      ? await this.episodeRepository.getOneByCompKey(lastPlayedEpInSerieCompKey)
+      ? await this.episodesRepo.getOneByCompKey(lastPlayedEpInSerieCompKey)
       : null;
     const mode = streamModeToPickerMode(stream.mode);
     let dependencies: DependenciesList | undefined;

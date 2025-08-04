@@ -15,7 +15,7 @@ const schema = episodeFileInfoEntitySchema;
 @Controller()
 export class EpisodeFileInfosCrudController {
   constructor(
-    private readonly fileInfoRepository: EpisodeFileInfoRepository,
+    private readonly fileInfoRepo: EpisodeFileInfoRepository,
   ) {
   }
 
@@ -24,7 +24,7 @@ export class EpisodeFileInfosCrudController {
     @Param() params: PatchOneByIdParamsDto,
     @Body() body: PatchOneByIdBodyDto,
   ): Promise<EpisodeFileInfoEntity> {
-    const got = await this.fileInfoRepository.patchOneByIdAndGet(params.id, body);
+    const got = await this.fileInfoRepo.patchOneByIdAndGet(params.id, body);
 
     assertFound(got);
 

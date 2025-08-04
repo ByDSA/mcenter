@@ -1,7 +1,7 @@
 import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
 import clone from "just-clone";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
-import { episodeHistoryEntriesRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
+import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
 import { EpisodesRepository } from "#episodes/crud/repository";
 import { episodeRepositoryMockProvider } from "#episodes/crud/repository/tests";
 import { StreamEntity } from "#modules/streams";
@@ -10,7 +10,7 @@ import { streamsRepositoryMockProvider } from "#modules/streams/crud/repository/
 import { episodeDependenciesRepositoryMockProvider } from "#episodes/dependencies/crud/repository/tests";
 import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
-import { EpisodeHistoryEntriesRepository } from "#episodes/history/crud/repository";
+import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
 import { HISTORY_ENTRY_SIMPSONS_6_25 } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
@@ -22,7 +22,7 @@ describe("tests", () => {
   let repos: {
     dependencies: jest.Mocked<EpisodeDependenciesRepository>;
     episodes: jest.Mocked<EpisodesRepository>;
-    historyEntries: jest.Mocked<EpisodeHistoryEntriesRepository>;
+    historyEntries: jest.Mocked<EpisodeHistoryRepository>;
     streams: jest.Mocked<StreamsRepository>;
   };
 
@@ -33,7 +33,7 @@ describe("tests", () => {
       providers: [
         streamsRepositoryMockProvider,
         episodeRepositoryMockProvider,
-        episodeHistoryEntriesRepositoryMockProvider,
+        episodeHistoryRepositoryMockProvider,
         episodeDependenciesRepositoryMockProvider,
         EpisodePickerService,
       ],
@@ -41,7 +41,7 @@ describe("tests", () => {
     repos = {
       dependencies: testingSetup.module.get(EpisodeDependenciesRepository),
       episodes: testingSetup.module.get<jest.Mocked<EpisodesRepository>>(EpisodesRepository),
-      historyEntries: testingSetup.module.get(EpisodeHistoryEntriesRepository),
+      historyEntries: testingSetup.module.get(EpisodeHistoryRepository),
       streams: testingSetup.module.get(StreamsRepository),
     };
     service = testingSetup.module.get(EpisodePickerService);

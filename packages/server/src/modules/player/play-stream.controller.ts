@@ -5,7 +5,7 @@ import { assertZod } from "$shared/utils/validation/zod";
 import { assertFound } from "#utils/validation/found";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { StreamsRepository } from "#modules/streams/crud/repository";
-import { EpisodeHistoryEntriesRepository } from "#episodes/history/crud/repository";
+import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { episodeEntityWithFileInfosSchema } from "#episodes/models";
 import { EpisodeEntityWithFileInfos } from "#episodes/file-info/series-tree/remote/service";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
@@ -27,8 +27,8 @@ export class PlayStreamController {
   constructor(
     private readonly playService: PlayService,
     private readonly episodePickerService: EpisodePickerService,
-    private readonly streamRepository: StreamsRepository,
-    private readonly episodeHistoryEntriesRepository: EpisodeHistoryEntriesRepository,
+    private readonly streamsRepo: StreamsRepository,
+    private readonly historyRepo: EpisodeHistoryRepository,
     private readonly episodeFileInfosRepo: EpisodeFileInfoRepository,
   ) {
   }
@@ -57,7 +57,7 @@ export class PlayStreamController {
     query: QueryDto,
   ) {
     const { force } = query;
-    const stream = await this.streamRepository.getOneByKey(id);
+    const stream = await this.streamsRepo.getOneByKey(id);
 
     assertFound(stream);
 
@@ -82,7 +82,7 @@ export class PlayStreamController {
     } );
 
     if (ok) {
-      await this.episodeHistoryEntriesRepository.addEpisodesToHistory( {
+      await this.historyRepo.addEpisodesToHistory( {
         episodes: episodesWithFileInfos,
         streamId: stream.id,
       } );

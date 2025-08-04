@@ -6,10 +6,10 @@ import z from "zod";
 import { EpisodesRepository } from "#episodes/crud/repository";
 import { Episode, EpisodeEntity } from "#episodes/models";
 import { LastTimePlayedService } from "#episodes/history";
-import { SerieRepository } from "#modules/series/crud/repository";
+import { SeriesRepository } from "#modules/series/crud/repository";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { assertFound } from "#utils/validation/found";
-import { EpisodeHistoryEntriesRepository } from "#episodes/history/crud/repository";
+import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { getSeriesKeyFromStream } from "#modules/streams";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { genRandomPickerWithData } from "#modules/picker/resource-picker/resource-picker-random";
@@ -28,11 +28,11 @@ type ResultType = Episode & {
 @Controller()
 export class EpisodePickerController {
   constructor(
-     private readonly streamRepository: StreamsRepository,
-     private readonly episodeRepository: EpisodesRepository,
+     private readonly streamsRepo: StreamsRepository,
+     private readonly episodesRepo: EpisodesRepository,
      private readonly dependenciesRepo: EpisodeDependenciesRepository,
-     private readonly episodeHistoryEntriesRepository: EpisodeHistoryEntriesRepository,
-     private readonly serieRepository: SerieRepository,
+     private readonly historyRepo: EpisodeHistoryRepository,
+     private readonly seriesRepo: SeriesRepository,
      private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
   }
@@ -40,10 +40,10 @@ export class EpisodePickerController {
   @Get("/:streamKey")
   async showPicker(@Param() params: ShowPickerParamsDto) {
     const { streamKey } = params;
-    const stream = await this.streamRepository.getOneByKey(streamKey);
+    const stream = await this.streamsRepo.getOneByKey(streamKey);
 
     assertFound(stream);
-    const lastEntry = await this.episodeHistoryEntriesRepository.findLast( {
+    const lastEntry = await this.historyRepo.findLast( {
       seriesKey: stream.key,
       streamId: stream.id,
     } );
@@ -53,10 +53,10 @@ export class EpisodePickerController {
     const seriesKey = getSeriesKeyFromStream(stream);
 
     assertIsDefined(seriesKey);
-    const seriePromise = this.serieRepository.getOneByKey(seriesKey);
+    const seriePromise = this.seriesRepo.getOneByKey(seriesKey);
     const lastEpCompKey = lastEntry.resourceId;
     const lastEpPromise = lastEpCompKey
-      ? this.episodeRepository.getOneByCompKey(lastEpCompKey)
+      ? this.episodesRepo.getOneByCompKey(lastEpCompKey)
       : Promise.resolve(null);
 
     await Promise.all([seriePromise, lastEpPromise]);
@@ -66,7 +66,7 @@ export class EpisodePickerController {
     assertFound(serie);
 
     const dependencies = dependenciesToList(await this.dependenciesRepo.getAll());
-    const episodes: EpisodeEntity[] = await this.episodeRepository.getManyBySerieKey(serie.key);
+    const episodes: EpisodeEntity[] = await this.episodesRepo.getManyBySerieKey(serie.key);
     const picker = await genRandomPickerWithData<EpisodeEntity>( {
       resources: episodes,
       lastOne: lastEp ?? undefined,

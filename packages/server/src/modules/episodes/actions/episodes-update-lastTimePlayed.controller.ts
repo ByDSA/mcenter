@@ -6,14 +6,14 @@ import { LastTimePlayedService } from "../history";
 export class EpisodesUpdateLastTimePlayedController {
   constructor(
     private readonly lastTimePlayedService: LastTimePlayedService,
-    private readonly episodeRepository: EpisodesRepository,
+    private readonly episodeRepo: EpisodesRepository,
   ) {
   }
 
   @Get("/")
   @HttpCode(HttpStatus.OK)
   async action(): Promise<void> {
-    const allEpisodes = await this.episodeRepository.getAll();
+    const allEpisodes = await this.episodeRepo.getAll();
     const promisesToAwait: Promise<any>[] = [];
 
     for (const episode of allEpisodes) {

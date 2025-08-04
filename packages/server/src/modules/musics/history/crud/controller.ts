@@ -18,12 +18,12 @@ const schema = musicHistoryEntryEntitySchema;
 @Controller()
 export class MusicHistoryCrudController implements CanGetAll<Request, Response> {
   constructor(
-    private readonly historyRepository: MusicHistoryRepository,
+    private readonly historyRepo: MusicHistoryRepository,
   ) {}
 
   @GetMany("/", schema)
   getAll() {
-    return this.historyRepository.getAll();
+    return this.historyRepo.getAll();
   }
 
   @DeleteOne("/:id", schema)
@@ -31,7 +31,7 @@ export class MusicHistoryCrudController implements CanGetAll<Request, Response> 
     @Param() params: DeleteOneByIdParamsDto,
   ) {
     const { id } = params;
-    const deleted = await this.historyRepository.deleteOneByIdAndGet(id);
+    const deleted = await this.historyRepo.deleteOneByIdAndGet(id);
 
     return deleted;
   }
@@ -40,6 +40,6 @@ export class MusicHistoryCrudController implements CanGetAll<Request, Response> 
   async getManyEntriesBySearch(
     @Body() body: GetManyByCriteriaBodyDto,
   ) {
-    return await this.historyRepository.getManyByCriteria(body);
+    return await this.historyRepo.getManyByCriteria(body);
   }
 }

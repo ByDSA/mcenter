@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { SerieRepository } from "./crud/repository";
+import { SeriesRepository } from "./crud/repository";
 
 @Module( {
   imports: [
@@ -9,8 +9,8 @@ import { SerieRepository } from "./crud/repository";
   controllers: [
   ],
   providers: [
-    SerieRepository,
+    SeriesRepository,
   ],
-  exports: [SerieRepository],
+  exports: [SeriesRepository],
 } )
 export class SeriesModule {}

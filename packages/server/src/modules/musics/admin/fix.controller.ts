@@ -10,7 +10,7 @@ const ROUTE_CREATE_YT = `${CREATE}/yt`;
 @Controller("/update/fix")
 export class MusicFixController {
   constructor(
-    private readonly musicRepository: MusicRepository,
+    private readonly musicRepo: MusicRepository,
   ) {
   }
 
@@ -19,6 +19,6 @@ export class MusicFixController {
     const { id: _ } = params;
 
     // TODO:
-    // return this.musicRepository.findOrCreateOneFromYoutube(id);
+    // return this.musicRepo.findOrCreateOneFromYoutube(id);
   }
 }

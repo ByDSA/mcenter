@@ -9,7 +9,7 @@ import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 
-let episodeRepository: EpisodesRepository;
+let episodesRepo: EpisodesRepository;
 let domainEventEmitter: DomainEventEmitter;
 let testingSetup: TestingSetup;
 
@@ -29,7 +29,7 @@ beforeAll(async () => {
   domainEventEmitter = testingSetup.module
     .get<DomainEventEmitter>(DomainEventEmitter);
 
-  episodeRepository = testingSetup.module
+  episodesRepo = testingSetup.module
     .get<EpisodesRepository>(EpisodesRepository);
 } );
 
@@ -46,7 +46,7 @@ it("should emit Patch Event", async () => {
     title: "new title",
   };
 
-  await episodeRepository.patchOneByCompKeyAndGet(episodeCompKey, {
+  await episodesRepo.patchOneByCompKeyAndGet(episodeCompKey, {
     entity: partialModel,
   } );
 
@@ -81,7 +81,7 @@ it("should emit Create Event", async () => {
   } ) as EpisodeEntity);
 
   await testingSetup.db?.drop();
-  await episodeRepository.createManyAndGet(models);
+  await episodesRepo.createManyAndGet(models);
 
   expect(fn).toHaveBeenCalledTimes(models.length);
 } );

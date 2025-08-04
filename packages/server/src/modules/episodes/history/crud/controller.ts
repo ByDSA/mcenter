@@ -8,7 +8,7 @@ import { DeleteOne, GetMany, GetManyCriteria } from "#utils/nestjs/rest";
 import { showError } from "#core/logging/show-error";
 import { type EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 import { LastTimePlayedService } from "../last-time-played.service";
-import { EpisodeHistoryEntriesRepository } from "./repository";
+import { EpisodeHistoryRepository } from "./repository";
 
 class GetManyByCriteriaBodyDto
   extends createZodDto(EpisodeHistoryEntryCrudDtos.GetManyByCriteria.criteriaSchema) {}
@@ -26,11 +26,11 @@ class IdParamsDto extends createZodDto(
 ) {}
 
 @Controller()
-export class EpisodeHistoryEntriesCrudController
+export class EpisodeHistoryCrudController
 implements
     CanGetAll<Request, Response> {
   constructor(
-    private readonly entriesRepository: EpisodeHistoryEntriesRepository,
+    private readonly entriesRepo: EpisodeHistoryRepository,
     @Inject(LastTimePlayedService)
     private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
@@ -38,21 +38,21 @@ implements
 
   @GetMany("/", episodeHistoryEntryEntitySchema)
   async getAll() {
-    return await this.entriesRepository.getAll();
+    return await this.entriesRepo.getAll();
   }
 
   @GetMany("/:seriesKey", episodeHistoryEntryEntitySchema)
   async getManyByseriesKey(
     @Param() params: SeriesKeyParamsDto,
   ) {
-    return await this.entriesRepository.getManyBySeriesKey(params.seriesKey);
+    return await this.entriesRepo.getManyBySeriesKey(params.seriesKey);
   }
 
   @GetMany("/:seriesKey/entries", episodeHistoryEntryEntitySchema)
   async getAllEntriesByseriesKey(
     @Param() params: SeriesKeyParamsDto,
   ) {
-    return await this.entriesRepository.getManyByCriteria( {
+    return await this.entriesRepo.getManyByCriteria( {
       filter: {
         seriesKey: params.seriesKey,
       },
@@ -64,7 +64,7 @@ implements
     @Body() body: GetManyByCriteriaBodyDto,
     @Param() params: SeriesKeyParamsDto,
   ) {
-    return await this.entriesRepository.getManyByCriteria( {
+    return await this.entriesRepo.getManyByCriteria( {
       ...body,
       filter: {
         ...body.filter,
@@ -77,7 +77,7 @@ implements
   async getManyEntriesByCriteria(
     @Body() body: GetManyByCriteriaBodyDto,
   ) {
-    return await this.entriesRepository.getManyByCriteria(body);
+    return await this.entriesRepo.getManyByCriteria(body);
   }
 
   @DeleteOne("/entries/:id", episodeHistoryEntryEntitySchema)
@@ -85,7 +85,7 @@ implements
     @Param() params: IdParamsDto,
   ): Promise<EpisodeHistoryEntryEntity> {
     const { id } = params;
-    const deleted = await this.entriesRepository.deleteOneByIdAndGet(id);
+    const deleted = await this.entriesRepo.deleteOneByIdAndGet(id);
 
     this.lastTimePlayedService.updateEpisodeLastTimePlayedByCompKey(deleted.resourceId)
       .catch(showError);

@@ -1,9 +1,9 @@
 import { createMockClass } from "#tests/jest/mocking";
-import { SerieRepository } from "../repository";
+import { SeriesRepository } from "../repository";
 
-class SerieRepositoryMock extends createMockClass(SerieRepository) { }
+class SeriesRepositoryMock extends createMockClass(SeriesRepository) { }
 
-export const serieRepositoryMockProvider = {
-  provide: SerieRepository,
-  useClass: SerieRepositoryMock,
+export const seriesRepositoryMockProvider = {
+  provide: SeriesRepository,
+  useClass: SeriesRepositoryMock,
 };

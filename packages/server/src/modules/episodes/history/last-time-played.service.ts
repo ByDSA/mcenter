@@ -3,24 +3,24 @@ import { DateTime } from "luxon";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { EpisodesRepository } from "#episodes/crud/repository";
 import { showError } from "#core/logging/show-error";
-import { EpisodeHistoryEntriesRepository } from "./crud/repository";
+import { EpisodeHistoryRepository } from "./crud/repository";
 
 @Injectable()
 export class LastTimePlayedService {
   constructor(
     @Inject(forwardRef(() => EpisodesRepository))
-    private readonly episodesRepository: EpisodesRepository,
-    private readonly entriesRepository: EpisodeHistoryEntriesRepository,
+    private readonly episodesRepo: EpisodesRepository,
+    private readonly historyRepo: EpisodeHistoryRepository,
   ) {
   }
 
   async updateEpisodeLastTimePlayedByEpisodeId(
     episodeId: EpisodeEntity["id"],
   ): Promise<number | null> {
-    const lastTimePlayed = await this.entriesRepository
+    const lastTimePlayed = await this.historyRepo
       .calcEpisodeLastTimePlayedByEpisodeId(episodeId) ?? undefined;
 
-    this.episodesRepository.patchOneByIdAndGet(episodeId, {
+    this.episodesRepo.patchOneByIdAndGet(episodeId, {
       entity: {
         lastTimePlayed,
       },
@@ -32,10 +32,10 @@ export class LastTimePlayedService {
   async updateEpisodeLastTimePlayedByCompKey(
     episodeCompKey: EpisodeCompKey,
   ): Promise<number | null> {
-    const lastTimePlayed = await this.entriesRepository
+    const lastTimePlayed = await this.historyRepo
       .calcEpisodeLastTimePlayedByCompKey(episodeCompKey) ?? undefined;
 
-    this.episodesRepository.patchOneByCompKeyAndGet(episodeCompKey, {
+    this.episodesRepo.patchOneByCompKeyAndGet(episodeCompKey, {
       entity: {
         lastTimePlayed,
       },
@@ -48,11 +48,11 @@ export class LastTimePlayedService {
     let lastTimePlayed = episode.lastTimePlayed ?? null;
 
     if (!lastTimePlayed) {
-      lastTimePlayed = await this.entriesRepository
+      lastTimePlayed = await this.historyRepo
         .calcEpisodeLastTimePlayedByEpisodeId(episode.id);
 
       if (lastTimePlayed) {
-        await this.episodesRepository.patchOneByIdAndGet(episode.id, {
+        await this.episodesRepo.patchOneByIdAndGet(episode.id, {
           entity: {
             lastTimePlayed,
           },

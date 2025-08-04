@@ -1,13 +1,13 @@
 import { Controller, Get } from "@nestjs/common";
 import { ResultResponse, errorToErrorElementResponse } from "$shared/utils/http/responses";
-import { SerieRepository } from "#modules/series/crud/repository";
+import { SeriesRepository } from "#modules/series/crud/repository";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 
 @Controller("/fixer")
 export class FixerController {
   constructor(
-    private readonly serieRepository: SerieRepository,
-    private readonly streamRepository: StreamsRepository,
+    private readonly seriesRepo: SeriesRepository,
+    private readonly streamsRepo: StreamsRepository,
   ) {
   }
 
@@ -21,11 +21,11 @@ export class FixerController {
       data: [],
       errors: [],
     };
-    const series = await this.serieRepository.getAll();
+    const series = await this.seriesRepo.getAll();
     const promises: Promise<string | null | void>[] = [];
 
     for (const serie of series) {
-      const promise = this.streamRepository.createDefaultForSerieIfNeeded(serie.key)
+      const promise = this.streamsRepo.createDefaultForSerieIfNeeded(serie.key)
         .then(stream => {
           if (!stream)
             return null;

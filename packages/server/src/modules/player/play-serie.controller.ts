@@ -3,9 +3,9 @@ import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { assertZod } from "$shared/utils/validation/zod";
 import { EpisodesRepository } from "#episodes/crud/repository";
-import { SerieRepository } from "#modules/series/crud/repository";
+import { SeriesRepository } from "#modules/series/crud/repository";
 import { assertFound } from "#utils/validation/found";
-import { EpisodeHistoryEntriesRepository } from "#episodes/history/crud/repository";
+import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { episodeCompKeySchema, episodeEntityWithFileInfosSchema } from "#episodes/models";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { PlayService } from "./play.service";
@@ -21,10 +21,10 @@ export class PlaySerieController {
   private readonly logger = new Logger(PlaySerieController.name);
 
   constructor(
-    private readonly seriesRepo: SerieRepository,
+    private readonly seriesRepo: SeriesRepository,
     private readonly episodesRepo: EpisodesRepository,
     private readonly playService: PlayService,
-    private readonly historyEntriesRepo: EpisodeHistoryEntriesRepository,
+    private readonly historyEntriesRepo: EpisodeHistoryRepository,
     private readonly streamsRepo: StreamsRepository,
   ) {
   }

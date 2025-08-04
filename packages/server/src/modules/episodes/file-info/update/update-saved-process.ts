@@ -36,7 +36,7 @@ export class UpdateMetadataProcess {
 
   constructor(
     private readonly savedSerieTreeService: RemoteSeriesTreeService,
-    private readonly episodeFileRepository: EpisodeFileInfoRepository,
+    private readonly fileInfosRepo: EpisodeFileInfoRepository,
   ) {
   }
 
@@ -109,7 +109,7 @@ export class UpdateMetadataProcess {
 
     assertIsDefined(MEDIA_FOLDER);
 
-    const currentEpisodeFile = await this.episodeFileRepository.getOneByPath(filePath);
+    const currentEpisodeFile = await this.fileInfosRepo.getOneByPath(filePath);
     const fullFilePath = `${MEDIA_FOLDER}/${filePath}`;
 
     if (!existsSync(fullFilePath)) {
@@ -207,7 +207,7 @@ export class UpdateMetadataProcess {
     if (episodeFileWithId === null)
       return null;
 
-    await this.episodeFileRepository
+    await this.fileInfosRepo
       .updateOneByEpisodeId(episodeFileWithId.episodeId, episodeFileWithId);
 
     return episodeFileWithId;

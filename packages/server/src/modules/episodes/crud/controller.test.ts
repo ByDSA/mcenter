@@ -1,5 +1,5 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { serieRepositoryMockProvider } from "#modules/series/crud/repository/tests";
+import { seriesRepositoryMockProvider } from "#modules/series/crud/repository/tests";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { fixtureEpisodes } from "#episodes/tests";
 import { testRoute } from "#core/routing/test";
@@ -18,7 +18,7 @@ crudTestsSuite( {
       controllers: [EpisodesCrudController],
       providers: [
         episodeRepositoryMockProvider,
-        serieRepositoryMockProvider,
+        seriesRepositoryMockProvider,
       ],
     }],
   repositoryClass: EpisodesRepository,

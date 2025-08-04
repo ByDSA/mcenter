@@ -34,7 +34,7 @@ type CreateNewEntryNowForProps = {
   streamId: StreamEntity["id"];
 };
 @Injectable()
-export class EpisodeHistoryEntriesRepository implements
+export class EpisodeHistoryRepository implements
 CanCreateOne<Model>,
 CanDeleteOneByIdAndGet<Model, Id> {
   constructor() { }

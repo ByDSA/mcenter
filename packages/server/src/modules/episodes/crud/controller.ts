@@ -20,7 +20,7 @@ const schema = episodeEntitySchema;
 @Controller()
 export class EpisodesCrudController {
   constructor(
-    private readonly episodeRepository: EpisodesRepository,
+    private readonly episodeRepo: EpisodesRepository,
   ) {
   }
 
@@ -31,7 +31,7 @@ export class EpisodesCrudController {
   ): Promise<EpisodeEntity> {
     const episodePartial = body;
     const compKey = params;
-    const got = await this.episodeRepository.patchOneByCompKeyAndGet(compKey, episodePartial);
+    const got = await this.episodeRepo.patchOneByCompKeyAndGet(compKey, episodePartial);
 
     assertFound(got);
 
@@ -44,14 +44,14 @@ export class EpisodesCrudController {
   ) {
     const { seriesKey } = params;
 
-    return await this.episodeRepository.getAllBySeriesKey(seriesKey);
+    return await this.episodeRepo.getAllBySeriesKey(seriesKey);
   }
 
   @GetOne("/:seriesKey/:episodeKey", schema)
   async getOneById(
     @Param() params: GetOneByIdParamsDto,
   ) {
-    const got = await this.episodeRepository.getOneByCompKey(params);
+    const got = await this.episodeRepo.getOneByCompKey(params);
 
     assertFound(got);
 
@@ -62,6 +62,6 @@ export class EpisodesCrudController {
   async getManyByCriteria(
     @Body() body: GetManyByCriteriaBodyDto,
   ) {
-    return await this.episodeRepository.getManyByCriteria(body);
+    return await this.episodeRepo.getManyByCriteria(body);
   }
 }

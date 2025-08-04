@@ -4,10 +4,10 @@ import { StreamsRepository } from "#modules/streams/crud/repository";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { type SerieEntity, assertIsSerieEntity } from "../../models";
-import { SerieRepository } from "./repository";
+import { SeriesRepository } from "./repository";
 
-let repository: SerieRepository;
-let streamRepository: StreamsRepository;
+let repo: SeriesRepository;
+let streamsRepo: StreamsRepository;
 let testingSetup: TestingSetup;
 
 describe("repository", () => {
@@ -16,7 +16,7 @@ describe("repository", () => {
       imports: [DomainEventEmitterModule],
       controllers: [],
       providers: [
-        SerieRepository,
+        SeriesRepository,
         StreamsRepository,
       ],
     }, {
@@ -25,9 +25,9 @@ describe("repository", () => {
       },
     } );
 
-    repository = testingSetup.module
-      .get<SerieRepository>(SerieRepository);
-    streamRepository = testingSetup.module
+    repo = testingSetup.module
+      .get<SeriesRepository>(SeriesRepository);
+    streamsRepo = testingSetup.module
       .get<StreamsRepository>(StreamsRepository);
   } );
 
@@ -44,21 +44,21 @@ describe("repository", () => {
       } );
 
       it("should not be in db", async () => {
-        const got = await repository.getOneByKey(newModel.key);
+        const got = await repo.getOneByKey(newModel.key);
 
         expect(got).toBeNull();
       } );
 
       it("should not be stream in db", async () => {
         const streamId = newModel.key;
-        const got = await streamRepository.getOneByKey(streamId);
+        const got = await streamsRepo.getOneByKey(streamId);
 
         expect(got).toBeNull();
       } );
     } );
 
     it("should execute function without errors", async () => {
-      const got = await repository.createOneAndGet(newModel);
+      const got = await repo.createOneAndGet(newModel);
 
       assertIsSerieEntity(got);
 
@@ -69,7 +69,7 @@ describe("repository", () => {
 
     describe("after Create", () => {
       it("should be in db", async () => {
-        const got = await repository.getOneByKey(newModel.key);
+        const got = await repo.getOneByKey(newModel.key);
 
         assertIsSerieEntity(got);
 
@@ -90,7 +90,7 @@ describe("repository", () => {
             }],
           },
         };
-        const got = await streamRepository.getOneByKey(streamExpected.key);
+        const got = await streamsRepo.getOneByKey(streamExpected.key);
 
         assertZod(streamEntitySchema, got);
 
