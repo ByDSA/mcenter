@@ -1,4 +1,4 @@
-import { MusicRestDtos } from "$shared/models/musics/dto/transport";
+import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { genAssertZod } from "$shared/utils/validation/zod";
 import { createOneResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
@@ -9,7 +9,7 @@ import { backendUrl } from "#modules/requests";
 export namespace MusicFetching {
   export namespace Patch {
     export type Response = ResultResponse<MusicEntity>;
-    export type Body = MusicRestDtos.PatchOneById.Body;
+    export type Body = MusicCrudDtos.PatchOneById.Body;
     // eslint-disable-next-line require-await
     export async function fetch(
       id: MusicId,
@@ -19,7 +19,7 @@ export namespace MusicFetching {
       const fetcher = makeFetcher<Body, Response>( {
         method,
         body,
-        reqBodyValidator: genAssertZod(MusicRestDtos.PatchOneById.bodySchema),
+        reqBodyValidator: genAssertZod(MusicCrudDtos.PatchOneById.bodySchema),
         resBodyValidator: genAssertZod(createOneResultResponseSchema(musicEntitySchema)),
       } );
       const URL = backendUrl(PATH_ROUTES.musics.withParams(id));

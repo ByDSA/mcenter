@@ -4,11 +4,11 @@ import { genAssertZod } from "$shared/utils/validation/zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching";
 import { EpisodeFileInfoEntity } from "./models";
-import { EpisodeFileInfoDtos, EpisodeFileInfoRestDtos } from "./models/dto";
+import { EpisodeFileInfoDtos, EpisodeFileInfoCrudDtos } from "./models/dto";
 
 export namespace EpisodeFileInfoFetching {
   export namespace Patch {
-    export type Body = EpisodeFileInfoRestDtos.PatchOneById.Body;
+    export type Body = EpisodeFileInfoCrudDtos.PatchOneById.Body;
     export type Response = ResultResponse<EpisodeFileInfoEntity>;
   // eslint-disable-next-line require-await
     export async function fetch(
@@ -19,7 +19,7 @@ export namespace EpisodeFileInfoFetching {
       const fetcher = makeFetcher<Body, Response>( {
         method,
         body,
-        reqBodyValidator: genAssertZod(EpisodeFileInfoRestDtos.PatchOneById.bodySchema),
+        reqBodyValidator: genAssertZod(EpisodeFileInfoCrudDtos.PatchOneById.bodySchema),
         resBodyValidator: genAssertIsOneResultResponse(EpisodeFileInfoDtos.Entity.schema),
       } );
       const URL = backendUrl(

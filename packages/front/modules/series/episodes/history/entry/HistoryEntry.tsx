@@ -3,7 +3,7 @@ import { assertIsManyResultResponse, ResultResponse } from "$shared/utils/http/r
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeHistoryEntry, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
-import { EpisodeHistoryEntryRestDtos } from "#modules/series/episodes/history/models/dto";
+import { EpisodeHistoryEntryCrudDtos } from "#modules/series/episodes/history/models/dto";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { backendUrl } from "#modules/requests";
 import { EpisodeHistoryEntryFetching } from "../requests";
@@ -29,7 +29,7 @@ export function fetchLastestHistoryEntries(
   historyEntry: EpisodeHistoryEntry,
 ): Promise<EpisodeHistoryEntryEntity[] | null> {
   const URL = backendUrl(PATH_ROUTES.episodes.history.entries.search.path);
-  const bodyJson: EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria = {
+  const bodyJson: EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria = {
     filter: {
       seriesKey: historyEntry.resourceId.seriesKey,
       episodeKey: historyEntry.resourceId.episodeKey,

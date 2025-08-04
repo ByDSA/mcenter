@@ -2,12 +2,12 @@ import { Controller, Get, Logger, Param, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { assertZod } from "$shared/utils/validation/zod";
-import { EpisodesRepository } from "#episodes/rest/repository";
-import { SerieRepository } from "#modules/series/rest/repository";
+import { EpisodesRepository } from "#episodes/crud/repository";
+import { SerieRepository } from "#modules/series/crud/repository";
 import { assertFound } from "#utils/validation/found";
-import { EpisodeHistoryEntriesRepository } from "#episodes/history/rest/repository";
+import { EpisodeHistoryEntriesRepository } from "#episodes/history/crud/repository";
 import { episodeCompKeySchema, episodeEntityWithFileInfosSchema } from "#episodes/models";
-import { StreamsRepository } from "#modules/streams/rest/repository";
+import { StreamsRepository } from "#modules/streams/crud/repository";
 import { PlayService } from "./play.service";
 import { episodeWithFileInfosToMediaElement } from "./player-services/models";
 

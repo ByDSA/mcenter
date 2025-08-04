@@ -1,7 +1,7 @@
 import { Controller, Get } from "@nestjs/common";
 import { ResultResponse, errorToErrorElementResponse } from "$shared/utils/http/responses";
-import { SerieRepository } from "#modules/series/rest/repository";
-import { StreamsRepository } from "#modules/streams/rest/repository";
+import { SerieRepository } from "#modules/series/crud/repository";
+import { StreamsRepository } from "#modules/streams/crud/repository";
 
 @Controller("/fixer")
 export class FixerController {

@@ -4,7 +4,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
-import { StreamsRepository } from "#modules/streams/rest/repository";
+import { StreamsRepository } from "#modules/streams/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { testRoute } from "#core/routing/test";

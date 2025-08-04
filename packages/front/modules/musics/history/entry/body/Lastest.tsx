@@ -5,7 +5,7 @@ import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { LatestHistoryEntries } from "#modules/history";
 import { DateFormat } from "#modules/utils/dates";
 import { backendUrl } from "#modules/requests";
-import { MusicHistoryEntryRestDtos } from "../../models/dto";
+import { MusicHistoryEntryCrudDtos } from "../../models/dto";
 
 type Props = {
   resourceId: string;
@@ -17,7 +17,7 @@ const DATE_FORMAT_DEFAULT: DateFormat = {
   ago: "yes",
 };
 
-type Body = MusicHistoryEntryRestDtos.GetManyByCriteria.Criteria;
+type Body = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
 
 export function LastestComponent(
   { resourceId, date, dateFormat = DATE_FORMAT_DEFAULT }: Props,

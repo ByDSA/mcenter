@@ -1,4 +1,4 @@
-import { MusicHistoryEntryRestDtos } from "$shared/models/musics/history/dto/transport";
+import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
 import { createManyResultResponseSchema, genAssertIsOneResultResponse, type ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { genAssertZod } from "$shared/utils/validation/zod";
@@ -9,7 +9,7 @@ import { musicEntitySchema } from "../models";
 import { musicHistoryEntryEntitySchema, type MusicHistoryEntryEntity } from "./models";
 
 namespace _GetManyByCriteria {
-  export type Req = MusicHistoryEntryRestDtos.GetManyByCriteria.Criteria;
+  export type Req = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
   const body: Req = {
     filter: {},
     sort: {

@@ -1,9 +1,9 @@
 import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { DateTime } from "luxon";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { EpisodesRepository } from "#episodes/rest/repository";
+import { EpisodesRepository } from "#episodes/crud/repository";
 import { showError } from "#core/logging/show-error";
-import { EpisodeHistoryEntriesRepository } from "./rest/repository";
+import { EpisodeHistoryEntriesRepository } from "./crud/repository";
 
 @Injectable()
 export class LastTimePlayedService {

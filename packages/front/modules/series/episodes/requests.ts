@@ -3,13 +3,13 @@ import { genAssertZod } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
 import { EpisodeCompKey, EpisodeEntity, episodeEntitySchema } from "#modules/series/episodes/models";
-import { EpisodesRestDtos } from "#modules/series/episodes/models/dto";
+import { EpisodesCrudDtos } from "#modules/series/episodes/models/dto";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 
 export namespace EpisodeFetching {
   export namespace Patch {
-    export type Body = EpisodesRestDtos.PatchOneById.Body;
+    export type Body = EpisodesCrudDtos.PatchOneById.Body;
     export type Res = ResultResponse<EpisodeEntity>;
     // eslint-disable-next-line require-await
     export async function fetch(
@@ -20,7 +20,7 @@ export namespace EpisodeFetching {
       const fetcher = makeFetcher<Body, Res>( {
         method,
         body,
-        reqBodyValidator: genAssertZod(EpisodesRestDtos.PatchOneById.bodySchema),
+        reqBodyValidator: genAssertZod(EpisodesCrudDtos.PatchOneById.bodySchema),
         resBodyValidator: genAssertIsOneResultResponse(episodeEntitySchema),
       } );
       const URL = backendUrl(
@@ -36,7 +36,7 @@ export namespace EpisodeFetching {
   }
 
   export namespace GetManyByCriteria {
-    const bodySchema = EpisodesRestDtos.GetManyByCriteria.criteriaSchema;
+    const bodySchema = EpisodesCrudDtos.GetManyByCriteria.criteriaSchema;
     const responseSchema = createManyResultResponseSchema(episodeEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
     export type Res = z.infer<typeof responseSchema>;

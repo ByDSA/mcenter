@@ -1,15 +1,15 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { MusicsCrudModule } from "../rest/module";
-import { MusicHistoryRepository } from "./rest/repository";
-import { MusicHistoryRestController } from "./rest/controller";
+import { MusicsCrudModule } from "../crud/module";
+import { MusicHistoryRepository } from "./crud/repository";
+import { MusicHistoryCrudController } from "./crud/controller";
 
 @Module( {
   imports: [
     DomainEventEmitterModule,
     forwardRef(() => MusicsCrudModule),
   ],
-  controllers: [MusicHistoryRestController],
+  controllers: [MusicHistoryCrudController],
   providers: [
     MusicHistoryRepository,
   ],

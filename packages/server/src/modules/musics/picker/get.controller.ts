@@ -4,9 +4,9 @@ import { assertIsNotEmpty } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicEntity } from "#musics/models";
 import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
-import { MusicHistoryRepository } from "../history/rest/repository";
-import { MusicRepository } from "../rest/repository";
-import { requestToFindMusicParams } from "../rest/repository/queries/queries";
+import { MusicHistoryRepository } from "../history/crud/repository";
+import { MusicRepository } from "../crud/repository";
+import { requestToFindMusicParams } from "../crud/repository/queries/queries";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./model";
 
 function getRootUrlFromForwardedRequest(req: Request): string {

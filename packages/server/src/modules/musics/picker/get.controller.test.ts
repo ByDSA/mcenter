@@ -6,11 +6,11 @@ import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicId } from "#musics/models";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { MusicRepository } from "../rest/repository";
-import { musicRepoMockProvider } from "../rest/repository/tests";
-import { musicHistoryRepoMockProvider } from "../history/rest/repository/tests";
-import { MusicFileInfoRepository } from "../file-info/rest/repository";
-import { musicFileInfoRepositoryMockProvider } from "../file-info/rest/repository/tests";
+import { MusicRepository } from "../crud/repository";
+import { musicRepoMockProvider } from "../crud/repository/tests";
+import { musicHistoryRepoMockProvider } from "../history/crud/repository/tests";
+import { MusicFileInfoRepository } from "../file-info/crud/repository";
+import { musicFileInfoRepositoryMockProvider } from "../file-info/crud/repository/tests";
 import { RawHandlerService } from "../raw/service";
 import { MusicGetRandomController } from "./get.controller";
 

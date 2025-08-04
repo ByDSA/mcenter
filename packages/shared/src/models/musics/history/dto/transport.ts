@@ -2,7 +2,7 @@ import z from "zod";
 import { idParamsSchema } from "../../../utils/schemas/requests";
 import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 
-export namespace MusicHistoryEntryRestDtos {
+export namespace MusicHistoryEntryCrudDtos {
   export namespace GetManyByCriteria {
     export const criteriaSchema = createCriteriaManySchema( {
       filterShape: {

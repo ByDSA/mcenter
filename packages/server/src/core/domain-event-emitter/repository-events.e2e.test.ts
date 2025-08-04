@@ -1,7 +1,7 @@
 import { Episode, EpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { EpisodesModule } from "#episodes/module";
-import { EpisodesRepository } from "#episodes/rest/repository";
-import { EpisodeEvents } from "#episodes/rest/repository/events";
+import { EpisodesRepository } from "#episodes/crud/repository";
+import { EpisodeEvents } from "#episodes/crud/repository/events";
 import { fixtureEpisodes } from "#episodes/tests";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 import { EntityEvent } from "#core/domain-event-emitter";

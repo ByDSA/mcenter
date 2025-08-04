@@ -1,14 +1,14 @@
 import { Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { EpisodeFileInfosRestController } from "./rest/controller";
-import { EpisodeFileInfoRepository } from "./rest/repository/repository";
+import { EpisodeFileInfosCrudController } from "./crud/controller";
+import { EpisodeFileInfoRepository } from "./crud/repository/repository";
 
 @Module( {
   imports: [
     DomainEventEmitterModule,
   ],
   controllers: [
-    EpisodeFileInfosRestController,
+    EpisodeFileInfosCrudController,
   ],
   providers: [
     EpisodeFileInfoRepository,

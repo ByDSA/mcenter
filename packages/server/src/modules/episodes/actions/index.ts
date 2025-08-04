@@ -1,3 +1,3 @@
 export {
-  EpisodesRestController,
-} from "../rest/controller";
+  EpisodesCrudController,
+} from "../crud/controller";

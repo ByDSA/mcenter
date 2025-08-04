@@ -2,8 +2,8 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { EpisodesModule } from "../module";
-import { EpisodeDependenciesRestController } from "./rest/controller";
-import { EpisodeDependenciesRepository } from "./rest/repository/repository";
+import { EpisodeDependenciesCrudController } from "./crud/controller";
+import { EpisodeDependenciesRepository } from "./crud/repository/repository";
 
 @Module( {
   imports: [
@@ -11,7 +11,7 @@ import { EpisodeDependenciesRepository } from "./rest/repository/repository";
     forwardRef(() => EpisodesModule),
   ],
   controllers: [
-    EpisodeDependenciesRestController,
+    EpisodeDependenciesCrudController,
   ],
   providers: [
     EpisodeDependenciesRepository,

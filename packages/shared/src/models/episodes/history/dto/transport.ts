@@ -1,7 +1,7 @@
 import z from "zod";
 import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 
-export namespace EpisodeHistoryEntryRestDtos {
+export namespace EpisodeHistoryEntryCrudDtos {
   export namespace GetManyByCriteria {
     export const criteriaSchema = createCriteriaManySchema( {
       filterShape: {

@@ -15,7 +15,7 @@ const criteriaConfig = {
   expandKeys: ["fileInfos"] as const,
 };
 
-export namespace MusicRestDtos {
+export namespace MusicCrudDtos {
   export namespace GetMany {
     export const criteriaSchema = createCriteriaManySchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;

@@ -2,9 +2,9 @@ import { Module } from "@nestjs/common";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { StreamsRepository } from "./rest/repository";
+import { StreamsRepository } from "./crud/repository";
 import { FixerController } from "./controllers/fixer.controller";
-import { StreamsRestController } from "./rest/controller";
+import { StreamsCrudController } from "./crud/controller";
 
 @Module( {
   imports: [
@@ -13,7 +13,7 @@ import { StreamsRestController } from "./rest/controller";
     EpisodeHistoryEntriesModule,
   ],
   controllers: [
-    StreamsRestController,
+    StreamsCrudController,
     FixerController,
   ],
   providers: [

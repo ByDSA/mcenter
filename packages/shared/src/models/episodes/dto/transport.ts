@@ -18,7 +18,7 @@ const criteriaConfig = createCriteriaConfig( {
   expandKeys: ["series", "fileInfos"],
 } );
 
-export namespace EpisodesRestDtos {
+export namespace EpisodesCrudDtos {
   export namespace GetAll {
     export const paramsSchema = z.object( {
       seriesKey: z.string(),
@@ -41,6 +41,6 @@ export namespace EpisodesRestDtos {
   export namespace PatchOneById {
     export const bodySchema = generatePatchBodySchema(episodeEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
-    export const { paramsSchema } = EpisodesRestDtos.GetOne.ById;
+    export const { paramsSchema } = EpisodesCrudDtos.GetOne.ById;
   }
 }

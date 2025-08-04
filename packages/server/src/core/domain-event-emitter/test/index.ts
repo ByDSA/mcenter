@@ -1,4 +1,4 @@
-import { MusicRepository } from "#musics/rest/repository";
+import { MusicRepository } from "#modules/musics/crud/repository";
 import { createMockClass } from "#tests/jest/mocking";
 import { DomainEventEmitter } from "../domain-event-emitter";
 

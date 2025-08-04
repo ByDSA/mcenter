@@ -1,4 +1,4 @@
-import { MusicOdm } from "#musics/rest/repository/odm";
+import { MusicOdm } from "#musics/crud/repository/odm";
 import { Music } from "#musics/models";
 import { fixtureMusics } from "#musics/tests";
 

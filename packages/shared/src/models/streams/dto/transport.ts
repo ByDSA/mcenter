@@ -1,7 +1,7 @@
 import z from "zod";
 import { createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
 
-export namespace StreamRestDtos {
+export namespace StreamCrudDtos {
   export namespace GetManyByCriteria {
     export const criteriaSchema = createCriteriaManySchema( {
       sortKeys: ["lastTimePlayed"],

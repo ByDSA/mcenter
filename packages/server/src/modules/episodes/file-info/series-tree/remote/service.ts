@@ -2,7 +2,7 @@ import type { EpisodeEntity } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { treePut } from "$shared/utils/trees";
 import { SerieFolderTree as SerieTree } from "#episodes/file-info";
-import { EpisodesRepository } from "#episodes/rest/repository";
+import { EpisodesRepository } from "#episodes/crud/repository";
 import { EpisodeFile, SerieFolderTree } from "#episodes/file-info";
 import { episodeToEpisodeFiles } from "./adapters";
 

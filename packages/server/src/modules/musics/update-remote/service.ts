@@ -3,10 +3,10 @@ import { Injectable, Logger } from "@nestjs/common";
 import z from "zod";
 import { MusicFileInfo, MusicFileInfoEntity, musicFileInfoEntitySchema } from "$shared/models/musics/file-info";
 import { musicEntitySchema } from "#musics/models";
-import { MusicFileInfoRepository } from "#musics/file-info/rest/repository";
+import { MusicFileInfoRepository } from "#modules/musics/file-info/crud/repository";
 import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../files";
-import { MusicRepository } from "../rest/repository";
+import { MusicRepository } from "../crud/repository";
 import { getFullPath } from "../utils";
 import { ChangesDetector, FileWithStats } from "./changes-detector";
 

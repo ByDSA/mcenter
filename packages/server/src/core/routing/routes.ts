@@ -13,7 +13,7 @@ import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
 import { MusicsGetRandomModule } from "#musics/picker/module";
 import { MusicsGetPlaylistsModule } from "#musics/playlists/module";
 import { MusicsGetRawModule } from "#musics/raw/module";
-import { MusicsCrudModule } from "#musics/rest/module";
+import { MusicsCrudModule } from "#musics/crud/module";
 import { LoggingModule } from "../logging/module";
 
 export const routeModules = [

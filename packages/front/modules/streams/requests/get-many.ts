@@ -2,7 +2,7 @@ import { createManyResultResponseSchema, ResultResponse } from "$shared/utils/ht
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
 import { genAssertZod } from "$shared/utils/validation/zod";
-import { StreamRestDtos } from "$shared/models/streams/dto/transport";
+import { StreamCrudDtos } from "$shared/models/streams/dto/transport";
 import { streamEntitySchema } from "$shared/models/streams";
 import { UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
@@ -15,7 +15,7 @@ const resSchema = createManyResultResponseSchema(dataSchema);
 
 export type Res = z.infer<typeof resSchema>;
 
-const reqSchema = StreamRestDtos.GetManyByCriteria.criteriaSchema;
+const reqSchema = StreamCrudDtos.GetManyByCriteria.criteriaSchema;
 
 type Req = z.infer<typeof reqSchema>;
 const body: Req = {
@@ -33,7 +33,7 @@ const fetcher = makeFetcher<Req, Res>( {
 } );
 
 export const useRequest: UseRequest<ResultResponse<Data[]>> = makeUseRequest<
-  StreamRestDtos.GetManyByCriteria.Criteria,
+  StreamCrudDtos.GetManyByCriteria.Criteria,
   ResultResponse<Data[]>
  >( {
    key: {

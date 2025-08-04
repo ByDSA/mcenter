@@ -6,9 +6,9 @@ import { MusicEntity, Music } from "#musics/models";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
-import { MusicHistoryEntryOdm } from "../history/rest/repository/odm";
+import { MusicHistoryEntryOdm } from "../history/crud/repository/odm";
 import { MusicHistoryModule } from "../history/module";
-import { MusicsCrudModule } from "../rest/module";
+import { MusicsCrudModule } from "../crud/module";
 import { MusicGetRandomController } from "./get.controller";
 
 let routerApp: Application;

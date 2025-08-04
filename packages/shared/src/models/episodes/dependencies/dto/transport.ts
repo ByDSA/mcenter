@@ -3,7 +3,7 @@ import { mongoDbId } from "../../../resource/partial-schemas";
 import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 import { episodeCompKeySchema } from "../../episode";
 
-export namespace EpisodeDependencyRestDtos {
+export namespace EpisodeDependencyCrudDtos {
   export namespace GetManyByCriteria {
     export const criteriaSchema = createCriteriaManySchema( {
       filterShape: {

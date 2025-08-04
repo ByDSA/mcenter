@@ -2,12 +2,12 @@ import type { ResourcePicker } from "#modules/picker";
 import type { EpisodeEntity } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined, neverCase } from "$shared/utils/validation";
-import { EpisodesRepository } from "#episodes/rest/repository";
+import { EpisodesRepository } from "#episodes/crud/repository";
 import { PickMode } from "#modules/picker/resource-picker/pick-mode";
 import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#modules/streams";
-import { StreamsRepository } from "#modules/streams/rest/repository";
-import { EpisodeHistoryEntriesRepository } from "#episodes/history/rest/repository";
-import { EpisodeDependenciesRepository } from "#episodes/dependencies/rest/repository";
+import { StreamsRepository } from "#modules/streams/crud/repository";
+import { EpisodeHistoryEntriesRepository } from "#episodes/history/crud/repository";
+import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { buildEpisodePicker } from "./episode-picker";
 import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
 

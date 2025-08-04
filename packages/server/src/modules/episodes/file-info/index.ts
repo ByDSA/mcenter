@@ -1,5 +1,5 @@
 export {
   EpisodeFileInfoRepository,
-} from "./rest/repository";
+} from "./crud/repository";
 
 export * from "./series-tree/local";

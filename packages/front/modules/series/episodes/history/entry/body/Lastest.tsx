@@ -1,7 +1,7 @@
 import { assertIsManyResultResponse, ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
-import { EpisodeHistoryEntryRestDtos } from "#modules/series/episodes/history/models/dto";
+import { EpisodeHistoryEntryCrudDtos } from "#modules/series/episodes/history/models/dto";
 import { EpisodeCompKey } from "#modules/series/episodes/models";
 import { DateFormat } from "#modules/utils/dates";
 import { LatestHistoryEntries } from "#modules/history";
@@ -19,7 +19,7 @@ const DATE_FORMAT_DEFAULT: DateFormat = {
   ago: "yes",
 };
 
-type Criteria = EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria;
+type Criteria = EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
 
 export function LastestComponent(
   { resourceId: compKey, timestamp, dateFormat = DATE_FORMAT_DEFAULT }: Props<EpisodeCompKey>,

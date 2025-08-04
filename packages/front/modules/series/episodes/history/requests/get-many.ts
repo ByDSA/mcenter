@@ -5,7 +5,7 @@ import { genAssertZod } from "$shared/utils/validation/zod";
 import { episodeEntitySchema } from "$shared/models/episodes";
 import { UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
-import { EpisodeHistoryEntryRestDtos } from "../models/dto";
+import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
 import { episodeHistoryEntryEntitySchema } from "../models";
 
 export const dataSchema = episodeHistoryEntryEntitySchema
@@ -24,7 +24,7 @@ const resSchema = createManyResultResponseSchema(dataSchema);
 
 export type Res = z.infer<typeof resSchema>;
 
-type Req = EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria;
+type Req = EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
 const body: Req = {
   filter: {},
   sort: {
@@ -41,7 +41,7 @@ const fetcher = makeFetcher<Req, Res>( {
 } );
 
 export const useRequest: UseRequest<ResultResponse<Data[]>> = makeUseRequest<
-  EpisodeHistoryEntryRestDtos.GetManyByCriteria.Criteria,
+  EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
   ResultResponse<Data[]>
  >( {
    key: {

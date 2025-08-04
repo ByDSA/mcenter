@@ -5,8 +5,8 @@ import { Response } from "express";
 import * as mime from "mime-types";
 import { assertIsDefined } from "$shared/utils/validation";
 import { assertFound } from "#utils/validation/found";
-import { MusicHistoryRepository } from "../history/rest/repository";
-import { MusicRepository } from "../rest/repository";
+import { MusicHistoryRepository } from "../history/crud/repository";
+import { MusicRepository } from "../crud/repository";
 import { getFullPath } from "../utils";
 import { Music } from "../models";
 

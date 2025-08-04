@@ -4,7 +4,7 @@ import { generatePatchBodySchema } from "../../../utils/schemas/patch";
 import { idParamsSchema } from "../../../utils/schemas/requests";
 import { musicFileInfoEntitySchema } from "../file-info";
 
-export namespace MusicFileInfoRestDtos {
+export namespace MusicFileInfoCrudDtos {
   export namespace GetOneById {
     export const paramsSchema = idParamsSchema;
   }

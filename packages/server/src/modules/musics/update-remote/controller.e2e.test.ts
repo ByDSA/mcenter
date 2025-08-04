@@ -4,12 +4,12 @@ import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { MusicRepository } from "../rest/repository";
-import { MusicFileInfoRepository } from "../file-info/rest/repository";
+import { MusicRepository } from "../crud/repository";
+import { MusicFileInfoRepository } from "../file-info/crud/repository";
 import { musicFileInfoEntitySchema } from "../file-info/models";
 import { musicEntitySchema } from "../models";
-import { musicFileInfoRepositoryMockProvider } from "../file-info/rest/repository/tests";
-import { musicRepoMockProvider } from "../rest/repository/tests";
+import { musicFileInfoRepositoryMockProvider } from "../file-info/crud/repository/tests";
+import { musicRepoMockProvider } from "../crud/repository/tests";
 import { MusicUpdateRemoteController } from "./controller";
 import { UpdateRemoteTreeService, UpdateResult } from "./service";
 
