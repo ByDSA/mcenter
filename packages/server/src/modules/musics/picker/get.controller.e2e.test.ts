@@ -1,17 +1,15 @@
 import { Application } from "express";
 import request from "supertest";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
+import { PATH_ROUTES } from "$shared/routing";
 import { MusicEntity, Music } from "#musics/models";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
-import { MusicHistoryRepository } from "../history/rest/repository";
-import { MusicRepository } from "../rest/repository";
-import { musicBuilderServiceMockProvicer } from "../builder/tests";
-import { MusicFileInfoRepository } from "../file-info/rest/repository";
 import { MusicHistoryEntryOdm } from "../history/rest/repository/odm";
-import { MusicGetController } from "./get.controller";
-import { RawHandlerService } from "./raw-handler.service";
+import { MusicHistoryModule } from "../history/module";
+import { MusicsCrudModule } from "../rest/module";
+import { MusicGetRandomController } from "./get.controller";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;
@@ -42,14 +40,9 @@ function expectNotEmpty(array: unknown[]) {
 describe("musicGetController", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [DomainEventEmitterModule],
-      controllers: [MusicGetController],
+      imports: [DomainEventEmitterModule, MusicHistoryModule, MusicsCrudModule],
+      controllers: [MusicGetRandomController],
       providers: [
-        MusicRepository,
-        MusicFileInfoRepository,
-        musicBuilderServiceMockProvicer,
-        MusicHistoryRepository,
-        RawHandlerService,
       ],
     }, {
       db: {
@@ -67,29 +60,27 @@ describe("musicGetController", () => {
 
   it("should get random", async () => {
     const response = await request(routerApp)
-      .get("/get/random")
+      .get("/")
       .expect(200)
       .send();
 
     expect(response.body).toBeDefined();
     expect(response.text).toBeDefined();
 
-    expect(response.text.includes("api/musics/get/raw/")).toBeTruthy();
-    expect(response.text.includes("get/random")).toBeTruthy();
+    expect(response.text.includes(PATH_ROUTES.musics.raw.path)).toBeTruthy();
   } );
 
   describe("query", () => {
     it("should get a music if query is put", async () => {
       const response = await request(routerApp)
-        .get("/get/random?q=tag:t1")
+        .get("/?q=tag:t1")
         .expect(200)
         .send();
 
       expect(response.body).toBeDefined();
       expect(response.text).toBeDefined();
 
-      expect(response.text.includes("api/musics/get/raw/")).toBeTruthy();
-      expect(response.text.includes("get/random")).toBeTruthy();
+      expect(response.text.includes(PATH_ROUTES.musics.raw.path)).toBeTruthy();
     } );
 
     it("should get a music if query weight is put", async () => {
@@ -98,7 +89,7 @@ describe("musicGetController", () => {
 
       expectNotEmpty(possibleMusics);
       const response = await request(routerApp)
-        .get("/get/random?q=weight:>10")
+        .get("/?q=weight:>10")
         .expect(200)
         .send();
 
@@ -112,7 +103,7 @@ describe("musicGetController", () => {
 
       expectNotEmpty(musicsWithTagT1);
       const response = await request(routerApp)
-        .get(`/get/random?q=${query}`)
+        .get(`/?q=${query}`)
         .expect(200)
         .send();
 
@@ -122,7 +113,7 @@ describe("musicGetController", () => {
     it("should get a music with tag only-t2 using t2 query", async () => {
       const query = "tag:t2";
       const response = await request(routerApp)
-        .get(`/get/random?q=${query}`)
+        .get(`/?q=${query}`)
         .expect(200)
         .send();
       const musicsWithTagT2Only = MUSICS_WITH_TAGS_SAMPLES.filter(
@@ -145,7 +136,7 @@ describe("musicGetController", () => {
       const query = "tag:t4";
 
       await request(routerApp)
-        .get(`/get/random?q=${query}`)
+        .get(`/?q=${query}`)
         .expect(500)
         .send();
     } );

@@ -1,26 +1,13 @@
-import path from "node:path";
-import { createReadStream } from "node:fs";
 import { Request } from "express";
-import { Controller, Get, Param, Req, Res, StreamableFile } from "@nestjs/common";
+import { Controller, Get, Req } from "@nestjs/common";
 import { assertIsNotEmpty } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
-import { createZodDto } from "nestjs-zod";
-import z from "zod";
-import { Response } from "express";
-import { Headers } from "@nestjs/common";
-import { MusicEntity, musicSchema } from "#musics/models";
-import { GetMany } from "#utils/nestjs/rest/get";
+import { MusicEntity } from "#musics/models";
 import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
 import { MusicHistoryRepository } from "../history/rest/repository";
 import { MusicRepository } from "../rest/repository";
 import { requestToFindMusicParams } from "../rest/repository/queries/queries";
-import { genMusicFilterApplier, genMusicWeightFixerApplier } from "../services";
-import { ENVS } from "../utils";
-import { RawHandlerService } from "./raw-handler.service";
-
-class GetRawDto extends createZodDto(z.object( {
-  url: z.string(),
-} ).strict()) {}
+import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./model";
 
 function getRootUrlFromForwardedRequest(req: Request): string {
   const protocol = req.get("x-forwarded-proto") ?? req.protocol;
@@ -46,16 +33,15 @@ function getRootUrlFromRequest(req: Request): string {
   return `${req.protocol}://${req.get("host")}`;
 }
 
-@Controller("/get")
-export class MusicGetController {
+@Controller("/")
+export class MusicGetRandomController {
   constructor(
     private readonly musicHistoryRepository: MusicHistoryRepository,
     private readonly musicRepository: MusicRepository,
-    private readonly rawHandler: RawHandlerService,
   ) {
   }
 
-  @Get("/random")
+  @Get("/")
   async getRandom(@Req() req: Request): Promise<string> {
     const musics = await this.#findMusics(req);
 
@@ -100,25 +86,6 @@ export class MusicGetController {
     return picked;
   }
 
-  @GetMany("/all", musicSchema)
-  async getAll(@Req() req: Request) {
-    const musics = await this.#findMusics(req);
-
-    this.#sortMusics(musics);
-
-    return musics;
-  }
-
-  @Get("/playlist/:name")
-  getPlaylist(@Param() params: any) {
-    const { name } = params;
-    const playlistsFolder = path.join(ENVS.mediaPath, "music", "playlists");
-    const filePath = path.join(playlistsFolder, name);
-    const file = createReadStream(filePath);
-
-    return new StreamableFile(file);
-  }
-
   #findMusics(req: Request): Promise<MusicEntity[]> {
     const params = requestToFindMusicParams(req);
 
@@ -126,27 +93,6 @@ export class MusicGetController {
       return this.musicRepository.getManyByQuery(params);
 
     return this.musicRepository.getAll();
-  }
-
-  #sortMusics(musics: MusicEntity[]): MusicEntity[] {
-    return musics.sort((a: MusicEntity, b: MusicEntity) => {
-      if (!a.artist || !b.artist || a.artist === b.artist)
-        return a.title.localeCompare(b.title);
-
-      return a.artist.localeCompare(b.artist);
-    } );
-  }
-
-  @Get("/raw/:url")
-  async getRaw(
-    @Param() params: GetRawDto,
-    @Headers("if-none-match") ifNoneMatch: string,
-    @Headers("range") range: string,
-     @Res( {
-       passthrough: true,
-     } ) res: Response,
-  ) {
-    return await this.rawHandler.handle(params.url, ifNoneMatch, range, res);
   }
 }
 

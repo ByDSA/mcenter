@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Body, Controller, forwardRef, Inject, Param } from "@nestjs/common";
+import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicHistoryEntryRestDtos } from "$shared/models/musics/history/dto/transport";
 import { CanGetAll } from "#utils/layers/controller";
@@ -18,7 +18,6 @@ const schema = musicHistoryEntryEntitySchema;
 @Controller()
 export class MusicHistoryRestController implements CanGetAll<Request, Response> {
   constructor(
-    @Inject(forwardRef(()=>MusicHistoryRepository))
     private readonly historyRepository: MusicHistoryRepository,
   ) {}
 

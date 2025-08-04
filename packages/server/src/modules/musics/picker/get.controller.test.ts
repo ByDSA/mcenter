@@ -3,17 +3,16 @@ import { INestApplication } from "@nestjs/common";
 import { Application } from "express";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
+import { PATH_ROUTES } from "$shared/routing";
 import { MusicId } from "#musics/models";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { MusicRepository } from "../rest/repository";
 import { musicRepoMockProvider } from "../rest/repository/tests";
 import { musicHistoryRepoMockProvider } from "../history/rest/repository/tests";
 import { MusicFileInfoRepository } from "../file-info/rest/repository";
 import { musicFileInfoRepositoryMockProvider } from "../file-info/rest/repository/tests";
-import { MusicFixController } from "./fix.controller";
-import { MusicGetController } from "./get.controller";
-import { RawHandlerService } from "./raw-handler.service";
+import { RawHandlerService } from "../raw/service";
+import { MusicGetRandomController } from "./get.controller";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 
@@ -26,8 +25,8 @@ describe("getAll", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [DomainEventEmitterModule],
-      controllers: [MusicGetController, MusicFixController],
+      imports: [],
+      controllers: [MusicGetRandomController],
       providers: [
         musicRepoMockProvider,
         musicHistoryRepoMockProvider,
@@ -66,14 +65,15 @@ describe("getAll", () => {
 
     musicRepoMock.getAll.mockResolvedValueOnce(fixtureMusics.Disk.List);
     const response = await request(routerApp)
-      .get("/get/random")
+      .get("/")
       .expect(200);
     const responseText = response.text;
 
     expect(musics.some((m) => responseText.includes(`,${m.title}`))).toBeTruthy();
 
     expect(responseText.includes("127.0.0.1")).toBeTruthy();
-    expect(musics.some((m) => responseText.includes(`/get/raw/${m.url}`))).toBeTruthy();
-    expect(responseText.includes("/random")).toBeTruthy();
+    expect(
+      musics.some((m) => responseText.includes(PATH_ROUTES.musics.raw.withParams(m.url))),
+    ).toBeTruthy();
   } );
 } );

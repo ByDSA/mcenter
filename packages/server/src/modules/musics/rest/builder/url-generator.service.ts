@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { ARTIST_EMPTY, Music } from "#musics/models";
-import { MusicRepository } from "../rest/repository";
+import { MusicRepository } from "../repository";
 import { fixUrl } from "./fix-url";
 
 @Injectable()

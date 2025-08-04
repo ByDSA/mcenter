@@ -2,9 +2,9 @@ import path from "node:path";
 import NodeID3 from "node-id3";
 import { Injectable } from "@nestjs/common";
 import { deepCopy } from "$shared/utils/objects";
-import { ARTIST_EMPTY, assertIsMusic, Music } from "../models";
-import { getFullPath } from "../utils";
-import { AUDIO_EXTENSIONS } from "../files";
+import { ARTIST_EMPTY, assertIsMusic, Music } from "../../models";
+import { getFullPath } from "../../utils";
+import { AUDIO_EXTENSIONS } from "../../files";
 import { MusicUrlGeneratorService } from "./url-generator.service";
 
 @Injectable()

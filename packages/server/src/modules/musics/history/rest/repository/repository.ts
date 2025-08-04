@@ -44,7 +44,7 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
     logDomainEvent(ev);
   }
 
-   @OnEvent(MusicHistoryEntryEvents.Deleted.TYPE)
+  @OnEvent(MusicHistoryEntryEvents.Deleted.TYPE)
   async handleDeleteEvents(event: MusicHistoryEntryEvents.Deleted.Event) {
     const deletedId = event.payload.entity.resourceId;
     const deletedTimestamp = event.payload.entity.date.timestamp;
@@ -59,33 +59,33 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
     }
   }
 
-   async isLast(id: MusicId): Promise<boolean> {
-     const lastOdm = await ModelOdm.findOne( {} ).sort( {
-       "date.timestamp": -1,
-     } );
+  async isLast(id: MusicId): Promise<boolean> {
+    const lastOdm = await ModelOdm.findOne( {} ).sort( {
+      "date.timestamp": -1,
+    } );
 
-     return lastOdm?.musicId === id;
-   }
+    return lastOdm?.musicId === id;
+  }
 
-   async createOneByMusicId(musicId: MusicId): Promise<Model> {
-     const newEntry: Model = {
-       date: getDateNow(),
-       resourceId: musicId,
-     };
+  async createOneByMusicId(musicId: MusicId): Promise<Model> {
+    const newEntry: Model = {
+      date: getDateNow(),
+      resourceId: musicId,
+    };
 
-     return await this.createOneAndGet(newEntry);
-   }
+    return await this.createOneAndGet(newEntry);
+  }
 
    @EmitEntityEvent(MusicHistoryEntryEvents.Deleted.TYPE)
-   async deleteOneByIdAndGet(id: EntryId): Promise<Entity> {
-     const deleted = await ModelOdm.findByIdAndDelete(id);
+  async deleteOneByIdAndGet(id: EntryId): Promise<Entity> {
+    const deleted = await ModelOdm.findByIdAndDelete(id);
 
-     assertFound(deleted);
+    assertFound(deleted);
 
-     const ret = MusicHistoryEntryOdm.toEntity(deleted);
+    const ret = MusicHistoryEntryOdm.toEntity(deleted);
 
-     return ret;
-   }
+    return ret;
+  }
 
    async getOneById(id: EntryId): Promise<Entity | null> {
      const docOdm = await ModelOdm.findById(id);

@@ -2,6 +2,9 @@ import { EpisodeCompKey } from "../models/episodes";
 import { PathRoutes } from "./routes.types";
 
 const MUSICS = "/api/musics";
+const MUSICS_RAW = `${MUSICS}/get/raw`;
+const MUSICS_PLAYLISTS = `${MUSICS}/get/playlists`;
+const MUSICS_RANDOM = `${MUSICS}/get/random`;
 const PLAYER = "/api/player";
 const EPISODES = "/api/episodes";
 const PLAYER_PLAY_EPISODE = `${PLAYER}/play/episode`;
@@ -24,7 +27,15 @@ export const PATH_ROUTES = {
       },
     },
     raw: {
-      withParams: (musicUrl: string) => `${MUSICS}/get/raw/${musicUrl}`,
+      path: MUSICS_RAW,
+      withParams: (musicUrl: string) => `${MUSICS_RAW}/${musicUrl}`,
+    },
+    playlists: {
+      path: MUSICS_PLAYLISTS,
+      withParams: (id: string) => `${MUSICS_PLAYLISTS}/${id}`,
+    },
+    pickRandom: {
+      path: MUSICS_RANDOM,
     },
   },
   logs: {

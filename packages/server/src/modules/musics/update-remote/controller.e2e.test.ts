@@ -6,8 +6,6 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { MusicRepository } from "../rest/repository";
 import { MusicFileInfoRepository } from "../file-info/rest/repository";
-import { MusicBuilderService } from "../builder/music-builder.service";
-import { MusicUrlGeneratorService } from "../builder/url-generator.service";
 import { musicFileInfoEntitySchema } from "../file-info/models";
 import { musicEntitySchema } from "../models";
 import { musicFileInfoRepositoryMockProvider } from "../file-info/rest/repository/tests";
@@ -29,8 +27,6 @@ describe("updateRemoteController", () => {
       providers: [
         UpdateRemoteTreeService,
         musicRepoMockProvider,
-        MusicBuilderService,
-        MusicUrlGeneratorService,
         musicFileInfoRepositoryMockProvider,
       ],
     }, {

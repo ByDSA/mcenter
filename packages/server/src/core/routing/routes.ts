@@ -1,8 +1,7 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { RouterModule } from "@nestjs/core";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
-import { MusicsModule } from "#musics/module";
-import { MusicsHistoryModule } from "#musics/history/module";
+import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryEntriesModule } from "#episodes/history/module";
 import { EpisodePickerModule } from "#modules/episode-picker/module";
@@ -11,6 +10,10 @@ import { PlayerModule } from "#modules/player/module";
 import { ConfigModule } from "#modules/config/config.module";
 import { StaticFilesModule } from "#modules/config/static-files.module";
 import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
+import { MusicsGetRandomModule } from "#musics/picker/module";
+import { MusicsGetPlaylistsModule } from "#musics/playlists/module";
+import { MusicsGetRawModule } from "#musics/raw/module";
+import { MusicsCrudModule } from "#musics/rest/module";
 import { LoggingModule } from "../logging/module";
 
 export const routeModules = [
@@ -19,8 +22,12 @@ export const routeModules = [
   StaticFilesModule,
   ConfigModule,
   EpisodeFileInfosModule,
-  MusicsHistoryModule,
+  MusicHistoryModule,
   PlayerModule,
+
+  MusicsGetRandomModule,
+  MusicsGetPlaylistsModule,
+  MusicsGetRawModule,
 
   /* Importante: el orden de las rutas aquí en el Register es irrelevante.
   Si hay colisiones en el acceso, cargar el módulo específico primero fuera del Register */
@@ -59,11 +66,23 @@ export const routeModules = [
     },
     {
       path: PATH_ROUTES.musics.path,
-      module: MusicsModule,
+      module: MusicsCrudModule,
+    },
+    {
+      path: PATH_ROUTES.musics.raw.path,
+      module: MusicsGetRawModule,
+    },
+    {
+      path: PATH_ROUTES.musics.pickRandom.path,
+      module: MusicsGetRandomModule,
+    },
+    {
+      path: PATH_ROUTES.musics.playlists.path,
+      module: MusicsGetPlaylistsModule,
     },
     {
       path: PATH_ROUTES.musics.history.path,
-      module: MusicsHistoryModule,
+      module: MusicHistoryModule,
     },
     {
       path: PATH_ROUTES.streams.path,
