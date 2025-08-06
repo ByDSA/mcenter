@@ -12,7 +12,7 @@ import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
-import { HISTORY_ENTRY_SIMPSONS_6_25 } from "#episodes/history/tests";
+import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { EpisodePickerService } from "./service";
 
@@ -51,7 +51,9 @@ describe("tests", () => {
     const stream: StreamEntity = STREAM_SIMPSONS;
 
     repos.episodes.getManyBySerieKey.mockResolvedValueOnce(fixtureEpisodes.Simpsons.List);
-    repos.historyEntries.findLast.mockResolvedValueOnce(HISTORY_ENTRY_SIMPSONS_6_25);
+    repos.historyEntries.findLast.mockResolvedValueOnce(
+      fixtureEpisodeHistoryEntries.Simpsons.Samples.EP6x25,
+    );
     repos.episodes.getOneByCompKey.mockResolvedValueOnce(
       fixtureEpisodes.Simpsons.Samples.Dependency.last,
     );
@@ -66,7 +68,9 @@ describe("tests", () => {
     const stream: StreamEntity = STREAM_SIMPSONS;
 
     repos.episodes.getManyBySerieKey.mockResolvedValueOnce(clone(fixtureEpisodes.Simpsons.List));
-    repos.historyEntries.findLast.mockResolvedValueOnce(HISTORY_ENTRY_SIMPSONS_6_25);
+    repos.historyEntries.findLast.mockResolvedValueOnce(
+      fixtureEpisodeHistoryEntries.Simpsons.Samples.EP6x25,
+    );
     repos.episodes.getOneByCompKey.mockResolvedValueOnce(
       fixtureEpisodes.Simpsons.Samples.Dependency.last,
     );

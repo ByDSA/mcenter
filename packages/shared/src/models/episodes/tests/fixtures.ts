@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { EpisodeEntity } from "../";
-import { ObjectId } from "mongodb";
 import { deepFreeze } from "../../../utils/objects";
 import { DATEJS_SAMPLE1 } from "../../../../tests/other-fixtures/dates";
+import { fixtureEpisodeFileInfos } from "../file-info/tests";
+import { simpsonIds } from "./fixture-ids";
 
 const timestamps = {
   createdAt: DATEJS_SAMPLE1,
@@ -10,7 +11,7 @@ const timestamps = {
   addedAt: DATEJS_SAMPLE1,
 };
 const ep1x01: EpisodeEntity = {
-  id: new ObjectId().toString(),
+  id: simpsonIds.ep1x01,
   compKey: {
     episodeKey: "1x01",
     seriesKey: "simpsons",
@@ -21,9 +22,12 @@ const ep1x01: EpisodeEntity = {
     "navidad",
   ],
   timestamps,
+  fileInfos: [
+    fixtureEpisodeFileInfos.Simpsons.Samples.EP1x01,
+  ],
 };
 const EP6x25: EpisodeEntity = {
-  id: new ObjectId().toString(),
+  id: simpsonIds.ep6x25,
   title: "Quién disparó al señor Burns (1ª parte)",
   weight: 4,
   timestamps,
@@ -33,7 +37,7 @@ const EP6x25: EpisodeEntity = {
   },
 };
 const EP7x01: EpisodeEntity = {
-  id: new ObjectId().toString(),
+  id: simpsonIds.ep7x01,
   title: "Quién disparó al señor Burns (2ª parte)",
   weight: 4,
   timestamps,
@@ -46,7 +50,7 @@ const EP7x01: EpisodeEntity = {
 const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   ep1x01,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x02,
     compKey: {
       episodeKey: "1x02",
       seriesKey: "simpsons",
@@ -56,7 +60,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x03,
     compKey: {
       episodeKey: "1x03",
       seriesKey: "simpsons",
@@ -66,7 +70,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x04,
     compKey: {
       episodeKey: "1x04",
       seriesKey: "simpsons",
@@ -76,7 +80,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x05,
     compKey: {
       episodeKey: "1x05",
       seriesKey: "simpsons",
@@ -86,7 +90,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x06,
     compKey: {
       episodeKey: "1x06",
       seriesKey: "simpsons",
@@ -96,7 +100,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x07,
     compKey: {
       episodeKey: "1x07",
       seriesKey: "simpsons",
@@ -106,7 +110,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x08,
     compKey: {
       episodeKey: "1x08",
       seriesKey: "simpsons",
@@ -116,7 +120,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x09,
     compKey: {
       episodeKey: "1x09",
       seriesKey: "simpsons",
@@ -126,7 +130,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x10,
     compKey: {
       episodeKey: "1x10",
       seriesKey: "simpsons",
@@ -136,7 +140,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x11,
     compKey: {
       episodeKey: "1x11",
       seriesKey: "simpsons",
@@ -146,7 +150,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x12,
     compKey: {
       episodeKey: "1x12",
       seriesKey: "simpsons",
@@ -156,7 +160,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     timestamps,
   } as EpisodeEntity,
   {
-    id: new ObjectId().toString(),
+    id: simpsonIds.ep1x13,
     compKey: {
       episodeKey: "1x13",
       seriesKey: "simpsons",

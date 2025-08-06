@@ -32,5 +32,9 @@ it("should load fixture simpsons", async () => {
   const episodesDocOdm = await EpisodeOdm.Model.find();
   const episodes = episodesDocOdm.map(EpisodeOdm.toEntity);
 
-  expectEpisodes(episodes, EPISODES_SIMPSONS);
+  expectEpisodes(episodes, EPISODES_SIMPSONS.map(e=>{
+    const { fileInfos, ...ret } = e;
+
+    return ret;
+  } ));
 } );

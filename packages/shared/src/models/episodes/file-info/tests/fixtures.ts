@@ -1,9 +1,9 @@
 import type { EpisodeFileInfoEntity } from "../file-info";
 import { ObjectId } from "mongodb";
 import { deepFreeze } from "../../../../utils/objects";
-import { fixtureEpisodes } from "../../tests";
 import { DATEJS_SAMPLE1 } from "../../../../../tests/other-fixtures/dates";
 import { generateRandomMD5 } from "../../../../../tests/other-fixtures/hash";
+import { simpsonIds } from "../../tests/fixture-ids";
 
 const fileInfoTimestamps = {
   createdAt: DATEJS_SAMPLE1,
@@ -14,7 +14,7 @@ const ep1x01FileInfo: EpisodeFileInfoEntity = {
   path: "series/simpsons/1/1_80.mkv",
   start: 2,
   end: 1326,
-  episodeId: fixtureEpisodes.Simpsons.Samples.EP1x01.id,
+  episodeId: simpsonIds.ep1x01,
   timestamps: fileInfoTimestamps,
   hash: generateRandomMD5(),
   size: 11, // fake video
@@ -31,7 +31,7 @@ const ep1x01FileInfo: EpisodeFileInfoEntity = {
 const ep1x02FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[1].id,
+  episodeId: simpsonIds.ep1x02,
   path: "series/simpsons/1/2_80.mkv",
   start: 90,
   end: 1337,
@@ -40,7 +40,7 @@ const ep1x02FileInfo: EpisodeFileInfoEntity = {
 const ep1x03FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[2].id,
+  episodeId: simpsonIds.ep1x03,
   path: "series/simpsons/1/3_80.mkv",
   start: 90,
   end: 1320,
@@ -49,7 +49,7 @@ const ep1x03FileInfo: EpisodeFileInfoEntity = {
 const ep1x04FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[3].id,
+  episodeId: simpsonIds.ep1x04,
   path: "series/simpsons/1/4_80.mkv",
   start: 90,
   end: 1277.5,
@@ -58,7 +58,7 @@ const ep1x04FileInfo: EpisodeFileInfoEntity = {
 const ep1x05FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[4].id,
+  episodeId: simpsonIds.ep1x05,
   path: "series/simpsons/1/5_80.mkv",
   start: 11,
   end: 1289,
@@ -67,7 +67,7 @@ const ep1x05FileInfo: EpisodeFileInfoEntity = {
 const ep1x06FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[5].id,
+  episodeId: simpsonIds.ep1x06,
   path: "series/simpsons/1/6_80.mkv",
   start: 89,
   end: 1316,
@@ -76,7 +76,7 @@ const ep1x06FileInfo: EpisodeFileInfoEntity = {
 const ep1x07FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[6].id,
+  episodeId: simpsonIds.ep1x07,
   path: "series/simpsons/1/7_80_+cat.mkv",
   start: 89.5,
   end: 1315,
@@ -85,7 +85,7 @@ const ep1x07FileInfo: EpisodeFileInfoEntity = {
 const ep1x08FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[7].id,
+  episodeId: simpsonIds.ep1x08,
   path: "series/simpsons/1/8_80.mkv",
   start: 88.5,
   end: 1307,
@@ -94,7 +94,7 @@ const ep1x08FileInfo: EpisodeFileInfoEntity = {
 const ep1x09FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[8].id,
+  episodeId: simpsonIds.ep1x09,
   path: "series/simpsons/1/9_80.mkv",
   start: 13.5,
   end: 1333,
@@ -103,7 +103,7 @@ const ep1x09FileInfo: EpisodeFileInfoEntity = {
 const ep1x10FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[9].id,
+  episodeId: simpsonIds.ep1x10,
   path: "series/simpsons/1/10_80.mkv",
   start: 90,
   end: 1331.5,
@@ -112,7 +112,7 @@ const ep1x10FileInfo: EpisodeFileInfoEntity = {
 const ep1x11FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[10].id,
+  episodeId: simpsonIds.ep1x11,
   path: "series/simpsons/1/11_80.mkv",
   start: 87,
   end: 1366,
@@ -121,7 +121,7 @@ const ep1x11FileInfo: EpisodeFileInfoEntity = {
 const ep1x12FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[11].id,
+  episodeId: simpsonIds.ep1x12,
   path: "series/simpsons/1/12_80.mkv",
   start: 86,
   end: 1381,
@@ -130,7 +130,7 @@ const ep1x12FileInfo: EpisodeFileInfoEntity = {
 const ep1x13FileInfo: EpisodeFileInfoEntity = {
   ...ep1x01FileInfo,
   id: new ObjectId().toString(),
-  episodeId: fixtureEpisodes.Simpsons.List[12].id,
+  episodeId: simpsonIds.ep1x13,
   path: "series/simpsons/1/13_80.mkv",
   start: 87,
   end: 1366.5,

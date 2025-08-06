@@ -4,9 +4,7 @@ import { deepFreeze } from "../../../../utils/objects";
 import { STREAM_SIMPSONS } from "../../../streams/tests";
 import { SAMPLE1 as DATE_SAMPLE1 } from "../../../../../tests/other-fixtures/dates";
 
-export const HISTORY_ENTRIES_WITH_NO_ENTRIES: EpisodeHistoryEntryEntity[] = deepFreeze([]);
-
-export const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntryEntity = {
+const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntryEntity = {
   id: new ObjectId().toString(),
   resourceId: {
     episodeKey: "1x01",
@@ -15,8 +13,7 @@ export const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntryEntity = {
   date: DATE_SAMPLE1,
   streamId: STREAM_SIMPSONS.id,
 };
-
-export const HISTORY_ENTRY_SIMPSONS_6_25: EpisodeHistoryEntryEntity = {
+const HISTORY_ENTRY_SIMPSONS_6_25: EpisodeHistoryEntryEntity = {
   id: new ObjectId().toString(),
   resourceId: {
     episodeKey: "6x25",
@@ -25,7 +22,17 @@ export const HISTORY_ENTRY_SIMPSONS_6_25: EpisodeHistoryEntryEntity = {
   date: DATE_SAMPLE1,
   streamId: STREAM_SIMPSONS.id,
 };
-
-export const HISTORY_ENTRIES_SIMPSONS: EpisodeHistoryEntryEntity[] = deepFreeze([
+const HISTORY_ENTRIES_SIMPSONS: EpisodeHistoryEntryEntity[] = deepFreeze([
   HISTORY_ENTRY_SIMPSONS1,
+  HISTORY_ENTRY_SIMPSONS_6_25,
 ] satisfies EpisodeHistoryEntryEntity[]);
+
+export const fixtureEpisodeHistoryEntries = {
+  Simpsons: {
+    Samples: {
+      EP1x01: HISTORY_ENTRY_SIMPSONS1,
+      EP6x25: HISTORY_ENTRY_SIMPSONS_6_25,
+    },
+    List: HISTORY_ENTRIES_SIMPSONS,
+  },
+};

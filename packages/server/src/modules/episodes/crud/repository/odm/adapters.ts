@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
+import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { timestampsDocOdmToModel } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { SeriesOdm } from "#modules/series/crud/repository/odm";
@@ -21,28 +22,35 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
     lastTimePlayed: docOdm.lastTimePlayed,
   } satisfies AllKeysOf<Episode>;
 
-  return model;
+  return removeUndefinedDeep(model);
 }
 
 export function docOdmToEntity(docOdm: FullDocOdm): EpisodeEntity {
-  return {
+  const ret: EpisodeEntity = {
     ...docOdmToModel(docOdm),
     id: docOdm._id.toString(),
-    fileInfos: docOdm.fileInfos ? docOdm.fileInfos.map(EpisodeFileInfoOdm.toEntity) : undefined,
-    serie: docOdm.serie ? SeriesOdm.toEntity(docOdm.serie) : undefined,
   };
+
+  if (docOdm.fileInfos)
+    ret.fileInfos = docOdm.fileInfos.map(EpisodeFileInfoOdm.toEntity);
+
+  if (docOdm.serie)
+    ret.serie = SeriesOdm.toEntity(docOdm.serie);
+
+  return ret;
 }
 
 export function entityToDocOdm(entity: EpisodeEntity): FullDocOdm {
-  return {
+  const ret: FullDocOdm = {
     ...episodeToDocOdm(entity),
     _id: new Types.ObjectId(entity.id),
-    fileInfos: entity.fileInfos ? entity.fileInfos.map(EpisodeFileInfoOdm.toFullDoc) : undefined,
   };
+
+  return ret;
 }
 
 export function episodeToDocOdm(model: Episode): DocOdm {
-  return {
+  const ret = {
     title: model.title,
     weight: model.weight,
     timestamps: model.timestamps,
@@ -52,6 +60,8 @@ export function episodeToDocOdm(model: Episode): DocOdm {
     tags: model.tags,
     lastTimePlayed: model.lastTimePlayed,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
+
+  return removeUndefinedDeep(ret);
 }
 
 export function partialModelToDocOdm(model: Partial<EpisodeEntity>): MongoUpdateQuery<DocOdm> {

@@ -1,12 +1,16 @@
 import z from "zod";
-import { episodeFileInfoEntitySchema, episodeFileInfoSchema } from "../../file-info";
+import { EpisodeFileInfo, EpisodeFileInfoEntity, episodeFileInfoEntitySchema, episodeFileInfoSchema } from "../../file-info";
+import { parseZod } from "../../../../../utils/validation/zod";
 
 export namespace EpisodeFileInfoDtos {
-  export namespace Model {
-    export const schema = episodeFileInfoSchema;
-    export type Dto = z.infer<typeof schema>;
-  }
-  export namespace Entity {
-    export const schema = episodeFileInfoEntitySchema;
-  }
+  export const schemaDto = episodeFileInfoSchema;
+  export type Dto = z.infer<typeof schemaDto>;
+  export const schemaFullDto = episodeFileInfoEntitySchema;
+  export type FullDto = z.infer<typeof schemaFullDto>;
+  export const toModel = (dto: Dto): EpisodeFileInfo => {
+    return parseZod(schemaDto, dto);
+  };
+  export const toEntity = (dto: FullDto): EpisodeFileInfoEntity => {
+    return parseZod(schemaFullDto, dto);
+  };
 };

@@ -1,7 +1,4 @@
-import { createMockInstance } from "$sharedTests/jest/mocking";
+import { createMockProvider } from "#utils/nestjs/tests";
 import { EpisodesRepository } from "../repository";
 
-export const episodeRepositoryMockProvider = {
-  provide: EpisodesRepository,
-  useValue: createMockInstance(EpisodesRepository),
-};
+export const episodeRepositoryMockProvider = createMockProvider(EpisodesRepository);

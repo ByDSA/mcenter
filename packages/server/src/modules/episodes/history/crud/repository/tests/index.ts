@@ -1,18 +1,7 @@
-import { Provider } from "@nestjs/common";
-import { createMockInstance } from "$sharedTests/jest/mocking";
+import { createMockProvider } from "#utils/nestjs/tests";
 import { EpisodeHistoryRepository } from "../repository";
 import { LastTimePlayedService } from "../../../last-time-played.service";
 
-const episodeHistoryRepositoryMock = createMockInstance(EpisodeHistoryRepository);
+export const episodeHistoryRepositoryMockProvider = createMockProvider(EpisodeHistoryRepository);
 
-export const episodeHistoryRepositoryMockProvider = {
-  provide: EpisodeHistoryRepository,
-  useValue: episodeHistoryRepositoryMock,
-} satisfies Provider;
-
-const lastTimePlayedServiceMock = createMockInstance(LastTimePlayedService);
-
-export const lastTimePlayedServiceMockProvider = {
-  provide: LastTimePlayedService,
-  useValue: lastTimePlayedServiceMock,
-} satisfies Provider;
+export const lastTimePlayedServiceMockProvider = createMockProvider(LastTimePlayedService);

@@ -1,10 +1,10 @@
 export {
   PlaySerieController,
-} from "./play-serie.controller";
+} from "./play-episode/controller";
 
 export {
   PlayStreamController,
-} from "./play-stream.controller";
+} from "./play-stream/controller";
 
 export {
   PlayService,

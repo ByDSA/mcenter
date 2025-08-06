@@ -1,5 +1,5 @@
 import { Test, TestingModule, TestingModuleBuilder } from "@nestjs/testing";
-import { INestApplication, ModuleMetadata } from "@nestjs/common";
+import { INestApplication, ModuleMetadata, Type } from "@nestjs/common";
 import { Application } from "express";
 import { addGlobalConfigToApp, globalValidationProviders } from "#core/app/init.service";
 import { Database } from "#core/db/database";
@@ -13,6 +13,7 @@ export type TestingSetup = {
   routerApp: Application;
   module: TestingModule;
   db?: TestRealDatabase;
+  getMock: <T>(clazz: Type<T>)=> jest.Mocked<T>;
 };
 type Options = {
   db?: {
@@ -61,6 +62,9 @@ export async function createTestingAppModule(
     app,
     module,
     db: options?.db?.using ? app.get<TestRealDatabase>(Database) : undefined,
+    getMock: <T>(clazz: Type<T>) => {
+      return module.get<jest.Mocked<T>>(clazz);
+    },
   };
 }
 

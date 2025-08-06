@@ -7,7 +7,7 @@ import { EpisodeHistoryEntryOdm } from "#episodes/history/crud/repository/odm";
 import { StreamOdm } from "#modules/streams/crud/repository/odm";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
 import { fixtureEpisodes } from "#episodes/tests";
-import { HISTORY_ENTRIES_SIMPSONS } from "#episodes/history/tests";
+import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 
 export const loadFixtureSimpsons = async () => {
   await loadFixtureSerieAndEpisodesSimpsons();
@@ -40,7 +40,7 @@ const loadFixtureStreamAndHistoryListSimpsons = async () => {
   await StreamOdm.Model.insertMany(streamsDocOdm);
 
   // Episode History Entries
-  const entriesOdm: EpisodeHistoryEntryOdm.FullDoc[] = HISTORY_ENTRIES_SIMPSONS
+  const entriesOdm: EpisodeHistoryEntryOdm.FullDoc[] = fixtureEpisodeHistoryEntries.Simpsons.List
     .map(EpisodeHistoryEntryOdm.toFullDoc);
 
   await EpisodeHistoryEntryOdm.Model.insertMany(entriesOdm);

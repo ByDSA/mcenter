@@ -2,11 +2,13 @@ import { Application } from "express";
 import request from "supertest";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
-import { HISTORY_ENTRY_SIMPSONS1 } from "#episodes/history/tests";
+import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { EpisodeHistoryRepository } from "./repository";
 import { episodeHistoryRepositoryMockProvider, lastTimePlayedServiceMockProvider } from "./repository/tests";
 import { EpisodeHistoryCrudController } from "./controller";
+
+const SAMPLE = fixtureEpisodeHistoryEntries.Simpsons.Samples.EP1x01;
 
 describe("crudController", () => {
   let routerApp: Application;
@@ -56,7 +58,7 @@ describe("crudController", () => {
     } );
 
     it("should return same as repository returns", async () => {
-      const entries = [HISTORY_ENTRY_SIMPSONS1];
+      const entries = [SAMPLE];
 
       repository.getManyBySeriesKey.mockResolvedValueOnce(entries);
 
@@ -85,7 +87,7 @@ describe("crudController", () => {
       } );
 
       it("should return the same entries that repository returns inside", async () => {
-        const entries = [HISTORY_ENTRY_SIMPSONS1];
+        const entries = [SAMPLE];
 
         repository.getManyByCriteria.mockResolvedValueOnce(entries);
 
@@ -122,7 +124,7 @@ describe("crudController", () => {
       } );
 
       it("should return all entries if empty criteria provided", async () => {
-        const entries = [HISTORY_ENTRY_SIMPSONS1];
+        const entries = [SAMPLE];
 
         repository.getManyByCriteria.mockResolvedValueOnce(entries);
 
@@ -160,7 +162,7 @@ describe("crudController", () => {
       } );
 
       it("should return all entries if empty criteria provided", async () => {
-        const entries = [HISTORY_ENTRY_SIMPSONS1];
+        const entries = [SAMPLE];
 
         repository.getManyByCriteria.mockResolvedValueOnce(entries);
 

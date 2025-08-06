@@ -85,10 +85,7 @@ describe("responses", () => {
 
 function expectWithEpisode(res: Response, expectedEpisode: EpisodeEntity) {
   const episodeDto = res.body.data;
-
-  expect(episodeDto).toBeDefined();
-
-  const episode = EpisodeDtos.Entity.toEntity(episodeDto);
+  const episode = EpisodeDtos.toEntity(episodeDto);
 
   expect(episode).toStrictEqual(expectedEpisode);
 }

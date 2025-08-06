@@ -1,4 +1,4 @@
-import z, { ZodType } from "zod";
+import z, { ZodType, ZodTypeAny } from "zod";
 import { throwErrorPopStack } from "../../errors";
 
 export type AssertZodSettings = {
@@ -29,11 +29,19 @@ export class CustomValidationError extends Error {
   }
 }
 
-export function assertZod<T>(
-  schema: ZodType<T>,
+export function assertZod<T extends ZodTypeAny>(
+  schema: T,
   model: unknown,
   settings?: AssertZodSettings,
-): asserts model is T {
+): asserts model is z.output<T> {
+  parseZod(schema, model, settings);
+}
+
+export function parseZod<T extends ZodTypeAny>(
+  schema: T,
+  model: unknown,
+  settings?: AssertZodSettings,
+): z.output<T> {
   if (settings?.useZodError) {
     schema.parse(model);
 
@@ -47,6 +55,8 @@ export function assertZod<T>(
 
     throwErrorPopStack(error);
   }
+
+  return result.data;
 }
 
 export function genAssertZod<T>(

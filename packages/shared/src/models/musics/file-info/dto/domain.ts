@@ -1,35 +1,26 @@
 import z from "zod";
+import { parseZod } from "../../../../utils/validation/zod";
 import { MusicFileInfo, MusicFileInfoEntity, musicFileInfoEntitySchema, musicFileInfoSchema } from "../file-info";
-import { replaceSchemaTimestampsFileToStrings, transformDateTimestampsFileToDto, transformDtoTimestampsFileToDates } from "../../../file-info-common/dto";
 
 type _Model = MusicFileInfo;
 type _Entity = MusicFileInfoEntity;
 export namespace MusicFileInfoEntityDtos {
   export namespace Model {
-    export const schema = replaceSchemaTimestampsFileToStrings(musicFileInfoSchema);
+    export const schema = musicFileInfoSchema;
 
     export type Dto = z.infer<typeof schema>;
     export const toModel = (dto: Dto): _Model => {
-      return {
-        ...dto,
-        timestamps: transformDtoTimestampsFileToDates(dto.timestamps),
-      };
+      return parseZod(schema, dto);
     };
   }
   export namespace Entity {
-    export const schema = replaceSchemaTimestampsFileToStrings(musicFileInfoEntitySchema);
+    export const schema = musicFileInfoEntitySchema;
     export type Dto = z.infer<typeof schema>;
     export const toEntity = (dto: Dto): _Entity => {
-      return {
-        ...dto,
-        timestamps: transformDtoTimestampsFileToDates(dto.timestamps),
-      };
+      return parseZod(schema, dto);
     };
     export const toDto = (entity: _Entity): Dto => {
-      return {
-        ...entity,
-        timestamps: transformDateTimestampsFileToDto(entity.timestamps),
-      };
+      return parseZod(schema, entity);
     };
   }
 }

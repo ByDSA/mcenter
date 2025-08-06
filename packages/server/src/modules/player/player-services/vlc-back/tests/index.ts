@@ -1,5 +1,6 @@
-import { createMockClass } from "$sharedTests/jest/mocking";
+import { createMockProvider } from "#utils/nestjs/tests";
 import { VlcBackWebSocketsServerService } from "..";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const PlayerBackWebSocketsServiceMock = createMockClass(VlcBackWebSocketsServerService);
+export const playerBackWebSocketsServiceMockProvider = createMockProvider(
+  VlcBackWebSocketsServerService,
+);
