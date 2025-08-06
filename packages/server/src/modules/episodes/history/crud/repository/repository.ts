@@ -5,14 +5,15 @@ import type { EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity,
 import type { EpisodeHistoryEntryCrudDtos } from "$shared/models/episodes/history/dto/transport";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { createEpisodeHistoryEntry } from "$shared/models/episodes/history/utils";
 import { OnEvent } from "@nestjs/event-emitter";
+import { getDateNow } from "$shared/utils/time";
 import { assertFound } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { StreamEntity } from "#modules/streams";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
+import { StreamsRepository } from "#modules/streams/crud/repository";
 import { getCriteriaPipeline } from "./criteria-pipeline";
 import { EpisodeHistoryEntryEvents } from "./events";
 import { EpisodeHistoryEntryOdm } from "./odm";
@@ -31,13 +32,15 @@ type AddEpisodesToHistoryProps = {
 };
 type CreateNewEntryNowForProps = {
   episodeCompKey: EpisodeCompKey;
-  streamId: StreamEntity["id"];
+  streamId?: StreamEntity["id"];
 };
 @Injectable()
 export class EpisodeHistoryRepository implements
 CanCreateOne<Model>,
 CanDeleteOneByIdAndGet<Model, Id> {
-  constructor() { }
+  constructor(
+    private readonly streamsRepo: StreamsRepository,
+  ) {}
 
   @OnEvent(EpisodeHistoryEntryEvents.WILDCARD)
   handleEvents(ev: DomainEvent<object>) {
@@ -158,8 +161,27 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return EpisodeHistoryEntryOdm.toEntity(last);
   }
 
+  async isLast(compKey: EpisodeCompKey): Promise<boolean> {
+    const lastOdm = await EpisodeHistoryEntryOdm.Model.findOne().sort( {
+      "date.timestamp": -1,
+    } );
+
+    return lastOdm?.episodeCompKey.seriesKey === compKey.seriesKey
+      && lastOdm?.episodeCompKey.episodeKey === compKey.episodeKey;
+  }
+
   async createNewEntryNowFor( { episodeCompKey, streamId }: CreateNewEntryNowForProps) {
-    const newEntry: Model = createEpisodeHistoryEntry(episodeCompKey, streamId);
+    if (streamId === undefined) {
+      const defaultStream = this.streamsRepo.getOneOrCreateBySeriesKey(episodeCompKey.seriesKey);
+
+      streamId = (await defaultStream).id;
+    }
+
+    const newEntry: Model = {
+      date: getDateNow(),
+      resourceId: episodeCompKey,
+      streamId,
+    };
 
     await this.createOne(newEntry);
   }

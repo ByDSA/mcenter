@@ -33,6 +33,10 @@
     "typeRoots": ["node_modules/@types"]
   },
   "exclude": ["node_modules"],
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "../shared/src/models/resource/response-format.enum.ts"
+  ],
   "types": ["node"]
 }

@@ -13,7 +13,7 @@ export class ResponseFormatterInterceptor implements NestInterceptor {
           return undefined;
 
         return {
-          data: data,
+          data,
         } satisfies ResultResponse;
       } ),
     );

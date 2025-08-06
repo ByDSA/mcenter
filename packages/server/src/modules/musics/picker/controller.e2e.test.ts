@@ -2,14 +2,15 @@ import { Application } from "express";
 import request from "supertest";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { PATH_ROUTES } from "$shared/routing";
-import { MusicEntity, Music } from "#musics/models";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
 import { MusicHistoryEntryOdm } from "../history/crud/repository/odm";
 import { MusicHistoryModule } from "../history/module";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicGetRandomController } from "./controller";
+import { MusicEntity, Music } from "#musics/models";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
+import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;
@@ -40,7 +41,12 @@ function expectNotEmpty(array: unknown[]) {
 describe("controller", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [DomainEventEmitterModule, MusicHistoryModule, MusicsCrudModule],
+      imports: [
+        DomainEventEmitterModule,
+        MusicHistoryModule,
+        MusicsCrudModule,
+        ResourceResponseFormatterModule,
+      ],
       controllers: [MusicGetRandomController],
       providers: [
       ],

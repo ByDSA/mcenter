@@ -17,7 +17,7 @@ const ep1x01FileInfo: EpisodeFileInfoEntity = {
   episodeId: fixtureEpisodes.Simpsons.Samples.EP1x01.id,
   timestamps: fileInfoTimestamps,
   hash: generateRandomMD5(),
-  size: 1234,
+  size: 11, // fake video
   mediaInfo: {
     duration: 123,
     fps: "24",

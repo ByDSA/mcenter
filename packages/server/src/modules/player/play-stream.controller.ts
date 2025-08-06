@@ -9,8 +9,9 @@ import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { episodeEntityWithFileInfosSchema } from "#episodes/models";
 import { EpisodeEntityWithFileInfos } from "#episodes/file-info/series-tree/remote/service";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
+import { mediaElementFixPlayerLabels } from "#modules/resources/response-formatter/m3u8.view";
+import { episodeToMediaElement } from "./player-services/models";
 import { PlayService } from "./play.service";
-import { episodeWithFileInfosToMediaElement } from "./player-services/models";
 
 class ParamsDto extends createZodDto(z.object( {
   id: z.string(),
@@ -61,21 +62,18 @@ export class PlayStreamController {
 
     assertFound(stream);
 
-    const episodes = await this.episodePickerService.getByStream(stream, number);
-    const promises: Promise<any>[] = [];
+    const episodes = await this.episodePickerService.getByStream(stream, number, {
+      expand: ["series", "fileInfos"],
+    } ) as EpisodeEntityWithFileInfos[];
 
-    for (const e of episodes) {
-      const p = this.episodeFileInfosRepo.getAllByEpisodeId(e.id)
-        .then(fileInfos=>e.fileInfos = fileInfos);
+    assertZod(z.array(episodeEntityWithFileInfosSchema), episodes);
+    const mediaElements = episodes.map((e)=>{
+      const mediaElement = episodeToMediaElement(e, {
+        local: true,
+      } );
 
-      promises.push(p);
-    }
-
-    await Promise.all(promises);
-    const episodesWithFileInfos = episodes as EpisodeEntityWithFileInfos[];
-
-    assertZod(z.array(episodeEntityWithFileInfosSchema), episodesWithFileInfos);
-    const mediaElements = episodesWithFileInfos.map(episodeWithFileInfosToMediaElement);
+      return mediaElementFixPlayerLabels(mediaElement);
+    } );
     const ok = await this.playService.play( {
       mediaElements,
       force,
@@ -83,12 +81,12 @@ export class PlayStreamController {
 
     if (ok) {
       await this.historyRepo.addEpisodesToHistory( {
-        episodes: episodesWithFileInfos,
+        episodes,
         streamId: stream.id,
       } );
     } else
       this.logger.log("Could not play");
 
-    return episodesWithFileInfos;
+    return episodes;
   }
 }

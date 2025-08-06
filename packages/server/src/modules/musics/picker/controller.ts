@@ -6,9 +6,9 @@ import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-p
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicsRepository } from "../crud/repository";
 import { requestToFindMusicParams } from "../crud/repository/queries/queries";
+import { ResponseFormatInterceptor } from "../../resources/response-formatter/response-format.interceptor";
+import { M3u8FormatUseNext } from "../../resources/response-formatter/use-next.decorator";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./model";
-import { ResponseFormatInterceptor } from "./responses/response-format.interceptor";
-import { M3u8FormatUseNext } from "./responses/use-next.decorator";
 
 @Controller("/")
 export class MusicGetRandomController {

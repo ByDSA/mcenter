@@ -3,7 +3,7 @@ import NodeID3 from "node-id3";
 import { Injectable } from "@nestjs/common";
 import { deepCopy } from "$shared/utils/objects";
 import { ARTIST_EMPTY, assertIsMusic, Music } from "../../models";
-import { getFullPath } from "../../utils";
+import { getAbsolutePath } from "../../utils";
 import { AUDIO_EXTENSIONS } from "../../files";
 import { MusicSlugGeneratorService } from "./slug-generator.service";
 
@@ -19,7 +19,7 @@ export class MusicBuilderService {
     // 2. Lectura de tags ID3 si no vienen en partial
     let title: string;
     let artist: string;
-    const fullPath = getFullPath(relativePath);
+    const fullPath = getAbsolutePath(relativePath);
     const tags = NodeID3.read(fullPath) ?? {};
 
     title = tags.title ?? getTitleFromFilenamePath(fullPath);

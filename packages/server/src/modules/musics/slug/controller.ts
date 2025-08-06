@@ -2,13 +2,13 @@ import { Controller, Get, Param, Req, Res } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { Response, Request } from "express";
-import { Headers } from "@nestjs/common";
+import { getHostFromRequest } from "#modules/resources/response-formatter/m3u8.view";
 import { assertFound } from "#utils/validation/found";
+import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { MusicsRepository } from "../crud/repository";
-import { getResponseFormatByRequest, ResponseFormat } from "../picker/responses";
-import { genM3u8View } from "../picker/m3u8.view";
-import { MusicEntity } from "../models";
-import { SlugHandlerService } from "./service";
+import { ResponseFormat, ResponseFormatterService } from "../../resources/response-formatter";
+import { MusicEntity, musicEntitySchema } from "../models";
+import { MusicSlugHandlerService } from "./service";
 
 class GetDto extends createZodDto(z.object( {
   slug: z.string(),
@@ -17,42 +17,44 @@ class GetDto extends createZodDto(z.object( {
 @Controller("/")
 export class MusicsSlugController {
   constructor(
-    private readonly slugHandler: SlugHandlerService,
+    private readonly slugHandler: MusicSlugHandlerService,
     private readonly musicRepo: MusicsRepository,
+    private readonly responseFormatter: ResponseFormatterService,
   ) {
   }
 
   @Get("/:slug")
   async getRaw(
     @Param() params: GetDto,
-    @Headers("if-none-match") ifNoneMatch: string,
-    @Headers("range") range: string,
-     @Res( {
-       passthrough: true,
-     } ) res: Response,
-     @Req() req: Request,
+    @Res( {
+      passthrough: true,
+    } ) res: Response,
+    @Req() req: Request,
   ) {
-    const format = getResponseFormatByRequest(req);
-    let picked: MusicEntity | null;
+    const format = this.responseFormatter.getResponseFormatByRequest(req);
+    let got: MusicEntity | null;
 
     if (format === ResponseFormat.M3U8 || format === ResponseFormat.JSON) {
-      picked = await this.musicRepo.getOneBySlug(params.slug);
-      assertFound(picked);
+      got = await this.musicRepo.getOneBySlug(params.slug);
+      assertFound(got);
     }
 
     switch (format) {
       case ResponseFormat.M3U8:
-      {
-        return genM3u8View( {
-          req,
-          picked: picked!,
-          useNext: false,
-        } );
-      }
+        return this.responseFormatter.formatOneRemoteM3u8Response(
+          got!,
+          getHostFromRequest(req),
+        );
       case ResponseFormat.RAW:
-        return await this.slugHandler.handle(params.slug, ifNoneMatch, range, res);
+        return await this.slugHandler.handle(params.slug, req, res);
       case ResponseFormat.JSON:
-        return picked!;
+      {
+        const json = this.responseFormatter.formatOneJsonResponse(got!, res);
+
+        validateResponseWithZodSchema(json.data, musicEntitySchema, req);
+
+        return json;
+      }
     }
   }
 }

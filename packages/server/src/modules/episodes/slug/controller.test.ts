@@ -3,22 +3,29 @@ import { seriesRepositoryMockProvider } from "#modules/series/crud/repository/te
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { fixtureEpisodes } from "#episodes/tests";
 import { testRoute } from "#core/routing/test";
-import { EpisodesRepository } from "./repository";
-import { episodeRepositoryMockProvider } from "./repository/tests";
-import { EpisodesCrudController } from "./controller";
+import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
+import { ResourceSlugService } from "#modules/resources/slug/service";
+import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
+import { episodeRepositoryMockProvider } from "../crud/repository/tests";
+import { EpisodesRepository } from "../crud/repository";
+import { EpisodesSlugController } from "./controller";
+import { EpisodeSlugHandlerService } from "./service";
 
-testRoute(PATH_ROUTES.episodes.withParams("seriesKey", "episodeKey"));
+testRoute(PATH_ROUTES.episodes.slug.withParams("seriesKey", "episodeKey"));
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
 crudTestsSuite( {
   appModule: [
     {
-      imports: [],
-      controllers: [EpisodesCrudController],
+      imports: [ResourceResponseFormatterModule],
+      controllers: [EpisodesSlugController],
       providers: [
         episodeRepositoryMockProvider,
+        episodeHistoryRepositoryMockProvider,
         seriesRepositoryMockProvider,
+        EpisodeSlugHandlerService,
+        ResourceSlugService,
       ],
     }],
   repositoryClass: EpisodesRepository,
@@ -37,6 +44,8 @@ crudTestsSuite( {
         params: [{
           seriesKey: "seriesKey",
           episodeKey: "episodeKey",
+        }, {
+          expand: ["series"],
         }],
         returned: EPISODES_SIMPSONS[0],
       },

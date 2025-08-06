@@ -4,7 +4,7 @@ import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
-import { getFullPath } from "#musics/utils";
+import { getAbsolutePath } from "#musics/utils";
 import { md5FileAsync } from "#utils/crypt";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
@@ -38,7 +38,7 @@ CanGetAll<Entity> {
 
     assertIsNotEmpty(currentFileInfos);
     const currentFileInfo = currentFileInfos[0];
-    const hash = await md5FileAsync(getFullPath(currentFileInfo.path));
+    const hash = await md5FileAsync(getAbsolutePath(currentFileInfo.path));
 
     await this.patchOneByPath(currentFileInfo.path, {
       hash,

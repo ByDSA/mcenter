@@ -1,6 +1,6 @@
 import { statSync } from "fs";
 import { md5FileAsync } from "#utils/crypt";
-import { getFullPath } from "../utils";
+import { getAbsolutePath } from "../utils";
 import { FileWithStats } from "../update-remote/changes-detector";
 import { MusicFileInfoOmitMusicId } from "./models";
 
@@ -33,7 +33,7 @@ export class MusicFileInfoOmitMusicIdBuilder {
     if (!this.info.path)
       throw new Error("MusicFileInfoBuilder: falta la propiedad path");
 
-    const fullPath = getFullPath(this.info.path);
+    const fullPath = getAbsolutePath(this.info.path);
 
     // 2. Si no tenemos stats, los obtenemos
     if (

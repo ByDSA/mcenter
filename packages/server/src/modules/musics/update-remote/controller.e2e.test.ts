@@ -9,7 +9,7 @@ import { MusicFileInfoRepository } from "../file-info/crud/repository";
 import { musicFileInfoEntitySchema } from "../file-info/models";
 import { musicEntitySchema } from "../models";
 import { musicFileInfoRepositoryMockProvider } from "../file-info/crud/repository/tests";
-import { musicRepoMockProvider } from "../crud/repository/tests";
+import { musicsRepoMockProvider } from "../crud/repository/tests";
 import { MusicUpdateRemoteController } from "./controller";
 import { UpdateRemoteTreeService, UpdateResult } from "./service";
 
@@ -26,7 +26,7 @@ describe("updateRemoteController", () => {
       controllers: [MusicUpdateRemoteController],
       providers: [
         UpdateRemoteTreeService,
-        musicRepoMockProvider,
+        musicsRepoMockProvider,
         musicFileInfoRepositoryMockProvider,
       ],
     }, {

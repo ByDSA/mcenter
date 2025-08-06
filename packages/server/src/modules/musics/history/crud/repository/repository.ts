@@ -67,7 +67,7 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
     return lastOdm?.musicId === id;
   }
 
-  async createOneByMusicId(musicId: MusicId): Promise<Model> {
+  async createNewEntryNowFor(musicId: MusicId): Promise<Model> {
     const newEntry: Model = {
       date: getDateNow(),
       resourceId: musicId,

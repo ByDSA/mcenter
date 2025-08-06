@@ -1,4 +1,5 @@
-import { Module } from "@nestjs/common";
+/* eslint-disable import/no-cycle */
+import { forwardRef, Module } from "@nestjs/common";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
@@ -10,7 +11,7 @@ import { StreamsCrudController } from "./crud/controller";
   imports: [
     DomainEventEmitterModule,
     SeriesModule,
-    EpisodeHistoryModule,
+    forwardRef(() => EpisodeHistoryModule),
   ],
   controllers: [
     StreamsCrudController,

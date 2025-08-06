@@ -2,7 +2,8 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { SeriesModule } from "#modules/series/module";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { EpisodesModule } from "../module";
+import { StreamsModule } from "#modules/streams/module";
+import { EpisodesCrudModule } from "#episodes/crud/module";
 import { EpisodeHistoryCrudController } from "./crud/controller";
 import { EpisodeHistoryRepository } from "./crud/repository";
 import { LastTimePlayedService } from "./last-time-played.service";
@@ -11,7 +12,8 @@ import { LastTimePlayedService } from "./last-time-played.service";
   imports: [
     DomainEventEmitterModule,
     SeriesModule,
-    forwardRef(() => EpisodesModule),
+    forwardRef(() => StreamsModule),
+    forwardRef(() => EpisodesCrudModule),
   ],
   controllers: [
     EpisodeHistoryCrudController,

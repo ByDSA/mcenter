@@ -1,5 +1,4 @@
 import { Episode, EpisodeCompKey, EpisodeEntity } from "#episodes/models";
-import { EpisodesModule } from "#episodes/module";
 import { EpisodesRepository } from "#episodes/crud/repository";
 import { EpisodeEvents } from "#episodes/crud/repository/events";
 import { fixtureEpisodes } from "#episodes/tests";
@@ -8,6 +7,7 @@ import { EntityEvent } from "#core/domain-event-emitter";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
+import { EpisodesCrudModule } from "#episodes/crud/module";
 
 let episodesRepo: EpisodesRepository;
 let domainEventEmitter: DomainEventEmitter;
@@ -15,7 +15,7 @@ let testingSetup: TestingSetup;
 
 beforeAll(async () => {
   testingSetup = await createTestingAppModuleAndInit( {
-    imports: [DomainEventEmitterModule, EpisodesModule],
+    imports: [DomainEventEmitterModule, EpisodesCrudModule],
     controllers: [],
     providers: [
     ],

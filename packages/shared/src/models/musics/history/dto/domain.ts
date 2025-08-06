@@ -18,7 +18,7 @@ export namespace MusicHistoryEntryDtos {
       let resource;
 
       if (dto.resource)
-        resource = MusicDtos.Entity.fromDto(dto.resource);
+        resource = MusicDtos.Entity.toEntity(dto.resource);
 
       return {
         ...dto,

@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { MusicHistoryModule } from "../history/module";
 import { MusicsCrudModule } from "../crud/module";
+import { ResponseFormatterService } from "../../resources/response-formatter/response-formatter.service";
 import { MusicGetRandomController } from "./controller";
 
 @Module( {
@@ -12,6 +13,7 @@ import { MusicGetRandomController } from "./controller";
     MusicGetRandomController,
   ],
   providers: [
+    ResponseFormatterService,
   ],
   exports: [],
 } )

@@ -35,12 +35,16 @@ export class EpisodePickerService {
     return nextEpisodes;
   }
 
-  async getByStream(stream: StreamEntity, n = 1): Promise<EpisodeEntity[]> {
+  async getByStream(
+    stream: StreamEntity,
+    n = 1,
+    criteria?: Parameters<typeof this.episodesRepo
+      .getManyBySerieKey>[1],
+  ): Promise<EpisodeEntity[]> {
     const seriesKey = getSeriesKeyFromStream(stream);
 
     assertIsDefined(seriesKey);
-    const criteria: Parameters<typeof this.episodesRepo
-      .getManyBySerieKey>[1] = {};
+    criteria ??= {};
 
     if (stream.mode === StreamMode.SEQUENTIAL) {
       criteria.sort = {

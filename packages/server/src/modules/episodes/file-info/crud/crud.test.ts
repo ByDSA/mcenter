@@ -1,12 +1,8 @@
-import { PATH_ROUTES } from "$shared/routing";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
-import { testRoute } from "#core/routing/test";
 import { episodeFileInfoRepositoryMockProvider } from "./repository/tests";
 import { EpisodeFileInfoRepository } from "./repository";
 import { EpisodeFileInfosCrudController } from "./controller";
-
-testRoute(PATH_ROUTES.episodes.fileInfo.path);
 
 crudTestsSuite( {
   appModule: [

@@ -42,7 +42,7 @@ implements
   }
 
   @GetMany("/:seriesKey", episodeHistoryEntryEntitySchema)
-  async getManyByseriesKey(
+  async getManyBySeriesKey(
     @Param() params: SeriesKeyParamsDto,
   ) {
     return await this.entriesRepo.getManyBySeriesKey(params.seriesKey);

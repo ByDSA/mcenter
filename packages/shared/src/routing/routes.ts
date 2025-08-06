@@ -1,3 +1,4 @@
+import { ResponseFormat } from "src/models/resource";
 import { EpisodeCompKey } from "../models/episodes";
 import { PathRoutes } from "./routes.types";
 
@@ -7,6 +8,7 @@ const MUSICS_PLAYLISTS = `${MUSICS}/playlists`;
 const MUSICS_RANDOM = `${MUSICS}/random`;
 const PLAYER = "/api/player";
 const EPISODES = "/api/episodes";
+const EPISODES_SLUG = `${EPISODES}/slug`;
 const PLAYER_PLAY_EPISODE = `${PLAYER}/play/episode`;
 const PLAYER_PLAY_STREAM = `${PLAYER}/play/stream`;
 const MUSICS_HISTORY = MUSICS + "/history";
@@ -14,6 +16,10 @@ const EPISODES_HISTORY = EPISODES + "/history";
 const EPISODES_FILE_INFO = EPISODES + "/file-info";
 const EPISODES_DEPENDENCIES = EPISODES + "/dependencies";
 const EPISODES_ACTIONS = EPISODES + "/actions";
+
+type MusicSlugQueryParams = {
+  format?: ResponseFormat;
+};
 
 export const PATH_ROUTES = {
   musics: {
@@ -28,7 +34,14 @@ export const PATH_ROUTES = {
     },
     slug: {
       path: MUSICS_SLUG,
-      withParams: (slug: string) => `${MUSICS_SLUG}/${slug}`,
+      withParams: (slug: string, query?: MusicSlugQueryParams) => {
+        let ret = `${MUSICS_SLUG}/${slug}`;
+
+        if (query && Object.entries(query).length > 0)
+          ret += `?${new URLSearchParams(query).toString()}`;
+
+        return ret;
+      },
     },
     playlists: {
       path: MUSICS_PLAYLISTS,
@@ -43,9 +56,20 @@ export const PATH_ROUTES = {
   },
   episodes: {
     path: EPISODES,
-    withParams: (seriesKey: string, episodeKey: string) => `${EPISODES}/${seriesKey}/${episodeKey}`,
+    withParams: (id: string) => `${EPISODES}/${id}`,
     search: {
-      path: "/api/episodes/search",
+      path: `${EPISODES}/search`,
+    },
+    slug: {
+      path: EPISODES_SLUG,
+      withParams: (seriesKey: string, episodeKey: string, query?: MusicSlugQueryParams) => {
+        let ret = `${EPISODES_SLUG}/${seriesKey}/${episodeKey}`;
+
+        if (query && Object.entries(query).length > 0)
+          ret += `?${new URLSearchParams(query).toString()}`;
+
+        return ret;
+      },
     },
     dependencies: {
       path: EPISODES_DEPENDENCIES,

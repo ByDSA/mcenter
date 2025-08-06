@@ -69,7 +69,7 @@ export function Body( { data }: Props) {
             "country",
             "game",
             "spotifyId",
-            "url",
+            "slug",
             "year",
           ],
         );
@@ -189,8 +189,8 @@ export function Body( { data }: Props) {
     </span>
     <span className={classes("line", "height2")}>
       {ResourceInputText( {
-        caption: <><a href={fullUrlOf(resource.url)}>Url</a>:</>,
-        ...getAndUpdateMusicByProp<string>("url"),
+        caption: <><a href={fullUrlOf(resource.slug)}>Url</a>:</>,
+        ...getAndUpdateMusicByProp<string>("slug"),
         ...commonInputProps,
       } )}
     </span>

@@ -34,6 +34,7 @@ const A_AOT4: MusicFileInfoEntity = {
 const DK: MusicFileInfoEntity = {
   ...A_AOT4,
   id: new ObjectId().toString(),
+  size: 6369835,
   musicId: fixtureMusics.Disk.Samples.DK.id,
   path: "dk.mp3",
   hash: "53cc4a37a3daa3ff0e283deac3d2f9b2",

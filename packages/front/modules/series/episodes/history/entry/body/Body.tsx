@@ -1,6 +1,7 @@
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
-import { EpisodeFileInfo, EpisodeFileInfoEntity } from "$shared/models/episodes/file-info";
+import { EpisodeFileInfoEntity } from "$shared/models/episodes/file-info";
 import { EpisodeEntity } from "$shared/models/episodes";
+import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
@@ -142,7 +143,7 @@ export function Body( { data }: Props) {
   const { resource } = state[0];
   const fileInfo = resource.fileInfos[0];
   const { duration } = fileInfo.mediaInfo;
-  const url = fullUrlOf(fileInfo);
+  const slug = fullUrlOf(resource);
 
   return <div className={classes(style.container, commonStyle.container)}>
     {titleArtist}
@@ -193,7 +194,7 @@ export function Body( { data }: Props) {
     </span>
     <span className={classes("line", "height2", commonStyle.url)}>
       <span>
-        <a href={url}>Url</a>:</span><span className={commonStyle.content}>{url}</span>
+        <a href={slug}>Url</a>:</span><span className={commonStyle.content}>{slug}</span>
     </span>
     <span className={classes("line", "height2", style.duration)}>
       <span>Duration:</span>
@@ -227,8 +228,10 @@ export function Body( { data }: Props) {
   </div>;
 }
 
-function fullUrlOf(resource: EpisodeFileInfo) {
-  return backendUrl(`/raw/${resource.path}`);
+function fullUrlOf(resource: EpisodeEntity) {
+  return backendUrl(
+    PATH_ROUTES.episodes.slug.withParams(resource.compKey.seriesKey, resource.compKey.episodeKey),
+  );
 }
 
 function calcIsModified(r1: EpisodeHistoryEntryEntity, r2: EpisodeHistoryEntryEntity) {

@@ -1,11 +1,11 @@
 import { Global, Module } from "@nestjs/common";
 import { EpisodePickerModule } from "#modules/episode-picker/module";
-import { EpisodesModule } from "#episodes/module";
 import { SeriesModule } from "#modules/series/module";
 import { StreamsModule } from "#modules/streams/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { EpisodesCrudModule } from "#episodes/crud/module";
 import { PlayService } from "./play.service";
 import { FrontWSServerService } from "./player-services/front/front-player-web-sockets-server.service";
 import { VlcBackWSService } from "./player-services/vlc-back/vlc-back-ws-server.service";
@@ -18,7 +18,7 @@ import { PlaySerieController } from "./play-serie.controller";
     DomainEventEmitterModule,
     StreamsModule,
     SeriesModule,
-    EpisodesModule,
+    EpisodesCrudModule,
     EpisodeHistoryModule,
     EpisodePickerModule,
     EpisodeFileInfosModule,

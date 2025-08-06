@@ -4,7 +4,7 @@ import { MediaElement, PlayResourceMessage } from "#modules/models";
 import { PlayerProcessService } from "../../../PlayerProcessService";
 import { QueuePlaylistManager } from "../../media";
 import { VLCFlag, VLCProcess } from "../singleton";
-import { completeMediaElement } from "./adapters";
+import { fixWithAbsolutePath } from "./adapters";
 
 export class VLCProcessService implements PlayerProcessService {
   #queue: QueuePlaylistManager;
@@ -57,7 +57,7 @@ export class VLCProcessService implements PlayerProcessService {
   async playResource( { mediaElements, force }: PlayResourceMessage): Promise<boolean> {
     assertIsNotEmpty(mediaElements);
 
-    const elements: MediaElement[] = mediaElements.map(completeMediaElement);
+    const elements: MediaElement[] = mediaElements.map(fixWithAbsolutePath);
 
     this.#openNewInstance = force ?? false;
     await this.#updateIsRunningAnyInstanceAsync();

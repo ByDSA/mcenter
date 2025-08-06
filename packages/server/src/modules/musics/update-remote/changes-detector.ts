@@ -1,7 +1,7 @@
 import { Stats } from "node:fs";
 import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { md5FileAsync } from "#utils/crypt";
-import { getFullPath } from "../utils";
+import { getAbsolutePath } from "../utils";
 
 export type FileWithStats = {
   path: string;
@@ -193,7 +193,7 @@ newPath: string;}[],
 
     if (!fileWithMetadata.hash)
 
-      fileWithMetadata.hash = await md5FileAsync(getFullPath(fileWithMetadata.path));
+      fileWithMetadata.hash = await md5FileAsync(getAbsolutePath(fileWithMetadata.path));
 
     if (music.hash !== fileWithMetadata.hash)
       return false;

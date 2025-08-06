@@ -7,7 +7,7 @@ import { MusicFileInfoRepository } from "#modules/musics/file-info/crud/reposito
 import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../files";
 import { MusicsRepository } from "../crud/repository";
-import { getFullPath } from "../utils";
+import { getAbsolutePath } from "../utils";
 import { ChangesDetector, FileWithStats } from "./changes-detector";
 
 export const updateResultSchema = z.object( {
@@ -140,7 +140,7 @@ async function detectChangesFromLocalFiles(remoteMusics: MusicFileInfoEntity[]) 
   const files = await findAllPathsOfValidMusicFiles();
   const filesWithMeta: FileWithStats[] = files.map((relativePath) => ( {
     path: relativePath,
-    stats: statSync(getFullPath(relativePath)),
+    stats: statSync(getAbsolutePath(relativePath)),
   } ));
   const changesDetector = new ChangesDetector(remoteMusics, filesWithMeta);
 

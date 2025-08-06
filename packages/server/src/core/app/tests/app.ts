@@ -1,4 +1,4 @@
-import { Test, TestingModule } from "@nestjs/testing";
+import { Test, TestingModule, TestingModuleBuilder } from "@nestjs/testing";
 import { INestApplication, ModuleMetadata } from "@nestjs/common";
 import { Application } from "express";
 import { addGlobalConfigToApp, globalValidationProviders } from "#core/app/init.service";
@@ -15,9 +15,10 @@ export type TestingSetup = {
   db?: TestRealDatabase;
 };
 type Options = {
-  db: {
+  db?: {
     using: "default" | "memory" | "real";
   };
+  beforeCompile?: (moduleBuilder: TestingModuleBuilder)=> void;
 };
 export async function createTestingAppModule(
   metadata: ModuleMetadata,
@@ -29,7 +30,7 @@ export async function createTestingAppModule(
       LoggingModule.forRoot(),
       GlobalErrorHandlerModule,
       ...(metadata.imports ?? []),
-      ...(options?.db.using ? [DatabaseModule] : []),
+      ...(options?.db?.using ? [DatabaseModule] : []),
     ],
     providers: [
       ...globalValidationProviders,
@@ -37,7 +38,7 @@ export async function createTestingAppModule(
     ],
   } );
 
-  switch (options?.db.using) {
+  switch (options?.db?.using) {
     case "default":
     case "real":
       moduleBuilder.overrideProvider(Database).useClass(TestRealDatabase);
@@ -46,6 +47,8 @@ export async function createTestingAppModule(
       moduleBuilder.overrideProvider(Database).useClass(TestMemoryDatabase);
       break;
   }
+
+  options?.beforeCompile?.(moduleBuilder);
 
   const module = await moduleBuilder.compile();
   const app = module.createNestApplication();
@@ -57,7 +60,7 @@ export async function createTestingAppModule(
     routerApp,
     app,
     module,
-    db: options?.db.using ? app.get<TestRealDatabase>(Database) : undefined,
+    db: options?.db?.using ? app.get<TestRealDatabase>(Database) : undefined,
   };
 }
 

@@ -19,7 +19,7 @@ export namespace MusicFileInfoEntityDtos {
   export namespace Entity {
     export const schema = replaceSchemaTimestampsFileToStrings(musicFileInfoEntitySchema);
     export type Dto = z.infer<typeof schema>;
-    export const fromDto = (dto: Dto): _Entity => {
+    export const toEntity = (dto: Dto): _Entity => {
       return {
         ...dto,
         timestamps: transformDtoTimestampsFileToDates(dto.timestamps),

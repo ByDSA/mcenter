@@ -2,13 +2,13 @@ import { Application } from "express";
 import request from "supertest";
 import { PATH_ROUTES } from "$shared/routing";
 import { SeriesModule } from "#modules/series/module";
-import { EpisodesModule } from "#episodes/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { testRoute } from "#core/routing/test";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
+import { EpisodesCrudModule } from "#episodes/crud/module";
 import { PlayService } from "./play.service";
 import { PlaySerieController } from "./play-serie.controller";
 import { VlcBackWebSocketsServerService } from "./player-services";
@@ -24,7 +24,7 @@ describe("playSerieController", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [SeriesModule, EpisodesModule, EpisodeHistoryModule],
+      imports: [SeriesModule, EpisodesCrudModule, EpisodeHistoryModule],
       controllers: [PlaySerieController],
       providers: [
         {

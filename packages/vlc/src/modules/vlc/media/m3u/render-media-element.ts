@@ -1,18 +1,9 @@
 import type { MediaElement } from "#modules/models";
 
 export function render(element: MediaElement): string {
-  let { title, length } = element;
-  const { path, startTime, stopTime } = element;
-
-  if (title === undefined)
-    title = "TITLE";
-
-  if (length === undefined)
-    length = 0;
-
-  let sb = `\
-#EXTM3U
-#EXTINF:${length},${renderComma(element)}${title}`;
+  const { path, startTime, stopTime, title, length, artist } = element;
+  let sb = `#EXTM3U
+#EXTINF:${length ?? 0},${artist ?? ""},${title ?? "TITLE"}`;
 
   if (startTime)
     sb += "\n" + `#EXTVLCOPT:start-time=${startTime}`;
@@ -23,11 +14,4 @@ export function render(element: MediaElement): string {
   sb += `\n${ encodeURI(path) }\n`;
 
   return sb;
-}
-
-function renderComma(element: MediaElement): string {
-  if (element.title !== undefined && element.title.includes(","))
-    return ",";
-
-  return "";
 }

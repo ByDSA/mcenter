@@ -1,6 +1,6 @@
 import { glob } from "glob";
 import { md5FileAsync } from "#utils/crypt";
-import { getFullPath } from "../utils";
+import { getAbsolutePath } from "../utils";
 
 export type FindOptions = {
   folder?: string;
@@ -101,7 +101,7 @@ function getAllFilesByExtensionCommon(
 }
 
 const DEFAULT_OPTIONS: FindOptions = {
-  folder: getFullPath(),
+  folder: getAbsolutePath(),
   recursive: true,
   onlyFirst: false,
 };

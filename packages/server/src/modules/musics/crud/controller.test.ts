@@ -5,7 +5,7 @@ import { testRoute } from "#core/routing/test/routing";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MusicsRepository } from "./repository";
 import { MusicCrudController } from "./controller";
-import { musicRepoMockProvider } from "./repository/tests";
+import { musicsRepoMockProvider } from "./repository/tests";
 
 testRoute(PATH_ROUTES.musics.withParams("id"));
 
@@ -16,7 +16,7 @@ crudTestsSuite( {
       imports: [DomainEventEmitterModule],
       controllers: [MusicCrudController],
       providers: [
-        musicRepoMockProvider,
+        musicsRepoMockProvider,
       ],
     }],
   repositoryClass: MusicsRepository,

@@ -2,7 +2,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { RouterModule } from "@nestjs/core";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { MusicHistoryModule } from "#musics/history/module";
-import { EpisodesModule } from "#episodes/module";
+import { EpisodesAdminModule } from "#episodes/actions/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { EpisodePickerModule } from "#modules/episode-picker/module";
 import { StreamsModule } from "#modules/streams/module";
@@ -14,6 +14,8 @@ import { MusicsGetRandomModule } from "#musics/picker/module";
 import { MusicsGetPlaylistsModule } from "#musics/playlists/module";
 import { MusicsSlugModule } from "#musics/slug/module";
 import { MusicsCrudModule } from "#musics/crud/module";
+import { EpisodesSlugModule } from "#episodes/slug/module";
+import { EpisodesCrudModule } from "#episodes/crud/module";
 import { LoggingModule } from "../logging/module";
 
 export const routeModules = [
@@ -21,13 +23,17 @@ export const routeModules = [
   // y por los que se importan en AppModule
   StaticFilesModule,
   ConfigModule,
-  EpisodeFileInfosModule,
-  MusicHistoryModule,
   PlayerModule,
 
+  MusicHistoryModule,
   MusicsGetRandomModule,
   MusicsGetPlaylistsModule,
   MusicsSlugModule,
+
+  EpisodesAdminModule,
+  EpisodeFileInfosModule,
+  EpisodesSlugModule,
+  EpisodesCrudModule, // Al final, para que no interfiera con slugs
 
   /* Importante: el orden de las rutas aquí en el Register es irrelevante.
   Si hay colisiones en el acceso, cargar el módulo específico primero fuera del Register */
@@ -46,7 +52,15 @@ export const routeModules = [
     },
     {
       path: PATH_ROUTES.episodes.path,
-      module: EpisodesModule,
+      module: EpisodesCrudModule,
+    },
+    {
+      path: PATH_ROUTES.episodes.path,
+      module: EpisodesAdminModule,
+    },
+    {
+      path: PATH_ROUTES.episodes.slug.path,
+      module: EpisodesSlugModule,
     },
     {
       path: PATH_ROUTES.episodes.history.path,

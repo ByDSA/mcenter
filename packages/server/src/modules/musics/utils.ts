@@ -1,6 +1,6 @@
 import path from "node:path";
 
-export function getFullPath(relativePath: string = ""): string {
+export function getAbsolutePath(relativePath: string = ""): string {
   let mediaPath = path.join(ENVS.mediaPath, "music", "data");
 
   if (!mediaPath.startsWith("/"))
