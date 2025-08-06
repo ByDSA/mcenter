@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/ByDSA/mcenter/compare/v4.0.24...v4.1.0) (2025-08-06)
+
+
+### Features
+
+* add player/play/music feature ([45ef49e](https://github.com/ByDSA/mcenter/commit/45ef49ef5c5f340b67fd1f08a57d616453826f15))
+* add slug in episodes ([70979a3](https://github.com/ByDSA/mcenter/commit/70979a379790f767c2bae7c2c2d1ccfa977b2729))
+* **front:** back to start with "previous" button ([0fcfd45](https://github.com/ByDSA/mcenter/commit/0fcfd45db55fc20ae33fc5c16a13828a9c1f7428))
+
+
+### Bug Fixes
+
+* **back:** add only once episode/music in player/play ([82e41cb](https://github.com/ByDSA/mcenter/commit/82e41cbaf103172a1b4222eb65e27a0401420751))
+* **back:** some build fixes ([9884acd](https://github.com/ByDSA/mcenter/commit/9884acde51cc5dd157db2507843e091941d51289))
+* change model "music" and "episode" to "resource" ([b9a32d5](https://github.com/ByDSA/mcenter/commit/b9a32d5c729165fc1c501311a51261e7e8b080c9))
+* **front:** title and artist autofit ([e4883c0](https://github.com/ByDSA/mcenter/commit/e4883c06fd72c438abe268acf84a78cfc0a21903))
+* lastest times limit 4 ([5d89aa4](https://github.com/ByDSA/mcenter/commit/5d89aa49743670430e6f01a9804b6b7b1b8cd59f))
+* rename "music.url" to "music.slug" (except in database) ([72d6c6c](https://github.com/ByDSA/mcenter/commit/72d6c6c078df11fd1b79675a4d0689e19f510972))
+* use episode dependency from db ([5d79d61](https://github.com/ByDSA/mcenter/commit/5d79d61f145863290f1162d69b46f67acf677521))
+
 ### [4.0.24](https://github.com/ByDSA/mcenter/compare/v4.0.22...v4.0.24) (2025-08-01)
 
 
