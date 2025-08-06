@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { Request, Response } from "express";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
-import { ResponseFormat } from "$sharedSrc/models/resources/response-format.enum";
+import { ResponseFormat } from "$shared/models/resources/response-format.enum";
 import { mediaElementWithAbsolutePath } from "$shared/models/player";
-import { genM3u8Item, genM3u8ItemWithNext, getHostFromRequest, M3u8ViewOptions, resourceToMediaElement } from "$sharedSrc/models/resources/m3u8.view";
+import { genM3u8Item, genM3u8ItemWithNext, getHostFromRequest, M3u8ViewOptions, resourceToMediaElement } from "$shared/models/resources/m3u8.view";
 
 export type FormatResponseOptions = M3u8ViewOptions & {
   m3u8UseNext?: boolean;

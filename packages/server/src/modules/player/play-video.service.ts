@@ -1,9 +1,9 @@
 import type { QueryDto } from "./play-stream/controller";
 import { Injectable } from "@nestjs/common";
-import { EpisodeEntityWithFileInfos, episodeEntityWithFileInfosSchema } from "$sharedSrc/models/episodes";
-import { episodeToMediaElement } from "$sharedSrc/models/player";
-import { mediaElementFixPlayerLabels } from "$sharedSrc/models/resources";
-import { assertZod } from "$sharedSrc/utils/validation/zod";
+import { EpisodeEntityWithFileInfos, episodeEntityWithFileInfosSchema } from "$shared/models/episodes";
+import { episodeToMediaElement } from "$shared/models/player";
+import { mediaElementFixPlayerLabels } from "$shared/models/resources";
+import { assertZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";

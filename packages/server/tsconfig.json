@@ -33,11 +33,6 @@
     "typeRoots": ["node_modules/@types"]
   },
   "exclude": ["node_modules"],
-  "include": [
-    "src/**/*.ts",
-    "tests/**/*.ts",
-    "../shared/src/models/resources/response-format.enum.ts",
-    "../shared/src/models/resources/m3u8.view.ts"
-  ],
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "types": ["node"]
 }
