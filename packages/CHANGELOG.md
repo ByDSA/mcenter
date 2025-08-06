@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.1](https://github.com/ByDSA/mcenter/compare/v4.1.0...v4.1.1) (2025-08-06)
+
+
+### Bug Fixes
+
+* **back:** access to musics/random ([8300525](https://github.com/ByDSA/mcenter/commit/8300525667c9a0b25ec4101c9d193cd535b9f739))
+
 ## [4.1.0](https://github.com/ByDSA/mcenter/compare/v4.0.24...v4.1.0) (2025-08-06)
 
 
