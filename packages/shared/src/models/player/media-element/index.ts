@@ -1,4 +1,3 @@
-import path from "node:path";
 import { MediaElement } from "./media-element";
 
 export * from "./media-element";
@@ -19,6 +18,6 @@ export function mediaElementWithAbsolutePath(
 
   return {
     ...mediaElement,
-    path: path.join(prefix, currentPath),
+    path: new URL(currentPath, prefix).toString(),
   };
 }
