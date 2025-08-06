@@ -1,6 +1,6 @@
 import type { QueryDto } from "../play-stream/controller";
 import { Injectable } from "@nestjs/common";
-import { MusicEntityWithFileInfos, musicEntityWithFileInfosSchema } from "$shared/models/musics";
+import { MusicEntity, MusicEntityWithFileInfos, musicEntityWithFileInfosSchema } from "$shared/models/musics";
 import { musicToMediaElement } from "$shared/models/player";
 import { mediaElementFixPlayerLabels } from "$shared/models/resources";
 import { assertZod } from "$shared/utils/validation/zod";
@@ -54,7 +54,13 @@ export class PlayMusicService {
       force,
     } );
 
-    for (const m of musics)
+    const isLast = await this.historyRepo.isLast(musics[0].id);
+
+    const musicsToAddInHistory: MusicEntity[] = isLast
+      ? musics.slice(1)
+      :  musics;
+
+    for (const m of musicsToAddInHistory)
       await this.historyRepo.createNewEntryNowFor(m.id);
 
     return musics;

@@ -9,7 +9,7 @@ import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { StreamsRepository } from "#modules/streams/crud/repository";
-import { EpisodeCompKey } from "#episodes/models";
+import { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { EpisodesRepository } from "#episodes/crud/repository";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { PlayService } from "./play.service";
@@ -49,8 +49,14 @@ export class PlayVideoService {
       force,
     } );
 
+    const isLast = await this.historyRepo.isLast(episodes[0].compKey);
+
+    const episodesToAddInHistory: EpisodeEntity[] = isLast
+      ? episodes.slice(1)
+      :  episodes;
+
     await this.historyRepo.addEpisodesToHistory( {
-      episodes,
+      episodes: episodesToAddInHistory,
       streamId,
     } );
 
