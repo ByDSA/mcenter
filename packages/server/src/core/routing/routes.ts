@@ -16,6 +16,7 @@ import { MusicsSlugModule } from "#musics/slug/module";
 import { MusicsCrudModule } from "#musics/crud/module";
 import { EpisodesSlugModule } from "#episodes/slug/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
+import { MusicFileInfoModule } from "#musics/file-info/module";
 import { LoggingModule } from "../logging/module";
 
 export const routeModules = [
@@ -26,6 +27,7 @@ export const routeModules = [
   PlayerModule,
 
   MusicHistoryModule,
+  MusicFileInfoModule,
   MusicsGetRandomModule,
   MusicsGetPlaylistsModule,
   MusicsSlugModule,

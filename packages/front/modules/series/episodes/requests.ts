@@ -24,7 +24,7 @@ export namespace EpisodeFetching {
         resBodyValidator: genAssertIsOneResultResponse(episodeEntitySchema),
       } );
       const URL = backendUrl(
-        PATH_ROUTES.episodes.withParams(episodeCompKey.seriesKey, episodeCompKey.episodeKey),
+        PATH_ROUTES.episodes.slug.withParams(episodeCompKey.seriesKey, episodeCompKey.episodeKey),
       );
 
       return fetcher( {

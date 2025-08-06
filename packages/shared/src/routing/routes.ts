@@ -10,6 +10,7 @@ const PLAYER = "/api/player";
 const EPISODES = "/api/episodes";
 const EPISODES_SLUG = `${EPISODES}/slug`;
 const PLAYER_PLAY_EPISODE = `${PLAYER}/play/episode`;
+const PLAYER_PLAY_MUSIC = `${PLAYER}/play/music`;
 const PLAYER_PLAY_STREAM = `${PLAYER}/play/stream`;
 const MUSICS_HISTORY = MUSICS + "/history";
 const EPISODES_HISTORY = EPISODES + "/history";
@@ -121,6 +122,10 @@ export const PATH_ROUTES = {
       episode: {
         path: PLAYER_PLAY_EPISODE,
         withParams: (seriesKey: string, episodeKey: string) => `${PLAYER_PLAY_EPISODE}/${seriesKey}/${episodeKey}`,
+      },
+      music: {
+        path: PLAYER_PLAY_MUSIC,
+        withParams: (slug: string) => `${PLAYER_PLAY_MUSIC}/${slug}`,
       },
       stream: {
         path: PLAYER_PLAY_STREAM,

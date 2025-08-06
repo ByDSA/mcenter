@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
-import { PlayService } from "../play.service";
+import { PlayVideoService } from "../play-video.service";
 
 class ParamsDto extends createZodDto(z.object( {
   id: z.string(),
@@ -31,7 +31,7 @@ export class QueryDto extends createZodDto(z.object( {
 @Controller("play/stream")
 export class PlayStreamController {
   constructor(
-    private readonly playService: PlayService,
+    private readonly playService: PlayVideoService,
   ) { }
 
     @Get("/:id")

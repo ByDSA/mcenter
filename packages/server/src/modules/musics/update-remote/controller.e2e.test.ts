@@ -2,14 +2,14 @@ import request from "supertest";
 import { assertIsDefined } from "$shared/utils/validation";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { createMockedModule } from "#utils/nestjs/tests";
 import { MusicsRepository } from "../crud/repository";
 import { MusicFileInfoRepository } from "../file-info/crud/repository";
 import { musicFileInfoEntitySchema } from "../file-info/models";
 import { musicEntitySchema } from "../models";
-import { musicFileInfoRepositoryMockProvider } from "../file-info/crud/repository/tests";
-import { musicsRepoMockProvider } from "../crud/repository/tests";
+import { MusicFileInfoModule } from "../file-info/module";
+import { MusicsCrudModule } from "../crud/module";
 import { MusicUpdateRemoteController } from "./controller";
 import { UpdateRemoteTreeService, UpdateResult } from "./service";
 
@@ -22,12 +22,13 @@ describe("updateRemoteController", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [DomainEventEmitterModule],
+      imports: [
+        createMockedModule(MusicFileInfoModule),
+        createMockedModule(MusicsCrudModule),
+      ],
       controllers: [MusicUpdateRemoteController],
       providers: [
         UpdateRemoteTreeService,
-        musicsRepoMockProvider,
-        musicFileInfoRepositoryMockProvider,
       ],
     }, {
       db: {
@@ -35,10 +36,8 @@ describe("updateRemoteController", () => {
       },
     } );
 
-    musicRepoMock = testingSetup.module.get<jest.Mocked<MusicsRepository>>(MusicsRepository);
-    musicFileInfoRepoMock = testingSetup.module.get<jest.Mocked<MusicFileInfoRepository>>(
-      MusicFileInfoRepository,
-    );
+    musicRepoMock = testingSetup.getMock(MusicsRepository);
+    musicFileInfoRepoMock = testingSetup.getMock(MusicFileInfoRepository);
     musicRepoMock.createOneFromPath.mockImplementation((path: string) => {
       const musicFileInfo = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
       const music = MUSICS_SAMPLES_IN_DISK.find(m=>m.id === musicFileInfo.musicId);

@@ -12,8 +12,8 @@ import { EpisodePickerService } from "#modules/episode-picker";
 import { StreamsModule } from "#modules/streams/module";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
+import { PlayVideoService } from "../play-video.service";
 import { PlayService } from "../play.service";
-import { VlcBackWebSocketsServerService } from "../player-services";
 import { PlayStreamController } from "./controller";
 
 describe("playStreamController", () => {
@@ -31,8 +31,8 @@ describe("playStreamController", () => {
       ],
       controllers: [PlayStreamController],
       providers: [
-        createMockProvider(VlcBackWebSocketsServerService),
-        PlayService,
+        createMockProvider(PlayService),
+        PlayVideoService,
       ],
     } );
 

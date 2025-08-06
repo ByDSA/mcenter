@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { episodeCompKeySchema } from "#episodes/models";
-import { PlayService } from "../play.service";
+import { PlayVideoService } from "../play-video.service";
 import { QueryDto } from "../play-stream/controller";
 
 class ParamsDto extends createZodDto(episodeCompKeySchema) {}
@@ -9,7 +9,7 @@ class ParamsDto extends createZodDto(episodeCompKeySchema) {}
 @Controller("play/episode")
 export class PlayEpisodeController {
   constructor(
-    private readonly playService: PlayService,
+    private readonly playService: PlayVideoService,
   ) {
   }
 

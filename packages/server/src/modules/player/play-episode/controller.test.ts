@@ -14,8 +14,8 @@ import { EpisodesRepository } from "#episodes/crud/repository";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
+import { PlayVideoService } from "../play-video.service";
 import { PlayService } from "../play.service";
-import { VlcBackWebSocketsServerService } from "../player-services";
 import { PlayEpisodeController } from "./controller";
 
 describe("playEpisodeController", () => {
@@ -33,8 +33,8 @@ describe("playEpisodeController", () => {
       ],
       controllers: [PlayEpisodeController],
       providers: [
-        createMockProvider(VlcBackWebSocketsServerService),
-        PlayService,
+        createMockProvider(PlayService),
+        PlayVideoService,
       ],
     } );
 

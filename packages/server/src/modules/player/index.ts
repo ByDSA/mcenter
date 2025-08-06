@@ -7,8 +7,8 @@ export {
 } from "./play-stream/controller";
 
 export {
-  PlayService,
-} from "./play.service";
+  PlayVideoService as PlayService,
+} from "./play-video.service";
 
 export {
   FrontWebSocketsServerService as RemotePlayerWebSocketsServerService,

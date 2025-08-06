@@ -20,7 +20,7 @@ export namespace EpisodeFileInfoFetching {
         method,
         body,
         reqBodyValidator: genAssertZod(EpisodeFileInfoCrudDtos.PatchOneById.bodySchema),
-        resBodyValidator: genAssertIsOneResultResponse(EpisodeFileInfoDtos.Entity.schema),
+        resBodyValidator: genAssertIsOneResultResponse(EpisodeFileInfoDtos.schemaFullDto),
       } );
       const URL = backendUrl(
         PATH_ROUTES.episodes.fileInfo.withParams(id),
