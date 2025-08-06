@@ -1,5 +1,5 @@
 import z from "zod";
-import { mongoDbId } from "../../../resource/partial-schemas";
+import { mongoDbId } from "../../../resources/partial-schemas";
 import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 import { episodeCompKeySchema } from "../../episode";
 

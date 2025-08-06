@@ -1,9 +1,9 @@
 import type { EpisodeEntity } from "../../episodes";
 import type { MediaElement } from "./media-element";
 import type { MusicEntity } from "../../musics";
-import { EpisodeFileInfoEntity } from "src/models/episodes/file-info";
+import { EpisodeFileInfoEntity } from "../../episodes/file-info";
 import { PATH_ROUTES } from "../../../routing";
-import { ResponseFormat } from "../../resource";
+import { ResponseFormat } from "../../resources";
 import { assertIsDefined } from "../../../utils/validation";
 
 type Options = {

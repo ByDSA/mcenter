@@ -1,5 +1,5 @@
 import z from "zod";
-import { mongoDbId } from "../../../models/resource/partial-schemas";
+import { mongoDbId } from "../../resources/partial-schemas";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { makeHistoryEntrySchema } from "../../history-lists-common";
 import { musicEntitySchema, musicIdSchema } from "../music";

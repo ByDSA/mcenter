@@ -1,5 +1,5 @@
 import z from "zod";
-import { replaceSchemaTimestampsToStrings, transformDateTimestampsToDto, transformDtoTimestampsToDates } from "../../resource/dto";
+import { replaceSchemaTimestampsToStrings, transformDateTimestampsToDto, transformDtoTimestampsToDates } from "../../resources/dto";
 import { Music, MusicEntity, musicEntitySchema, musicSchema } from "../music";
 
 type _Model = Music;

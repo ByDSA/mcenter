@@ -1,5 +1,5 @@
-import { MusicsRepository } from "#modules/musics/crud/repository";
-import { createMockClass } from "#tests/jest/mocking";
+import { createMockClass } from "$sharedTests/jest/mocking";
+import { MusicsRepository } from "#musics/crud/repository";
 import { DomainEventEmitter } from "../domain-event-emitter";
 
 class DomainEventEmitterMock extends createMockClass(MusicsRepository) {

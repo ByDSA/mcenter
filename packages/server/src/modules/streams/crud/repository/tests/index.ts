@@ -1,4 +1,4 @@
-import { createMockInstance } from "#tests/jest/mocking";
+import { createMockInstance } from "$sharedTests/jest/mocking";
 import { StreamsRepository } from "..";
 
 export const streamsRepositoryMockProvider = {

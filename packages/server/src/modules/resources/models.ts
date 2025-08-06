@@ -1,1 +1,1 @@
-export * from "$shared/models/resource";
+export * from "$shared/models/resources";

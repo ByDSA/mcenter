@@ -1,6 +1,6 @@
 import z from "zod";
 import { genAssertZod } from "../../../utils/validation/zod";
-import { mongoDbId } from "../../../models/resource/partial-schemas";
+import { mongoDbId } from "../../resources/partial-schemas";
 import { fileInfoSchema, compareFileInfo } from "../../file-info-common/file-info";
 
 const schema = fileInfoSchema

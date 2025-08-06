@@ -6,4 +6,4 @@ export * from "./response-format.interceptor";
 
 export * from "./use-next.decorator";
 
-export * from "$sharedSrc/models/resource/response-format.enum";
+export * from "$sharedSrc/models/resources/response-format.enum";

@@ -29,6 +29,7 @@
     "@types/jest": "30.0.0",
     "@types/node": "24.0.13",
     "$sharedSrc": "workspace:../shared/src",
+    "$sharedTests": "workspace:../shared/tests",
     "jest": "workspace:../node_modules/jest",
     "nodemon": "3.1.10",
     "socket.io": "4.8.1",

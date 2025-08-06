@@ -1,8 +1,4 @@
-import { PublicMethodsOf } from "$shared/utils/types";
+import { createMockInstance } from "$sharedTests/jest/mocking";
 import { VLCProcessService } from "../Service";
 
-export class PlayerServiceMock implements PublicMethodsOf<VLCProcessService> {
-  playResource = jest.fn();
-
-  isProcessOpen = jest.fn();
-}
+export const processServiceMock = createMockInstance(VLCProcessService);

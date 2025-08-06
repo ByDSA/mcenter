@@ -1,5 +1,5 @@
 import z from "zod";
-import { replaceSchemaTimestampsToStrings } from "../../../../models/resource/dto";
+import { replaceSchemaTimestampsToStrings } from "../../../resources/dto";
 import { musicHistoryEntryEntitySchema, MusicHistoryEntryEntity } from "../history-entry";
 import { MusicDtos } from "../../dto/domain";
 import { musicEntitySchema } from "../../music";

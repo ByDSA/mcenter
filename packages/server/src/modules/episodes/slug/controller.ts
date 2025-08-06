@@ -2,13 +2,13 @@ import { Body, Controller, Get, Param, Req, Res } from "@nestjs/common";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { Request, Response } from "express";
+import { getHostFromRequest } from "$shared/models/resources";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
 import { GetMany } from "#utils/nestjs/rest/crud/get";
 import { PatchOne } from "#utils/nestjs/rest";
 import { assertFound } from "#utils/validation/found";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
-import { getHostFromRequest } from "#modules/resources/response-formatter/m3u8.view";
 import { EpisodesRepository } from "../crud/repository";
 import { EpisodeSlugHandlerService } from "./service";
 

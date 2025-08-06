@@ -1,4 +1,4 @@
-import { ResponseFormat } from "src/models/resource";
+import { ResponseFormat } from "../models/resources";
 import { EpisodeCompKey } from "../models/episodes";
 import { PathRoutes } from "./routes.types";
 

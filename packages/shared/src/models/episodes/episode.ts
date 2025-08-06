@@ -1,7 +1,7 @@
 import z from "zod";
-import { resourceSchema } from "../resource";
+import { resourceSchema } from "../resources";
 import { serieEntitySchema, seriesKeySchema } from "../series";
-import { mongoDbId } from "../resource/partial-schemas";
+import { mongoDbId } from "../resources/partial-schemas";
 import { episodeFileInfoEntitySchema } from "./file-info";
 
 /* Model */

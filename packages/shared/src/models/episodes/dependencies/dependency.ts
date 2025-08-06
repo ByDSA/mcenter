@@ -1,5 +1,5 @@
 import z from "zod";
-import { mongoDbId } from "../../resource/partial-schemas";
+import { mongoDbId } from "../../resources/partial-schemas";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { episodeEntitySchema, episodeCompKeySchema } from "..";
 

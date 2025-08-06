@@ -1,6 +1,6 @@
 import z from "zod";
 import { serieEntitySchema } from "../series";
-import { mongoDbId } from "../resource/partial-schemas";
+import { mongoDbId } from "../resources/partial-schemas";
 
 enum Mode {
   SEQUENTIAL = "SEQUENTIAL",

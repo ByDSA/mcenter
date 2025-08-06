@@ -2,7 +2,7 @@ import { Controller, Get, Param, Req, Res } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { Response, Request } from "express";
-import { getHostFromRequest } from "#modules/resources/response-formatter/m3u8.view";
+import { getHostFromRequest } from "$shared/models/resources";
 import { assertFound } from "#utils/validation/found";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { MusicsRepository } from "../crud/repository";

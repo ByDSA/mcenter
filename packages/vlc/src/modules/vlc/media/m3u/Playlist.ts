@@ -1,6 +1,6 @@
 import fs from "node:fs";
+import { genM3u8Item } from "$shared/models/resources";
 import { MediaElement } from "#modules/models";
-import { render } from "./render-media-element";
 
 export class Playlist {
   #elements: MediaElement[] = [];
@@ -21,7 +21,7 @@ export class Playlist {
     let data = "";
 
     for (const e of this.#elements)
-      data += render(e);
+      data += genM3u8Item(e);
 
     return data;
   }

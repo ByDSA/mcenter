@@ -1,14 +1,14 @@
-import { MediaElement } from "#modules/models";
-import { render } from "./render-media-element";
+import { MediaElement } from "../player";
+import { genM3u8Item } from "./m3u8.view";
 
-it("render", () => {
+it("item", () => {
   const element: MediaElement = {
     title: "Title",
     length: 123,
     type: "video",
     path: "./media con espacios.mp4",
   };
-  const actual = render(element);
+  const actual = genM3u8Item(element);
   const expected = `\
 #EXTM3U
 #EXTINF:${element.length},${element.title}

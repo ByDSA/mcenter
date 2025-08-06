@@ -1,3 +1,1 @@
-export {
-  Episode,
-} from "$shared/models/episodes";
+export * from "$shared/models/episodes";

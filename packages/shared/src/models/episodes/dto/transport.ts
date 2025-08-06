@@ -1,5 +1,5 @@
 import z from "zod";
-import { mongoDbId } from "../../resource/partial-schemas";
+import { mongoDbId } from "../../resources/partial-schemas";
 import { episodeCompKeySchema } from "../episode";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { episodeEntitySchema } from "../episode";

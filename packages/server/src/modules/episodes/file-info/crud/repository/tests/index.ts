@@ -1,4 +1,4 @@
-import { createMockClass } from "#tests/jest/mocking";
+import { createMockClass } from "$sharedTests/jest/mocking";
 import { EpisodeFileInfosRepository } from "../repository";
 
 class EpisodeFileInfoRepositoryMock extends createMockClass(EpisodeFileInfosRepository) { }

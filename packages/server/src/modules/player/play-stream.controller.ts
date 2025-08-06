@@ -2,6 +2,7 @@ import { Controller, Get, Logger, Param, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { assertZod } from "$shared/utils/validation/zod";
+import { mediaElementFixPlayerLabels } from "$shared/models/resources";
 import { assertFound } from "#utils/validation/found";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { StreamsRepository } from "#modules/streams/crud/repository";
@@ -9,7 +10,6 @@ import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { episodeEntityWithFileInfosSchema } from "#episodes/models";
 import { EpisodeEntityWithFileInfos } from "#episodes/file-info/series-tree/remote/service";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
-import { mediaElementFixPlayerLabels } from "#modules/resources/response-formatter/m3u8.view";
 import { episodeToMediaElement } from "./player-services/models";
 import { PlayService } from "./play.service";
 

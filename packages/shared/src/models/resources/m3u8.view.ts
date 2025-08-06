@@ -1,8 +1,8 @@
-import { Request } from "express";
-import { MediaElement } from "$shared/models/player";
-import { musicToMediaElement, episodeToMediaElement } from "$shared/models/player/media-element/adapters";
-import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
-import { MusicEntity, musicEntitySchema } from "../../musics/models";
+import type { Request } from "express";
+import { EpisodeEntity, episodeEntitySchema } from "../episodes";
+import { MusicEntity, musicEntitySchema } from "../musics";
+import { MediaElement } from "../player";
+import { musicToMediaElement, episodeToMediaElement } from "../player/media-element/adapters";
 
 type Options = NonNullable<Parameters<typeof musicToMediaElement>[1]>;
 
@@ -89,12 +89,13 @@ ${nextUrl}`;
 
 export function genM3u8Item(mediaElement: MediaElement): string {
   mediaElement = mediaElementFixPlayerLabels(mediaElement);
-  const artist = mediaElement.artist ?? "";
-  const title = mediaElement.title ?? "";
-  const duration = mediaElement.length;
+  const { artist, path, startTime, length, stopTime, title } = mediaElement;
+  const artistOpt = artist ? mediaElement.artist + "," : "";
+  const startTimeOpt = startTime ? `\n#EXTVLCOPT:start-time=${startTime}` : "";
+  const stopTimeOpt = stopTime ? `\n#EXTVLCOPT:stop-time=${stopTime}` : "";
   const ret = `#EXTM3U
-#EXTINF:${duration},${artist},${title}
-${mediaElement.path}`;
+#EXTINF:${length ?? "-1"},${artistOpt}${title ?? "TITLE"}${startTimeOpt}${stopTimeOpt}
+${encodeURI(path)}\n`;
 
   return ret;
 }

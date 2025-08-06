@@ -1,8 +1,8 @@
 import z from "zod";
 import { genAssertZod } from "../../../utils/validation/zod";
-import { timeRangeSchema } from "../../resource";
+import { timeRangeSchema } from "../../resources";
 import { fileInfoSchema, compareFileInfo } from "../../file-info-common/file-info";
-import { mongoDbId } from "../../resource/partial-schemas";
+import { mongoDbId } from "../../resources/partial-schemas";
 
 const schema = fileInfoSchema
   .merge(timeRangeSchema)

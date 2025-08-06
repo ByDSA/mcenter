@@ -1,6 +1,6 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
-import { mongoDbId } from "../resource/partial-schemas";
+import { mongoDbId } from "../resources/partial-schemas";
 
 const seriesKeySchema = z.string();
 

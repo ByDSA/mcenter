@@ -1,5 +1,5 @@
 import { Provider } from "@nestjs/common";
-import { createMockInstance } from "#tests/jest/mocking";
+import { createMockInstance } from "$sharedTests/jest/mocking";
 import { EpisodeHistoryRepository } from "../repository";
 import { LastTimePlayedService } from "../../../last-time-played.service";
 

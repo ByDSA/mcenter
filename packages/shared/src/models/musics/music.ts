@@ -1,7 +1,7 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
-import { resourceSchema } from "../resource";
-import { pickableSchema, taggableSchema } from "../resource/partial-schemas";
+import { resourceSchema } from "../resources";
+import { pickableSchema, taggableSchema } from "../resources/partial-schemas";
 import { musicFileInfoEntitySchema } from "./file-info";
 
 const optionalPropsSchema = z.object( {

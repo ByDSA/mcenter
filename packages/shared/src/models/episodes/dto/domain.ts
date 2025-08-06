@@ -1,5 +1,5 @@
 import z from "zod";
-import { replaceSchemaTimestampsToStrings, transformDtoTimestampsToDates } from "../../resource/dto";
+import { replaceSchemaTimestampsToStrings, transformDtoTimestampsToDates } from "../../resources/dto";
 import { Episode, EpisodeEntity, episodeEntitySchema, episodeSchema } from "../episode";
 
 export namespace EpisodeDtos {
