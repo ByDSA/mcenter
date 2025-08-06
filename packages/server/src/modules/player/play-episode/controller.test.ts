@@ -16,7 +16,7 @@ import { StreamsRepository } from "#modules/streams/crud/repository";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
 import { PlayService } from "../play.service";
 import { VlcBackWebSocketsServerService } from "../player-services";
-import { PlaySerieController } from "./controller";
+import { PlayEpisodeController } from "./controller";
 
 describe("playEpisodeController", () => {
   let routerApp: Application;
@@ -31,7 +31,7 @@ describe("playEpisodeController", () => {
         createMockedModule(EpisodePickerModule),
         createMockedModule(EpisodeHistoryModule),
       ],
-      controllers: [PlaySerieController],
+      controllers: [PlayEpisodeController],
       providers: [
         createMockProvider(VlcBackWebSocketsServerService),
         PlayService,

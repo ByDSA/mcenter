@@ -10,7 +10,7 @@ import { PlayService } from "./play.service";
 import { FrontWSServerService } from "./player-services/front/front-player-web-sockets-server.service";
 import { VlcBackWSService } from "./player-services/vlc-back/vlc-back-ws-server.service";
 import { PlayStreamController } from "./play-stream/controller";
-import { PlaySerieController } from "./play-episode/controller";
+import { PlayEpisodeController } from "./play-episode/controller";
 
 @Global() // Para que use sólo una instancia de servicio backend de web sockets
 @Module( {
@@ -24,7 +24,7 @@ import { PlaySerieController } from "./play-episode/controller";
     EpisodeFileInfosModule,
   ],
   controllers: [
-    PlaySerieController,
+    PlayEpisodeController,
     PlayStreamController,
   ],
   providers: [

@@ -1,5 +1,5 @@
 export {
-  PlaySerieController,
+  PlayEpisodeController,
 } from "./play-episode/controller";
 
 export {

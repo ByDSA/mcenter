@@ -7,7 +7,7 @@ import { QueryDto } from "../play-stream/controller";
 class ParamsDto extends createZodDto(episodeCompKeySchema) {}
 
 @Controller("play/episode")
-export class PlaySerieController {
+export class PlayEpisodeController {
   constructor(
     private readonly playService: PlayService,
   ) {
