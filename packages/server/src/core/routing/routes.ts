@@ -24,19 +24,19 @@ export const routeModules = [
   // y por los que se importan en AppModule
   StaticFilesModule,
   ConfigModule,
-  PlayerModule,
 
+  MusicsGetRandomModule, // El primero para que "random" no se considere una UUID
+  MusicsSlugModule,
   MusicHistoryModule,
   MusicFileInfoModule,
-  MusicsGetRandomModule,
   MusicsGetPlaylistsModule,
-  MusicsSlugModule,
 
+  EpisodesSlugModule,
   EpisodesAdminModule,
   EpisodeFileInfosModule,
-  EpisodesSlugModule,
   EpisodesCrudModule, // Al final, para que no interfiera con slugs
 
+  PlayerModule,
   /* Importante: el orden de las rutas aquí en el Register es irrelevante.
   Si hay colisiones en el acceso, cargar el módulo específico primero fuera del Register */
   RouterModule.register([
