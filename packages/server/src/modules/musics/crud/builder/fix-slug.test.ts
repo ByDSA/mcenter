@@ -127,6 +127,11 @@ describe("fixSlug", () => {
       expected: "start",
       description: "remove start hypen",
     },
+    {
+      input: "fake space",
+      expected: "fake-space",
+      description: "remove fake spaces",
+    },
   ];
 
   testCases.forEach(( { input, expected, description } ) => {

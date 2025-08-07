@@ -6,6 +6,21 @@ import { ARTIST_EMPTY, assertIsMusic, Music } from "../../models";
 import { getAbsolutePath } from "../../utils";
 import { AUDIO_EXTENSIONS } from "../../files";
 import { MusicSlugGeneratorService } from "./slug-generator.service";
+import { fixTxtFields } from "../../../resources/fix-text";
+import { fixSlug } from "./fix-slug";
+
+export function fixFields<T extends Partial<Music>>(model: T): T {
+  const ret = fixTxtFields(model, [
+    "title",
+    "artist",
+    "album"
+  ]);
+
+  if (ret.slug)
+    ret.slug = fixSlug(ret.slug) ?? undefined;
+
+  return ret;
+}
 
 @Injectable()
 export class MusicBuilderService {
@@ -15,7 +30,7 @@ export class MusicBuilderService {
   }
 
   async build(relativePath: string, partial?: Partial<Music>): Promise<Music> {
-    const doc: Partial<Music> = partial ? deepCopy(partial) : {};
+    let doc: Partial<Music> = partial ? deepCopy(partial) : {};
     // 2. Lectura de tags ID3 si no vienen en partial
     let title: string;
     let artist: string;
@@ -28,11 +43,13 @@ export class MusicBuilderService {
     doc.artist ??= artist;
     doc.album ??= tags.album;
 
+    doc = fixFields(doc);
+
     // 3. Slug generator si no está definido
     if (!doc.slug) {
       doc.slug = await this.musicSlugGenerator.generateAvailableSlugFrom( {
-        title,
-        artist,
+        title: doc.title!,
+        artist: doc.artist!,
       } );
     }
 
@@ -59,7 +76,7 @@ function getTitleFromFilenamePath(relativePath: string): string {
 
   title = removeExtension(title);
 
-  return fixTitle(title);
+  return title;
 }
 
 function removeExtension(str: string): string {
@@ -71,10 +88,4 @@ function removeExtension(str: string): string {
   }
 
   return str;
-}
-
-function fixTitle(title: string): string {
-  return title.replace(/ \((Official )?(Lyric|Music) Video\)/ig, "")
-    .replace(/\(videoclip\)/ig, "")
-    .replace(/ $/g, "");
 }

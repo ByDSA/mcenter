@@ -17,6 +17,11 @@ import { EpisodeHistoryEntryEvents } from "../../history/crud/repository/events"
 import { EpisodeOdm } from "./odm";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { EpisodeEvents } from "./events";
+import { fixTxtFields } from "#modules/resources/fix-text";
+
+function fixFields<T extends Partial<Episode>>(model: T): T {
+  return fixTxtFields(model, ["title"]);
+}
 
 type CreateOneDto = Omit<Episode, "timestamps">;
 type EpisodeId = EpisodeEntity["id"];
@@ -82,7 +87,7 @@ CanGetAll<EpisodeEntity> {
     id: EpisodeId,
     patchParams: PatchOneParams<Partial<Episode>>,
   ): Promise<EpisodeEntity> {
-    const episode = patchParams.entity;
+    const episode = fixFields(patchParams.entity);
     const partialDocOdm = EpisodeOdm.partialToDoc(episode);
 
     if (Object.keys(partialDocOdm).length === 0)
@@ -191,7 +196,7 @@ CanGetAll<EpisodeEntity> {
     compKey: EpisodeCompKey,
     patchParams: PatchOneParams<Episode>,
   ): Promise<EpisodeEntity> {
-    const episode = patchParams.entity;
+    const episode = fixFields(patchParams.entity);
     const partialDocOdm = EpisodeOdm.partialToDoc(episode);
 
     if (Object.keys(partialDocOdm).length === 0)
@@ -220,7 +225,7 @@ CanGetAll<EpisodeEntity> {
   }
 
   async getOneOrCreate(createDto: CreateOneDto): Promise<EpisodeEntity> {
-    const model = this.createDtoToModel(createDto);
+    const model = fixFields(this.createDtoToModel(createDto));
     const filter = {
       seriesKey: model.compKey.seriesKey,
       episodeKey: model.compKey.episodeKey,
@@ -264,7 +269,7 @@ CanGetAll<EpisodeEntity> {
 
   @EmitEntityEvent(EpisodeEvents.Created.TYPE)
   async createOneAndGet(createDto: CreateOneDto): Promise<EpisodeEntity> {
-    const model = this.createDtoToModel(createDto);
+    const model = fixFields(this.createDtoToModel(createDto));
     const doc: EpisodeOdm.Doc = EpisodeOdm.toDoc(model);
     const created = await EpisodeOdm.Model.create(doc);
 
@@ -273,7 +278,9 @@ CanGetAll<EpisodeEntity> {
 
   @EmitEntityEvent(EpisodeEvents.Created.TYPE)
   async createManyAndGet(models: Episode[]): Promise<EpisodeEntity[]> {
-    const docsOdm: EpisodeOdm.Doc[] = models.map(EpisodeOdm.toDoc);
+    const docsOdm: EpisodeOdm.Doc[] = models.map(m=> {
+      return EpisodeOdm.toDoc(fixFields(m));
+  });
     const inserted = await EpisodeOdm.Model.insertMany(docsOdm);
     const ret = inserted.map(EpisodeOdm.toEntity);
 

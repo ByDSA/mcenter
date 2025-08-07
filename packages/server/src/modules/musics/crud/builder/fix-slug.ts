@@ -1,3 +1,5 @@
+import { fixTxt } from "../../../resources/fix-text";
+
 const cyrillicToLatinMap: { [key: string]: string } = {
   а: "a",
   б: "b",
@@ -83,7 +85,7 @@ const charMap: { [key: string]: string } = {
 };
 
 export function fixSlug(slug: string): string | null {
-  let fixed: string = slug
+  let fixed: string = fixTxt(slug)
     .toLowerCase()
     .replaceAll(" & ", " and ")
     .replaceAll(/(official-)?lyric-video/g, "");

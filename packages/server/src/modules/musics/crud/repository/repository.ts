@@ -13,8 +13,7 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicHistoryEntryEvents } from "../../history/crud/repository/events";
-import { MusicBuilderService } from "../builder/music-builder.service";
-import { fixSlug } from "../builder/fix-slug";
+import { fixFields, MusicBuilderService } from "../builder/music-builder.service";
 import { ExpressionNode } from "./queries/query-object";
 import { findParamsToQueryParams } from "./queries/queries-odm";
 import { MusicEvents } from "./events";
@@ -59,10 +58,9 @@ CanGetOneById<MusicEntity, MusicId> {
   }
 
   async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {
-    const { entity } = params;
+    const { entity: _entity } = params;
 
-    if (entity.slug)
-      entity.slug = fixSlug(entity.slug) ?? undefined;
+    const entity = fixFields(_entity);
 
     const updateQuery = patchParamsToUpdateQuery(params, MusicOdm.partialToDoc);
 
@@ -152,7 +150,7 @@ CanGetOneById<MusicEntity, MusicId> {
 
   @EmitEntityEvent(MusicEvents.Created.TYPE)
   async createOneAndGet(music: Music): Promise<MusicEntity> {
-    const docOdm = MusicOdm.toDoc(music);
+    const docOdm = MusicOdm.toDoc(fixFields(music));
     const gotDoc = await MusicOdm.Model.create(docOdm);
 
     return MusicOdm.toEntity(gotDoc);
