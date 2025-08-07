@@ -39,10 +39,10 @@ export class PlayVideoService {
       } );
 
       // TODO: quitar de db "series" del path y ponerlo aquí
-      mediaElement.path =`${mediaElement.path}`;
+      mediaElement.path = `${mediaElement.path}`;
 
       return mediaElementFixPlayerLabels(mediaElement);
-    });
+    } );
 
     await this.playService.play( {
       mediaElements,
@@ -50,10 +50,9 @@ export class PlayVideoService {
     } );
 
     const isLast = await this.historyRepo.isLast(episodes[0].compKey);
-
     const episodesToAddInHistory: EpisodeEntity[] = isLast
       ? episodes.slice(1)
-      :  episodes;
+      : episodes;
 
     await this.historyRepo.addEpisodesToHistory( {
       episodes: episodesToAddInHistory,

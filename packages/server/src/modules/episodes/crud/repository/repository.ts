@@ -11,13 +11,13 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
+import { fixTxtFields } from "#modules/resources/fix-text";
 import { Episode, EpisodeCompKey, EpisodeEntity } from "../../models";
 import { LastTimePlayedService } from "../../history/last-time-played.service";
 import { EpisodeHistoryEntryEvents } from "../../history/crud/repository/events";
 import { EpisodeOdm } from "./odm";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { EpisodeEvents } from "./events";
-import { fixTxtFields } from "#modules/resources/fix-text";
 
 function fixFields<T extends Partial<Episode>>(model: T): T {
   return fixTxtFields(model, ["title"]);
@@ -280,7 +280,7 @@ CanGetAll<EpisodeEntity> {
   async createManyAndGet(models: Episode[]): Promise<EpisodeEntity[]> {
     const docsOdm: EpisodeOdm.Doc[] = models.map(m=> {
       return EpisodeOdm.toDoc(fixFields(m));
-  });
+    } );
     const inserted = await EpisodeOdm.Model.insertMany(docsOdm);
     const ret = inserted.map(EpisodeOdm.toEntity);
 

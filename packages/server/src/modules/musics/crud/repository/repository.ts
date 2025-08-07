@@ -59,9 +59,7 @@ CanGetOneById<MusicEntity, MusicId> {
 
   async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {
     const { entity: _entity } = params;
-
     const entity = fixFields(_entity);
-
     const updateQuery = patchParamsToUpdateQuery(params, MusicOdm.partialToDoc);
 
     updateQuery.$set = {

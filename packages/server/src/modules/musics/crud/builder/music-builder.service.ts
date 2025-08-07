@@ -5,15 +5,15 @@ import { deepCopy } from "$shared/utils/objects";
 import { ARTIST_EMPTY, assertIsMusic, Music } from "../../models";
 import { getAbsolutePath } from "../../utils";
 import { AUDIO_EXTENSIONS } from "../../files";
-import { MusicSlugGeneratorService } from "./slug-generator.service";
 import { fixTxtFields } from "../../../resources/fix-text";
+import { MusicSlugGeneratorService } from "./slug-generator.service";
 import { fixSlug } from "./fix-slug";
 
 export function fixFields<T extends Partial<Music>>(model: T): T {
   const ret = fixTxtFields(model, [
     "title",
     "artist",
-    "album"
+    "album",
   ]);
 
   if (ret.slug)

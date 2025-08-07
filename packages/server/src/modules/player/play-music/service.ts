@@ -44,7 +44,7 @@ export class PlayMusicService {
         local: true,
       } );
 
-      mediaElement.path =`music/data/${mediaElement.path}`;
+      mediaElement.path = `music/data/${mediaElement.path}`;
 
       return mediaElementFixPlayerLabels(mediaElement);
     } );
@@ -55,10 +55,9 @@ export class PlayMusicService {
     } );
 
     const isLast = await this.historyRepo.isLast(musics[0].id);
-
     const musicsToAddInHistory: MusicEntity[] = isLast
       ? musics.slice(1)
-      :  musics;
+      : musics;
 
     for (const m of musicsToAddInHistory)
       await this.historyRepo.createNewEntryNowFor(m.id);

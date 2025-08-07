@@ -1,4 +1,4 @@
-import { MusicOdm } from "#modules/musics/crud/repository/odm";
+import { MusicOdm } from "#musics/crud/repository/odm";
 import { MusicHistoryEntry, MusicHistoryEntryEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 

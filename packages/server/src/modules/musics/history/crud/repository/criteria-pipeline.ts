@@ -1,6 +1,6 @@
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
 import { FilterQuery, PipelineStage } from "mongoose";
-import { DocOdm } from "#modules/musics/file-info/crud/repository";
+import { DocOdm } from "#musics/file-info/crud/repository";
 
 function buildMongooseSort(
   body: MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
