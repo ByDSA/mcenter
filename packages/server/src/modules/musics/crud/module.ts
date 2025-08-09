@@ -5,7 +5,7 @@ import { MusicHistoryModule } from "../history/module";
 import { MusicBuilderService } from "./builder/music-builder.service";
 import { MusicCrudController } from "./controller";
 import { MusicsRepository } from "./repository";
-import { MusicSlugGeneratorService } from "./builder/slug-generator.service";
+import { MusicAvailableSlugGeneratorService } from "./builder/vailable-slug-generator.service";
 
 @Module( {
   imports: [
@@ -17,9 +17,9 @@ import { MusicSlugGeneratorService } from "./builder/slug-generator.service";
   ],
   providers: [
     MusicsRepository,
-    MusicSlugGeneratorService,
+    MusicAvailableSlugGeneratorService,
     MusicBuilderService,
   ],
-  exports: [MusicsRepository],
+  exports: [MusicBuilderService, MusicsRepository],
 } )
 export class MusicsCrudModule {}

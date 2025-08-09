@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
-import { assertIsMusicEntity, MusicEntity } from "$shared/models/musics";
+import { MusicEntity } from "$shared/models/musics";
 import { AllKeysOf } from "$shared/utils/types";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { timestampsModelToDocOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
+import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 
 function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
   if (!docOdm.tags && !docOdm.onlyTags)
@@ -50,9 +51,7 @@ export function musicDocOdmToEntity(docOdm: FullDocOdm): MusicEntity {
     fileInfos: docOdm.fileInfos?.map(MusicFileInfoOdm.toEntity),
   } satisfies AllKeysOf<MusicEntity>;
 
-  assertIsMusicEntity(entity);
-
-  return entity;
+   return removeUndefinedDeep(entity);
 }
 
 export function musicToDocOdm(model: Music): DocOdm {
@@ -74,7 +73,7 @@ export function musicToDocOdm(model: Music): DocOdm {
     onlyTags: docOdmTags?.onlyTags,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
-  return docOdm;
+  return removeUndefinedDeep(docOdm);
 }
 
 export function musicEntityToDocOdm(entity: MusicEntity): FullDocOdm {

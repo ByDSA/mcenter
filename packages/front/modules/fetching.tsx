@@ -78,6 +78,7 @@ export function makeFetcher<ReqBody, ResBody>(
 
 type UseRequestResult<T> = {
   data: T | undefined;
+  setData: ReturnType<typeof useState<T>>[1];
   error?: any;
   isLoading: boolean;
 };
@@ -93,7 +94,8 @@ export function makeUseRequest<R, T>(
   { key, fetcher, refreshInterval }: MakeUseRequestParams<R, T>,
 ): UseRequest<T> {
   const ret: UseRequest<T> = () => {
-    const [data, setData] = useState<T | undefined>(undefined);
+    const stateData = useState<T | undefined>(undefined);
+    const [data, setData] = stateData;
     const { error, isLoading } = useSWR(
       key,
       fetcher,
@@ -108,6 +110,7 @@ export function makeUseRequest<R, T>(
 
     return {
       data,
+      setData,
       error,
       isLoading,
     };
@@ -118,13 +121,17 @@ export function makeUseRequest<R, T>(
 
 type FetchingRenderParams<T, U> = {
 useRequest: UseRequest<T>;
-render: (data: T, hooksRet: U)=> JSX.Element;
+render: (props: {
+  data: T;
+  setData: ReturnType<typeof useState<T>>[1];
+  hooksRet: U;
+} )=> JSX.Element;
 hooks?: (data: T | undefined)=> void;
 };
 export function FetchingRender<T, U = undefined>(
   { useRequest, render, hooks }: FetchingRenderParams<T, U>,
 ): JSX.Element {
-  const { data, error, isLoading } = useRequest();
+  const { data, setData, error, isLoading } = useRequest();
   const hooksRet = hooks?.(data) as U;
 
   if (error) {
@@ -156,7 +163,11 @@ export function FetchingRender<T, U = undefined>(
   if (!data)
     return <span>Empty data.</span>;
 
-  return render(data, hooksRet);
+  return render( {
+    data,
+    hooksRet,
+    setData,
+  } );
 }
 
 export function shouldSendPatchWithBody(body: ReturnType<typeof generatePatchBody>): boolean {

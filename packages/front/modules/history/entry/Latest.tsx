@@ -68,7 +68,7 @@ T extends Entry<any, any>,
         datesStr,
       };
     },
-    render: (res, hooksRet) => {
+    render: ( { data: res, hooksRet } ) => {
       const { datesStr } = hooksRet;
 
       if (res.data.length === 0)

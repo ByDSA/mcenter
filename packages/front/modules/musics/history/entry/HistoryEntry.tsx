@@ -5,10 +5,12 @@ import { Header } from "./Header";
 
 type Props<T> = {
   value: Required<T>;
+  setValue: (newData: T)=> void;
   showDate?: boolean;
 };
 export function HistoryEntryElement(
-  { value: entry, showDate = true }: Props<MusicHistoryEntryFetching.GetManyByCriteria.Data>,
+  { value: entry, setValue, showDate =
+  true }: Props<MusicHistoryEntryFetching.GetManyByCriteria.Data>,
 ) {
   return <span className="history-entry">
     {
@@ -20,6 +22,7 @@ export function HistoryEntryElement(
         } ),
         bodyContent: Body( {
           data: entry,
+          setData: setValue,
         } ),
       } )
     }

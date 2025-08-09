@@ -2,6 +2,7 @@ import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { EpisodeFileInfoEntity } from "$shared/models/episodes/file-info";
 import { EpisodeEntity } from "$shared/models/episodes";
 import { PATH_ROUTES } from "$shared/routing";
+import { useState } from "react";
 import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/models";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
@@ -58,12 +59,14 @@ function getAndUpdateFileInfoByProp<V>(
 
 type Props = {
   data: Data;
+  setData: ReturnType<typeof useState<EpisodeHistoryEntryFetching.GetMany.Data>>[1];
 };
-export function Body( { data }: Props) {
+export function Body( { data, setData }: Props) {
   const { state, remove, isModified,
     reset, addOnReset,
     update, initialState } = useHistoryEntryEdition<Data>( {
       data,
+      setData,
       isModifiedFn: calcIsModified,
       fetchRemove: async ()=> {
         const res = await EpisodeHistoryEntryFetching.Delete.fetch(data.id);

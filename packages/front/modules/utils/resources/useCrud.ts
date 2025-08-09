@@ -12,6 +12,7 @@ type FetchFn<T> = ()=> Promise<T | void>;
 
 export type UseCrudProps<T> = {
   data: T;
+  setData: (newData: T | undefined)=> void;
   isModifiedFn: (base: T, current: T)=> boolean;
   fetchUpdate: FetchFn<T>;
   fetchRemove: FetchFn<T>;
@@ -33,7 +34,7 @@ export type UseCrudRet<T> = {
 };
 
 export function useCrud<T>(
-  { data, isModifiedFn, fetchRemove, fetchUpdate }: UseCrudProps<T>,
+  { data, setData: setResponseData, isModifiedFn, fetchRemove, fetchUpdate }: UseCrudProps<T>,
 ): UseCrudRet<T> {
   const initialDataState = useInitialData(data, isModifiedFn);
   const [initialData] = initialDataState;
@@ -65,6 +66,7 @@ export function useCrud<T>(
       .then(async (r)=>{
         if (r) {
           initialDataState[1](r);
+          setResponseData(r);
           await genReset(r)();
         }
 
@@ -81,6 +83,8 @@ export function useCrud<T>(
     return await fetchRemove()
       .then((r)=>{
         done();
+
+        setResponseData(undefined);
 
         return r;
       } );

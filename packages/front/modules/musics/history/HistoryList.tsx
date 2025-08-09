@@ -22,13 +22,33 @@ export function HistoryList(props?: Props) {
 
   return FetchingRender<MusicHistoryEntryFetching.GetManyByCriteria.Res>( {
     useRequest: MusicHistoryEntryFetching.GetManyByCriteria.useRequest,
-    render: (res) => (
+    render: ( { data: res, setData } ) => (
       <span className="history-list">
         {
           res && res.data.map(
             (entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
               {params.showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
-              <HistoryEntryElement showDate={params.showDate === "eachOne"} value={entry} />
+              <HistoryEntryElement showDate={params.showDate === "eachOne"}
+                value={entry} setValue={(newEntry: typeof entry | undefined) => {
+                  setData((old)=> {
+                    if (!old)
+                      return undefined;
+
+                    const newData = {
+                      ...old,
+                    };
+
+                    if (!newEntry) {
+                      newData.data = [...newData.data.slice(0, i), ...newData.data.slice(i + 1)];
+
+                      return newData;
+                    }
+
+                    newData.data[i] = newEntry;
+
+                    return newData;
+                  } );
+                }} />
             </Fragment>,
           )
         }

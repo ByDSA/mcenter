@@ -1,5 +1,5 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { RouterModule } from "@nestjs/core";
+import { RouterModule, Routes } from "@nestjs/core";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesAdminModule } from "#episodes/admin/module";
@@ -18,15 +18,17 @@ import { EpisodesSlugModule } from "#episodes/slug/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
 import { MusicFileInfoModule } from "#musics/file-info/module";
 import { LoggingModule } from "../logging/module";
+import { MusicsAdminModule } from "#modules/musics/admin/module";
 
-export const routeModules = [
-  // No hace falta poner todos los modules porque hay imports internos
-  // y por los que se importan en AppModule
+// No hace falta poner todos los modules porque hay imports internos
+// y por los que se importan en AppModule
+const imports = [
   StaticFilesModule,
   ConfigModule,
 
   MusicsGetRandomModule, // El primero para que "random" no se considere una UUID
   MusicsSlugModule,
+  MusicsAdminModule,
   MusicHistoryModule,
   MusicFileInfoModule,
   MusicsGetPlaylistsModule,
@@ -37,10 +39,11 @@ export const routeModules = [
   EpisodesCrudModule, // Al final, para que no interfiera con slugs
 
   PlayerModule,
+];
 
   /* Importante: el orden de las rutas aquí en el Register es irrelevante.
   Si hay colisiones en el acceso, cargar el módulo específico primero fuera del Register */
-  RouterModule.register([
+const routes: Routes = [
     {
       path: "/",
       module: StaticFilesModule,
@@ -102,6 +105,10 @@ export const routeModules = [
       module: MusicHistoryModule,
     },
     {
+      path: PATH_ROUTES.musics.path + "/admin",
+      module: MusicsAdminModule,
+    },
+    {
       path: PATH_ROUTES.streams.path,
       module: StreamsModule,
     },
@@ -109,5 +116,9 @@ export const routeModules = [
       path: PATH_ROUTES.player.path,
       module: PlayerModule,
     },
-  ]),
+  ]
+
+export const routeModules = [
+  ...imports,
+  RouterModule.register(routes),
 ];

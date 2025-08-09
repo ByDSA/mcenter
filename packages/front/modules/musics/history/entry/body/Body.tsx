@@ -43,12 +43,14 @@ type Data = MusicHistoryEntryFetching.GetManyByCriteria.Data;
 
 type Props = {
   data: Data;
+  setData: (newData: Data)=> void;
 };
-export function Body( { data }: Props) {
+export function Body( { data, setData }: Props) {
   const { state, remove, isModified,
     reset, addOnReset,
     update, initialState } = useHistoryEntryEdition<Data>( {
       data,
+      setData,
       isModifiedFn: calcIsModified,
       fetchRemove: async ()=> {
         const res = await MusicHistoryEntryFetching.DeleteOneById.fetch(data.id);
@@ -105,17 +107,17 @@ export function Body( { data }: Props) {
 
         await Promise.all([musicPromise, fileInfoPromise]);
 
-        const newData = {
+        const newData: Data = {
           ...state[0],
         };
 
         if (await musicPromise)
-          newData.music = await musicPromise;
+          newData.resource = await musicPromise as Data["resource"];
 
-        if (await fileInfoPromise)
-          newData.music.fileInfos = [(await fileInfoPromise).data];
+        if (newData.resource && await fileInfoPromise)
+          newData.resource.fileInfos = [(await fileInfoPromise).data];
 
-        return newData;
+        return newData as Data;
       },
     } );
   const optionalProps: Record<keyof Music, PropInfo> = Object.entries(MUSIC_PROPS)

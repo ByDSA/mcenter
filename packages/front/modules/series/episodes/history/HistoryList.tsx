@@ -11,7 +11,7 @@ import "#styles/resources/serie.css";
 export function HistoryList() {
   return FetchingRender<EpisodeHistoryEntryFetching.GetMany.Res>( {
     useRequest: EpisodeHistoryEntryFetching.GetMany.useRequest,
-    render: (res) => {
+    render: ( { data: res, setData } ) => {
       return (
         <span className="history-list">
           {
@@ -27,7 +27,34 @@ export function HistoryList() {
               return <Fragment
                 key={entry.date.timestamp}>
                 {dayTitle}
-                <HistoryEntryElement value={entry}/>
+                <HistoryEntryElement value={entry} setValue={(newEntry: typeof entry |
+                  undefined) => {
+                  setData((old)=> {
+                    if (!old)
+                      return undefined;
+
+                    const newData = {
+                      ...old,
+                    };
+
+                    if (!newEntry) {
+                      newData.data = [...newData.data.slice(0, i), ...newData.data.slice(i + 1)];
+
+                      return newData;
+                    }
+
+                    newData.data[i] = {
+                      ...newEntry,
+                      resource: {
+                        ...newData.data[i].resource,
+                        ...newEntry.resource,
+                        serie: newEntry.resource.serie ?? newData.data[i].resource.serie,
+                      },
+                    };
+
+                    return newData;
+                  } );
+                }}/>
               </Fragment>;
             } )
           }

@@ -3,6 +3,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
+import { UpdateQuery } from "mongoose";
 import { assertFound } from "#utils/validation/found";
 import { CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { MusicEntity, Music, MusicId } from "#musics/models";
@@ -13,7 +14,8 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicHistoryEntryEvents } from "../../history/crud/repository/events";
-import { fixFields, MusicBuilderService } from "../builder/music-builder.service";
+import { MusicBuilderService } from "../builder/music-builder.service";
+import { MusicAvailableSlugGeneratorService } from "../builder/vailable-slug-generator.service";
 import { ExpressionNode } from "./queries/query-object";
 import { findParamsToQueryParams } from "./queries/queries-odm";
 import { MusicEvents } from "./events";
@@ -28,7 +30,8 @@ CanPatchOneByIdAndGet<MusicEntity, MusicId, Music>,
 CanGetOneById<MusicEntity, MusicId> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
-    @Inject(forwardRef(()=>MusicBuilderService))
+    @Inject(forwardRef(()=>MusicAvailableSlugGeneratorService))
+    private readonly slugGenerator: MusicAvailableSlugGeneratorService,
     private readonly musicBuilder: MusicBuilderService,
   ) { }
 
@@ -58,9 +61,12 @@ CanGetOneById<MusicEntity, MusicId> {
   }
 
   async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {
-    const { entity: _entity } = params;
-    const entity = fixFields(_entity);
-    const updateQuery = patchParamsToUpdateQuery(params, MusicOdm.partialToDoc);
+    const { entity: paramEntity } = params;
+    const validEntity = this.musicBuilder.fixFields(paramEntity);
+    const updateQuery = patchParamsToUpdateQuery( {
+      ...params,
+      entity: validEntity,
+    }, MusicOdm.partialToDoc);
 
     updateQuery.$set = {
       ...updateQuery.$set,
@@ -73,14 +79,15 @@ CanGetOneById<MusicEntity, MusicId> {
       {
         new: true,
       },
-    );
+    )
+      .catch(e=>this.handleUpdateError(e, id, updateQuery));
 
     assertFound(doc);
 
     const ret = MusicOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(MusicEvents.Patched.TYPE, {
-      entity,
+      entity: validEntity,
       id,
       unset: params.unset,
     } );
@@ -141,15 +148,53 @@ CanGetOneById<MusicEntity, MusicId> {
   }
 
   async createOneFromPath(relativePath: string): Promise<MusicEntity> {
-    const music = await this.musicBuilder.build(relativePath);
+    const music = await this.musicBuilder.createMusicFromFile(relativePath);
 
     return await this.createOneAndGet(music);
   }
 
+  private async handleUpdateError(
+    e: unknown,
+    id: string,
+    updateQuery: UpdateQuery<MusicOdm.Doc>,
+  ): Promise<MusicOdm.FullDoc | null> {
+    if (isDuplicateKeyError(e)) {
+      const fixedUpdateQuery: UpdateQuery<MusicOdm.Doc> = {
+        ...updateQuery,
+        url: await this.slugGenerator.getAvailableSlugFromSlug(updateQuery.url),
+      };
+
+      return MusicOdm.Model.findByIdAndUpdate(
+        id,
+        fixedUpdateQuery,
+        {
+          new: true,
+        },
+      );
+    }
+
+    throw e;
+  }
+
+  private async handleCreateError(e: unknown, doc: MusicOdm.Doc): Promise<MusicOdm.FullDoc> {
+    if (isDuplicateKeyError(e)) {
+      const fixedDoc: MusicOdm.Doc = {
+        ...doc,
+        url: await this.slugGenerator.getAvailableSlugFromSlug(doc.url),
+      };
+
+      return MusicOdm.Model.create(fixedDoc);
+    }
+
+    throw e;
+  }
+
   @EmitEntityEvent(MusicEvents.Created.TYPE)
   async createOneAndGet(music: Music): Promise<MusicEntity> {
-    const docOdm = MusicOdm.toDoc(fixFields(music));
-    const gotDoc = await MusicOdm.Model.create(docOdm);
+    const validMusic = this.musicBuilder.fixFields(music);
+    const docOdm = MusicOdm.toDoc(validMusic);
+    const gotDoc = await MusicOdm.Model.create(docOdm)
+      .catch(e=>this.handleCreateError(e, docOdm));
 
     return MusicOdm.toEntity(gotDoc);
   }
@@ -164,4 +209,8 @@ CanGetOneById<MusicEntity, MusicId> {
 
     return MusicOdm.toEntity(docOdm);
   }
+}
+
+function isDuplicateKeyError(e: unknown): boolean {
+  return e instanceof Error && e.message.includes("E11000 duplicate key");
 }

@@ -7,6 +7,7 @@ export function useHistoryEntryEdition<T>(
 ): Ret<T> {
   const { isModified, remove, reset, addOnReset, state, update, initialState } = useCrud<T>( {
     data: params.data,
+    setData: params.setData,
     fetchRemove: async () => {
       if (!confirm(`Borar esta entrada del historial?\n${ JSON.stringify(params.data, null, 2)}`))
         return Promise.resolve();
