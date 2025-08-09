@@ -62,7 +62,7 @@ CanGetOneById<MusicEntity, MusicId> {
 
   async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {
     const { entity: paramEntity } = params;
-    const validEntity = this.musicBuilder.fixFields(paramEntity);
+    let { timestamps: _, ...validEntity } = this.musicBuilder.fixFields(paramEntity);
     const updateQuery = patchParamsToUpdateQuery( {
       ...params,
       entity: validEntity,

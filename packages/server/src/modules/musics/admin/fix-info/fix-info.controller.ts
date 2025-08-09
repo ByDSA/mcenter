@@ -1,37 +1,46 @@
 import { Controller, Get } from "@nestjs/common";
-import { MusicsRepository } from "../../crud/repository";
 import { MusicEntity } from "$shared/models/musics";
-import { MusicBuilderService } from "#modules/musics/crud/builder/music-builder.service";
 import { diff } from "just-diff";
+import { MusicBuilderService } from "#musics/crud/builder/music-builder.service";
+import { MusicsRepository } from "../../crud/repository";
+
 type Result = {
   old: MusicEntity;
+  new: MusicEntity;
   diff: unknown;
-}[]
+}[];
 
 @Controller("/fix-info")
 export class MusicFixInfoController {
   constructor(
     private readonly musicRepo: MusicsRepository,
-    private builderService: MusicBuilderService,
+    private readonly builderService: MusicBuilderService,
   ) {
   }
 
   @Get()
   async fix() {
     const all = await this.musicRepo.getAll();
-
     const changed = all.reduce((acc, music)=> {
       const fixed = this.builderService.fixFields(music);
-
       const d = diff(music, fixed);
 
-      if (d.length > 0)
-        acc.push({old: music, diff: d});
-
+      if (d.length > 0) {
+        acc.push( {
+          old: music,
+          diff: d,
+          new: fixed,
+        } );
+      }
 
       return acc;
-    }, [] as Result)
+    }, [] as Result);
 
+    for (const c of changed) {
+      c.new = await this.musicRepo.patchOneByIdAndGet(c.old.id, {
+        entity: c.new,
+      } );
+    }
 
     return changed;
   }
