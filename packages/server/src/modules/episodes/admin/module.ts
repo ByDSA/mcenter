@@ -11,7 +11,7 @@ import { EpisodeFileInfosModule } from "../file-info/module";
 import { AddNewFilesRepository } from "../file-info/series-tree/add-new-files/repository";
 import { EpisodeDependenciesModule } from "../dependencies/module";
 import { EpisodesCrudModule } from "../crud/module";
-import { EpisodesUpdateLastTimePlayedController } from "./episodes-update-lastTimePlayed.controller";
+import { EpisodesUpdateLastTimePlayedController } from "./update-lastTimePlayed.controller";
 
 @Module( {
   imports: [

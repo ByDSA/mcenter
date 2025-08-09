@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
-import { EpisodesRepository } from "../crud/repository";
-import { LastTimePlayedService } from "../history";
+import { EpisodesRepository } from "../../crud/repository";
+import { LastTimePlayedService } from "../../history";
 
 @Controller("/actions/update-last-time-played")
 export class EpisodesUpdateLastTimePlayedController {

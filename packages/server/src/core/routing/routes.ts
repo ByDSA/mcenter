@@ -2,7 +2,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { RouterModule } from "@nestjs/core";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { MusicHistoryModule } from "#musics/history/module";
-import { EpisodesAdminModule } from "#episodes/actions/module";
+import { EpisodesAdminModule } from "#episodes/admin/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { EpisodePickerModule } from "#modules/episode-picker/module";
 import { StreamsModule } from "#modules/streams/module";
