@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/ByDSA/mcenter/compare/v4.1.2...v4.2.0) (2025-08-20)
+
+
+### Features
+
+* add music/admin/fix-info ([f7fa1ff](https://github.com/ByDSA/mcenter/commit/f7fa1ffa5635fc893ffbad3a6ede54adf42bf01f))
+* add some admin fixers ([83848d2](https://github.com/ByDSA/mcenter/commit/83848d2d7ff386d252b7c075c4a32e5f967f2cb1))
+
+
+### Bug Fixes
+
+* don't let create new resource with same slug ([df87807](https://github.com/ByDSA/mcenter/commit/df87807a6cdc9e65dce7d0a536342ecdaf3d9707))
+* fix fields episode and music on create/patch ([7138020](https://github.com/ByDSA/mcenter/commit/713802081c43fd16d23ce3d091a4c849a911654b))
+
 ### [4.1.2](https://github.com/ByDSA/mcenter/compare/v4.1.1...v4.1.2) (2025-08-06)
 
 
