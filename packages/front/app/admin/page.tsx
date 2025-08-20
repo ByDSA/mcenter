@@ -11,20 +11,32 @@ type Action = {
 };
 const ACTIONS: Action[] = [
   {
-    path: PATH_ROUTES.episodes.actions.updateLastTimePlayed.path,
+    path: PATH_ROUTES.episodes.admin.updateLastTimePlayed.path,
     name: "Episodes: updateLastTimePlayed",
   },
   {
-    path: PATH_ROUTES.episodes.actions.fileInfoUpdateSaved.path,
+    path: PATH_ROUTES.episodes.admin.fileInfoUpdateSaved.path,
     name: "Episodes: update file-info saved",
   },
   {
-    path: PATH_ROUTES.episodes.actions.addNewFiles.path,
+    path: PATH_ROUTES.episodes.admin.addNewFiles.path,
     name: "Episodes: add new files",
   },
   {
     path: PATH_ROUTES.streams.fixer.path,
     name: "Streams: fixer (ensure all series have default stream)",
+  },
+  {
+    path: PATH_ROUTES.musics.admin.fixInfo.path,
+    name: "Musics: fix info (title, artist...)",
+  },
+  {
+    path: PATH_ROUTES.musics.admin.searchDuplicates.path,
+    name: "Musics: search duplicates",
+  },
+  {
+    path: PATH_ROUTES.musics.admin.updateRemote.path,
+    name: "Musics: update remote tree (FileInfo DB + Local files)",
   },
   {
     path: PATH_ROUTES.logs.path,
@@ -34,6 +46,15 @@ const ACTIONS: Action[] = [
 
 export default function Page() {
   const [text, useText] = useState("");
+  let finalText = text;
+
+  try {
+    const parsedText = JSON.parse(text);
+
+    finalText = JSON.stringify(parsedText, null, 2);
+  } catch {
+    // Si no es JSON, lo dejamos como está
+  }
 
   return (
     <>
@@ -47,7 +68,7 @@ export default function Page() {
       </ul>
 
       <p>Out:</p>
-      {textArea(text)}
+      {textArea(finalText)}
     </>
   );
 }
@@ -88,7 +109,7 @@ function textArea(txt: string) {
       width: "100%",
       margin: "0.5em 1em",
       overflowX: "auto",
-      whiteSpace: "nowrap",
+      whiteSpace: "pre",
     }} readOnly value={txt} />
   );
 }

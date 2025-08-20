@@ -3,7 +3,7 @@ import { ResultResponse } from "$shared/utils/http/responses";
 import { UpdateEpisodesFileReqQueryDto } from "./validation";
 import { UpdateMetadataProcess } from "./update-saved-process";
 
-@Controller("/actions/file-info/update")
+@Controller("/admin/file-info/update")
 export class EpisodesUpdateController {
   constructor(private readonly updateMetadataProcess: UpdateMetadataProcess) {
   }

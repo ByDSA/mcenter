@@ -1,7 +1,7 @@
 import { statSync } from "fs";
 import { md5FileAsync } from "#utils/crypt";
 import { getAbsolutePath } from "../utils";
-import { FileWithStats } from "../update-remote/changes-detector";
+import { FileWithStats } from "../admin/update-remote/changes-detector";
 import { MusicFileInfoOmitMusicId } from "./models";
 
 type InfoWithPath = Partial<MusicFileInfoOmitMusicId> & Pick<MusicFileInfoOmitMusicId, "path">;

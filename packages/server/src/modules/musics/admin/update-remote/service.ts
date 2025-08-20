@@ -5,9 +5,9 @@ import { MusicFileInfo, MusicFileInfoEntity, musicFileInfoEntitySchema } from "$
 import { musicEntitySchema } from "#musics/models";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
-import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../files";
-import { MusicsRepository } from "../crud/repository";
-import { getAbsolutePath } from "../utils";
+import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
+import { MusicsRepository } from "../../crud/repository";
+import { getAbsolutePath } from "../../utils";
 import { ChangesDetector, FileWithStats } from "./changes-detector";
 
 export const updateResultSchema = z.object( {

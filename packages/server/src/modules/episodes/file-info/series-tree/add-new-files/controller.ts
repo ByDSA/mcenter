@@ -1,17 +1,17 @@
 import { Controller, Get } from "@nestjs/common";
 import { safeOneConcurrent, safeSequential } from "$shared/utils/errors";
 import { ResultResponse } from "$shared/utils/http/responses";
+import { EpisodesRepository } from "../../../crud/repository";
+import { RemoteSeriesTreeService } from "../remote";
+import { AddNewFilesRepository } from "./repository";
 import { diffSerieTree as diffSeriesTree, EpisodeFileInfoRepository, OldNewSerieTree as OldNew } from "#episodes/file-info";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { SerieNode, SerieTree, EpisodeNode } from "#episodes/file-info/series-tree/local/models";
 import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { UpdateMetadataProcess } from "#episodes/file-info/update/update-saved-process";
 import { Serie } from "#modules/series";
-import { EpisodesRepository } from "../../../crud/repository";
-import { RemoteSeriesTreeService } from "../remote";
-import { AddNewFilesRepository } from "./repository";
 
-@Controller("/actions/add-new-files")
+@Controller("/admin/add-new-files")
 export class EpisodeAddNewFilesController {
   constructor(
     private readonly seriesRepo: SeriesRepository,

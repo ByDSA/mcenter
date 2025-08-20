@@ -4,12 +4,12 @@ import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { createMockedModule } from "#utils/nestjs/tests";
-import { MusicsRepository } from "../crud/repository";
-import { MusicFileInfoRepository } from "../file-info/crud/repository";
-import { musicFileInfoEntitySchema } from "../file-info/models";
-import { musicEntitySchema } from "../models";
-import { MusicFileInfoModule } from "../file-info/module";
-import { MusicsCrudModule } from "../crud/module";
+import { MusicsRepository } from "../../crud/repository";
+import { MusicFileInfoRepository } from "../../file-info/crud/repository";
+import { musicFileInfoEntitySchema } from "../../file-info/models";
+import { musicEntitySchema } from "../../models";
+import { MusicFileInfoModule } from "../../file-info/module";
+import { MusicsCrudModule } from "../../crud/module";
 import { MusicUpdateRemoteController } from "./controller";
 import { UpdateRemoteTreeService, UpdateResult } from "./service";
 
@@ -65,7 +65,7 @@ describe("updateRemoteController", () => {
 
       musicFileInfoRepoMock.getAll.mockResolvedValue([]);
       response = await request(testingSetup.routerApp)
-        .get("/update/remote")
+        .get("/update-remote")
         .expect(200)
         .send();
     } );
@@ -95,7 +95,7 @@ describe("updateRemoteController", () => {
   it("fixAll no changes", async () => {
     musicFileInfoRepoMock.getAll.mockResolvedValue(fixtureMusicFileInfos.Disk.List);
     const response = await request(testingSetup.routerApp)
-      .get("/update/remote")
+      .get("/update-remote")
       .expect(200);
     const body = response.body as UpdateResult;
 
@@ -128,7 +128,7 @@ describe("updateRemoteController", () => {
       return Promise.resolve(music);
     } );
     const response = await request(testingSetup.routerApp)
-      .get("/update/remote")
+      .get("/update-remote")
       .expect(200);
     const body = response.body as UpdateResult;
 

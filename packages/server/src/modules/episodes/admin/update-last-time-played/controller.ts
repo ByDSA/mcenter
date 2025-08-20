@@ -2,7 +2,7 @@ import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
 import { EpisodesRepository } from "../../crud/repository";
 import { LastTimePlayedService } from "../../history";
 
-@Controller("/actions/update-last-time-played")
+@Controller("/admin/update-last-time-played")
 export class EpisodesUpdateLastTimePlayedController {
   constructor(
     private readonly lastTimePlayedService: LastTimePlayedService,

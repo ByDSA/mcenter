@@ -1,10 +1,8 @@
 import type { QueryDto } from "./play-stream/controller";
 import { Injectable } from "@nestjs/common";
-import { EpisodeEntityWithFileInfos, episodeEntityWithFileInfosSchema } from "$shared/models/episodes";
+import { EpisodeEntityWithFileInfos } from "$shared/models/episodes";
 import { episodeToMediaElement } from "$shared/models/player";
 import { mediaElementFixPlayerLabels } from "$shared/models/resources";
-import { assertZod } from "$shared/utils/validation/zod";
-import z from "zod";
 import { assertFound } from "#utils/validation/found";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { EpisodePickerService } from "#modules/episode-picker";
@@ -30,9 +28,6 @@ export class PlayVideoService {
     streamId: string,
     force?: boolean,
   ): Promise<EpisodeEntityWithFileInfos[]> {
-    assertFound(episodes[0]);
-    assertZod(z.array(episodeEntityWithFileInfosSchema), episodes);
-
     const mediaElements = episodes.map((e) => {
       const mediaElement = episodeToMediaElement(e, {
         local: true,
@@ -77,6 +72,8 @@ export class PlayVideoService {
     } ))
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
 
+    assertFound(episodes[0]);
+
     return this.processAndPlayEpisodes(episodes, stream.id, force);
   }
 
@@ -98,6 +95,8 @@ export class PlayVideoService {
         expand: ["series", "fileInfos"],
       } )]
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
+
+    assertFound(episodes[0]);
     const stream = await this.streamsRepo.getOneOrCreateBySeriesKey(seriesKey);
 
     return this.processAndPlayEpisodes(episodes, stream.id, force);

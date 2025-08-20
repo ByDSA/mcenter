@@ -2,7 +2,7 @@ import { Controller, Get } from "@nestjs/common";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { UpdateRemoteTreeService, UpdateResult, updateResultSchema } from "./service";
 
-@Controller("/update/remote")
+@Controller("/update-remote")
 export class MusicUpdateRemoteController {
   constructor(
     private readonly updateRemoteTreeService: UpdateRemoteTreeService,

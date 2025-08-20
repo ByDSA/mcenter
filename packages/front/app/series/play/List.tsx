@@ -23,7 +23,7 @@ export function List() {
 
       return <>
         {
-          streams && streams.map((stream: Stream) => {
+          streams.data && streams.data.map((stream: Stream) => {
             const name = (stream.group.origins[0].type === "serie"
               ? stream.group.origins[0]?.serie?.name
               : undefined)

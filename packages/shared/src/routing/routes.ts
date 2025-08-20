@@ -6,6 +6,7 @@ const MUSICS = "/api/musics";
 const MUSICS_SLUG = `${MUSICS}/slug`;
 const MUSICS_PLAYLISTS = `${MUSICS}/playlists`;
 const MUSICS_RANDOM = `${MUSICS}/random`;
+const MUSICS_ADMIN = `${MUSICS}/admin`;
 const PLAYER = "/api/player";
 const EPISODES = "/api/episodes";
 const EPISODES_SLUG = `${EPISODES}/slug`;
@@ -16,7 +17,7 @@ const MUSICS_HISTORY = MUSICS + "/history";
 const EPISODES_HISTORY = EPISODES + "/history";
 const EPISODES_FILE_INFO = EPISODES + "/file-info";
 const EPISODES_DEPENDENCIES = EPISODES + "/dependencies";
-const EPISODES_ACTIONS = EPISODES + "/actions";
+const EPISODES_ADMIN = EPISODES + "/admin";
 
 type MusicSlugQueryParams = {
   format?: ResponseFormat;
@@ -50,6 +51,17 @@ export const PATH_ROUTES = {
     },
     pickRandom: {
       path: MUSICS_RANDOM,
+    },
+    admin: {
+      fixInfo: {
+        path: `${MUSICS_ADMIN}/fix-info`,
+      },
+      searchDuplicates: {
+        path: `${MUSICS_ADMIN}/search-duplicates`,
+      },
+      updateRemote: {
+        path: `${MUSICS_ADMIN}/update-remote`,
+      },
     },
   },
   logs: {
@@ -92,15 +104,15 @@ export const PATH_ROUTES = {
         },
       },
     },
-    actions: {
+    admin: {
       updateLastTimePlayed: {
-        path: EPISODES_ACTIONS + "/update-last-time-played",
+        path: EPISODES_ADMIN + "/update-last-time-played",
       },
       fileInfoUpdateSaved: {
-        path: EPISODES_ACTIONS + "/file-info/update/saved",
+        path: EPISODES_ADMIN + "/file-info/update/saved",
       },
       addNewFiles: {
-        path: EPISODES_ACTIONS + "/add-new-files",
+        path: EPISODES_ADMIN + "/add-new-files",
       },
     },
     picker: {
