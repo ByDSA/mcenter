@@ -134,7 +134,7 @@ export function FetchingRender<T, U = undefined>(
   const { data, setData, error, isLoading } = useRequest();
   const hooksRet = hooks?.(data) as U;
 
-  if (error) {
+  if (!data && error) {
     const errorShown = {
       message: error instanceof Error
         ? error.message
