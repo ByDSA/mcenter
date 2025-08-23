@@ -1,8 +1,10 @@
 import { Fragment, useEffect, useState } from "react";
 import { ResultResponse } from "$shared/utils/http/responses";
-import { FetchingRender, UseRequest, makeFetcher, makeUseRequest } from "#modules/fetching";
+import { assertIsDefined } from "$shared/utils/validation";
+import { makeFetcher, renderFetchedData } from "#modules/fetching";
 import { DateFormat, formatDate } from "#modules/utils/dates";
 import { Entry } from "#modules/utils/resources/useResourceEdition";
+import { useFetchStaticData } from "#modules/fetching/fetch-data";
 
 type Props<Req, Res> = {
   url: string;
@@ -15,10 +17,6 @@ const DATE_FORMAT_DEFAULT: DateFormat = {
   ago: "yes",
 };
 
-type HooksRet = {
-  datesStr: string[];
-};
-
 export function Lastest<
 T extends Entry<any, any>,
  ReqBody,
@@ -26,57 +24,58 @@ T extends Entry<any, any>,
  >(
   { validator, url, body, dateFormat = DATE_FORMAT_DEFAULT }: Props<ReqBody, ResBody>,
 ) {
-  const method = "POST";
-  const fetcher = makeFetcher<ReqBody, ResBody>( {
-    method,
-    body,
-    resBodyValidator: validator,
-  } );
-  const useRequest: UseRequest<ResBody> = makeUseRequest<ReqBody, ResBody>( {
-    key: {
-      url,
-      method,
-      body,
+  const { data, error, isLoading } = useFetchStaticData( {
+    fetchFn: async () => {
+      const method = "POST";
+      const fetcher = makeFetcher<ReqBody, ResBody>( {
+        method,
+        body,
+        resBodyValidator: validator,
+      } );
+      const result = await fetcher( {
+        body,
+        url,
+      } );
+
+      return result.data;
     },
-    fetcher,
   } );
+  const [datesStr, setDatesStr] = useState([] as string[]);
 
-  return FetchingRender<ResBody, HooksRet>( {
-    useRequest,
-    hooks: (res) => {
-      const [datesStr, setDatesStr] = useState([] as string[]);
+  useEffect(() => {
+    const f = () => {
+      if (!data)
+        return;
 
-      useEffect(() => {
-        const f = () => {
-          const timestamps = res?.data.map((entry: T) => entry.date.timestamp);
-          const newDatesStr = timestamps?.map(
-            (timestamp) => formatDate(new Date(timestamp * 1000), dateFormat),
-          ) ?? [];
+      const timestamps = data.map((entry: T) => entry.date.timestamp);
+      const newDatesStr = timestamps?.map(
+        (timestamp) => formatDate(new Date(timestamp * 1000), dateFormat),
+      ) ?? [];
 
-          if (!deepCompareArrays(datesStr, newDatesStr))
-            setDatesStr(newDatesStr);
-        };
+      if (!deepCompareArrays(datesStr, newDatesStr))
+        setDatesStr(newDatesStr);
+    };
 
-        f();
+    f();
 
-        const interval = setInterval(f, 5 * 1000);
+    const interval = setInterval(f, 5 * 1000);
 
-        return () => clearInterval(interval);
-      }, [res]);
+    return () => clearInterval(interval);
+  }, [data]);
 
-      return {
-        datesStr,
-      };
-    },
-    render: ( { data: res, hooksRet } ) => {
-      const { datesStr } = hooksRet;
+  return renderFetchedData<T[] | null>( {
+    data,
+    error,
+    isLoading,
+    render: () => {
+      assertIsDefined(data);
 
-      if (res.data.length === 0)
+      if (data.length === 0)
         return <span>No se había reproducido antes.</span>;
 
       return <>
         <span className={"height2"}>Últimas veces:</span>
-        {datesStr.map((d: string, i) => <Fragment key={`${res.data[i].date.timestamp}`}>
+        {datesStr.map((d: string, i) => <Fragment key={`${data[i].date.timestamp}`}>
           <span className={"line"}>{d}</span>
         </Fragment>)}
       </>;

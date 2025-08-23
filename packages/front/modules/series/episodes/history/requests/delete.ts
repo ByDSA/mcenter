@@ -24,7 +24,6 @@ export async function fetch(
 
   return fetcher( {
     url: URL,
-    method,
     body: undefined,
   } );
 }

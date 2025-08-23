@@ -1,5 +1,6 @@
 import { Fragment } from "react";
-import { FetchingRender } from "#modules/fetching";
+import { renderFetchedData } from "#modules/fetching";
+import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { EpisodeHistoryEntryFetching } from "./requests";
 import { getDateStr } from "./utils";
@@ -8,17 +9,24 @@ import "#styles/resources/history-entry.css";
 import "#styles/resources/history-episodes.css";
 import "#styles/resources/serie.css";
 
+type Data = EpisodeHistoryEntryFetching.GetMany.Data[];
+
 export function HistoryList() {
-  return FetchingRender<EpisodeHistoryEntryFetching.GetMany.Res>( {
-    useRequest: EpisodeHistoryEntryFetching.GetMany.useRequest,
-    render: ( { data: res, setData } ) => {
+  const { data, isLoading, error,
+    setItem, observerTarget } = useHistoryList();
+
+  return renderFetchedData<Data | null>( {
+    data,
+    error,
+    isLoading,
+    render: () => {
       return (
         <span className="history-list">
           {
-            res && res.data.map((entry: EpisodeHistoryEntryFetching.GetMany.Data, i: number) => {
+            data!.map((entry: EpisodeHistoryEntryFetching.GetMany.Data, i: number) => {
               let dayTitle;
 
-              if (i === 0 || !isSameday(res.data[i - 1].date.timestamp, entry.date.timestamp)) {
+              if (i === 0 || !isSameday(data![i - 1].date.timestamp, entry.date.timestamp)) {
                 const dateStr = getDateStr(new Date(entry.date.timestamp * 1000));
 
                 dayTitle = <h2 key={dateStr}>{dateStr}</h2>;
@@ -29,35 +37,35 @@ export function HistoryList() {
                 {dayTitle}
                 <HistoryEntryElement value={entry} setValue={(newEntry: typeof entry |
                   undefined) => {
-                  setData((old)=> {
-                    if (!old)
-                      return undefined;
+                  if (!newEntry) {
+                    setItem(i, null);
 
-                    const newData = {
-                      ...old,
-                    };
+                    return;
+                  }
 
-                    if (!newEntry) {
-                      newData.data = [...newData.data.slice(0, i), ...newData.data.slice(i + 1)];
+                  const oldEntry = data![i];
+                  const newData = {
+                    ...oldEntry,
+                    resource: {
+                      ...oldEntry.resource,
+                      ...newEntry.resource,
+                      serie: newEntry.resource.serie ?? oldEntry.resource.serie,
+                    },
+                  };
 
-                      return newData;
-                    }
-
-                    newData.data[i] = {
-                      ...newEntry,
-                      resource: {
-                        ...newData.data[i].resource,
-                        ...newEntry.resource,
-                        serie: newEntry.resource.serie ?? newData.data[i].resource.serie,
-                      },
-                    };
-
-                    return newData;
-                  } );
+                  setItem(i, newData);
                 }}/>
               </Fragment>;
             } )
           }
+          <div ref={observerTarget} style={{
+            height: "1px",
+          }} />
+          {
+        !!error
+        && error instanceof Error
+        && <span style={{marginTop: "2em"}}>{error.message}</span>
+        }
         </span>
       );
     },
@@ -71,4 +79,46 @@ function isSameday(timestamp1: number, timestamp2: number) {
   return date1.getFullYear() === date2.getFullYear()
     && date1.getMonth() === date2.getMonth()
     && date1.getDate() === date2.getDate();
+}
+
+function useHistoryList() {
+  const { data, isLoading, error,
+    setData, setItem, observerTarget } = useCrudDataWithScroll( {
+    initialFetch: async () => {
+      const result = await EpisodeHistoryEntryFetching.GetMany.fetch( {
+        limit: 10,
+      } );
+
+      return result.data;
+    },
+    refetching: {
+      fn: async (d)=> {
+        const result = await EpisodeHistoryEntryFetching.GetMany.fetch( {
+          limit: Math.max(d?.length ?? 0, 10),
+        } );
+
+        return result.data;
+      },
+      everyMs: 5_000,
+    },
+    fetchingMore: {
+      fn: async (d) => {
+        const result = await EpisodeHistoryEntryFetching.GetMany.fetch( {
+          limit: 5,
+          offset: d?.length ?? 0,
+        } );
+
+        return result.data;
+      },
+    },
+  } );
+
+  return {
+    data,
+    isLoading,
+    error,
+    setItem,
+    setData,
+    observerTarget,
+  };
 }

@@ -2,7 +2,8 @@ import type { MusicHistoryEntry } from "#modules/musics/history/models";
 import extend from "just-extend";
 import { Fragment } from "react";
 import { formatDate } from "#modules/utils/dates";
-import { FetchingRender } from "#modules/fetching";
+import { renderFetchedData } from "#modules/fetching";
+import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { MusicHistoryEntryFetching } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 
@@ -17,40 +18,37 @@ const DEFAULT_PARAMS: Required<Props> = {
   showDate: "groupByDay",
 };
 
+type Data = MusicHistoryEntryFetching.GetManyByCriteria.Data[];
+
 export function HistoryList(props?: Props) {
   const params = extend(true, DEFAULT_PARAMS, props) as typeof DEFAULT_PARAMS;
+  const { data, isLoading, error,
+    setItem, observerTarget } = useHistoryList();
 
-  return FetchingRender<MusicHistoryEntryFetching.GetManyByCriteria.Res>( {
-    useRequest: MusicHistoryEntryFetching.GetManyByCriteria.useRequest,
-    render: ( { data: res, setData } ) => (
+  return renderFetchedData<Data | null>( {
+    data,
+    error,
+    isLoading,
+    render: () => (
       <span className="history-list">
         {
-          res && res.data.map(
+          data!.map(
             (entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
               {params.showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
               <HistoryEntryElement showDate={params.showDate === "eachOne"}
                 value={entry} setValue={(newEntry: typeof entry | undefined) => {
-                  setData((old)=> {
-                    if (!old)
-                      return undefined;
-
-                    const newData = {
-                      ...old,
-                    };
-
-                    if (!newEntry) {
-                      newData.data = [...newData.data.slice(0, i), ...newData.data.slice(i + 1)];
-
-                      return newData;
-                    }
-
-                    newData.data[i] = newEntry;
-
-                    return newData;
-                  } );
+                  setItem(i, newEntry ?? null);
                 }} />
             </Fragment>,
           )
+        }
+        <div ref={observerTarget} style={{
+          height: "1px",
+        }} />
+        {
+        !!error
+        && error instanceof Error
+        && <span style={{marginTop: "2em"}}>{error.message}</span>
         }
       </span>
     ),
@@ -79,4 +77,45 @@ function isSameday(timestamp1: number, timestamp2: number) {
   return date1.getFullYear() === date2.getFullYear()
     && date1.getMonth() === date2.getMonth()
     && date1.getDate() === date2.getDate();
+}
+
+function useHistoryList() {
+  const { data, isLoading, error,
+    setItem, observerTarget } = useCrudDataWithScroll( {
+    initialFetch: async () => {
+      const result = await MusicHistoryEntryFetching.GetManyByCriteria.fetch( {
+        limit: 10,
+      } );
+
+      return result.data;
+    },
+    refetching: {
+      fn: async (d)=> {
+        const result = await MusicHistoryEntryFetching.GetManyByCriteria.fetch( {
+          limit: Math.max(d?.length ?? 0, 10),
+        } );
+
+        return result.data;
+      },
+      everyMs: 5_000,
+    },
+    fetchingMore: {
+      fn: async (d) => {
+        const result = await MusicHistoryEntryFetching.GetManyByCriteria.fetch( {
+          limit: 5,
+          offset: d?.length ?? 0,
+        } );
+
+        return result.data;
+      },
+    },
+  } );
+
+  return {
+    data,
+    isLoading,
+    error,
+    setItem,
+    observerTarget,
+  };
 }

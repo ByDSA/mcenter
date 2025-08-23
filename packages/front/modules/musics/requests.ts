@@ -26,7 +26,6 @@ export namespace MusicFetching {
 
       return fetcher( {
         url: URL,
-        method,
         body,
       } );
     }

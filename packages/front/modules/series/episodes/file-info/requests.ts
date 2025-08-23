@@ -28,7 +28,6 @@ export namespace EpisodeFileInfoFetching {
 
       return fetcher( {
         url: URL,
-        method,
         body,
       } );
     }

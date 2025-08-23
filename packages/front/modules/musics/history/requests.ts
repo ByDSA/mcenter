@@ -4,20 +4,12 @@ import { PATH_ROUTES } from "$shared/routing";
 import { genAssertZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { backendUrl } from "#modules/requests";
-import { makeFetcher, makeUseRequest } from "#modules/fetching";
+import { makeFetcher } from "#modules/fetching";
 import { musicEntitySchema } from "../models";
 import { musicHistoryEntryEntitySchema, type MusicHistoryEntryEntity } from "./models";
 
 namespace _GetManyByCriteria {
   export type Req = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
-  const body: Req = {
-    filter: {},
-    sort: {
-      timestamp: "desc",
-    },
-    limit: 10,
-    expand: ["musics", "music-file-infos"],
-  };
 
   export const dataSchema = musicHistoryEntryEntitySchema
     .required( {
@@ -34,25 +26,32 @@ namespace _GetManyByCriteria {
   const resSchema = createManyResultResponseSchema(dataSchema);
   export type Res = z.infer<typeof resSchema>;
   const method = "POST";
-  const fetcher = makeFetcher<Req, Res>( {
-    method,
-    body,
-    resBodyValidator: genAssertZod(resSchema),
-  } );
 
-  export const useRequest = makeUseRequest<
-    Req,
-    ResultResponse<Data[]>
-  >( {
-    key:
-  {
-    url: backendUrl(PATH_ROUTES.musics.history.search.path),
-    method,
-    body,
-  },
-    fetcher,
-    refreshInterval: 5 * 1000,
-  } );
+  type FetchProps = {
+    limit?: number;
+    offset?: number;
+  };
+  export const fetch = (props: FetchProps) => {
+    const body: Req = {
+      filter: {},
+      sort: {
+        timestamp: "desc",
+      },
+      limit: props?.limit ?? 10,
+      offset: props?.offset ?? undefined,
+      expand: ["musics", "music-file-infos"],
+    };
+    const fetcher = makeFetcher<Req, Res>( {
+      method,
+      body,
+      resBodyValidator: genAssertZod(resSchema),
+    } );
+
+    return fetcher( {
+      url: backendUrl(PATH_ROUTES.musics.history.search.path),
+      body,
+    } );
+  };
 }
 
 namespace _DeleteOneById {
@@ -70,7 +69,6 @@ namespace _DeleteOneById {
 
     return fetcher( {
       url: URL,
-      method,
       body: undefined,
     } );
   }

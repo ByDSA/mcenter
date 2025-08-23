@@ -29,7 +29,6 @@ export namespace EpisodeFetching {
 
       return fetcher( {
         url: URL,
-        method,
         body,
       } );
     }
@@ -55,7 +54,6 @@ export namespace EpisodeFetching {
 
       return fetcher( {
         url: URL,
-        method,
         body,
       } );
     }

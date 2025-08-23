@@ -5,7 +5,7 @@ import { showError } from "$shared/utils/errors/showError";
 import { EpisodeEntity } from "#modules/series/episodes/models";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
 import { Episode } from "#modules/series/episodes/models";
-import { Loading } from "#modules/loading";
+import { Loading } from "#modules/fetching/loading";
 import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-player";
 import { EpisodeFetching } from "#modules/series/episodes/requests";
 import styles from "./Player.module.css";
