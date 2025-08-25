@@ -1,3 +1,4 @@
+/* eslint-disable require-await */
 import { createManyResultResponseSchema, genAssertIsOneResultResponse, ResultResponse } from "$shared/utils/http/responses";
 import { genAssertZod } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
@@ -6,56 +7,70 @@ import { EpisodeCompKey, EpisodeEntity, episodeEntitySchema } from "#modules/ser
 import { EpisodesCrudDtos } from "#modules/series/episodes/models/dto";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
+import { FetchApi } from "#modules/fetching/fetch-api";
 
-export namespace EpisodeFetching {
+export class EpisodesApi {
+  static register() {
+    FetchApi.register(this, new this());
+  }
+
+  async getManyByCriteria(
+    body: EpisodesApi.GetManyByCriteria.Body,
+  ): Promise<EpisodesApi.GetManyByCriteria.Res> {
+    const method = "POST";
+    const fetcher = makeFetcher<
+      EpisodesApi.GetManyByCriteria.Body,
+      EpisodesApi.GetManyByCriteria.Res
+    >( {
+      method,
+      body,
+      reqBodyValidator: genAssertZod(EpisodesApi.GetManyByCriteria.bodySchema),
+      resBodyValidator: genAssertZod(EpisodesApi.GetManyByCriteria.responseSchema),
+    } );
+    const URL = backendUrl(
+      PATH_ROUTES.episodes.search.path,
+    );
+
+    return fetcher( {
+      url: URL,
+      body,
+    } );
+  }
+
+  async patch(
+    episodeCompKey: EpisodeCompKey,
+    body: EpisodesApi.Patch.Body,
+  ): Promise<EpisodesApi.Patch.Res> {
+    const method = "PATCH";
+    const fetcher = makeFetcher<EpisodesApi.Patch.Body, EpisodesApi.Patch.Res>( {
+      method,
+      body,
+      reqBodyValidator: genAssertZod(EpisodesCrudDtos.PatchOneById.bodySchema),
+      resBodyValidator: genAssertIsOneResultResponse(episodeEntitySchema),
+    } );
+    const URL = backendUrl(
+      PATH_ROUTES.episodes.slug.withParams(episodeCompKey.seriesKey, episodeCompKey.episodeKey),
+    );
+
+    return fetcher( {
+      url: URL,
+      body,
+    } );
+  }
+}
+
+// eslint-disable-next-line no-redeclare
+export namespace EpisodesApi {
   export namespace Patch {
     export type Body = EpisodesCrudDtos.PatchOneById.Body;
     export type Res = ResultResponse<EpisodeEntity>;
-    // eslint-disable-next-line require-await
-    export async function fetch(
-      episodeCompKey: EpisodeCompKey,
-      body: Body,
-    ): Promise<Res> {
-      const method = "PATCH";
-      const fetcher = makeFetcher<Body, Res>( {
-        method,
-        body,
-        reqBodyValidator: genAssertZod(EpisodesCrudDtos.PatchOneById.bodySchema),
-        resBodyValidator: genAssertIsOneResultResponse(episodeEntitySchema),
-      } );
-      const URL = backendUrl(
-        PATH_ROUTES.episodes.slug.withParams(episodeCompKey.seriesKey, episodeCompKey.episodeKey),
-      );
-
-      return fetcher( {
-        url: URL,
-        body,
-      } );
-    }
   }
 
   export namespace GetManyByCriteria {
-    const bodySchema = EpisodesCrudDtos.GetManyByCriteria.criteriaSchema;
-    const responseSchema = createManyResultResponseSchema(episodeEntitySchema);
+    export const bodySchema = EpisodesCrudDtos.GetManyByCriteria.criteriaSchema;
+    export const responseSchema = createManyResultResponseSchema(episodeEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
     export type Res = z.infer<typeof responseSchema>;
-    // eslint-disable-next-line require-await
-    export async function fetch(body: Body): Promise<Res> {
-      const method = "POST";
-      const fetcher = makeFetcher<Body, Res>( {
-        method,
-        body,
-        reqBodyValidator: genAssertZod(bodySchema),
-        resBodyValidator: genAssertZod(responseSchema),
-      } );
-      const URL = backendUrl(
-        PATH_ROUTES.episodes.search.path,
-      );
 
-      return fetcher( {
-        url: URL,
-        body,
-      } );
-    }
   }
 }

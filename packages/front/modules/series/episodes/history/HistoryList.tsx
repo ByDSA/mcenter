@@ -1,15 +1,16 @@
 import { Fragment } from "react";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
+import { FetchApi } from "#modules/fetching/fetch-api";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
-import { EpisodeHistoryEntryFetching } from "./requests";
+import { EpisodeHistoryApi } from "./requests";
 import { getDateStr } from "./utils";
 
 import "#styles/resources/history-entry.css";
 import "#styles/resources/history-episodes.css";
 import "#styles/resources/serie.css";
 
-type Data = EpisodeHistoryEntryFetching.GetMany.Data[];
+type Data = EpisodeHistoryApi.GetMany.Data[];
 
 export function HistoryList() {
   const { data, isLoading, error,
@@ -23,7 +24,7 @@ export function HistoryList() {
       return (
         <span className="history-list">
           {
-            data!.map((entry: EpisodeHistoryEntryFetching.GetMany.Data, i: number) => {
+            data!.map((entry: EpisodeHistoryApi.GetMany.Data, i: number) => {
               let dayTitle;
 
               if (i === 0 || !isSameday(data![i - 1].date.timestamp, entry.date.timestamp)) {
@@ -62,10 +63,12 @@ export function HistoryList() {
             height: "1px",
           }} />
           {
-        !!error
+            !!error
         && error instanceof Error
-        && <span style={{marginTop: "2em"}}>{error.message}</span>
-        }
+        && <span style={{
+          marginTop: "2em",
+        }}>{error.message}</span>
+          }
         </span>
       );
     },
@@ -82,10 +85,11 @@ function isSameday(timestamp1: number, timestamp2: number) {
 }
 
 function useHistoryList() {
+  const historyApi = FetchApi.get(EpisodeHistoryApi);
   const { data, isLoading, error,
     setData, setItem, observerTarget } = useCrudDataWithScroll( {
     initialFetch: async () => {
-      const result = await EpisodeHistoryEntryFetching.GetMany.fetch( {
+      const result = await historyApi.getMany( {
         limit: 10,
       } );
 
@@ -93,7 +97,7 @@ function useHistoryList() {
     },
     refetching: {
       fn: async (d)=> {
-        const result = await EpisodeHistoryEntryFetching.GetMany.fetch( {
+        const result = await historyApi.getMany( {
           limit: Math.max(d?.length ?? 0, 10),
         } );
 
@@ -103,7 +107,7 @@ function useHistoryList() {
     },
     fetchingMore: {
       fn: async (d) => {
-        const result = await EpisodeHistoryEntryFetching.GetMany.fetch( {
+        const result = await historyApi.getMany( {
           limit: 5,
           offset: d?.length ?? 0,
         } );

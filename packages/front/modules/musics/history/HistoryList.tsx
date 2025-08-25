@@ -4,7 +4,8 @@ import { Fragment } from "react";
 import { formatDate } from "#modules/utils/dates";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
-import { MusicHistoryEntryFetching } from "./requests";
+import { FetchApi } from "#modules/fetching/fetch-api";
+import { MusicHistoryApi } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 
 import "#styles/resources/history-entry.css";
@@ -18,7 +19,7 @@ const DEFAULT_PARAMS: Required<Props> = {
   showDate: "groupByDay",
 };
 
-type Data = MusicHistoryEntryFetching.GetManyByCriteria.Data[];
+type Data = MusicHistoryApi.GetManyByCriteria.Data[];
 
 export function HistoryList(props?: Props) {
   const params = extend(true, DEFAULT_PARAMS, props) as typeof DEFAULT_PARAMS;
@@ -46,9 +47,11 @@ export function HistoryList(props?: Props) {
           height: "1px",
         }} />
         {
-        !!error
+          !!error
         && error instanceof Error
-        && <span style={{marginTop: "2em"}}>{error.message}</span>
+        && <span style={{
+          marginTop: "2em",
+        }}>{error.message}</span>
         }
       </span>
     ),
@@ -80,10 +83,11 @@ function isSameday(timestamp1: number, timestamp2: number) {
 }
 
 function useHistoryList() {
+  const api = FetchApi.get(MusicHistoryApi);
   const { data, isLoading, error,
     setItem, observerTarget } = useCrudDataWithScroll( {
     initialFetch: async () => {
-      const result = await MusicHistoryEntryFetching.GetManyByCriteria.fetch( {
+      const result = await api.getManyByCriteria( {
         limit: 10,
       } );
 
@@ -91,7 +95,7 @@ function useHistoryList() {
     },
     refetching: {
       fn: async (d)=> {
-        const result = await MusicHistoryEntryFetching.GetManyByCriteria.fetch( {
+        const result = await api.getManyByCriteria( {
           limit: Math.max(d?.length ?? 0, 10),
         } );
 
@@ -101,7 +105,7 @@ function useHistoryList() {
     },
     fetchingMore: {
       fn: async (d) => {
-        const result = await MusicHistoryEntryFetching.GetManyByCriteria.fetch( {
+        const result = await api.getManyByCriteria( {
           limit: 5,
           offset: d?.length ?? 0,
         } );

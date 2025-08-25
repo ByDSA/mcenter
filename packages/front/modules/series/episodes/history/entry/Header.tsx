@@ -1,10 +1,10 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { HistoryEntryHeader } from "#modules/history";
 import { formatDateDDMMYYY, formatDateHHmm } from "#modules/utils/dates";
-import { EpisodeHistoryEntryFetching } from "../requests";
+import { EpisodeHistoryApi } from "../requests";
 
 type HeaderProps = {
-  entry: EpisodeHistoryEntryFetching.GetMany.Data;
+  entry: EpisodeHistoryApi.GetMany.Data;
   showDate: boolean;
 };
 export function Header( { entry, showDate }: HeaderProps) {

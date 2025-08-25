@@ -3,5 +3,5 @@ export {
 } from "./history";
 
 export {
-  MusicFetching,
+  MusicsApi as MusicFetching,
 } from "./requests";

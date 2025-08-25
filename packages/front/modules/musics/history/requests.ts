@@ -4,35 +4,20 @@ import { PATH_ROUTES } from "$shared/routing";
 import { genAssertZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { backendUrl } from "#modules/requests";
-import { makeFetcher } from "#modules/fetching";
+import { makeFetcher } from "#modules/fetching/fetcher";
+import { FetchApi } from "#modules/fetching/fetch-api";
 import { musicEntitySchema } from "../models";
 import { musicHistoryEntryEntitySchema, type MusicHistoryEntryEntity } from "./models";
 
-namespace _GetManyByCriteria {
-  export type Req = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
+export class MusicHistoryApi {
+  static register() {
+    FetchApi.register(MusicHistoryApi, new MusicHistoryApi());
+  }
 
-  export const dataSchema = musicHistoryEntryEntitySchema
-    .required( {
-      resource: true,
-    } )
-    .extend( {
-      resource: musicEntitySchema.required( {
-        fileInfos: true,
-      } ),
-    } );
-
-  export type Data = z.infer<typeof dataSchema>;
-
-  const resSchema = createManyResultResponseSchema(dataSchema);
-  export type Res = z.infer<typeof resSchema>;
-  const method = "POST";
-
-  type FetchProps = {
-    limit?: number;
-    offset?: number;
-  };
-  export const fetch = (props: FetchProps) => {
-    const body: Req = {
+  getManyByCriteria(
+    props: MusicHistoryApi.GetManyByCriteria.Props,
+  ): Promise<MusicHistoryApi.GetManyByCriteria.Response> {
+    const body: MusicHistoryApi.GetManyByCriteria.Request = {
       filter: {},
       sort: {
         timestamp: "desc",
@@ -41,40 +26,64 @@ namespace _GetManyByCriteria {
       offset: props?.offset ?? undefined,
       expand: ["musics", "music-file-infos"],
     };
-    const fetcher = makeFetcher<Req, Res>( {
-      method,
+    const fetcher = makeFetcher<
+      MusicHistoryApi.GetManyByCriteria.Request,
+      MusicHistoryApi.GetManyByCriteria.Response
+    >( {
+      method: "POST",
       body,
-      resBodyValidator: genAssertZod(resSchema),
+      resBodyValidator: genAssertZod(MusicHistoryApi.GetManyByCriteria.responseSchema),
     } );
 
     return fetcher( {
       url: backendUrl(PATH_ROUTES.musics.history.search.path),
       body,
     } );
-  };
-}
+  }
 
-namespace _DeleteOneById {
-  export type Response = ResultResponse<MusicHistoryEntryEntity>;
-  export function fetch(
+  deleteOneById(
     id: MusicHistoryEntryEntity["id"],
-  ): Promise<Response> {
-    const method = "DELETE";
-    const URL = backendUrl(PATH_ROUTES.musics.history.withParams(id));
-    const fetcher = makeFetcher<typeof undefined, Response>( {
-      method,
+  ): Promise<MusicHistoryApi.DeleteOneById.Response> {
+    const fetcher = makeFetcher<undefined, MusicHistoryApi.DeleteOneById.Response>( {
+      method: "DELETE",
       resBodyValidator: genAssertIsOneResultResponse(musicHistoryEntryEntitySchema),
       body: undefined,
     } );
 
     return fetcher( {
-      url: URL,
+      url: backendUrl(PATH_ROUTES.musics.history.withParams(id)),
       body: undefined,
     } );
   }
 }
 
-export namespace MusicHistoryEntryFetching {
-  export import GetManyByCriteria = _GetManyByCriteria;
-  export import DeleteOneById = _DeleteOneById;
+// eslint-disable-next-line no-redeclare
+export namespace MusicHistoryApi {
+  export namespace GetManyByCriteria {
+    export type Request = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
+
+    export type Props = {
+    limit?: number;
+    offset?: number;
+  };
+
+    export const dataSchema = musicHistoryEntryEntitySchema
+      .required( {
+        resource: true,
+      } )
+      .extend( {
+        resource: musicEntitySchema.required( {
+          fileInfos: true,
+        } ),
+      } );
+
+    export type Data = z.infer<typeof dataSchema>;
+
+    export const responseSchema = createManyResultResponseSchema(dataSchema);
+    export type Response = z.infer<typeof responseSchema>;
+  }
+
+  export namespace DeleteOneById {
+    export type Response = ResultResponse<MusicHistoryEntryEntity>;
+  }
 }

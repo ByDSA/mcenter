@@ -6,7 +6,7 @@ import type { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInp
 import { JSX, useState } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
-import { MusicFileInfoFetching } from "#modules/musics/file-info/requests";
+import { MusicFileInfosApi } from "#modules/musics/file-info/requests";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
 import { isModified as isModifiedd } from "#modules/utils/objects";
@@ -14,10 +14,11 @@ import { secsToMmss } from "#modules/utils/dates";
 import { useHistoryEntryEdition } from "#modules/history/entry/useHistoryEntryEdition";
 import { backendUrl } from "#modules/requests";
 import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
-import { MusicFetching } from "#modules/musics/requests";
+import { MusicsApi } from "#modules/musics/requests";
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
+import { FetchApi } from "#modules/fetching/fetch-api";
 import { MUSIC_FILE_INFO_PROPS, MUSIC_PROPS } from "../utils";
-import { MusicHistoryEntryFetching } from "../../requests";
+import { MusicHistoryApi } from "../../requests";
 import commonStyle from "../../../../history/entry/body-common.module.css";
 import { LastestComponent } from "./Lastest";
 import style from "./style.module.css";
@@ -39,13 +40,16 @@ function getAndUpdateMusicByProp<V>(
   };
 }
 
-type Data = MusicHistoryEntryFetching.GetManyByCriteria.Data;
+type Data = MusicHistoryApi.GetManyByCriteria.Data;
 
 type Props = {
   data: Data;
   setData: (newData: Data)=> void;
 };
 export function Body( { data, setData }: Props) {
+  const historyApi = FetchApi.get(MusicHistoryApi);
+  const api = FetchApi.get(MusicsApi);
+  const fileInfosApi = FetchApi.get(MusicFileInfosApi);
   const { state, remove, isModified,
     reset, addOnReset,
     update, initialState } = useHistoryEntryEdition<Data>( {
@@ -53,12 +57,12 @@ export function Body( { data, setData }: Props) {
       setData,
       isModifiedFn: calcIsModified,
       fetchRemove: async ()=> {
-        const res = await MusicHistoryEntryFetching.DeleteOneById.fetch(data.id);
+        const res = await historyApi.deleteOneById(data.id);
 
         return res.data as Data;
       },
       fetchUpdate: async () => {
-        const body = generatePatchBody(
+        const body: MusicsApi.Patch.Body = generatePatchBody(
           data.resource,
           state[0].resource,
           [
@@ -78,7 +82,7 @@ export function Body( { data, setData }: Props) {
         let musicPromise: Promise<MusicEntity> = Promise.resolve() as Promise<any>;
 
         if (shouldSendPatchWithBody(body)) {
-          musicPromise = MusicFetching.Patch.fetch(data.resource.id, body)
+          musicPromise = api.patch(data.resource.id, body)
             .then(res=>{
               const music = {
                 ...res.data,
@@ -99,11 +103,11 @@ export function Body( { data, setData }: Props) {
           ["path"],
         );
         let fileInfoPromise: ReturnType<
-          typeof MusicFileInfoFetching.Patch.fetch
+          typeof fileInfosApi.patch
         > = Promise.resolve() as Promise<any>;
 
         if (Object.entries(fileInfoBody.entity).length > 0)
-          fileInfoPromise = MusicFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody);
+          fileInfoPromise = fileInfosApi.patch(stateFileInfo.id, fileInfoBody);
 
         await Promise.all([musicPromise, fileInfoPromise]);
 

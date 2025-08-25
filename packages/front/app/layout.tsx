@@ -1,4 +1,5 @@
 import { makeMenu } from "#modules/menus";
+import { InitApis } from "#modules/core/initApis";
 import "../styles/globals.css";
 
 export default function RootLayout( { children }: {
@@ -18,6 +19,7 @@ export default function RootLayout( { children }: {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
+        <InitApis />
         {menu}
 
         {children}

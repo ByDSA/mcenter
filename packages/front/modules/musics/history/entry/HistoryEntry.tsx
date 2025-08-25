@@ -1,5 +1,5 @@
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
-import { MusicHistoryEntryFetching } from "../requests";
+import { MusicHistoryApi } from "../requests";
 import { Body } from "./body/Body";
 import { Header } from "./Header";
 
@@ -10,7 +10,7 @@ type Props<T> = {
 };
 export function HistoryEntryElement(
   { value: entry, setValue, showDate =
-  true }: Props<MusicHistoryEntryFetching.GetManyByCriteria.Data>,
+  true }: Props<MusicHistoryApi.GetManyByCriteria.Data>,
 ) {
   return <span className="history-entry">
     {

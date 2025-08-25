@@ -11,16 +11,17 @@ import { secsToMmss } from "#modules/utils/dates";
 import { backendUrl } from "#modules/requests";
 import { useHistoryEntryEdition } from "#modules/history";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
-import { EpisodeFileInfoFetching } from "#modules/series/episodes/file-info/requests";
+import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
 import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
-import { EpisodeFetching } from "../../../requests";
-import { EpisodeHistoryEntryFetching } from "../../requests";
+import { FetchApi } from "#modules/fetching/fetch-api";
+import { EpisodesApi } from "../../../requests";
+import { EpisodeHistoryApi } from "../../requests";
 import { EPISODE_FILE_INFO_PROPS, EPISODE_PROPS } from "../utils";
 import commonStyle from "../../../../../history/entry/body-common.module.css";
 import { LastestComponent } from "./Lastest";
 import style from "./style.module.css";
 
-type Data = EpisodeHistoryEntryFetching.GetMany.Data;
+type Data = EpisodeHistoryApi.GetMany.Data;
 
 function getAndUpdateEpisodeByProp<V>(
   prop: string,
@@ -59,9 +60,12 @@ function getAndUpdateFileInfoByProp<V>(
 
 type Props = {
   data: Data;
-  setData: ReturnType<typeof useState<EpisodeHistoryEntryFetching.GetMany.Data>>[1];
+  setData: ReturnType<typeof useState<EpisodeHistoryApi.GetMany.Data>>[1];
 };
 export function Body( { data, setData }: Props) {
+  const api = FetchApi.get(EpisodesApi);
+  const fileInfosApi = FetchApi.get(EpisodeFileInfosApi);
+  const historyApi = FetchApi.get(EpisodeHistoryApi);
   const { state, remove, isModified,
     reset, addOnReset,
     update, initialState } = useHistoryEntryEdition<Data>( {
@@ -69,7 +73,7 @@ export function Body( { data, setData }: Props) {
       setData,
       isModifiedFn: calcIsModified,
       fetchRemove: async ()=> {
-        const res = await EpisodeHistoryEntryFetching.Delete.fetch(data.id);
+        const res = await historyApi.delete(data.id);
 
         return res.data as Data;
       },
@@ -84,7 +88,7 @@ export function Body( { data, setData }: Props) {
       let episodePromise: Promise<ResEpisode> = Promise.resolve() as Promise<any>;
 
       if (shouldSendPatchWithBody(episodeBody)) {
-        episodePromise = EpisodeFetching.Patch.fetch(data.resourceId, episodeBody)
+        episodePromise = api.patch(data.resourceId, episodeBody)
           .then(res=>{
             const episode: ResEpisode = {
               ...res.data,
@@ -99,7 +103,7 @@ export function Body( { data, setData }: Props) {
 
       const dataFileInfo = data.resource.fileInfos[0];
       const stateFileInfo = state[0].resource.fileInfos[0];
-      const fileInfoBody: EpisodeFileInfoFetching.Patch.Body = generatePatchBody(
+      const fileInfoBody: EpisodeFileInfosApi.Patch.Body = generatePatchBody(
         dataFileInfo,
         stateFileInfo,
         ["end", "path", "start"],
@@ -107,7 +111,7 @@ export function Body( { data, setData }: Props) {
       let fileInfoPromise: Promise<EpisodeFileInfoEntity> = Promise.resolve() as Promise<any>;
 
       if (shouldSendPatchWithBody(fileInfoBody)) {
-        fileInfoPromise = EpisodeFileInfoFetching.Patch.fetch(stateFileInfo.id, fileInfoBody)
+        fileInfoPromise = fileInfosApi.fetch(stateFileInfo.id, fileInfoBody)
           .then(res=>{
             return res.data;
           } );

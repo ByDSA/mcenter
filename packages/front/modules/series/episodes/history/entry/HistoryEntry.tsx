@@ -7,13 +7,13 @@ import { EpisodeHistoryEntryEntity } from "#modules/series/episodes/history/mode
 import { EpisodeHistoryEntryCrudDtos } from "#modules/series/episodes/history/models/dto";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { backendUrl } from "#modules/requests";
-import { EpisodeHistoryEntryFetching } from "../requests";
+import { EpisodeHistoryApi } from "../requests";
 import { Header } from "./Header";
 import { Body } from "./body/Body";
 
 type Props = {
-  value: EpisodeHistoryEntryFetching.GetMany.Data;
-  setValue: ReturnType<typeof useState<EpisodeHistoryEntryFetching.GetMany.Data>>[1];
+  value: EpisodeHistoryApi.GetMany.Data;
+  setValue: ReturnType<typeof useState<EpisodeHistoryApi.GetMany.Data>>[1];
   showDate?: boolean;
 };
 export function HistoryEntryElement( { value, setValue, showDate = false }: Props) {

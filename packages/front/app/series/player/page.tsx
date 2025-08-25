@@ -7,7 +7,8 @@ import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-pla
 import { Episode } from "#modules/series/episodes/models";
 import { Loading } from "#modules/fetching/loading";
 import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-player";
-import { EpisodeFetching } from "#modules/series/episodes/requests";
+import { EpisodesApi } from "#modules/series/episodes/requests";
+import { FetchApi } from "#modules/fetching/fetch-api";
 import styles from "./Player.module.css";
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;
@@ -19,6 +20,7 @@ let fetchingResource = false;
 let previousUri = "";
 
 export default function Player() {
+  const episodesApi = FetchApi.get(EpisodesApi);
   const [resource, setResource] = React.useState<EpisodeEntity | null>(null);
   const socketInitializer = () => {
     webSockets = new (class A extends RemotePlayerWebSocketsClient {
@@ -38,7 +40,7 @@ export default function Player() {
           if (!path)
             return;
 
-          const body: EpisodeFetching.GetManyByCriteria.Body = {
+          const body: EpisodesApi.GetManyByCriteria.Body = {
             filter: {
               path,
             },
@@ -48,8 +50,8 @@ export default function Player() {
           };
 
           fetchingResource = true;
-          EpisodeFetching.GetManyByCriteria.fetch(body)
-            .then((res: EpisodeFetching.GetManyByCriteria.Res) => {
+          episodesApi.getManyByCriteria(body)
+            .then((res: EpisodesApi.GetManyByCriteria.Res) => {
               const episodes = res.data;
               const [episode] = episodes;
 
