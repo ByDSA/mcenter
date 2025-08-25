@@ -47,6 +47,7 @@ export class MusicSlugHandlerService {
   private async updateHistory(musicId: string) {
     const isLast = await this.historyRepo.isLast(musicId);
 
+    // Si se llama en paralelo, esta condición podría no servir e igualmente añadirse
     if (!isLast)
       await this.historyRepo.createNewEntryNowFor(musicId);
   }

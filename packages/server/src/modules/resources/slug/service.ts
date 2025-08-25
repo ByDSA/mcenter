@@ -73,7 +73,7 @@ export class ResourceSlugService {
 
     if (fileSize !== undefined) {
       res.set( {
-        "Content-Length": fileInfo.size,
+        "Content-Length": fileSize,
       } );
     }
 

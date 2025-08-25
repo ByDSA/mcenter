@@ -1,14 +1,13 @@
 import { Injectable } from "@nestjs/common";
-import { MusicEntity, MusicId } from "$shared/models/musics";
-import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
+import { MusicId } from "$shared/models/musics";
+import { assertIsDefined } from "$shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
-import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
-import { getAbsolutePath } from "#musics/utils";
-import { md5FileAsync } from "#utils/crypt";
+import { CanCreateOneAndGet, CanGetAll, CanGetOneById } from "#utils/layers/repository";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 import { MusicFileInfo, MusicFileInfoEntity } from "../../models";
+import { MusicFileInfoOmitMusicIdBuilder } from "../../builder";
 import { MusicFileInfoOdm } from "./odm";
 import { MusicFileInfoEvents } from "./events";
 import { partialModelToDocOdm } from "./odm/adapters";
@@ -23,7 +22,8 @@ type UpdateOneParams = Model;
 export class MusicFileInfoRepository
 implements
 CanCreateOneAndGet<Model>,
-CanGetAll<Entity> {
+CanGetAll<Entity>,
+CanGetOneById<Entity, Entity["id"]> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
   ) {}
@@ -33,18 +33,28 @@ CanGetAll<Entity> {
     logDomainEvent(ev);
   }
 
-  async updateHashOfMusic(music: MusicEntity) {
-    const currentFileInfos = await this.getAllByMusicId(music.id);
+  async getOneById(id: Entity["id"]): Promise<Entity | null> {
+    const modelOdm = await MusicFileInfoOdm.Model.findById(id);
 
-    assertIsNotEmpty(currentFileInfos);
-    const currentFileInfo = currentFileInfos[0];
-    const hash = await md5FileAsync(getAbsolutePath(currentFileInfo.path));
+    if (!modelOdm)
+      return null;
 
-    await this.patchOneByPath(currentFileInfo.path, {
-      hash,
-    } );
+    return MusicFileInfoOdm.toEntity(modelOdm);
+  }
 
-    return hash;
+  async updateMetadata(id: Entity["id"]) {
+    const fileInfo = await this.getOneById(id);
+
+    assertIsDefined(fileInfo);
+    const { path } = fileInfo;
+    const updated = await new MusicFileInfoOmitMusicIdBuilder().withPartial( {
+      path,
+    } )
+      .build();
+
+    await this.patchOneByPath(path, updated);
+
+    return updated;
   }
 
   async createOneAndGet(model: Model): Promise<Entity> {

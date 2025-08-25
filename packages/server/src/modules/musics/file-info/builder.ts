@@ -1,7 +1,6 @@
 import { statSync } from "fs";
 import { md5FileAsync } from "#utils/crypt";
 import { getAbsolutePath } from "../utils";
-import { FileWithStats } from "../admin/update-remote/changes-detector";
 import { MusicFileInfoOmitMusicId } from "./models";
 
 type InfoWithPath = Partial<MusicFileInfoOmitMusicId> & Pick<MusicFileInfoOmitMusicId, "path">;
@@ -14,12 +13,13 @@ export class MusicFileInfoOmitMusicIdBuilder {
     return this;
   }
 
-  withFileWithStats( { path, stats, hash }: FileWithStats) {
+  withFileWithStats( { path, size, hash, timestamps, mediaInfo }: MusicFileInfoOmitMusicId) {
     this.info.path = path;
-    this.info.size = stats.size;
+    this.info.size = size;
+    this.info.mediaInfo = mediaInfo;
     this.info.timestamps = {
-      createdAt: stats.ctime,
-      updatedAt: stats.mtime,
+      createdAt: timestamps.createdAt,
+      updatedAt: timestamps.updatedAt,
     };
 
     if (hash)

@@ -1,46 +1,44 @@
-import { Stats } from "node:fs";
-import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
+import { MusicFileInfoEntity, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
 import { md5FileAsync } from "#utils/crypt";
 import { getAbsolutePath } from "../../utils";
-
-export type FileWithStats = {
-  path: string;
-  stats: Stats;
-  hash?: string;
-};
 
 type GroupBySize<T> = {
   [size: number | symbol]: T[];
 };
 
 export type Changes = {
-  new: FileWithStats[];
+  new: MusicFileInfoOmitMusicId[];
   deleted: MusicFileInfoEntity[];
   moved: {original: MusicFileInfoEntity;
 newPath: string;}[];
-  updated: MusicFileInfoEntity[];
+  updated: {old: MusicFileInfoEntity;
+new: MusicFileInfoEntity;}[];
 };
 
 type Options = {
   useOnlyHashChecking?: boolean;
 };
 export class ChangesDetector {
-  #remoteMusic: MusicFileInfoEntity[];
+  #remoteFiles: MusicFileInfoEntity[];
 
-  #localFiles: FileWithStats[];
+  #localFiles: MusicFileInfoOmitMusicId[];
 
   #remoteMusicGroupedBySize: GroupBySize<MusicFileInfoEntity>;
 
-  #localFilesGroupedBySize: GroupBySize<FileWithStats>;
+  #localFilesGroupedBySize: GroupBySize<MusicFileInfoOmitMusicId>;
 
   #pathToRemoteMusic: Map<string, MusicFileInfoEntity>;
 
-  #pathToLocalMusicFile: Map<string, FileWithStats>;
+  #pathToLocalMusicFile: Map<string, MusicFileInfoOmitMusicId>;
 
   #options: Required<Options>;
 
-  constructor(remoteMusic: MusicFileInfoEntity[], localFiles: FileWithStats[], options?: Options) {
-    this.#remoteMusic = remoteMusic;
+  constructor(
+    remoteMusic: MusicFileInfoEntity[],
+    localFiles: MusicFileInfoOmitMusicId[],
+    options?: Options,
+  ) {
+    this.#remoteFiles = remoteMusic;
     this.#localFiles = localFiles;
 
     this.#remoteMusicGroupedBySize = {};
@@ -59,13 +57,13 @@ export class ChangesDetector {
 
   async #findRemoteMusicInLocalFiles(
     remoteMusic: MusicFileInfoEntity,
-  ): Promise<FileWithStats | null> {
+  ): Promise<MusicFileInfoOmitMusicId | null> {
     const candidateByPath = this.#pathToLocalMusicFile.get(remoteMusic.path);
 
     if (candidateByPath && await this.#isSameFile(remoteMusic, candidateByPath))
       return candidateByPath;
 
-    const candidates = [] as FileWithStats[];
+    const candidates = [] as MusicFileInfoOmitMusicId[];
 
     if (remoteMusic.size !== null) {
       const candidatesWithSameSize = this.#localFilesGroupedBySize[remoteMusic.size];
@@ -88,7 +86,7 @@ export class ChangesDetector {
   }
 
   async #findLocalFileMusicInRemoteMusics(
-    localFile: FileWithStats,
+    localFile: MusicFileInfoOmitMusicId,
   ): Promise<MusicFileInfoEntity | null> {
     const candidateByPath = this.#pathToRemoteMusic.get(localFile.path);
 
@@ -96,7 +94,7 @@ export class ChangesDetector {
       return candidateByPath;
 
     const candidates = [] as MusicFileInfoEntity[];
-    const group = this.#remoteMusicGroupedBySize[localFile.stats.size];
+    const group = this.#remoteMusicGroupedBySize[localFile.size];
 
     if (group)
       candidates.push(...group);
@@ -115,7 +113,7 @@ export class ChangesDetector {
   }
 
   #createCaches() {
-    for (const m of this.#remoteMusic) {
+    for (const m of this.#remoteFiles) {
       const size = m.size ?? noKeySymbol;
       let group = this.#remoteMusicGroupedBySize[size];
 
@@ -130,7 +128,7 @@ export class ChangesDetector {
     }
 
     for (const ml of this.#localFiles) {
-      const { size } = ml.stats;
+      const { size } = ml;
 
       if (!this.#localFilesGroupedBySize[size])
         this.#localFilesGroupedBySize[size] = [];
@@ -143,16 +141,17 @@ export class ChangesDetector {
 
   async detectChanges(): Promise<Changes> {
     const ret = {
-      new: [] as FileWithStats[],
+      new: [] as MusicFileInfoOmitMusicId[],
       deleted: [] as MusicFileInfoEntity[],
       moved: [] as {original: MusicFileInfoEntity;
 newPath: string;}[],
-      updated: [] as MusicFileInfoEntity[],
+      updated: [] as {old: MusicFileInfoEntity;
+new: MusicFileInfoEntity;}[],
     };
 
     this.#createCaches();
 
-    for (const m of this.#remoteMusic) {
+    for (const m of this.#remoteFiles) {
       const foundSamePath = this.#pathToLocalMusicFile.get(m.path);
 
       if (!foundSamePath) {
@@ -175,27 +174,34 @@ newPath: string;}[],
       if (!foundSameContent) {
         if (!foundSamePath)
           ret.new.push(ml);
-        else
-          ret.updated.push(foundSamePath);
+        else {
+          ret.updated.push( {
+            old: foundSamePath,
+            new: {
+              id: foundSamePath.id,
+              musicId: foundSamePath.musicId,
+              ...ml,
+            },
+          } );
+        }
       }
     }
 
     return ret;
   }
 
-  async #isSameFile(music: MusicFileInfoEntity, fileWithMetadata: FileWithStats) {
+  async #isSameFile(file: MusicFileInfoEntity, fileWithMetadata: MusicFileInfoOmitMusicId) {
     if (!this.#options.useOnlyHashChecking
-      && music.size && music.size === fileWithMetadata.stats.size)
-      return true;
+      && file.size !== fileWithMetadata.size)
+      return false;
 
-    if (!music.hash)
+    if (!file.hash)
       throw new Error("music.hash is undefined");
 
     if (!fileWithMetadata.hash)
-
       fileWithMetadata.hash = await md5FileAsync(getAbsolutePath(fileWithMetadata.path));
 
-    if (music.hash !== fileWithMetadata.hash)
+    if (file.hash !== fileWithMetadata.hash)
       return false;
 
     return true;

@@ -1,14 +1,12 @@
-import { statSync } from "node:fs";
 import { Injectable, Logger } from "@nestjs/common";
 import z from "zod";
-import { MusicFileInfo, MusicFileInfoEntity, musicFileInfoEntitySchema } from "$shared/models/musics/file-info";
+import { MusicFileInfo, MusicFileInfoEntity, musicFileInfoEntitySchema, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
 import { musicEntitySchema } from "#musics/models";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
 import { MusicsRepository } from "../../crud/repository";
-import { getAbsolutePath } from "../../utils";
-import { ChangesDetector, FileWithStats } from "./changes-detector";
+import { ChangesDetector } from "./changes-detector";
 
 export const updateResultSchema = z.object( {
   new: z.array(z.object( {
@@ -30,7 +28,7 @@ export type UpdateResult = z.infer<typeof updateResultSchema>;
 
 @Injectable()
 export class UpdateRemoteTreeService {
-  private readonly logger = new Logger(UpdateRemoteTreeService.name);
+  static readonly logger = new Logger(UpdateRemoteTreeService.name);
 
   constructor(
     private readonly fileInfoRepo: MusicFileInfoRepository,
@@ -61,7 +59,7 @@ export class UpdateRemoteTreeService {
           } );
         } )
         .catch((err) => {
-          this.logger.error(err.message, localFileMusic);
+          UpdateRemoteTreeService.logger.error(err.message, localFileMusic);
 
           throw err;
         } );
@@ -72,7 +70,7 @@ export class UpdateRemoteTreeService {
     for (const deletedMusic of changes.deleted) {
       const p = this.fileInfoRepo.deleteOneByPath(deletedMusic.path)
         .catch((err) => {
-          this.logger.error(err.message, deletedMusic);
+          UpdateRemoteTreeService.logger.error(err.message, deletedMusic);
 
           throw err;
         } );
@@ -87,7 +85,7 @@ export class UpdateRemoteTreeService {
       };
       const p = this.fileInfoRepo.upsertOneByPathAndGet(original.path, newFileInfo)
         .catch((err) => {
-          this.logger.error(err.message, original, newFileInfo);
+          UpdateRemoteTreeService.logger.error(err.message, original, newFileInfo);
 
           throw err;
         } );
@@ -95,27 +93,20 @@ export class UpdateRemoteTreeService {
       promises.push(p);
     }
 
-    for (const oldMusicFileInfo of changes.updated) {
-      const newMusicFileInfo = {
-        musicId: oldMusicFileInfo.musicId,
-        ...await new MusicFileInfoOmitMusicIdBuilder()
-          .withPartial( {
-            path: oldMusicFileInfo.path,
-          } )
-          .build(),
-      };
+    for (const u of changes.updated) {
+      const newMusicFileInfo = u.new;
       const p = this.fileInfoRepo.upsertOneByPathAndGet(
-        oldMusicFileInfo.path,
+        u.old.path,
         newMusicFileInfo,
       )
         .then(newMusic => {
           updated.push( {
-            old: oldMusicFileInfo,
             new: newMusic,
+            old: u.old,
           } );
         } )
         .catch((err: Error) => {
-          this.logger.error(err.message, oldMusicFileInfo);
+          UpdateRemoteTreeService.logger.error(err.message, u.old);
 
           throw err;
         } );
@@ -137,11 +128,24 @@ export class UpdateRemoteTreeService {
 }
 
 async function detectChangesFromLocalFiles(remoteMusics: MusicFileInfoEntity[]) {
-  const files = await findAllPathsOfValidMusicFiles();
-  const filesWithMeta: FileWithStats[] = files.map((relativePath) => ( {
-    path: relativePath,
-    stats: statSync(getAbsolutePath(relativePath)),
-  } ));
+  const relativeFilePaths = await findAllPathsOfValidMusicFiles();
+  const filesWithMeta: MusicFileInfoOmitMusicId[] = [];
+
+  // Hacerlo secuencial y ordenar por path para aprovechar localidad espacial del HDD
+  relativeFilePaths.sort();
+
+  let i = 0;
+
+  for (const relativePath of relativeFilePaths) {
+    UpdateRemoteTreeService.logger.debug(`${++i} / ${relativeFilePaths.length}: ${relativePath}`);
+    const file = await new MusicFileInfoOmitMusicIdBuilder().withPartial( {
+      path: relativePath,
+    } )
+      .build();
+
+    filesWithMeta.push(file);
+  }
+
   const changesDetector = new ChangesDetector(remoteMusics, filesWithMeta);
 
   return changesDetector.detectChanges();
