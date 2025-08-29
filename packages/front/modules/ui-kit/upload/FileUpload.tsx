@@ -1,0 +1,312 @@
+import React, { useState, useRef } from "react";
+import { CloudUpload, InsertDriveFile, Close, CheckCircle } from "@mui/icons-material";
+import { classes } from "#modules/utils/styles";
+import styles from "./FileUpload.module.css";
+
+export type FileDataMetadata = Record<string, any>;
+
+type FileDataWithoutMetadata = {
+  file: File;
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  uploadProgress?: number;
+  uploadStatus?: "completed" | "error" | "pending" | "uploading";
+};
+export type FileData = FileDataWithoutMetadata & {
+  metadata: FileDataMetadata;
+};
+
+type ProvideMetadataFn = (fileDatas: FileDataWithoutMetadata)=> FileDataMetadata;
+
+interface FileUploadProps {
+  buttonText?: string;
+  maxFileSize?: number;
+  acceptedTypes?: string[];
+  multiple?: boolean;
+  provideMetadata?: ProvideMetadataFn;
+  onUpload?: ((files: FileData[], setSelectedFiles: any)=> Promise<void>);
+}
+
+function extensionsToDisplay(extensions: string[]): string[] {
+  const mapped = extensions
+    .map(s=>{
+      if (s.startsWith("."))
+        s = s.substring(1);
+
+      return s.toUpperCase();
+    } );
+  const set = new Set(mapped);
+
+  return [...set];
+}
+
+export function FileUpload<M extends Record<string, any>>( { maxFileSize,
+  onUpload,
+  provideMetadata,
+  acceptedTypes = [],
+  multiple = true,
+  buttonText = "Añadir archivo" + (multiple ? "(s)" : "") }: FileUploadProps) {
+  const acceptedTypesDisplay = extensionsToDisplay(acceptedTypes).join(", ");
+  const [dragActive, setDragActive] = useState<boolean>(false);
+  const [selectedFiles, setSelectedFiles] = useState<FileData[]>([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const acceptString = acceptedTypes.join(",");
+  const isFileValid = (fileToValidate: File): string[] => {
+    const fileErrors: string[] = [];
+
+    if (maxFileSize !== undefined && fileToValidate.size > maxFileSize) {
+      fileErrors.push(
+        `El archivo ${fileToValidate.name} excede el tamaño máximo de \
+${formatFileSize(maxFileSize)}`,
+      );
+    }
+
+    if (acceptedTypes.length > 0) {
+      const fileExtension = "." + fileToValidate.name.split(".").pop()
+        ?.toLowerCase();
+      const isValidExtension = acceptedTypes.some(
+        acceptedType => acceptedType.toLowerCase() === fileExtension,
+      );
+
+      if (!isValidExtension) {
+        fileErrors.push(
+          `El archivo ${fileToValidate.name} no es un tipo de archivo válido. Solo se aceptan: \
+${acceptedTypesDisplay}`,
+        );
+      }
+    }
+
+    return fileErrors;
+  };
+  const handleDrag = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.type === "dragenter" || e.type === "dragover")
+      setDragActive(true);
+    else if (e.type === "dragleave")
+      setDragActive(false);
+  };
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0])
+      handleFileSelection(e.dataTransfer.files);
+  };
+  const handleFileSelection = (fileList: FileList): void => {
+    const newValidationErrors: string[] = [];
+    const validFiles: FileData[] = [];
+
+    Array.from(fileList).forEach(fileItem => {
+      const fileErrors = isFileValid(fileItem);
+
+      if (fileErrors.length > 0)
+        newValidationErrors.push(...fileErrors);
+      else {
+        const fileDataWithoutMetadata: FileDataWithoutMetadata = {
+          file: fileItem,
+          id: Math.random().toString(36)
+            .substring(2, 9),
+          name: fileItem.name,
+          size: fileItem.size,
+          type: fileItem.type,
+          uploadProgress: 0,
+          uploadStatus: "pending",
+        };
+        const metadata = provideMetadata?.(fileDataWithoutMetadata) ?? {} as M;
+
+        validFiles.push( {
+          ...fileDataWithoutMetadata,
+          metadata,
+        } );
+      }
+    } );
+
+    setValidationErrors(newValidationErrors);
+
+    if (multiple)
+      setSelectedFiles(prev => [...prev, ...validFiles]);
+    else
+      setSelectedFiles(validFiles.slice(0, 1));
+  };
+  const onButtonClick = (): void => {
+    inputRef.current?.click();
+  };
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (e.target.files && e.target.files[0])
+      handleFileSelection(e.target.files);
+  };
+  const removeFile = (fileId: string): void => {
+    setSelectedFiles(prev => prev.filter(fileData => fileData.id !== fileId));
+  };
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0)
+      return "0 Bytes";
+
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / (k ** i)).toFixed(2)) + " " + sizes[i];
+  };
+  const uploadFiles = async (): Promise<void> => {
+    if (selectedFiles.length === 0 || isUploading)
+      return;
+
+    const pendingFiles = selectedFiles.filter(f => f.uploadStatus === "pending");
+
+    if (pendingFiles.length === 0)
+      return;
+
+    setIsUploading(true);
+    setValidationErrors([]);
+
+    try {
+      await onUpload?.(pendingFiles, setSelectedFiles);
+    } catch (uploadError) {
+      const errorMessage = uploadError instanceof Error
+        ? uploadError.message
+        : "Error desconocido";
+
+      setValidationErrors([`Error al subir archivos: ${errorMessage}`]);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  const hasCompletedFiles = selectedFiles.some(f => f.uploadStatus === "completed");
+  const hasPendingFiles = selectedFiles.some(f => f.uploadStatus === "pending");
+
+  return (
+    <div className={`${styles.container}`}>
+      <div
+        className={`${styles.dropzone} ${dragActive ? styles.active : ""}`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          className={styles.hiddenInput}
+          multiple={multiple}
+          accept={acceptedTypes.length > 0 ? acceptString : undefined}
+          onChange={onInputChange}
+        />
+
+        <CloudUpload
+          className={classes(
+            styles.uploadIcon,
+            dragActive && styles.iconActive,
+            hasPendingFiles && styles.uploadReady,
+            !hasPendingFiles && styles.uploadDisabled,
+          )}
+          onClick={hasPendingFiles && !isUploading ? uploadFiles : undefined}
+          titleAccess={isUploading ? "Subiendo..." : "Subir archivos"}
+        />
+
+        <button
+          className={styles.selectButton}
+          onClick={onButtonClick}
+          disabled={isUploading}
+        >
+          {buttonText}
+        </button>
+        <span className={styles.dragText}>o arrastra y suelta</span>
+        {acceptedTypes.length > 0 && (
+          <p className={styles.fileRestrictions}>
+            {acceptedTypesDisplay}
+          </p>
+        )}
+        {maxFileSize !== undefined && (
+          <p className={styles.fileRestrictions}>
+            hasta {formatFileSize(maxFileSize)}
+          </p>
+        )}
+      </div>
+
+      {validationErrors.length > 0 && (
+        <div className={styles.errorContainer}>
+          {validationErrors.map((errorMessage, index) => (
+            <p key={index} className={styles.errorText}>{errorMessage}</p>
+          ))}
+        </div>
+      )}
+
+      {selectedFiles.length > 0 && (
+        <div className={styles.filesSection}>
+          <div className={styles.filesList}>
+            {selectedFiles.map((fileObj) => (
+              <div key={fileObj.id} className={styles.fileItem}>
+                <div className={styles.fileInfo}>
+                  {fileObj.uploadStatus === "completed"
+                    ? (
+                      <CheckCircle className={`${styles.fileIcon} ${styles.successIcon}`} />
+                    )
+                    : (
+                      <InsertDriveFile className={styles.fileIcon} />
+                    )}
+                  <div className={styles.fileDetails}>
+                    <p className={styles.fileName}>{fileObj.name}</p>
+                    <p className={styles.fileSize}>
+                      {formatFileSize(fileObj.size)} • {fileObj.type ?? "Tipo desconocido"}
+                    </p>
+
+                    {fileObj.uploadStatus === "uploading" && (
+                      <div className={styles.progressContainer}>
+                        <div className={styles.progressBar}>
+                          <div
+                            className={styles.progressFill}
+                            style={{
+                              width: `${fileObj.uploadProgress || 0}%`,
+                            }}
+                          />
+                        </div>
+                        <span className={styles.progressText}>
+                          {fileObj.uploadProgress || 0}%
+                        </span>
+                      </div>
+                    )}
+
+                    {fileObj.uploadStatus === "completed" && (
+                      <p className={styles.successText}>¡Subido!</p>
+                    )}
+
+                    {fileObj.uploadStatus === "error" && (
+                      <p className={styles.errorText}>Error al subir</p>
+                    )}
+                  </div>
+                </div>
+
+                {fileObj.uploadStatus !== "completed" && (
+                  <button
+                    onClick={() => removeFile(fileObj.id)}
+                    className={styles.removeButton}
+                    disabled={fileObj.uploadStatus === "uploading"}
+                  >
+                    <Close className={styles.removeIcon} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {hasCompletedFiles && (
+        <button
+          className={styles.clearCompletedButton}
+          onClick={() => setSelectedFiles(prev => prev.filter(f => f.uploadStatus !== "completed"))}
+        >
+          Limpiar archivos subidos
+        </button>
+      )}
+    </div>
+  );
+}

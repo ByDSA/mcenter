@@ -1,7 +1,6 @@
+import { AUDIO_EXTENSIONS } from "$shared/models/musics/audio-extensions";
 import { getAbsolutePath } from "../utils";
 import { findFiles } from "./files.find";
-
-export const AUDIO_EXTENSIONS = ["mp3", "flac", "wma", "ape", "m4a"];
 
 export async function findAllValidMusicFiles() {
   return (await findFiles( {

@@ -2,6 +2,7 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MusicHistoryModule } from "../history/module";
+import { MusicFileInfoModule } from "../file-info/module";
 import { MusicBuilderService } from "./builder/music-builder.service";
 import { MusicCrudController } from "./controller";
 import { MusicsRepository } from "./repository";
@@ -10,6 +11,7 @@ import { MusicAvailableSlugGeneratorService } from "./builder/vailable-slug-gene
 @Module( {
   imports: [
     DomainEventEmitterModule,
+    forwardRef(()=>MusicFileInfoModule),
     forwardRef(()=>MusicHistoryModule),
   ],
   controllers: [

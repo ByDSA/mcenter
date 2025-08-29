@@ -1,0 +1,16 @@
+.container {
+  .album,
+  .title,
+  .artist {
+    flex-grow: 1;
+  }
+
+  .weight :global(.ui-kit-input-number) {
+    width: 4rem;
+  }
+
+  .weightAlbum,
+  .titleArtist {
+    flex-wrap: wrap !important;
+  }
+}

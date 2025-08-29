@@ -7,6 +7,7 @@ const MUSICS_SLUG = `${MUSICS}/slug`;
 const MUSICS_PLAYLISTS = `${MUSICS}/playlists`;
 const MUSICS_RANDOM = `${MUSICS}/random`;
 const MUSICS_ADMIN = `${MUSICS}/admin`;
+const MUSICS_FILE_INFO = MUSICS + "/file-info";
 const PLAYER = "/api/player";
 const EPISODES = "/api/episodes";
 const EPISODES_SLUG = `${EPISODES}/slug`;
@@ -27,6 +28,15 @@ export const PATH_ROUTES = {
   musics: {
     path: MUSICS,
     withParams: (id: string)=>`${MUSICS}/${id}`,
+    search: {
+      path: `${MUSICS}/search`,
+    },
+    fileInfo: {
+      path: `${MUSICS_FILE_INFO}`,
+      upload: {
+        path: `${MUSICS_FILE_INFO}/upload`,
+      },
+    },
     history: {
       path: MUSICS_HISTORY,
       withParams: (id: string) => `${MUSICS_HISTORY}/${id}`,

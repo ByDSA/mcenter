@@ -12,6 +12,9 @@ export class ResponseFormatterInterceptor implements NestInterceptor {
         if (data === undefined)
           return undefined;
 
+        if (Array.isArray(data.data))
+          return data;
+
         return {
           data,
         } satisfies ResultResponse;

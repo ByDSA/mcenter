@@ -1,0 +1,259 @@
+.container {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+
+  /* Variables de color locales para el componente */
+  --fileupload-text-primary: var(--color-black);
+  --fileupload-text-secondary: #6b7280;
+  --fileupload-text-muted: #9ca3af;
+  --fileupload-border-default: #d1d5db;
+  --fileupload-border-hover: #9ca3af;
+  --fileupload-bg-active: #eff6ff;
+  --fileupload-bg-item: #f9fafb;
+  --fileupload-border-item: #e5e7eb;
+  --fileupload-error-bg: #fef2f2;
+  --fileupload-error-border: #fecaca;
+  --fileupload-error-text: #dc2626;
+  --fileupload-success: #10b981;
+  --fileupload-success-hover: #059669;
+  --fileupload-remove-hover-bg: #fef2f2;
+}
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.dropzone {
+  position: relative;
+  border: 2px dashed var(--fileupload-border-default);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.5);
+  transition:
+    border-color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.dropzone:hover {
+  border-color: var(--fileupload-border-hover);
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.dropzone.active {
+  border-color: var(--color-primary);
+  background-color: var(--fileupload-bg-active);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.uploadIcon {
+  width: 3rem !important;
+  height: 3rem !important;
+  margin: 0 auto 1rem auto;
+  color: var(--color-primary-darker);
+  transition: all 0.2s ease-in-out;
+}
+
+.iconActive {
+  color: var(--color-green) !important;
+}
+
+/* Estados para el icono cuando actúa como botón de subida */
+.uploadReady {
+  color: var(--fileupload-success) !important;
+  cursor: pointer !important;
+}
+
+.uploadReady:hover {
+  color: var(--fileupload-success-hover) !important;
+  transform: scale(1.1);
+}
+
+.uploadDisabled {
+  color: var(--fileupload-text-muted) !important;
+  cursor: not-allowed !important;
+}
+
+.dragText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--fileupload-text-secondary);
+}
+
+.fileRestrictions {
+  margin: 0;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: var(--fileupload-text-muted);
+}
+
+.fileInfo {
+  margin: 0 0 1rem 0;
+  font-size: 0.75rem;
+  color: var(--fileupload-text-muted);
+}
+
+.selectButton {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.selectButton:hover {
+  background-color: var(--color-primary-darker);
+}
+
+.errorContainer {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: var(--fileupload-error-bg);
+  border: 1px solid var(--fileupload-error-border);
+  border-radius: 0.5rem;
+}
+
+.errorText {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+  color: var(--fileupload-error-text);
+}
+
+.errorText:last-child {
+  margin-bottom: 0;
+}
+
+.filesSection {
+  margin-top: 1.5rem;
+}
+
+.filesTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  color: var(--fileupload-text-primary);
+}
+
+.filesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background-color: var(--fileupload-bg-item);
+  border: 1px solid var(--fileupload-border-item);
+  border-radius: 0.5rem;
+}
+
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.fileIcon {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  color: var(--fileupload-text-secondary);
+  flex-shrink: 0;
+}
+
+.fileDetails {
+  min-width: 0;
+  flex: 1;
+}
+
+.fileName {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--fileupload-text-primary);
+  word-break: break-all;
+}
+
+.fileSize {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--fileupload-text-secondary);
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: var(--fileupload-error-text);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+}
+
+.removeButton:hover {
+  color: var(--color-red-darker, #b91c1c);
+  background-color: var(--fileupload-error-bg);
+}
+
+.removeIcon {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+/* Estilos del botón de icono eliminados - ya no se usan */
+
+/* Mantener el botón anterior como alternativa (oculto por defecto) */
+.uploadButton {
+  width: 100%;
+  margin-top: 1rem;
+  background-color: var(--fileupload-success);
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: none; /* Oculto por defecto */
+}
+
+.uploadButton:hover:not(:disabled) {
+  background-color: var(--fileupload-success-hover);
+}
+
+.uploadButton:disabled {
+  background-color: var(--fileupload-text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Responsividad */
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .dropzone {
+    padding: 1.5rem;
+  }
+
+  .uploadIcon {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+}

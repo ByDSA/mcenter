@@ -1,9 +1,9 @@
 import path from "node:path";
 import { Injectable } from "@nestjs/common";
 import NodeID3 from "node-id3";
+import { AUDIO_EXTENSIONS } from "$shared/models/musics/audio-extensions";
 import { ARTIST_EMPTY, assertIsMusic, Music } from "../../models";
 import { getAbsolutePath } from "../../utils";
-import { AUDIO_EXTENSIONS } from "../../files";
 import { fixTxtFields } from "../../../resources/fix-text";
 import { fixSlug } from "./fix-slug";
 import { generateSlug } from "./gen-slug";

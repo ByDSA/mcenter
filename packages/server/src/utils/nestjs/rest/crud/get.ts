@@ -7,6 +7,7 @@ import { Injectable,
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { createManyResultResponseSchema, createOneResultResponseSchema } from "$shared/utils/http/responses";
+import { createPaginatedResultResponseSchema } from "$sharedSrc/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { ResponseFormatterInterceptor } from "../responses/response-formatter.interceptor";
 
@@ -65,7 +66,7 @@ export function GetManyCriteria(
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Post(url),
     UseInterceptors(ResponseFormatterInterceptor),
-    ValidateResponseWithZodSchema(createManyResultResponseSchema(schema)),
+    ValidateResponseWithZodSchema(createPaginatedResultResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
   ];
 

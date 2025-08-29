@@ -1,29 +1,68 @@
 /* eslint-disable no-underscore-dangle */
 import * as z from "zod";
 
+export type FlattenedKeys<T> = T extends object
+  ? {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+      [K in keyof T]: T[K] extends Array<any> | Date | Function | RegExp
+        ? K extends string
+          ? K // Date se trata como hoja
+          : never
+        : T[K] extends object
+          ? K extends string
+            ? `${K}.${FlattenedKeys<T[K]>}` // Solo las hojas anidadas, no el objeto padre
+            : never
+          : K extends string
+            ? K
+            : never
+    }[keyof T]
+  : never;
+
 export type PropInfo = {
   type: string;
   required: boolean;
   caption?: string;
-  };
+};
 
 export function schemaToReadableFormat<T>(
   schema: z.ZodObject<Record<keyof T, z.ZodTypeAny>>,
-): Record<keyof T, PropInfo> {
-  return Object.entries(schema.shape).reduce((acc, [k, v]) => {
-    acc[k as keyof T] = zodTypeToPropInfo(v as any);
+): Record<FlattenedKeys<T>, PropInfo> {
+  const result: Record<string, PropInfo> = {};
 
-    return acc;
-  }, {} as Record<keyof T, PropInfo>);
+  Object.entries(schema.shape).forEach(([key, zodType]) => {
+    flattenZodType(key, zodType as any, result);
+  } );
+
+  return result;
 }
 
-function zodTypeToPropInfo(zodType: z.ZodTypeAny): PropInfo {
+function flattenZodType(
+  key: string,
+  zodType: z.ZodTypeAny,
+  result: Record<string, PropInfo>,
+): void {
   const type = calcNativeType(zodType);
+  const required = calcIsRequired(zodType);
 
-  return {
-    type,
-    required: calcIsRequired(zodType),
-  };
+  // Si es un objeto, aplanamos sus propiedades
+  if (type === "ZodObject") {
+    const objectSchema = zodType as z.ZodObject<any>;
+    const { shape } = objectSchema;
+
+    if (shape) {
+      Object.entries(shape).forEach(([nestedKey, nestedZodType]) => {
+        const flattenedKey = `${key}.${nestedKey}`;
+
+        flattenZodType(flattenedKey, nestedZodType as any, result);
+      } );
+    }
+  } else {
+    // Para tipos no-objeto, agregamos la entrada normalmente
+    result[key] = {
+      type,
+      required,
+    };
+  }
 }
 
 function calcIsRequired(zodType: z.ZodTypeAny): boolean {

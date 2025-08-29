@@ -6,6 +6,7 @@ export default function MusicLayout( { children }: {
 } ) {
   const submenu = makeMenu( {
     "/music/history": "Historial",
+    "/music/search": "Buscar",
   }, {
     type: "sub",
   } );

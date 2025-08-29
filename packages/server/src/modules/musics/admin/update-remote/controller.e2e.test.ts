@@ -45,8 +45,11 @@ describe("updateRemoteController", () => {
       assertIsDefined(music);
 
       return Promise.resolve( {
-        ...music,
-        id: "id",
+        music: {
+          ...music,
+          id: "id",
+        },
+        fileInfo: musicFileInfo,
       } );
     } );
     musicFileInfoRepoMock.upsertOneByPathAndGet.mockImplementation((path: string)=> {
@@ -125,7 +128,10 @@ describe("updateRemoteController", () => {
 
       assertIsDefined(music);
 
-      return Promise.resolve(music);
+      return Promise.resolve( {
+        music,
+        fileInfo: musicFileInfo,
+      } );
     } );
     const response = await request(testingSetup.routerApp)
       .get("/update-remote")

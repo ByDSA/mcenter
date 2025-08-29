@@ -1,19 +1,47 @@
 import type { FilterQuery, PipelineStage } from "mongoose";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { MongoFilterQuery } from "#utils/layers/db/mongoose";
+import { MusicOdm } from ".";
 
 type Criteria = MusicCrudDtos.GetMany.Criteria;
 
 function buildMongooseSort(
   body: Criteria,
 ): Record<string, -1 | 1> | undefined {
-  if (!body.sort?.episodeKey)
+  if (!body.sort)
     return undefined;
 
-  return {
-    "date.timestamp": body.sort.episodeKey === "asc" ? 1 : -1,
-  };
+  const { added, artist, updated } = body.sort;
+
+  if (!added && !artist && !updated)
+    return undefined;
+
+  const ret: Record<string, -1 | 1> | undefined = {};
+
+  if (added)
+    ret["timestamps.addedAt"] = added === "asc" ? 1 : -1;
+
+  if (updated)
+    ret["timestamps.updatedAt"] = updated === "asc" ? 1 : -1;
+
+  if (artist)
+    ret["artist"] = artist === "asc" ? 1 : -1;
+
+  // Importante para hacerlo determinista!
+  // Si dos elementos tienen el mismo valor de sort, no es determinista
+  // y puede devolver duplicados y omisiones en pagging
+  if (Object.keys(ret).length > 0)
+    ret["_id"] = 1;
+
+  return ret;
 }
+
+export type AggregationResult = {
+  data: MusicOdm.FullDoc[];
+  metadata: {
+    totalCount?: number;
+  }[];
+}[];
 
 export function getCriteriaPipeline(
   criteria: Criteria,
@@ -45,25 +73,44 @@ export function getCriteriaPipeline(
     } );
   }
 
-  // Sort después del lookup y match
+  // Usar $facet para obtener datos paginados y total en una sola consulta
+  const facetStage: PipelineStage = {
+    $facet: {
+      data: [],
+      metadata: [
+        {
+          $count: "totalCount",
+        },
+      ],
+    },
+  };
+  // Construir el pipeline de datos
+  const dataPipeline: PipelineStage[] = [];
+
+  // Sort antes de la paginación
   if (sort) {
-    pipeline.push( {
+    dataPipeline.push( {
       $sort: sort,
     } );
   }
 
-  // Pagination al final
+  // Paginación
   if (criteria.offset) {
-    pipeline.push( {
+    dataPipeline.push( {
       $skip: criteria.offset,
     } );
   }
 
   if (criteria.limit) {
-    pipeline.push( {
+    dataPipeline.push( {
       $limit: criteria.limit,
     } );
   }
+
+  // Asignar el pipeline de datos al facet
+  (facetStage.$facet as any).data = dataPipeline;
+
+  pipeline.push(facetStage);
 
   return pipeline;
 }
@@ -75,6 +122,20 @@ function buildMongooseFilterWithFileInfos(
   const filter: MongoFilterQuery<any> = {};
 
   if (criteria.filter) {
+    if (criteria.filter.title) {
+      filter["title"] = {
+        $regex: criteria.filter.title,
+        $options: "i",
+      };
+    }
+
+    if (criteria.filter.artist) {
+      filter["artist"] = {
+        $regex: criteria.filter.artist,
+        $options: "i",
+      };
+    }
+
     if (criteria.filter.id)
       filter["_id"] = criteria.filter.id;
 

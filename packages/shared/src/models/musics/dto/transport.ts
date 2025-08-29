@@ -8,10 +8,12 @@ const criteriaConfig = {
   filterShape: {
     id: z.string().optional(),
     slug: z.string().optional(),
+    title: z.string().optional(),
+    artist: z.string().optional(),
     hash: z.string().optional(),
     path: z.string().optional(),
   },
-  sortKeys: ["episodeKey"] as const,
+  sortKeys: ["added", "updated", "artist"] as const,
   expandKeys: ["fileInfos"] as const,
 };
 
@@ -31,6 +33,9 @@ export namespace MusicCrudDtos {
   export namespace PatchOneById {
     export const bodySchema = generatePatchBodySchema(musicEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
+    export const paramsSchema = idParamsSchema;
+  }
+  export namespace DeleteOneById {
     export const paramsSchema = idParamsSchema;
   }
 }

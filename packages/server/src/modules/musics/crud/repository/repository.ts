@@ -1,11 +1,12 @@
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { UpdateQuery } from "mongoose";
+import { MusicFileInfoEntity, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
 import { assertFound } from "#utils/validation/found";
-import { CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanDeleteOneByIdAndGet, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { MusicEntity, Music, MusicId } from "#musics/models";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { showError } from "#core/logging/show-error";
@@ -13,6 +14,7 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
+import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { MusicHistoryEntryEvents } from "../../history/crud/repository/events";
 import { MusicBuilderService } from "../builder/music-builder.service";
 import { MusicAvailableSlugGeneratorService } from "../builder/vailable-slug-generator.service";
@@ -20,19 +22,24 @@ import { ExpressionNode } from "./queries/query-object";
 import { findParamsToQueryParams } from "./queries/queries-odm";
 import { MusicEvents } from "./events";
 import { MusicOdm } from "./odm";
+import { AggregationResult } from "./odm/criteria-pipeline";
 
 type CriteriaOne = MusicCrudDtos.GetOne.Criteria;
+type CriteriaMany = MusicCrudDtos.GetMany.Criteria;
 
 @Injectable()
 export class MusicsRepository
 implements
 CanPatchOneByIdAndGet<MusicEntity, MusicId, Music>,
-CanGetOneById<MusicEntity, MusicId> {
+CanGetOneById<MusicEntity, MusicId>,
+CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]>,
+CanGetManyByCriteria<MusicEntity, CriteriaMany> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
     @Inject(forwardRef(()=>MusicAvailableSlugGeneratorService))
     private readonly slugGenerator: MusicAvailableSlugGeneratorService,
     private readonly musicBuilder: MusicBuilderService,
+    private readonly fileInfoRepo: MusicFileInfoRepository,
   ) { }
 
   @OnEvent(MusicEvents.WILDCARD)
@@ -51,13 +58,39 @@ CanGetOneById<MusicEntity, MusicId> {
     } ).catch(showError);
   }
 
+  async deleteOneByIdAndGet(id: string): Promise<MusicEntity> {
+    const doc = await MusicOdm.Model.findByIdAndDelete(id);
+
+    assertFound(doc);
+
+    const ret = MusicOdm.toEntity(doc);
+
+    this.domainEventEmitter.emitEntity(MusicEvents.Deleted.TYPE, ret);
+
+    return ret;
+  }
+
   async getOneById(id: string): Promise<MusicEntity | null> {
     const doc = await MusicOdm.Model.findById(id);
 
-    if (!doc)
-      return null;
+    assertFound(doc);
 
     return MusicOdm.toEntity(doc);
+  }
+
+  async getManyByCriteria(criteria: CriteriaMany): Promise<any> {
+    const actualCriteria: CriteriaMany = {
+      ...criteria,
+      limit: criteria.limit ?? 10,
+    };
+    const pipeline = MusicOdm.getCriteriaPipeline(actualCriteria);
+    const aggreationResult = await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
+    const docs = aggreationResult[0].data;
+
+    if (docs.length > 0 && actualCriteria?.expand?.includes("fileInfos"))
+      assertIsDefined(docs[0].fileInfos, "Lookup file infos failed");
+
+    return MusicOdm.toPaginatedResult(aggreationResult);
   }
 
   async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {
@@ -97,7 +130,12 @@ CanGetOneById<MusicEntity, MusicId> {
 
   async getOne(criteria: CriteriaOne): Promise<MusicEntity | null> {
     const pipeline = MusicOdm.getCriteriaPipeline(criteria);
-    const docs = await MusicOdm.Model.aggregate(pipeline);
+
+    if (pipeline.length === 0)
+      throw new UnprocessableEntityException(criteria);
+
+    const aggreationResult = await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
+    const docs = aggreationResult[0].data;
 
     if (docs.length === 0)
       return null;
@@ -147,10 +185,22 @@ CanGetOneById<MusicEntity, MusicId> {
     } );
   }
 
-  async createOneFromPath(relativePath: string): Promise<MusicEntity> {
-    const music = await this.musicBuilder.createMusicFromFile(relativePath);
+  async createOneFromPath(
+    relativePath: string,
+    localFileMusic?: Partial<MusicFileInfoOmitMusicId>,
+  ): Promise<{music: MusicEntity;
+fileInfo: MusicFileInfoEntity;}> {
+    const musicDto = await this.musicBuilder.createMusicFromFile(relativePath);
+    const music = await this.createOneAndGet(musicDto);
+    const fileInfo = await this.fileInfoRepo.upsertOneByPathAndGet(relativePath, {
+      ...localFileMusic,
+      musicId: music.id,
+    } );
 
-    return await this.createOneAndGet(music);
+    return {
+      music,
+      fileInfo,
+    };
   }
 
   private async handleUpdateError(

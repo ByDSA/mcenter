@@ -44,19 +44,9 @@ export class UpdateRemoteTreeService {
     const updated: UpdateResult["updated"] = [];
 
     for (const localFileMusic of changes.new) {
-      const newMusic = await this.musicRepo.createOneFromPath(localFileMusic.path);
-      const fileInfoOmitMusicId = await new MusicFileInfoOmitMusicIdBuilder()
-        .withFileWithStats(localFileMusic)
-        .build();
-      const p = await this.fileInfoRepo.upsertOneByPathAndGet(localFileMusic.path, {
-        ...fileInfoOmitMusicId,
-        musicId: newMusic.id,
-      } )
-        .then((fileInfo) => {
-          created.push( {
-            music: newMusic,
-            fileInfo,
-          } );
+      const p = this.musicRepo.createOneFromPath(localFileMusic.path, localFileMusic)
+        .then((got) => {
+          created.push(got);
         } )
         .catch((err) => {
           UpdateRemoteTreeService.logger.error(err.message, localFileMusic);

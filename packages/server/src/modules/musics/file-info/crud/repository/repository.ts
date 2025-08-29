@@ -1,11 +1,13 @@
 import { Injectable } from "@nestjs/common";
-import { MusicId } from "$shared/models/musics";
+import { MusicEntity, MusicId } from "$shared/models/musics";
 import { assertIsDefined } from "$shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById } from "#utils/layers/repository";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
+import { MusicEvents } from "#musics/crud/repository/events";
+import { showError } from "#core/logging/show-error";
 import { MusicFileInfo, MusicFileInfoEntity } from "../../models";
 import { MusicFileInfoOmitMusicIdBuilder } from "../../builder";
 import { MusicFileInfoOdm } from "./odm";
@@ -31,6 +33,14 @@ CanGetOneById<Entity, Entity["id"]> {
   @OnEvent(MusicFileInfoEvents.WILDCARD)
   handleEvents(ev: DomainEvent<unknown>) {
     logDomainEvent(ev);
+  }
+
+  @OnEvent(MusicEvents.Deleted.TYPE)
+  async handleCreateHistoryEntryEvents(event: MusicEvents.Deleted.Event) {
+    const { entity } = event.payload;
+
+    await this.deleteManyByMusicId(entity.id)
+      .catch(showError);
   }
 
   async getOneById(id: Entity["id"]): Promise<Entity | null> {
@@ -78,6 +88,12 @@ CanGetOneById<Entity, Entity["id"]> {
     } );
   }
 
+  async deleteManyByMusicId(id: MusicEntity["id"]): Promise<void> {
+    await MusicFileInfoOdm.Model.deleteMany( {
+      musicId: id,
+    } );
+  }
+
   async getAll(): Promise<Entity[]> {
     const modelsOdm = await MusicFileInfoOdm.Model.find();
 
@@ -109,10 +125,20 @@ CanGetOneById<Entity, Entity["id"]> {
 
   async upsertOneByPathAndGet(
     path: MusicFileInfoEntity["path"],
-    fileInfo: MusicFileInfo,
+    partial: Partial<MusicFileInfo> & Required<Pick<MusicFileInfo, "musicId">>,
   ): Promise<MusicFileInfoEntity> {
     const filterQuery: FilterQuery<DocOdm> = {
       path,
+    };
+    const fileInfoWithoutMusicId = await new MusicFileInfoOmitMusicIdBuilder()
+      .withPartial( {
+        ...partial,
+        path,
+      } )
+      .build();
+    const fileInfo: MusicFileInfo = {
+      ...fileInfoWithoutMusicId,
+      musicId: partial.musicId,
     };
     const updateQuery: Required<Omit<DocOdm, "_id">> = MusicFileInfoOdm.toDoc(fileInfo);
     const result = await MusicFileInfoOdm.Model.findOneAndUpdate(filterQuery, updateQuery, {
@@ -128,6 +154,17 @@ CanGetOneById<Entity, Entity["id"]> {
   async getOneByPath(path: Entity["path"]): Promise<Entity | null> {
     const modelOdm = await MusicFileInfoOdm.Model.findOne( {
       path,
+    } );
+
+    if (!modelOdm)
+      return null;
+
+    return MusicFileInfoOdm.toEntity(modelOdm);
+  }
+
+  async getOneByHash(hash: string): Promise<Entity | null> {
+    const modelOdm = await MusicFileInfoOdm.Model.findOne( {
+      hash,
     } );
 
     if (!modelOdm)

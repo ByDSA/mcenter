@@ -15,7 +15,13 @@ export const errorHandler = (err: unknown, _req: Request, res: Response, next: N
 
     if (code !== undefined && code !== 500) {
       unhandled = false;
-      res.sendStatus(code);
+
+      if (err instanceof Error) {
+        res.status(code).json( {
+          message: err.message,
+        } );
+      } else
+        res.sendStatus(code);
     }
   }
 

@@ -7,7 +7,7 @@ export type Action<D> = {
 
 type BaseProps<D> = {
   initialFetch?: (data: D | null)=> Promise<D>;
-  refetching: Action<D> & {
+  refetching?: Action<D> & {
     everyMs?: number;
   };
 };
@@ -28,6 +28,7 @@ type UseCrudDataReturn<
 > = {
       customActions: ExecutableCustomActions<T>;
       refetchData: ()=> Promise<void>;
+      fetchInitData: ()=> Promise<void>;
       data: D | null;
       setData: ReturnType<typeof useState<D | null>>[1];
       error: unknown | undefined;
@@ -53,11 +54,42 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
   }, [data]);
 
   const refetchData = useCallback(async () => {
-    const result = await refetching.fn(dataRef.current);
+    const fn = refetching?.fn;
+
+    if (!fn)
+      return;
+
+    const result = await fn(dataRef.current);
 
     isRefetchingRef.current = true;
     setData(result);
   }, [refetching]);
+  // Definir fetchInitData como useCallback para que esté disponible externamente
+  const fetchInitData = useCallback(async () => {
+    const fn = initialFetch ?? refetching?.fn;
+
+    if (!fn)
+      return;
+
+    setIsLoading(true);
+    setError(undefined);
+
+    try {
+      const result = await fn(dataRef.current);
+
+      setData(result);
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
+      setError(e);
+
+      if (isNetworkError(e)) {
+        startRecoveryMode( {
+          fn: fetchInitData,
+        } );
+      }
+    }
+  }, [initialFetch, refetching]);
 
   useEffect(() => {
     if (isRefetchingRef.current) {
@@ -73,24 +105,32 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
   refetchDataRef.current = refetchData;
 
   useEffect(() => {
-    let intervalId;
+    let intervalId: NodeJS.Timeout;
     // eslint-disable-next-line require-await
     const onSuccess = async (result: D) => {
       setData(result);
-
       setIsLoading(false);
-      intervalId = setInterval(() => {
-        refetchDataRef.current?.()
-          .catch(e => setError(e));
-      }, props.refetching.everyMs ?? 5_000);
+
+      if (props.refetching) {
+        intervalId = setInterval(() => {
+          refetchDataRef.current?.()
+            .catch(e => setError(e));
+        }, props.refetching.everyMs ?? 5_000);
+      }
     };
-    const fetchInitData = (async () => {
-      const result = await (initialFetch ?? refetching.fn)(dataRef.current);
+    // Función interna que maneja el éxito
+    const handleInitialFetch = async () => {
+      const fn = initialFetch ?? refetching?.fn;
+
+      if (!fn)
+        return;
+
+      const result = await fn(dataRef.current);
 
       return onSuccess(result);
-    } );
+    };
 
-    fetchInitData()
+    handleInitialFetch()
       .catch(e => {
         setIsLoading(false);
         setError(e);
@@ -102,7 +142,10 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
         }
       } );
 
-    return () => clearInterval(intervalId);
+    return () => {
+      if (intervalId)
+        clearInterval(intervalId);
+    };
   }, []);
 
   const setItem = useCallback((i: number, item: D[0] | null) => {
@@ -147,6 +190,7 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
 
   return {
     refetchData,
+    fetchInitData,
     data,
     setData,
     error,
@@ -165,6 +209,7 @@ export const isNetworkError = (error: unknown) => {
   return error?.message?.includes("Failed to fetch")
   || error?.name === "NetworkError";
 };
+
 const checkConnectivity = async (url: string) => {
   try {
     await fetch(url, {
@@ -182,6 +227,7 @@ type RetryProps = {
   fn: ()=> Promise<void>;
   healthyUrl?: string;
 };
+
 const startRecoveryMode = ( { fn, healthyUrl = backendUrl("") }: RetryProps) => {
   if (recoveryInterval)
     return; // Ya está en modo recovery

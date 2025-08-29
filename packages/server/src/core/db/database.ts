@@ -77,6 +77,10 @@ export class Database {
      await connectPromise;
    }
 
+   isConnected() {
+     return this.#connected;
+   }
+
    async disconnect() {
      this.logger.log("Disconnecting from mongodb ...");
      this.#assertConnected();

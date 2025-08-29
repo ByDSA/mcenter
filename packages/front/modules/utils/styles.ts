@@ -1,3 +1,6 @@
-export function classes(...classNames: string[]) {
-  return classNames.join(" ").trim();
+export function classes(...classNames: (boolean | string | null | undefined)[]) {
+  return classNames
+    .filter(Boolean)
+    .join(" ")
+    .trim();
 }

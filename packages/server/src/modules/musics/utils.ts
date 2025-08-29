@@ -1,14 +1,5 @@
 import path from "node:path";
 
-export function getAbsolutePath(relativePath: string = ""): string {
-  let mediaPath = path.join(ENVS.mediaPath, "music", "data");
-
-  if (!mediaPath.startsWith("/"))
-    mediaPath = path.join(process.cwd(), mediaPath);
-
-  return path.join(mediaPath, relativePath);
-}
-
 export const ENVS = Object.freeze( {
   mediaPath: process.env.MEDIA_FOLDER_PATH as string,
   mongo: {
@@ -20,3 +11,14 @@ export const ENVS = Object.freeze( {
   },
   port: +(process.env.PORT ?? 8080),
 } );
+
+export const MUSIC_MEDIA_PATH = path.join(ENVS.mediaPath, "music", "data");
+
+export function getAbsolutePath(relativePath: string = ""): string {
+  let mediaPath = MUSIC_MEDIA_PATH;
+
+  if (!mediaPath.startsWith("/"))
+    mediaPath = path.join(process.cwd(), mediaPath);
+
+  return path.join(mediaPath, relativePath);
+}

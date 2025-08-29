@@ -19,6 +19,7 @@ export class DatabaseModule implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    await this.db.disconnect();
+    if (this.db.isConnected())
+      await this.db.disconnect();
   }
 }

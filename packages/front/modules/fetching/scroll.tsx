@@ -1,13 +1,15 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Action, Props as UseCrudDataProps, isNetworkError, useCrudData } from "./use-crud-data";
 
 type Props<D extends unknown[]> = Pick<
   ReturnType<typeof useCrudData<D, any>>,
  "isLoading" | "setError" | "setIsLoading"> & {
   fetchScrollData: ()=> Promise<void>;
+  disabled?: boolean;
  };
 export function useScrollData<D extends unknown[]>( { setIsLoading,
   isLoading,
+  disabled = false,
   setError,
   fetchScrollData }: Props<D>) {
   const observerTarget = useRef(null);
@@ -17,7 +19,7 @@ export function useScrollData<D extends unknown[]>( { setIsLoading,
       (entries) => {
         const target = entries[0];
 
-        if (target.isIntersecting && !isLoading) {
+        if (target.isIntersecting && !isLoading && !disabled) {
           setIsLoading(true);
           fetchScrollData()
             .then(()=> {
@@ -52,6 +54,7 @@ export function useCrudDataWithScroll<
 >(props: UseCrudDataProps<D, T> & {
   fetchingMore: Action<D>;
 } ) {
+  const [scrollDisabled, setScrollDisabled] = useState(false);
   const canCall = useRef(true);
   const fetchScrollData: Action<D> = {
     fn: async (current: D) => {
@@ -69,6 +72,9 @@ export function useCrudDataWithScroll<
 
       canCall.current = true;
 
+      if (result.length === 0)
+        setScrollDisabled(true);
+
       if (!current)
         return result;
 
@@ -76,7 +82,7 @@ export function useCrudDataWithScroll<
     },
   };
   const { data, setData, isLoading, error,
-    setItem, setError, setIsLoading, customActions } = useCrudData(
+    setItem, setError, setIsLoading, customActions, fetchInitData } = useCrudData(
     {
       ...props,
       customActions: {
@@ -85,16 +91,36 @@ export function useCrudDataWithScroll<
       },
     },
   );
+
+  useEffect(() => {
+    setScrollDisabled(false);
+
+    // Search id duplicates:
+    const duplicates = data?.filter((item, index) => {
+      if (!item || !data)
+        return false;
+
+      const firstIndex = data.findIndex(i=> (i as any)?.id === (item as any)?.id);
+
+      return firstIndex !== index;
+    } );
+
+    if (duplicates && duplicates.length > 0)
+      console.warn("Duplicate items in data:", duplicates);
+  }, [data]);
+
   const { observerTarget } = useScrollData( {
     fetchScrollData: customActions.fetchScrollData,
     isLoading,
     setError,
     setIsLoading,
+    disabled: scrollDisabled,
   } );
 
   return {
     customActions,
     data,
+    fetchInitData,
     setData,
     setItem,
     error,

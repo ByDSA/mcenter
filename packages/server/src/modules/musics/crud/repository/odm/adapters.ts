@@ -1,11 +1,14 @@
 import mongoose from "mongoose";
 import { MusicEntity } from "$shared/models/musics";
 import { AllKeysOf } from "$shared/utils/types";
+import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
+import { PaginatedResult } from "$sharedSrc/utils/http/responses";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { timestampsModelToDocOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
-import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
+import { AggregationResult } from "./criteria-pipeline";
+import { MusicOdm } from ".";
 
 function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
   if (!docOdm.tags && !docOdm.onlyTags)
@@ -51,7 +54,7 @@ export function musicDocOdmToEntity(docOdm: FullDocOdm): MusicEntity {
     fileInfos: docOdm.fileInfos?.map(MusicFileInfoOdm.toEntity),
   } satisfies AllKeysOf<MusicEntity>;
 
-   return removeUndefinedDeep(entity);
+  return removeUndefinedDeep(entity);
 }
 
 export function musicToDocOdm(model: Music): DocOdm {
@@ -125,4 +128,21 @@ export function partialToDocOdm(partial: Partial<Music>): Partial<DocOdm> {
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return ret;
+}
+
+export function aggregationResultToResponse(
+  aggregationResult: AggregationResult,
+): PaginatedResult<MusicEntity> {
+  const result = aggregationResult[0];
+  const data = result.data.map(MusicOdm.toEntity);
+  const metadata: PaginatedResult<MusicEntity>["metadata"] = {};
+  const { totalCount } = result.metadata[0];
+
+  if (totalCount !== undefined)
+    metadata.totalCount = totalCount;
+
+  return {
+    data,
+    metadata,
+  };
 }

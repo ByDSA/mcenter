@@ -8,6 +8,7 @@ import { MusicCrudController } from "./controller";
 import { musicsRepoMockProvider } from "./repository/tests";
 
 testRoute(PATH_ROUTES.musics.withParams("id"));
+testRoute(PATH_ROUTES.musics.search.path);
 
 crudTestsSuite( {
   name: MusicCrudController.name,

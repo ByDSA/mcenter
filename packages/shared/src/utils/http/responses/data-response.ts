@@ -26,6 +26,21 @@ export function createManyResultResponseSchema<T extends z.ZodSchema>(schema: T)
     } );
 }
 
+export function createPaginatedResultResponseSchema<T extends z.ZodSchema>(schema: T) {
+  return createManyResultResponseSchema(schema)
+    .extend( {
+      metadata: z.object( {
+        totalCount: z.number().optional(),
+      } ).optional(),
+    } );
+}
+
+export type PaginatedResult<T = any> = Omit<z.infer<
+ReturnType<typeof createPaginatedResultResponseSchema<any>>
+>, "data"> & {
+  data: T[];
+};
+
 export function assertIsOneResultResponse<T>(
   res: unknown,
   dataSchema: z.ZodSchema<T>,
