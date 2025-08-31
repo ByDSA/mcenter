@@ -1,7 +1,7 @@
 /* eslint-disable require-await */
 import { PATH_ROUTES } from "$shared/routing";
-import { genAssertIsOneResultResponse, ResultResponse } from "$shared/utils/http/responses";
-import { genAssertZod } from "$shared/utils/validation/zod";
+import { createOneResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
+import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -25,7 +25,9 @@ export class EpisodeFileInfosApi {
       method,
       body,
       reqBodyValidator: genAssertZod(EpisodeFileInfoCrudDtos.PatchOneById.bodySchema),
-      resBodyValidator: genAssertIsOneResultResponse(EpisodeFileInfoDtos.schemaFullDto),
+      parseResponse: genParseZod(
+        createOneResultResponseSchema(EpisodeFileInfoDtos.schemaFullDto),
+      )as (m: unknown)=> any,
     } );
     const URL = backendUrl(
       PATH_ROUTES.episodes.fileInfo.withParams(id),

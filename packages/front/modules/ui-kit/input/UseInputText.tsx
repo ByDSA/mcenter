@@ -7,6 +7,7 @@ import { defaultValuesMap, ResourceInputType } from "./ResourceInput";
 type InputElement = HTMLTextAreaElement;
 export type UseInputTextProps = UseInputProps<string> & {
   onPressEnter?: OnPressEnter<string>;
+  autofocus?: boolean;
 };
 
 type OnPressEnterFn<T> = (value: T | undefined)=> void;
@@ -49,6 +50,7 @@ export function useInputText(props: UseInputTextProps) {
       className={classes("ui-kit-input-text", props.nullChecked ? "is-null" : "")}
       disabled={disabled}
       value={value}
+      autoFocus={props.autofocus}
       onChange={handleChange}
       onKeyDown={keyDownHandler}
       style={{

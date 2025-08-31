@@ -13,4 +13,8 @@
   .titleArtist {
     flex-wrap: wrap !important;
   }
+
+  details > summary {
+    cursor: pointer;
+  }
 }

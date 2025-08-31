@@ -9,8 +9,13 @@ export function useHistoryEntryEdition<T>(
     data: params.data,
     setData: params.setData,
     fetchRemove: async () => {
-      if (!confirm(`Borar esta entrada del historial?\n${ JSON.stringify(params.data, null, 2)}`))
-        return Promise.resolve();
+      if (
+        !confirm(`Borar esta entrada del historial?\n${ JSON.stringify(params.data, null, 2)}`)) {
+        return Promise.resolve( {
+          data: undefined,
+          success: false,
+        } );
+      }
 
       return await params.fetchRemove();
     },

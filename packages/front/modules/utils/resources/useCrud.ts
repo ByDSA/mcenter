@@ -8,7 +8,8 @@ export type AddOnReset<R> = (fn: OnReset<R>)=> void;
 
 type OnReset<R> = (resource: R)=> void;
 
-type FetchFn<T> = ()=> Promise<T | void>;
+type FetchFn<T> = ()=> Promise<{data: T | void;
+success: boolean;}>;
 
 export type UseCrudProps<T> = {
   data: T;
@@ -19,7 +20,8 @@ export type UseCrudProps<T> = {
 };
 
 type CrudOp<T> = {
-  action: ()=> Promise<T | void>;
+  action: ()=> Promise<{data: T | void;
+success: boolean;}>;
   isDoing: boolean;
 };
 
@@ -55,16 +57,22 @@ export function useCrud<T>(
     handleOnReset(initData);
   };
   const update = async () => {
-    if (!isModified)
-      return;
+    if (!isModified) {
+      return {
+        data: undefined,
+        success: false,
+      };
+    }
 
     const { done, start } = asyncUpdateAction;
 
     start();
 
     return await fetchUpdate()
-      .then(async (r)=>{
-        if (r) {
+      .then(async (obj)=>{
+        const r = obj.data;
+
+        if (obj.success && r) {
           initialDataState[1](r);
           setResponseData(r);
           await genReset(r)();
@@ -72,7 +80,7 @@ export function useCrud<T>(
 
         done();
 
-        return r;
+        return obj;
       } );
   };
   const remove = async () => {
@@ -81,12 +89,13 @@ export function useCrud<T>(
     start();
 
     return await fetchRemove()
-      .then((r)=>{
+      .then((obj)=>{
         done();
 
-        setResponseData(undefined);
+        if (obj.success)
+          setResponseData(undefined);
 
-        return r;
+        return obj;
       } );
   };
   const ret: UseCrudRet<T> = {

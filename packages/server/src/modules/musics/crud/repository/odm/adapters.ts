@@ -133,10 +133,10 @@ export function partialToDocOdm(partial: Partial<Music>): Partial<DocOdm> {
 export function aggregationResultToResponse(
   aggregationResult: AggregationResult,
 ): PaginatedResult<MusicEntity> {
-  const result = aggregationResult[0];
+  const result = aggregationResult[0] ?? [];
   const data = result.data.map(MusicOdm.toEntity);
   const metadata: PaginatedResult<MusicEntity>["metadata"] = {};
-  const { totalCount } = result.metadata[0];
+  const totalCount = result.metadata[0]?.totalCount;
 
   if (totalCount !== undefined)
     metadata.totalCount = totalCount;

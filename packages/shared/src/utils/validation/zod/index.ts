@@ -59,11 +59,33 @@ export function parseZod<T extends ZodTypeAny>(
   return result.data;
 }
 
+export function genParseZod<T>(
+  schema: ZodType<T>,
+  settings?: AssertZodSettings,
+) {
+  return (model: unknown): T => parseZodPopStack(schema, model, settings);
+}
+
 export function genAssertZod<T>(
   schema: ZodType<T>,
   settings?: AssertZodSettings,
 ) {
   return (model: unknown): asserts model is T => assertZodPopStack(schema, model, settings);
+}
+
+export function parseZodPopStack<T>(
+  schema: ZodType<T>,
+  model: unknown,
+  settings?: AssertZodSettings,
+): T {
+  try {
+    return parseZod(schema, model, settings);
+  } catch (e) {
+    if (e instanceof Error)
+      throwErrorPopStack(e, 2);
+
+    throw e;
+  }
 }
 
 export function assertZodPopStack<T>(

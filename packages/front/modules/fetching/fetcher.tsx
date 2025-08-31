@@ -9,15 +9,20 @@ type MakeFetcherParams<ReqBody, ResBody> = {
   body: ReqBody;
   method: Method;
   reqBodyValidator?: (data: ReqBody)=> void;
-  resBodyValidator: (data: ResBody)=> void;
+  parseResponse: (data: unknown)=> ResBody;
   errorMiddleware?: (error: any)=> void;
 };
 export function makeFetcher<ReqBody, ResBody>(
   { body,
     method,
-    resBodyValidator,
+    parseResponse,
     reqBodyValidator,
-    errorMiddleware = console.error }: MakeFetcherParams<ReqBody, ResBody>,
+    errorMiddleware = (err)=> {
+      console.error(err);
+
+      if (err instanceof Error)
+        alert(JSON.stringify(err.message, null, 2));
+    } }: MakeFetcherParams<ReqBody, ResBody>,
 ): Fetcher<ReqBody, ResBody> {
   const ret = async (params: FetcherParams<ReqBody>) => {
     reqBodyValidator?.(params.body);
@@ -56,9 +61,7 @@ export function makeFetcher<ReqBody, ResBody>(
 
       const value = text ? JSON.parse(text) : undefined;
 
-      resBodyValidator(value);
-
-      return value;
+      return parseResponse(value);
     } catch (error) {
       errorMiddleware(error);
 

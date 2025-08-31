@@ -3,7 +3,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
-import { UpdateQuery } from "mongoose";
+import { Types, UpdateQuery } from "mongoose";
 import { MusicFileInfoEntity, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
 import { assertFound } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
@@ -15,6 +15,7 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
+import { MusicsSearchService } from "#modules/search/search-services/musics.search.service";
 import { MusicHistoryEntryEvents } from "../../history/crud/repository/events";
 import { MusicBuilderService } from "../builder/music-builder.service";
 import { MusicAvailableSlugGeneratorService } from "../builder/vailable-slug-generator.service";
@@ -40,6 +41,7 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
     private readonly slugGenerator: MusicAvailableSlugGeneratorService,
     private readonly musicBuilder: MusicBuilderService,
     private readonly fileInfoRepo: MusicFileInfoRepository,
+    private readonly musicsSearchService: MusicsSearchService,
   ) { }
 
   @OnEvent(MusicEvents.WILDCARD)
@@ -83,14 +85,75 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
       ...criteria,
       limit: criteria.limit ?? 10,
     };
-    const pipeline = MusicOdm.getCriteriaPipeline(actualCriteria);
-    const aggreationResult = await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
-    const docs = aggreationResult[0].data;
+    let aggregationResult: AggregationResult;
+
+    if (criteria.filter && Object.entries(criteria.filter).length > 0) {
+      const { data: docs,
+        total } = await this.musicsSearchService.search(Object.values(criteria.filter).join(" "), {
+        limit: actualCriteria.limit,
+        offset: actualCriteria.offset,
+        sort: Object.entries(actualCriteria.sort ?? {} ).map(([key, value])=> {
+          const fixedKey = (()=> {
+            switch (key) {
+              case "added": return "addedAt";
+              default: return key;
+            }
+          } )();
+
+          return fixedKey + ":" + value;
+        } ),
+        showRankingScore: true,
+      } );
+      const musicStringIds = docs.map(hit => hit.id);
+      const musicObjectIds = docs.map(hit => new Types.ObjectId(hit.id));
+      const { filter, sort, offset, limit, ...criteriaSearch } = actualCriteria;
+      let pipeline = MusicOdm.getCriteriaPipeline(criteriaSearch);
+
+      pipeline = [
+        {
+          $match: {
+            _id: {
+              $in: musicObjectIds,
+            },
+          },
+        },
+        ...pipeline.slice(0, -1),
+        {
+          $addFields: {
+            __sortIndex: {
+              $indexOfArray: [musicStringIds, {
+                $toString: "$_id",
+              }],
+            },
+          },
+        },
+        {
+          $sort: {
+            __sortIndex: 1,
+          },
+        },
+        {
+          $unset: "__sortIndex",
+        },
+        ...pipeline.slice(-1),
+      ];
+
+      aggregationResult = await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
+      aggregationResult[0].metadata[0] = {
+        totalCount: total,
+      };
+    } else {
+      const pipeline = MusicOdm.getCriteriaPipeline(actualCriteria);
+
+      aggregationResult = await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
+    }
+
+    const docs = aggregationResult[0].data;
 
     if (docs.length > 0 && actualCriteria?.expand?.includes("fileInfos"))
       assertIsDefined(docs[0].fileInfos, "Lookup file infos failed");
 
-    return MusicOdm.toPaginatedResult(aggreationResult);
+    return MusicOdm.toPaginatedResult(aggregationResult);
   }
 
   async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {

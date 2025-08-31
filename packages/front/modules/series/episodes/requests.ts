@@ -1,6 +1,6 @@
 /* eslint-disable require-await */
-import { createManyResultResponseSchema, genAssertIsOneResultResponse, ResultResponse } from "$shared/utils/http/responses";
-import { genAssertZod } from "$shared/utils/validation/zod";
+import { createManyResultResponseSchema, createOneResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
+import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
 import { EpisodeCompKey, EpisodeEntity, episodeEntitySchema } from "#modules/series/episodes/models";
@@ -25,7 +25,9 @@ export class EpisodesApi {
       method,
       body,
       reqBodyValidator: genAssertZod(EpisodesApi.GetManyByCriteria.bodySchema),
-      resBodyValidator: genAssertZod(EpisodesApi.GetManyByCriteria.responseSchema),
+      parseResponse: genParseZod(
+        EpisodesApi.GetManyByCriteria.responseSchema,
+      )as (m: unknown)=> any,
     } );
     const URL = backendUrl(
       PATH_ROUTES.episodes.search.path,
@@ -46,7 +48,9 @@ export class EpisodesApi {
       method,
       body,
       reqBodyValidator: genAssertZod(EpisodesCrudDtos.PatchOneById.bodySchema),
-      resBodyValidator: genAssertIsOneResultResponse(episodeEntitySchema),
+      parseResponse: genParseZod(
+        createOneResultResponseSchema(episodeEntitySchema),
+      )as (m: unknown)=> any,
     } );
     const URL = backendUrl(
       PATH_ROUTES.episodes.slug.withParams(episodeCompKey.seriesKey, episodeCompKey.episodeKey),

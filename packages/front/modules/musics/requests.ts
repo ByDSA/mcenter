@@ -1,6 +1,6 @@
 /* eslint-disable require-await */
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
-import { genAssertZod } from "$shared/utils/validation/zod";
+import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { createOneResultResponseSchema, createPaginatedResultResponseSchema, PaginatedResult, ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
@@ -23,7 +23,9 @@ export class MusicsApi {
       method,
       body,
       reqBodyValidator: genAssertZod(MusicCrudDtos.PatchOneById.bodySchema),
-      resBodyValidator: genAssertZod(createOneResultResponseSchema(musicEntitySchema)),
+      parseResponse: genParseZod(
+        createOneResultResponseSchema(musicEntitySchema),
+      ) as (m: unknown)=> MusicsApi.Patch.Response,
     } );
     const URL = backendUrl(PATH_ROUTES.musics.withParams(id));
 
@@ -44,7 +46,9 @@ export class MusicsApi {
       method,
       body: criteria,
       reqBodyValidator: genAssertZod(MusicCrudDtos.GetMany.criteriaSchema),
-      resBodyValidator: genAssertZod(createPaginatedResultResponseSchema(musicEntitySchema)),
+      parseResponse: genParseZod(
+        createPaginatedResultResponseSchema(musicEntitySchema),
+      ) as (m: unknown)=> any,
     } );
     const URL = backendUrl(PATH_ROUTES.musics.search.path);
 
@@ -62,7 +66,9 @@ export class MusicsApi {
     >( {
       method,
       body: undefined,
-      resBodyValidator: genAssertZod(createOneResultResponseSchema(musicEntitySchema.or(z.null()))),
+      parseResponse: genParseZod(
+        createOneResultResponseSchema(musicEntitySchema.or(z.null())),
+      ) as (m: unknown)=> any,
     } );
     const URL = backendUrl(PATH_ROUTES.musics.withParams(id));
 

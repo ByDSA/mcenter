@@ -3,7 +3,8 @@ import { forwardRef, Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicFileInfoRepository } from "./crud/repository";
-import { UploadMusicFileInfoController } from "./upload.controller";
+import { MusicFileInfoController } from "./controller";
+import { MusicFileInfoUploadRepository } from "./upload.repository";
 
 @Module( {
   imports: [
@@ -11,10 +12,11 @@ import { UploadMusicFileInfoController } from "./upload.controller";
     forwardRef(()=>MusicsCrudModule),
   ],
   controllers: [
-    UploadMusicFileInfoController,
+    MusicFileInfoController,
   ],
   providers: [
     MusicFileInfoRepository,
+    MusicFileInfoUploadRepository,
   ],
   exports: [MusicFileInfoRepository],
 } )

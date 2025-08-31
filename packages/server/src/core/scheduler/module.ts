@@ -1,11 +1,19 @@
 import { Logger, Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { DateTime } from "luxon";
 import schedule from "node-schedule";
+import { IndexSyncService } from "#modules/search/indexes/sync-all.service";
+import { MeilisearchModule } from "#modules/search/module";
 import { dynamicLoadScriptFromEnvVar } from "../../dynamic-load";
 
-@Module( {} )
+@Module( {
+  imports: [MeilisearchModule],
+} )
 export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SchedulerModule.name);
+
+  constructor(
+    private readonly indexSyncService: IndexSyncService,
+  ) { }
 
   onModuleInit() {
     schedule.scheduleJob("* * * * * *", async (dateArg: Date) => {
@@ -23,7 +31,20 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
       scheduleFunc(date, calendar);
     } );
 
+    // 5 AM
+    schedule.scheduleJob("0 5 * * *", async () => {
+      await this.syncAllMeiliseachIndexes();
+    } );
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    this.syncAllMeiliseachIndexes();
+
     this.logger.log("Scheduler initialized!");
+  }
+
+  private async syncAllMeiliseachIndexes() {
+    this.logger.log("Sync Meilisearch data ...");
+
+    await this.indexSyncService.syncAll();
   }
 
   onModuleDestroy() {

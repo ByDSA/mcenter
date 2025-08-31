@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { RouterModule } from "@nestjs/core";
+import { MeilisearchModule } from "#modules/search/module";
 import { DevModule } from "../dev/module";
 import { DatabaseModule } from "../db/module";
 import { SchedulerModule } from "../scheduler/module";
@@ -23,6 +24,7 @@ const isDev = process.env.NODE_ENV === "development";
       : []),
     LoggingModule.forRoot(),
     GlobalErrorHandlerModule,
+    MeilisearchModule,
     ...routeModules,
     SchedulerModule,
     DatabaseModule,

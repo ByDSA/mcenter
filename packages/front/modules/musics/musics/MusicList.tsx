@@ -1,9 +1,10 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicsApi } from "../requests";
+import { MusicEntityWithFileInfos } from "../models";
 import { MusicEntryElement } from "./entry/MusicEntry";
 import { ArrayData } from "./types";
 import "#styles/resources/history-entry.css";
@@ -39,8 +40,12 @@ export function MusicList(props: Props) {
         <span className="history-list">
           {
           data!.map(
-            (music, i, array) => <Fragment key={`${music.id}`}>
-              <MusicEntryElement value={music} setValue={(newData)=>setItem(i, newData)}/>
+            (music, i) => <Fragment key={`${music.id}`}>
+              <MusicEntryElement data={music} setData={
+                (newData)=>setItem(i, newData as MusicEntityWithFileInfos)
+              }
+              shouldFetchFileInfo={true}
+              />
             </Fragment>,
           )
           }
@@ -63,6 +68,8 @@ export function MusicList(props: Props) {
 
 function useMusicList(props: Props) {
   const [totalCount, setTotalCount] = useState<number | null>(null);
+  const limitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fetchingMoreLimitRef = useRef<number>(5);
   const api = FetchApi.get(MusicsApi);
   const criteriaCommon: MusicsApi.GetManyByCriteria.Criteria = {
     sort: {
@@ -88,10 +95,19 @@ function useMusicList(props: Props) {
     fetchingMore: {
       fn: async (d) => {
         const result = await api.getManyByCriteria( {
-          limit: 5,
+          limit: fetchingMoreLimitRef.current,
           offset: d?.length ?? 0,
           ...criteriaCommon,
         } );
+
+        if (!limitTimeoutRef.current) {
+          fetchingMoreLimitRef.current = 20;
+          limitTimeoutRef.current = setTimeout(()=> {
+            fetchingMoreLimitRef.current = 5;
+            limitTimeoutRef.current = null;
+          }, 1000);
+        }
+
         const gotTotalCount = result.metadata?.totalCount;
 
         if (gotTotalCount !== undefined)

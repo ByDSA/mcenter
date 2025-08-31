@@ -30,7 +30,7 @@ T extends Entry<any, any>,
       const fetcher = makeFetcher<ReqBody, ResBody>( {
         method,
         body,
-        resBodyValidator: validator,
+        parseResponse: validator as (m: unknown)=> any,
       } );
       const result = await fetcher( {
         body,

@@ -64,7 +64,7 @@ export function useCrudDataWithScroll<
       canCall.current = false;
       setTimeout(()=> {
         canCall.current = true;
-      }, 1_000);
+      }, 500);
       const result = await props.fetchingMore.fn(current);
 
       if (isNetworkError(error))

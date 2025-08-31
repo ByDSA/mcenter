@@ -59,7 +59,10 @@ export function Body( { data, setData }: Props) {
       fetchRemove: async ()=> {
         const res = await historyApi.deleteOneById(data.id);
 
-        return res.data as Data;
+        return {
+          data: res.data as Data,
+          success: true,
+        };
       },
       fetchUpdate: async () => {
         const body: MusicsApi.Patch.Body = generatePatchBody(
@@ -121,7 +124,10 @@ export function Body( { data, setData }: Props) {
         if (newData.resource && await fileInfoPromise)
           newData.resource.fileInfos = [(await fileInfoPromise).data];
 
-        return newData as Data;
+        return {
+          data: newData as Data,
+          success: true,
+        };
       },
     } );
   const optionalProps: Record<keyof Music, PropInfo> = Object.entries(MUSIC_PROPS)
@@ -221,7 +227,7 @@ export function Body( { data, setData }: Props) {
       <span><a onClick={() => reset()}>Reset</a></span>
       {isModified && <span className={commonStyle.update}>{
         <LinkAsyncAction
-          action={update.action as ()=> Promise<void>}
+          action={update.action as ()=> Promise<any>}
           isDoing={update.isDoing}
         >Update</LinkAsyncAction>
       }</span>}</span>
@@ -231,7 +237,7 @@ export function Body( { data, setData }: Props) {
     && <>
       <span className={"line"}>
         <LinkAsyncAction
-          action={remove.action as ()=> Promise<void>}
+          action={remove.action as ()=> Promise<any>}
           isDoing={remove.isDoing}>Borrar</LinkAsyncAction>
       </span>
       <span className={"break"} />

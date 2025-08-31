@@ -32,7 +32,9 @@ export class MusicHistoryApi {
     >( {
       method: "POST",
       body,
-      resBodyValidator: genAssertZod(MusicHistoryApi.GetManyByCriteria.responseSchema),
+      parseResponse: genAssertZod(
+        MusicHistoryApi.GetManyByCriteria.responseSchema,
+      ) as (m: unknown)=> any,
     } );
 
     return fetcher( {
@@ -46,7 +48,9 @@ export class MusicHistoryApi {
   ): Promise<MusicHistoryApi.DeleteOneById.Response> {
     const fetcher = makeFetcher<undefined, MusicHistoryApi.DeleteOneById.Response>( {
       method: "DELETE",
-      resBodyValidator: genAssertIsOneResultResponse(musicHistoryEntryEntitySchema),
+      parseResponse: genAssertIsOneResultResponse(
+        musicHistoryEntryEntitySchema,
+      ) as (m: unknown)=> any,
       body: undefined,
     } );
 

@@ -13,9 +13,10 @@ export default function Search() {
       title: titleFilterRef.current,
     } ));
   }, []);
-  const { element: titleFilterInput, value: titleFilterValue } = useInputText( {
+  const { element: searchInput, value: titleFilterValue } = useInputText( {
     nullChecked: false,
     onPressEnter,
+    autofocus: true,
   } );
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function Search() {
         gap: "1rem",
       }}>
         {
-          titleFilterInput
+          searchInput
         }
         <button onClick={onPressEnter}>Buscar</button>
       </span>

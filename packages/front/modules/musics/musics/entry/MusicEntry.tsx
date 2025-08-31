@@ -1,25 +1,22 @@
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
-import { Data } from "../types";
-import { Body } from "./body/Body";
+import { Body, BodyProps } from "./body/Body";
 import { Header } from "./Header";
 
-type Props<T> = {
-  value: Required<T>;
-  setValue: (newData: T)=> void;
-};
+type Props = Omit<BodyProps, "setData"> & Partial<Pick<BodyProps, "setData">>;
 export function MusicEntryElement(
-  { value: entry, setValue }: Props<Data>,
+  props: Props,
 ) {
   return <span className="history-entry">
     {
       ResourceAccordion( {
         headerContent:
         Header( {
-          entry,
+          entry: props.data,
         } ),
         bodyContent: Body( {
-          data: entry,
-          setData: setValue,
+          ...props,
+          // eslint-disable-next-line no-empty-function
+          setData: props.setData ?? (()=>{ } ),
         } ),
       } )
     }

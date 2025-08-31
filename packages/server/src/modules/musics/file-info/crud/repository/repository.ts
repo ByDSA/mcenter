@@ -1,13 +1,17 @@
-import { Injectable } from "@nestjs/common";
+import { join, basename, dirname } from "node:path";
+import fs from "node:fs";
+import { Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { MusicEntity, MusicId } from "$shared/models/musics";
 import { assertIsDefined } from "$shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
-import { CanCreateOneAndGet, CanGetAll, CanGetOneById } from "#utils/layers/repository";
+import { CanCreateOneAndGet, CanDeleteOneById, CanGetAll, CanGetOneById } from "#utils/layers/repository";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 import { MusicEvents } from "#musics/crud/repository/events";
 import { showError } from "#core/logging/show-error";
+import { MUSIC_MEDIA_PATH } from "#musics/utils";
+import { assertFound } from "#utils/validation/found";
 import { MusicFileInfo, MusicFileInfoEntity } from "../../models";
 import { MusicFileInfoOmitMusicIdBuilder } from "../../builder";
 import { MusicFileInfoOdm } from "./odm";
@@ -25,10 +29,44 @@ export class MusicFileInfoRepository
 implements
 CanCreateOneAndGet<Model>,
 CanGetAll<Entity>,
+CanDeleteOneById<Entity["id"]>,
 CanGetOneById<Entity, Entity["id"]> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
   ) {}
+
+  async deleteOneById(id: string): Promise<void> {
+    const fileInfo = await MusicFileInfoOdm.Model.findById(id);
+
+    assertFound(fileInfo);
+    const { musicId } = fileInfo;
+    const count = await MusicFileInfoOdm.Model.count( {
+      musicId: musicId,
+    } );
+    const moreThanOne = count > 1;
+
+    if (!moreThanOne) {
+      throw new UnprocessableEntityException(
+        "No se puede eliminar el último archivo de una música. Elimine la \
+música si desea borrar el archivo.",
+      );
+    }
+
+    // Mover archivo
+    const absPath = join(MUSIC_MEDIA_PATH, fileInfo.path);
+    const filename = basename(absPath);
+    const newPath = join(MUSIC_MEDIA_PATH, "..", "deleted", filename);
+
+    await fs.promises.mkdir(dirname(newPath), {
+      recursive: true,
+    } );
+    await fs.promises.rename(absPath, newPath);
+
+    // Borrar de db
+    await MusicFileInfoOdm.Model.deleteOne( {
+      _id: id,
+    } );
+  }
 
   @OnEvent(MusicFileInfoEvents.WILDCARD)
   handleEvents(ev: DomainEvent<unknown>) {

@@ -42,3 +42,18 @@ services:
       - 8079:8081
     env_file:
       - .env.me
+
+  meilisearch:
+    container_name: mcenter_meilisearch
+    image: getmeili/meilisearch:v1.16
+    ports:
+      - 7700:7700
+    env_file:
+      - .env.db
+    volumes:
+      - mcenter_meilisearch_data:/meili_data
+    restart: unless-stopped
+
+volumes:
+  mcenter_meilisearch_data:
+    driver: local

@@ -75,7 +75,10 @@ export function Body( { data, setData }: Props) {
       fetchRemove: async ()=> {
         const res = await historyApi.delete(data.id);
 
-        return res.data as Data;
+        return {
+          data: res.data as Data,
+          success: true,
+        };
       },
       fetchUpdate: async () => {
         const episodeBody = generatePatchBody(
@@ -129,7 +132,10 @@ export function Body( { data, setData }: Props) {
       if (await fileInfoPromise)
         newData.resource.fileInfos = [await fileInfoPromise];
 
-      return newData;
+      return {
+        data: newData,
+        success: true,
+      };
       },
     } );
   const commonEpisodeInputProps = {
@@ -216,7 +222,7 @@ export function Body( { data, setData }: Props) {
     <span className="line">
       <span><a onClick={() => reset()}>Reset</a></span>
       {isModified && <span className={commonStyle.update}>{
-        <LinkAsyncAction action={update.action as ()=> Promise<void>}
+        <LinkAsyncAction action={update.action as ()=> Promise<any>}
           isDoing={update.isDoing}>Update</LinkAsyncAction>}</span>
       }</span>
     <span className={"break"} />
@@ -225,7 +231,7 @@ export function Body( { data, setData }: Props) {
     && <>
       <span className={"line"}>
         <LinkAsyncAction
-          action={remove.action as ()=> Promise<void>}
+          action={remove.action as ()=> Promise<any>}
           isDoing={remove.isDoing}>Borrar</LinkAsyncAction>
       </span>
       <span className={"break"} />

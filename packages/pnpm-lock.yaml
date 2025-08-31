@@ -219,6 +219,9 @@ importers:
       luxon:
         specifier: 3.7.1
         version: 3.7.1
+      meilisearch:
+        specifier: ^0.52.0
+        version: 0.52.0
       mime-types:
         specifier: 3.0.1
         version: 3.0.1
@@ -226,7 +229,7 @@ importers:
         specifier: 7.5.0
         version: 7.5.0
       multer:
-        specifier: ^2.0.2
+        specifier: 2.0.2
         version: 2.0.2
       nest-winston:
         specifier: 1.10.2
@@ -262,7 +265,7 @@ importers:
         specifier: 4.8.1
         version: 4.8.1
       uuid:
-        specifier: ^11.1.0
+        specifier: 11.1.0
         version: 11.1.0
       winston:
         specifier: 3.17.0
@@ -314,7 +317,7 @@ importers:
         specifier: 3.0.1
         version: 3.0.1
       '@types/multer':
-        specifier: ^2.0.0
+        specifier: 2.0.0
         version: 2.0.0
       '@types/node':
         specifier: 24.0.14
@@ -332,7 +335,7 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
       '@types/uuid':
-        specifier: ^10.0.0
+        specifier: 10.0.0
         version: 10.0.0
       dotenv:
         specifier: 17.2.0
@@ -4826,6 +4829,9 @@ packages:
   media-typer@1.1.0:
     resolution: {integrity: sha512-aisnrDP4GNe06UcKFnV5bfMNPBUw4jsLGaWwWfnH3v02GnBuXX2MCVn5RbrWo0j3pczUilYblq7fQ7Nw2t5XKw==}
     engines: {node: '>= 0.8'}
+
+  meilisearch@0.52.0:
+    resolution: {integrity: sha512-RqPsB4a78sXf/ATB7PIVvKCG7yf0y1M+uCj8Z9Wku44WmCy3iz0C1PHjVV5xphQolo09CdhdyFoRxHQSJkOdpg==}
 
   memfs@3.5.3:
     resolution: {integrity: sha512-UERzLsxzllchadvbPs5aolHh65ISpKpM+ccLbOJ8/vvpBKmAWf+la7dXFy7Mr0ySHbdHrFv5kGFCUHHe6GFEmw==}
@@ -12056,6 +12062,8 @@ snapshots:
   media-typer@0.3.0: {}
 
   media-typer@1.1.0: {}
+
+  meilisearch@0.52.0: {}
 
   memfs@3.5.3:
     dependencies:

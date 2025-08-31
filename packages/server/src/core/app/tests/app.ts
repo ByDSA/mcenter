@@ -7,6 +7,7 @@ import { DatabaseModule } from "#core/db/module";
 import { LoggingModule } from "#core/logging/module";
 import { GlobalErrorHandlerModule } from "#core/error-handlers/global-error-handler";
 import { TestRealDatabase, TestMemoryDatabase } from "#core/db/tests";
+import { MeilisearchModule } from "#modules/search/module";
 
 export type TestingSetup = {
   app: INestApplication;
@@ -30,6 +31,7 @@ export async function createTestingAppModule(
     imports: [
       LoggingModule.forRoot(),
       GlobalErrorHandlerModule,
+      MeilisearchModule,
       ...(metadata.imports ?? []),
       ...(options?.db?.using ? [DatabaseModule] : []),
     ],

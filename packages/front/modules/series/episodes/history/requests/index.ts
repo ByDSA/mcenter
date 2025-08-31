@@ -1,6 +1,6 @@
 /* eslint-disable require-await */
 import { PATH_ROUTES } from "$shared/routing";
-import { genAssertZod } from "$shared/utils/validation/zod";
+import { genParseZod } from "$shared/utils/validation/zod";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
@@ -26,7 +26,7 @@ export class EpisodeHistoryApi {
     const fetcher = makeFetcher<_GetMany.Req, _GetMany.Res>( {
       method: EpisodeHistoryApi.GetMany.method,
       body,
-      resBodyValidator: genAssertZod(_GetMany.resSchema),
+      parseResponse: genParseZod(_GetMany.resSchema) as (m: unknown)=> any,
     } );
 
     return fetcher( {
@@ -41,7 +41,7 @@ export class EpisodeHistoryApi {
     const URL = backendUrl(PATH_ROUTES.episodes.history.entries.withParams(entryId));
     const fetcher = makeFetcher<typeof undefined, _Delete.Response>( {
       method: _Delete.method,
-      resBodyValidator: genAssertZod(_Delete.responseSchema),
+      parseResponse: genParseZod(_Delete.responseSchema) as (m: unknown)=> any,
       body: undefined,
     } );
 

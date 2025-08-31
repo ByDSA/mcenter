@@ -6,6 +6,8 @@ import { Fragment, JSX, useState } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { AUDIO_EXTENSIONS } from "$shared/models/musics/audio-extensions";
+import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
+import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { MusicFileInfosApi } from "#modules/musics/file-info/requests";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
@@ -17,7 +19,7 @@ import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
 import { MusicsApi } from "#modules/musics/requests";
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { FileData, FileUpload } from "#modules/ui-kit/upload/FileUpload";
+import { FileData, FileUpload, OnUploadOptions, uploadSingleFileWithProgress } from "#modules/ui-kit/upload/FileUpload";
 import { MUSIC_FILE_INFO_PROPS, MUSIC_PROPS } from "../utils";
 import commonStyle from "../../../../history/entry/body-common.module.css";
 import { Data } from "../../types";
@@ -37,23 +39,28 @@ function getAndUpdateMusicByProp<V>(
   };
 }
 
-type Props = {
-  data: Data;
-  setData: (newData: Data)=> void;
+export type BodyProps = {
+  data: MusicEntity;
+  setData: (newData: MusicEntity)=> void;
+  shouldFetchFileInfo?: boolean;
 };
-export function Body( { data, setData }: Props) {
+
+export function Body( { data, setData, shouldFetchFileInfo }: BodyProps) {
   const api = FetchApi.get(MusicsApi);
   const fileInfosApi = FetchApi.get(MusicFileInfosApi);
   const { state, remove, isModified,
     reset, addOnReset,
-    update, initialState } = useHistoryEntryEdition<Data>( {
+    update, initialState } = useHistoryEntryEdition<MusicEntity>( {
       data,
       setData,
       isModifiedFn: calcIsModified,
       fetchRemove: async ()=> {
         const res = await api.deleteOneById(data.id);
 
-        return res.data as Data;
+        return {
+          data: res.data as Data,
+          success: true,
+        };
       },
       fetchUpdate: async () => {
         const body: MusicsApi.Patch.Body = generatePatchBody(
@@ -77,35 +84,44 @@ export function Body( { data, setData }: Props) {
 
         if (shouldSendPatchWithBody(body)) {
           musicPromise = api.patch(data.id, body)
-            .then(res=>{
+            .then(async res=>{
               const music = {
                 ...res.data,
-                fileInfos: state[0].fileInfos,
               };
 
-              assertIsDefined(music.fileInfos);
+              if (shouldFetchFileInfo) {
+                const fileInfos = (await fileInfosApi.getAllByMusicId(music.id)).data;
+
+                music.fileInfos = fileInfos;
+
+                assertIsDefined(music.fileInfos);
+              }
 
               return music;
             } );
         }
 
-        const dataFileInfo = data.fileInfos[0];
-        const stateFileInfo = state[0].fileInfos[0];
-        const fileInfoBody = generatePatchBody(
-          dataFileInfo,
-          stateFileInfo,
-          ["path"],
-        );
         let fileInfoPromise: ReturnType<
           typeof fileInfosApi.patch
         > = Promise.resolve() as Promise<any>;
 
-        if (Object.entries(fileInfoBody.entity).length > 0)
-          fileInfoPromise = fileInfosApi.patch(stateFileInfo.id, fileInfoBody);
+        if (data.fileInfos && data.fileInfos.length > 0
+          && state[0].fileInfos && state[0].fileInfos.length > 0) {
+          const dataFileInfo = data.fileInfos[0];
+          const stateFileInfo = state[0].fileInfos[0];
+          const fileInfoBody = generatePatchBody(
+            dataFileInfo,
+            stateFileInfo,
+            ["path"],
+          );
+
+          if (Object.entries(fileInfoBody.entity).length > 0)
+            fileInfoPromise = fileInfosApi.patch(stateFileInfo.id, fileInfoBody);
+        }
 
         await Promise.all([musicPromise, fileInfoPromise]);
 
-        let newData: Data = {
+        let newData: MusicEntity = {
           ...state[0],
         };
 
@@ -115,7 +131,10 @@ export function Body( { data, setData }: Props) {
         if (newData && await fileInfoPromise)
           newData.fileInfos = [(await fileInfoPromise).data];
 
-        return newData as Data;
+        return {
+          data: newData as Data,
+          success: true,
+        };
       },
     } );
   const optionalProps: Record<keyof Music, PropInfo> = Object.entries(MUSIC_PROPS)
@@ -156,6 +175,39 @@ export function Body( { data, setData }: Props) {
   </span>;
   const resource = state[0];
   const { fileInfos } = resource;
+
+  function removeFileInfo(id: string) {
+    const newData = {
+      ...state[0],
+      fileInfos: state[0]?.fileInfos?.filter(file => file.id !== id),
+    };
+    const lastResetData = initialState[0];
+    const newResetData = {
+      ...lastResetData,
+      fileInfos: lastResetData.fileInfos
+        ? lastResetData.fileInfos.filter(file => file.id !== id)
+        : undefined,
+    };
+
+    initialState[1](newResetData);
+    state[1](newData);
+  }
+  function addFileInfo(fileInfo: MusicFileInfoEntity) {
+    const newData = {
+      ...state[0],
+      fileInfos: state[0]?.fileInfos ? [...state[0].fileInfos, fileInfo] : [fileInfo],
+    };
+    const lastResetData = initialState[0];
+    const newResetData = {
+      ...lastResetData,
+      fileInfos: lastResetData.fileInfos
+        ? [...lastResetData.fileInfos, fileInfo]
+        : [fileInfo],
+    };
+
+    initialState[1](newResetData);
+    state[1](newData);
+  }
 
   return <div className={classes(style.container, commonStyle.container)}>
     {titleArtist}
@@ -206,7 +258,7 @@ export function Body( { data, setData }: Props) {
       <span><a onClick={() => reset()}>Reset</a></span>
       {isModified && <span className={commonStyle.update}>{
         <LinkAsyncAction
-          action={update.action as ()=> Promise<void>}
+          action={update.action as ()=> Promise<any>}
           isDoing={update.isDoing}
         >Update</LinkAsyncAction>
       }</span>}</span>
@@ -216,64 +268,98 @@ export function Body( { data, setData }: Props) {
     && <>
       <span className={"line"}>
         <LinkAsyncAction
-          action={remove.action as ()=> Promise<void>}
+          action={remove.action as ()=> Promise<any>}
           isDoing={remove.isDoing}>Borrar</LinkAsyncAction>
       </span>
       <span className={"break"} />
     </>
     }
-    <span>FileInfos ({fileInfos.length}):</span>
     {
-      fileInfos.map((f)=>{
-        const { duration } = f.mediaInfo;
+      fileInfos
+    && <details>
+      <summary>Files ({fileInfos.length})</summary>
+      {
+        fileInfos.map((f)=>{
+          const { duration } = f.mediaInfo;
 
-        return (
-          <Fragment key={f.hash}>
-            <hr/>
-            <span className={classes("line", "height2", commonStyle.url)}>
-              <span>{MUSIC_FILE_INFO_PROPS.path.caption}</span>
-              <span className={commonStyle.content}>{f.path}</span>
-            </span>
-            <span className={classes("line", "height2", style.duration)}>
-              <span>{MUSIC_FILE_INFO_PROPS["mediaInfo.duration"].caption}</span>
-              <span>{(isDefined(duration) && <>{secsToMmss(duration)} ({duration} s)</>) || "-"}</span>
-            </span>
-            <span className={classes("line", "height2", commonStyle.url)}>
-              <span>{MUSIC_FILE_INFO_PROPS.hash.caption}</span>
-              <span className={commonStyle.content}>{f.hash}</span>
-            </span>
-            <span className={classes("line", "height2", commonStyle.url)}>
-              <span>{MUSIC_FILE_INFO_PROPS.size.caption}</span>
-              <span className={commonStyle.content}>{f.size}</span>
-            </span>
-            <span className={classes("line", "height2", commonStyle.url)}>
-              <span>{MUSIC_FILE_INFO_PROPS["timestamps.createdAt"].caption}</span>
-              <span className={commonStyle.content}>{f.timestamps.createdAt.toString()}</span>
-            </span>
-            <span className={classes("line", "height2", commonStyle.url)}>
-              <span>{MUSIC_FILE_INFO_PROPS["timestamps.updatedAt"].caption}</span>
-              <span className={commonStyle.content}>{f.timestamps.updatedAt.toString()}</span>
-            </span>
-          </Fragment>
-        );
-      } )
+          return (
+            <Fragment key={f.hash}>
+              <hr/>
+              <span className={classes("line", "height2", commonStyle.url)}>
+                <span>{MUSIC_FILE_INFO_PROPS.path.caption}</span>
+                <span className={commonStyle.content}>{f.path}</span>
+              </span>
+              <span className={classes("line", "height2", style.duration)}>
+                <span>{MUSIC_FILE_INFO_PROPS["mediaInfo.duration"].caption}</span>
+                <span>{(isDefined(duration) && <>{secsToMmss(duration)} ({duration} s)</>) || "-"}</span>
+              </span>
+              <span className={classes("line", "height2", commonStyle.url)}>
+                <span>{MUSIC_FILE_INFO_PROPS.hash.caption}</span>
+                <span className={commonStyle.content}>{f.hash}</span>
+              </span>
+              <span className={classes("line", "height2", commonStyle.url)}>
+                <span>{MUSIC_FILE_INFO_PROPS.size.caption}</span>
+                <span className={commonStyle.content}>{f.size}</span>
+              </span>
+              <span className={classes("line", "height2", commonStyle.url)}>
+                <span>{MUSIC_FILE_INFO_PROPS["timestamps.createdAt"].caption}</span>
+                <span className={commonStyle.content}>{f.timestamps.createdAt.toISOString()}</span>
+              </span>
+              <span className={classes("line", "height2", commonStyle.url)}>
+                <span>{MUSIC_FILE_INFO_PROPS["timestamps.updatedAt"].caption}</span>
+                <span className={commonStyle.content}>{f.timestamps.updatedAt.toISOString()}</span>
+              </span>
+              <span>
+                <a onClick={async ()=> {
+                  if (confirm(`Borar este archivo?\n${ JSON.stringify(f, null, 2)}`)) {
+                    await fileInfosApi.deleteOneById(f.id);
+                    removeFileInfo(f.id);
+                  }
+                }}>Borrar</a>
+              </span>
+            </Fragment>
+          );
+        } )
+      }
+      <FileUpload
+        acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
+        multiple={true}
+        provideMetadata={()=> ( {
+          musicId: data.id,
+        } )}
+        onUpload={async (files: FileData[], options?: OnUploadOptions) =>{
+          for (const fileData of files) {
+            await uploadSingleFileWithProgress(
+              backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
+              fileData,
+              {
+                ...options,
+                // eslint-disable-next-line require-await
+                onEachUpload: async (response: unknown) => {
+                  const parsedResponse = MusicFileInfoCrudDtos.UploadFile.responseSchema
+                    .parse(response);
+
+                  options?.setSelectedFiles?.((old)=> ([
+                    ...old.filter(f=> f.name !== parsedResponse.meta.file.originalName),
+                  ]));
+
+                  addFileInfo(parsedResponse.data.fileInfo);
+                },
+              },
+            );
+          }
+        }}
+      />
+    </details>
     }
-    <FileUpload
-      acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
-      multiple={true}
-      provideMetadata={()=> ( {
-        musicId: data.id,
-      } )}
-      onUpload={onUpload}
-    />
   </div>;
 }
 
-type OptionalPropsProps = Omit<ResourceInputCommonProps<Data, string>, "getUpdatedResource" |
+type OptionalPropsProps = Omit<ResourceInputCommonProps<MusicEntity, string>, "getUpdatedResource" |
   "getValue" | "name"> & {
   onPressEnter?: OnPressEnter<unknown>;
   optionalProps: Record<keyof Music, PropInfo>;
-  initialResource: Data;
+  initialResource: MusicEntity;
 };
 function OptionalProps(
   { resourceState, optionalProps, initialResource,
@@ -388,93 +474,3 @@ function calcIsModified(r1: MusicEntity, r2: MusicEntity) {
     },
   } );
 }
-
-async function onUpload(files: FileData[], setSelectedFiles: any) {
-  for (const fileData of files)
-    await uploadSingleFileWithProgress(fileData, setSelectedFiles);
-}
-
-const uploadSingleFileWithProgress = (
-  fileData: FileData,
-  setSelectedFiles: any,
-): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    const formData = new FormData();
-
-    formData.append("file", fileData.file);
-
-    if (fileData.metadata)
-      formData.append("metadata", JSON.stringify(fileData.metadata));
-
-    // Actualizar estado a "uploading"
-    setSelectedFiles(prev => prev.map(f => f.id === fileData.id
-      ? {
-        ...f,
-        uploadStatus: "uploading" as const,
-        uploadProgress: 0,
-      }
-      : f));
-
-    xhr.upload.addEventListener("progress", (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = Math.round((event.loaded / event.total) * 100);
-
-        setSelectedFiles(prev => prev.map(f => f.id === fileData.id
-          ? {
-            ...f,
-            uploadProgress: percentComplete,
-          }
-          : f));
-      }
-    } );
-
-    xhr.addEventListener("load", () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        setSelectedFiles(prev => prev.map(f => f.id === fileData.id
-          ? {
-            ...f,
-            uploadStatus: "completed" as const,
-            uploadProgress: 100,
-          }
-          : f));
-        resolve();
-      } else {
-        setSelectedFiles(prev => prev.map(f => f.id === fileData.id
-          ? {
-            ...f,
-            uploadStatus: "error" as const,
-          }
-          : f));
-        let errorMessage = `HTTP ${xhr.status} ${xhr.statusText}`;
-
-        try {
-          const response = JSON.parse(xhr.responseText);
-
-          if (response.message)
-            errorMessage += `: ${response.message}`;
-          else
-            errorMessage += `: ${xhr.responseText}`;
-        } catch {
-          if (xhr.responseText)
-            errorMessage += `: ${xhr.responseText}`;
-        }
-
-        reject(new Error(errorMessage));
-      }
-    } );
-
-    xhr.addEventListener("error", () => {
-      setSelectedFiles(prev => prev.map(f => f.id === fileData.id
-        ? {
-          ...f,
-          uploadStatus: "error" as const,
-        }
-        : f));
-      reject(new Error("Upload failed"));
-    } );
-
-    xhr.open("POST", backendUrl(PATH_ROUTES.musics.fileInfo.upload.path));
-    xhr.send(formData);
-  } );
-};

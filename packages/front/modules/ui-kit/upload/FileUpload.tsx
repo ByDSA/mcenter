@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { CloudUpload, InsertDriveFile, Close, CheckCircle } from "@mui/icons-material";
+import { showError } from "$shared/utils/errors/showError";
 import { classes } from "#modules/utils/styles";
 import styles from "./FileUpload.module.css";
 
@@ -20,13 +21,17 @@ export type FileData = FileDataWithoutMetadata & {
 
 type ProvideMetadataFn = (fileDatas: FileDataWithoutMetadata)=> FileDataMetadata;
 
+export type OnUploadOptions = {
+  setSelectedFiles?: React.Dispatch<React.SetStateAction<FileData[]>>;
+};
+
 interface FileUploadProps {
   buttonText?: string;
   maxFileSize?: number;
   acceptedTypes?: string[];
   multiple?: boolean;
   provideMetadata?: ProvideMetadataFn;
-  onUpload?: ((files: FileData[], setSelectedFiles: any)=> Promise<void>);
+  onUpload?: ((files: FileData[], options?: OnUploadOptions)=> Promise<void>);
 }
 
 function extensionsToDisplay(extensions: string[]): string[] {
@@ -168,7 +173,9 @@ ${acceptedTypesDisplay}`,
     setValidationErrors([]);
 
     try {
-      await onUpload?.(pendingFiles, setSelectedFiles);
+      await onUpload?.(pendingFiles, {
+        setSelectedFiles,
+      } );
     } catch (uploadError) {
       const errorMessage = uploadError instanceof Error
         ? uploadError.message
@@ -310,3 +317,112 @@ ${acceptedTypesDisplay}`,
     </div>
   );
 }
+
+type Options = OnUploadOptions & {
+  onEachUpload?: (response: unknown)=> Promise<void>;
+};
+export const uploadSingleFileWithProgress = (
+  url: string,
+  fileData: FileData,
+  options?: Options,
+): Promise<void> => {
+  const setSelectedFiles = options?.setSelectedFiles;
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+
+    formData.append("file", fileData.file);
+
+    if (fileData.metadata)
+      formData.append("metadata", JSON.stringify(fileData.metadata));
+
+    if (setSelectedFiles) {
+      // Actualizar estado a "uploading"
+      setSelectedFiles(prev => prev.map(f => f.id === fileData.id
+        ? {
+          ...f,
+          uploadStatus: "uploading" as const,
+          uploadProgress: 0,
+        }
+        : f));
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+
+          setSelectedFiles(prev => prev.map(f => f.id === fileData.id
+            ? {
+              ...f,
+              uploadProgress: percentComplete,
+            }
+            : f));
+        }
+      } );
+    }
+
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        setSelectedFiles?.(prev => prev.map(f => f.id === fileData.id
+          ? {
+            ...f,
+            uploadStatus: "completed" as const,
+            uploadProgress: 100,
+          }
+          : f));
+
+        const onEachUpload = options?.onEachUpload;
+
+        if (onEachUpload) {
+          let response: unknown;
+
+          try {
+            response = JSON.parse(xhr.responseText);
+          } catch {
+            // Si no se puede parsear como JSON, pasar el texto plano
+            response = xhr.responseText;
+          }
+
+          onEachUpload(response)
+            .catch(showError);
+        }
+
+        resolve();
+      } else {
+        setSelectedFiles?.(prev => prev.map(f => f.id === fileData.id
+          ? {
+            ...f,
+            uploadStatus: "error" as const,
+          }
+          : f));
+        let errorMessage = `HTTP ${xhr.status} ${xhr.statusText}`;
+
+        try {
+          const response = JSON.parse(xhr.responseText);
+
+          if (response.message)
+            errorMessage += `: ${response.message}`;
+          else
+            errorMessage += `: ${xhr.responseText}`;
+        } catch {
+          if (xhr.responseText)
+            errorMessage += `: ${xhr.responseText}`;
+        }
+
+        reject(new Error(errorMessage));
+      }
+    } );
+
+    xhr.addEventListener("error", () => {
+      setSelectedFiles?.(prev => prev.map(f => f.id === fileData.id
+        ? {
+          ...f,
+          uploadStatus: "error" as const,
+        }
+        : f));
+      reject(new Error("Upload failed"));
+    } );
+
+    xhr.open("POST", url);
+    xhr.send(formData);
+  } );
+};
