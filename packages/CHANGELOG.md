@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.0](https://github.com/ByDSA/mcenter/compare/v4.2.0...v4.3.0) (2025-08-31)
+
+
+### Features
+
+* **front:** infinite scroll in history ([8ecf52d](https://github.com/ByDSA/mcenter/commit/8ecf52de82cd01016d4bebafa6180ae61c36e773))
+* search musics (directly to mongo) ([c3149e3](https://github.com/ByDSA/mcenter/commit/c3149e3a637a99e975903855f986eefd049aa785))
+* upload and search music files ([3d08761](https://github.com/ByDSA/mcenter/commit/3d08761b2669994417094da501f459297d61712c))
+
+
+### Bug Fixes
+
+* **back:** music update-remote to include size ([1a3c5bf](https://github.com/ByDSA/mcenter/commit/1a3c5bf0792048cad280b7524c4d6ebd72635f01))
+* **front:** prevent reload render if error when already has data ([de3329c](https://github.com/ByDSA/mcenter/commit/de3329c03f15b54cd037a8bbf349522eaec9c2e2))
+
 ## [4.2.0](https://github.com/ByDSA/mcenter/compare/v4.1.2...v4.2.0) (2025-08-20)
 
 
