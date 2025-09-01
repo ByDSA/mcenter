@@ -52,18 +52,6 @@ export function getCriteriaPipeline(
   const needsFileInfoLookup = criteria.expand?.includes("fileInfos")
                              || !!criteria.filter?.hash
                              || !!criteria.filter?.path;
-
-  if (needsFileInfoLookup) {
-    pipeline.push( {
-      $lookup: {
-        from: "musicfileinfos",
-        localField: "_id",
-        foreignField: "musicId",
-        as: "fileInfos",
-      },
-    } );
-  }
-
   // Construir filtro después del lookup si es necesario
   const filter = buildMongooseFilterWithFileInfos(criteria, needsFileInfoLookup);
 
@@ -104,6 +92,17 @@ export function getCriteriaPipeline(
   if (criteria.limit) {
     dataPipeline.push( {
       $limit: criteria.limit,
+    } );
+  }
+
+  if (needsFileInfoLookup) {
+    dataPipeline.push( {
+      $lookup: {
+        from: "musicfileinfos",
+        localField: "_id",
+        foreignField: "musicId",
+        as: "fileInfos",
+      },
     } );
   }
 
