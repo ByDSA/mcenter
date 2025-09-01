@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.2](https://github.com/ByDSA/mcenter/compare/v4.3.1...v4.3.2) (2025-09-01)
+
+
+### Bug Fixes
+
+* **front:** replace genAssertZod with genParseZod for response parsing in MusicHistoryApi ([a9a6f72](https://github.com/ByDSA/mcenter/commit/a9a6f725c9ce54ca958a45b1c69bc37c81e57046))
+
 ### [4.3.1](https://github.com/ByDSA/mcenter/compare/v4.3.0...v4.3.1) (2025-09-01)
 
 
