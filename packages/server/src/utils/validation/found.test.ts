@@ -1,6 +1,6 @@
-import { NotFoundException } from "@nestjs/common";
+import { InternalServerErrorException, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
 import { definedEntries, expectErrorStackStartsWithThisFilename, undefinedEntries } from "$sharedSrc/utils/tests";
-import { assertFound } from "./found";
+import { assertFound, assertFoundServer } from "./found";
 
 describe("assertFound", () => {
   describe.each(definedEntries)("when value is defined", (entry) => {
@@ -12,10 +12,18 @@ describe("assertFound", () => {
   } );
 
   describe.each(undefinedEntries)("when value is undefined", (entry) => {
-    it(`throws NotFoundException for ${entry.description}`, () => {
+    it(`throws UnprocessableEntityException for ${entry.description}`, () => {
       expect(() => {
         assertFound(entry.value);
-      } ).toThrow(NotFoundException);
+      } ).toThrow(UnprocessableEntityException);
+    } );
+  } );
+
+  describe.each(undefinedEntries)("when value is undefined", (entry) => {
+    it(`throws InternalServerErrorException for ${entry.description}`, () => {
+      expect(() => {
+        assertFoundServer(entry.value);
+      } ).toThrow(InternalServerErrorException);
     } );
   } );
 

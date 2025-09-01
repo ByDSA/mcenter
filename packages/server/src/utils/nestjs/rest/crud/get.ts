@@ -1,4 +1,4 @@
-import { applyDecorators, Get, HttpCode, HttpStatus, NotFoundException, Post, UseInterceptors } from "@nestjs/common";
+import { applyDecorators, Get, HttpCode, HttpStatus, Post, UseInterceptors } from "@nestjs/common";
 import z from "zod";
 import { Injectable,
   NestInterceptor,
@@ -7,17 +7,17 @@ import { Injectable,
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { createManyResultResponseSchema, createOneResultResponseSchema } from "$shared/utils/http/responses";
-import { createPaginatedResultResponseSchema } from "$sharedSrc/utils/http/responses";
+import { createPaginatedResultResponseSchema } from "$shared/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
+import { assertFound } from "#utils/validation/found";
 import { ResponseFormatterInterceptor } from "../responses/response-formatter.interceptor";
 
 @Injectable()
-export class NotFoundOnNullInterceptor implements NestInterceptor {
+export class DataNotFoundOnNullInterceptor implements NestInterceptor {
   intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((data) => {
-        if (data === null)
-          throw new NotFoundException();
+        assertFound(data);
 
         return data;
       } ),
@@ -32,7 +32,7 @@ export function GetOne(url: string, schema: z.ZodSchema, _options?: GetOneOption
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Get(url),
     // los interceptors se ejecutan al revés:
-    UseInterceptors(ResponseFormatterInterceptor, NotFoundOnNullInterceptor),
+    UseInterceptors(ResponseFormatterInterceptor, DataNotFoundOnNullInterceptor),
     ValidateResponseWithZodSchema(createOneResultResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
   ];

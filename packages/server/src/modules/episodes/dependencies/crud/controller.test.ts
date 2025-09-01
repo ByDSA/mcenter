@@ -55,11 +55,11 @@ describe("crudController", () => {
       } as EpisodeCompKey);
     } );
 
-    it("should return 404 if is not found in repository", async () => {
+    it("should return 422 if is not found in repository", async () => {
       repository.getNextByLast.mockResolvedValueOnce(null);
       await request(routerApp)
         .get("/serie/episode")
-        .expect(HttpStatus.NOT_FOUND)
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY)
         .send();
     } );
   } );

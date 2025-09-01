@@ -45,29 +45,29 @@ describe("playStreamController", () => {
   } );
 
   describe("requests", () => {
-    it("should return 404 if stream not found", async () => {
+    it("should return 422 if stream not found", async () => {
       testingSetup.getMock(StreamsRepository).getOneByKey
         .mockResolvedValueOnce(null);
       const response = await request(routerApp).get("/play/stream/not-found/1")
-        .expect(HttpStatus.NOT_FOUND);
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
       expect(response).toBeDefined();
     } );
 
-    it("should return 404 if no episodes found", async () => {
+    it("should return 422 if no episodes found", async () => {
       testingSetup.getMock(EpisodePickerService).getByStream
         .mockResolvedValueOnce([]);
       const response = await request(routerApp).get("/play/stream/simpsons/1")
-        .expect(HttpStatus.NOT_FOUND);
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
       expect(response).toBeDefined();
     } );
 
-    it("should return 404 if episodes are null/undefined", async () => {
+    it("should return 422 if episodes are null/undefined", async () => {
       testingSetup.getMock(EpisodePickerService).getByStream
         .mockResolvedValueOnce([null, undefined] as any[]);
       const response = await request(routerApp).get("/play/stream/simpsons/1")
-        .expect(HttpStatus.NOT_FOUND);
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
       expect(response).toBeDefined();
     } );

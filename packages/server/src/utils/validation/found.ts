@@ -4,9 +4,9 @@ import { InternalServerErrorException, UnprocessableEntityException } from "@nes
 
 export function assertFound<T>(value: T | null | undefined, msg?: string): asserts value is T {
   if (!isDefined(value)) {
-    const error = new UnprocessableEntityException(msg);
+    const error = new UnprocessableEntityException();
 
-    error.message += `: ${msg}`;
+    error.message += `: Data not found${msg ? `: ${msg}` : "."}`;
     throwErrorPopStack(error);
   }
 }
@@ -14,9 +14,9 @@ export function assertFound<T>(value: T | null | undefined, msg?: string): asser
 export function assertFoundServer<T>(value: T | null |
   undefined, msg?: string): asserts value is T {
   if (!isDefined(value)) {
-    const error = new InternalServerErrorException(msg);
+    const error = new InternalServerErrorException();
 
-    error.message += `: ${msg}`;
+    error.message += `: Data not found${msg ? `: ${msg}` : "."}`;
     throwErrorPopStack(error);
   }
 }

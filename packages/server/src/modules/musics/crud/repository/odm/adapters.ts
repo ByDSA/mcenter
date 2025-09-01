@@ -2,13 +2,12 @@ import mongoose from "mongoose";
 import { MusicEntity } from "$shared/models/musics";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { PaginatedResult } from "$sharedSrc/utils/http/responses";
+import { PaginatedResult } from "$shared/utils/http/responses";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { timestampsModelToDocOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 import { AggregationResult } from "./criteria-pipeline";
-import { MusicOdm } from ".";
 
 function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
   if (!docOdm.tags && !docOdm.onlyTags)
@@ -134,7 +133,7 @@ export function aggregationResultToResponse(
   aggregationResult: AggregationResult,
 ): PaginatedResult<MusicEntity> {
   const result = aggregationResult[0] ?? [];
-  const data = result.data.map(MusicOdm.toEntity);
+  const data = result.data.map(musicDocOdmToEntity);
   const metadata: PaginatedResult<MusicEntity>["metadata"] = {};
   const totalCount = result.metadata[0]?.totalCount;
 

@@ -28,7 +28,7 @@ const A_AOT4: MusicFileInfoEntity = {
     duration: 0,
   },
   path: "a/aot4.mp3",
-  size: 0,
+  size: 7614308,
   timestamps: fileInfoTimestamps,
 };
 const DK: MusicFileInfoEntity = {
@@ -45,6 +45,7 @@ const DRIFTVEIL: MusicFileInfoEntity = {
   musicId: fixtureMusics.Disk.Samples.DRIFTVEIL.id,
   path: "Driftveil.mp3",
   hash: "4c8d3285f37bd9537e66fb8a4034edff",
+  size: 10096359,
 };
 const AOT4_COPY: MusicFileInfoEntity = {
   ...AOT4_COMMON_FILE_INFO,

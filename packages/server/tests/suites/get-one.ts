@@ -1,7 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import { autoProps, PatchTestsProps } from "./patch-one";
 import { generateCase } from "./generate-case";
-import { defaultResponse } from "./common";
+import { defaultResponse, expectedDataNotFound } from "./common";
 
 export function getOneTests<R>(props: PatchTestsProps<R>) {
   const { getExpressApp } = props;
@@ -41,10 +41,7 @@ export function getOneTests<R>(props: PatchTestsProps<R>) {
       },
       url: validUrl,
       getExpressApp,
-      expected: {
-        body: undefined,
-        statusCode: HttpStatus.NOT_FOUND,
-      },
+      expected: expectedDataNotFound,
     } );
   } );
 }

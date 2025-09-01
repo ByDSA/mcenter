@@ -41,11 +41,11 @@ describe("playMusicController", () => {
   } );
 
   describe("requests", () => {
-    it("should return 404 if music not found", async () => {
+    it("should return 422 if music not found", async () => {
       testingSetup.getMock(MusicsRepository).getOneBySlug
         .mockResolvedValueOnce(null);
       const response = await request(routerApp).get("/play/music/not-found")
-        .expect(HttpStatus.NOT_FOUND);
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
       expect(response).toBeDefined();
     } );

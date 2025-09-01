@@ -14,6 +14,7 @@ import { EpisodesRepository } from "#episodes/crud/repository";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
+import { UUID_INVALID, UUID_UNUSED } from "#core/db/tests/fixtures/uuid";
 import { PlayVideoService } from "../play-video.service";
 import { PlayService } from "../play.service";
 import { PlayEpisodeController } from "./controller";
@@ -49,20 +50,29 @@ describe("playEpisodeController", () => {
   } );
 
   describe("requests", () => {
-    it("should return 404 if serie not found", async () => {
+    it("should return 422 if serie not found", async () => {
       testingSetup.getMock(SeriesRepository).getOneByKey
         .mockResolvedValueOnce(null);
       const response = await request(routerApp).get("/play/episode/not-found/1x01")
-        .expect(HttpStatus.NOT_FOUND);
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
       expect(response).toBeDefined();
     } );
 
-    it("should return 404 if episode not found", async () => {
+    it("should return 422 if episode id is not UUID", async () => {
       testingSetup.getMock(EpisodesRepository).getOneByCompKey
         .mockResolvedValueOnce(null);
-      const response = await request(routerApp).get("/play/episode/simpsons/not-found")
-        .expect(HttpStatus.NOT_FOUND);
+      const response = await request(routerApp).get("/play/episode/simpsons/" + UUID_INVALID)
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
+
+      expect(response).toBeDefined();
+    } );
+
+    it("should return 422 if episode id not exists", async () => {
+      testingSetup.getMock(EpisodesRepository).getOneByCompKey
+        .mockResolvedValueOnce(null);
+      const response = await request(routerApp).get("/play/episode/simpsons/" + UUID_UNUSED)
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
       expect(response).toBeDefined();
     } );

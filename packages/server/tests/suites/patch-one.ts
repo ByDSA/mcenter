@@ -3,7 +3,7 @@ import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
 import { assertFound } from "#utils/validation/found";
 import { ExpectedBody, generateCase, GenerateCaseProps } from "./generate-case";
-import { defaultResponse } from "./common";
+import { defaultResponse, expectedDataNotFound } from "./common";
 
 type MockFn = NonNullable<GenerateCaseProps["mock"]>["fn"][0];
 export type PatchTestsProps<R> = {
@@ -106,10 +106,7 @@ export function patchOneTests<R>(
       body: validInput,
       url: validUrl,
       getExpressApp,
-      expected: {
-        body: undefined,
-        statusCode: HttpStatus.NOT_FOUND,
-      },
+      expected: expectedDataNotFound,
       mock: {
         fn: [{
           ...repo,

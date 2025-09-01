@@ -11,6 +11,15 @@ const generatedConfigs = await generateConfigs( {
   [Dependencies.Node]: true,
 } );
 const packageDir = path.join(import.meta.url, "..").slice("file:".length);
+const restrictedImportPatternsCommon = [
+  {
+    group: [ // No funciona usar {episodes,musics}
+      "\\#modules/episodes",
+      "\\#modules/musics",
+    ],
+    message: "Usa el alias interno correspondiente en lugar de #modules/* (Ej: '#musics/models').",
+  },
+];
 const packageConfig = [
   {
     ignores: ["lib/chevrotain", "bin/live-tests", "bin/migrations", "coverage"],
@@ -25,13 +34,25 @@ const packageConfig = [
         "error",
         {
           patterns: [
+            ...restrictedImportPatternsCommon,
             {
-              group: [ // No funciona usar {episodes,musics}
-                "\\#modules/episodes",
-                "\\#modules/musics",
-              ],
-              message: "Usa el alias interno correspondiente en lugar de #modules/* (Ej: '#musics/models').",
+              group: ["$sharedSrc/*"],
+              message: "Use $shared instead of $sharedSrc in production code",
             },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["**/*.spec.ts", "**/*.test.ts", "**/tests/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...restrictedImportPatternsCommon,
+            // Como no está lo de $sharedSrc que sí está en los .ts, se ignora para tests
           ],
         },
       ],

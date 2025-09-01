@@ -31,9 +31,8 @@ export async function createTestingAppModule(
     imports: [
       LoggingModule.forRoot(),
       GlobalErrorHandlerModule,
-      MeilisearchModule,
       ...(metadata.imports ?? []),
-      ...(options?.db?.using ? [DatabaseModule] : []),
+      ...(options?.db?.using ? [DatabaseModule, MeilisearchModule] : []),
     ],
     providers: [
       ...globalValidationProviders,

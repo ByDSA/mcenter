@@ -1,7 +1,7 @@
 import type { FilterQuery, PipelineStage } from "mongoose";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { MongoFilterQuery } from "#utils/layers/db/mongoose";
-import { MusicOdm } from ".";
+import { FullDocOdm } from "./odm";
 
 type Criteria = MusicCrudDtos.GetMany.Criteria;
 
@@ -37,7 +37,7 @@ function buildMongooseSort(
 }
 
 export type AggregationResult = {
-  data: MusicOdm.FullDoc[];
+  data: FullDocOdm[];
   metadata: {
     totalCount?: number;
   }[];

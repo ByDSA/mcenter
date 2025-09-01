@@ -89,9 +89,9 @@ export class UpdateRemoteTreeService {
         u.old.path,
         newMusicFileInfo,
       )
-        .then(newMusic => {
+        .then(newMusicFile => {
           updated.push( {
-            new: newMusic,
+            new: newMusicFile,
             old: u.old,
           } );
         } )

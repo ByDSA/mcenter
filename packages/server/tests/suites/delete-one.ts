@@ -2,7 +2,7 @@ import { HttpStatus } from "@nestjs/common";
 import { assertFound } from "#utils/validation/found";
 import { generateCase } from "./generate-case";
 import { autoProps, PatchTestsProps } from "./patch-one";
-import { defaultResponse } from "./common";
+import { defaultResponse, expectedDataNotFound } from "./common";
 
 export function deleteOneTests<R>(props: PatchTestsProps<R>) {
   const { repo,
@@ -38,10 +38,7 @@ export function deleteOneTests<R>(props: PatchTestsProps<R>) {
       method: "delete",
       url: validUrl,
       getExpressApp,
-      expected: {
-        body: undefined,
-        statusCode: HttpStatus.NOT_FOUND,
-      },
+      expected: expectedDataNotFound,
       mock: {
         fn: [{
           ...repo,
