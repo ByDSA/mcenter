@@ -1,7 +1,7 @@
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
 import { createManyResultResponseSchema, genAssertIsOneResultResponse, type ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
-import { genAssertZod } from "$shared/utils/validation/zod";
+import { genParseZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
@@ -32,7 +32,7 @@ export class MusicHistoryApi {
     >( {
       method: "POST",
       body,
-      parseResponse: genAssertZod(
+      parseResponse: genParseZod(
         MusicHistoryApi.GetManyByCriteria.responseSchema,
       ) as (m: unknown)=> any,
     } );
