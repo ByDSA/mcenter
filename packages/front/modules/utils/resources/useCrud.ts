@@ -78,9 +78,10 @@ export function useCrud<T>(
           await genReset(r)();
         }
 
-        done();
-
         return obj;
+      } )
+      .finally(()=> {
+        done();
       } );
   };
   const remove = async () => {
@@ -90,12 +91,13 @@ export function useCrud<T>(
 
     return await fetchRemove()
       .then((obj)=>{
-        done();
-
         if (obj.success)
           setResponseData(undefined);
 
         return obj;
+      } )
+      .finally(()=> {
+        done();
       } );
   };
   const ret: UseCrudRet<T> = {
