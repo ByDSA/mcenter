@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.3](https://github.com/ByDSA/mcenter/compare/v4.3.2...v4.3.3) (2025-09-02)
+
+
+### Bug Fixes
+
+* **back:** execute lookup only for limit docs ([26c8016](https://github.com/ByDSA/mcenter/commit/26c8016b31fa005ad2b49aa39cb422eae9c468eb))
+* **back:** updated max body size (for upload files) ([b1d65ab](https://github.com/ByDSA/mcenter/commit/b1d65abf18405a5a0019a2431f771bd0db6b1c2e))
+* **front:** latest ([d49f74d](https://github.com/ByDSA/mcenter/commit/d49f74dfaa40f917dcee8013f95c54018f51eedb))
+
 ### [4.3.2](https://github.com/ByDSA/mcenter/compare/v4.3.1...v4.3.2) (2025-09-01)
 
 
