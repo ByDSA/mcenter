@@ -1,5 +1,6 @@
-import { assertIsManyResultResponse, ResultResponse } from "$shared/utils/http/responses";
+import { createManyResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
+import { genAssertZod } from "$shared/utils/validation/zod";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "#modules/series/episodes/history/models";
 import { EpisodeHistoryEntryCrudDtos } from "#modules/series/episodes/history/models/dto";
 import { EpisodeCompKey } from "#modules/series/episodes/models";
@@ -41,11 +42,9 @@ export function LastestComponent(
   return LatestHistoryEntries<EpisodeHistoryEntryEntity, Criteria>( {
     url: URL,
     body,
-    validator,
+    parseResponse: genAssertZod(
+      createManyResultResponseSchema(episodeHistoryEntryEntitySchema),
+    ) as (m: unknown)=> ResultResponse<Data>,
     dateFormat,
   } );
 }
-
-const validator = (res: ResultResponse<Data>) => {
-  assertIsManyResultResponse(res, episodeHistoryEntryEntitySchema as any);
-};

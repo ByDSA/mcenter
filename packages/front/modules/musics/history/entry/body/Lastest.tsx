@@ -1,5 +1,6 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { genAssertIsManyResultResponse } from "$shared/utils/http/responses";
+import { createManyResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
+import { genParseZod } from "$shared/utils/validation/zod";
 import { MusicHistoryEntryEntity, musicHistoryEntryEntitySchema } from "#musics/history/models/index";
 import { MusicHistoryEntry } from "#modules/musics/history/models";
 import { LatestHistoryEntries } from "#modules/history";
@@ -38,7 +39,9 @@ export function LastestComponent(
   return LatestHistoryEntries<MusicHistoryEntryEntity, Body>( {
     url,
     body,
-    validator: genAssertIsManyResultResponse(musicHistoryEntryEntitySchema),
+    parseResponse: genParseZod(
+      createManyResultResponseSchema(musicHistoryEntryEntitySchema),
+    ) as (m: unknown)=> ResultResponse<MusicHistoryEntryEntity[]>,
     dateFormat,
   } );
 }

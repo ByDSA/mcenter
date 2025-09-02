@@ -1,5 +1,5 @@
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
-import { createManyResultResponseSchema, genAssertIsOneResultResponse, type ResultResponse } from "$shared/utils/http/responses";
+import { createManyResultResponseSchema, createOneResultResponseSchema, type ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { genParseZod } from "$shared/utils/validation/zod";
 import z from "zod";
@@ -48,9 +48,9 @@ export class MusicHistoryApi {
   ): Promise<MusicHistoryApi.DeleteOneById.Response> {
     const fetcher = makeFetcher<undefined, MusicHistoryApi.DeleteOneById.Response>( {
       method: "DELETE",
-      parseResponse: genAssertIsOneResultResponse(
+      parseResponse: genParseZod(createOneResultResponseSchema(
         musicHistoryEntryEntitySchema,
-      ) as (m: unknown)=> any,
+      )) as (m: unknown)=> any,
       body: undefined,
     } );
 

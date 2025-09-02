@@ -9,7 +9,7 @@ import { useFetchStaticData } from "#modules/fetching/fetch-data";
 type Props<Req, Res> = {
   url: string;
   body: Req;
-  validator: (resBody: Res)=> void;
+  parseResponse: (resBody: unknown)=> Res;
   dateFormat?: DateFormat;
 };
 const DATE_FORMAT_DEFAULT: DateFormat = {
@@ -22,7 +22,8 @@ T extends Entry<any, any>,
  ReqBody,
  ResBody extends ResultResponse<T[]> = ResultResponse<T[]>
  >(
-  { validator, url, body, dateFormat = DATE_FORMAT_DEFAULT }: Props<ReqBody, ResBody>,
+  { parseResponse, url, body, dateFormat =
+  DATE_FORMAT_DEFAULT }: Props<ReqBody, ResBody>,
 ) {
   const { data, error, isLoading } = useFetchStaticData( {
     fetchFn: async () => {
@@ -30,7 +31,7 @@ T extends Entry<any, any>,
       const fetcher = makeFetcher<ReqBody, ResBody>( {
         method,
         body,
-        parseResponse: validator as (m: unknown)=> any,
+        parseResponse: parseResponse as (m: unknown)=> any,
       } );
       const result = await fetcher( {
         body,
