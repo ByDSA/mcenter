@@ -78,6 +78,12 @@ export function parseZodPopStack<T>(
   model: unknown,
   settings?: AssertZodSettings,
 ): T {
+  // Porque el double mounting de React a veces da en el primer mount
+  // un schema inválido
+  // eslint-disable-next-line no-underscore-dangle
+  if ("_cached" in schema && !schema._cached)
+    return model as T;
+
   try {
     return parseZod(schema, model, settings);
   } catch (e) {

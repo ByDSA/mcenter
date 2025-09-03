@@ -13,7 +13,7 @@ export class EpisodeHistoryApi {
     FetchApi.register(this, new this());
   }
 
-  async getMany(props: EpisodeHistoryApi.GetMany.FetchProps) {
+  async getMany(props: EpisodeHistoryApi.GetMany.FetchProps): Promise<_GetMany.Res> {
     const body: _GetMany.Req = {
       filter: {},
       sort: {
@@ -23,10 +23,11 @@ export class EpisodeHistoryApi {
       offset: props?.offset ?? undefined,
       expand: ["episodes", "series", "episode-file-infos"],
     };
+    const schema = _GetMany.resSchema;
     const fetcher = makeFetcher<_GetMany.Req, _GetMany.Res>( {
       method: EpisodeHistoryApi.GetMany.method,
       body,
-      parseResponse: genParseZod(_GetMany.resSchema) as (m: unknown)=> any,
+      parseResponse: genParseZod(schema) as (m: unknown)=> _GetMany.Res,
     } );
 
     return fetcher( {
