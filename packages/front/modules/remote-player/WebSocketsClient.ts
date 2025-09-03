@@ -4,6 +4,7 @@ import { PlayerEvent, PlayerStatusResponse, playerStatusResponseSchema } from "$
 import { assertZod } from "$shared/utils/validation/zod";
 import { PlayResourceParams, PlayerActions } from "$shared/models/player";
 import { backendUrl } from "#modules/requests";
+import { logger } from "#modules/core/logger";
 
 export const socketUrl = {
   url: backendUrl(""),
@@ -16,13 +17,13 @@ export abstract class RemotePlayerWebSocketsClient implements PlayerActions {
   init() {
     const SOCKET_URL = socketUrl.url;
 
-    console.log("connecting to", SOCKET_URL);
+    logger.debug("connecting to", SOCKET_URL);
     this.socket = io(SOCKET_URL, {
       path: socketUrl.path,
     } );
 
     this.socket.on(PlayerEvent.CONNECT, () => {
-      console.log("connected");
+      logger.debug("connected");
       this.socket.emit("join", "player");
     } );
 

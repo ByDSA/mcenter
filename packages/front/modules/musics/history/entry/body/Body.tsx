@@ -6,7 +6,6 @@ import type { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInp
 import { JSX, useState } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
-import { MusicFileInfosApi } from "#modules/musics/file-info/requests";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
 import { isModified as isModifiedd } from "#modules/utils/objects";
@@ -49,7 +48,6 @@ type Props = {
 export function Body( { data, setData }: Props) {
   const historyApi = FetchApi.get(MusicHistoryApi);
   const api = FetchApi.get(MusicsApi);
-  const fileInfosApi = FetchApi.get(MusicFileInfosApi);
   const { state, remove, isModified,
     reset, addOnReset,
     update, initialState } = useHistoryEntryEdition<Data>( {
@@ -82,10 +80,10 @@ export function Body( { data, setData }: Props) {
             "year",
           ],
         );
-        let musicPromise: Promise<MusicEntity> = Promise.resolve() as Promise<any>;
+        let musicAfterPatch: MusicEntity | undefined;
 
         if (shouldSendPatchWithBody(body)) {
-          musicPromise = api.patch(data.resource.id, body)
+          musicAfterPatch = await api.patch(data.resource.id, body)
             .then(res=>{
               const music = {
                 ...res.data,
@@ -98,31 +96,12 @@ export function Body( { data, setData }: Props) {
             } );
         }
 
-        const dataFileInfo = data.resource.fileInfos[0];
-        const stateFileInfo = state[0].resource.fileInfos[0];
-        const fileInfoBody = generatePatchBody(
-          dataFileInfo,
-          stateFileInfo,
-          ["path"],
-        );
-        let fileInfoPromise: ReturnType<
-          typeof fileInfosApi.patch
-        > = Promise.resolve() as Promise<any>;
-
-        if (Object.entries(fileInfoBody.entity).length > 0)
-          fileInfoPromise = fileInfosApi.patch(stateFileInfo.id, fileInfoBody);
-
-        await Promise.all([musicPromise, fileInfoPromise]);
-
         const newData: Data = {
           ...state[0],
         };
 
-        if (await musicPromise)
-          newData.resource = await musicPromise as Data["resource"];
-
-        if (newData.resource && await fileInfoPromise)
-          newData.resource.fileInfos = [(await fileInfoPromise).data];
+        if (musicAfterPatch)
+          newData.resource = musicAfterPatch as Data["resource"];
 
         return {
           data: newData as Data,

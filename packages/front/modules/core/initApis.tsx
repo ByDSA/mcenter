@@ -6,6 +6,7 @@ import { MusicsApi } from "#modules/musics/requests";
 import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
 import { EpisodeHistoryApi } from "#modules/series/episodes/history/requests";
 import { EpisodesApi } from "#modules/series/episodes/requests";
+import { logger } from "./logger";
 
 let init = false;
 
@@ -20,7 +21,8 @@ export function InitApis() {
   EpisodesApi.register();
   EpisodeFileInfosApi.register();
   EpisodeHistoryApi.register();
-  console.log("APIs registradas ✅ (cliente)");
+
+  logger.debug("APIs registradas ✅ (cliente)");
 
   return null;
 }

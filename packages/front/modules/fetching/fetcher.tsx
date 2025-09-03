@@ -1,3 +1,5 @@
+import { logger } from "#modules/core/logger";
+
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
 type FetcherParams<ReqBody> = {
   url: string;
@@ -18,10 +20,7 @@ export function makeFetcher<ReqBody, ResBody>(
     parseResponse,
     reqBodyValidator,
     errorMiddleware = (err)=> {
-      console.error(err);
-
-      if (err instanceof Error)
-        alert(JSON.stringify(err.message, null, 2));
+      logger.error(err);
     } }: MakeFetcherParams<ReqBody, ResBody>,
 ): Fetcher<ReqBody, ResBody> {
   const ret = async (params: FetcherParams<ReqBody>) => {

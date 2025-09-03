@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { backendUrl } from "#modules/requests";
+import { logger } from "#modules/core/logger";
 
 export type Action<D> = {
   fn: (data: D | null)=> Promise<D>;
@@ -218,6 +219,8 @@ const checkConnectivity = async (url: string) => {
 
     return true;
   } catch {
+    logger.debug("Connectivity check failed");
+
     return false;
   }
 };

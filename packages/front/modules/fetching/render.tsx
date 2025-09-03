@@ -25,11 +25,18 @@ export function renderFetchedData<T>(
       // Ignore JSON parse errors
     }
 
+    const errorMessage = errorShown.message;
+    const hideMessages = ["Failed to fetch"];
+
     return <>
-      <p>Failed to request.</p>
-      {error && <pre>{errorShown.message?.split("\n").map(e=><pre key={e} style={{
-        margin: 0,
-      }}>{e}</pre>)}</pre>}
+      <p style={{
+        textAlign: "center",
+      }}>Failed to request.</p>
+      {errorMessage
+        && !hideMessages.includes(errorMessage)
+        && <pre>{errorMessage.split("\n").map(e=><pre key={e} style={{
+          margin: 0,
+        }}>{e}</pre>)}</pre>}
     </>;
   }
 

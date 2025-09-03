@@ -1,5 +1,8 @@
+import { ToastContainer } from "react-toastify";
 import { makeMenu } from "#modules/menus";
 import { InitApis } from "#modules/core/initApis";
+
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 
 export default function RootLayout( { children }: {
@@ -23,6 +26,17 @@ export default function RootLayout( { children }: {
         {menu}
 
         {children}
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={true}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </body>
     </html>
   );

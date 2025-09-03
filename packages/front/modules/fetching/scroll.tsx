@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react";
+import { logger } from "#modules/core/logger";
 import { Action, Props as UseCrudDataProps, isNetworkError, useCrudData } from "./use-crud-data";
 
 type Props<D extends unknown[]> = Pick<
@@ -106,7 +107,7 @@ export function useCrudDataWithScroll<
     } );
 
     if (duplicates && duplicates.length > 0)
-      console.warn("Duplicate items in data:", duplicates);
+      logger.warn("Duplicate items in data:", duplicates);
   }, [data]);
 
   const { observerTarget } = useScrollData( {
