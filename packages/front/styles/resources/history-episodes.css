@@ -1,8 +1,10 @@
 .history-entry {
   .ui-kit-accordion {
-    --color-hover: var(--color-serie-darker);
-    --color-hover-text: var(--color-serie-text-on-darker);
-    --color-open: var(--color-hover);
+    @media (hover: hover) {
+      --color-hover: var(--color-serie-darker);
+      --color-hover-text: var(--color-serie-text-on-darker);
+    }
+    --color-open: var(--color-serie-darker);
     --color-container: var(--color-serie-light2);
 
     --color-link: var(--color-serie-link);
