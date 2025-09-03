@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.0](https://github.com/ByDSA/mcenter/compare/v4.3.3...v4.4.0) (2025-09-03)
+
+
+### Features
+
+* **front:** add logger and toasts ([4d759c4](https://github.com/ByDSA/mcenter/commit/4d759c41f1ee0072b1e70ef03fd52ddf662fa14d))
+
+
+### Bug Fixes
+
+* **back:** logger unhandled errors ([4d68802](https://github.com/ByDSA/mcenter/commit/4d6880274dba268e75590a07a597fdce0b0c8763))
+* **back:** rw to upload and move files ([8fcedbd](https://github.com/ByDSA/mcenter/commit/8fcedbd20a8d1545c2c43e49c3a596a8162f3deb))
+* **front:** ensure done() is called in finally block for update and remove actions ([f1dfd40](https://github.com/ByDSA/mcenter/commit/f1dfd40c7b0e2b0a5fc0ce5c76048662e8a1e514))
+* **front:** header not "hovered" when closed in mobile ([fa8de4d](https://github.com/ByDSA/mcenter/commit/fa8de4d8e3367be0cee48525829e93851ea70b76))
+* **front:** latest in series ([63df3f6](https://github.com/ByDSA/mcenter/commit/63df3f6cd6aa4e77cf26cf9e6531a03e880baa0f))
+
 ### [4.3.3](https://github.com/ByDSA/mcenter/compare/v4.3.2...v4.3.3) (2025-09-02)
 
 
