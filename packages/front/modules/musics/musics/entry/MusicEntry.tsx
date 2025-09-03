@@ -1,6 +1,6 @@
-import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { Body, BodyProps } from "./body/Body";
 import { Header } from "./Header";
+import { ResourceAccordion } from "#modules/ui-kit/accordion";
 
 type Props = Omit<BodyProps, "setData"> & Partial<Pick<BodyProps, "setData">>;
 export function MusicEntryElement(
