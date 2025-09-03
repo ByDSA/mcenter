@@ -40,6 +40,7 @@ export const createLoggerConfig = (props?: LoggingModuleProps) => {
         level: "error",
         maxSize: "20m",
         maxFiles: "14d",
+        handleExceptions: true,
         format: winston.format.combine(
           winston.format.timestamp(),
           winston.format.errors( {
@@ -56,6 +57,7 @@ export const createLoggerConfig = (props?: LoggingModuleProps) => {
         datePattern: "YYYY-MM-DD",
         maxSize: "20m",
         maxFiles: "14d",
+        handleExceptions: true,
         format: winston.format.combine(
           winston.format.timestamp(),
           winston.format.json(),
@@ -71,6 +73,7 @@ export const createLoggerConfig = (props?: LoggingModuleProps) => {
         datePattern: "YYYY-MM-DD",
         maxSize: "20m",
         maxFiles: "14d",
+        handleExceptions: true,
       } ),
     ],
 
@@ -83,7 +86,9 @@ export const createLoggerConfig = (props?: LoggingModuleProps) => {
           datePattern: "YYYY-MM-DD",
           maxSize: "20m",
           maxFiles: "14d",
+          handleExceptions: true,
         } ),
       ],
+    exitOnError: false,
   } satisfies winston.LoggerOptions;
 };
