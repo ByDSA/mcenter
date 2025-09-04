@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { assertIsNotEmpty } from "$shared/utils/validation";
 import { MediaElement } from "$shared/models/player";
+import { assertIsNotEmpty } from "$shared/utils/validation";
 import { VlcBackWebSocketsServerService } from "./player-services";
 
 type PlayParams = {

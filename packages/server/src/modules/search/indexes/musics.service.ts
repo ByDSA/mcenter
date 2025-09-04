@@ -7,6 +7,7 @@ import { MusicEvents } from "#musics/crud/repository/events";
 import { DomainEvent, EntityEvent, PatchEvent } from "#core/domain-event-emitter";
 import { assertFoundServer } from "#utils/validation/found";
 import { countries, generateSynonymsFromGroup } from "./synonyms";
+import { waitForTask } from "./utils";
 
 type Doc = {
   id: string;
@@ -15,7 +16,10 @@ type Doc = {
   game?: string;
   country?: string;
   addedAt: number;
+  lastTimePlayedAt: number;
   weight: number;
+  tags: string[] | null;
+  onlyTags: string[] | null;
 };
 
 export {
@@ -62,7 +66,10 @@ export class MusicsIndexService {
     const musics = await MusicOdm.Model.find();
     const documentsForSearch = musics.map(this.mapOdm);
 
-    await this.index.addDocuments(documentsForSearch);
+    await this.index.deleteAllDocuments();
+    const task = await this.index.addDocuments(documentsForSearch);
+
+    await waitForTask(this.meiliSearch, task.taskUid);
 
     this.logger.log(`Sincronizados ${documentsForSearch.length} documentos`);
   }
@@ -88,6 +95,9 @@ export class MusicsIndexService {
       country: m.country,
       addedAt: Math.floor(m.timestamps.addedAt.getTime() / 1000),
       weight: m.weight,
+      lastTimePlayedAt: m.lastTimePlayed ?? 0,
+      tags: m.tags ?? null,
+      onlyTags: m.onlyTags ?? null,
     } satisfies Doc;
   }
 
@@ -100,6 +110,9 @@ export class MusicsIndexService {
       country: m.country,
       addedAt: Math.floor(m.timestamps.addedAt.getTime() / 1000),
       weight: m.weight,
+      lastTimePlayedAt: m.lastTimePlayed ?? 0,
+      tags: m.tags ?? null,
+      onlyTags: null,
     } satisfies Doc;
   }
 
@@ -113,10 +126,11 @@ export class MusicsIndexService {
     ]);
 
     await this.index.updateFilterableAttributes([
-      "title",
-      "artist",
-      "game",
-      "country",
+      "weight",
+      "tags",
+      "onlyTags",
+      "addedAt",
+      "lastTimePlayedAt",
     ]);
 
     await this.index.updateSortableAttributes([

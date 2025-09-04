@@ -36,7 +36,7 @@
     "just-clone": "6.2.0",
     "just-diff": "6.0.2",
     "luxon": "3.7.1",
-    "meilisearch": "^0.52.0",
+    "meilisearch": "0.52.0",
     "mime-types": "3.0.1",
     "mongoose": "7.5.0",
     "multer": "2.0.2",

@@ -4,7 +4,7 @@ import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/tra
 import { MusicId } from "$shared/models/musics";
 import { getDateNow } from "$shared/utils/time";
 import { OnEvent } from "@nestjs/event-emitter";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { CanCreateOne, CanCreateOneAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById } from "#utils/layers/repository";
 import { MusicHistoryEntry, MusicHistoryEntryEntity } from "#musics/history/models";
 import { showError } from "#core/logging/show-error";
@@ -80,7 +80,7 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
   async deleteOneByIdAndGet(id: EntryId): Promise<Entity> {
     const deleted = await ModelOdm.findByIdAndDelete(id);
 
-    assertFound(deleted);
+    assertFoundClient(deleted);
 
     const ret = MusicHistoryEntryOdm.toEntity(deleted);
 

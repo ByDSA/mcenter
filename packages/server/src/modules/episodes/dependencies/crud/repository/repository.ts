@@ -5,7 +5,7 @@ import type { EpisodeDependencyCrudDtos } from "$shared/models/episodes/dependen
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { EpisodeCompKey } from "#episodes/models";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { EpisodeDependencyOdm } from "./odm";
@@ -64,7 +64,7 @@ CanDeleteOneByIdAndGet<Model, Id> {
   async deleteOneByIdAndGet(id: Id): Promise<Entity> {
     const docOdm = await EpisodeDependencyOdm.Model.findByIdAndDelete(id);
 
-    assertFound(docOdm);
+    assertFoundClient(docOdm);
 
     return EpisodeDependencyOdm.toEntity(docOdm);
   }

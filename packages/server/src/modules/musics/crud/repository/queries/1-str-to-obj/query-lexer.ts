@@ -89,6 +89,11 @@ export const numberLiteral = createToken( {
   pattern: /\d+(\.\d+)?/,
 } );
 
+export const isoDateLiteral = createToken( {
+  name: "ISODate",
+  pattern: /\d{4}-\d{2}-\d{2}/,
+} );
+
 export const weightIdentifier = createToken( {
   name: "Weight",
   pattern: /weight/,
@@ -97,6 +102,16 @@ export const weightIdentifier = createToken( {
 export const yearIdentifier = createToken( {
   name: "Year",
   pattern: /year/,
+} );
+
+export const playedIdentifier = createToken( {
+  name: "Played",
+  pattern: /played/,
+} );
+
+export const addedIdentifier = createToken( {
+  name: "Added",
+  pattern: /added/,
 } );
 
 export const tagIdentifier = createToken( {
@@ -108,6 +123,13 @@ export const stringLiteral = createToken( {
   name: "StringLiteral",
   // eslint-disable-next-line no-control-regex
   pattern: /(?:["'?!#a-zA-Z0-9._~-]|[^\x00-\x7F])+/,
+} );
+
+export const relativeDateLiteral = createToken( {
+  name: "RelativeDateString",
+  pattern: /\d+(\.\d+)?(y|m|w|d)/,
+  // eslint-disable-next-line camelcase
+  longer_alt: stringLiteral, // esto le da prioridad sobre StringLiteral
 } );
 
 export const whiteSpace = createToken( {
@@ -123,7 +145,9 @@ export const tokens = [
   additionOperator, multiplicationOperator,
   colon, lParen, rParen, lBracket, rBracket, comma,
   greaterEqual, lessEqual, greaterThan, lessThan,
-  numberLiteral, tagIdentifier, yearIdentifier, weightIdentifier, stringLiteral,
+  relativeDateLiteral, isoDateLiteral,
+  tagIdentifier, yearIdentifier, playedIdentifier, addedIdentifier, weightIdentifier,
+  numberLiteral, stringLiteral,
 ];
 
 export const queryLexer = new Lexer(tokens);

@@ -5,7 +5,7 @@ import { OnEvent } from "@nestjs/event-emitter";
 import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { EpisodeEntity } from "#episodes/models";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { MongoFilterQuery, patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
@@ -103,7 +103,7 @@ CanGetAll<Entity> {
       new: true,
     } );
 
-    assertFound(updateResult);
+    assertFoundClient(updateResult);
 
     const id = updateResult._id.toString();
 

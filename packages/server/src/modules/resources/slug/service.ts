@@ -3,7 +3,7 @@ import { HttpStatus, Injectable, NotFoundException, StreamableFile } from "@nest
 import { Request, Response } from "express";
 import * as mime from "mime-types";
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 
 type FileInfo = {
   path: string;
@@ -44,7 +44,7 @@ export class ResourceSlugService {
     }
 
     // 2. File existence
-    assertFound(entity.fileInfos);
+    assertFoundClient(entity.fileInfos);
     const fileInfo = entity.fileInfos![0];
 
     assertIsDefined(fileInfo);

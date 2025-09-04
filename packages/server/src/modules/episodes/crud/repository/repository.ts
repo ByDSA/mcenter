@@ -4,7 +4,7 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { CanCreateManyAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
@@ -98,7 +98,7 @@ CanGetAll<EpisodeEntity> {
     }, partialDocOdm);
 
     if (updateResult.matchedCount === 0 || updateResult.acknowledged === false)
-      assertFound(null);
+      assertFoundClient(null);
 
     const episodeId = updateResult.upsertedId!.toString();
 
@@ -109,7 +109,7 @@ CanGetAll<EpisodeEntity> {
 
     const ret = await this.getOneById(id);
 
-    assertFound(ret);
+    assertFoundClient(ret);
 
     return ret;
   }
@@ -208,7 +208,7 @@ CanGetAll<EpisodeEntity> {
     } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
     const updateResult = await EpisodeOdm.Model.findOneAndUpdate(filter, partialDocOdm);
 
-    assertFound(updateResult);
+    assertFoundClient(updateResult);
 
     const episodeId = updateResult._id.toString();
 
@@ -219,7 +219,7 @@ CanGetAll<EpisodeEntity> {
 
     const ret = await this.getOneByCompKey(compKey);
 
-    assertFound(ret);
+    assertFoundClient(ret);
 
     return ret;
   }

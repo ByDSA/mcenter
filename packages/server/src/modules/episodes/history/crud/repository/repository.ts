@@ -7,7 +7,7 @@ import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { OnEvent } from "@nestjs/event-emitter";
 import { getDateNow } from "$shared/utils/time";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { StreamEntity } from "#modules/streams";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
@@ -100,7 +100,7 @@ CanDeleteOneByIdAndGet<Model, Id> {
   async deleteOneByIdAndGet(id: Id): Promise<Entity> {
     const docOdm = await EpisodeHistoryEntryOdm.Model.findByIdAndDelete(id);
 
-    assertFound(docOdm);
+    assertFoundClient(docOdm);
 
     return EpisodeHistoryEntryOdm.toEntity(docOdm);
   }

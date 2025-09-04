@@ -9,7 +9,7 @@ import { map } from "rxjs/operators";
 import { createManyResultResponseSchema, createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { createPaginatedResultResponseSchema } from "$shared/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { ResponseFormatterInterceptor } from "../responses/response-formatter.interceptor";
 
 @Injectable()
@@ -17,7 +17,7 @@ export class DataNotFoundOnNullInterceptor implements NestInterceptor {
   intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((data) => {
-        assertFound(data);
+        assertFoundClient(data);
 
         return data;
       } ),

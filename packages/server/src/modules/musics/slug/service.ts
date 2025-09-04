@@ -1,7 +1,7 @@
 // src/music/raw-handler.service.ts
 import { Injectable, StreamableFile } from "@nestjs/common";
 import { Request, Response } from "express";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { ResourceSlugService } from "#modules/resources/slug/service";
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicsRepository } from "../crud/repository";
@@ -27,7 +27,7 @@ export class MusicSlugHandlerService {
       expand: ["fileInfos"],
     } );
 
-    assertFound(music);
+    assertFoundClient(music);
 
     await this.updateHistory(music.id);
 

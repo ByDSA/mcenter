@@ -8,11 +8,20 @@ export type MultiplicationNode = IntersectionNode;
 
 export type AdditionNode = DifferenceNode | UnionNode;
 
-export type FilterNode = TagNode | WeightNode | YearNode;
+export type FilterNode = AddedNode | PlayedNode | TagNode | WeightNode | YearNode;
 
 export type YearNode = {
   type: "year";
   value: NumberLiteral | RangeNumber;
+};
+
+export type PlayedNode = {
+  type: "played";
+  value: RangeDate;
+};
+
+export type AddedNode = Omit<PlayedNode, "type"> & {
+  type: "added";
 };
 
 export type WeightNode = {
@@ -37,6 +46,21 @@ export type RangeNumber = {
   maxIncluded: boolean;
 } | {
   min: number;
+  minIncluded: boolean;
+} );
+
+export type RangeDate = {
+  type: "range-date";
+} & ( {
+  max: Date;
+  maxIncluded: boolean;
+} | {
+  min: Date;
+  minIncluded: boolean;
+  max: Date;
+  maxIncluded: boolean;
+} | {
+  min: Date;
   minIncluded: boolean;
 } );
 

@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { generateCase } from "./generate-case";
 import { autoProps, PatchTestsProps } from "./patch-one";
 import { defaultResponse, expectedDataNotFound } from "./common";
@@ -45,7 +45,7 @@ export function deleteOneTests<R>(props: PatchTestsProps<R>) {
           getFn,
           returned: undefined,
           implementation: ()=> {
-            assertFound(null);
+            assertFoundClient(null);
           },
         }],
       },

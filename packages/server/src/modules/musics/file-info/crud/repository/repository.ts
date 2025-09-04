@@ -11,7 +11,7 @@ import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 import { MusicEvents } from "#musics/crud/repository/events";
 import { showError } from "#core/logging/show-error";
 import { MUSIC_MEDIA_PATH } from "#musics/utils";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { MusicFileInfo, MusicFileInfoEntity } from "../../models";
 import { MusicFileInfoOmitMusicIdBuilder } from "../../builder";
 import { MusicFileInfoOdm } from "./odm";
@@ -38,7 +38,7 @@ CanGetOneById<Entity, Entity["id"]> {
   async deleteOneById(id: string): Promise<void> {
     const fileInfo = await MusicFileInfoOdm.Model.findById(id);
 
-    assertFound(fileInfo);
+    assertFoundClient(fileInfo);
     const { musicId } = fileInfo;
     const count = await MusicFileInfoOdm.Model.count( {
       musicId: musicId,

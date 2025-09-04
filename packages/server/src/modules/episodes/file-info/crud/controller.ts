@@ -3,7 +3,7 @@ import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/t
 import { createZodDto } from "nestjs-zod";
 import { EpisodeFileInfoEntity, episodeFileInfoEntitySchema } from "$shared/models/episodes/file-info";
 import { PatchOne } from "#utils/nestjs/rest";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { EpisodeFileInfoRepository } from "./repository";
 
 class PatchOneByIdParamsDto
@@ -26,7 +26,7 @@ export class EpisodeFileInfosCrudController {
   ): Promise<EpisodeFileInfoEntity> {
     const got = await this.fileInfoRepo.patchOneByIdAndGet(params.id, body);
 
-    assertFound(got);
+    assertFoundClient(got);
 
     return got;
   }

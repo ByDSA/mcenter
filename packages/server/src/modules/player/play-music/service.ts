@@ -7,7 +7,7 @@ import { assertZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { MusicsRepository } from "#musics/crud/repository";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient, assertIsNotEmptyClient } from "#utils/validation/found";
 import { PlayService } from "../play.service";
 
 @Injectable()
@@ -36,7 +36,7 @@ export class PlayMusicService {
     musics: MusicEntityWithFileInfos[],
     force?: boolean,
   ): Promise<MusicEntityWithFileInfos[]> {
-    assertFound(musics[0]);
+    assertFoundClient(musics[0]);
     assertZod(z.array(musicEntityWithFileInfosSchema), musics);
 
     const mediaElements = musics.map((m) => {
@@ -49,6 +49,7 @@ export class PlayMusicService {
       return mediaElementFixPlayerLabels(mediaElement);
     } );
 
+    assertIsNotEmptyClient(mediaElements);
     await this.playService.play( {
       mediaElements,
       force,

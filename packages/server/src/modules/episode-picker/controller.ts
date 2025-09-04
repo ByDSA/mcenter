@@ -8,7 +8,7 @@ import { Episode, EpisodeEntity } from "#episodes/models";
 import { LastTimePlayedService } from "#episodes/history";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { StreamsRepository } from "#modules/streams/crud/repository";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { getSeriesKeyFromStream } from "#modules/streams";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
@@ -42,13 +42,13 @@ export class EpisodePickerController {
     const { streamKey } = params;
     const stream = await this.streamsRepo.getOneByKey(streamKey);
 
-    assertFound(stream);
+    assertFoundClient(stream);
     const lastEntry = await this.historyRepo.findLast( {
       seriesKey: stream.key,
       streamId: stream.id,
     } );
 
-    assertFound(lastEntry);
+    assertFoundClient(lastEntry);
 
     const seriesKey = getSeriesKeyFromStream(stream);
 
@@ -63,7 +63,7 @@ export class EpisodePickerController {
     const serie = await seriePromise;
     const lastEp = await lastEpPromise;
 
-    assertFound(serie);
+    assertFoundClient(serie);
 
     const dependencies = dependenciesToList(await this.dependenciesRepo.getAll());
     const episodes: EpisodeEntity[] = await this.episodesRepo.getManyBySerieKey(serie.key);

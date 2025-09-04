@@ -1,8 +1,8 @@
 import { Request } from "express";
 import { Controller, Get, Req, UseInterceptors } from "@nestjs/common";
-import { assertIsNotEmpty } from "$shared/utils/validation";
 import { Music, MusicEntity } from "#musics/models";
 import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
+import { assertIsNotEmptyClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicsRepository } from "../crud/repository";
 import { requestToFindMusicParams } from "../crud/repository/queries/queries";
@@ -24,7 +24,7 @@ export class MusicGetRandomController {
   async getRandom(@Req() req: Request): Promise<Music> {
     const musics = await this.#findMusics(req);
 
-    assertIsNotEmpty(musics);
+    assertIsNotEmptyClient(musics);
     const picked = await this.#randomPick(musics);
 
     return picked;

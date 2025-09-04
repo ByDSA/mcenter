@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { EpisodeEntityWithFileInfos } from "$shared/models/episodes";
 import { episodeToMediaElement } from "$shared/models/player";
 import { mediaElementFixPlayerLabels } from "$shared/models/resources";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient, assertIsNotEmptyClient } from "#utils/validation/found";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { StreamsRepository } from "#modules/streams/crud/repository";
@@ -39,6 +39,7 @@ export class PlayVideoService {
       return mediaElementFixPlayerLabels(mediaElement);
     } );
 
+    assertIsNotEmptyClient(mediaElements);
     await this.playService.play( {
       mediaElements,
       force,
@@ -65,14 +66,14 @@ export class PlayVideoService {
     const { force } = query;
     const stream = await this.streamsRepo.getOneByKey(streamId);
 
-    assertFound(stream);
+    assertFoundClient(stream);
 
     const episodes = (await this.episodePickerService.getByStream(stream, number, {
       expand: ["series", "fileInfos"],
     } ))
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
 
-    assertFound(episodes[0]);
+    assertFoundClient(episodes[0]);
 
     return this.processAndPlayEpisodes(episodes, stream.id, force);
   }
@@ -85,7 +86,7 @@ export class PlayVideoService {
     const { episodeKey, seriesKey } = episodeCompKey;
     const serie = await this.seriesRepo.getOneByKey(seriesKey);
 
-    assertFound(serie);
+    assertFoundClient(serie);
 
     const episodes = [await this.episodesRepo
       .getOneByCompKey( {
@@ -96,7 +97,7 @@ export class PlayVideoService {
       } )]
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
 
-    assertFound(episodes[0]);
+    assertFoundClient(episodes[0]);
     const stream = await this.streamsRepo.getOneOrCreateBySeriesKey(seriesKey);
 
     return this.processAndPlayEpisodes(episodes, stream.id, force);

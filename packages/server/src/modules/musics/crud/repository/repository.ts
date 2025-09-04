@@ -5,7 +5,7 @@ import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types, UpdateQuery } from "mongoose";
 import { MusicFileInfoEntity, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { MusicEntity, Music, MusicId } from "#musics/models";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
@@ -20,10 +20,10 @@ import { MusicHistoryEntryEvents } from "../../history/crud/repository/events";
 import { MusicBuilderService } from "../builder/music-builder.service";
 import { MusicAvailableSlugGeneratorService } from "../builder/vailable-slug-generator.service";
 import { ExpressionNode } from "./queries/query-object";
-import { findParamsToQueryParams } from "./queries/queries-odm";
 import { MusicEvents } from "./events";
 import { MusicOdm } from "./odm";
 import { AggregationResult } from "./odm/criteria-pipeline";
+import { expressionToMeilisearchQuery } from "./queries/queries-meili";
 
 type CriteriaOne = MusicCrudDtos.GetOne.Criteria;
 type CriteriaMany = MusicCrudDtos.GetMany.Criteria;
@@ -63,7 +63,7 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
   async deleteOneByIdAndGet(id: string): Promise<MusicEntity> {
     const doc = await MusicOdm.Model.findByIdAndDelete(id);
 
-    assertFound(doc);
+    assertFoundClient(doc);
 
     const ret = MusicOdm.toEntity(doc);
 
@@ -75,7 +75,7 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
   async getOneById(id: string): Promise<MusicEntity | null> {
     const doc = await MusicOdm.Model.findById(id);
 
-    assertFound(doc);
+    assertFoundClient(doc);
 
     return MusicOdm.toEntity(doc);
   }
@@ -178,7 +178,7 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
     )
       .catch(e=>this.handleUpdateError(e, id, updateQuery));
 
-    assertFound(doc);
+    assertFoundClient(doc);
 
     const ret = MusicOdm.toEntity(doc);
 
@@ -231,8 +231,22 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
   }
 
   async getManyByQuery(params: ExpressionNode): Promise<MusicEntity[]> {
-    const query = findParamsToQueryParams(params);
-    const docs = await MusicOdm.Model.find(query);
+    const query = expressionToMeilisearchQuery(params);
+    const meiliRet = await this.musicsSearchService.filter(query, {
+      limit: 0,
+    } );
+    const meiliDocs = meiliRet.data;
+
+    if (meiliDocs.length === 0)
+      return [];
+
+    const ids = meiliDocs.map(doc => doc.id);
+    // Nota: no tiene por qué respetarse el orden de los meiliDocs
+    const docs = await MusicOdm.Model.find( {
+      _id: {
+        $in: ids,
+      },
+    } );
     const ret = docs.map(MusicOdm.toEntity);
 
     return ret;
@@ -318,7 +332,7 @@ fileInfo: MusicFileInfoEntity;}> {
       path: relativePath,
     } );
 
-    assertFound(docOdm, "Music not found");
+    assertFoundClient(docOdm, "Music not found");
 
     return MusicOdm.toEntity(docOdm);
   }

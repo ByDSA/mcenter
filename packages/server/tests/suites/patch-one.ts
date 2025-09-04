@@ -1,7 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { ExpectedBody, generateCase, GenerateCaseProps } from "./generate-case";
 import { defaultResponse, expectedDataNotFound } from "./common";
 
@@ -113,7 +113,7 @@ export function patchOneTests<R>(
           getFn,
           returned: undefined,
           implementation: ()=> {
-            assertFound(undefined);
+            assertFoundClient(undefined);
           },
         }],
       },

@@ -6,7 +6,7 @@ import { getHostFromRequest } from "$shared/models/resources";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
 import { GetMany } from "#utils/nestjs/rest/crud/get";
 import { PatchOne } from "#utils/nestjs/rest";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { EpisodesRepository } from "../crud/repository";
@@ -37,7 +37,7 @@ export class EpisodesSlugController {
     const compKey = params;
     const got = await this.episodesRepo.patchOneByCompKeyAndGet(compKey, episodePartial);
 
-    assertFound(got);
+    assertFoundClient(got);
 
     return got;
   }
@@ -77,7 +77,7 @@ export class EpisodesSlugController {
 
       got = await this.episodesRepo.getOneByCompKey(params, criteria);
 
-      assertFound(got);
+      assertFoundClient(got);
     }
 
     switch (format) {

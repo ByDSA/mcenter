@@ -3,7 +3,7 @@ import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { Response, Request } from "express";
 import { getHostFromRequest } from "$shared/models/resources";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { MusicsRepository } from "../crud/repository";
 import { ResponseFormat, ResponseFormatterService } from "../../resources/response-formatter";
@@ -36,7 +36,7 @@ export class MusicsSlugController {
 
     if (format === ResponseFormat.M3U8 || format === ResponseFormat.JSON) {
       got = await this.musicRepo.getOneBySlug(params.slug);
-      assertFound(got);
+      assertFoundClient(got);
     }
 
     switch (format) {

@@ -1,6 +1,6 @@
 import { Injectable, StreamableFile } from "@nestjs/common";
 import { Request, Response } from "express";
-import { assertFound } from "#utils/validation/found";
+import { assertFoundClient } from "#utils/validation/found";
 import { ResourceSlugService } from "#modules/resources/slug/service";
 import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { getAbsolutePath } from "#episodes/utils";
@@ -27,7 +27,7 @@ export class EpisodeSlugHandlerService {
       expand: ["fileInfos", "series"],
     } );
 
-    assertFound(episode);
+    assertFoundClient(episode);
 
     await this.updateHistory(episode.compKey);
 

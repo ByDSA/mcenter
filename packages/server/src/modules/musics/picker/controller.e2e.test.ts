@@ -7,6 +7,7 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
+import { MusicsIndexService } from "#modules/search/indexes/musics.service";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicHistoryEntryOdm } from "../history/crud/repository/odm";
@@ -58,6 +59,10 @@ describe("controller", () => {
     routerApp = testingSetup.routerApp;
 
     await loadFixtures();
+
+    const musicsIndexService = testingSetup.app.get(MusicsIndexService);
+
+    await musicsIndexService.syncAll();
   } );
 
   beforeEach(async () => {
@@ -140,7 +145,7 @@ describe("controller", () => {
 
       await request(routerApp)
         .get(`/?q=${query}`)
-        .expect(500)
+        .expect(422)
         .send();
     } );
   } );

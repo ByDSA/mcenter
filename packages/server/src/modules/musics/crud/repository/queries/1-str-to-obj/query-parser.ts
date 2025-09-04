@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { CstElement, CstNode, IToken } from "@chevrotain/types";
-import { BinaryOperationNode, DifferenceNode, FilterNode, IntersectionNode, NumberLiteral, QueryObject, RangeNumber, UnionNode, WeightNode, YearNode } from "../query-object";
+import { AddedNode, BinaryOperationNode, DifferenceNode, FilterNode, IntersectionNode, NumberLiteral, PlayedNode, QueryObject, RangeDate, RangeNumber, UnionNode, WeightNode, YearNode } from "../query-object";
 import { queryLexer } from "./query-lexer";
 import { QueryParser } from "./query-parser-chevrotain";
 
@@ -15,8 +15,11 @@ export function parseQuery(query: string): QueryObject {
   parserInstance.input = lexingResult.tokens;
   const cst = parserInstance.expression();
 
-  if (parserInstance.errors.length > 0)
-    throw new Error("Error de parsing");
+  if (parserInstance.errors.length > 0) {
+    const msg = "Error de parsing:\n" + parserInstance.errors.map(e=>e.message).join("\n");
+
+    throw new Error(msg);
+  }
 
   const queryObject = transformCSTToQueryObject(cst);
 
@@ -93,34 +96,23 @@ function multiplicationExpressionToObj(node: CstNode): BinaryOperationNode | Fil
 }
 
 function arrayFilterToTree(filters: FilterNode[], operatorsArray: IToken[]): BinaryOperationNode {
-  let rootIntersection: BinaryOperationNode | undefined;
-  let currentIntersection!: BinaryOperationNode;
+  // Construir de izquierda a derecha
+  let result: BinaryOperationNode = {
+    type: getOperatorType(operatorsArray[0]),
+    child1: filters[0],
+    child2: filters[1],
+  };
 
-  for (let i = 0; i < filters.length; i++) {
-    if (i === 0) {
-      rootIntersection = {
-        type: getOperatorType(operatorsArray[0]),
-        child1: filters[i],
-        child2: null as any,
-      } as BinaryOperationNode;
-      currentIntersection = rootIntersection;
-    } else if (i === filters.length - 1)
-      currentIntersection.child2 = filters[i];
-    else {
-      currentIntersection.child2 = {
-        type: getOperatorType(operatorsArray[i]),
-        child1: filters[i],
-        child2: null as any,
-      } as BinaryOperationNode;
-
-      currentIntersection = currentIntersection.child2;
-    }
+  // Para el resto de operadores, ir construyendo hacia la izquierda
+  for (let i = 1; i < operatorsArray.length; i++) {
+    result = {
+      type: getOperatorType(operatorsArray[i]),
+      child1: result,
+      child2: filters[i + 1],
+    };
   }
 
-  if (!rootIntersection)
-    throw new Error("error");
-
-  return rootIntersection;
+  return result;
 }
 
 function atomicExpressionToObj(node: CstNode): FilterNode {
@@ -159,6 +151,10 @@ const filterToObj = (node: CstNode): FilterNode => {
         return yearFilterToObj(filter);
       case "weightFilter":
         return weightFilterToObj(filter);
+      case "playedFilter":
+        return playedFilterToObj(filter);
+      case "addedFilter":
+        return addedFilterToObj(filter);
       case "tagFilter":
       {
         return {
@@ -245,7 +241,7 @@ function rangeToObj(rangeCst: CstElement[]): RangeNumber {
 
   throw new Error("A");
 }
-function shortRangeToObj(shortRangeCst: CstElement[]): RangeNumber {
+function shortRangeNumberToObj(shortRangeCst: CstElement[]): RangeNumber {
   const shortRangeCstChildren = (shortRangeCst[0] as CstNode).children;
   const NumberLiteralArray = shortRangeCstChildren.NumberLiteral;
 
@@ -294,12 +290,12 @@ function yearFilterToObj(filter: CstNode): YearNode {
 
   if (filter.children.NumberLiteral)
     value = numberLiteralToObj(filter.children.NumberLiteral);
-  else if (filter.children.range)
-    value = rangeToObj(filter.children.range);
-  else if (filter.children.shortRange)
-    value = shortRangeToObj(filter.children.shortRange);
+  else if (filter.children.rangeNumber)
+    value = rangeToObj(filter.children.rangeNumber);
+  else if (filter.children.shortRangeNumber)
+    value = shortRangeNumberToObj(filter.children.shortRangeNumber);
   else
-    throw new Error("a");
+    throw new Error("YearFilter: unexpected CST structure: " + JSON.stringify(filter, null, 2));
 
   return {
     type: "year",
@@ -312,15 +308,170 @@ function weightFilterToObj(filter: CstNode): WeightNode {
 
   if (filter.children.NumberLiteral)
     value = numberLiteralToObj(filter.children.NumberLiteral);
-  else if (filter.children.range)
-    value = rangeToObj(filter.children.range);
-  else if (filter.children.shortRange)
-    value = shortRangeToObj(filter.children.shortRange);
+  else if (filter.children.rangeNumber)
+    value = rangeToObj(filter.children.rangeNumber);
+  else if (filter.children.shortRangeNumber)
+    value = shortRangeNumberToObj(filter.children.shortRangeNumber);
   else
-    throw new Error("a");
+    throw new Error("WeightFilter: unexpected CST structure: " + JSON.stringify(filter, null, 2));
 
   return {
     type: "weight",
     value,
   };
+}
+
+function playedFilterToObj(filter: CstNode): PlayedNode {
+  let value: RangeDate;
+
+  if (filter.children.shortRangeTime)
+    value = shortRangeTimeToObj(filter.children.shortRangeTime);
+  else
+    throw new Error("PlayedFilter: unexpected CST structure: " + JSON.stringify(filter, null, 2));
+
+  return {
+    type: "played",
+    value,
+  };
+}
+function addedFilterToObj(filter: CstNode): AddedNode {
+  let value: RangeDate;
+
+  if (filter.children.shortRangeTime)
+    value = shortRangeTimeToObj(filter.children.shortRangeTime);
+  else
+    throw new Error("AddedFilter: unexpected CST structure: " + JSON.stringify(filter, null, 2));
+
+  return {
+    type: "added",
+    value,
+  };
+}
+
+function shortRangeTimeToObj(shortRangeTimeCst: CstElement[]): RangeDate {
+  const shortRangeTimeCstChildren = (shortRangeTimeCst[0] as CstNode).children;
+  const { timeValue } = shortRangeTimeCstChildren;
+  const relativeDateString = (timeValue[0] as CstNode).children.RelativeDateString[0] as IToken;
+  const value = relativeDateStringToDate(relativeDateString);
+
+  if (shortRangeTimeCstChildren.LessEqual) {
+    return {
+      type: "range-date",
+      max: value,
+      maxIncluded: true,
+    };
+  }
+
+  if (shortRangeTimeCstChildren.LessThan) {
+    return {
+      type: "range-date",
+      max: value,
+      maxIncluded: false,
+    };
+  }
+
+  if (shortRangeTimeCstChildren.GreaterThan) {
+    return {
+      type: "range-date",
+      min: value,
+      minIncluded: false,
+    };
+  }
+
+  if (shortRangeTimeCstChildren.GreaterEqual) {
+    return {
+      type: "range-date",
+      min: value,
+      minIncluded: true,
+    };
+  }
+
+  throw new Error("A");
+}
+
+function relativeDateStringToDate(cstElement: IToken): Date {
+  const { image } = cstElement;
+  const result = separateNumberFromString(image);
+
+  if (!result)
+    throw new Error("Invalid relative date format: " + image);
+
+  const { numeric: numericStr, rest } = result;
+  const numeric = +numericStr;
+  const now = new Date();
+  let date: Date;
+
+  switch (rest) {
+    case "day":
+    case "days":
+    case "d":
+      date = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() - numeric,
+        now.getHours(),
+        now.getMinutes(),
+        now.getSeconds(),
+        now.getMilliseconds(),
+      );
+      break;
+    case "week":
+    case "weeks":
+    case "w":
+      date = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() - (numeric * 7),
+        now.getHours(),
+        now.getMinutes(),
+        now.getSeconds(),
+        now.getMilliseconds(),
+      );
+      break;
+    case "month":
+    case "months":
+    case "m":
+      date = new Date(
+        now.getFullYear(),
+        now.getMonth() - numeric,
+        now.getDate(),
+        now.getHours(),
+        now.getMinutes(),
+        now.getSeconds(),
+        now.getMilliseconds(),
+      );
+      break;
+    case "year":
+    case "years":
+    case "y":
+      date = new Date(
+        now.getFullYear() - numeric,
+        now.getMonth(),
+        now.getDate(),
+        now.getHours(),
+        now.getMinutes(),
+        now.getSeconds(),
+        now.getMilliseconds(),
+      );
+      break;
+    default: throw new Error("Invalid relative date format: " + rest);
+  }
+
+  return date;
+}
+
+function separateNumberFromString(image: string) {
+  const match = image.match(/^(\d+)(.*)$/);
+
+  if (match) {
+    const numericPart = match[1]; // "1"
+    const restPart = match[2]; // "y-ago"
+
+    return {
+      numeric: numericPart,
+      rest: restPart,
+    };
+  }
+
+  return null; // si no coincide el patrón
 }

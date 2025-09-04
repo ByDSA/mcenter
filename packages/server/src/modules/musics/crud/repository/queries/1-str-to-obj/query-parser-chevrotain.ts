@@ -1,5 +1,5 @@
 import { CstParser } from "chevrotain";
-import { additionOperator, colon, comma, greaterEqual, greaterThan, lBracket, lessEqual, lessThan, lParen, multiplicationOperator, numberLiteral, rBracket, rParen, stringLiteral, tagIdentifier, tokens, weightIdentifier, yearIdentifier } from "./query-lexer";
+import { addedIdentifier, additionOperator, colon, comma, greaterEqual, greaterThan, isoDateLiteral, lBracket, lessEqual, lessThan, lParen, multiplicationOperator, numberLiteral, playedIdentifier, rBracket, relativeDateLiteral, rParen, stringLiteral, tagIdentifier, tokens, weightIdentifier, yearIdentifier } from "./query-lexer";
 
 export class QueryParser extends CstParser {
   constructor() {
@@ -66,6 +66,12 @@ export class QueryParser extends CstParser {
       {
         ALT: () => this.SUBRULE(this.tagFilter),
       },
+      {
+        ALT: () => this.SUBRULE(this.playedFilter),
+      },
+      {
+        ALT: () => this.SUBRULE(this.addedFilter),
+      },
     ]);
   } );
 
@@ -74,10 +80,10 @@ export class QueryParser extends CstParser {
     this.CONSUME(colon);
     this.OR([
       {
-        ALT: () => this.SUBRULE(this.range),
+        ALT: () => this.SUBRULE(this.rangeNumber),
       }, // range
       {
-        ALT: () => this.SUBRULE(this.shortRange),
+        ALT: () => this.SUBRULE(this.shortRangeNumber),
       }, // short range
       {
         ALT: () => this.CONSUME(numberLiteral),
@@ -85,15 +91,27 @@ export class QueryParser extends CstParser {
     ]);
   } );
 
+  private playedFilter = this.RULE("playedFilter", () => {
+    this.CONSUME(playedIdentifier);
+    this.CONSUME(colon);
+    this.SUBRULE(this.shortRangeTime);
+  } );
+
+  private addedFilter = this.RULE("addedFilter", () => {
+    this.CONSUME(addedIdentifier);
+    this.CONSUME(colon);
+    this.SUBRULE(this.shortRangeTime);
+  } );
+
   private weightFilter = this.RULE("weightFilter", () => {
     this.CONSUME(weightIdentifier);
     this.CONSUME(colon);
     this.OR([
       {
-        ALT: () => this.SUBRULE(this.range),
+        ALT: () => this.SUBRULE(this.rangeNumber),
       }, // range
       {
-        ALT: () => this.SUBRULE(this.shortRange),
+        ALT: () => this.SUBRULE(this.shortRangeNumber),
       }, // short range
       {
         ALT: () => this.CONSUME(numberLiteral),
@@ -108,7 +126,7 @@ export class QueryParser extends CstParser {
   } );
 
   // Nueva regla para rangos
-  private range = this.RULE("range", () => {
+  private rangeNumber = this.RULE("rangeNumber", () => {
     this.CONSUME1(lBracket);
     this.OR([
       {
@@ -134,7 +152,21 @@ export class QueryParser extends CstParser {
     this.CONSUME3(rBracket);
   } );
 
-  private shortRange = this.RULE("shortRange", () => {
+  private timeValue = this.RULE("timeValue", () => {
+    this.OR([
+      {
+        ALT: () => this.CONSUME(numberLiteral),
+      }, // timestamps numéricos
+      {
+        ALT: () => this.CONSUME(relativeDateLiteral),
+      }, // 1y-ago, 2months-ago, etc.
+      {
+        ALT: () => this.CONSUME(isoDateLiteral),
+      }, // 2024-01-15
+    ]);
+  } );
+
+  private shortRangeNumber = this.RULE("shortRangeNumber", () => {
     this.OR([
       {
         ALT: () => {
@@ -162,4 +194,33 @@ export class QueryParser extends CstParser {
       },
     ]);
   } );
+
+private shortRangeTime = this.RULE("shortRangeTime", () => {
+  this.OR([
+    {
+      ALT: () => {
+        this.CONSUME(greaterEqual);
+        this.SUBRULE(this.timeValue); // >= valor
+      },
+    },
+    {
+      ALT: () => {
+        this.CONSUME(greaterThan);
+        this.SUBRULE2(this.timeValue); // > valor
+      },
+    },
+    {
+      ALT: () => {
+        this.CONSUME(lessEqual);
+        this.SUBRULE3(this.timeValue); // <= valor
+      },
+    },
+    {
+      ALT: () => {
+        this.CONSUME(lessThan);
+        this.SUBRULE4(this.timeValue); // < valor
+      },
+    },
+  ]);
+} );
 }
