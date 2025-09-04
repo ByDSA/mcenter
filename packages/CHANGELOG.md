@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.5.0](https://github.com/ByDSA/mcenter/compare/v4.4.1...v4.5.0) (2025-09-04)
+
+
+### Features
+
+* **back:** use meilisearch query and can use "added" and "played" ([775f87f](https://github.com/ByDSA/mcenter/commit/775f87fe6b8605f0f03da14cc5447d34331a3e76))
+
 ### [4.4.1](https://github.com/ByDSA/mcenter/compare/v4.4.0...v4.4.1) (2025-09-03)
 
 
