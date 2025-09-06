@@ -1,0 +1,24 @@
+.iconActive {
+  color: var(--color-green) !important;
+}
+
+.uploadIcon {
+  width: 3rem !important;
+  height: 3rem !important;
+  margin: 0 auto 1rem auto;
+  color: var(--color-primary-darker);
+}
+
+.uploadReady {
+  color: var(--color-green-darker) !important;
+  cursor: pointer !important;
+}
+
+.uploadReady:hover {
+  color: var(--color-green-darker2) !important;
+}
+
+.uploadDisabled {
+  color: var(--color-gray-300) !important;
+  cursor: not-allowed !important;
+}

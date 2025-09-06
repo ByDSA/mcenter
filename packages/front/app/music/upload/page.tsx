@@ -8,7 +8,8 @@ import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/trans
 import { assertIsDefined } from "$shared/utils/validation";
 import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
 import { backendUrl } from "#modules/requests";
-import { MusicEntryElement } from "#modules/musics/musics/entry/MusicEntry";
+import { MusicEntryElement } from "#musics/musics/entry/MusicEntry";
+import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 
 import "#styles/resources/history-entry.css";
 import "#styles/resources/history-musics.css";
@@ -50,6 +51,9 @@ export default function Upload() {
         multiple={true}
         onUpload={onUpload}
       />
+      <YouTubeUpload onSubmit={(input)=>{
+        console.log(input);
+      }}/>
       <hr/>
       <span className="history-list">
         {

@@ -3,6 +3,7 @@ import { CloudUpload, InsertDriveFile, Close, CheckCircle, Error as ErrorIcon } 
 import { showError } from "$shared/utils/errors/showError";
 import { classes } from "#modules/utils/styles";
 import styles from "./FileUpload.module.css";
+import { UploadButton } from "./UploadButton";
 
 export type FileDataMetadata = Record<string, any>;
 
@@ -216,15 +217,9 @@ ${acceptedTypesDisplay}`,
           onChange={onInputChange}
         />
 
-        <CloudUpload
-          className={classes(
-            styles.uploadIcon,
-            dragActive && styles.iconActive,
-            hasPendingFiles && styles.uploadReady,
-            !hasPendingFiles && styles.uploadDisabled,
-          )}
-          onClick={hasPendingFiles && !isUploading ? uploadFiles : undefined}
-          titleAccess={isUploading ? "Subiendo..." : "Subir archivos"}
+        <UploadButton
+          disabled={!(hasPendingFiles && !isUploading)}
+          onClick={uploadFiles}
         />
 
         <button

@@ -341,4 +341,66 @@
 
   --color-link: var(--color-primary);
   --color-link-hover: var(--color-primary-light);
+
+  /* Escala de grises */
+  --color-black: #000000;
+  --color-white: #ffffff;
+
+  --color-gray-0: var(--color-white);
+  --color-gray-25: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 2.5%
+  );
+  --color-gray-50: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 5%
+  );
+  --color-gray-100: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 10%
+  );
+  --color-gray-200: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 20%
+  );
+  --color-gray-300: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 30%
+  );
+  --color-gray-400: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 40%
+  );
+  --color-gray-500: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 50%
+  );
+  --color-gray-600: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 60%
+  );
+  --color-gray-700: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 70%
+  );
+  --color-gray-800: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 80%
+  );
+  --color-gray-900: color-mix(
+    in srgb,
+    var(--color-white),
+    var(--color-black) 90%
+  );
+  --color-gray-1000: var(--color-black);
 }

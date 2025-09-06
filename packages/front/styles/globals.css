@@ -1,6 +1,7 @@
 @import "./globals-colors.css";
 @import "./globals-resolution.css";
 @import "./globals-ui-kit.css";
+@import "./globals-animation.css";
 
 html,
 body {
