@@ -6,8 +6,8 @@ import { Fragment, JSX, useState } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { AUDIO_EXTENSIONS } from "$shared/models/musics/audio-extensions";
-import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
+import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { MusicFileInfosApi } from "#modules/musics/file-info/requests";
 import { LinkAsyncAction, ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
 import { classes } from "#modules/utils/styles";
@@ -19,10 +19,10 @@ import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
 import { MusicsApi } from "#modules/musics/requests";
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { FileData, FileUpload, OnUploadOptions, uploadSingleFileWithProgress } from "#modules/ui-kit/upload/FileUpload";
-import { MUSIC_FILE_INFO_PROPS, MUSIC_PROPS } from "../utils";
-import commonStyle from "../../../../history/entry/body-common.module.css";
+import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
 import { Data } from "../../types";
+import commonStyle from "../../../../history/entry/body-common.module.css";
+import { MUSIC_FILE_INFO_PROPS, MUSIC_PROPS } from "../utils";
 import style from "./style.module.css";
 
 function getAndUpdateMusicByProp<V>(
@@ -327,28 +327,22 @@ export function Body( { data, setData, shouldFetchFileInfo }: BodyProps) {
         provideMetadata={()=> ( {
           musicId: data.id,
         } )}
-        onUpload={async (files: FileData[], options?: OnUploadOptions) =>{
-          for (const fileData of files) {
-            await uploadSingleFileWithProgress(
-              backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
-              fileData,
-              {
-                ...options,
-                // eslint-disable-next-line require-await
-                onEachUpload: async (response: unknown) => {
-                  const parsedResponse = MusicFileInfoCrudDtos.UploadFile.responseSchema
-                    .parse(response);
+        onUpload={genOnUpload( {
+          url: backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
+          // eslint-disable-next-line require-await
+          onEachUpload: async (
+            response: unknown,
+            fileData: FileData,
+            options: OnUploadOptions,
+          )=> {
+            const parsedResponse = MusicFileInfoCrudDtos.UploadFile.responseSchema.parse(response);
 
-                  options?.setSelectedFiles?.((old)=> ([
-                    ...old.filter(f=> f.name !== parsedResponse.meta.file.originalName),
-                  ]));
-
-                  addFileInfo(parsedResponse.data.fileInfo);
-                },
-              },
-            );
-          }
-        }}
+            options?.setSelectedFiles?.((old)=> ([
+              ...old.filter(f=> f.id !== fileData.id),
+            ]));
+            addFileInfo(parsedResponse.data.fileInfo);
+          },
+        } )}
       />
     </details>
     }

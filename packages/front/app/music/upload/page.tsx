@@ -1,12 +1,12 @@
 "use client";
 
 import { AUDIO_EXTENSIONS } from "$shared/models/musics/audio-extensions";
-import { Fragment, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { MusicEntity } from "$shared/models/musics";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { assertIsDefined } from "$shared/utils/validation";
-import { FileData, FileUpload, OnUploadOptions, uploadSingleFileWithProgress } from "#modules/ui-kit/upload/FileUpload";
+import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
 import { backendUrl } from "#modules/requests";
 import { MusicEntryElement } from "#modules/musics/musics/entry/MusicEntry";
 
@@ -16,30 +16,31 @@ import "#styles/resources/music.css";
 
 export default function Upload() {
   const [uploaded, setUploaded] = useState<MusicEntity[]>([]);
+  const onUpload = useCallback(genOnUpload( {
+    url: backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
+    // eslint-disable-next-line require-await
+    onEachUpload: async (
+      response: unknown,
+      fileData: FileData,
+      options: OnUploadOptions,
+    )=> {
+      const parsedResponse = MusicFileInfoCrudDtos.UploadFile.responseSchema.parse(response);
+      const { music } = parsedResponse.data;
 
-  async function onUpload(files: FileData[], options?: OnUploadOptions) {
-    for (const f of files) {
-      await uploadSingleFileWithProgress(
-        backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
-        f,
-        {
-          ...options,
-          // eslint-disable-next-line require-await
-          onEachUpload: async (response: unknown) => {
-            const parsedResponse = MusicFileInfoCrudDtos.UploadFile.responseSchema.parse(response);
-            const { music } = parsedResponse.data;
+      assertIsDefined(music);
 
-            assertIsDefined(music);
+      setUploaded(old => ([
+        ...old,
+        music,
+      ]));
 
-            setUploaded(old => ([
-              ...old,
-              music,
-            ]));
-          },
-        },
-      );
-    }
-  }
+      options?.setSelectedFiles?.((old)=> {
+        return old.filter(
+          f2=> f2.id !== fileData.id,
+        );
+      } );
+    },
+  } ), [setUploaded]);
 
   return (
     <>

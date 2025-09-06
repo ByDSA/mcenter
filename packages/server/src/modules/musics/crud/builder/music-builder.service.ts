@@ -60,13 +60,23 @@ export class MusicBuilderService {
 
 function getTitleFromFilenamePath(relativePath: string): string {
   let title = path.basename(relativePath);
+  let oldTitle: string;
 
-  title = removeExtension(title);
+  do {
+    oldTitle = title;
+    title = removeFilenameExtension(title);
+    title = removeFilenameEndUuid(title);
+  } while (oldTitle !== title);
 
   return title;
 }
 
-function removeExtension(str: string): string {
+function removeFilenameEndUuid(str: string): string {
+  const uuidRegex = /\[[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\]$/;
+
+  return str.replace(uuidRegex, "");
+}
+export function removeFilenameExtension(str: string): string {
   for (const ext of AUDIO_EXTENSIONS) {
     const index = str.lastIndexOf(`.${ext}`);
 

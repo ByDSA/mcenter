@@ -9,8 +9,9 @@
 
   --color-light: 33%;
   --color-light2: 42%;
-  --color-light3: 53%;
-  --color-light4: 66%;
+  --color-light3: 65%;
+  --color-light4: 85%;
+  --color-light5: 95%;
   --color-darker: 15%;
   --color-darker2: 30%;
   --color-darker3: 70%;
@@ -57,6 +58,11 @@
     var(--color-red),
     #fff var(--color-light4)
   );
+  --color-red-light5: color-mix(
+    in srgb,
+    var(--color-red),
+    #fff var(--color-light5)
+  );
 
   --color-green: hsl(var(--color-green-hue), 100%, 50%);
   --color-green-darker: color-mix(
@@ -98,6 +104,11 @@
     in srgb,
     var(--color-green),
     #fff var(--color-light4)
+  );
+  --color-green-light5: color-mix(
+    in srgb,
+    var(--color-green),
+    #fff var(--color-light5)
   );
 
   --color-cyan: hsl(var(--color-cyan-hue), 100%, 50%);

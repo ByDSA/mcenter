@@ -12,9 +12,9 @@
   --fileupload-bg-active: #eff6ff;
   --fileupload-bg-item: #f9fafb;
   --fileupload-border-item: #e5e7eb;
-  --fileupload-error-bg: #fef2f2;
-  --fileupload-error-border: #fecaca;
-  --fileupload-error-text: #dc2626;
+  --fileupload-error-bg: var(--color-red-light4);
+  --fileupload-error-border: var(--color-red-light3);
+  --fileupload-error-text: var(--color-red-light);
   --fileupload-success: #10b981;
   --fileupload-success-hover: #059669;
   --fileupload-remove-hover-bg: #fef2f2;
@@ -98,7 +98,6 @@
 }
 
 .fileInfo {
-  margin: 0 0 1rem 0;
   font-size: 0.75rem;
   color: var(--fileupload-text-muted);
 }
@@ -120,19 +119,23 @@
 .errorContainer {
   margin-top: 1rem;
   padding: 0.75rem;
+  color: var(--fileupload-error-text);
   background-color: var(--fileupload-error-bg);
   border: 1px solid var(--fileupload-error-border);
   border-radius: 0.5rem;
-}
-
-.errorText {
-  margin: 0 0 0.25rem 0;
   font-size: 0.875rem;
-  color: var(--fileupload-error-text);
+  line-height: 1.25rem;
 }
 
-.errorText:last-child {
-  margin-bottom: 0;
+.statusContainer {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  &.completed {
+    color: var(--fileupload-success);
+  }
+  &.error {
+    color: var(--fileupload-error-text);
+  }
 }
 
 .filesSection {
@@ -160,6 +163,23 @@
   background-color: var(--fileupload-bg-item);
   border: 1px solid var(--fileupload-border-item);
   border-radius: 0.5rem;
+
+  &:has(.error) {
+    border: 1px solid var(--color-red-light4);
+    background-color: var(--color-red-light5);
+
+    .fileIcon {
+      color: var(--color-red-light);
+    }
+  }
+  &:has(.completed) {
+    border: 1px solid var(--color-green-light4);
+    background-color: var(--color-green-light5);
+
+    .fileIcon {
+      color: var(--color-green-light);
+    }
+  }
 }
 
 .fileInfo {
@@ -171,8 +191,8 @@
 }
 
 .fileIcon {
-  width: 1.25rem !important;
-  height: 1.25rem !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
   color: var(--fileupload-text-secondary);
   flex-shrink: 0;
 }
@@ -207,39 +227,13 @@
 }
 
 .removeButton:hover {
-  color: var(--color-red-darker, #b91c1c);
+  color: var(--color-red-darker);
   background-color: var(--fileupload-error-bg);
 }
 
 .removeIcon {
   width: 1rem !important;
   height: 1rem !important;
-}
-
-/* Estilos del botón de icono eliminados - ya no se usan */
-
-/* Mantener el botón anterior como alternativa (oculto por defecto) */
-.uploadButton {
-  width: 100%;
-  margin-top: 1rem;
-  background-color: var(--fileupload-success);
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 0.875rem;
-  display: none; /* Oculto por defecto */
-}
-
-.uploadButton:hover:not(:disabled) {
-  background-color: var(--fileupload-success-hover);
-}
-
-.uploadButton:disabled {
-  background-color: var(--fileupload-text-muted);
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
 /* Responsividad */

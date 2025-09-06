@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { CloudUpload, InsertDriveFile, Close, CheckCircle } from "@mui/icons-material";
+import { CloudUpload, InsertDriveFile, Close, CheckCircle, Error as ErrorIcon } from "@mui/icons-material";
 import { showError } from "$shared/utils/errors/showError";
 import { classes } from "#modules/utils/styles";
 import styles from "./FileUpload.module.css";
@@ -23,6 +23,12 @@ type ProvideMetadataFn = (fileDatas: FileDataWithoutMetadata)=> FileDataMetadata
 
 export type OnUploadOptions = {
   setSelectedFiles?: React.Dispatch<React.SetStateAction<FileData[]>>;
+  setItemValidationErrors?: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+};
+
+export type GenOnUploadOptions = {
+  url: string;
+  onEachUpload?: (response: unknown, fileData: FileData, options?: OnUploadOptions)=> Promise<void>;
 };
 
 interface FileUploadProps {
@@ -57,6 +63,7 @@ export function FileUpload<M extends Record<string, any>>( { maxFileSize,
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<FileData[]>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [itemValidationErrors, setItemValidationErrors] = useState<Record<string, string>>( {} );
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const acceptString = acceptedTypes.join(",");
@@ -171,10 +178,12 @@ ${acceptedTypesDisplay}`,
 
     setIsUploading(true);
     setValidationErrors([]);
+    setItemValidationErrors( {} );
 
     try {
       await onUpload?.(pendingFiles, {
         setSelectedFiles,
+        setItemValidationErrors,
       } );
     } catch (uploadError) {
       const errorMessage = uploadError instanceof Error
@@ -241,7 +250,7 @@ ${acceptedTypesDisplay}`,
       {validationErrors.length > 0 && (
         <div className={styles.errorContainer}>
           {validationErrors.map((errorMessage, index) => (
-            <p key={index} className={styles.errorText}>{errorMessage}</p>
+            <span key={index}>{errorMessage}</span>
           ))}
         </div>
       )}
@@ -252,42 +261,36 @@ ${acceptedTypesDisplay}`,
             {selectedFiles.map((fileObj) => (
               <div key={fileObj.id} className={styles.fileItem}>
                 <div className={styles.fileInfo}>
-                  {fileObj.uploadStatus === "completed"
-                    ? (
-                      <CheckCircle className={`${styles.fileIcon} ${styles.successIcon}`} />
-                    )
-                    : (
-                      <InsertDriveFile className={styles.fileIcon} />
-                    )}
+                  {getFileIconFromUploadStatus(fileObj.uploadStatus)}
                   <div className={styles.fileDetails}>
                     <p className={styles.fileName}>{fileObj.name}</p>
                     <p className={styles.fileSize}>
                       {formatFileSize(fileObj.size)} • {fileObj.type ?? "Tipo desconocido"}
                     </p>
 
-                    {fileObj.uploadStatus === "uploading" && (
-                      <div className={styles.progressContainer}>
-                        <div className={styles.progressBar}>
-                          <div
-                            className={styles.progressFill}
-                            style={{
-                              width: `${fileObj.uploadProgress || 0}%`,
-                            }}
-                          />
-                        </div>
-                        <span className={styles.progressText}>
+                    <div className={classes(
+                      styles.statusContainer,
+                      styles[fileObj.uploadStatus as string],
+                    )}>
+                      {fileObj.uploadStatus === "pending" && (
+                        <span>Pendiente de subir</span>
+                      )}
+                      {fileObj.uploadStatus === "uploading" && (
+                        <span>
                           {fileObj.uploadProgress || 0}%
                         </span>
-                      </div>
-                    )}
+                      )}
 
-                    {fileObj.uploadStatus === "completed" && (
-                      <p className={styles.successText}>¡Subido!</p>
-                    )}
+                      {fileObj.uploadStatus === "completed" && (
+                        <span>¡Subido!</span>
+                      )}
 
-                    {fileObj.uploadStatus === "error" && (
-                      <p className={styles.errorText}>Error al subir</p>
-                    )}
+                      {fileObj.uploadStatus === "error" && (
+                        <span>Error al subir{itemValidationErrors[fileObj.id]
+                          ? `: ${itemValidationErrors[fileObj.id]}`
+                          : ""}</span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -318,9 +321,7 @@ ${acceptedTypesDisplay}`,
   );
 }
 
-type Options = OnUploadOptions & {
-  onEachUpload?: (response: unknown)=> Promise<void>;
-};
+type Options = Omit<GenOnUploadOptions, "url"> & OnUploadOptions;
 export const uploadSingleFileWithProgress = (
   url: string,
   fileData: FileData,
@@ -382,7 +383,7 @@ export const uploadSingleFileWithProgress = (
             response = xhr.responseText;
           }
 
-          onEachUpload(response)
+          onEachUpload(response, fileData, options)
             .catch(showError);
         }
 
@@ -408,7 +409,11 @@ export const uploadSingleFileWithProgress = (
             errorMessage += `: ${xhr.responseText}`;
         }
 
-        reject(new Error(errorMessage));
+        const err = new Error(errorMessage);
+
+        // eslint-disable-next-line no-underscore-dangle
+        (err as any)._fileId = fileData.id;
+        reject(err);
       }
     } );
 
@@ -419,10 +424,55 @@ export const uploadSingleFileWithProgress = (
           uploadStatus: "error" as const,
         }
         : f));
-      reject(new Error("Upload failed"));
+      const err = new Error("Upload failed");
+
+      // eslint-disable-next-line no-underscore-dangle
+      (err as any)._fileId = fileData.id;
+      reject(err);
     } );
 
     xhr.open("POST", url);
     xhr.send(formData);
   } );
+};
+
+function getFileIconFromUploadStatus(uploadStatus: string | undefined) {
+  switch (uploadStatus) {
+    case "completed": return <CheckCircle className={styles.fileIcon} />;
+    case "error": return <ErrorIcon className={styles.fileIcon} />;
+    case "uploading": return <CloudUpload className={styles.fileIcon} />;
+    default: return <InsertDriveFile className={styles.fileIcon} />;
+  }
+}
+
+export const genOnUpload = (
+  genOptions: GenOnUploadOptions,
+) =>async (files: FileData[], options?: OnUploadOptions) =>{
+  for (const fileData of files) {
+    try {
+      await uploadSingleFileWithProgress(
+        genOptions.url,
+        fileData,
+        {
+          ...options,
+          onEachUpload: genOptions?.onEachUpload,
+        },
+      );
+    } catch (uploadError) {
+      if (options?.setItemValidationErrors) {
+        const errorMessage = uploadError instanceof Error
+          ? uploadError.message
+          : "Error desconocido";
+
+        if ("_fileId" in uploadError) {
+          options.setItemValidationErrors(old=> ( {
+            ...old,
+            // eslint-disable-next-line no-underscore-dangle
+            [uploadError._fileId]: errorMessage,
+          } ));
+        }
+      } else
+        throw uploadError;
+    }
+  }
 };

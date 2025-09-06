@@ -20,6 +20,7 @@ import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { MusicsRepository } from "../crud/repository";
 import { MusicEntity } from "../models";
 import { MUSIC_MEDIA_PATH } from "../utils";
+import { removeFilenameExtension } from "../crud/builder/music-builder.service";
 import { MusicFileInfoEntity } from "./models";
 
 // eslint-disable-next-line no-underscore-dangle
@@ -148,8 +149,10 @@ const storage = diskStorage( {
     callback(null, uploadPath);
   },
   filename: (_req, file, callback) => {
+    const originalName = Buffer.from(file.originalname, "latin1").toString("utf8");
     // Generar nombre único para el archivo
-    const uniqueName = `${file.originalname}[${uuidv4()}]${extname(file.originalname)}`;
+    const uniqueName = `${removeFilenameExtension(originalName)}\
+[${uuidv4()}]${extname(originalName)}`;
 
     callback(null, uniqueName);
   },
