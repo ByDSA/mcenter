@@ -157,8 +157,9 @@ const storage = diskStorage( {
 
 function getMime(ext: string) {
   switch (ext) {
-    case "ape": return "audio/ape";
+    case "ape": return "audio/x-ape";
     case "m4a": return "audio/x-m4a";
+    case "flac": return "audio/flac";
     default: return mime.lookup(ext);
   }
 }
