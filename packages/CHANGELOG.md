@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.6.0](https://github.com/ByDSA/mcenter/compare/v4.5.1...v4.6.0) (2025-09-09)
+
+
+### Features
+
+* **front:** upload youtube input ([4a620ef](https://github.com/ByDSA/mcenter/commit/4a620efc9cf5cbc2ac8296dbe65b3a00af684d62))
+* upload youtube musics ([b9b14ba](https://github.com/ByDSA/mcenter/commit/b9b14bab001e0571d2916257e389fe91ee7c3c77))
+
 ### [4.5.1](https://github.com/ByDSA/mcenter/compare/v4.5.0...v4.5.1) (2025-09-06)
 
 
