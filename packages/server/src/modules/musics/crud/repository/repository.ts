@@ -269,10 +269,17 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
 fileInfo: MusicFileInfoEntity;}> {
     const musicDto = await this.musicBuilder.createMusicFromFile(relativePath);
     const music = await this.createOneAndGet(musicDto);
-    const fileInfo = await this.fileInfoRepo.upsertOneByPathAndGet(relativePath, {
-      ...localFileMusic,
-      musicId: music.id,
-    } );
+    let fileInfo: MusicFileInfoEntity;
+
+    try {
+      fileInfo = await this.fileInfoRepo.upsertOneByPathAndGet(relativePath, {
+        ...localFileMusic,
+        musicId: music.id,
+      } );
+    } catch (e) {
+      await this.deleteOneByIdAndGet(music.id);
+      throw e;
+    }
 
     return {
       music,

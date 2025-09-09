@@ -10,7 +10,11 @@ const schema = z.object( {
 
 type ErrorElementResponse = z.infer<typeof schema>;
 
-export function errorToErrorElementResponse(err: unknown): ErrorElementResponse {
+type Options = {
+  type?: string;
+  ignoreTrace?: boolean;
+};
+export function errorToErrorElementResponse(err: unknown, options?: Options): ErrorElementResponse {
   if (!(err instanceof Error)) {
     return {
       message: stringifyUnknown(err),
@@ -19,11 +23,19 @@ export function errorToErrorElementResponse(err: unknown): ErrorElementResponse 
   }
 
   const [_, ...stack] = err.stack?.split("\n").map(s => s.trim()) ?? [];
+  let message: string;
+  let type: string = options?.type ?? err.name;
+
+  try {
+    message = JSON.parse(err.message);
+  } catch {
+    message = err.message;
+  }
 
   return {
-    message: err.message,
-    trace: stack,
-    type: typeof err,
+    message,
+    trace: options?.ignoreTrace ? undefined : stack,
+    type,
   };
 }
 

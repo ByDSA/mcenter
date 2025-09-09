@@ -42,8 +42,6 @@ export class MusicsIndexService {
 
   @OnEvent(MusicEvents.WILDCARD)
   async handleEvents(ev: DomainEvent<unknown>) {
-    let doc: Doc;
-
     if (ev.type === MusicEvents.Patched.TYPE) {
       const typedEv = ev as PatchEvent<Music>;
       const id = typedEv.payload.entityId;
@@ -51,15 +49,20 @@ export class MusicsIndexService {
 
       assertFoundServer(docOdm);
 
-      doc = this.mapOdm(docOdm);
+      let doc: Doc = this.mapOdm(docOdm);
+
+      await this.updateOne(doc);
     } else if (ev.type === MusicEvents.Created.TYPE) {
       const typedEv = ev as EntityEvent<MusicEntity>;
+      let doc: Doc = this.mapModel(typedEv.payload.entity);
 
-      doc = this.mapModel(typedEv.payload.entity);
+      await this.updateOne(doc);
+    } else if (ev.type === MusicEvents.Deleted.TYPE) {
+      const typedEv = ev as EntityEvent<{ id: string }>;
+
+      await this.index.deleteDocument(typedEv.payload.entity.id);
     } else
       throw new Error("Event type not handled: " + ev.type);
-
-    await this.updateOne(doc);
   }
 
   async syncAll() {

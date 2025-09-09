@@ -17,6 +17,7 @@
     "test:watch": "pnpm run test --watch"
   },
   "dependencies": {
+    "@nestjs/bullmq": "11.0.3",
     "@nestjs/common": "11.1.3",
     "@nestjs/core": "11.1.3",
     "@nestjs/event-emitter": "3.0.1",
@@ -24,6 +25,7 @@
     "@nestjs/serve-static": "5.0.3",
     "$shared": "workspace:../shared/build",
     "axios": "1.10.0",
+    "bullmq": "5.58.5",
     "chevrotain": "workspace:./lib/chevrotain",
     "cors": "2.8.5",
     "date-ops": "2.2.0",
@@ -32,6 +34,7 @@
     "fluent-ffmpeg": "2.1.3",
     "glob": "11.0.3",
     "helmet": "8.1.0",
+    "ioredis": "5.7.0",
     "jsdom": "26.1.0",
     "just-clone": "6.2.0",
     "just-diff": "6.0.2",
@@ -54,7 +57,6 @@
     "uuid": "11.1.0",
     "winston": "3.17.0",
     "winston-daily-rotate-file": "5.0.0",
-    "youtube-mp3-downloader": "0.7.11",
     "zod": "3.25.74"
   },
   "devDependencies": {

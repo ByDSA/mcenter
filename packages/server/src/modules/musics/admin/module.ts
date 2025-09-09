@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { TasksModule } from "#core/tasks/module";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicFileInfoModule } from "../file-info/module";
 import { MusicFixInfoController } from "./fix-info/fix-info.controller";
@@ -10,6 +11,7 @@ import { UpdateRemoteTreeService } from "./update-remote/service";
   imports: [
     MusicsCrudModule,
     MusicFileInfoModule,
+    TasksModule,
   ],
   controllers: [
     MusicFixInfoController,

@@ -19,6 +19,8 @@ import { EpisodesSlugModule } from "#episodes/slug/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
 import { MusicFileInfoModule } from "#musics/file-info/module";
 import { MusicsAdminModule } from "#musics/admin/module";
+import { TasksModule } from "#core/tasks";
+import { YoutubeImportMusicModule } from "#modules/youtube/import-music/module";
 import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
@@ -40,6 +42,9 @@ const imports = [
   EpisodesCrudModule, // Al final, para que no interfiera con slugs
 
   PlayerModule,
+
+  TasksModule,
+  YoutubeImportMusicModule,
 ];
   /* Importante: el orden de las rutas aquí en el Register es irrelevante.
   Si hay colisiones en el acceso, cargar el módulo específico primero fuera del Register */
@@ -119,6 +124,14 @@ const routes: Routes = [
   {
     path: PATH_ROUTES.player.path,
     module: PlayerModule,
+  },
+  {
+    path: PATH_ROUTES.tasks.path,
+    module: TasksModule,
+  },
+  {
+    path: PATH_ROUTES.youtube.import.music.path,
+    module: YoutubeImportMusicModule,
   },
 ];
 

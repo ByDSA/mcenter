@@ -61,7 +61,15 @@ RUN pnpm build
 FROM base AS runner
 
 # Instalar ffmpeg y ffprobe
-RUN apk add --no-cache ffmpeg
+RUN apk add --no-cache ffmpeg && \
+  ffmpeg -version
+
+# Instalar yt-dlp
+RUN apk add --no-cache python3 && \
+  wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp && \
+  chmod +x /usr/local/bin/yt-dlp && \
+  yt-dlp --version
+
 
 WORKDIR /packages
 COPY --from=builder /packages/shared/build ./shared/build

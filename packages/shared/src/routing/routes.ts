@@ -2,6 +2,8 @@ import { ResponseFormat } from "../models/resources";
 import { EpisodeCompKey } from "../models/episodes";
 import { PathRoutes } from "./routes.types";
 
+const TASKS = "/api/tasks";
+const YOUTUBE = "/api/youtube";
 const MUSICS = "/api/musics";
 const MUSICS_SLUG = `${MUSICS}/slug`;
 const MUSICS_PLAYLISTS = `${MUSICS}/playlists`;
@@ -25,6 +27,30 @@ type MusicSlugQueryParams = {
 };
 
 export const PATH_ROUTES = {
+  tasks: {
+    path: TASKS,
+    withParams: (id: string) => `${TASKS}/${id}`,
+    status: {
+      withParams: (id: string) => `${TASKS}/${id}/status`,
+    },
+    statusStream: {
+      withParams: (id: string, heartbeatEveryMs?: number) => `${TASKS}/${id}/status/stream${heartbeatEveryMs ? `?heartbeat=${heartbeatEveryMs}` : ""}`,
+    },
+  },
+  youtube: {
+    path: YOUTUBE,
+    import: {
+      music: {
+        path: `${YOUTUBE}/import/music`,
+        one: {
+          withParams: (youtubeId: string) => `${YOUTUBE}/import/music/one/${youtubeId}`,
+        },
+        playlist: {
+          withParams: (playlistId: string) => `${YOUTUBE}/import/music/playlist/${playlistId}`,
+        },
+      },
+    },
+  },
   musics: {
     path: MUSICS,
     withParams: (id: string)=>`${MUSICS}/${id}`,

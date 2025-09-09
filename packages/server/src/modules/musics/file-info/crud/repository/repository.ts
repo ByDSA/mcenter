@@ -179,14 +179,29 @@ música si desea borrar el archivo.",
       musicId: partial.musicId,
     };
     const updateQuery: Required<Omit<DocOdm, "_id">> = MusicFileInfoOdm.toDoc(fileInfo);
-    const result = await MusicFileInfoOdm.Model.findOneAndUpdate(filterQuery, updateQuery, {
-      upsert: true, // lo crea si no existe
-      new: true,
-    } );
 
-    assertIsDefined(result);
+    try {
+      const result = await MusicFileInfoOdm.Model.findOneAndUpdate(filterQuery, updateQuery, {
+        upsert: true, // lo crea si no existe
+        new: true,
+      } );
 
-    return MusicFileInfoOdm.toEntity(result);
+      assertIsDefined(result);
+
+      return MusicFileInfoOdm.toEntity(result);
+    } catch (e) {
+      if (!(e instanceof Error))
+        throw e;
+
+      if (e.message.includes("E11000 duplicate key error collection")) {
+        if (e.message.includes("index: hash"))
+          throw new UnprocessableEntityException("A file with the same hash already exists.");
+
+        throw new UnprocessableEntityException("A file with some same key already exists.");
+      }
+
+      throw e;
+    }
   }
 
   async getOneByPath(path: Entity["path"]): Promise<Entity | null> {

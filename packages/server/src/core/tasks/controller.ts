@@ -1,0 +1,156 @@
+import { Controller,
+  Get,
+  Param,
+  MessageEvent,
+  HttpStatus,
+  HttpException,
+  Sse,
+  Query } from "@nestjs/common";
+import { Observable, switchMap, catchError, timer, fromEvent, merge, of } from "rxjs";
+import { TasksCrudDtos } from "$shared/models/tasks";
+import { assertFoundClient } from "#utils/validation/found";
+import { TaskService } from "./task.service";
+
+type TaskMessageEvent = Omit<MessageEvent, "id" | "type"> & {
+  id: string;
+  type: "error" | "task-status";
+};
+
+@Controller()
+export class TaskController {
+  constructor(private readonly taskService: TaskService) {}
+
+  /**
+   * Obtiene estadísticas generales de la cola de tareas
+   */
+  @Get("queue/status")
+  async getQueueStatus() {
+    return await this.taskService.getQueueStatus();
+  }
+
+  /**
+   * Obtiene el estado de una tarea específica por su ID
+   */
+  @Get(":id/status")
+  async getTaskStatus(
+    @Param("id") id: string,
+  ): Promise<TasksCrudDtos.TaskStatus.TaskStatus<unknown>> {
+    try {
+      return await this.taskService.getTaskStatus(id);
+    } catch (error) {
+      if (!(error instanceof Error))
+        throw error;
+
+      if (error.message.includes("not found"))
+        assertFoundClient(null, error.message);
+
+      throw error;
+    }
+  }
+
+  private async getSecureTaskStatusResponse(id: string) {
+    try {
+      const status = await this.taskService.getTaskStatus(id);
+
+      return createTaskSuccessMessageEvent(status);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("not found")) {
+        return createTaskErrorMessageEvent(
+          new HttpException(
+            `Task with ID ${id} not found`,
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          ),
+          {
+            taskId: id,
+          },
+        );
+      }
+
+      throw error;
+    }
+  }
+
+  /**
+   * SSE endpoint para monitorear el estado de una tarea específica en tiempo real
+   */
+  @Sse(":id/status/stream")
+  streamTaskStatus(
+    @Param("id") id: string,
+    @Query("heartbeat") heartbeatMsStr: string,
+  ): Observable<TaskMessageEvent> {
+    let heartbeatMs = +heartbeatMsStr;
+
+    if (Number.isNaN(heartbeatMs))
+      heartbeatMs = 30_000; // 30 segundos por defecto
+
+    // Observable para cambios de estado de la tarea específica
+    const taskChanges$ = fromEvent(this.taskService, "task-change").pipe(
+      switchMap(async (jobId: unknown) => {
+        if (jobId !== id)
+          return null;
+
+        return await this.getSecureTaskStatusResponse(jobId);
+      } ),
+      // Filtrar valores null (cuando el evento no es para nuestra tarea)
+      switchMap(result => result ? of(result) : []),
+    );
+    // Observable para heartbeat
+    const heartbeat$ = timer(heartbeatMs, heartbeatMs).pipe(
+      switchMap(async () => await this.getSecureTaskStatusResponse(id)),
+    );
+    // Estado inicial
+    const initialState$ = new Observable<TaskMessageEvent>(observer => {
+      this.taskService.getTaskStatus(id)
+        .then(status => {
+          observer.next(createTaskSuccessMessageEvent(status));
+          observer.complete();
+        } )
+        .catch(error => {
+          if (error instanceof Error && error.message.includes("not found")) {
+            observer.next(createTaskErrorMessageEvent(
+              new HttpException(
+                `Task with ID ${id} not found`,
+                HttpStatus.UNPROCESSABLE_ENTITY,
+              ),
+              {
+                taskId: id,
+              },
+            ));
+          } else
+            observer.next(createTaskErrorMessageEvent(error));
+
+          observer.complete();
+        } );
+    } );
+
+    return merge(
+      initialState$,
+      taskChanges$,
+      heartbeat$,
+    ).pipe(
+      catchError((error: unknown) => {
+        // Retornar un Observable con un solo TaskMessageEvent, no un array
+        return of(createTaskErrorMessageEvent(error));
+      } ),
+    );
+  }
+}
+
+function createTaskSuccessMessageEvent(data: object): TaskMessageEvent {
+  return {
+    data,
+    type: "task-status",
+    id: Date.now().toString(),
+  };
+}
+
+function createTaskErrorMessageEvent(error: unknown, meta?: Record<string, any>): TaskMessageEvent {
+  return {
+    data: JSON.stringify( {
+      error: error instanceof Error ? error.message : "Unknown error",
+      meta,
+    } ),
+    type: "error",
+    id: Date.now().toString(),
+  };
+}

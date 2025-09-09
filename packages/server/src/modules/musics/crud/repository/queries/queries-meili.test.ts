@@ -1,7 +1,6 @@
 /* eslint-disable jest/no-conditional-expect */
 import { parseQuery } from "./1-str-to-obj/query-parser";
 import { expressionToMeilisearchQuery } from "./queries-meili";
-import { FindQueryParams } from "./queries-odm";
 
 describe.each([
   ["year:1990", "year = 1990"],
@@ -40,9 +39,9 @@ OR ((tags IN [\"jazz\"] AND onlyTags IS NULL) OR onlyTags IN [\"jazz\"])"],
     "((tags IN [\"rock\"] AND onlyTags IS NULL) OR onlyTags IN [\"rock\"]) \
 AND (weight > 50)",
   ],
-] as [string, FindQueryParams | null][])(
+] as [string, string | null][])(
   "tests",
-  (query: string, expected: FindQueryParams | null) => {
+  (query: string, expected: string | null) => {
     it(`query=${query}`, () => {
       const f = (q: string) => {
         const expr = parseQuery(q);

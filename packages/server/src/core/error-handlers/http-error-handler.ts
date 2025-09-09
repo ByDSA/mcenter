@@ -3,36 +3,26 @@ import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from "@nestjs/commo
 import { ZodError } from "zod";
 import { isDebugging } from "$shared/utils/vscode";
 import { CustomValidationError } from "$shared/utils/validation/zod";
+import { errorToErrorElementResponse, ResultResponse } from "$shared/utils/http/responses";
+
+const ignoreTraceCodes = [404];
 
 export const errorHandler = (err: unknown, _req: Request, res: Response, next: NextFunction) => {
-  let unhandled = true;
+  let code = HttpStatus.INTERNAL_SERVER_ERROR;
 
-  if (err instanceof ZodError || err instanceof CustomValidationError) {
-    unhandled = false;
-    res.sendStatus(HttpStatus.UNPROCESSABLE_ENTITY);
-  } else if (typeof err === "object" && err !== null) {
-    const code = (err as any).code ?? (err as any).status;
+  if (err instanceof ZodError || err instanceof CustomValidationError)
+    code = HttpStatus.UNPROCESSABLE_ENTITY;
+  else if (typeof err === "object" && err !== null)
+    code = (err as any).code ?? (err as any).status;
 
-    if (code !== undefined && code !== 500) {
-      unhandled = false;
+  const errObj: NonNullable<ResultResponse<null>["errors"]>[0] = errorToErrorElementResponse(err, {
+    ignoreTrace: !isDebugging() || ignoreTraceCodes.includes(code),
+  } );
 
-      if (err instanceof Error) {
-        res.status(code).json( {
-          message: err.message,
-        } );
-      } else
-        res.sendStatus(code);
-    }
-  }
-
-  if (unhandled) {
-    if (isDebugging()) {
-      res.status(500).json( {
-        message: (err as any).message ?? String(err),
-      } );
-    } else
-      res.sendStatus(500);
-  }
+  res.status(code).json( {
+    data: null,
+    errors: [errObj],
+  } satisfies ResultResponse<null>);
 
   next();
 };

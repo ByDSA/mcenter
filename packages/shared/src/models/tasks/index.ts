@@ -1,0 +1,81 @@
+import z from "zod";
+import { createOneResultResponseSchema } from "../../utils/http/responses";
+import { dateSchema } from "../utils/schemas/timestamps/date";
+
+export namespace TasksCrudDtos {
+  export namespace CreateTask {
+    export const taskOptionsSchema = z.object( {
+      delay: z.number().min(0),
+      attempts: z.number().int()
+        .min(1),
+      priority: z.number().int()
+        .min(1)
+        .max(10),
+    } );
+
+    export type TaskOptions = z.infer<typeof taskOptionsSchema>;
+
+    export const createTaskJobSchema = (payloadSchema: z.ZodTypeAny) => {
+      return z.object( {
+        id: z.string(),
+        name: z.string(),
+        message: z.string().optional(),
+        payload: payloadSchema,
+        createdAt: dateSchema,
+      } );
+    };
+
+    export const createCreatedTaskResultResponseSchema = (
+      schema: z.ZodTypeAny,
+    ) => createOneResultResponseSchema(z.object( {
+      job: createTaskJobSchema(schema),
+    } ));
+
+    export type TaskJob<T> = Omit<z.infer<ReturnType<typeof createTaskJobSchema>>, "payload"> & {
+  payload: T;
+};
+  }
+
+  export namespace TaskStatus {
+    // bullmq
+    const finishedStatusSchema = z.enum(["completed", "failed"]);
+    const jobStateSchema = z.enum([
+      "active",
+      "delayed",
+      "prioritized",
+      "waiting-children",
+      "waiting",
+    ]).or(finishedStatusSchema);
+
+    type Params<P, PL, R> = {
+      payloadSchema?: z.ZodSchema<PL>;
+      progressSchema: z.ZodSchema<P>;
+      returnValueSchema?: z.ZodSchema<R>;
+    };
+    export const createSchema = <P, PL, R, >( { progressSchema = z.any(),
+      payloadSchema = z.any(),
+      returnValueSchema = z.any() }: Params<P, PL, R>) => z.object( {
+        id: z.string(),
+        name: z.string(),
+        status: z.union([jobStateSchema, z.literal("unknown")]),
+        payload: payloadSchema,
+        progress: progressSchema,
+        createdAt: dateSchema,
+        processedAt: dateSchema.nullable().optional(),
+        finishedAt: dateSchema.nullable().optional(),
+        failedReason: z.string().nullable()
+          .optional(),
+        returnValue: returnValueSchema.optional(),
+        attempts: z.number(),
+        maxAttempts: z.number(),
+      } );
+
+    export type TaskStatus<P = any, PL=any, R=any> =
+      Omit<z.infer<ReturnType<typeof createSchema>>, "payload" | "progress" | "returnValue"> &
+    {
+  progress: P;
+  payload: PL;
+  returnValue?: R;
+};
+}
+}
