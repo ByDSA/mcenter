@@ -1,4 +1,3 @@
-// TODO: testing RKs0btOhOes
 import { exec } from "child_process";
 import { promisify } from "util";
 import * as fs from "fs";
