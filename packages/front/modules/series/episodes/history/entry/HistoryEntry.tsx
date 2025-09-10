@@ -10,7 +10,7 @@ type Props = {
   showDate?: boolean;
 };
 export function HistoryEntryElement( { value, setValue, showDate = false }: Props) {
-  return <span className="history-entry">
+  return <span className="resource-list-entry">
     {
       ResourceAccordion( {
         headerContent: <Header entry={value} showDate={showDate}/>,

@@ -13,8 +13,8 @@ import { MusicEntryElement } from "#musics/musics/entry/MusicEntry";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import { streamTaskStatus } from "#modules/tasks";
 
-import "#styles/resources/history-entry.css";
-import "#styles/resources/history-musics.css";
+import "#styles/resources/resource-list-entry.css";
+import "#styles/resources/resource-list-musics.css";
 import "#styles/resources/music.css";
 
 export default function Upload() {
@@ -148,7 +148,7 @@ export default function Upload() {
           } );
         }}/>
       <hr/>
-      <span className="history-list">
+      <span className="resource-list">
         {
                 uploaded!.map(
                   (music) => <Fragment key={`${music.id}`}>

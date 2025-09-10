@@ -7,8 +7,8 @@ import { MusicsApi } from "../requests";
 import { MusicEntityWithFileInfos } from "../models";
 import { MusicEntryElement } from "./entry/MusicEntry";
 import { ArrayData } from "./types";
-import "#styles/resources/history-entry.css";
-import "#styles/resources/history-musics.css";
+import "#styles/resources/resource-list-entry.css";
+import "#styles/resources/resource-list-musics.css";
 import "#styles/resources/music.css";
 
 type Props = {
@@ -37,7 +37,7 @@ export function MusicList(props: Props) {
       <>
         {resultNumbers}
         <br/>
-        <span className="history-list">
+        <span className="resource-list">
           {
           data!.map(
             (music, i) => <Fragment key={`${music.id}`}>

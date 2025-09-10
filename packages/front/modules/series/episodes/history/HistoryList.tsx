@@ -6,8 +6,8 @@ import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { EpisodeHistoryApi } from "./requests";
 import { getDateStr } from "./utils";
 
-import "#styles/resources/history-entry.css";
-import "#styles/resources/history-episodes.css";
+import "#styles/resources/resource-list-entry.css";
+import "#styles/resources/resource-list-episodes.css";
 import "#styles/resources/serie.css";
 
 type Data = EpisodeHistoryApi.GetMany.Data[];
@@ -22,7 +22,7 @@ export function HistoryList() {
     isLoading,
     render: () => {
       return (
-        <span className="history-list">
+        <span className="resource-list">
           {
             data!.map((entry: EpisodeHistoryApi.GetMany.Data, i: number) => {
               let dayTitle;

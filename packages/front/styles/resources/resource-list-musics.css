@@ -1,4 +1,4 @@
-.history-entry {
+.resource-list-entry {
   .ui-kit-accordion {
     @media (hover: hover) {
       --color-hover: var(--color-music-darker);

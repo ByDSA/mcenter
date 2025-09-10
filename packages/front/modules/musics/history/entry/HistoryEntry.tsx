@@ -12,7 +12,7 @@ export function HistoryEntryElement(
   { value: entry, setValue, showDate =
   true }: Props<MusicHistoryApi.GetManyByCriteria.Data>,
 ) {
-  return <span className="history-entry">
+  return <span className="resource-list-entry">
     {
       ResourceAccordion( {
         headerContent:

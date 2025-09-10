@@ -8,8 +8,8 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicHistoryApi } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 
-import "#styles/resources/history-entry.css";
-import "#styles/resources/history-musics.css";
+import "#styles/resources/resource-list-entry.css";
+import "#styles/resources/resource-list-musics.css";
 import "#styles/resources/music.css";
 
 type Props = {
@@ -31,7 +31,7 @@ export function HistoryList(props?: Props) {
     error,
     isLoading,
     render: () => (
-      <span className="history-list">
+      <span className="resource-list">
         {
           data!.map(
             (entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
