@@ -1,5 +1,5 @@
 import { classes } from "#modules/utils/styles";
-import style from "./style.module.css";
+import styles from "./style.module.css";
 
 type HeaderProps = {
   time: string;
@@ -9,17 +9,17 @@ type HeaderProps = {
   right?: string;
 };
 export function Header( { time, date, title, subtitle, right }: HeaderProps) {
-  return <span className={style.container}>
-    <div className={style.fullTime}>
-      <span className={style.time}>{time}</span>
+  return <span className={styles.container}>
+    <div className={styles.fullTime}>
+      <span className={styles.time}>{time}</span>
 
       {date
-      && <span className={style.date}>{date}</span> }
+      && <span className={styles.date}>{date}</span> }
     </div>
     <span className={classes("center", "ellipsis")}>
       <span className="ellipsis">{title}</span>
       <span className="ellipsis">{subtitle}</span>
     </span>
-    { right && <span className={style.item}>{right}</span> }
+    { right && <span className={styles.item}>{right}</span> }
   </span>;
 }

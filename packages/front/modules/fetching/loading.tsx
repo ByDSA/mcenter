@@ -1,5 +1,5 @@
 import { Spinner } from "#modules/ui-kit/spinner";
-import style from "./fetching.style.module.css";
+import styles from "./fetching.style.module.css";
 
 const L = function Loading() {
   return (
@@ -18,4 +18,4 @@ export {
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const LoadingSpinner = <span className={style.loading}><Spinner /></span>;
+export const LoadingSpinner = <span className={styles.loading}><Spinner /></span>;

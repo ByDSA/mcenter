@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Spinner } from "../spinner/Spinner";
 
 type LabelAsyncActionProps = {
+  title?: string;
+  disabled?: boolean;
   isDoing: boolean;
   action: ()=> Promise<void>;
   children?: React.ReactNode;
-  spinnerSide?: "left" | "right";
+  spinnerSide?: "left" | "none" | "right";
 };
 
 export function useAsyncAction() {
@@ -19,13 +21,23 @@ export function useAsyncAction() {
 }
 
 export function LinkAsyncAction(
-  { isDoing, action, spinnerSide = "right", children }: LabelAsyncActionProps,
+  { isDoing, action, disabled, spinnerSide = "right", title, children }: LabelAsyncActionProps,
 ) {
   const element = (<span>
     {spinnerSide === "left" && isDoing && <Spinner/> }
-    <a style={{
-      [spinnerSide === "left" ? "marginLeft" : "marginRight"]: "0.5em",
-    }} onClick={()=> action()}>{children}</a>
+    <a
+      title={title}
+      style={
+        spinnerSide !== "none"
+          ? {
+            [spinnerSide === "left" ? "marginLeft" : "marginRight"]: "0.5em",
+          }
+          : undefined
+      }
+      onClick={disabled ? undefined : (() => action())}
+    >
+      {children}
+    </a>
     {spinnerSide === "right" && isDoing && <Spinner/> }
   </span>);
 

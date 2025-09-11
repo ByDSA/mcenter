@@ -1,13 +1,5 @@
-.container {
-  .url {
-    .content {
-      word-break: break-all;
-      white-space: normal;
-      word-wrap: break-word;
-    }
-  }
-
-  .update {
-    margin-left: 1em;
-  }
+.autoBreakUrl {
+  word-break: break-all;
+  white-space: normal;
+  word-wrap: break-word;
 }

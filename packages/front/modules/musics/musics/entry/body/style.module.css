@@ -1,19 +1,25 @@
+*:has(> .album),
+*:has(> .title),
+*:has(> .artist) {
+  flex-grow: 1;
+}
+
+.weight :global(.ui-kit-input-number) {
+  width: 4rem;
+}
+
+.lineWrap {
+  flex-wrap: wrap !important;
+}
+
+.title,
+.artist,
+.album,
+.url {
+  width: 100%;
+}
+
 .container {
-  .album,
-  .title,
-  .artist {
-    flex-grow: 1;
-  }
-
-  .weight :global(.ui-kit-input-number) {
-    width: 4rem;
-  }
-
-  .weightAlbum,
-  .titleArtist {
-    flex-wrap: wrap !important;
-  }
-
   details > summary {
     cursor: pointer;
   }

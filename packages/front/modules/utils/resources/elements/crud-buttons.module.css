@@ -1,0 +1,47 @@
+.deleteButton {
+  a {
+    color: var(--color-red-darker);
+
+    &:hover {
+      color: var(--color-red-light);
+    }
+  }
+}
+
+.resetButton {
+  a {
+    color: var(--color-gray-900);
+
+    &:hover {
+      color: var(--color-gray-600);
+    }
+  }
+}
+
+.disabled a {
+  filter: saturate(0.5) opacity(0.4) !important;
+
+  &:hover {
+    cursor: default;
+  }
+}
+
+.updateButton {
+  a {
+    color: var(--color-green-darker2);
+
+    &:hover {
+      color: var(--color-green-darker);
+    }
+  }
+}
+
+.actionsBar {
+  display: flex;
+  justify-content: end !important;
+  gap: 1.5rem !important;
+}
+
+:global(.ui-kit-accordion .body):has(> .actionsBar:first-child) {
+  padding-top: 0.5rem !important;
+}

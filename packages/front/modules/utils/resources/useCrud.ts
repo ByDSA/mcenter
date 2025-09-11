@@ -14,21 +14,25 @@ success: boolean;}>;
 export type UseCrudProps<T> = {
   data: T;
   setData: (newData: T | undefined)=> void;
-  isModifiedFn: (base: T, current: T)=> boolean;
-  fetchUpdate: FetchFn<T>;
-  fetchRemove: FetchFn<T>;
+  isModifiedFn?: (base: T, current: T)=> boolean;
+  fetchUpdate?: FetchFn<T>;
+  fetchRemove?: FetchFn<T>;
 };
 
-type CrudOp<T> = {
-  action: ()=> Promise<{data: T | void;
-success: boolean;}>;
+export type RetCrudOp<T> = Promise<{
+  data: T | void;
+  success: boolean;
+}>;
+
+export type CrudOp<T> = {
+  action: ()=> RetCrudOp<T>;
   isDoing: boolean;
 };
 
 export type UseCrudRet<T> = {
   isModified: boolean;
-  update: CrudOp<T>;
-  remove: CrudOp<T>;
+  update?: CrudOp<T>;
+  remove?: CrudOp<T>;
   addOnReset: AddOnReset<T>;
   reset: ()=> Promise<void>;
   state: ResourceState<T>;
@@ -56,61 +60,68 @@ export function useCrud<T>(
 
     handleOnReset(initData);
   };
-  const update = async () => {
-    if (!isModified) {
-      return {
-        data: undefined,
-        success: false,
-      };
+  const update = fetchUpdate
+    ? async () => {
+      if (!isModified) {
+        return {
+          data: undefined,
+          success: false,
+        };
+      }
+
+      const { done, start } = asyncUpdateAction;
+
+      start();
+
+      return await fetchUpdate()
+        .then(async (obj)=>{
+          const r = obj.data;
+
+          if (obj.success && r) {
+            initialDataState[1](r);
+            setResponseData(r);
+            await genReset(r)();
+          }
+
+          return obj;
+        } )
+        .finally(()=> {
+          done();
+        } );
     }
+    : undefined;
+  const remove = fetchRemove
+    ? async () => {
+      const { done, start } = asyncRemoveAction;
 
-    const { done, start } = asyncUpdateAction;
+      start();
 
-    start();
+      return await fetchRemove()
+        .then((obj)=>{
+          if (obj.success)
+            setResponseData(undefined);
 
-    return await fetchUpdate()
-      .then(async (obj)=>{
-        const r = obj.data;
-
-        if (obj.success && r) {
-          initialDataState[1](r);
-          setResponseData(r);
-          await genReset(r)();
-        }
-
-        return obj;
-      } )
-      .finally(()=> {
-        done();
-      } );
-  };
-  const remove = async () => {
-    const { done, start } = asyncUpdateAction;
-
-    start();
-
-    return await fetchRemove()
-      .then((obj)=>{
-        if (obj.success)
-          setResponseData(undefined);
-
-        return obj;
-      } )
-      .finally(()=> {
-        done();
-      } );
-  };
+          return obj;
+        } )
+        .finally(()=> {
+          done();
+        } );
+    }
+    : undefined;
   const ret: UseCrudRet<T> = {
     isModified,
-    update: {
-      action: update,
-      isDoing: asyncUpdateAction.isDoing,
-    },
-    remove: {
-      action: remove,
-      isDoing: asyncRemoveAction.isDoing,
-    },
-
+    update: update
+      ? {
+        action: update,
+        isDoing: asyncUpdateAction.isDoing,
+      }
+      : undefined,
+    remove: remove
+      ? {
+        action: remove,
+        isDoing: asyncRemoveAction.isDoing,
+      }
+      : undefined,
     reset: genReset(initialData),
     addOnReset,
     state: dataState,
@@ -121,11 +132,11 @@ export function useCrud<T>(
 }
 
 type CompareFn<T> = (r1: T, r2: T)=> boolean;
-function useInitialData<T>(data: T, compare: CompareFn<T>) {
+function useInitialData<T>(data: T, compare?: CompareFn<T>) {
   const [initialData, setInitialData] = React.useState(data);
 
   useEffect(() => {
-    if (compare(data, initialData))
+    if (compare?.(data, initialData))
       setInitialData(data);
   }, [data]);
 
@@ -135,11 +146,11 @@ function useInitialData<T>(data: T, compare: CompareFn<T>) {
   ] as const;
 }
 
-function useIsModified<T>(base: T, current: T, compare: CompareFn<T>) {
+function useIsModified<T>(base: T, current: T, compare?: CompareFn<T>) {
   const [isModified, setIsModified] = useState(false);
 
   useEffect(() => {
-    const v = compare(base, current);
+    const v = compare?.(base, current) ?? false;
 
     setIsModified(v);
   }, [base, current]);
@@ -148,4 +159,25 @@ function useIsModified<T>(base: T, current: T, compare: CompareFn<T>) {
     isModified,
     setIsModified,
   ] as const;
+}
+
+export function mergeCrudOp(...ops: CrudOp<unknown>[]): CrudOp<undefined> {
+  return {
+    isDoing: ops.some(op=>op.isDoing),
+    action: async () => {
+      try {
+        await Promise.all(ops.map(op=>op.action()));
+      } catch {
+        return {
+          data: undefined,
+          success: false,
+        };
+      }
+
+      return {
+        data: undefined,
+        success: true,
+      };
+    },
+  };
 }

@@ -3,21 +3,26 @@ import { FlattenedKeys, PropInfo } from "$shared/utils/validation/zod/utils";
 
 export function schemaToProps<T>(
   s: Parameters<typeof zodSchemaToReadableFormat<T>>[0],
-  captionMap: Record<FlattenedKeys<T>, string>,
 ) {
-  const flattenedSchema = zodSchemaToReadableFormat<T>(s);
-  const result: Record<FlattenedKeys<T>, PropInfo> = {} as any;
+  return <C extends Partial<Record<FlattenedKeys<T>, string>>>(
+    captionMap: C,
+  ) => {
+    const flattenedSchema = zodSchemaToReadableFormat<T>(s);
+    const result: Record<keyof C, PropInfo> = {} as any;
 
-  for (const [key, propInfo] of Object.entries(flattenedSchema) as [string, PropInfo][]) {
-    const caption = (captionMap[key] !== undefined)
-      ? captionMap[key]
-      : `${key}:`;
+    for (const [key, propInfo] of Object.entries(flattenedSchema) as [string, PropInfo][]) {
+      if (key in captionMap) {
+        const caption = (captionMap[key as keyof C] !== undefined)
+          ? captionMap[key as keyof C]
+          : `${key}:`;
 
-    result[key] = {
-      ...propInfo,
-      caption,
-    };
-  }
+        result[key as keyof C] = {
+          ...propInfo,
+          caption,
+        };
+      }
+    }
 
-  return result;
+    return result;
+  };
 }

@@ -27,7 +27,8 @@
 }
 
 .ui-kit-resource-input .ui-kit-resource-input-text,
-.ui-kit-resource-input .ui-kit-resource-input-number {
+.ui-kit-resource-input .ui-kit-resource-input-number,
+.ui-kit-resource-input .ui-kit-resource-input-array-string {
   flex-flow: row;
   width: 100%;
   margin: 0 1em;

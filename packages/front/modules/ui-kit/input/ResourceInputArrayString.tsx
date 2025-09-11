@@ -14,11 +14,10 @@ export type ResourceInputTextArrayProps<R> = EnterProps & ResourceInputCommonPro
 
 export function ResourceInputArrayString<R extends object>(
   { resourceState, getUpdatedResource: calcUpdatedResource, getValue: getResourceValue, addOnReset,
-    onEmptyPressEnter, onPressEnter }: ResourceInputTextArrayProps<R>,
+    onEmptyPressEnter, onPressEnter, caption }: ResourceInputTextArrayProps<R>,
 ) {
   const array = (getResourceValue(resourceState[0]) ?? []) as string[];
-
-  return <>
+  const input = <>
     <span className="ui-kit-resource-input-array-string">
       {
         array.map((t, i, a)=>{
@@ -45,6 +44,17 @@ export function ResourceInputArrayString<R extends object>(
       }
     </span>
   </>;
+
+  if (caption) {
+    return (
+      <span className="ui-kit-resource-input">
+        <span>{caption}</span>
+        {input}
+      </span>
+    );
+  }
+
+  return input;
 }
 
 type ItemProps<R extends object> = {

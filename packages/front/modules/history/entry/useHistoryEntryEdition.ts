@@ -1,3 +1,4 @@
+import { assertIsDefined } from "$shared/utils/validation";
 import { useCrud, UseCrudProps, UseCrudRet } from "#modules/utils/resources/useCrud";
 
 type Props<T> = UseCrudProps<T> ;
@@ -8,17 +9,23 @@ export function useHistoryEntryEdition<T>(
   const { isModified, remove, reset, addOnReset, state, update, initialState } = useCrud<T>( {
     data: params.data,
     setData: params.setData,
-    fetchRemove: async () => {
-      if (
-        !confirm(`Borar esta entrada del historial?\n${ JSON.stringify(params.data, null, 2)}`)) {
-        return Promise.resolve( {
-          data: undefined,
-          success: false,
-        } );
-      }
+    fetchRemove: params.fetchRemove
+      ? (async () => {
+        if (
+          !confirm(`Borar esta entrada del historial?\n${ JSON.stringify(params.data, null, 2)}`)) {
+          return Promise.resolve( {
+            data: undefined,
+            success: false,
+          } );
+        }
 
-      return await params.fetchRemove();
-    },
+        const ret = await params.fetchRemove?.();
+
+        assertIsDefined(ret);
+
+        return ret;
+      } )
+      : undefined,
     fetchUpdate: params.fetchUpdate,
     isModifiedFn: params.isModifiedFn,
   } );
