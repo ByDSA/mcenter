@@ -1,21 +1,25 @@
-import { Injectable } from "@nestjs/common";
+import { existsSync } from "fs";
+import fs from "node:fs";
+import path from "node:path";
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { safeOneConcurrent, safeSequential } from "$shared/utils/errors";
 import { createOneResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
 import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
 import { EpisodeTasks } from "$shared/models/episodes/admin";
+import { assertIsDefined } from "$shared/utils/validation";
+import ffmpeg from "fluent-ffmpeg";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { SeriesRepository } from "#modules/series/crud/repository";
-import { EpisodeFileInfo, EpisodeFileInfoEntity, episodeFileInfoSchema } from "#episodes/file-info/models";
-import { UpdateMetadataProcess } from "#episodes/file-info/update/update-saved-process";
+import { EpisodeFileInfo, EpisodeFileInfoEntity, EpisodeFileInfoOmitEpisodeId, episodeFileInfoSchema } from "#episodes/file-info/models";
 import { Serie } from "#modules/series";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
+import { md5FileAsync } from "#utils/crypt";
 import { EpisodesRepository } from "../../crud/repository";
-import { diffSerieTree as diffSeriesTree, OldNewSerieTree as OldNew } from "./disk";
+import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "./disk";
 import { RemoteSeriesTreeService } from "./db";
 import { SerieNode, SerieTree, EpisodeNode } from "./disk/models";
-import { AddNewFilesRepository } from "./disk/repository";
 
 const TASK_NAME = EpisodeTasks.sync.name;
 
@@ -35,16 +39,18 @@ type Payload = z.infer<typeof payloadSchema>;
 type Progress = z.infer<typeof progressSchema>;
 type Result = z.infer<typeof resultSchema>;
 
+type ModelOmitEpisodeId = EpisodeFileInfoOmitEpisodeId;
+
 @Injectable()
 @TaskHandlerClass()
 export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Result> {
+  private readonly logger = new Logger(EpisodeUpdateRemoteTaskHandler.name);
+
   constructor(
     private readonly seriesRepo: SeriesRepository,
     private readonly episodesRepo: EpisodesRepository,
     private readonly savedSerieTreeService: RemoteSeriesTreeService,
     private readonly fileInfoRepo: EpisodeFileInfoRepository,
-    private readonly updateMetadataProcess: UpdateMetadataProcess,
-    private readonly repo: AddNewFilesRepository,
     private readonly taskService: TaskService,
   ) {
   }
@@ -92,7 +98,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
             message: "Getting local series tree ...",
             percentage: 5,
           } );
-          localSeriesTree = await this.repo.getLocalSeriesTree();
+          localSeriesTree = await this.getLocalSeriesTree();
         },
         // 2
         async () => {
@@ -213,11 +219,90 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
     };
     const gotEpisode = await this.episodesRepo.getOneOrCreate(episode);
     const fileInfo: EpisodeFileInfo = {
-      ...await this.updateMetadataProcess.episodeFileToFileInfoOmitEpisodeId(localEpisode),
+      ...await this.episodeFileToFileInfoOmitEpisodeId(localEpisode),
       episodeId: gotEpisode.id,
     };
     const gotFileInfo = await this.fileInfoRepo.createOneAndGet(fileInfo);
 
     return gotFileInfo;
+  }
+
+  async episodeFileToFileInfoOmitEpisodeId(
+    episodeFile: EpisodeFile,
+  ): Promise<ModelOmitEpisodeId> {
+    const { filePath } = episodeFile.content;
+    const MEDIA_FOLDER = process.env.MEDIA_FOLDER_PATH;
+
+    assertIsDefined(MEDIA_FOLDER);
+
+    const fullFilePath = `${MEDIA_FOLDER}/${filePath}`;
+
+    if (!existsSync(fullFilePath))
+      throw new Error("UpdateMetadataProcess: file '" + fullFilePath + "' not exists");
+
+    const episodeFileInfo: ModelOmitEpisodeId = await new Promise((resolve, reject) =>{
+      ffmpeg.ffprobe(fullFilePath, async (err, metadata) => {
+        if (err) {
+          if (err instanceof Error && err.message === "Cannot find ffprobe") {
+            const newError = new InternalServerErrorException();
+
+            newError.message = err.message;
+            newError.stack = err.stack;
+
+            return reject(newError);
+          }
+
+          return reject(err);
+        }
+
+        if (!metadata)
+          return;
+
+        const duration = metadata.format?.duration ?? null;
+        const resolution = {
+          width: metadata.streams[0].width ?? null,
+          height: metadata.streams[0].height ?? null,
+        };
+        const fps = metadata.streams[0].r_frame_rate ?? null;
+        const { mtime, ctime, size } = fs.statSync(fullFilePath);
+        const createdAt = new Date(ctime);
+        const updatedAt = new Date(mtime);
+
+        this.logger.log(`got metadata of ${filePath}`);
+
+        const ret: ModelOmitEpisodeId = {
+          path: filePath,
+          hash: await md5FileAsync(fullFilePath),
+          size,
+          timestamps: {
+            createdAt,
+            updatedAt,
+          },
+          mediaInfo: {
+            duration,
+            resolution,
+            fps,
+          },
+        };
+
+        return resolve(ret);
+      } );
+    } );
+
+    return episodeFileInfo;
+  }
+
+  // eslint-disable-next-line require-await
+  async getLocalSeriesTree() {
+    const { MEDIA_FOLDER_PATH } = process.env;
+
+    assertIsDefined(MEDIA_FOLDER_PATH);
+
+    const seriesPath = path.join(MEDIA_FOLDER_PATH, "series");
+    const filesSerieTreeResult = findAllSerieFolderTreesAt(seriesPath, {
+      baseFolder: "series/",
+    } );
+
+    return filesSerieTreeResult;
   }
 }

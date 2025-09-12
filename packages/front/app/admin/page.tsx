@@ -25,12 +25,14 @@ const ACTIONS: Action[] = [
   {
     path: PATH_ROUTES.episodes.admin.updateLastTimePlayed.path,
     name: "Episodes: updateLastTimePlayed",
-    type: "action",
+    type: "task",
+    taskName: EpisodeTasks.cache.updateLastTimePlayed.name,
   },
   {
     path: PATH_ROUTES.episodes.admin.fileInfoUpdateSaved.path,
     name: "Episodes: update file-info saved",
-    type: "action",
+    type: "task",
+    taskName: EpisodeTasks.updateFileInfoSaved.name,
   },
   {
     path: PATH_ROUTES.episodes.admin.addNewFiles.path,
@@ -108,7 +110,7 @@ export default function Page() {
         ))}
       </ul>
 
-      <p>Out:</p>
+      <hr/>
       <JsonViewer
         value={text}
         rootName={false}
@@ -143,8 +145,14 @@ async function callAction( { setText: useText, path, name }: ActionParams) {
 
     useText(json);
   } catch {
-    useText( {
-      message: await response.text(),
-    } );
+    try {
+      useText( {
+        message: await response.text(),
+      } );
+    } catch {
+      useText( {
+        message: "",
+      } );
+    }
   }
 }

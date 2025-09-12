@@ -1,28 +1,19 @@
-import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
-import { EpisodesRepository } from "../../crud/repository";
-import { LastTimePlayedService } from "../../history";
+import { Controller, Get } from "@nestjs/common";
+import { TaskCreatedResponseValidation } from "#core/tasks";
+import { EpisodeUpdateLastTimePlayedTaskHandler, payloadSchema } from "./task.handler";
 
 @Controller("/admin/update-last-time-played")
 export class EpisodesUpdateLastTimePlayedController {
   constructor(
-    private readonly lastTimePlayedService: LastTimePlayedService,
-    private readonly episodeRepo: EpisodesRepository,
+    private readonly taskHandler: EpisodeUpdateLastTimePlayedTaskHandler,
   ) {
   }
 
   @Get("/")
-  @HttpCode(HttpStatus.OK)
-  async action(): Promise<void> {
-    const allEpisodes = await this.episodeRepo.getAll();
-    const promisesToAwait: Promise<any>[] = [];
-
-    for (const episode of allEpisodes) {
-      const updatePromise = this.lastTimePlayedService
-        .updateEpisodeLastTimePlayedByCompKey(episode.compKey);
-
-      promisesToAwait.push(updatePromise);
-    }
-
-    await Promise.all(promisesToAwait);
+  @TaskCreatedResponseValidation(payloadSchema)
+  async task() {
+    return {
+      job: await this.taskHandler.addTask(undefined),
+    };
   }
 }

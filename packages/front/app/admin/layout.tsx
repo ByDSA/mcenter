@@ -7,7 +7,8 @@ export default function MusicLayout( { children }: {
   children: React.ReactNode;
 } ) {
   const submenu = makeMenu( {
-    "/admin/": "-",
+    "/admin/": "Do tasks",
+    "/admin/task-manager": "Task Manager",
   }, {
     type: "sub",
   } );
