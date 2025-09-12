@@ -37,7 +37,7 @@ export function assertFoundServer<T>(value: T | null |
   if (!isDefined(value)) {
     const error = new InternalServerErrorException();
 
-    error.message += `: Data not found${msg ? `: ${msg}` : "."}`;
+    error.message = `Data not found${msg ? `: ${msg}` : "."}`;
     throwErrorPopStack(error);
   }
 }

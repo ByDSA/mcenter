@@ -1,9 +1,12 @@
+import type { Progress } from "./task.handler";
 import { Injectable, Logger } from "@nestjs/common";
 import z from "zod";
 import { MusicFileInfo, MusicFileInfoEntity, musicFileInfoEntitySchema, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
+import { Job } from "bullmq";
 import { musicEntitySchema } from "#musics/models";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
+import { showError } from "#core/logging/show-error";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
 import { MusicsRepository } from "../../crud/repository";
 import { ChangesDetector } from "./changes-detector";
@@ -26,6 +29,10 @@ export const updateResultSchema = z.object( {
 
 export type UpdateResult = z.infer<typeof updateResultSchema>;
 
+type Props = {
+  job: Job;
+};
+
 @Injectable()
 export class UpdateRemoteTreeService {
   static readonly logger = new Logger(UpdateRemoteTreeService.name);
@@ -36,9 +43,26 @@ export class UpdateRemoteTreeService {
   ) {
   }
 
-  async update() {
+  async update(props: Props) {
+    const { job } = props;
+
+    await job.updateProgress( {
+      percentage: 0,
+      message: "Starting",
+    } );
     const remoteMusic = await this.fileInfoRepo.getAll();
-    const changes = await detectChangesFromLocalFiles(remoteMusic);
+
+    await job.updateProgress( {
+      percentage: 3,
+      message: "Fetched database musics.",
+    } );
+    const changes = await detectChangesFromLocalFiles(remoteMusic, props);
+
+    await job.updateProgress( {
+      percentage: 96,
+      message: "Updating database ...",
+    } );
+
     const promises = [];
     const created: UpdateResult["new"] = [];
     const updated: UpdateResult["updated"] = [];
@@ -113,11 +137,16 @@ export class UpdateRemoteTreeService {
       updated,
     };
 
+    await job.updateProgress( {
+      percentage: 100,
+      message: "Done!",
+    } satisfies Progress);
+
     return ret;
   }
 }
 
-async function detectChangesFromLocalFiles(remoteMusics: MusicFileInfoEntity[]) {
+async function detectChangesFromLocalFiles(remoteMusics: MusicFileInfoEntity[], options: Props) {
   const relativeFilePaths = await findAllPathsOfValidMusicFiles();
   const filesWithMeta: MusicFileInfoOmitMusicId[] = [];
 
@@ -127,7 +156,11 @@ async function detectChangesFromLocalFiles(remoteMusics: MusicFileInfoEntity[]) 
   let i = 0;
 
   for (const relativePath of relativeFilePaths) {
-    UpdateRemoteTreeService.logger.debug(`${++i} / ${relativeFilePaths.length}: ${relativePath}`);
+    options.job.updateProgress( {
+      percentage: 5 + ((95 - 5) * (i / relativeFilePaths.length)),
+      message: `${++i} / ${relativeFilePaths.length}: ${relativePath}`,
+    } )
+      .catch(showError);
     const file = await new MusicFileInfoOmitMusicIdBuilder().withPartial( {
       path: relativePath,
     } )

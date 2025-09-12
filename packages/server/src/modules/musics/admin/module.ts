@@ -6,6 +6,7 @@ import { MusicFixInfoController } from "./fix-info/fix-info.controller";
 import { SearchDuplicatesController } from "./search-duplicates/controller";
 import { MusicUpdateRemoteController } from "./update-remote/controller";
 import { UpdateRemoteTreeService } from "./update-remote/service";
+import { MusicUpdateRemoteTaskHandler } from "./update-remote/task.handler";
 
 @Module( {
   imports: [
@@ -20,6 +21,7 @@ import { UpdateRemoteTreeService } from "./update-remote/service";
   ],
   providers: [
     UpdateRemoteTreeService,
+    MusicUpdateRemoteTaskHandler,
   ],
   exports: [],
 } )

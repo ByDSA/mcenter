@@ -1,5 +1,5 @@
 import type { EpisodeEntityWithFileInfos } from "./service";
-import { EpisodeFile, getSeasonEpisodeFromEpisodeId } from "#episodes/file-info";
+import { EpisodeFile, getSeasonEpisodeFromEpisodeId } from "../disk";
 
 export function episodeToEpisodeFiles(
   episode: EpisodeEntityWithFileInfos,

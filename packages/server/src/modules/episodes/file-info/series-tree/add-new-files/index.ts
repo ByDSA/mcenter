@@ -1,3 +1,0 @@
-export {
-  EpisodeAddNewFilesController,
-} from "./controller";

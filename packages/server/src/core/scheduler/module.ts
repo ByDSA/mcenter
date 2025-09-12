@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import schedule from "node-schedule";
 import { IndexSyncService } from "#modules/search/indexes/sync-all.service";
 import { MeilisearchModule } from "#modules/search/module";
+import { showError } from "#core/logging/show-error";
 import { dynamicLoadScriptFromEnvVar } from "../../dynamic-load";
 
 @Module( {
@@ -35,8 +36,9 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
     schedule.scheduleJob("0 5 * * *", async () => {
       await this.syncAllMeiliseachIndexes();
     } );
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.syncAllMeiliseachIndexes();
+
+    this.syncAllMeiliseachIndexes()
+      .catch(showError);
 
     this.logger.log("Scheduler initialized!");
   }
@@ -50,7 +52,7 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
   onModuleDestroy() {
     schedule.gracefulShutdown()
       .then(()=> {
-        this.logger.log("Scheduler stopped!");
+        this.logger.warn("Scheduler stopped!");
       } )
       .catch(e=> {
         this.logger.error(e);

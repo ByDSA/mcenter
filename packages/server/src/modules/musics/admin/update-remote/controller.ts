@@ -1,19 +1,19 @@
 import { Controller, Get } from "@nestjs/common";
-import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
-import { TaskService } from "#core/tasks/task.service";
-import { UpdateRemoteTreeService, UpdateResult, updateResultSchema } from "./service";
+import { TaskCreatedResponseValidation } from "#core/tasks";
+import { MusicUpdateRemoteTaskHandler, payloadSchema } from "./task.handler";
 
 @Controller("/update-remote")
 export class MusicUpdateRemoteController {
   constructor(
-    private readonly updateRemoteTreeService: UpdateRemoteTreeService,
-    private readonly tasksService: TaskService,
+    private readonly taskHandler: MusicUpdateRemoteTaskHandler,
   ) {
   }
 
   @Get("/")
-  @ValidateResponseWithZodSchema(updateResultSchema)
-  all(): Promise<UpdateResult> {
-    return this.updateRemoteTreeService.update();
+  @TaskCreatedResponseValidation(payloadSchema)
+  async all() {
+    return {
+      job: await this.taskHandler.addTask(undefined),
+    };
   }
 }

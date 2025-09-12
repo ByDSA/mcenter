@@ -1,12 +1,12 @@
 /* eslint-disable require-await */
 import type { AnyTaskHandler } from "./task.interface";
 import EventEmitter from "node:events";
-import { Injectable, OnModuleInit, Logger } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit, UnprocessableEntityException } from "@nestjs/common";
 import { Queue, Worker, Job } from "bullmq";
 import { InjectQueue } from "@nestjs/bullmq";
 import { DiscoveryService } from "@nestjs/core";
-import { v4 as uuidv4 } from "uuid";
 import { TasksCrudDtos } from "$shared/models/tasks";
+import { v4 as uuidv4 } from "uuid";
 import { assertFoundServer } from "#utils/validation/found";
 import { taskRegistry } from "./task.registry";
 import { TASK_HANDLER_METADATA } from "./task-handler.decorator";
@@ -17,6 +17,8 @@ const defaultOptions: TasksCrudDtos.CreateTask.TaskOptions = {
   priority: 1,
 };
 
+export const QUEUE_NAME = "tasks2";
+
 @Injectable()
 export class TaskService extends EventEmitter
   implements OnModuleInit {
@@ -25,24 +27,21 @@ export class TaskService extends EventEmitter
   private worker: Worker;
 
   constructor(
-  @InjectQueue("tasks") private readonly queue: Queue,
+  @InjectQueue(QUEUE_NAME) private readonly queue: Queue,
   private readonly discoveryService: DiscoveryService,
   ) {
     super();
+
     this.worker = new Worker(
-      "tasks",
+      QUEUE_NAME,
       async (job: Job) => {
-        return this.processJob(job);
+        return await this.processJob(job);
       },
       {
         connection: this.queue.opts.connection,
       },
     );
-  }
-
-  async onModuleInit() {
-    // Auto-discover y registrar handlers
-    await this.discoverAndRegisterHandlers();
+    this.logger.log("New worker created.");
 
     this.logger.log("Task service initialized");
     this.worker.on("completed", (job) => {
@@ -67,6 +66,18 @@ export class TaskService extends EventEmitter
       if (job.id)
         this.emit("task-change", job.id);
     } );
+  }
+
+  async onModuleInit() {
+    await this.queue.waitUntilReady();
+
+    // No sé por qué, sin harcodear no funciona y ereisVersion es undefined y lanza error
+    // eslint-disable-next-line accessor-pairs
+    Object.defineProperty(this.queue, "redisVersion", {
+      get: () => "8.2.1",
+    } );
+    // Auto-discover y registrar handlers
+    await this.discoverAndRegisterHandlers();
   }
 
   private async discoverAndRegisterHandlers() {
@@ -94,6 +105,23 @@ export class TaskService extends EventEmitter
     );
   }
 
+  async isJobRunningByName(name: string): Promise<boolean> {
+    const activeJobs = await this.queue.getActive();
+    const isRunning = activeJobs.some(job => job.name === name);
+
+    return isRunning;
+  }
+
+  async assertJobIsNotRunningByName(name: string) {
+    if (await this.isJobRunningByName(name)) {
+      const err = new UnprocessableEntityException();
+
+      err.message = "Ya se estaba ejecutando " + name;
+
+      throw err;
+    }
+  }
+
   async addTask<T>(
     name: string,
     payload: T,
@@ -113,13 +141,13 @@ export class TaskService extends EventEmitter
       name,
       payload,
       {
+        removeOnFail: false, // Para que llame el onFail tras el último intento
         ...TasksCrudDtos.CreateTask.taskOptionsSchema.parse( {
           attempts: options.attempts ?? defaultOptions.attempts,
           delay: options.delay ?? defaultOptions.delay,
           priority: options.priority ?? defaultOptions.priority,
+          jobId: options.jobId ?? uuidv4(),
         } satisfies TasksCrudDtos.CreateTask.TaskOptions),
-        removeOnFail: false, // Para que llame el onFail tras el último intento
-        jobId: uuidv4(),
       },
     );
 

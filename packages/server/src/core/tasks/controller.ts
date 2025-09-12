@@ -5,8 +5,9 @@ import { Controller,
   HttpStatus,
   HttpException,
   Sse,
-  Query } from "@nestjs/common";
-import { Observable, switchMap, catchError, timer, fromEvent, merge, of } from "rxjs";
+  Query,
+  UnprocessableEntityException } from "@nestjs/common";
+import { Observable, switchMap, catchError, timer, fromEvent, merge, of, auditTime } from "rxjs";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import { assertFoundClient } from "#utils/validation/found";
 import { TaskService } from "./task.service";
@@ -41,8 +42,12 @@ export class TaskController {
       if (!(error instanceof Error))
         throw error;
 
-      if (error.message.includes("not found"))
-        assertFoundClient(null, error.message);
+      if (error.message.includes("not found")) {
+        const err = new UnprocessableEntityException();
+
+        err.message = error.message;
+        throw err;
+      }
 
       throw error;
     }
@@ -51,6 +56,8 @@ export class TaskController {
   private async getSecureTaskStatusResponse(id: string) {
     try {
       const status = await this.taskService.getTaskStatus(id);
+
+      assertFoundClient(status);
 
       return createTaskSuccessMessageEvent(status);
     } catch (error) {
@@ -93,6 +100,7 @@ export class TaskController {
       } ),
       // Filtrar valores null (cuando el evento no es para nuestra tarea)
       switchMap(result => result ? of(result) : []),
+      auditTime(1_000), // Esperar X tiempo entre envíos
     );
     // Observable para heartbeat
     const heartbeat$ = timer(heartbeatMs, heartbeatMs).pipe(
@@ -102,7 +110,9 @@ export class TaskController {
     const initialState$ = new Observable<TaskMessageEvent>(observer => {
       this.taskService.getTaskStatus(id)
         .then(status => {
-          observer.next(createTaskSuccessMessageEvent(status));
+          if (status)
+            observer.next(createTaskSuccessMessageEvent(status));
+
           observer.complete();
         } )
         .catch(error => {

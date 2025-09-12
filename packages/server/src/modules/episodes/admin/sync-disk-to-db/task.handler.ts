@@ -1,18 +1,43 @@
-import { Controller, Get } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { safeOneConcurrent, safeSequential } from "$shared/utils/errors";
-import { ResultResponse } from "$shared/utils/http/responses";
-import { diffSerieTree as diffSeriesTree, EpisodeFileInfoRepository, OldNewSerieTree as OldNew } from "#episodes/file-info";
+import { createOneResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
+import { Job } from "bullmq";
+import { TasksCrudDtos } from "$shared/models/tasks";
+import z from "zod";
+import { EpisodeTasks } from "$shared/models/episodes/admin";
+import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { SeriesRepository } from "#modules/series/crud/repository";
-import { SerieNode, SerieTree, EpisodeNode } from "#episodes/file-info/series-tree/local/models";
-import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
+import { EpisodeFileInfo, EpisodeFileInfoEntity, episodeFileInfoSchema } from "#episodes/file-info/models";
 import { UpdateMetadataProcess } from "#episodes/file-info/update/update-saved-process";
 import { Serie } from "#modules/series";
-import { RemoteSeriesTreeService } from "../remote";
-import { EpisodesRepository } from "../../../crud/repository";
-import { AddNewFilesRepository } from "./repository";
+import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
+import { EpisodesRepository } from "../../crud/repository";
+import { diffSerieTree as diffSeriesTree, OldNewSerieTree as OldNew } from "./disk";
+import { RemoteSeriesTreeService } from "./db";
+import { SerieNode, SerieTree, EpisodeNode } from "./disk/models";
+import { AddNewFilesRepository } from "./disk/repository";
 
-@Controller("/admin/add-new-files")
-export class EpisodeAddNewFilesController {
+const TASK_NAME = EpisodeTasks.sync.name;
+
+export const payloadSchema = z.undefined();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const progressSchema = z.object( {
+  percentage: z.number(),
+  message: z.string(),
+} );
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const resultSchema = createOneResultResponseSchema(z.object( {
+  new: z.array(episodeFileInfoSchema),
+  updated: z.array(episodeFileInfoSchema),
+} ));
+
+type Payload = z.infer<typeof payloadSchema>;
+type Progress = z.infer<typeof progressSchema>;
+type Result = z.infer<typeof resultSchema>;
+
+@Injectable()
+@TaskHandlerClass()
+export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Result> {
   constructor(
     private readonly seriesRepo: SeriesRepository,
     private readonly episodesRepo: EpisodesRepository,
@@ -20,11 +45,38 @@ export class EpisodeAddNewFilesController {
     private readonly fileInfoRepo: EpisodeFileInfoRepository,
     private readonly updateMetadataProcess: UpdateMetadataProcess,
     private readonly repo: AddNewFilesRepository,
+    private readonly taskService: TaskService,
   ) {
   }
 
-  @Get("/")
-  async syncLocalToRemote() {
+  readonly taskName = TASK_NAME;
+
+  async addTask(
+    payload: Payload,
+    options?: Partial<TasksCrudDtos.CreateTask.TaskOptions>,
+  ) {
+    await this.taskService.assertJobIsNotRunningByName(TASK_NAME);
+
+    const job = await this.taskService.addTask<Payload>(
+      TASK_NAME,
+      payloadSchema.parse(payload),
+      {
+        ...options,
+      },
+    );
+
+    return job;
+  }
+
+  async execute(_payload: Payload, job: Job): Promise<Result> {
+    const updateProgress = async (p: Progress) => {
+      return await job.updateProgress(p);
+    };
+
+    await updateProgress( {
+      message: "Starting",
+      percentage: 0,
+    } );
     let localSeriesTree: SerieTree;
     let remoteSeriesTree: SerieTree;
     let diff: ReturnType<typeof diffSeriesTree>;
@@ -36,14 +88,26 @@ export class EpisodeAddNewFilesController {
       [
       // 1
         async ()=> {
+          await updateProgress( {
+            message: "Getting local series tree ...",
+            percentage: 5,
+          } );
           localSeriesTree = await this.repo.getLocalSeriesTree();
         },
         // 2
         async () => {
+          await updateProgress( {
+            message: "Getting database series tree ...",
+            percentage: 50,
+          } );
           remoteSeriesTree = await this.savedSerieTreeService.getRemoteSeriesTree();
         },
         // 3
         async () => {
+          await updateProgress( {
+            message: "Calc differences between local and database trees ...",
+            percentage: 75,
+          } );
           diff = diffSeriesTree(
             remoteSeriesTree,
             localSeriesTree,
@@ -53,12 +117,21 @@ export class EpisodeAddNewFilesController {
             move => move.old.content.filePath !== move.new.content.filePath,
           );
 
+          await updateProgress( {
+            message: "Saving new file infos and episodes ...",
+            percentage: 85,
+          } );
+
           const savedData = await this.saveNewFileInfosAndEpisode(diff.new.children);
 
           data.new = savedData;
         },
         // 4
         async ()=> {
+          await updateProgress( {
+            message: "Saving changes to database ...",
+            percentage: 90,
+          } );
           const updatedEpisodesResult = await this.#safeUpdateEpisodes(
             [...diff.updated, ...diff.moved],
           );
@@ -72,6 +145,11 @@ export class EpisodeAddNewFilesController {
         stopOnError: true,
       },
     );
+
+    await updateProgress( {
+      message: "Done!",
+      percentage: 100,
+    } );
 
     return {
       data,

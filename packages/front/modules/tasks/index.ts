@@ -55,7 +55,7 @@ export async function streamTaskStatus<
     } );
 
     eventSource.onerror = (error) => {
-      console.error("SSE Error:", error);
+      logger.error("SSE Error: " + JSON.stringify(error));
     };
   } );
 }

@@ -1,9 +1,8 @@
 import type { EpisodeEntity } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { treePut } from "$shared/utils/trees";
-import { SerieFolderTree as SerieTree } from "#episodes/file-info";
 import { EpisodesRepository } from "#episodes/crud/repository";
-import { EpisodeFile, SerieFolderTree } from "#episodes/file-info";
+import { EpisodeFile, SerieFolderTree as SerieTree } from "../disk";
 import { episodeToEpisodeFiles } from "./adapters";
 
 export type EpisodeEntityWithFileInfos = EpisodeEntity & Required<Pick<EpisodeEntity, "fileInfos">>;
@@ -33,8 +32,8 @@ export class RemoteSeriesTreeService {
 
 export function putModelInSerieFolderTree(
   episodeEntity: EpisodeEntityWithFileInfos,
-  serieFolderTree: SerieFolderTree,
-): SerieFolderTree {
+  serieFolderTree: SerieTree,
+): SerieTree {
   const { compKey: { seriesKey, episodeKey } } = episodeEntity;
   const seasonId = getSeasonFromCode(episodeKey) ?? "";
   const episodeFiles: EpisodeFile[] = episodeToEpisodeFiles(episodeEntity);

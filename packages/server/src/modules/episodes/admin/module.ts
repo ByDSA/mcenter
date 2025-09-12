@@ -3,15 +3,17 @@ import { SeriesModule } from "#modules/series/module";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
+import { TasksModule } from "#core/tasks";
 import { UpdateMetadataProcess } from "../file-info/update/update-saved-process";
-import { EpisodeAddNewFilesController } from "../file-info/series-tree/add-new-files/controller";
 import { EpisodesUpdateController } from "../file-info/update/controller";
 import { EpisodeHistoryModule } from "../history/module";
 import { EpisodeFileInfosModule } from "../file-info/module";
-import { AddNewFilesRepository } from "../file-info/series-tree/add-new-files/repository";
 import { EpisodeDependenciesModule } from "../dependencies/module";
 import { EpisodesCrudModule } from "../crud/module";
+import { AddNewFilesRepository } from "./sync-disk-to-db/disk/repository";
+import { EpisodesSyncDiskToDatabaseController } from "./sync-disk-to-db/controller";
 import { EpisodesUpdateLastTimePlayedController } from "./update-last-time-played/controller";
+import { EpisodeUpdateRemoteTaskHandler } from "./sync-disk-to-db/task.handler";
 
 @Module( {
   imports: [
@@ -22,16 +24,18 @@ import { EpisodesUpdateLastTimePlayedController } from "./update-last-time-playe
     EpisodeDependenciesModule,
     ResourceResponseFormatterModule,
     EpisodesCrudModule,
+    TasksModule,
   ],
   controllers: [
     EpisodesUpdateLastTimePlayedController,
     EpisodesUpdateController,
-    EpisodeAddNewFilesController,
+    EpisodesSyncDiskToDatabaseController,
   ],
   providers: [
     SeriesRepository,
     UpdateMetadataProcess,
     AddNewFilesRepository,
+    EpisodeUpdateRemoteTaskHandler,
   ],
   exports: [],
 } )

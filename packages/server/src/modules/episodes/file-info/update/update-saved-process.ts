@@ -6,12 +6,13 @@ import { ErrorElementResponse, ResultResponse, errorToErrorElementResponse } fro
 import { compareEpisodeFileInfoOmitEpisodeId } from "$shared/models/episodes/file-info";
 import { EpisodeFileInfoOmitEpisodeId } from "$shared/models/episodes/file-info";
 import { EpisodeCompKey } from "#episodes/models";
-import { EpisodeFile, EpisodeFileInfoRepository, SerieFolderTree } from "#episodes/file-info";
+import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { md5FileAsync } from "#utils/crypt";
-import { RemoteSeriesTreeService } from "../series-tree/remote";
+import { EpisodeFile, SerieFolderTree } from "#episodes/admin/sync-disk-to-db/disk";
+import { RemoteSeriesTreeService } from "../../admin/sync-disk-to-db/db";
 import { EpisodeOdm } from "../../crud/repository/odm";
-import { SerieNode } from "../series-tree/local/models";
+import { SerieNode } from "../../admin/sync-disk-to-db/disk/models";
 
 type Entity = EpisodeFileInfoEntity;
 type ModelOmitEpisodeId = EpisodeFileInfoOmitEpisodeId;

@@ -1,7 +1,7 @@
 import path from "node:path";
 import { assertIsDefined } from "$shared/utils/validation";
 import { Injectable } from "@nestjs/common";
-import { findAllSerieFolderTreesAt } from "#episodes/file-info";
+import { findAllSerieFolderTreesAt } from ".";
 
 @Injectable()
 export class AddNewFilesRepository {

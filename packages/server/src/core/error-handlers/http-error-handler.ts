@@ -13,7 +13,7 @@ export const errorHandler = (err: unknown, _req: Request, res: Response, next: N
   if (err instanceof ZodError || err instanceof CustomValidationError)
     code = HttpStatus.UNPROCESSABLE_ENTITY;
   else if (typeof err === "object" && err !== null)
-    code = (err as any).code ?? (err as any).status;
+    code = (err as any).code ?? (err as any).status ?? code;
 
   const errObj: NonNullable<ResultResponse<null>["errors"]>[0] = errorToErrorElementResponse(err, {
     ignoreTrace: !isDebugging() || ignoreTraceCodes.includes(code),

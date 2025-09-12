@@ -11,6 +11,7 @@ export namespace TasksCrudDtos {
       priority: z.number().int()
         .min(1)
         .max(10),
+      jobId: z.string().optional(),
     } );
 
     export type TaskOptions = z.infer<typeof taskOptionsSchema>;
