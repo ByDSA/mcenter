@@ -5,13 +5,13 @@ import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeTasks } from "$shared/models/episodes/admin";
 import { MusicTasks } from "$shared/models/musics/admin";
 import { assertIsDefined } from "$shared/utils/validation";
-import styles from "./Page.module.css";
+import { JsonViewer } from "@textea/json-viewer";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
 
 type Action = {
   path: string;
-  name?: string;
+  name: string;
 } & (
   {
       type: "action";
@@ -20,6 +20,7 @@ type Action = {
       taskName: string;
   }
 );
+const ACTION_LOG_NAME = "Get logs";
 const ACTIONS: Action[] = [
   {
     path: PATH_ROUTES.episodes.admin.updateLastTimePlayed.path,
@@ -60,22 +61,13 @@ const ACTIONS: Action[] = [
   },
   {
     path: PATH_ROUTES.logs.path,
-    name: "Get logs",
+    name: ACTION_LOG_NAME,
     type: "action",
   },
 ];
 
 export default function Page() {
-  const [text, setText] = useState("");
-  let finalText = text;
-
-  try {
-    const parsedText = JSON.parse(text);
-
-    finalText = JSON.stringify(parsedText, null, 2);
-  } catch {
-    // Si no es JSON, lo dejamos como está
-  }
+  const [text, setText] = useState<object>( {} );
 
   return (
     <>
@@ -84,6 +76,7 @@ export default function Page() {
           <li key={action.path}><a onClick={async ()=>{
             if (action.type === "action") {
               await callAction( {
+                name: action.name,
                 setText,
                 path: action.path,
               } );
@@ -100,71 +93,58 @@ export default function Page() {
                 taskName: action.taskName,
                 // eslint-disable-next-line require-await
                 onListenStatus: async (status) => {
-                  let txt: string;
-
-                  if (status.status === "active") {
-                    if ("message" in status.progress)
-                      txt = status.progress.message;
-                    else
-                      txt = JSON.stringify(status.progress, null, 2);
-                  } else if (status.status === "completed")
-                    txt = JSON.stringify(status.returnValue, null, 2);
+                  if (status.status === "active")
+                    setText(status.progress);
+                  else if (status.status === "completed")
+                    setText(status.returnValue);
                   else
-                    txt = JSON.stringify(status, null, 2);
-
-                  setText(txt);
+                    setText(status);
 
                   return status;
                 },
               } );
             }
-          }}>{action.name ?? action.path}</a></li>
+          }}>{action.name}</a></li>
         ))}
       </ul>
 
       <p>Out:</p>
-      {textArea(finalText)}
+      <JsonViewer
+        value={text}
+        rootName={false}
+        displayDataTypes={false}
+        indentWidth={2}
+        groupArraysAfterLength={1_000}
+        highlightUpdates={true}
+        collapseStringsAfterLength={55}
+      />
     </>
   );
 }
 
 type ActionParams = {
-  setText: (text: string)=> void;
+  setText: (text: object)=> void;
   path: string;
+  name: string;
 };
-async function callAction( { setText: useText, path }: ActionParams) {
+async function callAction( { setText: useText, path, name }: ActionParams) {
   const fullUrl = backendUrl(path);
 
-  useText(`Loading: ${ fullUrl } ...`);
+  useText( {
+    message: `Loading: ${ fullUrl } ...`,
+  } );
   const response = await fetch(fullUrl);
-  const responseText = await response.text();
-  let txt: string;
 
   try {
-    const formattedText = JSON.stringify(JSON.parse(responseText), null, 2);
+    let json = await response.json();
 
-    txt = formattedText;
+    if (name === ACTION_LOG_NAME)
+      json = (json as string[]).map(l=>l.substring(11)).reverse();
+
+    useText(json);
   } catch {
-    txt = responseText;
+    useText( {
+      message: await response.text(),
+    } );
   }
-  useText(txt);
-
-  // Text area con scroll bottom:
-  const tArea = document.querySelector("textarea");
-
-  setTimeout(()=>{
-    if (tArea)
-      tArea.scrollTop = tArea.scrollHeight;
-  }, 1);
-}
-
-function textArea(txt: string) {
-  return (
-    <textarea className={styles.log} rows={20} style={{
-      width: "100%",
-      margin: "0.5em 1em",
-      overflowX: "auto",
-      whiteSpace: "pre",
-    }} readOnly value={txt} />
-  );
 }

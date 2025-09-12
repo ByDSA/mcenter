@@ -1,6 +1,8 @@
 import { PageContainer } from "app/PageContainer";
 import { makeMenu } from "#modules/menus";
 
+import "./page.css";
+
 export default function MusicLayout( { children }: {
   children: React.ReactNode;
 } ) {
