@@ -16,7 +16,7 @@ const N = 10;
 export default function Page() {
   const [taskStatuses, setTaskStatuses] = useState<Record<string, TaskStatusAny> | null>(null);
   const [sortedTaskStatuses, setSortedTaskStatuses] = useState<TaskStatusAny[] | null>(null);
-  const { data, isLoading, error } = useCrudData(
+  const { data, isLoading } = useCrudData(
     {
       refetching: {
         everyMs: 1000,
