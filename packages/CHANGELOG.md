@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.7.0](https://github.com/ByDSA/mcenter/compare/v4.6.0...v4.7.0) (2025-09-13)
+
+
+### Features
+
+* **front:** modularize elements and fetching. change crud buttons ([a01df12](https://github.com/ByDSA/mcenter/commit/a01df12122837998fe6c8f325dfa41c5276bf76d))
+* **front:** use json viewer for admin output ([e87c3ec](https://github.com/ByDSA/mcenter/commit/e87c3eccaae53b6a5180bd18d52a68336afa3293))
+* real time tasks monitoring and improve style ([01261de](https://github.com/ByDSA/mcenter/commit/01261deb10815672d05e28af405af096194a240c))
+* some actions converted to tasks ([9ad45d6](https://github.com/ByDSA/mcenter/commit/9ad45d63e9f198077bbc1af5a98f1cadd349ab0e))
+* transform more actions to tasks ([37e914d](https://github.com/ByDSA/mcenter/commit/37e914dc1e299d8b92b0fe749222768e01b78014))
+
 ## [4.6.0](https://github.com/ByDSA/mcenter/compare/v4.5.1...v4.6.0) (2025-09-09)
 
 
