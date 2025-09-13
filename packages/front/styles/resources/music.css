@@ -8,6 +8,7 @@
   --color-music-darker2: var(--color-cyan-darker2);
   --color-music-darker3: var(--color-cyan-darker3);
   --color-music-darker4: var(--color-cyan-darker4);
+  --color-music-darker5: var(--color-cyan-darker5);
 
   --color-music-text: black;
   --color-music-text-on-light: black;
@@ -20,5 +21,5 @@
   --color-music-text-on-darker4: white;
 
   --color-music-link: var(--color-yellow);
-  --color-music-link-hover: var(--color-yellow-light3);
+  --color-music-link-hover: var(--color-yellow-light);
 }

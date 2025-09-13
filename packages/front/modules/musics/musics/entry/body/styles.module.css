@@ -1,0 +1,51 @@
+.container {
+  *:has(> .album),
+  *:has(> .title),
+  *:has(> .artist) {
+    flex-grow: 1;
+  }
+
+  .album,
+  .title,
+  .artist {
+    flex-grow: 1;
+  }
+
+  .title,
+  .artist,
+  .album,
+  .url {
+    width: 100%;
+  }
+
+  .weight :global(.ui-kit-input-number) {
+    width: 4rem;
+  }
+
+  .weightAlbum,
+  .titleArtist {
+    flex-wrap: wrap !important;
+  }
+
+  .optionalButton {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.5rem !important;
+    user-select: none;
+    cursor: pointer;
+    color: var(--color-primary-darker2);
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  details > summary {
+    cursor: pointer;
+  }
+
+  .lineWrap {
+    flex-wrap: wrap !important;
+  }
+}

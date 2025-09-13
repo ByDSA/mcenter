@@ -8,7 +8,7 @@ import { TaskStatusAny } from "#modules/tasks/types";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
 import { logger } from "#modules/core/logger";
-import { useCrudData } from "#modules/fetching";
+import { LoadingSpinner, useCrudData } from "#modules/fetching";
 
 const QUEUE_NAME = "single-tasks";
 const N = 10;
@@ -16,7 +16,7 @@ const N = 10;
 export default function Page() {
   const [taskStatuses, setTaskStatuses] = useState<Record<string, TaskStatusAny> | null>(null);
   const [sortedTaskStatuses, setSortedTaskStatuses] = useState<TaskStatusAny[] | null>(null);
-  const { data } = useCrudData(
+  const { data, isLoading, error } = useCrudData(
     {
       refetching: {
         everyMs: 1000,
@@ -115,6 +115,7 @@ errors?: any[];};
   return (
     <>
       <h2>Task Manager</h2>
+      {isLoading && LoadingSpinner}
       {sortedTaskStatuses && sortedTaskStatuses.map(t=> {
         return <Task key={t.id} value={t} />;
       } )}

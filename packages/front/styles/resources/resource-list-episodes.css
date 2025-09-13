@@ -11,5 +11,17 @@
     --color-link-hover: var(--color-serie-link-hover);
 
     --spinner-color: var(--color-link);
+
+    --color-border: var(--color-serie-darker3) !important;
+
+    hr {
+      color: var(--color-serie-darker3);
+    }
+
+    color: var(--color-serie-darker5);
+
+    textarea {
+      color: var(--color-serie-darker5);
+    }
   }
 }

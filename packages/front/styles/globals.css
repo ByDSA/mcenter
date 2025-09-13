@@ -125,3 +125,10 @@ nav :has(a) {
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
+
+hr {
+  color: var(--color-gray-400);
+  border-style: solid;
+  border-width: 1px;
+  border-bottom: none;
+}

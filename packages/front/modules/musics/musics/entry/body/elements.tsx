@@ -7,7 +7,7 @@ import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean
 import { classes } from "#modules/utils/styles";
 import { Data } from "../../types";
 import { MUSIC_PROPS } from "../utils";
-import styles from "./style.module.css";
+import styles from "./styles.module.css";
 
 function getAndUpdateMusicByProp<V>(
   prop: string,
@@ -130,3 +130,13 @@ export function genUnknownElement(
 function fullUrlOf(url: string) {
   return backendUrl(PATH_ROUTES.musics.slug.withParams(url));
 }
+
+type OptionalPropsButtonProps = {
+  onClick: ()=> void;
+  isVisible: boolean;
+};
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const OptionalPropsButton = ( { isVisible, onClick }: OptionalPropsButtonProps)=><span
+  onClick={onClick}
+  className={classes("line", "height2", styles.optionalButton)}>
+  {!isVisible ? "▼" : "▲"} Propiedades opcionales</span>;

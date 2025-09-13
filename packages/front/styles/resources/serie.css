@@ -8,6 +8,7 @@
   --color-serie-darker2: var(--color-yellow-darker2);
   --color-serie-darker3: var(--color-yellow-darker3);
   --color-serie-darker4: var(--color-yellow-darker4);
+  --color-serie-darker5: var(--color-yellow-darker5);
 
   --color-serie-text: black;
   --color-serie-text-on-light: black;
@@ -18,6 +19,7 @@
   --color-serie-text-on-darker2: black;
   --color-serie-text-on-darker3: white;
   --color-serie-text-on-darker4: white;
+  --color-serie-text-on-darker5: white;
 
   --color-serie-link: var(--color-primary);
   --color-serie-link-hover: var(--color-primary-light);

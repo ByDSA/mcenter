@@ -6,11 +6,11 @@ import { useMusicCrudWithElements } from "#modules/musics/musics/entry/body/useM
 import { createActionsBar } from "#modules/utils/resources/elements/crud-buttons";
 import { MUSIC_FILE_INFO_PROPS } from "#modules/musics/musics/entry/utils";
 import { OutputText } from "#modules/ui-kit/output/Text";
+import { OptionalPropsButton } from "#modules/musics/musics/entry/body/elements";
 import { MusicHistoryApi } from "../../requests";
-import commonStyle from "../../../../history/entry/body-common.module.css";
 import { useMusicHistoryEntryEdition } from "../../useMusicHistoryEntryCrud";
+import styles from "../../../musics/entry/body/styles.module.css";
 import { LastestComponent } from "./Lastest";
-import styles from "./style.module.css";
 
 type Data = MusicHistoryApi.GetManyByCriteria.Data;
 
@@ -57,14 +57,16 @@ export function Body( { data, setData }: Props) {
 
   return <>
     {createActionsBarElement()}
-    <div className={classes(styles.container, commonStyle.container)}>
-      <span className={"height2"}>
-        {musicElements.titleElement}
+    <div className={classes(styles.container)}>
+      <span className={classes("line", styles.lineWrap)}>
+        <span className={"height2"}>
+          {musicElements.titleElement}
+        </span>
+        <span className={"height2"}>
+          {musicElements.artistElement}
+        </span>
       </span>
-      <span className={"height2"}>
-        {musicElements.artistElement}
-      </span>
-      <span className={classes("line", styles.weightAlbum)}>
+      <span className={classes("line", styles.lineWrap)}>
         <span className={classes("height2")}>
           {musicElements.weightElement}
         </span>
@@ -84,16 +86,15 @@ export function Body( { data, setData }: Props) {
       <span className={classes("line", "height2")}>{
         fileInfoElements.pathElement
       }</span>
-      <span className={classes("line", "height2")}>
-        <a onClick={() => optionalProps.setAllVisible(v=>!v)}>{!optionalProps.allVisible
-
-          ? "Mostrar"
-
-          : "Ocultar"} todas las propiedades opcionales</a>
-      </span>
+      <OptionalPropsButton
+        isVisible={optionalProps.allVisible}
+        onClick={() => optionalProps.setAllVisible(v=>!v)}
+      />
       {Object.entries(optionalProps.elements)
         .map(([key, element]) => <span key={key}>{element}</span>)}
 
+      <span className={"break"} />
+      <hr/>
       <span className={"break"} />
       <LastestComponent resourceId={data.resourceId} date={data.date}/>
     </div>

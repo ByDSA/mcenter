@@ -16,7 +16,8 @@ import { OutputText } from "#modules/ui-kit/output/Text";
 import { MUSIC_FILE_INFO_PROPS } from "../utils";
 import commonStyle from "../../../../history/entry/body-common.module.css";
 import { useMusicCrudWithElements, UseMusicCrudWithElementsProps } from "./useMusicCrudWithElements";
-import styles from "./style.module.css";
+import styles from "./styles.module.css";
+import { OptionalPropsButton } from "./elements";
 
 export type BodyProps = UseMusicCrudWithElementsProps<MusicEntity> & {
   shouldFetchFileInfo?: boolean;
@@ -68,13 +69,10 @@ export function Body( { data, setData, shouldFetchFileInfo }: BodyProps) {
         {slugElement}
       </span>
 
-      <span className={classes("line", "height2")}>
-        <a onClick={() => optionalProps.setAllVisible(v=>!v)}>{!optionalProps.allVisible
-
-          ? "Mostrar"
-
-          : "Ocultar"} todas las propiedades opcionales</a>
-      </span>
+      <OptionalPropsButton
+        isVisible={optionalProps.allVisible}
+        onClick={() => optionalProps.setAllVisible(v=>!v)}
+      />
       {Object.entries(optionalProps.elements)
         .map(([key, element]) => <span key={key}>{element}</span>)}
 

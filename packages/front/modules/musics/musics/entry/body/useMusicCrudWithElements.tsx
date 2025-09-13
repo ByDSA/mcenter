@@ -15,7 +15,7 @@ import { useCrud, UseCrudProps } from "#modules/utils/resources/useCrud";
 import { DeleteResource, ResetResource, UpdateResource } from "#modules/utils/resources/elements/crud-buttons";
 import { MUSIC_PROPS } from "../utils";
 import { genTitleElement, genArtistElement, genWeightElement, genAlbumElement, genSlugElement, genTagsElement, genUnknownElement } from "./elements";
-import styles from "./style.module.css";
+import styles from "./styles.module.css";
 
 export type UseMusicCrudWithElementsProps<T> = Pick<UseCrudProps<T>, "data" | "setData"> & {
   shouldFetchFileInfo?: boolean;

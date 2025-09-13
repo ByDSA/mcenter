@@ -115,6 +115,8 @@ export function Body( { data, setData }: Props) {
         {pathElement}
       </span>
       <span className="break"></span>
+      <hr/>
+      <span className="break"></span>
       <LastestComponent resourceId={resource.compKey} timestamp={state[0].date.timestamp}/>
     </div>
   </>;

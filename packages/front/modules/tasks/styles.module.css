@@ -189,6 +189,11 @@
   font-size: 0.8rem;
   transition: transform 0.2s ease;
   margin-top: 1rem;
+  user-select: none;
+
+  &:hover {
+    filter: brightness(2);
+  }
 }
 
 .expandedContent {

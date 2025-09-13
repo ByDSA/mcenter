@@ -11,5 +11,22 @@
     --color-link-hover: var(--color-music-link-hover);
 
     --spinner-color: var(--color-link);
+
+    --color-border: var(--color-music-darker3) !important;
+
+    hr {
+      color: var(--color-music-darker3);
+    }
+
+    color: var(--color-music-darker5);
+
+    textarea {
+      color: var(--color-music-darker5);
+    }
+  }
+
+  .ui-kit-array-item,
+  textarea {
+    border-color: var(--color-music-darker3);
   }
 }
