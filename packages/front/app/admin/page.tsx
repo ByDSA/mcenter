@@ -5,9 +5,10 @@ import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeTasks } from "$shared/models/episodes/admin";
 import { MusicTasks } from "$shared/models/musics/admin";
 import { assertIsDefined } from "$shared/utils/validation";
-import { JsonViewer } from "@textea/json-viewer";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
+import { TaskJsonViewer } from "#modules/tasks/TaskJsonViewer";
+import { logger } from "#modules/core/logger";
 
 type Action = {
   path: string;
@@ -88,6 +89,12 @@ export default function Page() {
               ).then(r=> r.json());
               const taskId = response.data?.job?.id;
 
+              if (response.errors) {
+                logger.error(response.errors[0]);
+
+                return;
+              }
+
               assertIsDefined(taskId);
 
               await streamTaskStatus( {
@@ -111,14 +118,8 @@ export default function Page() {
       </ul>
 
       <hr/>
-      <JsonViewer
+      <TaskJsonViewer
         value={text}
-        rootName={false}
-        displayDataTypes={false}
-        indentWidth={2}
-        groupArraysAfterLength={1_000}
-        highlightUpdates={true}
-        collapseStringsAfterLength={55}
       />
     </>
   );

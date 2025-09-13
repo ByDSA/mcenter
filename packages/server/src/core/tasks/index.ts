@@ -11,7 +11,7 @@ export {
 } from "./task.interface";
 
 export {
-  TaskService,
+  SingleTasksService as TaskService,
 } from "./task.service";
 
 export {

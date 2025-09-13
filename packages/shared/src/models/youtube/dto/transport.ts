@@ -30,11 +30,7 @@ export namespace YoutubeCrudDtos {
     export type Result = z.infer<typeof resultSchema>;
 
     export namespace TaskStatus {
-      export const progressSchema = z.object( {
-        percentage: z.number().min(0)
-          .max(100),
-        message: z.string(),
-      } );
+      export const progressSchema = TasksCrudDtos.TaskStatus.progressSchemaBase;
 
       export type Progress = z.infer<typeof progressSchema>;
 
@@ -85,11 +81,8 @@ export namespace YoutubeCrudDtos {
 
     export namespace TaskStatus {
 
-      export const progressSchema = z.object( {
-        percentage: z.number().min(0)
-          .max(100),
+      export const progressSchema = TasksCrudDtos.TaskStatus.progressSchemaBase.extend( {
         created: createdSchema.optional(),
-        message: z.string(),
         classification: classificationSchema.optional(),
       } );
 

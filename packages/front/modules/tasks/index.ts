@@ -13,7 +13,7 @@ export async function streamTaskStatus<
     const eventSource = new EventSource(url);
 
     eventSource.onopen = () => {
-      logger.info(`Starting task "${taskName}".`);
+      logger.info(`Active task "${taskName}".`);
     };
 
     eventSource.addEventListener("task-status", async (

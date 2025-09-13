@@ -33,8 +33,8 @@ export namespace TasksCrudDtos {
     } ));
 
     export type TaskJob<T> = Omit<z.infer<ReturnType<typeof createTaskJobSchema>>, "payload"> & {
-  payload: T;
-};
+      payload: T;
+    };
   }
 
   export namespace TaskStatus {
@@ -48,35 +48,45 @@ export namespace TasksCrudDtos {
       "waiting",
     ]).or(finishedStatusSchema);
 
-    type Params<P, PL, R> = {
-      payloadSchema?: z.ZodSchema<PL>;
-      progressSchema: z.ZodSchema<P>;
-      returnValueSchema?: z.ZodSchema<R>;
+    export const progressSchemaBase = z.object( {
+      percentage: z.number().min(0)
+        .max(100),
+      message: z.string(),
+      pausable: z.boolean().optional(),
+    } );
+
+    export type ProgressBase = z.infer<typeof progressSchemaBase>;
+
+    type Params<P extends z.infer<typeof progressSchemaBase>, PL, R> = {
+       progressSchema: z.ZodType<P>;
+    payloadSchema: z.ZodType<PL>;
+    returnValueSchema: z.ZodType<R>;
     };
-    export const createSchema = <P, PL, R, >( { progressSchema = z.any(),
-      payloadSchema = z.any(),
-      returnValueSchema = z.any() }: Params<P, PL, R>) => z.object( {
+
+    export const createSchema = <P extends z.infer<typeof progressSchemaBase>, PL, R>(
+      params: Params<P, PL, R>,
+    ) => z.object( {
         id: z.string(),
         name: z.string(),
         status: z.union([jobStateSchema, z.literal("unknown")]),
-        payload: payloadSchema,
-        progress: progressSchema,
         createdAt: dateSchema,
         processedAt: dateSchema.nullable().optional(),
         finishedAt: dateSchema.nullable().optional(),
         failedReason: z.string().nullable()
           .optional(),
-        returnValue: returnValueSchema.optional(),
         attempts: z.number(),
         maxAttempts: z.number(),
+        payload: params.payloadSchema,
+        progress: params.progressSchema,
+        returnValue: params.returnValueSchema.optional(),
       } );
 
     export type TaskStatus<P = any, PL=any, R=any> =
       Omit<z.infer<ReturnType<typeof createSchema>>, "payload" | "progress" | "returnValue"> &
-    {
-  progress: P;
-  payload: PL;
-  returnValue?: R;
-};
-}
+      {
+        progress: P;
+        payload: PL;
+        returnValue?: R;
+      };
+  }
 }

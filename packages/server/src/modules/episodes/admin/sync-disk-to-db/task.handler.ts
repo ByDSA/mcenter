@@ -25,10 +25,7 @@ const TASK_NAME = EpisodeTasks.sync.name;
 
 export const payloadSchema = z.undefined();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const progressSchema = z.object( {
-  percentage: z.number(),
-  message: z.string(),
-} );
+const progressSchema = TasksCrudDtos.TaskStatus.progressSchemaBase;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const resultSchema = createOneResultResponseSchema(z.object( {
   new: z.array(episodeFileInfoSchema),
@@ -61,7 +58,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
     payload: Payload,
     options?: Partial<TasksCrudDtos.CreateTask.TaskOptions>,
   ) {
-    await this.taskService.assertJobIsNotRunningByName(TASK_NAME);
+    await this.taskService.assertJobIsNotRunningOrPendingByName(TASK_NAME);
 
     const job = await this.taskService.addTask<Payload>(
       TASK_NAME,

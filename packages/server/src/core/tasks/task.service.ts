@@ -1,15 +1,13 @@
 /* eslint-disable require-await */
-import type { AnyTaskHandler } from "./task.interface";
 import EventEmitter from "node:events";
-import { Injectable, Logger, OnModuleInit, UnprocessableEntityException } from "@nestjs/common";
-import { Queue, Worker, Job } from "bullmq";
+import { Injectable, Logger, UnprocessableEntityException } from "@nestjs/common";
+import { Queue, Worker, Job, JobState } from "bullmq";
 import { InjectQueue } from "@nestjs/bullmq";
-import { DiscoveryService } from "@nestjs/core";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import { v4 as uuidv4 } from "uuid";
+import { assertIsDefined } from "$shared/utils/validation";
 import { assertFoundServer } from "#utils/validation/found";
 import { taskRegistry } from "./task.registry";
-import { TASK_HANDLER_METADATA } from "./task-handler.decorator";
 
 const defaultOptions: TasksCrudDtos.CreateTask.TaskOptions = {
   delay: 0,
@@ -17,18 +15,16 @@ const defaultOptions: TasksCrudDtos.CreateTask.TaskOptions = {
   priority: 1,
 };
 
-export const QUEUE_NAME = "tasks2";
+export const QUEUE_NAME = "single-tasks";
 
 @Injectable()
-export class TaskService extends EventEmitter
-  implements OnModuleInit {
-  private readonly logger = new Logger(TaskService.name);
+export class SingleTasksService extends EventEmitter {
+  private readonly logger = new Logger(SingleTasksService.name);
 
   private worker: Worker;
 
   constructor(
-  @InjectQueue(QUEUE_NAME) private readonly queue: Queue,
-  private readonly discoveryService: DiscoveryService,
+    @InjectQueue(QUEUE_NAME) private readonly queue: Queue,
   ) {
     super();
 
@@ -68,55 +64,34 @@ export class TaskService extends EventEmitter
     } );
   }
 
-  async onModuleInit() {
-    await this.queue.waitUntilReady();
-
-    // No sé por qué, sin harcodear no funciona y ereisVersion es undefined y lanza error
-    // eslint-disable-next-line accessor-pairs
-    Object.defineProperty(this.queue, "redisVersion", {
-      get: () => "8.2.1",
-    } );
-    // Auto-discover y registrar handlers
-    await this.discoverAndRegisterHandlers();
-  }
-
-  private async discoverAndRegisterHandlers() {
-    const providers = this.discoveryService.getProviders();
-
-    for (const wrapper of providers) {
-      const { instance } = wrapper;
-
-      if (!instance)
-        continue;
-
-      const isTaskHandler = Reflect.getMetadata(TASK_HANDLER_METADATA, instance.constructor);
-
-      if (isTaskHandler && this.isTaskHandler(instance)) {
-        taskRegistry.register(instance as AnyTaskHandler);
-        this.logger.log(`Registered task handler: ${instance.taskName}`);
-      }
-    }
-  }
-
-  private isTaskHandler(instance: AnyTaskHandler): instance is AnyTaskHandler {
-    return (
-      typeof instance.taskName === "string"
-      && typeof instance.execute === "function"
-    );
-  }
-
-  async isJobRunningByName(name: string): Promise<boolean> {
+  async isJobRunningOrPendingByName(name: string): Promise<boolean> {
+  // Verificar cada estado por separado y retornar tan pronto como encontremos una coincidencia
+  // Primero verificar activos (más probable que sean pocos)
     const activeJobs = await this.queue.getActive();
-    const isRunning = activeJobs.some(job => job.name === name);
 
-    return isRunning;
+    if (activeJobs.some(job => job.name === name))
+      return true;
+
+    // Luego verificar en espera
+    const waitingJobs = await this.queue.getWaiting();
+
+    if (waitingJobs.some(job => job.name === name))
+      return true;
+
+    // Verificar trabajos retrasados/programados
+    const delayedJobs = await this.queue.getDelayed();
+
+    if (delayedJobs.some(job => job.name === name))
+      return true;
+
+    return false;
   }
 
-  async assertJobIsNotRunningByName(name: string) {
-    if (await this.isJobRunningByName(name)) {
+  async assertJobIsNotRunningOrPendingByName(name: string) {
+    if (await this.isJobRunningOrPendingByName(name)) {
       const err = new UnprocessableEntityException();
 
-      err.message = "Ya se estaba ejecutando " + name;
+      err.message = "La tarea " + name + " ya se estaba ejecutando o está en la cola.";
 
       throw err;
     }
@@ -159,30 +134,19 @@ export class TaskService extends EventEmitter
     };
   }
 
-  async getTaskStatus(jobId: string): Promise<TasksCrudDtos.TaskStatus.TaskStatus<unknown>> {
+  async getTaskStatus(
+    jobId: string,
+  ): Promise<any> {
     const job = await this.queue.getJob(jobId);
 
     assertFoundServer(job, `Task with ID "${jobId}" not found`);
 
     const state = await job.getState();
 
-    return {
-      id: job.id!,
-      name: job.name!,
-      status: state,
-      payload: job.data,
-      progress: job.progress,
-      createdAt: new Date(job.timestamp),
-      processedAt: job.processedOn ? new Date(job.processedOn) : null,
-      finishedAt: job.finishedOn ? new Date(job.finishedOn) : null,
-      failedReason: job.failedReason ?? undefined,
-      returnValue: job.returnvalue ?? undefined,
-      attempts: job.attemptsMade,
-      maxAttempts: job.opts.attempts ?? 3,
-    };
+    return adaptToTaskStatus(job, state);
   }
 
-  private async processJob(job: Job): Promise<any> {
+  private async processJob(job: Job): Promise<TasksCrudDtos.TaskStatus.TaskStatus> {
     const handler = taskRegistry.get(job.name);
 
     if (!handler)
@@ -193,17 +157,60 @@ export class TaskService extends EventEmitter
     return handler.execute(job.data, job);
   }
 
-  async getQueueStatus() {
-    const waiting = await this.queue.getWaiting();
-    const active = await this.queue.getActive();
-    const completed = await this.queue.getCompleted();
-    const failed = await this.queue.getFailed();
-
-    return {
-      waiting: waiting.length,
-      active: active.length,
-      completed: completed.length,
-      failed: failed.length,
-    };
+  private async getLatestJobs(queue: Queue, n: number = 10) {
+    return (await queue.getJobs([], 0, n - 1))
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, n);
   }
+
+  async getQueueStatus(n: number = 10) {
+    const jobs = await this.getLatestJobs(this.queue, n);
+    const states: (JobState | "unknown")[] = [];
+
+    for (const j of jobs)
+      states.push(await j.getState());
+
+    return jobs.map((_, i)=>adaptToTaskStatus(jobs[i], states[i]));
+  }
+
+  async getQueueIds(n: number = 10) {
+    const jobs = await this.getLatestJobs(this.queue, n);
+
+    return jobs.map((j)=>{
+      const { id } = j;
+
+      assertIsDefined(id);
+
+      return id;
+    } );
+  }
+}
+
+function adaptToTaskStatus(
+  job: Job,
+  state: JobState | "unknown",
+): TasksCrudDtos.TaskStatus.TaskStatus<any> {
+  if (typeof job.progress === "number") {
+    job.progress = {
+      percentage: job.progress,
+      message: "",
+    } as TasksCrudDtos.TaskStatus.ProgressBase;
+  }
+
+  const progress = TasksCrudDtos.TaskStatus.progressSchemaBase.parse(job.progress);
+
+  return {
+    id: job.id!,
+    name: job.name!,
+    status: state,
+    payload: job.data,
+    progress,
+    createdAt: new Date(job.timestamp),
+    processedAt: job.processedOn ? new Date(job.processedOn) : null,
+    finishedAt: job.finishedOn ? new Date(job.finishedOn) : null,
+    failedReason: job.failedReason ?? undefined,
+    returnValue: job.returnvalue ?? undefined,
+    attempts: job.attemptsMade,
+    maxAttempts: job.opts.attempts ?? 3,
+  };
 }

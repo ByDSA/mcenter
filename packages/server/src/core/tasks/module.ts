@@ -1,9 +1,12 @@
-import { Logger, Module, OnApplicationBootstrap } from "@nestjs/common";
-import { BullModule, getQueueToken } from "@nestjs/bullmq";
-import { DiscoveryModule, ModuleRef } from "@nestjs/core";
+import type { AnyTaskHandler } from "./task.interface";
 import { Queue } from "bullmq";
-import { QUEUE_NAME, TaskService } from "./task.service";
+import { DiscoveryModule, DiscoveryService, ModuleRef } from "@nestjs/core";
+import { BullModule, getQueueToken } from "@nestjs/bullmq";
+import { Logger, Module, OnApplicationBootstrap } from "@nestjs/common";
 import { TaskController } from "./controller";
+import { QUEUE_NAME, SingleTasksService } from "./task.service";
+import { taskRegistry } from "./task.registry";
+import { TASK_HANDLER_METADATA } from "./task-handler.decorator";
 
 const connection = {
   host: process.env.REDIS_HOST ?? "localhost",
@@ -27,14 +30,17 @@ const connection = {
   ],
   controllers: [TaskController],
   providers: [
-    TaskService,
+    SingleTasksService,
   ],
-  exports: [TaskService],
+  exports: [SingleTasksService],
 } )
 export class TasksModule implements OnApplicationBootstrap {
   private readonly logger = new Logger(TasksModule.name);
 
-  constructor(private readonly moduleRef: ModuleRef) {}
+  constructor(
+    private readonly moduleRef: ModuleRef,
+    private readonly discoveryService: DiscoveryService,
+  ) {}
 
   async onApplicationBootstrap() {
     if (await this.connectionTest()) {
@@ -168,5 +174,36 @@ export class TasksModule implements OnApplicationBootstrap {
       clientConnection.once("ready", readyHandler);
       clientConnection.once("error", errorHandler);
     } );
+  }
+
+  async onModuleInit() {
+    // Auto-discover y registrar handlers
+    await this.discoverAndRegisterHandlers();
+  }
+
+  // eslint-disable-next-line require-await
+  private async discoverAndRegisterHandlers() {
+    const providers = this.discoveryService.getProviders();
+
+    for (const wrapper of providers) {
+      const { instance } = wrapper;
+
+      if (!instance)
+        continue;
+
+      const isTaskHandler = Reflect.getMetadata(TASK_HANDLER_METADATA, instance.constructor);
+
+      if (isTaskHandler && this.isTaskHandler(instance)) {
+        taskRegistry.register(instance as AnyTaskHandler);
+        this.logger.log(`Registered task handler: ${instance.taskName}`);
+      }
+    }
+  }
+
+  private isTaskHandler(instance: AnyTaskHandler): instance is AnyTaskHandler {
+    return (
+      typeof instance.taskName === "string"
+        && typeof instance.execute === "function"
+    );
   }
 }

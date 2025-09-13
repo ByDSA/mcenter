@@ -33,6 +33,14 @@ export const PATH_ROUTES = {
     status: {
       withParams: (id: string) => `${TASKS}/${id}/status`,
     },
+    queue: {
+      status: {
+        withParams: (queue: string, n?: number) => `${TASKS}/queue/${queue}/status${n ? `?n=${n}` : ""}`,
+      },
+      ids: {
+        withParams: (queue: string, n?: number) => `${TASKS}/queue/${queue}/ids/${n ? `?n=${n}` : ""}`,
+      },
+    },
     statusStream: {
       withParams: (id: string, heartbeatEveryMs?: number) => `${TASKS}/${id}/status/stream${heartbeatEveryMs ? `?heartbeat=${heartbeatEveryMs}` : ""}`,
     },

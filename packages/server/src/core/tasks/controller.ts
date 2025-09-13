@@ -10,7 +10,7 @@ import { Controller,
 import { Observable, switchMap, catchError, timer, fromEvent, merge, of, auditTime } from "rxjs";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import { assertFoundClient } from "#utils/validation/found";
-import { TaskService } from "./task.service";
+import { SingleTasksService } from "./task.service";
 
 type TaskMessageEvent = Omit<MessageEvent, "id" | "type"> & {
   id: string;
@@ -19,14 +19,29 @@ type TaskMessageEvent = Omit<MessageEvent, "id" | "type"> & {
 
 @Controller()
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(private readonly singleTaskService: SingleTasksService) {}
 
   /**
    * Obtiene estadísticas generales de la cola de tareas
    */
-  @Get("queue/status")
-  async getQueueStatus() {
-    return await this.taskService.getQueueStatus();
+  @Get("queue/:name/status")
+  async getQueueStatus(
+    @Param("name") _name: string,
+    @Query("n") n: number | undefined,
+  ) {
+    return {
+      data: await this.singleTaskService.getQueueStatus(n),
+    };
+  }
+
+  @Get("queue/:name/ids")
+  async getQueueIds(
+    @Param("name") _name: string,
+    @Query("n") n: number | undefined,
+  ) {
+    return {
+      data: await this.singleTaskService.getQueueIds(n),
+    };
   }
 
   /**
@@ -35,9 +50,9 @@ export class TaskController {
   @Get(":id/status")
   async getTaskStatus(
     @Param("id") id: string,
-  ): Promise<TasksCrudDtos.TaskStatus.TaskStatus<unknown>> {
+  ): Promise<TasksCrudDtos.TaskStatus.TaskStatus> {
     try {
-      return await this.taskService.getTaskStatus(id);
+      return await this.singleTaskService.getTaskStatus(id);
     } catch (error) {
       if (!(error instanceof Error))
         throw error;
@@ -55,7 +70,7 @@ export class TaskController {
 
   private async getSecureTaskStatusResponse(id: string) {
     try {
-      const status = await this.taskService.getTaskStatus(id);
+      const status = await this.singleTaskService.getTaskStatus(id);
 
       assertFoundClient(status);
 
@@ -91,7 +106,7 @@ export class TaskController {
       heartbeatMs = 30_000; // 30 segundos por defecto
 
     // Observable para cambios de estado de la tarea específica
-    const taskChanges$ = fromEvent(this.taskService, "task-change").pipe(
+    const taskChanges$ = fromEvent(this.singleTaskService, "task-change").pipe(
       switchMap(async (jobId: unknown) => {
         if (jobId !== id)
           return null;
@@ -108,7 +123,7 @@ export class TaskController {
     );
     // Estado inicial
     const initialState$ = new Observable<TaskMessageEvent>(observer => {
-      this.taskService.getTaskStatus(id)
+      this.singleTaskService.getTaskStatus(id)
         .then(status => {
           if (status)
             observer.next(createTaskSuccessMessageEvent(status));
