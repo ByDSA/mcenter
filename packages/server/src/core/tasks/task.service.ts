@@ -48,7 +48,10 @@ export class SingleTasksService extends EventEmitter2 {
     } );
 
     this.worker.on("failed", (job, err) => {
-      this.logger.error(`Task ${job?.name} failed with ID: ${job?.id}`, err);
+      this.logger.error(
+        `Task ${job?.name} failed with ID: ${job?.id}`,
+        JSON.stringify(err, null, 2),
+      );
 
       if (job?.id)
         this.emit("task-change", job.id);
