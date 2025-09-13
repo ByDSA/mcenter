@@ -15,12 +15,12 @@ export const payloadSchema = z.undefined();
 const progressSchema = TasksCrudDtos.TaskStatus.progressSchemaBase;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const resultSchema = createOneResultResponseSchema(z.object( {
-  changes: z.array(z.object(
-    {
-      old: z.number().optional(),
-      new: z.number().nullable(),
-    },
-  )),
+  changes: z.array(z.object( {
+    id: z.string(),
+    description: z.string(),
+    old: z.number().optional(),
+    new: z.number().nullable(),
+  } )),
 } ));
 
 type Payload = z.infer<typeof payloadSchema>;
@@ -76,6 +76,9 @@ export class EpisodeUpdateLastTimePlayedTaskHandler implements TaskHandler<Paylo
         .then(n=> {
           if (n !== (episode.lastTimePlayed ?? null)) {
             data.changes.push( {
+              id: episode.id,
+              description:
+                `${episode.compKey.seriesKey} ${episode.compKey.episodeKey}: ${episode.title}`,
               new: n,
               old: episode.lastTimePlayed,
             } );
