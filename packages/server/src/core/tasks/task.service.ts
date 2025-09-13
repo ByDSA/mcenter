@@ -1,11 +1,11 @@
 /* eslint-disable require-await */
-import EventEmitter from "node:events";
 import { Injectable, Logger, UnprocessableEntityException } from "@nestjs/common";
 import { Queue, Worker, Job, JobState } from "bullmq";
 import { InjectQueue } from "@nestjs/bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import { v4 as uuidv4 } from "uuid";
 import { assertIsDefined } from "$shared/utils/validation";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { assertFoundServer } from "#utils/validation/found";
 import { taskRegistry } from "./task.registry";
 
@@ -18,7 +18,7 @@ const defaultOptions: TasksCrudDtos.CreateTask.TaskOptions = {
 export const QUEUE_NAME = "single-tasks";
 
 @Injectable()
-export class SingleTasksService extends EventEmitter {
+export class SingleTasksService extends EventEmitter2 {
   private readonly logger = new Logger(SingleTasksService.name);
 
   private worker: Worker;
@@ -40,6 +40,7 @@ export class SingleTasksService extends EventEmitter {
     this.logger.log("New worker created.");
 
     this.logger.log("Task service initialized");
+
     this.worker.on("completed", (job) => {
       this.logger.log(`Task ${job.name} completed with ID: ${job.id}`);
 
