@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.7.1](https://github.com/ByDSA/mcenter/compare/v4.7.0...v4.7.1) (2025-09-13)
+
+
+### Bug Fixes
+
+* **back:** add episode ID and description to changes in last time played update ([985760f](https://github.com/ByDSA/mcenter/commit/985760f118753bf560aed03e638d1f3b12bba7f5))
+
 ## [4.7.0](https://github.com/ByDSA/mcenter/compare/v4.6.0...v4.7.0) (2025-09-13)
 
 
