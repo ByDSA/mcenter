@@ -91,9 +91,10 @@ export function useEpisodeCrudWithElements<T extends EpisodeEntity = EpisodeEnti
   } );
   const resource = state[0];
   const slug = fullUrlOf(resource);
-  const urlElement = <span className={classes(styles.url, commonStyle.autoBreakUrl)}>
+  const urlElement = <span className={classes(styles.url)}>
     {OutputText( {
       caption: <><a href={slug}>Url</a>:</>,
+      className: commonStyle.autoBreakUrl,
       value: slug,
     } )}
   </span>;

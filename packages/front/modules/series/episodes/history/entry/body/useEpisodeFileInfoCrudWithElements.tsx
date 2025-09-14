@@ -11,6 +11,7 @@ import { OutputText } from "#modules/ui-kit/output/Text";
 import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
 import { secsToMmss } from "#modules/utils/dates";
 import { EPISODE_FILE_INFO_PROPS } from "../utils";
+import commonStyle from "../../../../../history/entry/body-common.module.css";
 import styles from "./style.module.css";
 import { UseCrudWithElementsProps } from "./useEpisodeCrudWithElements";
 
@@ -84,6 +85,7 @@ export function useEpisodeFileInfoCrudWithElements<T extends Data =
   const pathElement = <span className={styles.path}>{
     OutputText( {
       caption: EPISODE_FILE_INFO_PROPS.path.caption,
+      className: commonStyle.autoBreakUrl,
       value: state[0].path,
     } )
   }</span>;

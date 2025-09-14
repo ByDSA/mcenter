@@ -83,9 +83,6 @@ export function Body( { data, setData }: Props) {
       <span className={classes("line", "height2")}> {
         fileInfoElements.durationElement
       }</span>
-      <span className={classes("line", "height2")}>{
-        fileInfoElements.pathElement
-      }</span>
       <OptionalPropsButton
         isVisible={optionalProps.allVisible}
         onClick={() => optionalProps.setAllVisible(v=>!v)}
