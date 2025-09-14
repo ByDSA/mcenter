@@ -17,7 +17,7 @@ export async function waitForTask(
       return task;
 
     if (Date.now() - start > timeoutMs)
-      throw new Error(`Timeout esperando a que termine la tarea ${taskUid}`);
+      throw new Error(`Timeout esperando a que termine la tarea de meilisearch ${taskUid}`);
 
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }
