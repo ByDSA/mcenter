@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { ResponseFormat } from "$shared/models/resources/response-format.enum";
 import { mediaElementWithAbsolutePath } from "$shared/models/player";
-import { genM3u8Item, genM3u8ItemWithNext, getHostFromRequest, M3u8ViewOptions, resourceToMediaElement } from "$shared/models/resources/m3u8.view";
+import { genM3u8Item, getHostFromRequest, M3u8ViewOptions, resourceToMediaElement, genM3u8Playlist, genM3u8PlaylistWithNext } from "$shared/models/resources/m3u8.view";
 
 export type FormatResponseOptions = M3u8ViewOptions & {
   m3u8UseNext?: boolean;
@@ -68,14 +68,16 @@ export class ResponseFormatterService {
     }
 
     if (useNext) {
-      return genM3u8ItemWithNext( {
+      return genM3u8PlaylistWithNext( {
         mediaElement,
         req: request,
         host,
       } );
     }
 
-    return genM3u8Item(mediaElement);
+    return genM3u8Playlist([
+      genM3u8Item(mediaElement),
+    ]);
   }
 
   formatOneRemoteM3u8Response(
@@ -88,7 +90,22 @@ export class ResponseFormatterService {
       prefix: host,
     } );
 
-    return genM3u8Item(mediaElement);
+    return genM3u8Playlist([
+      genM3u8Item(mediaElement),
+    ]);
+  }
+
+  formatManyRemoteM3u8Response(
+    data: object[],
+    host: string,
+    options?: Omit<M3u8ViewOptions, "local" | "prefix">,
+  ) {
+    const items = data.map(d=>genM3u8Item(resourceToMediaElement(d, {
+      ...options,
+      prefix: host,
+    } )));
+
+    return genM3u8Playlist(items);
   }
 
   formatOneJsonResponse(data: object, response: Response) {

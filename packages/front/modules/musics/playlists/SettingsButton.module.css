@@ -1,0 +1,36 @@
+.controlButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0rem;
+  background: none;
+  margin: 0;
+  border: none;
+  border-radius: 50%; /* Hace que sea un círculo perfecto */
+  color: var(--color-gray-50) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.25) !important;
+  }
+
+  &:active {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+
+  &.overWhite {
+    color: var(--color-gray-600) !important;
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(0, 0, 0, 0.125) !important;
+    }
+
+    &:active {
+      background-color: rgba(0, 0, 0, 0.25) !important;
+    }
+  }
+}

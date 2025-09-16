@@ -16,6 +16,7 @@ import { streamTaskStatus } from "#modules/tasks";
 import "#styles/resources/resource-list-entry.css";
 import "#styles/resources/resource-list-musics.css";
 import "#styles/resources/music.css";
+import MusicLayout from "../music.layout";
 
 export default function Upload() {
   const [uploaded, setUploaded] = useState<MusicEntity[]>([]);
@@ -54,7 +55,7 @@ export default function Upload() {
                   | YoutubeCrudDtos.ImportPlaylist.TaskStatus.Status;
 
   return (
-    <>
+    <MusicLayout>
       <h2>Upload</h2>
       <FileUpload
         acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
@@ -157,6 +158,6 @@ export default function Upload() {
                 )
         }
       </span>
-    </>
+    </MusicLayout>
   );
 }

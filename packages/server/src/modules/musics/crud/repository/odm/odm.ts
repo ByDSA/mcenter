@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { timestampsSchemaOdm } from "#modules/resources/odm/timestamps";
+import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "#musics/models";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
@@ -18,7 +18,7 @@ const NAME = "Music";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   timestamps: {
-    type: timestampsSchemaOdm,
+    type: TimestampsOdm.schema,
     required: true,
   },
   spotifyId: {

@@ -19,3 +19,7 @@ export interface CanGetMany<T, PARTIAL=Partial<T>> {
 export interface CanGetManyByCriteria<T, C> {
   getManyByCriteria(criteria: C): Promise<T[]>;
 }
+
+export interface CanGetOneByCriteria<T, C> {
+  getOneByCriteria(criteria: C): Promise<T | null>;
+}

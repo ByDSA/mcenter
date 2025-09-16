@@ -3,7 +3,7 @@ import { makeMenu } from "#modules/menus";
 
 import "./page.css";
 
-export default function MusicLayout( { children }: {
+export default function AdminLayout( { children }: {
   children: React.ReactNode;
 } ) {
   const submenu = makeMenu( {

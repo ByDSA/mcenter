@@ -1,0 +1,206 @@
+.playlistContainer {
+  width: 100%;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.playlistHeader {
+  background: linear-gradient(135deg, #2196f3 0%, #9c27b0 100%);
+  color: white;
+  padding: 48px;
+}
+
+.headerContent {
+  display: flex;
+  gap: 24px;
+}
+
+.playlistCover {
+  width: 192px;
+  height: 192px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.playlistCoverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playlistCoverIcon {
+  color: rgba(255, 255, 255, 0.6);
+
+  --size: 50%;
+  width: var(--size) !important;
+  height: var(--size) !important;
+}
+
+.playlistInfo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  align-self: stretch;
+}
+
+.playlistTitle {
+  font-size: 5rem !important;
+  font-weight: bold;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+  word-break: break-word;
+  align-self: flex-start;
+}
+
+.playlistStats {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  justify-content: left;
+
+  flex-flow: row nowrap;
+  gap: 0.5rem;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &.createdAt {
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+}
+
+.playlistControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.playAllButton {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--color-green-darker2);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.playAllButton:hover {
+  background-color: var(--color-green-darker);
+}
+
+.playlistContent {
+  padding: 24px;
+}
+
+.tracksHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 12px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.headerIndex {
+  width: 32px;
+  text-align: center;
+}
+
+.headerTitle {
+  flex: 1;
+}
+
+.headerYear {
+  width: 64px;
+}
+
+.headerDuration {
+  width: 64px;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.headerActions {
+  width: 80px;
+}
+
+.tracksList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 48px 24px;
+  color: #666;
+}
+
+.emptyStateIcon {
+  color: #ccc;
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.emptyStateText {
+  font-size: 16px;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .playlistCover {
+    width: 160px;
+    height: 160px;
+  }
+
+  .playlistTitle {
+    font-size: 2rem;
+  }
+
+  .headerYear {
+    display: none;
+  }
+}
+
+.contextMenuItem {
+  cursor: pointer;
+}
+
+.isDragging {
+  cursor: grabbing;
+}

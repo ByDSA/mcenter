@@ -3,7 +3,7 @@ import { ResourceResponseFormatterModule } from "#modules/resources/response-for
 import { ResourcesSlugModule } from "#modules/resources/slug/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicsCrudModule } from "../crud/module";
-import { MusicSlugHandlerService } from "./service";
+import { MusicRendererModule } from "../renderer/module";
 import { MusicsSlugController } from "./controller";
 
 @Module( {
@@ -11,14 +11,14 @@ import { MusicsSlugController } from "./controller";
     MusicHistoryModule,
     MusicsCrudModule,
     ResourceResponseFormatterModule,
+    MusicRendererModule,
     ResourcesSlugModule,
   ],
   controllers: [
     MusicsSlugController,
   ],
   providers: [
-    MusicSlugHandlerService,
   ],
-  exports: [MusicSlugHandlerService],
+  exports: [],
 } )
 export class MusicsSlugModule {}

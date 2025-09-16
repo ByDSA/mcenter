@@ -1,4 +1,4 @@
-import type { FilterQuery, PipelineStage } from "mongoose";
+import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { MongoFilterQuery } from "#utils/layers/db/mongoose";
 import { FullDocOdm } from "./odm";
@@ -136,7 +136,7 @@ function buildMongooseFilterWithFileInfos(
     }
 
     if (criteria.filter.id)
-      filter["_id"] = criteria.filter.id;
+      filter["_id"] = new Types.ObjectId(criteria.filter.id);
 
     if (criteria.filter.slug)
       filter["url"] = criteria.filter.slug;

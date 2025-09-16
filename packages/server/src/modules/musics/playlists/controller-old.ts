@@ -3,6 +3,9 @@ import { createReadStream } from "node:fs";
 import { Controller, Get, Param, StreamableFile } from "@nestjs/common";
 import { ENVS } from "../utils";
 
+/**
+ * @Deprecated
+ * */
 @Controller("/")
 export class MusicGetPlaylistsController {
   constructor() {

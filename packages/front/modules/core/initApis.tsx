@@ -2,6 +2,7 @@
 
 import { MusicFileInfosApi } from "#modules/musics/file-info/requests";
 import { MusicHistoryApi } from "#modules/musics/history/requests";
+import { MusicPlaylistsApi } from "#modules/musics/playlists/requests";
 import { MusicsApi } from "#modules/musics/requests";
 import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
 import { EpisodeHistoryApi } from "#modules/series/episodes/history/requests";
@@ -18,6 +19,7 @@ export function InitApis() {
   MusicsApi.register();
   MusicHistoryApi.register();
   MusicFileInfosApi.register();
+  MusicPlaylistsApi.register();
   EpisodesApi.register();
   EpisodeFileInfosApi.register();
   EpisodeHistoryApi.register();

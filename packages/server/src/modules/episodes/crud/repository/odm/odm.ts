@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
-import { timestampsSchemaOdm } from "#modules/resources/odm/timestamps";
+import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { MongoFilterQuery, OptionalId, RequireId } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#modules/series/crud/repository/odm";
@@ -57,7 +57,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: Number,
   },
   timestamps: {
-    type: timestampsSchemaOdm,
+    type: TimestampsOdm.schema,
     required: true,
   },
 }, {

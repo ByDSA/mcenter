@@ -76,6 +76,14 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
     return await this.createOneAndGet(newEntry);
   }
 
+  async createNewEntryNowIfShouldFor(musicId: string) {
+    const isLast = await this.isLast(musicId);
+
+    // Si se llama en paralelo, esta condición podría no servir e igualmente añadirse al historial
+    if (!isLast)
+      await this.createNewEntryNowFor(musicId);
+  }
+
    @EmitEntityEvent(MusicHistoryEntryEvents.Deleted.TYPE)
   async deleteOneByIdAndGet(id: EntryId): Promise<Entity> {
     const deleted = await ModelOdm.findByIdAndDelete(id);

@@ -93,6 +93,22 @@ export const PATH_ROUTES = {
     playlists: {
       path: MUSICS_PLAYLISTS,
       withParams: (id: string) => `${MUSICS_PLAYLISTS}/${id}`,
+      track: {
+        withParams: (id: string, trackNumber: number) => `${MUSICS_PLAYLISTS}/${id}/track/${trackNumber}`,
+        move: {
+          withParams: (
+            id: string,
+            itemId: string,
+            newIndex: number,
+          ) => `${MUSICS_PLAYLISTS}/${id}/track/move/${itemId}/${newIndex}`,
+        },
+      },
+      user: {
+        withParams: (userId: string) => `${MUSICS_PLAYLISTS}/user/${userId}`,
+      },
+      slug: {
+        withParams: (user: string, slug: string, trackNumber?: number) => `${MUSICS_PLAYLISTS}/user/${user}/${slug}${trackNumber ? `/track/${trackNumber}` : ""}`,
+      },
     },
     pickRandom: {
       path: MUSICS_RANDOM,

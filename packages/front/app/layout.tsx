@@ -24,7 +24,6 @@ export default function RootLayout( { children }: {
       <body>
         <InitApis />
         {menu}
-
         {children}
         <ToastContainer
           position="bottom-right"

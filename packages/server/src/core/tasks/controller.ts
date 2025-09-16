@@ -9,8 +9,8 @@ import { Controller,
   UnprocessableEntityException } from "@nestjs/common";
 import { Observable, switchMap, catchError, timer, fromEvent, merge, of, auditTime } from "rxjs";
 import { TasksCrudDtos } from "$shared/models/tasks";
-import { assertFoundClient } from "#utils/validation/found";
 import { SingleTasksService } from "./task.service";
+import { assertFoundClient } from "#utils/validation/found";
 
 type TaskMessageEvent = Omit<MessageEvent, "id" | "type"> & {
   id: string;

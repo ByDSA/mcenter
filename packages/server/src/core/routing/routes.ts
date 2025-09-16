@@ -12,7 +12,7 @@ import { ConfigModule } from "#modules/config/config.module";
 import { StaticFilesModule } from "#modules/config/static-files.module";
 import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
 import { MusicsGetRandomModule } from "#musics/picker/module";
-import { MusicsGetPlaylistsModule } from "#musics/playlists/module";
+import { MusicPlaylistsModule } from "#musics/playlists/module";
 import { MusicsSlugModule } from "#musics/slug/module";
 import { MusicsCrudModule } from "#musics/crud/module";
 import { EpisodesSlugModule } from "#episodes/slug/module";
@@ -34,7 +34,7 @@ const imports = [
   MusicsAdminModule,
   MusicHistoryModule,
   MusicFileInfoModule,
-  MusicsGetPlaylistsModule,
+  MusicPlaylistsModule,
 
   EpisodesSlugModule,
   EpisodesAdminModule,
@@ -107,7 +107,7 @@ const routes: Routes = [
   },
   {
     path: PATH_ROUTES.musics.playlists.path,
-    module: MusicsGetPlaylistsModule,
+    module: MusicPlaylistsModule,
   },
   {
     path: PATH_ROUTES.musics.history.path,

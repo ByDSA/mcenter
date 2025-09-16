@@ -28,13 +28,14 @@ type Props = {
   host: string;
   req: Request;
 };
-export function genM3u8ItemWithNext( { host, mediaElement, req }: Props) {
+export function genM3u8PlaylistWithNext( { host, mediaElement, req }: Props) {
   const nextUrl = `${host}${req.url}`;
+  const ret = genM3u8Playlist([
+    genM3u8Item(mediaElement),
+    genNextM3u8Item(nextUrl),
+  ]);
 
-  return generatePlaylist( {
-    mediaElement,
-    nextUrl,
-  } );
+  return ret;
 }
 
 function getTypeFromObj(obj: object): NonNullable<MediaElement["type"]> {
@@ -71,18 +72,7 @@ export function getHostFromRequest(req: Request): string {
   return `${req.protocol}://${req.get("host")}`;
 }
 
-type GenPlayListParams = {
-  mediaElement: MediaElement;
-  nextUrl: string;
-};
-function generatePlaylist( { mediaElement, nextUrl }: GenPlayListParams): string {
-  const ret = `${genM3u8Item(mediaElement)}
-${nextM3u8(nextUrl)}`;
-
-  return ret;
-}
-
-function nextM3u8(nextUrl: string): string {
+function genNextM3u8Item(nextUrl: string): string {
   return `#EXTINF:-1,NEXT
 ${nextUrl}`;
 }
@@ -93,11 +83,16 @@ export function genM3u8Item(mediaElement: MediaElement): string {
   const artistOpt = artist ? mediaElement.artist + "," : "";
   const startTimeOpt = startTime ? `\n#EXTVLCOPT:start-time=${startTime}` : "";
   const stopTimeOpt = stopTime ? `\n#EXTVLCOPT:stop-time=${stopTime}` : "";
-  const ret = `#EXTM3U
-#EXTINF:${length ?? "-1"},${artistOpt}${title ?? "TITLE"}${startTimeOpt}${stopTimeOpt}
-${encodeURI(path)}\n`;
+  const ret = `#EXTINF:${length ?? "-1"},\
+${artistOpt}${title ?? "TITLE"}${startTimeOpt}${stopTimeOpt}
+${encodeURI(path)}`;
 
   return ret;
+}
+
+export function genM3u8Playlist(items: string[]): string {
+  return `#EXTM3U
+${items.join("\n")}\n`;
 }
 
 export function mediaElementFixPlayerLabels(mediaElement: MediaElement): MediaElement {

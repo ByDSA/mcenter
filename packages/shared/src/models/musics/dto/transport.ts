@@ -28,8 +28,9 @@ export namespace MusicCrudDtos {
     export type Criteria = z.infer<typeof criteriaSchema>;
     export namespace ById {
       export const paramsSchema = idParamsSchema;
+    }
   }
-}
+
   export namespace PatchOneById {
     export const bodySchema = generatePatchBodySchema(musicEntitySchema);
     export type Body = z.infer<typeof bodySchema>;

@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { timestampsDocOdmToModel } from "#modules/resources/odm/timestamps";
+import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { SeriesOdm } from "#modules/series/crud/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
@@ -16,7 +16,7 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
     },
     title: docOdm.title,
     weight: docOdm.weight,
-    timestamps: timestampsDocOdmToModel(docOdm.timestamps),
+    timestamps: TimestampsOdm.toModel(docOdm.timestamps),
     disabled: docOdm.disabled,
     tags: docOdm.tags,
     lastTimePlayed: docOdm.lastTimePlayed,

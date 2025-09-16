@@ -4,7 +4,7 @@ import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { PaginatedResult } from "$shared/utils/http/responses";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
-import { timestampsModelToDocOdm } from "#modules/resources/odm/timestamps";
+import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 import { AggregationResult } from "./criteria-pipeline";
@@ -63,7 +63,7 @@ export function musicToDocOdm(model: Music): DocOdm {
     url: model.slug,
     weight: model.weight,
     artist: model.artist,
-    timestamps: timestampsModelToDocOdm(model.timestamps),
+    timestamps: TimestampsOdm.toDocOdm(model.timestamps),
     disabled: model.disabled,
     lastTimePlayed: model.lastTimePlayed,
     album: model.album,

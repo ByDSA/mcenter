@@ -2,13 +2,12 @@ import { Controller, Get, Param, Req, Res } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { Response, Request } from "express";
-import { getHostFromRequest } from "$shared/models/resources";
 import { assertFoundClient } from "#utils/validation/found";
-import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { MusicsRepository } from "../crud/repository";
 import { ResponseFormat, ResponseFormatterService } from "../../resources/response-formatter";
-import { MusicEntity, musicEntitySchema } from "../models";
-import { MusicSlugHandlerService } from "./service";
+import { MusicEntity } from "../models";
+import { MusicHistoryRepository } from "../history/crud/repository";
+import { MusicRendererService } from "../renderer/render.service";
 
 class GetDto extends createZodDto(z.object( {
   slug: z.string(),
@@ -17,8 +16,9 @@ class GetDto extends createZodDto(z.object( {
 @Controller("/")
 export class MusicsSlugController {
   constructor(
-    private readonly slugHandler: MusicSlugHandlerService,
     private readonly musicRepo: MusicsRepository,
+    private readonly historyRepo: MusicHistoryRepository,
+    private readonly renderer: MusicRendererService,
     private readonly responseFormatter: ResponseFormatterService,
   ) {
   }
@@ -32,29 +32,25 @@ export class MusicsSlugController {
     @Req() req: Request,
   ) {
     const format = this.responseFormatter.getResponseFormatByRequest(req);
-    let got: MusicEntity | null;
+    let got: MusicEntity | null = await this.musicRepo.getOneBySlug(
+      params.slug,
+      format === ResponseFormat.RAW
+        ? {
+          expand: ["fileInfos"],
+        }
+        : {},
+    );
 
-    if (format === ResponseFormat.M3U8 || format === ResponseFormat.JSON) {
-      got = await this.musicRepo.getOneBySlug(params.slug);
-      assertFoundClient(got);
-    }
+    assertFoundClient(got);
 
-    switch (format) {
-      case ResponseFormat.M3U8:
-        return this.responseFormatter.formatOneRemoteM3u8Response(
-          got!,
-          getHostFromRequest(req),
-        );
-      case ResponseFormat.RAW:
-        return await this.slugHandler.handle(params.slug, req, res);
-      case ResponseFormat.JSON:
-      {
-        const json = this.responseFormatter.formatOneJsonResponse(got!, res);
+    if (format === ResponseFormat.RAW)
+      await this.historyRepo.createNewEntryNowIfShouldFor(got.id);
 
-        validateResponseWithZodSchema(json.data, musicEntitySchema, req);
-
-        return json;
-      }
-    }
+    return this.renderer.render( {
+      music: got,
+      format,
+      request: req,
+      response: res,
+    } );
   }
 }
