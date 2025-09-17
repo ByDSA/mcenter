@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.8.1](https://github.com/ByDSA/mcenter/compare/v4.8.0...v4.8.1) (2025-09-17)
+
+
+### Bug Fixes
+
+* **back:** change path ([fc1e496](https://github.com/ByDSA/mcenter/commit/fc1e4960ad97213f697906898639bf0a28921bd1))
+* **back:** reanudable job ([cad98d8](https://github.com/ByDSA/mcenter/commit/cad98d8a6fa5eb49fbf68b46a5e9de9705a10bd5))
+
 ## [4.8.0](https://github.com/ByDSA/mcenter/compare/v4.7.1...v4.8.0) (2025-09-17)
 
 
