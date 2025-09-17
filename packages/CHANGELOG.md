@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.8.0](https://github.com/ByDSA/mcenter/compare/v4.7.1...v4.8.0) (2025-09-17)
+
+
+### Features
+
+* add playlists first version ([ccf3a7a](https://github.com/ByDSA/mcenter/commit/ccf3a7a88eb41908bcda973136fcfeefe78f17db))
+* upload yt videos at music file infos. fix some style css ([4ce1525](https://github.com/ByDSA/mcenter/commit/4ce15256cb0ad943879c8c901c29360efe514abf))
+
 ### [4.7.1](https://github.com/ByDSA/mcenter/compare/v4.7.0...v4.7.1) (2025-09-13)
 
 
