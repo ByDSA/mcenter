@@ -202,12 +202,19 @@ function adaptToTaskStatus(
   }
 
   const progress = TasksCrudDtos.TaskStatus.progressSchemaBase.parse(job.progress);
+  let cleanData = job.data;
+
+  if ("_internal" in cleanData) {
+    let { _internal, ...tmp } = cleanData;
+
+    cleanData = tmp;
+  }
 
   return {
     id: job.id!,
     name: job.name!,
     status: state,
-    payload: job.data,
+    payload: cleanData,
     progress,
     createdAt: new Date(job.timestamp),
     processedAt: job.processedOn ? new Date(job.processedOn) : null,
