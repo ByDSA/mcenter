@@ -170,8 +170,8 @@ música si desea borrar el archivo.",
     };
     const fileInfoWithoutMusicId = await new MusicFileInfoOmitMusicIdBuilder()
       .withPartial( {
-        ...partial,
         path,
+        ...partial,
       } )
       .build();
     const fileInfo: MusicFileInfo = {
