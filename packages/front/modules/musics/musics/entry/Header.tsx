@@ -12,7 +12,7 @@ export function Header( { entry }: HeaderProps) {
   const { title } = resource;
   const subtitle = resource.game ?? resource.artist;
   const duration = resource.fileInfos?.[0]?.mediaInfo.duration;
-  const right = <span className={styles.right}>{isDefined(duration) ? <span>{secsToMmss(duration)}</span> : null}<span>W: {resource.weight.toString()}</span></span>;
+  const right = <span className={styles.right}>{isDefined(duration) ? <span>{secsToMmss(duration)}</span> : null}</span>;
 
   return HistoryEntryHeader( {
     time: undefined,

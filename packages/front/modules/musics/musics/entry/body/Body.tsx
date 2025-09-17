@@ -7,7 +7,7 @@ import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/trans
 import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { MusicFileInfosApi } from "#modules/musics/file-info/requests";
 import { classes } from "#modules/utils/styles";
-import { secsToMmss } from "#modules/utils/dates";
+import { formatDateDDMMYYYHHmm, secsToMmss } from "#modules/utils/dates";
 import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
@@ -146,13 +146,13 @@ function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps)
             <span className={classes("line", "height2", styles.createdAt)}>{
               OutputText( {
                 caption: MUSIC_FILE_INFO_PROPS["timestamps.createdAt"].caption,
-                value: f.timestamps.createdAt.toISOString(),
+                value: formatDateDDMMYYYHHmm(f.timestamps.createdAt),
               } )}
             </span>
             <span className={classes("line", "height2", styles.updatedAt)}>{
               OutputText( {
                 caption: MUSIC_FILE_INFO_PROPS["timestamps.updatedAt"].caption,
-                value: f.timestamps.updatedAt.toISOString(),
+                value: formatDateDDMMYYYHHmm(f.timestamps.updatedAt),
               } )}
             </span>
             <span className={classes("line", "height2", styles.hash)}>{
@@ -165,34 +165,37 @@ function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps)
         );
       } )
     }
-    <FileUpload
-      acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
-      multiple={true}
-      provideMetadata={()=> ( {
-        musicId,
-      } )}
-      onUpload={genOnUpload( {
-        url: backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
-        // eslint-disable-next-line require-await
-        onEachUpload: async (
-          response: unknown,
-          fileData: FileData,
-          options: OnUploadOptions,
-        )=> {
-          const parsedResponse = MusicFileInfoCrudDtos.UploadFile.responseSchema.parse(response);
+    <div className={styles.uploaders}>
+      <YouTubeUpload
+        musicId={musicId}
+        onCreateMusicFileInfo={musicFileInfo=> {
+          actions.add(musicFileInfo);
+        }}
+      />
+      <FileUpload
+        acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
+        multiple={true}
+        provideMetadata={()=> ( {
+          musicId,
+        } )}
+        onUpload={genOnUpload( {
+          url: backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
+          // eslint-disable-next-line require-await
+          onEachUpload: async (
+            response: unknown,
+            fileData: FileData,
+            options: OnUploadOptions,
+          )=> {
+            const parsedResponse = MusicFileInfoCrudDtos.UploadFile.responseSchema.parse(response);
 
-          options?.setSelectedFiles?.((old)=> ([
-            ...old.filter(f=> f.id !== fileData.id),
-          ]));
-          actions.add(parsedResponse.data.fileInfo);
-        },
-      } )}
-    />
-    <YouTubeUpload
-      musicId={musicId}
-      onCreateMusicFileInfo={musicFileInfo=> {
-        actions.add(musicFileInfo);
-      }}
-    />
+            options?.setSelectedFiles?.((old)=> ([
+              ...old.filter(f=> f.id !== fileData.id),
+            ]));
+            actions.add(parsedResponse.data.fileInfo);
+          },
+        } )}
+      />
+    </div>
+
   </details>;
 }

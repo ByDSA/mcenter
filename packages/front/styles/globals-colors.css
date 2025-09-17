@@ -1,11 +1,12 @@
 :root {
-  --color-red-hue: -8;
-  --color-yellow-hue: calc(var(--color-red-hue) + 66);
-  --color-orange-hue: calc(var(--color-red-hue) + 38);
-  --color-blue-hue: calc(var(--color-red-hue) + 210);
-  --color-green-hue: calc(var(--color-red-hue) + 160);
-  --color-cyan-hue: calc(var(--color-red-hue) + 185);
-  --color-purple-hue: calc(var(--color-red-hue) + 266);
+  --color-base-hue: -8;
+  --color-red-hue: 8;
+  --color-yellow-hue: calc(var(--color-base-hue) + 70);
+  --color-orange-hue: calc(var(--color-base-hue) + 38);
+  --color-green-hue: calc(var(--color-base-hue) + 150);
+  --color-cyan-hue: calc(var(--color-base-hue) + 185);
+  --color-blue-hue: calc(var(--color-base-hue) + 208);
+  --color-purple-hue: calc(var(--color-base-hue) + 295);
 
   --color-light: 33%;
   --color-light2: 42%;

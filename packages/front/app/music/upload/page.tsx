@@ -11,6 +11,7 @@ import { backendUrl } from "#modules/requests";
 import { MusicEntryElement } from "#musics/musics/entry/MusicEntry";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import MusicLayout from "../music.layout";
+import styles from "./page.module.css";
 
 import "#styles/resources/resource-list-entry.css";
 import "#styles/resources/resource-list-musics.css";
@@ -57,23 +58,25 @@ export default function Upload() {
   return (
     <MusicLayout>
       <h2>Upload</h2>
-      <FileUpload
-        acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
-        multiple={true}
-        onUpload={onUpload}
-      />
-      <YouTubeUpload
-        onCreateMusic={onCreateMusic}/>
-      <hr/>
-      <span className="resource-list">
-        {
+      <div className={styles.uploaders}>
+        <YouTubeUpload
+          onCreateMusic={onCreateMusic}/>
+        <FileUpload
+          acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
+          multiple={true}
+          onUpload={onUpload}
+        />
+        <hr/>
+        <span className="resource-list">
+          {
           uploaded!.map(
             (music) => <Fragment key={`${music.id}`}>
               <MusicEntryElement data={music} shouldFetchFileInfo={false} />
             </Fragment>,
           )
-        }
-      </span>
+          }
+        </span>
+      </div>
     </MusicLayout>
   );
 }

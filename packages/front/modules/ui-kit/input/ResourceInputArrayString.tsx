@@ -1,5 +1,6 @@
 import { isDefined } from "$shared/utils/validation";
 import { useEffect } from "react";
+import { AddCircle, Cancel } from "@mui/icons-material";
 import { AddOnReset } from "#modules/utils/resources/useCrud";
 import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
 import { OnPressEnter, useInputText } from "./UseInputText";
@@ -95,7 +96,7 @@ function DeleteIcon<R extends object>( { resourceState, calcUpdatedResource,
       index,
       resourceState,
     } )}
-    >X</a>
+    ><Cancel /></a>
   </span>;
 }
 const deleteIconOnClickHandler = <R extends object>(
@@ -149,7 +150,7 @@ function AddIcon<R extends object, T extends string>(
     {mainInputElement}
     <a className="ui-kit-add-button"
       onClick={add}
-    >+</a>
+    ><AddCircle /></a>
   </span>;
 }
 

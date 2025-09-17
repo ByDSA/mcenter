@@ -84,7 +84,7 @@ nav {
     background-color: var(--color-green);
 
     & a {
-      color: var(--color-primary2);
+      color: var(--color-primary2-light);
 
       &:hover {
         color: var(--color-primary2-light3);

@@ -139,4 +139,4 @@ type OptionalPropsButtonProps = {
 export const OptionalPropsButton = ( { isVisible, onClick }: OptionalPropsButtonProps)=><span
   onClick={onClick}
   className={classes("line", "height2", styles.optionalButton)}>
-  {!isVisible ? "▼" : "▲"} Propiedades opcionales</span>;
+  {!isVisible ? "►" : "▼"} Propiedades opcionales</span>;

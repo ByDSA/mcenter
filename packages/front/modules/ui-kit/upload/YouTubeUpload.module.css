@@ -9,6 +9,7 @@
   svg {
     margin: auto;
   }
+
   .firstRow {
     display: flex;
     align-items: center;
@@ -121,5 +122,26 @@
     --spinner-size: var(--width) !important;
     --spinner-width: 0.125rem !important;
     margin: 0;
+  }
+}
+
+@media (width < 400px) {
+  .container {
+    .firstRow {
+      gap: 0.25rem;
+    }
+  }
+
+  .logoContainer {
+    left: 0.5rem;
+  }
+
+  .input {
+    min-width: 10rem;
+    width: 100%;
+    padding-left: 2.75rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 }

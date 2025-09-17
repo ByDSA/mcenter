@@ -217,7 +217,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
             type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Pon la URL del vídeo o playlist"
+            placeholder="URL del vídeo o playlist"
             className={getInputClasses()}
             disabled={doing}
           />

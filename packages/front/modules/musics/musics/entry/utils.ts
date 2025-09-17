@@ -25,7 +25,7 @@ export const MUSIC_FILE_INFO_PROPS = schemaToProps<MusicFileInfo>(musicFileInfoS
   path: "Path:",
   hash: "Hash:",
   "timestamps.createdAt": "Creación:",
-  "timestamps.updatedAt": "Última modificación:",
+  "timestamps.updatedAt": "Modificación:",
   size: "Tamaño:",
   "mediaInfo.duration": "Duración:",
   musicId: "ID Música:",

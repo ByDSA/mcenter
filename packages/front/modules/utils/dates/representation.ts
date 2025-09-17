@@ -171,3 +171,7 @@ export function formatDateDDMMYYY(date: Date) {
     ago: "no",
   } );
 }
+
+export function formatDateDDMMYYYHHmm(date: Date) {
+  return formatDateDDMMYYY(date) + " " + formatDateHHmm(date);
+}

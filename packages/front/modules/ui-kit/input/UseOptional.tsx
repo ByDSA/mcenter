@@ -32,7 +32,7 @@ export function useOptional( { isUndefined,
         disabled={disabled}
         onChange={handleChange}
       />
-      <label htmlFor={optionalId}>Sin valor</label>
+      <label htmlFor={optionalId}>Nulo</label>
     </span>
   );
 
