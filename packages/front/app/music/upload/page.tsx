@@ -6,17 +6,15 @@ import { MusicEntity } from "$shared/models/musics";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { assertIsDefined } from "$shared/utils/validation";
-import { YoutubeCrudDtos } from "$shared/models/youtube/dto/transport";
 import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
 import { backendUrl } from "#modules/requests";
 import { MusicEntryElement } from "#musics/musics/entry/MusicEntry";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
-import { streamTaskStatus } from "#modules/tasks";
+import MusicLayout from "../music.layout";
 
 import "#styles/resources/resource-list-entry.css";
 import "#styles/resources/resource-list-musics.css";
 import "#styles/resources/music.css";
-import MusicLayout from "../music.layout";
 
 export default function Upload() {
   const [uploaded, setUploaded] = useState<MusicEntity[]>([]);
@@ -50,9 +48,11 @@ export default function Upload() {
       } );
     },
   } ), [setUploaded]);
-
-  type Status = YoutubeCrudDtos.ImportOne.TaskStatus.Status
-                  | YoutubeCrudDtos.ImportPlaylist.TaskStatus.Status;
+  const onCreateMusic = (music: MusicEntity) => {
+    setUploaded(old => ([
+      ...old,
+      music]));
+  };
 
   return (
     <MusicLayout>
@@ -63,99 +63,15 @@ export default function Upload() {
         onUpload={onUpload}
       />
       <YouTubeUpload
-        textStatus={(s: Status)=>(<>{ s.attempts > 1 && <span>(Intento {s.attempts}/{s.maxAttempts}) </span> }<span>{s.progress.percentage}% {s.progress.message}</span></>)}
-        onSubmit={async (input, { onChangeStatus } )=>{
-          let res: YoutubeCrudDtos.ImportOne.CreateTask.Response
-        | YoutubeCrudDtos.ImportPlaylist.CreateTask.Response;
-          let isPlayListRequest = false;
-
-          if (input.includes("playlist")) {
-            const playlistId = new URL(input).searchParams.get("list");
-
-            assertIsDefined(playlistId);
-            const response = await fetch(
-              backendUrl(PATH_ROUTES.youtube.import.music.playlist.withParams(playlistId)),
-            ).then(r=> r.json());
-            const parsedResponse = YoutubeCrudDtos.ImportPlaylist.CreateTask
-              .responseSchema.parse(response);
-
-            res = parsedResponse;
-            isPlayListRequest = true;
-          } else {
-            const videoId = new URL(input).searchParams.get("v")
-            ?? input.split("youtu.be/")[1]?.split("?")[0]?.split("&")[0];
-
-            assertIsDefined(videoId);
-            const response = await fetch(
-              backendUrl(PATH_ROUTES.youtube.import.music.one.withParams(videoId)),
-            ).then(r=> r.json());
-            const parsedResponse = YoutubeCrudDtos.ImportOne.CreateTask
-              .responseSchema.parse(response);
-
-            res = parsedResponse;
-          }
-
-          const taskId = res.data?.job.id;
-
-          assertIsDefined(taskId);
-
-          await streamTaskStatus<Status>( {
-            taskName: "YouTube import music",
-            url: backendUrl(PATH_ROUTES.tasks.statusStream.withParams(taskId, 10_000)),
-            // eslint-disable-next-line require-await
-            onListenStatus: async (taskStatus) => {
-              if (isPlayListRequest) {
-                const data = YoutubeCrudDtos.ImportPlaylist.TaskStatus.statusSchema.parse(
-                  taskStatus,
-                );
-
-                taskStatus = data;
-                const newMusics: MusicEntity[] = [];
-
-                if (data.progress.created) {
-                  for (
-                    const [_ytid, created] of Object.entries(data.progress.created)) {
-                    if (!uploadedRef.current.find(m=>m.id === created.music.id))
-                      newMusics.push(created.music as MusicEntity);
-                  }
-                }
-
-                if (newMusics.length > 0) {
-                  setUploaded(old => ([
-                    ...old,
-                    ...newMusics]));
-                }
-              } else {
-                const data = YoutubeCrudDtos.ImportOne.TaskStatus.statusSchema.parse(
-                  taskStatus,
-                );
-
-                taskStatus = data;
-
-                const music = data.returnValue?.created?.music as MusicEntity | undefined;
-
-                if (music && !uploadedRef.current.find(m=>m.id === music.id)) {
-                  setUploaded(old => ([
-                    ...old,
-                    music,
-                  ]));
-                }
-              }
-
-              onChangeStatus(taskStatus);
-
-              return taskStatus;
-            },
-          } );
-        }}/>
+        onCreateMusic={onCreateMusic}/>
       <hr/>
       <span className="resource-list">
         {
-                uploaded!.map(
-                  (music) => <Fragment key={`${music.id}`}>
-                    <MusicEntryElement data={music} shouldFetchFileInfo={false} />
-                  </Fragment>,
-                )
+          uploaded!.map(
+            (music) => <Fragment key={`${music.id}`}>
+              <MusicEntryElement data={music} shouldFetchFileInfo={false} />
+            </Fragment>,
+          )
         }
       </span>
     </MusicLayout>

@@ -53,7 +53,7 @@ export function getSmallDateStr(date: Date) {
   return `${day}/${month}/${year}`;
 }
 
-export function secsToMmss(secs: number) {
+export function secsToMmssWithCents(secs: number) {
   const minutes = Math.floor(secs / 60);
   const seconds = secs - (minutes * 60);
   const secondsInt = Math.floor(seconds);
@@ -66,7 +66,15 @@ export function secsToMmss(secs: number) {
   }`;
 }
 
-function pad2(n: number | string) {
+export function secsToMmss(secs: number) {
+  const minutes = Math.floor(secs / 60);
+  const seconds = secs - (minutes * 60);
+  const secondsInt = Math.round(seconds);
+
+  return `${pad2(minutes)}:${pad2(secondsInt)}`;
+}
+
+export function pad2(n: number | string) {
   return n.toString().padStart(2, "0");
 }
 

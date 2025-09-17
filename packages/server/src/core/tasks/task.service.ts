@@ -15,7 +15,7 @@ const defaultOptions: TasksCrudDtos.CreateTask.TaskOptions = {
   priority: 1,
 };
 
-export const QUEUE_NAME = "single-tasks";
+export const QUEUE_NAME = "mcenter-tasks-main";
 
 @Injectable()
 export class SingleTasksService extends EventEmitter2 {

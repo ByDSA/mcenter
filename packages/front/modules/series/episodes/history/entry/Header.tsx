@@ -18,7 +18,7 @@ export function Header( { entry, showDate }: HeaderProps) {
     : resource.compKey.episodeKey
     ?? "(Sin título)";
   const subtitle = serie.name ?? resource.compKey.seriesKey;
-  const right = resource.compKey.episodeKey;
+  const right = <span>resource.compKey.episodeKey</span>;
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return <HistoryEntryHeader

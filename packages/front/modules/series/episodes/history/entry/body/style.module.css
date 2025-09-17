@@ -14,14 +14,10 @@
 
 .start,
 .end {
+  display: flex;
   flex-grow: 1;
   flex-shrink: 1;
   column-gap: 1rem;
-}
-
-.start span,
-.end span {
-  align-items: center;
 }
 
 .duration {

@@ -32,23 +32,28 @@ export class YoutubeImportMusicOneTaskHandler implements TaskHandler<Payload, Re
       message: "Downloading music from YouTube",
     } satisfies Progress);
     const downloadResult: DownloadResult = await this.service.downloadOne(payload.id);
+    let created: Result["created"];
 
     await job.updateProgress( {
       percentage: 90,
-      message: "Creating new music",
+      message: `Creating new ${payload.musicId ? "file info" : "music"}`,
     } satisfies Progress);
 
-    let created: Result["created"];
+    if (payload.musicId) {
+      created = {
+        fileInfo: await this.service.createNewMusicFileInfo(downloadResult, payload.musicId),
+      };
+    } else {
+      try {
+        created = await this.service.createNewMusic(downloadResult);
+      } catch (error) {
+        await this.service.deleteDownloadedFile(downloadResult);
 
-    try {
-      created = await this.service.createNewMusic(downloadResult);
-    } catch (error) {
-      await this.service.deleteDownloadedFile(downloadResult);
+        if (error instanceof UnprocessableEntityException)
+          throw new UnrecoverableError(error.message);
 
-      if (error instanceof UnprocessableEntityException)
-        throw new UnrecoverableError(error.message);
-
-      throw error;
+        throw error;
+      }
     }
 
     await job.updateProgress( {

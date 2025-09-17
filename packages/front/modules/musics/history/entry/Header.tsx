@@ -10,7 +10,7 @@ export function Header( { entry, showDate }: HeaderProps) {
   const { resource } = entry;
   const { title } = resource;
   const subtitle = resource.game ?? resource.artist;
-  const right = resource.weight.toString();
+  const right = <span>{resource.weight.toString()}</span>;
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return HistoryEntryHeader( {

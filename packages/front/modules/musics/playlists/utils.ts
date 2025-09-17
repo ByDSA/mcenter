@@ -1,4 +1,4 @@
-import { secsToMmss } from "#modules/utils/dates";
+import { secsToMmss, pad2 } from "#modules/utils/dates";
 
 export const formatDurationHeader = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
@@ -21,7 +21,3 @@ export const formatDurationHeader = (seconds: number): string => {
 export const formatDurationItem = (seconds: number): string => {
   return secsToMmss(seconds);
 };
-
-function pad2(n: number) {
-  return n.toString().padStart(2, "0");
-}

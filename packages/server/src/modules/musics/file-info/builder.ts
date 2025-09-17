@@ -2,6 +2,7 @@ import { statSync } from "fs";
 import { md5FileAsync } from "#utils/crypt";
 import { getAbsolutePath } from "../utils";
 import { MusicFileInfoOmitMusicId } from "./models";
+import { getAudioInfo } from "./audio-info";
 
 type InfoWithPath = Partial<MusicFileInfoOmitMusicId> & Pick<MusicFileInfoOmitMusicId, "path">;
 export class MusicFileInfoOmitMusicIdBuilder {
@@ -51,10 +52,14 @@ export class MusicFileInfoOmitMusicIdBuilder {
     if (!this.info.hash)
       this.info.hash = await md5FileAsync(fullPath);
 
-    // 4. Media info por defecto
-    this.info.mediaInfo ??= {
-      duration: null,
-    };
+    // 4. Media info
+    if (!this.info.mediaInfo) {
+      const aa = await getAudioInfo(fullPath);
+
+      this.info.mediaInfo ??= {
+        duration: aa.duration ?? null,
+      };
+    }
 
     // 5. Devolvemos con todos los campos “definitivos”
     return this.info as MusicFileInfoOmitMusicId;

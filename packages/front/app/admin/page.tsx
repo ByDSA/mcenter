@@ -63,6 +63,12 @@ const ACTIONS: Action[] = [
     taskName: MusicTasks.sync.name,
   },
   {
+    path: PATH_ROUTES.musics.admin.updateFileInfos.path,
+    name: "Musics: update file infos",
+    type: "task",
+    taskName: MusicTasks.updateFileInfos.name,
+  },
+  {
     path: PATH_ROUTES.logs.path,
     name: ACTION_LOG_NAME,
     type: "action",

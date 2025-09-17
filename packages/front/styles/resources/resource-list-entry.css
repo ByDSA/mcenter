@@ -47,21 +47,22 @@
           align-items: center;
           flex-wrap: nowrap;
           justify-items: center;
-          column-gap: 1em;
         }
 
         .height2 {
-          min-height: 2em;
-        }
-
-        span {
           display: flex;
+          align-items: center;
+          margin-bottom: 0.8rem;
         }
 
-        span.break {
-          flex-basis: 100%;
-          height: 0;
-          margin-bottom: 3vh;
+        > span {
+          display: flex;
+
+          &.break {
+            flex-basis: 100%;
+            height: 0;
+            margin-bottom: 3vh;
+          }
         }
 
         .ui-kit-resource-input-text:last-child,

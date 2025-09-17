@@ -7,6 +7,8 @@ import { SearchDuplicatesController } from "./search-duplicates/controller";
 import { MusicUpdateRemoteController } from "./update-remote/controller";
 import { UpdateRemoteTreeService } from "./update-remote/service";
 import { MusicUpdateRemoteTaskHandler } from "./update-remote/task.handler";
+import { MusicUpdateFileInfoController } from "./update-file-info/controller";
+import { MusicUpdateFileInfoTaskHandler } from "./update-file-info/task.handler";
 
 @Module( {
   imports: [
@@ -18,10 +20,12 @@ import { MusicUpdateRemoteTaskHandler } from "./update-remote/task.handler";
     MusicFixInfoController,
     SearchDuplicatesController,
     MusicUpdateRemoteController,
+    MusicUpdateFileInfoController,
   ],
   providers: [
     UpdateRemoteTreeService,
     MusicUpdateRemoteTaskHandler,
+    MusicUpdateFileInfoTaskHandler,
   ],
   exports: [],
 } )

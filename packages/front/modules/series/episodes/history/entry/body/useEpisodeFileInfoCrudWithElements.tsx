@@ -9,7 +9,7 @@ import { useCrud } from "#modules/utils/resources/useCrud";
 import { classes } from "#modules/utils/styles";
 import { OutputText } from "#modules/ui-kit/output/Text";
 import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
-import { secsToMmss } from "#modules/utils/dates";
+import { secsToMmss, secsToMmssWithCents } from "#modules/utils/dates";
 import { EPISODE_FILE_INFO_PROPS } from "../utils";
 import commonStyle from "../../../../../history/entry/body-common.module.css";
 import styles from "./style.module.css";
@@ -79,7 +79,7 @@ export function useEpisodeFileInfoCrudWithElements<T extends Data =
   const durationElement = <span className={styles.duration}>{
     OutputText( {
       caption: EPISODE_FILE_INFO_PROPS["mediaInfo.duration"].caption,
-      value: isDefined(duration) ? `${secsToMmss(duration)} (${duration} s)` : "-",
+      value: isDefined(duration) ? `${secsToMmss(duration)}` : "-",
     } )
   }</span>;
   const pathElement = <span className={styles.path}>{
@@ -97,7 +97,7 @@ export function useEpisodeFileInfoCrudWithElements<T extends Data =
       isOptional: true,
     } )}
     <span>
-      {fileInfo.start && fileInfo.start > 0 ? secsToMmss(fileInfo.start) : "-"}
+      {fileInfo.start && fileInfo.start > 0 ? secsToMmssWithCents(fileInfo.start) : "-"}
     </span>
   </span>;
   const endElement = <span className={classes(styles.end)}>
@@ -108,7 +108,7 @@ export function useEpisodeFileInfoCrudWithElements<T extends Data =
       isOptional: true,
     } )}
     <span>
-      {fileInfo.end && fileInfo.end > 0 ? secsToMmss(fileInfo.end) : "-"}
+      {fileInfo.end && fileInfo.end > 0 ? secsToMmssWithCents(fileInfo.end) : "-"}
     </span>
   </span>;
 

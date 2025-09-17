@@ -1,23 +1,142 @@
 import { useEffect, useRef, useState } from "react";
 import { YouTube } from "@mui/icons-material";
-import { TasksCrudDtos } from "$shared/models/tasks";
 import { JSX } from "react";
+import { YoutubeCrudDtos } from "$shared/models/youtube/dto/transport";
+import { assertIsDefined } from "$shared/utils/validation";
+import { MusicEntity } from "$shared/models/musics";
+import { PATH_ROUTES } from "$shared/routing";
+import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { LoadingSpinner } from "#modules/fetching";
 import { classes } from "#modules/utils/styles";
+import { backendUrl } from "#modules/requests";
+import { streamTaskStatus } from "#modules/tasks";
 import styles from "./YouTubeUpload.module.css";
 import { UploadButton } from "./UploadButton";
 
-type OnSubmitProps<S> = {
+type OnSubmitProps<S> = Pick<Props,
+ "musicId" | "onCreateMusic" | "onCreateMusicFileInfo"
+> & {
   onChangeStatus: (status: S)=> void;
 };
-type Props<S> = {
-  onSubmit: (input: string, props: OnSubmitProps<S>)=> Promise<void>;
-  textStatus?: (status: S)=> JSX.Element | string;
+
+export type YoutubeTaskStatus = YoutubeCrudDtos.ImportOne.TaskStatus.Status
+  | YoutubeCrudDtos.ImportPlaylist.TaskStatus.Status;
+
+type InputData = {
+  type: "playlist" | "video";
+  id: string;
 };
 
-export function YouTubeUpload<
-  S extends TasksCrudDtos.TaskStatus.TaskStatus<unknown>
->( { onSubmit, textStatus }: Props<S>) {
+type Context = {
+  addedMusics: MusicEntity[];
+  addedMusicFileInfos: MusicFileInfoEntity[];
+};
+
+const defaultTextStatus = (s: YoutubeTaskStatus)=>(<>{ s.attempts > 1 && <span>(Intento {s.attempts}/{s.maxAttempts}) </span> }<span>{s.progress.percentage}% {s.progress.message}</span></>);
+const defaultOnSubmit: Props["onSubmit"] = async (
+  input,
+  { onChangeStatus, onCreateMusic, onCreateMusicFileInfo, musicId },
+)=>{
+  let res: YoutubeCrudDtos.ImportOne.CreateTask.Response
+        | YoutubeCrudDtos.ImportPlaylist.CreateTask.Response;
+
+  if (input.type === "playlist") {
+    const response = await fetch(
+      backendUrl(PATH_ROUTES.youtube.import.music.playlist.withParams(input.id)),
+    ).then(r=> r.json());
+    const parsedResponse = YoutubeCrudDtos.ImportPlaylist.CreateTask
+      .responseSchema.parse(response);
+
+    res = parsedResponse;
+  } else {
+    const response = await fetch(
+      backendUrl(PATH_ROUTES.youtube.import.music.one.withParams(input.id, {
+        musicId,
+      } )),
+    ).then(r=> r.json());
+    const parsedResponse = YoutubeCrudDtos.ImportOne.CreateTask
+      .responseSchema.parse(response);
+
+    res = parsedResponse;
+  }
+
+  const taskId = res.data?.job.id;
+
+  assertIsDefined(taskId);
+
+  await streamTaskStatus<YoutubeTaskStatus>( {
+    taskName: "YouTube import music",
+    url: backendUrl(PATH_ROUTES.tasks.statusStream.withParams(taskId, 10_000)),
+    // eslint-disable-next-line require-await
+    onListenStatus: async (taskStatus, ctx: Context) => {
+      ctx.addedMusics = ctx.addedMusics ?? [];
+      ctx.addedMusicFileInfos = ctx.addedMusicFileInfos ?? [];
+
+      if (input.type === "playlist") {
+        const data = YoutubeCrudDtos.ImportPlaylist.TaskStatus.statusSchema.parse(
+          taskStatus,
+        );
+
+        taskStatus = data;
+
+        if (data.progress.created) {
+          for (
+            const [_ytid, created] of Object.entries(data.progress.created)) {
+            const { fileInfo, music } = created;
+
+            if (music && onCreateMusic && !ctx.addedMusics.find(m=>m.id === music.id)) {
+              ctx.addedMusics.push(music as MusicEntity);
+              onCreateMusic?.(music as MusicEntity);
+            }
+
+            if (onCreateMusicFileInfo && !ctx.addedMusicFileInfos.find(m=>m.id === fileInfo.id)) {
+              ctx.addedMusicFileInfos.push(fileInfo as MusicFileInfoEntity);
+              onCreateMusicFileInfo?.(fileInfo as MusicFileInfoEntity);
+            }
+          }
+        }
+      } else {
+        const data = YoutubeCrudDtos.ImportOne.TaskStatus.statusSchema.parse(
+          taskStatus,
+        );
+
+        taskStatus = data;
+
+        if (data.returnValue?.created) {
+          const { fileInfo, music } = data.returnValue.created;
+
+          if (music && onCreateMusic && !ctx.addedMusics.find(m=>m.id === music.id)) {
+            ctx.addedMusics.push(music as MusicEntity);
+            onCreateMusic?.(music as MusicEntity);
+          }
+
+          if (onCreateMusicFileInfo && !ctx.addedMusicFileInfos.find(m=>m.id === fileInfo.id)) {
+            ctx.addedMusicFileInfos.push(fileInfo as MusicFileInfoEntity);
+            onCreateMusicFileInfo?.(fileInfo as MusicFileInfoEntity);
+          }
+        }
+      }
+
+      onChangeStatus(taskStatus);
+
+      return taskStatus;
+    },
+  } );
+};
+
+type Props = {
+  onSubmit?: (input: InputData, props: OnSubmitProps<YoutubeTaskStatus>)=> Promise<void>;
+  textStatus?: (status: YoutubeTaskStatus)=> JSX.Element | string;
+  musicId?: string;
+  onCreateMusic?: (music: MusicEntity)=> void;
+  onCreateMusicFileInfo?: (musicFileInfo: MusicFileInfoEntity)=> void;
+};
+
+export function YouTubeUpload( { onSubmit = defaultOnSubmit,
+  textStatus = defaultTextStatus,
+  onCreateMusic,
+  onCreateMusicFileInfo,
+  musicId }: Props) {
   const [doing, setDoing] = useState(false);
   const doingRef = useRef(doing);
 
@@ -25,13 +144,13 @@ export function YouTubeUpload<
     doingRef.current = doing;
   }, [doing]);
   const [url, setUrl] = useState("");
-  const [status, setStatus] = useState<S | null>(null);
+  const [status, setStatus] = useState<YoutubeTaskStatus | null>(null);
   // Validar URL de YouTube
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const isValidYouTubeURL = (u: string) => {
     const patterns = [
       /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/,
-      /^https?:\/\/(www\.)?youtube\.com\/watch\?v=.+/,
+      /^https?:\/\/(www\.)?(music\.)?youtube\.com\/watch\?v=.+/,
       /^https?:\/\/(www\.)?youtube\.com\/playlist\?list=.+/,
       /^https?:\/\/youtu\.be\/.+/,
     ];
@@ -50,8 +169,31 @@ export function YouTubeUpload<
       if (!isValidYouTubeURL(trimmedUrl))
         throw new Error("URL de YouTube no válida");
 
-      await onSubmit?.(trimmedUrl, {
+      let input: InputData;
+
+      if (trimmedUrl.includes("playlist")) {
+        const playlistId = new URL(trimmedUrl).searchParams.get("list");
+
+        assertIsDefined(playlistId);
+        input = {
+          type: "playlist",
+          id: playlistId,
+        };
+      } else {
+        const videoId = new URL(trimmedUrl).searchParams.get("v")
+                  ?? trimmedUrl.split("youtu.be/")[1]?.split("?")[0]?.split("&")[0];
+
+        input = {
+          type: "video",
+          id: videoId,
+        };
+      }
+
+      await onSubmit?.(input, {
         onChangeStatus: (s) => setStatus(s),
+        onCreateMusic,
+        onCreateMusicFileInfo,
+        musicId,
       } );
     } finally {
       setDoing(false);
@@ -75,7 +217,7 @@ export function YouTubeUpload<
             type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Pega aquí la URL del vídeo o playlist de YouTube..."
+            placeholder="Pon la URL del vídeo o playlist"
             className={getInputClasses()}
             disabled={doing}
           />

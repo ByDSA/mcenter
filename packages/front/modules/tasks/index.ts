@@ -4,7 +4,7 @@ import { logger } from "#modules/core/logger";
 type Props<S> = {
   taskName: string;
   url: string;
-  onListenStatus: (status: S)=> Promise<S>;
+  onListenStatus: (status: S, ctx: object)=> Promise<S>;
 };
 export async function streamTaskStatus<
   S extends TasksCrudDtos.TaskStatus.TaskStatus<any>
@@ -16,13 +16,15 @@ export async function streamTaskStatus<
       logger.info(`Active task "${taskName}".`);
     };
 
+    const context = {};
+
     eventSource.addEventListener("task-status", async (
       event: MessageEvent<S>,
     ) => {
       const receivedTaskStatus: S = typeof event.data === "string"
         ? JSON.parse(event.data)
         : event.data;
-      const taskStatus = await onListenStatus?.(receivedTaskStatus);
+      const taskStatus = await onListenStatus?.(receivedTaskStatus, context);
 
       switch (taskStatus.status) {
         case "failed": {

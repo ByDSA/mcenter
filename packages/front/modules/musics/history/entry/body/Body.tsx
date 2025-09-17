@@ -47,7 +47,7 @@ export function Body( { data, setData }: Props) {
   const fileInfoElements = {
     durationElement: OutputText( {
       caption: MUSIC_FILE_INFO_PROPS["mediaInfo.duration"].caption,
-      value: isDefined(duration) ? `${secsToMmss(duration)} (${duration} s)` : "-",
+      value: isDefined(duration) ? `${secsToMmss(duration)}` : "-",
     } ),
     pathElement: OutputText( {
       caption: MUSIC_FILE_INFO_PROPS.path.caption,

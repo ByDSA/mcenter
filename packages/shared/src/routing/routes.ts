@@ -26,6 +26,10 @@ type MusicSlugQueryParams = {
   format?: ResponseFormat;
 };
 
+type YoutubeImportMusicOneOptions = {
+  musicId?: string;
+};
+
 export const PATH_ROUTES = {
   tasks: {
     path: TASKS,
@@ -51,7 +55,7 @@ export const PATH_ROUTES = {
       music: {
         path: `${YOUTUBE}/import/music`,
         one: {
-          withParams: (youtubeId: string) => `${YOUTUBE}/import/music/one/${youtubeId}`,
+          withParams: (youtubeId: string, options?: YoutubeImportMusicOneOptions) => `${YOUTUBE}/import/music/one/${youtubeId}${options?.musicId ? `?musicId=${options.musicId}` : ""}`,
         },
         playlist: {
           withParams: (playlistId: string) => `${YOUTUBE}/import/music/playlist/${playlistId}`,
@@ -122,6 +126,9 @@ export const PATH_ROUTES = {
       },
       updateRemote: {
         path: `${MUSICS_ADMIN}/update-remote`,
+      },
+      updateFileInfos: {
+        path: `${MUSICS_ADMIN}/update-file-infos`,
       },
     },
   },

@@ -1,5 +1,5 @@
-import { Controller, Get, Param } from "@nestjs/common";
 import { YoutubeCrudDtos } from "$shared/models/youtube/dto/transport";
+import { Controller, Get, Param, Query } from "@nestjs/common";
 import { TaskCreatedResponseValidation } from "#core/tasks";
 import { YoutubeImportMusicOneTaskHandler } from "./import-one.handler";
 import { YoutubeImportMusicPlaylistTaskHandler } from "./import-playlist.handler";
@@ -15,9 +15,11 @@ export class YoutubeImportMusicController {
   @TaskCreatedResponseValidation(YoutubeCrudDtos.ImportOne.CreateTask.payloadSchema)
   async createImportOneTask(
     @Param("id") id: string,
+    @Query("musicId") musicId: string | undefined,
   ) {
     const job = await this.importOneTaskHandler.addTask( {
       id,
+      musicId,
     } );
 
     return {

@@ -1,4 +1,5 @@
 import z from "zod";
+import { mongoDbId } from "../../resources/partial-schemas";
 import { musicFileInfoEntitySchema } from "../../musics/file-info";
 import { musicEntitySchema } from "../../musics";
 import { TasksCrudDtos } from "../../tasks/";
@@ -8,6 +9,7 @@ export namespace YoutubeCrudDtos {
     export namespace CreateTask {
       export const payloadSchema = z.object( {
         id: z.string(),
+        musicId: mongoDbId.optional(),
       } );
 
       export type Payload = z.infer<typeof payloadSchema>;
@@ -23,7 +25,7 @@ export namespace YoutubeCrudDtos {
     export const resultSchema = z.object( {
       videoId: z.string(),
       created: z.object( {
-        music: musicEntitySchema,
+        music: musicEntitySchema.optional(),
         fileInfo: musicFileInfoEntitySchema,
       } ).optional(),
     } );
@@ -59,7 +61,7 @@ export namespace YoutubeCrudDtos {
   }
 
     const valueSchema = z.object( {
-      music: musicEntitySchema,
+      music: musicEntitySchema.optional(),
       fileInfo: musicFileInfoEntitySchema,
     } );
     const createdSchema = z.record(z.string(), valueSchema);

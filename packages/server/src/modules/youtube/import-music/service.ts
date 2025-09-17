@@ -1,9 +1,10 @@
-import path from "node:path";
+import path, { relative } from "node:path";
 import fs from "node:fs";
 import { Injectable, Logger } from "@nestjs/common";
 import { v4 as uuidv4 } from "uuid";
 import { MusicsRepository } from "#musics/crud/repository";
 import { MUSIC_MEDIA_PATH } from "#musics/utils";
+import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { DownloadResult, YoutubeDownloadMusicService } from "./youtube-download-music.service";
 
 @Injectable()
@@ -12,6 +13,7 @@ export class YoutubeImportMusicService {
 
   constructor(
     private readonly musicsRepo: MusicsRepository,
+    private readonly musicFileInfosRepo: MusicFileInfoRepository,
     private readonly musicDownloader: YoutubeDownloadMusicService,
   ) {}
 
@@ -80,6 +82,14 @@ export class YoutubeImportMusicService {
       await this.deleteDownloadedFile(downloadResult);
       throw error;
     }
+  }
+
+  async createNewMusicFileInfo(downloadResult: DownloadResult, musicId: string) {
+    const relativePath = relative(MUSIC_MEDIA_PATH, downloadResult.fullpath);
+
+    return await this.musicFileInfosRepo.upsertOneByPathAndGet(relativePath, {
+      musicId,
+    } );
   }
 
   async deleteDownloadedFile(downloadResult: DownloadResult) {

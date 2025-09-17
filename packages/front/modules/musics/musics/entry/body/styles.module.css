@@ -5,6 +5,11 @@
     flex-grow: 1;
   }
 
+  :global(.line):has(.title),
+  :global(.line):has(.weight) {
+    gap: 1rem;
+  }
+
   .album,
   .title,
   .artist {
@@ -16,15 +21,15 @@
   .album,
   .url {
     width: 100%;
+
+    :global(.ui-kit-resource-input-number),
+    :global(.ui-kit-resource-input-text) {
+      width: 100%;
+    }
   }
 
   .weight :global(.ui-kit-input-number) {
     width: 4rem;
-  }
-
-  .weightAlbum,
-  .titleArtist {
-    flex-wrap: wrap !important;
   }
 
   .optionalButton {

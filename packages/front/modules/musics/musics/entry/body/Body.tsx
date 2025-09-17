@@ -13,6 +13,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
 import { createActionsBar, DeleteResource } from "#modules/utils/resources/elements/crud-buttons";
 import { OutputText } from "#modules/ui-kit/output/Text";
+import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import { MUSIC_FILE_INFO_PROPS } from "../utils";
 import commonStyle from "../../../../history/entry/body-common.module.css";
 import { useMusicCrudWithElements, UseMusicCrudWithElementsProps } from "./useMusicCrudWithElements";
@@ -121,8 +122,9 @@ function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps)
               }}
               isDoing={false} />
             </span>
-            <span className={classes("line", "height2", commonStyle.autoBreakUrl)}>{
+            <span className={classes("line", "height2", styles.path)}>{
               OutputText( {
+                className: commonStyle.autoBreakUrl,
                 caption: MUSIC_FILE_INFO_PROPS.path.caption,
                 value: f.path,
               } )
@@ -130,27 +132,35 @@ function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps)
             <span className={classes("line", "height2", styles.duration)}>{
               OutputText( {
                 caption: MUSIC_FILE_INFO_PROPS["mediaInfo.duration"].caption,
-                value: isDefined(duration) ? `${secsToMmss(duration)} (${duration} s)` : "-",
+                value: isDefined(duration)
+                  ? secsToMmss(duration)
+                  : "-",
               } )
             }</span>
-            <span className={classes("line", "height2", commonStyle.url)}>{
+            <span className={classes("line", "height2", styles.size)}>{
+              OutputText( {
+                caption: MUSIC_FILE_INFO_PROPS.size.caption,
+                value: (f.size / (2 ** 20)).toFixed(2).toString() + " MB",
+              } )}
+            </span>
+            <span className={classes("line", "height2", styles.createdAt)}>{
+              OutputText( {
+                caption: MUSIC_FILE_INFO_PROPS["timestamps.createdAt"].caption,
+                value: f.timestamps.createdAt.toISOString(),
+              } )}
+            </span>
+            <span className={classes("line", "height2", styles.updatedAt)}>{
+              OutputText( {
+                caption: MUSIC_FILE_INFO_PROPS["timestamps.updatedAt"].caption,
+                value: f.timestamps.updatedAt.toISOString(),
+              } )}
+            </span>
+            <span className={classes("line", "height2", styles.hash)}>{
               OutputText( {
                 caption: MUSIC_FILE_INFO_PROPS.hash.caption,
                 value: f.hash,
               } )
             }</span>
-            <span className={classes("line", "height2", commonStyle.url)}>
-              <span>{MUSIC_FILE_INFO_PROPS.size.caption}</span>
-              <span className={commonStyle.content}>{f.size}</span>
-            </span>
-            <span className={classes("line", "height2", commonStyle.url)}>
-              <span>{MUSIC_FILE_INFO_PROPS["timestamps.createdAt"].caption}</span>
-              <span className={commonStyle.content}>{f.timestamps.createdAt.toISOString()}</span>
-            </span>
-            <span className={classes("line", "height2", commonStyle.url)}>
-              <span>{MUSIC_FILE_INFO_PROPS["timestamps.updatedAt"].caption}</span>
-              <span className={commonStyle.content}>{f.timestamps.updatedAt.toISOString()}</span>
-            </span>
           </Fragment>
         );
       } )
@@ -177,6 +187,12 @@ function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps)
           actions.add(parsedResponse.data.fileInfo);
         },
       } )}
+    />
+    <YouTubeUpload
+      musicId={musicId}
+      onCreateMusicFileInfo={musicFileInfo=> {
+        actions.add(musicFileInfo);
+      }}
     />
   </details>;
 }

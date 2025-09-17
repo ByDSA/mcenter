@@ -1,17 +1,18 @@
+import { JSX } from "react";
 import { classes } from "#modules/utils/styles";
 import styles from "./style.module.css";
 
 type HeaderProps = {
-  time: string;
+  time?: string;
   date?: string;
   title: string;
   subtitle: string;
-  right?: string;
+  right?: JSX.Element;
 };
 export function Header( { time, date, title, subtitle, right }: HeaderProps) {
   return <span className={styles.container}>
     <div className={styles.fullTime}>
-      <span className={styles.time}>{time}</span>
+      {time && <span className={styles.time}>{time}</span>}
 
       {date
       && <span className={styles.date}>{date}</span> }
