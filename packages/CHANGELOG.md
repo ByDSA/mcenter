@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.8.2](https://github.com/ByDSA/mcenter/compare/v4.8.1...v4.8.2) (2025-09-17)
+
+
+### Bug Fixes
+
+* **front:** episode key ([b2ece64](https://github.com/ByDSA/mcenter/commit/b2ece642845236fd77719f84ff08f4fe084ae793))
+
 ### [4.8.1](https://github.com/ByDSA/mcenter/compare/v4.8.0...v4.8.1) (2025-09-17)
 
 
