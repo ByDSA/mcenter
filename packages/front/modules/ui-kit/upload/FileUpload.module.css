@@ -2,20 +2,20 @@
   width: 100%;
 
   /* Variables de color locales para el componente */
-  --fileupload-text-primary: var(--color-black);
-  --fileupload-text-secondary: #6b7280;
-  --fileupload-text-muted: #9ca3af;
-  --fileupload-border-default: #d1d5db;
-  --fileupload-border-hover: #9ca3af;
-  --fileupload-bg-active: #eff6ff;
-  --fileupload-bg-item: #f9fafb;
-  --fileupload-border-item: #e5e7eb;
-  --fileupload-error-bg: var(--color-red-light4);
-  --fileupload-error-border: var(--color-red-light3);
-  --fileupload-error-text: var(--color-red-light);
-  --fileupload-success: #10b981;
-  --fileupload-success-hover: #059669;
-  --fileupload-remove-hover-bg: #fef2f2;
+  --text-primary: var(--color-black);
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-default: var(--color-gray-200);
+  --border-hover: var(--color-gray-300);
+  --bg-active: #eff6ff;
+  --bg-item: #f9fafb;
+  --border-item: #e5e7eb;
+  --error-bg: var(--color-red-100);
+  --error-border: var(--color-red-200);
+  --error-text: var(--color-red-400);
+  --success: var(--color-green-300);
+  --success-hover: var(--color-green-100);
+  --remove-hover-bg: #fef2f2;
 }
 .header {
   margin-bottom: 1.5rem;
@@ -23,7 +23,7 @@
 
 .dropzone {
   position: relative;
-  border: 2px dashed var(--fileupload-border-default);
+  border: 2px dashed var(--border-default);
   border-radius: 0.5rem;
   padding: 1rem;
   text-align: center;
@@ -37,13 +37,13 @@
   flex-direction: column;
 
   &:hover {
-    border-color: var(--fileupload-border-hover);
+    border-color: var(--border-hover);
     background-color: rgba(255, 255, 255, 1);
   }
 
   &.active {
     border-color: var(--color-primary);
-    background-color: var(--fileupload-bg-active);
+    background-color: var(--bg-active);
   }
 }
 
@@ -58,19 +58,19 @@
   margin: 0;
   margin-top: 0.25rem;
   font-size: 0.875rem;
-  color: var(--fileupload-text-secondary);
+  color: var(--text-secondary);
 }
 
 .fileRestrictions {
   margin: 0;
   margin-top: 1rem;
   font-size: 0.75rem;
-  color: var(--fileupload-text-muted);
+  color: var(--text-muted);
 }
 
 .fileInfo {
   font-size: 0.75rem;
-  color: var(--fileupload-text-muted);
+  color: var(--text-muted);
 }
 
 .selectButton {
@@ -84,16 +84,16 @@
   max-width: 15rem;
 
   &:hover {
-    background-color: var(--color-primary-darker);
+    background-color: var(--color-primary-hover);
   }
 }
 
 .errorContainer {
   margin-top: 1rem;
   padding: 0.75rem;
-  color: var(--fileupload-error-text);
-  background-color: var(--fileupload-error-bg);
-  border: 1px solid var(--fileupload-error-border);
+  color: var(--error-text);
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-border);
   border-radius: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -103,10 +103,10 @@
   margin-top: 1rem;
   font-size: 0.875rem;
   &.completed {
-    color: var(--fileupload-success);
+    color: var(--success);
   }
   &.error {
-    color: var(--fileupload-error-text);
+    color: var(--error-text);
   }
 }
 
@@ -118,7 +118,7 @@
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 0.75rem 0;
-  color: var(--fileupload-text-primary);
+  color: var(--text-primary);
 }
 
 .filesList {
@@ -132,24 +132,24 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem;
-  background-color: var(--fileupload-bg-item);
-  border: 1px solid var(--fileupload-border-item);
+  background-color: var(--bg-item);
+  border: 1px solid var(--border-item);
   border-radius: 0.5rem;
 
   &:has(.error) {
-    border: 1px solid var(--color-red-light4);
-    background-color: var(--color-red-light5);
+    border: 1px solid var(--color-red-100);
+    background-color: var(--color-red-50);
 
     .fileIcon {
-      color: var(--color-red-light);
+      color: var(--color-red-400);
     }
   }
   &:has(.completed) {
-    border: 1px solid var(--color-green-light4);
-    background-color: var(--color-green-light5);
+    border: 1px solid var(--color-green-100);
+    background-color: var(--color-green-50);
 
     .fileIcon {
-      color: var(--color-green-light);
+      color: var(--color-green-400);
     }
   }
 }
@@ -165,7 +165,7 @@
 .fileIcon {
   width: 1.5rem !important;
   height: 1.5rem !important;
-  color: var(--fileupload-text-secondary);
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
@@ -178,20 +178,20 @@
   margin: 0 0 0.25rem 0;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--fileupload-text-primary);
+  color: var(--text-primary);
   word-break: break-all;
 }
 
 .fileSize {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--fileupload-text-secondary);
+  color: var(--text-secondary);
 }
 
 .removeButton {
   background: none;
   border: none;
-  color: var(--fileupload-error-text);
+  color: var(--error-text);
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 0.25rem;
@@ -199,8 +199,8 @@
 }
 
 .removeButton:hover {
-  color: var(--color-red-darker);
-  background-color: var(--fileupload-error-bg);
+  color: var(--color-red-600);
+  background-color: var(--error-bg);
 }
 
 .removeIcon {

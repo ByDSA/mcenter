@@ -30,7 +30,7 @@ export function HistoryList() {
               if (i === 0 || !isSameday(data![i - 1].date.timestamp, entry.date.timestamp)) {
                 const dateStr = getDateStr(new Date(entry.date.timestamp * 1000));
 
-                dayTitle = <h2 key={dateStr}>{dateStr}</h2>;
+                dayTitle = <h3 key={dateStr}>{dateStr}</h3>;
               }
 
               return <Fragment

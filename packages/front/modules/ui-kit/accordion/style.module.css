@@ -6,6 +6,20 @@
   margin: 0.25rem;
   overflow: hidden;
 
+  .header {
+    background-color: var(--color-header, var(--color-container));
+    &:hover {
+      cursor: pointer;
+      background-color: var(--color-hover);
+      color: var(--color-hover-text);
+    }
+
+    &:has(+ *:not([style*="display: none"])) {
+      background-color: var(--color-open);
+      color: var(--color-hover-text);
+    }
+  }
+
   .header > * {
     padding: 0.33rem var(--padding-x);
     height: 3rem;
@@ -18,15 +32,4 @@
       height: 4rem;
     }
   }
-}
-
-.header:hover {
-  cursor: pointer;
-  background-color: var(--color-hover);
-  color: var(--color-hover-text);
-}
-
-.header:has(+ *:not([style*="display: none"])) {
-  background-color: var(--color-open);
-  color: var(--color-hover-text);
 }

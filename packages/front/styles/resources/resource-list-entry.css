@@ -55,14 +55,11 @@
           margin-bottom: 0.8rem;
         }
 
-        > span {
+        .break {
           display: flex;
-
-          &.break {
-            flex-basis: 100%;
-            height: 0;
-            margin-bottom: 3vh;
-          }
+          flex-basis: 100%;
+          height: 0;
+          margin-bottom: 3vh;
         }
 
         .ui-kit-resource-input-text:last-child,

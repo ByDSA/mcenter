@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { isDefined } from "$shared/utils/validation";
+import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
 import { TaskStatusAny } from "./types";
 import styles from "./styles.module.css";
 import { TaskJsonViewer } from "./TaskJsonViewer";
@@ -134,7 +135,7 @@ export const Task = ( { value, onClick }: Props) => {
       )}
       <div className={styles.clickableArea} onClick={handleCardClick}>
         <div className={styles.expandIcon}>
-          {isExpanded ? "▲ Contraer" : "▼ Ver más detalles"}
+          {isExpanded ? <ArrowDropDown /> : <ArrowRight />}Detalles
         </div>
       </div>
 

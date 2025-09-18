@@ -41,7 +41,6 @@
 
 /* Contenedor principal */
 .wrapper {
-  max-height: 200px;
   position: relative;
 }
 
@@ -49,8 +48,14 @@
   position: relative;
   display: inline-block;
   overflow: auto;
-  max-height: inherit;
+  max-height: 200px;
   width: 100%;
+}
+
+@media (height < 700px) {
+  .expandableContainer {
+    max-height: 150px;
+  }
 }
 
 /* Botón expandir */

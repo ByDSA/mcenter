@@ -30,11 +30,11 @@
   }
 
   .statusError {
-    color: var(--color-red-darker);
+    color: var(--color-red-600);
   }
 
   .statusCompleted {
-    color: var(--color-green-darker2);
+    color: var(--color-green-700);
   }
 }
 

@@ -3,6 +3,11 @@
 @import "./globals-ui-kit.css";
 @import "./globals-animation.css";
 
+:root {
+  --color-link: var(--color-primary);
+  --color-link-hover: var(--color-primary-hover);
+}
+
 html,
 body {
   padding: 0;
@@ -73,7 +78,7 @@ nav {
       color: var(--color-primary2);
 
       &:hover {
-        color: var(--color-primary2-light3);
+        color: var(--color-primary2-hover);
       }
     }
   }
@@ -84,10 +89,10 @@ nav {
     background-color: var(--color-green);
 
     & a {
-      color: var(--color-primary2-light);
+      color: var(--color-primary2);
 
       &:hover {
-        color: var(--color-primary2-light3);
+        color: var(--color-primary2-hover);
       }
     }
   }

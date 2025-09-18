@@ -1,5 +1,5 @@
 :root {
-  --spinner-color: var(--color-yellow);
+  --spinner-color: var(--color-gray-200);
   --spinner-size: 1rem;
   --spinner-width: 2px;
 }
@@ -82,6 +82,11 @@
     min-width: 0;
     width: 8rem;
   }
+
+  svg {
+    stroke: rgba(0, 0, 0, 0.5);
+    stroke-width: 0.25px;
+  }
 }
 
 .ui-kit-resource-input-array-string .ui-kit-array-item {
@@ -92,7 +97,7 @@
   align-items: center;
 
   .ui-kit-delete-button a {
-    --color: var(--color-red-darker);
+    --color: var(--color-red);
     display: flex;
     color: var(--color);
     width: 1em;
@@ -100,10 +105,9 @@
     text-align: center;
     line-height: 1em;
     margin-left: 0.5em;
-    margin-top: 1px;
 
     &:hover {
-      color: var(--color-red-light);
+      color: var(--color-red-hover);
     }
 
     &,
@@ -120,20 +124,23 @@
   align-items: center;
 
   .ui-kit-add-button {
-    --color: var(--color-green-darker2);
-    border-color: var(--color);
+    --color: var(--color-green-600);
     color: var(--color);
     padding: 0 0.25em;
+    height: 1.3rem;
+    width: auto;
+    display: flex;
+    align-items: center;
 
-    &,
     svg {
-      width: 1rem;
-      height: 1rem;
+      width: 100%;
+      height: 100%;
+      stroke-width: 0.25px;
     }
 
     &:hover {
       text-decoration: none;
-      color: var(--color-green-darker);
+      color: var(--color-green-hover);
     }
   }
 }
@@ -146,4 +153,26 @@
 /* Label */
 .ui-kit-resource-input:first-child {
   white-space: nowrap;
+}
+
+.checkbox-optional {
+  input[type="checkbox"] {
+    accent-color: var(--color-primary);
+  }
+
+  input[type="checkbox"]:hover {
+    accent-color: var(--color-primary-hover);
+  }
+  label {
+    color: var(--color-black);
+  }
+
+  input[type="checkbox"]:hover ~ label {
+    color: var(--color-primary-800);
+  }
+
+  input[type="checkbox"],
+  label {
+    cursor: pointer;
+  }
 }

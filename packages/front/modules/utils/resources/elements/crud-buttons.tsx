@@ -66,7 +66,7 @@ export function createActionsBar( { isModified = false,
       disabled={isDoing}
       spinnerSide="none"
     />}
-    {reset && <ResetResource disabled={isDoing} onClick={reset}/>}
+    {reset && isModified && <ResetResource disabled={isDoing} onClick={reset}/>}
     {remove && <DeleteResource
       action={async ()=>{
         await remove.action();

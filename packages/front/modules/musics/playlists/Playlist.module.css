@@ -96,7 +96,7 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background-color: var(--color-green-darker2);
+  background-color: var(--color-green-700);
   color: white;
   border: none;
   display: flex;
@@ -107,7 +107,7 @@
 }
 
 .playAllButton:hover {
-  background-color: var(--color-green-darker);
+  background-color: var(--color-green-600);
 }
 
 .playlistContent {

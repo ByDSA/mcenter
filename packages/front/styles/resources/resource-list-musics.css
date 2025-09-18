@@ -1,32 +1,33 @@
 .resource-list-entry {
   .ui-kit-accordion {
     @media (hover: hover) {
-      --color-hover: var(--color-music-darker);
-      --color-hover-text: var(--color-music-text-on-darker);
+      --color-hover: var(--color-music-600);
+      --color-hover-text: var(--color-music-text-on-600);
     }
-    --color-open: var(--color-music-darker);
-    --color-container: var(--color-music-light2);
+    --color-open: var(--color-music-600);
+    --color-header: var(--color-music-150);
+    --color-container: var(--color-music-50);
 
     --color-link: var(--color-music-link);
     --color-link-hover: var(--color-music-link-hover);
 
     --spinner-color: var(--color-link);
 
-    --color-border: var(--color-music-darker3) !important;
+    --color-border: var(--color-teal-750) !important;
 
     hr {
-      color: var(--color-music-darker3);
+      color: var(--color-teal-750);
     }
 
-    color: var(--color-music-darker5);
+    color: var(--color-music-900);
 
     textarea {
-      color: var(--color-music-darker5);
+      color: var(--color-music-900);
     }
   }
 
   .ui-kit-array-item,
   textarea {
-    border-color: var(--color-music-darker3);
+    border-color: var(--color-music-800);
   }
 }

@@ -1,25 +1,28 @@
 :root {
-  --color-music: var(--color-cyan);
-  --color-music-light: var(--color-cyan-light);
-  --color-music-light2: var(--color-cyan-light2);
-  --color-music-light3: var(--color-cyan-light3);
-  --color-music-light4: var(--color-cyan-light4);
-  --color-music-darker: var(--color-cyan-darker);
-  --color-music-darker2: var(--color-cyan-darker2);
-  --color-music-darker3: var(--color-cyan-darker3);
-  --color-music-darker4: var(--color-cyan-darker4);
-  --color-music-darker5: var(--color-cyan-darker5);
+  --color-music-25: var(--color-teal-25);
+  --color-music-50: var(--color-teal-50);
+  --color-music-100: var(--color-teal-100);
+  --color-music-150: var(--color-teal-150);
+  --color-music-200: var(--color-teal-200);
+  --color-music-300: var(--color-teal-300);
+  --color-music-400: var(--color-teal-400);
+  --color-music-500: var(--color-teal-500);
+  --color-music-600: var(--color-teal-600);
+  --color-music-700: var(--color-teal-700);
+  --color-music-800: var(--color-teal-800);
+  --color-music-900: var(--color-teal-900);
+  --color-music: var(--color-music-500);
 
+  --color-music-text-on-100: black;
+  --color-music-text-on-200: black;
+  --color-music-text-on-300: black;
+  --color-music-text-on-400: black;
   --color-music-text: black;
-  --color-music-text-on-light: black;
-  --color-music-text-on-light2: black;
-  --color-music-text-on-light3: black;
-  --color-music-text-on-light4: black;
-  --color-music-text-on-darker: white;
-  --color-music-text-on-darker2: white;
-  --color-music-text-on-darker3: white;
-  --color-music-text-on-darker4: white;
+  --color-music-text-on-600: white;
+  --color-music-text-on-700: white;
+  --color-music-text-on-800: white;
+  --color-music-text-on-900: white;
 
-  --color-music-link: var(--color-yellow);
-  --color-music-link-hover: var(--color-yellow-light);
+  --color-music-link: var(--color-blue);
+  --color-music-link-hover: var(--color-blue-hover);
 }

@@ -1,5 +1,6 @@
 import { MusicEntity } from "$shared/models/musics";
 import { PATH_ROUTES } from "$shared/routing";
+import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
 import { backendUrl } from "#modules/requests";
 import { ResourceInputText, ResourceInputNumber, ResourceInputArrayString } from "#modules/ui-kit/input";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
@@ -139,4 +140,4 @@ type OptionalPropsButtonProps = {
 export const OptionalPropsButton = ( { isVisible, onClick }: OptionalPropsButtonProps)=><span
   onClick={onClick}
   className={classes("line", "height2", styles.optionalButton)}>
-  {!isVisible ? "►" : "▼"} Propiedades opcionales</span>;
+  {!isVisible ? <ArrowRight /> : <ArrowDropDown />} Propiedades opcionales</span>;

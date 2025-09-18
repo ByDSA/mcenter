@@ -1,26 +1,27 @@
 :root {
-  --color-serie: var(--color-yellow);
-  --color-serie-light: var(--color-yellow-light);
-  --color-serie-light2: var(--color-yellow-light2);
-  --color-serie-light3: var(--color-yellow-light3);
-  --color-serie-light4: var(--color-yellow-light4);
-  --color-serie-darker: var(--color-yellow-darker);
-  --color-serie-darker2: var(--color-yellow-darker2);
-  --color-serie-darker3: var(--color-yellow-darker3);
-  --color-serie-darker4: var(--color-yellow-darker4);
-  --color-serie-darker5: var(--color-yellow-darker5);
+  --color-serie-25: var(--color-yellow-25);
+  --color-serie-50: var(--color-yellow-50);
+  --color-serie-100: var(--color-yellow-100);
+  --color-serie-200: var(--color-yellow-200);
+  --color-serie-300: var(--color-yellow-300);
+  --color-serie-400: var(--color-yellow-400);
+  --color-serie-500: var(--color-yellow-500);
+  --color-serie-600: var(--color-yellow-600);
+  --color-serie-700: var(--color-yellow-700);
+  --color-serie-800: var(--color-yellow-800);
+  --color-serie-900: var(--color-yellow-900);
+  --color-serie: var(--color-serie-500);
 
   --color-serie-text: black;
-  --color-serie-text-on-light: black;
-  --color-serie-text-on-light2: black;
-  --color-serie-text-on-light3: black;
-  --color-serie-text-on-light4: black;
-  --color-serie-text-on-darker: black;
-  --color-serie-text-on-darker2: black;
-  --color-serie-text-on-darker3: white;
-  --color-serie-text-on-darker4: white;
-  --color-serie-text-on-darker5: white;
+  --color-serie-text-on-100: black;
+  --color-serie-text-on-200: black;
+  --color-serie-text-on-300: black;
+  --color-serie-text-on-400: black;
+  --color-serie-text-on-600: black;
+  --color-serie-text-on-700: black;
+  --color-serie-text-on-800: white;
+  --color-serie-text-on-900: white;
 
   --color-serie-link: var(--color-primary);
-  --color-serie-link-hover: var(--color-primary-light);
+  --color-serie-link-hover: var(--color-primary-hover);
 }

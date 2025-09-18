@@ -1,7 +1,7 @@
 .playerBox {
   border: 1px solid rgba(0, 0, 0, 0.25);
   border-radius: 1em;
-  background-color: var(--color-primary2-light);
+  background-color: var(--color-primary2-400);
   width: 100%;
   min-width: 338px;
   padding: 1em 1em;
@@ -103,8 +103,8 @@
 
 .controls .btn:hover,
 .controlsVolume .btn:hover {
-  background-color: var(--color-primary-darker);
-  color: var(--color-primary2-light4);
+  background-color: var(--color-primary-600);
+  color: var(--color-primary2-100);
 }
 
 .title,

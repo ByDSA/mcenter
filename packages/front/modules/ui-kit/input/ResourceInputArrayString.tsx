@@ -1,6 +1,6 @@
 import { isDefined } from "$shared/utils/validation";
 import { useEffect } from "react";
-import { AddCircle, Cancel } from "@mui/icons-material";
+import { AddBox, Cancel } from "@mui/icons-material";
 import { AddOnReset } from "#modules/utils/resources/useCrud";
 import { ResourceInputCommonProps } from "./ResourceInputCommonProps";
 import { OnPressEnter, useInputText } from "./UseInputText";
@@ -150,7 +150,7 @@ function AddIcon<R extends object, T extends string>(
     {mainInputElement}
     <a className="ui-kit-add-button"
       onClick={add}
-    ><AddCircle /></a>
+    ><AddBox /></a>
   </span>;
 }
 

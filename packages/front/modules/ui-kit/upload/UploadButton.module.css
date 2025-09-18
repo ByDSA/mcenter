@@ -6,16 +6,15 @@
   width: 3rem !important;
   height: 3rem !important;
   margin: 0 auto 1rem auto;
-  color: var(--color-primary-darker);
+  color: var(--color-primary-600);
 }
 
 .uploadReady {
-  color: var(--color-green-darker) !important;
+  color: var(--color-green) !important;
   cursor: pointer !important;
-}
-
-.uploadReady:hover {
-  color: var(--color-green-darker2) !important;
+  &:hover {
+    color: var(--color-green-hover) !important;
+  }
 }
 
 .uploadDisabled {

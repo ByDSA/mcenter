@@ -15,13 +15,13 @@
 }
 
 .taskCard.completed {
-  --border-left-color: var(--color-green-darker);
-  background-color: var(--color-green-light5);
+  --border-left-color: var(--color-green-600);
+  background-color: var(--color-green-50);
 }
 
 .taskCard.failed {
-  --border-left-color: var(--color-red-darker);
-  background-color: var(--color-red-light5);
+  --border-left-color: var(--color-red-600);
+  background-color: var(--color-red-50);
 }
 
 .taskCard.neutral {
@@ -59,32 +59,33 @@
   }
 
   .id {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
 }
 
 .taskName {
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1.5rem !important;
   margin: 0;
 }
 
 .status {
   padding: 4px 8px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
 }
 
 .status.completed {
-  background-color: var(--color-green-light3);
-  color: var(--color-green-darker3);
+  background-color: var(--color-green-200);
+  color: var(--color-green-700);
 }
 
-.status.failed {
-  background-color: var(--color-red-light3);
-  color: var(--color-red-darker3);
+.status.failed,
+.failedReason {
+  background-color: var(--color-red-200);
+  color: var(--color-red-700);
 }
 
 .status.active {
@@ -125,7 +126,7 @@
   flex-wrap: nowrap;
 
   &:not(:last-child) {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.4rem;
   }
 }
 
@@ -159,7 +160,7 @@
 
     .foregroundBar {
       height: 100%;
-      background-color: var(--color-blue-darker);
+      background-color: var(--color-blue-500);
       transition: width 0.3s ease;
     }
   }
@@ -168,16 +169,16 @@
     width: 100%;
     text-align: center;
     font-size: 0.8rem;
+    margin-top: 0.5rem;
   }
 }
 
 .failedReason {
   margin-top: 1rem;
   padding: 8px;
-  background-color: var(--color-red-light4);
   border-radius: 4px;
-  font-size: 13px;
-  color: var(--color-red-darker2);
+  font-size: 0.8rem;
+  line-height: 1.2rem;
 }
 /* Añade estos estilos a tu styles.module.css existente */
 
@@ -190,9 +191,11 @@
   transition: transform 0.2s ease;
   margin-top: 1rem;
   user-select: none;
+  color: var(--color-link);
+  align-items: center;
 
   &:hover {
-    filter: brightness(2);
+    color: var(--color-link-hover);
   }
 }
 
@@ -237,12 +240,7 @@
 .codeBlock {
   border: 1px solid var(--color-gray-100);
   border-radius: 4px;
-  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--color-gray-800);
   white-space: pre-wrap;
-  word-wrap: break-word;
 
   & > * {
     padding: 12px;
@@ -267,9 +265,8 @@
   }
 
   .codeBlock {
-    font-size: 11px;
+    font-size: 0.7rem;
     padding: 8px;
-    max-height: 150px;
   }
 }
 

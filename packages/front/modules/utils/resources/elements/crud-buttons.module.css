@@ -1,9 +1,9 @@
 .deleteButton {
   a {
-    color: var(--color-red-darker);
+    color: var(--color-red);
 
     &:hover {
-      color: var(--color-red-light);
+      color: var(--color-red-300);
     }
   }
 }
@@ -28,10 +28,10 @@
 
 .updateButton {
   a {
-    color: var(--color-green-darker2);
+    color: var(--color-green-600);
 
     &:hover {
-      color: var(--color-green-darker);
+      color: var(--color-green-500);
     }
   }
 }
@@ -41,6 +41,11 @@
   justify-content: end !important;
   gap: 1.5rem !important;
   margin: 0.5rem 0 !important;
+
+  svg {
+    stroke: rgba(0, 0, 0, 0.5);
+    stroke-width: 0.25px;
+  }
 }
 
 :global(.ui-kit-accordion .body):has(> .actionsBar:first-child) {
