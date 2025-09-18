@@ -108,7 +108,7 @@ export class MusicPlaylistsController {
 
   @GetManyCriteria("/user/:userId", musicPlaylistEntitySchema)
   async getUserPlaylists(
-    @Param() params: GetManyUserPlaylistsParams,
+    @Param() _params: GetManyUserPlaylistsParams,
     @Body() body: GetManyUserPlaylistsBody,
   ) {
     return await this.playlistsRepo.getManyByCriteria( {
