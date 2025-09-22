@@ -1,0 +1,3 @@
+export {
+  UsersRepository,
+} from "./repository";

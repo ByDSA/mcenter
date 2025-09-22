@@ -10,6 +10,6 @@ export interface CanCreateOne<T> {
   createOne(model: T): Promise<void>;
 }
 
-export interface CanCreateOneAndGet<T> {
-  createOneAndGet(model: T): Promise<T>;
+export interface CanCreateOneAndGet<M, E = M> {
+  createOneAndGet(model: M): Promise<E>;
 }

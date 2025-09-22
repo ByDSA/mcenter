@@ -1,10 +1,11 @@
+import { WithRequired } from "$shared/utils/objects";
 import { Schema, SchemaTypeOptions, Types } from "mongoose";
 
 export type OptionalId = {
   _id?: Types.ObjectId;
 };
 
-export type RequireId<T extends OptionalId> = Omit<T, "_id"> & Required<Pick<T, "_id">>;
+export type RequireId<T extends OptionalId> = WithRequired<T, "_id">;
 
 export type SchemaDef<T> = {
   [K in keyof Omit<T, "_id">]-?: T[K] extends Date | Types.ObjectId

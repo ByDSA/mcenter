@@ -4,12 +4,12 @@ export interface CanFindOneById<T, ID> {
 }
 
 /* Get: permite null como resultado */
-export interface CanGetOneById<T, ID> {
-  getOneById(id: ID): Promise<T | null>;
+export interface CanGetOneById<E, ID> {
+  getOneById(id: ID): Promise<E | null>;
 }
 
-export interface CanGetAll<T> {
-  getAll(): Promise<T[]>;
+export interface CanGetAll<E> {
+  getAll(): Promise<E[]>;
 }
 
 export interface CanGetMany<T, PARTIAL=Partial<T>> {

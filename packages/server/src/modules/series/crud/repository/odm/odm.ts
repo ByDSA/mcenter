@@ -1,4 +1,5 @@
 import mongoose, { Schema, Types } from "mongoose";
+import { RequireId } from "#utils/layers/db/mongoose";
 import { SeriesKey } from "../../../models";
 
 export interface DocOdm {
@@ -7,7 +8,7 @@ export interface DocOdm {
   name: string;
 }
 
-export type FullDocOdm = DocOdm & Required<Pick<DocOdm, "_id">>;
+export type FullDocOdm = RequireId<DocOdm>;
 
 const NAME = "series";
 

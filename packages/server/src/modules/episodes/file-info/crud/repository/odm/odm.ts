@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { SchemaDef } from "#utils/layers/db/mongoose";
+import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 
 export interface DocOdm {
   _id?: mongoose.Types.ObjectId;
@@ -23,7 +23,7 @@ export interface DocOdm {
   };
 }
 
-export type FullDocOdm = DocOdm & Required<Pick<DocOdm, "_id">>;
+export type FullDocOdm = RequireId<DocOdm>;
 
 const NAME = "EpisodeFileInfo";
 

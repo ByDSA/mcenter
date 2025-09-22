@@ -1,11 +1,12 @@
 import type { EpisodeEntity } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { treePut } from "$shared/utils/trees";
+import { WithRequired } from "$shared/utils/objects";
 import { EpisodesRepository } from "#episodes/crud/repository";
 import { EpisodeFile, SerieFolderTree as SerieTree } from "../disk";
 import { episodeToEpisodeFiles } from "./adapters";
 
-export type EpisodeEntityWithFileInfos = EpisodeEntity & Required<Pick<EpisodeEntity, "fileInfos">>;
+export type EpisodeEntityWithFileInfos = WithRequired<EpisodeEntity, "fileInfos">;
 
 @Injectable()
 export class RemoteSeriesTreeService {

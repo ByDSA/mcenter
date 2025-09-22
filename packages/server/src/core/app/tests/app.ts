@@ -1,13 +1,22 @@
 import { Test, TestingModule, TestingModuleBuilder } from "@nestjs/testing";
 import { INestApplication, ModuleMetadata, Type } from "@nestjs/common";
 import { Application } from "express";
-import { addGlobalConfigToApp, globalValidationProviders } from "#core/app/init.service";
+import { RouterModule } from "@nestjs/core";
+import { addGlobalConfigToApp, globalAuthProviders, globalValidationProviders } from "#core/app/init.service";
 import { Database } from "#core/db/database";
 import { DatabaseModule } from "#core/db/module";
 import { LoggingModule } from "#core/logging/module";
 import { GlobalErrorHandlerModule } from "#core/error-handlers/global-error-handler";
 import { TestRealDatabase, TestMemoryDatabase } from "#core/db/tests";
 import { MeilisearchModule } from "#modules/search/module";
+import { UsersModule } from "#core/auth/users/module";
+import { AuthModule } from "#core/auth/strategies/jwt";
+import { MockUserPassRepository } from "#core/auth/strategies/local/tests/repository";
+import { UserPassesRepository } from "#core/auth/strategies/local/user-pass";
+import { MockUsersRepository } from "#core/auth/users/tests/repository";
+import { authRoutes } from "#core/routing";
+import { UsersRepository } from "#core/auth/users/crud/repository";
+import { AuthGoogleModule } from "#core/auth/strategies/google";
 
 export type TestingSetup = {
   app: INestApplication;
@@ -19,6 +28,9 @@ export type TestingSetup = {
 type Options = {
   db?: {
     using: "default" | "memory" | "real";
+  };
+  auth?: {
+    using: boolean | "mock";
   };
   beforeCompile?: (moduleBuilder: TestingModuleBuilder)=> void;
 };
@@ -33,9 +45,18 @@ export async function createTestingAppModule(
       GlobalErrorHandlerModule,
       ...(metadata.imports ?? []),
       ...(options?.db?.using ? [DatabaseModule, MeilisearchModule] : []),
+      ...(options?.auth?.using
+        ? [
+          UsersModule,
+          AuthModule,
+          AuthGoogleModule,
+          RouterModule.register(authRoutes),
+        ]
+        : []),
     ],
     providers: [
       ...globalValidationProviders,
+      ...(options?.auth?.using ? globalAuthProviders : []),
       ...(metadata.providers ?? []),
     ],
   } );
@@ -48,6 +69,15 @@ export async function createTestingAppModule(
     case "memory":
       moduleBuilder.overrideProvider(Database).useClass(TestMemoryDatabase);
       break;
+  }
+
+  if (options?.auth?.using === "mock") {
+    moduleBuilder
+      .overrideProvider(UsersRepository)
+      .useClass(MockUsersRepository);
+    moduleBuilder
+      .overrideProvider(UserPassesRepository)
+      .useClass(MockUserPassRepository);
   }
 
   options?.beforeCompile?.(moduleBuilder);

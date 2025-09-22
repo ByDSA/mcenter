@@ -3,9 +3,10 @@ import { isDebugging } from "$shared/utils/vscode";
 import { utilities as nestWinstonModuleUtilities } from "nest-winston";
 import * as winston from "winston";
 import "winston-daily-rotate-file";
+import { isTest } from "#utils";
 
 const IS_DEBUGGING = isDebugging();
-const IS_TEST = process.env.NODE_ENV === "test";
+const IS_TEST = isTest();
 
 export const LOGS_FOLDER = IS_TEST ? "tests/logs/" : "logs/";
 

@@ -1,0 +1,3 @@
+export {
+  UserPassesRepository,
+} from "./repository";

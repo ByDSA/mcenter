@@ -1,15 +1,17 @@
 import { Server } from "node:http";
-import { HttpAdapterHost } from "@nestjs/core";
-import { ArgumentMetadata, INestApplication, Injectable, OnModuleInit, PipeTransform, Logger } from "@nestjs/common";
+import { APP_GUARD, HttpAdapterHost } from "@nestjs/core";
+import { ArgumentMetadata, INestApplication, Injectable, OnModuleInit, PipeTransform, Logger, Provider } from "@nestjs/common";
 import helmet from "helmet";
 import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ZodSerializerInterceptor, ZodValidationException, ZodValidationPipe } from "nestjs-zod";
 import { assertIsDefined } from "$shared/utils/validation";
 import { CustomValidationError } from "$shared/utils/validation/zod";
+import cookieParser from "cookie-parser";
 import { RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/player";
 import { ZodSerializerSchemaInterceptor } from "#utils/validation/zod-nestjs";
 import { setupEventEmitterDecorators } from "#core/domain-event-emitter/get-event-emitter";
 import { GlobalExceptionFilter } from "#core/error-handlers/http-error-handler";
+import { OptionalJwtGuard } from "#core/auth/strategies/jwt/AuthCookieJwt.guard";
 import { LoggingInterceptor } from "../logging/interceptor";
 import { Cleanup } from "./clean-up.service";
 
@@ -82,6 +84,8 @@ export function addGlobalConfigToApp(app: INestApplication) {
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   } );
+
+  app.use(cookieParser());
 }
 
 @Injectable()
@@ -100,7 +104,7 @@ export class CustomZodValidationPipe extends ZodValidationPipe implements PipeTr
   }
 }
 
-export const globalValidationProviders = [
+export const globalValidationProviders: Provider[] = [
   // Requests validation
   {
     provide: APP_PIPE,
@@ -116,6 +120,11 @@ export const globalValidationProviders = [
     useClass: ZodSerializerSchemaInterceptor,
   },
 ];
+
+export const globalAuthProviders: Provider[] = [{
+  provide: APP_GUARD,
+  useClass: OptionalJwtGuard,
+}];
 
 export function resendZodErrorWith422(error: ZodValidationException, model: unknown) {
   const zodError = error.getZodError();

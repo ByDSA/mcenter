@@ -5,6 +5,7 @@ import { NestFactory } from "@nestjs/core";
 import { Logger, LoggerService } from "@nestjs/common";
 import { AppModule } from "#core/app/app.module";
 import { addGlobalConfigToApp } from "#core/app/init.service";
+import { isDev } from "#utils";
 
 (async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,7 +14,7 @@ import { addGlobalConfigToApp } from "#core/app/init.service";
   const logger = app.get(Logger);
   const PORT: number = +(process.env.PORT ?? 8080);
 
-  if (process.env.NODE_ENV === "development")
+  if (isDev())
     killProcessesUsingPort(PORT, logger);
 
   await app.listen(PORT);

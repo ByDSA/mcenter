@@ -1,4 +1,3 @@
-/* eslint-disable @stylistic/lines-around-comment */
 import { PATH_ROUTES } from "$shared/routing";
 import { RouterModule, Routes } from "@nestjs/core";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
@@ -21,6 +20,9 @@ import { MusicFileInfoModule } from "#musics/file-info/module";
 import { MusicsAdminModule } from "#musics/admin/module";
 import { TasksModule } from "#core/tasks";
 import { YoutubeImportMusicModule } from "#modules/youtube/import-music/module";
+import { UsersModule } from "#core/auth/users";
+import { AuthModule } from "#core/auth/module";
+import { AuthGoogleModule } from "#core/auth/strategies/google";
 import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
@@ -46,8 +48,23 @@ const imports = [
   TasksModule,
   YoutubeImportMusicModule,
 ];
-  /* Importante: el orden de las rutas aquí en el Register es irrelevante.
+
+/* Importante: el orden de las rutas aquí en el Register es irrelevante.
   Si hay colisiones en el acceso, cargar el módulo específico primero fuera del Register */
+export const authRoutes: Routes = [
+  {
+    path: "api/users", // TODO
+    module: UsersModule,
+  },
+  {
+    path: "api/auth", // TODO
+    module: AuthModule,
+  },
+  {
+    path: "api/auth", // TODO
+    module: AuthGoogleModule,
+  },
+];
 const routes: Routes = [
   {
     path: "/",
@@ -61,6 +78,7 @@ const routes: Routes = [
     path: PATH_ROUTES.logs.path,
     module: LoggingModule,
   },
+  ...authRoutes,
   {
     path: PATH_ROUTES.episodes.path,
     module: EpisodesCrudModule,

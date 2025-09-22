@@ -31,3 +31,13 @@ export function pgDump( { host, pass, user, db, file }: PgDumpParams) {
 
   return execPromisify(cmd);
 }
+
+export type PublicMembers<T> = {
+  [K in keyof T]: T[K]
+};
+
+export const isTest = () => process.env.NODE_ENV === "test";
+
+export const isDev = () => process.env.NODE_ENV === "development";
+
+export const isProduction = () => process.env.NODE_ENV === "production";
