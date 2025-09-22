@@ -1,6 +1,7 @@
 import { MusicEntity } from "$shared/models/musics";
 import { PATH_ROUTES } from "$shared/routing";
 import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
+import { WithRequired } from "$shared/utils/objects/types";
 import { backendUrl } from "#modules/requests";
 import { ResourceInputText, ResourceInputNumber, ResourceInputArrayString } from "#modules/ui-kit/input";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
@@ -23,11 +24,9 @@ function getAndUpdateMusicByProp<V>(
   };
 }
 
-type RequireFields<T, K extends keyof T> = Required<Pick<T, K>> & T;
-
 type F = (...args: any[])=> any;
 type ElementProps<I extends F> =
-  RequireFields<
+  WithRequired<
   Partial<Parameters<I>[0]>,
   "originalResource" | "resourceState"
   >;

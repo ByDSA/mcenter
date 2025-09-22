@@ -5,3 +5,5 @@ export type RequiredKeys<T> = Exclude<KeysOfType<T, Exclude<T[keyof T], undefine
 export type OptionalKeys<T> = Exclude<keyof T, RequiredKeys<T>>;
 
 export type OnlyWithRequiredKeys<T> = Pick<T, RequiredKeys<T>>;
+
+export type WithRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
