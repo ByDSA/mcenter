@@ -60,12 +60,16 @@ export const PATH_ROUTES = {
       },
       login: {
         path: "auth/login",
+        withParams: ( { redirect }: {redirect: string} ) => "/auth/login?redirect=" + encodeURI(redirect),
       },
       logout: {
         path: "auth/logout",
       },
       register: {
         path: "auth/register",
+        done: {
+          path: "auth/register/done",
+        },
       },
     },
     logout: {

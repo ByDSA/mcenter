@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { PATH_ROUTES } from "$shared/routing";
 import { Forbidden } from "../errors/403";
 import { UserRoleName } from "./models";
 import { getUser } from "./server";
@@ -13,7 +14,9 @@ export default async function LoggedLayout( { children } ) {
     const referer = headersList.get("x-url");
     const currentUrl = referer ?? "/";
 
-    redirect("/auth/login?redirect=" + encodeURI(currentUrl));
+    redirect(PATH_ROUTES.auth.frontend.login.withParams( {
+      redirect: currentUrl,
+    } ));
   }
 
   if (!user.roles.find(r=>r.name === UserRoleName.USER))

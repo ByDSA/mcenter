@@ -41,7 +41,7 @@ export const localLoginAction: Action<Props, Ret> = async ( { page,
   await page.waitForFunction(
     // eslint-disable-next-line no-undef
     (prevUrl) => !window.location.href.includes(prevUrl),
-    frontEndUrl("auth/login"),
+    frontEndUrl(PATH_ROUTES.auth.frontend.login.path),
     {
       timeout: 3_000,
     },

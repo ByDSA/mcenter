@@ -68,7 +68,7 @@ export const localRegisterAction: Action<Props, Ret> = async (
 
   await page.waitForFunction(
     // eslint-disable-next-line no-undef
-    () => window.location.href.includes("auth/register/done"),
+    () => window.location.href.includes(PATH_ROUTES.auth.frontend.register.done.path),
     undefined,
     {
       timeout: 1_000,
