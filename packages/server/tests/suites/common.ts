@@ -22,8 +22,25 @@ export const expectBodyNotFound = (body: unknown) => {
   assert(
     typeof body === "object" && body !== null,
   );
-  assert("message" in body && typeof body.message === "string");
-  assert(body.message.includes("Unprocessable Entity: Data not found"));
+  assert("data" in body && body.data === null);
+  assert("errors" in body && Array.isArray(body.errors));
+  assert(body.errors[0]?.message);
+  assert(typeof body.errors[0].message === "string");
+  assert(body.errors[0].message.includes("Data not found"));
+};
+
+export const expectUnprocessableEntity = (body: unknown) => {
+  assert(
+    typeof body === "object" && body !== null,
+  );
+  assert("errors" in body);
+  assert(Array.isArray(body.errors));
+  assert(body.errors[0].type === "CustomValidationError");
+};
+
+export const expectedUnprocessableEntity = {
+  expectBody: expectUnprocessableEntity,
+  statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
 };
 
 export const expectedDataNotFound = {

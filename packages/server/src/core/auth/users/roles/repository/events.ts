@@ -1,5 +1,5 @@
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
-import { UserRoleEntity } from "../repository";
+import { UserRoleEntity } from "../../models";
 
 type Entity = UserRoleEntity;
 export namespace UserRoleEvents {

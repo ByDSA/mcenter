@@ -8,7 +8,7 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
-import { UserRole, UserRoleEntity } from "../repository";
+import { UserRole, UserRoleEntity } from "../../models";
 import { UserRoleEvents } from "./events";
 import { UserRoleOdm } from "./odm";
 

@@ -1,6 +1,6 @@
 import { applyDecorators, CanActivate, ExecutionContext, Injectable, SetMetadata, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { UserPayload } from "../../strategies/jwt/payload/AppPayload";
+import { UserPayload } from "../models";
 
 const ROLES_KEY = "roles";
 

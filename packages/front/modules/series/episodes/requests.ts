@@ -23,7 +23,6 @@ export class EpisodesApi {
       EpisodesApi.GetManyByCriteria.Res
     >( {
       method,
-      body,
       reqBodyValidator: genAssertZod(EpisodesApi.GetManyByCriteria.bodySchema),
       parseResponse: genParseZod(
         EpisodesApi.GetManyByCriteria.responseSchema,
@@ -46,7 +45,6 @@ export class EpisodesApi {
     const method = "PATCH";
     const fetcher = makeFetcher<EpisodesApi.Patch.Body, EpisodesApi.Patch.Res>( {
       method,
-      body,
       reqBodyValidator: genAssertZod(EpisodesCrudDtos.PatchOneById.bodySchema),
       parseResponse: genParseZod(
         createOneResultResponseSchema(episodeEntitySchema),

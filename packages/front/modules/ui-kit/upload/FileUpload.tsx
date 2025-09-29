@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { CloudUpload, InsertDriveFile, Close, CheckCircle, Error as ErrorIcon } from "@mui/icons-material";
 import { showError } from "$shared/utils/errors/showError";
 import { classes } from "#modules/utils/styles";
+import { Button } from "../input/Button";
 import styles from "./FileUpload.module.css";
 import { UploadButton } from "./UploadButton";
 
@@ -222,13 +223,13 @@ ${acceptedTypesDisplay}`,
           onClick={uploadFiles}
         />
 
-        <button
+        <Button
           className={styles.selectButton}
           onClick={onButtonClick}
           disabled={isUploading}
         >
           {buttonText}
-        </button>
+        </Button>
         <span className={styles.dragText}>o arrastra y suelta</span>
         {acceptedTypes.length > 0 && (
           <p className={styles.fileRestrictions}>

@@ -1,0 +1,28 @@
+*:has(> .container) {
+  justify-content: start !important;
+
+  .container {
+    color: var(--color-gray-800);
+    margin-top: 10rem;
+    font-size: 1rem;
+    max-width: 30rem;
+
+    .title {
+      font-size: 2rem;
+      text-align: center;
+    }
+  }
+}
+
+.disabled {
+  &,
+  &:hover {
+    cursor: not-allowed;
+    color: var(--color-gray-500) !important;
+    text-decoration: none !important;
+  }
+}
+
+.strong {
+  font-weight: bold;
+}

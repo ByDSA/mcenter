@@ -7,110 +7,140 @@ export type Options = {
   connectOptions?: ConnectOptions;
 };
 
+export type DatabaseConfig = {
+  hostname?: string;
+  database?: string;
+  port?: string;
+  username?: string;
+  password?: string;
+};
+
 export class Database {
-  #options: Options;
+  #connected: boolean = false;
 
-  #dbConnectionURL: string;
-
-  #connected: boolean;
+  #dropable: boolean = false;
 
   protected connection: mongoose.Connection | null = null;
 
-   private readonly logger = new Logger(Database.name);
+  private readonly logger = new Logger(Database.name);
 
-   constructor(options?: Options) {
-     this.#options = {
-       connectOptions: options?.connectOptions ?? {},
-     };
+  constructor() {
+    // Constructor vacío, toda la configuración se mueve a connect
+  }
 
-     if (options?.silent) {
-       this.logger.log = ()=>undefined;
-       this.logger.error = ()=>undefined;
-     }
+  #assertNotConnected() {
+    if (this.#connected) {
+      throw new Error(
+        "Database is already connected. Disconnect first before connecting to a new database.",
+      );
+    }
+  }
 
-     this.#dbConnectionURL = "";
-     this.#connected = false;
-   }
+  #assertConnected() {
+    if (!this.#connected)
+      throw new Error("MongoDatabase not connected");
+  }
 
-   #init() {
-     // mongoose options
-     this.#options.connectOptions = {
-       autoIndex: false,
-       maxPoolSize: 10,
-       bufferCommands: false, // Para que lance error si no hay una conexión a la DB
-       autoCreate: false, // disable `autoCreate` since `bufferCommands` is false, value)
-       ...this.#options.connectOptions,
-     };
+  #generateUrl(config?: DatabaseConfig): string {
+    // Usar config pasado o variables de entorno como fallback
+    const hostname = config?.hostname ?? process.env.MONGO_HOSTNAME;
+    const database = config?.database ?? process.env.MONGO_DB;
+    const port = config?.port ?? process.env.MONGO_PORT;
+    const username = config?.username ?? process.env.MONGO_USER;
+    const password = config?.password ?? process.env.MONGO_PASSWORD;
 
-     this.#dbConnectionURL = this.generateUrl();
-   }
+    assertIsDefined(hostname);
 
-   #assertConnected() {
-     if (!this.#connected)
-       throw new Error("MongoDatabase not connected");
-   }
+    const isLocal = (port !== undefined || (hostname === "localhost" || hostname === "127.0.0.1"))
+      && !hostname.includes("mongodb.net");
+    let ret = `${isLocal ? "mongodb" : "mongodb+srv"}://`;
 
-   async connect() {
-     this.#init();
-     this.logger.log(`Connecting to ${this.#dbConnectionURL} ...`);
-     mongoose.set("strictQuery", false);
-     const connectPromise = mongoose.connect(this.#dbConnectionURL, this.#options.connectOptions);
-     const { connection } = mongoose;
+    if (username && password)
+      ret += `${username}:${password}@`;
 
-     connection.on(
-       "error",
-       ()=>this.logger.error(`Mongodb Connection Error: ${this.#dbConnectionURL}\n`),
-     );
-     connection.once("open", () => {
-       this.logger.log("Mongodb Connection Successful!");
+    ret += hostname;
 
-       this.#connected = true;
-     } );
-     connection.once("close", () => {
-       this.logger.log("Mongodb Connection Closed!");
+    if (port)
+      ret += `:${port}`;
 
-       this.#connected = false;
-     } );
+    ret += `/${database}`;
 
-     this.connection = connection;
+    return ret;
+  }
 
-     await connectPromise;
-   }
+  async connect(config?: DatabaseConfig, options?: Options) {
+    // Verificar que no esté ya conectado
+    this.#assertNotConnected();
 
-   isConnected() {
-     return this.#connected;
-   }
+    // Configurar opciones (movido del constructor)
+    const finalOptions: Options = {
+      connectOptions: options?.connectOptions ?? {},
+    };
 
-   async disconnect() {
-     this.logger.log("Disconnecting from mongodb ...");
-     this.#assertConnected();
-     await mongoose.disconnect();
-   }
+    // Configurar logger silencioso si se especifica
+    if (options?.silent) {
+      this.logger.log = () => undefined;
+      this.logger.error = () => undefined;
+    }
 
-   protected generateUrl() {
-     // mongodb environment variables
-     const { MONGO_HOSTNAME,
-       MONGO_DB,
-       MONGO_PORT,
-       MONGO_USER,
-       MONGO_PASSWORD } = process.env;
+    // Configurar opciones de mongoose
+    finalOptions.connectOptions = {
+      autoIndex: false,
+      maxPoolSize: 10,
+      bufferCommands: false, // Para que lance error si no hay una conexión a la DB
+      autoCreate: false, // disable `autoCreate` since `bufferCommands` is false
+      ...finalOptions.connectOptions,
+    };
 
-     assertIsDefined(MONGO_HOSTNAME);
+    if (config?.database !== undefined || config?.hostname !== undefined)
+      this.#dropable = true;
 
-     const isLocal = (MONGO_PORT !== undefined || (MONGO_HOSTNAME === "localhost"
-      || MONGO_HOSTNAME === "127.0.0.1")) && !MONGO_HOSTNAME.includes("mongodb.net");
-     let ret = `${isLocal ? "mongodb" : "mongodb+srv"}://`;
+    // Generar URL de conexión
+    const dbConnectionURL = this.#generateUrl(config);
 
-     if (MONGO_USER && MONGO_PASSWORD)
-       ret += `${MONGO_USER}:${MONGO_PASSWORD}@`;
+    this.logger.log(`Connecting to ${dbConnectionURL} ...`);
+    mongoose.set("strictQuery", false);
 
-     ret += MONGO_HOSTNAME;
+    const connectPromise = mongoose.connect(dbConnectionURL, finalOptions.connectOptions);
+    const { connection } = mongoose;
 
-     if (MONGO_PORT)
-       ret += `:${MONGO_PORT}`;
+    connection.on(
+      "error",
+      () => this.logger.error(`Mongodb Connection Error: ${dbConnectionURL}\n`),
+    );
 
-     ret += `/${MONGO_DB}`;
+    connection.once("open", () => {
+      this.logger.log("Mongodb Connection Successful!");
+      this.#connected = true;
+    } );
 
-     return ret;
-   }
+    connection.once("close", () => {
+      this.logger.log("Mongodb Connection Closed!");
+      this.#connected = false;
+    } );
+
+    this.connection = connection;
+
+    await connectPromise;
+  }
+
+  isConnected() {
+    return this.#connected;
+  }
+
+  async dropAll() {
+    if (!this.#dropable) {
+      this.logger.warn("Database is not dropable. Skipping dropAll.");
+
+      return;
+    }
+
+    await this.connection?.dropDatabase();
+  }
+
+  async disconnect() {
+    this.logger.log("Disconnecting from mongodb ...");
+    this.#assertConnected();
+    await mongoose.disconnect();
+  }
 }

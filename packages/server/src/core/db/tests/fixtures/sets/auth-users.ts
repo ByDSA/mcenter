@@ -1,8 +1,8 @@
-import { fixtureUsers } from "#core/auth/users/tests/fixtures";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
+import { fixtureAuthLocal } from "$sharedSrc/models/auth/tests/auth-local-fixtures";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { UserRoleOdm } from "#core/auth/users/roles/repository/odm";
 import { UserRoleMapOdm } from "#core/auth/users/roles/user-role/repository/odm";
-import { fixtureAuthLocal } from "#core/auth/strategies/local/tests/fixtures";
 import { UserPassOdm } from "#core/auth/strategies/local/user-pass/repository/odm";
 
 export const loadFixtureAuthUsers = async () => {

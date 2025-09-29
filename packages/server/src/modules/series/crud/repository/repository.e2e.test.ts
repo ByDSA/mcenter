@@ -40,7 +40,7 @@ describe("repository", () => {
 
     describe("before Create", () => {
       beforeAll(async () => {
-        await testingSetup.db!.drop();
+        await testingSetup.db!.dropAll();
       } );
 
       it("should not be in db", async () => {

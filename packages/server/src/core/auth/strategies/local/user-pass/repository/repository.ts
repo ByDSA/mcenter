@@ -2,15 +2,15 @@ import { Injectable } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { assertFoundClient } from "#utils/validation/found";
-import { CanDeleteOneByIdAndGet, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanDeleteOneByIdAndGet, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { UserPass, UserPassEntity } from "../userPass.entity";
-import { UserPassEvents } from "./events";
 import { UserPassOdm } from "./odm";
+import { UserPassEvents } from "./events";
 
 type Entity = UserPassEntity;
 type Model = UserPass;
@@ -19,6 +19,7 @@ type Model = UserPass;
 export class UserPassesRepository
 implements
 CanPatchOneByIdAndGet<Entity, Entity["id"], Model>,
+CanGetOneById<Entity, Entity["id"]>,
 CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
@@ -38,9 +39,29 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     return UserPassOdm.toEntity(doc);
   }
 
+  async getOneById(id: string): Promise<Entity | null> {
+    const doc = await UserPassOdm.Model.findById(id);
+
+    if (!doc)
+      return null;
+
+    return UserPassOdm.toEntity(doc);
+  }
+
   async getOneByUserId(userId: string): Promise<Entity | null> {
     const doc = await UserPassOdm.Model.findOne( {
       userId,
+    } );
+
+    if (!doc)
+      return null;
+
+    return UserPassOdm.toEntity(doc);
+  }
+
+  async getOneByVerificationToken(token: string): Promise<Entity | null> {
+    const doc = await UserPassOdm.Model.findOne( {
+      verificationToken: token,
     } );
 
     if (!doc)
@@ -70,6 +91,9 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
 
     updateQuery.$set = {
       ...updateQuery.$set,
+    };
+    updateQuery.$unset = {
+      ...updateQuery.$unset,
     };
 
     const doc = await UserPassOdm.Model.findByIdAndUpdate(

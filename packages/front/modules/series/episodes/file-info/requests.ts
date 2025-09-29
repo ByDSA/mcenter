@@ -23,7 +23,6 @@ export class EpisodeFileInfosApi {
       EpisodeFileInfosApi.Patch.Response
     >( {
       method,
-      body,
       reqBodyValidator: genAssertZod(EpisodeFileInfoCrudDtos.PatchOneById.bodySchema),
       parseResponse: genParseZod(
         createOneResultResponseSchema(EpisodeFileInfoDtos.schemaFullDto),

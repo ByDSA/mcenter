@@ -9,12 +9,12 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
-import { UserEntity, User } from "../../dto/user.dto";
+import { User, UserEntity } from "../../models";
 import { UserRoleOdm } from "../../roles/repository/odm";
 import { UserRoleMapOdm } from "../../roles/user-role/repository/odm";
 import { UserEvents } from "./events";
 import { UserOdm } from "./odm";
-import { AlreadyExistsEmail, isMongoErrorDupEmail } from "./errors";
+import { AlreadyExistsEmailException, isMongoErrorDupEmail } from "./errors";
 
 type Entity = UserEntity;
 type Model = User;
@@ -150,7 +150,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
       return UserOdm.toEntity(gotDoc);
     } catch (e) {
       if (isMongoErrorDupEmail(e))
-        throw new AlreadyExistsEmail();
+        throw new AlreadyExistsEmailException();
 
       throw e;
     }

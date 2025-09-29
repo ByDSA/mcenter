@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "importHelpers": false, // Para no necesitar tslib en producción
     "inlineSources": true,
+    "jsx": "react-jsx", // React
     "lib": ["dom", "es2024"],
     "module": "CommonJS",
     "moduleResolution": "node",
@@ -33,6 +34,17 @@
     "typeRoots": ["node_modules/@types"]
   },
   "exclude": ["node_modules"],
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+
+    // React
+    "src/**/*.tsx",
+    "tests/**/*.tsx",
+    "../shared/src/models/auth/tests/fixtures.ts",
+    "../shared/src/models/auth/user-pass-fixtures.ts",
+    "../shared/src/models/auth/local/utils.ts",
+    "../shared/src/models/auth/tests/utils.ts"
+  ],
   "types": ["node"]
 }

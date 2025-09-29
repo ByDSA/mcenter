@@ -1,5 +1,5 @@
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
-import { UserEntity } from "../../dto/user.dto";
+import { UserEntity } from "../../models";
 
 type Entity = UserEntity;
 export namespace UserEvents {

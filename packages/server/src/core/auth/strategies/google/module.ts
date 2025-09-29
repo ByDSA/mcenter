@@ -9,6 +9,6 @@ import { GoogleStrategy } from "./strategy";
   imports: [UsersModule, AuthModule],
   controllers: [GoogleController],
   providers: [AuthGoogleService, GoogleStrategy],
-  exports: [],
+  exports: [AuthGoogleService],
 } )
 export class AuthGoogleModule {}

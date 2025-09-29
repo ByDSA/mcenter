@@ -22,7 +22,6 @@ export class MusicPlaylistsApi {
       MusicPlaylistsApi.GetOne.Response
     >( {
       method: "GET",
-      body: undefined,
       parseResponse: genParseZod(
         MusicPlaylistsApi.GetOne.responseSchema,
       ) as (m: unknown)=> any,
@@ -44,7 +43,6 @@ export class MusicPlaylistsApi {
       MusicPlaylistsApi.GetOne.Response
     >( {
       method: "GET",
-      body: undefined,
       parseResponse: genParseZod(
         MusicPlaylistsApi.GetOne.responseSchema,
       ) as (m: unknown)=> any,
@@ -80,7 +78,6 @@ export class MusicPlaylistsApi {
       MusicPlaylistsApi.GetManyByCriteria.Response
     >( {
       method: "POST",
-      body,
       parseResponse: genParseZod(
         MusicPlaylistsApi.GetManyByCriteria.responseSchema,
       ) as (m: unknown)=> any,
@@ -103,7 +100,6 @@ export class MusicPlaylistsApi {
       MusicPlaylistsApi.GetManyByCriteria.Response
     >( {
       method: "POST",
-      body,
       parseResponse: genParseZod(
         MusicPlaylistsApi.GetManyByCriteria.responseSchema,
       ) as (m: unknown)=> any,
@@ -123,7 +119,6 @@ export class MusicPlaylistsApi {
       parseResponse: genParseZod(createOneResultResponseSchema(
         musicPlaylistEntitySchema,
       )) as (m: unknown)=> any,
-      body: undefined,
     } );
 
     return fetcher( {

@@ -8,6 +8,7 @@ const generatedConfigs = await generateConfigs( {
   [Dependencies.Eslint]: true,
   [Dependencies.Prettier]: true,
   [Dependencies.TypeScript]: true,
+  [Dependencies.React]: true,
   [Dependencies.Node]: true,
 } );
 const packageDir = path.join(import.meta.url, "..").slice("file:".length);

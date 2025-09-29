@@ -21,7 +21,6 @@ export class MusicsApi {
     const method = "PATCH";
     const fetcher = makeFetcher<MusicsApi.Patch.Body, MusicsApi.Patch.Response>( {
       method,
-      body,
       reqBodyValidator: genAssertZod(MusicCrudDtos.PatchOneById.bodySchema),
       parseResponse: genParseZod(
         createOneResultResponseSchema(musicEntitySchema),
@@ -44,7 +43,6 @@ export class MusicsApi {
       MusicsApi.GetManyByCriteria.Response
     >( {
       method,
-      body: criteria,
       reqBodyValidator: genAssertZod(MusicCrudDtos.GetMany.criteriaSchema),
       parseResponse: genParseZod(
         createPaginatedResultResponseSchema(musicEntitySchema),
@@ -65,7 +63,6 @@ export class MusicsApi {
       MusicsApi.DeleteOneById.Response
     >( {
       method,
-      body: undefined,
       parseResponse: genParseZod(
         createOneResultResponseSchema(musicEntitySchema.or(z.null())),
       ) as (m: unknown)=> any,

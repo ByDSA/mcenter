@@ -80,7 +80,7 @@ it("should emit Create Event", async () => {
     } as EpisodeCompKey,
   } ) as EpisodeEntity);
 
-  await testingSetup.db?.drop();
+  await testingSetup.db?.dropAll();
   await episodesRepo.createManyAndGet(models);
 
   expect(fn).toHaveBeenCalledTimes(models.length);

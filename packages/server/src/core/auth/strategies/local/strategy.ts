@@ -3,16 +3,16 @@ import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-local";
 import { ContextIdFactory, ModuleRef } from "@nestjs/core";
 import { Request } from "express";
-import { UserPayload } from "../jwt/payload/AppPayload";
+import { UserPayload } from "$shared/models/auth";
 import { AuthLocalService } from "./service";
-import { loginBodySchema } from "./dto/Login";
+import { localLoginBodySchema } from "./dto";
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly moduleRef: ModuleRef) {
     super( {
-      usernameField: loginBodySchema.keyof().enum.usernameOrEmail,
-      passwordField: loginBodySchema.keyof().enum.password,
+      usernameField: localLoginBodySchema.keyof().enum.usernameOrEmail,
+      passwordField: localLoginBodySchema.keyof().enum.password,
       passReqToCallback: true,
     } );
   }

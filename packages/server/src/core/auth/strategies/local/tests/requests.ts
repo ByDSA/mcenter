@@ -1,7 +1,7 @@
 import request, { Response } from "supertest";
 import { Application } from "express";
-import { LoginDto } from "../dto/Login";
-import { SignUpDto } from "../dto/SignUp";
+import { PATH_ROUTES } from "$sharedSrc/routing";
+import { LoginDto, SignUpDto } from "../dto";
 
 type CreateRequestProps = {
   routerApp: Application;
@@ -15,7 +15,7 @@ export type LoginRequestProps = {
 export const createLoginRequest = ( { routerApp }: CreateRequestProps)=> async ( { dto, agent =
 request(routerApp) }: LoginRequestProps): Promise<Response> =>{
   return await agent
-    .post("/auth/local/login")
+    .post(PATH_ROUTES.auth.local.login.path)
     .send(dto);
 };
 
@@ -27,6 +27,6 @@ export type SignUpRequestProps = {
 export const createSignUpRequest = ( { routerApp }: CreateRequestProps)=> async ( { dto, agent =
 request(routerApp) }: SignUpRequestProps): Promise<Response> => {
   return await agent
-    .post("/auth/local/signup")
+    .post(PATH_ROUTES.auth.local.signup.path)
     .send(dto);
 };

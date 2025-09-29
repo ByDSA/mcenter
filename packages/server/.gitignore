@@ -8,3 +8,5 @@
 coverage/
 /logs/
 /tests/logs/
+
+preview.html

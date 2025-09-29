@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { UserRole, UserRoleEntity } from "../../repository";
-import { parseUserRole } from "../../role";
+import { parseUserRole, UserRole, UserRoleEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
 type Entity = UserRoleEntity;

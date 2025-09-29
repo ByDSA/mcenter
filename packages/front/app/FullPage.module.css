@@ -1,0 +1,13 @@
+body:has(.main) {
+  display: flex;
+  flex-flow: column nowrap;
+
+  .main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column;
+    flex: 1;
+    overflow: hidden;
+  }
+}

@@ -1,11 +1,11 @@
 import { Application } from "express";
 import request, { Response } from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
+import { fixtureAuthLocal } from "$sharedSrc/models/auth/tests/auth-local-fixtures";
 import { createLoginRequest } from "../strategies/local/tests/requests";
-import { fixtureUsers } from "../users/tests/fixtures";
-import { fixtureAuthLocal } from "../strategies/local/tests/fixtures";
 import { WithAuthController } from "./with-auth.controller";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 describe("auth controller", () => {
   let testingSetup: TestingSetup;

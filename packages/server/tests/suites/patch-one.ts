@@ -3,7 +3,7 @@ import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
 import { assertFoundClient } from "#utils/validation/found";
 import { ExpectedBody, generateCase, GenerateCaseProps } from "./generate-case";
-import { defaultResponse, expectedDataNotFound } from "./common";
+import { defaultResponse, expectedDataNotFound, expectUnprocessableEntity } from "./common";
 
 type MockFn = NonNullable<GenerateCaseProps["mock"]>["fn"][0];
 export type PatchTestsProps<R> = {
@@ -95,7 +95,7 @@ export function patchOneTests<R>(
       url: validUrl,
       getExpressApp,
       expected: {
-        body: undefined,
+        expectBody: expectUnprocessableEntity,
         statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       },
     } );

@@ -30,7 +30,6 @@ T extends Entry<any, any>,
       const method = "POST";
       const fetcher = makeFetcher<ReqBody, ResBody>( {
         method,
-        body,
         parseResponse: parseResponse as (m: unknown)=> any,
       } );
       const result = await fetcher( {

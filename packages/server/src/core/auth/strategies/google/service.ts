@@ -1,10 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { Request } from "express";
 import z from "zod";
-import { UserEntityWithRoles, UserSignUpDto } from "#core/auth/users/dto/user.dto";
+import { User, UserEntityWithRoles } from "../../users/models";
+import { AppPayloadService } from "../jwt";
 import { UsersService } from "#core/auth/users";
 import { UsersRepository } from "#core/auth/users/crud/repository";
-import { AppPayloadService } from "../jwt";
+
+type SignUpResult = {
+  user: UserEntityWithRoles;
+  state: "created" | "nothing" | "verified";
+};
 
 const googleUserSchema = z.object( {
   email: z.string().email(),
@@ -14,14 +19,14 @@ const googleUserSchema = z.object( {
   accessToken: z.string(),
 } );
 
-type GoogleUser = z.infer<typeof googleUserSchema>;
+export type GoogleUser = z.infer<typeof googleUserSchema>;
 
 @Injectable()
 export class AuthGoogleService {
   constructor(
-    private readonly appPayloadService: AppPayloadService,
     private readonly usersService: UsersService,
     private readonly usersRepo: UsersRepository,
+    private readonly appPayloadService: AppPayloadService,
   ) { }
 
   async googleRedirect(req: Request) {
@@ -29,32 +34,54 @@ export class AuthGoogleService {
       return "No user from google";
 
     const googleUser = googleUserSchema.parse(req.user);
-    const { email } = googleUser;
-    let user = await this.usersRepo.getOneByEmail(email, {
-      expand: ["roles"],
-    } ) as UserEntityWithRoles | null;
+    const { user } = await this.signUpOrGet(googleUser);
 
-    if (!user)
-      user = await this.signUp(googleUser);
-
-    this.login(user);
+    this.appPayloadService.login(user);
 
     return user;
   }
 
-  private login(user: UserEntityWithRoles) {
-    this.appPayloadService.putUser(user);
-    this.appPayloadService.persist();
-  }
+  async signUpOrGet(googleUser: GoogleUser): Promise<SignUpResult> {
+    let state: SignUpResult["state"] = "nothing";
+    let userWithRoles = await this.usersRepo.getOneByEmail(googleUser.email, {
+      expand: ["roles"],
+    } ) as UserEntityWithRoles | null;
 
-  private async signUp(googleUser: GoogleUser): Promise<UserEntityWithRoles> {
-    const insertingUser: UserSignUpDto = {
-      email: googleUser.email,
-      firstName: googleUser.firstName,
-      lastName: googleUser.lastName,
-      publicName: `${googleUser.firstName} ${googleUser.lastName}`,
+    if (!userWithRoles) {
+      const insertingUser = googleUserToSignUpUser(googleUser);
+
+      userWithRoles = await this.usersService.signUp(insertingUser);
+      state = "created";
+    // Local auth unverificated:
+    } else if (!userWithRoles.emailVerified) {
+      const user = await this.usersRepo.patchOneByIdAndGet(
+        userWithRoles.id,
+        {
+          entity: googleUserToSignUpUser(googleUser),
+        },
+      );
+
+      userWithRoles = {
+        ...userWithRoles,
+        ...user,
+      };
+
+      state = "verified";
+    }
+
+    return {
+      user: userWithRoles,
+      state,
     };
-
-    return await this.usersService.signUp(insertingUser);
   }
+}
+
+function googleUserToSignUpUser(googleUser: GoogleUser): Omit<User, "roles"> {
+  return {
+    email: googleUser.email,
+    firstName: googleUser.firstName,
+    lastName: googleUser.lastName,
+    publicName: `${googleUser.firstName} ${googleUser.lastName}`,
+    emailVerified: true,
+  };
 }

@@ -31,7 +31,6 @@ export class MusicHistoryApi {
       MusicHistoryApi.GetManyByCriteria.Response
     >( {
       method: "POST",
-      body,
       parseResponse: genParseZod(
         MusicHistoryApi.GetManyByCriteria.responseSchema,
       ) as (m: unknown)=> any,
@@ -51,7 +50,6 @@ export class MusicHistoryApi {
       parseResponse: genParseZod(createOneResultResponseSchema(
         musicHistoryEntryEntitySchema,
       )) as (m: unknown)=> any,
-      body: undefined,
     } );
 
     return fetcher( {

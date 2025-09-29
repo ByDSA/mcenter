@@ -1,12 +1,30 @@
 import z from "zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import { userEntitySchema, UserEntityWithRoles } from "#core/auth/users/dto/user.dto";
+import { dateSchema } from "$shared/models/utils/schemas/timestamps/date";
+import { userEntitySchema, UserEntityWithRoles } from "../../../users/models";
 
+const counterSchema = z.number().int()
+  .positive();
 const schema = z.object( {
   userId: mongoDbId,
   username: z.string(),
-  password: z.string(),
-  createdAt: z.date(),
+  passwordHash: z.string(),
+  createdAt: dateSchema,
+
+  // Verificación
+  verificationToken: z.string().optional(), // Si es undefined, está verificada
+  verificationTokenExpiresAt: dateSchema.optional(),
+  lastVerificationEmailSentAt: dateSchema.optional(),
+  verificationEmailCount: counterSchema.optional(),
+
+  // Reset password rate limiting
+  lastResetEmailSentAt: dateSchema.optional(),
+  resetEmailCount: counterSchema.optional(),
+
+  // Login rate limiting (separado)
+  failedLoginAttempts: counterSchema.optional(),
+  lastFailedLoginAt: dateSchema.optional(),
+  lockedUntil: dateSchema.optional(),
 } );
 
 export type UserPass = z.infer<typeof schema>;

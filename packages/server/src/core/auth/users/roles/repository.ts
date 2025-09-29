@@ -1,23 +1,9 @@
-import z from "zod";
 import { Injectable } from "@nestjs/common";
-import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { CanGetOneById } from "#utils/layers/repository";
-import { UserRoleName } from "./role";
+import { UserRoleEntity, UserRoleName } from "../models";
 import { UserRoleOdm } from "./repository/odm";
 
 type Entity = UserRoleEntity;
-
-export const userRoleSchema = z.object( {
-  name: z.nativeEnum(UserRoleName),
-} );
-
-export type UserRole = z.infer<typeof userRoleSchema>;
-
-export const roleEntitySchema = userRoleSchema.extend( {
-  id: mongoDbId,
-} );
-
-export type UserRoleEntity = z.infer<typeof roleEntitySchema>;
 
 @Injectable()
 export class UserRolesRepository implements

@@ -1,21 +1,20 @@
-import type { LoginDto } from "./dto/Login";
-import type { SignUpDto } from "./dto/SignUp";
-import type { UserDto, UserEntityWithRoles } from "#core/auth/users/dto/user.dto";
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { compare } from "bcryptjs";
 import { assertIsDefined } from "$shared/utils/validation";
-import { UsersRepository } from "#core/auth/users/crud/repository";
-import { UsersService } from "#core/auth/users";
-import { AlreadyExistsEmail } from "#core/auth/users/crud/repository/errors";
+import { hashPassword } from "$shared/models/auth/local/utils";
 import { AppPayloadService } from "../jwt/payload/AppPayloadService";
-import { UserRoleName } from "../../users/roles/role";
-import { hashPassword } from "../../users/utils";
-import { UserPayload } from "../jwt/payload/AppPayload";
 import { type UserPass, UserPassesRepository } from "./user-pass";
 import { UserPassEntityWithUserWithRoles } from "./user-pass/userPass.entity";
+import { LoginDto, SignUpDto } from "./dto";
+import { LocalUserVerificationService } from "./verification.service";
+import { assertFoundClient } from "#utils/validation/found";
+import { User, UserEntityWithRoles, UserPayload } from "#core/auth/users/models";
+import { AlreadyExistsEmailException } from "#core/auth/users/crud/repository/errors";
+import { UsersService } from "#core/auth/users";
+import { UsersRepository } from "#core/auth/users/crud/repository";
 
 export enum SignUpStatus {
-  Success = "success",
+  EmailAlreadyExists = "email-already-exists",
   PendingEmail = "pending-email",
 }
 
@@ -31,61 +30,75 @@ export class AuthLocalService {
     private readonly usersService: UsersService,
     private readonly usersRepo: UsersRepository,
     private readonly appPayloadService: AppPayloadService,
+    private readonly verificationService: LocalUserVerificationService,
   ) {
   }
 
   async signUp(dto: SignUpDto): Promise<SignUpRet> {
-    const alreadyExists = await this.userPassRepo.getOneByUsername(dto.username);
-
-    if (alreadyExists)
-      throw new ConflictException("Username already exists");
-
-    const insertingUser: UserDto = {
-      email: dto.email,
-      roles: [UserRoleName.DEFAULT],
-      publicName: dto.username,
-    };
-
     try {
+      let currentUser = await this.userPassRepo.getOneByUsername(dto.username);
+
+      if (currentUser)
+        throw new ConflictException("Username already exists");
+
+      let currentUserPass = await this.usersRepo.getOneByEmail(dto.email);
+
+      if (currentUserPass)
+        throw new AlreadyExistsEmailException();
+
+      const insertingUser: Omit<User, "roles"> = {
+        email: dto.email,
+        publicName: dto.username,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        emailVerified: false,
+      };
       const insertedUser = await this.usersService.signUp(insertingUser);
 
       assertIsDefined(insertedUser);
       const insertingUserPass: UserPass = {
         userId: insertedUser.id,
-        password: await hashPassword(dto.password),
+        passwordHash: await hashPassword(dto.password),
         username: dto.username,
         createdAt: new Date(),
+        verificationToken: "will be generated",
       };
 
       await this.userPassRepo.createOneAndGet(insertingUserPass);
 
-      const userDto = insertedUser;
-
-      this.appPayloadService.putUser(userDto);
-      this.appPayloadService.persist();
-
       return {
-        user: userDto,
-        status: SignUpStatus.Success,
+        user: insertedUser,
+        status: SignUpStatus.PendingEmail,
       };
     } catch (e) {
-      if (e instanceof AlreadyExistsEmail) {
-        const user = (await this.usersRepo.getOneByEmail(dto.email))!;
-        const userId = user.id;
-        const existingUserPass = await this.userPassRepo.getOneByUserId(userId);
-
-        if (existingUserPass)
-          throw new ConflictException();
-
-        // TODO: comprobar la propiedad del email
+      if (e instanceof AlreadyExistsEmailException) {
         return {
-          status: SignUpStatus.PendingEmail,
+          status: SignUpStatus.EmailAlreadyExists,
           user: null,
         };
       }
 
       throw e;
     }
+  }
+
+  async requestNewToken(email: string) {
+    const user = await this.usersRepo.getOneByEmail(email);
+
+    assertFoundClient(user);
+
+    const userPass = await this.userPassRepo.getOneByUserId(user.id);
+
+    assertFoundClient(userPass);
+
+    if (!userPass.verificationToken)
+      throw new UnprocessableEntityException("Already verified email");
+
+    await this.verificationService.sendVerificationMail( {
+      mail: email,
+      userPass: userPass,
+      publicName: user.publicName ?? userPass.username,
+    } );
   }
 
   private async getUserPassByUsernameOrEmail(
@@ -135,26 +148,35 @@ export class AuthLocalService {
     const { usernameOrEmail, password } = dto;
     let userPass = await this.getUserPassByUsernameOrEmail(usernameOrEmail);
 
+    if (userPass?.verificationToken)
+      throw new UnprocessableEntityException("Email not verified");
+
     if (!userPass)
       return null;
 
-    const isValid = await compare(password, userPass.password);
+    const isValid = await compare(password, userPass.passwordHash);
 
     if (!isValid)
       return null;
 
-    this.appPayloadService.putUser(userPass.user);
-    this.appPayloadService.persist();
+    this.appPayloadService.login(userPass.user);
 
     return userPass.user;
   }
 
-  logout() {
-    this.appPayloadService.removeUser();
-    this.appPayloadService.persist();
-  }
+  async verifyEmail(token: string) {
+    const userPass = await this.userPassRepo.getOneByVerificationToken(token);
 
-  info(): UserPayload | null {
-    return this.appPayloadService.getUser();
+    if (!userPass)
+      throw new UnprocessableEntityException("Invalid token: " + token);
+
+    await this.userPassRepo.patchOneByIdAndGet(userPass.id, {
+      unset: [
+        ["verificationToken"],
+      ],
+      entity: {},
+    } );
+
+    return userPass;
   }
 }

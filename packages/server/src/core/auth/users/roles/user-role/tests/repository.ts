@@ -1,10 +1,10 @@
 /* eslint-disable require-await */
 import { Types } from "mongoose";
-import { assertIsDefined } from "$sharedSrc/utils/validation";
-import { CanCreateOneAndGet } from "#utils/layers/repository";
-import { fixtureUsers } from "#core/auth/users/tests/fixtures";
-import { UserEntity } from "#core/auth/users/dto/user.dto";
+import { assertIsDefined } from "$shared/utils/validation";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UserRoleMapEntity, UserRoleMap } from "../userRole.entity";
+import { UserEntity } from "../../../models";
+import { CanCreateOneAndGet } from "#utils/layers/repository";
 
 type Entity = UserRoleMapEntity;
 type Model = UserRoleMap;

@@ -1,8 +1,4 @@
 export {
-  AppPayload,
-} from "./payload/AppPayload";
-
-export {
   AppPayloadService,
 } from "./payload/AppPayloadService";
 

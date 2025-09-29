@@ -2,7 +2,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { HttpStatus } from "@nestjs/common";
 import { autoProps, PatchTestsProps } from "./patch-one";
 import { generateCase } from "./generate-case";
-import { defaultResponse } from "./common";
+import { defaultResponse, expectUnprocessableEntity } from "./common";
 
 function defaultProps<R>(props: PatchTestsProps<R>) {
   const validUrl = props.url ?? "/search";
@@ -57,7 +57,7 @@ export function getManyCriteriaTests<R>(props: PatchTestsProps<R>) {
       url: validUrl,
       getExpressApp,
       expected: {
-        body: undefined,
+        expectBody: expectUnprocessableEntity,
         statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       },
     } );

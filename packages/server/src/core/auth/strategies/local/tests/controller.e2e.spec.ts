@@ -1,12 +1,12 @@
 import request from "supertest";
 import { Application } from "express";
 import { HttpStatus } from "@nestjs/common";
+import { fixtureAuthLocal } from "$sharedSrc/models/auth/tests/auth-local-fixtures";
+import { AuthModule } from "../../../module";
+import { LoginDto, SignUpDto, localLoginResponseSchema, localSignUpResponseSchema } from "../dto";
+import { createLoginRequest, createSignUpRequest, LoginRequestProps } from "./requests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { deleteFixtureAuthUsers, loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
-import { AuthModule } from "../../../module";
-import { LoginDto, loginResponseSchema, signUpResponseSchema } from "../dto/Login";
-import { SignUpDto } from "../dto/SignUp";
-import { createLoginRequest, createSignUpRequest, LoginRequestProps } from "./requests";
 
 describe("controller", () => {
   let testingSetup: TestingSetup;
@@ -46,8 +46,8 @@ describe("controller", () => {
 
   async function correctLoginRequest(props?: Omit<LoginRequestProps, "dto">) {
     const dto: LoginDto = {
-      usernameOrEmail: "test",
-      password: "123456",
+      usernameOrEmail: fixtureAuthLocal.Normal.userPass.username,
+      password: fixtureAuthLocal.Normal.password,
     };
     const res = await loginRequest( {
       agent: props?.agent,
@@ -84,7 +84,7 @@ describe("controller", () => {
     } );
 
     it("should return valid login response schema for correct login", () => {
-      expect(() => loginResponseSchema.parse(res.body)).not.toThrow();
+      expect(() => localLoginResponseSchema.parse(res.body)).not.toThrow();
     } );
 
     it("should set auth cookie for correct login", () => {
@@ -140,7 +140,7 @@ describe("controller", () => {
     } );
 
     it("should return valid sign up response schema for correct sign up", () => {
-      expect(() => signUpResponseSchema.parse(res.body)).not.toThrow();
+      expect(() => localSignUpResponseSchema.parse(res.body)).not.toThrow();
     } );
 
     it("should set auth cookie after successful sign up", () => {

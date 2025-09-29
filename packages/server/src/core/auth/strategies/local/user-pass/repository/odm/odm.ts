@@ -7,8 +7,25 @@ export type DocOdm = {
   _id?: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   username: string;
-  password: string;
+  passwordHash: string;
   createdAt: Date;
+
+  // Verificación
+  verificationToken?: string; // Si es undefined, está verificada
+  verificationTokenExpiresAt?: Date;
+
+  // Rate limiting de EMAILS (no de login)
+  lastVerificationEmailSentAt?: Date;
+  verificationEmailCount?: number;
+
+  // Reset password rate limiting
+  lastResetEmailSentAt?: Date;
+  resetEmailCount?: number;
+
+  // Login rate limiting (separado)
+  failedLoginAttempts?: number;
+  lastFailedLoginAt?: Date;
+  lockedUntil?: Date;
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
@@ -24,7 +41,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     required: true,
     unique: true,
   },
-  password: {
+  passwordHash: {
     type: String,
     required: true,
   },
@@ -36,6 +53,42 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   createdAt: {
     type: Date,
     required: true,
+  },
+  verificationToken: {
+    type: String,
+    required: false,
+  },
+  verificationTokenExpiresAt: {
+    type: Date,
+    required: false,
+  },
+  lastVerificationEmailSentAt: {
+    type: Date,
+    required: false,
+  },
+  verificationEmailCount: {
+    type: Number,
+    required: false,
+  },
+  lastResetEmailSentAt: {
+    type: Date,
+    required: false,
+  },
+  resetEmailCount: {
+    type: Number,
+    required: false,
+  },
+  failedLoginAttempts: {
+    type: Number,
+    required: false,
+  },
+  lastFailedLoginAt: {
+    type: Date,
+    required: false,
+  },
+  lockedUntil: {
+    type: Date,
+    required: false,
   },
 } satisfies SchemaDef<DocOdm>, {
   collection: COLLECTION_NAME,

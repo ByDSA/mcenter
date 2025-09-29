@@ -16,6 +16,7 @@ interface PaletteOptions {
     range: [number, number]; // [min, max] - del menos saturado al más saturado
     easing: "ease-in-out" | "ease-in" | "ease-out" | "linear";
   };
+  convertToHex?: boolean;
 }
 
 class OKLCHColorGenerator {
@@ -154,8 +155,14 @@ class OKLCHColorGenerator {
       const l = Math.round(finalLightness * 100 * 100) / 100;
       const c = Math.round(finalChroma * 1000) / 1000;
       const h = config.hue;
+      let value: string;
 
-      palette[`--color-${config.name}-${level}`] = `oklch(${l}% ${c} ${h})`;
+      if (options.convertToHex)
+        value = oklchToHex(l / 100, c, h);
+      else
+        value = `oklch(${l}% ${c} ${h})`;
+
+      palette[`--color-${config.name}-${level}`] = value;
     } );
 
     return palette;
@@ -196,13 +203,13 @@ class OKLCHColorGenerator {
       css += vars.join("\n") + "\n";
     } );
 
-    css += this.generateSemanticAliases();
+    css += this.generateSemanticAliases(options);
     css += "}\n";
 
     return css;
   }
 
-  private generateSemanticAliases(): string {
+  private generateSemanticAliases(options?: Partial<PaletteOptions>): string {
     return `
     /* Semantic Aliases */
     --color-red: var(--color-red-500);
@@ -214,7 +221,7 @@ class OKLCHColorGenerator {
     --color-yellow-hover: var(--color-yellow-100);
     --color-orange: var(--color-orange-500);
     --color-blue: var(--color-blue-500);
-    --color-blue-hover: var(--color-blue-300);
+    --color-blue-hover: var(--color-blue-400);
     --color-purple: var(--color-purple-500);
 
 
@@ -249,28 +256,14 @@ class OKLCHColorGenerator {
   --color-error: var(--color-red-500);
   --color-info: var(--color-blue-500);
 
-  --color-black: #000000;
-  --color-white: #ffffff;
+  ${generateColorInterpolations(
+    "#FFFFFF",
+    "#000000",
+    [0, 25, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
+    options?.convertToHex,
+  ).join("\n  ")}
 
-  --color-gray-0: var(--color-white);
-  --color-gray-25: color-mix(in srgb, var(--color-white), var(--color-black) 2.5%);
-  --color-gray-50: color-mix(in srgb, var(--color-white), var(--color-black) 5%);
-  --color-gray-100: color-mix(in srgb, var(--color-white), var(--color-black) 10%);
-  --color-gray-200: color-mix(in srgb, var(--color-white), var(--color-black) 20%);
-  --color-gray-300: color-mix(in srgb, var(--color-white), var(--color-black) 30%);
-  --color-gray-400: color-mix(in srgb, var(--color-white), var(--color-black) 40%);
-  --color-gray-500: color-mix(in srgb, var(--color-white), var(--color-black) 50%);
-  --color-gray-600: color-mix(in srgb, var(--color-white), var(--color-black) 60%);
-  --color-gray-700: color-mix(in srgb, var(--color-white), var(--color-black) 70%);
-  --color-gray-800: color-mix(in srgb, var(--color-white), var(--color-black) 80%);
-  --color-gray-900: color-mix(in srgb, var(--color-white), var(--color-black) 90%);
-  --color-gray-1000: var(--color-black);
-
-  --color-surface: var(--color-gray-50);
-  --color-surface-dark: var(--color-gray-100);
   --color-border: var(--color-gray-200);
-  --color-text: var(--color-gray-900);
-  --color-text-muted: var(--color-gray-600);
 `;
   }
 
@@ -301,5 +294,147 @@ export function generateOKLCHPalette(options?: Partial<PaletteOptions>): string 
 if (typeof require !== "undefined" && require.main === module) {
   const generator = new OKLCHColorGenerator();
 
-  console.log(generator.generateCSS());
+  console.log(generator.generateCSS( {
+    convertToHex: true,
+  } ));
+}
+
+/**
+ * Convierte valores OKLCH a código HEX
+ * @param L Luminosidad (0-1)
+ * @param C Croma (0-0.4 aproximadamente)
+ * @param H Matiz en grados (0-360)
+ * @returns Código de color en formato HEX
+ */
+function oklchToHex(L: number, C: number, H: number): string {
+  // Convertir OKLCH a OKLAB
+  const hRad = (H * Math.PI) / 180;
+  const a = C * Math.cos(hRad);
+  const b = C * Math.sin(hRad);
+  // Convertir OKLAB a LMS usando las matrices correctas
+  const lPrime = L + 0.3963377774 * a + 0.2158037573 * b;
+  const mPrime = L - 0.1055613458 * a - 0.0638541728 * b;
+  const sPrime = L - 0.0894841775 * a - 1.2914855480 * b;
+  // Convertir LMS' a LMS (elevar al cubo)
+  const lLms = lPrime ** 3;
+  const mLms = mPrime ** 3;
+  const sLms = sPrime ** 3;
+  // Convertir LMS a RGB lineal usando la matriz correcta
+  const rLinear = +4.0767416621 * lLms - 3.3077115913 * mLms + 0.2309699292 * sLms;
+  const gLinear = -1.2684380046 * lLms + 2.6097574011 * mLms - 0.3413193965 * sLms;
+  const bLinear = -0.0041960863 * lLms - 0.7034186147 * mLms + 1.7076147010 * sLms;
+  // Convertir RGB lineal a sRGB (aplicar gamma)
+  const toSrgb = (c: number): number => {
+    if (c >= 0.0031308)
+      return 1.055 * c ** (1 / 2.4) - 0.055;
+    else
+      return 12.92 * c;
+  };
+  let r = toSrgb(rLinear);
+  let g = toSrgb(gLinear);
+  let bRgb = toSrgb(bLinear);
+
+  // Clamp valores entre 0 y 1
+  r = Math.max(0, Math.min(1, r));
+  g = Math.max(0, Math.min(1, g));
+  bRgb = Math.max(0, Math.min(1, bRgb));
+
+  // Convertir a 0-255 y luego a HEX
+  const rHex = Math.round(r * 255).toString(16)
+    .padStart(2, "0");
+  const gHex = Math.round(g * 255).toString(16)
+    .padStart(2, "0");
+  const bHex = Math.round(bRgb * 255).toString(16)
+    .padStart(2, "0");
+
+  return `#${rHex}${gHex}${bHex}`.toUpperCase();
+}
+
+function generateColorInterpolations(
+  whiteHex: string,
+  blackHex: string,
+  keys: number[],
+  convertToHex: boolean = false,
+): string[] {
+  const result: string[] = [];
+
+  // Generar las interpolaciones para cada key
+  keys.forEach(key => {
+    const percentage = keyToPercentage(key);
+    const colorValue = interpolateColors(whiteHex, blackHex, percentage, convertToHex);
+
+    result.push(`--color-gray-${key}: ${colorValue};`);
+  } );
+
+  return result;
+}
+
+// Función para convertir hex a RGB
+function hexToRgb(hex: string): { r: number;
+g: number;
+b: number; } {
+  const cleanHex = hex.replace("#", "");
+  const r = parseInt(cleanHex.substring(0, 2), 16);
+  const g = parseInt(cleanHex.substring(2, 4), 16);
+  const b = parseInt(cleanHex.substring(4, 6), 16);
+
+  return {
+    r,
+    g,
+    b,
+  };
+}
+
+// Función para convertir RGB a hex
+function rgbToHex(r: number, g: number, b: number): string {
+  const toHex = (n: number) => Math.round(n).toString(16)
+    .padStart(2, "0");
+
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+// Función para interpolar entre dos colores
+function interpolateColors(
+  white: string,
+  black: string,
+  percentage: number,
+  convertToHex: boolean,
+): string {
+  if (!convertToHex) {
+    // Usar color-mix CSS
+    if (percentage === 0)
+      return white;
+    else if (percentage === 100)
+      return black;
+    else
+      return `color-mix(in srgb, ${white}, ${black} ${percentage}%)`;
+  } else {
+    // Convertir a hex directamente
+    const whiteRgb = hexToRgb(white);
+    const blackRgb = hexToRgb(black);
+    const factor = percentage / 100;
+    const r = whiteRgb.r + (blackRgb.r - whiteRgb.r) * factor;
+    const g = whiteRgb.g + (blackRgb.g - whiteRgb.g) * factor;
+    const b = whiteRgb.b + (blackRgb.b - whiteRgb.b) * factor;
+
+    return rgbToHex(r, g, b);
+  }
+}
+
+// Función para convertir key a porcentaje
+function keyToPercentage(key: number): number {
+  if (key === 0)
+    return 0;
+
+  if (key === 1000)
+    return 100;
+
+  if (key === 25)
+    return 2.5;
+
+  if (key === 50)
+    return 5;
+
+  // Para el resto, dividir por 10 (100 -> 10%, 200 -> 20%, etc.)
+  return key / 10;
 }

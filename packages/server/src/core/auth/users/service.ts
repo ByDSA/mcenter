@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { UserRoleName } from "./roles/role";
-import { User, UserEntityWithRoles } from "./dto/user.dto";
+import { UserRoleName } from "./models";
+import { User, UserEntityWithRoles } from "./models";
 import { UserRolesRepository } from "./roles/repository";
 import { UsersRepository } from "./crud/repository";
 import { UserRoleMapRepository } from "./roles/user-role";
@@ -15,11 +15,12 @@ export class UsersService {
   ) {
   }
 
-  async signUp(userDto: User): Promise<UserEntityWithRoles> {
-    const user = await this.usersRepo.createOneAndGet(userDto);
+  async signUp(userCreateDto: Omit<User, "roles">): Promise<UserEntityWithRoles> {
+    // Se obtiene antes de crear el usuario por si falla, no secree el usuario
     const newRole = await this.rolesRepo.getOneByName(UserRoleName.DEFAULT);
 
     assertIsDefined(newRole);
+    const user = await this.usersRepo.createOneAndGet(userCreateDto);
 
     await this.userRoleMapRepo.createOneAndGet( {
       userId: user.id,

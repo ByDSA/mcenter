@@ -1,9 +1,9 @@
 /* eslint-disable require-await */
 import { Injectable } from "@nestjs/common";
 import { createMockClass } from "$sharedTests/jest/mocking";
-import { fixtureUsers } from "#core/auth/users/tests/fixtures";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UserRolesRepository } from "../../repository";
-import { UserRoleName } from "../../role";
+import { UserRoleName } from "../../../models";
 
 @Injectable()
 export class MockUserRolesRepository extends createMockClass(UserRolesRepository) {

@@ -2,6 +2,7 @@
 import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy, VerifyCallback } from "passport-google-oauth20";
+import { Request } from "express";
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
@@ -30,5 +31,16 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
     };
 
     done(null, user);
+  }
+
+  async authenticate(req: Request, options?: object) {
+    if (req.query.state) {
+      return super.authenticate(req, {
+        ...options,
+        state: req.query.state,
+      } );
+    }
+
+    return super.authenticate(req, options);
   }
 }

@@ -26,7 +26,6 @@ export class EpisodeHistoryApi {
     const schema = _GetMany.resSchema;
     const fetcher = makeFetcher<_GetMany.Req, _GetMany.Res>( {
       method: EpisodeHistoryApi.GetMany.method,
-      body,
       parseResponse: genParseZod(schema) as (m: unknown)=> _GetMany.Res,
     } );
 
@@ -43,7 +42,6 @@ export class EpisodeHistoryApi {
     const fetcher = makeFetcher<typeof undefined, _Delete.Response>( {
       method: _Delete.method,
       parseResponse: genParseZod(_Delete.responseSchema) as (m: unknown)=> any,
-      body: undefined,
     } );
 
     return fetcher( {

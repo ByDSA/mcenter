@@ -1,0 +1,23 @@
+.button {
+  width: 100%;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:disabled {
+    background-color: hsl(from var(--color-primary-500) h 50% l);
+    cursor: not-allowed;
+  }
+
+  &:hover:not(&:disabled) {
+    background-color: var(--color-primary-hover);
+  }
+}

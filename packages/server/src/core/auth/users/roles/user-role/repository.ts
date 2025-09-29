@@ -1,5 +1,5 @@
 import { CanCreateOneAndGet } from "#utils/layers/repository";
-import { UserEntity } from "../../dto/user.dto";
+import { UserEntity } from "../../models";
 import { UserRoleMapOdm } from "./repository/odm";
 import { UserRoleMap, UserRoleMapEntity } from "./userRole.entity";
 

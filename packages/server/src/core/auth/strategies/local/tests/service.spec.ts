@@ -1,4 +1,5 @@
 import { REQUEST } from "@nestjs/core";
+import { createMockClass } from "$sharedTests/jest/mocking";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { MockUsersRepository } from "#core/auth/users/tests/repository";
@@ -10,6 +11,7 @@ import { UserRolesRepository } from "#core/auth/users/roles/repository";
 import { MockUserRolesRepository } from "#core/auth/users/roles/repository/tests/repository";
 import { AuthLocalService } from "../service";
 import { UserPassesRepository } from "../user-pass";
+import { LocalUserVerificationService } from "../verification.service";
 import { MockUserPassRepository } from "./repository";
 
 describe("localValidationService", () => {
@@ -32,6 +34,10 @@ describe("localValidationService", () => {
       ],
       controllers: [],
       providers: [
+        {
+          provide: LocalUserVerificationService,
+          useClass: createMockClass(LocalUserVerificationService),
+        },
         AuthLocalService,
         UserPassesRepository,
         {

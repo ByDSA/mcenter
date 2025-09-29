@@ -11,17 +11,21 @@
     "test": "NODE_ENV=test jest",
     "test:coverage": "pnpm run test --coverage",
     "test:coverage:clean": "rm -rf coverage",
+    "test:e2e": "cd tests/e2e/bin && ./run.mjs",
     "test:watch": "pnpm run test --watch"
   },
   "dependencies": {
+    "bcryptjs": "3.0.2",
     "find-process": "1.4.7",
     "zod": "3.25.74"
   },
   "devDependencies": {
+    "@playwright/test": "1.55.1",
     "@types/express": "5.0.3",
     "@types/jest": "29.5.4",
     "@types/node": "22.14.1",
     "jest": "workspace:../node_modules/jest",
-    "mongodb": "6.18.0"
+    "mongodb": "6.18.0",
+    "mongoose": "7.5.0"
   }
 }

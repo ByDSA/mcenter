@@ -1,10 +1,9 @@
 /* eslint-disable require-await */
 import { Controller, Get } from "@nestjs/common";
-import { UserRoleName } from "../users/roles/role";
+import { UserPayload, UserRoleName } from "../users/models";
 import { GuestOnly } from "../users/GuestOnly.guard";
 import { User } from "../users/User.decorator";
 import { Roles } from "../users/roles/Roles.guard";
-import { UserPayload } from "../strategies/jwt/payload/AppPayload";
 import { Authenticated } from "../users/Authenticated.guard";
 
 @Controller("/")

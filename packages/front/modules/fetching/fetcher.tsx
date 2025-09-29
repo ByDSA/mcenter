@@ -1,3 +1,4 @@
+import { HttpError, HttpErrorUnauthorized } from "#modules/core/auth/requests";
 import { logger } from "#modules/core/logger";
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
@@ -8,15 +9,13 @@ type FetcherParams<ReqBody> = {
 export type Fetcher<ReqBody, ResBody> = (params: FetcherParams<ReqBody>)=> Promise<ResBody>;
 
 type MakeFetcherParams<ReqBody, ResBody> = {
-  body: ReqBody;
   method: Method;
   reqBodyValidator?: (data: ReqBody)=> void;
   parseResponse: (data: unknown)=> ResBody;
   errorMiddleware?: (error: any)=> void;
 };
 export function makeFetcher<ReqBody, ResBody>(
-  { body,
-    method,
+  { method,
     parseResponse,
     reqBodyValidator,
     errorMiddleware = (err)=> {
@@ -26,10 +25,10 @@ export function makeFetcher<ReqBody, ResBody>(
   const ret = async (params: FetcherParams<ReqBody>) => {
     reqBodyValidator?.(params.body);
 
-    const options = {
+    const options: RequestInit = {
       method,
-      cors: "no-cors",
-      body: JSON.stringify(body),
+      credentials: "include", // Para que devuelva la cookie de auth
+      body: JSON.stringify(params.body),
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
@@ -55,7 +54,12 @@ export function makeFetcher<ReqBody, ResBody>(
           throw new Error(text);
         }
 
-        throw new Error(JSON.stringify(json, null, 2));
+        const msg = JSON.stringify(json, null, 2);
+
+        if (res.status === 401)
+          throw new HttpErrorUnauthorized(msg);
+
+        throw new HttpError(res.status, msg);
       }
 
       const value = text ? JSON.parse(text) : undefined;

@@ -1,4 +1,6 @@
-const config = {
+import { JestConfigWithTsJest } from "ts-jest";
+
+const config: JestConfigWithTsJest = {
   moduleDirectories: ["node_modules", "src"],
   roots: ["<rootDir>/src", "<rootDir>/tests"],
   transform: {

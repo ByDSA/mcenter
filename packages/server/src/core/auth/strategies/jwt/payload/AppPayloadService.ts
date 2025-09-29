@@ -3,8 +3,8 @@ import { REQUEST } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { Request, Response } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
+import { AppPayload, UserEntityWithRoles, userEntityWithRolesSchema, UserPayload } from "$shared/models/auth";
 import { UsersRepository } from "#core/auth/users/crud/repository";
-import { AppPayload, UserPayload } from "./AppPayload";
 
 @Injectable( {
   scope: Scope.REQUEST,
@@ -35,38 +35,12 @@ export class AppPayloadService {
     response.cookie(AUTH_COOKIE_NAME, token);
   }
 
-  persist(): void {
+  private persist(): void {
     (this.request as any).auth = this.payload;
 
     const token = this.sign(this.payload);
 
     this.setAuthCookie(token);
-  }
-
-  getLastPage(): string {
-    const { payload } = this;
-
-    if (!payload)
-      return domainToBaseUrl();
-
-    return payload.lastPage;
-  }
-
-  putLastPageFromQuery() {
-    const redirectFullUrl: string | null = getFullUrlByQuery(this.request.query as Query);
-
-    if (redirectFullUrl) {
-      this.putLastPage(redirectFullUrl);
-
-      this.persist();
-    }
-  }
-
-  private putLastPage(lastPage: string): void {
-    this.payload = {
-      ...this.payload,
-      lastPage,
-    };
   }
 
   getUser(): UserPayload | null {
@@ -91,7 +65,19 @@ export class AppPayloadService {
     this.payload.user = updatedUser;
   }
 
-  putUser(user: UserPayload): void {
+  login(user: UserEntityWithRoles) {
+    const parsed = userEntityWithRolesSchema.parse(user);
+
+    this.putUser(parsed);
+    this.persist();
+  }
+
+  logout() {
+    this.removeUser();
+    this.persist();
+  }
+
+  private putUser(user: UserPayload): void {
     this.payload = {
       ...this.payload,
       user,
@@ -101,7 +87,6 @@ export class AppPayloadService {
   private generateEmptyPayload(): AppPayload {
     return {
       user: null,
-      lastPage: "/",
     };
   }
 
@@ -112,7 +97,7 @@ export class AppPayloadService {
     return token;
   }
 
-  removeUser(): void {
+  private removeUser(): void {
     this.payload = {
       ...this.payload,
       user: null,

@@ -36,7 +36,6 @@ export const fetch = (props: FetchProps) => {
   };
   const fetcher = makeFetcher<Req, Res>( {
     method,
-    body,
     reqBodyValidator: genAssertZod(reqSchema),
     parseResponse: genParseZod(resSchema),
   } );

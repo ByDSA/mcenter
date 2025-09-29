@@ -9,6 +9,7 @@ export type DocOdm = {
   publicName: string;
   firstName?: string;
   lastName?: string;
+  emailVerified: boolean;
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
@@ -36,6 +37,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   lastName: {
     type: String,
     required: false,
+  },
+  emailVerified: {
+    type: Boolean,
+    required: true,
   },
 } satisfies SchemaDef<DocOdm>, {
   collection: COLLECTION_NAME,

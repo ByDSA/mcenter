@@ -1,0 +1,271 @@
+.box {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 1rem 2rem;
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-gray-500);
+  font-size: 0.9rem;
+
+  .header {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 0.5rem;
+    text-align: center;
+    margin-bottom: 1.25rem;
+
+    h1 {
+      margin: 0;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-gray-800);
+      margin: 0 0 8px 0;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      margin: 0;
+    }
+  }
+}
+
+.loginForm {
+  margin-bottom: 24px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 0.5rem;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-flow: row nowrap;
+
+  --padding-left: 2.7rem;
+  --svg-color: var(--color-gray-400);
+
+  svg {
+    transform: scale(0.8);
+  }
+
+  .icon {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+    color: var(--svg-color);
+
+    &.iconLeft {
+      justify-content: center;
+      width: var(--padding-left);
+      height: 2.2rem;
+    }
+
+    &.iconRight {
+      right: 0.8rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 0;
+
+      &:hover {
+        --svg-color: var(--color-gray-600);
+      }
+    }
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.7rem 0.7rem 0.7rem var(--padding-left);
+    border: 2px solid var(--color-gray-100);
+    border-radius: 12px;
+    font-size: 1rem;
+    background: white;
+    box-sizing: border-box;
+
+    &:hover {
+      background-color: var(--color-gray-25);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-gray-300);
+    }
+    &.error {
+      border-color: var(--color-red);
+    }
+
+    &::placeholder {
+      color: var(--color-gray-300);
+    }
+  }
+}
+
+.forgotPassword {
+  text-align: right;
+  font-size: 0.8rem;
+}
+
+.loginButton {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+
+  &.loading {
+    cursor: wait;
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 32px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-gray-200);
+}
+
+.dividerText {
+  padding: 0 16px;
+}
+
+.socialLogin {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  --google-color: #ea4335;
+  --facebook-color: #1877f2;
+  --twitter-color: #1da1f2;
+  --github-color: #333;
+}
+
+.socialButton {
+  background-color: var(--color-gray-25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.8rem;
+  border: 2px solid var(--color-gray-100);
+  border-radius: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 1rem;
+
+  --color: #4a5568;
+
+  svg {
+    color: var(--color);
+  }
+
+  svg,
+  img {
+    position: absolute;
+    left: 4rem;
+  }
+
+  &:hover {
+    border-color: var(--color-gray-200);
+    background-color: var(--color-gray-100);
+  }
+}
+
+.googleButton {
+  --color: var(--google-color);
+}
+
+.facebookButton {
+  --color: var(--facebook-color);
+}
+
+.twitterButton {
+  --color: var(--twitter-color);
+}
+
+.githubButton {
+  --color: var(--github-color);
+}
+
+.signupPrompt {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .box {
+    padding: 24px;
+    margin: 16px;
+  }
+
+  .socialLogin {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .input {
+    padding: 0.5rem 0.5rem 0.5rem 2rem;
+  }
+
+  .iconLeft {
+    left: 14px;
+    font-size: 18px;
+  }
+
+  .iconRight {
+    right: 14px;
+    font-size: 18px;
+  }
+}
+
+.errors {
+  display: flex;
+  flex-flow: column nowrap;
+  color: var(--color-red);
+  min-height: 1.5rem;
+
+  > p {
+    display: flex;
+    align-items: center;
+
+    margin: 0;
+    padding: 0.25rem 0;
+    padding-left: 1rem;
+    font-size: 0.8rem;
+  }
+}

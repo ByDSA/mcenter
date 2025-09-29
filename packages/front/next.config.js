@@ -58,7 +58,6 @@ module.exports = {
   ...dev,
   output: "standalone",
   reactStrictMode: true,
-  swcMinify: true,
   eslint: {
     ignoreDuringBuilds: true,
   },

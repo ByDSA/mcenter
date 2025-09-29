@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext, InternalServerErrorException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { UserPayload } from "../strategies/jwt/payload/AppPayload";
 import { HAS_AUTHENTICATED_DECORATOR_KEY } from "./Authenticated.guard";
+import { UserPayload } from "./models";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const User = createParamDecorator((_data, ctx: ExecutionContext): UserPayload | null => {

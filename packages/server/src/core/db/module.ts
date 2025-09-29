@@ -7,7 +7,7 @@ import { Database } from "./database";
   providers: [
     Database,
   ],
-  exports: [],
+  exports: [Database],
 } )
 export class DatabaseModule implements OnModuleInit, OnModuleDestroy {
   constructor(

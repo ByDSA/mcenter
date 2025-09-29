@@ -1,0 +1,18 @@
+.topBar {
+  display: flex;
+  flex-flow: row;
+  gap: 1rem;
+  height: 1.5rem;
+  align-items: center;
+
+  > * {
+    height: 100% !important;
+  }
+}
+
+.searchButton {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 400;
+  padding: 0.7rem;
+}

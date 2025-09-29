@@ -1,5 +1,6 @@
 import { ResponseFormat } from "../models/resources";
 import { EpisodeCompKey } from "../models/episodes";
+import { GoogleState, googleStateSchema } from "../models/auth";
 import { PathRoutes } from "./routes.types";
 
 const TASKS = "/api/tasks";
@@ -21,6 +22,8 @@ const EPISODES_HISTORY = EPISODES + "/history";
 const EPISODES_FILE_INFO = EPISODES + "/file-info";
 const EPISODES_DEPENDENCIES = EPISODES + "/dependencies";
 const EPISODES_ADMIN = EPISODES + "/admin";
+const AUTH = "/api/auth";
+const AUTH_EMAIL_VERIFICATION = `${AUTH}/local/email-verification`;
 
 type MusicSlugQueryParams = {
   format?: ResponseFormat;
@@ -31,6 +34,73 @@ type YoutubeImportMusicOneOptions = {
 };
 
 export const PATH_ROUTES = {
+  tests: {
+    createOauthUser: {
+      path: "/tests/users/oauth/create",
+    },
+    loginOauthUser: {
+      path: "/tests/users/oauth/login",
+    },
+    verificationToken: {
+      get: {
+        withParams: (username: string)=>`/tests/users/local/verification-token?username=${username}`,
+      },
+    },
+    resetFixtures: {
+      path: "/tests/db/fixtures/reset",
+    },
+  },
+  auth: {
+    path: AUTH,
+    frontend: {
+      emailVerification: {
+        verify: {
+          withParams: (token: string) => `/auth/register/verify?token=${token}`,
+        },
+      },
+      login: {
+        path: "auth/login",
+      },
+      logout: {
+        path: "auth/logout",
+      },
+      register: {
+        path: "auth/register",
+      },
+    },
+    logout: {
+      path: `${AUTH}/logout`,
+    },
+    local: {
+      login: {
+        path: `${AUTH}/local/login`,
+      },
+      signup: {
+        path: `${AUTH}/local/signup`,
+      },
+      emailVerification: {
+        verify: {
+          path: `${AUTH_EMAIL_VERIFICATION}/verify`,
+        },
+        resend: {
+          path: `${AUTH_EMAIL_VERIFICATION}/resend`,
+        },
+      },
+    },
+    google: {
+      login: {
+        path: `${AUTH}/google`,
+        withParams: (
+          state: GoogleState,
+        ) => `${AUTH}/google?state=${encodeURIComponent(
+          JSON.stringify(googleStateSchema.parse(state)),
+        )}`,
+      },
+      redirect: {
+        path: `${AUTH}/google/redirect`,
+      },
+    },
+  },
   tasks: {
     path: TASKS,
     withParams: (id: string) => `${TASKS}/${id}`,

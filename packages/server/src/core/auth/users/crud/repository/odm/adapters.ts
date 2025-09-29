@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { User, UserEntity } from "#core/auth/users/dto/user.dto";
 import { UserRoleOdm } from "#core/auth/users/roles/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
+import { User, UserEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
 type Entity = UserEntity;
@@ -15,6 +15,7 @@ export function docOdmToModel(docOdm: DocOdm): Model {
     publicName: docOdm.publicName,
     firstName: docOdm.firstName,
     lastName: docOdm.lastName,
+    emailVerified: docOdm.emailVerified,
   } satisfies AllKeysOf<Model>;
 
   return removeUndefinedDeep(entity);
@@ -36,6 +37,7 @@ export function partialToDocOdm(model: Partial<Model>): MongoUpdateQuery<DocOdm>
     publicName: model.publicName,
     firstName: model.firstName,
     lastName: model.lastName,
+    emailVerified: model.emailVerified,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(docOdm);
@@ -47,6 +49,7 @@ export function modelToDocOdm(model: Model): DocOdm {
     publicName: model.publicName,
     firstName: model.firstName,
     lastName: model.lastName,
+    emailVerified: model.emailVerified,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(docOdm);

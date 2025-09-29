@@ -25,7 +25,6 @@ export class MusicFileInfosApi {
       MusicFileInfosApi.Patch.Response
     >( {
       method,
-      body,
       reqBodyValidator: genAssertZod(MusicFileInfoCrudDtos.PatchOneById.bodySchema),
       parseResponse: genParseZod(
         MusicFileInfoCrudDtos.PatchOneById.responseSchema,
@@ -49,7 +48,6 @@ export class MusicFileInfosApi {
       undefined
     >( {
       method,
-      body,
       parseResponse: genParseZod(z.undefined()),
     } );
     const URL = backendUrl(PATH_ROUTES.musics.fileInfo.withParams(id));
@@ -74,7 +72,6 @@ export class MusicFileInfosApi {
       MusicFileInfosApi.GetMany.Response
     >( {
       method,
-      body,
       reqBodyValidator: genAssertZod(MusicFileInfoCrudDtos.GetMany.criteriaSchema),
       parseResponse: genParseZod(
         MusicFileInfoCrudDtos.GetMany.responseSchema,

@@ -1,15 +1,8 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { DatabaseOptions } from "#core";
 import { TestRealDatabase } from "./test-real-database";
 
 export class TestMemoryDatabase extends TestRealDatabase {
   #mongoServer!: MongoMemoryServer;
-
-  constructor(options?: DatabaseOptions) {
-    super( {
-      ...options,
-    } );
-  }
 
   async connect() {
     this.#mongoServer = await MongoMemoryServer.create();

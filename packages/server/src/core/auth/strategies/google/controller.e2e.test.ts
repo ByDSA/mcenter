@@ -1,6 +1,7 @@
 import { Server } from "http";
 import { APIRequestContext, request } from "playwright";
 import { Application } from "express";
+import { PATH_ROUTES } from "$shared/routing";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 declare global {
@@ -54,7 +55,7 @@ describe("googleController", () => {
   } );
 
   it("should redirect to google login page", async () => {
-    const response = await global.apiRequest.get(`${baseURL}/api/auth/google`);
+    const response = await global.apiRequest.get(`${baseURL}${PATH_ROUTES.auth.google.login.path}`);
 
     expect(response.status()).toBe(200);
 
@@ -64,9 +65,12 @@ describe("googleController", () => {
   } );
 
   it("should show current OAuth config", async () => {
-    const response = await global.apiRequest.get(`${baseURL}/api/auth/google`, {
-      maxRedirects: 0,
-    } );
+    const response = await global.apiRequest.get(
+      `${baseURL}${PATH_ROUTES.auth.google.login.path}`,
+      {
+        maxRedirects: 0,
+      },
+    );
 
     expect(response.status()).toBe(302);
 
