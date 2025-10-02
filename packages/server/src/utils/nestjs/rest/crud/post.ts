@@ -2,6 +2,7 @@ import { applyDecorators, HttpCode, HttpStatus, Post, UseInterceptors } from "@n
 import z from "zod";
 import { createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
+import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
 import { ResponseFormatterInterceptor } from "../responses/response-formatter.interceptor";
 
 type PostOneOptions = {
@@ -9,6 +10,7 @@ type PostOneOptions = {
 };
 export function PostOne(url: string, schema: z.ZodSchema, _options?: PostOneOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
+    IsAdmin,
     Post(url),
     // los interceptors se ejecutan al revés:
     UseInterceptors(ResponseFormatterInterceptor),

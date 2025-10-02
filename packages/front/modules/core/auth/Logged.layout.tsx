@@ -2,11 +2,20 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { PATH_ROUTES } from "$shared/routing";
 import { Forbidden } from "../errors/403";
-import { UserRoleName } from "./models";
 import { getUser } from "./server";
+import { isUser } from "./utils";
 
 // eslint-disable-next-line import/no-default-export
 export default async function LoggedLayout( { children } ) {
+  const user = await guardLoggedUser();
+
+  if (!isUser(user))
+    return Forbidden();
+
+  return children;
+}
+
+export async function guardLoggedUser() {
   const user = await getUser();
 
   if (!user) {
@@ -19,8 +28,5 @@ export default async function LoggedLayout( { children } ) {
     } ));
   }
 
-  if (!user.roles.find(r=>r.name === UserRoleName.USER))
-    return Forbidden();
-
-  return children;
+  return user;
 }

@@ -1,26 +1,20 @@
-import { JSX } from "react";
+import { ReactNode } from "react";
 import { classes } from "#modules/utils/styles";
 import styles from "./style.module.css";
 
 type HeaderProps = {
-  time?: string;
-  date?: string;
+  left?: ReactNode;
   title: string;
   subtitle: string;
-  right?: JSX.Element;
+  right?: ReactNode;
 };
-export function Header( { time, date, title, subtitle, right }: HeaderProps) {
+export function Header( { left, title, subtitle, right }: HeaderProps) {
   return <span className={styles.container}>
-    <div className={styles.fullTime}>
-      {time && <span className={styles.time}>{time}</span>}
-
-      {date
-      && <span className={styles.date}>{date}</span> }
-    </div>
-    <span className={classes("center", "ellipsis")}>
+    {left && <aside>{left}</aside>}
+    <main className={classes("center", "ellipsis")}>
       <span className="ellipsis">{title}</span>
       <span className="ellipsis">{subtitle}</span>
-    </span>
-    { right && <span className={styles.item}>{right}</span> }
+    </main>
+    { right && <aside>{right}</aside> }
   </span>;
 }

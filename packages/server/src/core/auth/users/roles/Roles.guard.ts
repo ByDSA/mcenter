@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { applyDecorators, CanActivate, ExecutionContext, Injectable, SetMetadata, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { UserPayload } from "../models";
+import { UserPayload, UserRoleName } from "../models";
 
 const ROLES_KEY = "roles";
 
@@ -25,15 +26,20 @@ export class RolesGuard implements CanActivate {
     return user.roles.some((role) => requiredRoles.includes(role.name));
   }
 
-  private getRolesFromDecorator(context: ExecutionContext): string[] {
-    const roles = this.reflector.get<string[]>(ROLES_KEY, context.getHandler());
+  private getRolesFromDecorator(context: ExecutionContext): UserRoleName[] {
+  // getAllAndMerge combina los roles del controller y del handler
+    const roles = this.reflector.getAllAndMerge<UserRoleName[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-    return roles;
+    return roles || [];
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const Roles = (...roles: string[]) => applyDecorators(
+export const Roles = (...roles: UserRoleName[]) => applyDecorators(
   SetMetadata(ROLES_KEY, roles),
   UseGuards(RolesGuard),
 );
+
+export const IsAdmin = () => Roles(UserRoleName.ADMIN);

@@ -5,12 +5,12 @@ import { formatDate } from "#modules/utils/dates";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { classes } from "#modules/utils/styles";
+import styles from "../musics/styles.module.css";
 import { MusicHistoryApi } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 
 import "#styles/resources/resource-list-entry.css";
-import "#styles/resources/resource-list-musics.css";
-import "#styles/resources/music.css";
 
 type Props = {
   showDate?: "eachOne" | "groupByDay" | "none";
@@ -31,7 +31,7 @@ export function HistoryList(props?: Props) {
     error,
     isLoading,
     render: () => (
-      <span className="resource-list">
+      <span className={classes("resource-list", styles.list)}>
         {
           data!.map(
             (entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>

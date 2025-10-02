@@ -106,10 +106,6 @@
     line-height: 1em;
     margin-left: 0.5em;
 
-    &:hover {
-      color: var(--color-red-hover);
-    }
-
     &,
     svg {
       width: 1rem;
@@ -140,7 +136,6 @@
 
     &:hover {
       text-decoration: none;
-      color: var(--color-green-hover);
     }
   }
 }
@@ -160,15 +155,12 @@
     accent-color: var(--color-primary);
   }
 
-  input[type="checkbox"]:hover {
-    accent-color: var(--color-primary-hover);
-  }
   label {
-    color: var(--color-black);
+    color: inherit;
   }
 
   input[type="checkbox"]:hover ~ label {
-    color: var(--color-primary-800);
+    color: inherit;
   }
 
   input[type="checkbox"],

@@ -9,3 +9,5 @@ export {
 export {
   Lastest as LatestHistoryEntries,
 } from "./entry/Latest";
+
+export * from "./utils";

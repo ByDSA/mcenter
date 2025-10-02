@@ -42,21 +42,28 @@ export function parseZod<T extends ZodTypeAny>(
   model: unknown,
   settings?: AssertZodSettings,
 ): z.output<T> {
-  if (settings?.useZodError) {
+  if (settings?.useZodError)
     schema.parse(model);
 
-    return;
+  try {
+    const result = schema.safeParse(model);
+
+    if (!result.success) {
+      const error = CustomValidationError.fromZodError(result.error, model, settings?.msg);
+
+      throwErrorPopStack(error);
+    }
+
+    return result.data;
+  } catch (e) {
+    // Porque el double mounting de React a veces da en el primer mount
+    // un schema inválido
+    if (e instanceof Error
+        && e.message === "Cannot read properties of undefined (reading '_parseSync')")
+      return model as T;
+
+    throwErrorPopStack(e as Error);
   }
-
-  const result = schema.safeParse(model);
-
-  if (!result.success) {
-    const error = CustomValidationError.fromZodError(result.error, model, settings?.msg);
-
-    throwErrorPopStack(error);
-  }
-
-  return result.data;
 }
 
 export function genParseZod<T>(
@@ -81,14 +88,8 @@ export function parseZodPopStack<T>(
   try {
     return parseZod(schema, model, settings);
   } catch (e) {
-    if (e instanceof Error) {
-      // Porque el double mounting de React a veces da en el primer mount
-      // un schema inválido
-      if (e.message === "Cannot read properties of undefined (reading '_parseSync')")
-        return model as T;
-
+    if (e instanceof Error)
       throwErrorPopStack(e, 2);
-    }
 
     throw e;
   }

@@ -1,8 +1,8 @@
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
-import { ReactRenderService, TemplateProps } from "./render.service";
 import { APP_CONFIG, ConfigOdm } from "#core/config";
 import { isDev } from "#utils";
+import { ReactRenderService, TemplateProps } from "./render.service";
 
 type SendProps<T> = {
   subject: string;

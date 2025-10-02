@@ -2,20 +2,39 @@
   display: flex;
   column-gap: 1rem;
 
-  .fullTime {
+  aside {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .time {
+    flex-flow: column nowrap;
+    gap: 0.3rem;
+    font-size: 1rem;
+    > * {
       display: flex;
-      font-size: 1rem;
-    }
-
-    .date {
-      display: flex;
+      flex-flow: row nowrap;
       align-items: center;
-      font-size: 0.67rem;
+
+      svg {
+        transform: scale(0.7);
+      }
+
+      * {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  :global(aside):first-of-type {
+    justify-content: start;
+
+    > * {
+      justify-content: start;
+    }
+  }
+
+  :global(aside):last-of-type {
+    justify-content: end;
+
+    > * {
+      justify-content: end;
     }
   }
 }

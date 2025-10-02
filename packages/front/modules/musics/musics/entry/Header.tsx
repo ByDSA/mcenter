@@ -1,8 +1,5 @@
-import { MusicEntity } from "$shared/models/musics";
-import { isDefined } from "$shared/utils/validation";
-import { HistoryEntryHeader } from "#modules/history";
-import { secsToMmss } from "#modules/utils/dates";
-import styles from "./Header.module.css";
+import { Music, MusicEntity } from "$shared/models/musics";
+import { createDurationElement, HistoryEntryHeader } from "#modules/history";
 
 type HeaderProps = {
   entry: MusicEntity;
@@ -10,15 +7,16 @@ type HeaderProps = {
 export function Header( { entry }: HeaderProps) {
   const resource = entry;
   const { title } = resource;
-  const subtitle = resource.game ?? resource.artist;
   const duration = resource.fileInfos?.[0]?.mediaInfo.duration;
-  const right = <span className={styles.right}>{isDefined(duration) ? <span>{secsToMmss(duration)}</span> : null}</span>;
 
   return HistoryEntryHeader( {
-    time: undefined,
-    date: undefined,
+    left: undefined,
+    right: duration && createDurationElement(duration),
     title,
-    subtitle,
-    right,
+    subtitle: createMusicSubtitle(resource),
   } );
+}
+
+export function createMusicSubtitle(resource: Music) {
+  return resource.game ?? resource.artist;
 }

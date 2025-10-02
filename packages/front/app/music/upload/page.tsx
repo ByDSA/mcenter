@@ -14,8 +14,6 @@ import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 
 import "#styles/resources/resource-list-entry.css";
-import "#styles/resources/resource-list-musics.css";
-import "#styles/resources/music.css";
 
 export default function Upload() {
   const [uploaded, setUploaded] = useState<MusicEntity[]>([]);

@@ -24,6 +24,7 @@ const EPISODES_DEPENDENCIES = EPISODES + "/dependencies";
 const EPISODES_ADMIN = EPISODES + "/admin";
 const AUTH = "/api/auth";
 const AUTH_EMAIL_VERIFICATION = `${AUTH}/local/email-verification`;
+const AUTH_EMAIL_VERIFICATION_FRONT = "/auth/register/verify";
 
 type MusicSlugQueryParams = {
   format?: ResponseFormat;
@@ -43,6 +44,7 @@ export const PATH_ROUTES = {
     },
     verificationToken: {
       get: {
+        path: "/tests/users/local/verification-token",
         withParams: (username: string)=>`/tests/users/local/verification-token?username=${username}`,
       },
     },
@@ -55,21 +57,25 @@ export const PATH_ROUTES = {
     frontend: {
       emailVerification: {
         verify: {
-          withParams: (token: string) => `/auth/register/verify?token=${token}`,
+          path: AUTH_EMAIL_VERIFICATION_FRONT,
+          withParams: (token: string) => `${AUTH_EMAIL_VERIFICATION_FRONT}?token=${token}`,
         },
       },
       login: {
-        path: "auth/login",
-        withParams: ( { redirect }: {redirect: string} ) => "/auth/login?redirect=" + encodeURI(redirect),
+        path: "/auth/login",
+        withParams: ( { redirect }: {redirect: string} ) => `/auth/login?redirect=${encodeURI(redirect)}`,
       },
       logout: {
-        path: "auth/logout",
+        path: "/auth/logout",
       },
       register: {
-        path: "auth/register",
+        path: "/auth/register",
         done: {
-          path: "auth/register/done",
+          path: "/auth/register/done",
         },
+      },
+      userPage: {
+        path: "/user",
       },
     },
     logout: {

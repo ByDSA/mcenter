@@ -1,3 +1,5 @@
+/* eslint-disable no-empty-function */
+/* eslint-disable func-names */
 import { Server } from "node:http";
 import { APP_GUARD, HttpAdapterHost } from "@nestjs/core";
 import { ArgumentMetadata, INestApplication, Injectable, OnModuleInit, PipeTransform, Logger, Provider } from "@nestjs/common";
@@ -7,13 +9,15 @@ import { ZodSerializerInterceptor, ZodValidationException, ZodValidationPipe } f
 import { assertIsDefined } from "$shared/utils/validation";
 import { CustomValidationError } from "$shared/utils/validation/zod";
 import cookieParser from "cookie-parser";
+import { isDebugging } from "$shared/utils/vscode";
+import { LoggingInterceptor } from "../logging/interceptor";
+import { Cleanup } from "./clean-up.service";
 import { RemotePlayerWebSocketsServerService, VlcBackWebSocketsServerService } from "#modules/player";
 import { ZodSerializerSchemaInterceptor } from "#utils/validation/zod-nestjs";
 import { setupEventEmitterDecorators } from "#core/domain-event-emitter/get-event-emitter";
 import { GlobalExceptionFilter } from "#core/error-handlers/http-error-handler";
 import { OptionalJwtGuard } from "#core/auth/strategies/jwt/AuthCookieJwt.guard";
-import { LoggingInterceptor } from "../logging/interceptor";
-import { Cleanup } from "./clean-up.service";
+import { isTest } from "#utils";
 
 @Injectable()
 export class InitService implements OnModuleInit {
@@ -44,9 +48,18 @@ export class InitService implements OnModuleInit {
 export function addGlobalConfigToApp(app: INestApplication) {
   Cleanup.register(app);
 
-  const logger = app.get(Logger);
+  const logger: Logger = app.get(Logger);
 
   app.useLogger(logger);
+
+  if (isTest() && !isDebugging()) {
+    Logger.prototype.log = function () {};
+    Logger.prototype.error = function () {};
+    Logger.prototype.warn = function () {};
+    Logger.prototype.debug = function () {};
+    Logger.prototype.verbose = function () {};
+  }
+
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.use(helmet());
   app.enableShutdownHooks(); // Para que se llame onModuleDestroy de services

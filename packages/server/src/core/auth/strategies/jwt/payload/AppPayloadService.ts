@@ -1,10 +1,10 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
-import { JwtService } from "@nestjs/jwt";
 import { Request, Response } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
 import { AppPayload, UserEntityWithRoles, userEntityWithRolesSchema, UserPayload } from "$shared/models/auth";
 import { UsersRepository } from "#core/auth/users/crud/repository";
+import { AppPayloadEncoderService } from "./AppPayloadEncoderService";
 
 @Injectable( {
   scope: Scope.REQUEST,
@@ -14,7 +14,7 @@ export class AppPayloadService {
 
   constructor(
     @Inject(REQUEST) private readonly request: Request,
-    private readonly jwtService: JwtService,
+    private readonly encoder: AppPayloadEncoderService,
     private readonly usersRepo: UsersRepository,
   ) {
     assertIsDefined(this.request);
@@ -38,7 +38,7 @@ export class AppPayloadService {
   private persist(): void {
     (this.request as any).auth = this.payload;
 
-    const token = this.sign(this.payload);
+    const token = this.encoder.sign(this.payload);
 
     this.setAuthCookie(token);
   }
@@ -90,13 +90,6 @@ export class AppPayloadService {
     };
   }
 
-  private sign(payload: AppPayload): string {
-    const { exp, iat, ...payloadWithoutExp } = payload;
-    const token = this.jwtService.sign(payloadWithoutExp);
-
-    return token;
-  }
-
   private removeUser(): void {
     this.payload = {
       ...this.payload,
@@ -120,16 +113,7 @@ export class AppPayloadService {
     if (!jwtToken)
       return null;
 
-    try {
-      this.jwtService.verify(jwtToken);
-    } catch {
-      return null;
-    }
-    const json = this.jwtService.decode(jwtToken, {
-      json: true,
-    } ) as AppPayload;
-
-    return json;
+    return this.encoder.decode(jwtToken);
   }
 
   private getTokenFromCookie(): string | null {

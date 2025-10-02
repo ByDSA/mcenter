@@ -4,7 +4,7 @@
   padding: 16px;
   margin-bottom: 12px;
   color: var(--color-gray-800);
-  background-color: var(--color-white);
+  background-color: var(--color-gray-0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.2s ease;
   border-left: 4px solid var(--border-left-color);

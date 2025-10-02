@@ -24,7 +24,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!id)
       throw new UnauthorizedException();
 
-    const user = await this.usersService.getOneById(id);
+    const user = await this.usersService.getOneById(id, {
+      expand: ["roles"],
+    } );
 
     (req as any).auth = {
       ...payload,

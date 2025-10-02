@@ -7,13 +7,12 @@ import { Body } from "./body/Body";
 type Props = {
   value: EpisodeHistoryApi.GetMany.Data;
   setValue: ReturnType<typeof useState<EpisodeHistoryApi.GetMany.Data>>[1];
-  showDate?: boolean;
 };
-export function HistoryEntryElement( { value, setValue, showDate = false }: Props) {
+export function HistoryEntryElement( { value, setValue }: Props) {
   return <span className="resource-list-entry">
     {
       ResourceAccordion( {
-        headerContent: <Header entry={value} showDate={showDate}/>,
+        headerContent: <Header entry={value}/>,
         bodyContent: <Body data={value} setData={setValue}/>,
       } )
     }

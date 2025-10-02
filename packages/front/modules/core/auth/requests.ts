@@ -1,6 +1,6 @@
 import { STATUS_CODES } from "node:http";
 import { PATH_ROUTES } from "$shared/routing";
-import { LocalLoginBody, localLoginBodySchema, localLoginResponseSchema, LocalSignUpBody, localSignUpBodySchema } from "$shared/models/auth/local/dto";
+import { LocalLoginBody, localLoginBodySchema, localLoginResponseSchema, LocalSignUpBody, localSignUpBodySchema } from "$shared/models/auth/dto";
 import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { backendUrl } from "#modules/requests";

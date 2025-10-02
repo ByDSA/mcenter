@@ -1,20 +1,12 @@
 .deleteButton {
   a {
     color: var(--color-red);
-
-    &:hover {
-      color: var(--color-red-300);
-    }
   }
 }
 
 .resetButton {
   a {
-    color: var(--color-gray-900);
-
-    &:hover {
-      color: var(--color-gray-600);
-    }
+    color: var(--color-gray-50);
   }
 }
 
@@ -29,10 +21,6 @@
 .updateButton {
   a {
     color: var(--color-green-600);
-
-    &:hover {
-      color: var(--color-green-500);
-    }
   }
 }
 

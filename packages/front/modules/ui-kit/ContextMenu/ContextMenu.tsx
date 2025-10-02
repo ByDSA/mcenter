@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useRef, useEffect, ReactNode, MouseEvent, useCallback } from "react";
-import styles from "./styles.module.css";
+import { classes } from "#modules/utils/styles";
+import styles from "./ContextMenu.module.css";
 
 // Types
 type Position = {
@@ -13,10 +14,12 @@ type ContextMenuProps = {
   position: Position;
   onClose: ()=> void;
   children: ReactNode;
+  className?: string;
 };
 
 type UseContextMenuProps<T> = {
   renderChildren: (value: T)=> ReactNode;
+  className?: string;
 };
 
 // Función para calcular la posición inteligente
@@ -62,6 +65,7 @@ const ContextMenu = ( { isOpen,
   position,
   onClose,
   children,
+  className,
   menuRef }: ContextMenuProps & { menuRef?: React.RefObject<HTMLDivElement> } ) => {
   const internalRef = useRef<HTMLDivElement>(null);
   const ref = menuRef || internalRef;
@@ -93,7 +97,7 @@ const ContextMenu = ( { isOpen,
   return (
     <div
       ref={ref}
-      className={`${styles.contextMenu} ${isOpen ? styles.open : ""}`}
+      className={classes(styles.contextMenu, className, isOpen && styles.open)}
       style={{
         top: position.y,
         left: position.x,
@@ -141,7 +145,7 @@ export const useListContextMenu = <T, >(config: UseContextMenuProps<T>) => {
 };
 
 export const useContextMenu = <T, >(config: UseContextMenuProps<T>) => {
-  const { renderChildren } = config;
+  const { renderChildren, className } = config;
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [position, setPosition] = useState<Position>( {
@@ -245,6 +249,7 @@ export const useContextMenu = <T, >(config: UseContextMenuProps<T>) => {
 
   return {
     renderContextMenu: (value: T) =><ContextMenu
+      className={className}
       isOpen={isOpen}
       position={position}
       onClose={closeMenu}

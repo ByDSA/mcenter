@@ -1,6 +1,6 @@
 import z from "zod";
-import { createOneResultResponseSchema } from "../../../../utils/http/responses";
-import { userEntityWithRolesSchema } from "../..";
+import { createOneResultResponseSchema } from "../../../utils/http/responses";
+import { userEntityWithRolesSchema } from "..";
 
 const schema = z.object( {
   firstName: z.string().optional(),
@@ -19,6 +19,6 @@ type Response = z.infer<typeof responseSchema>;
 export {
   schema as localSignUpBodySchema,
   LocalSignUpBody,
-  responseSchema as localSignUpResponseSchema,
-  Response as LocalSignUpResponse,
+  responseSchema as oauthSignUpResponseSchema,
+  Response as OauthSignUpResponse,
 };

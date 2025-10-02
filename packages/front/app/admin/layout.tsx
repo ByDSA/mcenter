@@ -1,24 +1,31 @@
 import { PageContainer } from "app/PageContainer";
-import { makeMenu } from "#modules/menus";
+import AdminLayout from "#modules/core/auth/Admin.layout";
+import { TabsContainer } from "app/TabsContainer";
 
 import "./page.css";
 
-export default function AdminLayout( { children }: {
+export default function AdminSectionLayout( { children }: {
   children: React.ReactNode;
 } ) {
-  const submenu = makeMenu( {
-    "/admin/": "Do tasks",
-    "/admin/task-manager": "Task Manager",
-  }, {
-    type: "sub",
-  } );
+  const data = [
+    {
+      path: "/admin/",
+      label: "Do tasks",
+    },
+    {
+      path: "/admin/task-manager",
+      label: "Task Manager",
+    },
+  ];
 
-  return (
-    <>
-      {submenu}
-      <PageContainer>
-        <h1>Admin</h1>
-        {children}
-      </PageContainer>
-    </>);
+  return AdminLayout( {
+    children: <>
+      <TabsContainer data={data}>
+        <PageContainer>
+          <h1>Admin</h1>
+          {children}
+        </PageContainer>
+      </TabsContainer>
+    </>,
+  } );
 }

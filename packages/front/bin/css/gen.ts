@@ -21,7 +21,9 @@ interface PaletteOptions {
 
 class OKLCHColorGenerator {
   private defaultOptions: PaletteOptions = {
-    levels: [25, 50, 100, 150, 200, 300, 400, 500, 550, 600, 700, 750, 800, 900],
+    levels: [25, 50, 100, 150, 200, 250,
+      300, 350, 400, 500, 550, 600, 650,
+      700, 750, 800, 850, 900, 950, 975],
     lightness: {
       range: [0, 1],
       base: 0.7, // Base en 500
@@ -259,7 +261,7 @@ class OKLCHColorGenerator {
   ${generateColorInterpolations(
     "#FFFFFF",
     "#000000",
-    [0, 25, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
+    [0, 25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 850, 900, 925, 950, 975, 1000],
     options?.convertToHex,
   ).join("\n  ")}
 

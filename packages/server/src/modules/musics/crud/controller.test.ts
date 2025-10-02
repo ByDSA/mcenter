@@ -19,6 +19,10 @@ crudTestsSuite( {
       providers: [
         musicsRepoMockProvider,
       ],
+    }, {
+      auth: {
+        using: "mock",
+      },
     }],
   repositoryClass: MusicsRepository,
   testsConfig: {
@@ -29,6 +33,10 @@ crudTestsSuite( {
       },
     },
     patchOne: {
+      auth: {
+        admin: true,
+        user: false,
+      },
       repo: {
         getFn: (repo)=>repo.patchOneByIdAndGet,
         params: ["id", {

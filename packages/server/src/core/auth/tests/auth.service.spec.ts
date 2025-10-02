@@ -3,9 +3,9 @@ import request, { Response } from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { fixtureAuthLocal } from "$sharedSrc/models/auth/tests/auth-local-fixtures";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { createLoginRequest } from "../strategies/local/tests/requests";
 import { WithAuthController } from "./with-auth.controller";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 
 describe("auth controller", () => {
   let testingSetup: TestingSetup;

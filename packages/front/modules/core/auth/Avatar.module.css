@@ -1,0 +1,36 @@
+.contextMenu {
+  font-weight: normal;
+}
+
+.userAvatarButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--color-green-500),
+    var(--color-green-700)
+  );
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  &:hover,
+  &.open {
+    background: linear-gradient(
+      135deg,
+      var(--color-green-600),
+      var(--color-green-800)
+    );
+  }
+}
+
+.userIcon {
+  width: 20px;
+  height: 20px;
+  color: white;
+}

@@ -1,4 +1,4 @@
-import { CheckBox, DeleteForever, Undo } from "@mui/icons-material";
+import { DeleteForever, SaveAs, Undo } from "@mui/icons-material";
 import { LinkAsyncAction } from "#modules/ui-kit/input/LinkAsyncAction";
 import { classes } from "#modules/utils/styles";
 import { Spinner } from "#modules/ui-kit/spinner";
@@ -27,7 +27,7 @@ export const UpdateResource = ( { className, action, isDoing,
       spinnerSide={spinnerSide ?? "right"}
       title="Actualizar"
       disabled={disabled}
-    ><CheckBox /></LinkAsyncAction>
+    ><SaveAs /></LinkAsyncAction>
   }</span>
 );
 

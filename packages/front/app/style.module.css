@@ -7,29 +7,29 @@
 }
 
 .container .title .titlePart1 {
-  color: var(--color-green-600);
+  color: var(--color-green-400);
 }
 
 .container .title .titlePart2 {
-  color: var(--color-orange-600);
+  color: var(--color-orange-400);
 }
 
 .container .stamp {
   .version {
-    color: var(--color-red-700);
+    color: var(--color-red-300);
     line-height: 1;
     font-size: 1.5rem;
     margin-bottom: 0;
   }
   .date {
     margin-top: 0;
-    color: var(--color-primary-800);
+    color: var(--color-primary-200);
     font-size: 0.75rem;
   }
 }
 
 .title a {
-  color: var(--color-primary);
+  color: var(--color-blue-300);
   text-decoration: none;
 }
 

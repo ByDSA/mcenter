@@ -1,13 +1,11 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { HistoryEntryHeader } from "#modules/history";
-import { formatDateDDMMYYY, formatDateHHmm } from "#modules/utils/dates";
+import { createHistoryTimeElement, HistoryEntryHeader } from "#modules/history";
 import { EpisodeHistoryApi } from "../requests";
 
 type HeaderProps = {
   entry: EpisodeHistoryApi.GetMany.Data;
-  showDate: boolean;
 };
-export function Header( { entry, showDate }: HeaderProps) {
+export function Header( { entry }: HeaderProps) {
   const { resource } = entry;
   const { serie } = resource;
 
@@ -22,10 +20,9 @@ export function Header( { entry, showDate }: HeaderProps) {
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return <HistoryEntryHeader
-    time={formatDateHHmm(timeStampDate)}
-    date={showDate
-      ? formatDateDDMMYYY(timeStampDate)
-      : undefined}
+    left={<>
+      {createHistoryTimeElement(timeStampDate)}
+    </>}
     title={title}
     subtitle={subtitle}
     right={right} />;

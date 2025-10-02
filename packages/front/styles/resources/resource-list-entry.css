@@ -9,14 +9,14 @@
 
     .ui-kit-accordion {
       --color-border: grey;
-      --padding-x: 1.5rem;
+      --padding-x: 0.5rem;
 
-      @media (width >= 640px) {
+      @media (width >= 480px) {
         --padding-x: 2rem;
       }
 
       .center {
-        width: 100vw;
+        width: 100%;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -36,7 +36,7 @@
         justify-content: flex-start;
         flex-wrap: wrap;
 
-        @media (width >= 640px) {
+        @media (width >= 480px) {
           padding: 1.5rem var(--padding-x);
         }
 

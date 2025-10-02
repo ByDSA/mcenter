@@ -1,7 +1,9 @@
 /* eslint-disable jest/no-export */
-import request from "supertest";
-import { HttpStatus } from "@nestjs/common";
+import request, { Request, Response } from "supertest";
+import { HttpStatus, Logger } from "@nestjs/common";
 import { Application } from "express";
+
+export let logger: Logger;
 
 type BodyType = Array<any> | object;
 
@@ -12,6 +14,14 @@ type MockFn<F extends (...args: unknown[])=> unknown> = {
   params?: Parameters<F>;
   returned?: ReturnType<F>;
   implementation?: F;
+};
+
+export type BeforeProps = {
+  request: Request;
+};
+
+export type AfterProps = BeforeProps & {
+  response: Response;
 };
 
 export type GenerateCaseProps = {
@@ -28,6 +38,8 @@ export type GenerateCaseProps = {
     body?: ExpectedBody;
     statusCode?: HttpStatus;
   };
+  before?: (props: BeforeProps)=> Promise<void>;
+  after?: (props: AfterProps)=> Promise<void>;
 };
 
 export function generateCase(props: GenerateCaseProps) {
@@ -49,8 +61,25 @@ export function generateCase(props: GenerateCaseProps) {
         }
       }
 
-      response = await request(props.getExpressApp())[httpMethod](props.url)
-        .send(props.body);
+      logger = new Logger(`case ${httpMethod} ${props.name}`);
+
+      logger.debug("Executing case");
+
+      const req = request(props.getExpressApp())[httpMethod](props.url);
+
+      await props.before?.( {
+        request: req,
+      } );
+
+      logger.debug("Executing request" + props.body
+        ? "with body: " + JSON.stringify(props.body, null, 2)
+        : "");
+      response = await req.send(props.body);
+
+      await props.after?.( {
+        request: req,
+        response,
+      } );
 
       mockFnCalls = (props.mock?.fn ?? []).map((m) => m.getFn().mock.calls);
     } );
@@ -76,7 +105,7 @@ export function generateCase(props: GenerateCaseProps) {
       else if (props.expected.body)
         objBody = props.expected.body;
 
-      it("should return expected obj body: " + JSON.stringify(objBody), () => {
+      it("should return expected obj body", () => {
         expect(response.body).toEqual(objBody);
       } );
     }

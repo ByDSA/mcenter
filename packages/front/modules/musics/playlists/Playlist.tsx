@@ -25,13 +25,13 @@ import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { MusicEntityWithFileInfos } from "../models";
+import { useListContextMenu } from "../../ui-kit/ContextMenu/ContextMenu";
 import { MusicPlaylistItem } from "./PlaylistItem";
 import { MusicPlaylistEntity } from "./models";
 import { formatDurationHeader } from "./utils";
 import styles from "./Playlist.module.css";
 import commonStyles from "./common.module.css";
 import { SettingsButton } from "./SettingsButton";
-import { useListContextMenu } from "./ContextMenu/ContextMenu";
 import { MusicPlaylistsApi } from "./requests";
 
 export type PlaylistItemEntity = MusicPlaylistEntity["list"][0]

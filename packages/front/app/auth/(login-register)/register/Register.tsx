@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { LocalSignUpBody } from "$shared/models/auth/local/dto";
+import { LocalSignUpBody } from "$shared/models/auth/dto";
 import { Email, Person } from "@mui/icons-material";
 import { showError } from "$shared/utils/errors/showError";
 import z from "zod";

@@ -4,8 +4,16 @@
 @import "./globals-animation.css";
 
 :root {
-  --color-link: var(--color-primary);
-  --color-link-hover: var(--color-primary-hover);
+  --color-link: var(--color-blue-300);
+  --color-link-hover: var(--color-blue-200);
+
+  --topbar-height: 3rem;
+  --sidebar-width: 18vw;
+  --sidebar-min-width: 10rem;
+  --sidebar-margin-top: var(--topbar-height);
+
+  --button-link-color: var(--color-gray-50);
+  --button-link-color-hover: var(--color-gray-0);
 }
 
 html,
@@ -62,58 +70,6 @@ a:hover {
   max-width: 100%;
 }
 
-/** Menú **/
-nav {
-  height: 3rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &.main-nav {
-    width: 100vw;
-    background-color: var(--color-primary);
-
-    & a {
-      color: var(--color-primary2);
-
-      &:hover {
-        color: var(--color-primary2-hover);
-      }
-    }
-  }
-
-  &.sub-nav {
-    width: 100vw;
-    height: 2rem;
-    background-color: var(--color-green);
-
-    & a {
-      color: var(--color-primary2);
-
-      &:hover {
-        color: var(--color-primary2-hover);
-      }
-    }
-  }
-}
-nav :has(a) {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-  width: 100vw;
-  color: white;
-
-  & a {
-    &:hover {
-      text-decoration-line: underline;
-      text-underline-offset: 0.35em;
-      text-decoration-thickness: 0.15em;
-    }
-  }
-}
-
 /** Buttons */
 .btnClickable:hover {
   box-shadow:
@@ -136,4 +92,5 @@ hr {
   border-style: solid;
   border-width: 1px;
   border-bottom: none;
+  width: 100%;
 }

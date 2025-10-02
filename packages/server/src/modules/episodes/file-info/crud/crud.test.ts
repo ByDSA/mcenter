@@ -5,6 +5,7 @@ import { EpisodeFileInfoRepository } from "./repository";
 import { EpisodeFileInfosCrudController } from "./controller";
 
 crudTestsSuite( {
+  name: EpisodeFileInfosCrudController.name,
   appModule: [
     {
       imports: [],
@@ -12,10 +13,18 @@ crudTestsSuite( {
       providers: [
         episodeFileInfoRepositoryMockProvider,
       ],
+    }, {
+      auth: {
+        using: "mock",
+      },
     }],
   repositoryClass: EpisodeFileInfoRepository,
   testsConfig: {
     patchOne: {
+      auth: {
+        admin: true,
+        user: false,
+      },
       repo: {
         getFn: (repo)=>repo.patchOneByIdAndGet,
         params: ["id", {

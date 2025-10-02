@@ -7,8 +7,6 @@ import { PlaylistEntity } from "../Playlist";
 import { MusicPlaylistListItem } from "./Item";
 
 import "#styles/resources/resource-list-entry.css";
-import "#styles/resources/resource-list-musics.css";
-import "#styles/resources/music.css";
 
 type Data = MusicPlaylistsApi.GetManyByCriteria.Data[];
 

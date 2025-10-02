@@ -1,10 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 import { Controller, Get } from "@nestjs/common";
 import { MusicEntity } from "$shared/models/musics";
-import { fixSlug } from "#musics/crud/builder/fix-slug";
 import { MusicsRepository } from "../../crud/repository";
 import { MusicDuplicatesIgnoreGroupsOdm } from "./repository/odm";
+import { fixSlug } from "#musics/crud/builder/fix-slug";
+import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
 
+@IsAdmin()
 @Controller("/search-duplicates")
 export class SearchDuplicatesController {
   constructor(

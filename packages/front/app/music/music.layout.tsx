@@ -1,6 +1,6 @@
 /* eslint-disable import/no-default-export */
 import { PageContainer, PageContainerProps } from "app/PageContainer";
-import { makeMenu } from "#modules/menus";
+import { TabsContainer } from "app/TabsContainer";
 
 type MusicLayoutProps = {
   pageContainerProps?: PageContainerProps;
@@ -11,21 +11,31 @@ type Props = {
 };
 
 export default function MusicLayout( { children, props }: Props) {
-  const submenu = makeMenu( {
-    "/music/history": "Historial",
-    "/music/search": "Buscar",
-    "/music/playlists": "Playlists",
-    "/music/upload": "Subir",
-  }, {
-    type: "sub",
-  } );
+  const data = [
+    {
+      label: "Historial",
+      path: "/music/history",
+    },
+    {
+      label: "Buscar",
+      path: "/music/search",
+    },
+    {
+      label: "Playlists",
+      path: "/music/playlists",
+    },
+    {
+      label: "Subir",
+      path: "/music/upload",
+    },
+  ];
 
   return (
     <>
-      {submenu}
-      <PageContainer props={props?.pageContainerProps}>
-        <h1>Música</h1>
-        {children}
-      </PageContainer>
+      <TabsContainer data={data}>
+        <PageContainer props={props?.pageContainerProps}>
+          {children}
+        </PageContainer>
+      </TabsContainer>
     </>);
 }

@@ -2,13 +2,14 @@ import request from "supertest";
 import { Application } from "express";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureAuthLocal } from "$sharedSrc/models/auth/tests/auth-local-fixtures";
-import { AuthModule } from "../../../module";
-import { LoginDto, SignUpDto, localLoginResponseSchema, localSignUpResponseSchema } from "../dto";
-import { createLoginRequest, createSignUpRequest, LoginRequestProps } from "./requests";
+import z from "zod";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { deleteFixtureAuthUsers, loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
+import { AuthModule } from "../../../module";
+import { LoginDto, SignUpDto, localLoginResponseSchema } from "../dto";
+import { createLoginRequest, createSignUpRequest, LoginRequestProps } from "./requests";
 
-describe("controller", () => {
+describe(AuthModule.name + "", () => {
   let testingSetup: TestingSetup;
   let routerApp: Application;
   let loginRequest: ReturnType<typeof createLoginRequest>;
@@ -135,16 +136,16 @@ describe("controller", () => {
       res = await correctSignUpRequest();
     } );
 
-    it("should return OK status code for correct sign up", () => {
-      expect(res.statusCode).toBe(HttpStatus.OK);
+    it("should return ACCEPTED status code for correct sign up but not verified", () => {
+      expect(res.statusCode).toBe(HttpStatus.ACCEPTED);
     } );
 
     it("should return valid sign up response schema for correct sign up", () => {
-      expect(() => localSignUpResponseSchema.parse(res.body)).not.toThrow();
+      expect(() => z.object( {} ).parse(res.body)).not.toThrow();
     } );
 
     it("should set auth cookie after successful sign up", () => {
-      expectHasAuthCookie(res);
+      expectHasNotAuthCookie(res);
     } );
 
     it("should prevent sign up with existing username", async () => {
@@ -162,7 +163,7 @@ describe("controller", () => {
       expect(res2.statusCode).toBe(HttpStatus.CONFLICT);
     } );
 
-    it("should prevent sign up with existing email", async () => {
+    it("should not throw any error on reuse email because of security", async () => {
       const dto: SignUpDto = {
         email: "new-email@mail.com", // not really new
         username: "asdfgh",
@@ -174,7 +175,7 @@ describe("controller", () => {
         dto,
       } );
 
-      expect(res2.statusCode).toBe(HttpStatus.CONFLICT);
+      expect(res2.statusCode).toBe(HttpStatus.ACCEPTED);
     } );
 
     it("should prevent sign up when already authenticated", async () => {

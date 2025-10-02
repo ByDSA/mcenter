@@ -1,9 +1,11 @@
 import { HttpStatus } from "@nestjs/common";
 import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
+import { UserRoleName } from "$shared/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
-import { ExpectedBody, generateCase, GenerateCaseProps } from "./generate-case";
+import { AfterProps, BeforeProps, ExpectedBody, generateCase, GenerateCaseProps } from "./generate-case";
 import { defaultResponse, expectedDataNotFound, expectUnprocessableEntity } from "./common";
+import { setAuthRole } from "./auth";
 
 type MockFn = NonNullable<GenerateCaseProps["mock"]>["fn"][0];
 export type PatchTestsProps<R> = {
@@ -17,6 +19,9 @@ export type PatchTestsProps<R> = {
     validInput?: object;
     invalidInput?: object;
   };
+  auth?: Record<UserRoleName, boolean>;
+  beforeEach?: (props: BeforeProps)=> Promise<void>;
+  afterEach?: (props: AfterProps)=> Promise<void>;
   expectBody?: (body: unknown, repoReturned?: Awaited<MockFn["returned"]>)=> void;
   expectedBody?: ExpectedBody;
   customCases?: ((props: PatchTestsProps<R>)=> GenerateCaseProps)[];
@@ -66,57 +71,112 @@ export function patchOneTests<R>(
   assertIsDefined(repo.params, "repoParams must be defined in patch tests");
 
   describe("patch one", () => {
-    generateCase( {
-      name: "valid case",
-      method: "patch",
-      body: validInput,
-      url: validUrl,
-      getExpressApp,
-      expected: {
-        expectBody: props.expectBody
-          ? (body: unknown) => props.expectBody!(body, repoReturned)
-          : undefined,
-        body: expectedBody,
-        statusCode: shouldReturn ? HttpStatus.OK : HttpStatus.NO_CONTENT,
-      },
-      mock: {
-        fn: [{
-          ...repo,
-          getFn,
-          returned: shouldReturn ? repoReturned : undefined,
-        }],
-      },
-    } );
+    const { auth } = props;
+    const positiveAuth = auth
+      ? Object.entries(auth).filter(([, v])=> v)
+        .map(([k])=> k as UserRoleName)
+      : undefined;
+    const negativeAuth = auth
+      ? Object.entries(auth).filter(([, v])=> !v)
+        .map(([k])=> k as UserRoleName)
+      : undefined;
 
-    generateCase( {
-      name: "invalid input case",
-      method: "patch",
-      body: invalidInput,
-      url: validUrl,
-      getExpressApp,
-      expected: {
-        expectBody: expectUnprocessableEntity,
-        statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-      },
-    } );
+    for (const role of positiveAuth ?? [null]) {
+      const rolePrefix = `${role ? `role=${role} ` : ""}`;
+      const beforeEach: typeof props.beforeEach = role
+        ? async (p) => {
+          await setAuthRole( {
+            role,
+            req: p.request,
+          } );
 
-    generateCase( {
-      name: "not found case",
-      method: "patch",
-      body: validInput,
-      url: validUrl,
-      getExpressApp,
-      expected: expectedDataNotFound,
-      mock: {
-        fn: [{
-          ...repo,
-          getFn,
-          returned: undefined,
-          implementation: ()=> {
-            assertFoundClient(undefined);
-          },
-        }],
-      },
-    } );
+          return props.beforeEach?.(p);
+        }
+        : props.beforeEach;
+
+      generateCase( {
+        name: `${rolePrefix}valid case`,
+        method: "patch",
+        body: validInput,
+        url: validUrl,
+        before: beforeEach,
+        after: props.afterEach,
+        getExpressApp,
+        expected: {
+          expectBody: props.expectBody
+            ? (body: unknown) => props.expectBody!(body, repoReturned)
+            : undefined,
+          body: expectedBody,
+          statusCode: shouldReturn ? HttpStatus.OK : HttpStatus.NO_CONTENT,
+        },
+        mock: {
+          fn: [{
+            ...repo,
+            getFn,
+            returned: shouldReturn ? repoReturned : undefined,
+          }],
+        },
+      } );
+
+      generateCase( {
+        name: `${rolePrefix}invalid input case`,
+        method: "patch",
+        body: invalidInput,
+        url: validUrl,
+        before: beforeEach,
+        after: props.afterEach,
+        getExpressApp,
+        expected: {
+          expectBody: expectUnprocessableEntity,
+          statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        },
+      } );
+
+      generateCase( {
+        name: `${rolePrefix}not found case`,
+        method: "patch",
+        body: validInput,
+        url: validUrl,
+        before: beforeEach,
+        after: props.afterEach,
+        getExpressApp,
+        expected: expectedDataNotFound,
+        mock: {
+          fn: [{
+            ...repo,
+            getFn,
+            returned: undefined,
+            implementation: ()=> {
+              assertFoundClient(undefined);
+            },
+          }],
+        },
+      } );
+    }
+
+    for (const role of negativeAuth ?? []) {
+      const rolePrefix = `${role ? `role=${role} ` : ""}`;
+      const beforeEach: typeof props.beforeEach = async (p) => {
+        await setAuthRole( {
+          role,
+          req: p.request,
+        } );
+
+        return props.beforeEach?.(p);
+      };
+
+      generateCase( {
+        name: `${rolePrefix}invalid auth`,
+        method: "patch",
+        url: validUrl,
+        before: beforeEach,
+        after: props.afterEach,
+        getExpressApp,
+        expected: {
+          expectBody: ()=>undefined, // any body
+          statusCode: HttpStatus.FORBIDDEN,
+        },
+      } );
+    }
   } );
 }

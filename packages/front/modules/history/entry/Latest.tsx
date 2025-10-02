@@ -5,6 +5,8 @@ import { makeFetcher, renderFetchedData } from "#modules/fetching";
 import { DateFormat, formatDate } from "#modules/utils/dates";
 import { Entry } from "#modules/utils/resources/useResourceEdition";
 import { useFetchStaticData } from "#modules/fetching/fetch-data";
+import { classes } from "#modules/utils/styles";
+import styles from "./body-common.module.css";
 
 type Props<Req, Res> = {
   url: string;
@@ -76,7 +78,7 @@ T extends Entry<any, any>,
       return <>
         <span className={"height2"}>Últimas veces:</span>
         {datesStr.map((d: string, i) => <Fragment key={`${data[i].date.timestamp}`}>
-          <span className={"line"}>{d}</span>
+          <span className={classes("line", styles.lastestLine)}>{d}</span>
         </Fragment>)}
       </>;
     },

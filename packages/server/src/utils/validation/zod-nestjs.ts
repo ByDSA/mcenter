@@ -5,6 +5,7 @@ import { map } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { isDebugging } from "$shared/utils/vscode";
 import { Request } from "express";
+import { parseZod } from "$shared/utils/validation/zod";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ValidateResponseWithZodSchema = (
@@ -33,31 +34,28 @@ export class ZodSerializerSchemaInterceptor implements NestInterceptor {
 
 export function validateResponseWithZodSchema<D>(data: D, schema: z.ZodSchema, req?: Request): D {
   try {
-    return schema.parse(data);
+    return parseZod(schema, data);
   } catch (e) {
-    if (e instanceof ZodError) {
-      let msg;
+    if (!isDebugging() || !(e instanceof Error))
+      throw e;
 
-      if (isDebugging()) {
-        const msgObj = {
-          ctx: {
-            request: {
-              body: req?.body,
-              method: req?.method,
-              url: req?.originalUrl,
-            },
-            response: {
-              data,
-            },
-          },
-          issues: e.issues,
-        };
+    const msgObj = {
+      message: e.message,
+      issues: e instanceof ZodError ? e.issues : undefined,
+      ctx: {
+        request: {
+          body: req?.body,
+          method: req?.method,
+          url: req?.originalUrl,
+        },
+        response: {
+          data,
+        },
+      },
+      schema: JSON.stringify(schema, null, 2),
+    };
 
-        msg = JSON.stringify(msgObj);
-      }
-
-      throw new Error(msg);
-    }
+    e.message = JSON.stringify(msgObj);
 
     throw e;
   }

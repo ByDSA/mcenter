@@ -1,6 +1,6 @@
 import z from "zod";
-import { createOneResultResponseSchema } from "../../../../utils/http/responses";
-import { userEntityWithRolesSchema } from "../..";
+import { createOneResultResponseSchema } from "../../../utils/http/responses";
+import { userEntityWithRolesSchema } from "..";
 
 const schema = z.object( {
   usernameOrEmail: z.string().min(1),

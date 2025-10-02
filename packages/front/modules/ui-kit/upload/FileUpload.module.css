@@ -2,7 +2,7 @@
   width: 100%;
 
   /* Variables de color locales para el componente */
-  --text-primary: var(--color-black);
+  --text-primary: var(--color-gray-1000);
   --text-secondary: #6b7280;
   --text-muted: #9ca3af;
   --border-default: var(--color-gray-200);
@@ -27,7 +27,7 @@
   border-radius: 0.5rem;
   padding: 1rem;
   text-align: center;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.8);
   transition:
     border-color var(--transition-duration) ease-in-out,
     background-color var(--transition-duration) ease-in-out;

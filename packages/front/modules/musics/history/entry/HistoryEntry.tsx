@@ -9,8 +9,7 @@ type Props<T> = {
   showDate?: boolean;
 };
 export function HistoryEntryElement(
-  { value: entry, setValue, showDate =
-  true }: Props<MusicHistoryApi.GetManyByCriteria.Data>,
+  { value: entry, setValue }: Props<MusicHistoryApi.GetManyByCriteria.Data>,
 ) {
   return <span className="resource-list-entry">
     {
@@ -18,7 +17,6 @@ export function HistoryEntryElement(
         headerContent:
         Header( {
           entry,
-          showDate,
         } ),
         bodyContent: Body( {
           data: entry,

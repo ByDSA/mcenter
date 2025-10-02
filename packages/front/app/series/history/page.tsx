@@ -2,11 +2,9 @@
 
 import { EpisodeHistoryList } from "#modules/series";
 
-export default function History() {
+export default function SeriesHistoryPage() {
   return (
     <>
-      <h2>Historial</h2>
-
       <EpisodeHistoryList />
     </>
   );

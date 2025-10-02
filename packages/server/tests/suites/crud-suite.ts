@@ -24,7 +24,7 @@ type TestsConfig<R> = {
 };
 
 type Props<R> = {
-  name?: string;
+  name: string;
   appModule: Parameters<typeof createTestingAppModuleAndInit>;
   repositoryClass?: new (...args: any[])=> R;
   testsConfig: TestsConfig<R>;

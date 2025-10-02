@@ -1,8 +1,14 @@
 import { ToastContainer } from "react-toastify";
-import { makeMenu } from "#modules/menus";
+import { Home, LiveTv, Movie, MusicNote } from "@mui/icons-material";
+import { Topbar } from "#modules/ui-kit/menus/Topbar";
 import { InitApis } from "#modules/core/initApis";
 import { UserProvider } from "#modules/core/auth/UserProvider";
 import { getUser } from "#modules/core/auth/server";
+import { UserAvatarButton } from "#modules/core/auth/Avatar";
+import { SidebarClient } from "#modules/ui-kit/menus/SidebarClient";
+import { classes } from "#modules/utils/styles";
+import styles from "./layout.module.css";
+import { LoginButton } from "./LoginButton";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
@@ -11,20 +17,72 @@ export default async function RootLayout( { children }: {
   children: React.ReactNode;
 } ) {
   const user = await getUser();
-  const menu = makeMenu( {
-    "/": "Inicio",
-    "/admin": "Admin",
-    "/series/history": "Series",
-    "/music/history": "Música",
-    ...(user
-      ? {
-        "/auth/user": "Usuario",
-        "/auth/logout": "Logout",
-      }
-      : {
-        "/auth/login": "Login",
-      } ),
-  } );
+  const menu = <Topbar
+    className={classes(styles.topBar, styles.fixed)}
+    leftAside={
+      <>
+        <a className={classes(styles.topBarLeftAside, styles.normal)} href="/">MCenter</a>
+        <a className={classes(styles.topBarLeftAside, styles.mini)} href="/">M</a>
+      </>
+    }
+    rightAside={
+      <>
+        {user && <UserAvatarButton user={user}/>}
+        {!user && <LoginButton />}
+      </>
+    }
+    mainData={[
+      {
+        label: <Home />,
+        title: "Inicio",
+        path: "/",
+      },
+      {
+        label: <Movie />,
+        title: "Series",
+        path: "/series",
+      },
+      {
+        label: <MusicNote />,
+        title: "Música",
+        path: "/music",
+      },
+      {
+        label: <LiveTv />,
+        title: "Player",
+        path: "/player",
+      },
+    ]}
+  />;
+  const sideBar = <SidebarClient
+    className={classes(styles.fixed, styles.sidebar)}
+    data={[
+      {
+        icon: <Home />,
+        label: "Inicio",
+        path: "/",
+      },
+      {
+        icon: <MusicNote />,
+        label: "Música",
+        path: "/music",
+      },
+      {
+        icon: <Movie />,
+        label: "Series",
+        path: "/series",
+      },
+      {
+        icon: <Movie />,
+        label: "Películas",
+        path: "/movies",
+      },
+      {
+        icon: <LiveTv />,
+        label: "Player",
+        path: "/player",
+      },
+    ]}/>;
 
   return (
     <html lang="es">
@@ -34,9 +92,12 @@ export default async function RootLayout( { children }: {
       </head>
       <body>
         <InitApis />
-        {menu}
         <UserProvider initialUser={user}>
-          {children}
+          {menu}
+          {sideBar}
+          <main className={styles.content}>
+            {children}
+          </main>
         </UserProvider>
         <ToastContainer
           position="bottom-right"

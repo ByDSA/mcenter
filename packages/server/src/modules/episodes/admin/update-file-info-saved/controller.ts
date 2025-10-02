@@ -1,8 +1,10 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { TaskCreatedResponseValidation } from "#core/tasks";
+import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
 import { UpdateEpisodesFileReqQueryDto } from "./validation";
 import { EpisodeUpdateFileInfoSavedTaskHandler, payloadSchema } from "./task.handler";
 
+@IsAdmin()
 @Controller("/admin/file-info/update")
 export class EpisodesUpdateController {
   constructor(private readonly taskHandler: EpisodeUpdateFileInfoSavedTaskHandler) {

@@ -31,12 +31,18 @@ const validCriteria = {
 } as GetManyCriteria;
 
 crudTestsSuite( {
+  name: MusicHistoryCrudController.name,
   appModule: [
     {
       controllers: [MusicHistoryCrudController],
       providers: [
         musicHistoryRepoMockProvider,
       ],
+    },
+    {
+      auth: {
+        using: "mock",
+      },
     },
   ],
   repositoryClass: MusicHistoryRepository,
@@ -78,6 +84,10 @@ crudTestsSuite( {
       ],
     },
     deleteOne: {
+      auth: {
+        admin: true,
+        user: false,
+      },
       repo: {
         getFn: (repo)=>repo.deleteOneByIdAndGet,
         params: ["entryId"],

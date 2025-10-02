@@ -2,6 +2,7 @@ import { Controller, Get } from "@nestjs/common";
 import { MusicEntity } from "$shared/models/musics";
 import { diff } from "just-diff";
 import { MusicBuilderService } from "#musics/crud/builder/music-builder.service";
+import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
 import { MusicsRepository } from "../../crud/repository";
 
 type Result = {
@@ -10,6 +11,7 @@ type Result = {
   diff: unknown;
 }[];
 
+@IsAdmin()
 @Controller("/fix-info")
 export class MusicFixInfoController {
   constructor(

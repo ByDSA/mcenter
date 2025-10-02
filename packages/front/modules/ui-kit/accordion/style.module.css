@@ -27,7 +27,7 @@
     flex-direction: row;
     align-items: center;
 
-    @media (width >= 640px) {
+    @media (width >= 800px) {
       padding: 0.67rem var(--padding-x);
       height: 4rem;
     }

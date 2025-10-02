@@ -1,24 +1,26 @@
 import { PageContainer } from "app/PageContainer";
-import { makeMenu } from "#modules/menus";
+import { TabsContainer } from "app/TabsContainer";
 
 export default function SeriesLayout( { children }: {
   children: React.ReactNode;
 } ) {
-  const submenu = makeMenu( {
-    "/series/history": "Historial",
-    "/series/play": "Play",
-    "/series/player": "Player",
-
-  }, {
-    type: "sub",
-  } );
+  const data = [
+    {
+      path: "/series/history",
+      label: "Historial",
+    },
+    {
+      path: "/series/play",
+      label: "Play",
+    },
+  ];
 
   return (
     <>
-      {submenu}
-      <PageContainer>
-        <h1>Series</h1>
-        {children}
-      </PageContainer>
+      <TabsContainer data={data}>
+        <PageContainer>
+          {children}
+        </PageContainer>
+      </TabsContainer>
     </>);
 }

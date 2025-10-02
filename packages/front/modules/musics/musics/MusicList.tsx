@@ -3,13 +3,14 @@ import { showError } from "$shared/utils/errors/showError";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { classes } from "#modules/utils/styles";
 import { MusicsApi } from "../requests";
 import { MusicEntityWithFileInfos } from "../models";
 import { MusicEntryElement } from "./entry/MusicEntry";
 import { ArrayData } from "./types";
+import styles from "./styles.module.css";
+
 import "#styles/resources/resource-list-entry.css";
-import "#styles/resources/resource-list-musics.css";
-import "#styles/resources/music.css";
 
 type Props = {
   filters: {
@@ -37,7 +38,7 @@ export function MusicList(props: Props) {
       <>
         {resultNumbers}
         <br/>
-        <span className="resource-list">
+        <span className={classes("resource-list", styles.list)}>
           {
           data!.map(
             (music, i) => <Fragment key={`${music.id}`}>

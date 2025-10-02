@@ -19,6 +19,12 @@ export function makeFetcher<ReqBody, ResBody>(
     parseResponse,
     reqBodyValidator,
     errorMiddleware = (err)=> {
+      if (err instanceof HttpErrorUnauthorized) {
+        logger.error("No estás autorizado a realizar esta acción.");
+
+        return;
+      }
+
       logger.error(err);
     } }: MakeFetcherParams<ReqBody, ResBody>,
 ): Fetcher<ReqBody, ResBody> {

@@ -1,0 +1,111 @@
+.fixed {
+  position: fixed;
+}
+
+.sidebar {
+  z-index: 1;
+  margin-top: 0 !important;
+  top: var(--sidebar-margin-top);
+}
+
+@media (width < 600px) {
+  :global(body):has(.sidebar) {
+    --sidebar-width: 0px;
+  }
+  .sidebar {
+    display: none !important;
+  }
+
+  .topBar {
+    > aside:first-of-type {
+      > .mini {
+        display: flex;
+        border-right: var(--color-gray-900) solid 1px;
+      }
+      > .normal {
+        display: none;
+      }
+    }
+
+    > main {
+      display: flex !important;
+      > * {
+        padding: 0 clamp(10px, calc(6vw - 10px), 5rem);
+        border-right: var(--color-gray-900) solid 1px;
+      }
+    }
+
+    > aside:last-of-type {
+      button {
+        padding-right: 0.75rem;
+        padding-left: 0.75rem;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+@media (width >= 600px) {
+  .topBar {
+    > aside:first-child .mini {
+      display: none;
+    }
+    > main {
+      display: none !important;
+    }
+  }
+}
+
+.topBar {
+  z-index: 1;
+  > aside:first-child .mini {
+    width: 3rem;
+    justify-content: center;
+  }
+
+  *:has(> .topBarLeftAside) {
+    min-width: var(--content-margin-left);
+    justify-content: center;
+
+    .topBarLeftAside {
+      color: var(--color-blue-300) !important;
+
+      font-size: 1.5rem;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      letter-spacing: 0.05rem;
+      font-weight: bolder;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  > aside:last-child {
+    padding-right: min(5vw, 100px);
+  }
+}
+
+body:has(.content) {
+  /* if --sidebar-width == 0px
+      => 0px
+    else
+      => max(--sidebar-width, --sidebar-min-width)
+  */
+  --content-margin-left: min(
+    calc(var(--sidebar-width) * 999999),
+    max(var(--sidebar-width), var(--sidebar-min-width))
+  );
+}
+
+.content {
+  --content-margin-top: var(--topbar-height);
+  margin-left: var(--content-margin-left);
+  margin-top: var(--content-margin-top);
+
+  background: var(--color-gray-950);
+  color: white;
+  min-height: calc(100vh - var(--content-margin-top));
+  min-width: calc(100vw - var(--content-margin-left));
+}

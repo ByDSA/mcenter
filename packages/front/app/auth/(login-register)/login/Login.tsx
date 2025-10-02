@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Facebook, GitHub, Person, Twitter } from "@mui/icons-material";
-import { LocalLoginBody } from "$shared/models/auth/local/dto";
+import { LocalLoginBody } from "$shared/models/auth/dto";
 import { Button } from "#modules/ui-kit/input/Button";
 import { classes } from "#modules/utils/styles";
 import styles from "../styles.module.css";

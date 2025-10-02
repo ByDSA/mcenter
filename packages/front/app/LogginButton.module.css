@@ -1,0 +1,14 @@
+.button {
+  background: var(--button-link-color);
+  padding: 0.3rem 1.5rem;
+  border: none;
+  border-radius: 1rem;
+  color: black;
+  font-size: 1rem;
+  font-weight: bold;
+
+  &:hover {
+    background: var(--button-link-color-hover);
+    cursor: pointer;
+  }
+}

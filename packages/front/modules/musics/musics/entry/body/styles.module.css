@@ -41,10 +41,9 @@
 
   .optionalButton,
   details > summary {
-    color: var(--color-primary);
+    color: var(--color-blue-200);
 
     &:hover {
-      color: var(--color-primary-hover);
       cursor: pointer;
       user-select: none;
     }

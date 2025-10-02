@@ -5,15 +5,14 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { MailsModule } from "#core/mails/module";
 import { UsersModule } from "./users/module";
 import { AppPayloadService } from "./strategies/jwt/payload/AppPayloadService";
-import { JwtStrategy } from "./strategies/jwt/strategy";
 import { AuthPassController } from "./strategies/local/controller";
 import { AuthLocalService } from "./strategies/local/service";
 import { LocalStrategy } from "./strategies/local/strategy";
 import { UserPassesRepository } from "./strategies/local/user-pass";
-import { AuthGoogleService } from "./strategies/google/service";
-import { GoogleStrategy } from "./strategies/google/strategy";
 import { AuthController } from "./controller";
 import { LocalUserVerificationService } from "./strategies/local/verification.service";
+import { AppPayloadEncoderService } from "./strategies/jwt/payload/AppPayloadEncoderService";
+import { JwtStrategy } from "./strategies/jwt/strategy";
 
 const { AUTH_JWT_SECRET } = process.env;
 
@@ -30,11 +29,13 @@ assertIsDefined(AUTH_JWT_SECRET);
         expiresIn: 3600,
       },
     } ),
+    PassportModule,
     UsersModule,
     MailsModule,
   ],
   controllers: [AuthController, AuthPassController],
   providers: [
+    AppPayloadEncoderService,
     AppPayloadService,
     JwtStrategy,
     // Local
@@ -42,10 +43,7 @@ assertIsDefined(AUTH_JWT_SECRET);
     LocalUserVerificationService,
     AuthLocalService,
     LocalStrategy,
-    // Google
-    AuthGoogleService,
-    GoogleStrategy,
   ],
-  exports: [AppPayloadService],
+  exports: [AppPayloadService, AppPayloadEncoderService],
 } )
 export class AuthModule {}

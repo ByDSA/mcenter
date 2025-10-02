@@ -1,0 +1,13 @@
+.container {
+  --tabs-height: 2rem;
+  margin-top: var(--topbar-height);
+  padding-top: var(--tabs-height);
+
+  .tabs {
+    position: fixed;
+    z-index: 1;
+    top: var(--topbar-height);
+    width: calc(100vw - var(--sidebar-width));
+    height: var(--tabs-height);
+  }
+}

@@ -3,3 +3,8 @@
   white-space: normal;
   word-wrap: break-word;
 }
+
+.lastestLine {
+  line-height: 1.5rem;
+  margin-left: 1rem !important;
+}

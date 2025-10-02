@@ -2,13 +2,13 @@ import { Fragment } from "react";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { classes } from "#modules/utils/styles";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { EpisodeHistoryApi } from "./requests";
 import { getDateStr } from "./utils";
+import styles from "./styles.module.css";
 
 import "#styles/resources/resource-list-entry.css";
-import "#styles/resources/resource-list-episodes.css";
-import "#styles/resources/serie.css";
 
 type Data = EpisodeHistoryApi.GetMany.Data[];
 
@@ -22,7 +22,7 @@ export function HistoryList() {
     isLoading,
     render: () => {
       return (
-        <span className="resource-list">
+        <span className={classes("resource-list", styles.list)}>
           {
             data!.map((entry: EpisodeHistoryApi.GetMany.Data, i: number) => {
               let dayTitle;

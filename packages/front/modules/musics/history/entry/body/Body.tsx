@@ -1,11 +1,7 @@
-import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { useCallback } from "react";
 import { classes } from "#modules/utils/styles";
-import { secsToMmss } from "#modules/utils/dates";
 import { useMusicCrudWithElements } from "#modules/musics/musics/entry/body/useMusicCrudWithElements";
 import { createActionsBar } from "#modules/utils/resources/elements/crud-buttons";
-import { MUSIC_FILE_INFO_PROPS } from "#modules/musics/musics/entry/utils";
-import { OutputText } from "#modules/ui-kit/output/Text";
 import { OptionalPropsButton } from "#modules/musics/musics/entry/body/elements";
 import { MusicHistoryApi } from "../../requests";
 import { useMusicHistoryEntryEdition } from "../../useMusicHistoryEntryCrud";
@@ -20,7 +16,7 @@ type Props = {
 };
 export function Body( { data, setData }: Props) {
   const { actions: musicActions, elements: musicElements,
-    optionalProps, isModified, state } = useMusicCrudWithElements( {
+    optionalProps, isModified } = useMusicCrudWithElements( {
     data: data.resource,
     setData: (d: Data["resource"])=>setData(( {
       ...data,
@@ -32,11 +28,6 @@ export function Body( { data, setData }: Props) {
     data,
     setData,
   } );
-  const resource = state[0];
-  const fileInfo = resource.fileInfos?.[0];
-
-  assertIsDefined(fileInfo);
-  const { duration } = fileInfo.mediaInfo;
   const createActionsBarElement = useCallback(()=>createActionsBar( {
     spinnerSide: "left",
     isModified,
@@ -44,35 +35,20 @@ export function Body( { data, setData }: Props) {
     update: musicActions.update,
     remove: historyActions.remove,
   } ), [musicActions.update, historyActions.remove, isModified]);
-  const fileInfoElements = {
-    durationElement: OutputText( {
-      caption: MUSIC_FILE_INFO_PROPS["mediaInfo.duration"].caption,
-      value: isDefined(duration) ? `${secsToMmss(duration)}` : "-",
-    } ),
-    pathElement: OutputText( {
-      caption: MUSIC_FILE_INFO_PROPS.path.caption,
-      value: data.resource.fileInfos[0].path,
-    } ),
-  };
 
   return <>
     {createActionsBarElement()}
     <div className={classes(styles.container)}>
-      <span className={classes("line", styles.lineWrap)}>
-        <span className={"height2"}>
-          {musicElements.titleElement}
-        </span>
-        <span className={"height2"}>
-          {musicElements.artistElement}
-        </span>
+      <span className={classes("line", "height2", styles.lineWrap)}>
+
+        {musicElements.titleElement}
+
+        {musicElements.artistElement}
+
       </span>
-      <span className={classes("line", styles.lineWrap)}>
-        <span className={classes("height2")}>
-          {musicElements.weightElement}
-        </span>
-        <span className={classes("height2")}>
-          {musicElements.albumElement}
-        </span>
+      <span className={classes("line", "height2", styles.lineWrap)}>
+        {musicElements.weightElement}
+        {musicElements.albumElement}
       </span>
       <span className={classes("line", "height2")}>
         {musicElements.tagsElement}
@@ -80,9 +56,6 @@ export function Body( { data, setData }: Props) {
       <span className={classes("line", "height2")}>
         {musicElements.slugElement}
       </span>
-      <span className={classes("line", "height2")}> {
-        fileInfoElements.durationElement
-      }</span>
       <OptionalPropsButton
         isVisible={optionalProps.allVisible}
         onClick={() => optionalProps.setAllVisible(v=>!v)}

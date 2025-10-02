@@ -16,6 +16,7 @@ testRoute(PATH_ROUTES.episodes.slug.withParams("seriesKey", "episodeKey"));
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
 crudTestsSuite( {
+  name: EpisodesSlugController.name,
   appModule: [
     {
       imports: [ResourceResponseFormatterModule],
@@ -27,6 +28,10 @@ crudTestsSuite( {
         EpisodeSlugHandlerService,
         ResourceSlugService,
       ],
+    }, {
+      auth: {
+        using: "mock",
+      },
     }],
   repositoryClass: EpisodesRepository,
   testsConfig: {
@@ -52,6 +57,10 @@ crudTestsSuite( {
       url: "/seriesKey/episodeKey",
     },
     patchOne: {
+      auth: {
+        admin: true,
+        user: false,
+      },
       repo: {
         getFn: (repo)=>repo.patchOneByCompKeyAndGet,
         params: [{

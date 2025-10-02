@@ -83,14 +83,19 @@ export const useFormInputText = (props?: CreateProps) => {
       registerFn(callValidation);
   }, [props?.validation, callValidation]);
 
-  const isFirstRender = useRef(true);
+  const isInitialMount = useRef(true);
+  const prevValue = useRef(value);
 
-  useEffect(()=> {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+  useEffect(() => {
+    // Si es el mount inicial o el valor no cambió, skipear
+    if (isInitialMount.current || prevValue.current === value) {
+      isInitialMount.current = false;
+      prevValue.current = value;
 
       return;
     }
+
+    prevValue.current = value;
 
     callValidation( {
       updateErrors: true,

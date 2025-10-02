@@ -1,28 +1,26 @@
+import { isDefined } from "$shared/utils/validation";
 import { MusicHistoryEntryEntity } from "#modules/musics/history/models";
-import { HistoryEntryHeader } from "#modules/history";
-import { formatDate, formatDateHHmm } from "#modules/utils/dates";
+import { createDurationElement, createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 
 type HeaderProps = {
   entry: Required<MusicHistoryEntryEntity>;
-  showDate: boolean;
 };
-export function Header( { entry, showDate }: HeaderProps) {
+export function Header( { entry }: HeaderProps) {
   const { resource } = entry;
   const { title } = resource;
+  const duration = resource.fileInfos?.[0].mediaInfo.duration;
   const subtitle = resource.game ?? resource.artist;
-  const right = <span>{resource.weight.toString()}</span>;
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return HistoryEntryHeader( {
-    time: formatDateHHmm(timeStampDate),
-    date: showDate
-      ? formatDate(timeStampDate, {
-        dateTime: "date",
-        ago: "no",
-      } )
-      : undefined,
+    left: <>
+      {createHistoryTimeElement(timeStampDate)}
+    </>,
     title,
     subtitle,
-    right,
+    right: <>
+      {isDefined(duration) && createDurationElement(duration)}
+      {createWeightElement(resource.weight) }
+    </>,
   } );
 }

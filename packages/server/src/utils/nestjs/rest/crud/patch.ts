@@ -2,12 +2,14 @@ import { applyDecorators, HttpCode, HttpStatus, Patch, UseInterceptors } from "@
 import z from "zod";
 import { createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
+import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
 import { ResponseFormatterInterceptor } from "../responses/response-formatter.interceptor";
 
 const UNDEFINED_SCHEMA = z.undefined();
 
 export function PatchOne(url: string, dataSchema?: z.ZodSchema) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
+    IsAdmin(),
     Patch(url),
     ...getCommonCommandDecorators(dataSchema),
   ];
