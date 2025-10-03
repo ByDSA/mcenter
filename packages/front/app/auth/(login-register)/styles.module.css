@@ -1,3 +1,12 @@
+.container {
+  align-items: center !important;
+  > main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
 .box {
   background: white;
   border-radius: 1rem;
@@ -67,7 +76,7 @@
 
     &.iconLeft {
       justify-content: center;
-      width: var(--padding-left);
+      width: calc(var(--padding-left) + 4px);
       height: 2.2rem;
     }
 
@@ -79,6 +88,11 @@
       font-size: 20px;
       padding: 0;
 
+      > * {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
       &:hover {
         --svg-color: var(--color-gray-600);
       }
@@ -224,10 +238,17 @@
 }
 
 /* Responsive Design */
-@media (max-width: 480px) {
+@media (width < 480px) {
   .box {
-    padding: 24px;
-    margin: 16px;
+    padding: 1rem;
+    margin: 0rem;
+    background: none;
+    border: none;
+    color: var(--color-gray-200);
+
+    h1 {
+      color: var(--color-gray-0) !important;
+    }
   }
 
   .socialLogin {
@@ -243,13 +264,21 @@
   }
 
   .iconLeft {
-    left: 14px;
-    font-size: 18px;
+    width: var(--padding-left);
   }
+}
 
-  .iconRight {
-    right: 14px;
-    font-size: 18px;
+@media (width >= 480px) {
+  .loginButton {
+    background: var(--button-light-background-color);
+    color: white;
+    --button-background-color: var(--button-light-background-color);
+    --button-color: var(--button-light-color);
+    --button-hover-background-color: var(--button-light-hover-background-color);
+    --button-disabled-background-color: var(
+      --button-light-disabled-background-color
+    );
+    --button-disabled-color: var(--button-light-disabled-color);
   }
 }
 

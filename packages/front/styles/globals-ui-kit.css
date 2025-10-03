@@ -7,6 +7,7 @@
 .ui-kit-input-text,
 .ui-kit-input-number {
   width: 100%;
+  outline: none;
 }
 
 .ui-kit-input-text,

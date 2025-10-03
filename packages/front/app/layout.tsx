@@ -21,7 +21,7 @@ export default async function RootLayout( { children }: {
     className={classes(styles.topBar, styles.fixed)}
     leftAside={
       <>
-        <a className={classes(styles.topBarLeftAside, styles.normal)} href="/">MCenter</a>
+        <a className={classes(styles.topBarLeftAside, styles.normal)} href="/">M<span className={styles.logoCenter}>Center</span></a>
         <a className={classes(styles.topBarLeftAside, styles.mini)} href="/">M</a>
       </>
     }

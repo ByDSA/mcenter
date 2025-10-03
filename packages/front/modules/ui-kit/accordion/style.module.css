@@ -2,9 +2,14 @@
   background-color: var(--color-container);
   border: 2px solid var(--color-border);
   border-radius: 10px;
-  width: 100%;
-  margin: 0.25rem;
+  --margin-x: 0.25rem;
+  width: calc(100% - var(--margin-x) * 2);
+  margin: 0.25rem var(--margin-x);
   overflow: hidden;
+
+  @media (width < 600px) {
+    --padding-x: 0.5rem !important;
+  }
 
   .header {
     background-color: var(--color-header, var(--color-container));

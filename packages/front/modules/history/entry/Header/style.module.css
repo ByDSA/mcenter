@@ -5,7 +5,6 @@
   aside {
     display: flex;
     flex-flow: column nowrap;
-    gap: 0.3rem;
     font-size: 1rem;
     > * {
       display: flex;

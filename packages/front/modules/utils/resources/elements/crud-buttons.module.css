@@ -26,7 +26,7 @@
 
 .actionsBar {
   display: flex;
-  justify-content: end !important;
+  justify-content: flex-end !important;
   gap: 1.5rem !important;
   margin: 0.5rem 0 !important;
 

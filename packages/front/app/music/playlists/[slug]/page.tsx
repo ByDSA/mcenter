@@ -40,11 +40,7 @@ export default function Page( { params }: PageProps) {
 
   return (
     <>
-      <MusicLayout props={{
-        pageContainerProps: {
-          width: "full",
-        },
-      }}>
+      <MusicLayout>
         <h2>Playlist</h2>
         {error && <pre>{(()=>{
           try {

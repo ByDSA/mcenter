@@ -5,13 +5,11 @@ import { useRouter } from "next/navigation";
 import { AuthApi } from "#modules/core/auth/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { RegisterComponent } from "./Register";
-import styles from "./styles.module.css";
 
 export default function RegisterPage() {
   const router = useRouter();
 
   return RegisterComponent( {
-    className: styles.register,
     handleRegister: async (dto)=> {
       const api = FetchApi.get(AuthApi);
 

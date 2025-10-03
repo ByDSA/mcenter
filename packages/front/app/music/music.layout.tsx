@@ -1,16 +1,12 @@
 /* eslint-disable import/no-default-export */
-import { PageContainer, PageContainerProps } from "app/PageContainer";
+import { PageContainer } from "app/PageContainer";
 import { TabsContainer } from "app/TabsContainer";
 
-type MusicLayoutProps = {
-  pageContainerProps?: PageContainerProps;
-};
 type Props = {
   children: React.ReactNode;
-  props?: MusicLayoutProps;
 };
 
-export default function MusicLayout( { children, props }: Props) {
+export default function MusicLayout( { children }: Props) {
   const data = [
     {
       label: "Historial",
@@ -33,7 +29,7 @@ export default function MusicLayout( { children, props }: Props) {
   return (
     <>
       <TabsContainer data={data}>
-        <PageContainer props={props?.pageContainerProps}>
+        <PageContainer>
           {children}
         </PageContainer>
       </TabsContainer>

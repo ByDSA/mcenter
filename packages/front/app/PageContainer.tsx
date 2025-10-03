@@ -2,20 +2,14 @@ import { ReactNode } from "react";
 import { classes } from "#modules/utils/styles";
 import styles from "./PageContainer.module.css";
 
-export type PageContainerProps = {
-  width?: "default" | "full";
-};
-
 type Props = {
-  props?: PageContainerProps;
+  className?: string;
   children: ReactNode;
 };
 
-export function PageContainer( { children, props }: Props) {
+export function PageContainer( { children, className }: Props) {
   return (
-    <div className={classes(styles.container, props?.width === "full"
-      ? styles.full
-      : styles.default)}>
+    <div className={classes(styles.container, className)}>
       <main>
         {children}
       </main>

@@ -123,8 +123,8 @@
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 100dvw !important;
+  height: 100dvh !important;
   z-index: 1000 !important;
   background-color: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
@@ -152,12 +152,12 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   animation: scaleIn 0.3s ease-out;
-  width: 90vw !important;
-  height: 90vh !important;
+  width: 90dvw !important;
+  height: 90dvh !important;
   max-width: none !important;
   max-height: none !important;
-  min-width: 90vw !important;
-  min-height: 90vh !important;
+  min-width: 90dvw !important;
+  min-height: 90dvh !important;
 }
 
 .fullscreenContent.closing {

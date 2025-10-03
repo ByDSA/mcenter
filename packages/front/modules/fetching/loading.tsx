@@ -4,7 +4,7 @@ import styles from "./fetching.style.module.css";
 const L = function Loading() {
   return (
     <div style={{
-      fontSize: "8vw",
+      fontSize: "8dvw",
       textAlign: "center",
       margin: "0",
       padding: "0",

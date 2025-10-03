@@ -1,0 +1,9 @@
+.content {
+  margin: 1rem 0;
+  --spinner-size: 5rem;
+  --spinner-width: 0.4rem;
+  height: var(--spinner-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

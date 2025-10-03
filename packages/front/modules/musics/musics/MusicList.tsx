@@ -27,12 +27,16 @@ export function MusicList(props: Props) {
     display: "flex",
     justifyContent: "left",
     marginTop: "0.5rem",
+    marginLeft: "1rem",
     fontSize: "0.8em",
   }}>Resultados: {data?.length} de {totalCount}</span>;
 
   return renderFetchedData<Data | null>( {
     data,
     error,
+    scroll: {
+      observerRef: observerTarget,
+    },
     isLoading,
     render: () => (
       <>
@@ -49,16 +53,6 @@ export function MusicList(props: Props) {
               />
             </Fragment>,
           )
-          }
-          <div ref={observerTarget} style={{
-            height: "1px",
-          }} />
-          {
-            !!error
-        && error instanceof Error
-        && <span style={{
-          marginTop: "2em",
-        }}>{error.message}</span>
           }
         </span>
         {(data?.length ?? 0) > 10 && data?.length === totalCount && resultNumbers}

@@ -30,7 +30,7 @@
     > main {
       display: flex !important;
       > * {
-        padding: 0 clamp(10px, calc(6vw - 10px), 5rem);
+        padding: 0 clamp(10px, calc(6dvw - 10px), 5rem);
         border-right: var(--color-gray-900) solid 1px;
       }
     }
@@ -68,22 +68,25 @@
     justify-content: center;
 
     .topBarLeftAside {
-      color: var(--color-blue-300) !important;
+      color: var(--color-blue-200) !important;
 
       font-size: 1.5rem;
       padding: 0.5rem;
-      border-radius: 0.5rem;
       letter-spacing: 0.05rem;
       font-weight: bolder;
 
       &:hover {
         text-decoration: none;
       }
+
+      .logoCenter {
+        color: var(--color-blue-150) !important;
+      }
     }
   }
 
   > aside:last-child {
-    padding-right: min(5vw, 100px);
+    padding-right: min(5dvw, 100px);
   }
 }
 
@@ -106,6 +109,6 @@ body:has(.content) {
 
   background: var(--color-gray-950);
   color: white;
-  min-height: calc(100vh - var(--content-margin-top));
-  min-width: calc(100vw - var(--content-margin-left));
+  min-height: calc(100dvh - var(--content-margin-top));
+  min-width: calc(100dvw - var(--content-margin-left));
 }

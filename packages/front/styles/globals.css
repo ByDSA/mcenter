@@ -8,7 +8,7 @@
   --color-link-hover: var(--color-blue-200);
 
   --topbar-height: 3rem;
-  --sidebar-width: 18vw;
+  --sidebar-width: 18dvw;
   --sidebar-min-width: 10rem;
   --sidebar-margin-top: var(--topbar-height);
 
@@ -32,8 +32,8 @@ body {
     Droid Sans,
     Helvetica Neue,
     sans-serif;
-  min-height: 100vh;
-  width: 100vw;
+  min-height: 100dvh;
+  width: 100dvw;
   overflow-x: hidden;
 }
 * {
@@ -65,7 +65,7 @@ a:hover {
 /** Layout **/
 
 .extra-margin {
-  margin: 0 4vw;
+  margin: 0 4dvw;
   width: 100vw;
   max-width: 100%;
 }

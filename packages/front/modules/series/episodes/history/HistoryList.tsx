@@ -20,6 +20,9 @@ export function HistoryList() {
     data,
     error,
     isLoading,
+    scroll: {
+      observerRef: observerTarget,
+    },
     render: () => {
       return (
         <span className={classes("resource-list", styles.list)}>
@@ -58,16 +61,6 @@ export function HistoryList() {
                 }}/>
               </Fragment>;
             } )
-          }
-          <div ref={observerTarget} style={{
-            height: "1px",
-          }} />
-          {
-            !!error
-        && error instanceof Error
-        && <span style={{
-          marginTop: "2em",
-        }}>{error.message}</span>
           }
         </span>
       );

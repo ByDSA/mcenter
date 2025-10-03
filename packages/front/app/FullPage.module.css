@@ -4,7 +4,7 @@ body:has(.main) {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    width: calc(100vw - var(--sidebar-width));
-    height: calc(100vh - var(--topbar-height));
+    width: calc(100dvw - var(--content-margin-left));
+    height: calc(100dvh - var(--topbar-height));
   }
 }

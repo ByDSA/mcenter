@@ -1,5 +1,6 @@
 import NotLoggedLayout from "#modules/core/auth/NotLogged.layout";
-import { FullPageContainer } from "../../FullPageContainer";
+import { PageContainer } from "app/PageContainer";
+import styles from "./styles.module.css";
 
 export default async function LoginLayout( { children }: {
   children: React.ReactNode;
@@ -8,9 +9,9 @@ export default async function LoginLayout( { children }: {
     <>
       {await NotLoggedLayout( {
         children: (
-          <FullPageContainer>
+          <PageContainer className={styles.container}>
             {children}
-          </FullPageContainer>
+          </PageContainer>
         ),
       } )}
     </>

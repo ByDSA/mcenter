@@ -31,7 +31,7 @@ export function useScrollData<D extends unknown[]>( { setIsLoading,
       },
       {
         threshold: 1.0,
-        rootMargin: "20px",
+        rootMargin: "140px",
       },
     );
 
