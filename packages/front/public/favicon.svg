@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200" height="200" role="img" aria-label="Logo MCenter">
+  <circle cx="50" cy="50" r="50" fill="#000" />
+
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif" font-size="80" font-weight="700" fill="#8CDBFF">
+    M
+  </text>
+</svg>
