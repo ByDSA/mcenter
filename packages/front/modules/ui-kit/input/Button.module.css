@@ -1,8 +1,8 @@
 body:has(.button) {
   /* Variables dark theme */
-  --button-dark-background-color: var(--button-link-color);
+  --button-dark-background-color: var(--color-gray-25);
   --button-dark-color: black;
-  --button-dark-hover-background-color: var(--button-link-color-hover);
+  --button-dark-hover-background-color: var(--color-gray-50);
   --button-dark-disabled-background-color: var(--color-gray-200);
   --button-dark-disabled-color: var(--color-gray-500);
 
