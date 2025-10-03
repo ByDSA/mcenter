@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.9.0](https://github.com/ByDSA/mcenter/compare/v4.8.2...v4.9.0) (2025-10-03)
+
+
+### Features
+
+* **back:** add auth and users ([082f992](https://github.com/ByDSA/mcenter/commit/082f992768dbd69a63a27dce93c483ebafdc0f3b))
+* more users stuff. new design in front ([6453d3a](https://github.com/ByDSA/mcenter/commit/6453d3a1847d037175cc33c34e044ebfd349d8c1))
+* users ([c3b3a3b](https://github.com/ByDSA/mcenter/commit/c3b3a3b99bdb3d6d08d7e7743d786782ea58c917))
+
+
+### Bug Fixes
+
+* **front:** use PATH_ROUTES ([0994c0b](https://github.com/ByDSA/mcenter/commit/0994c0b7abe972248ab91ef89bdfe97c1ca75c45))
+* **server:** not expose _internal ([51dfe87](https://github.com/ByDSA/mcenter/commit/51dfe872dc2902b9e3fa8241369b0c9747b1a418))
+
 ### [4.8.2](https://github.com/ByDSA/mcenter/compare/v4.8.1...v4.8.2) (2025-09-17)
 
 
