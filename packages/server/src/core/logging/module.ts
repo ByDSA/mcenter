@@ -3,6 +3,7 @@ import { WinstonModule } from "nest-winston";
 import { createLoggerConfig } from "./config";
 import { CustomLoggerService } from "./service";
 import { LoggingController } from "./controller";
+import { LoggingInterceptor } from "./interceptor";
 
 export type LoggingModuleProps = {
   silentFiles?: boolean;
@@ -24,9 +25,10 @@ export class LoggingModule {
           provide: Logger,
           useClass: CustomLoggerService,
         },
+        LoggingInterceptor,
       ],
       controllers: [LoggingController],
-      exports: [Logger],
+      exports: [Logger, LoggingInterceptor],
     };
   }
 }

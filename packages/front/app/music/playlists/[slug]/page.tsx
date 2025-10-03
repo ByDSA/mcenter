@@ -1,6 +1,5 @@
 "use client";
 
-import { use } from "react";
 import { ResultResponse } from "$shared/utils/http/responses";
 import { MusicPlaylist } from "#modules/musics/playlists/Playlist";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -14,8 +13,8 @@ interface PageProps {
   }>;
 }
 
-export default function Page( { params }: PageProps) {
-  const resolvedParams = use(params);
+export default async function Page( { params }: PageProps) {
+  const resolvedParams = await params;
   const api = FetchApi.get(MusicPlaylistsApi);
   const { isLoading, data, error, setData } = useCrudData( {
     initialFetch: async ()=> {

@@ -16,5 +16,7 @@ test("homepage loads successfully", async ( { page } ) => {
   } );
 
   // Que contenga el texto "MCenter":
-  await expect(page.getByText("MCenter")).toBeVisible();
+  const el = page.getByText("MCenter").last();
+
+  await expect(el).toBeVisible();
 } );

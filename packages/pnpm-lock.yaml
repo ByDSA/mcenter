@@ -132,7 +132,7 @@ importers:
         specifier: 5.14.9
         version: 5.14.9(@emotion/react@11.11.1(@types/react@18.2.21)(react@18.2.0))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.2.21)(react@18.2.0))(@types/react@18.2.21)(react@18.2.0))(@types/react@18.2.21)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@tanstack/react-query':
-        specifier: ^5.85.5
+        specifier: 5.85.5
         version: 5.85.5(react@18.2.0)
       '@textea/json-viewer':
         specifier: 4.0.1
@@ -175,7 +175,7 @@ importers:
         specifier: workspace:../shared/src
         version: link:../shared/src
       '@next/eslint-plugin-next':
-        specifier: ^13.5.4
+        specifier: 13.5.4
         version: 13.5.4
       '@types/node':
         specifier: 18.17.14

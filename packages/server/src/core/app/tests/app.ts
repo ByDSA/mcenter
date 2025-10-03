@@ -1,7 +1,8 @@
 import { Test, TestingModule, TestingModuleBuilder } from "@nestjs/testing";
-import { INestApplication, ModuleMetadata, Type } from "@nestjs/common";
+import { INestApplication, Logger, ModuleMetadata, Type } from "@nestjs/common";
 import { Application } from "express";
 import { RouterModule } from "@nestjs/core";
+import { isDebugging } from "$shared/utils/vscode";
 import { addGlobalConfigToApp, globalAuthProviders, globalValidationProviders } from "#core/app/init.service";
 import { Database } from "#core/db/database";
 import { DatabaseModule } from "#core/db/module";
@@ -82,7 +83,12 @@ export async function createTestingAppModule(
 
   options?.beforeCompile?.(moduleBuilder);
 
+  if (!isDebugging())
+    Logger.overrideLogger([]);
+
   const module = await moduleBuilder.compile();
+
+  module.useLogger(false);
   const app = module.createNestApplication();
 
   addGlobalConfigToApp(app);

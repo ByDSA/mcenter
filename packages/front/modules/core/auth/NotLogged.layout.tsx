@@ -1,13 +1,12 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { ReactNode } from "react";
 import { getUser } from "./server";
 
 type Props = {
-  children: ReactNode;
+  children: any;
 };
 // eslint-disable-next-line import/no-default-export
-export default async function NotLoggedLayout( { children }: Props): Promise<ReactNode> {
+export default async function NotLoggedLayout( { children }: Props) {
   const user = await getUser();
 
   if (user) {

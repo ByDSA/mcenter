@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
-import { cache } from "react";
 import { AppPayload, UserPayload } from "./models";
 
-export const getUser = cache(async (): Promise<UserPayload | null> =>{
+export const getUser = async (): Promise<UserPayload | null> =>{
   const cookieStore = await cookies();
   const token = cookieStore.get("auth")?.value;
 
@@ -23,4 +22,4 @@ export const getUser = cache(async (): Promise<UserPayload | null> =>{
 
     return null;
   }
-} );
+};

@@ -5,14 +5,14 @@ import { AuthGuard } from "@nestjs/passport";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { UserEntityWithRoles } from "$shared/models/auth";
-import { AppPayloadService } from "../jwt";
-import { SignUpDto } from "./dto";
-import { AuthLocalService } from "./service";
 import { PostOne } from "#utils/nestjs/rest";
 import { GuestOnly } from "#core/auth/users/GuestOnly.guard";
 import { userEntityWithRolesSchema } from "#core/auth/users/models";
 import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
 import { UsersRepository } from "#core/auth/users/crud/repository";
+import { AppPayloadService } from "../jwt";
+import { AuthLocalService } from "./service";
+import { SignUpDto } from "./dto";
 
 const tokenSchema = z.object( {
   token: z.string(),

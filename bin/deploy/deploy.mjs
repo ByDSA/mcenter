@@ -11,6 +11,7 @@ import { infraUp } from "../../packages/lib/index.mjs";
 
 (async () => {
   $.verbose = false;
+  process.env.FORCE_COLOR = "3";
 
   const { ENVS } = await readAndCheckEnvs();
 
@@ -24,6 +25,13 @@ import { infraUp } from "../../packages/lib/index.mjs";
       ssh,
     } );
   }
+
+  console.log("Executing shared tests ...");
+  // await $`cd ../../packages/shared && pnpm test --forceExit`;
+  console.log("Executing server tests ...");
+  await $`cd ../../packages/server && pnpm test --forceExit`;
+  console.log("Executing shared e2e tests ...");
+  await $`cd ../../packages/shared && pnpm test:e2e --forceExit`;
 
   await serverPackageDeployParticular({
     ...ENVS,

@@ -8,6 +8,11 @@ $.verbose = false;
 
 const { ENVS } = await readAndCheckEnvs();
 
+$.verbose = true;
+await echo("Executing server tests");
+$.verbose = false;
+await $`cd ../../packages/server && pnpm test --forceExit`;
+
 await deployParticular( {
   ...ENVS,
 } );

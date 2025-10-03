@@ -1,22 +1,23 @@
-import { Injectable, NestInterceptor, Logger, ExecutionContext, CallHandler, HttpException } from "@nestjs/common";
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, Logger } from "@nestjs/common";
 import { Observable, tap, catchError } from "rxjs";
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(LoggingInterceptor.name);
+  constructor(private readonly logger: Logger) {
+  }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const { method, url, body: _ } = request;
     const startTime = Date.now();
 
-    this.logger.log(`Incoming ${method} ${url}`);
+    this.logger.log(`Incoming ${method} ${url}`, LoggingInterceptor.name);
 
     return next.handle().pipe(
       tap((_data) => {
         const duration = Date.now() - startTime;
 
-        this.logger.log(`Completed ${method} ${url} in ${duration}ms`);
+        this.logger.log(`Completed ${method} ${url} in ${duration}ms`, LoggingInterceptor.name);
       } ),
       catchError((error) => {
         const duration = Date.now() - startTime;
@@ -31,11 +32,11 @@ export class LoggingInterceptor implements NestInterceptor {
             ? `${h}\n${genOutputStackError(error.stack)}`
             : h;
 
-          this.logger.error(output);
+          this.logger.error(output, LoggingInterceptor.name);
         } else {
           const header = `Failed ${method} ${url} in ${duration}ms: ${error.message}`;
 
-          this.logger.warn(header);
+          this.logger.warn(header, LoggingInterceptor.name);
         }
 
         throw error;

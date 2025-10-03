@@ -2,6 +2,7 @@
 import request, { Request, Response } from "supertest";
 import { HttpStatus, Logger } from "@nestjs/common";
 import { Application } from "express";
+import { createManualLogger } from "#core/logging/tests/create-manual-logger";
 
 export let logger: Logger;
 
@@ -61,7 +62,7 @@ export function generateCase(props: GenerateCaseProps) {
         }
       }
 
-      logger = new Logger(`case ${httpMethod} ${props.name}`);
+      logger = createManualLogger(`case ${httpMethod} ${props.name}`);
 
       logger.debug("Executing case");
 

@@ -15,7 +15,7 @@
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.14.9",
     "@mui/material": "5.14.9",
-    "@tanstack/react-query": "^5.85.5",
+    "@tanstack/react-query": "5.85.5",
     "@textea/json-viewer": "4.0.1",
     "$shared": "workspace:../shared/build",
     "just-clone": "6.2.0",
@@ -31,7 +31,7 @@
     "zod": "3.25.74"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^13.5.4",
+    "@next/eslint-plugin-next": "13.5.4",
     "@types/node": "18.17.14",
     "@types/react": "18.2.21",
     "$sharedSrc": "workspace:../shared/src"

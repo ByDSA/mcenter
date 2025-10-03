@@ -23,8 +23,10 @@ test.describe("register local", () => {
     expect(response?.status()).toBe(200);
 
     // Comprobar que se haya ido a la url "/"
-    await page.waitForURL(frontEndUrl(`auth/register/done?email=${email}`), {
-      timeout: 5_000,
+    await page.waitForURL(frontEndUrl(
+      `${PATH_ROUTES.auth.frontend.register.done.path}?email=${email}`,
+    ), {
+      timeout: 1_000,
     } );
 
     await expectNotLoggedAuthCookie( {

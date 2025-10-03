@@ -1,5 +1,7 @@
 .container {
   align-items: center !important;
+  display: flex;
+  justify-content: center;
   > main {
     display: flex;
     justify-content: center;

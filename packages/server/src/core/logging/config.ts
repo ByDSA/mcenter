@@ -5,13 +5,12 @@ import * as winston from "winston";
 import "winston-daily-rotate-file";
 import { isTest } from "#utils";
 
-const IS_DEBUGGING = isDebugging();
 const IS_TEST = isTest();
 
 export const LOGS_FOLDER = IS_TEST ? "tests/logs/" : "logs/";
 
 const SILENT_CONSOLE = IS_TEST
-  && !IS_DEBUGGING;
+  && !isDebugging();
 
 export const createLoggerConfig = (props?: LoggingModuleProps) => {
   const silentFiles = props?.silentFiles ?? SILENT_CONSOLE;

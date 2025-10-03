@@ -1,16 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
-import { PATH_ROUTES } from "$shared/routing";
 import { Application } from "express";
 import request from "supertest";
-import { Controller, Get, HttpStatus, InternalServerErrorException, UnprocessableEntityException } from "@nestjs/common";
-import { testRoute } from "#core/routing/test";
+import { HttpStatus, InternalServerErrorException, UnprocessableEntityException } from "@nestjs/common";
 import { TestingSetup, createTestingAppModuleAndInit } from "#core/app/tests/app";
 import { GlobalErrorHandlerService } from "#core/error-handlers/global-error-handler";
-import { LOGS_FOLDER } from "./config";
-import { LoggingModule } from "./module";
-
-testRoute(PATH_ROUTES.logs.path);
+import { LOGS_FOLDER } from "../config";
+import { LoggingModule } from "../module";
+import { TestController } from "./Test.controller";
 
 function clearLogs() {
   const logDir = LOGS_FOLDER;
@@ -24,29 +21,6 @@ function clearLogs() {
     } );
     // Nota: si se borra la carpeta o archivos, no funciona porque
     // no se vuelve a crear el archivo de log
-  }
-}
-
-@Controller("test")
-class TestController {
-  @Get("unhandled")
-  throwUnhandledError() {
-    throw new Error("Test unhandled error for logging");
-  }
-
-  @Get("error-500")
-  throwError500() {
-    throw new InternalServerErrorException();
-  }
-
-  @Get("error-423")
-  throwError423() {
-    throw new UnprocessableEntityException();
-  }
-
-  @Get("ok-200")
-  ok() {
-    return "OK";
   }
 }
 
@@ -67,8 +41,9 @@ describe("test", () => {
     routerApp = testingSetup.routerApp;
   } );
 
-  function fetchLogs() {
-    return request(routerApp).get("/");
+  async function fetchLogs() {
+    return await request(routerApp).get("/")
+      .send();
   }
 
   afterEach(()=> {
@@ -76,8 +51,13 @@ describe("test", () => {
   } );
 
   it("logs works", async () => {
-    const res = await fetchLogs()
-      .expect(HttpStatus.OK);
+    const res = await fetchLogs();
+
+    expect(res.statusCode).toBe(HttpStatus.OK);
+
+    const body = res.body as any[];
+
+    expect(body.length).toBeGreaterThan(0);
 
     expect(res.text).toContain("Nest application successfully started");
   } );

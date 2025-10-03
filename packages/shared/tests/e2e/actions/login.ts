@@ -21,7 +21,7 @@ export const localLoginAction: Action<Props, Ret> = async ( { page,
     url,
   } );
 
-  await expect(page.getByText("Login")).toBeVisible();
+  await expect(page.getByText("Login").last()).toBeVisible();
 
   // Si se usa fill, en webkit falla
   await safeFillInput( {
