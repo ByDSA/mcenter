@@ -1,7 +1,7 @@
 import z from "zod";
-import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import { dateSchema } from "$shared/models/utils/schemas/timestamps/date";
-import { userEntitySchema, UserEntityWithRoles } from "../../../users/models";
+import { mongoDbId } from "../resources/partial-schemas";
+import { dateSchema } from "../utils/schemas/timestamps/date";
+import { userEntitySchema, UserEntityWithRoles } from "./user";
 
 const counterSchema = z.number().int()
   .positive();

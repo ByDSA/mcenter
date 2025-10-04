@@ -6,68 +6,23 @@
   z-index: 1;
   margin-top: 0 !important;
   top: var(--sidebar-margin-top);
+  user-select: none;
 }
 
-@media (width < 600px) {
-  :global(body):has(.sidebar) {
-    --sidebar-width: 0px;
-  }
-  .sidebar {
+.topbar {
+  top: 0;
+  z-index: 2;
+  user-select: none;
+
+  > main {
     display: none !important;
   }
 
-  .topBar {
-    > aside:first-of-type {
-      > .mini {
-        display: flex;
-        border-right: var(--color-gray-900) solid 1px;
-      }
-      > .normal {
-        display: none;
-      }
-    }
-
-    > main {
-      display: flex !important;
-      > * {
-        padding: 0 clamp(10px, calc(6dvw - 10px), 5rem);
-        border-right: var(--color-gray-900) solid 1px;
-      }
-    }
-
-    > aside:last-of-type {
-      button {
-        padding-right: 0.75rem;
-        padding-left: 0.75rem;
-        font-size: 0.8rem;
-      }
-    }
-  }
-}
-
-@media (width >= 600px) {
-  .topBar {
-    > aside:first-child .mini {
-      display: none;
-    }
-    > main {
-      display: none !important;
-    }
-  }
-}
-
-.topBar {
-  z-index: 1;
-  > aside:first-child .mini {
-    width: 3rem;
-    justify-content: center;
-  }
-
-  *:has(> .topBarLeftAside) {
+  aside:has(> .topbarLeftAsideChild) {
     min-width: var(--content-margin-left);
     justify-content: center;
 
-    .topBarLeftAside {
+    .topbarLeftAsideChild {
       color: var(--color-blue-200) !important;
 
       font-size: 1.5rem;
@@ -79,8 +34,14 @@
         text-decoration: none;
       }
 
-      .logoCenter {
+      &.normal .logoCenter {
         color: var(--color-blue-150) !important;
+      }
+
+      &.mini {
+        display: none;
+        width: 3rem;
+        justify-content: center;
       }
     }
   }
@@ -111,4 +72,42 @@ body:has(.content) {
   color: white;
   min-height: calc(100dvh - var(--content-margin-top));
   min-width: calc(100dvw - var(--content-margin-left));
+}
+
+@media (width < 600px) {
+  :global(body):has(.sidebar) {
+    --sidebar-width: 0px;
+
+    .sidebar {
+      display: none !important;
+    }
+  }
+
+  .topbar {
+    > aside:first-of-type {
+      > .mini {
+        display: flex !important;
+        border-right: var(--color-gray-900) solid 1px;
+      }
+      > .normal {
+        display: none;
+      }
+    }
+
+    > main {
+      display: flex !important;
+      > * {
+        padding: 0 clamp(10px, calc(6dvw - 10px), 5rem);
+        border-right: var(--color-gray-900) solid 1px;
+      }
+    }
+
+    > aside:last-of-type {
+      button {
+        padding-right: 0.75rem;
+        padding-left: 0.75rem;
+        font-size: 0.8rem;
+      }
+    }
+  }
 }

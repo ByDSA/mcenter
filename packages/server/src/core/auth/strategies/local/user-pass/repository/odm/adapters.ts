@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { UserPass, UserPassEntity } from "../../userPass.entity";
-import { DocOdm, FullDocOdm } from "./odm";
+import { UserPassEntity, UserPass } from "$shared/models/auth";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
+import { DocOdm, FullDocOdm } from "./odm";
 
 type Entity = UserPassEntity;
 type Model = UserPass;

@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { HttpException, HttpExceptionOptions, HttpStatus, Injectable } from "@nestjs/common";
 import { PATH_ROUTES } from "$shared/routing";
-import { User } from "$shared/models/auth";
+import { User, UserPass, UserPassEntity } from "$shared/models/auth";
 import { OnEvent } from "@nestjs/event-emitter";
 import { assertIsDefined } from "$shared/utils/validation";
 import { APP_CONFIG } from "#core/config";
@@ -9,12 +9,10 @@ import { MailsService } from "#core/mails/service";
 import { UserEvents } from "#core/auth/users/crud/repository/events";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { assertFoundServer } from "#utils/validation/found";
-import { UserPassEntity } from "./user-pass/userPass.entity";
 import { UserPassesRepository } from "./user-pass";
 import { VerificationEmail } from "./VerificationEmail";
 import { WelcomeEmail } from "./WelcomeEmail";
 import { UserPassEvents } from "./user-pass/repository/events";
-import { UserPass } from "./user-pass/userPass.entity";
 
 type SendVerificationMailUserPass = Pick<UserPassEntity, "id" | "lastVerificationEmailSentAt" |
   "username" | "verificationEmailCount">;

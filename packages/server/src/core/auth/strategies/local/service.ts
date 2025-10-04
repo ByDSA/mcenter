@@ -2,14 +2,14 @@ import { ConflictException, Injectable, UnprocessableEntityException } from "@ne
 import { compare } from "bcryptjs";
 import { assertIsDefined } from "$shared/utils/validation";
 import { hashPassword } from "$shared/models/auth/utils";
+import { UserPass, UserPassEntityWithUserWithRoles } from "$shared/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
 import { User, UserEntityWithRoles, UserPayload } from "#core/auth/users/models";
 import { AlreadyExistsEmailException } from "#core/auth/users/crud/repository/errors";
 import { UsersService } from "#core/auth/users";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { AppPayloadService } from "../jwt/payload/AppPayloadService";
-import { type UserPass, UserPassesRepository } from "./user-pass";
-import { UserPassEntityWithUserWithRoles } from "./user-pass/userPass.entity";
+import { UserPassesRepository } from "./user-pass";
 import { LoginDto, SignUpDto } from "./dto";
 import { LocalUserVerificationService } from "./verification.service";
 

@@ -18,11 +18,11 @@ export default async function RootLayout( { children }: {
 } ) {
   const user = await getUser();
   const menu = <Topbar
-    className={classes(styles.topBar, styles.fixed)}
+    className={classes(styles.topbar, styles.fixed)}
     leftAside={
       <>
-        <a className={classes(styles.topBarLeftAside, styles.normal)} href="/">M<span className={styles.logoCenter}>Center</span></a>
-        <a className={classes(styles.topBarLeftAside, styles.mini)} href="/">M</a>
+        <a className={classes(styles.topbarLeftAsideChild, styles.normal)} href="/">M<span className={styles.logoCenter}>Center</span></a>
+        <a className={classes(styles.topbarLeftAsideChild, styles.mini)} href="/">M</a>
       </>
     }
     rightAside={

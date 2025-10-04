@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { UserPassEntity } from "../../../../../server/src/core/auth/strategies/local/user-pass/userPass.entity";
+import { UserPassEntity } from "../user-pass";
 import { hashPasswordSync } from "./utils";
 import { fixtureUsers } from "./fixtures";
 

@@ -4,6 +4,8 @@ export * from "./role";
 
 export * from "./user";
 
+export * from "./user-pass";
+
 export * from "./jwt";
 
 export const googleStateSchema = z.object( {

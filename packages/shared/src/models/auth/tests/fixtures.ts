@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import mongoose from "mongoose";
-import { UserRoleName, UserRoleEntity } from "../../../../../server/src/core/auth/users/models";
-import { UserEntity } from "../../../../../server/src/core/auth/users/models";
+import { UserEntity } from "../user";
+import { UserRoleEntity, UserRoleName } from "../role";
 
 const admin = {
   id: new mongoose.Types.ObjectId().toString(),

@@ -29,7 +29,7 @@ export default function Search() {
   return (
     <MusicLayout>
       <h2>Search</h2>
-      <span className={styles.topBar}>
+      <span className={styles.topbar}>
         {
           searchInput
         }

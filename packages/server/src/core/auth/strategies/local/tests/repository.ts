@@ -3,8 +3,8 @@ import { Injectable } from "@nestjs/common";
 import { createMockClass } from "$sharedTests/jest/mocking";
 import { Types } from "mongoose";
 import { fixtureAuthLocal } from "$sharedSrc/models/auth/tests/auth-local-fixtures";
-import { UserPass, UserPassesRepository } from "../user-pass";
-import { UserPassEntity } from "../user-pass/userPass.entity";
+import { UserPassEntity, UserPass } from "$shared/models/auth";
+import { UserPassesRepository } from "../user-pass";
 
 const userPassData = fixtureAuthLocal.All;
 

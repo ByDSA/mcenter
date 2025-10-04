@@ -1,5 +1,5 @@
+import { UserPassEntity } from "$shared/models/auth";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
-import { UserPassEntity } from "../userPass.entity";
 
 type Entity = UserPassEntity;
 export namespace UserPassEvents {
