@@ -23,7 +23,7 @@
     justify-content: center;
 
     .topbarLeftAsideChild {
-      color: var(--color-blue-200) !important;
+      color: var(--color-blue-300) !important;
 
       font-size: 1.5rem;
       padding: 0.5rem;
@@ -35,7 +35,7 @@
       }
 
       &.normal .logoCenter {
-        color: var(--color-blue-150) !important;
+        color: var(--color-blue-200) !important;
       }
 
       &.mini {
