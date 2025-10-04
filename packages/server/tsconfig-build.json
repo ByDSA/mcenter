@@ -9,6 +9,7 @@
     "**/tests",
     "spec",
     "src/**/tests/*",
+    "src/core/dev/*",
     "src/**/testUtils.ts",
     "**/*.spec.ts",
     "**/*.test.ts"

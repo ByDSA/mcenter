@@ -24,10 +24,6 @@ export class Database {
 
   private readonly logger = new Logger(Database.name);
 
-  constructor() {
-    // Constructor vacío, toda la configuración se mueve a connect
-  }
-
   #assertNotConnected() {
     if (this.#connected) {
       throw new Error(

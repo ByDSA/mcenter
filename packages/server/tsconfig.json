@@ -40,11 +40,7 @@
 
     // React
     "src/**/*.tsx",
-    "tests/**/*.tsx",
-    "../shared/src/models/auth/tests/fixtures.ts",
-    "../shared/src/models/auth/user-pass-fixtures.ts",
-    "../shared/src/models/auth/utils.ts",
-    "../shared/src/models/auth/tests/utils.ts"
+    "tests/**/*.tsx"
   ],
   "types": ["node"]
 }

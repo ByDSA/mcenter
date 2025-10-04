@@ -12,7 +12,8 @@ import { updateRemoteEnvs } from "./envs.mjs";
 /**
  * @param {import("../../lib/projects/deploy/types.mjs").TreeEnvs} ENVS
  */
-export async function deployParticular(ENVS) {
+export async function deployParticular(ENVS, opts = {} ) {
+  opts.noMigrations ??= false;
   const packageName = "server";
   const packageVersion = ENVS.project.version;
   const { ssh, vault } = ENVS;
@@ -76,10 +77,12 @@ export async function deployParticular(ENVS) {
     } );
   }
 
-  await migrations( {
-    targetEnv: ENVS.TARGET_ENV,
-    projectRoot: ENVS.project.root,
-  } );
+  if (!opts.noMigrations) {
+    await migrations( {
+      targetEnv: ENVS.TARGET_ENV,
+      projectRoot: ENVS.project.root,
+    } );
+  }
 }
 
 /**

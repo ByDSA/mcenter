@@ -7,11 +7,11 @@ import { Database } from "../../src/core/db/database";
 
   // eslint-disable-next-line no-empty-function, no-console
   console.log = () => {};
-  const database = new Database({
+  const database = new Database();
+
+  await database.connect(undefined,{
     silent: true,
   });
-
-  await database.connect();
 
   const metaCollection = mongoose.connection.collection("meta");
   const docs = await metaCollection.find().toArray();

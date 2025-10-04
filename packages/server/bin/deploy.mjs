@@ -7,11 +7,14 @@ import { deployParticular } from "../lib/deploy-particular.mjs";
 $.verbose = false;
 
 const { ENVS } = await readAndCheckEnvs();
+const haveToDoTests = argv["tests"] === undefined || argv["tests"] === true;
 
-$.verbose = true;
-await echo("Executing server tests");
-$.verbose = false;
-await $`cd ../../packages/server && pnpm test --forceExit`;
+if (haveToDoTests) {
+  $.verbose = true;
+  await echo("Executing server tests");
+  $.verbose = false;
+  await $`cd ../ && pnpm test --forceExit`;
+}
 
 await deployParticular( {
   ...ENVS,

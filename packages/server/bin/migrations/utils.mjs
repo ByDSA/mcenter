@@ -43,6 +43,8 @@ export async function fetchLastMigration(envFilePath) {
   console.log("Fetching last migration ...");
   const scriptPath = path.join(thisFolder, "fetchMeta.ts");
 
+  console.log("Script path:", scriptPath);
+
   $.verbose = false;
   const ret = await $`set -a && source ${envFilePath} && node -r ts-node/register -r tsconfig-paths/register ${scriptPath}`;
 
