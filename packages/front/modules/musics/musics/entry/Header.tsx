@@ -1,5 +1,5 @@
 import { Music, MusicEntity } from "$shared/models/musics";
-import { createDurationElement, HistoryEntryHeader } from "#modules/history";
+import { createDurationElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 
 type HeaderProps = {
   entry: MusicEntity;
@@ -11,7 +11,10 @@ export function Header( { entry }: HeaderProps) {
 
   return HistoryEntryHeader( {
     left: undefined,
-    right: duration && createDurationElement(duration),
+    right: <>
+      {duration && createDurationElement(duration)}
+      {createWeightElement(resource.weight)}
+    </>,
     title,
     subtitle: createMusicSubtitle(resource),
   } );
