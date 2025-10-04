@@ -18,6 +18,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, usernameOrEmail: string, password: string): Promise<UserPayload> {
+    // Instanciar AuthLocalService, que tiene de dependencia AppPayloadService (Request Scoped),
+    // en JwtStrategy que no lo es
     const contextId = ContextIdFactory.create();
 
     this.moduleRef.registerRequestByContextId(req, contextId);

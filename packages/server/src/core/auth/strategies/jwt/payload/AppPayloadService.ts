@@ -1,28 +1,22 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
-import { REQUEST } from "@nestjs/core";
 import { Request, Response } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
 import { AppPayload, UserEntityWithRoles, userEntityWithRolesSchema, UserPayload } from "$shared/models/auth";
+import { REQUEST } from "@nestjs/core";
 import { UsersRepository } from "#core/auth/users/crud/repository";
+import { isProduction } from "#utils";
 import { AppPayloadEncoderService } from "./AppPayloadEncoderService";
 
 @Injectable( {
   scope: Scope.REQUEST,
 } )
 export class AppPayloadService {
-  private payload: AppPayload;
-
   constructor(
     @Inject(REQUEST) private readonly request: Request,
     private readonly encoder: AppPayloadEncoderService,
     private readonly usersRepo: UsersRepository,
   ) {
     assertIsDefined(this.request);
-    this.payload = this.getValidPayloadOrNull() ?? this.generateEmptyPayload();
-  }
-
-  currentPayload() {
-    return this.payload;
   }
 
   private setAuthCookie(token: string): void {
@@ -32,121 +26,60 @@ export class AppPayloadService {
 
     assertIsDefined(AUTH_COOKIE_NAME);
 
-    response.cookie(AUTH_COOKIE_NAME, token);
+    response.cookie(AUTH_COOKIE_NAME, token, {
+      httpOnly: true, // Protege contra XSS
+      secure: isProduction(), // HTTPS
+      sameSite: "strict", // Protege contra CSRF
+      maxAge: 7 * 24 * 60 * 60 * 1_000,
+    } );
   }
 
-  private persist(): void {
-    (this.request as any).auth = this.payload;
-
-    const token = this.encoder.sign(this.payload);
+  private persist(payload: AppPayload): void {
+    (this.request as any).auth = payload;
+    const token = this.encoder.sign(payload, {
+      expiresIn: "7d",
+    } );
 
     this.setAuthCookie(token);
   }
 
-  getUser(): UserPayload | null {
-    const { payload } = this;
+  getCookieUser(): UserPayload | null {
+    const payload = (this.request as any).auth;
 
-    if (!payload)
-      return null;
-
-    return payload.user;
+    return payload?.user ?? null;
   }
 
-  async refreshUserAsync() {
-    const currentUser = this.getUser();
-
-    if (!currentUser)
-      return;
-
-    const updatedUser = await this.usersRepo.getOneById(currentUser.id, {
+  async refreshUser(user: UserPayload) {
+    const updatedUser = await this.usersRepo.getOneById(user.id, {
       expand: ["roles"],
     } ) as UserPayload;
 
-    this.payload.user = updatedUser;
+    this.putUser(updatedUser);
+
+    this.persist((this.request as any).auth);
+
+    return updatedUser;
   }
 
   login(user: UserEntityWithRoles) {
     const parsed = userEntityWithRolesSchema.parse(user);
 
     this.putUser(parsed);
-    this.persist();
+    this.persist((this.request as any).auth);
   }
 
   logout() {
-    this.removeUser();
-    this.persist();
+    (this.request as any).auth = {
+      ...(this.request as any).auth,
+      user: null,
+    };
+    this.persist((this.request as any).auth);
   }
 
   private putUser(user: UserPayload): void {
-    this.payload = {
-      ...this.payload,
+    (this.request as any).auth = {
+      ...(this.request as any).auth,
       user,
     };
   }
-
-  private generateEmptyPayload(): AppPayload {
-    return {
-      user: null,
-    };
-  }
-
-  private removeUser(): void {
-    this.payload = {
-      ...this.payload,
-      user: null,
-    };
-  }
-
-  private getValidPayloadOrNull() {
-    const { request } = this;
-
-    if (!request)
-      return null;
-
-    const requestAuth = (request as any).auth;
-
-    if (requestAuth)
-      return requestAuth;
-
-    const jwtToken = this.getTokenFromCookie();
-
-    if (!jwtToken)
-      return null;
-
-    return this.encoder.decode(jwtToken);
-  }
-
-  private getTokenFromCookie(): string | null {
-    const { cookies } = this.request;
-
-    if (!cookies)
-      return null;
-
-    const { AUTH_COOKIE_NAME } = process.env;
-
-    assertIsDefined(AUTH_COOKIE_NAME);
-
-    return cookies[AUTH_COOKIE_NAME];
-  }
-}
-
-function domainToBaseUrl(_domain?: string) {
-  // TODO
-  return "/";
-}
-
-export type Query = {[key: string]: string} | undefined;
-
-export function getFullUrlByQuery(query: Query) {
-  if (!query)
-    return null;
-
-  const redirectPage: string | undefined = query.redirect_page?.toString();
-
-  if (!redirectPage)
-    return null;
-
-  const redirectDomain: string | undefined = query.redirect_domain?.toString();
-
-  return `${domainToBaseUrl(redirectDomain)}/${redirectPage}`;
 }

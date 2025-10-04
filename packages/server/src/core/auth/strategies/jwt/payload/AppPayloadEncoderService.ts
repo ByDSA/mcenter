@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { JwtService, JwtSignOptions } from "@nestjs/jwt";
 import { AppPayload } from "$shared/models/auth";
 
 @Injectable()
@@ -8,9 +8,9 @@ export class AppPayloadEncoderService {
     private readonly jwtService: JwtService,
   ) { }
 
-  sign(payload: AppPayload): string {
+  sign(payload: AppPayload, opts?: JwtSignOptions): string {
     const { exp, iat, ...payloadWithoutExp } = payload;
-    const token = this.jwtService.sign(payloadWithoutExp);
+    const token = this.jwtService.sign(payloadWithoutExp, opts);
 
     return token;
   }

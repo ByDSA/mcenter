@@ -3,12 +3,13 @@ import { PassportStrategy } from "@nestjs/passport";
 import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { AppPayload } from "$shared/models/auth";
-import { UsersRepository } from "#core/auth/users/crud/repository";
+import { ModuleRef, ContextIdFactory } from "@nestjs/core";
+import { AppPayloadService } from "./payload/AppPayloadService";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly usersService: UsersRepository,
+    private readonly moduleRef: ModuleRef,
   ) {
     super( {
       jwtFromRequest: ExtractJwt.fromExtractors([getTokenFromRequest]),
@@ -19,19 +20,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, payload: AppPayload) {
-    const id = payload.user?.id;
-
-    if (!id)
+    if (!payload.user)
       throw new UnauthorizedException();
 
-    const user = await this.usersService.getOneById(id, {
-      expand: ["roles"],
-    } );
+    // Instanciar AppPayloadService que es Request Scoped
+    // en JwtStrategy que no lo es
+    const contextId = ContextIdFactory.create();
 
-    (req as any).auth = {
-      ...payload,
-      user,
-    };
+    this.moduleRef.registerRequestByContextId(req, contextId);
+    const appPayloadService = await this.moduleRef.resolve(
+      AppPayloadService,
+      contextId,
+    );
+
+    await appPayloadService.refreshUser(payload.user);
 
     return null;
   }

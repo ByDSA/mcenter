@@ -3,12 +3,13 @@ import { AppPayloadService } from "../strategies/jwt";
 
 @Injectable()
 export class GuestOnlyGuard implements CanActivate {
-  constructor(private readonly appPayloadService: AppPayloadService) {
+  constructor(
+    private readonly appPayloadService: AppPayloadService,
+  ) {
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  canActivate(context: ExecutionContext) {
-    const user = this.appPayloadService.getUser();
+  canActivate(_context: ExecutionContext) {
+    const user = this.appPayloadService.getCookieUser();
 
     return !user;
   }
