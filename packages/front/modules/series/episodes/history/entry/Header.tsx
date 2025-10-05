@@ -1,5 +1,5 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { createHistoryTimeElement, HistoryEntryHeader } from "#modules/history";
+import { createDurationElement, createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 import { EpisodeHistoryApi } from "../requests";
 
 type HeaderProps = {
@@ -15,9 +15,11 @@ export function Header( { entry }: HeaderProps) {
     ? `${resource.title}`
     : resource.compKey.episodeKey
     ?? "(Sin título)";
-  const subtitle = serie.name ?? resource.compKey.seriesKey;
-  const right = <span>{resource.compKey.episodeKey}</span>;
+  const subtitle = <>{resource.compKey.episodeKey} • {serie.name ?? resource.compKey.seriesKey}</>;
   const timeStampDate = new Date(entry.date.timestamp * 1000);
+  const start = resource.fileInfos[0].start ?? 0;
+  const end = resource.fileInfos[0].end ?? resource.fileInfos[0].mediaInfo.duration;
+  const duration = end ? (end - start) : undefined;
 
   return <HistoryEntryHeader
     left={<>
@@ -25,5 +27,8 @@ export function Header( { entry }: HeaderProps) {
     </>}
     title={title}
     subtitle={subtitle}
-    right={right} />;
+    right={<>
+      {duration && createDurationElement(duration)}
+      {createWeightElement(resource.weight)}
+    </>} />;
 }

@@ -5,7 +5,7 @@ import styles from "./style.module.css";
 type HeaderProps = {
   left?: ReactNode;
   title: string;
-  subtitle: string;
+  subtitle: ReactNode;
   right?: ReactNode;
 };
 export function Header( { left, title, subtitle, right }: HeaderProps) {
