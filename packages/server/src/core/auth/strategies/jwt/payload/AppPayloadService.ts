@@ -1,5 +1,5 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
 import { AppPayload, UserEntityWithRoles, userEntityWithRolesSchema, UserPayload } from "$shared/models/auth";
 import { REQUEST } from "@nestjs/core";
@@ -19,28 +19,31 @@ export class AppPayloadService {
     assertIsDefined(this.request);
   }
 
-  private setAuthCookie(token: string): void {
+  private setAuthCookie(token: string, opts?: CookieOptions): void {
     const request = (this.request as Request);
     const response = request.res as Response;
     const { AUTH_COOKIE_NAME } = process.env;
 
     assertIsDefined(AUTH_COOKIE_NAME);
 
-    response.cookie(AUTH_COOKIE_NAME, token, {
+    const options: CookieOptions = {
       httpOnly: true, // Protege contra XSS
       secure: isProduction(), // HTTPS
-      sameSite: "strict", // Protege contra CSRF
+      sameSite: "lax", // Para que el redirect de google mande la cookie. No protege contra CSRF
       maxAge: 7 * 24 * 60 * 60 * 1_000,
-    } );
+      ...opts,
+    };
+
+    response.cookie(AUTH_COOKIE_NAME, token, options);
   }
 
-  private persist(payload: AppPayload): void {
+  private persist(payload: AppPayload, opts?: CookieOptions): void {
     (this.request as any).auth = payload;
     const token = this.encoder.sign(payload, {
       expiresIn: "7d",
     } );
 
-    this.setAuthCookie(token);
+    this.setAuthCookie(token, opts);
   }
 
   getCookieUser(): UserPayload | null {
