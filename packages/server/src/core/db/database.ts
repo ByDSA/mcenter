@@ -92,17 +92,17 @@ export class Database {
       this.#dropable = true;
 
     // Generar URL de conexión
-    const dbConnectionURL = this.#generateUrl(config);
+    const dbConnectionUrl = this.#generateUrl(config);
 
-    this.logger.log(`Connecting to ${dbConnectionURL} ...`);
+    this.logger.log(`Connecting to ${dbConnectionUrl} ...`);
     mongoose.set("strictQuery", false);
 
-    const connectPromise = mongoose.connect(dbConnectionURL, finalOptions.connectOptions);
+    const connectPromise = mongoose.connect(dbConnectionUrl, finalOptions.connectOptions);
     const { connection } = mongoose;
 
     connection.on(
       "error",
-      () => this.logger.error(`Mongodb Connection Error: ${dbConnectionURL}\n`),
+      () => this.logger.error(`Mongodb Connection Error: ${dbConnectionUrl}\n`),
     );
 
     connection.once("open", () => {

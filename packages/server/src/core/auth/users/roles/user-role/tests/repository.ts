@@ -2,9 +2,9 @@
 import { Types } from "mongoose";
 import { assertIsDefined } from "$shared/utils/validation";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
+import { CanCreateOneAndGet } from "#utils/layers/repository";
 import { UserRoleMapEntity, UserRoleMap } from "../userRole.entity";
 import { UserEntity } from "../../../models";
-import { CanCreateOneAndGet } from "#utils/layers/repository";
 
 type Entity = UserRoleMapEntity;
 type Model = UserRoleMap;

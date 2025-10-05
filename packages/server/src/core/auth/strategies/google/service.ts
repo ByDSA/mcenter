@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { Request } from "express";
 import z from "zod";
-import { User, UserEntityWithRoles } from "../../users/models";
-import { AppPayloadService } from "../jwt";
 import { UsersService } from "#core/auth/users";
 import { UsersRepository } from "#core/auth/users/crud/repository";
+import { User, UserEntityWithRoles } from "../../users/models";
+import { AppPayloadService } from "../jwt";
 
 type SignUpResult = {
   user: UserEntityWithRoles;

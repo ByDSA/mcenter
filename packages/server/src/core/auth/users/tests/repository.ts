@@ -1,9 +1,9 @@
 /* eslint-disable require-await */
 import { createMockClass } from "$sharedTests/jest/mocking";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UsersRepository } from "../crud/repository";
 import { CriteriaOne } from "../crud/repository/repository";
 import { UserEntity, UserEntityWithRoles } from "../models";
-import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 
 const usersData = fixtureUsers.AllUsers;
 
