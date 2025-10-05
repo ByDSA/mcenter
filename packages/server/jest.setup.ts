@@ -5,6 +5,9 @@ import * as dotenv from "dotenv";
 import mongoose from "mongoose";
 import { isDebugging } from "../shared/src/utils/vscode";
 
+if (process.env.NODE_ENV === "test")
+  process.setMaxListeners(20);
+
 function loadEnvsFile(p: string): void {
   if (!existsSync(p))
     throw new Error(`File ${p} does not exist`);

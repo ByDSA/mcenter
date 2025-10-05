@@ -1,9 +1,14 @@
+import { getQueueToken } from "@nestjs/bullmq";
 import { INestApplication } from "@nestjs/common";
+import { Queue } from "bullmq";
 
+type Listener = (...args: any[])=> void;
 export class Cleanup {
   private static apps: INestApplication[] = [];
 
   private static initialized = false;
+
+  private static listeners = new Map<string, Listener>();
 
   static register(app: INestApplication) {
     this.apps.push(app);
@@ -15,11 +20,28 @@ export class Cleanup {
       // eslint-disable-next-line no-undef
       afterAll(async () => {
         await Cleanup.cleanup();
+        Cleanup.removeListeners();
       } );
     }
   }
 
   static cleanup = async () => {
+    for (const app of this.apps) {
+    // Intenta cerrar BullMQ
+      try {
+        const queue = app.get<Queue>(getQueueToken("single-tasks"), {
+          strict: false,
+        } );
+
+        if (queue) {
+          await queue.close();
+          await queue.disconnect();
+        }
+      } catch {
+      // BullMQ no existe en esta app/test
+      }
+    }
+
     await Promise.all(this.apps.map(app => app.close()));
     this.apps = [];
   };
@@ -30,12 +52,29 @@ export class Cleanup {
 
     this.initialized = true;
 
-    process.on("exit", this.cleanup);
-    process.on("SIGINT", this.cleanup);
-    process.on("SIGTERM", this.cleanup);
-    process.on("SIGUSR1", this.cleanup);
-    process.on("SIGUSR2", this.cleanup);
-    process.on("uncaughtException", this.cleanup);
-    process.on("unhandledRejection", this.cleanup);
+    const events = [
+      "exit",
+      "SIGINT",
+      "SIGTERM",
+      "SIGUSR1",
+      "SIGUSR2",
+      "uncaughtException",
+      "unhandledRejection",
+    ] as const;
+
+    events.forEach(event => {
+      const handler = this.cleanup;
+
+      this.listeners.set(event, handler);
+      process.on(event, handler);
+    } );
+  }
+
+  private static removeListeners() {
+    this.listeners.forEach((handler, event) => {
+      process.off(event as any, handler);
+    } );
+    this.listeners.clear();
+    this.initialized = false;
   }
 }

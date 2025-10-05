@@ -2,44 +2,58 @@ import { Injectable, Logger, OnApplicationBootstrap } from "@nestjs/common";
 import { Module } from "@nestjs/common";
 import { genOutputStackError } from "../logging/interceptor";
 
+type Handler = (...args: any[])=> void;
 @Injectable()
 export class GlobalErrorHandlerService implements OnApplicationBootstrap {
   private readonly logger = new Logger(GlobalErrorHandlerService.name);
 
-  onApplicationBootstrap() {
-    this.setupGlobalErrorHandlers();
-  }
+   private handlers = new Map<string, Handler>();
 
-  private setupGlobalErrorHandlers() {
-    // Handler para excepciones no capturadas
-    process.on("uncaughtException", (error: Error) => {
-      this.onUncaughtException(error);
-    } );
+   onApplicationBootstrap() {
+     this.setupGlobalErrorHandlers();
+   }
 
-    // Handler para promesas rechazadas no capturadas
-    process.on("unhandledRejection", (reason: any, promise: Promise<any>) => {
-      this.logger.error("Unhandled Rejection at:", promise, "reason:", reason);
-      // Opcional: convertir en uncaughtException si quieres consistencia
-      throw reason;
-    } );
+   onApplicationShutdown() {
+     this.removeHandlers();
+   }
 
-    // Handler opcional para warnings
-    process.on("warning", (warning: Error) => {
-      this.logger.warn("Process Warning:", warning.message);
-    } );
+   private setupGlobalErrorHandlers() {
+     const uncaughtHandler = (error: Error) => this.onUncaughtException(error);
+     const rejectionHandler = (reason: any, promise: Promise<any>) => {
+       this.logger.error("Unhandled Rejection at:", promise, "reason:", reason);
+       throw reason;
+     };
+     const warningHandler = (warning: Error) => {
+       this.logger.warn("Process Warning:", warning.message);
+     };
 
-    this.logger.log("Global error handlers initialized");
-  }
+     this.handlers.set("uncaughtException", uncaughtHandler);
+     this.handlers.set("unhandledRejection", rejectionHandler);
+     this.handlers.set("warning", warningHandler);
 
-  onUncaughtException(error: Error) {
-    const stack = error.stack ? genOutputStackError(error.stack) : "";
+     process.on("uncaughtException", uncaughtHandler);
+     process.on("unhandledRejection", rejectionHandler);
+     process.on("warning", warningHandler);
 
-    this.logger.error(
-      `Uncaught Exception.\n${error.name}: ${error.message}${stack ? `\n${stack}` : ""}`,
-    );
+     this.logger.log("Global error handlers initialized");
+   }
 
-    throw error;
-  }
+   private removeHandlers() {
+     this.handlers.forEach((handler, event) => {
+       process.off(event as any, handler);
+     } );
+     this.handlers.clear();
+   }
+
+   onUncaughtException(error: Error) {
+     const stack = error.stack ? genOutputStackError(error.stack) : "";
+
+     this.logger.error(
+       `Uncaught Exception.\n${error.name}: ${error.message}${stack ? `\n${stack}` : ""}`,
+     );
+
+     throw error;
+   }
 }
 
 @Module( {
