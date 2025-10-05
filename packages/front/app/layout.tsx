@@ -7,11 +7,63 @@ import { getUser } from "#modules/core/auth/server";
 import { UserAvatarButton } from "#modules/core/auth/Avatar";
 import { SidebarClient } from "#modules/ui-kit/menus/SidebarClient";
 import { classes } from "#modules/utils/styles";
+import { MenuItemData } from "#modules/ui-kit/menus/Sidebar";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
+
+// TODO
+/*
+  {
+    icon: <Movie />,
+    label: "Películas",
+    path: "/movies",
+  },
+  */
+
+const sideData: MenuItemData[] = [
+  {
+    icon: <Home />,
+    label: "Inicio",
+    path: "/",
+    matchPath: {
+      startsWith: "-",
+    },
+  },
+  {
+    icon: <MusicNote />,
+    label: "Música",
+    path: "/music/history",
+    matchPath: {
+      startsWith: "/music",
+    },
+  },
+  {
+    icon: <Movie />,
+    label: "Series",
+    path: "/series/history",
+    matchPath: {
+      startsWith: "/series",
+    },
+  },
+  {
+    icon: <LiveTv />,
+    label: "Player",
+    path: "/player/remote",
+    matchPath: {
+      startsWith: "/player",
+    },
+  },
+];
+const topbarData: MenuItemData[] = [
+  ...sideData.map(e=>( {
+    ...e,
+    title: e.label?.toString(),
+    label: undefined,
+  } )),
+];
 
 export default async function RootLayout( { children }: {
   children: React.ReactNode;
@@ -31,58 +83,11 @@ export default async function RootLayout( { children }: {
         {!user && <LoginButton />}
       </>
     }
-    mainData={[
-      {
-        label: <Home />,
-        title: "Inicio",
-        path: "/",
-      },
-      {
-        label: <Movie />,
-        title: "Series",
-        path: "/series",
-      },
-      {
-        label: <MusicNote />,
-        title: "Música",
-        path: "/music",
-      },
-      {
-        label: <LiveTv />,
-        title: "Player",
-        path: "/player",
-      },
-    ]}
+    mainData={topbarData}
   />;
   const sideBar = <SidebarClient
     className={classes(styles.fixed, styles.sidebar)}
-    data={[
-      {
-        icon: <Home />,
-        label: "Inicio",
-        path: "/",
-      },
-      {
-        icon: <MusicNote />,
-        label: "Música",
-        path: "/music",
-      },
-      {
-        icon: <Movie />,
-        label: "Series",
-        path: "/series",
-      },
-      {
-        icon: <Movie />,
-        label: "Películas",
-        path: "/movies",
-      },
-      {
-        icon: <LiveTv />,
-        label: "Player",
-        path: "/player",
-      },
-    ]}/>;
+    data={sideData}/>;
 
   return (
     <html lang="es">

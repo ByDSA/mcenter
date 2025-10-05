@@ -6,7 +6,7 @@ import { Sidebar } from "#modules/ui-kit/menus/Sidebar";
 export function SidebarClient(props: Parameters<typeof Sidebar>[0]) {
   const router = useRouter();
   const pathname = usePathname();
-  const isActive = (itemPath: string) => {
+  const matchPath = (itemPath: string) => {
     if (itemPath === "/")
       return pathname === "/";
 
@@ -15,7 +15,7 @@ export function SidebarClient(props: Parameters<typeof Sidebar>[0]) {
   const { data, ...otherProps } = props;
 
   for (const d of data) {
-    d.active = isActive(d.path);
+    d.active = matchPath(d.matchPath?.startsWith ?? d.path);
     d.onClick = (e) => {
     // Si es click con cmd/ctrl (nueva pestaña) o click derecho, deja el comportamiento normal
       if (e.metaKey || e.ctrlKey || e.button !== 0)

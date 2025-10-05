@@ -10,6 +10,9 @@ export type MenuItemData = {
   title?: string;
   label: ReactNode;
   path: string;
+  matchPath?: {
+    startsWith: string;
+  };
   active?: boolean;
   onClick?: SidebarItemProps["onClick"];
 };

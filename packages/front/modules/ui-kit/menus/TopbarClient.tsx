@@ -10,7 +10,7 @@ type Props = {
 export function TopbarMainClient( { data }: Props) {
   const router = useRouter();
   const pathname = usePathname();
-  const isActive = (itemPath: string) => {
+  const matchPath = (itemPath: string) => {
     if (itemPath === "/")
       return pathname === "/";
 
@@ -18,7 +18,7 @@ export function TopbarMainClient( { data }: Props) {
   };
 
   for (const d of data) {
-    d.active = isActive(d.path);
+    d.active = matchPath(d.matchPath?.startsWith ?? d.path);
     d.onClick = (e) => {
     // Si es click con cmd/ctrl (nueva pestaña) o click derecho, deja el comportamiento normal
       if (e.metaKey || e.ctrlKey || e.button !== 0)
