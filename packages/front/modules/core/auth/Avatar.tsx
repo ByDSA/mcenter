@@ -41,7 +41,6 @@ export function UserAvatarButton( { user }: Props) {
         aria-expanded={isOpen}
       >
         <svg
-          className={styles.userIcon}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

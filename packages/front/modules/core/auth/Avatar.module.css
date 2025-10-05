@@ -3,34 +3,27 @@
 }
 
 .userAvatarButton {
+  --size: calc(var(--topbar-height) - 6px);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--size);
+  height: var(--size);
   border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    var(--color-green-500),
-    var(--color-green-700)
-  );
+  background: var(--color-gray-400);
   border: none;
   cursor: pointer;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 
   &:hover,
   &.open {
-    background: linear-gradient(
-      135deg,
-      var(--color-green-600),
-      var(--color-green-800)
-    );
+    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.6);
   }
-}
 
-.userIcon {
-  width: 20px;
-  height: 20px;
-  color: white;
+  svg {
+    color: white;
+    --svg-size: calc(var(--size) * 0.64);
+    height: var(--svg-size);
+    width: var(--svg-size);
+  }
 }

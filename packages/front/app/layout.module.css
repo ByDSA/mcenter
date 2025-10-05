@@ -101,13 +101,5 @@ body:has(.content) {
         border-right: var(--color-gray-900) solid 1px;
       }
     }
-
-    > aside:last-of-type {
-      button {
-        padding-right: 0.75rem;
-        padding-left: 0.75rem;
-        font-size: 0.8rem;
-      }
-    }
   }
 }
