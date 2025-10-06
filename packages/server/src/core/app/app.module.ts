@@ -30,24 +30,7 @@ async function getDevModules() {
   ];
 }
 
-@Module( {
-  imports: [
-    LoggingModule.forRoot(),
-    GlobalErrorHandlerModule,
-    MeilisearchModule,
-    ...routeModules,
-    SchedulerModule,
-    DatabaseModule,
-    AuthModule,
-    UsersModule,
-    AuthGoogleModule,
-  ],
-  providers: [
-    ...globalValidationProviders,
-    ...globalAuthProviders,
-    InitService,
-  ],
-} )
+@Module( {} )
 export class AppModule {
   static async register(): Promise<DynamicModule> {
     const devModules = await getDevModules();
@@ -65,6 +48,11 @@ export class AppModule {
         AuthModule,
         UsersModule,
         AuthGoogleModule,
+      ],
+      providers: [
+        ...globalValidationProviders,
+        ...globalAuthProviders,
+        InitService,
       ],
     };
   }

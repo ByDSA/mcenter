@@ -8,7 +8,7 @@ import { addGlobalConfigToApp } from "#core/app/init.service";
 import { isDev } from "#utils";
 
 (async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(await AppModule.register());
 
   addGlobalConfigToApp(app);
   const logger = app.get(Logger);
