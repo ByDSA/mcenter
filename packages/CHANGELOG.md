@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.9.1](https://github.com/ByDSA/mcenter/compare/v4.9.0...v4.9.1) (2025-10-06)
+
+
+### Bug Fixes
+
+* **back:** get more than 1000 musics in picker ([5e13314](https://github.com/ByDSA/mcenter/commit/5e133146a0fd07c4cfddae103cb959c697a230c9))
+* **back:** improve cookies ([3abb068](https://github.com/ByDSA/mcenter/commit/3abb068746a94b7301b11d656af415c0ea7eaf19))
+* cookie ([073638d](https://github.com/ByDSA/mcenter/commit/073638d38d50f46752976cfb7305a51f6b35f303))
+* **front:** match path ([6c4c49f](https://github.com/ByDSA/mcenter/commit/6c4c49f1e056e18f12e5ec2a7bae5fd958410959))
+* **front:** move to /player/remote ([01e6b5c](https://github.com/ByDSA/mcenter/commit/01e6b5ce60149378e3dbd0812164e501e81f6b25))
+* **front:** show weight ([61a2a4b](https://github.com/ByDSA/mcenter/commit/61a2a4b1b525cb716acdb0f0a90ea7cbb1829f26))
+* **front:** update favicon ([08efd5e](https://github.com/ByDSA/mcenter/commit/08efd5e28dee5bdeddc3069a28986e569dd780d2))
+* **front:** update icon ([c225b5a](https://github.com/ByDSA/mcenter/commit/c225b5a1d7f505a2e934275b09289b9e849355e4))
+* minor fixes ([cfd3c46](https://github.com/ByDSA/mcenter/commit/cfd3c469c2aac1ec6508f284149c6a30f67ee2e4))
+
 ## [4.9.0](https://github.com/ByDSA/mcenter/compare/v4.8.2...v4.9.0) (2025-10-03)
 
 
