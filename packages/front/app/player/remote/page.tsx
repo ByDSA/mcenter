@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { showError } from "$shared/utils/errors/showError";
+import { assertIsDefined } from "$shared/utils/validation";
 import { EpisodeEntity } from "#modules/series/episodes/models";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
 import { Episode } from "#modules/series/episodes/models";
-import { Loading } from "#modules/fetching/loading";
 import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-player";
 import { EpisodesApi } from "#modules/series/episodes/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { Spinner } from "#modules/ui-kit/spinner";
+import stylesFetching from "#modules/fetching/fetching.style.module.css";
+import { classes } from "#modules/utils/styles";
 import styles from "./Player.module.css";
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;
@@ -20,7 +23,6 @@ let fetchingResource = false;
 let previousUri = "";
 
 export default function Player() {
-  const episodesApi = FetchApi.get(EpisodesApi);
   const [resource, setResource] = React.useState<EpisodeEntity | null>(null);
   const socketInitializer = () => {
     webSockets = new (class A extends RemotePlayerWebSocketsClient {
@@ -50,6 +52,8 @@ export default function Player() {
           };
 
           fetchingResource = true;
+          const episodesApi = FetchApi.get(EpisodesApi);
+
           episodesApi.getManyByCriteria(body)
             .then((res: EpisodesApi.GetManyByCriteria.Res) => {
               const episodes = res.data;
@@ -70,17 +74,35 @@ export default function Player() {
     } )();
 
     webSockets.init();
+
+    setTimeout(()=> {
+      if (statusStateRef.current.status === undefined)
+        statusStateRef.current.setStatus(null);
+    }, 500 + (1_500 * Math.random()));
   };
 
   useEffect(() => socketInitializer(), []);
   const [status, setStatus] = React.useState<PlayerStatusResponse | null | undefined>(undefined);
+  const statusStateRef = useRef( {
+    status,
+    setStatus,
+  } );
+
+  useEffect(()=> {
+    statusStateRef.current.setStatus = setStatus;
+    statusStateRef.current.status = status;
+  }, [status, setStatus]);
 
   return (
     <>
-      <h1>Player</h1>
+      <h1>Remote Player</h1>
 
-      {status === undefined && <Loading/>}
-      {status === null && "Error"}
+      {status === undefined && <div className={stylesFetching.loading}><Spinner/></div>}
+      {status === null
+        && <p className={classes(
+          stylesFetching.loading,
+          styles.error,
+        )}>No se ha detectado ningún reproductor remoto.</p>}
       {status && statusRepresentaton(status, resource)}
     </>
   );
@@ -108,28 +130,14 @@ function getPathFromUri(uri: string) {
   return null;
 }
 
-function calcStartLength(statusLength: number | undefined, resource: EpisodeEntity | null = null) {
-  let resourceEnd;
-  let resourceStart;
+function calcStartLength(statusLength: number, resource: EpisodeEntity | null = null) {
+  let resourceEnd: number;
+  let resourceStart: number;
   const fileInfo = resource?.fileInfos?.[0];
 
-  if (
-    typeof fileInfo?.end !== "number" || fileInfo.end < 0 || (fileInfo.start !== undefined
-    && fileInfo.end < fileInfo.start
-    )
-  )
-    resourceEnd = statusLength;
-  else
-    resourceEnd = fileInfo.end;
+  resourceEnd = fileInfo?.end ?? statusLength;
 
-  if (
-    typeof fileInfo?.start !== "number" || fileInfo?.start < 0
-    || (fileInfo.end !== undefined && fileInfo.start > fileInfo.end
-    )
-  )
-    resourceStart = 0;
-  else
-    resourceStart = fileInfo.start;
+  resourceStart = fileInfo?.start ?? 0;
 
   const length = resourceEnd - resourceStart;
 
@@ -140,14 +148,14 @@ function calcStartLength(statusLength: number | undefined, resource: EpisodeEnti
 }
 
 function statusRepresentaton(status: PlayerStatusResponse, resource: EpisodeEntity | null = null) {
-  const uri = status?.status?.playlist?.current?.uri;
+  const uri = status.status?.playlist?.current?.uri;
   let title = "-";
 
   if (resource)
 
     title = resource.title;
-  else if (status?.status?.meta?.title)
-    title = status?.status?.meta?.title;
+  else if (status.status?.meta?.title)
+    title = status.status?.meta?.title;
 
   let artist = "-";
 
@@ -156,9 +164,11 @@ function statusRepresentaton(status: PlayerStatusResponse, resource: EpisodeEnti
   else
     artist = uri?.slice(uri.lastIndexOf("/") + 1) ?? "-";
 
-  const statusLength = status?.status?.length;
+  const statusLength = status.status?.length;
+
+  assertIsDefined(statusLength);
   const { start: resourceStart, length } = calcStartLength(statusLength, resource);
-  const time = status?.status?.time ?? 0 - (resourceStart ?? 0);
+  const time = status.status?.time ?? 0 - (resourceStart ?? 0);
 
   return <>
     Proceso: {status.open ? "Abierto" : "Cerrado"}

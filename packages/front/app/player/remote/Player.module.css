@@ -20,3 +20,7 @@ ol.list {
   text-align: center;
   display: inline-block;
 }
+
+.error {
+  height: var(--spinner-size);
+}
