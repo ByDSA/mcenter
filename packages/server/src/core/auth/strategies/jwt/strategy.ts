@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(req: Request, payload: AppPayload) {
     if (!payload.user)
-      throw new UnauthorizedException();
+      return null;
 
     // Instanciar AppPayloadService que es Request Scoped
     // en JwtStrategy que no lo es
@@ -35,7 +35,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     await appPayloadService.refreshUser(payload.user);
 
-    return null;
+    return null; // req.user = null
   }
 }
 
