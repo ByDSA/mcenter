@@ -49,9 +49,6 @@
     }
   }
 
-  .lineWrap {
-    flex-wrap: wrap !important;
-  }
   .createdAt,
   .updatedAt {
     white-space: nowrap;

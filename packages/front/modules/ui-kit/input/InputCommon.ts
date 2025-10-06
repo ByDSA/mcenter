@@ -38,10 +38,11 @@ export function useOnChanges<T, E extends Element>( { value,
   return {
     addOnChange,
     handleChange,
+    callHandle: handle,
   };
 }
 
-type Observer<Args extends unknown[]> = (...params: Args)=> void;
+export type Observer<Args extends unknown[]> = (...params: Args)=> void;
 
 export function useObserver<Args extends unknown[]>() {
   const [observers, setObservers] = useState<Observer<Args>[]>([]);

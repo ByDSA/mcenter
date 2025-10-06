@@ -1,6 +1,5 @@
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { EpisodeFileInfoEntity } from "$shared/models/episodes/file-info";
-import { ResourceInputNumber } from "#uikit/input";
 import { isModified as isModifiedd } from "#modules/utils/objects";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
 import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
@@ -9,7 +8,8 @@ import { useCrud } from "#modules/utils/resources/useCrud";
 import { classes } from "#modules/utils/styles";
 import { OutputText } from "#modules/ui-kit/output/Text";
 import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
-import { secsToMmss, secsToMmssWithCents } from "#modules/utils/dates";
+import { secsToMmss } from "#modules/utils/dates";
+import { ResourceInputTime } from "#modules/ui-kit/input/ResourceInputTime";
 import { EPISODE_FILE_INFO_PROPS } from "../utils";
 import commonStyle from "../../../../../history/entry/body-common.module.css";
 import styles from "./style.module.css";
@@ -90,26 +90,20 @@ export function useEpisodeFileInfoCrudWithElements<T extends Data =
     } )
   }</span>;
   const startElement = <span className={classes(styles.start)}>
-    {ResourceInputNumber( {
+    {ResourceInputTime( {
       caption: EPISODE_FILE_INFO_PROPS.start.caption,
       ...getAndUpdateFileInfoByProp<number>("start"),
       ...commonEpisodeInputProps,
       isOptional: true,
     } )}
-    <span>
-      {fileInfo.start && fileInfo.start > 0 ? secsToMmssWithCents(fileInfo.start) : "-"}
-    </span>
   </span>;
   const endElement = <span className={classes(styles.end)}>
-    {ResourceInputNumber( {
+    {ResourceInputTime( {
       caption: EPISODE_FILE_INFO_PROPS.end.caption,
       ...getAndUpdateFileInfoByProp<number>("end"),
       ...commonEpisodeInputProps,
       isOptional: true,
     } )}
-    <span>
-      {fileInfo.end && fileInfo.end > 0 ? secsToMmssWithCents(fileInfo.end) : "-"}
-    </span>
   </span>;
 
   return {

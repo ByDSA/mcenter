@@ -6,6 +6,7 @@ import { OptionalPropsButton } from "#modules/musics/musics/entry/body/elements"
 import { MusicHistoryApi } from "../../requests";
 import { useMusicHistoryEntryEdition } from "../../useMusicHistoryEntryCrud";
 import styles from "../../../musics/entry/body/styles.module.css";
+import commonStyles from "../../../../history/entry/body-common.module.css";
 import { LastestComponent } from "./Lastest";
 
 type Data = MusicHistoryApi.GetManyByCriteria.Data;
@@ -39,14 +40,14 @@ export function Body( { data, setData }: Props) {
   return <>
     {createActionsBarElement()}
     <div className={classes(styles.container)}>
-      <span className={classes("line", "height2", styles.lineWrap)}>
+      <span className={classes("line", "height2", commonStyles.lineWrap)}>
 
         {musicElements.titleElement}
 
         {musicElements.artistElement}
 
       </span>
-      <span className={classes("line", "height2", styles.lineWrap)}>
+      <span className={classes("line", "height2", commonStyles.lineWrap)}>
         {musicElements.weightElement}
         {musicElements.albumElement}
       </span>

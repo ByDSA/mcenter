@@ -84,8 +84,7 @@ export function Body( { data, setData }: Props) {
   const { resource } = state[0];
   const { startElement,
     endElement,
-    pathElement,
-    durationElement } = fileInfoElements;
+    pathElement } = fileInfoElements;
 
   return <>
     {createActionsBarElement()}
@@ -96,10 +95,8 @@ export function Body( { data, setData }: Props) {
       <span className={classes("line", "height2")}>
         {weightElement}
       </span>
-      <span className={classes("line", "height2")}>
+      <span className={classes("line", "height2", commonStyle.lineWrap)}>
         {startElement}
-      </span>
-      <span className={classes("line", "height2")}>
         {endElement}
       </span>
       <span className={classes("line", "height2")}>
@@ -107,9 +104,6 @@ export function Body( { data, setData }: Props) {
       </span>
       <span className={classes("line", "height2")}>
         {urlElement}
-      </span>
-      <span className={classes("line", "height2")}>
-        {durationElement}
       </span>
       <span className={classes("line", "height2")}>
         {pathElement}
