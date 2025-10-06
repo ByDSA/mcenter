@@ -26,6 +26,8 @@ export {
   Doc as MusicDocMeili,
 };
 
+export const MEILISEARCH_MUSICS_MAX_HITS = 10_000;
+
 @Injectable()
 export class MusicsIndexService {
   private indexName = "musics";
@@ -73,6 +75,13 @@ export class MusicsIndexService {
     const task = await this.index.addDocuments(documentsForSearch);
 
     await waitForTask(this.meiliSearch, task.taskUid);
+
+    await this.index.updateSettings( {
+      pagination: {
+        maxTotalHits: MEILISEARCH_MUSICS_MAX_HITS, // Para que en el picker permita > 1000
+        // TODO: cuando se haga para episodes, añadir algo como esto
+      },
+    } );
 
     this.logger.log(`Sincronizados ${documentsForSearch.length} documentos`);
   }
