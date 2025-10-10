@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.10.0](https://github.com/ByDSA/mcenter/compare/v4.9.1...v4.10.0) (2025-10-10)
+
+
+### Features
+
+* **front:** time input ([7ba385b](https://github.com/ByDSA/mcenter/commit/7ba385b254d4174d9ec1ff0378f3cc94bf6a4379))
+* more than one remote player ([63561f8](https://github.com/ByDSA/mcenter/commit/63561f8f8666cce56b086d6220e6ac9087a47613))
+
+
+### Bug Fixes
+
+* **back:** local login ([d48b2ed](https://github.com/ByDSA/mcenter/commit/d48b2edbad5e3b6b9caaabd13ac622045d1c46ac))
+
 ### [4.9.1](https://github.com/ByDSA/mcenter/compare/v4.9.0...v4.9.1) (2025-10-06)
 
 
