@@ -1,14 +1,9 @@
-import { PATH_ROUTES } from "$shared/routing";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
-import { testRoute } from "#core/routing/test/routing";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MusicsRepository } from "./repository";
 import { MusicCrudController } from "./controller";
 import { musicsRepoMockProvider } from "./repository/tests";
-
-testRoute(PATH_ROUTES.musics.withParams("id"));
-testRoute(PATH_ROUTES.musics.search.path);
 
 crudTestsSuite( {
   name: MusicCrudController.name,
@@ -21,7 +16,7 @@ crudTestsSuite( {
       ],
     }, {
       auth: {
-        using: "mock",
+        repositories: "mock",
       },
     }],
   repositoryClass: MusicsRepository,

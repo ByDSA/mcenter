@@ -43,8 +43,8 @@ describe("playStreamController", () => {
       ],
     }, {
       auth: {
-        using: "mock",
-        jwtGuard: "mock",
+        repositories: "mock",
+        cookies: "mock",
       },
     } );
 

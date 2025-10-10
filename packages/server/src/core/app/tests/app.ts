@@ -3,8 +3,8 @@ import { INestApplication, Logger, ModuleMetadata, Type } from "@nestjs/common";
 import { Application } from "express";
 import { APP_GUARD, RouterModule } from "@nestjs/core";
 import { isDebugging } from "$shared/utils/vscode";
-import { createMockInstance } from "$sharedTests/jest/mocking";
 import { AppPayload, UserPayload } from "$shared/models/auth";
+import { createMockInstance } from "$sharedTests/jest/mocking";
 import { addGlobalConfigToApp, globalAuthProviders, globalValidationProviders } from "#core/app/init.service";
 import { Database } from "#core/db/database";
 import { DatabaseModule } from "#core/db/module";
@@ -22,6 +22,7 @@ import { UsersRepository } from "#core/auth/users/crud/repository";
 import { AuthGoogleModule } from "#core/auth/strategies/google";
 
 export type TestingSetup = {
+  options?: Options;
   app: INestApplication;
   routerApp: Application;
   module: TestingModule;
@@ -35,8 +36,8 @@ type Options = {
     using: "default" | "memory" | "real";
   };
   auth?: {
-    using: boolean | "mock";
-    jwtGuard?: "mock" | "normal";
+    repositories: "mock" | "normal";
+    cookies?: "mock" | "normal";
   };
   beforeCompile?: (moduleBuilder: TestingModuleBuilder)=> void;
 };
@@ -54,7 +55,7 @@ export async function createTestingAppModule(
       GlobalErrorHandlerModule,
       ...(metadata.imports ?? []),
       ...(options?.db?.using ? [DatabaseModule, MeilisearchModule] : []),
-      ...(options?.auth?.using
+      ...(options?.auth?.repositories
         ? [
           UsersModule,
           AuthModule,
@@ -65,8 +66,10 @@ export async function createTestingAppModule(
     ],
     providers: [
       ...globalValidationProviders,
-      ...(options?.auth?.using && options.auth.jwtGuard !== "mock" ? globalAuthProviders : []),
-      ...(options?.auth?.jwtGuard === "mock"
+      ...(options?.auth && options.auth.cookies !== "mock"
+        ? globalAuthProviders
+        : []),
+      ...(options?.auth?.cookies === "mock"
         ? [{
           provide: APP_GUARD,
           useValue: mockAuthGuard,
@@ -86,16 +89,37 @@ export async function createTestingAppModule(
       break;
   }
 
-  if (options?.auth?.using === "mock") {
+  if (options?.auth?.repositories === "mock") {
     moduleBuilder
       .overrideProvider(UsersRepository)
       .useClass(MockUsersRepository);
     moduleBuilder
       .overrideProvider(UserPassesRepository)
       .useClass(MockUserPassRepository);
+  }
+
+  if (options?.auth?.cookies === "mock") {
+    const mockAppPayloadService = createMockInstance(AppPayloadService);
+
+    mockAppPayloadService.getCookieUser.mockImplementation(
+      ()=>null,
+    );
+
     moduleBuilder
       .overrideProvider(AppPayloadService)
-      .useValue(createMockInstance(AppPayloadService));
+      .useValue(mockAppPayloadService);
+
+    mockAuthGuard.canActivate.mockImplementation((context) => {
+      const req = context.switchToHttp().getRequest();
+
+      req.auth = {
+        user: null,
+      } as AppPayload;
+
+      req.user = null;
+
+      return true;
+    } );
   }
 
   options?.beforeCompile?.(moduleBuilder);
@@ -116,6 +140,7 @@ export async function createTestingAppModule(
 
   return {
     routerApp,
+    options,
     app,
     module,
     db: options?.db?.using ? app.get<TestRealDatabase>(Database) : undefined,
@@ -124,10 +149,16 @@ export async function createTestingAppModule(
     },
     resolveMock,
     useMockedUser: async (user: UserPayload) => {
-      (await resolveMock(AppPayloadService))
-        .getCookieUser.mockImplementation(
-          ()=>user,
-        );
+      if (options?.auth?.cookies !== "mock")
+        return;
+
+      const mockAppPayloadService = (await resolveMock(AppPayloadService));
+
+      mockAppPayloadService.getCookieUser.mockImplementation(
+        ()=>user,
+      );
+
+      mockAppPayloadService.refreshUser.mockImplementation(async ()=>await user);
 
       mockAuthGuard.canActivate.mockImplementation((context) => {
         const req = context.switchToHttp().getRequest();
@@ -135,6 +166,8 @@ export async function createTestingAppModule(
         req.auth = {
           user,
         } as AppPayload;
+
+        req.user = user;
 
         return true;
       } );

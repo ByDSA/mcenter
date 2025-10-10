@@ -22,7 +22,7 @@ describe(AuthModule.name + "", () => {
       providers: [],
     }, {
       auth: {
-        using: true,
+        repositories: "normal",
       },
       db: {
         using: "default",

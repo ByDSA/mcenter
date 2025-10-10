@@ -44,8 +44,8 @@ describe("playEpisodeController", () => {
       ],
     }, {
       auth: {
-        using: "mock",
-        jwtGuard: "mock",
+        repositories: "mock",
+        cookies: "mock",
       },
     } );
 

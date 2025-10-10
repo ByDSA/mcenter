@@ -41,7 +41,7 @@ crudTestsSuite( {
     },
     {
       auth: {
-        using: "mock",
+        repositories: "mock",
       },
     },
   ],

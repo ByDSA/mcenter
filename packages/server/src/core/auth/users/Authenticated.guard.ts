@@ -1,11 +1,11 @@
-import { Injectable, CanActivate, UnauthorizedException, applyDecorators, SetMetadata, UseGuards } from "@nestjs/common";
+import { Injectable, CanActivate, UnauthorizedException, applyDecorators, SetMetadata, UseGuards, ExecutionContext } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 
 @Injectable()
 export class AuthenticatedGuard implements CanActivate {
-  canActivate(context: any) {
+  canActivate(context: ExecutionContext) {
     try {
-      const user = context.getRequest().auth?.user;
+      const { user } = context.switchToHttp().getRequest();
 
       assertIsDefined(user);
     } catch {

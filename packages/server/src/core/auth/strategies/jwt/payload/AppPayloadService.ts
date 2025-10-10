@@ -73,17 +73,16 @@ export class AppPayloadService {
   }
 
   logout() {
-    (this.request as any).auth = {
-      ...(this.request as any).auth,
-      user: null,
-    };
+    this.putUser(null);
     this.persist((this.request as any).auth);
   }
 
-  private putUser(user: UserPayload): void {
+  private putUser(user: UserPayload | null): void {
     (this.request as any).auth = {
       ...(this.request as any).auth,
       user,
     };
+
+    (this.request as any).user = user;
   }
 }

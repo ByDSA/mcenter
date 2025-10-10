@@ -4,11 +4,11 @@ import { assertFoundClient } from "#utils/validation/found";
 import { generateCase } from "./generate-case";
 import { autoProps, PatchTestsProps } from "./patch-one";
 import { defaultResponse, expectedDataNotFound } from "./common";
-import { setAuthRole } from "./auth";
+import { getFixtureUserByRole, setAuthRole } from "./auth";
 
 export function deleteOneTests<R>(props: PatchTestsProps<R>) {
   const { repo,
-    getExpressApp } = props;
+    getExpressApp, getTestingSetup } = props;
   const { getFn, repoReturned } = autoProps(props);
   const { expectedBody, shouldReturn } = defaultResponse(props);
   const validUrl = props.url ?? "/id";
@@ -28,10 +28,16 @@ export function deleteOneTests<R>(props: PatchTestsProps<R>) {
       const rolePrefix = `${role ? `role=${role} ` : ""}`;
       const beforeEach: typeof props.beforeEach = role
         ? async (p) => {
-          await setAuthRole( {
-            role,
-            req: p.request,
-          } );
+          const testingSetup = getTestingSetup();
+
+          if (testingSetup.options?.auth?.cookies === "mock")
+            await testingSetup.useMockedUser(getFixtureUserByRole(role));
+          else {
+            await setAuthRole( {
+              role,
+              req: p.request,
+            } );
+          }
 
           return props.beforeEach?.(p);
         }
@@ -84,10 +90,16 @@ export function deleteOneTests<R>(props: PatchTestsProps<R>) {
     for (const role of negativeAuth ?? []) {
       const rolePrefix = `${role ? `role=${role} ` : ""}`;
       const beforeEach: typeof props.beforeEach = async (p) => {
-        await setAuthRole( {
-          role,
-          req: p.request,
-        } );
+        const testingSetup = getTestingSetup();
+
+        if (testingSetup.options?.auth?.cookies === "mock")
+          await testingSetup.useMockedUser(getFixtureUserByRole(role));
+        else {
+          await setAuthRole( {
+            role,
+            req: p.request,
+          } );
+        }
 
         return props.beforeEach?.(p);
       };

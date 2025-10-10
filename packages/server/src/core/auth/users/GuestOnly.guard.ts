@@ -1,15 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable, UseGuards } from "@nestjs/common";
-import { AppPayloadService } from "../strategies/jwt";
 
 @Injectable()
 export class GuestOnlyGuard implements CanActivate {
-  constructor(
-    private readonly appPayloadService: AppPayloadService,
-  ) {
-  }
-
-  canActivate(_context: ExecutionContext) {
-    const user = this.appPayloadService.getCookieUser();
+  canActivate(context: ExecutionContext) {
+    const { user } = context.switchToHttp().getRequest();
 
     return !user;
   }

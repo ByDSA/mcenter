@@ -34,8 +34,8 @@ describe("playMusicController", () => {
       ],
     }, {
       auth: {
-        using: "mock",
-        jwtGuard: "mock",
+        repositories: "mock",
+        cookies: "mock",
       },
     } );
 

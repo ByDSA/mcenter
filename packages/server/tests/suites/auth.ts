@@ -29,22 +29,8 @@ export async function setAuthRole( { req, role }: Props) {
   } ).setLogger(logger);
   const module = await moduleBuilder.compile();
   const service = await module.resolve<AppPayloadEncoderService>(AppPayloadEncoderService);
-  let user: UserEntityWithRoles;
-
-  if (role === UserRoleName.ADMIN) {
-    user = {
-      ...fixtureUsers.Admin.User,
-      roles: fixtureUsers.Admin.Roles,
-    };
-  } else {
-    user = {
-      ...fixtureUsers.Normal.User,
-      roles: fixtureUsers.Normal.Roles,
-    };
-  }
-
   const authCookieObj = {
-    user,
+    user: getFixtureUserByRole(role),
   };
   const authCookieValue = service.sign(authCookieObj);
   const cookieTxt = `${process.env.AUTH_COOKIE_NAME}=${authCookieValue}`;
@@ -53,4 +39,15 @@ export async function setAuthRole( { req, role }: Props) {
     `Putting cookie: ${JSON.stringify(authCookieObj, null, 2)}"`,
   );
   req.set("Cookie", [cookieTxt]);
+}
+
+export function getFixtureUserByRole(role: UserRoleName): UserEntityWithRoles {
+  let user: UserEntityWithRoles;
+
+  if (role === UserRoleName.ADMIN)
+    user = fixtureUsers.Admin.UserWithRoles;
+  else
+    user = fixtureUsers.Normal.UserWithRoles;
+
+  return user;
 }

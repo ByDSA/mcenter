@@ -19,7 +19,7 @@ describe("auth controller", () => {
       providers: [],
     }, {
       auth: {
-        using: "mock",
+        repositories: "mock",
       },
     } );
     routerApp = testingSetup.routerApp;

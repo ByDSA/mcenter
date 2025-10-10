@@ -6,7 +6,7 @@ import { UserPayload } from "./models";
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const User = createParamDecorator((_data, ctx: ExecutionContext): UserPayload | null => {
   const req = ctx.switchToHttp().getRequest();
-  const user = req?.auth?.user as UserPayload | undefined;
+  const user = req?.user as UserPayload | undefined;
 
   if (!user) {
     const reflector = new Reflector();

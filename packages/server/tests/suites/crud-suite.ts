@@ -13,7 +13,7 @@ type OmitGetRepo<T> = T extends { repo: infer R }
     }
   : T;
 
-type TestConfig<R> = OmitGetRepo<Omit<PatchTestsProps<R>, "getExpressApp">>;
+type TestConfig<R> = OmitGetRepo<Omit<PatchTestsProps<R>, "getExpressApp" | "getTestingSetup">>;
 
 type TestsConfig<R> = {
   getAll?: TestConfig<jest.Mocked<R>>;
@@ -39,6 +39,11 @@ export function crudTestsSuite<R>(props: Props<R>) {
     let testingSetup: TestingSetup;
 
     beforeAll(async () => {
+      if (props.appModule[1]?.auth) {
+        props.appModule[1].auth.cookies ??= "mock";
+        props.appModule[1].auth.repositories ??= "mock";
+      }
+
       testingSetup = await createTestingAppModuleAndInit(...props.appModule);
       routerApp = testingSetup.routerApp;
 
@@ -64,6 +69,7 @@ export function crudTestsSuite<R>(props: Props<R>) {
 
     if (testConfig.getAll) {
       getAllTests( {
+        getTestingSetup: ()=>testingSetup,
         ...testConfig.getAll,
         repo: {
           ...testConfig.getAll.repo,
@@ -75,6 +81,7 @@ export function crudTestsSuite<R>(props: Props<R>) {
 
     if (testConfig.getOne) {
       getOneTests( {
+        getTestingSetup: ()=>testingSetup,
         ...testConfig.getOne,
         repo: {
           ...testConfig.getOne.repo,
@@ -86,6 +93,7 @@ export function crudTestsSuite<R>(props: Props<R>) {
 
     if (testConfig.patchOne) {
       patchOneTests( {
+        getTestingSetup: ()=>testingSetup,
         ...testConfig.patchOne,
         repo: {
           ...testConfig.patchOne.repo,
@@ -97,6 +105,7 @@ export function crudTestsSuite<R>(props: Props<R>) {
 
     if (testConfig.getManyCriteria) {
       getManyCriteriaTests( {
+        getTestingSetup: ()=>testingSetup,
         ...testConfig.getManyCriteria,
         repo: {
           ...testConfig.getManyCriteria.repo,
@@ -108,6 +117,7 @@ export function crudTestsSuite<R>(props: Props<R>) {
 
     if (testConfig.deleteOne) {
       deleteOneTests( {
+        getTestingSetup: ()=> testingSetup,
         ...testConfig.deleteOne,
         repo: {
           ...testConfig.deleteOne.repo,

@@ -30,7 +30,7 @@ crudTestsSuite( {
       ],
     }, {
       auth: {
-        using: "mock",
+        repositories: "mock",
       },
     }],
   repositoryClass: EpisodesRepository,

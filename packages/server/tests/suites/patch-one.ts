@@ -3,12 +3,14 @@ import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserRoleName } from "$shared/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
+import { TestingSetup } from "#core/app/tests/app";
 import { AfterProps, BeforeProps, ExpectedBody, generateCase, GenerateCaseProps } from "./generate-case";
 import { defaultResponse, expectedDataNotFound, expectUnprocessableEntity } from "./common";
-import { setAuthRole } from "./auth";
+import { getFixtureUserByRole, setAuthRole } from "./auth";
 
 type MockFn = NonNullable<GenerateCaseProps["mock"]>["fn"][0];
 export type PatchTestsProps<R> = {
+  getTestingSetup: ()=> TestingSetup;
   repo: Omit<MockFn, "getFn"> & {
     getRepo: ()=> R;
     getFn: (repo: R)=> ReturnType<MockFn["getFn"]>;
@@ -61,7 +63,7 @@ export function patchOneTests<R>(
   props: PatchTestsProps<R>,
 ) {
   const { repo,
-    getExpressApp } = props;
+    getExpressApp, getTestingSetup } = props;
   const { expectedBody, getFn,
     repoReturned, shouldReturn,
     invalidInput, validInput } = defaultProps(props);
@@ -85,10 +87,16 @@ export function patchOneTests<R>(
       const rolePrefix = `${role ? `role=${role} ` : ""}`;
       const beforeEach: typeof props.beforeEach = role
         ? async (p) => {
-          await setAuthRole( {
-            role,
-            req: p.request,
-          } );
+          const testingSetup = getTestingSetup();
+
+          if (testingSetup.options?.auth?.cookies === "mock")
+            await testingSetup.useMockedUser(getFixtureUserByRole(role));
+          else {
+            await setAuthRole( {
+              role,
+              req: p.request,
+            } );
+          }
 
           return props.beforeEach?.(p);
         }
@@ -157,10 +165,16 @@ export function patchOneTests<R>(
     for (const role of negativeAuth ?? []) {
       const rolePrefix = `${role ? `role=${role} ` : ""}`;
       const beforeEach: typeof props.beforeEach = async (p) => {
-        await setAuthRole( {
-          role,
-          req: p.request,
-        } );
+        const testingSetup = getTestingSetup();
+
+        if (testingSetup.options?.auth?.cookies === "mock")
+          await testingSetup.useMockedUser(getFixtureUserByRole(role));
+        else {
+          await setAuthRole( {
+            role,
+            req: p.request,
+          } );
+        }
 
         return props.beforeEach?.(p);
       };

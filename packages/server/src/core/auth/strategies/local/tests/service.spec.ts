@@ -46,7 +46,7 @@ describe("localValidationService", () => {
         }],
     }, {
       auth: {
-        using: true,
+        repositories: "normal",
       },
       beforeCompile: (builder) => {
         builder

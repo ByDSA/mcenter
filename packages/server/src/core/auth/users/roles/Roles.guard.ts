@@ -12,16 +12,16 @@ export class RolesGuard implements CanActivate {
   ) { }
 
   canActivate(context: ExecutionContext): boolean {
+    const req = context.switchToHttp().getRequest();
+    const user = req.user as UserPayload | undefined;
+
+    if (!user?.roles)
+      throw new UnauthorizedException();
+
     const requiredRoles = this.getRolesFromDecorator(context);
 
     if (!requiredRoles)
       return true;
-
-    const req = context.switchToHttp().getRequest();
-    const user = req.auth?.user as UserPayload | undefined;
-
-    if (!user?.roles)
-      throw new UnauthorizedException();
 
     return user.roles.some((role) => requiredRoles.includes(role.name));
   }

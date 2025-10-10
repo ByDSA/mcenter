@@ -30,7 +30,7 @@ describe("googleController", () => {
       providers: [],
     }, {
       auth: {
-        using: true,
+        repositories: "normal",
       },
     } );
     routerApp = testingSetup.routerApp;

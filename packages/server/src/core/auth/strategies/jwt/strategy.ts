@@ -32,10 +32,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       AppPayloadService,
       contextId,
     );
+    const refreshedUser = await appPayloadService.refreshUser(payload.user);
 
-    await appPayloadService.refreshUser(payload.user);
-
-    return null; // req.user = null
+    return refreshedUser; // req.user
   }
 }
 

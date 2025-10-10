@@ -15,7 +15,7 @@ crudTestsSuite( {
       ],
     }, {
       auth: {
-        using: "mock",
+        repositories: "mock",
       },
     }],
   repositoryClass: EpisodeFileInfoRepository,
