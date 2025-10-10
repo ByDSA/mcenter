@@ -10,6 +10,7 @@ import { classes } from "#modules/utils/styles";
 import { MenuItemData } from "#modules/ui-kit/menus/Sidebar";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
+import { NavigationWatcher } from "./NavigationWatcher";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
@@ -100,6 +101,7 @@ export default async function RootLayout( { children }: {
       </head>
       <body>
         <InitApis />
+        <NavigationWatcher />
         <UserProvider initialUser={user}>
           {menu}
           {sideBar}

@@ -1,8 +1,10 @@
 import { Test, TestingModule, TestingModuleBuilder } from "@nestjs/testing";
 import { INestApplication, Logger, ModuleMetadata, Type } from "@nestjs/common";
 import { Application } from "express";
-import { RouterModule } from "@nestjs/core";
+import { APP_GUARD, RouterModule } from "@nestjs/core";
 import { isDebugging } from "$shared/utils/vscode";
+import { createMockInstance } from "$sharedTests/jest/mocking";
+import { AppPayload, UserPayload } from "$shared/models/auth";
 import { addGlobalConfigToApp, globalAuthProviders, globalValidationProviders } from "#core/app/init.service";
 import { Database } from "#core/db/database";
 import { DatabaseModule } from "#core/db/module";
@@ -11,7 +13,7 @@ import { GlobalErrorHandlerModule } from "#core/error-handlers/global-error-hand
 import { TestRealDatabase, TestMemoryDatabase } from "#core/db/tests";
 import { MeilisearchModule } from "#modules/search/module";
 import { UsersModule } from "#core/auth/users/module";
-import { AuthModule } from "#core/auth/strategies/jwt";
+import { AppPayloadService, AuthModule } from "#core/auth/strategies/jwt";
 import { MockUserPassRepository } from "#core/auth/strategies/local/tests/repository";
 import { UserPassesRepository } from "#core/auth/strategies/local/user-pass";
 import { MockUsersRepository } from "#core/auth/users/tests/repository";
@@ -25,6 +27,8 @@ export type TestingSetup = {
   module: TestingModule;
   db?: TestRealDatabase;
   getMock: <T>(clazz: Type<T>)=> jest.Mocked<T>;
+  resolveMock: <T>(clazz: Type<T>)=> Promise<jest.Mocked<T>>;
+  useMockedUser: (user: UserPayload)=> Promise<void>;
 };
 type Options = {
   db?: {
@@ -32,6 +36,7 @@ type Options = {
   };
   auth?: {
     using: boolean | "mock";
+    jwtGuard?: "mock" | "normal";
   };
   beforeCompile?: (moduleBuilder: TestingModuleBuilder)=> void;
 };
@@ -39,6 +44,9 @@ export async function createTestingAppModule(
   metadata: ModuleMetadata,
   options?: Options,
 ): Promise<TestingSetup> {
+  const mockAuthGuard = {
+    canActivate: jest.fn(),
+  };
   const moduleBuilder = Test.createTestingModule( {
     ...metadata,
     imports: [
@@ -57,7 +65,13 @@ export async function createTestingAppModule(
     ],
     providers: [
       ...globalValidationProviders,
-      ...(options?.auth?.using ? globalAuthProviders : []),
+      ...(options?.auth?.using && options.auth.jwtGuard !== "mock" ? globalAuthProviders : []),
+      ...(options?.auth?.jwtGuard === "mock"
+        ? [{
+          provide: APP_GUARD,
+          useValue: mockAuthGuard,
+        }]
+        : []),
       ...(metadata.providers ?? []),
     ],
   } );
@@ -79,6 +93,9 @@ export async function createTestingAppModule(
     moduleBuilder
       .overrideProvider(UserPassesRepository)
       .useClass(MockUserPassRepository);
+    moduleBuilder
+      .overrideProvider(AppPayloadService)
+      .useValue(createMockInstance(AppPayloadService));
   }
 
   options?.beforeCompile?.(moduleBuilder);
@@ -93,6 +110,9 @@ export async function createTestingAppModule(
 
   addGlobalConfigToApp(app);
   const routerApp = app.getHttpServer();
+  const resolveMock = async <T>(clazz: Type<T>) => {
+    return await module.resolve<jest.Mocked<T>>(clazz);
+  };
 
   return {
     routerApp,
@@ -101,6 +121,23 @@ export async function createTestingAppModule(
     db: options?.db?.using ? app.get<TestRealDatabase>(Database) : undefined,
     getMock: <T>(clazz: Type<T>) => {
       return module.get<jest.Mocked<T>>(clazz);
+    },
+    resolveMock,
+    useMockedUser: async (user: UserPayload) => {
+      (await resolveMock(AppPayloadService))
+        .getCookieUser.mockImplementation(
+          ()=>user,
+        );
+
+      mockAuthGuard.canActivate.mockImplementation((context) => {
+        const req = context.switchToHttp().getRequest();
+
+        req.auth = {
+          user,
+        } as AppPayload;
+
+        return true;
+      } );
     },
   };
 }

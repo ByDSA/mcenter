@@ -14,13 +14,13 @@ export class App {
     this.#webSocketsService = webSocketsService;
   }
 
-  async start() {
+  start() {
     if (!this.#webSocketsService)
       throw new Error("webSocketsService is not defined");
 
     const { WS_SERVER_HOST: host, WS_SERVER_PATH: path, WS_SERVER_PORT: port } = getEnvs();
 
-    await this.#webSocketsService.startSocket( {
+    this.#webSocketsService.startSocket( {
       host,
       port,
       path,

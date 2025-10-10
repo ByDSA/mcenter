@@ -1,26 +1,3 @@
-ol.list {
-  list-style: none;
-  counter-reset: item;
-  padding-left: 0;
-  margin: 0;
-}
-
-.list li {
-  counter-increment: item;
-  margin-bottom: 5px;
-}
-
-.list li:before {
-  margin-right: 10px;
-  content: counter(item);
-  background: lightblue;
-  border-radius: 100%;
-  color: white;
-  width: 1.2em;
-  text-align: center;
-  display: inline-block;
-}
-
 .error {
   height: var(--spinner-size);
 }

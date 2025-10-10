@@ -6,6 +6,7 @@ import { VlcBackWebSocketsServerService } from "./player-services";
 type PlayParams = {
   force?: boolean;
   mediaElements: MediaElement[];
+  remotePlayerId: string;
 };
 
 @Injectable()
@@ -14,12 +15,15 @@ export class PlayService {
     private readonly vlcBackWSServerService: VlcBackWebSocketsServerService,
   ) { }
 
-  async play( { mediaElements, force }: PlayParams): Promise<void> {
+  async play( { mediaElements, force, remotePlayerId }: PlayParams): Promise<void> {
     assertIsNotEmpty(mediaElements);
 
     await this.vlcBackWSServerService.emitPlayResource( {
-      mediaElements,
-      force,
+      message: {
+        mediaElements,
+        force,
+      },
+      remotePlayerId,
     } );
   }
 }

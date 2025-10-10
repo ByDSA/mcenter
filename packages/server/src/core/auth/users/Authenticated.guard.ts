@@ -1,18 +1,16 @@
-import { Injectable, CanActivate, UnauthorizedException, ExecutionContext, applyDecorators, SetMetadata, UseGuards } from "@nestjs/common";
-import { AppPayloadService } from "../strategies/jwt";
+import { Injectable, CanActivate, UnauthorizedException, applyDecorators, SetMetadata, UseGuards } from "@nestjs/common";
+import { assertIsDefined } from "$shared/utils/validation";
 
 @Injectable()
 export class AuthenticatedGuard implements CanActivate {
-  constructor(
-    private readonly appPayloadService: AppPayloadService,
-  ) {
-  }
+  canActivate(context: any) {
+    try {
+      const user = context.getRequest().auth?.user;
 
-  canActivate(_context: ExecutionContext) {
-    const user = this.appPayloadService.getCookieUser();
-
-    if (!user)
+      assertIsDefined(user);
+    } catch {
       throw new UnauthorizedException();
+    }
 
     return true;
   }

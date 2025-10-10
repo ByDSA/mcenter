@@ -9,6 +9,7 @@ import { EpisodesCrudModule } from "#episodes/crud/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { MusicsCrudModule } from "#musics/crud/module";
 import { MusicFileInfoModule } from "#musics/file-info/module";
+import { AuthModule } from "#core/auth/module";
 import { PlayVideoService } from "./play-video.service";
 import { FrontWSServerService } from "./player-services/front/front-player-web-sockets-server.service";
 import { VlcBackWSService } from "./player-services/vlc-back/vlc-back-ws-server.service";
@@ -17,6 +18,11 @@ import { PlayEpisodeController } from "./play-episode/controller";
 import { PlayMusicController } from "./play-music/controller";
 import { PlayService } from "./play.service";
 import { PlayMusicService } from "./play-music/service";
+import { RemotePlayersController } from "./remote-players.controller";
+import { OnlineRemotePlayersService } from "./online-remote-players.service";
+import { RemotePlayersRepository } from "./player-services/repository";
+import { RemotePlayerSubscriptionsService } from "./player-services/front/subs.service";
+import { AuthPlayerService } from "./AuthPlayer.service";
 
 @Global() // Para que use sólo una instancia de servicio backend de web sockets
 @Module( {
@@ -31,11 +37,13 @@ import { PlayMusicService } from "./play-music/service";
     MusicsCrudModule,
     MusicHistoryModule,
     MusicFileInfoModule,
+    AuthModule,
   ],
   controllers: [
     PlayEpisodeController,
     PlayMusicController,
     PlayStreamController,
+    RemotePlayersController,
   ],
   providers: [
     FrontWSServerService,
@@ -43,6 +51,11 @@ import { PlayMusicService } from "./play-music/service";
     PlayVideoService,
     PlayMusicService,
     VlcBackWSService,
+    OnlineRemotePlayersService,
+    RemotePlayersRepository,
+    RemotePlayerSubscriptionsService,
+    AuthPlayerService,
+    RemotePlayersController, // Como provider para que se pueda usar el handler de eventos
   ],
   exports: [
     FrontWSServerService,

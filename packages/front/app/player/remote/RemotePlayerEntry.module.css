@@ -1,0 +1,103 @@
+.playerEntry {
+  width: 100%;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-gray-800);
+  transition: background-color 0.2s ease;
+  color: white;
+
+  &:hover {
+    cursor: not-allowed;
+  }
+
+  &.playing {
+    &:hover {
+      cursor: pointer;
+    }
+    .statusIndicator {
+      background-color: var(--color-green-700);
+    }
+  }
+  &.unknown {
+    .statusIndicator {
+      background-color: var(--color-gray-900);
+    }
+  }
+
+  &.idle {
+    color: var(--color-gray-100);
+
+    .statusIndicator {
+      background-color: var(--color-yellow-600);
+    }
+  }
+
+  &.offline {
+    color: var(--color-gray-300);
+
+    .statusIndicator {
+      background-color: var(--color-red-700);
+    }
+  }
+
+  .statusContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+    width: 4rem;
+
+    .statusIndicator {
+      width: 0.8rem;
+      height: 0.8rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+      margin: 2px;
+    }
+
+    .statusLabel {
+      width: inherit;
+      display: flex;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .playerInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .playerName {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.5rem;
+  }
+
+  .playerId {
+    font-size: 0.67rem;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

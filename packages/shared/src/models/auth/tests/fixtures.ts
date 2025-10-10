@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import mongoose from "mongoose";
-import { UserEntity } from "../user";
+import { UserEntity, UserEntityWithRoles } from "../user";
 import { UserRoleEntity, UserRoleName } from "../role";
 
 const admin = {
@@ -26,6 +26,10 @@ const userRole = {
 const Admin = {
   User: admin,
   Roles: [adminRole, userRole],
+  UserWithRoles: {
+    ...admin,
+    roles: [adminRole, userRole],
+  } satisfies UserEntityWithRoles,
   UserRoleMap: [
     {
       userId: admin.id,
@@ -40,6 +44,10 @@ const Admin = {
 const Normal = {
   User: normal,
   Roles: [userRole],
+  UserWithRoles: {
+    ...normal,
+    roles: [userRole],
+  } satisfies UserEntityWithRoles,
   UserRoleMap: [
     {
       userId: normal.id,

@@ -1,15 +1,18 @@
 "use client";
 
 import { Fragment, MouseEventHandler } from "react";
-import { showError } from "$shared/utils/errors/showError";
 import { Stream } from "$shared/models/streams";
 import { PATH_ROUTES } from "$shared/routing";
+import { RemotePlayerDtos } from "$shared/models/player/remote-player/dto/domain";
+import { useRouter } from "next/navigation";
 import { backendUrl } from "#modules/requests";
 import { StreamsFetching } from "#modules/streams/requests";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudData } from "#modules/fetching/index";
+import { logger } from "#modules/core/logger";
 
 export function List() {
+  const router = useRouter();
   const { data, error, isLoading } = useCrudData( {
     refetching: {
       fn: async () => {
@@ -17,6 +20,7 @@ export function List() {
 
         return result.data;
       },
+      everyMs: 10_000,
     },
   } );
 
@@ -25,12 +29,34 @@ export function List() {
     error,
     isLoading,
     render: (d) => {
-      const playStream: (stream: string)=> MouseEventHandler = (stream: string) => (e) => {
+      const playStream: (
+        stream: string
+      )=> MouseEventHandler = (stream: string) => async (e) => {
         e.preventDefault();
-        fetch(backendUrl(PATH_ROUTES.player.play.stream.withParams(stream)), {
+
+        const remotePlayersRes = await fetch(backendUrl("/api/player/remote-players"), {
+          credentials: "include",
+        } );
+        const remotePlayers: RemotePlayerDtos.Front.Dto[] = await remotePlayersRes.json();
+        const onlineRemotePlayers = remotePlayers.filter(r=>r.status !== "offline");
+
+        if (onlineRemotePlayers.length === 0)
+          logger.error("No hay remote players disponibles");
+
+        if (onlineRemotePlayers.length > 1)
+          logger.error("Hay más de un remote player disponible");
+
+        const remotePlayer = onlineRemotePlayers[0];
+
+        await fetch(backendUrl(PATH_ROUTES.player.play.stream.withParams(
+          remotePlayer.id,
+          stream,
+        )), {
           method: "GET",
-        } )
-          .catch(showError);
+          credentials: "include",
+        } );
+
+        await router.push("/player/remote/" + remotePlayer.id);
       };
 
       return <>

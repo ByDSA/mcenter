@@ -8,13 +8,13 @@ export function logDomainEvent(
   const logger = new Logger();
 
   if (isEntityEvent(event))
-    logger.log(`[${queueKey}]`, event.type, event.payload.entity);
+    logger.log(`[${queueKey}] ${event.type} ${event.payload.entity}`);
   else if (isPatchEvent(event)) {
     const key = (event.payload.key as any).toString();
     const { value } = event.payload;
     const showedValue = typeof value === "string" ? `'${ value }'` : value;
 
-    logger.log(`[${queueKey}]`, event.type, event.payload.entityId, `${key}:`, showedValue);
+    logger.log(`[${queueKey}] ${event.type} ${event.payload.entityId} ${key}: ${showedValue}`);
   } else
     throw new Error("Unknown event type: " + event.type);
 }

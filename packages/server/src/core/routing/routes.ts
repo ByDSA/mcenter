@@ -53,15 +53,15 @@ const imports = [
   Si hay colisiones en el acceso, cargar el módulo específico primero fuera del Register */
 export const authRoutes: Routes = [
   {
-    path: "api/users", // TODO
+    path: "api/users",
     module: UsersModule,
   },
   {
-    path: "api/auth", // TODO
+    path: "api/auth",
     module: AuthModule,
   },
   {
-    path: "api/auth", // TODO
+    path: "api/auth",
     module: AuthGoogleModule,
   },
 ];

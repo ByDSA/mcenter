@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { ScrollStatus } from "#modules/ui-kit/ScrollStatus";
-import { LoadingSpinner } from "./loading";
+import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
 
 type DataRenderParams<T> = {
   data: T;
@@ -45,7 +45,7 @@ export function renderFetchedData<T>(
   }
 
   if (!data && isLoading)
-    return LoadingSpinner;
+    return <PageSpinner />;
 
   if (!data)
     return <span>Empty data.</span>;

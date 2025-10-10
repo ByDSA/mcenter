@@ -4,8 +4,9 @@ import { ResultResponse } from "$shared/utils/http/responses";
 import { MusicPlaylist } from "#modules/musics/playlists/Playlist";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicPlaylistsApi } from "#modules/musics/playlists/requests";
-import { LoadingSpinner, useCrudData } from "#modules/fetching";
+import { useCrudData } from "#modules/fetching";
 import MusicLayout from "app/music/music.layout";
+import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
 
 interface PageProps {
   params: Promise<{
@@ -50,7 +51,7 @@ export default async function Page( { params }: PageProps) {
             return error.toString();
           }
         } )()}</pre>}
-        {isLoading && LoadingSpinner}
+        {isLoading && <PageSpinner />}
         {data
       && <MusicPlaylist value={data} setValue={(d)=>setData(d)}/>
         }

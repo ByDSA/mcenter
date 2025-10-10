@@ -6,12 +6,12 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { MusicEntity } from "$shared/models/musics";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
-import { LoadingSpinner } from "#modules/fetching";
 import { classes } from "#modules/utils/styles";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
 import styles from "./YouTubeUpload.module.css";
 import { UploadButton } from "./UploadButton";
+import { PageSpinner } from "../spinner/Spinner";
 
 type OnSubmitProps<S> = Pick<Props,
  "musicId" | "onCreateMusic" | "onCreateMusicFileInfo"
@@ -233,7 +233,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
       />
           }
           {
-            doing && <div className={styles.loading}>{LoadingSpinner}</div>
+            doing && <div className={styles.loading}><PageSpinner /></div>
           }
         </div>
       </div>

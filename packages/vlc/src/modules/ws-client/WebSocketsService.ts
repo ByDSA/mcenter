@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { showError } from "$shared/utils/errors/showError";
-import { PlayerEvent, PlayResourceMessage } from "#modules/models";
+import { assertIsDefined } from "$shared/utils/validation";
+import { FromRemotePlayerEvent, PlayResourceMessage, ToRemotePlayerEvent } from "#modules/models";
 import { PlayerService } from "../PlayerService";
 
 type StartSocketParams = {
@@ -33,61 +34,67 @@ export class WebSocketsService {
     return this.#socket;
   }
 
-  async startSocket( { host, path, port }: StartSocketParams): Promise<void> {
+  startSocket( { host, path, port }: StartSocketParams): void {
+    const secretToken = process.env.SECRET_TOKEN;
+
+    assertIsDefined(secretToken);
     this.#socket = io(`http://${host}:${port}`, {
       path,
+      auth: {
+        token: secretToken,
+      },
     } );
 
     const socket = this.#socket;
 
     this.#playerService.onStatusChange((status) => {
-      socket.emit(PlayerEvent.STATUS, status);
+      socket.emit(FromRemotePlayerEvent.STATUS, status);
     } );
 
-    socket.on(PlayerEvent.CONNECT, () => {
-      console.log("socket connected");
+    socket.on("connect", () => {
+      console.log("socket connected to backend");
     } );
 
-    socket.on(PlayerEvent.DISCONNECT, () => {
-      console.log("socket disconnected");
+    socket.on("disconnect", () => {
+      console.log("socket disconnected from backend");
     } );
 
-    socket.on(PlayerEvent.PAUSE_TOGGLE, () => {
+    socket.on(ToRemotePlayerEvent.PAUSE_TOGGLE, () => {
       console.log("pause toggle");
 
       this.#playerService.pauseToggle()
         .catch(showError);
     } );
 
-    socket.on(PlayerEvent.NEXT, () => {
+    socket.on(ToRemotePlayerEvent.NEXT, () => {
       console.log("next");
 
       this.#playerService.next()
         .catch(showError);
     } );
 
-    socket.on(PlayerEvent.PREVIOUS, () => {
+    socket.on(ToRemotePlayerEvent.PREVIOUS, () => {
       console.log("previous");
 
       this.#playerService.previous()
         .catch(showError);
     } );
 
-    socket.on(PlayerEvent.STOP, () => {
+    socket.on(ToRemotePlayerEvent.STOP, () => {
       console.log("stop");
 
       this.#playerService.stop()
         .catch(showError);
     } );
 
-    socket.on(PlayerEvent.PLAY, (id: number) => {
+    socket.on(ToRemotePlayerEvent.PLAY, (id: number) => {
       console.log("play", id);
 
       this.#playerService.play(id)
         .catch(showError);
     } );
 
-    socket.on(PlayerEvent.SEEK, (val: number | string) => {
+    socket.on(ToRemotePlayerEvent.SEEK, (val: number | string) => {
       if (!(typeof val === "string" || typeof val === "number"))
         throw new Error("val is not string or number");
 
@@ -97,17 +104,9 @@ export class WebSocketsService {
         .catch(showError);
     } );
 
-    socket.on(PlayerEvent.PLAY_RESOURCE, (msg: PlayResourceMessage) => {
+    socket.on(ToRemotePlayerEvent.PLAY_RESOURCE, (msg: PlayResourceMessage) => {
       this.#playerService.playResource(msg)
         .catch(showError);
-    } );
-
-    await new Promise<void>((resolve) => {
-      socket.on("connect", () => {
-        console.log("connected");
-
-        resolve();
-      } );
     } );
   }
 }

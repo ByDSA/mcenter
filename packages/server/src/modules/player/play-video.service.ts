@@ -24,6 +24,7 @@ export class PlayVideoService {
   ) { }
 
   private async processAndPlayEpisodes(
+    remotePlayerId: string,
     episodes: EpisodeEntityWithFileInfos[],
     streamId: string,
     force?: boolean,
@@ -43,6 +44,7 @@ export class PlayVideoService {
     await this.playService.play( {
       mediaElements,
       force,
+      remotePlayerId,
     } );
 
     const isLast = await this.historyRepo.isLast(episodes[0].compKey);
@@ -59,8 +61,8 @@ export class PlayVideoService {
   }
 
   async playEpisodeStream(
+    remotePlayerId: string,
     streamId: string,
-    number: number,
     query: QueryDto,
   ) {
     const { force } = query;
@@ -68,17 +70,25 @@ export class PlayVideoService {
 
     assertFoundClient(stream);
 
-    const episodes = (await this.episodePickerService.getByStream(stream, number, {
+    let number: number;
+
+    if (query.n === undefined || query.n < 1)
+      number = 1;
+    else
+      number = query.n;
+
+    const episodes = (await this.episodePickerService.getByStream(stream, number ?? 1, {
       expand: ["series", "fileInfos"],
     } ))
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
 
     assertFoundClient(episodes[0]);
 
-    return this.processAndPlayEpisodes(episodes, stream.id, force);
+    return this.processAndPlayEpisodes(remotePlayerId, episodes, stream.id, force);
   }
 
   async playEpisode(
+    remotePlayerId: string,
     episodeCompKey: EpisodeCompKey,
     query: QueryDto,
   ) {
@@ -100,6 +110,6 @@ export class PlayVideoService {
     assertFoundClient(episodes[0]);
     const stream = await this.streamsRepo.getOneOrCreateBySeriesKey(seriesKey);
 
-    return this.processAndPlayEpisodes(episodes, stream.id, force);
+    return this.processAndPlayEpisodes(remotePlayerId, episodes, stream.id, force);
   }
 }

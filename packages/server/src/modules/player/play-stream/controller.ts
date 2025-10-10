@@ -1,11 +1,17 @@
-import { Controller, Get, Param, Query } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
+import { mongoDbId } from "$shared/models/resources/partial-schemas";
+import { UserPayload } from "$shared/models/auth";
+import { Authenticated } from "#core/auth/users/Authenticated.guard";
+import { User } from "#core/auth/users/User.decorator";
 import { PlayVideoService } from "../play-video.service";
+import { AuthPlayerService } from "../AuthPlayer.service";
+import { SecretTokenBodyDto } from "../model";
 
 class ParamsDto extends createZodDto(z.object( {
+  remotePlayerId: mongoDbId,
   id: z.string(),
-  number: z.coerce.number(),
 } )) {}
 
 const booleanFromString = z.preprocess((val) => {
@@ -26,29 +32,45 @@ const booleanFromString = z.preprocess((val) => {
 
 export class QueryDto extends createZodDto(z.object( {
   force: booleanFromString.optional(),
+  n: z.coerce.number().optional(),
 } )) {}
 
-@Controller("play/stream")
+@Controller("play/:remotePlayerId/stream")
 export class PlayStreamController {
   constructor(
     private readonly playService: PlayVideoService,
+    private readonly auth: AuthPlayerService,
   ) { }
 
-    @Get("/:id")
+  @Get("/:id")
+  @Authenticated()
   async playStreamDefault(
-    @Param("id") id: string,
-    @Query() query: QueryDto,
-  ) {
-    return await this.playService.playEpisodeStream(id, 1, query);
-  }
-
-  @Get("/:id/:number")
-    async playStream(
     @Param() params: ParamsDto,
     @Query() query: QueryDto,
-    ) {
-      const { id, number = 1 } = params;
+    @User() user: UserPayload,
+  ) {
+    await this.auth.guardUser( {
+      userId: user.id,
+      remotePlayerId: params.remotePlayerId,
+    } );
 
-      return await this.playService.playEpisodeStream(id, number, query);
-    }
+    return await this.playService.playEpisodeStream(params.remotePlayerId, params.id, query);
+  }
+
+  @Post("/:id")
+  @HttpCode(HttpStatus.ACCEPTED)
+  async playStreamWithToken(
+    @Param() params: ParamsDto,
+    @Query() query: QueryDto,
+    @Body() body: SecretTokenBodyDto,
+  ) {
+    try {
+      await this.auth.guardToken( {
+        remotePlayerId: params.remotePlayerId,
+        secretToken: body.secretToken,
+      } );
+
+      return await this.playService.playEpisodeStream(params.remotePlayerId, params.id, query);
+    } catch { /* empty */ }
+  }
 }

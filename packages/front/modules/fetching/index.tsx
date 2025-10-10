@@ -12,8 +12,6 @@ export * from "./patch";
 
 export * from "./fetcher";
 
-export * from "./loading";
-
 export * from "./scroll";
 
 export * from "./scroll";

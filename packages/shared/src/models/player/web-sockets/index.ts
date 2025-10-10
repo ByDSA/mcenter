@@ -1,3 +1,3 @@
-export * from "./player-event";
+export * from "./remote-player-event";
 
 export * from "./message";

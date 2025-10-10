@@ -5,10 +5,13 @@ import { Server, Socket } from "socket.io";
 import { Injectable, Logger } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { OnEvent } from "@nestjs/event-emitter";
-import { PlayerEvent, PlayResourceMessage } from "#modules/player/player-services/models";
+import { WithRequired } from "$shared/utils/objects";
+import { PlayerStatusResponse } from "$shared/models/player";
+import { ToRemotePlayerEvent, PlayResourceMessage, FromRemotePlayerEvent, RemotePlayerConnection } from "#modules/player/player-services/models";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
-import { DomainEvent } from "#core/domain-event-emitter";
-import { PlayerEvents } from "../events";
+import { OnlineRemotePlayersService } from "#modules/player/online-remote-players.service";
+import { ToRemotePlayerEvents, FromRemotePlayerEvents } from "../events";
+import { RemotePlayersRepository } from "../repository";
 
 @Injectable()
 export class VlcBackWSService {
@@ -18,31 +21,48 @@ export class VlcBackWSService {
 
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
+    private readonly remotePlayersService: OnlineRemotePlayersService,
+    private readonly repo: RemotePlayersRepository,
   ) { }
 
-  @OnEvent(PlayerEvents.WILDCARD)
-  async handleEvents(event: DomainEvent<unknown>) {
+  @OnEvent(ToRemotePlayerEvents.WILDCARD)
+  async handleEvents(event: ToRemotePlayerEvents.Empty.Event) {
+    assertIsDefined(this.io);
+    const { remotePlayerId } = event.payload;
+
+    assertIsDefined(remotePlayerId);
+
+    const op = this.io
+      .to(remotePlayerRoom(remotePlayerId));
+
     switch (event.type) {
-      case PlayerEvents.getEventEmitterType(PlayerEvent.PAUSE_TOGGLE):
-        await this.#emitPauseToggle();
+      case ToRemotePlayerEvents.getEventEmitterType(ToRemotePlayerEvent.PAUSE_TOGGLE):
+        op.emit(ToRemotePlayerEvent.PAUSE_TOGGLE);
         break;
-      case PlayerEvents.getEventEmitterType(PlayerEvent.NEXT):
-        await this.#emitNext();
+      case ToRemotePlayerEvents.getEventEmitterType(ToRemotePlayerEvent.NEXT):
+        op.emit(ToRemotePlayerEvent.NEXT);
         break;
-      case PlayerEvents.getEventEmitterType(PlayerEvent.PREVIOUS):
-        await this.#emitPrevious();
+      case ToRemotePlayerEvents.getEventEmitterType(ToRemotePlayerEvent.PREVIOUS):
+        op.emit(ToRemotePlayerEvent.PREVIOUS);
         break;
-      case PlayerEvents.getEventEmitterType(PlayerEvent.STOP):
-        await this.#emitStop();
+      case ToRemotePlayerEvents.getEventEmitterType(ToRemotePlayerEvent.STOP):
+        op.emit(ToRemotePlayerEvent.STOP);
         break;
-      case PlayerEvents.getEventEmitterType(PlayerEvent.SEEK):
-        await this.#emitSeek((event as PlayerEvents.Seek.Event).payload.value);
+      case ToRemotePlayerEvents.getEventEmitterType(ToRemotePlayerEvent.SEEK):
+        op.emit(
+          ToRemotePlayerEvent.SEEK,
+          (event as ToRemotePlayerEvents.Seek.Event).payload.value,
+        );
         break;
-      case PlayerEvents.getEventEmitterType(PlayerEvent.PLAY):
-        await this.#emitPlay((event as PlayerEvents.Play.Event).payload.id);
+      case ToRemotePlayerEvents.getEventEmitterType(ToRemotePlayerEvent.PLAY):
+        op.emit(
+          ToRemotePlayerEvent.PLAY,
+          (event as ToRemotePlayerEvents.Play.Event).payload.id,
+        );
         break;
-      case PlayerEvents.getEventEmitterType(PlayerEvent.FULLSCREEN_TOGGLE):
-        await this.#emitFullscreenToggle();
+      case ToRemotePlayerEvents.getEventEmitterType(ToRemotePlayerEvent.FULLSCREEN_TOGGLE):
+        op
+          .emit(ToRemotePlayerEvent.FULLSCREEN_TOGGLE);
         break;
       default:
         break;
@@ -64,68 +84,53 @@ export class VlcBackWSService {
 
     this.logger.log("WebSocket iniciado!");
 
-    this.io.on(PlayerEvent.CONNECTION, (socket: Socket) => {
-      this.logger.log("a user connected");
+    this.io.on(FromRemotePlayerEvent.CONNECTION, async (socket: Socket) => {
+      const { token } = socket.handshake.auth;
 
-      socket.on(PlayerEvent.DISCONNECT, () => {
-        this.logger.log("user disconnected");
+      assertIsDefined(token);
+
+      const remotePlayer = await this.repo.getOneBySecretToken(token);
+
+      assertIsDefined(remotePlayer);
+      const remotePlayerConnection: WithRequired<RemotePlayerConnection, "remotePlayer"> = {
+        id: socket.id,
+        ip: socket.handshake.address,
+        remotePlayerId: remotePlayer.id,
+        remotePlayer,
+        isVlcInstanceOpen: false,
+      };
+
+      await this.remotePlayersService.register(remotePlayerConnection);
+      await socket.join(remotePlayerRoom(remotePlayer.id));
+
+      socket.on(FromRemotePlayerEvent.DISCONNECT, async () => {
+        await this.remotePlayersService.flush(remotePlayer.id);
       } );
 
-      socket.on(PlayerEvent.STATUS, (status) => {
-        this.domainEventEmitter.publish(PlayerEvents.Status.create(status));
+      socket.on(FromRemotePlayerEvent.STATUS, async (status: PlayerStatusResponse) => {
+        await this.remotePlayersService.setOpen(remotePlayer.id, !!status.status);
+        this.domainEventEmitter.publish(
+          FromRemotePlayerEvents.Status.create(status, remotePlayer.id),
+        );
       } );
     } );
   }
 
-  async #emitPauseToggle() {
+  async emitPlayResource(params: {message: PlayResourceMessage;
+remotePlayerId: string;} ) {
     assertIsDefined(this.io);
-
-    this.io.emit(PlayerEvent.PAUSE_TOGGLE);
-  }
-
-  async #emitNext() {
-    assertIsDefined(this.io);
-
-    this.io.emit(PlayerEvent.NEXT);
-  }
-
-  async #emitPrevious() {
-    assertIsDefined(this.io);
-
-    this.io.emit(PlayerEvent.PREVIOUS);
-  }
-
-  async #emitStop() {
-    assertIsDefined(this.io);
-
-    this.io.emit(PlayerEvent.STOP);
-  }
-
-  async #emitSeek(val: number | string) {
-    assertIsDefined(this.io);
-
-    this.io.emit(PlayerEvent.SEEK, val);
-  }
-
-  async #emitFullscreenToggle() {
-    assertIsDefined(this.io);
-
-    this.io.emit(PlayerEvent.FULLSCREEN_TOGGLE);
-  }
-
-  async #emitPlay(id: number) {
-    assertIsDefined(this.io);
-
-    this.io.emit(PlayerEvent.PLAY, id);
-  }
-
-  async emitPlayResource(params: PlayResourceMessage) {
-    assertIsDefined(this.io);
+    const { message, remotePlayerId } = params;
     const msg: PlayResourceMessage = {
-      mediaElements: params.mediaElements,
-      force: params.force,
+      mediaElements: message.mediaElements,
+      force: message.force,
     };
 
-    this.io.emit(PlayerEvent.PLAY_RESOURCE, msg);
+    this.io
+      .to(remotePlayerRoom(remotePlayerId))
+      .emit(ToRemotePlayerEvent.PLAY_RESOURCE, msg);
   }
+}
+
+export function remotePlayerRoom(remotePlayerId: string) {
+  return `remote-player:${remotePlayerId}`;
 }

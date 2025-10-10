@@ -1,7 +1,7 @@
 /* eslint-disable require-await */
 /* eslint-disable jest/no-done-callback */
 import { Socket } from "socket.io-client";
-import { PlayerEvent } from "#modules/models";
+import { ToRemotePlayerEvent } from "#modules/models";
 import { PlayerServiceMock } from "#modules/player-service/tests/PlayerServiceMock";
 import { PlayerService } from "#modules/PlayerService";
 import { WebSocketsService } from "./WebSocketsService";
@@ -46,7 +46,7 @@ describe("server emissions", () => {
 
       done();
     } );
-    server.emit(PlayerEvent.PAUSE_TOGGLE, undefined);
+    server.emit(ToRemotePlayerEvent.PAUSE_TOGGLE, undefined);
   } );
 
   it("next", (done) => {
@@ -55,7 +55,7 @@ describe("server emissions", () => {
 
       done();
     } );
-    server.emit(PlayerEvent.NEXT, undefined);
+    server.emit(ToRemotePlayerEvent.NEXT, undefined);
   } );
 
   it("previous", (done) => {
@@ -64,7 +64,7 @@ describe("server emissions", () => {
 
       done();
     } );
-    server.emit(PlayerEvent.PREVIOUS, undefined);
+    server.emit(ToRemotePlayerEvent.PREVIOUS, undefined);
   } );
 
   it("stop", (done) => {
@@ -73,7 +73,7 @@ describe("server emissions", () => {
 
       done();
     } );
-    server.emit(PlayerEvent.STOP, undefined);
+    server.emit(ToRemotePlayerEvent.STOP, undefined);
   } );
 
   it("play", (done) => {
@@ -85,7 +85,7 @@ describe("server emissions", () => {
 
       done();
     } );
-    server.emit(PlayerEvent.PLAY, sendingId);
+    server.emit(ToRemotePlayerEvent.PLAY, sendingId);
   } );
 
   it("seek (valid string)", (done) => {
@@ -97,7 +97,7 @@ describe("server emissions", () => {
 
       done();
     } );
-    server.emit(PlayerEvent.SEEK, sendingData);
+    server.emit(ToRemotePlayerEvent.SEEK, sendingData);
   } );
 
   it("seek (valid number)", (done) => {
@@ -109,7 +109,7 @@ describe("server emissions", () => {
 
       done();
     } );
-    server.emit(PlayerEvent.SEEK, sendingData);
+    server.emit(ToRemotePlayerEvent.SEEK, sendingData);
   } );
 
   it("seek (invalid type data)", (done) => {
@@ -118,12 +118,12 @@ describe("server emissions", () => {
     };
     const socket: Socket = (client as any).getSocket();
 
-    socketErrorHandler(socket, PlayerEvent.SEEK, (error) => {
+    socketErrorHandler(socket, ToRemotePlayerEvent.SEEK, (error) => {
       expect(error.message).toBe("val is not string or number");
 
       done();
     } );
-    server.emit(PlayerEvent.SEEK, sendingData);
+    server.emit(ToRemotePlayerEvent.SEEK, sendingData);
   } );
 } );
 

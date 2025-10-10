@@ -21,7 +21,4 @@ app.addDependencies( {
   webSocketsService,
 } );
 
-app.start()
-  .catch((error) => {
-    console.error(error);
-  } );
+app.start();

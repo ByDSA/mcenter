@@ -19,6 +19,7 @@ export class PlayMusicService {
   ) { }
 
   async playMusic(
+    remotePlayerId: string,
     slug: string,
     query: QueryDto,
   ) {
@@ -29,10 +30,11 @@ export class PlayMusicService {
       } )]
       .filter(Boolean) as MusicEntityWithFileInfos[];
 
-    return this.processAndPlayMusics(musics, force);
+    return this.processAndPlayMusics(remotePlayerId, musics, force);
   }
 
   private async processAndPlayMusics(
+    remotePlayerId: string,
     musics: MusicEntityWithFileInfos[],
     force?: boolean,
   ): Promise<MusicEntityWithFileInfos[]> {
@@ -51,6 +53,7 @@ export class PlayMusicService {
 
     assertIsNotEmptyClient(mediaElements);
     await this.playService.play( {
+      remotePlayerId,
       mediaElements,
       force,
     } );

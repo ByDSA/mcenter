@@ -8,7 +8,8 @@ import { TaskStatusAny } from "#modules/tasks/types";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
 import { logger } from "#modules/core/logger";
-import { LoadingSpinner, useCrudData } from "#modules/fetching";
+import { useCrudData } from "#modules/fetching";
+import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
 
 const QUEUE_NAME = "single-tasks";
 const N = 10;
@@ -115,7 +116,7 @@ errors?: any[];};
   return (
     <>
       <h2>Task Manager</h2>
-      {isLoading && LoadingSpinner}
+      {isLoading && <PageSpinner />}
       {sortedTaskStatuses && sortedTaskStatuses.map(t=> {
         return <Task key={t.id} value={t} />;
       } )}

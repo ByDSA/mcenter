@@ -1,5 +1,5 @@
+import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
 import { ReactNode, useState, useEffect } from "react";
-import { LoadingSpinner } from "#modules/fetching";
 
 type Props = {
   action: ()=> Promise<void>;
@@ -28,7 +28,7 @@ export function usePageAsyncAction( { action, autoStart, loadingMessage, errorMe
   if (status === "loading") {
     element = <div>
       {loadingMessage ?? "Loading..."}
-      {LoadingSpinner}
+      <PageSpinner />
     </div>;
   } else if (status === "error") {
     element = <div>

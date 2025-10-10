@@ -47,6 +47,7 @@ export class AppPayloadService {
   }
 
   getCookieUser(): UserPayload | null {
+    assertIsDefined(this.request);
     const payload = (this.request as any).auth;
 
     return payload?.user ?? null;
