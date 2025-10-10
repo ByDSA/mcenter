@@ -4,16 +4,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RemotePlayerDtos } from "$shared/models/player/remote-player/dto/domain";
 import { useRouter } from "next/navigation";
+import { getPreviousPath } from "app/NavigationWatcher";
+import styles from "./styles.module.css";
+import { sseRemotePlayers } from "./sse";
+import { RemotePlayerEntry } from "./RemotePlayerEntry";
 import { classes } from "#modules/utils/styles";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 import { useUser } from "#modules/core/auth/useUser";
 import stylesFetching from "#modules/ui-kit/spinner/fetching.style.module.css";
 import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
-import { getPreviousPath } from "app/NavigationWatcher";
-import styles from "./Player.module.css";
-import { sseRemotePlayers } from "./sse";
-import { RemotePlayerEntry } from "./RemotePlayerEntry";
 
 type Props = {
   onUnauthorized: ()=> Promise<void>;
@@ -150,7 +150,9 @@ export default function RemotePlayerSelector() {
           stylesFetching.loading,
           styles.error,
         )}>No se ha detectado ningún reproductor remoto.</p>}
-      {remotePlayers.map(r=>(<RemotePlayerEntry key={r.id} value={r}/>))}
+      <section className={styles.list}>
+        {remotePlayers.map(r=>(<RemotePlayerEntry key={r.id} value={r}/>))}
+      </section>
     </>
   );
 }
