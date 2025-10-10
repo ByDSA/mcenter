@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.10.1](https://github.com/ByDSA/mcenter/compare/v4.10.0...v4.10.1) (2025-10-10)
+
+
+### Bug Fixes
+
+* **back:** auth with req.user ([3f5f8c8](https://github.com/ByDSA/mcenter/commit/3f5f8c8dab0204c10777fa5f7f47909f97c22414))
+
 ## [4.10.0](https://github.com/ByDSA/mcenter/compare/v4.9.1...v4.10.0) (2025-10-10)
 
 
