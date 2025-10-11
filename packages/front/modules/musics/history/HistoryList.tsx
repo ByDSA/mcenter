@@ -81,7 +81,7 @@ function useHistoryList() {
     setItem, observerTarget } = useCrudDataWithScroll( {
     initialFetch: async () => {
       const result = await api.getManyByCriteria( {
-        limit: 10,
+        limit: 15,
       } );
 
       return result.data;
@@ -99,7 +99,7 @@ function useHistoryList() {
     fetchingMore: {
       fn: async (d) => {
         const result = await api.getManyByCriteria( {
-          limit: 5,
+          limit: 15,
           offset: d?.length ?? 0,
         } );
 

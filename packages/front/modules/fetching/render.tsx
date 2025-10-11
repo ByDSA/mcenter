@@ -52,6 +52,7 @@ export function renderFetchedData<T>(
 
   return <>
     {render(data)}
-    {scroll && <ScrollStatus ref={scroll.observerRef} isLoading error={error}/>}
+    {scroll
+      && <ScrollStatus ref={scroll.observerRef} isLoading={isLoading} error={error}/>}
   </>;
 }

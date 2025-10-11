@@ -77,7 +77,7 @@ function useMusicList(props: Props) {
     setItem, observerTarget, fetchInitData } = useCrudDataWithScroll( {
     initialFetch: async () => {
       const result = await api.getManyByCriteria( {
-        limit: 10,
+        limit: 20,
         ...criteriaCommon,
       } );
       const gotTotalCount = result.metadata?.totalCount;
@@ -96,9 +96,9 @@ function useMusicList(props: Props) {
         } );
 
         if (!limitTimeoutRef.current) {
-          fetchingMoreLimitRef.current = 20;
+          fetchingMoreLimitRef.current = 30;
           limitTimeoutRef.current = setTimeout(()=> {
-            fetchingMoreLimitRef.current = 5;
+            fetchingMoreLimitRef.current = 15;
             limitTimeoutRef.current = null;
           }, 1000);
         }
