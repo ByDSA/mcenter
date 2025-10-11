@@ -22,16 +22,25 @@ type UseContextMenuProps<T> = {
   className?: string;
 };
 
+type SmartPositionOptions = {
+  considerScroll?: boolean;
+};
+
 // Función para calcular la posición inteligente
 const calculateSmartPosition = (
   triggerRect: DOMRect,
   menuWidth: number,
   menuHeight: number,
+  optsParam?: SmartPositionOptions,
 ): Position => {
+  const opts: Required<SmartPositionOptions> = {
+    considerScroll: optsParam?.considerScroll ?? true,
+  };
+  // Obtener dimensiones de la ventana y scroll
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  const { scrollX } = window;
-  const { scrollY } = window;
+  const scrollX = opts.considerScroll ? window.screenX : 0;
+  const scrollY = opts.considerScroll ? window.scrollY : 0;
   // Posición inicial preferida (debajo del elemento)
   let x = triggerRect.left + scrollX;
   let y = triggerRect.bottom + scrollY + 4;
@@ -144,6 +153,22 @@ export const useListContextMenu = <T, >(config: UseContextMenuProps<T>) => {
   };
 };
 
+function isInsideFixedElement(target: Element) {
+  let element = target.parentElement;
+  let considerScroll = true;
+
+  while (element) {
+    if (getComputedStyle(element).position === "fixed") {
+      considerScroll = false;
+      break;
+    }
+
+    element = element.parentElement;
+  }
+
+  return considerScroll;
+}
+
 export const useContextMenu = <T, >(config: UseContextMenuProps<T>) => {
   const { renderChildren, className } = config;
   const [isOpen, setIsOpen] = useState(false);
@@ -183,6 +208,7 @@ export const useContextMenu = <T, >(config: UseContextMenuProps<T>) => {
     disableScroll();
 
     const triggerRect = event.currentTarget.getBoundingClientRect();
+    const considerScroll = isInsideFixedElement(event.currentTarget);
 
     setPosition( {
       x: -9999,
@@ -194,11 +220,15 @@ export const useContextMenu = <T, >(config: UseContextMenuProps<T>) => {
       if (menuRef.current) {
         const menuWidth = menuRef.current.offsetWidth;
         const menuHeight = menuRef.current.offsetHeight;
-        const smartPosition = calculateSmartPosition(triggerRect, menuWidth, menuHeight);
+        const smartPosition = calculateSmartPosition(triggerRect, menuWidth, menuHeight, {
+          considerScroll,
+        } );
 
         setPosition(smartPosition);
       } else {
-        const smartPosition = calculateSmartPosition(triggerRect, 200, 200);
+        const smartPosition = calculateSmartPosition(triggerRect, 200, 200, {
+          considerScroll,
+        } );
 
         setPosition(smartPosition);
       }
