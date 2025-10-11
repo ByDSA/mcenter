@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { assertIsDefined } from "$shared/utils/validation";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { assertFoundServer } from "#utils/validation/found";
+import { showError } from "#core/logging/show-error";
 import { taskRegistry } from "./task.registry";
 
 const defaultOptions: TasksCrudDtos.CreateTask.TaskOptions = {
@@ -16,6 +17,35 @@ const defaultOptions: TasksCrudDtos.CreateTask.TaskOptions = {
 };
 
 export const QUEUE_NAME = "mcenter-tasks-main";
+
+async function fixVersion(queue: Queue, worker: Worker) {
+// Nota: si se cambia el nombre de la QUEUE, puede dar errores de que "no encuentra la versión".
+// Eso es porque se crea un nuevo worker, conviven el del viejo nombre y el nuevo.
+// Script para fusionar colas:
+/*
+OLD=single-tasks
+NEW=mcenter-tasks-main
+
+docker exec mcenter_redis redis-cli KEYS "bull:${OLD}:*" | while read key; do
+  new_key=$(echo $key | sed "s/${OLD}/${NEW}/")
+  docker exec mcenter_redis redis-cli RENAME "$key" "$new_key" && echo "✓ $key -> $new_key"
+done
+*/
+
+  if (!queue.redisVersion) {
+    const client = await worker.client;
+    const info = await client.info("server");
+    const versionMatch = info.match(/redis_version:([^\r\n]+)/);
+
+    // eslint-disable-next-line accessor-pairs
+    Object.defineProperty(queue, "redisVersion", {
+      get() { return versionMatch?.[1]; },
+      configurable: true,
+    } );
+  }
+
+  assertIsDefined(queue.redisVersion, "Versión de redis no definida");
+}
 
 @Injectable()
 export class SingleTasksService extends EventEmitter2 {
@@ -37,6 +67,10 @@ export class SingleTasksService extends EventEmitter2 {
         connection: this.queue.opts.connection,
       },
     );
+
+    fixVersion(queue, this.worker)
+      .catch(showError);
+
     this.logger.log("New worker created.");
 
     this.logger.log("Task service initialized");
@@ -171,8 +205,21 @@ export class SingleTasksService extends EventEmitter2 {
     const jobs = await this.getLatestJobs(this.queue, n);
     const states: (JobState | "unknown")[] = [];
 
-    for (const j of jobs)
-      states.push(await j.getState());
+    for (const j of jobs) {
+      try {
+        const state = await j.getState();
+
+        states.push(state);
+      } catch (e) {
+        const ctx = {
+          job: j.asJSON(),
+        };
+
+        this.logger.debug("Error geting job state. Context: " + JSON.stringify(ctx, null, 2));
+
+        throw e;
+      }
+    }
 
     return jobs.map((_, i)=>adaptToTaskStatus(jobs[i], states[i]));
   }

@@ -11,7 +11,7 @@ import { logger } from "#modules/core/logger";
 import { useCrudData } from "#modules/fetching";
 import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
 
-const QUEUE_NAME = "single-tasks";
+const QUEUE_NAME = "mcenter-tasks-main";
 const N = 10;
 
 export default function Page() {
