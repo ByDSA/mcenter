@@ -1,6 +1,7 @@
 import { getQueueToken } from "@nestjs/bullmq";
 import { INestApplication } from "@nestjs/common";
 import { Queue } from "bullmq";
+import { QUEUE_NAME } from "#core/tasks/task.service";
 
 type Listener = (...args: any[])=> void;
 export class Cleanup {
@@ -29,7 +30,7 @@ export class Cleanup {
     for (const app of this.apps) {
     // Intenta cerrar BullMQ
       try {
-        const queue = app.get<Queue>(getQueueToken("single-tasks"), {
+        const queue = app.get<Queue>(getQueueToken(QUEUE_NAME), {
           strict: false,
         } );
 
