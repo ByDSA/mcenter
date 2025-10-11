@@ -7,7 +7,7 @@ import { MusicTasks } from "$shared/models/musics/admin";
 import { assertIsDefined } from "$shared/utils/validation";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
-import { TaskJsonViewer } from "#modules/tasks/TaskJsonViewer";
+import { TaskJsonViewer, useResponsiveCollapseLength } from "#modules/tasks/TaskJsonViewer";
 import { logger } from "#modules/core/logger";
 
 type Action = {
@@ -77,6 +77,7 @@ const ACTIONS: Action[] = [
 
 export default function Page() {
   const [text, setText] = useState<object>( {} );
+  const collapseStringsAfterLength = useResponsiveCollapseLength();
 
   return (
     <>
@@ -125,6 +126,8 @@ export default function Page() {
 
       <hr/>
       <TaskJsonViewer
+        key={collapseStringsAfterLength} // Fuerza el re-renderizado cuando cambia
+        collapseStringsAfterLength={collapseStringsAfterLength}
         value={text}
       />
     </>
