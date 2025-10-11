@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.10.2](https://github.com/ByDSA/mcenter/compare/v4.10.1...v4.10.2) (2025-10-11)
+
+
+### Bug Fixes
+
+* **backend:** correct queue's name ([829f345](https://github.com/ByDSA/mcenter/commit/829f3457a5bed619bc77bc22338267f697ad2b03))
+* **back:** tasks queue name and fix version ([3824f10](https://github.com/ByDSA/mcenter/commit/3824f1040a6aba6380b0b44e540808b133ca865f))
+* **front:** context menu scroll position ([50a0afa](https://github.com/ByDSA/mcenter/commit/50a0afac663c084cef837dee8b51e457963cf248))
+* **front:** fix yt upload button and style ([d426037](https://github.com/ByDSA/mcenter/commit/d4260377554860073b3d418d4078e023b668d225))
+* **front:** more fetching/refetching length ([a5072e8](https://github.com/ByDSA/mcenter/commit/a5072e839d0d86200e8ae4e21c2081cb093cb3a4))
+* **front:** no redirect from every page ([aaae106](https://github.com/ByDSA/mcenter/commit/aaae1060b274c4899c83a789f89f882aae3706fe))
+* **front:** scroll loading spinner and fetch more data by fetch ([cdcd40a](https://github.com/ByDSA/mcenter/commit/cdcd40a9b0dc2da4904496ac6b0d64e64ec4c3c4))
+* **front:** send cookie in admin tasks ([767ad56](https://github.com/ByDSA/mcenter/commit/767ad56ce4e6ca6be7aa348b0510d57c84becb2a))
+
 ### [4.10.1](https://github.com/ByDSA/mcenter/compare/v4.10.0...v4.10.1) (2025-10-10)
 
 
