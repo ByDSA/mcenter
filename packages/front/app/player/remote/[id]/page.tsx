@@ -44,6 +44,7 @@ export default function RemotePlayer( { params }: PageProps) {
   const previousUriRef = useRef("");
 
   setResourceRef.current = setResource;
+  const intentionalDisconnectOrErrorRef = useRef(false);
   const socketInitializer = () => {
     webSockets = new (class A extends RemotePlayerWebSocketsClient {
       onBackendConnect(): void {
@@ -56,7 +57,8 @@ export default function RemotePlayer( { params }: PageProps) {
       }
 
       onDisonnect(): void {
-        gotoRemotePlayers.current();
+        if (!intentionalDisconnectOrErrorRef.current)
+          gotoRemotePlayers.current();
       }
 
       onStatus(status: PlayerStatusResponse) {
@@ -112,6 +114,7 @@ export default function RemotePlayer( { params }: PageProps) {
     } );
 
     return () => {
+      intentionalDisconnectOrErrorRef.current = true;
       webSockets?.close();
     };
   };

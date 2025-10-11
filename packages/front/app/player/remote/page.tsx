@@ -5,15 +5,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { RemotePlayerDtos } from "$shared/models/player/remote-player/dto/domain";
 import { useRouter } from "next/navigation";
 import { getPreviousPath } from "app/NavigationWatcher";
-import styles from "./styles.module.css";
-import { sseRemotePlayers } from "./sse";
-import { RemotePlayerEntry } from "./RemotePlayerEntry";
 import { classes } from "#modules/utils/styles";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 import { useUser } from "#modules/core/auth/useUser";
 import stylesFetching from "#modules/ui-kit/spinner/fetching.style.module.css";
 import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { RemotePlayerEntry } from "./RemotePlayerEntry";
+import { sseRemotePlayers } from "./sse";
+import styles from "./styles.module.css";
 
 type Props = {
   onUnauthorized: ()=> Promise<void>;

@@ -29,7 +29,7 @@ export function sseRemotePlayers( { url,
       logger.debug("Received data: " + JSON.stringify(parsedData, null, 2));
 
       if (parsedData.type === "initial") {
-        logger.info("Connected to server.");
+        logger.debug("Connected to server.");
         await onInitial(initialConnectionsResponseSchema.parse(parsedData.data));
       } else if (parsedData.type === FromRemotePlayerEvent.CONNECTION)
         await onNewConnection(newConnectionResponseSchema.parse(parsedData.data));
