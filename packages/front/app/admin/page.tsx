@@ -93,6 +93,9 @@ export default function Page() {
             } else if (action.type === "task") {
               const response = await fetch(
                 backendUrl(action.path),
+                {
+                  credentials: "include",
+                },
               ).then(r=> r.json());
               const taskId = response.data?.job?.id;
 

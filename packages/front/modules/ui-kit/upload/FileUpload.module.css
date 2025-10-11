@@ -3,8 +3,8 @@
 
   /* Variables de color locales para el componente */
   --text-primary: var(--color-gray-1000);
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
+  --text-secondary: var(--color-gray-600);
+  --text-muted: var(--color-gray-700);
   --border-default: var(--color-gray-200);
   --border-hover: var(--color-gray-300);
   --bg-active: #eff6ff;
@@ -16,6 +16,7 @@
   --success: var(--color-green-300);
   --success-hover: var(--color-green-100);
   --remove-hover-bg: #fef2f2;
+  --bg-color: var(--color-gray-25);
 }
 .header {
   margin-bottom: 1.5rem;
@@ -27,7 +28,7 @@
   border-radius: 0.5rem;
   padding: 1rem;
   text-align: center;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: color-mix(in srgb, var(--bg-color) 60%, transparent);
   transition:
     border-color var(--transition-duration) ease-in-out,
     background-color var(--transition-duration) ease-in-out;
@@ -38,7 +39,7 @@
 
   &:hover {
     border-color: var(--border-hover);
-    background-color: rgba(255, 255, 255, 1);
+    background-color: color-mix(in srgb, var(--bg-color) 80%, transparent);
   }
 
   &.active {

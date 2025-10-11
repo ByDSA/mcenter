@@ -9,9 +9,9 @@ import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { classes } from "#modules/utils/styles";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
+import { PageSpinner } from "../spinner/Spinner";
 import styles from "./YouTubeUpload.module.css";
 import { UploadButton } from "./UploadButton";
-import { PageSpinner } from "../spinner/Spinner";
 
 type OnSubmitProps<S> = Pick<Props,
  "musicId" | "onCreateMusic" | "onCreateMusicFileInfo"
@@ -32,7 +32,7 @@ type Context = {
   addedMusicFileInfos: MusicFileInfoEntity[];
 };
 
-const defaultTextStatus = (s: YoutubeTaskStatus)=>(<>{ s.attempts > 1 && <span>(Intento {s.attempts}/{s.maxAttempts}) </span> }<span>{s.progress.percentage}% {s.progress.message}</span></>);
+const defaultTextStatus = (s: YoutubeTaskStatus)=>(<>{ s.attempts > 1 && <span>(Intento {s.attempts}/{s.maxAttempts}) </span> }<span>{s.progress.percentage.toFixed(1)}% {s.progress.message}</span></>);
 const defaultOnSubmit: Props["onSubmit"] = async (
   input,
   { onChangeStatus, onCreateMusic, onCreateMusicFileInfo, musicId },

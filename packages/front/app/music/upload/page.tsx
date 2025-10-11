@@ -10,6 +10,8 @@ import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-
 import { backendUrl } from "#modules/requests";
 import { MusicEntryElement } from "#musics/musics/entry/MusicEntry";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
+import { classes } from "#modules/utils/styles";
+import musicListStyles from "#modules/musics/musics/styles.module.css";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 
@@ -65,11 +67,23 @@ export default function Upload() {
           onUpload={onUpload}
         />
         <hr/>
-        <span className="resource-list">
+        <span className={classes("resource-list", musicListStyles.list)}>
           {
           uploaded!.map(
             (music) => <Fragment key={`${music.id}`}>
-              <MusicEntryElement data={music} shouldFetchFileInfo={false} />
+              <MusicEntryElement data={music} setData={(newMusic: MusicEntity) => {
+                const index = uploaded.findIndex(m=>m.id === music.id);
+
+                if (index === -1)
+                  return;
+
+                setUploaded((old: MusicEntity[]) => ([
+                  ...old.slice(0, index),
+                  newMusic,
+                  ...old.slice(index + 1),
+                ]));
+              }
+              } shouldFetchFileInfo={false} />
             </Fragment>,
           )
           }
