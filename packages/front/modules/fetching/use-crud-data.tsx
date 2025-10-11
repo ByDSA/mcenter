@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 
@@ -49,6 +49,7 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
   const refetchDataRef = useRef<()=> Promise<void>>();
   const dataRef = useRef(data);
   const isRefetchingRef = useRef(false);
+  const lastFetchDateRef = useRef<Date | null>(null);
 
   useEffect(() => {
     dataRef.current = data;
@@ -61,6 +62,8 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
       return;
 
     const result = await fn(dataRef.current);
+
+    resetFetchingDate(lastFetchDateRef);
 
     isRefetchingRef.current = true;
     setData(result);
@@ -78,6 +81,8 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
     try {
       const result = await fn(dataRef.current);
 
+      resetFetchingDate(lastFetchDateRef);
+
       setData(result);
       setIsLoading(false);
     } catch (e) {
@@ -93,13 +98,14 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
   }, [initialFetch, refetching]);
 
   useEffect(() => {
-    if (isRefetchingRef.current) {
+    if (isRefetchingRef.current || !canFetch(lastFetchDateRef)) {
       isRefetchingRef.current = false;
 
       return;
     }
 
     refetchDataRef.current?.()
+      .then(()=>resetFetchingDate(lastFetchDateRef))
       .catch(e => setError(e));
   }, [data]);
 
@@ -109,12 +115,17 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
     let intervalId: NodeJS.Timeout;
     // eslint-disable-next-line require-await
     const onSuccess = async (result: D) => {
+      resetFetchingDate(lastFetchDateRef);
       setData(result);
       setIsLoading(false);
 
       if (props.refetching) {
         intervalId = setInterval(() => {
+          if (!canFetch(lastFetchDateRef))
+            return;
+
           refetchDataRef.current?.()
+            .then(()=>resetFetchingDate(lastFetchDateRef))
             .catch(e => setError(e));
         }, props.refetching.everyMs ?? 5_000);
       }
@@ -253,3 +264,17 @@ const retry = async ( { fn, healthyUrl = backendUrl("") }: RetryProps) => {
       } );
   }
 };
+
+// Nota: quizá no sirva de nada todo el sistema de date con la ref.
+// Se estaba intentando que se llamara dos veces seguidas al principio, pero
+// seguramente sea porque en dev se monta el componente dos veces
+function resetFetchingDate(ref: MutableRefObject<Date | null>) {
+  ref.current = new Date();
+}
+
+function canFetch(lastFetchDateRef: MutableRefObject<Date | null>) {
+  if (!lastFetchDateRef.current)
+    return true;
+
+  return (new Date().getTime() - lastFetchDateRef.current.getTime()) > 1 * 1_000;
+}

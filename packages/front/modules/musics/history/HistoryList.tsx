@@ -6,6 +6,7 @@ import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
+import { INITIAL_FETCHING_LENGTH, FETCHING_MORE_LENGTH } from "#modules/history/lists";
 import styles from "../musics/styles.module.css";
 import { MusicHistoryApi } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
@@ -81,7 +82,7 @@ function useHistoryList() {
     setItem, observerTarget } = useCrudDataWithScroll( {
     initialFetch: async () => {
       const result = await api.getManyByCriteria( {
-        limit: 15,
+        limit: INITIAL_FETCHING_LENGTH,
       } );
 
       return result.data;
@@ -89,7 +90,7 @@ function useHistoryList() {
     refetching: {
       fn: async (d)=> {
         const result = await api.getManyByCriteria( {
-          limit: Math.max(d?.length ?? 0, 10),
+          limit: Math.max(d?.length ?? 0, INITIAL_FETCHING_LENGTH),
         } );
 
         return result.data;
@@ -99,7 +100,7 @@ function useHistoryList() {
     fetchingMore: {
       fn: async (d) => {
         const result = await api.getManyByCriteria( {
-          limit: 15,
+          limit: FETCHING_MORE_LENGTH,
           offset: d?.length ?? 0,
         } );
 

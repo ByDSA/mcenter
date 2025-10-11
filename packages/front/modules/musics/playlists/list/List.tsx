@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
 import { MusicPlaylistsApi } from "../requests";
 import { PlaylistEntity } from "../Playlist";
 import { MusicPlaylistListItem } from "./Item";
@@ -61,7 +62,7 @@ function useMusicPlaylists() {
     refetching: {
       fn: async (d)=> {
         const result = await api.getManyByUserCriteria(userId, {
-          limit: Math.max(d?.length ?? 0, 10),
+          limit: Math.max(d?.length ?? 0, INITIAL_FETCHING_LENGTH),
         } );
 
         return result.data;

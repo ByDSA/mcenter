@@ -1,0 +1,3 @@
+export const INITIAL_FETCHING_LENGTH = 15;
+
+export const FETCHING_MORE_LENGTH = 15;

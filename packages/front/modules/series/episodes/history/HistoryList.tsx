@@ -3,6 +3,7 @@ import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
+import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { EpisodeHistoryApi } from "./requests";
 import { getDateStr } from "./utils";
@@ -83,7 +84,7 @@ function useHistoryList() {
     setData, setItem, observerTarget } = useCrudDataWithScroll( {
     initialFetch: async () => {
       const result = await historyApi.getMany( {
-        limit: 15,
+        limit: INITIAL_FETCHING_LENGTH,
       } );
 
       return result.data;
@@ -91,7 +92,7 @@ function useHistoryList() {
     refetching: {
       fn: async (d)=> {
         const result = await historyApi.getMany( {
-          limit: Math.max(d?.length ?? 0, 10),
+          limit: Math.max(d?.length ?? 0, INITIAL_FETCHING_LENGTH),
         } );
 
         return result.data;
@@ -101,7 +102,7 @@ function useHistoryList() {
     fetchingMore: {
       fn: async (d) => {
         const result = await historyApi.getMany( {
-          limit: 15,
+          limit: INITIAL_FETCHING_LENGTH,
           offset: d?.length ?? 0,
         } );
 
