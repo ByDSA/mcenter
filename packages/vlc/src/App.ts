@@ -18,12 +18,11 @@ export class App {
     if (!this.#webSocketsService)
       throw new Error("webSocketsService is not defined");
 
-    const { WS_SERVER_HOST: host, WS_SERVER_PATH: path, WS_SERVER_PORT: port } = getEnvs();
+    const { SERVER: url, SECRET_TOKEN: secretToken } = getEnvs();
 
     this.#webSocketsService.startSocket( {
-      host,
-      port,
-      path,
+      url,
+      secretToken,
     } );
   }
 }

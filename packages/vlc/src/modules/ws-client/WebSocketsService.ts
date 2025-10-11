@@ -1,13 +1,11 @@
 import { io, Socket } from "socket.io-client";
 import { showError } from "$shared/utils/errors/showError";
-import { assertIsDefined } from "$shared/utils/validation";
 import { FromRemotePlayerEvent, PlayResourceMessage, ToRemotePlayerEvent } from "#modules/models";
 import { PlayerService } from "../PlayerService";
 
 type StartSocketParams = {
-  host: string;
-  port: number;
-  path: string;
+  url: string;
+  secretToken: string;
 };
 
 type Params = {
@@ -34,11 +32,11 @@ export class WebSocketsService {
     return this.#socket;
   }
 
-  startSocket( { host, path, port }: StartSocketParams): void {
-    const secretToken = process.env.SECRET_TOKEN;
+  startSocket( { url, secretToken }: StartSocketParams): void {
+    const { origin } = new URL(url);
+    const path = new URL(url).pathname;
 
-    assertIsDefined(secretToken);
-    this.#socket = io(`http://${host}:${port}`, {
+    this.#socket = io(origin, {
       path,
       auth: {
         token: secretToken,

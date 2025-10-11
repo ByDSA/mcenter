@@ -1,55 +1,36 @@
 import dotenv from "dotenv";
-import { assertIsDefined } from "$shared/utils/validation";
+import z from "zod";
 
-export type Envs = Readonly<{
-  VLC_HTTP_PORT: number;
-  VLC_HTTP_PASSWORD: string;
-  WS_SERVER_HOST: string;
-  WS_SERVER_PATH: string;
-  WS_SERVER_PORT: number;
-  MEDIA_PATH: string;
-  TMP_PATH: string;
-}>;
+const pathSchema = z
+  .string()
+  .refine(
+    (path) => path.length > 0 && !path.includes("\0"),
+    {
+      message: "Invalid path",
+    },
+  );
 
+export const envsSchema = z.object( {
+  VLC_HTTP_PORT: z
+    .string()
+    .transform((val) => parseInt(val, 10))
+    .pipe(z.number().int()
+      .min(1)
+      .max(65535)),
+  VLC_HTTP_PASSWORD: z.string(),
+  SERVER: z.string().url(),
+  SECRET_TOKEN: z.string(),
+  MEDIA_PATH: pathSchema,
+  TMP_PATH: pathSchema,
+} );
+
+export type Envs = z.infer<typeof envsSchema>;
 let envs: Envs;
 
 function loadEnvs(): Envs {
   dotenv.config();
 
-  const password = process.env.VLC_HTTP_PASSWORD;
-  const port = process.env.VLC_HTTP_PORT;
-
-  assertIsDefined(password, "VLC_HTTP_PASSWORD");
-
-  assertIsDefined(port, "VLC_HTTP_PORT");
-
-  const { WS_SERVER_HOST, WS_SERVER_PATH } = process.env;
-  const WS_SERVER_PORT = Number(process.env.WS_SERVER_PORT);
-
-  assertIsDefined(WS_SERVER_HOST, "WS_SERVER_HOST is not defined");
-  assertIsDefined(WS_SERVER_PATH, "WS_SERVER_PATH is not defined");
-  assertIsDefined(WS_SERVER_PORT, "WS_SERVER_PORT is not defined");
-
-  if (Number.isNaN(WS_SERVER_PORT))
-    throw new Error("WS_SERVER_PORT is not a number");
-
-  const { MEDIA_PATH } = process.env;
-
-  assertIsDefined(MEDIA_PATH, "MEDIA_PATH is not defined");
-
-  const { TMP_PATH } = process.env;
-
-  assertIsDefined(TMP_PATH, "TMP_PATH is not defined");
-
-  envs = Object.freeze( {
-    VLC_HTTP_PASSWORD: password,
-    VLC_HTTP_PORT: +port,
-    WS_SERVER_HOST,
-    WS_SERVER_PATH,
-    WS_SERVER_PORT,
-    MEDIA_PATH,
-    TMP_PATH,
-  } );
+  envs = envsSchema.parse(process.env);
 
   return envs;
 }

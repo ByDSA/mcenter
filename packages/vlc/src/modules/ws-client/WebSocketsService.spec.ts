@@ -23,10 +23,11 @@ beforeAll(async () => {
   if (!port)
     throw new Error("port is not defined");
 
+  const url = `http://${server.getHost()}:${server.getPort()}${server.getPath()}`;
+
   await client.startSocket( {
-    host: server.getHost(),
-    port,
-    path: server.getPath(),
+    url,
+    secretToken: "123456",
   } );
 } );
 
