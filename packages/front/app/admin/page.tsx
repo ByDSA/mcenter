@@ -142,7 +142,9 @@ async function callAction( { setText: useText, path, name }: ActionParams) {
   useText( {
     message: `Loading: ${ fullUrl } ...`,
   } );
-  const response = await fetch(fullUrl);
+  const response = await fetch(fullUrl, {
+    credentials: "include",
+  } );
 
   try {
     let json = await response.json();
