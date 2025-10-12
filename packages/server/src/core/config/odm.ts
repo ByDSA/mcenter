@@ -19,7 +19,8 @@ export type DocOdm = {
 export type FullDocOdm = RequireId<DocOdm>;
 
 const NAME = "Config";
-const COLLECTION_NAME = "configs";
+
+export const COLLECTION = "configs";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   appName: {
@@ -61,7 +62,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     },
   },
 } satisfies SchemaDef<DocOdm>, {
-  collection: COLLECTION_NAME,
+  collection: COLLECTION,
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

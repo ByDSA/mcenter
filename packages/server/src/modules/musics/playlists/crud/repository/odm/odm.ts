@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
-import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicOdm } from "#musics/crud/repository/odm";
+import { UserOdm } from "#core/auth/users/crud/repository/odm";
+import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 
 type EntryDocOdm = {
   _id: mongoose.Types.ObjectId;
@@ -21,28 +21,24 @@ const entrySchemaOdm = new mongoose.Schema<EntryDocOdm>( {
   _id: true,
 } );
 
-export type DocOdm = {
+export type DocOdm = TimestampsOdm.AutoTimestamps & {
   _id?: mongoose.Types.ObjectId;
   name: string;
   slug: string;
-  userId: mongoose.Types.ObjectId;
+  userId: UserOdm.FullDoc["_id"];
   list: EntryDocOdm[];
-  timestamps: TimestampsModel;
 };
 
 export type FullDocOdm = Omit<RequireId<DocOdm>, "list"> & {
-  user?: unknown; // TODO: cambiar cuando haya users
+  user?: UserOdm.FullDoc;
   list: EntryFullDocOdm[];
 };
 
 const NAME = "MusicPlaylist";
-const COLLECTION_NAME = "musicPlaylists";
+
+export const COLLECTION = "music_playlists";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
-  timestamps: {
-    type: TimestampsOdm.schema,
-    required: true,
-  },
   name: {
     type: String,
     required: true,
@@ -59,9 +55,9 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: [entrySchemaOdm],
     required: true,
   },
-} satisfies SchemaDef<DocOdm>, {
-  collection: COLLECTION_NAME,
-  _id: true,
+} satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
+  collection: COLLECTION,
+  timestamps: true,
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

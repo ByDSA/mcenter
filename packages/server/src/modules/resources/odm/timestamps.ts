@@ -39,4 +39,11 @@ export namespace TimestampsOdm {
       releasedOn: docOdm.releasedOn,
     };
   }
+
+  export type AutoTimestamps = {
+    createdAt: Date;
+    updatedAt: Date;
+  };
+
+  export type OmitAutoTimestamps<T> = Omit<T, keyof AutoTimestamps>;
 }

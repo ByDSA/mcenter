@@ -1,7 +1,8 @@
 import type { EpisodeHistoryEntryCrudDtos } from "$shared/models/episodes/history/dto/transport";
 import type { PipelineStage } from "mongoose";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
-import { DocOdm } from "./odm/mongo";
+import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
+import { DocOdm } from "./odm/odm";
 
 function buildMongooseSort(
   body: EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
@@ -160,7 +161,7 @@ export function getCriteriaPipeline(
       // Ahora expandir los fileInfos del episode
       pipeline.push( {
         $lookup: {
-          from: "episodefileinfos", // nombre de la colección de episode file infos
+          from: EpisodeFileInfoOdm.COLLECTION_NAME,
           localField: "episode._id",
           foreignField: "episodeId",
           as: "episodeFileInfos",

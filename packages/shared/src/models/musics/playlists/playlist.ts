@@ -1,7 +1,7 @@
 import z from "zod";
 import { mongoDbId } from "../../resources/partial-schemas";
 import { musicEntitySchema } from "../music";
-import { timestampsSchema } from "../../utils/schemas/timestamps";
+import { basicTimestampsSchema } from "../../utils/schemas/timestamps";
 
 const entrySchema = z.object( {
   id: mongoDbId,
@@ -19,8 +19,7 @@ const modelSchema = z.object( {
   list: z.array(entrySchema),
   slug: z.string(),
   userId: mongoDbId,
-  timestamps: timestampsSchema,
-} );
+} ).merge(basicTimestampsSchema);
 
 type Model = z.infer<typeof modelSchema>;
 const entitySchema = modelSchema.extend( {

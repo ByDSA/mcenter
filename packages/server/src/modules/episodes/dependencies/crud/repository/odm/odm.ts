@@ -12,6 +12,9 @@ type FullDocOdm = RequireId<DocOdm> & {
   next?: EpisodeOdm.FullDoc;
 };
 
+const NAME = "EpisodeDependency";
+
+export const COLLECTION = "episode_dependencies";
 const schemaOdm = new mongoose.Schema<DocOdm>( {
   lastCompKey: {
     episodeKey: {
@@ -34,22 +37,20 @@ const schemaOdm = new mongoose.Schema<DocOdm>( {
     },
   },
 } satisfies SchemaDef<DocOdm>, {
-  collection: "episodeDependencies",
+  collection: COLLECTION,
   autoIndex: false,
 } );
-// Index:
-/*
-db.getCollection("episodeDependencies").createIndex(
+
+schemaOdm.index(
   {
     "lastCompKey.seriesKey": 1,
     "lastCompKey.episodeKey": 1,
   },
   {
     unique: true,
-  }
+  },
 );
-*/
-const NAME = "EpisodeDependency";
+
 const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);
 
 export {

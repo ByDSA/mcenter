@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { DocOdm, ModelOdm, schemaOdm,
-  FullDocOdm, getIdOdmFromCompKey, EpisodeCompKeyOdm } from "./odm";
+  FullDocOdm, getIdOdmFromCompKey, EpisodeCompKeyOdm,
+  COLLECTION } from "./odm";
 import { docOdmToEntity, docOdmToModel, entityToDocOdm, episodeToDocOdm, partialModelToDocOdm } from "./adapters";
 
 export namespace EpisodeOdm {
@@ -15,4 +16,5 @@ export namespace EpisodeOdm {
   export const toDoc = episodeToDocOdm;
   export const partialToDoc = partialModelToDocOdm;
   export type EpisodeCompKey = EpisodeCompKeyOdm;
+  export const COLLECTION_NAME = COLLECTION;
 }

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { DocOdm,
+import { COLLECTION, DocOdm,
   FullDocOdm,
   ModelOdm,
   schema as _schema } from "./odm";
@@ -15,4 +15,5 @@ export namespace StreamOdm {
   export type FullDoc = FullDocOdm;
   export const Model = ModelOdm;
   export const schema = _schema;
+  export const COLLECTION_NAME = COLLECTION;
 }

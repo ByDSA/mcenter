@@ -14,6 +14,9 @@ export type DocOdm = OptionalId & {
     updatedAt: Date;
   };
 };
+const NAME = "MusicFileInfo";
+
+export const COLLECTION = "music_file_infos";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   musicId: {
@@ -44,11 +47,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     updatedAt: Date,
   },
 } satisfies SchemaDef<DocOdm>, {
+  collection: COLLECTION,
   autoIndex: false,
 } );
 
 export type FullDocOdm = RequireId<DocOdm>;
-
-const NAME = "MusicFileInfo";
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

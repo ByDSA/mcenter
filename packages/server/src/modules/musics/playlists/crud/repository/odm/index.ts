@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { DocOdm,
+import { COLLECTION, DocOdm,
   FullDocOdm,
   ModelOdm,
   schemaOdm } from "./odm";
@@ -23,4 +23,5 @@ export namespace MusicPlaylistOdm {
   export const toDoc = modelToDocOdm;
   export const partialToUpdateQuery = partialModelToUpdateQuery;
   export const getCriteriaPipeline = _getCriteriaPipeline;
+  export const COLLECTION_NAME = COLLECTION;
 };

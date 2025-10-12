@@ -1,9 +1,9 @@
 import mongoose, { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { MusicOdm } from "#musics/crud/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
+import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { MusicPlaylist, MusicPlaylistEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
@@ -44,7 +44,8 @@ function commonModelToDocOdm(model: Model): Omit<DocOdm, "_id" | "list"> {
     name: model.name,
     slug: model.slug,
     userId: new Types.ObjectId(model.userId),
-    timestamps: TimestampsOdm.toDocOdm(model.timestamps),
+    createdAt: model.createdAt,
+    updatedAt: model.updatedAt,
   };
 }
 
@@ -53,10 +54,11 @@ export function fullDocOdmToEntity(docOdm: FullDocOdm): Entity {
     id: docOdm._id.toString(),
     name: docOdm.name,
     slug: docOdm.slug,
-    user: docOdm.user ? null : undefined, // TODO: cambiar cuando hayan users
+    user: docOdm.user ? UserOdm.toEntity(docOdm.user) : undefined,
     userId: docOdm.userId.toString(),
     list: docOdm.list.map(entryFullDocOdmToEntity),
-    timestamps: TimestampsOdm.toModel(docOdm.timestamps),
+    createdAt: docOdm.createdAt,
+    updatedAt: docOdm.updatedAt,
   } satisfies AllKeysOf<Entity>;
 
   return entity;

@@ -3,7 +3,7 @@ import { MusicFileInfoEntity } from "../../models";
 
 type Entity = MusicFileInfoEntity;
 export namespace MusicFileInfoEvents {
-  const MAIN_TYPE = "musicFileInfos";
+  const MAIN_TYPE = "music_file_infos";
   export const WILDCARD = `${MAIN_TYPE}.*`;
 
   export namespace Patched {

@@ -3,7 +3,7 @@ import { MusicHistoryEntryEntity } from "../../models";
 
 type Entity = MusicHistoryEntryEntity;
 export namespace MusicHistoryEntryEvents {
-  const MAIN_TYPE = "musicHistory";
+  const MAIN_TYPE = "music_history";
   export const WILDCARD = `${MAIN_TYPE}.*`;
 
   export namespace Patched {

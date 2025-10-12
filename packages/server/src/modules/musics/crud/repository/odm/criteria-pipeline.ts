@@ -1,6 +1,7 @@
 import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { MongoFilterQuery } from "#utils/layers/db/mongoose";
+import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { FullDocOdm } from "./odm";
 
 type Criteria = MusicCrudDtos.GetMany.Criteria;
@@ -98,7 +99,7 @@ export function getCriteriaPipeline(
   if (needsFileInfoLookup) {
     dataPipeline.push( {
       $lookup: {
-        from: "musicfileinfos",
+        from: MusicFileInfoOdm.COLLECTION_NAME,
         localField: "_id",
         foreignField: "musicId",
         as: "fileInfos",

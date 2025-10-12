@@ -20,6 +20,8 @@ type FullDocOdm = RequireId<DocOdm> & {
   stream?: StreamOdm.FullDoc;
 };
 
+export const COLLECTION = "episode_history_entries";
+
 const schemaOdm = new mongoose.Schema<DocOdm>( {
   date: {
     type: DateTypeOdmSchema,
@@ -40,7 +42,7 @@ const schemaOdm = new mongoose.Schema<DocOdm>( {
     required: true,
   },
 } satisfies SchemaDef<DocOdm>, {
-  collection: "episodeHistoryEntries",
+  collection: COLLECTION,
 } );
 const NAME = "EpisodeHistoryEntry";
 const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

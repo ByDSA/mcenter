@@ -27,6 +27,8 @@ export type FullDocOdm = RequireId<DocOdm>;
 
 const NAME = "EpisodeFileInfo";
 
+export const COLLECTION = "episode_file_infos";
+
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   episodeId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -63,6 +65,8 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
 } satisfies SchemaDef<DocOdm>, {
   autoIndex: false,
+  collection: COLLECTION,
+  versionKey: false,
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

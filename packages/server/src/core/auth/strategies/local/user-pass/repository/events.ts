@@ -3,7 +3,7 @@ import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
 
 type Entity = UserPassEntity;
 export namespace UserPassEvents {
-  const MAIN_TYPE = "userPass";
+  const MAIN_TYPE = "user_pass";
   export const WILDCARD = `${MAIN_TYPE}.*`;
 
   export namespace Patched {

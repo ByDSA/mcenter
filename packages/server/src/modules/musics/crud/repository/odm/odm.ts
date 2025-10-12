@@ -16,6 +16,8 @@ export type FullDocOdm = RequireId<DocOdm> & {
 
 const NAME = "Music";
 
+export const COLLECTION = "musics";
+
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   timestamps: {
     type: TimestampsOdm.schema,
@@ -70,6 +72,9 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   year: {
     type: Number,
   },
-} satisfies SchemaDef<DocOdm>);
+} satisfies SchemaDef<DocOdm>, {
+  collection: COLLECTION,
+  versionKey: false,
+} );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

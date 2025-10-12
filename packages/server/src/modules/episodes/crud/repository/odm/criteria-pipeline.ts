@@ -1,6 +1,7 @@
 import type { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import type { FilterQuery, PipelineStage } from "mongoose";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
+import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { DocOdm as EpisodeDocOdm } from "./odm";
 
 // Asumiendo que tienes un ODM para Episode
@@ -88,7 +89,7 @@ export function getCriteriaPipeline(
   if (needsFileInfoLookup) {
     pipeline.push( {
       $lookup: {
-        from: "episodefileinfos",
+        from: EpisodeFileInfoOdm.COLLECTION_NAME,
         localField: "_id",
         foreignField: "episodeId",
         as: "fileInfos",
@@ -149,7 +150,7 @@ export function getCriteriaPipeline(
       // Lookup para obtener fileInfos de la serie
       pipeline.push( {
         $lookup: {
-          from: "seriefileinfos",
+          from: EpisodeFileInfoOdm.COLLECTION_NAME,
           localField: "serie._id",
           foreignField: "seriesKey",
           as: "serieFileInfos",

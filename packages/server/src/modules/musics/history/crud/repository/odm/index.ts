@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { DocOdm, FullDocOdm, ModelOdm, schemaOdm } from "./odm";
+import { COLLECTION, DocOdm, FullDocOdm, ModelOdm, schemaOdm } from "./odm";
 import { docOdmToEntity, docOdmToModel, modelToDocOdm } from "./adapters";
 
 export namespace MusicHistoryEntryOdm {
@@ -10,4 +10,5 @@ export namespace MusicHistoryEntryOdm {
   export const toEntity = docOdmToEntity;
   export const toModel = docOdmToModel;
   export const toDoc = modelToDocOdm;
+  export const COLLECTION_NAME = COLLECTION;
 }

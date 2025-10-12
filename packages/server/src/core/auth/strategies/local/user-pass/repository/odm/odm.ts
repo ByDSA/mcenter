@@ -33,7 +33,7 @@ export type FullDocOdm = RequireId<DocOdm> & {
 };
 
 const NAME = "UserPass";
-const COLLECTION_NAME = "userPasses";
+const COLLECTION_NAME = "users_passes";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   username: {

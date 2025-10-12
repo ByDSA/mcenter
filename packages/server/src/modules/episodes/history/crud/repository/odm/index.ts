@@ -1,5 +1,5 @@
 import { DocOdm,
-  ModelOdm, FullDocOdm, schemaOdm } from "./mongo";
+  ModelOdm, FullDocOdm, schemaOdm, COLLECTION } from "./odm";
 import { docOdmToEntity, entityToFullDocOdm,
   modelToDocOdm } from "./adapters";
 
@@ -12,4 +12,5 @@ export namespace EpisodeHistoryEntryOdm {
   export const toEntity = docOdmToEntity;
   export const toDoc = modelToDocOdm;
   export const toFullDoc = entityToFullDocOdm;
+  export const COLLECTION_NAME = COLLECTION;
 }

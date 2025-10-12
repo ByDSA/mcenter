@@ -1,4 +1,4 @@
-import { DocOdm,
+import { COLLECTION, DocOdm,
   FullDocOdm,
   ModelOdm,
   schema as schemaOdm } from "./odm";
@@ -15,4 +15,5 @@ export namespace SeriesOdm {
   export const toEntity = docOdmToEntity;
   export const toFullDoc = entityToDocOdm;
   export const toDoc = modelToDocOdm;
+  export const COLLECTION_NAME = COLLECTION;
 }

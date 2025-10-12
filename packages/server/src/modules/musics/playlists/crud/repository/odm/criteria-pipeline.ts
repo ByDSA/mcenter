@@ -1,6 +1,7 @@
 import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MongoFilterQuery } from "#utils/layers/db/mongoose";
 import { MusicPlaylistCrudDtos } from "#musics/playlists/models/dto";
+import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { FullDocOdm } from "./odm";
 import { DocOdm } from "./odm";
 
@@ -114,7 +115,7 @@ export function getCriteriaPipeline(
       // Lookup para obtener fileinfos de cada música
       {
         $lookup: {
-          from: "musicfileinfos",
+          from: MusicFileInfoOdm.COLLECTION_NAME,
           let: {
             musicIds: {
               $map: {

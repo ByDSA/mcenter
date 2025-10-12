@@ -1,4 +1,4 @@
-import { DocOdm,
+import { COLLECTION, DocOdm,
   FullDocOdm,
   ModelOdm,
   schemaOdm } from "./odm";
@@ -17,4 +17,5 @@ export namespace UserOdm {
   export const toFullDoc = musicEntityToDocOdm;
   export const partialToDoc = partialToDocOdm;
   export const toDoc = modelToDocOdm;
+  export const COLLECTION_NAME = COLLECTION;
 };

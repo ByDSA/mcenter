@@ -10,7 +10,9 @@ export interface DocOdm {
 
 export type FullDocOdm = RequireId<DocOdm>;
 
-const NAME = "series";
+const NAME = "Serie";
+
+export const COLLECTION = "series";
 
 export const schema = new Schema<DocOdm>( {
   key: {
@@ -21,7 +23,7 @@ export const schema = new Schema<DocOdm>( {
     type: String,
   },
 }, {
-  collection: NAME,
+  collection: COLLECTION,
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schema);

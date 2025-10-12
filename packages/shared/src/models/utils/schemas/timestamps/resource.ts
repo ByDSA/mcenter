@@ -1,6 +1,11 @@
 import z from "zod";
 import { dateSchema } from "./date";
 
+export const basicTimestampsSchema = z.object( {
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
+} ).strict();
+
 export const timestampsSchema = z.object( {
   createdAt: dateSchema,
   updatedAt: dateSchema,

@@ -1,6 +1,7 @@
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
 import { FilterQuery, PipelineStage } from "mongoose";
 import { DocOdm } from "#musics/file-info/crud/repository";
+import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 
 function buildMongooseSort(
   body: MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
@@ -99,7 +100,7 @@ export function getCriteriaPipeline(
       // Ahora expandir los fileInfos de la música
       pipeline.push( {
         $lookup: {
-          from: "musicfileinfos", // nombre de la colección de music file infos
+          from: MusicFileInfoOdm.COLLECTION_NAME,
           localField: "music._id",
           foreignField: "musicId",
           as: "musicFileInfos",

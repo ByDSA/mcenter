@@ -9,6 +9,8 @@ export type DocOdm = Stream & {
 export type FullDocOdm = RequireId<DocOdm>;
 
 const NAME = "Stream";
+
+export const COLLECTION = "streams";
 const originSchema = new mongoose.Schema<StreamOrigin>( {
   type: {
     type: String,
@@ -39,6 +41,8 @@ export const schema = new mongoose.Schema<DocOdm>( {
     type: String,
     required: true,
   },
-} satisfies SchemaDef<DocOdm>);
+} satisfies SchemaDef<DocOdm>, {
+  collection: COLLECTION,
+} );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schema);

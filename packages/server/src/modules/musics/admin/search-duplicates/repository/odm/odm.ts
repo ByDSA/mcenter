@@ -8,13 +8,15 @@ export type DocOdm = {
 
 const NAME = "musicDuplicatesIgnoreGroups";
 
+export const COLLECTION = "music_duplicates_ignore_groups";
+
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   group: {
     type: [Types.ObjectId],
     required: true,
   },
 } satisfies SchemaDef<DocOdm>, {
-  collection: NAME,
+  collection: COLLECTION,
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

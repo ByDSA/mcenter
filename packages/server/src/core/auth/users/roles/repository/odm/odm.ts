@@ -10,7 +10,7 @@ export type DocOdm = {
 export type FullDocOdm = RequireId<DocOdm>;
 
 const NAME = "UserRole";
-const COLLECTION_NAME = "userRoles";
+const COLLECTION_NAME = "user_roles";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   name: {

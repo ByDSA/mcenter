@@ -1,7 +1,7 @@
 import type { EpisodeDependencyCrudDtos } from "$shared/models/episodes/dependencies/dto/transport";
 import type { PipelineStage } from "mongoose";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
-import { DocOdm } from "./odm/mongo";
+import { DocOdm } from "./odm/odm";
 
 function buildMongooseSort(
   _body: EpisodeDependencyCrudDtos.GetManyByCriteria.Criteria,

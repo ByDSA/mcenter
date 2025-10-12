@@ -17,7 +17,8 @@ export type FullDocOdm = RequireId<DocOdm> & {
 };
 
 const NAME = "User";
-const COLLECTION_NAME = "users";
+
+export const COLLECTION = "users";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   email: {
@@ -43,7 +44,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     required: true,
   },
 } satisfies SchemaDef<DocOdm>, {
-  collection: COLLECTION_NAME,
+  collection: COLLECTION,
   autoIndex: isTest(),
 } );
 

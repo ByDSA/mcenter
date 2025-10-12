@@ -3,7 +3,7 @@ import { UserRoleEntity } from "../../models";
 
 type Entity = UserRoleEntity;
 export namespace UserRoleEvents {
-  const MAIN_TYPE = "userRole";
+  const MAIN_TYPE = "user_role";
   export const WILDCARD = `${MAIN_TYPE}.*`;
 
   export namespace Patched {

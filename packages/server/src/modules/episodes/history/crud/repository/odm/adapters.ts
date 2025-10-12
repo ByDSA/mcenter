@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 import { EpisodeOdm } from "#episodes/crud/repository/odm";
 import { StreamOdm } from "#modules/streams/crud/repository/odm";
 import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../../models";
-import { DocOdm, FullDocOdm } from "./mongo";
+import { DocOdm, FullDocOdm } from "./odm";
 
 function docOdmToEntity(docOdm: FullDocOdm): Entity {
   const ret: Entity = {

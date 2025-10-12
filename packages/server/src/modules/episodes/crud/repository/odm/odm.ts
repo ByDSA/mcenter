@@ -27,6 +27,8 @@ export type FullDocOdm = RequireId<DocOdm> & {
 
 const NAME = "Episode";
 
+export const COLLECTION = "episodes";
+
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
   episodeKey: {
     type: String,
@@ -59,8 +61,9 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     required: true,
   },
 }, {
-  _id: true,
+  collection: COLLECTION,
   autoIndex: false,
+  versionKey: false,
 } );
 
 schemaOdm.index( {

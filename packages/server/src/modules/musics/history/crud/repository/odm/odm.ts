@@ -17,6 +17,8 @@ export type FullDocOdm = RequireId<DocOdm> & {
 
 const NAME = "MusicHistory";
 
+export const COLLECTION = "music_history_entries";
+
 export const schemaOdm = new mongoose.Schema<DocOdm>(
   {
     date: {
@@ -29,7 +31,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>(
     },
   },
   {
-    collection: "musicHistoryEntries",
+    collection: COLLECTION,
   },
 );
 
