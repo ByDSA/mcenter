@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.11.0-alpha.0](https://github.com/ByDSA/mcenter/compare/v4.10.2...v4.11.0-alpha.0) (2025-10-13)
+
+
+### Features
+
+* add users to music/episodes (part 1) ([75bad14](https://github.com/ByDSA/mcenter/commit/75bad144e9b6022d6ce74b71bd26a691741d9400))
+
+
+### Bug Fixes
+
+* **back:** rename db collections ([b850f13](https://github.com/ByDSA/mcenter/commit/b850f13c9c613e54e976d2697f2f80475cb7311e))
+* **vlc:** envs ([16f4345](https://github.com/ByDSA/mcenter/commit/16f4345345af91f1c47518186175774b7445b952))
+
 ### [4.10.2](https://github.com/ByDSA/mcenter/compare/v4.10.1...v4.10.2) (2025-10-11)
 
 
