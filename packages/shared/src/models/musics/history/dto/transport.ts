@@ -1,6 +1,7 @@
 import z from "zod";
 import { idParamsSchema } from "../../../utils/schemas/requests";
 import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
+import { mongoDbId } from "../../../resources/partial-schemas";
 
 export namespace MusicHistoryEntryCrudDtos {
   export namespace GetManyByCriteria {
@@ -8,6 +9,7 @@ export namespace MusicHistoryEntryCrudDtos {
       filterShape: {
         resourceId: z.string().optional(),
         timestampMax: z.number().optional(),
+        userId: mongoDbId.optional(),
       },
       sortKeys: ["timestamp"],
       expandKeys: ["musics", "music-file-infos"],

@@ -1,5 +1,5 @@
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
-import { FilterQuery, PipelineStage } from "mongoose";
+import { FilterQuery, PipelineStage, Types } from "mongoose";
 import { DocOdm } from "#musics/file-info/crud/repository";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 
@@ -21,7 +21,7 @@ function buildMongooseFilter(
 
   if (criteria.filter) {
     if (criteria.filter.resourceId)
-      filter["musicId"] = criteria.filter.resourceId;
+      filter["musicId"] = new Types.ObjectId(criteria.filter.resourceId);
 
     if (criteria.filter.timestampMax !== undefined) {
       filter["date.timestamp"] = {
@@ -69,9 +69,7 @@ export function getCriteriaPipeline(
         $lookup: {
           from: "musics", // nombre de la colección de músicas
           let: {
-            musicId: {
-              $toObjectId: "$musicId",
-            },
+            musicId: "$musicId",
           },
           pipeline: [
             {

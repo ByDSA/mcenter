@@ -1,10 +1,11 @@
-import { Request, Response } from "express";
 import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
+import { UserPayload } from "$shared/models/auth";
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
-import { CanGetAll } from "#utils/layers/controller";
 import { AdminDeleteOne } from "#utils/nestjs/rest";
-import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/crud/get";
+import { GetManyCriteria } from "#utils/nestjs/rest/crud/get";
+import { Authenticated } from "#core/auth/users/Authenticated.guard";
+import { User } from "#core/auth/users/User.decorator";
 import { musicHistoryEntryEntitySchema } from "../models";
 import { MusicHistoryRepository } from "./repository";
 
@@ -16,15 +17,10 @@ class DeleteOneByIdParamsDto
 const schema = musicHistoryEntryEntitySchema;
 
 @Controller()
-export class MusicHistoryCrudController implements CanGetAll<Request, Response> {
+export class MusicHistoryCrudController {
   constructor(
     private readonly historyRepo: MusicHistoryRepository,
   ) {}
-
-  @GetMany("/", schema)
-  getAll() {
-    return this.historyRepo.getAll();
-  }
 
   @AdminDeleteOne("/:id", schema)
   async deleteOneByIdAndGet(
@@ -36,10 +32,18 @@ export class MusicHistoryCrudController implements CanGetAll<Request, Response> 
     return deleted;
   }
 
+  @Authenticated()
   @GetManyCriteria("/search", schema)
   async getManyEntriesBySearch(
     @Body() body: GetManyByCriteriaBodyDto,
+    @User() user: UserPayload,
   ) {
-    return await this.historyRepo.getManyByCriteria(body);
+    return await this.historyRepo.getManyByCriteria( {
+      ...body,
+      filter: {
+        ...body.filter,
+        userId: user.id,
+      },
+    } );
   }
 }

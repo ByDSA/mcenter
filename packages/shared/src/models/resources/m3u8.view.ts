@@ -29,10 +29,10 @@ type Props = {
   req: Request;
 };
 export function genM3u8PlaylistWithNext( { host, mediaElement, req }: Props) {
-  const nextUrl = `${host}${req.url}`;
+  const nextUrl = new URL(`${host}${req.url}`);
   const ret = genM3u8Playlist([
     genM3u8Item(mediaElement),
-    genNextM3u8Item(nextUrl),
+    genNextM3u8Item(nextUrl.toString()),
   ]);
 
   return ret;

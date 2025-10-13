@@ -4,7 +4,7 @@ import { Body } from "./body/Body";
 import { Header } from "./Header";
 
 type Props<T> = {
-  value: Required<T>;
+  value: T;
   setValue: (newData: T)=> void;
   showDate?: boolean;
 };

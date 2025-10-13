@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, Res } from "@nestjs/common";
+import { Controller, Get, Param, Query, Req, Res } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { Response, Request } from "express";
@@ -34,7 +34,7 @@ export class MusicsSlugController {
     } ) res: Response,
     @Req() req: Request,
     @User() user: UserPayload | null,
-    @Param("token") token: string | undefined,
+    @Query("token") token: string | undefined,
   ) {
     mongoDbId.or(z.undefined()).parse(token);
     const format = this.responseFormatter.getResponseFormatByRequest(req);

@@ -67,6 +67,12 @@ export class ResponseFormatterService {
       mediaElement = mediaElementWithAbsolutePath(mediaElement, prefix);
     }
 
+    // add query to path
+    const queryParams = new URL(request.url, "http://dummy.com").search;
+
+    if (queryParams)
+      mediaElement.path += (mediaElement.path.includes("?") ? "&" : "") + queryParams;
+
     if (useNext) {
       return genM3u8PlaylistWithNext( {
         mediaElement,

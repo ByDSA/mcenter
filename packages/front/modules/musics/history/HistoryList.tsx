@@ -1,5 +1,4 @@
 import type { MusicHistoryEntry } from "#modules/musics/history/models";
-import extend from "just-extend";
 import { Fragment } from "react";
 import { formatDate } from "#modules/utils/dates";
 import { renderFetchedData } from "#modules/fetching";
@@ -16,14 +15,11 @@ import "#styles/resources/resource-list-entry.css";
 type Props = {
   showDate?: "eachOne" | "groupByDay" | "none";
 };
-const DEFAULT_PARAMS: Required<Props> = {
-  showDate: "groupByDay",
-};
 
 type Data = MusicHistoryApi.GetManyByCriteria.Data[];
 
 export function HistoryList(props?: Props) {
-  const params = extend(true, DEFAULT_PARAMS, props) as typeof DEFAULT_PARAMS;
+  const showDate = props?.showDate ?? "groupByDay";
   const { data, isLoading, error,
     setItem, observerTarget } = useHistoryList();
 
@@ -39,8 +35,8 @@ export function HistoryList(props?: Props) {
         {
           data!.map(
             (entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
-              {params.showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
-              <HistoryEntryElement showDate={params.showDate === "eachOne"}
+              {showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
+              <HistoryEntryElement showDate={showDate === "eachOne"}
                 value={entry} setValue={(newEntry: typeof entry | undefined) => {
                   setItem(i, newEntry ?? null);
                 }} />

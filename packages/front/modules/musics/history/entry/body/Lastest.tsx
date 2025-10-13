@@ -12,6 +12,7 @@ type Props = {
   resourceId: string;
   date: MusicHistoryEntry["date"];
   dateFormat?: DateFormat;
+  userId: string;
 };
 const DATE_FORMAT_DEFAULT: DateFormat = {
   dateTime: "datetime",

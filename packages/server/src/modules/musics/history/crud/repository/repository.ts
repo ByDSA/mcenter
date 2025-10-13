@@ -4,6 +4,11 @@ import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/tra
 import { MusicId } from "$shared/models/musics";
 import { getDateNow } from "$shared/utils/time";
 import { OnEvent } from "@nestjs/event-emitter";
+import { MusicsRepository } from "../../../crud/repository";
+import { docOdmToEntity, docOdmToModel } from "./odm/adapters";
+import { getCriteriaPipeline } from "./criteria-pipeline";
+import { MusicHistoryEntryOdm } from "./odm";
+import { MusicHistoryEntryEvents } from "./events";
 import { assertFoundClient } from "#utils/validation/found";
 import { CanCreateOne, CanCreateOneAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById } from "#utils/layers/repository";
 import { MusicHistoryEntry, MusicHistoryEntryEntity } from "#musics/history/models";
@@ -11,11 +16,6 @@ import { showError } from "#core/logging/show-error";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent } from "#core/domain-event-emitter";
-import { MusicsRepository } from "../../../crud/repository";
-import { docOdmToEntity, docOdmToModel } from "./odm/adapters";
-import { getCriteriaPipeline } from "./criteria-pipeline";
-import { MusicHistoryEntryOdm } from "./odm";
-import { MusicHistoryEntryEvents } from "./events";
 
 type Model = MusicHistoryEntry;
 type Entity = MusicHistoryEntryEntity;
@@ -143,8 +143,10 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
      return docsOdm.map(MusicHistoryEntryOdm.toEntity);
    }
 
-   async #getLastOdm(): Promise<DocOdm | null> {
-     const docsOdm = await ModelOdm.find( {}, {
+   async #getLastOdm(userId: string): Promise<DocOdm | null> {
+     const docsOdm = await ModelOdm.find( {
+       userId,
+     }, {
        _id: 0,
      } ).sort( {
        "date.timestamp": -1,
@@ -157,8 +159,8 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
      return docsOdm[0];
    }
 
-   async getLast(): Promise<Model | null> {
-     const docOdm = await this.#getLastOdm();
+   async getLast(userId: string): Promise<Model | null> {
+     const docOdm = await this.#getLastOdm(userId);
 
      if (!docOdm)
        return null;

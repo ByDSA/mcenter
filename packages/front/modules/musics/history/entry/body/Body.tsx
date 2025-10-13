@@ -67,7 +67,7 @@ export function Body( { data, setData }: Props) {
       <span className={"break"} />
       <hr/>
       <span className={"break"} />
-      <LastestComponent resourceId={data.resourceId} date={data.date}/>
+      <LastestComponent resourceId={data.resourceId} date={data.date} userId={data.userId}/>
     </div>
   </>;
 }

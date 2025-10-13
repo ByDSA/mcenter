@@ -18,7 +18,6 @@ export class MusicHistoryApi {
     props: MusicHistoryApi.GetManyByCriteria.Props,
   ): Promise<MusicHistoryApi.GetManyByCriteria.Response> {
     const body: MusicHistoryApi.GetManyByCriteria.Request = {
-      filter: {},
       sort: {
         timestamp: "desc",
       },
@@ -65,9 +64,9 @@ export namespace MusicHistoryApi {
     export type Request = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
 
     export type Props = {
-    limit?: number;
-    offset?: number;
-  };
+      limit?: number;
+      offset?: number;
+    };
 
     export const dataSchema = musicHistoryEntryEntitySchema
       .required( {
@@ -76,6 +75,7 @@ export namespace MusicHistoryApi {
       .extend( {
         resource: musicEntitySchema.required( {
           fileInfos: true,
+          // userInfo: true, // TODO
         } ),
       } );
 

@@ -260,7 +260,7 @@ index: number; } ) => {
               <span className={commonStyles.separator}>•</span>
               <div className={classes(styles.statItem, styles.createdAt)} title="Fecha de creación">
                 <CalendarToday />
-                <span>{formatDateDDMMYYY(value.timestamps.createdAt)}</span>
+                <span>{formatDateDDMMYYY(value.createdAt)}</span>
               </div>
             </div>
           </div>

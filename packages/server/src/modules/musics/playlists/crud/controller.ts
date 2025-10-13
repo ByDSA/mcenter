@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Req, Res, UnprocessableEntityException } from "@nestjs/common";
+import { Body, Controller, Get, Param, Query, Req, Res, UnprocessableEntityException } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
@@ -167,7 +167,7 @@ export class MusicPlaylistsController {
     } ) res: Response,
     @Req() req: Request,
     @User() user: UserPayload | null,
-    @Param("token") token: string | undefined,
+    @Query("token") token: string | undefined,
   ) {
     mongoDbId.or(z.undefined()).parse(token);
     const format = this.responseFormatter.getResponseFormatByRequest(req);
