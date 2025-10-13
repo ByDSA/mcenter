@@ -1,5 +1,7 @@
+import { fixtureUsers } from "../../auth/tests/fixtures";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { EpisodeHistoryEntry, episodeHistoryEntrySchema } from "./history-entry";
+import { fixtureEpisodeHistoryEntries } from "./tests";
 
 const assertIsModel: ReturnType<typeof genAssertZod> = genAssertZod(episodeHistoryEntrySchema);
 const VALID_MODEL: EpisodeHistoryEntry = {
@@ -13,7 +15,8 @@ const VALID_MODEL: EpisodeHistoryEntry = {
     day: 1,
     timestamp: 1234567890,
   },
-  streamId: "streamId",
+  streamId: fixtureEpisodeHistoryEntries.Simpsons.Samples.EP1x01.streamId,
+  userId: fixtureUsers.Normal.User.id,
 };
 
 describe("assertIsModel", () => {
@@ -39,12 +42,12 @@ describe("assertIsModel", () => {
   it(
     "should throw an error when asserting an entry object with a missing required property",
     () => {
-      const obj = {
+      const obj: EpisodeHistoryEntry = {
         ...VALID_MODEL,
       };
 
       // @ts-ignore
-      delete obj.episodeCompKey;
+      delete obj.userId;
 
       expect(() => {
         assertIsModel(obj);

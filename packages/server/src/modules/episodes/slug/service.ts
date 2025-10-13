@@ -9,7 +9,12 @@ import { EpisodeEntity } from "../models";
 import { EpisodesRepository } from "../crud/repository";
 
 type Slug = EpisodeEntity["compKey"];
-
+type HandleProps = {
+  slug: Slug;
+  userId?: string;
+  req: Request;
+  res: Response;
+};
 @Injectable()
 export class EpisodeSlugHandlerService {
   constructor(
@@ -18,18 +23,15 @@ export class EpisodeSlugHandlerService {
     private readonly resourceSlugService: ResourceSlugService,
   ) {}
 
-  async handle(
-    slug: Slug,
-    req: Request,
-    res: Response,
-  ): Promise<StreamableFile | void> {
+  async handle( { req, res, slug, userId }: HandleProps): Promise<StreamableFile | void> {
     const episode = await this.repo.getOneByCompKey(slug, {
       expand: ["fileInfos", "series"],
     } );
 
     assertFoundClient(episode);
 
-    await this.updateHistory(episode.compKey);
+    if (userId)
+      await this.updateHistory(episode.compKey, userId);
 
     return this.resourceSlugService.handle( {
       entity: episode,
@@ -46,12 +48,13 @@ export class EpisodeSlugHandlerService {
     } );
   }
 
-  private async updateHistory(episodeCompKey: Slug) {
-    const isLast = await this.historyRepo.isLast(episodeCompKey);
+  private async updateHistory(episodeCompKey: Slug, userId: string) {
+    const isLast = await this.historyRepo.isLast(episodeCompKey, userId);
 
     if (!isLast) {
       await this.historyRepo.createNewEntryNowFor( {
         episodeCompKey,
+        userId,
       } );
     }
   }

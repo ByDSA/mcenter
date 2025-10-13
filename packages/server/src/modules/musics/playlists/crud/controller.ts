@@ -7,11 +7,13 @@ import { Request, Response } from "express";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { assertIsDefined } from "$shared/utils/validation";
+import { UserPayload } from "$shared/models/auth";
 import { GetManyCriteria, GetOne } from "#utils/nestjs/rest";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { assertFoundClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { MusicRendererService } from "#musics/renderer/render.service";
+import { User } from "#core/auth/users/User.decorator";
 import { MusicPlaylistCrudDtos } from "../models/dto";
 import { musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistsRepository } from "./repository/repository";
@@ -108,14 +110,14 @@ export class MusicPlaylistsController {
 
   @GetManyCriteria("/user/:userId", musicPlaylistEntitySchema)
   async getUserPlaylists(
-    @Param() _params: GetManyUserPlaylistsParams,
+    @Param() params: GetManyUserPlaylistsParams,
     @Body() body: GetManyUserPlaylistsBody,
   ) {
     return await this.playlistsRepo.getManyByCriteria( {
       ...body,
       filter: {
         ...body.filter,
-        // userId: params.userId, // TODO: añadir cuando haya users
+        userId: params.userId,
       },
 
     } );
@@ -143,7 +145,7 @@ export class MusicPlaylistsController {
     };
     const playlist = await this.playlistsRepo.getOneBySlug( {
       slug: params.slug,
-      user: params.user,
+      userId: params.user,
     }, playlistCriteria);
 
     assertFoundClient(playlist);
@@ -164,7 +166,10 @@ export class MusicPlaylistsController {
       passthrough: true,
     } ) res: Response,
     @Req() req: Request,
+    @User() user: UserPayload | null,
+    @Param("token") token: string | undefined,
   ) {
+    mongoDbId.or(z.undefined()).parse(token);
     const format = this.responseFormatter.getResponseFormatByRequest(req);
     const musicCriteria: MusicCrudDtos.GetOne.Criteria = format === ResponseFormat.RAW
       ? {
@@ -173,7 +178,7 @@ export class MusicPlaylistsController {
       : {};
     const playlist = await this.playlistsRepo.getOneBySlug( {
       slug: params.slug,
-      user: params.user,
+      userId: params.user,
     } );
 
     assertFoundClient(playlist);
@@ -185,8 +190,12 @@ export class MusicPlaylistsController {
 
     assertFoundClient(got);
 
-    if (format === ResponseFormat.RAW)
-      await this.musicHistoryRepo.createNewEntryNowIfShouldFor(got.id);
+    if (format === ResponseFormat.RAW) {
+      const userId = user?.id ?? token;
+
+      if (userId)
+        await this.musicHistoryRepo.createNewEntryNowIfShouldFor(got.id, userId);
+    }
 
     return this.musicRenderer.render( {
       music: got,

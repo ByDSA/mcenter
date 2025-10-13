@@ -2,6 +2,7 @@ import { AllKeysOf } from "$shared/utils/types";
 import { Types } from "mongoose";
 import { EpisodeOdm } from "#episodes/crud/repository/odm";
 import { StreamOdm } from "#modules/streams/crud/repository/odm";
+import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
@@ -21,6 +22,8 @@ function docOdmToEntity(docOdm: FullDocOdm): Entity {
     streamId: docOdm.streamId.toString(),
     resource: docOdm.episode ? EpisodeOdm.toEntity(docOdm.episode) : undefined,
     stream: docOdm.stream ? StreamOdm.toEntity(docOdm.stream) : undefined,
+    userId: docOdm.userId.toString(),
+    user: docOdm.user ? UserOdm.toEntity(docOdm.user) : undefined,
   } satisfies AllKeysOf<Entity>;
 
   return ret;
@@ -39,6 +42,7 @@ function modelToDocOdm(model: Entry): DocOdm {
       timestamp: model.date.timestamp,
     },
     streamId: new Types.ObjectId(model.streamId),
+    userId: new Types.ObjectId(model.userId),
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 }
 

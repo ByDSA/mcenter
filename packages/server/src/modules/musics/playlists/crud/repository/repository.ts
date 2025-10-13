@@ -24,7 +24,7 @@ type Id = Entity["id"];
 
 type SlugProps = {
   slug: string;
-  user: string;
+  userId: string;
 };
 
 type CriteriaOne = MusicPlaylistCrudDtos.GetOne.Criteria;
@@ -116,7 +116,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   }
 
   async getOneBySlug(
-    { slug }: SlugProps,
+    { slug, userId }: SlugProps,
     criteria?: CriteriaOne,
   ): Promise<Entity | null> {
     criteria = {
@@ -124,7 +124,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
       filter: {
         ...criteria?.filter,
         slug: slug,
-        // TODO: añadir user cuando se use
+        userId,
       },
     };
 

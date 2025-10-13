@@ -2,7 +2,10 @@ import { Controller, Get, Param, Req, Res } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { Response, Request } from "express";
+import { UserPayload } from "$shared/models/auth";
+import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { assertFoundClient } from "#utils/validation/found";
+import { User } from "#core/auth/users/User.decorator";
 import { MusicsRepository } from "../crud/repository";
 import { ResponseFormat, ResponseFormatterService } from "../../resources/response-formatter";
 import { MusicEntity } from "../models";
@@ -30,7 +33,10 @@ export class MusicsSlugController {
       passthrough: true,
     } ) res: Response,
     @Req() req: Request,
+    @User() user: UserPayload | null,
+    @Param("token") token: string | undefined,
   ) {
+    mongoDbId.or(z.undefined()).parse(token);
     const format = this.responseFormatter.getResponseFormatByRequest(req);
     let got: MusicEntity | null = await this.musicRepo.getOneBySlug(
       params.slug,
@@ -43,8 +49,12 @@ export class MusicsSlugController {
 
     assertFoundClient(got);
 
-    if (format === ResponseFormat.RAW)
-      await this.historyRepo.createNewEntryNowIfShouldFor(got.id);
+    if (format === ResponseFormat.RAW) {
+      const userId = user?.id ?? token;
+
+      if (userId)
+        await this.historyRepo.createNewEntryNowIfShouldFor(got.id, userId);
+    }
 
     return this.renderer.render( {
       music: got,

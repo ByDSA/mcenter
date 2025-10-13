@@ -38,7 +38,11 @@ export class PlayEpisodeController {
       seriesKey: params.seriesKey,
     };
 
-    return await this.playService.playEpisode(params.remotePlayerId, compKey, query);
+    return await this.playService.playEpisode( {
+      remotePlayerId: params.remotePlayerId,
+      episodeCompKey: compKey,
+      query,
+    } );
   }
 
   @Post("/:seriesKey/:episodeKey")
@@ -58,7 +62,11 @@ export class PlayEpisodeController {
         seriesKey: params.seriesKey,
       };
 
-      return await this.playService.playEpisode(params.remotePlayerId, compKey, query);
+      return await this.playService.playEpisode( {
+        remotePlayerId: params.remotePlayerId,
+        episodeCompKey: compKey,
+        query,
+      } );
     } catch { /* empty */ }
   }
 }

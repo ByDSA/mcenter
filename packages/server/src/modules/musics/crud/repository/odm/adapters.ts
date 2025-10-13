@@ -1,37 +1,19 @@
 import mongoose from "mongoose";
-import { MusicEntity } from "$shared/models/musics";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { PaginatedResult } from "$shared/utils/http/responses";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
-import { Music } from "../../../models";
+import { Music, MusicEntity, MusicUserInfo } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 import { AggregationResult } from "./criteria-pipeline";
+import { FullDocOdm as MusicUserInfoFullDocOdm } from "./userInfo.odm";
 
-function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
-  if (!docOdm.tags && !docOdm.onlyTags)
-    return undefined;
+type Model = Music;
+type Entity = MusicEntity;
 
-  let tags: string[] | undefined;
-
-  if (docOdm.tags)
-    tags = [...docOdm.tags];
-
-  if (docOdm.onlyTags) {
-    if (!tags)
-      tags = [];
-
-    tags.push(...docOdm.onlyTags.map((tag) => `only-${tag}`));
-
-    return tags;
-  }
-
-  return tags;
-}
-
-export function musicDocOdmToEntity(docOdm: FullDocOdm): MusicEntity {
-  const entity: MusicEntity = {
+export function docOdmToEntity(docOdm: FullDocOdm): Entity {
+  const entity: Entity = {
     id: docOdm._id.toString(),
     title: docOdm.title,
     slug: docOdm.url,
@@ -51,12 +33,13 @@ export function musicDocOdmToEntity(docOdm: FullDocOdm): MusicEntity {
     year: docOdm.year,
     spotifyId: docOdm.spotifyId,
     fileInfos: docOdm.fileInfos?.map(MusicFileInfoOdm.toEntity),
-  } satisfies AllKeysOf<MusicEntity>;
+    userInfo: docOdm.userInfo ? docOdmToModelUserInfo(docOdm.userInfo) : undefined,
+  } satisfies AllKeysOf<Entity>;
 
   return removeUndefinedDeep(entity);
 }
 
-export function musicToDocOdm(model: Music): DocOdm {
+export function modelToDocOdm(model: Model): DocOdm {
   const docOdmTags = model.tags ? modelTagsToDocOdmTags(model.tags) : undefined;
   const docOdm: DocOdm = {
     title: model.title,
@@ -78,9 +61,9 @@ export function musicToDocOdm(model: Music): DocOdm {
   return removeUndefinedDeep(docOdm);
 }
 
-export function musicEntityToDocOdm(entity: MusicEntity): FullDocOdm {
+export function musicEntityToDocOdm(entity: Entity): FullDocOdm {
   return {
-    ...musicToDocOdm(entity),
+    ...modelToDocOdm(entity),
     _id: new mongoose.Types.ObjectId(entity.id),
   };
 }
@@ -101,7 +84,7 @@ onlyTags?: string[]; } {
   };
 }
 
-export function partialToDocOdm(partial: Partial<Music>): Partial<DocOdm> {
+export function partialToDocOdm(partial: Partial<Model>): Partial<DocOdm> {
   const docOdmTags = modelTagsToDocOdmTags(partial.tags);
   const ret: Partial<DocOdm> = {
     title: partial.title,
@@ -131,10 +114,10 @@ export function partialToDocOdm(partial: Partial<Music>): Partial<DocOdm> {
 
 export function aggregationResultToResponse(
   aggregationResult: AggregationResult,
-): PaginatedResult<MusicEntity> {
+): PaginatedResult<Entity> {
   const result = aggregationResult[0] ?? [];
-  const data = result.data.map(musicDocOdmToEntity);
-  const metadata: PaginatedResult<MusicEntity>["metadata"] = {};
+  const data = result.data.map(docOdmToEntity);
+  const metadata: PaginatedResult<Entity>["metadata"] = {};
   const totalCount = result.metadata[0]?.totalCount;
 
   if (totalCount !== undefined)
@@ -143,5 +126,34 @@ export function aggregationResultToResponse(
   return {
     data,
     metadata,
+  };
+}
+
+function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
+  if (!docOdm.tags && !docOdm.onlyTags)
+    return undefined;
+
+  let tags: string[] | undefined;
+
+  if (docOdm.tags)
+    tags = [...docOdm.tags];
+
+  if (docOdm.onlyTags) {
+    if (!tags)
+      tags = [];
+
+    tags.push(...docOdm.onlyTags.map((tag) => `only-${tag}`));
+
+    return tags;
+  }
+
+  return tags;
+}
+
+function docOdmToModelUserInfo(docOdm: MusicUserInfoFullDocOdm): MusicUserInfo {
+  return {
+    lastTimePlayed: docOdm.lastTimePlayed,
+    weight: docOdm.weight,
+    tags: docOdm.tags,
   };
 }

@@ -7,7 +7,7 @@ import { Types, UpdateQuery } from "mongoose";
 import { MusicFileInfoEntity, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
 import { assertFoundClient } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
-import { MusicEntity, Music, MusicId } from "#musics/models";
+import { MusicEntity, Music, MusicId, MusicEntityWithUserInfo } from "#musics/models";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { showError } from "#core/logging/show-error";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
@@ -28,10 +28,14 @@ import { ExpressionNode } from "./queries/query-object";
 type CriteriaOne = MusicCrudDtos.GetOne.Criteria;
 type CriteriaMany = MusicCrudDtos.GetMany.Criteria;
 
+type PatchOptions = {
+  userId?: string;
+};
+
 @Injectable()
 export class MusicsRepository
 implements
-CanPatchOneByIdAndGet<MusicEntity, MusicId, Music>,
+CanPatchOneByIdAndGet<MusicEntity, MusicId, Music, PatchOptions>,
 CanGetOneById<MusicEntity, MusicId>,
 CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]>,
 CanGetManyByCriteria<MusicEntity, CriteriaMany> {
@@ -57,6 +61,8 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
       entity: {
         lastTimePlayed: entity.date.timestamp,
       },
+    }, {
+      userId: event.payload.entity.userId,
     } ).catch(showError);
   }
 
@@ -150,13 +156,19 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
 
     const docs = aggregationResult[0].data;
 
-    if (docs.length > 0 && actualCriteria?.expand?.includes("fileInfos"))
-      assertIsDefined(docs[0].fileInfos, "Lookup file infos failed");
+    if (docs.length > 0) {
+      if (actualCriteria?.expand?.includes("fileInfos"))
+        assertIsDefined(docs[0].fileInfos, "Lookup file infos failed");
+    }
 
     return MusicOdm.toPaginatedResult(aggregationResult);
   }
 
-  async patchOneByIdAndGet(id: MusicId, params: PatchOneParams<Music>): Promise<MusicEntity> {
+  async patchOneByIdAndGet(
+    id: MusicId,
+    params: PatchOneParams<Omit<MusicEntityWithUserInfo, "id">>,
+    opts: PatchOptions,
+  ): Promise<MusicEntity> {
     const { entity: paramEntity } = params;
     let { timestamps: _, ...validEntity } = this.musicBuilder.fixFields(paramEntity);
     const updateQuery = patchParamsToUpdateQuery( {

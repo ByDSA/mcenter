@@ -3,6 +3,7 @@ import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { Music } from "#musics/models";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
+import { FullDocOdm as MusicUserInfoFullDocOdm } from "./userInfo.odm";
 
 export type DocOdm = Omit<Music, "id" | "slug"> & {
   _id?: mongoose.Types.ObjectId;
@@ -12,6 +13,7 @@ export type DocOdm = Omit<Music, "id" | "slug"> & {
 
 export type FullDocOdm = RequireId<DocOdm> & {
   fileInfos?: MusicFileInfoOdm.FullDoc[];
+  userInfo?: MusicUserInfoFullDocOdm;
 };
 
 const NAME = "Music";

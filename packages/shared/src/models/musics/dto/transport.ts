@@ -14,7 +14,7 @@ const criteriaConfig = {
     path: z.string().optional(),
   },
   sortKeys: ["added", "updated", "artist"] as const,
-  expandKeys: ["fileInfos"] as const,
+  expandKeys: ["fileInfos", "userInfo"] as const,
 };
 
 export namespace MusicCrudDtos {

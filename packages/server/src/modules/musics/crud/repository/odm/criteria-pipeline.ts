@@ -53,6 +53,7 @@ export function getCriteriaPipeline(
   const needsFileInfoLookup = criteria.expand?.includes("fileInfos")
                              || !!criteria.filter?.hash
                              || !!criteria.filter?.path;
+  const needsUserInfoLookup = criteria.expand?.includes("userInfo");
   // Construir filtro después del lookup si es necesario
   const filter = buildMongooseFilterWithFileInfos(criteria, needsFileInfoLookup);
 
@@ -96,6 +97,7 @@ export function getCriteriaPipeline(
     } );
   }
 
+  // Lookups después de la paginación
   if (needsFileInfoLookup) {
     dataPipeline.push( {
       $lookup: {
@@ -103,6 +105,25 @@ export function getCriteriaPipeline(
         localField: "_id",
         foreignField: "musicId",
         as: "fileInfos",
+      },
+    } );
+  }
+
+  if (needsUserInfoLookup) {
+    dataPipeline.push( {
+      $lookup: {
+        from: "users", // Ajusta el nombre de la colección según tu esquema
+        localField: "userId", // Ajusta el campo según tu esquema
+        foreignField: "_id",
+        as: "userInfo",
+      },
+    } );
+
+    // Convertir el array en un objeto único (asumiendo relación 1:1)
+    dataPipeline.push( {
+      $unwind: {
+        path: "$userInfo",
+        preserveNullAndEmptyArrays: true,
       },
     } );
   }

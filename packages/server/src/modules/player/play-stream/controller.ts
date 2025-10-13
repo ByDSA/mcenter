@@ -54,7 +54,11 @@ export class PlayStreamController {
       remotePlayerId: params.remotePlayerId,
     } );
 
-    return await this.playService.playEpisodeStream(params.remotePlayerId, params.id, query);
+    return await this.playService.playEpisodeStream( {
+      remotePlayerId: params.remotePlayerId,
+      streamId: params.id,
+      query,
+    } );
   }
 
   @Post("/:id")
@@ -70,7 +74,11 @@ export class PlayStreamController {
         secretToken: body.secretToken,
       } );
 
-      return await this.playService.playEpisodeStream(params.remotePlayerId, params.id, query);
+      return await this.playService.playEpisodeStream( {
+        remotePlayerId: params.remotePlayerId,
+        streamId: params.id,
+        query,
+      } );
     } catch { /* empty */ }
   }
 }

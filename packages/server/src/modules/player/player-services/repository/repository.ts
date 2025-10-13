@@ -1,9 +1,11 @@
+import assert from "assert";
 import { Injectable } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { RemotePlayerCrudDtos } from "$shared/models/player/remote-player/dto/transport";
 import { UserEntity } from "$shared/models/auth";
 import { Types } from "mongoose";
+import { assertIsDefined } from "$shared/utils/validation";
 import { assertFoundClient } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
@@ -16,6 +18,7 @@ import { RemotePlayerEvents } from "./events";
 import { RemotePlayerOdm } from "./odm";
 
 type CriteriaMany = RemotePlayerCrudDtos.GetMany.Criteria;
+type CriteriaOne = Omit<RemotePlayerCrudDtos.GetMany.Criteria, "limit" | "offset" | "sort">;
 type Entity = RemotePlayerEntity;
 type Model = RemotePlayer;
 
@@ -47,12 +50,29 @@ CanGetManyByCriteria<Entity, CriteriaMany> {
     return ret;
   }
 
-  async getOneById(id: string): Promise<Entity | null> {
+  async getOneById(id: string, _criteria?: CriteriaOne): Promise<Entity | null> {
     const doc = await RemotePlayerOdm.Model.findById(id);
 
     assertFoundClient(doc);
 
     return RemotePlayerOdm.toEntity(doc);
+  }
+
+  async getAllViewersOf(remotePlayerId: string): Promise<UserEntity["id"][]> {
+    const allDocs: RemotePlayerOdm.FullDoc[] = await this.getManyByCriteriaInner( {
+      expand: ["permissions"],
+      filter: {
+        id: remotePlayerId,
+      },
+    } );
+
+    assert(allDocs.length === 1);
+
+    const doc = allDocs[0];
+
+    assertIsDefined(doc.permissions);
+
+    return doc.permissions.map(p=>p.userId.toString());
   }
 
   async getAllVisiblesForUser(userId: UserEntity["id"]): Promise<Entity[]> {

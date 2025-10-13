@@ -41,6 +41,8 @@ export class MusicFixInfoController {
     for (const c of changed) {
       c.new = await this.musicRepo.patchOneByIdAndGet(c.old.id, {
         entity: c.new,
+      }, {
+        userId: undefined,
       } );
     }
 

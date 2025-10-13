@@ -3,7 +3,7 @@ import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
 import { CanGetAll } from "#utils/layers/controller";
-import { DeleteOne } from "#utils/nestjs/rest";
+import { AdminDeleteOne } from "#utils/nestjs/rest";
 import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/crud/get";
 import { musicHistoryEntryEntitySchema } from "../models";
 import { MusicHistoryRepository } from "./repository";
@@ -26,7 +26,7 @@ export class MusicHistoryCrudController implements CanGetAll<Request, Response> 
     return this.historyRepo.getAll();
   }
 
-  @DeleteOne("/:id", schema)
+  @AdminDeleteOne("/:id", schema)
   async deleteOneByIdAndGet(
     @Param() params: DeleteOneByIdParamsDto,
   ) {

@@ -2,7 +2,7 @@ import { Body, Controller, Param } from "@nestjs/common";
 import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { EpisodeFileInfoEntity, episodeFileInfoEntitySchema } from "$shared/models/episodes/file-info";
-import { PatchOne } from "#utils/nestjs/rest";
+import { AdminPatchOne } from "#utils/nestjs/rest";
 import { assertFoundClient } from "#utils/validation/found";
 import { EpisodeFileInfoRepository } from "./repository";
 
@@ -19,7 +19,7 @@ export class EpisodeFileInfosCrudController {
   ) {
   }
 
-  @PatchOne("/:id", schema)
+  @AdminPatchOne("/:id", schema)
   async patchOneByIdAndGet(
     @Param() params: PatchOneByIdParamsDto,
     @Body() body: PatchOneByIdBodyDto,

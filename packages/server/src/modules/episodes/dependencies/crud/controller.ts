@@ -4,7 +4,7 @@ import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { EpisodeDependencyCrudDtos } from "$shared/models/episodes/dependencies/dto/transport";
 import { episodeCompKeySchema } from "$shared/models/episodes/episode";
-import { DeleteOne, GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest";
+import { AdminDeleteOne, GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest";
 import { type EpisodeDependencyEntity, episodeDependencyEntitySchema } from "../models";
 import { EpisodeDependenciesRepository } from "./repository/repository";
 
@@ -46,7 +46,7 @@ implements
     return await this.repo.getManyByCriteria(body);
   }
 
-  @DeleteOne("/:id", episodeDependencyEntitySchema)
+  @AdminDeleteOne("/:id", episodeDependencyEntitySchema)
   async deleteOneByIdAndGet(
     @Param() params: DeleteOneByIdParamsDto,
   ): Promise<EpisodeDependencyEntity> {

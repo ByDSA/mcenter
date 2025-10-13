@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { fixtureMusics } from "#musics/tests";
 import { MusicEntity } from "../../../models";
-import { musicDocOdmToEntity, musicEntityToDocOdm } from "./adapters";
+import { docOdmToEntity, musicEntityToDocOdm } from "./adapters";
 import { DocOdm, FullDocOdm } from "./odm";
 
 function removeUndefinedProps(obj: Record<string, any>) {
@@ -111,7 +111,7 @@ describe("musicDocOdmToModel", () => {
       game: docOdm.game,
       year: docOdm.year,
     };
-    const result = musicDocOdmToEntity(docOdm);
+    const result = docOdmToEntity(docOdm);
 
     expect(result).toEqual(expectedMusic);
   } );
@@ -141,7 +141,7 @@ describe("musicDocOdmToModel", () => {
       artist: docOdm.artist,
       weight: docOdm.weight,
     };
-    const result = musicDocOdmToEntity(docOdm);
+    const result = docOdmToEntity(docOdm);
 
     expect(result).toEqual(expectedMusic);
   } );
@@ -151,7 +151,7 @@ describe("reversibility", () => {
   it("should be reversible: model->odm->model", () => {
     const music: MusicEntity = fixtureMusics.Disk.Samples.A_AOT4;
     const docOdm = musicEntityToDocOdm(music);
-    const result = musicDocOdmToEntity(docOdm);
+    const result = docOdmToEntity(docOdm);
 
     expect(result).toEqual(music);
   } );
@@ -171,7 +171,7 @@ describe("reversibility", () => {
       },
       weight: fixtureMusics.Disk.Samples.A_AOT4.weight,
     };
-    const music = musicDocOdmToEntity(docOdm);
+    const music = docOdmToEntity(docOdm);
     const result = musicEntityToDocOdm(music);
 
     expect(result).toEqual(docOdm);

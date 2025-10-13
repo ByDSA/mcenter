@@ -1,14 +1,18 @@
-import { Body, Controller, Get, Param, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, Param, Query, Req, Res } from "@nestjs/common";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { Request, Response } from "express";
 import { getHostFromRequest } from "$shared/models/resources";
+import { UserPayload } from "$shared/models/auth";
+import { mongoDbId } from "$shared/models/resources/partial-schemas";
+import z from "zod";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
 import { GetMany } from "#utils/nestjs/rest/crud/get";
-import { PatchOne } from "#utils/nestjs/rest";
+import { AdminPatchOne } from "#utils/nestjs/rest";
 import { assertFoundClient } from "#utils/validation/found";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
+import { User } from "#core/auth/users/User.decorator";
 import { EpisodesRepository } from "../crud/repository";
 import { EpisodeSlugHandlerService } from "./service";
 
@@ -28,7 +32,7 @@ export class EpisodesSlugController {
   ) {
   }
 
-  @PatchOne("/:seriesKey/:episodeKey", schema)
+  @AdminPatchOne("/:seriesKey/:episodeKey", schema)
   async patchOneByIdAndGet(
     @Param() params: PatchOneByIdParamsDto,
     @Body() body: PatchOneByIdBodyDto,
@@ -58,7 +62,10 @@ export class EpisodesSlugController {
       passthrough: true,
     } ) res: Response,
     @Req() req: Request,
+    @User() user: UserPayload | null,
+    @Query("token") token: string | undefined,
   ) {
+    mongoDbId.or(z.undefined()).parse(token);
     const format = this.responseFormatter.getResponseFormatByRequest(req);
     let got: EpisodeEntity | null;
 
@@ -86,8 +93,16 @@ export class EpisodesSlugController {
           got!,
           getHostFromRequest(req),
         );
-      case ResponseFormat.RAW:
-        return await this.slugHandler.handle(params, req, res);
+      case ResponseFormat.RAW: {
+        let userId: string | undefined = user?.id ?? token;
+
+        return await this.slugHandler.handle( {
+          slug: params,
+          req,
+          res,
+          userId,
+        } );
+      }
       case ResponseFormat.JSON:
       {
         validateResponseWithZodSchema(got!, schema, req);

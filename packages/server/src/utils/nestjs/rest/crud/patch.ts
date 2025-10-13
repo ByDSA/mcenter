@@ -3,13 +3,24 @@ import z from "zod";
 import { createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
+import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { ResponseFormatterInterceptor } from "../responses/response-formatter.interceptor";
 
 const UNDEFINED_SCHEMA = z.undefined();
 
-export function PatchOne(url: string, dataSchema?: z.ZodSchema) {
+export function AdminPatchOne(url: string, dataSchema?: z.ZodSchema) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     IsAdmin(),
+    Patch(url),
+    ...getCommonCommandDecorators(dataSchema),
+  ];
+
+  return applyDecorators(...decorators);
+}
+
+export function UserPatchOne(url: string, dataSchema?: z.ZodSchema) {
+  const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
+    Authenticated,
     Patch(url),
     ...getCommonCommandDecorators(dataSchema),
   ];

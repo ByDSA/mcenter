@@ -26,9 +26,17 @@ const modelSchema = optionalPropsSchema.extend( {
 
 type Model = z.infer<typeof modelSchema>;
 
+const musicUserInfoSchema = z.object( {
+  weight: z.number(),
+  tags: z.array(z.string()).optional(),
+  lastTimePlayed: z.number(),
+} );
+
+type MusicUserInfo = z.infer<typeof musicUserInfoSchema>;
 const entitySchema = modelSchema.extend( {
   id: idSchema,
   fileInfos: z.array(musicFileInfoEntitySchema).optional(),
+  userInfo: musicUserInfoSchema.optional(),
 } );
 
 type Entity = z.infer<typeof entitySchema>;
@@ -44,6 +52,11 @@ const entityWithFileInfosSchema = entitySchema.required( {
 } );
 
 type EntityWithFileInfos = z.infer<typeof entityWithFileInfosSchema>;
+const entityWithUserInfoSchema = entitySchema.required( {
+  fileInfos: true,
+} );
+
+type EntityWithUserInfo = z.infer<typeof entityWithUserInfoSchema>;
 
 export {
   idSchema as musicIdSchema,
@@ -54,6 +67,10 @@ export {
   Model as Music,
   EntityWithFileInfos as MusicEntityWithFileInfos,
   entityWithFileInfosSchema as musicEntityWithFileInfosSchema,
+  musicUserInfoSchema as musicFileInfoSchema,
+  MusicUserInfo,
+  entityWithUserInfoSchema as musicEntityWithUserInfoSchema,
+  EntityWithUserInfo as MusicEntityWithUserInfo,
   assertIsModel as assertIsMusic,
   assertIsEntity as assertIsMusicEntity,
   compareId as compareMusicId,

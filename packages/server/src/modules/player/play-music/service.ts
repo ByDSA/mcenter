@@ -9,13 +9,20 @@ import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { MusicsRepository } from "#musics/crud/repository";
 import { assertFoundClient, assertIsNotEmptyClient } from "#utils/validation/found";
 import { PlayService } from "../play.service";
+import { RemotePlayersRepository } from "../player-services/repository";
 
+type ProcessAndPlayMusicsProps = {
+  remotePlayerId: string;
+  musics: MusicEntityWithFileInfos[];
+  force?: boolean;
+};
 @Injectable()
 export class PlayMusicService {
   constructor(
     private readonly historyRepo: MusicHistoryRepository,
     private readonly musicsRepo: MusicsRepository,
     private readonly playService: PlayService,
+    private readonly remotePlayersRepo: RemotePlayersRepository,
   ) { }
 
   async playMusic(
@@ -30,13 +37,15 @@ export class PlayMusicService {
       } )]
       .filter(Boolean) as MusicEntityWithFileInfos[];
 
-    return this.processAndPlayMusics(remotePlayerId, musics, force);
+    return this.processAndPlayMusics( {
+      remotePlayerId,
+      musics,
+      force,
+    } );
   }
 
   private async processAndPlayMusics(
-    remotePlayerId: string,
-    musics: MusicEntityWithFileInfos[],
-    force?: boolean,
+    { musics, remotePlayerId, force }: ProcessAndPlayMusicsProps,
   ): Promise<MusicEntityWithFileInfos[]> {
     assertFoundClient(musics[0]);
     assertZod(z.array(musicEntityWithFileInfosSchema), musics);
@@ -58,13 +67,17 @@ export class PlayMusicService {
       force,
     } );
 
-    const isLast = await this.historyRepo.isLast(musics[0].id);
-    const musicsToAddInHistory: MusicEntity[] = isLast
-      ? musics.slice(1)
-      : musics;
+    const userIds = await this.remotePlayersRepo.getAllViewersOf(remotePlayerId);
 
-    for (const m of musicsToAddInHistory)
-      await this.historyRepo.createNewEntryNowFor(m.id);
+    for (const userId of userIds) {
+      const isLast = await this.historyRepo.isLast(musics[0].id, userId);
+      const musicsToAddInHistory: MusicEntity[] = isLast
+        ? musics.slice(1)
+        : musics;
+
+      for (const m of musicsToAddInHistory)
+        await this.historyRepo.createNewEntryNowFor(m.id, userId);
+    }
 
     return musics;
   }

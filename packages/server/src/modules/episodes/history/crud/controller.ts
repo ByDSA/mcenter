@@ -4,7 +4,7 @@ import { Body, Controller, Inject, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { EpisodeHistoryEntryCrudDtos } from "$shared/models/episodes/history/dto/transport";
 import z from "zod";
-import { DeleteOne, GetMany, GetManyCriteria } from "#utils/nestjs/rest";
+import { AdminDeleteOne, GetMany, GetManyCriteria } from "#utils/nestjs/rest";
 import { showError } from "#core/logging/show-error";
 import { type EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 import { LastTimePlayedService } from "../last-time-played.service";
@@ -80,7 +80,7 @@ implements
     return await this.entriesRepo.getManyByCriteria(body);
   }
 
-  @DeleteOne("/entries/:id", episodeHistoryEntryEntitySchema)
+  @AdminDeleteOne("/entries/:id", episodeHistoryEntryEntitySchema)
   async deleteOneEntryByIdAndGet(
     @Param() params: IdParamsDto,
   ): Promise<EpisodeHistoryEntryEntity> {

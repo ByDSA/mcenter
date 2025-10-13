@@ -1,7 +1,7 @@
 import { Controller, Post, UseInterceptors, HttpStatus, HttpCode, Body, UploadedFile, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
-import { DeleteOne, GetManyCriteria } from "#utils/nestjs/rest";
+import { AdminDeleteOne, GetManyCriteria } from "#utils/nestjs/rest";
 import { MusicFileInfoRepository } from "./crud/repository";
 import { MusicFileInfoEntity, musicFileInfoEntitySchema } from "./models";
 import { MusicFileInfoUploadRepository, UploadFile, UploadFileInterceptor, UploadMusicFileInfoDto } from "./upload.repository";
@@ -36,7 +36,7 @@ export class MusicFileInfoController {
     return [];
   }
 
-  @DeleteOne("/:id")
+  @AdminDeleteOne("/:id")
   async deleteOne(
     @Param() params: DeleteParamsDto,
   ) {

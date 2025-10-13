@@ -7,6 +7,7 @@ import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { OnEvent } from "@nestjs/event-emitter";
 import { getDateNow } from "$shared/utils/time";
+import { UserEntity } from "$shared/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { StreamEntity } from "#modules/streams";
@@ -29,10 +30,12 @@ type EpisodeId = EpisodeEntity["id"];
 type AddEpisodesToHistoryProps = {
   episodes: EpisodeEntity[];
   streamId: StreamEntity["id"];
+  userId: UserEntity["id"];
 };
 type CreateNewEntryNowForProps = {
   episodeCompKey: EpisodeCompKey;
   streamId?: StreamEntity["id"];
+  userId: UserEntity["id"];
 };
 @Injectable()
 export class EpisodeHistoryRepository implements
@@ -161,8 +164,10 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return EpisodeHistoryEntryOdm.toEntity(last);
   }
 
-  async isLast(compKey: EpisodeCompKey): Promise<boolean> {
-    const lastOdm = await EpisodeHistoryEntryOdm.Model.findOne().sort( {
+  async isLast(compKey: EpisodeCompKey, userId: string): Promise<boolean> {
+    const lastOdm = await EpisodeHistoryEntryOdm.Model.findOne( {
+      userId,
+    } ).sort( {
       "date.timestamp": -1,
     } );
 
@@ -170,7 +175,9 @@ CanDeleteOneByIdAndGet<Model, Id> {
       && lastOdm?.episodeCompKey.episodeKey === compKey.episodeKey;
   }
 
-  async createNewEntryNowFor( { episodeCompKey, streamId }: CreateNewEntryNowForProps) {
+  async createNewEntryNowFor( { episodeCompKey, streamId, userId }: CreateNewEntryNowForProps) {
+    assertIsDefined(userId);
+
     if (streamId === undefined) {
       const defaultStream = this.streamsRepo.getOneOrCreateBySeriesKey(episodeCompKey.seriesKey);
 
@@ -181,17 +188,19 @@ CanDeleteOneByIdAndGet<Model, Id> {
       date: getDateNow(),
       resourceId: episodeCompKey,
       streamId,
+      userId,
     };
 
     await this.createOne(newEntry);
   }
 
-  async addEpisodesToHistory( { episodes, streamId }: AddEpisodesToHistoryProps) {
+  async addEpisodesToHistory( { episodes, streamId, userId }: AddEpisodesToHistoryProps) {
     // TODO: usar bulk insert (quitar await en for)
     for (const episode of episodes) {
       await this.createNewEntryNowFor( {
         episodeCompKey: episode.compKey,
         streamId,
+        userId,
       } );
     }
   }

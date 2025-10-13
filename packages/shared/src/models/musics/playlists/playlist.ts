@@ -1,4 +1,5 @@
 import z from "zod";
+import { userEntitySchema } from "../../auth";
 import { mongoDbId } from "../../resources/partial-schemas";
 import { musicEntitySchema } from "../music";
 import { basicTimestampsSchema } from "../../utils/schemas/timestamps";
@@ -24,7 +25,7 @@ const modelSchema = z.object( {
 type Model = z.infer<typeof modelSchema>;
 const entitySchema = modelSchema.extend( {
   id: mongoDbId,
-  user: z.unknown().optional(), // TODO: cambiar cuando hayan users
+  user: userEntitySchema.optional(),
   list: z.array(entryEntitySchema),
 } );
 

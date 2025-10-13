@@ -3,7 +3,7 @@ import { OnEvent } from "@nestjs/event-emitter";
 import { EMPTY, Observable, of, Subject } from "rxjs";
 import { map, startWith, mergeMap } from "rxjs/operators";
 import { disconnectionResponseSchema, FromRemotePlayerEvent, initialConnectionsResponseSchema, newConnectionResponseSchema, openClosedResponseSchema } from "$shared/models/player";
-import { UserEntity } from "$shared/models/auth";
+import { UserEntity, UserPayload } from "$shared/models/auth";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
@@ -66,7 +66,7 @@ export class RemotePlayersController {
 
   @Sse("stream")
   async streamConnections(
-    @User() user: UserEntity | null,
+    @User() user: UserPayload | null,
   ): Promise<Observable<MessageEvent>> {
     if (!user)
       throw new UnauthorizedException();

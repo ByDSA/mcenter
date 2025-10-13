@@ -1,10 +1,12 @@
+import { Types } from "mongoose";
 import { MusicOdm } from "#musics/crud/repository/odm";
 import { MusicHistoryEntry, MusicHistoryEntryEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): MusicHistoryEntry {
   return {
-    resourceId: docOdm.musicId,
+    resourceId: docOdm.musicId.toString(),
+    userId: docOdm.userId.toString(),
     date: {
       year: docOdm.date.year,
       month: docOdm.date.month,
@@ -24,7 +26,8 @@ export function docOdmToEntity(docOdm: FullDocOdm): MusicHistoryEntryEntity {
 
 export function modelToDocOdm(model: MusicHistoryEntry): DocOdm {
   return {
-    musicId: model.resourceId,
+    musicId: new Types.ObjectId(model.resourceId),
+    userId: new Types.ObjectId(model.userId),
     date: {
       year: model.date.year,
       month: model.date.month,

@@ -1,8 +1,10 @@
 import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
+import { UserPayload } from "$shared/models/auth";
 import { MusicEntity, musicEntitySchema } from "#musics/models";
-import { DeleteOne, GetManyCriteria, GetOne, PatchOne } from "#utils/nestjs/rest";
+import { AdminDeleteOne, GetManyCriteria, GetOne, AdminPatchOne } from "#utils/nestjs/rest";
+import { User } from "#core/auth/users/User.decorator";
 import { MusicsRepository } from "./repository";
 
 class GetOneByIdParamsDto extends createZodDto(MusicCrudDtos.GetOne.ById.paramsSchema) {}
@@ -25,22 +27,27 @@ export class MusicCrudController {
     return await this.musicRepo.getManyByCriteria(criteria);
   }
 
-  @PatchOne(":id", musicEntitySchema)
+  @AdminPatchOne(":id", musicEntitySchema)
   async patchOneByIdAndGet(
     @Param() params: DeleteOneParamsDto,
     @Body() body: PatchBodyDto,
+    @User() user: UserPayload,
   ) {
     const { id } = params;
 
-    return await this.musicRepo.patchOneByIdAndGet(id, body);
+    // TODO: filtro por uploader
+    return await this.musicRepo.patchOneByIdAndGet(id, body, {
+      userId: user.id,
+    } );
   }
 
-  @DeleteOne(":id", musicEntitySchema)
+  @AdminDeleteOne(":id", musicEntitySchema)
   async deleteOneByIdAndGet(
     @Param() params: PatchParamsDto,
   ) {
     const { id } = params;
 
+    // TODO: filtro por uploader
     return await this.musicRepo.deleteOneByIdAndGet(id);
   }
 

@@ -1,4 +1,5 @@
 import z from "zod";
+import { userEntitySchema } from "../../auth";
 import { mongoDbId } from "../../resources/partial-schemas";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { episodeEntitySchema, episodeCompKeySchema } from "..";
@@ -7,6 +8,7 @@ import { makeHistoryEntrySchema } from "../../history-lists-common";
 
 const schema = makeHistoryEntrySchema(episodeCompKeySchema).extend( {
   streamId: mongoDbId,
+  userId: mongoDbId,
 } )
   .strict();
 
@@ -18,6 +20,7 @@ const entitySchema = schema
     id: mongoDbId,
     resource: episodeEntitySchema.optional(),
     stream: streamEntitySchema.optional(),
+    user: userEntitySchema.optional(),
   } )
   .strict();
 

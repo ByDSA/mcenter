@@ -1,18 +1,20 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { DateType } from "$shared/utils/time";
-import { MusicId } from "#musics/models";
 import { DateTypeOdmSchema } from "#utils/time";
 import { RequireId } from "#utils/layers/db/mongoose";
 import { MusicOdm } from "#musics/crud/repository/odm";
+import { UserOdm } from "#core/auth/users/crud/repository/odm";
 
 export type DocOdm = {
   _id?: mongoose.Types.ObjectId;
   date: DateType;
-  musicId: MusicId;
+  musicId: MusicOdm.FullDoc["_id"];
+  userId: UserOdm.FullDoc["_id"];
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
   music?: MusicOdm.FullDoc;
+  user?: UserOdm.FullDoc;
 };
 
 const NAME = "MusicHistory";
@@ -26,7 +28,11 @@ export const schemaOdm = new mongoose.Schema<DocOdm>(
       required: true,
     },
     musicId: {
-      type: String,
+      type: Schema.ObjectId,
+      required: true,
+    },
+    userId: {
+      type: Schema.ObjectId,
       required: true,
     },
   },
