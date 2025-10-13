@@ -70,8 +70,12 @@ export class ResponseFormatterService {
     // add query to path
     const queryParams = new URL(request.url, "http://dummy.com").search;
 
-    if (queryParams)
-      mediaElement.path += (mediaElement.path.includes("?") ? "&" : "") + queryParams;
+    if (queryParams) {
+      const separator = mediaElement.path.includes("?") ? "&" : "?";
+
+      // slice(1) quita el '?' inicial que trae .search
+      mediaElement.path += separator + queryParams.slice(1);
+    }
 
     if (useNext) {
       return genM3u8PlaylistWithNext( {
