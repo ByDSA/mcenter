@@ -19,6 +19,7 @@ import { PlayVideoService } from "../play-video.service";
 import { PlayService } from "../play.service";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { SecretTokenBody } from "../model";
+import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
 import { PlayStreamController } from "./controller";
 
 describe("playStreamController", () => {
@@ -40,6 +41,7 @@ describe("playStreamController", () => {
         createMockProvider(PlayService),
         createMockProvider(AuthPlayerService),
         PlayVideoService,
+        mockRemotePlayersRepositoryProvider,
       ],
     }, {
       auth: {

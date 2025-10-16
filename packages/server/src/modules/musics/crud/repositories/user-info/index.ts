@@ -1,3 +1,3 @@
 export {
-  MusicsUsersRepository as MusicsRepository,
+  MusicsUsersRepository,
 } from "./repository";

@@ -3,10 +3,10 @@ import { fixtureUsers } from "../../auth/tests/fixtures";
 import { deepFreeze } from "../../../utils/objects";
 import { MusicEntity } from "../music";
 import { DATEJS_SAMPLE1 } from "../../../../tests/other-fixtures/dates";
+import { MusicUserInfoEntity } from "../user-info/user-info";
 
 const AOT4_COMMON = {
   artist: "artist",
-  weight: 0,
   timestamps: {
     createdAt: DATEJS_SAMPLE1,
     updatedAt: DATEJS_SAMPLE1,
@@ -51,15 +51,36 @@ const MUSIC_FILE_SAMPLES: MusicEntity[] = deepFreeze([
   DK,
   DRIFTVEIL,
 ]);
+const userInfo: MusicUserInfoEntity = {
+  id: new ObjectId().toString(),
+  userId: fixtureUsers.Normal.User.id,
+  musicId: A_AOT4.id,
+  lastTimePlayed: 0,
+  weight: 0,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  tags: ["userTag"],
+};
+const samples = {
+  A_AOT4,
+  AOT4_COPY,
+  DK,
+  DRIFTVEIL,
+};
+const samplesWithUserInfo = Object.values(samples).map(s=> ( {
+  ...s,
+  userInfo: {
+    ...userInfo,
+    musicId: s.id,
+  },
+} ));
 
 export const fixtureMusics = {
   Disk: {
-    Samples: {
-      A_AOT4,
-      AOT4_COPY,
-      DK,
-      DRIFTVEIL,
-    },
+    Samples: samples,
     List: MUSIC_FILE_SAMPLES,
+    WithUserInfo: {
+      List: samplesWithUserInfo,
+    },
   },
 };

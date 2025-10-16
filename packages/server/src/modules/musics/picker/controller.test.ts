@@ -50,7 +50,7 @@ describe("random", () => {
   it("get random", async () => {
     const musics = MUSICS_SAMPLES_IN_DISK;
 
-    musicRepoMock.getAll.mockResolvedValueOnce(fixtureMusics.Disk.List);
+    musicRepoMock.getAll.mockResolvedValueOnce(fixtureMusics.Disk.WithUserInfo.List);
     const response = await request(routerApp)
       .get("/?format=m3u8")
       .expect(200);

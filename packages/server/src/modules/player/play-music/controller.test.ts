@@ -4,16 +4,17 @@ import { HttpStatus } from "@nestjs/common";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { Types } from "mongoose";
-import { PlayService } from "../play.service";
-import { AuthPlayerService } from "../AuthPlayer.service";
-import { PlayMusicController } from "./controller";
-import { PlayMusicService } from "./service";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { createMockedModule, createMockProvider } from "#utils/nestjs/tests";
 import { MusicHistoryModule } from "#musics/history/module";
 import { MusicsCrudModule } from "#musics/crud/module";
 import { MusicsRepository } from "#musics/crud/repositories/music";
 import { fixtureMusics } from "#musics/tests";
+import { AuthPlayerService } from "../AuthPlayer.service";
+import { PlayService } from "../play.service";
+import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
+import { PlayMusicService } from "./service";
+import { PlayMusicController } from "./controller";
 
 describe("playMusicController", () => {
   let routerApp: Application;
@@ -31,6 +32,7 @@ describe("playMusicController", () => {
         createMockProvider(PlayService),
         createMockProvider(AuthPlayerService),
         PlayMusicService,
+        mockRemotePlayersRepositoryProvider,
       ],
     }, {
       auth: {

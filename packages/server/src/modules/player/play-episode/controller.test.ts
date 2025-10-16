@@ -20,6 +20,7 @@ import { UUID_INVALID, UUID_UNUSED } from "#core/db/tests/fixtures/uuid";
 import { PlayVideoService } from "../play-video.service";
 import { PlayService } from "../play.service";
 import { AuthPlayerService } from "../AuthPlayer.service";
+import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
 import { PlayEpisodeController } from "./controller";
 
 describe("playEpisodeController", () => {
@@ -40,6 +41,7 @@ describe("playEpisodeController", () => {
       providers: [
         createMockProvider(PlayService),
         createMockProvider(AuthPlayerService),
+        mockRemotePlayersRepositoryProvider,
         PlayVideoService,
       ],
     }, {

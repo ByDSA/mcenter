@@ -161,7 +161,9 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
       if (pipeline.length === 0)
         throw new UnprocessableEntityException(criteria);
 
-      docs = await MusicOdm.Model.aggregate(pipeline);
+      const result = await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
+
+      docs = result[0].data;
     } else
       docs = await MusicOdm.Model.find( {} );
 

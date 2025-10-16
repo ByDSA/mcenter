@@ -1,9 +1,11 @@
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { createMockProvider } from "#utils/nestjs/tests";
 import { MusicsRepository } from "./repositories/music";
 import { MusicCrudController } from "./controller";
 import { musicsRepoMockProvider } from "./repositories/music/tests";
+import { MusicsUsersRepository } from "./repositories/user-info/repository";
 
 crudTestsSuite( {
   name: MusicCrudController.name,
@@ -13,6 +15,7 @@ crudTestsSuite( {
       controllers: [MusicCrudController],
       providers: [
         musicsRepoMockProvider,
+        createMockProvider(MusicsUsersRepository),
       ],
     }, {
       auth: {
@@ -30,7 +33,7 @@ crudTestsSuite( {
     patchOne: {
       auth: {
         admin: true,
-        user: false,
+        user: true, // TODO: cuando se agregue rol uploader, poner a false y añadir uploader
       },
       repo: {
         getFn: (repo)=>repo.patchOneByIdAndGet,

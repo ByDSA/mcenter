@@ -2,6 +2,7 @@ import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { MongoFilterQuery } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
+import { MusicsUsersOdm } from "../../user-info/odm";
 import { FullDocOdm } from "./odm";
 
 type Criteria = MusicCrudDtos.GetMany.Criteria;
@@ -53,8 +54,7 @@ export function getCriteriaPipeline(
   const needsFileInfoLookup = criteria.expand?.includes("fileInfos")
                              || !!criteria.filter?.hash
                              || !!criteria.filter?.path;
-  const needsUserInfoLookup = criteria.expand?.includes("userInfo")
-                         && criteria.filter?.userInfoUserId;
+  const needsUserInfoLookup = criteria.expand?.includes("userInfo");
   // Construir filtro después del lookup si es necesario
   const filter = buildMongooseFilterWithFileInfos(
     criteria,
@@ -82,7 +82,7 @@ export function getCriteriaPipeline(
   const dataPipeline: PipelineStage[] = [];
 
   if (needsUserInfoLookup) {
-  // Si necesitamos filtrar por userId, usar lookup con pipeline
+    // Si necesitamos filtrar por userId, usar lookup con pipeline
     if (criteria.filter?.userInfoUserId !== undefined) {
       dataPipeline.push( {
         $lookup: {
@@ -110,13 +110,20 @@ export function getCriteriaPipeline(
         },
       } );
     } else {
-    // Lookup normal si no filtramos
+      const fakeId = new Types.ObjectId();
+
+      // Default UserInfo
       dataPipeline.push( {
-        $lookup: {
-          from: "musics_users",
-          localField: "_id",
-          foreignField: "musicId",
-          as: "userInfo",
+        $addFields: {
+          userInfo: {
+            _id: fakeId,
+            musicId: "$_id" as any,
+            createdAt: new Date(),
+            lastTimePlayed: 0,
+            updatedAt: new Date(),
+            userId: fakeId,
+            weight: 0,
+          }satisfies MusicsUsersOdm.FullDoc,
         },
       } );
     }

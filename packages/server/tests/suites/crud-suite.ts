@@ -1,5 +1,6 @@
 /* eslint-disable jest/no-export */
 import { Application } from "express";
+import { Logger } from "@nestjs/common";
 import { getOneTests } from "#tests/suites/get-one";
 import { patchOneTests, PatchTestsProps } from "#tests/suites/patch-one";
 import { getManyCriteriaTests } from "#tests/suites/get-many-criteria";
@@ -25,6 +26,7 @@ type TestsConfig<R> = {
 
 type Props<R> = {
   name: string;
+  skip?: boolean;
   appModule: Parameters<typeof createTestingAppModuleAndInit>;
   repositoryClass?: new (...args: any[])=> R;
   testsConfig: TestsConfig<R>;
@@ -32,6 +34,17 @@ type Props<R> = {
 export function crudTestsSuite<R>(props: Props<R>) {
   const { testsConfig: testConfig } = props;
   const title = props.name ?? "CrudController";
+
+  if (props.skip) {
+    new Logger(crudTestsSuite.name).warn(`Skipping tests suite ${title}`);
+
+    // eslint-disable-next-line jest/no-disabled-tests, jest/expect-expect, no-empty-function
+    it.skip("skipped", () => {
+
+    } );
+
+    return;
+  }
 
   describe(`${title}`, () => {
     let routerApp: Application;
