@@ -1,19 +1,36 @@
 import { FilterApplier, PreventDisabledFilter, PreventRepeatInTimeFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { Resource } from "#modules/resources/models";
-import { MusicEntity, compareMusicId } from "#musics/models";
+import { MusicEntity, MusicEntityWithUserInfo, compareMusicId } from "#musics/models";
 
-type Entity = MusicEntity;
+type Entity = MusicEntityWithUserInfo;
 type ModelId = string;
+export class PreventDisabledMusicFilter extends PreventDisabledFilter<Entity> {
+  isDisabled(self: Entity): boolean {
+    return !!self.disabled;
+  }
+}
 
-type Params<ID, R extends Resource = Resource> = {
-  resources: R[];
-  lastEp: R | null;
-  lastId: ID | undefined;
+export class RemoveWeightLowerOrEqualThanMusicFilter
+  extends RemoveWeightLowerOrEqualThanFilter<Entity> {
+  getWeight(self: Entity): number {
+    return self.userInfo.weight;
+  }
+}
+
+export class PreventRepeatInTimeMusicFilter extends PreventRepeatInTimeFilter<Entity> {
+  getLastTimePlayed(self: Entity): number {
+    return self.userInfo.lastTimePlayed;
+  }
+}
+
+type Params = {
+  resources: Entity[];
+  lastEp: MusicEntity | null;
+  lastId: ModelId | undefined;
 };
 export class MusicFilterApplier extends FilterApplier<Entity> {
-  #params: Params<ModelId, Entity>;
+  #params: Params;
 
-  constructor(params: Params<ModelId, Entity>) {
+  constructor(params: Params) {
     super();
     this.#params = params;
 
@@ -24,7 +41,7 @@ export class MusicFilterApplier extends FilterApplier<Entity> {
     const { PICKER_MIN_WEIGHT = -99 } = process.env;
     const { lastEp, lastId } = this.#params;
 
-    this.add(new PreventDisabledFilter());
+    this.add(new PreventDisabledMusicFilter());
 
     if (lastEp) {
       this.addReversible(new PreventRepeatLastFilter<ModelId, Entity>(
@@ -36,17 +53,17 @@ export class MusicFilterApplier extends FilterApplier<Entity> {
       ));
     }
 
-    this.add(new RemoveWeightLowerOrEqualThanFilter(+PICKER_MIN_WEIGHT));
+    this.add(new RemoveWeightLowerOrEqualThanMusicFilter(+PICKER_MIN_WEIGHT));
 
     const minSecondsElapsed = 30 * 60;
 
-    this.addReversible(new PreventRepeatInTimeFilter( {
+    this.addReversible(new PreventRepeatInTimeMusicFilter( {
       minSecondsElapsed,
     } ));
   }
 }
 
-export function genFilterApplier(resources: Entity[], lastOne?: Entity) {
+export function genFilterApplier(resources: Entity[], lastOne?: MusicEntity) {
   return new MusicFilterApplier( {
     resources,
     lastEp: lastOne ?? null,

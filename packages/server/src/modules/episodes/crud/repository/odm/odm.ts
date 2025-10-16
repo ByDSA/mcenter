@@ -18,6 +18,7 @@ export type DocOdm = EpisodeCompKeyOdm & OptionalId & {
   disabled?: boolean;
   lastTimePlayed?: number;
   timestamps: TimestampsModel;
+  uploaderUserId: mongoose.Types.ObjectId;
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
@@ -36,6 +37,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
   seriesKey: {
     type: String,
+    required: true,
+  },
+  uploaderUserId: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   title: {

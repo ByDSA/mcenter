@@ -20,6 +20,7 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
     disabled: docOdm.disabled,
     tags: docOdm.tags,
     lastTimePlayed: docOdm.lastTimePlayed,
+    uploaderUserId: docOdm.uploaderUserId.toString(),
   } satisfies AllKeysOf<Episode>;
 
   return removeUndefinedDeep(model);
@@ -59,6 +60,7 @@ export function episodeToDocOdm(model: Episode): DocOdm {
     disabled: model.disabled,
     tags: model.tags,
     lastTimePlayed: model.lastTimePlayed,
+    uploaderUserId: new Types.ObjectId(model.uploaderUserId),
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(ret);

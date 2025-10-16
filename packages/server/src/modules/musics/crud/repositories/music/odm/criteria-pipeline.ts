@@ -53,9 +53,13 @@ export function getCriteriaPipeline(
   const needsFileInfoLookup = criteria.expand?.includes("fileInfos")
                              || !!criteria.filter?.hash
                              || !!criteria.filter?.path;
-  const needsUserInfoLookup = criteria.expand?.includes("userInfo");
+  const needsUserInfoLookup = criteria.expand?.includes("userInfo")
+                         && criteria.filter?.userInfoUserId;
   // Construir filtro después del lookup si es necesario
-  const filter = buildMongooseFilterWithFileInfos(criteria, needsFileInfoLookup);
+  const filter = buildMongooseFilterWithFileInfos(
+    criteria,
+    needsFileInfoLookup,
+  );
 
   if (Object.keys(filter).length > 0) {
     pipeline.push( {
@@ -76,6 +80,55 @@ export function getCriteriaPipeline(
   };
   // Construir el pipeline de datos
   const dataPipeline: PipelineStage[] = [];
+
+  if (needsUserInfoLookup) {
+  // Si necesitamos filtrar por userId, usar lookup con pipeline
+    if (criteria.filter?.userInfoUserId !== undefined) {
+      dataPipeline.push( {
+        $lookup: {
+          from: "musics_users",
+          let: {
+            musicId: "$_id",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ["$musicId", "$$musicId"],
+                    },
+                    {
+                      $eq: ["$userId", criteria.filter.userInfoUserId],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "userInfo",
+        },
+      } );
+    } else {
+    // Lookup normal si no filtramos
+      dataPipeline.push( {
+        $lookup: {
+          from: "musics_users",
+          localField: "_id",
+          foreignField: "musicId",
+          as: "userInfo",
+        },
+      } );
+    }
+
+    dataPipeline.push( {
+      $unwind: {
+        path: "$userInfo",
+        preserveNullAndEmptyArrays:
+        criteria.filter?.userInfoUserId === undefined, // Si filtramos, no preservar nulls
+      },
+    } );
+  }
 
   // Sort antes de la paginación
   if (sort) {
@@ -105,25 +158,6 @@ export function getCriteriaPipeline(
         localField: "_id",
         foreignField: "musicId",
         as: "fileInfos",
-      },
-    } );
-  }
-
-  if (needsUserInfoLookup) {
-    dataPipeline.push( {
-      $lookup: {
-        from: "users", // Ajusta el nombre de la colección según tu esquema
-        localField: "userId", // Ajusta el campo según tu esquema
-        foreignField: "_id",
-        as: "userInfo",
-      },
-    } );
-
-    // Convertir el array en un objeto único (asumiendo relación 1:1)
-    dataPipeline.push( {
-      $unwind: {
-        path: "$userInfo",
-        preserveNullAndEmptyArrays: true,
       },
     } );
   }

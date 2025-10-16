@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
 
 export namespace TimestampsOdm {
-  type DocOdm = TimestampsModel;
+  export type DocOdm = TimestampsModel;
   export const schema = new mongoose.Schema<DocOdm>( {
     createdAt: {
       type: Date,

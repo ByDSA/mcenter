@@ -75,7 +75,7 @@ export namespace MusicHistoryApi {
       .extend( {
         resource: musicEntitySchema.required( {
           fileInfos: true,
-          // userInfo: true, // TODO
+          userInfo: true,
         } ),
       } );
 

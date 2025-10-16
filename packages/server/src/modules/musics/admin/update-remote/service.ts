@@ -8,7 +8,7 @@ import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
 import { showError } from "#core/logging/show-error";
 import { findAllValidMusicFiles as findAllPathsOfValidMusicFiles } from "../../files";
-import { MusicsRepository } from "../../crud/repository";
+import { MusicsRepository } from "../../crud/repositories/music";
 import { ChangesDetector } from "./changes-detector";
 
 export const updateResultSchema = z.object( {
@@ -31,6 +31,7 @@ export type UpdateResult = z.infer<typeof updateResultSchema>;
 
 type Props = {
   job: Job;
+  userId: string;
 };
 
 @Injectable()
@@ -68,7 +69,7 @@ export class UpdateRemoteTreeService {
     const updated: UpdateResult["updated"] = [];
 
     for (const localFileMusic of changes.new) {
-      const p = this.musicRepo.createOneFromPath(localFileMusic.path, localFileMusic)
+      const p = this.musicRepo.createOneFromPath(localFileMusic.path, props.userId, localFileMusic)
         .then((got) => {
           created.push(got);
         } )

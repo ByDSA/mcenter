@@ -1,7 +1,6 @@
-import { Pickable } from "#modules/resources/models";
 import { Filter } from "./filter";
 
-export class FilterApplier<R extends Pickable = Pickable> {
+export class FilterApplier<R> {
   #nonReversibleFilters: Filter<R>[] = [];
 
   #reversibleFilters: Filter<R>[] = [];
@@ -44,9 +43,9 @@ export class FilterApplier<R extends Pickable = Pickable> {
   }
 }
 
-async function applyFiltersToResource<R extends Pickable>(
+async function applyFiltersToResource<R>(
   resource: R,
-  filters: Filter[],
+  filters: Filter<R>[],
 ): Promise<boolean> {
   for (const f of filters) {
     if (!await f.filter(resource))

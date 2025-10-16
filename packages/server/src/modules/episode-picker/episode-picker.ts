@@ -7,6 +7,26 @@ import { compareEpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 import { DependenciesList } from "./appliers/dependencies";
 
+class EpisodePickerRandom extends ResourcePickerRandom<EpisodeEntity> {
+  constructor( { filterApplier, resources, weightFixerApplier, lastOne }: {
+    resources: EpisodeEntity[];
+    lastOne?: EpisodeEntity;
+    filterApplier: ReturnType<typeof genEpisodeFilterApplier>;
+    weightFixerApplier: ReturnType<typeof genEpisodeWeightFixerApplier>;
+  } ) {
+    super( {
+      filterApplier,
+      resources,
+      weightFixerApplier,
+      lastOne,
+    } );
+  }
+
+  setLastTimePlayed(resource: EpisodeEntity, time: number): void {
+    resource.lastTimePlayed = time;
+  }
+}
+
 type Params = {
   episodes: EpisodeEntity[];
   lastEp?: EpisodeEntity;
@@ -29,7 +49,7 @@ export function buildEpisodePicker(
       break;
     case PickMode.RANDOM:
       assertIsDefined(dependencies);
-      picker = new ResourcePickerRandom<EpisodeEntity>( {
+      picker = new EpisodePickerRandom( {
         resources: episodes,
         lastOne: lastEp,
         filterApplier: genEpisodeFilterApplier(episodes, dependencies, lastEp),

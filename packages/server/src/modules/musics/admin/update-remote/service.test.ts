@@ -1,10 +1,11 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { createMockedModule } from "#utils/nestjs/tests";
 import { MockJob } from "#core/tasks/tests";
-import { MusicsRepository } from "../../crud/repository";
+import { MusicsRepository } from "../../crud/repositories/music";
 import { MusicFileInfoRepository } from "../../file-info/crud/repository";
 import { musicFileInfoEntitySchema } from "../../file-info/models";
 import { musicEntitySchema } from "../../models";
@@ -71,6 +72,7 @@ describe("updateRemoteService", () => {
 
       result = await service.update( {
         job: new MockJob(),
+        userId: fixtureUsers.Admin.User.id,
       } );
     } );
 
@@ -99,6 +101,7 @@ describe("updateRemoteService", () => {
     musicFileInfoRepoMock.getAll.mockResolvedValue(fixtureMusicFileInfos.Disk.List);
     const result = await service.update( {
       job: new MockJob(),
+      userId: fixtureUsers.Admin.User.id,
     } );
 
     expect(result).toBeDefined();
@@ -121,7 +124,7 @@ describe("updateRemoteService", () => {
     musicRepoMock.getAll.mockResolvedValue(musics);
     musicFileInfoRepoMock.getAll.mockResolvedValue(musicFileInfos);
     musicFileInfoRepoMock.upsertOneByPathAndGet.mockResolvedValue(deletedMusicFileInfo);
-    musicRepoMock.createOneFromPath = jest.fn((path: string) => {
+    musicRepoMock.createOneFromPath = jest.fn((path: string, _userId: string) => {
       const musicFileInfo = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
       const music = MUSICS_SAMPLES_IN_DISK.find(m=>m.id === musicFileInfo.musicId);
 
@@ -134,6 +137,7 @@ describe("updateRemoteService", () => {
     } );
     const result = await service.update( {
       job: new MockJob(),
+      userId: fixtureUsers.Admin.User.id,
     } );
 
     expect(result).toBeDefined();

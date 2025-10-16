@@ -1,6 +1,8 @@
 import { Controller, Get } from "@nestjs/common";
+import { UserPayload } from "$shared/models/auth";
 import { TaskCreatedResponseValidation } from "#core/tasks";
 import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
+import { User } from "#core/auth/users/User.decorator";
 import { EpisodeUpdateRemoteTaskHandler as EpisodesSyncDiskToDatabaseTaskHandler, payloadSchema } from "./task.handler";
 
 @IsAdmin()
@@ -13,9 +15,13 @@ export class EpisodesSyncDiskToDatabaseController {
 
   @Get("/")
   @TaskCreatedResponseValidation(payloadSchema)
-  async syncDiskToDatabase() {
+  async syncDiskToDatabase(
+    @User() user: UserPayload,
+  ) {
     return {
-      job: await this.taskHandler.addTask(undefined),
+      job: await this.taskHandler.addTask( {
+        uploaderUserId: user.id,
+      } ),
     };
   }
 }

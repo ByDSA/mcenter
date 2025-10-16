@@ -45,7 +45,7 @@ export class YoutubeImportMusicOneTaskHandler implements TaskHandler<Payload, Re
       };
     } else {
       try {
-        created = await this.service.createNewMusic(downloadResult);
+        created = await this.service.createNewMusic(downloadResult, payload.uploaderUserId);
       } catch (error) {
         await this.service.deleteDownloadedFile(downloadResult);
 

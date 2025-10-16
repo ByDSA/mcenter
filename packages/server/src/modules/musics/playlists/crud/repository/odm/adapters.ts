@@ -1,7 +1,7 @@
 import mongoose, { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { MusicOdm } from "#musics/crud/repository/odm";
+import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { MusicPlaylist, MusicPlaylistEntity } from "../../../models";

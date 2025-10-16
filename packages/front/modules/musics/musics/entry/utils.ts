@@ -1,11 +1,10 @@
 import { MusicFileInfo, musicFileInfoSchema } from "$shared/models/musics/file-info";
-import { Music, musicSchema as schema } from "#musics/models";
+import { Music, MusicUserInfo, musicUserInfoSchema, musicSchema as schema } from "#musics/models";
 import { schemaToProps } from "#modules/utils/schema-to-props";
 
 export const MUSIC_PROPS = schemaToProps<Music>(schema)( {
   artist: "Artista:",
   title: "Título:",
-  weight: "Peso:",
   tags: "Tags:",
   slug: "Url:",
   album: "Álbum:",
@@ -18,6 +17,10 @@ export const MUSIC_PROPS = schemaToProps<Music>(schema)( {
   "timestamps.updatedAt": "Última modificación:",
   disabled: "Desactivado:",
   spotifyId: "Spotify ID:",
+} );
+
+export const MUSIC_USER_INFO_PROPS = schemaToProps<MusicUserInfo>(musicUserInfoSchema)( {
+  weight: "Peso:",
   lastTimePlayed: "Última reproducción:",
 } );
 

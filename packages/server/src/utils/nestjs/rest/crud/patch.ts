@@ -20,7 +20,7 @@ export function AdminPatchOne(url: string, dataSchema?: z.ZodSchema) {
 
 export function UserPatchOne(url: string, dataSchema?: z.ZodSchema) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
-    Authenticated,
+    Authenticated(),
     Patch(url),
     ...getCommonCommandDecorators(dataSchema),
   ];

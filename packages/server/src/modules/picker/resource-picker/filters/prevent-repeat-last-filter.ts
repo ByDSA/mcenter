@@ -1,14 +1,13 @@
 import { isDefined } from "$shared/utils/validation";
-import { ResourceEntity } from "$shared/models/resources";
 import { Filter } from "./filter";
 import { CompareIdFunc } from "./utils";
 
-type Params<ID, R extends ResourceEntity = ResourceEntity> = {
+type Params<ID, R> = {
   lastId: ID | undefined;
   compareId: CompareIdFunc<ID>;
   getResourceId: (r: R)=> ID;
 };
-export class PreventRepeatLastFilter<ID = string, R extends ResourceEntity = ResourceEntity>
+export class PreventRepeatLastFilter<ID = string, R = unknown>
 implements Filter<R> {
   #params: Params<ID, R>;
 

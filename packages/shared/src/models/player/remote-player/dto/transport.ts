@@ -1,5 +1,5 @@
 import z from "zod";
-import { mongoDbId } from "src/models/resources/partial-schemas";
+import { mongoDbId } from "../../../resources/partial-schemas";
 import { idParamsSchema } from "../../../utils/schemas/requests";
 import { createCriteriaManySchema, createCriteriaOneSchema } from "../../../utils/schemas/requests/criteria";
 import { generatePatchBodySchema } from "../../../utils/schemas/patch";

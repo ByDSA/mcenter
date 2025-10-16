@@ -1,10 +1,12 @@
 import { isDefined } from "$shared/utils/validation";
-import { WithRequired } from "@tanstack/react-query";
+import { MusicEntityWithUserInfo } from "$shared/models/musics";
 import { MusicHistoryEntryEntity } from "#modules/musics/history/models";
 import { createDurationElement, createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 
 type HeaderProps = {
-  entry: WithRequired<MusicHistoryEntryEntity, "resource">;
+  entry: Omit<MusicHistoryEntryEntity, "resource"> & {
+    resource: MusicEntityWithUserInfo;
+  };
 };
 export function Header( { entry }: HeaderProps) {
   const { resource } = entry;
@@ -21,7 +23,7 @@ export function Header( { entry }: HeaderProps) {
     subtitle,
     right: <>
       {isDefined(duration) && createDurationElement(duration)}
-      {createWeightElement(resource.weight) }
+      {createWeightElement(resource.userInfo.weight) }
     </>,
   } );
 }

@@ -1,12 +1,10 @@
-import { Pickable } from "#modules/resources/models";
-
-type Params<R extends Pickable = Pickable> = {
+type Params<R> = {
   resource: R;
   resources: readonly R[];
   currentWeight: number;
 };
 
-export interface WeightFixer<R extends Pickable = Pickable> {
+export interface WeightFixer<R> {
   fixWeight(params: Params<R>): Promise<number>;
 }
 

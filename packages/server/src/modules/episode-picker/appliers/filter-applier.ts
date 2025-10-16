@@ -1,10 +1,28 @@
 /* eslint-disable accessor-pairs */
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { Resource } from "#modules/resources/models";
 import { Episode, EpisodeCompKey, EpisodeEntity, compareEpisodeCompKey } from "../../episodes/models";
 import { DependenciesList } from "./dependencies";
 
-type Params<R extends Resource = Resource, ID = string> = {
+class PreventDisabledEpisodeFilter extends PreventDisabledFilter<EpisodeEntity> {
+  isDisabled(resource: EpisodeEntity): boolean {
+    return !!resource.disabled;
+  }
+}
+
+class RemoveWeightLowerOrEqualThanEpisodeFilter
+  extends RemoveWeightLowerOrEqualThanFilter<EpisodeEntity> {
+  getWeight(resource: EpisodeEntity): number {
+    return resource.weight;
+  }
+}
+
+class PreventRepeatInDaysEpisodeFilter extends PreventRepeatInDaysFilter<EpisodeEntity> {
+  getLastTimePlayed(resource: EpisodeEntity): number {
+    return resource.lastTimePlayed ?? 0;
+  }
+}
+
+type Params<R, ID = string> = {
   resources: R[];
   lastEp: R | null;
   lastId: ID | undefined;
@@ -66,7 +84,7 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
     if (addedDependencyFilter)
       return;
 
-    this.add(new PreventDisabledFilter());
+    this.add(new PreventDisabledEpisodeFilter());
 
     if (lastEp) {
       this.add(new PreventRepeatLastFilter<EpisodeCompKey, Episode>(
@@ -78,9 +96,9 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
       ));
     }
 
-    this.add(new RemoveWeightLowerOrEqualThanFilter(+PICKER_MIN_WEIGHT));
+    this.add(new RemoveWeightLowerOrEqualThanEpisodeFilter(+PICKER_MIN_WEIGHT));
 
-    this.add(new PreventRepeatInDaysFilter( {
+    this.add(new PreventRepeatInDaysEpisodeFilter( {
       minDays: +PICKER_MIN_DAYS,
     } ));
   }

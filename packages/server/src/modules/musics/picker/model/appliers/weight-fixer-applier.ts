@@ -1,13 +1,19 @@
 import { LastTimeWeightFilterFx, LastTimeWeightFixer, LimiterSafeIntegerPerItems, WeightFixerApplier } from "#modules/picker";
 import { SECONDS_IN_HOUR, SECONDS_IN_MONTH, SECONDS_IN_WEEK } from "#modules/resources";
-import { Pickable, Resource } from "#modules/resources/models";
-import { MusicEntity } from "#musics/models";
+import { MusicEntityWithUserInfo } from "#musics/models";
 
-export class MusicWeightFixerApplier<R extends Resource = Resource>
-  extends WeightFixerApplier<R> {
+type Entity = MusicEntityWithUserInfo;
+
+export class LastTimeMusicWeightFixer extends LastTimeWeightFixer<Entity> {
+  getLastTimePlayed(r: Entity): number {
+    return r.userInfo.lastTimePlayed;
+  }
+}
+
+export class MusicWeightFixerApplier extends WeightFixerApplier<Entity> {
   constructor() {
     super();
-    this.add(new LastTimeWeightFixer( {
+    this.add(new LastTimeMusicWeightFixer( {
       fx,
     } ));
     // this.add(new TagWeightFixer());
@@ -15,8 +21,8 @@ export class MusicWeightFixerApplier<R extends Resource = Resource>
   }
 }
 
-const fx: LastTimeWeightFilterFx = (r: Pickable, secondsFromLastTime: number): number => {
-  const weightFactor = weightFactorFx(r.weight);
+const fx: LastTimeWeightFilterFx<Entity> = (r: Entity, secondsFromLastTime: number): number => {
+  const weightFactor = weightFactorFx(r.userInfo.weight);
   const timeFactor = timeFactorFx(secondsFromLastTime);
 
   return weightFactor * timeFactor;
@@ -46,5 +52,5 @@ function timeFactorFx(secondsFromLastTime: number): number {
 }
 
 export function genWeightFixerApplier() {
-  return new MusicWeightFixerApplier<MusicEntity>();
+  return new MusicWeightFixerApplier();
 }

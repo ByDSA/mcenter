@@ -6,8 +6,8 @@ import { PATH_ROUTES } from "$shared/routing";
 import { testRoute } from "#core/routing/test";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { ResourceResponseFormatterModule, ResponseFormatInterceptor } from "#modules/resources/response-formatter";
-import { MusicsRepository } from "../crud/repository";
-import { musicsRepoMockProvider } from "../crud/repository/tests";
+import { MusicsRepository } from "../crud/repositories/music";
+import { musicsRepoMockProvider } from "../crud/repositories/music/tests";
 import { musicHistoryRepoMockProvider } from "../history/crud/repository/tests";
 import { MusicGetRandomController } from "./controller";
 

@@ -1,11 +1,10 @@
-import { Resource } from "#modules/resources/models";
 import { secondsElapsedFrom } from "../utils";
 import { Filter } from "./filter";
 
 type Params = {
   minSecondsElapsed: number;
 };
-export class PreventRepeatInTimeFilter implements Filter<Resource> {
+export abstract class PreventRepeatInTimeFilter<R> implements Filter<R> {
   #params: Params;
 
   constructor(params: Params) {
@@ -13,13 +12,17 @@ export class PreventRepeatInTimeFilter implements Filter<Resource> {
   }
 
   // eslint-disable-next-line require-await
-  async filter(resource: Resource): Promise<boolean> {
-    if (resource.lastTimePlayed === undefined || resource.lastTimePlayed <= 0)
+  async filter(self: R): Promise<boolean> {
+    const lastTimePlayed = this.getLastTimePlayed(self);
+
+    if (lastTimePlayed === undefined || lastTimePlayed <= 0)
       return true;
 
     const { minSecondsElapsed } = this.#params;
-    const secondsElapsed = secondsElapsedFrom(resource.lastTimePlayed);
+    const secondsElapsed = secondsElapsedFrom(lastTimePlayed);
 
     return secondsElapsed >= minSecondsElapsed;
   }
+
+  abstract getLastTimePlayed(self: R): number;
 }

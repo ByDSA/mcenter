@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
+import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { MusicHistoryEntry, MusicHistoryEntryEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
-import { MusicOdm } from "#musics/crud/repository/odm";
 
 export function docOdmToModel(docOdm: DocOdm): MusicHistoryEntry {
   return {

@@ -17,7 +17,7 @@ import * as mime from "mime-types";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { md5FileAsync } from "#utils/crypt";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
-import { MusicsRepository } from "../crud/repository";
+import { MusicsRepository } from "../crud/repositories/music";
 import { MusicEntity } from "../models";
 import { MUSIC_MEDIA_PATH } from "../utils";
 import { removeFilenameExtension } from "../crud/builder/music-builder.service";
@@ -49,6 +49,7 @@ export class MusicFileInfoUploadRepository {
   async upload(
     file: UploadFile,
     uploadDto: UploadMusicFileInfoDto,
+    uploaderUserId: string,
   ) {
     if (!file)
       throw new BadRequestException("No se ha proporcionado archivo");
@@ -109,7 +110,7 @@ export class MusicFileInfoUploadRepository {
         hash,
       } );
     } else {
-      const got = await this.musicsRepo.createOneFromPath(relativePath, {
+      const got = await this.musicsRepo.createOneFromPath(relativePath, uploaderUserId, {
         size: file.size,
         hash,
       } );

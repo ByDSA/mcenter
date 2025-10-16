@@ -17,7 +17,7 @@ export function AdminDeleteOne(url: string, dataSchema?: z.ZodSchema) {
 
 export function UserDeleteOne(url: string, dataSchema?: z.ZodSchema) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
-    Authenticated,
+    Authenticated(),
     Delete(url),
     ...getCommonCommandDecorators(dataSchema),
   ];

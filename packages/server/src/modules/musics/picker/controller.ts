@@ -2,15 +2,19 @@ import { Request } from "express";
 import { Controller, Get, Query, Req, UseInterceptors } from "@nestjs/common";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
+import { UserPayload } from "$shared/models/auth";
+import { Music, MusicEntity, MusicEntityWithUserInfo } from "#musics/models";
+import { assertIsNotEmptyClient } from "#utils/validation/found";
+import { User } from "#core/auth/users/User.decorator";
 import { MusicHistoryRepository } from "../history/crud/repository";
-import { MusicsRepository } from "../crud/repository";
-import { requestToFindMusicParams } from "../crud/repository/queries/queries";
+import { MusicsRepository } from "../crud/repositories/music";
+import { requestToFindMusicParams } from "../crud/repositories/music/queries/queries";
 import { ResponseFormatInterceptor } from "../../resources/response-formatter/response-format.interceptor";
 import { M3u8FormatUseNext } from "../../resources/response-formatter/use-next.decorator";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./model";
-import { assertIsNotEmptyClient } from "#utils/validation/found";
-import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
-import { Music, MusicEntity } from "#musics/models";
+import { MusicPickerRandom } from "./model/music-picker";
+
+type Entity = MusicEntityWithUserInfo;
 
 @Controller("/")
 export class MusicGetRandomController {
@@ -26,9 +30,10 @@ export class MusicGetRandomController {
   async getRandom(
     @Req() req: Request,
     @Query("token") token: string | undefined,
+    @User() user: UserPayload | null,
   ): Promise<Music> {
     mongoDbId.or(z.undefined()).parse(token);
-    const musics = await this.#findMusics(req);
+    const musics = await this.#findMusics(user?.id ?? token ?? null, req);
 
     assertIsNotEmptyClient(musics);
     const picked = await this.#randomPick(token, musics);
@@ -49,11 +54,11 @@ export class MusicGetRandomController {
 
   async #randomPick(
     userId: string | undefined,
-    musics: MusicEntity[],
+    musics: Entity[],
     n: number = 1,
-  ): Promise<MusicEntity> {
+  ): Promise<Entity> {
     const lastOne = (userId ? await this.#getLastMusicInHistory(userId) : undefined) ?? undefined;
-    const picker = new ResourcePickerRandom<MusicEntity>( {
+    const picker = new MusicPickerRandom( {
       resources: musics,
       lastOne,
       filterApplier: genMusicFilterApplier(musics, lastOne),
@@ -68,12 +73,17 @@ export class MusicGetRandomController {
     return picked;
   }
 
-  #findMusics(req: Request): Promise<MusicEntity[]> {
+  async #findMusics(userId: string | null, req: Request): Promise<MusicEntityWithUserInfo[]> {
     const params = requestToFindMusicParams(req);
 
-    if (params)
-      return this.musicRepo.getManyByQuery(params);
+    if (params) {
+      return await this.musicRepo.getManyByQuery(userId, params, {
+        expand: ["userInfo"],
+      } ) as MusicEntityWithUserInfo[];
+    }
 
-    return this.musicRepo.getAll();
+    return (await this.musicRepo.getAll( {
+      expand: ["userInfo"],
+    } )) as MusicEntityWithUserInfo[];
   }
 }

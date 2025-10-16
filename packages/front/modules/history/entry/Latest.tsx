@@ -77,7 +77,8 @@ T extends Entry<any, any>,
 
       return <>
         <span className={"height2"}>Últimas veces:</span>
-        {datesStr.map((d: string, i) => <Fragment key={`${data[i].date.timestamp}`}>
+        {datesStr.map((d: string, i) => <Fragment
+          key={`${data[i].id}`}>
           <span className={classes("line", styles.lastestLine)}>{d}</span>
         </Fragment>)}
       </>;

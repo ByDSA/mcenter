@@ -6,6 +6,8 @@ import { Observable } from "rxjs";
 import { isDebugging } from "$shared/utils/vscode";
 import { Request } from "express";
 import { parseZod } from "$shared/utils/validation/zod";
+import { CustomValidationError } from "$shared/utils/validation/zod";
+import { toGenericError } from "$shared/utils/errors";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ValidateResponseWithZodSchema = (
@@ -36,6 +38,10 @@ export function validateResponseWithZodSchema<D>(data: D, schema: z.ZodSchema, r
   try {
     return parseZod(schema, data);
   } catch (e) {
+    if (e instanceof CustomValidationError)
+      // eslint-disable-next-line no-ex-assign
+      e = toGenericError(e);
+
     if (!isDebugging() || !(e instanceof Error))
       throw e;
 

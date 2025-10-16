@@ -10,12 +10,14 @@ import z from "zod";
 import { EpisodeTasks } from "$shared/models/episodes/admin";
 import { assertIsDefined } from "$shared/utils/validation";
 import ffmpeg from "fluent-ffmpeg";
+import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { EpisodeFileInfo, EpisodeFileInfoEntity, EpisodeFileInfoOmitEpisodeId, episodeFileInfoSchema } from "#episodes/file-info/models";
 import { Serie } from "#modules/series";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { md5FileAsync } from "#utils/crypt";
+import { Episode } from "#episodes/models";
 import { EpisodesRepository } from "../../crud/repository";
 import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "./disk";
 import { RemoteSeriesTreeService } from "./db";
@@ -23,7 +25,9 @@ import { SerieNode, SerieTree, EpisodeNode } from "./disk/models";
 
 const TASK_NAME = EpisodeTasks.sync.name;
 
-export const payloadSchema = z.undefined();
+export const payloadSchema = z.object( {
+  uploaderUserId: mongoDbId,
+} );
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const progressSchema = TasksCrudDtos.TaskStatus.progressSchemaBase;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -71,7 +75,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
     return job;
   }
 
-  async execute(_payload: Payload, job: Job): Promise<Result> {
+  async execute(payload: Payload, job: Job): Promise<Result> {
     const updateProgress = async (p: Progress) => {
       return await job.updateProgress(p);
     };
@@ -125,7 +129,10 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
             percentage: 85,
           } );
 
-          const savedData = await this.saveNewFileInfosAndEpisode(diff.new.children);
+          const savedData = await this.saveNewFileInfosAndEpisode(
+            diff.new.children,
+            payload.uploaderUserId,
+          );
 
           data.new = savedData;
         },
@@ -178,6 +185,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
 
   private async saveNewFileInfosAndEpisode(
     seriesNodes: SerieNode[],
+    userId: string,
   ): Promise<EpisodeFileInfoEntity[]> {
     const allPromises: Promise<EpisodeFileInfoEntity>[] = [];
 
@@ -193,7 +201,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
       for (const seasonInTree of seriesNode.children) {
         for (const episodeInTree of seasonInTree.children) {
           const episodePromise = seriePromise.then(
-            serie => this.createFileInfoFromLocalEpisode(episodeInTree, serie),
+            serie => this.createFileInfoFromLocalEpisode(episodeInTree, serie, userId),
           );
 
           allPromises.push(episodePromise);
@@ -205,14 +213,19 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
     return await Promise.all(allPromises);
   }
 
-  private async createFileInfoFromLocalEpisode(localEpisode: EpisodeNode, serie: Serie) {
-    const episode = {
+  private async createFileInfoFromLocalEpisode(
+    localEpisode: EpisodeNode,
+    serie: Serie,
+    userId: string,
+  ) {
+    const episode: Omit<Episode, "timestamps"> = {
       compKey: {
         episodeKey: localEpisode.content.episodeKey,
         seriesKey: serie.key,
       },
       title: `${serie.name} ${localEpisode.content.episodeKey}`,
       weight: 0,
+      uploaderUserId: userId,
     };
     const gotEpisode = await this.episodesRepo.getOneOrCreate(episode);
     const fileInfo: EpisodeFileInfo = {

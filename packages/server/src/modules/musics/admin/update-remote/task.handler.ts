@@ -8,7 +8,9 @@ import { UpdateRemoteTreeService, type UpdateResult } from "./service";
 
 const TASK_NAME = MusicTasks.sync.name;
 
-export const payloadSchema = z.undefined();
+export const payloadSchema = z.object( {
+  userId: z.string(),
+} );
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const progressSchema = TasksCrudDtos.TaskStatus.progressSchemaBase;
 
@@ -29,9 +31,10 @@ export class MusicUpdateRemoteTaskHandler implements TaskHandler<Payload, Result
     private readonly service: UpdateRemoteTreeService,
   ) {}
 
-  async execute(_payload: Payload, job: Job): Promise<Result> {
+  async execute(payload: Payload, job: Job): Promise<Result> {
     const ret = await this.service.update( {
       job,
+      userId: payload.userId,
     } );
 
     return ret;

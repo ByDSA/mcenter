@@ -16,8 +16,12 @@ export class MusicsSearchService {
   ) {
   }
 
-  async search(query: string, options?: SearchOptions): Promise<SearchRet> {
-    const { hits: docs, estimatedTotalHits } = await this.musicsIndexService.search(query, options);
+  async search(userId: string | null, query: string, options?: SearchOptions): Promise<SearchRet> {
+    const { hits: docs, estimatedTotalHits } = await this.musicsIndexService.search(
+      userId,
+      query,
+      options,
+    );
 
     return {
       data: docs.map(d=>d),
@@ -26,10 +30,11 @@ export class MusicsSearchService {
   }
 
   async filter(
+    userId: string | null,
     queryFilter: string,
     options?: Omit<SearchOptions, "filter" | "offset">,
   ): Promise<SearchRet> {
-    const { hits, estimatedTotalHits } = await this.musicsIndexService.search("", {
+    const { hits, estimatedTotalHits } = await this.musicsIndexService.search(userId, "", {
       ...options,
       filter: queryFilter,
       limit: (options?.limit ?? 0) === 0 ? MEILISEARCH_MUSICS_MAX_HITS : options?.limit,

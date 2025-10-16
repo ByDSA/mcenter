@@ -67,7 +67,7 @@ export class EpisodePickerController {
 
     const dependencies = dependenciesToList(await this.dependenciesRepo.getAll());
     const episodes: EpisodeEntity[] = await this.episodesRepo.getManyBySerieKey(serie.key);
-    const picker = await genRandomPickerWithData<EpisodeEntity>( {
+    const picker = await genRandomPickerWithData<EpisodeEntity, EpisodeEntity>( {
       resources: episodes,
       lastOne: lastEp ?? undefined,
       filterApplier: genEpisodeFilterApplier(episodes, dependencies, lastEp ?? undefined),

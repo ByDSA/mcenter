@@ -1,4 +1,4 @@
-import type { Music, MusicEntity } from "#modules/musics/models";
+import type { Music, MusicEntity, MusicEntityWithUserInfo, MusicUserInfoEntity } from "#modules/musics/models";
 import type { PropInfo } from "$shared/utils/validation/zod";
 import type { OnPressEnter } from "#modules/ui-kit/input/UseInputText";
 import type { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
@@ -13,6 +13,7 @@ import { MusicsApi } from "#modules/musics/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useCrud, UseCrudProps } from "#modules/utils/resources/useCrud";
 import { DeleteResource, ResetResource, UpdateResource } from "#modules/utils/resources/elements/crud-buttons";
+import { MusicUserInfosApi } from "#modules/musics/user-info.requests";
 import { MUSIC_PROPS } from "../utils";
 import { genTitleElement, genArtistElement, genWeightElement, genAlbumElement, genSlugElement, genTagsElement, genUnknownElement } from "./elements";
 import styles from "./styles.module.css";
@@ -21,10 +22,12 @@ export type UseMusicCrudWithElementsProps<T> = Pick<UseCrudProps<T>, "data" | "s
   shouldFetchFileInfo?: boolean;
 };
 
-export function useMusicCrudWithElements<T extends MusicEntity = MusicEntity>( { data,
+export function useMusicCrudWithElements
+  <T extends MusicEntityWithUserInfo = MusicEntityWithUserInfo>( { data,
   setData,
   shouldFetchFileInfo }: UseMusicCrudWithElementsProps<T>) {
   const api = FetchApi.get(MusicsApi);
+  const userInfoApi = FetchApi.get(MusicUserInfosApi);
   const fileInfosApi = FetchApi.get(MusicFileInfosApi);
   const { isModified, remove, reset, addOnReset, state, update, initialState } = useCrud<T>( {
     data,
@@ -48,12 +51,11 @@ export function useMusicCrudWithElements<T extends MusicEntity = MusicEntity>( {
       };
     },
     fetchUpdate: async () => {
-      const body: MusicsApi.Patch.Body = generatePatchBody(
+      const musicBody: MusicsApi.Patch.Body = generatePatchBody(
         data,
         state[0],
         [
           "title",
-          "weight",
           "disabled",
           "tags",
           "album",
@@ -66,9 +68,18 @@ export function useMusicCrudWithElements<T extends MusicEntity = MusicEntity>( {
         ],
       );
       let musicPromise: Promise<MusicEntity> = Promise.resolve() as Promise<any>;
+      const userInfoBody: MusicsApi.Patch.Body = generatePatchBody(
+        data.userInfo,
+        state[0].userInfo,
+        [
+          "weight",
+          "tags",
+        ],
+      );
+      let userInfoPromise: Promise<MusicUserInfoEntity> = Promise.resolve() as Promise<any>;
 
-      if (shouldSendPatchWithBody(body)) {
-        musicPromise = api.patch(data.id, body)
+      if (shouldSendPatchWithBody(musicBody)) {
+        musicPromise = api.patch(data.id, musicBody)
           .then(async res=>{
             const music = {
               ...res.data,
@@ -86,7 +97,14 @@ export function useMusicCrudWithElements<T extends MusicEntity = MusicEntity>( {
           } );
       }
 
-      await musicPromise;
+      if (shouldSendPatchWithBody(userInfoBody)) {
+        userInfoPromise = userInfoApi.patch(data.id, userInfoBody)
+          .then(res=>{
+            return res.data;
+          } );
+      }
+
+      await Promise.all([musicPromise, userInfoPromise].filter(Boolean));
 
       let newData: MusicEntity = {
         ...state[0],
@@ -94,6 +112,11 @@ export function useMusicCrudWithElements<T extends MusicEntity = MusicEntity>( {
 
       if (await musicPromise)
         newData = await musicPromise as T;
+
+      if (await userInfoPromise)
+        newData.userInfo = await userInfoPromise;
+      else
+        newData.userInfo = state[0].userInfo;
 
       return {
         data: newData as T,
@@ -276,7 +299,7 @@ function OptionalProps(
   return ret;
 }
 
-function calcIsModified(r1: MusicEntity, r2: MusicEntity) {
+function calcIsModified(r1: MusicEntityWithUserInfo, r2: MusicEntityWithUserInfo) {
   return isModifiedd(r1, r2, {
     ignoreNewUndefined: true,
     shouldMatch: {
@@ -288,10 +311,17 @@ function calcIsModified(r1: MusicEntity, r2: MusicEntity) {
       game: true,
       tags: true,
       slug: true,
-      weight: true,
       year: true,
       fileInfos: true,
       spotifyId: true,
+    },
+  } )
+  || isModifiedd(r1.userInfo, r2.userInfo, {
+    ignoreNewUndefined: true,
+    shouldMatch: {
+      weight: true,
+      tags: true,
+      // onlyTags: true, // TODO
     },
   } );
 }

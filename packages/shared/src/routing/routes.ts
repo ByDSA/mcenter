@@ -147,6 +147,9 @@ export const PATH_ROUTES = {
     search: {
       path: `${MUSICS}/search`,
     },
+    userInfo: {
+      withParams: (musicId: string)=>`${MUSICS}/${musicId}/user-info`,
+    },
     fileInfo: {
       path: `${MUSICS_FILE_INFO}`,
       withParams: (id: string)=>`${MUSICS_FILE_INFO}/${id}`,

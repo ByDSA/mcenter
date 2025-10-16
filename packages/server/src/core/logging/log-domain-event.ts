@@ -14,7 +14,11 @@ export function logDomainEvent(
     const { value } = event.payload;
     const showedValue = typeof value === "string" ? `'${ value }'` : value;
 
-    logger.log(`[${queueKey}] ${event.type} ${event.payload.entityId} ${key}: ${showedValue}`);
+    logger.log(`[${queueKey}] ${event.type} ${
+      typeof event.payload.entityId === "object"
+        ? JSON.stringify(event.payload.entityId, null, 2)
+        : String(event.payload.entityId)
+    } ${key}: ${showedValue}`);
   } else
     throw new Error("Unknown event type: " + event.type);
 }

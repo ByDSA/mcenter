@@ -1,7 +1,6 @@
-import { Pickable } from "#modules/resources/models";
 import { Filter } from "./filter";
 
-export class RemoveWeightLowerOrEqualThanFilter implements Filter {
+export abstract class RemoveWeightLowerOrEqualThanFilter<R> implements Filter<R> {
   #num: number;
 
   constructor(num: number) {
@@ -9,7 +8,9 @@ export class RemoveWeightLowerOrEqualThanFilter implements Filter {
   }
 
   // eslint-disable-next-line require-await
-  async filter(self: Pickable): Promise<boolean> {
-    return self.weight >= this.#num;
+  async filter(self: R): Promise<boolean> {
+    return this.getWeight(self) >= this.#num;
   }
+
+  abstract getWeight(self: R): number;
 }

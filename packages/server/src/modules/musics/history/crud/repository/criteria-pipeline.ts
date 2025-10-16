@@ -92,6 +92,40 @@ export function getCriteriaPipeline(
           },
         },
       } );
+
+      // Lookup para traer userInfo desde musics_users
+      pipeline.push( {
+        $lookup: {
+          from: "musics_users", // colección musics_users
+          let: {
+            musicId: "$music._id",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$musicId", "$$musicId"],
+                },
+              },
+            },
+          ],
+          as: "musicUserInfo",
+        },
+      } );
+
+      // Añadir userInfo a music (primer elemento del array o null si está vacío)
+      pipeline.push( {
+        $addFields: {
+          "music.userInfo": {
+            $arrayElemAt: ["$musicUserInfo", 0],
+          },
+        },
+      } );
+
+      // Limpiar el campo temporal
+      pipeline.push( {
+        $unset: "musicUserInfo",
+      } );
     }
 
     if (criteria.expand.includes("music-file-infos") && criteria.expand.includes("musics")) {

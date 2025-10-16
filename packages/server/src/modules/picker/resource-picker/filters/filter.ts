@@ -1,5 +1,3 @@
-import { Pickable } from "#modules/resources/models";
-
-export interface Filter<R extends Pickable = Pickable> {
+export interface Filter<R> {
   filter(resource: R): Promise<boolean>;
 }

@@ -2,22 +2,21 @@ import type { FilterApplier } from "./filters";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
-import { Resource } from "#modules/resources/models";
 import { EpisodeFilterApplier } from "#modules/episode-picker/appliers/filter-applier";
 import { EpisodeEntity } from "#episodes/models";
 import { ResourcePicker } from "./resource-picker";
 import { WeightFixerApplier } from "./weight-fixers";
 
-type Params<R extends Resource> = {
+type Params<R, L = R> = {
   resources: R[];
-  lastOne?: R;
+  lastOne?: L;
   filterApplier: FilterApplier<R>;
   weightFixerApplier: WeightFixerApplier<R>;
 };
-export class ResourcePickerRandom<R extends Resource> implements ResourcePicker<R> {
-  #params: Params<R>;
+export abstract class ResourcePickerRandom<R extends L, L = R> implements ResourcePicker<R> {
+  #params: Params<R, L>;
 
-  constructor(params: Params<R>) {
+  constructor(params: Params<R, L>) {
     this.#params = params;
   }
 
@@ -35,7 +34,8 @@ export class ResourcePickerRandom<R extends Resource> implements ResourcePicker<
       assertIsDefined(resource, "Picker has no data");
 
       if (i < n - 1) {
-        resource.lastTimePlayed = Math.floor(DateTime.now().toSeconds());
+        this.setLastTimePlayed(resource, Math.floor(DateTime.now().toSeconds()));
+
         lastOne = resource;
       }
 
@@ -44,10 +44,12 @@ export class ResourcePickerRandom<R extends Resource> implements ResourcePicker<
 
     return ret;
   }
+
+  abstract setLastTimePlayed(resource: R, time: number): void;
 }
 
-export async function genRandomPickerWithData<R extends Resource>(
-  { resources, lastOne, filterApplier, weightFixerApplier }: Params<R>,
+export async function genRandomPickerWithData<R, L>(
+  { resources, lastOne, filterApplier, weightFixerApplier }: Params<R, L>,
 ): Promise<Picker<R>> {
   assertIsDefined(resources, "Undefined resources");
   assertIsNotEmpty(resources, "Empty resources");

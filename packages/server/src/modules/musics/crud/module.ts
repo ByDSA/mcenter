@@ -4,10 +4,12 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MeilisearchModule } from "#modules/search/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicFileInfoModule } from "../file-info/module";
+import { MusicsUsersRepository } from "./repositories/user-info/repository";
 import { MusicBuilderService } from "./builder/music-builder.service";
 import { MusicCrudController } from "./controller";
-import { MusicsRepository } from "./repository";
+import { MusicsRepository } from "./repositories/music";
 import { MusicAvailableSlugGeneratorService } from "./builder/vailable-slug-generator.service";
+import { GetManyByCriteriaMusicRepoService } from "./repositories/music/get-many-criteria";
 
 @Module( {
   imports: [
@@ -21,9 +23,11 @@ import { MusicAvailableSlugGeneratorService } from "./builder/vailable-slug-gene
   ],
   providers: [
     MusicsRepository,
+    MusicsUsersRepository,
     MusicAvailableSlugGeneratorService,
     MusicBuilderService,
+    GetManyByCriteriaMusicRepoService,
   ],
-  exports: [MusicBuilderService, MusicsRepository],
+  exports: [MusicBuilderService, MusicsRepository, MusicsUsersRepository],
 } )
 export class MusicsCrudModule {}

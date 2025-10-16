@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { Music } from "#musics/models";
-import { MusicsRepository } from "../repository";
+import { MusicsRepository } from "../repositories/music";
 
 @Injectable()
 export class MusicAvailableSlugGeneratorService {

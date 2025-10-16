@@ -1,5 +1,3 @@
-import { Resource } from "#modules/resources/models";
-
-export interface ResourcePicker<R extends Resource = Resource> {
+export interface ResourcePicker<R> {
   pick(n: number): Promise<R[]>;
 }

@@ -2,7 +2,7 @@ import path, { relative } from "node:path";
 import fs from "node:fs";
 import { Injectable, Logger } from "@nestjs/common";
 import { v4 as uuidv4 } from "uuid";
-import { MusicsRepository } from "#musics/crud/repository";
+import { MusicsRepository } from "#musics/crud/repositories/music";
 import { MUSIC_MEDIA_PATH } from "#musics/utils";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { DownloadResult, YoutubeDownloadMusicService } from "./youtube-download-music.service";
@@ -73,11 +73,11 @@ export class YoutubeImportMusicService {
     }
   }
 
-  async createNewMusic(downloadResult: DownloadResult) {
+  async createNewMusic(downloadResult: DownloadResult, uploaderUserId: string) {
     const relativePath = path.relative(MUSIC_MEDIA_PATH, downloadResult.fullpath);
 
     try {
-      return await this.musicsRepo.createOneFromPath(relativePath);
+      return await this.musicsRepo.createOneFromPath(relativePath, uploaderUserId);
     } catch (error) {
       await this.deleteDownloadedFile(downloadResult);
       throw error;

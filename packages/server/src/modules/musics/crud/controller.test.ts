@@ -1,9 +1,9 @@
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { MusicsRepository } from "./repository";
+import { MusicsRepository } from "./repositories/music";
 import { MusicCrudController } from "./controller";
-import { musicsRepoMockProvider } from "./repository/tests";
+import { musicsRepoMockProvider } from "./repositories/music/tests";
 
 crudTestsSuite( {
   name: MusicCrudController.name,

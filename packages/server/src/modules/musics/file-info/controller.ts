@@ -1,7 +1,10 @@
 import { Controller, Post, UseInterceptors, HttpStatus, HttpCode, Body, UploadedFile, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
+import { UserPayload } from "$shared/models/auth";
 import { AdminDeleteOne, GetManyCriteria } from "#utils/nestjs/rest";
+import { Authenticated } from "#core/auth/users/Authenticated.guard";
+import { User } from "#core/auth/users/User.decorator";
 import { MusicFileInfoRepository } from "./crud/repository";
 import { MusicFileInfoEntity, musicFileInfoEntitySchema } from "./models";
 import { MusicFileInfoUploadRepository, UploadFile, UploadFileInterceptor, UploadMusicFileInfoDto } from "./upload.repository";
@@ -19,11 +22,15 @@ export class MusicFileInfoController {
   @Post("upload")
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(UploadFileInterceptor)
+  @Authenticated() // TODO: filtro role uploader
   async uploadFile(
     @UploadedFile() file: UploadFile,
     @Body() uploadDto: UploadMusicFileInfoDto,
+    @User() user: UserPayload,
   ): Promise<MusicFileInfoCrudDtos.UploadFile.Response> {
-    return await this.uploadRepo.upload(file, uploadDto);
+    const uploaderUserId = user.id;
+
+    return await this.uploadRepo.upload(file, uploadDto, uploaderUserId);
   }
 
   @GetManyCriteria("/", musicFileInfoEntitySchema)

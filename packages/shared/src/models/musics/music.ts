@@ -1,8 +1,9 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
 import { resourceSchema } from "../resources";
-import { pickableSchema, taggableSchema } from "../resources/partial-schemas";
+import { taggableSchema } from "../resources/partial-schemas";
 import { musicFileInfoEntitySchema } from "./file-info";
+import { musicUserInfoSchema } from "./user-info/user-info";
 
 const optionalPropsSchema = z.object( {
   album: z.string().optional(),
@@ -21,18 +22,14 @@ const modelSchema = optionalPropsSchema.extend( {
   slug: z.string(),
 } )
   .merge(resourceSchema)
-  .merge(pickableSchema)
+  .omit( {
+    weight: true,
+    lastTimePlayed: true,
+  } )
   .merge(taggableSchema);
 
 type Model = z.infer<typeof modelSchema>;
 
-const musicUserInfoSchema = z.object( {
-  weight: z.number(),
-  tags: z.array(z.string()).optional(),
-  lastTimePlayed: z.number(),
-} );
-
-type MusicUserInfo = z.infer<typeof musicUserInfoSchema>;
 const entitySchema = modelSchema.extend( {
   id: idSchema,
   fileInfos: z.array(musicFileInfoEntitySchema).optional(),
@@ -53,11 +50,10 @@ const entityWithFileInfosSchema = entitySchema.required( {
 
 type EntityWithFileInfos = z.infer<typeof entityWithFileInfosSchema>;
 const entityWithUserInfoSchema = entitySchema.required( {
-  fileInfos: true,
+  userInfo: true,
 } );
 
 type EntityWithUserInfo = z.infer<typeof entityWithUserInfoSchema>;
-
 export {
   idSchema as musicIdSchema,
   entitySchema as musicEntitySchema,
@@ -67,8 +63,6 @@ export {
   Model as Music,
   EntityWithFileInfos as MusicEntityWithFileInfos,
   entityWithFileInfosSchema as musicEntityWithFileInfosSchema,
-  musicUserInfoSchema as musicFileInfoSchema,
-  MusicUserInfo,
   entityWithUserInfoSchema as musicEntityWithUserInfoSchema,
   EntityWithUserInfo as MusicEntityWithUserInfo,
   assertIsModel as assertIsMusic,

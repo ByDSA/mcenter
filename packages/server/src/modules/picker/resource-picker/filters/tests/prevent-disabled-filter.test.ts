@@ -30,7 +30,11 @@ describe.each([
   [ENABLED_DISABLED_UNDEFINED, true],
 ] as Case[])("preventDisabledFilter", (self, expected) => {
   it(`should return ${expected} when disabled = ${self.disabled}`, async () => {
-    const filter = new PreventDisabledFilter();
+    const filter = new class extends PreventDisabledFilter<Resource> {
+      isDisabled(r: Resource): boolean {
+        return !!r.disabled;
+      }
+    }();
     const result = await filter.filter(self);
 
     expect(result).toBe(expected);

@@ -5,7 +5,7 @@ type Params = {
   minDays: number;
 };
 
-export class PreventRepeatInDaysFilter extends PreventRepeatInTimeFilter {
+export abstract class PreventRepeatInDaysFilter<R> extends PreventRepeatInTimeFilter<R> {
   constructor(params: Params) {
     super( {
       minSecondsElapsed: params.minDays * SECONDS_IN_DAY,

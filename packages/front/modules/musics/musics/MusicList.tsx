@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
+import { WithRequired } from "@tanstack/react-query";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -47,7 +48,7 @@ export function MusicList(props: Props) {
           data!.map(
             (music, i) => <Fragment key={`${music.id}`}>
               <MusicEntryElement data={music} setData={
-                (newData)=>setItem(i, newData as MusicEntityWithFileInfos)
+                (newData)=>setItem(i, newData as WithRequired<MusicEntityWithFileInfos, "userInfo">)
               }
               shouldFetchFileInfo={true}
               />
@@ -71,7 +72,7 @@ function useMusicList(props: Props) {
       added: "desc",
     },
     filter: getFilterFromProps(props),
-    expand: ["fileInfos"],
+    expand: ["fileInfos", "userInfo"],
   };
   const { data, isLoading, error,
     setItem, observerTarget, fetchInitData } = useCrudDataWithScroll( {

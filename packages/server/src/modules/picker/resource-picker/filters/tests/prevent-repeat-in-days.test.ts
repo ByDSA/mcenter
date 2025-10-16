@@ -7,6 +7,12 @@ import { PreventRepeatInDaysFilter } from "../prevent-repeat-in-days-filter";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
+class PreventRepeatInDaysResourceFilter extends PreventRepeatInDaysFilter<Resource> {
+  getLastTimePlayed(r: Resource) {
+    return r.lastTimePlayed ?? 0;
+  }
+}
+
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
 const EP_BASE: Resource = {
@@ -45,7 +51,7 @@ ${testCase.lastTimePlayedDaysAgo} days ago and minDays = ${testCase.minDays}`,
       const params = {
         minDays: testCase.minDays,
       };
-      const filter = new PreventRepeatInDaysFilter(params);
+      const filter = new PreventRepeatInDaysResourceFilter(params);
       const result = await filter.filter( {
         ...EP_BASE,
         lastTimePlayed: genLastTimePlayedDaysAgo(testCase.lastTimePlayedDaysAgo),
@@ -93,7 +99,7 @@ describe.each(casesLastTimePlayed)("preventRepeatInDaysFilter", (testCase) => {
       const params = {
         minDays: testCase.minDays,
       };
-      const filter = new PreventRepeatInDaysFilter(params);
+      const filter = new PreventRepeatInDaysResourceFilter(params);
       const result = await filter.filter( {
         ...EP_BASE,
         lastTimePlayed: testCase.lastTimePlayed,

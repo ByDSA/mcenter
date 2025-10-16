@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { DateType } from "$shared/utils/time";
 import { DateTypeOdmSchema } from "#utils/time";
 import { RequireId } from "#utils/layers/db/mongoose";
-import { MusicOdm } from "#musics/crud/repository/odm";
+import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 
 export type DocOdm = {

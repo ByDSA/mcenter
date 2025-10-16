@@ -4,7 +4,7 @@ import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { createOneResultResponseSchema, createPaginatedResultResponseSchema, PaginatedResult, ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
-import { MusicEntity, musicEntitySchema, MusicId } from "#musics/models";
+import { MusicEntity, musicEntitySchema, MusicEntityWithUserInfo, MusicId } from "#musics/models";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -79,14 +79,14 @@ export class MusicsApi {
 // eslint-disable-next-line no-redeclare
 export namespace MusicsApi {
   export namespace Patch {
-    export type Response = ResultResponse<MusicEntity>;
+    export type Response = ResultResponse<MusicEntityWithUserInfo>;
     export type Body = MusicCrudDtos.PatchOneById.Body;
   }
   export namespace DeleteOneById {
     export type Response = ResultResponse<MusicEntity>;
   }
   export namespace GetManyByCriteria {
-    export type Response = PaginatedResult<MusicEntity>;
+    export type Response = PaginatedResult<MusicEntityWithUserInfo>;
     export type Criteria = MusicCrudDtos.GetMany.Criteria;
     export type Body = Criteria;
   }

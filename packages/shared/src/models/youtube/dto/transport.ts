@@ -10,6 +10,7 @@ export namespace YoutubeCrudDtos {
       export const payloadSchema = z.object( {
         id: z.string(),
         musicId: mongoDbId.optional(),
+        uploaderUserId: mongoDbId,
       } );
 
       export type Payload = z.infer<typeof payloadSchema>;
@@ -49,6 +50,7 @@ export namespace YoutubeCrudDtos {
     export namespace CreateTask {
       export const payloadSchema = z.object( {
         id: z.string(),
+        uploaderUserId: mongoDbId,
       } );
       export type Payload = z.infer<typeof payloadSchema>;
 

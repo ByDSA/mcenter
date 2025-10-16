@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { fixtureMusics } from "#musics/tests";
-import { MusicEntity } from "../../../models";
+import { MusicEntity } from "../../../../models";
 import { docOdmToEntity, musicEntityToDocOdm } from "./adapters";
 import { DocOdm, FullDocOdm } from "./odm";
 
@@ -15,17 +16,16 @@ describe("musicModelToDocOdm", () => {
       _id: new mongoose.Types.ObjectId(music.id),
       title: music.title,
       url: music.slug,
-      weight: music.weight,
       artist: music.artist,
       tags: ["t1"],
       onlyTags: ["t2"],
       disabled: music.disabled,
-      lastTimePlayed: music.lastTimePlayed,
       timestamps: {
         createdAt: music.timestamps.createdAt,
         updatedAt: music.timestamps.updatedAt,
         addedAt: music.timestamps.addedAt,
       },
+      uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
       album: music.album,
       country: music.country,
       game: music.game,
@@ -50,7 +50,7 @@ describe("musicModelToDocOdm", () => {
         addedAt: new Date(),
       },
       artist: "Test Artist",
-      weight: 1,
+      uploaderUserId: fixtureUsers.Admin.User.id,
     };
     const expectedDocOdm: DocOdm = {
       _id: new mongoose.Types.ObjectId(music.id),
@@ -62,7 +62,7 @@ describe("musicModelToDocOdm", () => {
         addedAt: music.timestamps.addedAt,
       },
       artist: music.artist,
-      weight: music.weight,
+      uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
     };
     const result = musicEntityToDocOdm(music);
 
@@ -76,17 +76,16 @@ describe("musicDocOdmToModel", () => {
       _id: new mongoose.Types.ObjectId(),
       title: "Test Title",
       url: "http://test.url",
-      weight: 1,
       artist: "Test Artist",
       tags: ["tag1"],
       onlyTags: ["tag2"],
       disabled: false,
-      lastTimePlayed: +new Date(),
       timestamps: {
         createdAt: new Date(),
         updatedAt: new Date(),
         addedAt: new Date(),
       },
+      uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
       album: "Test Album",
       country: "Test Country",
       game: "Test Game",
@@ -96,16 +95,15 @@ describe("musicDocOdmToModel", () => {
       id: docOdm._id.toString(),
       title: docOdm.title,
       slug: docOdm.url,
-      weight: docOdm.weight,
       artist: docOdm.artist,
       tags: ["tag1", "only-tag2"],
       disabled: docOdm.disabled,
-      lastTimePlayed: docOdm.lastTimePlayed,
       timestamps: {
         createdAt: docOdm.timestamps.createdAt,
         updatedAt: docOdm.timestamps.updatedAt,
         addedAt: docOdm.timestamps.addedAt,
       },
+      uploaderUserId: fixtureUsers.Admin.User.id,
       album: docOdm.album,
       country: docOdm.country,
       game: docOdm.game,
@@ -126,8 +124,8 @@ describe("musicDocOdmToModel", () => {
         updatedAt: new Date(),
         addedAt: new Date(),
       },
+      uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
       artist: "Test Artist",
-      weight: 1,
     };
     const expectedMusic: MusicEntity = {
       id: docOdm._id.toString(),
@@ -138,8 +136,8 @@ describe("musicDocOdmToModel", () => {
         updatedAt: docOdm.timestamps.updatedAt,
         addedAt: docOdm.timestamps.addedAt,
       },
+      uploaderUserId: fixtureUsers.Admin.User.id,
       artist: docOdm.artist,
-      weight: docOdm.weight,
     };
     const result = docOdmToEntity(docOdm);
 
@@ -169,7 +167,7 @@ describe("reversibility", () => {
         updatedAt: fixtureMusics.Disk.Samples.A_AOT4.timestamps.updatedAt,
         addedAt: fixtureMusics.Disk.Samples.A_AOT4.timestamps.addedAt,
       },
-      weight: fixtureMusics.Disk.Samples.A_AOT4.weight,
+      uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
     };
     const music = docOdmToEntity(docOdm);
     const result = musicEntityToDocOdm(music);

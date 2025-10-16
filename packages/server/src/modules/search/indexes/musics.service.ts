@@ -1,25 +1,38 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Index, MeiliSearch, SearchParams, SearchResponse } from "meilisearch";
 import { OnEvent } from "@nestjs/event-emitter";
-import { Music, MusicEntity } from "$shared/models/musics";
-import { MusicOdm } from "#musics/crud/repository/odm";
-import { MusicEvents } from "#musics/crud/repository/events";
+import { Music, MusicEntity, MusicUserInfoEntity } from "$shared/models/musics";
+import { MusicOdm } from "#musics/crud/repositories/music/odm";
+import { MusicEvents } from "#musics/crud/repositories/music/events";
 import { DomainEvent, EntityEvent, PatchEvent } from "#core/domain-event-emitter";
 import { assertFoundServer } from "#utils/validation/found";
-import { countries, generateSynonymsFromGroup } from "./synonyms";
+import { UserOdm } from "#core/auth/users/crud/repository/odm";
+import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
+import { MusicsUsersEvents } from "#musics/crud/repositories/user-info/events";
 import { waitForTask } from "./utils";
+import { countries, generateSynonymsFromGroup } from "./synonyms";
 
-type Doc = {
-  id: string;
+type MusicDoc = {
+  musicId: string;
   title: string;
   artist: string;
   game?: string;
   country?: string;
   addedAt: number;
+  tags: string[] | null;
+  onlyTags: string[] | null;
+};
+
+type UserInfoDoc = {
+  userId: string | null;
+  musicId: string;
   lastTimePlayedAt: number;
   weight: number;
   tags: string[] | null;
   onlyTags: string[] | null;
+};
+type Doc = MusicDoc & Omit<UserInfoDoc, "musicId"> & {
+  id: string;
 };
 
 export {
@@ -43,7 +56,7 @@ export class MusicsIndexService {
   }
 
   @OnEvent(MusicEvents.WILDCARD)
-  async handleEvents(ev: DomainEvent<unknown>) {
+  async handleMusicEvents(ev: DomainEvent<unknown>) {
     if (ev.type === MusicEvents.Patched.TYPE) {
       const typedEv = ev as PatchEvent<Music>;
       const id = typedEv.payload.entityId;
@@ -51,30 +64,117 @@ export class MusicsIndexService {
 
       assertFoundServer(docOdm);
 
-      let doc: Doc = this.mapOdm(docOdm);
+      let doc: MusicDoc = this.mapMusicOdm(docOdm);
 
-      await this.updateOne(doc);
+      await this.updateMusic(doc); // TODO: tags
     } else if (ev.type === MusicEvents.Created.TYPE) {
       const typedEv = ev as EntityEvent<MusicEntity>;
-      let doc: Doc = this.mapModel(typedEv.payload.entity);
+      let doc: MusicDoc = this.mapMusicModel(typedEv.payload.entity);
 
-      await this.updateOne(doc);
+      await this.updateMusic(doc);
     } else if (ev.type === MusicEvents.Deleted.TYPE) {
       const typedEv = ev as EntityEvent<{ id: string }>;
 
-      await this.index.deleteDocument(typedEv.payload.entity.id);
+      await this.index.deleteDocuments( {
+        filter: `musicId = ${typedEv.payload.entity.id}`,
+      } );
+    } else
+      throw new Error("Event type not handled: " + ev.type);
+  }
+
+  @OnEvent(MusicsUsersEvents.WILDCARD)
+  async handleUserInfoEvents(ev: DomainEvent<unknown>) {
+    if (ev.type === MusicsUsersEvents.Patched.TYPE) {
+      const typedEv = ev as MusicsUsersEvents.Patched.Event;
+      const { _id } = typedEv.payload.entityId;
+      const docOdm = await MusicsUsersOdm.Model.findById(_id);
+
+      assertFoundServer(docOdm);
+
+      let doc: UserInfoDoc = this.mapUserInfoOdm(docOdm);
+
+      await this.updateUserInfo(doc); // TODO: tags
+    } else if (ev.type === MusicsUsersEvents.Created.TYPE) {
+      const typedEv = ev as MusicsUsersEvents.Created.Event;
+      let doc: UserInfoDoc = this.mapUserInfoModel(typedEv.payload.entity);
+
+      await this.updateUserInfo(doc);
+    } else if (ev.type === MusicsUsersEvents.Deleted.TYPE) {
+      const typedEv = ev as MusicsUsersEvents.Deleted.Event;
+
+      await this.index.deleteDocument(genId( {
+        musicId: typedEv.payload.entity.musicId,
+        userId: typedEv.payload.entity.userId,
+      } ));
     } else
       throw new Error("Event type not handled: " + ev.type);
   }
 
   async syncAll() {
-    const musics = await MusicOdm.Model.find();
-    const documentsForSearch = musics.map(this.mapOdm);
+    // OPTIMIZACIÓN: Cargar solo los campos necesarios de MongoDB
+    const musics = await MusicOdm.Model.find().lean(); // .lean() elimina overhead de Mongoose
+    const musicsUsers = await MusicsUsersOdm.Model.find().lean();
+    const usersIds: (string)[] = ["NONE", ...await this.getUserIds()];
+    // OPTIMIZACIÓN: Crear mapa de musicsUsers eficientemente
+    const musicsUsersMap = new Map<string, Map<string, MusicsUsersOdm.FullDoc>>();
+
+    for (const mu of musicsUsers) {
+      const userId = mu.userId.toString();
+      const musicId = mu.musicId.toString();
+
+      if (!musicsUsersMap.has(userId))
+        musicsUsersMap.set(userId, new Map());
+
+      musicsUsersMap.get(userId)!.set(musicId, mu);
+    }
+
+    // OPTIMIZACIÓN: Pre-mapear músicas UNA SOLA VEZ (evitar mapear N veces)
+    const musicsParts = new Map<string, MusicDoc>();
+
+    for (const music of musics) {
+      const musicId = music._id.toString();
+
+      musicsParts.set(musicId, this.mapMusicOdm(music));
+    }
+
+    // Procesar por lotes (chunks) para evitar RAM overflow por documentsForSearch
+    const BATCH_SIZE = 1;
 
     await this.index.deleteAllDocuments();
-    const task = await this.index.addDocuments(documentsForSearch);
 
-    await waitForTask(this.meiliSearch, task.taskUid);
+    let total = 0;
+
+    for (let i = 0; i < usersIds.length; i += BATCH_SIZE) {
+      const usersBatch = usersIds.slice(i, i + BATCH_SIZE);
+      const documentsForSearch: Doc[] = [];
+
+      for (const userId of usersBatch) {
+        const userMusicsMap = musicsUsersMap.get(userId);
+
+        for (const music of musics) {
+          const musicId = music._id.toString();
+          const musicPart = musicsParts.get(musicId)!; // Ya mapeado
+          const userMusic = userMusicsMap?.get(musicId);
+
+          documentsForSearch.push( {
+            id: genId( {
+              userId,
+              musicId,
+            } ),
+            ...musicPart,
+            tags: [...musicPart.tags ?? [], ...userMusic?.tags ?? []],
+            lastTimePlayedAt: userMusic?.lastTimePlayed ?? 0,
+            userId,
+            weight: userMusic?.weight ?? 0,
+          } );
+          total++;
+        }
+      }
+
+      const task = await this.index.addDocuments(documentsForSearch);
+
+      await waitForTask(this.meiliSearch, task.taskUid);
+    }
 
     await this.index.updateSettings( {
       pagination: {
@@ -83,14 +183,43 @@ export class MusicsIndexService {
       },
     } );
 
-    this.logger.log(`Sincronizados ${documentsForSearch.length} documentos`);
+    this.logger.log(`Sincronizados ${total} documentos`);
   }
 
   async addOne(doc: Doc): Promise<void> {
     await this.index.addDocuments([doc]);
   }
 
-  async updateOne(doc: Doc): Promise<void> {
+  private async getUserIds(): Promise<string[]> {
+    const usersIds = (await UserOdm.Model.find( {}, {
+      _id: true,
+    } )).map(u=>u._id.toString());
+
+    return usersIds;
+  }
+
+  async updateMusic(musicDoc: MusicDoc): Promise<void> {
+    const usersIds = await this.getUserIds();
+    const docs = usersIds.map(_id=>{
+      const userId = _id.toString();
+      const id = genId( {
+        musicId: musicDoc.musicId,
+        userId,
+      } );
+
+      return {
+        ...musicDoc,
+        id,
+        userId,
+      } as Partial<Doc>;
+    } );
+
+    await this.index.updateDocuments(docs);
+  }
+
+  async updateUserInfo(
+    doc: UserInfoDoc,
+  ): Promise<void> {
     await this.index.updateDocuments([doc]);
   }
 
@@ -98,34 +227,52 @@ export class MusicsIndexService {
     await this.index.addDocuments(docs);
   }
 
-  private mapOdm(m: MusicOdm.FullDoc): Doc {
+  private mapMusicOdm(m: MusicOdm.FullDoc): MusicDoc {
     return {
-      id: m._id.toString(),
+      musicId: m._id.toString(),
       title: m.title,
       artist: m.artist,
       game: m.game,
       country: m.country,
       addedAt: Math.floor(m.timestamps.addedAt.getTime() / 1000),
-      weight: m.weight,
-      lastTimePlayedAt: m.lastTimePlayed ?? 0,
       tags: m.tags ?? null,
       onlyTags: m.onlyTags ?? null,
-    } satisfies Doc;
+    } satisfies MusicDoc;
   }
 
-  private mapModel(m: MusicEntity): Doc {
+  private mapUserInfoOdm(m: MusicsUsersOdm.FullDoc): UserInfoDoc {
     return {
-      id: m.id,
+      musicId: m.musicId.toString(),
+      userId: m.userId.toString(),
+      lastTimePlayedAt: m.lastTimePlayed,
+      weight: m.weight,
+      tags: m.tags ?? null,
+      onlyTags: null,
+    } satisfies UserInfoDoc;
+  }
+
+  private mapMusicModel(m: MusicEntity): MusicDoc {
+    return {
+      musicId: m.id,
       title: m.title,
       artist: m.artist,
       game: m.game,
       country: m.country,
       addedAt: Math.floor(m.timestamps.addedAt.getTime() / 1000),
-      weight: m.weight,
-      lastTimePlayedAt: m.lastTimePlayed ?? 0,
       tags: m.tags ?? null,
       onlyTags: null,
-    } satisfies Doc;
+    } satisfies MusicDoc;
+  }
+
+  private mapUserInfoModel(m: MusicUserInfoEntity): UserInfoDoc {
+    return {
+      userId: m.userId,
+      musicId: m.id,
+      lastTimePlayedAt: m.lastTimePlayed,
+      weight: m.weight,
+      tags: m.tags ?? null,
+      onlyTags: null,
+    } satisfies UserInfoDoc;
   }
 
   async initialize() {
@@ -143,6 +290,9 @@ export class MusicsIndexService {
       "onlyTags",
       "addedAt",
       "lastTimePlayedAt",
+      // internos:
+      "musicId",
+      "userId",
     ]);
 
     await this.index.updateSortableAttributes([
@@ -172,14 +322,41 @@ export class MusicsIndexService {
   }
 
   async search(
+    userId: string | null,
     query: string,
     options?: SearchParams,
   ): Promise<SearchResponse<Doc, SearchParams>> {
+    const filters: string[] = [];
+
+    if (userId)
+      filters.push(`userId = '${userId}'`);
+    else
+      filters.push("userId = 'NONE'");
+
+    if (options?.filter) {
+      if (Array.isArray(options.filter)) {
+        const flatFilters = options.filter.flat();
+
+        filters.push(...flatFilters.map(f => String(f)));
+      } else if (typeof options.filter === "string")
+        filters.push(options.filter);
+    }
+
     const result = await this.index.search<Doc>(query, {
       ...options,
+      filter: filters.length > 0 ? filters : undefined,
       matchingStrategy: "last",
     } );
 
     return result;
   }
+}
+
+type GenIdProps = {
+  musicId: string;
+  userId: string | null;
+};
+function genId( { musicId,
+  userId }: GenIdProps) {
+  return `${musicId}_${userId}`;
 }

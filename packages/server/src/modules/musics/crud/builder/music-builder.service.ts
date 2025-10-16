@@ -24,7 +24,7 @@ export class MusicBuilderService {
   }
 
   // eslint-disable-next-line require-await
-  async createMusicFromFile(relativePath: string): Promise<Music> {
+  async createMusicFromFile(relativePath: string, userId: string): Promise<Music> {
     let title: string;
     let artist: string;
     const fullPath = getAbsolutePath(relativePath);
@@ -43,7 +43,7 @@ export class MusicBuilderService {
         updatedAt: now,
         addedAt: now,
       },
-      weight: 0,
+      uploaderUserId: userId,
     };
     let doc = {
       ...doc1,

@@ -11,12 +11,12 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
-import { MusicsRepository } from "#musics/crud/repository";
-import { MusicPlaylistCrudDtos } from "../../models/dto";
+import { MusicsRepository } from "#musics/crud/repositories/music";
 import { MusicPlaylist, MusicPlaylistEntity } from "../../models";
-import { AggregationResult } from "./odm/criteria-pipeline";
-import { MusicPlaylistOdm } from "./odm";
+import { MusicPlaylistCrudDtos } from "../../models/dto";
 import { MusicPlayListEvents } from "./events";
+import { MusicPlaylistOdm } from "./odm";
+import { AggregationResult } from "./odm/criteria-pipeline";
 
 type Model = MusicPlaylist;
 type Entity = MusicPlaylistEntity;

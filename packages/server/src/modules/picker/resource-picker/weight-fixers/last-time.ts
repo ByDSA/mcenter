@@ -1,12 +1,11 @@
-import { Pickable, Resource } from "#modules/resources/models";
 import { secondsElapsedFrom } from "../utils";
 import { WeightFixer, WeightFixerParams } from "./weight-fixer";
 
-export type Fx<R extends Pickable = Pickable> = (pickable: R, x: number)=> number;
-type Params<R extends Pickable> = {
+export type Fx<R> = (pickable: R, x: number)=> number;
+type Params<R> = {
   fx: Fx<R>;
 };
-export class LastTimeWeightFixer<R extends Resource = Resource> implements WeightFixer<R> {
+export abstract class LastTimeWeightFixer<R> implements WeightFixer<R> {
   #params: Params<R>;
 
   constructor(params: Params<R>) {
@@ -16,9 +15,10 @@ export class LastTimeWeightFixer<R extends Resource = Resource> implements Weigh
   // eslint-disable-next-line require-await
   async fixWeight( { resource }: WeightFixerParams<R>): Promise<number> {
     let secondsElapsed;
+    const lastTimePlayed = this.getLastTimePlayed(resource);
 
-    if (resource.lastTimePlayed) {
-      secondsElapsed = secondsElapsedFrom(resource.lastTimePlayed);
+    if (lastTimePlayed) {
+      secondsElapsed = secondsElapsedFrom(lastTimePlayed);
 
       if (secondsElapsed < 0)
         secondsElapsed = 0;
@@ -27,4 +27,6 @@ export class LastTimeWeightFixer<R extends Resource = Resource> implements Weigh
 
     return this.#params.fx(resource, secondsElapsed);
   }
+
+  abstract getLastTimePlayed(r: R): number;
 }

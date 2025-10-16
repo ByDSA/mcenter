@@ -1,19 +1,29 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
-import { Music } from "#musics/models";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
-import { FullDocOdm as MusicUserInfoFullDocOdm } from "./userInfo.odm";
+import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 
-export type DocOdm = Omit<Music, "id" | "slug"> & {
+export type DocOdm = {
   _id?: mongoose.Types.ObjectId;
+  timestamps: TimestampsOdm.DocOdm;
+  title: string;
+  artist: string;
+  album?: string;
+  tags?: string[];
   onlyTags?: string[];
   url: string;
+  game?: string;
+  year?: number;
+  spotifyId?: string;
+  disabled?: boolean;
+  country?: string;
+  uploaderUserId: mongoose.Types.ObjectId;
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
   fileInfos?: MusicFileInfoOdm.FullDoc[];
-  userInfo?: MusicUserInfoFullDocOdm;
+  userInfo?: MusicsUsersOdm.FullDoc;
 };
 
 const NAME = "Music";
@@ -25,6 +35,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: TimestampsOdm.schema,
     required: true,
   },
+  uploaderUserId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+  },
   spotifyId: {
     type: String,
     required: false,
@@ -33,10 +47,6 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: String,
     required: true,
     unique: true,
-  },
-  weight: {
-    type: Number,
-    required: true,
   },
   title: {
     type: String,
@@ -61,9 +71,6 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
   disabled: {
     type: Boolean,
-  },
-  lastTimePlayed: {
-    type: Number,
   },
   game: {
     type: String,

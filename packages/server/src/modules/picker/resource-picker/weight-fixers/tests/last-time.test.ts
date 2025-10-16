@@ -6,6 +6,12 @@ import { fixtureEpisodes } from "#episodes/tests";
 import { Fx, LastTimeWeightFixer } from "../last-time";
 import { secondsElapsedFrom } from "../../utils";
 
+class LastTimeResourceWeightFixer extends LastTimeWeightFixer<Resource> {
+  getLastTimePlayed(r: Resource): number {
+    return r.lastTimePlayed ?? 0;
+  }
+}
+
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
@@ -116,7 +122,7 @@ describe.each(cases)("lastTimeWeightFixer", (testCase) => {
 
   it(`should return ${testCase.expectedWeight} when initialWeight = ${testCase.initialWeight}, \
     seconds ago = ${elapsed} and fx=${testCase.fx === fxDays ? "fxDays" : "fx"}`, async () => {
-    const weightFixer = new LastTimeWeightFixer( {
+    const weightFixer = new LastTimeResourceWeightFixer( {
       fx: testCase.fx,
     } );
     const result = await weightFixer.fixWeight( {

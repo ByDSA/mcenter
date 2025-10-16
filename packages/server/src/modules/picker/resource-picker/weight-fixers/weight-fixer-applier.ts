@@ -1,8 +1,7 @@
 import { Picker } from "rand-picker";
-import { Pickable } from "#modules/resources/models";
 import { WeightFixer } from "./weight-fixer";
 
-export class WeightFixerApplier<R extends Pickable = Pickable> {
+export class WeightFixerApplier<R> {
   #weightFixers: WeightFixer<R>[] = [];
 
   constructor() {

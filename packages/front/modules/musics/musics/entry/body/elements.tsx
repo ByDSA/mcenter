@@ -8,7 +8,7 @@ import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCom
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
 import { classes } from "#modules/utils/styles";
 import { Data } from "../../types";
-import { MUSIC_PROPS } from "../utils";
+import { MUSIC_PROPS, MUSIC_USER_INFO_PROPS } from "../utils";
 import styles from "./styles.module.css";
 
 function getAndUpdateMusicByProp<V>(
@@ -20,6 +20,21 @@ function getAndUpdateMusicByProp<V>(
       [prop]: v,
     } ),
     getValue: (r)=>r[prop],
+    name: prop,
+  };
+}
+function getAndUpdateMusicUserInfoByProp<V>(
+  prop: string,
+): Pick<ResourceInputCommonProps<Data, V>, "getUpdatedResource" | "getValue" | "name"> {
+  return {
+    getUpdatedResource: (v, r) => ( {
+      ...r,
+      userInfo: {
+        ...r.userInfo,
+        [prop]: v,
+      },
+    } ),
+    getValue: (r)=>r.userInfo[prop],
     name: prop,
   };
 }
@@ -57,8 +72,8 @@ export function genArtistElement(props: TextProps) {
 export function genWeightElement(props: NumberProps) {
   return <span className={styles.weight}>{
     ResourceInputNumber<MusicEntity>( {
-      caption: MUSIC_PROPS.weight.caption,
-      ...getAndUpdateMusicByProp<number>("weight"),
+      caption: MUSIC_USER_INFO_PROPS.weight.caption,
+      ...getAndUpdateMusicUserInfoByProp<number>("weight"),
       ...props,
     } )
   }</span>;
@@ -89,7 +104,18 @@ export function genTagsElement(props: TextArrayProps) {
   return <span className={styles.tags}>{
     ResourceInputArrayString( {
       caption: MUSIC_PROPS.tags.caption,
-      ...getAndUpdateMusicByProp<string[]>("tags"),
+      getUpdatedResource: (v, r) => ( {
+        ...r,
+        tags: v?.filter(t=>t.startsWith("#")),
+        userInfo: r.userInfo
+          ? {
+            ...r.userInfo,
+            tags: v?.filter(t=>!t.startsWith("#")),
+          }
+          : undefined,
+      } ),
+      getValue: (r)=>[...r.tags ?? [], ...r.userInfo?.tags ?? []],
+      name: "tags",
       // eslint-disable-next-line no-empty-function
       addOnReset: ()=>{},
       ...props,

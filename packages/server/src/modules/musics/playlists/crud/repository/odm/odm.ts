@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
-import { MusicOdm } from "#musics/crud/repository/odm";
+import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 

@@ -3,7 +3,7 @@ import { MusicEntity } from "$shared/models/musics";
 import { diff } from "just-diff";
 import { MusicBuilderService } from "#musics/crud/builder/music-builder.service";
 import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
-import { MusicsRepository } from "../../crud/repository";
+import { MusicsRepository } from "../../crud/repositories/music";
 
 type Result = {
   old: MusicEntity;
@@ -41,8 +41,6 @@ export class MusicFixInfoController {
     for (const c of changed) {
       c.new = await this.musicRepo.patchOneByIdAndGet(c.old.id, {
         entity: c.new,
-      }, {
-        userId: undefined,
       } );
     }
 

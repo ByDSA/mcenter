@@ -2,7 +2,8 @@ import { Application } from "express";
 import request from "supertest";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { PATH_ROUTES } from "$shared/routing";
-import { MusicEntity, Music } from "#musics/models";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
+import { Music, MusicEntityWithUserInfo } from "#musics/models";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
@@ -92,8 +93,18 @@ describe("controller", () => {
     } );
 
     it("should get a music if query weight is put", async () => {
-      const possibleMusics: MusicEntity[] = MUSICS_WITH_TAGS_SAMPLES
-        .filter((music) => music.weight > 10);
+      const possibleMusics: MusicEntityWithUserInfo[] = MUSICS_WITH_TAGS_SAMPLES.map(m=>( {
+        ...m,
+        userInfo: {
+          lastTimePlayed: 0,
+          weight: 11,
+          createdAt: new Date(),
+          musicId: m.id,
+          updatedAt: new Date(),
+          userId: fixtureUsers.Admin.User.id,
+        },
+      } satisfies MusicEntityWithUserInfo))
+        .filter((music) => music.userInfo.weight > 10);
 
       expectNotEmpty(possibleMusics);
       const response = await request(routerApp)

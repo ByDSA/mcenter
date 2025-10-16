@@ -74,7 +74,10 @@ export class YoutubeImportMusicPlaylistTaskHandler implements TaskHandler<Payloa
       const downloadResult: DownloadResult = await this.service.downloadOne(videoId);
 
       try {
-        const createdInfo = await this.service.createNewMusic(downloadResult);
+        const createdInfo = await this.service.createNewMusic(
+          downloadResult,
+          payload.uploaderUserId,
+        );
 
         created[videoId] = {
           music: createdInfo.music,

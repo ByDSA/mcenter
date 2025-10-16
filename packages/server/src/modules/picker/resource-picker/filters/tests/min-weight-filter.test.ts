@@ -31,7 +31,11 @@ describe.each([
   [W7, 0, true],
 ] as Case[])("minWeightFilter", (self, num, expected) => {
   it(`should return ${expected} when weight = ${self.weight} and min = ${num}`, async () => {
-    const filter = new RemoveWeightLowerOrEqualThanFilter(num);
+    const filter = new class extends RemoveWeightLowerOrEqualThanFilter<Pickable> {
+      getWeight(s: Pickable): number {
+        return s.weight;
+      }
+    }(num);
     const result = await filter.filter(self);
 
     expect(result).toBe(expected);

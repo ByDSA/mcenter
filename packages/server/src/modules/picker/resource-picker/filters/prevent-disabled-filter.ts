@@ -1,9 +1,10 @@
-import { Resource } from "#modules/resources/models";
 import { Filter } from "./filter";
 
-export class PreventDisabledFilter implements Filter {
+export abstract class PreventDisabledFilter<R> implements Filter<R> {
   // eslint-disable-next-line require-await
-  async filter(episode: Resource): Promise<boolean> {
-    return episode.disabled !== true;
+  async filter(self: R): Promise<boolean> {
+    return this.isDisabled(self) !== true;
   }
+
+  abstract isDisabled(self: R): boolean;
 }

@@ -6,39 +6,34 @@ import { OnEvent } from "@nestjs/event-emitter";
 import { Types, UpdateQuery } from "mongoose";
 import { MusicFileInfoEntity, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
 import { assertFoundClient } from "#utils/validation/found";
-import { CanDeleteOneByIdAndGet, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
-import { MusicEntity, Music, MusicId, MusicEntityWithUserInfo } from "#musics/models";
+import { CanDeleteOneByIdAndGet, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { MusicEntity, Music, MusicId } from "#musics/models";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
-import { showError } from "#core/logging/show-error";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { MusicsSearchService } from "#modules/search/search-services/musics.search.service";
-import { MusicAvailableSlugGeneratorService } from "../builder/vailable-slug-generator.service";
-import { MusicBuilderService } from "../builder/music-builder.service";
-import { MusicHistoryEntryEvents } from "../../history/crud/repository/events";
-import { expressionToMeilisearchQuery } from "./queries/queries-meili";
-import { AggregationResult } from "./odm/criteria-pipeline";
-import { MusicOdm } from "./odm";
-import { MusicEvents } from "./events";
+import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
+import { MusicBuilderService } from "../../builder/music-builder.service";
+import { MusicAvailableSlugGeneratorService } from "../../builder/vailable-slug-generator.service";
 import { ExpressionNode } from "./queries/query-object";
+import { MusicEvents } from "./events";
+import { MusicOdm } from "./odm";
+import { AggregationResult } from "./odm/criteria-pipeline";
+import { expressionToMeilisearchQuery } from "./queries/queries-meili";
+import { GetManyByCriteriaMusicRepoService } from "./get-many-criteria";
 
 type CriteriaOne = MusicCrudDtos.GetOne.Criteria;
 type CriteriaMany = MusicCrudDtos.GetMany.Criteria;
 
-type PatchOptions = {
-  userId?: string;
-};
-
 @Injectable()
 export class MusicsRepository
 implements
-CanPatchOneByIdAndGet<MusicEntity, MusicId, Music, PatchOptions>,
+CanPatchOneByIdAndGet<MusicEntity, MusicId, Music>,
 CanGetOneById<MusicEntity, MusicId>,
-CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]>,
-CanGetManyByCriteria<MusicEntity, CriteriaMany> {
+CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
     @Inject(forwardRef(()=>MusicAvailableSlugGeneratorService))
@@ -46,24 +41,12 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
     private readonly musicBuilder: MusicBuilderService,
     private readonly fileInfoRepo: MusicFileInfoRepository,
     private readonly musicsSearchService: MusicsSearchService,
+    private readonly getManyByCriteriaMusicRepoService: GetManyByCriteriaMusicRepoService,
   ) { }
 
   @OnEvent(MusicEvents.WILDCARD)
   handleEvents(ev: DomainEvent<unknown>) {
     logDomainEvent(ev);
-  }
-
-  @OnEvent(MusicHistoryEntryEvents.Created.TYPE)
-  async handleCreateHistoryEntryEvents(event: MusicHistoryEntryEvents.Created.Event) {
-    const { entity } = event.payload;
-
-    await this.patchOneByIdAndGet(entity.resourceId, {
-      entity: {
-        lastTimePlayed: entity.date.timestamp,
-      },
-    }, {
-      userId: event.payload.entity.userId,
-    } ).catch(showError);
   }
 
   async deleteOneByIdAndGet(id: string): Promise<MusicEntity> {
@@ -86,88 +69,13 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
     return MusicOdm.toEntity(doc);
   }
 
-  async getManyByCriteria(criteria: CriteriaMany): Promise<any> {
-    const actualCriteria: CriteriaMany = {
-      ...criteria,
-      limit: criteria.limit ?? 10,
-    };
-    let aggregationResult: AggregationResult;
-
-    if (criteria.filter && Object.entries(criteria.filter).length > 0) {
-      const { data: docs,
-        total } = await this.musicsSearchService.search(Object.values(criteria.filter).join(" "), {
-        limit: actualCriteria.limit,
-        offset: actualCriteria.offset,
-        sort: Object.entries(actualCriteria.sort ?? {} ).map(([key, value])=> {
-          const fixedKey = (()=> {
-            switch (key) {
-              case "added": return "addedAt";
-              default: return key;
-            }
-          } )();
-
-          return fixedKey + ":" + value;
-        } ),
-        showRankingScore: true,
-      } );
-      const musicStringIds = docs.map(hit => hit.id);
-      const musicObjectIds = docs.map(hit => new Types.ObjectId(hit.id));
-      const { filter, sort, offset, limit, ...criteriaSearch } = actualCriteria;
-      let pipeline = MusicOdm.getCriteriaPipeline(criteriaSearch);
-
-      pipeline = [
-        {
-          $match: {
-            _id: {
-              $in: musicObjectIds,
-            },
-          },
-        },
-        ...pipeline.slice(0, -1),
-        {
-          $addFields: {
-            __sortIndex: {
-              $indexOfArray: [musicStringIds, {
-                $toString: "$_id",
-              }],
-            },
-          },
-        },
-        {
-          $sort: {
-            __sortIndex: 1,
-          },
-        },
-        {
-          $unset: "__sortIndex",
-        },
-        ...pipeline.slice(-1),
-      ];
-
-      aggregationResult = await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
-      aggregationResult[0].metadata[0] = {
-        totalCount: total,
-      };
-    } else {
-      const pipeline = MusicOdm.getCriteriaPipeline(actualCriteria);
-
-      aggregationResult = await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
-    }
-
-    const docs = aggregationResult[0].data;
-
-    if (docs.length > 0) {
-      if (actualCriteria?.expand?.includes("fileInfos"))
-        assertIsDefined(docs[0].fileInfos, "Lookup file infos failed");
-    }
-
-    return MusicOdm.toPaginatedResult(aggregationResult);
+  async getManyByCriteria(userId: string | null, criteria: CriteriaMany): Promise<any> {
+    return await this.getManyByCriteriaMusicRepoService.doAction(userId, criteria);
   }
 
   async patchOneByIdAndGet(
     id: MusicId,
-    params: PatchOneParams<Omit<MusicEntityWithUserInfo, "id">>,
-    opts: PatchOptions,
+    params: PatchOneParams<Music>,
   ): Promise<MusicEntity> {
     const { entity: paramEntity } = params;
     let { timestamps: _, ...validEntity } = this.musicBuilder.fixFields(paramEntity);
@@ -180,6 +88,13 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
       ...updateQuery.$set,
       "timestamps.updatedAt": new Date(),
     };
+
+    if (paramEntity.tags?.length === 0) {
+      updateQuery.$unset = {
+        ...updateQuery.$unset,
+        tags: true,
+      };
+    }
 
     const doc = await MusicOdm.Model.findByIdAndUpdate(
       id,
@@ -235,30 +150,88 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
     }, criteria);
   }
 
-  async getAll(): Promise<MusicEntity[]> {
-    const docs = await MusicOdm.Model.find( {} );
+  async getAll(
+    criteria?: CriteriaMany,
+  ): Promise<MusicEntity[]> {
+    let docs;
+
+    if (criteria) {
+      const pipeline = MusicOdm.getCriteriaPipeline(criteria);
+
+      if (pipeline.length === 0)
+        throw new UnprocessableEntityException(criteria);
+
+      docs = await MusicOdm.Model.aggregate(pipeline);
+    } else
+      docs = await MusicOdm.Model.find( {} );
+
     const ret = docs.map(MusicOdm.toEntity);
 
     return ret;
   }
 
-  async getManyByQuery(params: ExpressionNode): Promise<MusicEntity[]> {
+  async getManyByQuery(
+    userId: string | null,
+    params: ExpressionNode,
+    criteria?: Pick<CriteriaMany, "expand">,
+  ): Promise<MusicEntity[]> {
     const query = expressionToMeilisearchQuery(params);
-    const meiliRet = await this.musicsSearchService.filter(query, {
+    const meiliRet = await this.musicsSearchService.filter(userId, query, {
       limit: 0,
     } );
     const meiliDocs = meiliRet.data;
+    const meiliDocsMap: Record<string, typeof meiliDocs[0]> = {};
+
+    for (const doc of meiliDocs)
+      meiliDocsMap[doc.musicId] = doc;
 
     if (meiliDocs.length === 0)
       return [];
 
-    const ids = meiliDocs.map(doc => doc.id);
+    const ids = meiliDocs.map(doc => new Types.ObjectId(doc.musicId));
     // Nota: no tiene por qué respetarse el orden de los meiliDocs
-    const docs = await MusicOdm.Model.find( {
-      _id: {
-        $in: ids,
+    const pipeline: any[] = [
+      {
+        $match: {
+          _id: {
+            $in: ids,
+          },
+        },
       },
-    } );
+    ];
+    const docs: MusicOdm.FullDoc[] = await MusicOdm.Model.aggregate(pipeline);
+    const fakeId = new Types.ObjectId();
+
+    if (criteria?.expand?.includes("userInfo")) {
+      if (userId) {
+        for (const d of docs) {
+          const u = meiliDocsMap[d._id.toString()];
+
+          d.userInfo = {
+            _id: fakeId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            lastTimePlayed: u.lastTimePlayedAt,
+            musicId: new Types.ObjectId(u.musicId),
+            userId: new Types.ObjectId(userId),
+            weight: u.weight,
+          } satisfies MusicsUsersOdm.FullDoc;
+        }
+      } else {
+        for (const d of docs) {
+          d.userInfo = {
+            _id: fakeId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            lastTimePlayed: 0,
+            musicId: "$_id" as any,
+            userId: fakeId,
+            weight: 0,
+          } satisfies MusicsUsersOdm.FullDoc;
+        }
+      }
+    }
+
     const ret = docs.map(MusicOdm.toEntity);
 
     return ret;
@@ -276,10 +249,11 @@ CanGetManyByCriteria<MusicEntity, CriteriaMany> {
 
   async createOneFromPath(
     relativePath: string,
+    userId: string,
     localFileMusic?: Partial<MusicFileInfoOmitMusicId>,
   ): Promise<{music: MusicEntity;
 fileInfo: MusicFileInfoEntity;}> {
-    const musicDto = await this.musicBuilder.createMusicFromFile(relativePath);
+    const musicDto = await this.musicBuilder.createMusicFromFile(relativePath, userId);
     const music = await this.createOneAndGet(musicDto);
     let fileInfo: MusicFileInfoEntity;
 

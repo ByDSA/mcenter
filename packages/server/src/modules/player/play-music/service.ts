@@ -6,10 +6,10 @@ import { mediaElementFixPlayerLabels } from "$shared/models/resources";
 import { assertZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
-import { MusicsRepository } from "#musics/crud/repository";
+import { MusicsRepository } from "#musics/crud/repositories/music";
 import { assertFoundClient, assertIsNotEmptyClient } from "#utils/validation/found";
-import { PlayService } from "../play.service";
 import { RemotePlayersRepository } from "../player-services/repository";
+import { PlayService } from "../play.service";
 
 type ProcessAndPlayMusicsProps = {
   remotePlayerId: string;

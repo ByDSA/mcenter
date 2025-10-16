@@ -1,4 +1,4 @@
-import type { MusicEntity } from "#modules/musics/models";
+import type { MusicEntityWithUserInfo } from "#modules/musics/models";
 import { Fragment, useCallback } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { isDefined } from "$shared/utils/validation";
@@ -20,7 +20,7 @@ import { useMusicCrudWithElements, UseMusicCrudWithElementsProps } from "./useMu
 import styles from "./styles.module.css";
 import { OptionalPropsButton } from "./elements";
 
-export type BodyProps = UseMusicCrudWithElementsProps<MusicEntity> & {
+export type BodyProps = UseMusicCrudWithElementsProps<MusicEntityWithUserInfo> & {
   shouldFetchFileInfo?: boolean;
 };
 

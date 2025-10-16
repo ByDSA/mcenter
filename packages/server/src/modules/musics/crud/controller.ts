@@ -2,10 +2,12 @@ import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { UserPayload } from "$shared/models/auth";
-import { MusicEntity, musicEntitySchema } from "#musics/models";
-import { AdminDeleteOne, GetManyCriteria, GetOne, AdminPatchOne } from "#utils/nestjs/rest";
+import { MusicInfoCrudDtos } from "$shared/models/musics/user-info/dto/transport";
+import { MusicEntity, musicEntitySchema, musicUserInfoEntitySchema } from "#musics/models";
+import { AdminDeleteOne, GetManyCriteria, GetOne, UserPatchOne } from "#utils/nestjs/rest";
 import { User } from "#core/auth/users/User.decorator";
-import { MusicsRepository } from "./repository";
+import { MusicsUsersRepository } from "./repositories/user-info/repository";
+import { MusicsRepository } from "./repositories/music";
 
 class GetOneByIdParamsDto extends createZodDto(MusicCrudDtos.GetOne.ById.paramsSchema) {}
 class GetManyByCriteriaDto extends createZodDto(MusicCrudDtos.GetMany.criteriaSchema) {}
@@ -13,21 +15,25 @@ class PatchParamsDto extends createZodDto(MusicCrudDtos.PatchOneById.paramsSchem
 class DeleteOneParamsDto extends createZodDto(MusicCrudDtos.DeleteOneById.paramsSchema) {}
 class PatchBodyDto extends createZodDto(MusicCrudDtos.PatchOneById.bodySchema) {}
 
+class PatchUserInfoBodyDto extends createZodDto(MusicInfoCrudDtos.PatchOneById.bodySchema) {}
+
 @Controller("/")
 export class MusicCrudController {
   constructor(
     private readonly musicRepo: MusicsRepository,
+    private readonly musicsUsersrepo: MusicsUsersRepository,
   ) {
   }
 
   @GetManyCriteria("/search", musicEntitySchema)
   async getManyByCriteria(
     @Body() criteria: GetManyByCriteriaDto,
+    @User() user: UserPayload | null,
   ): Promise<MusicEntity[]> {
-    return await this.musicRepo.getManyByCriteria(criteria);
+    return await this.musicRepo.getManyByCriteria(user?.id ?? null, criteria);
   }
 
-  @AdminPatchOne(":id", musicEntitySchema)
+  @UserPatchOne(":id", musicEntitySchema)
   async patchOneByIdAndGet(
     @Param() params: DeleteOneParamsDto,
     @Body() body: PatchBodyDto,
@@ -36,9 +42,19 @@ export class MusicCrudController {
     const { id } = params;
 
     // TODO: filtro por uploader
-    return await this.musicRepo.patchOneByIdAndGet(id, body, {
+    return await this.musicRepo.patchOneByIdAndGet(id, body);
+  }
+
+  @UserPatchOne(":id/user-info", musicUserInfoEntitySchema)
+  async patchOneUserInfoByKeyAndGet(
+    @Param() params: PatchParamsDto,
+    @Body() body: PatchUserInfoBodyDto,
+    @User() user: UserPayload,
+  ) {
+    return await this.musicsUsersrepo.patchOneByIdAndGet( {
+      musicId: params.id,
       userId: user.id,
-    } );
+    }, body);
   }
 
   @AdminDeleteOne(":id", musicEntitySchema)

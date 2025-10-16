@@ -3,7 +3,7 @@ import { Controller, Get } from "@nestjs/common";
 import { MusicEntity } from "$shared/models/musics";
 import { fixSlug } from "#musics/crud/builder/fix-slug";
 import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
-import { MusicsRepository } from "../../crud/repository";
+import { MusicsRepository } from "../../crud/repositories/music";
 import { MusicDuplicatesIgnoreGroupsOdm } from "./repository/odm";
 
 @IsAdmin()
