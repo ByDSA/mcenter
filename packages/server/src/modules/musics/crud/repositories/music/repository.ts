@@ -118,8 +118,8 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
     return ret;
   }
 
-  async getOne(criteria: CriteriaOne): Promise<MusicEntity | null> {
-    const pipeline = MusicOdm.getCriteriaPipeline(criteria);
+  async getOne(userId: string | null, criteria: CriteriaOne): Promise<MusicEntity | null> {
+    const pipeline = MusicOdm.getCriteriaPipeline(userId, criteria);
 
     if (pipeline.length === 0)
       throw new UnprocessableEntityException(criteria);
@@ -138,25 +138,34 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
     return MusicOdm.toEntity(doc);
   }
 
-  async getOneByHash(hash: string, criteria?: CriteriaOne): Promise<MusicEntity | null> {
-    return await this.getOneByFilter( {
+  async getOneByHash(
+    userId: string | null,
+    hash: string,
+    criteria?: CriteriaOne,
+  ): Promise<MusicEntity | null> {
+    return await this.getOneByFilter(userId, {
       hash,
     }, criteria);
   }
 
-  async getOneBySlug(slug: string, criteria?: CriteriaOne): Promise<MusicEntity | null> {
-    return await this.getOneByFilter( {
+  async getOneBySlug(
+    userId: string | null,
+    slug: string,
+    criteria?: CriteriaOne,
+  ): Promise<MusicEntity | null> {
+    return await this.getOneByFilter(userId, {
       slug,
     }, criteria);
   }
 
   async getAll(
+    userId: string | null,
     criteria?: CriteriaMany,
   ): Promise<MusicEntity[]> {
     let docs;
 
     if (criteria) {
-      const pipeline = MusicOdm.getCriteriaPipeline(criteria);
+      const pipeline = MusicOdm.getCriteriaPipeline(userId, criteria);
 
       if (pipeline.length === 0)
         throw new UnprocessableEntityException(criteria);
@@ -239,8 +248,12 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
     return ret;
   }
 
-  private async getOneByFilter(filter: CriteriaOne["filter"], criteria?: CriteriaOne) {
-    return await this.getOne( {
+  private async getOneByFilter(
+    userId: string | null,
+    filter: CriteriaOne["filter"],
+    criteria?: CriteriaOne,
+  ) {
+    return await this.getOne(userId, {
       ...criteria,
       filter: {
         ...criteria?.filter,

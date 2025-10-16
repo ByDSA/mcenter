@@ -20,7 +20,7 @@ export class GetManyByCriteriaMusicRepoService {
     criteria: CriteriaMany,
   ): Promise<any> {
     const normalizedCriteria = this.normalizeCriteria(criteria);
-    const aggregationResult = await this.executeSearch(userId, normalizedCriteria);
+    const aggregationResult = await this.searchWithFilters(userId, normalizedCriteria);
     const docs = aggregationResult[0].data;
 
     if (!userId)
@@ -37,23 +37,8 @@ export class GetManyByCriteriaMusicRepoService {
       limit: criteria.limit ?? 10,
       filter: {
         ...criteria.filter,
-        userInfoUserId: criteria.expand?.includes("userInfo")
-          ? criteria.filter?.userInfoUserId ?? null
-          : criteria.filter?.userInfoUserId,
       },
     };
-  }
-
-  private async executeSearch(
-    userId: string | null,
-    criteria: CriteriaMany,
-  ): Promise<AggregationResult> {
-    const hasFilters = criteria.filter && Object.entries(criteria.filter).length > 0;
-
-    if (hasFilters)
-      return await this.searchWithFilters(userId, criteria);
-    else
-      return await this.searchWithoutFilters(criteria);
   }
 
   private async searchWithFilters(
@@ -78,8 +63,11 @@ export class GetManyByCriteriaMusicRepoService {
     return aggregationResult;
   }
 
-  private async searchWithoutFilters(criteria: CriteriaMany): Promise<AggregationResult> {
-    const pipeline = MusicOdm.getCriteriaPipeline(criteria);
+  private async searchWithoutFilters(
+    userId: string | null,
+    criteria: CriteriaMany,
+  ): Promise<AggregationResult> {
+    const pipeline = MusicOdm.getCriteriaPipeline(userId, criteria);
 
     return await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
   }
@@ -124,7 +112,7 @@ objectIds: Types.ObjectId[]; } {
 objectIds: Types.ObjectId[]; },
   ): PipelineStage[] {
     const { filter, sort, offset, limit, ...criteriaSearch } = criteria;
-    let pipeline = MusicOdm.getCriteriaPipeline(criteriaSearch);
+    let pipeline = MusicOdm.getCriteriaPipeline(userId, criteriaSearch);
     const lastStage = pipeline[pipeline.length - 1];
 
     pipeline = this.addMatchStage(pipeline, musicIds.objectIds);

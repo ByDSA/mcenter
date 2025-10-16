@@ -46,6 +46,7 @@ export type AggregationResult = {
 }[];
 
 export function getCriteriaPipeline(
+  userId: string | null,
   criteria: Criteria,
 ) {
   const sort = buildMongooseSort(criteria);
@@ -83,7 +84,7 @@ export function getCriteriaPipeline(
 
   if (needsUserInfoLookup) {
     // Si necesitamos filtrar por userId, usar lookup con pipeline
-    if (criteria.filter?.userInfoUserId !== undefined) {
+    if (userId !== null) {
       dataPipeline.push( {
         $lookup: {
           from: "musics_users",
@@ -99,7 +100,7 @@ export function getCriteriaPipeline(
                       $eq: ["$musicId", "$$musicId"],
                     },
                     {
-                      $eq: ["$userId", criteria.filter.userInfoUserId],
+                      $eq: ["$userId", new Types.ObjectId(userId)],
                     },
                   ],
                 },
@@ -131,8 +132,7 @@ export function getCriteriaPipeline(
     dataPipeline.push( {
       $unwind: {
         path: "$userInfo",
-        preserveNullAndEmptyArrays:
-        criteria.filter?.userInfoUserId === undefined, // Si filtramos, no preservar nulls
+        preserveNullAndEmptyArrays: userId === null, // Si filtramos, no preservar nulls
       },
     } );
   }

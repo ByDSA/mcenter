@@ -22,7 +22,7 @@ export class MusicFixInfoController {
 
   @Get()
   async fix() {
-    const all = await this.musicRepo.getAll();
+    const all = await this.musicRepo.getAll(null);
     const changed = all.reduce((acc, music)=> {
       const fixed = this.builderService.fixFields(music);
       const d = diff(music, fixed);

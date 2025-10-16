@@ -82,7 +82,7 @@ export class MusicGetRandomController {
       } ) as MusicEntityWithUserInfo[];
     }
 
-    return (await this.musicRepo.getAll( {
+    return (await this.musicRepo.getAll(userId, {
       expand: ["userInfo"],
     } )) as MusicEntityWithUserInfo[];
   }

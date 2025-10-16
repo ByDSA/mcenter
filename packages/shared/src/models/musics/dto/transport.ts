@@ -1,5 +1,4 @@
 import z from "zod";
-import { mongoDbId } from "../../resources/partial-schemas";
 import { idParamsSchema } from "../../utils/schemas/requests";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { musicEntitySchema } from "../music";
@@ -13,7 +12,6 @@ const criteriaConfig = {
     artist: z.string().optional(),
     hash: z.string().optional(),
     path: z.string().optional(),
-    userInfoUserId: mongoDbId.or(z.null()).optional(),
   },
   sortKeys: ["added", "updated", "artist"] as const,
   expandKeys: ["fileInfos", "userInfo"] as const,

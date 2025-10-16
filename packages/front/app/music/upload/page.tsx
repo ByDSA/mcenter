@@ -2,7 +2,7 @@
 
 import { AUDIO_EXTENSIONS } from "$shared/models/musics/audio-extensions";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { MusicEntity } from "$shared/models/musics";
+import { MusicEntity, MusicEntityWithUserInfo } from "$shared/models/musics";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { assertIsDefined } from "$shared/utils/validation";
@@ -12,13 +12,30 @@ import { MusicEntryElement } from "#musics/musics/entry/MusicEntry";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import { classes } from "#modules/utils/styles";
 import musicListStyles from "#modules/musics/musics/styles.module.css";
+import { useUser } from "#modules/core/auth/useUser";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 
 import "#styles/resources/resource-list-entry.css";
 
+function injectDefaultUserInfo(music: MusicEntity, userId: string): MusicEntityWithUserInfo {
+  music.userInfo = {
+    createdAt: music.timestamps.createdAt,
+    lastTimePlayed: 0,
+    musicId: music.id,
+    updatedAt: music.timestamps.updatedAt,
+    userId: userId,
+    weight: 0,
+  };
+
+  return music as MusicEntityWithUserInfo;
+}
+
 export default function Upload() {
-  const [uploaded, setUploaded] = useState<MusicEntity[]>([]);
+  const { user } = useUser();
+
+  assertIsDefined(user);
+  const [uploaded, setUploaded] = useState<MusicEntityWithUserInfo[]>([]);
   const uploadedRef = useRef<MusicEntity[]>(uploaded);
 
   useEffect(() => {
@@ -39,7 +56,7 @@ export default function Upload() {
 
       setUploaded(old => ([
         ...old,
-        music,
+        injectDefaultUserInfo(music, user.id),
       ]));
 
       options?.setSelectedFiles?.((old)=> {
@@ -52,7 +69,7 @@ export default function Upload() {
   const onCreateMusic = (music: MusicEntity) => {
     setUploaded(old => ([
       ...old,
-      music]));
+      injectDefaultUserInfo(music, user.id)]));
   };
 
   return (
@@ -71,13 +88,13 @@ export default function Upload() {
           {
           uploaded!.map(
             (music) => <Fragment key={`${music.id}`}>
-              <MusicEntryElement data={music} setData={(newMusic: MusicEntity) => {
+              <MusicEntryElement data={music} setData={(newMusic: MusicEntityWithUserInfo) => {
                 const index = uploaded.findIndex(m=>m.id === music.id);
 
                 if (index === -1)
                   return;
 
-                setUploaded((old: MusicEntity[]) => ([
+                setUploaded((old: MusicEntityWithUserInfo[]) => ([
                   ...old.slice(0, index),
                   newMusic,
                   ...old.slice(index + 1),

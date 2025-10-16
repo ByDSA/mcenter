@@ -140,7 +140,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
 
     assertFoundClient(track, "Track position invalid");
 
-    const ret = await this.musicsRepo.getOne( {
+    const ret = await this.musicsRepo.getOne(null, {
       ...musicCriteria,
       filter: {
         ...musicCriteria?.filter,
