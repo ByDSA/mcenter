@@ -75,6 +75,8 @@ const samplesWithUserInfo = Object.values(samples).map(s=> ( {
   },
 } ));
 
+samplesWithUserInfo[0].userInfo.weight = 11;
+
 export const fixtureMusics = {
   Disk: {
     Samples: samples,

@@ -2,19 +2,18 @@
 import { Application } from "express";
 import { Logger } from "@nestjs/common";
 import { getOneTests } from "#tests/suites/get-one";
-import { patchOneTests, PatchTestsProps } from "#tests/suites/patch-one";
+import { BeforeExecutionConfig, patchOneTests, PatchTestsProps, TestGroupConfigCtx } from "#tests/suites/patch-one";
 import { getManyCriteriaTests } from "#tests/suites/get-many-criteria";
-import { getAllTests } from "#tests/suites/get-all";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { deleteOneTests } from "./delete-one";
+import { MockConfig } from "./generate-http-case";
 
-type OmitGetRepo<T> = T extends { repo: infer R }
-  ? Omit<T, "repo"> & {
-      repo: Omit<R, "getRepo">;
-    }
-  : T;
+type ReplaceRepoConfig<T, R> = Omit<T, "buildDynamicConfig"> & {
+  repoConfig: (ctx: BeforeExecutionConfig<R> & TestGroupConfigCtx)=> MockConfig<any>;
+};
 
-type TestConfig<R> = OmitGetRepo<Omit<PatchTestsProps<R>, "getExpressApp" | "getTestingSetup">>;
+type CommonTestsKeys = "beforeExecution" | "getExpressApp" | "getTestingSetup";
+type TestConfig<R> = ReplaceRepoConfig<Omit<PatchTestsProps<R>, CommonTestsKeys>, R>;
 
 type TestsConfig<R> = {
   getAll?: TestConfig<jest.Mocked<R>>;
@@ -36,7 +35,7 @@ export function crudTestsSuite<R>(props: Props<R>) {
   const title = props.name ?? "CrudController";
 
   if (props.skip) {
-    new Logger(crudTestsSuite.name).warn(`Skipping tests suite ${title}`);
+    new Logger(crudTestsSuite.name).warn(`Skipping test suite ${title}`);
 
     // eslint-disable-next-line jest/no-disabled-tests, jest/expect-expect, no-empty-function
     it.skip("skipped", () => {
@@ -48,7 +47,7 @@ export function crudTestsSuite<R>(props: Props<R>) {
 
   describe(`${title}`, () => {
     let routerApp: Application;
-    let repository: jest.Mocked<R> | undefined;
+    let repo: jest.Mocked<R> | undefined;
     let testingSetup: TestingSetup;
 
     beforeAll(async () => {
@@ -61,7 +60,7 @@ export function crudTestsSuite<R>(props: Props<R>) {
       routerApp = testingSetup.routerApp;
 
       if (props.repositoryClass) {
-        repository = testingSetup.module
+        repo = testingSetup.module
           .get<jest.Mocked<R>>(props.repositoryClass);
       }
     } );
@@ -76,66 +75,78 @@ export function crudTestsSuite<R>(props: Props<R>) {
 
     if (props.repositoryClass) {
       it("repository should be defined", () => {
-        expect(repository).toBeDefined();
+        expect(repo).toBeDefined();
       } );
     }
 
-    if (testConfig.getAll) {
-      getAllTests( {
-        getTestingSetup: ()=>testingSetup,
-        ...testConfig.getAll,
-        repo: {
-          ...testConfig.getAll.repo,
-          getRepo: () => repository!,
-        },
-        getExpressApp: () => routerApp,
-      } );
-    }
+    const beforeExecution = () => ( {
+      repo: repo!,
+    } );
 
     if (testConfig.getOne) {
       getOneTests( {
-        getTestingSetup: ()=>testingSetup,
+        getTestingSetup: () => testingSetup,
         ...testConfig.getOne,
-        repo: {
-          ...testConfig.getOne.repo,
-          getRepo: () => repository!,
+        buildDynamicConfig: (ctx) => {
+          return {
+            mockConfig: testConfig.getOne!.repoConfig( {
+              ...ctx,
+              beforeExecution,
+            } ),
+          };
         },
+        beforeExecution,
         getExpressApp: () => routerApp,
       } );
     }
 
     if (testConfig.patchOne) {
       patchOneTests( {
-        getTestingSetup: ()=>testingSetup,
+        getTestingSetup: () => testingSetup,
         ...testConfig.patchOne,
-        repo: {
-          ...testConfig.patchOne.repo,
-          getRepo: () => repository!,
+        buildDynamicConfig: (ctx) => {
+          return {
+            mockConfig: testConfig.patchOne!.repoConfig( {
+              ...ctx,
+              beforeExecution,
+            } ),
+          };
         },
+        beforeExecution,
         getExpressApp: () => routerApp,
       } );
     }
 
     if (testConfig.getManyCriteria) {
       getManyCriteriaTests( {
-        getTestingSetup: ()=>testingSetup,
+        getTestingSetup: () => testingSetup,
         ...testConfig.getManyCriteria,
-        repo: {
-          ...testConfig.getManyCriteria.repo,
-          getRepo: () => repository!,
+        buildDynamicConfig: (ctx) => {
+          return {
+            mockConfig: testConfig.getManyCriteria!.repoConfig( {
+              ...ctx,
+              beforeExecution,
+            } ),
+          };
         },
+        beforeExecution,
         getExpressApp: () => routerApp,
       } );
     }
 
     if (testConfig.deleteOne) {
       deleteOneTests( {
-        getTestingSetup: ()=> testingSetup,
+        getTestingSetup: () => testingSetup,
         ...testConfig.deleteOne,
-        repo: {
-          ...testConfig.deleteOne.repo,
-          getRepo: () => repository!,
+        buildDynamicConfig: (ctx) => {
+          return {
+            mockConfig: testConfig.deleteOne!.repoConfig( {
+              ...ctx,
+              beforeExecution,
+            } ),
+          };
         },
+        beforeExecution,
         getExpressApp: () => routerApp,
       } );
     }

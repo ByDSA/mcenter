@@ -2,58 +2,82 @@ import { HttpStatus } from "@nestjs/common";
 import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserRoleName } from "$shared/models/auth";
+import { UserEntityWithRoles } from "$sharedSrc/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
 import { TestingSetup } from "#core/app/tests/app";
-import { AfterProps, BeforeProps, ExpectedBody, generateCase, GenerateCaseProps } from "./generate-case";
+import { AfterProps, BeforeProps, GenerateHttpCaseProps } from "./generate-http-case";
 import { defaultResponse, expectedDataNotFound, expectUnprocessableEntity } from "./common";
-import { getFixtureUserByRole, setAuthRole } from "./auth";
+import { classifyAuth, generateNotAllowedTest, putUser } from "./auth";
+import { generateHttpCase, MockConfig } from "./generate-http-case";
 
-type MockFn = NonNullable<GenerateCaseProps["mock"]>["fn"][0];
+export type AuthConfig = {
+  roles?: Partial<Record<UserRoleName, boolean>>;
+};
+
+export type BeforeExecutionConfig<R> = {
+  beforeExecution: BeforeExecutionFn<R>;
+};
+
+export type TestGroupConfigCtx = {
+  authUser: UserEntityWithRoles | null;
+};
+type BeforeExecution<R> = {
+  repo: R;
+};
+type BeforeExecutionFn<R> = ()=> BeforeExecution<R>;
+
+export type TestDynamicConfig = {
+    mockConfig: MockConfig<any>;
+};
+
+export type TestGroupFullConfig<R> = {
+  dynamicConfig: TestDynamicConfig;
+  ctx: TestGroupConfigCtx;
+  beforeExecution: BeforeExecutionFn<R>;
+};
+
 export type PatchTestsProps<R> = {
-  getTestingSetup: ()=> TestingSetup;
-  repo: Omit<MockFn, "getFn"> & {
-    getRepo: ()=> R;
-    getFn: (repo: R)=> ReturnType<MockFn["getFn"]>;
-  };
   getExpressApp: ()=> Application;
+  getTestingSetup: ()=> TestingSetup;
+  buildDynamicConfig: (ctx: TestGroupConfigCtx)=> TestDynamicConfig;
+  beforeExecution: BeforeExecutionFn<R>;
   url?: string;
   data?: {
     validInput?: object;
     invalidInput?: object;
   };
-  auth?: Record<UserRoleName, boolean>;
+  auth?: AuthConfig;
   beforeEach?: (props: BeforeProps)=> Promise<void>;
   afterEach?: (props: AfterProps)=> Promise<void>;
-  expectBody?: (body: unknown, repoReturned?: Awaited<MockFn["returned"]>)=> void;
-  expectedBody?: ExpectedBody;
-  customCases?: ((props: PatchTestsProps<R>)=> GenerateCaseProps)[];
+  expectBody?: (body: object, ctx?: TestGroupFullConfig<R>)=> void;
+  customCases?: ((props: PatchTestsProps<R>)=> GenerateHttpCaseProps)[];
 };
 
-function defaultProps<R>(props: PatchTestsProps<R>) {
-  const { getFn, invalidInput, repoReturned, validInput } = autoProps(props);
-  const { expectedBody, shouldReturn } = defaultResponse(props);
+function defaultProps<R>(
+  config: TestDynamicConfig,
+  props: PatchTestsProps<R>,
+) {
+  const { invalidInput, validInput } = autoProps(config, props.data);
+  const { expectBody, shouldReturn } = defaultResponse(config, props.expectBody);
 
   return {
-    expectedBody,
-    getFn,
+    expectBody,
     invalidInput,
-    repoReturned,
     shouldReturn,
     validInput,
   };
 }
 
-export function autoProps<R>(props: PatchTestsProps<R>) {
-  const repoReturned = props.repo.returned;
-  const getFn = ()=>props.repo.getFn(props.repo.getRepo());
-  const invalidInput = props.data?.invalidInput ?? {
+export function autoProps<R>(
+  config: TestDynamicConfig,
+  data: PatchTestsProps<R>["data"],
+) {
+  const invalidInput = data?.invalidInput ?? {
     cosaRara: "new title",
   };
-  const validInput = props.data?.validInput ?? props.repo.params?.[1];
+  const validInput = data?.validInput ?? config.mockConfig.expected?.params?.[1];
 
   return {
-    repoReturned,
-    getFn,
     invalidInput,
     validInput,
   };
@@ -62,134 +86,115 @@ export function autoProps<R>(props: PatchTestsProps<R>) {
 export function patchOneTests<R>(
   props: PatchTestsProps<R>,
 ) {
-  const { repo,
-    getExpressApp, getTestingSetup } = props;
-  const { expectedBody, getFn,
-    repoReturned, shouldReturn,
-    invalidInput, validInput } = defaultProps(props);
+  const { buildDynamicConfig, getExpressApp, getTestingSetup } = props;
   const validUrl = props.url ?? "/id";
 
-  assertIsDefined(validInput, "validInput must be defined in patch tests");
-  assertIsDefined(repo.params, "repoParams must be defined in patch tests");
-
   describe("patch one", () => {
-    const { auth } = props;
-    const positiveAuth = auth
-      ? Object.entries(auth).filter(([, v])=> v)
-        .map(([k])=> k as UserRoleName)
-      : undefined;
-    const negativeAuth = auth
-      ? Object.entries(auth).filter(([, v])=> !v)
-        .map(([k])=> k as UserRoleName)
-      : undefined;
+    const { allowed, notAllowed } = classifyAuth(props.auth);
 
-    for (const role of positiveAuth ?? [null]) {
-      const rolePrefix = `${role ? `role=${role} ` : ""}`;
-      const beforeEach: typeof props.beforeEach = role
-        ? async (p) => {
-          const testingSetup = getTestingSetup();
+    for (const entry of allowed) {
+      const { user } = entry;
 
-          if (testingSetup.options?.auth?.cookies === "mock")
-            await testingSetup.useMockedUser(getFixtureUserByRole(role));
-          else {
-            await setAuthRole( {
-              role,
-              req: p.request,
-            } );
-          }
+      describe(`allowed auth ${entry.name}`, () => {
+        const ctx: TestGroupConfigCtx = {
+          authUser: user,
+        };
+        const dynamicConfig = buildDynamicConfig(ctx);
+        const { expectBody, shouldReturn,
+          invalidInput, validInput } = defaultProps(dynamicConfig, props);
+
+        assertIsDefined(validInput, "validInput must be defined in patch tests");
+        assertIsDefined(
+          dynamicConfig.mockConfig.expected?.params,
+          "mockConfig.expected.params must be defined in patch tests",
+        );
+        const beforeEach: typeof props.beforeEach = async (p) => {
+          await putUser( {
+            getTestingSetup,
+            request: p.request,
+            user,
+          } );
 
           return props.beforeEach?.(p);
-        }
-        : props.beforeEach;
+        };
 
-      generateCase( {
-        name: `${rolePrefix}valid case`,
-        method: "patch",
-        body: validInput,
-        url: validUrl,
-        before: beforeEach,
-        after: props.afterEach,
-        getExpressApp,
-        expected: {
-          expectBody: props.expectBody
-            ? (body: unknown) => props.expectBody!(body, repoReturned)
-            : undefined,
-          body: expectedBody,
-          statusCode: shouldReturn ? HttpStatus.OK : HttpStatus.NO_CONTENT,
-        },
-        mock: {
-          fn: [{
-            ...repo,
-            getFn,
-            returned: shouldReturn ? repoReturned : undefined,
+        generateHttpCase( {
+          name: "valid case",
+          request: {
+            method: "patch",
+            body: validInput,
+            url: validUrl,
+          },
+          before: beforeEach,
+          after: props.afterEach,
+          getExpressApp,
+          response: {
+            body: expectBody
+              ? (body)=> {
+                expectBody(body, {
+                  ctx,
+                  dynamicConfig,
+                  beforeExecution: props.beforeExecution,
+                } );
+              }
+              : undefined,
+            statusCode: shouldReturn ? HttpStatus.OK : HttpStatus.NO_CONTENT,
+          },
+          mockConfigs: [{
+            ...dynamicConfig.mockConfig,
+            returned: shouldReturn ? dynamicConfig.mockConfig.returned : undefined,
           }],
-        },
-      } );
+        } );
 
-      generateCase( {
-        name: `${rolePrefix}invalid input case`,
-        method: "patch",
-        body: invalidInput,
-        url: validUrl,
-        before: beforeEach,
-        after: props.afterEach,
-        getExpressApp,
-        expected: {
-          expectBody: expectUnprocessableEntity,
-          statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-        },
-      } );
+        generateHttpCase( {
+          name: "invalid input case",
+          request: {
+            method: "patch",
+            body: invalidInput,
+            url: validUrl,
+          },
+          before: beforeEach,
+          after: props.afterEach,
+          getExpressApp,
+          response: {
+            body: expectUnprocessableEntity,
+            statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+          },
+        } );
 
-      generateCase( {
-        name: `${rolePrefix}not found case`,
-        method: "patch",
-        body: validInput,
-        url: validUrl,
-        before: beforeEach,
-        after: props.afterEach,
-        getExpressApp,
-        expected: expectedDataNotFound,
-        mock: {
-          fn: [{
-            ...repo,
-            getFn,
+        generateHttpCase( {
+          name: "not found case",
+          request: {
+            method: "patch",
+            body: validInput,
+            url: validUrl,
+          },
+          before: beforeEach,
+          after: props.afterEach,
+          getExpressApp,
+          response: expectedDataNotFound,
+          mockConfigs: [{
+            ...dynamicConfig.mockConfig,
             returned: undefined,
             implementation: ()=> {
               assertFoundClient(undefined);
             },
           }],
-        },
+        } );
       } );
     }
 
-    for (const role of negativeAuth ?? []) {
-      const rolePrefix = `${role ? `role=${role} ` : ""}`;
-      const beforeEach: typeof props.beforeEach = async (p) => {
-        const testingSetup = getTestingSetup();
-
-        if (testingSetup.options?.auth?.cookies === "mock")
-          await testingSetup.useMockedUser(getFixtureUserByRole(role));
-        else {
-          await setAuthRole( {
-            role,
-            req: p.request,
-          } );
-        }
-
-        return props.beforeEach?.(p);
-      };
-
-      generateCase( {
-        name: `${rolePrefix}invalid auth`,
-        method: "patch",
-        url: validUrl,
-        before: beforeEach,
-        after: props.afterEach,
+    for (const entry of notAllowed) {
+      generateNotAllowedTest( {
         getExpressApp,
-        expected: {
-          expectBody: ()=>undefined, // any body
-          statusCode: HttpStatus.FORBIDDEN,
+        getTestingSetup,
+        request: {
+          method: "patch",
+          url: validUrl,
         },
+        entry,
+        after: props.afterEach,
+        before: props.beforeEach,
       } );
     }
   } );

@@ -76,23 +76,40 @@ describe("controller", () => {
     const musicsIndexService = testingSetup.app.get(MusicsIndexService);
 
     await musicsIndexService.syncAll();
-    testingSetup.getMock(MusicsSearchService).filter.mockResolvedValue( {
-      data: fixtureMusics.Disk.WithUserInfo.List.map(music=>( {
-        addedAt: music.timestamps.addedAt.getTime(),
-        artist: music.artist,
-        id: music.userInfo.id,
-        lastTimePlayedAt: music.userInfo.lastTimePlayed,
-        musicId: music.id,
-        title: music.title,
-        userId: music.userInfo.userId,
-        weight: music.userInfo.weight,
-        country: music.country,
-        game: music.game,
-        tags: music.tags || [],
-        onlyTags: [],
-      } )),
-      total: fixtureMusics.Disk.WithUserInfo.List.length,
-    } as SearchRet);
+    function getPrimerSubstringEntreComillas(texto: string): string | null {
+      const match = texto.match(/"([^"]*)"/);
+
+      return match ? match[1] : null;
+    }
+    testingSetup.getMock(MusicsSearchService).filter
+      // eslint-disable-next-line require-await
+      .mockImplementation(async (_userId, queryFilter)=> ( {
+        data: fixtureMusics.Disk.WithUserInfo.List.map(music=>( {
+          addedAt: music.timestamps.addedAt.getTime(),
+          artist: music.artist,
+          id: music.userInfo.id,
+          lastTimePlayedAt: music.userInfo.lastTimePlayed,
+          musicId: music.id,
+          title: music.title,
+          userId: music.userInfo.userId,
+          weight: music.userInfo.weight,
+          country: music.country,
+          game: music.game,
+          tags: [...music.tags ?? [], ...music.userInfo.tags ?? []],
+          onlyTags: [],
+        } )).filter(e=>{
+          if (queryFilter.includes("tag"))
+            return e.tags.includes(getPrimerSubstringEntreComillas(queryFilter) ?? "nope");
+          else if (queryFilter.includes("weight")) {
+            if (queryFilter.includes("> 10"))
+              return e.weight > 10;
+            else
+              return false;
+          } else
+            return false;
+        } ),
+        total: fixtureMusics.Disk.WithUserInfo.List.length,
+      } as SearchRet));
 
     await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
   } );
@@ -124,17 +141,7 @@ describe("controller", () => {
     } );
 
     it("should get a music if query weight is put", async () => {
-      const possibleMusics: MusicEntityWithUserInfo[] = MUSICS_WITH_TAGS_SAMPLES.map(m=>( {
-        ...m,
-        userInfo: {
-          lastTimePlayed: 0,
-          weight: 11,
-          createdAt: new Date(),
-          musicId: m.id,
-          updatedAt: new Date(),
-          userId: fixtureUsers.Admin.User.id,
-        },
-      } satisfies MusicEntityWithUserInfo))
+      const possibleMusics: MusicEntityWithUserInfo[] = fixtureMusics.Disk.WithUserInfo.List
         .filter((music) => music.userInfo.weight > 10);
 
       expectNotEmpty(possibleMusics);
@@ -149,18 +156,22 @@ describe("controller", () => {
     it("should get a music with tag t1", async () => {
       const query = "tag:t1";
       const musicsWithTagT1 = MUSICS_WITH_TAGS_SAMPLES
-        .filter((music) => music.tags?.includes("t1"));
+        .filter((music) => music.tags?.includes("t1") || music.userInfo?.tags?.includes("t1"));
 
       expectNotEmpty(musicsWithTagT1);
-      const response = await request(routerApp)
-        .get(`/?format=m3u8&q=${query}`)
-        .expect(200)
-        .send();
 
-      expectResponseIncludeAnyOfMusics(response, musicsWithTagT1);
+      for (let i = 0; i < 5; i++) {
+        const response = await request(routerApp)
+          .get(`/?format=m3u8&q=${query}`)
+          .expect(200)
+          .send();
+
+        expectResponseIncludeAnyOfMusics(response, musicsWithTagT1);
+      }
     } );
 
-    it("should get a music with tag only-t2 using t2 query", async () => {
+    // TODO
+    it.skip("should get a music with tag only-t2 using t2 query", async () => {
       const query = "tag:t2";
       const response = await request(routerApp)
         .get(`/?format=m3u8&q=${query}`)

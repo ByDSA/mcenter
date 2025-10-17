@@ -22,18 +22,23 @@ crudTestsSuite( {
   testsConfig: {
     patchOne: {
       auth: {
-        admin: true,
-        user: false,
+        roles: {
+          admin: true,
+          user: false,
+          guest: false,
+        },
       },
-      repo: {
-        getFn: (repo)=>repo.patchOneByIdAndGet,
-        params: ["id", {
-          entity: {
-            path: "new path",
-          },
-        }],
+      repoConfig: (ctx) =>( {
+        getFn: ()=>ctx.beforeExecution().repo.patchOneByIdAndGet,
+        expected: {
+          params: ["id", {
+            entity: {
+              path: "new path",
+            },
+          }],
+        },
         returned: fixtureEpisodeFileInfos.Simpsons.Samples.EP1x01,
-      },
+      } ),
       url: "/id",
     },
   },

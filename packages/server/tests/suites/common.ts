@@ -1,20 +1,26 @@
-import type { PatchTestsProps } from "./patch-one";
+import type { PatchTestsProps, TestDynamicConfig } from "./patch-one";
 import assert from "node:assert";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
+import { expectBodyEquals } from "./generate-http-case";
 
-export function defaultResponse<R>(props: PatchTestsProps<R>) {
-  let { expectedBody, repo } = props;
-  const repoReturned = repo.returned;
+export function defaultResponse<R>(
+  config: TestDynamicConfig,
+  expectBody: PatchTestsProps<R>["expectBody"],
+) {
+  const repoReturned = config.mockConfig.returned;
 
-  if (expectedBody === undefined && repoReturned && !props.expectBody)
-    expectedBody = createSuccessResultResponse(JSON.parse(JSON.stringify(repoReturned)));
+  if (!expectBody && repoReturned) {
+    expectBody = expectBodyEquals(
+      createSuccessResultResponse(JSON.parse(JSON.stringify(repoReturned))),
+    );
+  }
 
-  const shouldReturn = !!props.expectBody || !!expectedBody;
+  const shouldReturn = !!expectBody;
 
   return {
     shouldReturn,
-    expectedBody,
+    expectBody,
   };
 }
 

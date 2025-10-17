@@ -29,7 +29,7 @@ export type TestingSetup = {
   db?: TestRealDatabase;
   getMock: <T>(clazz: Type<T>)=> jest.Mocked<T>;
   resolveMock: <T>(clazz: Type<T>)=> Promise<jest.Mocked<T>>;
-  useMockedUser: (user: UserPayload)=> Promise<void>;
+  useMockedUser: (user: UserPayload | null)=> Promise<void>;
 };
 type Options = {
   db?: {
@@ -148,7 +148,7 @@ export async function createTestingAppModule(
       return module.get<jest.Mocked<T>>(clazz);
     },
     resolveMock,
-    useMockedUser: async (user: UserPayload) => {
+    useMockedUser: async (user: UserPayload | null) => {
       if (options?.auth?.cookies !== "mock")
         return;
 
@@ -158,7 +158,8 @@ export async function createTestingAppModule(
         ()=>user,
       );
 
-      mockAppPayloadService.refreshUser.mockImplementation(async ()=>await user);
+      if (user)
+        mockAppPayloadService.refreshUser.mockImplementation(async ()=>await user);
 
       mockAuthGuard.canActivate.mockImplementation((context) => {
         const req = context.switchToHttp().getRequest();

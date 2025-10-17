@@ -7,3 +7,5 @@ export type OptionalKeys<T> = Exclude<keyof T, RequiredKeys<T>>;
 export type OnlyWithRequiredKeys<T> = Pick<T, RequiredKeys<T>>;
 
 export type WithRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
+export type WithOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

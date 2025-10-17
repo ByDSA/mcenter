@@ -4,7 +4,8 @@ import { mongoDbId } from "../resources/partial-schemas";
 export enum UserRoleName {
   ADMIN = "admin",
   USER = "user",
-  DEFAULT = USER,
+  GUEST = "guest",
+  UPLOADER = "uploader"
 }
 
 const ROLE_VALUES = Object.freeze(Object.values(UserRoleName));

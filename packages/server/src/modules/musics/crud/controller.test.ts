@@ -25,28 +25,33 @@ crudTestsSuite( {
   repositoryClass: MusicsRepository,
   testsConfig: {
     getOne: {
-      repo: {
-        getFn: (repo)=>repo.getOneById,
+      repoConfig: ((ctx)=>( {
+        getFn: ()=>ctx.beforeExecution().repo.getOneById,
         returned: fixtureMusics.Disk.List[0],
-      },
+      } )),
     },
     patchOne: {
       auth: {
-        admin: true,
-        user: true, // TODO: cuando se agregue rol uploader, poner a false y añadir uploader
+        roles: {
+          admin: true,
+          user: true, // TODO: cuando se agregue rol uploader, poner a false y añadir uploader
+          guest: false,
+        },
       },
-      repo: {
-        getFn: (repo)=>repo.patchOneByIdAndGet,
-        params: ["id", {
-          entity: {
-            title: "new title",
-          },
-        }],
+      repoConfig: ((ctx)=>( {
+        getFn: ()=>ctx.beforeExecution().repo.patchOneByIdAndGet,
+        expected: {
+          params: ["id", {
+            entity: {
+              title: "new title",
+            },
+          }],
+        },
         returned: {
           ...fixtureMusics.Disk.List[0],
           title: "new title",
         },
-      },
+      } )),
     },
   },
 } );

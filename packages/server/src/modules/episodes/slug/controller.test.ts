@@ -36,43 +36,52 @@ crudTestsSuite( {
   repositoryClass: EpisodesRepository,
   testsConfig: {
     getAll: {
-      repo: {
-        getFn: (repo)=>repo.getAllBySeriesKey,
-        params: ["seriesKey"],
+      repoConfig: (ctx) =>( {
+        getFn: ()=>ctx.beforeExecution().repo.getAllBySeriesKey,
+        expected: {
+          params: ["seriesKey"],
+        },
         returned: EPISODES_SIMPSONS,
-      },
+      } ),
       url: "/seriesKey",
     },
     getOne: {
-      repo: {
-        getFn: (repo)=>repo.getOneByCompKey,
-        params: [{
-          seriesKey: "seriesKey",
-          episodeKey: "episodeKey",
-        }, {
-          expand: ["series"],
-        }],
+      repoConfig: (ctx) =>( {
+        getFn: ()=>ctx.beforeExecution().repo.getOneByCompKey,
+        expected: {
+          params: [{
+            seriesKey: "seriesKey",
+            episodeKey: "episodeKey",
+          }, {
+            expand: ["series"],
+          }],
+        },
         returned: EPISODES_SIMPSONS[0],
-      },
+      } ),
       url: "/seriesKey/episodeKey",
     },
     patchOne: {
       auth: {
-        admin: true,
-        user: false,
+        roles: {
+          admin: true,
+          user: false,
+          guest: false,
+        },
       },
-      repo: {
-        getFn: (repo)=>repo.patchOneByCompKeyAndGet,
-        params: [{
-          seriesKey: "seriesKey",
-          episodeKey: "episodeKey",
-        }, {
-          entity: {
-            title: "new title",
-          },
-        }],
+      repoConfig: (ctx) =>( {
+        getFn: ()=>ctx.beforeExecution().repo.patchOneByCompKeyAndGet,
+        expected: {
+          params: [{
+            seriesKey: "seriesKey",
+            episodeKey: "episodeKey",
+          }, {
+            entity: {
+              title: "new title",
+            },
+          }],
+        },
         returned: EPISODES_SIMPSONS[0],
-      },
+      } ),
       url: "/seriesKey/episodeKey",
     },
   },

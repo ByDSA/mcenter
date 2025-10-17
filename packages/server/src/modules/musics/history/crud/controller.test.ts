@@ -3,7 +3,8 @@ import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { HISTORY_MUSIC_SAMPLES1 } from "#musics/history/tests";
-import { MusicHistoryEntryDtos } from "../models/dto";
+import { expectBodyEquals } from "#tests/suites/generate-http-case";
+import { putUser } from "#tests/suites/auth";
 import { MusicHistoryCrudController } from "./controller";
 import { MusicHistoryRepository } from "./repository";
 import { musicHistoryRepoMockProvider } from "./repository/tests";
@@ -24,7 +25,6 @@ const validCriteria = {
 
 crudTestsSuite( {
   name: MusicHistoryCrudController.name,
-  skip: true, // TODO
   appModule: [
     {
       controllers: [MusicHistoryCrudController],
@@ -42,38 +42,54 @@ crudTestsSuite( {
   repositoryClass: MusicHistoryRepository,
   testsConfig: {
     getManyCriteria: {
-      repo: {
-        getFn: (repo)=>repo.getManyByCriteria,
-        params: [{
-          ...validCriteria,
-          filter: {
-            ...validCriteria.filter,
-            userId: fixtureUsers.Normal.User.id, // Se añade en el controller
-          },
-        }],
+      repoConfig: (ctx)=>( {
+        getFn: ()=>ctx.beforeExecution().repo.getManyByCriteria,
+        expected: {
+          params: [{
+            ...validCriteria,
+            filter: {
+              ...validCriteria.filter,
+              userId: ctx.authUser?.id, // Se añade en el controller
+            },
+          }],
+        },
         returned: HISTORY_MUSIC_SAMPLES1,
-      },
+      } ),
       auth: {
-        admin: true,
-        user: true,
+        roles: {
+          admin: true,
+          user: true,
+          guest: false,
+        },
       },
       url: "/search",
       data: {
         validInput: validCriteria,
       },
       customCases: [(props)=>( {
-        name: "no criteria",
-        url: "/search",
-        method: "post",
-        repo: {
-          getFn: ()=>props.repo.getFn,
+        name: "no criteria (user)",
+        request: {
+          url: "/search",
+          method: "post",
+        },
+        before: async (p) => {
+          await putUser( {
+            getTestingSetup: props.getTestingSetup,
+            request: p.request,
+            user: fixtureUsers.Normal.UserWithRoles,
+          } );
+        },
+        repoConfig: ((ctx: any)=>( {
+          getFn: props.buildDynamicConfig(ctx).mockConfig.getFn,
           params: [{}],
           returned: HISTORY_MUSIC_SAMPLES1,
-        },
+        } )),
         getExpressApp: props.getExpressApp,
-        expected: {
-          body: createSuccessResultResponse(
-            HISTORY_MUSIC_SAMPLES1.map(MusicHistoryEntryDtos.Entity.toDto),
+        response: {
+          body: expectBodyEquals(
+            createSuccessResultResponse(
+              HISTORY_MUSIC_SAMPLES1.map(h=>JSON.parse(JSON.stringify(h))),
+            ),
           ),
           statusCode: HttpStatus.OK,
         },
@@ -82,14 +98,19 @@ crudTestsSuite( {
     },
     deleteOne: {
       auth: {
-        admin: true,
-        user: false,
+        roles: {
+          admin: true,
+          user: false,
+          guest: false,
+        },
       },
-      repo: {
-        getFn: (repo)=>repo.deleteOneByIdAndGet,
-        params: ["entryId"],
+      repoConfig: (ctx)=>( {
+        getFn: ()=>ctx.beforeExecution().repo.deleteOneByIdAndGet,
+        expected: {
+          params: ["entryId"],
+        },
         returned: HISTORY_MUSIC_SAMPLES1[0],
-      },
+      } ),
       url: "/entryId",
     },
   },

@@ -1,120 +1,97 @@
 import { HttpStatus } from "@nestjs/common";
-import { UserRoleName } from "$shared/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
-import { generateCase } from "./generate-case";
-import { autoProps, PatchTestsProps } from "./patch-one";
+import { TestGroupConfigCtx, PatchTestsProps } from "./patch-one";
 import { defaultResponse, expectedDataNotFound } from "./common";
-import { getFixtureUserByRole, setAuthRole } from "./auth";
+import { classifyAuth, generateNotAllowedTest, putUser } from "./auth";
+import { generateHttpCase } from "./generate-http-case";
 
 export function deleteOneTests<R>(props: PatchTestsProps<R>) {
-  const { repo,
-    getExpressApp, getTestingSetup } = props;
-  const { getFn, repoReturned } = autoProps(props);
-  const { expectedBody, shouldReturn } = defaultResponse(props);
+  const { buildDynamicConfig, getExpressApp, getTestingSetup } = props;
   const validUrl = props.url ?? "/id";
 
   describe("delete one", () => {
-    const { auth } = props;
-    const positiveAuth = auth
-      ? Object.entries(auth).filter(([, v])=> v)
-        .map(([k])=> k as UserRoleName)
-      : undefined;
-    const negativeAuth = auth
-      ? Object.entries(auth).filter(([, v])=> !v)
-        .map(([k])=> k as UserRoleName)
-      : undefined;
+    const { allowed, notAllowed } = classifyAuth(props.auth);
 
-    for (const role of positiveAuth ?? [null]) {
-      const rolePrefix = `${role ? `role=${role} ` : ""}`;
-      const beforeEach: typeof props.beforeEach = role
-        ? async (p) => {
-          const testingSetup = getTestingSetup();
-
-          if (testingSetup.options?.auth?.cookies === "mock")
-            await testingSetup.useMockedUser(getFixtureUserByRole(role));
-          else {
-            await setAuthRole( {
-              role,
-              req: p.request,
+    for (const entry of allowed) {
+      describe(`allowed auth ${entry.name}`, () => {
+        const { user } = entry;
+        const ctx: TestGroupConfigCtx = {
+          authUser: user,
+        };
+        const dynamicConfig = buildDynamicConfig(ctx);
+        const { expectBody, shouldReturn } = defaultResponse(dynamicConfig, props.expectBody);
+        const beforeEach: typeof props.beforeEach = entry
+          ? async (p) => {
+            await putUser( {
+              getTestingSetup,
+              request: p.request,
+              user,
             } );
+
+            return props.beforeEach?.(p);
           }
+          : props.beforeEach;
 
-          return props.beforeEach?.(p);
-        }
-        : props.beforeEach;
-
-      generateCase( {
-        name: `${rolePrefix}valid case`,
-        method: "delete",
-        url: validUrl,
-        before: beforeEach,
-        after: props.afterEach,
-        getExpressApp,
-        expected: {
-          expectBody: props.expectBody
-            ? (body: unknown) => props.expectBody!(body, repoReturned)
-            : undefined,
-          body: expectedBody,
-          statusCode: shouldReturn ? HttpStatus.OK : HttpStatus.NO_CONTENT,
-        },
-        mock: {
-          fn: [{
-            ...repo,
-            getFn,
-            returned: shouldReturn ? repoReturned : undefined,
+        generateHttpCase( {
+          name: "valid case",
+          request: {
+            method: "delete",
+            url: validUrl,
+          },
+          before: beforeEach,
+          after: props.afterEach,
+          getExpressApp,
+          response: {
+            body: expectBody
+              ? (body)=>{
+                expectBody(body, {
+                  ctx,
+                  dynamicConfig,
+                  beforeExecution: props.beforeExecution,
+                } );
+              }
+              : undefined,
+            statusCode: shouldReturn ? HttpStatus.OK : HttpStatus.NO_CONTENT,
+          },
+          mockConfigs: [{
+            ...dynamicConfig.mockConfig,
+            returned: shouldReturn ? dynamicConfig.mockConfig.returned : undefined,
           }],
-        },
-      } );
+        } );
 
-      generateCase( {
-        name: `${rolePrefix}not found case`,
-        method: "delete",
-        url: validUrl,
-        before: beforeEach,
-        after: props.afterEach,
-        getExpressApp,
-        expected: expectedDataNotFound,
-        mock: {
-          fn: [{
-            ...repo,
-            getFn,
-            returned: undefined,
+        const { returned, ...mockConfig } = dynamicConfig.mockConfig;
+
+        generateHttpCase( {
+          name: "not found case",
+          request: {
+            method: "delete",
+            url: validUrl,
+          },
+          before: beforeEach,
+          after: props.afterEach,
+          getExpressApp,
+          response: expectedDataNotFound,
+          mockConfigs: [{
+            ...mockConfig,
             implementation: ()=> {
               assertFoundClient(null);
             },
           }],
-        },
+        } );
       } );
     }
 
-    for (const role of negativeAuth ?? []) {
-      const rolePrefix = `${role ? `role=${role} ` : ""}`;
-      const beforeEach: typeof props.beforeEach = async (p) => {
-        const testingSetup = getTestingSetup();
-
-        if (testingSetup.options?.auth?.cookies === "mock")
-          await testingSetup.useMockedUser(getFixtureUserByRole(role));
-        else {
-          await setAuthRole( {
-            role,
-            req: p.request,
-          } );
-        }
-
-        return props.beforeEach?.(p);
-      };
-
-      generateCase( {
-        name: `${rolePrefix}invalid auth`,
-        method: "delete",
-        url: validUrl,
-        before: beforeEach,
-        after: props.afterEach,
+    for (const entry of notAllowed) {
+      generateNotAllowedTest( {
         getExpressApp,
-        expected: {
-          expectBody: ()=>undefined, // any body
-          statusCode: HttpStatus.FORBIDDEN,
+        getTestingSetup,
+        request: {
+          method: "delete",
+          url: validUrl,
         },
+        entry,
+        after: props.afterEach,
+        before: props.beforeEach,
       } );
     }
   } );

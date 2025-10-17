@@ -1,65 +1,97 @@
 import { HttpStatus } from "@nestjs/common";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
-import { autoProps, PatchTestsProps } from "./patch-one";
-import { generateCase } from "./generate-case";
+import { TestGroupConfigCtx, PatchTestsProps } from "./patch-one";
 import { defaultResponse } from "./common";
-
-function defaultProps<R>(props: PatchTestsProps<R>) {
-  const validUrl = props.url ?? "/";
-  const { getFn,
-    repoReturned } = autoProps(props);
-  const { expectedBody } = defaultResponse(props);
-
-  return {
-    validUrl,
-    expectedBody,
-    getFn,
-    repoReturned,
-  };
-}
+import { generateHttpCase } from "./generate-http-case";
+import { expectBodyEquals } from "./generate-http-case";
+import { classifyAuth, generateNotAllowedTest, putUser } from "./auth";
 
 export function getAllTests<R>(props: PatchTestsProps<R>) {
-  const { getExpressApp } = props;
-  const { getFn,
-    repoReturned, validUrl, expectedBody } = defaultProps(props);
+  const { getExpressApp, getTestingSetup, buildDynamicConfig } = props;
+  const validUrl = props.url ?? "/";
 
   describe("get all", () => {
-    generateCase( {
-      name: "valid case",
-      method: "get",
-      url: validUrl,
-      getExpressApp,
-      expected: {
-        expectBody: props.expectBody
-          ? (body: any) => props.expectBody!(body, repoReturned)
-          : undefined,
-        body: expectedBody,
-        statusCode: HttpStatus.OK,
-      },
-      mock: {
-        fn: [{
-          ...props.repo,
-          getFn,
-        }],
-      },
-    } );
+    const { allowed, notAllowed } = classifyAuth(props.auth);
 
-    generateCase( {
-      name: "not found case",
-      method: "get",
-      url: validUrl,
-      getExpressApp,
-      expected: {
-        body: createSuccessResultResponse([]),
-        statusCode: HttpStatus.OK,
-      },
-      mock: {
-        fn: [{
-          ...props.repo,
-          getFn,
-          returned: [],
-        }],
-      },
-    } );
+    for (const entry of allowed) {
+      describe(`allowed auth ${entry.name}`, () => {
+        const { user } = entry;
+        const ctx: TestGroupConfigCtx = {
+          authUser: user,
+        };
+        const dynamicConfig = buildDynamicConfig(ctx);
+        const { expectBody } = defaultResponse(dynamicConfig, props.expectBody);
+        const beforeEach: typeof props.beforeEach = async (p) => {
+          await putUser( {
+            getTestingSetup,
+            request: p.request,
+            user,
+          } );
+
+          return props.beforeEach?.(p);
+        };
+
+        generateHttpCase( {
+          name: "valid case",
+          request: {
+            method: "get",
+            url: validUrl,
+          },
+          before: beforeEach,
+          after: props.afterEach,
+          getExpressApp,
+          response: {
+            body: expectBody
+              ? (body)=>{
+                expectBody(body, {
+                  ctx,
+                  dynamicConfig,
+                  beforeExecution: props.beforeExecution,
+                } );
+              }
+              : undefined,
+            statusCode: HttpStatus.OK,
+          },
+          mockConfigs: [{
+            ...props.buildDynamicConfig(ctx).mockConfig,
+          }],
+        } );
+
+        generateHttpCase( {
+          name: "not found case",
+          request: {
+            method: "get",
+            url: validUrl,
+          },
+          before: beforeEach,
+          after: props.afterEach,
+          getExpressApp,
+          response: {
+            body: expectBodyEquals(
+              createSuccessResultResponse([]),
+            ),
+            statusCode: HttpStatus.OK,
+          },
+          mockConfigs: [{
+            ...props.buildDynamicConfig(ctx).mockConfig,
+            returned: [],
+          }],
+        } );
+      } );
+    }
+
+    for (const entry of notAllowed) {
+      generateNotAllowedTest( {
+        getExpressApp,
+        getTestingSetup,
+        request: {
+          method: "get",
+          url: validUrl,
+        },
+        entry,
+        after: props.afterEach,
+        before: props.beforeEach,
+      } );
+    }
   } );
 }
