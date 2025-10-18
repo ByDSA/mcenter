@@ -2,7 +2,6 @@ import mongoose, { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { PaginatedResult } from "$shared/utils/http/responses";
-import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 import { Music, MusicEntity } from "../../../../models";
@@ -20,17 +19,16 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
     artist: docOdm.artist,
     tags: docOdmToModelTags(docOdm),
     disabled: docOdm.disabled,
-    timestamps: {
-      createdAt: docOdm.timestamps.createdAt,
-      updatedAt: docOdm.timestamps.updatedAt,
-      addedAt: docOdm.timestamps.addedAt,
-    },
     uploaderUserId: docOdm.uploaderUserId.toString(),
     album: docOdm.album,
     country: docOdm.country,
     game: docOdm.game,
     year: docOdm.year,
     spotifyId: docOdm.spotifyId,
+    createdAt: docOdm.createdAt,
+    updatedAt: docOdm.updatedAt,
+    addedAt: docOdm.addedAt,
+    releasedOn: docOdm.releasedOn,
     fileInfos: docOdm.fileInfos?.map(MusicFileInfoOdm.toEntity),
     userInfo: docOdm.userInfo ? MusicsUsersOdm.toModel(docOdm.userInfo) : undefined,
   } satisfies AllKeysOf<Entity>;
@@ -44,7 +42,6 @@ export function modelToDocOdm(model: Model): DocOdm {
     title: model.title,
     url: model.slug,
     artist: model.artist,
-    timestamps: TimestampsOdm.toDocOdm(model.timestamps),
     uploaderUserId: new Types.ObjectId(model.uploaderUserId),
     disabled: model.disabled,
     album: model.album,
@@ -54,6 +51,10 @@ export function modelToDocOdm(model: Model): DocOdm {
     spotifyId: model.spotifyId,
     tags: docOdmTags?.tags,
     onlyTags: docOdmTags?.onlyTags,
+    addedAt: model.addedAt,
+    createdAt: model.createdAt,
+    releasedOn: model.releasedOn,
+    updatedAt: model.updatedAt,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(docOdm);
@@ -96,14 +97,11 @@ export function partialToDocOdm(partial: Partial<Model>): Partial<DocOdm> {
     game: partial.game,
     year: partial.year,
     spotifyId: partial.spotifyId,
-    timestamps: partial.timestamps
-      ? {
-        createdAt: partial.timestamps.createdAt,
-        updatedAt: partial.timestamps.updatedAt,
-        addedAt: partial.timestamps.addedAt,
-      }
-      : undefined,
     uploaderUserId: partial.uploaderUserId ? new Types.ObjectId(partial.uploaderUserId) : undefined,
+    createdAt: partial.createdAt,
+    updatedAt: partial.updatedAt,
+    addedAt: partial.addedAt,
+    releasedOn: partial.releasedOn,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return ret;

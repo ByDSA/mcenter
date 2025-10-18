@@ -218,7 +218,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
     serie: Serie,
     userId: string,
   ) {
-    const episode: Omit<Episode, "timestamps"> = {
+    const episode: Omit<Episode, "addedAt" | "createdAt" | "releasedOn" | "updatedAt"> = {
       compKey: {
         episodeKey: localEpisode.content.episodeKey,
         seriesKey: serie.key,

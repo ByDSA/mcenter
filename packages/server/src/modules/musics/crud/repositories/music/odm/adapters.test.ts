@@ -20,16 +20,14 @@ describe("musicModelToDocOdm", () => {
       tags: ["t1"],
       onlyTags: ["t2"],
       disabled: music.disabled,
-      timestamps: {
-        createdAt: music.timestamps.createdAt,
-        updatedAt: music.timestamps.updatedAt,
-        addedAt: music.timestamps.addedAt,
-      },
       uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
       album: music.album,
       country: music.country,
       game: music.game,
       year: music.year,
+      createdAt: music.createdAt,
+      updatedAt: music.updatedAt,
+      addedAt: music.addedAt,
     };
 
     removeUndefinedProps(expectedDocOdm);
@@ -44,25 +42,21 @@ describe("musicModelToDocOdm", () => {
       id: new mongoose.Types.ObjectId().toString(),
       title: "Test Title",
       slug: "http://test.url",
-      timestamps: {
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        addedAt: new Date(),
-      },
       artist: "Test Artist",
       uploaderUserId: fixtureUsers.Admin.User.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      addedAt: new Date(),
     };
     const expectedDocOdm: DocOdm = {
       _id: new mongoose.Types.ObjectId(music.id),
       title: music.title,
       url: music.slug,
-      timestamps: {
-        createdAt: music.timestamps.createdAt,
-        updatedAt: music.timestamps.updatedAt,
-        addedAt: music.timestamps.addedAt,
-      },
       artist: music.artist,
       uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
+      createdAt: music.createdAt,
+      updatedAt: music.updatedAt,
+      addedAt: music.addedAt,
     };
     const result = musicEntityToDocOdm(music);
 
@@ -80,16 +74,14 @@ describe("musicDocOdmToModel", () => {
       tags: ["tag1"],
       onlyTags: ["tag2"],
       disabled: false,
-      timestamps: {
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        addedAt: new Date(),
-      },
       uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
       album: "Test Album",
       country: "Test Country",
       game: "Test Game",
       year: 2021,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      addedAt: new Date(),
     };
     const expectedMusic: MusicEntity = {
       id: docOdm._id.toString(),
@@ -98,16 +90,14 @@ describe("musicDocOdmToModel", () => {
       artist: docOdm.artist,
       tags: ["tag1", "only-tag2"],
       disabled: docOdm.disabled,
-      timestamps: {
-        createdAt: docOdm.timestamps.createdAt,
-        updatedAt: docOdm.timestamps.updatedAt,
-        addedAt: docOdm.timestamps.addedAt,
-      },
       uploaderUserId: fixtureUsers.Admin.User.id,
       album: docOdm.album,
       country: docOdm.country,
       game: docOdm.game,
       year: docOdm.year,
+      createdAt: docOdm.createdAt,
+      updatedAt: docOdm.updatedAt,
+      addedAt: docOdm.addedAt,
     };
     const result = docOdmToEntity(docOdm);
 
@@ -119,25 +109,21 @@ describe("musicDocOdmToModel", () => {
       _id: new mongoose.Types.ObjectId(),
       title: "Test Title",
       url: "http://test.url",
-      timestamps: {
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        addedAt: new Date(),
-      },
       uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
       artist: "Test Artist",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      addedAt: new Date(),
     };
     const expectedMusic: MusicEntity = {
       id: docOdm._id.toString(),
       title: docOdm.title,
       slug: docOdm.url,
-      timestamps: {
-        createdAt: docOdm.timestamps.createdAt,
-        updatedAt: docOdm.timestamps.updatedAt,
-        addedAt: docOdm.timestamps.addedAt,
-      },
       uploaderUserId: fixtureUsers.Admin.User.id,
       artist: docOdm.artist,
+      createdAt: docOdm.createdAt,
+      updatedAt: docOdm.updatedAt,
+      addedAt: docOdm.addedAt,
     };
     const result = docOdmToEntity(docOdm);
 
@@ -162,12 +148,10 @@ describe("reversibility", () => {
       artist: fixtureMusics.Disk.Samples.A_AOT4.artist,
       tags: ["t1", "t3"],
       onlyTags: ["t2", "t3"],
-      timestamps: {
-        createdAt: fixtureMusics.Disk.Samples.A_AOT4.timestamps.createdAt,
-        updatedAt: fixtureMusics.Disk.Samples.A_AOT4.timestamps.updatedAt,
-        addedAt: fixtureMusics.Disk.Samples.A_AOT4.timestamps.addedAt,
-      },
       uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
+      createdAt: fixtureMusics.Disk.Samples.A_AOT4.createdAt,
+      updatedAt: fixtureMusics.Disk.Samples.A_AOT4.updatedAt,
+      addedAt: fixtureMusics.Disk.Samples.A_AOT4.addedAt,
     };
     const music = docOdmToEntity(docOdm);
     const result = musicEntityToDocOdm(music);

@@ -85,7 +85,7 @@ describe("controller", () => {
       // eslint-disable-next-line require-await
       .mockImplementation(async (_userId, queryFilter)=> ( {
         data: fixtureMusics.Disk.WithUserInfo.List.map(music=>( {
-          addedAt: music.timestamps.addedAt.getTime(),
+          addedAt: music.addedAt.getTime(),
           artist: music.artist,
           id: music.userInfo.id,
           lastTimePlayedAt: music.userInfo.lastTimePlayed,

@@ -7,6 +7,7 @@ import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 type EntryDocOdm = {
   _id: mongoose.Types.ObjectId;
   musicId: mongoose.Types.ObjectId;
+  addedAt: Date;
 };
 type EntryFullDocOdm = RequireId<EntryDocOdm> & {
   music?: MusicOdm.FullDoc;
@@ -15,6 +16,10 @@ type EntryFullDocOdm = RequireId<EntryDocOdm> & {
 const entrySchemaOdm = new mongoose.Schema<EntryDocOdm>( {
   musicId: {
     type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  addedAt: {
+    type: Date,
     required: true,
   },
 } satisfies SchemaDef<EntryDocOdm>, {

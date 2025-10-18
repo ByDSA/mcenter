@@ -20,10 +20,10 @@ import "#styles/resources/resource-list-entry.css";
 
 function injectDefaultUserInfo(music: MusicEntity, userId: string): MusicEntityWithUserInfo {
   music.userInfo = {
-    createdAt: music.timestamps.createdAt,
+    createdAt: music.createdAt,
     lastTimePlayed: 0,
     musicId: music.id,
-    updatedAt: music.timestamps.updatedAt,
+    updatedAt: music.updatedAt,
     userId: userId,
     weight: 0,
   };

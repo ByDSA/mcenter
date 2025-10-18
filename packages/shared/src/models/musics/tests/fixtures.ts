@@ -7,12 +7,10 @@ import { MusicUserInfoEntity } from "../user-info/user-info";
 
 const AOT4_COMMON = {
   artist: "artist",
-  timestamps: {
-    createdAt: DATEJS_SAMPLE1,
-    updatedAt: DATEJS_SAMPLE1,
-    addedAt: DATEJS_SAMPLE1,
-  },
   uploaderUserId: fixtureUsers.Admin.User.id,
+  createdAt: DATEJS_SAMPLE1,
+  updatedAt: DATEJS_SAMPLE1,
+  addedAt: DATEJS_SAMPLE1,
 };
 
 export const A_AOT4: MusicEntity = {

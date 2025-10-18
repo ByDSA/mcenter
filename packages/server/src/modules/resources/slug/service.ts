@@ -11,9 +11,7 @@ type FileInfo = {
 };
 
 type Entity<F extends FileInfo> = {
-  timestamps: {
-    updatedAt: Date;
-  };
+  updatedAt: Date;
   fileInfos?: Array<F>;
 };
 
@@ -35,7 +33,7 @@ export class ResourceSlugService {
     const ifNoneMatch = req.headers["if-none-match"] as string;
     const range = req.headers.range as string;
     // 1. Client cache check
-    const etag = `"${entity.timestamps.updatedAt.getTime()}"`;
+    const etag = `"${entity.updatedAt.getTime()}"`;
 
     if (ifNoneMatch === etag) {
       res.status(HttpStatus.NOT_MODIFIED);
@@ -93,7 +91,7 @@ export class ResourceSlugService {
       "Content-Type": mime.lookup(fileInfo.path) || "application/octet-stream",
       "Accept-Ranges": "bytes",
       ETag: etag,
-      "Last-Modified": entity.timestamps.updatedAt.toUTCString(),
+      "Last-Modified": entity.updatedAt.toUTCString(),
       "Cache-Control": "public, max-age=31536000, must-revalidate",
       "Content-Disposition": `inline; filename*=UTF-8''${encodeURIComponent(filename)}`,
     } );

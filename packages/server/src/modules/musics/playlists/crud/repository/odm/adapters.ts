@@ -21,6 +21,7 @@ export function entryDocOdmToModel(docOdm: DocOdm["list"][0]): Model["list"][0] 
   return {
     musicId: docOdm.musicId.toString(),
     id: docOdm._id.toString(),
+    addedAt: docOdm.addedAt,
   };
 }
 
@@ -28,6 +29,7 @@ export function entryModelToDocOdm(model: Model["list"][0]): DocOdm["list"][0] {
   return {
     musicId: new Types.ObjectId(model.musicId),
     _id: new Types.ObjectId(model.id),
+    addedAt: model.addedAt,
   };
 }
 

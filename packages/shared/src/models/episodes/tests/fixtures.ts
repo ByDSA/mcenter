@@ -23,7 +23,7 @@ const ep1x01: EpisodeEntity = {
   tags: [
     "navidad",
   ],
-  timestamps,
+  ...timestamps,
   fileInfos: [
     fixtureEpisodeFileInfos.Simpsons.Samples.EP1x01,
   ],
@@ -33,7 +33,7 @@ const EP6x25: EpisodeEntity = {
   id: simpsonIds.ep6x25,
   title: "Quién disparó al señor Burns (1ª parte)",
   weight: 4,
-  timestamps,
+  ...timestamps,
   compKey: {
     episodeKey: "6x25",
     seriesKey: "simpsons",
@@ -44,7 +44,7 @@ const EP7x01: EpisodeEntity = {
   id: simpsonIds.ep7x01,
   title: "Quién disparó al señor Burns (2ª parte)",
   weight: 4,
-  timestamps,
+  ...timestamps,
   compKey: {
     episodeKey: "7x01",
     seriesKey: "simpsons",
@@ -62,7 +62,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "Bart, el genio",
     weight: -30,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -73,7 +73,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "La odisea de Homer",
     weight: -4,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -84,7 +84,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "Hogar, agridulce hogar",
     weight: -2,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -95,7 +95,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "Bart, el general",
     weight: -8,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -106,7 +106,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "El blues de la Mona Lisa",
     weight: 0,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -117,7 +117,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "El abominable hombre del bosque",
     weight: -8,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -128,7 +128,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "La cabeza chiflada",
     weight: -4,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -139,7 +139,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "Jacques, el rompecorazones",
     weight: -8,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -150,7 +150,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "Homer se va de juerga",
     weight: -16,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -161,7 +161,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "Viva la vendimia",
     weight: -8,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -172,7 +172,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "Krusty entra en chirona",
     weight: 0,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } as EpisodeEntity,
   {
@@ -183,7 +183,7 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
     },
     title: "La baby siter ataca de nuevo",
     weight: -6,
-    timestamps,
+    ...timestamps,
     uploaderUserId,
   } satisfies EpisodeEntity,
   EP6x25,

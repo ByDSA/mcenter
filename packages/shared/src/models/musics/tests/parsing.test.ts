@@ -6,5 +6,5 @@ it("parsing", () => {
 
   expect(test).toBeDefined();
 
-  expect(test.timestamps.createdAt).toBeInstanceOf(Date);
+  expect(test.createdAt).toBeInstanceOf(Date);
 } );

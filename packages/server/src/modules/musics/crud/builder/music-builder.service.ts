@@ -38,12 +38,10 @@ export class MusicBuilderService {
       title,
       artist,
       album: tags.album,
-      timestamps: {
-        createdAt: now,
-        updatedAt: now,
-        addedAt: now,
-      },
       uploaderUserId: userId,
+      createdAt: now,
+      updatedAt: now,
+      addedAt: now,
     };
     let doc = {
       ...doc1,

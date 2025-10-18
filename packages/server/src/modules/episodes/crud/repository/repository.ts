@@ -23,7 +23,7 @@ function fixFields<T extends Partial<Episode>>(model: T): T {
   return fixTxtFields(model, ["title"]);
 }
 
-type CreateOneDto = Omit<Episode, "timestamps">;
+type CreateOneDto = Omit<Episode, "addedAt" | "createdAt" | "releasedOn" | "updatedAt">;
 type EpisodeId = EpisodeEntity["id"];
 
 type Criteria = EpisodesCrudDtos.GetManyByCriteria.Criteria;
@@ -257,11 +257,9 @@ CanGetAll<EpisodeEntity> {
     const now = new Date();
     const model = {
       ...createDto,
-      timestamps: {
-        createdAt: now,
-        updatedAt: now,
-        addedAt: now,
-      },
+      createdAt: now,
+      updatedAt: now,
+      addedAt: now,
     };
 
     return model;

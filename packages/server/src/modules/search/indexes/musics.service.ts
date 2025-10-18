@@ -93,7 +93,7 @@ export class MusicsIndexService {
 
       let doc: UserInfoDoc = this.mapUserInfoOdm(docOdm);
 
-      await this.updateUserInfo(doc); // TODO: tags
+      await this.updateUserInfo(doc);
     } else if (ev.type === MusicsUsersEvents.Created.TYPE) {
       const typedEv = ev as MusicsUsersEvents.Created.Event;
       let doc: UserInfoDoc = this.mapUserInfoModel(typedEv.payload.entity);
@@ -234,7 +234,7 @@ export class MusicsIndexService {
       artist: m.artist,
       game: m.game,
       country: m.country,
-      addedAt: Math.floor(m.timestamps.addedAt.getTime() / 1000),
+      addedAt: Math.floor(m.addedAt.getTime() / 1000),
       tags: m.tags ?? null,
       onlyTags: m.onlyTags ?? null,
     } satisfies MusicDoc;
@@ -258,7 +258,7 @@ export class MusicsIndexService {
       artist: m.artist,
       game: m.game,
       country: m.country,
-      addedAt: Math.floor(m.timestamps.addedAt.getTime() / 1000),
+      addedAt: Math.floor(m.addedAt.getTime() / 1000),
       tags: m.tags ?? null,
       onlyTags: null,
     } satisfies MusicDoc;

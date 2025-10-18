@@ -1,34 +1,26 @@
 import z from "zod";
-import { TimestampsDto, timestampsDtoSchema, TimestampsModel, timestampsSchema } from "../utils/schemas/timestamps";
-
-type InputSchemaType<T extends z.ZodRawShape> = z.ZodObject<
-  T & {
-    timestamps: typeof timestampsSchema;
-  }
->;
-
-type OutputSchemaType<T extends z.ZodRawShape> = z.ZodObject<
-  Omit<T, "timestamps"> & {
-    timestamps: z.ZodObject<{
-      createdAt: z.ZodString;
-      updatedAt: z.ZodString;
-      addedAt: z.ZodString;
-    }>;
-  }
->;
+import { TimestampsDto, TimestampsModel } from "../utils/schemas/timestamps";
 
 export function replaceSchemaTimestampsToStrings<T extends z.ZodRawShape>(
-  schema: InputSchemaType<T>,
-): OutputSchemaType<T> {
+  schema: z.ZodObject<T>,
+) {
   const ret = schema
     .omit( {
-      timestamps: true,
-    } )
+      createdAt: true,
+      updatedAt: true,
+      addedAt: true,
+    }as any)
     .extend( {
-      timestamps: timestampsDtoSchema,
+      createdAt: z.string().datetime(),
+      updatedAt: z.string().datetime(),
+      addedAt: z.string().datetime(),
     } );
 
-  return ret as OutputSchemaType<T>;
+  return ret as z.ZodObject<Omit<T, "addedAt" | "createdAt" | "updatedAt"> & {
+    createdAt: z.ZodString;
+    updatedAt: z.ZodString;
+    addedAt: z.ZodString;
+  }>;
 }
 
 export function transformDtoTimestampsToDates(timestamps: TimestampsDto): TimestampsModel {

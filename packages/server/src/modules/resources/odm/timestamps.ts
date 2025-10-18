@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
 import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
 
 export namespace TimestampsOdm {
   export type DocOdm = TimestampsModel;
-  export const schema = new mongoose.Schema<DocOdm>( {
+  export const autoTimestampsSchemaDefinition = {
     createdAt: {
       type: Date,
       required: true,
@@ -12,15 +11,17 @@ export namespace TimestampsOdm {
       type: Date,
       required: false,
     },
+  };
+  export const nonAutoTimestampsSchemaDefinition = {
     addedAt: {
       type: Date,
-      required: false,
+      required: true,
     },
     releasedOn: {
       type: String,
       required: false,
     },
-  } );
+  };
 
   export function toDocOdm(model: TimestampsModel): DocOdm {
     return {
@@ -43,6 +44,11 @@ export namespace TimestampsOdm {
   export type AutoTimestamps = {
     createdAt: Date;
     updatedAt: Date;
+  };
+
+  export type NonAutoTimestamps = {
+    addedAt: Date;
+    releasedOn?: string;
   };
 
   export type OmitAutoTimestamps<T> = Omit<T, keyof AutoTimestamps>;

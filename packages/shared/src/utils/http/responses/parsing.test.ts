@@ -11,5 +11,5 @@ it("parsing", () => {
 
   expect(test).toBeDefined();
 
-  expect(test.data[0].timestamps.createdAt).toBeInstanceOf(Date);
+  expect(test.data[0].createdAt).toBeInstanceOf(Date);
 } );

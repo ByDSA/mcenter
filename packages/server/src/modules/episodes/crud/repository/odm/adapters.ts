@@ -1,7 +1,6 @@
 import { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { SeriesOdm } from "#modules/series/crud/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
@@ -16,11 +15,14 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
     },
     title: docOdm.title,
     weight: docOdm.weight,
-    timestamps: TimestampsOdm.toModel(docOdm.timestamps),
     disabled: docOdm.disabled,
     tags: docOdm.tags,
     lastTimePlayed: docOdm.lastTimePlayed,
     uploaderUserId: docOdm.uploaderUserId.toString(),
+    createdAt: docOdm.createdAt,
+    updatedAt: docOdm.updatedAt,
+    addedAt: docOdm.addedAt,
+    releasedOn: docOdm.releasedOn,
   } satisfies AllKeysOf<Episode>;
 
   return removeUndefinedDeep(model);
@@ -54,13 +56,16 @@ export function episodeToDocOdm(model: Episode): DocOdm {
   const ret = {
     title: model.title,
     weight: model.weight,
-    timestamps: model.timestamps,
     episodeKey: model.compKey.episodeKey,
     seriesKey: model.compKey.seriesKey,
     disabled: model.disabled,
     tags: model.tags,
     lastTimePlayed: model.lastTimePlayed,
     uploaderUserId: new Types.ObjectId(model.uploaderUserId),
+    createdAt: model.createdAt,
+    updatedAt: model.updatedAt,
+    addedAt: model.addedAt,
+    releasedOn: model.releasedOn,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(ret);

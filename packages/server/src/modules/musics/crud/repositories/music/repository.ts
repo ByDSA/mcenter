@@ -78,7 +78,10 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
     params: PatchOneParams<Music>,
   ): Promise<MusicEntity> {
     const { entity: paramEntity } = params;
-    let { timestamps: _, ...validEntity } = this.musicBuilder.fixFields(paramEntity);
+    let { createdAt: _1,
+      updatedAt: _2,
+      addedAt: _3,
+      ...validEntity } = this.musicBuilder.fixFields(paramEntity);
     const updateQuery = patchParamsToUpdateQuery( {
       ...params,
       entity: validEntity,
@@ -86,7 +89,6 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
 
     updateQuery.$set = {
       ...updateQuery.$set,
-      "timestamps.updatedAt": new Date(),
     };
 
     if (paramEntity.tags?.length === 0) {

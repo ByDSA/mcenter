@@ -20,10 +20,10 @@ function buildMongooseSort(
   }
 
   if (body.sort.createdAt)
-    sortObj["timestamps.createdAt"] = body.sort.createdAt === "asc" ? 1 : -1;
+    sortObj["createdAt"] = body.sort.createdAt === "asc" ? 1 : -1;
 
   if (body.sort.updatedAt)
-    sortObj["timestamps.updatedAt"] = body.sort.updatedAt === "asc" ? 1 : -1;
+    sortObj["updatedAt"] = body.sort.updatedAt === "asc" ? 1 : -1;
 
   return Object.keys(sortObj).length > 0 ? sortObj as Record<string, -1 | 1> : undefined;
 }

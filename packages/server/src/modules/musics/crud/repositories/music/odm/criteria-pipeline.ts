@@ -1,9 +1,9 @@
 import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
-import { MongoFilterQuery } from "#utils/layers/db/mongoose";
+import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "../../user-info/odm";
-import { FullDocOdm } from "./odm";
+import { DocOdm, FullDocOdm } from "./odm";
 
 type Criteria = MusicCrudDtos.GetMany.Criteria;
 
@@ -18,13 +18,13 @@ function buildMongooseSort(
   if (!added && !artist && !updated)
     return undefined;
 
-  const ret: Record<string, -1 | 1> | undefined = {};
+  const ret: MongoSortQuery<DocOdm> = {};
 
   if (added)
-    ret["timestamps.addedAt"] = added === "asc" ? 1 : -1;
+    ret["addedAt"] = added === "asc" ? 1 : -1;
 
   if (updated)
-    ret["timestamps.updatedAt"] = updated === "asc" ? 1 : -1;
+    ret["updatedAt"] = updated === "asc" ? 1 : -1;
 
   if (artist)
     ret["artist"] = artist === "asc" ? 1 : -1;

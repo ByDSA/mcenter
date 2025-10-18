@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
-import { TimestampsModel } from "$shared/models/utils/schemas/timestamps";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
-import { MongoFilterQuery, OptionalId, RequireId } from "#utils/layers/db/mongoose";
+import { MongoFilterQuery, OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#modules/series/crud/repository/odm";
 import { EpisodeCompKey } from "../../../models";
 
@@ -11,13 +10,13 @@ export type EpisodeCompKeyOdm = {
   seriesKey: string;
 };
 
-export type DocOdm = EpisodeCompKeyOdm & OptionalId & {
+export type DocOdm = EpisodeCompKeyOdm & OptionalId & TimestampsOdm.AutoTimestamps &
+  TimestampsOdm.NonAutoTimestamps & {
   title: string;
   weight: number;
   tags?: string[];
   disabled?: boolean;
   lastTimePlayed?: number;
-  timestamps: TimestampsModel;
   uploaderUserId: mongoose.Types.ObjectId;
 };
 
@@ -61,14 +60,12 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   lastTimePlayed: {
     type: Number,
   },
-  timestamps: {
-    type: TimestampsOdm.schema,
-    required: true,
-  },
-}, {
+  ...TimestampsOdm.nonAutoTimestampsSchemaDefinition,
+} satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
   collection: COLLECTION,
   autoIndex: false,
   versionKey: false,
+  timestamps: true,
 } );
 
 schemaOdm.index( {

@@ -161,7 +161,6 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
 
     updateQuery.$set = {
       ...updateQuery.$set,
-      "timestamps.updatedAt": new Date(),
     };
 
     const doc = await MusicPlaylistOdm.Model.findByIdAndUpdate(

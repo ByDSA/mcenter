@@ -1,12 +1,14 @@
 import z from "zod";
+import { dateSchema } from "src/models/utils/schemas/timestamps/date";
 import { userEntitySchema } from "../../auth";
 import { mongoDbId } from "../../resources/partial-schemas";
 import { musicEntitySchema } from "../music";
-import { basicTimestampsSchema } from "../../utils/schemas/timestamps";
+import { autoTimestampsSchema } from "../../utils/schemas/timestamps";
 
 const entrySchema = z.object( {
   id: mongoDbId,
   musicId: mongoDbId,
+  addedAt: dateSchema,
 } );
 
 type EntryModel = z.infer<typeof entryEntitySchema>;
@@ -20,7 +22,7 @@ const modelSchema = z.object( {
   list: z.array(entrySchema),
   slug: z.string(),
   userId: mongoDbId,
-} ).merge(basicTimestampsSchema);
+} ).merge(autoTimestampsSchema);
 
 type Model = z.infer<typeof modelSchema>;
 const entitySchema = modelSchema.extend( {

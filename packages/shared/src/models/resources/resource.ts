@@ -7,9 +7,9 @@ const modelSchema = z.object( {
   title: z.string(),
   disabled: z.boolean().optional(),
   lastTimePlayed: z.number().optional(),
-  timestamps: timestampsSchema,
   uploaderUserId: mongoDbId,
 } )
+  .merge(timestampsSchema)
   .merge(pickableSchema)
   .merge(taggableSchema);
 

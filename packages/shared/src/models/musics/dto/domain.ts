@@ -1,5 +1,5 @@
 import z from "zod";
-import { replaceSchemaTimestampsToStrings, transformDateTimestampsToDto, transformDtoTimestampsToDates } from "../../resources/dto";
+import { replaceSchemaTimestampsToStrings } from "../../resources/dto";
 import { Music, MusicEntity, musicEntitySchema, musicSchema } from "../music";
 
 type _Model = Music;
@@ -12,7 +12,9 @@ export namespace MusicDtos {
     export const toModel = (dto: Dto): _Model => {
       return {
         ...dto,
-        timestamps: transformDtoTimestampsToDates(dto.timestamps),
+        addedAt: new Date(dto.addedAt),
+        updatedAt: new Date(dto.updatedAt),
+        createdAt: new Date(dto.createdAt),
       };
     };
   }
@@ -22,13 +24,17 @@ export namespace MusicDtos {
     export const toEntity = (dto: Dto): _Entity => {
       return {
         ...dto,
-        timestamps: transformDtoTimestampsToDates(dto.timestamps),
+        createdAt: new Date(dto.createdAt),
+        updatedAt: new Date(dto.updatedAt),
+        addedAt: new Date(dto.addedAt),
       };
     };
     export const toDto = (entity: _Entity): Dto => {
       return {
         ...entity,
-        timestamps: transformDateTimestampsToDto(entity.timestamps),
+        createdAt: entity.createdAt.toString(),
+        updatedAt: entity.updatedAt.toString(),
+        addedAt: entity.addedAt.toString(),
       };
     };
   }

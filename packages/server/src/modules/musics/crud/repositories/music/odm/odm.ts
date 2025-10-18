@@ -1,12 +1,11 @@
 import mongoose, { Schema } from "mongoose";
-import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
+import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 
-export type DocOdm = {
+export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimestamps & {
   _id?: mongoose.Types.ObjectId;
-  timestamps: TimestampsOdm.DocOdm;
   title: string;
   artist: string;
   album?: string;
@@ -31,10 +30,6 @@ const NAME = "Music";
 export const COLLECTION = "musics";
 
 export const schemaOdm = new mongoose.Schema<DocOdm>( {
-  timestamps: {
-    type: TimestampsOdm.schema,
-    required: true,
-  },
   uploaderUserId: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -81,9 +76,11 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   year: {
     type: Number,
   },
-} satisfies SchemaDef<DocOdm>, {
+  ...TimestampsOdm.nonAutoTimestampsSchemaDefinition,
+} satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
   collection: COLLECTION,
   versionKey: false,
+  timestamps: true,
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);
