@@ -8,12 +8,16 @@ const admin = {
   publicName: "Admin",
   email: "test@mail.com",
   emailVerified: true,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 } satisfies UserEntity;
 const normal = {
   id: new mongoose.Types.ObjectId().toString(),
   publicName: "Normal user",
   email: "test2@mail.com",
   emailVerified: true,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 } satisfies UserEntity;
 const adminRole = {
   id: new mongoose.Types.ObjectId().toString(),

@@ -1,8 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import { Application } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
-import { UserRoleName } from "$shared/models/auth";
-import { UserEntityWithRoles } from "$sharedSrc/models/auth";
+import { UserPayload, UserRoleName } from "$shared/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
 import { TestingSetup } from "#core/app/tests/app";
 import { AfterProps, BeforeProps, GenerateHttpCaseProps } from "./generate-http-case";
@@ -19,7 +18,7 @@ export type BeforeExecutionConfig<R> = {
 };
 
 export type TestGroupConfigCtx = {
-  authUser: UserEntityWithRoles | null;
+  authUser: UserPayload | null;
 };
 type BeforeExecution<R> = {
   repo: R;

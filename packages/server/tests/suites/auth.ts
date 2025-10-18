@@ -1,5 +1,5 @@
 import type { AuthConfig, PatchTestsProps } from "./patch-one";
-import { UserEntityWithRoles, UserRoleName } from "$shared/models/auth";
+import { UserRoleName } from "$shared/models/auth";
 import { Request } from "supertest";
 import { Test } from "@nestjs/testing";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
@@ -47,7 +47,7 @@ export async function setAuthRoleInCookie( { req, user }: Props) {
   req.set("Cookie", [cookieTxt]);
 }
 
-export function getFixtureUserByRole(role: UserRoleName): UserEntityWithRoles | null {
+export function getFixtureUserByRole(role: UserRoleName): UserPayload | null {
   switch (role) {
     case UserRoleName.ADMIN:
       return fixtureUsers.Admin.UserWithRoles;
@@ -62,7 +62,7 @@ export function getFixtureUserByRole(role: UserRoleName): UserEntityWithRoles | 
 }
 
 type AuthClassificationEntry = {
-  user: UserEntityWithRoles | null;
+  user: UserPayload | null;
   name: string;
 };
 export function classifyAuth(auth?: AuthConfig) {

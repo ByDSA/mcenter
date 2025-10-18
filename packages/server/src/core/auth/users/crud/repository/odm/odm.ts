@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { UserRoleOdm } from "#core/auth/users/roles/repository/odm";
 import { isTest } from "#utils";
+import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 
-export type DocOdm = {
+export type DocOdm = TimestampsOdm.AutoTimestamps & {
   _id?: mongoose.Types.ObjectId;
   email: string;
   publicName: string;
@@ -43,9 +44,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: Boolean,
     required: true,
   },
-} satisfies SchemaDef<DocOdm>, {
+} satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
   collection: COLLECTION,
   autoIndex: isTest(),
+  timestamps: true,
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

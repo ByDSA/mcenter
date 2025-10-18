@@ -1,7 +1,12 @@
-import { WithRequired } from "../../utils/objects";
-import { UserEntity } from "./user";
+import z from "zod";
+import { userEntityWithRolesSchema } from "./user";
 
-export type UserPayload = WithRequired<UserEntity, "roles">;
+export const userPayloadSchema = userEntityWithRolesSchema.omit( {
+  createdAt: true,
+  updatedAt: true,
+} );
+
+export type UserPayload = z.infer<typeof userPayloadSchema>;
 
 export type AppPayload = {
   user: UserPayload | null;

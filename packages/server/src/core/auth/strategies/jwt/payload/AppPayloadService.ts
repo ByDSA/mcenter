@@ -1,8 +1,10 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
 import { CookieOptions, Request, Response } from "express";
 import { assertIsDefined } from "$shared/utils/validation";
-import { AppPayload, UserEntityWithRoles, userEntityWithRolesSchema, UserPayload } from "$shared/models/auth";
+import { AppPayload, userEntityWithRolesSchema, UserPayload } from "$shared/models/auth";
 import { REQUEST } from "@nestjs/core";
+import { userPayloadSchema } from "$shared/models/auth";
+import z from "zod";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { isProduction } from "#utils";
 import { AppPayloadEncoderService } from "./AppPayloadEncoderService";
@@ -65,7 +67,7 @@ export class AppPayloadService {
     return updatedUser;
   }
 
-  login(user: UserEntityWithRoles) {
+  login(user: UserPayload) {
     const parsed = userEntityWithRolesSchema.parse(user);
 
     this.putUser(parsed);
@@ -78,11 +80,14 @@ export class AppPayloadService {
   }
 
   private putUser(user: UserPayload | null): void {
+    const validUser = userPayloadSchema.strip().or(z.null())
+      .parse(user);
+
     (this.request as any).auth = {
       ...(this.request as any).auth,
-      user,
+      user: validUser,
     };
 
-    (this.request as any).user = user;
+    (this.request as any).user = validUser;
   }
 }

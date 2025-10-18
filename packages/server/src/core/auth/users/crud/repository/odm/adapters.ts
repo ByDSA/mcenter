@@ -3,6 +3,7 @@ import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { UserRoleOdm } from "#core/auth/users/roles/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
+import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { User, UserEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
@@ -25,6 +26,8 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
   const entity: Entity = {
     ...docOdmToModel(docOdm) as Required<Model>,
     id: docOdm._id.toString(),
+    createdAt: docOdm.createdAt,
+    updatedAt: docOdm.updatedAt,
     roles: docOdm.roles?.map(UserRoleOdm.toEntity),
   } satisfies AllKeysOf<Entity>;
 
@@ -38,19 +41,21 @@ export function partialToDocOdm(model: Partial<Model>): MongoUpdateQuery<DocOdm>
     firstName: model.firstName,
     lastName: model.lastName,
     emailVerified: model.emailVerified,
+    createdAt: undefined,
+    updatedAt: undefined,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(docOdm);
 }
 
-export function modelToDocOdm(model: Model): DocOdm {
-  const docOdm: DocOdm = {
+export function modelToDocOdm(model: Model): TimestampsOdm.OmitAutoTimestamps<DocOdm> {
+  const docOdm: TimestampsOdm.OmitAutoTimestamps<DocOdm> = {
     email: model.email,
     publicName: model.publicName,
     firstName: model.firstName,
     lastName: model.lastName,
     emailVerified: model.emailVerified,
-  } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
+  } satisfies AllKeysOf<TimestampsOdm.OmitAutoTimestamps<Omit<DocOdm, "_id">>>;
 
   return removeUndefinedDeep(docOdm);
 }
@@ -58,6 +63,8 @@ export function modelToDocOdm(model: Model): DocOdm {
 export function musicEntityToDocOdm(entity: Entity): FullDocOdm {
   return {
     ...modelToDocOdm(entity),
+    createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
     _id: new mongoose.Types.ObjectId(entity.id),
   };
 }

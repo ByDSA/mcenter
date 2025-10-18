@@ -97,7 +97,6 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
 
     updateQuery.$set = {
       ...updateQuery.$set,
-      "timestamps.updatedAt": new Date(), // TODO: añadir en odm
     };
 
     const doc = await UserOdm.Model.findByIdAndUpdate(

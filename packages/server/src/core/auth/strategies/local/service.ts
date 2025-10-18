@@ -2,9 +2,9 @@ import { ConflictException, Injectable, UnprocessableEntityException } from "@ne
 import { compare } from "bcryptjs";
 import { assertIsDefined } from "$shared/utils/validation";
 import { hashPassword } from "$shared/models/auth/utils";
-import { UserPass, UserPassEntityWithUserWithRoles } from "$shared/models/auth";
+import { User, UserPass, UserPassEntityWithUserWithRoles } from "$shared/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
-import { User, UserEntityWithRoles, UserPayload } from "#core/auth/users/models";
+import { UserEntityWithRoles, UserPayload } from "#core/auth/users/models";
 import { AlreadyExistsEmailException } from "#core/auth/users/crud/repository/errors";
 import { UsersService } from "#core/auth/users";
 import { UsersRepository } from "#core/auth/users/crud/repository";
@@ -46,7 +46,7 @@ export class AuthLocalService {
       if (currentUserPass)
         throw new AlreadyExistsEmailException();
 
-      const insertingUser: Omit<User, "roles"> = {
+      const insertingUser: User = {
         email: dto.email,
         publicName: dto.username,
         firstName: dto.firstName,

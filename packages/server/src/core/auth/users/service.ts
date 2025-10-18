@@ -15,12 +15,12 @@ export class UsersService {
   ) {
   }
 
-  async signUp(userCreateDto: Omit<User, "roles">): Promise<UserEntityWithRoles> {
+  async signUp(userInput: User): Promise<UserEntityWithRoles> {
     // Se obtiene antes de crear el usuario por si falla, no secree el usuario
     const newRole = await this.rolesRepo.getOneByName(UserRoleName.USER);
 
     assertIsDefined(newRole);
-    const user = await this.usersRepo.createOneAndGet(userCreateDto);
+    const user = await this.usersRepo.createOneAndGet(userInput);
 
     await this.userRoleMapRepo.createOneAndGet( {
       userId: user.id,
