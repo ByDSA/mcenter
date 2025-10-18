@@ -38,7 +38,8 @@ RUN . /etc/environment && \
   pnpm i --fix-lockfile --frozen-lockfile --ignore-scripts; \
   fi
 
-RUN cd shared && pnpm build
+COPY ./lib/artifacts ./lib/artifacts
+RUN cd shared && pnpm build:cache
 
 RUN sh ./app/lib/install_chevrotain.sh
 

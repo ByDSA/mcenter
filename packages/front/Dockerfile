@@ -53,7 +53,9 @@ EOF
 
 # Nota: si se intentan reaprovechar las dependencias instaladas de deps-prod, no instala el resto de dependencias con pnpm i. Mejor instalarlas todas de nuevo que copiarlas y usar luego el flag --force.
 RUN pnpm i --fix-lockfile
-RUN cd shared && pnpm build
+COPY ./lib/artifacts ./lib/artifacts
+COPY ./shared/bin ./shared/bin
+RUN cd shared && pnpm build:cache
 # Nota: No se puede usar sin --fix-lockfile porque da error, porque el lockfile incluye las dependencias de todos los proyectos y sólo estamos usando dos
 
 # Rebuild the source code only when needed

@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "pnpm build:clean && pnpm build:raw",
+    "build:cache": "bin/build_cache.sh",
     "build:clean": "rm -rf build",
     "build:raw": "tsc -p tsconfig-build.json",
     "lint": "bin/lint.mjs",
