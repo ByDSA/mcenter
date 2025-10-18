@@ -1,5 +1,5 @@
 import z from "zod";
-import { dateSchema } from "src/models/utils/schemas/timestamps/date";
+import { dateSchema } from "../../utils/schemas/timestamps/date";
 import { userEntitySchema } from "../../auth";
 import { mongoDbId } from "../../resources/partial-schemas";
 import { musicEntitySchema } from "../music";
