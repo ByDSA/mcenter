@@ -4,11 +4,11 @@ import { PATH_ROUTES } from "$shared/routing";
 import { useContextMenu, contextMenuStyles } from "#modules/ui-kit/ContextMenu";
 import { classes } from "#modules/utils/styles";
 import styles from "./Avatar.module.css";
-import { UserEntityWithRoles } from "./models";
+import { UserPayload } from "./models";
 import { isAdmin } from "./utils";
 
 type Props = {
-  user: UserEntityWithRoles;
+  user: UserPayload;
 };
 export function UserAvatarButton( { user }: Props) {
   const { renderContextMenu, openMenu, isOpen } = useContextMenu( {
