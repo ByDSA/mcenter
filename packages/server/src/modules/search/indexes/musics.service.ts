@@ -66,7 +66,7 @@ export class MusicsIndexService {
 
       let doc: MusicDoc = this.mapMusicOdm(docOdm);
 
-      await this.updateMusic(doc); // TODO: tags
+      await this.updateMusic(doc);
     } else if (ev.type === MusicEvents.Created.TYPE) {
       const typedEv = ev as EntityEvent<MusicEntity>;
       let doc: MusicDoc = this.mapMusicModel(typedEv.payload.entity);
@@ -111,10 +111,9 @@ export class MusicsIndexService {
   }
 
   async syncAll() {
-    // OPTIMIZACIÓN: Cargar solo los campos necesarios de MongoDB
     const musics = await MusicOdm.Model.find().lean(); // .lean() elimina overhead de Mongoose
     const musicsUsers = await MusicsUsersOdm.Model.find().lean();
-    const usersIds: (string)[] = ["NONE", ...await this.getUserIds()];
+    const usersIds: (string)[] = await this.getUserIds();
     // OPTIMIZACIÓN: Crear mapa de musicsUsers eficientemente
     const musicsUsersMap = new Map<string, Map<string, MusicsUsersOdm.FullDoc>>();
 
@@ -155,8 +154,7 @@ export class MusicsIndexService {
           const musicId = music._id.toString();
           const musicPart = musicsParts.get(musicId)!; // Ya mapeado
           const userMusic = userMusicsMap?.get(musicId);
-
-          documentsForSearch.push( {
+          const doc = {
             id: genId( {
               userId,
               musicId,
@@ -166,7 +164,9 @@ export class MusicsIndexService {
             lastTimePlayedAt: userMusic?.lastTimePlayed ?? 0,
             userId,
             weight: userMusic?.weight ?? 0,
-          } );
+          };
+
+          documentsForSearch.push(doc);
           total++;
         }
       }
@@ -195,7 +195,7 @@ export class MusicsIndexService {
       _id: true,
     } )).map(u=>u._id.toString());
 
-    return usersIds;
+    return ["NONE", ...usersIds];
   }
 
   async updateMusic(musicDoc: MusicDoc): Promise<void> {

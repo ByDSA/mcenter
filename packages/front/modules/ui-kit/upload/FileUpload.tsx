@@ -28,8 +28,9 @@ export type OnUploadOptions = {
   setItemValidationErrors?: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 };
 
-export type GenOnUploadOptions = {
+type GenOnUploadOptions = {
   url: string;
+  withCredentials?: boolean;
   onEachUpload?: (response: unknown, fileData: FileData, options?: OnUploadOptions)=> Promise<void>;
 };
 
@@ -428,6 +429,10 @@ export const uploadSingleFileWithProgress = (
     } );
 
     xhr.open("POST", url);
+
+    if (options?.withCredentials)
+      xhr.withCredentials = true;
+
     xhr.send(formData);
   } );
 };
@@ -451,6 +456,7 @@ export const genOnUpload = (
         fileData,
         {
           ...options,
+          withCredentials: genOptions.withCredentials,
           onEachUpload: genOptions?.onEachUpload,
         },
       );

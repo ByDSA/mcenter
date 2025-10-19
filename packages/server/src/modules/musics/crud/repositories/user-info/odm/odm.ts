@@ -30,6 +30,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   weight: {
     type: Number,
     required: true,
+    default: 0,
   },
   tags: {
     type: [String],
@@ -38,6 +39,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
   lastTimePlayed: {
     type: Number,
+    default: 0,
   },
 } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
   collection: COLLECTION,

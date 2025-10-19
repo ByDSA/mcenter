@@ -168,6 +168,7 @@ function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps)
     <div className={styles.uploaders}>
       <YouTubeUpload
         musicId={musicId}
+        withCredentials
         onCreateMusicFileInfo={musicFileInfo=> {
           actions.add(musicFileInfo);
         }}
@@ -180,6 +181,7 @@ function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps)
         } )}
         onUpload={genOnUpload( {
           url: backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
+          withCredentials: true,
           // eslint-disable-next-line require-await
           onEachUpload: async (
             response: unknown,

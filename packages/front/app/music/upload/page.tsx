@@ -43,6 +43,7 @@ export default function Upload() {
   }, [uploaded]);
   const onUpload = useCallback(genOnUpload( {
     url: backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
+    withCredentials: true,
     // eslint-disable-next-line require-await
     onEachUpload: async (
       response: unknown,
@@ -77,6 +78,7 @@ export default function Upload() {
       <h2>Upload</h2>
       <div className={styles.uploaders}>
         <YouTubeUpload
+          withCredentials
           onCreateMusic={onCreateMusic}/>
         <FileUpload
           acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}

@@ -86,8 +86,15 @@ CanGetOneById<Entity, UserInfoKey> {
         musicId: key.musicId,
         userId: key.userId,
       },
-      updateQuery,
       {
+        ...updateQuery,
+        $setOnInsert: {
+          musicId: key.musicId,
+          userId: key.userId,
+        },
+      },
+      {
+        upsert: true,
         new: true,
       },
     );

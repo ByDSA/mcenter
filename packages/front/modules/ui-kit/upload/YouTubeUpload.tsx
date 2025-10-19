@@ -17,6 +17,7 @@ type OnSubmitProps<S> = Pick<Props,
  "musicId" | "onCreateMusic" | "onCreateMusicFileInfo"
 > & {
   onChangeStatus: (status: S)=> void;
+  withCredentials?: boolean;
 };
 
 export type YoutubeTaskStatus = YoutubeCrudDtos.ImportOne.TaskStatus.Status
@@ -35,7 +36,7 @@ type Context = {
 const defaultTextStatus = (s: YoutubeTaskStatus)=>(<>{ s.attempts > 1 && <span>(Intento {s.attempts}/{s.maxAttempts}) </span> }<span>{s.progress.percentage.toFixed(1)}% {s.progress.message}</span></>);
 const defaultOnSubmit: Props["onSubmit"] = async (
   input,
-  { onChangeStatus, onCreateMusic, onCreateMusicFileInfo, musicId },
+  { onChangeStatus, onCreateMusic, onCreateMusicFileInfo, musicId, withCredentials },
 )=>{
   let res: YoutubeCrudDtos.ImportOne.CreateTask.Response
         | YoutubeCrudDtos.ImportPlaylist.CreateTask.Response;
@@ -43,6 +44,9 @@ const defaultOnSubmit: Props["onSubmit"] = async (
   if (input.type === "playlist") {
     const response = await fetch(
       backendUrl(PATH_ROUTES.youtube.import.music.playlist.withParams(input.id)),
+      {
+        credentials: withCredentials ? "include" : "omit",
+      },
     ).then(r=> r.json());
     const parsedResponse = YoutubeCrudDtos.ImportPlaylist.CreateTask
       .responseSchema.parse(response);
@@ -53,6 +57,9 @@ const defaultOnSubmit: Props["onSubmit"] = async (
       backendUrl(PATH_ROUTES.youtube.import.music.one.withParams(input.id, {
         musicId,
       } )),
+      {
+        credentials: withCredentials ? "include" : "omit",
+      },
     ).then(r=> r.json());
     const parsedResponse = YoutubeCrudDtos.ImportOne.CreateTask
       .responseSchema.parse(response);
@@ -128,6 +135,7 @@ type Props = {
   onSubmit?: (input: InputData, props: OnSubmitProps<YoutubeTaskStatus>)=> Promise<void>;
   textStatus?: (status: YoutubeTaskStatus)=> JSX.Element | string;
   musicId?: string;
+  withCredentials?: boolean;
   onCreateMusic?: (music: MusicEntity)=> void;
   onCreateMusicFileInfo?: (musicFileInfo: MusicFileInfoEntity)=> void;
 };
@@ -136,7 +144,8 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
   textStatus = defaultTextStatus,
   onCreateMusic,
   onCreateMusicFileInfo,
-  musicId }: Props) {
+  musicId,
+  withCredentials }: Props) {
   const [doing, setDoing] = useState(false);
   const doingRef = useRef(doing);
 
@@ -151,7 +160,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
     const patterns = [
       /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/,
       /^https?:\/\/(www\.)?(music\.)?youtube\.com\/watch\?v=.+/,
-      /^https?:\/\/(www\.)?youtube\.com\/playlist\?list=.+/,
+      /^https?:\/\/(www\.)?(music\.)?youtube\.com\/playlist\?list=.+/,
       /^https?:\/\/youtu\.be\/.+/,
     ];
 
@@ -194,6 +203,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
         onCreateMusic,
         onCreateMusicFileInfo,
         musicId,
+        withCredentials,
       } );
     } finally {
       setDoing(false);

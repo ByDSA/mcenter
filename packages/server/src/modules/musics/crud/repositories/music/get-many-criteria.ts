@@ -23,8 +23,10 @@ export class GetManyByCriteriaMusicRepoService {
     const aggregationResult = await this.searchWithFilters(userId, normalizedCriteria);
     const docs = aggregationResult[0].data;
 
-    if (!userId)
-      this.addDefaultUserInfo(docs);
+    for (const doc of docs) {
+      if (!doc.userInfo)
+        this.addDefaultUserInfo(doc);
+    }
 
     this.validateExpands(normalizedCriteria, docs);
 
@@ -61,15 +63,6 @@ export class GetManyByCriteriaMusicRepoService {
     };
 
     return aggregationResult;
-  }
-
-  private async searchWithoutFilters(
-    userId: string | null,
-    criteria: CriteriaMany,
-  ): Promise<AggregationResult> {
-    const pipeline = MusicOdm.getCriteriaPipeline(userId, criteria);
-
-    return await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
   }
 
   private buildSearchOptions(criteria: CriteriaMany) {
@@ -178,7 +171,7 @@ objectIds: Types.ObjectId[]; },
     return [...pipeline, lastStage];
   }
 
-  private addDefaultUserInfo(docs: any[]): void {
+  private addDefaultUserInfo(doc: any): void {
     const id = new Types.ObjectId();
     const defaultUserInfo: Omit<MusicsUsersOdm.FullDoc, "musicId"> = {
       _id: id,
@@ -189,12 +182,10 @@ objectIds: Types.ObjectId[]; },
       updatedAt: new Date(),
     };
 
-    for (const doc of docs) {
-      doc.userInfo = {
-        ...defaultUserInfo,
-        musicId: doc._id,
-      };
-    }
+    doc.userInfo = {
+      ...defaultUserInfo,
+      musicId: doc._id,
+    };
   }
 
   private validateExpands(criteria: CriteriaMany, docs: any[]): void {

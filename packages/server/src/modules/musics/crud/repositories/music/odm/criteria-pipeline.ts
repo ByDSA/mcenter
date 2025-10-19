@@ -132,7 +132,8 @@ export function getCriteriaPipeline(
     dataPipeline.push( {
       $unwind: {
         path: "$userInfo",
-        preserveNullAndEmptyArrays: userId === null, // Si filtramos, no preservar nulls
+        // Si una música no tiene su correspondiente entrada en musics_users, se preseva la música:
+        preserveNullAndEmptyArrays: true,
       },
     } );
   }

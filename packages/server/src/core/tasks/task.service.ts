@@ -248,7 +248,9 @@ function adaptToTaskStatus(
     } as TasksCrudDtos.TaskStatus.ProgressBase;
   }
 
-  const progress = TasksCrudDtos.TaskStatus.progressSchemaBase.parse(job.progress);
+  const progress = TasksCrudDtos.TaskStatus.progressSchemaBase
+    .passthrough()
+    .parse(job.progress);
   let cleanData = job.data;
 
   if ("_internal" in cleanData) {
