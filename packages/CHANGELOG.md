@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.11.0](https://github.com/ByDSA/mcenter/compare/v4.11.0-alpha.5...v4.11.0) (2025-10-19)
+
+
+### Bug Fixes
+
+* **front:** update user prop type from UserEntityWithRoles to UserPayload ([5a93cb2](https://github.com/ByDSA/mcenter/commit/5a93cb21bfe44e1f011693b43413304034bdbca0))
+* upload music ([0079962](https://github.com/ByDSA/mcenter/commit/007996268ed3a806319a2d55604b61119385cc3a))
+
 ## [4.11.0-alpha.5](https://github.com/ByDSA/mcenter/compare/v4.11.0-alpha.4...v4.11.0-alpha.5) (2025-10-18)
 
 ## [4.11.0-alpha.4](https://github.com/ByDSA/mcenter/compare/v4.11.0-alpha.3...v4.11.0-alpha.4) (2025-10-18)
