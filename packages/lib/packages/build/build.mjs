@@ -26,7 +26,7 @@ export async function build(params) {
     dockerPlatform,
     targetEnv,
     packageName,
-    replace
+    replace,
   } = params;
 
   await dockerImageBuild({
@@ -38,6 +38,6 @@ export async function build(params) {
     buildArgs: {
       ENV: targetEnv,
     },
-    replace
+    replace,
   });
 }

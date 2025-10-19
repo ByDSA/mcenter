@@ -1,4 +1,21 @@
 #!/bin/sh
+set -e
+
+find_packages_dir() {
+    _current="$PWD"
+    while [ "$_current" != "/" ]; do
+        if [ -f "$_current/pnpm-workspace.yaml" ]; then
+            echo "$_current"
+            return 0
+        fi
+        _current="$(cd "$_current/.." && pwd)"
+    done
+
+    echo "Error: No se encontró pnpm-workspace.yaml" >&2
+    exit 1
+}
+
+artifacts_dir=$(cd "$(find_packages_dir)/bin/artifacts/builds" && pwd)
 
 # Determina la arquitectura más concreta para builds de Docker
 get_platform() {
@@ -66,7 +83,6 @@ will_use_artifact() {
     project_name="$1"
     version="$2"
     platform="$3"
-    artifacts_dir="$4"
 
     # Si no hay versión, busca artifact local más reciente
     if [ -z "$version" ]; then
@@ -99,10 +115,8 @@ run_artifact_workflow() {
     project_name="$1"
     version="$2"
     platform="$3"
-    artifacts_dir="$4"
 
     echo "Platform: $platform"
-    echo "Última versión: $version"
 
     # Manejo de versión
     if [ -n "$version" ]; then
@@ -146,7 +160,7 @@ run_artifact_workflow() {
 
     echo "Creando artifact..."
     compress_artifact "$artifact_path"
-    echo "Artifact guardado como: $artifact_name"
+    echo "Artifact guardado en: $artifact_path"
 
     echo "Fin!"
 }

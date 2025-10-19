@@ -60,6 +60,8 @@ export async function imageBuild(params) {
 
   cmd.push("--progress=plain"); // Para que salga el log completo y debugear
 
+  console.log(`Command: ${cmd.join(" ")}`);
+
   await $`${cmd}`;
 }
 

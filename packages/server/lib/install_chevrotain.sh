@@ -4,11 +4,11 @@ set -e
 # Instala la dependencia "chevrotain" para que sea compatible con CommonJS
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-. "$SCRIPT_DIR/../../lib/artifacts/utils.sh"
+. "$SCRIPT_DIR/../../bin/artifacts/lib/utils.sh"
 
 compress_artifact() {
   artifact_path="$1"
-  tar -czf "$SCRIPT_DIR/$ARTIFACT_NAME" chevrotain
+  tar -czf "$artifact_path" chevrotain
 }
 
 decompress_artifact() {
@@ -65,4 +65,4 @@ ARTIFACT_NAME="chevrotain"
 PLATFORM=$(get_platform)
 VERSION=$(get_latest_version)
 
-run_artifact_workflow "$ARTIFACT_NAME" "$VERSION" "$PLATFORM" "$SCRIPT_DIR"
+run_artifact_workflow "$ARTIFACT_NAME" "$VERSION" "$PLATFORM"

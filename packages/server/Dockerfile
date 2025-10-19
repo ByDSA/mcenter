@@ -1,4 +1,6 @@
 FROM node:22-alpine3.21 AS base
+ARG TARGETPLATFORM
+ARG PNPM_CACHE_PATH=/root/.local/share/pnpm/store
 ENV APP=server
 
 FROM base AS base-pnpm
@@ -29,7 +31,8 @@ WORKDIR /packages
 
 RUN apk add --no-cache git # Instalar git, para daproj y chevronatain
 
-RUN . /etc/environment && \
+RUN --mount=type=cache,target=${PNPM_CACHE_PATH},id=pnpm-${TARGETPLATFORM} \
+  . /etc/environment && \
   if [ "$PNPMFILE_EXISTS" = "true" ]; then \
   echo ".pnpmfile.cjs existe"; \
   pnpm i --fix-lockfile --no-frozen-lockfile --ignore-scripts; \
@@ -38,15 +41,19 @@ RUN . /etc/environment && \
   pnpm i --fix-lockfile --frozen-lockfile --ignore-scripts; \
   fi
 
-COPY ./lib/artifacts ./lib/artifacts
-RUN cd shared && pnpm build:cache
+# Nota: Los artifacts se cachean en el docker build, no en el host.
+COPY ./bin/artifacts/lib ./bin/artifacts/lib
+RUN --mount=type=cache,target=/packages/bin/artifacts/builds,id=mcenter-artifacts-cache,sharing=locked \
+  cd shared && pnpm build:cache
 
-RUN sh ./app/lib/install_chevrotain.sh
+RUN --mount=type=cache,target=/packages/bin/artifacts/builds,id=mcenter-artifacts-cache,sharing=locked \
+  sh ./app/lib/install_chevrotain.sh
 
 FROM deps-common AS deps-prod
 RUN apk add --no-cache git # Instalar git (no sé por qué, necesita resolver las devDependencies aunque no las instale)
 
-RUN . /etc/environment && \
+RUN --mount=type=cache,target=${PNPM_CACHE_PATH},id=pnpm-${TARGETPLATFORM} \
+  . /etc/environment && \
   if [ "$PNPMFILE_EXISTS" = "true" ]; then \
   echo ".pnpmfile.cjs existe"; \
   pnpm i --prod --fix-lockfile --no-frozen-lockfile --ignore-scripts; \

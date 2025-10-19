@@ -2,6 +2,8 @@
 
 FROM node:22-alpine3.21 AS base
 ARG ENV=local
+ARG PNPM_CACHE_PATH=/root/.local/share/pnpm/store
+ARG TARGETPLATFORM
 ENV APP=front
 
 FROM base AS deps-base
@@ -36,7 +38,8 @@ RUN jq '{ \
   && mv ./app/packageTmp.json ./app/package.json
 # Nota: si se usa el mismo archivo de entrada y de salida, genera un archivo vacío porque jq aún está leyendo el archivo de entrada cuando va a escribirlo.
 
-RUN pnpm install --prod --fix-lockfile --ignore-scripts
+RUN --mount=type=cache,target=${PNPM_CACHE_PATH},id=pnpm-${TARGETPLATFORM} \
+  pnpm install --prod --fix-lockfile --ignore-scripts
 
 RUN rm -rf /packages/node_modules/.pnpm/@next+swc*
 
@@ -52,10 +55,12 @@ packages:
 EOF
 
 # Nota: si se intentan reaprovechar las dependencias instaladas de deps-prod, no instala el resto de dependencias con pnpm i. Mejor instalarlas todas de nuevo que copiarlas y usar luego el flag --force.
-RUN pnpm i --fix-lockfile
-COPY ./lib/artifacts ./lib/artifacts
+RUN --mount=type=cache,target=${PNPM_CACHE_PATH},id=pnpm-${TARGETPLATFORM} \
+  pnpm i --fix-lockfile
 COPY ./shared/bin ./shared/bin
-RUN cd shared && pnpm build:cache
+COPY ./bin/artifacts/lib ./bin/artifacts/lib
+RUN --mount=type=cache,target=/packages/bin/artifacts/builds,id=mcenter-artifacts-cache,sharing=locked \
+  cd shared && pnpm build:cache
 # Nota: No se puede usar sin --fix-lockfile porque da error, porque el lockfile incluye las dependencias de todos los proyectos y sólo estamos usando dos
 
 # Rebuild the source code only when needed
