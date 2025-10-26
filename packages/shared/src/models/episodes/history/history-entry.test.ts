@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { fixtureUsers } from "../../auth/tests/fixtures";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { EpisodeHistoryEntry, episodeHistoryEntrySchema } from "./history-entry";
@@ -5,10 +6,7 @@ import { fixtureEpisodeHistoryEntries } from "./tests";
 
 const assertIsModel: ReturnType<typeof genAssertZod> = genAssertZod(episodeHistoryEntrySchema);
 const VALID_MODEL: EpisodeHistoryEntry = {
-  resourceId: {
-    episodeKey: "1x01",
-    seriesKey: "serie",
-  },
+  resourceId: new Types.ObjectId().toString(),
   date: {
     year: 2021,
     month: 1,

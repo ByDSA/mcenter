@@ -6,8 +6,8 @@ import { testRoute } from "#core/routing/test";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { ResourceSlugService } from "#modules/resources/slug/service";
 import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
-import { episodeRepositoryMockProvider } from "../crud/repository/tests";
-import { EpisodesRepository } from "../crud/repository";
+import { episodeRepositoryMockProvider } from "../crud/repositories/episodes/tests";
+import { EpisodesRepository } from "../crud/repositories/episodes";
 import { EpisodesSlugController } from "./controller";
 import { EpisodeSlugHandlerService } from "./service";
 

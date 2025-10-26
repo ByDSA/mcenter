@@ -1,8 +1,10 @@
-import { assertZod } from "$shared/utils/validation/zod";
-import { StreamEntity, streamEntitySchema, StreamMode, StreamOriginType } from "#modules/streams/models";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { UsersRepository } from "#core/auth/users/crud/repository";
+import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
+import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 import { type SerieEntity, assertIsSerieEntity } from "../../models";
 import { SeriesRepository } from "./repository";
 
@@ -18,12 +20,17 @@ describe("repository", () => {
       providers: [
         SeriesRepository,
         StreamsRepository,
+        UsersRepository,
       ],
     }, {
       db: {
         using: "default",
       },
     } );
+
+    await loadFixtureAuthUsers();
+
+    await loadFixtureSimpsons();
 
     repo = testingSetup.module
       .get<SeriesRepository>(SeriesRepository);
@@ -51,23 +58,30 @@ describe("repository", () => {
 
       it("should not be stream in db", async () => {
         const streamId = newModel.key;
-        const got = await streamsRepo.getOneByKey(streamId);
+        const got = await streamsRepo.getOneByKey(
+          fixtureUsers.Normal.User.id,
+          streamId,
+        );
 
         expect(got).toBeNull();
       } );
     } );
 
-    it("should execute function without errors", async () => {
-      const got = await repo.createOneAndGet(newModel);
+    describe("create", () => {
+      let createdGot: SerieEntity;
 
-      assertIsSerieEntity(got);
+      beforeAll(async () => {
+        createdGot = await repo.createOneAndGet(newModel);
 
-      newModel.id = got.id;
+        assertIsSerieEntity(createdGot);
 
-      expect(got).toStrictEqual(newModel);
-    } );
+        newModel.id = createdGot.id;
+      } );
 
-    describe("after Create", () => {
+      it("ok", () => {
+        expect(createdGot).toStrictEqual(newModel);
+      } );
+
       it("should be in db", async () => {
         const got = await repo.getOneByKey(newModel.key);
 
@@ -78,25 +92,11 @@ describe("repository", () => {
         expect(got).toStrictEqual(newModel);
       } );
 
-      it("should be stream in db", async () => {
-        const streamExpected: StreamEntity = {
-          id: "id",
-          key: newModel.key,
-          mode: StreamMode.SEQUENTIAL,
-          group: {
-            origins: [{
-              type: StreamOriginType.SERIE,
-              id: newModel.key,
-            }],
-          },
-        };
-        const got = await streamsRepo.getOneByKey(streamExpected.key);
+      it("should not stream created", async () => {
+        const userId = fixtureUsers.Normal.User.id;
+        const got = await streamsRepo.getOneByKey(userId, newModel.key);
 
-        assertZod(streamEntitySchema, got);
-
-        streamExpected.id = got.id;
-
-        expect(got).toStrictEqual(streamExpected);
+        expect(got).toBeNull();
       } );
     } );
   } );

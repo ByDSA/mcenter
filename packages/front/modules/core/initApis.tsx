@@ -8,6 +8,7 @@ import { MusicUserInfosApi } from "#modules/musics/user-info.requests";
 import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
 import { EpisodeHistoryApi } from "#modules/series/episodes/history/requests";
 import { EpisodesApi } from "#modules/series/episodes/requests";
+import { EpisodeUserInfosApi } from "#modules/series/episodes/user-info/requests";
 import { logger } from "./logger";
 
 let init = false;
@@ -23,6 +24,7 @@ export function InitApis() {
   MusicFileInfosApi.register();
   MusicPlaylistsApi.register();
   EpisodesApi.register();
+  EpisodeUserInfosApi.register();
   EpisodeFileInfosApi.register();
   EpisodeHistoryApi.register();
 

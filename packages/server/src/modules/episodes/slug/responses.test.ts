@@ -9,8 +9,8 @@ import { EpisodeEntity } from "#episodes/models";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
-import { EpisodesRepository } from "../crud/repository";
-import { episodeRepositoryMockProvider } from "../crud/repository/tests";
+import { EpisodesRepository } from "../crud/repositories/episodes";
+import { episodeRepositoryMockProvider } from "../crud/repositories/episodes/tests";
 import { EpisodesSlugModule } from "./module";
 
 describe("responses", () => {
@@ -28,7 +28,7 @@ describe("responses", () => {
       beforeCompile: (builder) => {
         builder
           .overrideProvider(EpisodesRepository)
-          .useValue(episodeRepositoryMockProvider.useValue);
+          .useClass(episodeRepositoryMockProvider.useClass);
 
         builder
           .overrideProvider(EpisodeHistoryRepository)

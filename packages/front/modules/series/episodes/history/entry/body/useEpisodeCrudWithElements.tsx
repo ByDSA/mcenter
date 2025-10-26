@@ -1,7 +1,7 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { EpisodeEntity } from "$shared/models/episodes";
 import { PATH_ROUTES } from "$shared/routing";
-import { ResourceInputArrayString, ResourceInputNumber, ResourceInputText } from "#uikit/input";
+import { ResourceInputArrayString, ResourceInputText } from "#uikit/input";
 import { isModified as isModifiedd } from "#modules/utils/objects";
 import { backendUrl } from "#modules/requests";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
@@ -49,7 +49,7 @@ export function useEpisodeCrudWithElements<T extends EpisodeEntity = EpisodeEnti
         const episodeBody = generatePatchBody(
           data,
           state[0],
-          ["title", "weight", "disabled", "tags"],
+          ["title", "disabled", "tags"],
         );
 
         if (shouldSendPatchWithBody(episodeBody)) {
@@ -98,18 +98,12 @@ export function useEpisodeCrudWithElements<T extends EpisodeEntity = EpisodeEnti
       value: slug,
     } )}
   </span>;
-  const weightElement = <span className={styles.weight}>{ResourceInputNumber( {
-    caption: EPISODE_PROPS.weight.caption,
-    ...getAndUpdateEpisodeByProp<number>("weight"),
-    ...commonEpisodeInputProps,
-  } )}</span>;
 
   return {
     elements: {
       titleElement,
       urlElement,
       tagsElement,
-      weightElement,
     },
     actions: {
       remove,
@@ -132,7 +126,6 @@ function calcIsModified(r1: EpisodeEntity, r2: EpisodeEntity) {
     ignoreNewUndefined: true,
     shouldMatch: {
       title: true,
-      weight: true,
       disabled: true,
       tags: true,
     },

@@ -13,7 +13,7 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicsUsersRepository } from "#musics/crud/repositories/user-info/repository";
 import { docOdmToEntity, docOdmToModel } from "./odm/adapters";
-import { getCriteriaPipeline } from "./criteria-pipeline";
+import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { MusicHistoryEntryOdm } from "./odm";
 import { MusicHistoryEntryEvents } from "./events";
 

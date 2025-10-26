@@ -2,7 +2,7 @@ import type { EpisodeEntity } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { treePut } from "$shared/utils/trees";
 import { WithRequired } from "$shared/utils/objects";
-import { EpisodesRepository } from "#episodes/crud/repository";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { EpisodeFile, SerieFolderTree as SerieTree } from "../disk";
 import { episodeToEpisodeFiles } from "./adapters";
 
@@ -21,7 +21,7 @@ export class RemoteSeriesTreeService {
     };
     const allEpisodesWithFileInfos: EpisodeEntityWithFileInfos[] = await this.episodesRepo
       .getManyByCriteria( {
-        expand: ["fileInfos"],
+        expand: ["file-infos"],
       } ) as EpisodeEntityWithFileInfos[];
 
     for (const episodeWithFileInfos of allEpisodesWithFileInfos)

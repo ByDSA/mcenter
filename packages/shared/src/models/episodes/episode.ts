@@ -3,6 +3,7 @@ import { resourceSchema } from "../resources";
 import { serieEntitySchema, seriesKeySchema } from "../series";
 import { mongoDbId } from "../resources/partial-schemas";
 import { episodeFileInfoEntitySchema } from "./file-info";
+import { episodeUserInfoEntitySchema } from "./user-info/user-info";
 
 /* Model */
 const episodeKeySchema = z.string();
@@ -26,6 +27,7 @@ const entitySchema = modelSchema
     id: mongoDbId,
     serie: serieEntitySchema.optional(),
     fileInfos: z.array(episodeFileInfoEntitySchema).optional(),
+    userInfo: episodeUserInfoEntitySchema.optional(),
   } );
 
 type Entity = z.infer<typeof entitySchema>;
@@ -41,6 +43,12 @@ const entityWithFileInfos = entitySchema.required( {
 
 type EntityWithFileInfos = z.infer<typeof entityWithFileInfos>;
 
+const entityWithUserInfoSchema = entitySchema.required( {
+  userInfo: true,
+} );
+
+type EntityWithUserInfo = z.infer<typeof entityWithUserInfoSchema>;
+
 export {
   modelSchema as episodeSchema,
   entitySchema as episodeEntitySchema,
@@ -51,4 +59,6 @@ export {
   type CompKey as EpisodeCompKey,
   type Entity as EpisodeEntity,
   type EntityWithFileInfos as EpisodeEntityWithFileInfos,
+  entityWithUserInfoSchema as episodeEntityWithUserInfoSchema,
+  type EntityWithUserInfo as EpisodeEntityWithUserInfo,
 };

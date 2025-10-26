@@ -55,6 +55,7 @@ export class PlayStreamController {
     } );
 
     return await this.playService.playEpisodeStream( {
+      userId: user.id,
       remotePlayerId: params.remotePlayerId,
       streamId: params.id,
       query,
@@ -69,12 +70,13 @@ export class PlayStreamController {
     @Body() body: SecretTokenBodyDto,
   ) {
     try {
-      await this.auth.guardToken( {
+      const remotePlayer = await this.auth.guardToken( {
         remotePlayerId: params.remotePlayerId,
         secretToken: body.secretToken,
       } );
 
       return await this.playService.playEpisodeStream( {
+        userId: remotePlayer.ownerId,
         remotePlayerId: params.remotePlayerId,
         streamId: params.id,
         query,

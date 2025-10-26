@@ -1,9 +1,8 @@
 import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
-import clone from "just-clone";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
-import { EpisodesRepository } from "#episodes/crud/repository";
-import { episodeRepositoryMockProvider } from "#episodes/crud/repository/tests";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
+import { episodeRepositoryMockProvider } from "#episodes/crud/repositories/episodes/tests";
 import { StreamEntity } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { streamsRepositoryMockProvider } from "#modules/streams/crud/repository/tests";
@@ -14,6 +13,9 @@ import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
 import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { createMockProvider } from "#utils/nestjs/tests";
+import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
+import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { EpisodePickerService } from "./service";
 
 describe("tests", () => {
@@ -24,6 +26,7 @@ describe("tests", () => {
     episodes: jest.Mocked<EpisodesRepository>;
     historyEntries: jest.Mocked<EpisodeHistoryRepository>;
     streams: jest.Mocked<StreamsRepository>;
+    episodesUsers: jest.Mocked<EpisodesUsersRepository>;
   };
 
   beforeAll(async () => {
@@ -35,6 +38,7 @@ describe("tests", () => {
         episodeRepositoryMockProvider,
         episodeHistoryRepositoryMockProvider,
         episodeDependenciesRepositoryMockProvider,
+        createMockProvider(EpisodesUsersRepository),
         EpisodePickerService,
       ],
     } );
@@ -43,14 +47,17 @@ describe("tests", () => {
       episodes: testingSetup.module.get<jest.Mocked<EpisodesRepository>>(EpisodesRepository),
       historyEntries: testingSetup.module.get(EpisodeHistoryRepository),
       streams: testingSetup.module.get(StreamsRepository),
+      episodesUsers: testingSetup.module.get(EpisodesUsersRepository),
     };
     service = testingSetup.module.get(EpisodePickerService);
+    repos.episodesUsers.getFullSerieForUser.mockResolvedValue(
+      fixtureEpisodes.Simpsons.ListForUser.NormalUser,
+    );
   } );
 
   it("one dependency test", async ()=> {
     const stream: StreamEntity = STREAM_SIMPSONS;
 
-    repos.episodes.getManyBySerieKey.mockResolvedValueOnce(fixtureEpisodes.Simpsons.List);
     repos.historyEntries.findLast.mockResolvedValueOnce(
       fixtureEpisodeHistoryEntries.Simpsons.Samples.EP6x25,
     );
@@ -60,14 +67,14 @@ describe("tests", () => {
     repos.dependencies.getAll.mockResolvedValueOnce([DEPENDENCY_SIMPSONS]);
 
     const ret = await service.getByStream(stream);
+    const expectedNext = addUserInfo(fixtureEpisodes.Simpsons.Samples.Dependency.next);
 
-    expect(ret).toStrictEqual([fixtureEpisodes.Simpsons.Samples.Dependency.next]);
+    expect(ret).toStrictEqual([expectedNext]);
   } );
 
   it("two dependency test", async ()=> {
     const stream: StreamEntity = STREAM_SIMPSONS;
 
-    repos.episodes.getManyBySerieKey.mockResolvedValueOnce(clone(fixtureEpisodes.Simpsons.List));
     repos.historyEntries.findLast.mockResolvedValueOnce(
       fixtureEpisodeHistoryEntries.Simpsons.Samples.EP6x25,
     );
@@ -86,15 +93,24 @@ describe("tests", () => {
     repos.dependencies.getAll.mockResolvedValueOnce([DEPENDENCY_SIMPSONS, nextTwoDependency]);
 
     const ret = await service.getByStream(stream, 2);
-    const { lastTimePlayed: _1, ...actualFirstWithoutLastTimePlayed } = ret[0];
-    const { lastTimePlayed: _2, ...actualSecondWithoutLastTimePlayed } = ret[1];
+    const actualFirstWithoutLastTimePlayed = ret[0];
+    const actualSecondWithoutLastTimePlayed = ret[1];
 
     expect([
       actualFirstWithoutLastTimePlayed,
       actualSecondWithoutLastTimePlayed,
     ]).toStrictEqual([
-      nextOne,
-      nextTwo,
+      addUserInfo(nextOne),
+      addUserInfo(nextTwo),
     ]);
   } );
 } );
+
+function addUserInfo(episode: EpisodeEntity): EpisodeEntityWithUserInfo {
+  return {
+    ...episode,
+    userInfo: fixtureEpisodes.Simpsons.ListForUser.NormalUser.find(
+      e=>e.id === episode.id,
+    )!.userInfo,
+  };
+}

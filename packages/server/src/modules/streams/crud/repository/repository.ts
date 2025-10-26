@@ -7,6 +7,7 @@ import { SeriesEvents } from "#modules/series/crud/repository/events";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
+import { UsersRepository } from "#core/auth/users/crud/repository";
 import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
 import { StreamEvents } from "./events";
 import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
@@ -19,7 +20,9 @@ implements
 CanGetManyByCriteria<StreamEntity, CriteriaMany>,
 CanCreateOneAndGet<StreamEntity>,
 CanGetAll<StreamEntity> {
-  constructor() { }
+  constructor(
+    private readonly usersRepo: UsersRepository,
+  ) { }
 
   @OnEvent(StreamEvents.WILDCARD)
   handleEvents(ev: DomainEvent<unknown>) {
@@ -31,7 +34,11 @@ CanGetAll<StreamEntity> {
     const serie = event.payload.entity;
 
     assertIsSerieEntity(serie);
-    await this.createDefaultForSerie(serie.key);
+
+    // TODO: mejor crear el stream al vuelo cuando se vaya a usar,
+    // puede haber muchos users que ni la usen
+    for (const user of await this.usersRepo.getAll())
+      await this.createDefaultForSerie(user.id, serie.key);
   }
 
   async getManyByCriteria(criteria: CriteriaMany) {
@@ -41,13 +48,25 @@ CanGetAll<StreamEntity> {
     return got.map(StreamOdm.toEntity);
   }
 
-  async createDefaultForSerieIfNeeded(seriesKey: SeriesKey): Promise<StreamEntity | null> {
+  async createDefaultForSerieIfNeeded(
+    userId: string,
+    seriesKey: SeriesKey,
+  ): Promise<StreamEntity | null> {
     const hasDefault = await this.hasDefaultForSerie(seriesKey);
 
     if (!hasDefault)
-      return await this.createDefaultForSerie(seriesKey);
+      return await this.createDefaultForSerie(userId, seriesKey);
 
     return null;
+  }
+
+  async getOneById(id: string): Promise<StreamEntity | null> {
+    const doc = await StreamOdm.Model.findById(id);
+
+    if (!doc)
+      return null;
+
+    return StreamOdm.toEntity(doc);
   }
 
   async getAll(): Promise<StreamEntity[]> {
@@ -56,7 +75,7 @@ CanGetAll<StreamEntity> {
     return docs.map(StreamOdm.toEntity);
   }
 
-  private async createDefaultForSerie(seriesKey: SeriesKey): Promise<StreamEntity> {
+  private async createDefaultForSerie(userId: string, seriesKey: SeriesKey): Promise<StreamEntity> {
     const stream: Stream = {
       group: {
         origins: [
@@ -66,6 +85,7 @@ CanGetAll<StreamEntity> {
           },
         ],
       },
+      userId,
       mode: StreamMode.SEQUENTIAL,
       key: seriesKey,
     };
@@ -96,9 +116,10 @@ CanGetAll<StreamEntity> {
     return StreamOdm.toEntity(got);
   }
 
-  async getOneByKey(key: StreamEntity["key"]): Promise<StreamEntity | null> {
+  async getOneByKey(userId: string, key: StreamEntity["key"]): Promise<StreamEntity | null> {
     const docOdm = await StreamOdm.Model.findOne( {
       key,
+      userId,
     } );
 
     if (!docOdm)
@@ -107,13 +128,13 @@ CanGetAll<StreamEntity> {
     return StreamOdm.toEntity(docOdm);
   }
 
-  async getOneOrCreateBySeriesKey(seriesKey: Serie["key"]): Promise<StreamEntity> {
+  async getOneOrCreateBySeriesKey(userId: string, seriesKey: Serie["key"]): Promise<StreamEntity> {
     const docOdm = await StreamOdm.Model.findOne( {
       key: seriesKey,
     } );
 
     if (!docOdm)
-      return this.createDefaultForSerie(seriesKey);
+      return this.createDefaultForSerie(userId, seriesKey);
 
     return StreamOdm.toEntity(docOdm);
   }

@@ -3,7 +3,8 @@ import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { MongoFilterQuery, OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#modules/series/crud/repository/odm";
-import { EpisodeCompKey } from "../../../models";
+import { EpisodeCompKey } from "../../../../models";
+import { EpisodesUsersOdm } from "../../user-infos/odm";
 
 export type EpisodeCompKeyOdm = {
   episodeKey: string;
@@ -13,16 +14,15 @@ export type EpisodeCompKeyOdm = {
 export type DocOdm = EpisodeCompKeyOdm & OptionalId & TimestampsOdm.AutoTimestamps &
   TimestampsOdm.NonAutoTimestamps & {
   title: string;
-  weight: number;
   tags?: string[];
   disabled?: boolean;
-  lastTimePlayed?: number;
   uploaderUserId: mongoose.Types.ObjectId;
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
   serie?: SeriesOdm.FullDoc;
   fileInfos?: EpisodeFileInfoOdm.FullDoc[];
+  userInfo?: EpisodesUsersOdm.FullDoc;
 };
 
 const NAME = "Episode";
@@ -46,19 +46,12 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: String,
     required: true,
   },
-  weight: {
-    type: Number,
-    required: true,
-  },
   tags: {
     type: [String],
     default: undefined,
   },
   disabled: {
     type: Boolean,
-  },
-  lastTimePlayed: {
-    type: Number,
   },
   ...TimestampsOdm.nonAutoTimestampsSchemaDefinition,
 } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {

@@ -1,14 +1,20 @@
+import { EpisodeUserInfoEntity } from "$shared/models/episodes";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
-import { EpisodeEntity } from "../../models";
 
-type Entity = EpisodeEntity;
-export namespace EpisodeEvents {
-  const MAIN_TYPE = "episodes";
+type Key = {
+  _id: string;
+  userId: string;
+  episodeId: string;
+};
+
+type Entity = EpisodeUserInfoEntity;
+export namespace EpisodesUsersEvents {
+  const MAIN_TYPE = "episodes_users";
   export const WILDCARD = `${MAIN_TYPE}.*`;
 
   export namespace Patched {
     export const TYPE = `${MAIN_TYPE}.patched`;
-    export type Event = PatchEvent<Entity, Entity["id"]>;
+    export type Event = PatchEvent<Entity, Key>;
   }
   export namespace Created {
     export const TYPE = `${MAIN_TYPE}.created`;

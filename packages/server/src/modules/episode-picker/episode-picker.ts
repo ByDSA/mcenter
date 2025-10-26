@@ -1,16 +1,16 @@
 import { assertIsDefined, neverCase } from "$shared/utils/validation";
+import { EpisodeEntityWithUserInfo } from "$shared/models/episodes";
 import { PickMode } from "#modules/picker/resource-picker/pick-mode";
 import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
 import { ResourcePickerSequential } from "#modules/picker/resource-picker/resource-picker-sequential";
 import { ResourcePicker } from "#modules/picker/resource-picker/resource-picker";
-import { compareEpisodeCompKey, EpisodeEntity } from "#episodes/models";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 import { DependenciesList } from "./appliers/dependencies";
 
-class EpisodePickerRandom extends ResourcePickerRandom<EpisodeEntity> {
+class EpisodePickerRandom extends ResourcePickerRandom<EpisodeEntityWithUserInfo> {
   constructor( { filterApplier, resources, weightFixerApplier, lastOne }: {
-    resources: EpisodeEntity[];
-    lastOne?: EpisodeEntity;
+    resources: EpisodeEntityWithUserInfo[];
+    lastOne?: EpisodeEntityWithUserInfo;
     filterApplier: ReturnType<typeof genEpisodeFilterApplier>;
     weightFixerApplier: ReturnType<typeof genEpisodeWeightFixerApplier>;
   } ) {
@@ -22,29 +22,29 @@ class EpisodePickerRandom extends ResourcePickerRandom<EpisodeEntity> {
     } );
   }
 
-  setLastTimePlayed(resource: EpisodeEntity, time: number): void {
-    resource.lastTimePlayed = time;
+  setLastTimePlayed(resource: EpisodeEntityWithUserInfo, time: number): void {
+    resource.userInfo.lastTimePlayed = time;
   }
 }
 
 type Params = {
-  episodes: EpisodeEntity[];
-  lastEp?: EpisodeEntity;
+  episodes: EpisodeEntityWithUserInfo[];
+  lastEp?: EpisodeEntityWithUserInfo;
   mode: PickMode;
   dependencies?: DependenciesList;
 };
 export function buildEpisodePicker(
   { mode, episodes, lastEp, dependencies }: Params,
-): ResourcePicker<EpisodeEntity> {
-  let picker: ResourcePicker<EpisodeEntity>;
+): ResourcePicker<EpisodeEntityWithUserInfo> {
+  let picker: ResourcePicker<EpisodeEntityWithUserInfo>;
 
   switch (mode) {
     case PickMode.SEQUENTIAL:
       picker = new ResourcePickerSequential( {
         resources: episodes,
-        lastId: lastEp?.compKey,
-        compareId: compareEpisodeCompKey,
-        getId: e=>e.compKey,
+        lastId: lastEp?.id,
+        compareId: (a, b) => a === b,
+        getId: e=>e.id,
       } );
       break;
     case PickMode.RANDOM:

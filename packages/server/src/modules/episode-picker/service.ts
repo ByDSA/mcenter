@@ -1,13 +1,14 @@
 import type { ResourcePicker } from "#modules/picker";
-import type { EpisodeEntity } from "#episodes/models";
+import type { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined, neverCase } from "$shared/utils/validation";
-import { EpisodesRepository } from "#episodes/crud/repository";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { PickMode } from "#modules/picker/resource-picker/pick-mode";
 import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#modules/streams";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
+import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { buildEpisodePicker } from "./episode-picker";
 import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
 
@@ -16,13 +17,18 @@ export class EpisodePickerService {
   constructor(
     private readonly streamsRepo: StreamsRepository,
     private readonly episodesRepo: EpisodesRepository,
+    private readonly episodesUsersRepo: EpisodesUsersRepository,
     private readonly historyRepo: EpisodeHistoryRepository,
     private readonly dependenciesRepo: EpisodeDependenciesRepository,
   ) {
   }
 
-  async getByStreamKey(streamKey: StreamEntity["key"], n = 1): Promise<EpisodeEntity[]> {
-    const stream = await this.streamsRepo.getOneByKey(streamKey);
+  async getByStreamKey(
+    userId: string,
+    streamKey: StreamEntity["key"],
+    n = 1,
+  ): Promise<EpisodeEntity[]> {
+    const stream = await this.streamsRepo.getOneByKey(userId, streamKey);
 
     if (!stream)
       return [];
@@ -52,15 +58,19 @@ export class EpisodePickerService {
       };
     }
 
-    const allEpisodesInSerie = await this.episodesRepo
-      .getManyBySerieKey(seriesKey, criteria);
+    const allEpisodesInSerie: EpisodeEntityWithUserInfo[] = await this.episodesUsersRepo
+      .getFullSerieForUser( {
+        userId: stream.userId,
+        seriesKey,
+      }, criteria);
     const lastEntry = await this.historyRepo.findLast( {
-      seriesKey,
       streamId: stream.id,
     } );
-    const lastPlayedEpInSerieCompKey = lastEntry?.resourceId;
-    const lastPlayedEpInSerie = lastPlayedEpInSerieCompKey
-      ? await this.episodesRepo.getOneByCompKey(lastPlayedEpInSerieCompKey)
+    const lastPlayedEpInSerieId = lastEntry?.resourceId;
+    const lastPlayedEpInSerie: EpisodeEntityWithUserInfo | null = lastPlayedEpInSerieId
+      ? await this.episodesRepo.getOneById(lastPlayedEpInSerieId, {
+        expand: ["user-info"],
+      } ) as EpisodeEntityWithUserInfo | null
       : null;
     const mode = streamModeToPickerMode(stream.mode);
     let dependencies: DependenciesList | undefined;
@@ -68,7 +78,7 @@ export class EpisodePickerService {
     if (mode === PickMode.RANDOM)
       dependencies = dependenciesToList(await this.dependenciesRepo.getAll());
 
-    const picker: ResourcePicker<EpisodeEntity> = buildEpisodePicker( {
+    const picker: ResourcePicker<EpisodeEntityWithUserInfo> = buildEpisodePicker( {
       mode,
       episodes: allEpisodesInSerie,
       lastEp: lastPlayedEpInSerie ?? undefined,

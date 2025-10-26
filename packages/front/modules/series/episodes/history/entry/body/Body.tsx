@@ -1,6 +1,6 @@
 import { EpisodeFileInfoEntity } from "$shared/models/episodes/file-info";
 import { useCallback, useState } from "react";
-import { EpisodeEntity } from "$shared/models/episodes";
+import { EpisodeEntity, EpisodeUserInfoEntity } from "$shared/models/episodes";
 import { classes } from "#modules/utils/styles";
 import { useHistoryEntryEdition } from "#modules/history";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -12,6 +12,7 @@ import { LastestComponent } from "./Lastest";
 import styles from "./style.module.css";
 import { useEpisodeCrudWithElements } from "./useEpisodeCrudWithElements";
 import { useEpisodeFileInfoCrudWithElements } from "./useEpisodeFileInfoCrudWithElements";
+import { useEpisodeUserInfoCrudWithElements } from "./useEpisodeUserInfoCrudWithElements";
 
 type Data = EpisodeHistoryApi.GetMany.Data;
 
@@ -35,6 +36,7 @@ export function Body( { data, setData }: Props) {
           resource: {
             ...e,
             fileInfos: data.resource.fileInfos,
+            userInfo: data.resource.userInfo,
           },
         } );
       },
@@ -55,6 +57,21 @@ export function Body( { data, setData }: Props) {
     },
     onPressEnter,
   } );
+  const { actions: userInfoActions,
+    elements: userInfoElements,
+    isModified: userInfoIsModified } = useEpisodeUserInfoCrudWithElements( {
+    data: data.resource.userInfo,
+    setData: (userInfo: EpisodeUserInfoEntity)=> {
+      setData( {
+        ...data,
+        resource: {
+          ...data.resource,
+          userInfo,
+        },
+      } );
+    },
+    onPressEnter,
+  } );
   const historyApi = FetchApi.get(EpisodeHistoryApi);
   const { state, remove } = useHistoryEntryEdition<Data>( {
     data,
@@ -70,21 +87,31 @@ export function Body( { data, setData }: Props) {
   } );
   const createActionsBarElement = useCallback(()=>createActionsBar( {
     spinnerSide: "left",
-    isModified: episodeIsModified || fileInfoIsModified,
+    isModified: episodeIsModified || fileInfoIsModified || userInfoIsModified,
     reset: async ()=>{
       await Promise.all([
         episodeActions.reset(),
         fileInfoActions.reset(),
+        userInfoActions.reset(),
       ]);
     },
-    update: mergeCrudOp(episodeActions.update, fileInfoActions.update),
+    update: mergeCrudOp(episodeActions.update, fileInfoActions.update, userInfoActions.update),
     remove,
-  } ), [remove, episodeActions, fileInfoActions, episodeIsModified, fileInfoIsModified]);
-  const { titleElement, tagsElement, urlElement, weightElement } = elements;
+  } ), [
+    remove,
+    episodeActions,
+    fileInfoActions,
+    userInfoActions,
+    episodeIsModified,
+    fileInfoIsModified,
+    userInfoIsModified,
+  ]);
+  const { titleElement, tagsElement, urlElement } = elements;
   const { resource } = state[0];
   const { startElement,
     endElement,
     pathElement } = fileInfoElements;
+  const { weightElement } = userInfoElements;
 
   return <>
     {createActionsBarElement()}

@@ -1,17 +1,16 @@
 import { LastTimeWeightFilterFx, LastTimeWeightFixer, LimiterSafeIntegerPerItems, TagWeightFixer, WeightFixerApplier } from "#modules/picker";
-import { Pickable } from "#modules/resources/models";
-import { EpisodeEntity } from "#episodes/models";
+import { EpisodeEntityWithUserInfo } from "#episodes/models";
 
 const SECONDS_IN_DAY = 24 * 60 * 60;
 
-class LastTimeEpisodeWeightFixer extends LastTimeWeightFixer<EpisodeEntity> {
-  getLastTimePlayed(r: EpisodeEntity): number {
-    return r.lastTimePlayed ?? 0;
+class LastTimeEpisodeWeightFixer extends LastTimeWeightFixer<EpisodeEntityWithUserInfo> {
+  getLastTimePlayed(r: EpisodeEntityWithUserInfo): number {
+    return r.userInfo.lastTimePlayed ?? 0;
   }
 }
 
 export class EpisodeWeightFixerApplier
-  extends WeightFixerApplier<EpisodeEntity> {
+  extends WeightFixerApplier<EpisodeEntityWithUserInfo> {
   constructor() {
     super();
     this.add(new LastTimeEpisodeWeightFixer( {
@@ -22,10 +21,13 @@ export class EpisodeWeightFixerApplier
   }
 }
 
-const fx: LastTimeWeightFilterFx<EpisodeEntity> = (r: Pickable, x: number): number => {
+const fx: LastTimeWeightFilterFx<EpisodeEntityWithUserInfo> = (
+  r: EpisodeEntityWithUserInfo,
+  x: number,
+): number => {
   const daysFromLastTime = x / SECONDS_IN_DAY;
   let reinforcementFactor = 1;
-  const { weight } = r;
+  const { weight } = r.userInfo;
 
   if (weight < -1)
     reinforcementFactor = 1.0 / (-weight);

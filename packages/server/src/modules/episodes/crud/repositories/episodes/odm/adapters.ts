@@ -4,7 +4,8 @@ import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { SeriesOdm } from "#modules/series/crud/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
-import { Episode, EpisodeEntity } from "../../../models";
+import { Episode, EpisodeEntity } from "../../../../models";
+import { EpisodesUsersOdm } from "../../user-infos/odm";
 import { DocOdm, FullDocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {
@@ -14,10 +15,8 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
       seriesKey: docOdm.seriesKey,
     },
     title: docOdm.title,
-    weight: docOdm.weight,
     disabled: docOdm.disabled,
     tags: docOdm.tags,
-    lastTimePlayed: docOdm.lastTimePlayed,
     uploaderUserId: docOdm.uploaderUserId.toString(),
     createdAt: docOdm.createdAt,
     updatedAt: docOdm.updatedAt,
@@ -37,6 +36,9 @@ export function docOdmToEntity(docOdm: FullDocOdm): EpisodeEntity {
   if (docOdm.fileInfos)
     ret.fileInfos = docOdm.fileInfos.map(EpisodeFileInfoOdm.toEntity);
 
+  if (docOdm.userInfo)
+    ret.userInfo = EpisodesUsersOdm.toEntity(docOdm.userInfo);
+
   if (docOdm.serie)
     ret.serie = SeriesOdm.toEntity(docOdm.serie);
 
@@ -55,12 +57,10 @@ export function entityToDocOdm(entity: EpisodeEntity): FullDocOdm {
 export function episodeToDocOdm(model: Episode): DocOdm {
   const ret = {
     title: model.title,
-    weight: model.weight,
     episodeKey: model.compKey.episodeKey,
     seriesKey: model.compKey.seriesKey,
     disabled: model.disabled,
     tags: model.tags,
-    lastTimePlayed: model.lastTimePlayed,
     uploaderUserId: new Types.ObjectId(model.uploaderUserId),
     createdAt: model.createdAt,
     updatedAt: model.updatedAt,
@@ -83,15 +83,6 @@ export function partialModelToDocOdm(model: Partial<EpisodeEntity>): MongoUpdate
   if (model.title !== undefined)
     ret.title = model.title;
 
-  if ("weight" in model) {
-    if (model.weight !== undefined)
-      ret.weight = model.weight;
-    else {
-      ret.$unset = ret.$unset ?? {};
-      ret.$unset.weight = 1;
-    }
-  }
-
   if ("disabled" in model) {
     if (model.disabled !== undefined)
       ret.disabled = model.disabled;
@@ -103,15 +94,6 @@ export function partialModelToDocOdm(model: Partial<EpisodeEntity>): MongoUpdate
 
   if (model.tags !== undefined)
     ret.tags = model.tags;
-
-  if ("lastTimePlayed" in model) {
-    if (model.lastTimePlayed !== undefined)
-      ret.lastTimePlayed = model.lastTimePlayed;
-    else {
-      ret.$unset = ret.$unset ?? {};
-      ret.$unset.lastTimePlayed = 1;
-    }
-  }
 
   return ret;
 }

@@ -1,8 +1,11 @@
 import type { EpisodeHistoryEntryCrudDtos } from "$shared/models/episodes/history/dto/transport";
-import type { PipelineStage } from "mongoose";
+import { Types, type PipelineStage } from "mongoose";
+import { WithRequired } from "$shared/utils/objects";
+import { assertIsDefined } from "$shared/utils/validation";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
-import { DocOdm } from "./odm/odm";
+import { EpisodesUsersOdm } from "#episodes/crud/repositories/user-infos/odm";
+import { DocOdm, FullDocOdm } from "./odm/odm";
 
 function buildMongooseSort(
   body: EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
@@ -18,14 +21,23 @@ function buildMongooseSort(
 function buildMongooseFilter(
   criteria: EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
 ): MongoFilterQuery<DocOdm> {
-  const filter: MongoFilterQuery<DocOdm> = {};
+  const filter: MongoFilterQuery<WithRequired<FullDocOdm, "episode"> & {
+    episode: {
+      serie: NonNullable<Required<FullDocOdm>["episode"]["serie"]>;
+    };
+  }> = {};
+  const userIdStr = criteria.filter?.userId;
+
+  assertIsDefined(userIdStr);
+
+  filter.userId = new Types.ObjectId(userIdStr);
 
   if (criteria.filter) {
     if (criteria.filter.seriesKey)
-      filter["episodeCompKey.seriesKey"] = criteria.filter.seriesKey;
+      filter["episode.serie.key"] = criteria.filter.seriesKey;
 
     if (criteria.filter.episodeKey)
-      filter["episodeCompKey.episodeKey"] = criteria.filter.episodeKey;
+      filter["episode.episodeKey"] = criteria.filter.episodeKey;
 
     if (criteria.filter.timestampMax !== undefined) {
       filter["date.timestamp"] = {
@@ -71,27 +83,9 @@ export function getCriteriaPipeline(
     if (criteria.expand.includes("episodes")) {
       pipeline.push( {
         $lookup: {
-          from: "episodes", // nombre de la colección de episodios
-          let: {
-            seriesKey: "$episodeCompKey.seriesKey",
-            episodeKey: "$episodeCompKey.episodeKey",
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    {
-                      $eq: ["$seriesKey", "$$seriesKey"],
-                    },
-                    {
-                      $eq: ["$episodeKey", "$$episodeKey"],
-                    },
-                  ],
-                },
-              },
-            },
-          ],
+          from: "episodes",
+          localField: "episodeId",
+          foreignField: "_id",
           as: "episode",
         },
       } );
@@ -106,11 +100,11 @@ export function getCriteriaPipeline(
       } );
 
       // Si también se solicita series, agregarlo al episode
-      if (criteria.expand.includes("series")) {
+      if (criteria.expand.includes("episode-series")) {
         pipeline.push( {
           $lookup: {
-            from: "series", // nombre de la colección de series
-            localField: "episodeCompKey.seriesKey",
+            from: "series",
+            localField: "episode.seriesKey",
             foreignField: "key",
             as: "serieTemp",
           },
@@ -130,55 +124,55 @@ export function getCriteriaPipeline(
           $unset: "serieTemp",
         } );
       }
-    } else if (criteria.expand.includes("series")) {
-      // Si solo se solicita series sin episodes, crear un episode vacío solo con la serie
-      pipeline.push( {
-        $lookup: {
-          from: "series", // nombre de la colección de series
-          localField: "episodeCompKey.seriesKey",
-          foreignField: "key",
-          as: "serieTemp",
-        },
-      } );
 
-      pipeline.push( {
-        $addFields: {
-          episode: {
-            serie: {
-              $arrayElemAt: ["$serieTemp", 0],
-            },
+      if (criteria.expand.includes("episode-file-infos")) {
+        pipeline.push( {
+          $lookup: {
+            from: EpisodeFileInfoOdm.COLLECTION_NAME,
+            localField: "episode._id",
+            foreignField: "episodeId",
+            as: "episodeFileInfos",
           },
-        },
-      } );
+        } );
 
-      // Limpiar el campo temporal
-      pipeline.push( {
-        $unset: "serieTemp",
-      } );
-    }
+        // Añadir los fileInfos al episode
+        pipeline.push( {
+          $addFields: {
+            "episode.fileInfos": "$episodeFileInfos",
+          },
+        } );
 
-    if (criteria.expand.includes("episode-file-infos") && criteria.expand.includes("episodes")) {
-      // Ahora expandir los fileInfos del episode
-      pipeline.push( {
-        $lookup: {
-          from: EpisodeFileInfoOdm.COLLECTION_NAME,
-          localField: "episode._id",
-          foreignField: "episodeId",
-          as: "episodeFileInfos",
-        },
-      } );
+        // Limpiar el campo temporal
+        pipeline.push( {
+          $unset: "episodeFileInfos",
+        } );
+      }
 
-      // Añadir los fileInfos al episode
-      pipeline.push( {
-        $addFields: {
-          "episode.fileInfos": "$episodeFileInfos",
-        },
-      } );
+      if (criteria.expand.includes("episode-user-info")) {
+        pipeline.push( {
+          $lookup: {
+            from: EpisodesUsersOdm.COLLECTION_NAME,
+            localField: "episode._id",
+            foreignField: "episodeId",
+            as: "tmp",
+          },
+        } );
 
-      // Limpiar el campo temporal
-      pipeline.push( {
-        $unset: "episodeFileInfos",
-      } );
+        // Añadir al episode
+        pipeline.push( {
+          $addFields: {
+            "episode.userInfo": {
+              $arrayElemAt: ["$tmp", 0],
+            },
+
+          },
+        } );
+
+        // Limpiar el campo temporal
+        pipeline.push( {
+          $unset: "tmp",
+        } );
+      }
     }
   }
 

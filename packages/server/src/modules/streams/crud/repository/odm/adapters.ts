@@ -8,6 +8,7 @@ export function streamDocOdmToModel(docOdm: DocOdm): Stream {
     key: docOdm.key,
     group: groupDocOdmToModel(docOdm.group),
     mode: docOdm.mode,
+    userId: docOdm.userId.toString(),
   };
 }
 
@@ -32,6 +33,7 @@ export function streamToDocOdm(model: Stream): DocOdm {
     key: model.key,
     group: model.group,
     mode: model.mode,
+    userId: new Types.ObjectId(model.userId),
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 }
 

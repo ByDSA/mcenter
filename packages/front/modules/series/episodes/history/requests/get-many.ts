@@ -11,6 +11,7 @@ export const dataSchema = episodeHistoryEntryEntitySchema
   .extend( {
     resource: episodeEntitySchema.required( {
       fileInfos: true,
+      userInfo: true,
     } ),
   } );
 

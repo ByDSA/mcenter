@@ -4,7 +4,8 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { EpisodesCrudController } from "./controller";
-import { EpisodesRepository } from "./repository";
+import { EpisodesRepository } from "./repositories/episodes";
+import { EpisodesUsersRepository } from "./repositories/user-infos";
 
 @Module( {
   imports: [
@@ -17,7 +18,8 @@ import { EpisodesRepository } from "./repository";
   ],
   providers: [
     EpisodesRepository,
+    EpisodesUsersRepository,
   ],
-  exports: [EpisodesRepository],
+  exports: [EpisodesRepository, EpisodesUsersRepository],
 } )
 export class EpisodesCrudModule {}

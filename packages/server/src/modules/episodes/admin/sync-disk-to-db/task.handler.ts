@@ -18,7 +18,7 @@ import { Serie } from "#modules/series";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { md5FileAsync } from "#utils/crypt";
 import { Episode } from "#episodes/models";
-import { EpisodesRepository } from "../../crud/repository";
+import { EpisodesRepository } from "../../crud/repositories/episodes";
 import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "./disk";
 import { RemoteSeriesTreeService } from "./db";
 import { SerieNode, SerieTree, EpisodeNode } from "./disk/models";
@@ -224,7 +224,6 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
         seriesKey: serie.key,
       },
       title: `${serie.name} ${localEpisode.content.episodeKey}`,
-      weight: 0,
       uploaderUserId: userId,
     };
     const gotEpisode = await this.episodesRepo.getOneOrCreate(episode);

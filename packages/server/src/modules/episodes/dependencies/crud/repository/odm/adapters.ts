@@ -1,6 +1,6 @@
 import { AllKeysOf } from "$shared/utils/types";
 import { Types } from "mongoose";
-import { EpisodeOdm } from "#episodes/crud/repository/odm";
+import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
 import { EpisodeDependency as Model, EpisodeDependencyEntity as Entity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 

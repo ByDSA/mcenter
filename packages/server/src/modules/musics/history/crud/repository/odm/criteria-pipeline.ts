@@ -1,7 +1,8 @@
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
 import { FilterQuery, PipelineStage, Types } from "mongoose";
-import { DocOdm } from "#musics/file-info/crud/repository";
+import { assertIsDefined } from "$shared/utils/validation";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
+import { DocOdm } from "./odm";
 
 function buildMongooseSort(
   body: MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
@@ -18,6 +19,11 @@ function buildMongooseFilter(
   criteria: MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
 ): FilterQuery<DocOdm> {
   const filter: FilterQuery<DocOdm> = {};
+  const userIdStr = criteria.filter?.userId;
+
+  assertIsDefined(userIdStr);
+
+  filter.userId = new Types.ObjectId(userIdStr);
 
   if (criteria.filter) {
     if (criteria.filter.resourceId)

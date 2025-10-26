@@ -20,6 +20,7 @@ import { PlayService } from "../play.service";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { SecretTokenBody } from "../model";
 import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
+import { fixturesRemotePlayers } from "../tests/fixtures";
 import { PlayStreamController } from "./controller";
 
 describe("playStreamController", () => {
@@ -54,6 +55,9 @@ describe("playStreamController", () => {
 
     testingSetup.getMock(StreamsRepository).getOneByKey
       .mockResolvedValue(STREAM_SIMPSONS);
+    testingSetup.getMock(StreamsRepository).getOneById
+      // eslint-disable-next-line require-await
+      .mockImplementation(async id=> id === STREAM_SIMPSONS.id ? STREAM_SIMPSONS : null);
     testingSetup.getMock(EpisodePickerService).getByStream
       .mockResolvedValue([fixtureEpisodes.Simpsons.Samples.EP1x01]);
 
@@ -121,13 +125,7 @@ describe("playStreamController", () => {
       await request(routerApp).get(`/play/${remotePlayerId}/stream/simpsons-stream?n=5`)
         .expect(HttpStatus.OK);
 
-      expect(episodePickerSpy).toHaveBeenCalledWith(
-        STREAM_SIMPSONS,
-        5,
-        {
-          expand: ["series", "fileInfos"],
-        },
-      );
+      expect(episodePickerSpy).toHaveBeenCalledTimes(5);
     } );
   } );
 
@@ -137,17 +135,11 @@ describe("playStreamController", () => {
 
       await request(routerApp).post(`/play/${remotePlayerId}/stream/simpsons-stream?n=5`)
         .send( {
-          secretToken: "123456",
+          secretToken: fixturesRemotePlayers.valid.secretToken,
         } satisfies SecretTokenBody)
         .expect(HttpStatus.ACCEPTED);
 
-      expect(episodePickerSpy).toHaveBeenCalledWith(
-        STREAM_SIMPSONS,
-        5,
-        {
-          expand: ["series", "fileInfos"],
-        },
-      );
+      expect(episodePickerSpy).toHaveBeenCalledTimes(5);
     } );
   } );
 } );

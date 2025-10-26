@@ -8,7 +8,7 @@ import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { EpisodePickerService } from "#modules/episode-picker";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { EpisodeEntity } from "#episodes/models";
-import { EpisodesRepository } from "#episodes/crud/repository";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { PlayService } from "./play.service";
 import { RemotePlayersRepository } from "./player-services/repository";
@@ -25,6 +25,7 @@ type PlayEpisodeProps = {
   query: QueryDto;
 };
 type PlayEpisodeStreamProps = {
+  userId: string;
   remotePlayerId: string;
   streamId: string;
   query: QueryDto;
@@ -66,7 +67,7 @@ export class PlayVideoService {
     const userIds = await this.remotePlayersRepo.getAllViewersOf(remotePlayerId);
 
     for (const userId of userIds) {
-      const isLast = await this.historyRepo.isLast(episodes[0].compKey, userId);
+      const isLast = await this.historyRepo.isLast(episodes[0].id, userId);
       const episodesToAddInHistory: EpisodeEntity[] = isLast
         ? episodes.slice(1)
         : episodes;
@@ -81,9 +82,9 @@ export class PlayVideoService {
     return episodes;
   }
 
-  async playEpisodeStream( { query, remotePlayerId, streamId }: PlayEpisodeStreamProps) {
+  async playEpisodeStream( { query, remotePlayerId, streamId, userId }: PlayEpisodeStreamProps) {
     const { force } = query;
-    const stream = await this.streamsRepo.getOneByKey(streamId);
+    const stream = await this.streamsRepo.getOneByKey(userId, streamId);
 
     assertFoundClient(stream);
 
@@ -95,7 +96,7 @@ export class PlayVideoService {
       number = query.n;
 
     const episodes = (await this.episodePickerService.getByStream(stream, number ?? 1, {
-      expand: ["series", "fileInfos"],
+      expand: ["series", "file-infos"],
     } ))
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
 
@@ -123,12 +124,18 @@ export class PlayVideoService {
         seriesKey,
         episodeKey,
       }, {
-        expand: ["series", "fileInfos"],
+        expand: ["series", "file-infos"],
       } )]
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
+    const remotePlayer = await this.remotePlayersRepo.getOneById(remotePlayerId);
+
+    assertFoundClient(remotePlayer);
 
     assertFoundClient(episodes[0]);
-    const stream = await this.streamsRepo.getOneOrCreateBySeriesKey(seriesKey);
+    const stream = await this.streamsRepo.getOneOrCreateBySeriesKey(
+      remotePlayer.ownerId.toString(),
+      seriesKey,
+    );
 
     return this.processAndPlayEpisodes( {
       remotePlayerId,

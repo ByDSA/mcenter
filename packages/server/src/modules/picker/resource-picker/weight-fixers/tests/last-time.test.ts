@@ -1,56 +1,68 @@
 import { SECONDS_IN_DAY } from "#modules/resources";
-import { Resource } from "#modules/resources/models";
 import { genLastTimePlayedAgo, genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { useFakeTime } from "#tests/time";
 import { fixtureEpisodes } from "#episodes/tests";
 import { Fx, LastTimeWeightFixer } from "../last-time";
 import { secondsElapsedFrom } from "../../utils";
+import { ResourceWithUserInfo } from "../../filters/tests/types";
 
-class LastTimeResourceWeightFixer extends LastTimeWeightFixer<Resource> {
-  getLastTimePlayed(r: Resource): number {
-    return r.lastTimePlayed ?? 0;
+class LastTimeResourceWeightFixer extends LastTimeWeightFixer<ResourceWithUserInfo> {
+  getLastTimePlayed(r: ResourceWithUserInfo): number {
+    return r.userInfo.lastTimePlayed ?? 0;
   }
 }
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
-const fx: Fx<Resource> = (r: Resource, x: number) => {
-  if (r.lastTimePlayed === undefined)
+const fx: Fx<ResourceWithUserInfo> = (r: ResourceWithUserInfo, x: number) => {
+  if (r.userInfo.lastTimePlayed === undefined)
     return Infinity;
 
   return x;
 };
-const fxDays: Fx<Resource> = (_: Resource, x: number) => Math.round(x / SECONDS_IN_DAY);
+const fxDays: Fx<ResourceWithUserInfo> = (
+  _: ResourceWithUserInfo,
+  x: number,
+) => Math.round(x / SECONDS_IN_DAY);
 
 type Case = {
-  resource: Resource;
-  resources: readonly Resource[];
-  fx: Fx<Resource>;
+  resource: ResourceWithUserInfo;
+  resources: readonly ResourceWithUserInfo[];
+  fx: Fx<ResourceWithUserInfo>;
   initialWeight: number;
   expectedWeight: number;
 };
 
-const RESOURCE_NEVER: Resource = {
+const RESOURCE_NEVER: ResourceWithUserInfo = {
   ...EPISODES_SIMPSONS[0],
+  userInfo: {
+    lastTimePlayed: 0,
+  },
 };
-
-delete RESOURCE_NEVER.lastTimePlayed;
-const RESOURCE_THREE_DAYS_AGO: Resource = {
+const RESOURCE_THREE_DAYS_AGO: ResourceWithUserInfo = {
   ...RESOURCE_NEVER,
-  lastTimePlayed: genLastTimePlayedDaysAgo(3),
+  userInfo: {
+    lastTimePlayed: genLastTimePlayedDaysAgo(3),
+  },
 };
-const RESOURCE_TWO_SECONDS_AGO: Resource = {
+const RESOURCE_TWO_SECONDS_AGO: ResourceWithUserInfo = {
   ...RESOURCE_NEVER,
-  lastTimePlayed: genLastTimePlayedAgo(2),
+  userInfo: {
+    lastTimePlayed: genLastTimePlayedAgo(2),
+  },
 };
-const RESOURCE_RIGHT_NOW: Resource = {
+const RESOURCE_RIGHT_NOW: ResourceWithUserInfo = {
   ...RESOURCE_NEVER,
-  lastTimePlayed: genLastTimePlayedAgo(),
+  userInfo: {
+    lastTimePlayed: genLastTimePlayedAgo(),
+  },
 };
-const RESOURCE_TWO_SECONDS_IN_THE_FUTURE: Resource = {
+const RESOURCE_TWO_SECONDS_IN_THE_FUTURE: ResourceWithUserInfo = {
   ...RESOURCE_NEVER,
-  lastTimePlayed: genLastTimePlayedAgo(-2),
+  userInfo: {
+    lastTimePlayed: genLastTimePlayedAgo(-2),
+  },
 };
 const RESOURCES = Object.freeze([
   RESOURCE_NEVER,
@@ -118,7 +130,7 @@ const cases = [
 ] as Case[];
 
 describe.each(cases)("lastTimeWeightFixer", (testCase) => {
-  const elapsed = secondsElapsedFrom(testCase.resource.lastTimePlayed ?? 0);
+  const elapsed = secondsElapsedFrom(testCase.resource.userInfo.lastTimePlayed ?? 0);
 
   it(`should return ${testCase.expectedWeight} when initialWeight = ${testCase.initialWeight}, \
     seconds ago = ${elapsed} and fx=${testCase.fx === fxDays ? "fxDays" : "fx"}`, async () => {

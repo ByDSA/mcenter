@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { EpisodeFilterApplier } from "#modules/episode-picker/appliers/filter-applier";
-import { EpisodeEntity } from "#episodes/models";
+import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { ResourcePicker } from "./resource-picker";
 import { WeightFixerApplier } from "./weight-fixers";
 
@@ -59,9 +59,9 @@ export async function genRandomPickerWithData<R, L>(
   if (filterApplier instanceof EpisodeFilterApplier) {
     newFilterApplier = new EpisodeFilterApplier( {
       dependencies: filterApplier.dependencies,
-      lastEp: lastOne as EpisodeEntity | undefined ?? null,
+      lastEp: lastOne as EpisodeEntityWithUserInfo | undefined ?? null,
       lastId: (lastOne as unknown as EpisodeEntity).compKey,
-      resources: resources as unknown as EpisodeEntity[],
+      resources: resources as unknown as EpisodeEntityWithUserInfo[],
     } ) as unknown as FilterApplier<R>;
   }
 

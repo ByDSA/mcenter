@@ -6,7 +6,7 @@ import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { getAbsolutePath } from "#episodes/utils";
 import { EpisodeHistoryRepository } from "../history/crud/repository";
 import { EpisodeEntity } from "../models";
-import { EpisodesRepository } from "../crud/repository";
+import { EpisodesRepository } from "../crud/repositories/episodes";
 
 type Slug = EpisodeEntity["compKey"];
 type HandleProps = {
@@ -25,13 +25,13 @@ export class EpisodeSlugHandlerService {
 
   async handle( { req, res, slug, userId }: HandleProps): Promise<StreamableFile | void> {
     const episode = await this.repo.getOneByCompKey(slug, {
-      expand: ["fileInfos", "series"],
+      expand: ["file-infos", "series"],
     } );
 
     assertFoundClient(episode);
 
     if (userId)
-      await this.updateHistory(episode.compKey, userId);
+      await this.updateHistory(episode, userId);
 
     return this.resourceSlugService.handle( {
       entity: episode,
@@ -48,12 +48,12 @@ export class EpisodeSlugHandlerService {
     } );
   }
 
-  private async updateHistory(episodeCompKey: Slug, userId: string) {
-    const isLast = await this.historyRepo.isLast(episodeCompKey, userId);
+  private async updateHistory(episode: EpisodeEntity, userId: string) {
+    const isLast = await this.historyRepo.isLast(episode.id, userId);
 
     if (!isLast) {
       await this.historyRepo.createNewEntryNowFor( {
-        episodeCompKey,
+        episode,
         userId,
       } );
     }

@@ -37,6 +37,7 @@ const modelSchema = z.object( {
   key: z.string(),
   group: groupSchema,
   mode: z.nativeEnum(Mode),
+  userId: mongoDbId,
 } ).strict();
 
 type Model = z.infer<typeof modelSchema>;

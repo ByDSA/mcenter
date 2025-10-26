@@ -1,8 +1,9 @@
-import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
+import type { EpisodeEntity, EpisodeUserInfoEntity } from "#episodes/models";
 import { DateTime } from "luxon";
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { EpisodesRepository } from "#episodes/crud/repository";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { showError } from "#core/logging/show-error";
+import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { EpisodeHistoryRepository } from "./crud/repository";
 
 @Injectable()
@@ -10,17 +11,22 @@ export class LastTimePlayedService {
   constructor(
     @Inject(forwardRef(() => EpisodesRepository))
     private readonly episodesRepo: EpisodesRepository,
+    private readonly episodesUsersRepo: EpisodesUsersRepository,
     private readonly historyRepo: EpisodeHistoryRepository,
   ) {
   }
 
   async updateEpisodeLastTimePlayedByEpisodeId(
+    userId: string,
     episodeId: EpisodeEntity["id"],
   ): Promise<number | null> {
     const lastTimePlayed = await this.historyRepo
       .calcEpisodeLastTimePlayedByEpisodeId(episodeId) ?? undefined;
 
-    this.episodesRepo.patchOneByIdAndGet(episodeId, {
+    this.episodesUsersRepo.patchOneByIdAndGet( {
+      userId,
+      episodeId,
+    }, {
       entity: {
         lastTimePlayed,
       },
@@ -29,13 +35,17 @@ export class LastTimePlayedService {
     return lastTimePlayed ?? null;
   }
 
-  async updateEpisodeLastTimePlayedByCompKey(
-    episodeCompKey: EpisodeCompKey,
+  async updateEpisodeLastTimePlayedById(
+    userId: string,
+    episodeId: EpisodeEntity["id"],
   ): Promise<number | null> {
     const lastTimePlayed = await this.historyRepo
-      .calcEpisodeLastTimePlayedByCompKey(episodeCompKey) ?? undefined;
+      .calcEpisodeLastTimePlayedById(episodeId) ?? undefined;
 
-    this.episodesRepo.patchOneByCompKeyAndGet(episodeCompKey, {
+    this.episodesUsersRepo.patchOneByIdAndGet( {
+      userId,
+      episodeId,
+    }, {
       entity: {
         lastTimePlayed,
       },
@@ -44,15 +54,18 @@ export class LastTimePlayedService {
     return lastTimePlayed ?? null;
   }
 
-  async getDaysFromLastPlayed(episode: EpisodeEntity): Promise<number> {
-    let lastTimePlayed = episode.lastTimePlayed ?? null;
+  async getDaysFromLastPlayed(userInfo: EpisodeUserInfoEntity): Promise<number> {
+    let { lastTimePlayed } = userInfo;
 
     if (!lastTimePlayed) {
       lastTimePlayed = await this.historyRepo
-        .calcEpisodeLastTimePlayedByEpisodeId(episode.id);
+        .calcEpisodeLastTimePlayedByEpisodeId(userInfo.episodeId) ?? 0;
 
-      if (lastTimePlayed) {
-        await this.episodesRepo.patchOneByIdAndGet(episode.id, {
+      if (lastTimePlayed !== 0) {
+        await this.episodesUsersRepo.patchOneByIdAndGet( {
+          episodeId: userInfo.episodeId,
+          userId: userInfo.userId,
+        }, {
           entity: {
             lastTimePlayed,
           },
@@ -60,7 +73,7 @@ export class LastTimePlayedService {
       }
     }
 
-    if (lastTimePlayed) {
+    if (lastTimePlayed !== 0) {
       const now = DateTime.now();
       const lastTimePlayedDate = DateTime.fromSeconds(lastTimePlayed);
       const { days } = now.diff(lastTimePlayedDate, "days");

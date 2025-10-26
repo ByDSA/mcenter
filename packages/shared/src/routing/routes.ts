@@ -222,6 +222,9 @@ export const PATH_ROUTES = {
     search: {
       path: `${EPISODES}/search`,
     },
+    userInfo: {
+      withParams: (episodeId: string)=>`${EPISODES}/${episodeId}/user-info`,
+    },
     slug: {
       path: EPISODES_SLUG,
       withParams: (seriesKey: string, episodeKey: string, query?: MusicSlugQueryParams) => {

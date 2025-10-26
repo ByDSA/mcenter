@@ -12,9 +12,9 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { fixTxtFields } from "#modules/resources/fix-text";
-import { Episode, EpisodeCompKey, EpisodeEntity } from "../../models";
-import { LastTimePlayedService } from "../../history/last-time-played.service";
-import { EpisodeHistoryEntryEvents } from "../../history/crud/repository/events";
+import { Episode, EpisodeCompKey, EpisodeEntity } from "../../../models";
+import { LastTimePlayedService } from "../../../history/last-time-played.service";
+import { EpisodeHistoryEntryEvents } from "../../../history/crud/repository/events";
 import { EpisodeOdm } from "./odm";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { EpisodeEvents } from "./events";
@@ -49,23 +49,12 @@ CanGetAll<EpisodeEntity> {
     logDomainEvent(ev);
   }
 
-  @OnEvent(EpisodeHistoryEntryEvents.Created.TYPE)
-  async handleCreateHistoryEntryEvents(event: EpisodeHistoryEntryEvents.Created.Event) {
-    const { entity } = event.payload;
-
-    await this.patchOneByCompKeyAndGet(entity.resourceId, {
-      entity: {
-        lastTimePlayed: entity.date.timestamp,
-      },
-    } );
-  }
-
   @OnEvent(EpisodeHistoryEntryEvents.Deleted.TYPE)
   async handleDeleteHistoryEntryEvents(event: EpisodeHistoryEntryEvents.Deleted.Event) {
     const { entity } = event.payload;
 
     await this.lastTimePlayedService
-      .updateEpisodeLastTimePlayedByCompKey(entity.resourceId);
+      .updateEpisodeLastTimePlayedById(entity.userId, entity.resourceId);
     ;
   }
 

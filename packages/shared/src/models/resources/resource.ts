@@ -1,16 +1,14 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
 import { timestampsSchema } from "../utils/schemas/timestamps";
-import { mongoDbId, pickableSchema, taggableSchema } from "./partial-schemas";
+import { mongoDbId, taggableSchema } from "./partial-schemas";
 
 const modelSchema = z.object( {
   title: z.string(),
   disabled: z.boolean().optional(),
-  lastTimePlayed: z.number().optional(),
   uploaderUserId: mongoDbId,
 } )
   .merge(timestampsSchema)
-  .merge(pickableSchema)
   .merge(taggableSchema);
 
 type Model = z.infer<typeof modelSchema>;

@@ -18,6 +18,7 @@ const config: JestConfigWithTsJest = {
     "^#utils($|/.*)$": "<rootDir>/src/utils/$1",
   },
   setupFiles: ["./jest.setup.ts"],
+  globalSetup: "./jest.global.setup.ts",
   collectCoverageFrom: ["**/*.(t|j)s"],
   coverageDirectory: "./coverage",
   testTimeout: 100 * 1000,

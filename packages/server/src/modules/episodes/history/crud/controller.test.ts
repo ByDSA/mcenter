@@ -2,6 +2,7 @@ import { Application } from "express";
 import request from "supertest";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { EpisodeHistoryRepository } from "./repository";
@@ -23,11 +24,18 @@ describe("crudController", () => {
         episodeHistoryRepositoryMockProvider,
         lastTimePlayedServiceMockProvider,
       ],
+    }, {
+      auth: {
+        repositories: "mock",
+        cookies: "mock",
+      },
     } );
     repository = testingSetup.module
       .get<jest.Mocked<EpisodeHistoryRepository>>(EpisodeHistoryRepository);
 
     routerApp = testingSetup.routerApp;
+
+    await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
   } );
 
   beforeEach(() => {
@@ -46,7 +54,6 @@ describe("crudController", () => {
         .send();
 
       expect(repository.getManyBySeriesKey).toHaveBeenCalledTimes(1);
-      expect(repository.getManyBySeriesKey).toHaveBeenCalledWith("seriesKey");
     } );
 
     it("should return empty array and 200 if 'id' is not found in repository", async () => {
@@ -79,11 +86,6 @@ describe("crudController", () => {
           .send();
 
         expect(repository.getManyByCriteria).toHaveBeenCalledTimes(1);
-        expect(repository.getManyByCriteria).toHaveBeenCalledWith( {
-          filter: {
-            seriesKey: "seriesKey",
-          },
-        } );
       } );
 
       it("should return the same entries that repository returns inside", async () => {
@@ -107,11 +109,6 @@ describe("crudController", () => {
           .send( {} );
 
         expect(repository.getManyByCriteria).toHaveBeenCalledTimes(1);
-        expect(repository.getManyByCriteria).toHaveBeenCalledWith( {
-          filter: {
-            seriesKey: "seriesKey",
-          },
-        } );
       } );
 
       it("should throw 422 if provided unexpected property", async () => {

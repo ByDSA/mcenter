@@ -1,24 +1,25 @@
 /* eslint-disable accessor-pairs */
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { Episode, EpisodeCompKey, EpisodeEntity, compareEpisodeCompKey } from "../../episodes/models";
+import { Episode, EpisodeCompKey, EpisodeEntityWithUserInfo, compareEpisodeCompKey } from "../../episodes/models";
 import { DependenciesList } from "./dependencies";
 
-class PreventDisabledEpisodeFilter extends PreventDisabledFilter<EpisodeEntity> {
-  isDisabled(resource: EpisodeEntity): boolean {
+class PreventDisabledEpisodeFilter extends PreventDisabledFilter<EpisodeEntityWithUserInfo> {
+  isDisabled(resource: EpisodeEntityWithUserInfo): boolean {
     return !!resource.disabled;
   }
 }
 
 class RemoveWeightLowerOrEqualThanEpisodeFilter
-  extends RemoveWeightLowerOrEqualThanFilter<EpisodeEntity> {
-  getWeight(resource: EpisodeEntity): number {
-    return resource.weight;
+  extends RemoveWeightLowerOrEqualThanFilter<EpisodeEntityWithUserInfo> {
+  getWeight(resource: EpisodeEntityWithUserInfo): number {
+    return resource.userInfo.weight;
   }
 }
 
-class PreventRepeatInDaysEpisodeFilter extends PreventRepeatInDaysFilter<EpisodeEntity> {
-  getLastTimePlayed(resource: EpisodeEntity): number {
-    return resource.lastTimePlayed ?? 0;
+class PreventRepeatInDaysEpisodeFilter
+  extends PreventRepeatInDaysFilter<EpisodeEntityWithUserInfo> {
+  getLastTimePlayed(resource: EpisodeEntityWithUserInfo): number {
+    return resource.userInfo.lastTimePlayed ?? 0;
   }
 }
 
@@ -28,10 +29,10 @@ type Params<R, ID = string> = {
   lastId: ID | undefined;
   dependencies: DependenciesList;
 };
-export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
-  #params: Params<EpisodeEntity, EpisodeCompKey>;
+export class EpisodeFilterApplier extends FilterApplier<EpisodeEntityWithUserInfo> {
+  #params: Params<EpisodeEntityWithUserInfo, EpisodeCompKey>;
 
-  constructor(params: Params<EpisodeEntity, EpisodeCompKey>) {
+  constructor(params: Params<EpisodeEntityWithUserInfo, EpisodeCompKey>) {
     super();
     this.#params = params;
 
@@ -61,7 +62,7 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
             seriesKey: seriesKey,
           } )) as [EpisodeCompKey, EpisodeCompKey];
 
-        this.add(new DependencyFilter<EpisodeCompKey, EpisodeEntity>( {
+        this.add(new DependencyFilter<EpisodeCompKey, EpisodeEntityWithUserInfo>( {
           lastId,
           firstId: dependencyFullId[0],
           secondId: dependencyFullId[1],
@@ -105,9 +106,9 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntity> {
 }
 
 export function genEpisodeFilterApplier(
-  resources: EpisodeEntity[],
+  resources: EpisodeEntityWithUserInfo[],
   deps: DependenciesList,
-  lastEp?: EpisodeEntity,
+  lastEp?: EpisodeEntityWithUserInfo,
 ) {
   return new EpisodeFilterApplier( {
     resources,

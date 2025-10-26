@@ -22,10 +22,6 @@ const modelSchema = optionalPropsSchema.extend( {
   slug: z.string(),
 } )
   .merge(resourceSchema)
-  .omit( {
-    weight: true,
-    lastTimePlayed: true,
-  } )
   .merge(taggableSchema);
 
 type Model = z.infer<typeof modelSchema>;

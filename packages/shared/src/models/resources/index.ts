@@ -1,5 +1,5 @@
 export {
-  Pickable, Taggable, TimeRange, timeRangeSchema,
+  Taggable, TimeRange, timeRangeSchema,
 } from "./partial-schemas";
 
 export * from "./resource";

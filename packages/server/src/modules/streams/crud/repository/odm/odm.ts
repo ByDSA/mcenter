@@ -1,9 +1,10 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { Stream, StreamGroup, StreamOrigin } from "../../../models";
 
-export type DocOdm = Stream & {
+export type DocOdm = Omit<Stream, "userId"> & {
   _id?: Types.ObjectId;
+  userId: Types.ObjectId;
 };
 
 export type FullDocOdm = RequireId<DocOdm>;
@@ -39,6 +40,10 @@ export const schema = new mongoose.Schema<DocOdm>( {
   },
   mode: {
     type: String,
+    required: true,
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
     required: true,
   },
 } satisfies SchemaDef<DocOdm>, {

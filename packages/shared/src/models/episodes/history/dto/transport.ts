@@ -1,4 +1,5 @@
 import z from "zod";
+import { mongoDbId } from "../../../resources/partial-schemas";
 import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 
 export namespace EpisodeHistoryEntryCrudDtos {
@@ -8,9 +9,10 @@ export namespace EpisodeHistoryEntryCrudDtos {
         seriesKey: z.string().optional(),
         episodeKey: z.string().optional(),
         timestampMax: z.number().optional(),
+        userId: mongoDbId.optional(),
       },
       sortKeys: ["timestamp"],
-      expandKeys: ["series", "episodes", "episode-file-infos"],
+      expandKeys: ["episode-series", "episodes", "episode-file-infos", "episode-user-info"],
     } );
     export type Criteria = z.infer<typeof criteriaSchema>;
   }

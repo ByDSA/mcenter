@@ -37,5 +37,7 @@ export class AuthPlayerService {
 
       throw new ForbiddenException();
     }
+
+    return remotePlayer;
   }
 }

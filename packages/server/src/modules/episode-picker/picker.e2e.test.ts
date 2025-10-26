@@ -1,11 +1,14 @@
 import request from "supertest";
 import { Application } from "express";
+import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { EpisodePickerModule } from "./module";
 
 async function loadFixtures() {
   await loadFixtureSimpsons();
+  await loadFixtureAuthUsers();
 }
 
 let testingSetup: TestingSetup;
@@ -19,12 +22,17 @@ describe("showPicker", () => {
       providers: [
       ],
     }, {
+      auth: {
+        repositories: "normal",
+        cookies: "mock",
+      },
       db: {
         using: "default",
       },
     } );
     routerApp = testingSetup.routerApp;
     await loadFixtures();
+    await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
   } );
 
   it("should get", async () => {

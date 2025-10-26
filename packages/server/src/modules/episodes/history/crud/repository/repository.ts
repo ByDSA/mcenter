@@ -1,4 +1,4 @@
-import type { EpisodeCompKey, EpisodeEntity } from "#episodes/models";
+import type { EpisodeEntity } from "#episodes/models";
 import type { DomainEvent } from "#core/domain-event-emitter";
 import type { CanCreateOne, CanDeleteOneByIdAndGet } from "#utils/layers/repository";
 import type { EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity, EpisodeHistoryEntryEntity } from "../../models";
@@ -20,7 +20,6 @@ import { EpisodeHistoryEntryEvents } from "./events";
 import { EpisodeHistoryEntryOdm } from "./odm";
 
 type FindLastProps = {
-  seriesKey: SeriesKey;
   streamId: StreamEntity["id"];
 };
 
@@ -33,7 +32,7 @@ type AddEpisodesToHistoryProps = {
   userId: UserEntity["id"];
 };
 type CreateNewEntryNowForProps = {
-  episodeCompKey: EpisodeCompKey;
+  episode: EpisodeEntity;
   streamId?: StreamEntity["id"];
   userId: UserEntity["id"];
 };
@@ -68,9 +67,10 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return docsOdm.map(EpisodeHistoryEntryOdm.toEntity);
   }
 
-  async getManyBySeriesKey(seriesKey: SeriesKey): Promise<Entity[]> {
+  async getManyBySeriesKey(userId: string, seriesKey: SeriesKey): Promise<Entity[]> {
     return await this.getManyByCriteria( {
       filter: {
+        userId,
         seriesKey,
       },
     } );
@@ -87,8 +87,11 @@ CanDeleteOneByIdAndGet<Model, Id> {
     if (docsOdm.length === 0)
       return [];
 
-    if (criteria.expand?.includes("series"))
+    if (criteria.expand?.includes("episode-series"))
       assertIsDefined(docsOdm[0].episode?.serie, "Lookup serie failed");
+
+    if (criteria.expand?.includes("episode-user-info"))
+      assertIsDefined(docsOdm[0].episode?.userInfo, "Lookup serie failed");
 
     if (criteria.expand?.includes("episodes"))
       assertIsDefined(docsOdm[0].episode, "Lookup episode failed");
@@ -122,33 +125,8 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return EpisodeHistoryEntryOdm.toEntity(last);
   }
 
-  async findLastByEpisodeCompKey(episodeCompKey: EpisodeCompKey): Promise<Entity | null> {
+  async findLast( { streamId }: FindLastProps): Promise<Entity | null> {
     const filter = {
-      episodeCompKey: {
-        episodeKey: episodeCompKey.episodeKey,
-        seriesKey: episodeCompKey.seriesKey,
-      },
-    } satisfies MongoFilterQuery<EpisodeHistoryEntryOdm.Doc>;
-    const sort = {
-      "date.timestamp": -1,
-    } satisfies MongoSortQuery<EpisodeHistoryEntryOdm.Doc>;
-    const last = await EpisodeHistoryEntryOdm.Model.findOne(
-      filter,
-      {},
-      {
-        sort,
-      },
-    );
-
-    if (!last)
-      return null;
-
-    return EpisodeHistoryEntryOdm.toEntity(last);
-  }
-
-  async findLast( { seriesKey, streamId }: FindLastProps): Promise<Entity | null> {
-    const filter = {
-      "episodeCompKey.seriesKey": seriesKey,
       streamId,
     } satisfies MongoFilterQuery<EpisodeHistoryEntryOdm.Doc>;
     const sort = {
@@ -164,29 +142,31 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return EpisodeHistoryEntryOdm.toEntity(last);
   }
 
-  async isLast(compKey: EpisodeCompKey, userId: string): Promise<boolean> {
+  async isLast(episodeId: EpisodeEntity["id"], userId: string): Promise<boolean> {
     const lastOdm = await EpisodeHistoryEntryOdm.Model.findOne( {
       userId,
     } ).sort( {
       "date.timestamp": -1,
     } );
 
-    return lastOdm?.episodeCompKey.seriesKey === compKey.seriesKey
-      && lastOdm?.episodeCompKey.episodeKey === compKey.episodeKey;
+    return lastOdm?.episodeId.toString() === episodeId;
   }
 
-  async createNewEntryNowFor( { episodeCompKey, streamId, userId }: CreateNewEntryNowForProps) {
+  async createNewEntryNowFor( { episode, streamId, userId }: CreateNewEntryNowForProps) {
     assertIsDefined(userId);
 
     if (streamId === undefined) {
-      const defaultStream = this.streamsRepo.getOneOrCreateBySeriesKey(episodeCompKey.seriesKey);
+      const defaultStream = this.streamsRepo.getOneOrCreateBySeriesKey(
+        userId,
+        episode.compKey.seriesKey,
+      );
 
       streamId = (await defaultStream).id;
     }
 
     const newEntry: Model = {
       date: getDateNow(),
-      resourceId: episodeCompKey,
+      resourceId: episode.id,
       streamId,
       userId,
     };
@@ -198,15 +178,15 @@ CanDeleteOneByIdAndGet<Model, Id> {
     // TODO: usar bulk insert (quitar await en for)
     for (const episode of episodes) {
       await this.createNewEntryNowFor( {
-        episodeCompKey: episode.compKey,
+        episode,
         streamId,
         userId,
       } );
     }
   }
 
-  async calcEpisodeLastTimePlayedByCompKey(episodeCompKey: EpisodeCompKey): Promise<number | null> {
-    const last = await this.findLastByEpisodeCompKey(episodeCompKey);
+  async calcEpisodeLastTimePlayedById(episodeId: EpisodeEntity["id"]): Promise<number | null> {
+    const last = await this.findLastByEpisodeId(episodeId);
 
     if (last === null)
       return null;

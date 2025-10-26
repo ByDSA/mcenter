@@ -1,22 +1,25 @@
 import { SECONDS_IN_DAY } from "#modules/resources";
-import { Resource } from "#modules/resources/models";
 import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { useFakeTime } from "#tests/time";
 import { fixtureEpisodes } from "#episodes/tests";
 import { PreventRepeatInDaysFilter } from "../prevent-repeat-in-days-filter";
+import { ResourceWithUserInfo } from "./types";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
-class PreventRepeatInDaysResourceFilter extends PreventRepeatInDaysFilter<Resource> {
-  getLastTimePlayed(r: Resource) {
-    return r.lastTimePlayed ?? 0;
+class PreventRepeatInDaysResourceFilter extends PreventRepeatInDaysFilter<ResourceWithUserInfo> {
+  getLastTimePlayed(r: ResourceWithUserInfo) {
+    return r.userInfo.lastTimePlayed ?? 0;
   }
 }
 
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
-const EP_BASE: Resource = {
+const EP_BASE: ResourceWithUserInfo = {
   ...EPISODES_SIMPSONS[0],
+  userInfo: {
+    lastTimePlayed: 0,
+  },
 };
 
 type CaseDaysAgo = {
@@ -54,7 +57,10 @@ ${testCase.lastTimePlayedDaysAgo} days ago and minDays = ${testCase.minDays}`,
       const filter = new PreventRepeatInDaysResourceFilter(params);
       const result = await filter.filter( {
         ...EP_BASE,
-        lastTimePlayed: genLastTimePlayedDaysAgo(testCase.lastTimePlayedDaysAgo),
+        userInfo: {
+          ...EP_BASE.userInfo,
+          lastTimePlayed: genLastTimePlayedDaysAgo(testCase.lastTimePlayedDaysAgo),
+        },
       } );
 
       expect(result).toBe(testCase.expected);
@@ -102,7 +108,10 @@ describe.each(casesLastTimePlayed)("preventRepeatInDaysFilter", (testCase) => {
       const filter = new PreventRepeatInDaysResourceFilter(params);
       const result = await filter.filter( {
         ...EP_BASE,
-        lastTimePlayed: testCase.lastTimePlayed,
+        userInfo: {
+          ...EP_BASE.userInfo,
+          lastTimePlayed: testCase.lastTimePlayed ?? 0,
+        },
       } );
 
       expect(result).toBe(testCase.expected);

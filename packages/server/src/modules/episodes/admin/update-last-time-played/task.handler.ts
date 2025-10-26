@@ -6,7 +6,7 @@ import z from "zod";
 import { EpisodeTasks } from "$shared/models/episodes/admin";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { LastTimePlayedService } from "#episodes/history/last-time-played.service";
-import { EpisodesRepository } from "../../crud/repository";
+import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 
 const TASK_NAME = EpisodeTasks.cache.updateLastTimePlayed.name;
 
@@ -32,7 +32,7 @@ type Result = z.infer<typeof resultSchema>;
 export class EpisodeUpdateLastTimePlayedTaskHandler implements TaskHandler<Payload, Result> {
   constructor(
     private readonly lastTimePlayedService: LastTimePlayedService,
-    private readonly episodeRepo: EpisodesRepository,
+    private readonly episodesUsersRepo: EpisodesUsersRepository,
     private readonly taskService: TaskService,
   ) { }
 
@@ -64,23 +64,23 @@ export class EpisodeUpdateLastTimePlayedTaskHandler implements TaskHandler<Paylo
       message: "Starting",
       percentage: 0,
     } );
-    const allEpisodes = await this.episodeRepo.getAll();
+    const allUserInfos = await this.episodesUsersRepo.getAll();
     const promisesToAwait: Promise<any>[] = [];
     const data: Result["data"] = {
       changes: [],
     };
 
-    for (const episode of allEpisodes) {
+    for (const userInfo of allUserInfos) {
       const updatePromise = this.lastTimePlayedService
-        .updateEpisodeLastTimePlayedByCompKey(episode.compKey)
+        .updateEpisodeLastTimePlayedById(userInfo.userId, userInfo.episodeId)
         .then(n=> {
-          if (n !== (episode.lastTimePlayed ?? null)) {
+          if (n !== (userInfo.lastTimePlayed ?? null)) {
             data.changes.push( {
-              id: episode.id,
+              id: userInfo.id,
               description:
-                `${episode.compKey.seriesKey} ${episode.compKey.episodeKey}: ${episode.title}`,
+                `episodeId=${userInfo.id} userId=${userInfo.userId}`,
               new: n,
-              old: episode.lastTimePlayed,
+              old: userInfo.lastTimePlayed,
             } );
           }
         } );

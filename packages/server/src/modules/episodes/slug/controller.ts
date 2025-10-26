@@ -13,7 +13,7 @@ import { assertFoundClient } from "#utils/validation/found";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { User } from "#core/auth/users/User.decorator";
-import { EpisodesRepository } from "../crud/repository";
+import { EpisodesRepository } from "../crud/repositories/episodes";
 import { EpisodeSlugHandlerService } from "./service";
 
 class GetOneByIdParamsDto extends createZodDto(EpisodesCrudDtos.GetOne.ById.paramsSchema) {}
@@ -74,7 +74,7 @@ export class EpisodesSlugController {
         typeof this.episodesRepo.getOneByCompKey
       >[1] = format === ResponseFormat.M3U8
         ? {
-          expand: ["fileInfos"],
+          expand: ["file-infos"],
         }
         : {
           expand: [],

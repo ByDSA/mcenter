@@ -10,12 +10,6 @@ export const timeRangeSchema = z.object( {
 
 export type TimeRange = z.infer<typeof timeRangeSchema>;
 
-export const pickableSchema = z.object( {
-  weight: z.number(),
-} );
-
-export type Pickable = z.infer<typeof pickableSchema>;
-
 export const taggableSchema = z.object( {
   tags: z.array(z.string()).optional(),
 } );

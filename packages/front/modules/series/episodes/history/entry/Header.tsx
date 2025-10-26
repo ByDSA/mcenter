@@ -29,6 +29,6 @@ export function Header( { entry }: HeaderProps) {
     subtitle={subtitle}
     right={<>
       {duration && createDurationElement(duration)}
-      {createWeightElement(resource.weight)}
+      {createWeightElement(resource.userInfo.weight)}
     </>} />;
 }

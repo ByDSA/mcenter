@@ -3,7 +3,6 @@ import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { SERIE_SIMPSONS } from "$sharedSrc/models/series/tests/fixtures";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
-import { Types } from "mongoose";
 import { SeriesModule } from "#modules/series/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { fixtureEpisodes } from "#episodes/tests";
@@ -12,7 +11,7 @@ import { EpisodesCrudModule } from "#episodes/crud/module";
 import { createMockedModule, createMockProvider } from "#utils/nestjs/tests";
 import { EpisodePickerModule } from "#modules/episode-picker/module";
 import { StreamsModule } from "#modules/streams/module";
-import { EpisodesRepository } from "#episodes/crud/repository";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
@@ -21,12 +20,13 @@ import { PlayVideoService } from "../play-video.service";
 import { PlayService } from "../play.service";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
+import { fixturesRemotePlayers } from "../tests/fixtures";
 import { PlayEpisodeController } from "./controller";
 
 describe("playEpisodeController", () => {
   let routerApp: Application;
   let testingSetup: TestingSetup;
-  let remotePlayerId = new Types.ObjectId().toString();
+  let remotePlayerId = fixturesRemotePlayers.valid.id;
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {

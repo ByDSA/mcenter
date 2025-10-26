@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { EpisodeOdm } from "#episodes/crud/repository/odm";
+import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
 import { OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 
 type DocOdm = OptionalId & {

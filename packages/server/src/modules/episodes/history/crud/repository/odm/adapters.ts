@@ -1,6 +1,6 @@
 import { AllKeysOf } from "$shared/utils/types";
 import { Types } from "mongoose";
-import { EpisodeOdm } from "#episodes/crud/repository/odm";
+import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
 import { StreamOdm } from "#modules/streams/crud/repository/odm";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../../models";
@@ -9,10 +9,7 @@ import { DocOdm, FullDocOdm } from "./odm";
 function docOdmToEntity(docOdm: FullDocOdm): Entity {
   const ret: Entity = {
     id: docOdm._id.toString(),
-    resourceId: {
-      episodeKey: docOdm.episodeCompKey.episodeKey,
-      seriesKey: docOdm.episodeCompKey.seriesKey,
-    },
+    resourceId: docOdm.episodeId.toString(),
     date: {
       year: docOdm.date.year,
       month: docOdm.date.month,
@@ -31,10 +28,7 @@ function docOdmToEntity(docOdm: FullDocOdm): Entity {
 
 function modelToDocOdm(model: Entry): DocOdm {
   return {
-    episodeCompKey: {
-      episodeKey: model.resourceId.episodeKey,
-      seriesKey: model.resourceId.seriesKey,
-    },
+    episodeId: new Types.ObjectId(model.resourceId),
     date: {
       year: model.date.year,
       month: model.date.month,
