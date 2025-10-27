@@ -1,7 +1,7 @@
 import type { ResourcePicker } from "#modules/picker";
 import type { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
-import { assertIsDefined, neverCase } from "$shared/utils/validation";
+import { assertIsDefined, assertIsNotEmpty, neverCase } from "$shared/utils/validation";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { PickMode } from "#modules/picker/resource-picker/pick-mode";
 import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#modules/streams";
@@ -9,6 +9,8 @@ import { StreamsRepository } from "#modules/streams/crud/repository";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
+import { SeriesRepository } from "#modules/series/crud/repository";
+import { EpisodeFileInfosRepository } from "#episodes/file-info/crud/repository/repository";
 import { buildEpisodePicker } from "./episode-picker";
 import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
 
@@ -20,6 +22,8 @@ export class EpisodePickerService {
     private readonly episodesUsersRepo: EpisodesUsersRepository,
     private readonly historyRepo: EpisodeHistoryRepository,
     private readonly dependenciesRepo: EpisodeDependenciesRepository,
+    private readonly seriesRepo: SeriesRepository,
+    private readonly fileInfosRepo: EpisodeFileInfosRepository,
   ) {
   }
 
@@ -85,6 +89,26 @@ export class EpisodePickerService {
       dependencies,
     } );
     const episodes = await picker.pick(n);
+
+    if (criteria.expand) {
+      for (const e of episodes) {
+        if (criteria.expand.includes("series")) {
+          const gotSerie = await this.seriesRepo.getOneByKey(e.compKey.seriesKey);
+
+          assertIsDefined(gotSerie);
+
+          e.serie = gotSerie;
+        }
+
+        if (criteria.expand.includes("file-infos")) {
+          const gotFileInfos = await this.fileInfosRepo.getAllByEpisodeId(e.id);
+
+          assertIsNotEmpty(gotFileInfos);
+
+          e.fileInfos = gotFileInfos;
+        }
+      }
+    }
 
     return episodes;
   }

@@ -4,6 +4,7 @@ import { StreamsModule } from "#modules/streams/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
+import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { EpisodePickerController } from "./controller";
 import { EpisodePickerService } from "./service";
 
@@ -14,6 +15,7 @@ import { EpisodePickerService } from "./service";
     EpisodeHistoryModule,
     SeriesModule,
     EpisodeDependenciesModule,
+    EpisodeFileInfosModule,
   ],
   controllers: [
     EpisodePickerController,

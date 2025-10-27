@@ -1,5 +1,5 @@
 import type { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
-import type { FilterQuery, PipelineStage } from "mongoose";
+import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { DocOdm as EpisodeDocOdm } from "./odm";
@@ -34,6 +34,9 @@ function buildMongooseFilter(
   const filter: MongoFilterQuery<EpisodeDocOdm> = {};
 
   if (criteria.filter) {
+    if (criteria.filter.id)
+      filter["_id"] = new Types.ObjectId(criteria.filter.id);
+
     if (criteria.filter.seriesKey)
       filter["seriesKey"] = criteria.filter.seriesKey;
 

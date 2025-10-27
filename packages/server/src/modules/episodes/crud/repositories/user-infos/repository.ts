@@ -85,7 +85,7 @@ CanGetOneById<Entity, UserInfoKey> {
                       $eq: ["$episodeId", "$$episodeId"],
                     },
                     {
-                      $eq: ["$userId", userId],
+                      $eq: ["$userId", new Types.ObjectId(userId)],
                     },
                   ],
                 },
