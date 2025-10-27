@@ -16,6 +16,9 @@ import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app
 import { createMockProvider } from "#utils/nestjs/tests";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
+import { seriesRepositoryMockProvider } from "#modules/series/crud/repository/tests";
+import { SeriesRepository } from "#modules/series/crud/repository";
+import { episodeFileInfoRepositoryMockProvider } from "#episodes/file-info/crud/repository/tests";
 import { EpisodePickerService } from "./service";
 
 describe("tests", () => {
@@ -27,11 +30,14 @@ describe("tests", () => {
     historyEntries: jest.Mocked<EpisodeHistoryRepository>;
     streams: jest.Mocked<StreamsRepository>;
     episodesUsers: jest.Mocked<EpisodesUsersRepository>;
+    series: jest.Mocked<SeriesRepository>;
+    fileInfos: jest.Mocked<EpisodeDependenciesRepository>;
   };
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [],
+      imports: [
+      ],
       controllers: [],
       providers: [
         streamsRepositoryMockProvider,
@@ -40,6 +46,8 @@ describe("tests", () => {
         episodeDependenciesRepositoryMockProvider,
         createMockProvider(EpisodesUsersRepository),
         EpisodePickerService,
+        seriesRepositoryMockProvider,
+        episodeFileInfoRepositoryMockProvider,
       ],
     } );
     repos = {
@@ -48,6 +56,8 @@ describe("tests", () => {
       historyEntries: testingSetup.module.get(EpisodeHistoryRepository),
       streams: testingSetup.module.get(StreamsRepository),
       episodesUsers: testingSetup.module.get(EpisodesUsersRepository),
+      series: testingSetup.module.get(SeriesRepository),
+      fileInfos: testingSetup.module.get(EpisodeDependenciesRepository),
     };
     service = testingSetup.module.get(EpisodePickerService);
     repos.episodesUsers.getFullSerieForUser.mockResolvedValue(
