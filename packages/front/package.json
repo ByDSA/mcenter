@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
+    "build": "next build --webpack",
+    "dev": "next dev --webpack",
     "lint": "bin/lint.mjs",
     "start": "[ -e .env ] && set -a && . ./.env; next start"
   },
@@ -21,7 +21,7 @@
     "just-clone": "6.2.0",
     "just-diff": "6.0.2",
     "just-extend": "6.2.0",
-    "next": "latest",
+    "next": "16.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-toastify": "11.0.5",
@@ -37,6 +37,6 @@
     "$sharedSrc": "workspace:../shared/src"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   }
 }

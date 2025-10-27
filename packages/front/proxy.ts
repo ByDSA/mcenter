@@ -1,7 +1,7 @@
-// middleware.js (en la raíz del proyecto)
+/* eslint-disable import/no-default-export */
 import { NextResponse } from "next/server";
 
-export function middleware(request) {
+export default function middleware(request) {
   const requestHeaders = new Headers(request.headers);
 
   // Agregar la URL completa como header

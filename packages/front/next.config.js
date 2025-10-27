@@ -58,9 +58,6 @@ module.exports = {
   ...dev,
   output: "standalone",
   reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   env: {
     version: (() => {
       const { version } = readMainPackageJson();
