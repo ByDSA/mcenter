@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.12.0](https://github.com/ByDSA/mcenter/compare/v4.12.0-alpha.2...v4.12.0) (2025-10-27)
+
 ## [4.12.0-alpha.2](https://github.com/ByDSA/mcenter/compare/v4.12.0-alpha.1...v4.12.0-alpha.2) (2025-10-27)
 
 
