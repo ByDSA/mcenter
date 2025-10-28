@@ -5,6 +5,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { EpisodesUsersOdm } from "#episodes/crud/repositories/user-infos/odm";
+import { assertFoundClient } from "#utils/validation/found";
 import { DocOdm, FullDocOdm } from "./odm/odm";
 
 function buildMongooseSort(
@@ -33,11 +34,21 @@ function buildMongooseFilter(
   filter.userId = new Types.ObjectId(userIdStr);
 
   if (criteria.filter) {
-    if (criteria.filter.seriesKey)
-      filter["episode.serie.key"] = criteria.filter.seriesKey;
+    if (criteria.filter.seriesKey) {
+      assertFoundClient(
+        criteria.expand?.includes("episodes"),
+        "Lookup episodes is required to filter by seriesKey",
+      );
+      filter["episode.seriesKey"] = criteria.filter.seriesKey;
+    }
 
-    if (criteria.filter.episodeKey)
+    if (criteria.filter.episodeKey) {
+      assertFoundClient(
+        criteria.expand?.includes("episodes"),
+        "Lookup episodes is required to filter by episodeKey",
+      );
       filter["episode.episodeKey"] = criteria.filter.episodeKey;
+    }
 
     if (criteria.filter.timestampMax !== undefined) {
       filter["date.timestamp"] = {
@@ -81,14 +92,19 @@ export function getCriteriaPipeline(
   // Agregar lookups para expand
   if (criteria.expand) {
     if (criteria.expand.includes("episodes")) {
-      pipeline.push( {
+      const episodesLookUp = {
         $lookup: {
           from: "episodes",
           localField: "episodeId",
           foreignField: "_id",
           as: "episode",
         },
-      } );
+      };
+
+      if (criteria.filter?.episodeKey || criteria.filter?.seriesKey)
+        pipeline.unshift(episodesLookUp);
+      else
+        pipeline.push(episodesLookUp);
 
       // Convertir el array a objeto único
       pipeline.push( {

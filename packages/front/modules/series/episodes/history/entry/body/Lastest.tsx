@@ -36,6 +36,7 @@ export function LastestComponent(
       timestamp: "desc",
     },
     limit: 4,
+    expand: ["episodes"],
   };
 
   return LatestHistoryEntries<EpisodeHistoryEntryEntity, Criteria>( {
