@@ -1,4 +1,4 @@
-FROM node:22-alpine3.21 AS base
+FROM node:24.10.0-alpine3.22 AS base
 ARG TARGETPLATFORM
 ARG PNPM_CACHE_PATH=/root/.local/share/pnpm/store
 ENV APP=server

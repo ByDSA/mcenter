@@ -37,6 +37,6 @@
     "$sharedSrc": "workspace:../shared/src"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   }
 }

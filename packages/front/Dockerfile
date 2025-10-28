@@ -1,6 +1,6 @@
 # Fuente: https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile
 
-FROM node:22-alpine3.21 AS base
+FROM node:24.10.0-alpine3.22 AS base
 ARG ENV=local
 ARG PNPM_CACHE_PATH=/root/.local/share/pnpm/store
 ARG TARGETPLATFORM
