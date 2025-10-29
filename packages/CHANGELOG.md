@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.12.1](https://github.com/ByDSA/mcenter/compare/v4.12.0...v4.12.1) (2025-10-29)
+
+
+### Bug Fixes
+
+* **back:** music time elapsed filter ([a108c71](https://github.com/ByDSA/mcenter/commit/a108c71ca21f4a758a74cf35ebb02796bc9c6509))
+* latest episodes in history ([8b8875f](https://github.com/ByDSA/mcenter/commit/8b8875f67ef92c74827236688fad67e62f7b7986))
+
 ## [4.12.0](https://github.com/ByDSA/mcenter/compare/v4.12.0-alpha.2...v4.12.0) (2025-10-27)
 
 ## [4.12.0-alpha.2](https://github.com/ByDSA/mcenter/compare/v4.12.0-alpha.1...v4.12.0-alpha.2) (2025-10-27)
