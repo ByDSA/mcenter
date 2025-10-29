@@ -193,8 +193,12 @@ export class MusicPlaylistsController {
     if (format === ResponseFormat.RAW) {
       const userId = user?.id ?? token;
 
-      if (userId)
-        await this.musicHistoryRepo.createNewEntryNowIfShouldFor(got.id, userId);
+      if (userId) {
+        await this.musicHistoryRepo.createNewEntryNowIfShouldFor( {
+          musicId: got.id,
+          userId,
+        } );
+      }
     }
 
     return this.musicRenderer.render( {

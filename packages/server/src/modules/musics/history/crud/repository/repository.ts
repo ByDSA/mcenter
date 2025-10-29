@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
-import { MusicId } from "$shared/models/musics";
 import { getDateNow } from "$shared/utils/time";
 import { OnEvent } from "@nestjs/event-emitter";
 import { assertFoundClient } from "#utils/validation/found";
@@ -25,6 +24,11 @@ const ModelOdm = MusicHistoryEntryOdm.Model;
 
 export type GetManyCriteria = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
 type EntryId = Entity["id"];
+
+type CreateNewEntryNowForProps = {
+  musicId: string;
+  userId: string;
+};
 
 @Injectable()
 export class MusicHistoryRepository
@@ -62,17 +66,17 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
     }
   }
 
-  async isLast(id: MusicId, userId: string): Promise<boolean> {
+  async isLast( { musicId, userId }: CreateNewEntryNowForProps): Promise<boolean> {
     const lastOdm = await ModelOdm.findOne( {
       userId,
     } ).sort( {
       "date.timestamp": -1,
     } );
 
-    return lastOdm?.musicId.toString() === id;
+    return lastOdm?.musicId.toString() === musicId;
   }
 
-  async createNewEntryNowFor(musicId: MusicId, userId: string): Promise<Model> {
+  async createNewEntryNowFor( { musicId, userId }: CreateNewEntryNowForProps): Promise<Model> {
     const newEntry: Model = {
       date: getDateNow(),
       resourceId: musicId,
@@ -82,12 +86,12 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
     return await this.createOneAndGet(newEntry);
   }
 
-  async createNewEntryNowIfShouldFor(musicId: string, userId: string) {
-    const isLast = await this.isLast(musicId, userId);
+  async createNewEntryNowIfShouldFor(props: CreateNewEntryNowForProps) {
+    const isLast = await this.isLast(props);
 
     // Si se llama en paralelo, esta condición podría no servir e igualmente añadirse al historial
     if (!isLast)
-      await this.createNewEntryNowFor(musicId, userId);
+      await this.createNewEntryNowFor(props);
   }
 
   @EmitEntityEvent(MusicHistoryEntryEvents.Deleted.TYPE)

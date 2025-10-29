@@ -35,6 +35,8 @@ export class FilterApplier<R> {
           newData.push(self);
       }
 
+      // Si el resultado de aplicar filtros reversibles es 'length=0',
+      // no aplicar filtros reversibles
       if (newData.length > 0)
         currentData = newData;
     }

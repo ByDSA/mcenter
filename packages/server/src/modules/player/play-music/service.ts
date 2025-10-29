@@ -70,13 +70,20 @@ export class PlayMusicService {
     const userIds = await this.remotePlayersRepo.getAllViewersOf(remotePlayerId);
 
     for (const userId of userIds) {
-      const isLast = await this.historyRepo.isLast(musics[0].id, userId);
+      const isLast = await this.historyRepo.isLast( {
+        musicId: musics[0].id,
+        userId,
+      } );
       const musicsToAddInHistory: MusicEntity[] = isLast
         ? musics.slice(1)
         : musics;
 
-      for (const m of musicsToAddInHistory)
-        await this.historyRepo.createNewEntryNowFor(m.id, userId);
+      for (const m of musicsToAddInHistory) {
+        await this.historyRepo.createNewEntryNowFor( {
+          musicId: m.id,
+          userId,
+        } );
+      }
     }
 
     return musics;

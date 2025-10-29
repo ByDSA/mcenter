@@ -218,8 +218,14 @@ export class MusicsIndexService {
   }
 
   async updateUserInfo(
-    doc: UserInfoDoc,
+    userInfoDoc: UserInfoDoc,
   ): Promise<void> {
+    const id = genId(userInfoDoc);
+    const doc = {
+      ...userInfoDoc,
+      id,
+    } satisfies Partial<Doc>;
+
     await this.index.updateDocuments([doc]);
   }
 

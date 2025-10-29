@@ -53,8 +53,12 @@ export class MusicsSlugController {
     if (format === ResponseFormat.RAW) {
       const userId = user?.id ?? token;
 
-      if (userId)
-        await this.historyRepo.createNewEntryNowIfShouldFor(got.id, userId);
+      if (userId) {
+        await this.historyRepo.createNewEntryNowIfShouldFor( {
+          musicId: got.id,
+          userId,
+        } );
+      }
     }
 
     return this.renderer.render( {
