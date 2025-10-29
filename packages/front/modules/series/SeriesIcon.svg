@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <defs>
+    <mask id="__MASK_ID__" mask-units="userSpaceOnUse">
+      <rect width="200" height="140" fill="currentColor"/>
+      <text x="100" y="78" font-family="-apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif" font-size="74" font-weight="bold" fill="black" text-anchor="middle" dominant-baseline="middle">1x01</text>
+    </mask>
+  </defs>
+
+  <path fill="currentColor" fill-rule="evenodd" mask="url(#__MASK_ID__)" d="
+    M0 10 H200 A4 4 0 0 1 204 14 V126 A4 4 0 0 1 200 130 H0 A4 4 0 0 1 -4 126 V14 A4 4 0 0 1 0 10 Z
+
+    M15 18 H31 A2 2 0 0 1 33 20 V32 A2 2 0 0 1 31 34 H15 A2 2 0 0 1 13 32 V20 A2 2 0 0 1 15 18 Z
+    M55 18 H71 A2 2 0 0 1 73 20 V32 A2 2 0 0 1 71 34 H55 A2 2 0 0 1 53 32 V20 A2 2 0 0 1 55 18 Z
+    M95 18 H111 A2 2 0 0 1 113 20 V32 A2 2 0 0 1 111 34 H95 A2 2 0 0 1 93 32 V20 A2 2 0 0 1 95 18 Z
+    M135 18 H151 A2 2 0 0 1 153 20 V32 A2 2 0 0 1 151 34 H135 A2 2 0 0 1 133 32 V20 A2 2 0 0 1 135 18 Z
+    M175 18 H191 A2 2 0 0 1 193 20 V32 A2 2 0 0 1 191 34 H175 A2 2 0 0 1 173 32 V20 A2 2 0 0 1 175 18 Z
+
+    M15 108 H31 A2 2 0 0 1 33 110 V122 A2 2 0 0 1 31 124 H15 A2 2 0 0 1 13 122 V110 A2 2 0 0 1 15 108 Z
+    M55 108 H71 A2 2 0 0 1 73 110 V122 A2 2 0 0 1 71 124 H55 A2 2 0 0 1 53 122 V110 A2 2 0 0 1 55 108 Z
+    M95 108 H111 A2 2 0 0 1 113 110 V122 A2 2 0 0 1 111 124 H95 A2 2 0 0 1 93 122 V110 A2 2 0 0 1 95 108 Z
+    M135 108 H151 A2 2 0 0 1 153 110 V122 A2 2 0 0 1 151 124 H135 A2 2 0 0 1 133 122 V110 A2 2 0 0 1 135 108 Z
+    M175 108 H191 A2 2 0 0 1 193 110 V122 A2 2 0 0 1 191 124 H175 A2 2 0 0 1 173 122 V110 A2 2 0 0 1 175 108 Z
+  "/>
+</svg>

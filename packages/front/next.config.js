@@ -19,9 +19,43 @@ const dev = {
       ),
     );
 
+    addSvgr(config);
+
     return config;
   },
 };
+
+function addSvgr(config) {
+  // Encuentra la regla existente que maneja archivos SVG
+  const fileLoaderRule = config.module.rules.find((rule) => rule.test?.test?.(".svg"));
+
+  // Excluye todos los SVG de la regla original
+  fileLoaderRule.exclude = /\.svg$/i;
+
+  // Agrega nuevas reglas específicas
+  config.module.rules.push(
+    // SVG con ?raw → texto crudo
+    {
+      test: /\.svg$/i,
+      resourceQuery: /raw/, // *.svg?raw
+      type: "asset/source",
+    },
+    // SVG con ?url → url del archivo
+    {
+      test: /\.svg$/i,
+      resourceQuery: /url/, // *.svg?url
+      type: "asset/resource",
+    },
+    // SVG normal → componente React
+    {
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
+      resourceQuery: { not: [/raw/, /url/] },
+      use: ["@svgr/webpack"],
+    },
+  );
+}
+
 const fs = require("node:fs");
 const path = require("node:path");
 

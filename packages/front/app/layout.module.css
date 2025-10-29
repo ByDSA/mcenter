@@ -9,6 +9,15 @@
   user-select: none;
 }
 
+.sidebar,
+.topbar {
+  svg {
+    width: 1em;
+    height: 1em;
+    font-size: 1.5rem;
+  }
+}
+
 .topbar {
   top: 0;
   z-index: 2;

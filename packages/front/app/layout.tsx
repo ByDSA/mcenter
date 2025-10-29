@@ -8,6 +8,7 @@ import { UserAvatarButton } from "#modules/core/auth/Avatar";
 import { SidebarClient } from "#modules/ui-kit/menus/SidebarClient";
 import { classes } from "#modules/utils/styles";
 import { MenuItemData } from "#modules/ui-kit/menus/Sidebar";
+import { SeriesIcon } from "#modules/series/SeriesIcon";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
@@ -15,16 +16,7 @@ import { NavigationWatcher } from "./NavigationWatcher";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 
-// TODO
-/*
-  {
-    icon: <Movie />,
-    label: "Películas",
-    path: "/movies",
-  },
-  */
-
-const sideData: MenuItemData[] = [
+const sideData: ()=> MenuItemData[] = ()=>[
   {
     icon: <Home />,
     label: "Inicio",
@@ -42,12 +34,17 @@ const sideData: MenuItemData[] = [
     },
   },
   {
-    icon: <Movie />,
+    icon: <SeriesIcon />,
     label: "Series",
     path: "/series/history",
     matchPath: {
       startsWith: "/series",
     },
+  },
+  {
+    icon: <Movie />,
+    label: "Películas",
+    path: "/movies",
   },
   {
     icon: <LiveTv />,
@@ -59,7 +56,7 @@ const sideData: MenuItemData[] = [
   },
 ];
 const topbarData: MenuItemData[] = [
-  ...sideData.map(e=>( {
+  ...sideData().map(e=>( {
     ...e,
     title: e.label?.toString(),
     label: undefined,
@@ -88,7 +85,7 @@ export default async function RootLayout( { children }: {
   />;
   const sideBar = <SidebarClient
     className={classes(styles.fixed, styles.sidebar)}
-    data={sideData}/>;
+    data={sideData()}/>;
 
   return (
     <html lang="es">
