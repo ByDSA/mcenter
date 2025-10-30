@@ -1,5 +1,5 @@
 import { ToastContainer } from "react-toastify";
-import { Home, LiveTv, Movie, MusicNote } from "@mui/icons-material";
+import { Home, LiveTv } from "@mui/icons-material";
 import { Topbar } from "#modules/ui-kit/menus/Topbar";
 import { InitApis } from "#modules/core/initApis";
 import { UserProvider } from "#modules/core/auth/UserProvider";
@@ -9,6 +9,8 @@ import { SidebarClient } from "#modules/ui-kit/menus/SidebarClient";
 import { classes } from "#modules/utils/styles";
 import { MenuItemData } from "#modules/ui-kit/menus/Sidebar";
 import { SeriesIcon } from "#modules/series/SeriesIcon";
+import { MoviesIcon } from "#modules/movies/MoviesIcon";
+import { MusicsIcon } from "#modules/musics/MusicsIcon";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
@@ -26,7 +28,7 @@ const sideData: ()=> MenuItemData[] = ()=>[
     },
   },
   {
-    icon: <MusicNote />,
+    icon: <MusicsIcon />,
     label: "Música",
     path: "/music/history",
     matchPath: {
@@ -42,7 +44,7 @@ const sideData: ()=> MenuItemData[] = ()=>[
     },
   },
   {
-    icon: <Movie />,
+    icon: <MoviesIcon />,
     label: "Películas",
     path: "/movies",
   },

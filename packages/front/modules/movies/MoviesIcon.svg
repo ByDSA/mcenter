@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-17 -15 213 215" fill="none">
+  <!-- Máscara del cuerpo con texto y líneas -->
+  <mask id="__ID2__">
+    <!-- Base blanca (visible) -->
+    <rect x="0" y="0" width="200" height="200" fill="white"/>
+
+    <!-- Líneas del cuerpo -->
+    <rect x="10" y="105" width="165" height="2" fill="black"/>
+    <rect x="10" y="145" width="165" height="2" fill="black"/>
+    <rect x="10" y="175" width="165" height="2" fill="black"/>
+
+    <!-- Divisiones verticales para Scene/Take/Roll -->
+    <rect x="65" y="107" width="2" height="40" fill="black"/>
+    <rect x="120" y="107" width="2" height="40" fill="black"/>
+  </mask>
+
+  <!-- Cuerpo -->
+  <path fill="currentColor" mask="url(#__ID2__)" d="
+    M10 90
+    h165
+    a6 6 0 0 1 6 6
+    v93
+    a6 6 0 0 1 -6 6
+    H10
+    a6 6 0 0 1 -6 -6
+    v-88
+    a6 6 0 0 1 6 -6
+    Z
+  "/>
+
+  <!-- Máscara para las rayas de la parte superior -->
+  <mask id="__ID__">
+    <rect x="0" y="0" width="200" height="200" fill="white"/>
+    <path d="
+      M20 60 l25 35 h-12 l-25 -35 z
+      M65 60 l25 35 h-12 l-25 -35 z
+      M110 60 l25 35 h-12 l-25 -35 z
+      M155 60 l25 35 h-12 l-25 -35 z
+    " fill="black"/>
+  </mask>
+
+  <!-- Parte superior (rotada y unida a la izquierda) -->
+  <g transform="rotate(-25 0 100)">
+    <path fill="currentColor" mask="url(#__ID__)" d="
+      M10 60
+      h165
+      a6 6 0 0 1 6 6
+      v30
+      a6 6 0 0 1 -6 6
+      H10
+      a6 6 0 0 1 -6 -6
+      v-30
+      a6 6 0 0 1 6 -6
+      Z
+    "/>
+  </g>
+</svg>

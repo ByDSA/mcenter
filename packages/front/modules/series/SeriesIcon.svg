@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
   <defs>
-    <mask id="__MASK_ID__" mask-units="userSpaceOnUse">
+    <mask id="__ID__" mask-units="userSpaceOnUse">
       <rect width="200" height="140" fill="currentColor"/>
       <text x="100" y="78" font-family="-apple-system,
     BlinkMacSystemFont,
@@ -16,7 +16,7 @@
     </mask>
   </defs>
 
-  <path fill="currentColor" fill-rule="evenodd" mask="url(#__MASK_ID__)" d="
+  <path fill="currentColor" fill-rule="evenodd" mask="url(#__ID__)" d="
     M0 10 H200 A4 4 0 0 1 204 14 V126 A4 4 0 0 1 200 130 H0 A4 4 0 0 1 -4 126 V14 A4 4 0 0 1 0 10 Z
 
     M15 18 H31 A2 2 0 0 1 33 20 V32 A2 2 0 0 1 31 34 H15 A2 2 0 0 1 13 32 V20 A2 2 0 0 1 15 18 Z
