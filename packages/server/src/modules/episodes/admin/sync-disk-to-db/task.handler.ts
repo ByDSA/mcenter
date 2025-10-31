@@ -187,7 +187,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
     seriesNodes: SerieNode[],
     userId: string,
   ): Promise<EpisodeFileInfoEntity[]> {
-    const allPromises: Promise<EpisodeFileInfoEntity>[] = [];
+    const allFileInfos: EpisodeFileInfoEntity[] = [];
 
     // Recopilar todas las promesas para procesarlas en paralelo
     for (const seriesNode of seriesNodes) {
@@ -200,17 +200,18 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
       // Para cada temporada y episodio, crear las promesas que dependen de la serie
       for (const seasonInTree of seriesNode.children) {
         for (const episodeInTree of seasonInTree.children) {
-          const episodePromise = seriePromise.then(
+          // se hace await para no leer varios capítulos en disco en paralelo
+          const episodeFileInfo = await seriePromise.then(
             serie => this.createFileInfoFromLocalEpisode(episodeInTree, serie, userId),
           );
 
-          allPromises.push(episodePromise);
+          allFileInfos.push(episodeFileInfo);
         }
       }
     }
 
     // Un solo await para todas las promesas
-    return await Promise.all(allPromises);
+    return allFileInfos;
   }
 
   private async createFileInfoFromLocalEpisode(

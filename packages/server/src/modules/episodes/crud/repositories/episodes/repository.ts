@@ -3,6 +3,7 @@ import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
+import { Types } from "mongoose";
 import { CanCreateManyAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { assertFoundClient } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
@@ -19,11 +20,11 @@ import { EpisodeOdm } from "./odm";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { EpisodeEvents } from "./events";
 
-function fixFields<T extends Partial<Episode>>(model: T): T {
+function fixFields<T extends Partial<{title: string}>>(model: T): T {
   return fixTxtFields(model, ["title"]);
 }
 
-type CreateOneDto = Omit<Episode, "addedAt" | "createdAt" | "releasedOn" | "updatedAt">;
+type CreateOneDto = Omit<Episode, "addedAt" | "createdAt" | "updatedAt">;
 type EpisodeId = EpisodeEntity["id"];
 
 type Criteria = EpisodesCrudDtos.GetManyByCriteria.Criteria;
@@ -214,13 +215,13 @@ CanGetAll<EpisodeEntity> {
   }
 
   async getOneOrCreate(createDto: CreateOneDto): Promise<EpisodeEntity> {
-    const model = fixFields(this.createDtoToModel(createDto));
+    const model = fixFields(this.createDtoToCreateDoc(createDto));
     const filter = {
-      seriesKey: model.compKey.seriesKey,
-      episodeKey: model.compKey.episodeKey,
+      seriesKey: model.seriesKey,
+      episodeKey: model.episodeKey,
     } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
     const update = {
-      $setOnInsert: EpisodeOdm.toDoc(model), // Solo se aplica en la creación
+      $setOnInsert: model, // Solo se aplica en la creación
     } satisfies MongoUpdateQuery<EpisodeOdm.Doc>;
     const result = await EpisodeOdm.Model.findOneAndUpdate(
       filter,
@@ -242,23 +243,27 @@ CanGetAll<EpisodeEntity> {
     return ret;
   }
 
-  private createDtoToModel(createDto: CreateOneDto): Episode {
-    const now = new Date();
-    const model = {
-      ...createDto,
-      createdAt: now,
-      updatedAt: now,
-      addedAt: now,
+  private createDtoToCreateDoc(
+    createDto: CreateOneDto,
+  ): Omit<EpisodeOdm.Doc, "createdAt" | "updatedAt"> {
+    const createDoc = {
+      episodeKey: createDto.compKey.episodeKey,
+      seriesKey: createDto.compKey.seriesKey,
+      title: createDto.title,
+      uploaderUserId: new Types.ObjectId(createDto.uploaderUserId),
+      tags: createDto.tags,
+      disabled: createDto.disabled,
+      releasedOn: createDto.releasedOn,
+      addedAt: new Date(),
     };
 
-    return model;
+    return createDoc;
   }
 
   @EmitEntityEvent(EpisodeEvents.Created.TYPE)
   async createOneAndGet(createDto: CreateOneDto): Promise<EpisodeEntity> {
-    const model = fixFields(this.createDtoToModel(createDto));
-    const doc: EpisodeOdm.Doc = EpisodeOdm.toDoc(model);
-    const created = await EpisodeOdm.Model.create(doc);
+    const createDoc = fixFields(this.createDtoToCreateDoc(createDto));
+    const created = await EpisodeOdm.Model.create(createDoc);
 
     return EpisodeOdm.toEntity(created);
   }
