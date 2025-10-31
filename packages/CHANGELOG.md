@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.12.2](https://github.com/ByDSA/mcenter/compare/v4.12.1...v4.12.2) (2025-10-31)
+
+
+### Bug Fixes
+
+* **back:** add new episodes ([f286deb](https://github.com/ByDSA/mcenter/commit/f286debe73d349a4d43cde05e12a50d2cd0eab93))
+
 ### [4.12.1](https://github.com/ByDSA/mcenter/compare/v4.12.0...v4.12.1) (2025-10-29)
 
 
