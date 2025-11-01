@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { Logger, Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { DateTime } from "luxon";
 import schedule from "node-schedule";
@@ -35,18 +36,33 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
     // 5 AM
     schedule.scheduleJob("0 5 * * *", async () => {
       await this.syncAllMeiliseachIndexes();
+
+      await this.updateYtDlp();
     } );
 
-    this.syncAllMeiliseachIndexes()
+    this.onInit()
       .catch(showError);
 
     this.logger.log("Scheduler initialized!");
+  }
+
+  private async onInit() {
+    await this.syncAllMeiliseachIndexes();
+
+    await this.updateYtDlp();
   }
 
   private async syncAllMeiliseachIndexes() {
     this.logger.log("Sync Meilisearch data ...");
 
     await this.indexSyncService.syncAll();
+  }
+
+  // eslint-disable-next-line require-await
+  private async updateYtDlp() {
+    this.logger.log("Updating yt-dlp ...");
+
+    execSync("sudo yt-dlp -U");
   }
 
   onModuleDestroy() {
