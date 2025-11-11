@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { EpisodePickerModule } from "#modules/episode-picker/module";
+import { StreamPickerModule } from "#modules/streams/picker/module";
 import { SeriesModule } from "#modules/series/module";
 import { StreamsModule } from "#modules/streams/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
@@ -32,7 +32,7 @@ import { AuthPlayerService } from "./AuthPlayer.service";
     SeriesModule,
     EpisodesCrudModule,
     EpisodeHistoryModule,
-    EpisodePickerModule,
+    StreamPickerModule,
     EpisodeFileInfosModule,
     MusicsCrudModule,
     MusicHistoryModule,

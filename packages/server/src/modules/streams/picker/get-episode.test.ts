@@ -19,11 +19,11 @@ import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { seriesRepositoryMockProvider } from "#modules/series/crud/repository/tests";
 import { SeriesRepository } from "#modules/series/crud/repository";
 import { episodeFileInfoRepositoryMockProvider } from "#episodes/file-info/crud/repository/tests";
-import { EpisodePickerService } from "./service";
+import { StreamGetRandomEpisodeService } from "./get-episode.service";
 
-describe("tests", () => {
+describe("streamGetRandomEpisode", () => {
   let testingSetup: TestingSetup;
-  let service: EpisodePickerService;
+  let service: StreamGetRandomEpisodeService;
   let repos: {
     dependencies: jest.Mocked<EpisodeDependenciesRepository>;
     episodes: jest.Mocked<EpisodesRepository>;
@@ -45,7 +45,7 @@ describe("tests", () => {
         episodeHistoryRepositoryMockProvider,
         episodeDependenciesRepositoryMockProvider,
         createMockProvider(EpisodesUsersRepository),
-        EpisodePickerService,
+        StreamGetRandomEpisodeService,
         seriesRepositoryMockProvider,
         episodeFileInfoRepositoryMockProvider,
       ],
@@ -59,7 +59,7 @@ describe("tests", () => {
       series: testingSetup.module.get(SeriesRepository),
       fileInfos: testingSetup.module.get(EpisodeDependenciesRepository),
     };
-    service = testingSetup.module.get(EpisodePickerService);
+    service = testingSetup.module.get(StreamGetRandomEpisodeService);
     repos.episodesUsers.getFullSerieForUser.mockResolvedValue(
       fixtureEpisodes.Simpsons.ListForUser.NormalUser,
     );

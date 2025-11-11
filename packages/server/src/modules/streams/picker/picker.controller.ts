@@ -1,9 +1,10 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, Query, UnauthorizedException } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { asyncMap } from "$shared/utils/arrays";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { UserPayload } from "$shared/models/auth";
+import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { Episode, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { LastTimePlayedService } from "#episodes/history";
@@ -16,7 +17,6 @@ import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repos
 import { genRandomPickerWithData } from "#modules/picker/resource-picker/resource-picker-random";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { User } from "#core/auth/users/User.decorator";
-import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 import { dependenciesToList } from "./appliers/dependencies";
 
@@ -29,8 +29,8 @@ type ResultType = Episode & {
   days: number;
 };
 
-@Controller()
-export class EpisodePickerController {
+@Controller("/picker")
+export class StreamPickerController {
   constructor(
      private readonly streamsRepo: StreamsRepository,
      private readonly episodesRepo: EpisodesRepository,
@@ -42,14 +42,23 @@ export class EpisodePickerController {
   ) {
   }
 
-  @Authenticated()
   @Get("/:streamKey")
   async showPicker(
     @Param() params: ShowPickerParamsDto,
-    @User() user: UserPayload,
+    @Query("token") token: string | undefined,
+    @User() user: UserPayload | null,
   ) {
+    mongoDbId.or(z.undefined()).parse(token);
     const { streamKey } = params;
-    const stream = await this.streamsRepo.getOneByKey(user.id, streamKey);
+    const userId = user?.id ?? token;
+
+    if (!userId)
+      throw new UnauthorizedException("User not authorized");
+
+    const stream = await this.streamsRepo.getOneByKey(
+      userId,
+      streamKey,
+    );
 
     assertFoundClient(stream);
     const lastEntry = await this.historyRepo.findLast( {
@@ -77,7 +86,7 @@ export class EpisodePickerController {
     const episodes: EpisodeEntityWithUserInfo[] = await this.episodesUsersRepo
       .getFullSerieForUser( {
         seriesKey: serie.key,
-        userId: user.id,
+        userId: userId,
       } );
     const picker = await genRandomPickerWithData<
         EpisodeEntityWithUserInfo,

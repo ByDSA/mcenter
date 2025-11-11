@@ -5,8 +5,11 @@ import { EpisodeHistoryModule } from "#episodes/history/module";
 import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
-import { EpisodePickerController } from "./controller";
-import { EpisodePickerService } from "./service";
+import { EpisodeRendererModule } from "#episodes/renderer/module";
+import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
+import { StreamPickerController } from "./picker.controller";
+import { StreamGetRandomEpisodeService } from "./get-episode.service";
+import { StreamGetEpisodeController } from "./get-episode.controller";
 
 @Module( {
   imports: [
@@ -16,13 +19,16 @@ import { EpisodePickerService } from "./service";
     SeriesModule,
     EpisodeDependenciesModule,
     EpisodeFileInfosModule,
+    EpisodeRendererModule,
+    ResourceResponseFormatterModule,
   ],
   controllers: [
-    EpisodePickerController,
+    StreamPickerController,
+    StreamGetEpisodeController,
   ],
   providers: [
-    EpisodePickerService,
+    StreamGetRandomEpisodeService,
   ],
-  exports: [EpisodePickerService],
+  exports: [StreamGetRandomEpisodeService],
 } )
-export class EpisodePickerModule {}
+export class StreamPickerModule {}

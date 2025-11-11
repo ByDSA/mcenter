@@ -2,8 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { Request, Response } from "express";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { ResponseFormat } from "$shared/models/resources/response-format.enum";
-import { mediaElementWithAbsolutePath } from "$shared/models/player";
-import { genM3u8Item, getHostFromRequest, M3u8ViewOptions, resourceToMediaElement, genM3u8Playlist, genM3u8PlaylistWithNext } from "$shared/models/resources/m3u8.view";
+import { mediaElementWithAbsolutePath } from "$shared/models/player/media-element";
+import { genM3u8Item, getHostFromRequest, genM3u8Playlist, genM3u8PlaylistWithNext } from "$shared/models/resources/m3u8.view";
+import { resourceToMediaElement, type M3u8ViewOptions } from "./retource-to-media-element";
 
 export type FormatResponseOptions = M3u8ViewOptions & {
   m3u8UseNext?: boolean;
@@ -68,13 +69,20 @@ export class ResponseFormatterService {
     }
 
     // add query to path
-    const queryParams = new URL(request.url, "http://dummy.com").search;
+    const ignoreItems = ["format", "q"];
+    const urlObj = new URL(request.url, "http://dummy.com");
+    const queryParams = new URLSearchParams(urlObj.search);
 
-    if (queryParams) {
+    ignoreItems.forEach(key => {
+      queryParams.delete(key);
+    } );
+
+    const filteredQuery = queryParams.toString(); // genera "a=1&b=2" sin los ignorados
+
+    if (filteredQuery) {
       const separator = mediaElement.path.includes("?") ? "&" : "?";
 
-      // slice(1) quita el '?' inicial que trae .search
-      mediaElement.path += separator + queryParams.slice(1);
+      mediaElement.path += separator + filteredQuery;
     }
 
     if (useNext) {

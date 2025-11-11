@@ -13,6 +13,7 @@ import { assertFoundClient } from "#utils/validation/found";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { User } from "#core/auth/users/User.decorator";
+import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { EpisodesRepository } from "../crud/repositories/episodes";
 import { EpisodeSlugHandlerService } from "./service";
 
@@ -29,6 +30,7 @@ export class EpisodesSlugController {
     private readonly slugHandler: EpisodeSlugHandlerService,
     private readonly episodesRepo: EpisodesRepository,
     private readonly responseFormatter: ResponseFormatterService,
+    private readonly episodeUserInfosRepo: EpisodesUsersRepository,
   ) {
   }
 
@@ -66,6 +68,7 @@ export class EpisodesSlugController {
     @Query("token") token: string | undefined,
   ) {
     mongoDbId.or(z.undefined()).parse(token);
+    const userId = user?.id ?? token ?? null;
     const format = this.responseFormatter.getResponseFormatByRequest(req);
     let got: EpisodeEntity | null;
 
@@ -94,17 +97,25 @@ export class EpisodesSlugController {
           getHostFromRequest(req),
         );
       case ResponseFormat.RAW: {
-        let userId: string | undefined = user?.id ?? token;
-
         return await this.slugHandler.handle( {
           slug: params,
           req,
           res,
-          userId,
+          userId: userId ?? undefined,
         } );
       }
       case ResponseFormat.JSON:
       {
+        if (userId) {
+          const userInfo = await this.episodeUserInfosRepo.getOneById( {
+            episodeId: got!.id,
+            userId,
+          } );
+
+          if (userInfo)
+            got!.userInfo = userInfo;
+        }
+
         validateResponseWithZodSchema(got!, schema, req);
         const json = this.responseFormatter.formatOneJsonResponse(got!, res);
 

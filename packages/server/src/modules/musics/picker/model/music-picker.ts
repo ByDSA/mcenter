@@ -1,10 +1,10 @@
 import { neverCase } from "$shared/utils/validation";
 import { PickMode, ResourcePicker, ResourcePickerSequential } from "#modules/picker";
-import { MusicEntity, MusicEntityWithUserInfo } from "#musics/models";
+import { MusicEntity } from "#musics/models";
 import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
 import { genMusicFilterApplier, genMusicWeightFixerApplier, MusicFilterApplier, MusicWeightFixerApplier } from "./appliers";
 
-type Entity = MusicEntityWithUserInfo;
+type Entity = MusicEntity;
 type ModelId = string;
 
 type ParamsPicker = {
@@ -24,7 +24,18 @@ export class MusicPickerRandom extends ResourcePickerRandom<Entity, MusicEntity>
   }
 
   setLastTimePlayed(resource: Entity, time: number): void {
-    resource.userInfo.lastTimePlayed = time;
+    if (resource.userInfo)
+      resource.userInfo.lastTimePlayed = time;
+    else {
+      resource.userInfo = {
+        lastTimePlayed: time,
+        weight: 0,
+        createdAt: new Date(),
+        musicId: resource.id,
+        updatedAt: new Date(),
+        userId: null!,
+      };
+    }
   }
 }
 type Params = {

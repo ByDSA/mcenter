@@ -2,7 +2,7 @@ import type { FilterApplier } from "./filters";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
-import { EpisodeFilterApplier } from "#modules/episode-picker/appliers/filter-applier";
+import { EpisodeFilterApplier } from "#modules/streams/picker/appliers/filter-applier";
 import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { ResourcePicker } from "./resource-picker";
 import { WeightFixerApplier } from "./weight-fixers";

@@ -1,12 +1,12 @@
 import { LastTimeWeightFilterFx, LastTimeWeightFixer, LimiterSafeIntegerPerItems, WeightFixerApplier } from "#modules/picker";
 import { SECONDS_IN_HOUR, SECONDS_IN_MONTH, SECONDS_IN_WEEK } from "#modules/resources";
-import { MusicEntityWithUserInfo } from "#musics/models";
+import { MusicEntity } from "#musics/models";
 
-type Entity = MusicEntityWithUserInfo;
+type Entity = MusicEntity;
 
 export class LastTimeMusicWeightFixer extends LastTimeWeightFixer<Entity> {
   getLastTimePlayed(r: Entity): number {
-    return r.userInfo.lastTimePlayed;
+    return r.userInfo?.lastTimePlayed ?? 0;
   }
 }
 
@@ -22,7 +22,7 @@ export class MusicWeightFixerApplier extends WeightFixerApplier<Entity> {
 }
 
 const fx: LastTimeWeightFilterFx<Entity> = (r: Entity, secondsFromLastTime: number): number => {
-  const weightFactor = weightFactorFx(r.userInfo.weight);
+  const weightFactor = weightFactorFx(r.userInfo?.weight ?? 0);
   const timeFactor = timeFactorFx(secondsFromLastTime);
 
   return weightFactor * timeFactor;

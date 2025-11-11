@@ -15,7 +15,7 @@ import { buildEpisodePicker } from "./episode-picker";
 import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
 
 @Injectable()
-export class EpisodePickerService {
+export class StreamGetRandomEpisodeService {
   constructor(
     private readonly streamsRepo: StreamsRepository,
     private readonly episodesRepo: EpisodesRepository,
@@ -40,6 +40,9 @@ export class EpisodePickerService {
     const nextEpisodes: EpisodeEntity[] = await this.getByStream(
       stream,
       n,
+      {
+        expand: ["series", "file-infos"],
+      },
     );
 
     return nextEpisodes;
@@ -72,9 +75,9 @@ export class EpisodePickerService {
     } );
     const lastPlayedEpInSerieId = lastEntry?.resourceId;
     const lastPlayedEpInSerie: EpisodeEntityWithUserInfo | null = lastPlayedEpInSerieId
-      ? await this.episodesRepo.getOneById(lastPlayedEpInSerieId, {
-        expand: ["user-info"],
-      } ) as EpisodeEntityWithUserInfo | null
+      ? await this.episodesRepo.getOneById(
+        lastPlayedEpInSerieId,
+      ) as EpisodeEntityWithUserInfo | null
       : null;
     const mode = streamModeToPickerMode(stream.mode);
     let dependencies: DependenciesList | undefined;

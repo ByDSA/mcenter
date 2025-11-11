@@ -6,7 +6,6 @@ import { PATH_ROUTES } from "$shared/routing";
 import { testRoute } from "#core/routing/test";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { ResourceResponseFormatterModule, ResponseFormatInterceptor } from "#modules/resources/response-formatter";
-import { MusicsRepository } from "../crud/repositories/music";
 import { musicsRepoMockProvider } from "../crud/repositories/music/tests";
 import { musicHistoryRepoMockProvider } from "../history/crud/repository/tests";
 import { MusicGetRandomController } from "./controller";
@@ -16,7 +15,6 @@ testRoute(PATH_ROUTES.musics.pickRandom.path);
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 
 describe("random", () => {
-  let musicRepoMock: jest.Mocked<MusicsRepository>;
   let app: INestApplication;
   let routerApp: Application;
   let testingSetup: TestingSetup;
@@ -34,8 +32,6 @@ describe("random", () => {
 
     app = testingSetup.app;
     routerApp = testingSetup.routerApp;
-
-    musicRepoMock = testingSetup.module.get<jest.Mocked<MusicsRepository>>(MusicsRepository);
   } );
 
   afterAll(async () => {
@@ -44,13 +40,10 @@ describe("random", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    musicRepoMock.getAll.mockResolvedValue(fixtureMusics.Disk.List);
   } );
 
   it("get random", async () => {
     const musics = MUSICS_SAMPLES_IN_DISK;
-
-    musicRepoMock.getAll.mockResolvedValueOnce(fixtureMusics.Disk.WithUserInfo.List);
     const response = await request(routerApp)
       .get("/?format=m3u8")
       .expect(200);
@@ -62,5 +55,30 @@ describe("random", () => {
     expect(
       musics.some((m) => responseText.includes(PATH_ROUTES.musics.slug.withParams(m.slug))),
     ).toBeTruthy();
+  } );
+
+  it("no user provided should not return userinfo", async () => {
+    const response = await request(routerApp)
+      .get("/?format=json")
+      .expect(200);
+
+    expect(response.body).toHaveProperty("data");
+
+    const { data } = response.body;
+
+    expect(data).not.toHaveProperty("userInfo");
+  } );
+
+  it("user provided should return userinfo", async () => {
+    const token = fixtureMusics.Disk.WithUserInfo.List[0].userInfo.id;
+    const response = await request(routerApp)
+      .get("/?format=json&token=" + token)
+      .expect(200);
+
+    expect(response.body).toHaveProperty("data");
+
+    const { data } = response.body;
+
+    expect(data).toHaveProperty("userInfo");
   } );
 } );

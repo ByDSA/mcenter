@@ -1,7 +1,7 @@
 import { FilterApplier, PreventDisabledFilter, PreventRepeatInTimeFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { MusicEntity, MusicEntityWithUserInfo, compareMusicId } from "#musics/models";
+import { MusicEntity, compareMusicId } from "#musics/models";
 
-type Entity = MusicEntityWithUserInfo;
+type Entity = MusicEntity;
 type ModelId = string;
 export class PreventDisabledMusicFilter extends PreventDisabledFilter<Entity> {
   isDisabled(self: Entity): boolean {
@@ -12,13 +12,13 @@ export class PreventDisabledMusicFilter extends PreventDisabledFilter<Entity> {
 export class RemoveWeightLowerOrEqualThanMusicFilter
   extends RemoveWeightLowerOrEqualThanFilter<Entity> {
   getWeight(self: Entity): number {
-    return self.userInfo.weight;
+    return self.userInfo?.weight ?? 0;
   }
 }
 
 export class PreventRepeatInTimeMusicFilter extends PreventRepeatInTimeFilter<Entity> {
   getLastTimePlayed(self: Entity): number {
-    return self.userInfo.lastTimePlayed;
+    return self.userInfo?.lastTimePlayed ?? 0;
   }
 }
 

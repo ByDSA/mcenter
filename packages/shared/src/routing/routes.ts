@@ -20,6 +20,7 @@ const EPISODES_HISTORY = EPISODES + "/history";
 const EPISODES_FILE_INFO = EPISODES + "/file-info";
 const EPISODES_DEPENDENCIES = EPISODES + "/dependencies";
 const EPISODES_ADMIN = EPISODES + "/admin";
+const STREAMS = "/api/streams";
 const AUTH = "/api/auth";
 const AUTH_EMAIL_VERIFICATION = `${AUTH}/local/email-verification`;
 const AUTH_EMAIL_VERIFICATION_FRONT = "/auth/register/verify";
@@ -267,17 +268,22 @@ export const PATH_ROUTES = {
         path: EPISODES_ADMIN + "/add-new-files",
       },
     },
-    picker: {
-      path: "/api/picker",
-    },
   },
   streams: {
-    path: "/api/streams",
+    path: STREAMS,
     search: {
-      path: "/api/streams/criteria",
+      path: STREAMS + "/criteria",
     },
     fixer: {
-      path: "/api/streams/fixer",
+      path: `${STREAMS}/fixer`,
+    },
+    picker: {
+      path: "/api/streams/picker",
+      withParams: (streamKey: string) => `${STREAMS}/picker/${streamKey}`,
+    },
+    pickRandom: {
+      path: `${STREAMS}/random`,
+      withParams: (streamKey: string) => `${STREAMS}/random/${streamKey}`,
     },
   },
   player: {

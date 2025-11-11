@@ -10,8 +10,8 @@ import { fixtureEpisodes } from "#episodes/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { EpisodesCrudModule } from "#episodes/crud/module";
 import { createMockedModule, createMockProvider } from "#utils/nestjs/tests";
-import { EpisodePickerModule } from "#modules/episode-picker/module";
-import { EpisodePickerService } from "#modules/episode-picker";
+import { StreamPickerModule } from "#modules/streams/picker/module";
+import { EpisodePickerService } from "#modules/streams/picker";
 import { StreamsModule } from "#modules/streams/module";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { STREAM_SIMPSONS } from "#modules/streams/tests";
@@ -34,7 +34,7 @@ describe("playStreamController", () => {
         createMockedModule(SeriesModule),
         createMockedModule(StreamsModule),
         createMockedModule(EpisodesCrudModule),
-        createMockedModule(EpisodePickerModule),
+        createMockedModule(StreamPickerModule),
         createMockedModule(EpisodeHistoryModule),
       ],
       controllers: [PlayStreamController],

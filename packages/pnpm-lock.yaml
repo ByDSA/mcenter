@@ -463,9 +463,6 @@ importers:
       find-process:
         specifier: 1.4.7
         version: 1.4.7
-      zod:
-        specifier: 3.25.74
-        version: 3.25.74
     devDependencies:
       '@playwright/test':
         specifier: 1.55.1
@@ -488,6 +485,9 @@ importers:
       mongoose:
         specifier: 7.5.0
         version: 7.5.0
+      zod:
+        specifier: 3.25.74
+        version: 3.25.74
 
   vlc:
     dependencies:

@@ -49,7 +49,7 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
   private async onInit() {
     await this.syncAllMeiliseachIndexes();
 
-    await this.updateYtDlp();
+    // No se pone updateYtDlp, porque hay rate limit
   }
 
   private async syncAllMeiliseachIndexes() {

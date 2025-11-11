@@ -73,6 +73,7 @@ CanDeleteOneByIdAndGet<Model, Id> {
         userId,
         seriesKey,
       },
+      expand: ["episodes"],
     } );
   }
 

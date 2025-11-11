@@ -1,27 +1,5 @@
 import type { Request } from "express";
-import { EpisodeEntity, episodeEntitySchema } from "../episodes";
-import { MusicEntity, musicEntitySchema } from "../musics";
-import { MediaElement } from "../player";
-import { musicToMediaElement, episodeToMediaElement } from "../player/media-element/adapters";
-
-type Options = NonNullable<Parameters<typeof musicToMediaElement>[1]>;
-
-export {
-  Options as M3u8ViewOptions,
-};
-
-export function resourceToMediaElement(picked: object, options?: Options): MediaElement {
-  const type = getTypeFromObj(picked);
-
-  switch (type) {
-    case "audio":
-      return musicToMediaElement(picked as MusicEntity, options);
-    case "video":
-      return episodeToMediaElement(picked as EpisodeEntity, options);
-    default:
-      throw new Error("Invalid media type for M3U8 generation");
-  }
-}
+import { MediaElement } from "../player/media-element/media-element";
 
 type Props = {
   mediaElement: MediaElement;
@@ -36,16 +14,6 @@ export function genM3u8PlaylistWithNext( { host, mediaElement, req }: Props) {
   ]);
 
   return ret;
-}
-
-function getTypeFromObj(obj: object): NonNullable<MediaElement["type"]> {
-  if (episodeEntitySchema.safeParse(obj).success)
-    return "video";
-
-  if (musicEntitySchema.safeParse(obj).success)
-    return "audio";
-
-  throw new Error("Invalid object type for media element");
 }
 
 function getHostFromForwardedRequest(req: Request): string {

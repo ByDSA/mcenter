@@ -14,7 +14,7 @@ import { M3u8FormatUseNext } from "../../resources/response-formatter/use-next.d
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./model";
 import { MusicPickerRandom } from "./model/music-picker";
 
-type Entity = MusicEntityWithUserInfo;
+type Entity = MusicEntity;
 
 @Controller("/")
 export class MusicGetRandomController {
@@ -33,10 +33,17 @@ export class MusicGetRandomController {
     @User() user: UserPayload | null,
   ): Promise<Music> {
     mongoDbId.or(z.undefined()).parse(token);
-    const musics = await this.#findMusics(user?.id ?? token ?? null, req);
+    const userId = user?.id ?? token ?? null;
+    const musics = await this.#findMusics(userId, req);
 
     assertIsNotEmptyClient(musics);
     const picked = await this.#randomPick(token, musics);
+
+    if (!userId && picked.userInfo) {
+      const { userInfo, ...pickedWithoutUserInfo } = picked;
+
+      return pickedWithoutUserInfo;
+    }
 
     return picked;
   }

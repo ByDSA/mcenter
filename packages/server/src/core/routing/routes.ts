@@ -4,7 +4,7 @@ import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesAdminModule } from "#episodes/admin/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
-import { EpisodePickerModule } from "#modules/episode-picker/module";
+import { StreamPickerModule } from "#modules/streams/picker/module";
 import { StreamsModule } from "#modules/streams/module";
 import { PlayerModule } from "#modules/player/module";
 import { ConfigModule } from "#modules/config/config.module";
@@ -96,10 +96,6 @@ const routes: Routes = [
     module: EpisodeHistoryModule,
   },
   {
-    path: PATH_ROUTES.episodes.picker.path,
-    module: EpisodePickerModule,
-  },
-  {
     path: PATH_ROUTES.episodes.fileInfo.path,
     module: EpisodeFileInfosModule,
   },
@@ -138,6 +134,10 @@ const routes: Routes = [
   {
     path: PATH_ROUTES.streams.path,
     module: StreamsModule,
+  },
+  {
+    path: PATH_ROUTES.streams.path,
+    module: StreamPickerModule,
   },
   {
     path: PATH_ROUTES.player.path,
