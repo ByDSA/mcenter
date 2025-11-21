@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.13.0](https://github.com/ByDSA/mcenter/compare/v4.12.2...v4.13.0) (2025-11-21)
+
+
+### Features
+
+* music playlists ([b8ca2bb](https://github.com/ByDSA/mcenter/commit/b8ca2bb5904c8a1490424dcdca59be08c002939b))
+
+
+### Bug Fixes
+
+* **back:** get episodes in stream by url ([8bcac9d](https://github.com/ByDSA/mcenter/commit/8bcac9d7411426fc8a66cd6fe1da3bce5827cb8c))
+
 ### [4.12.2](https://github.com/ByDSA/mcenter/compare/v4.12.1...v4.12.2) (2025-10-31)
 
 
