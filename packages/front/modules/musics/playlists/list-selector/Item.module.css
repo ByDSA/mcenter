@@ -1,0 +1,21 @@
+.item {
+  user-select: none;
+  padding: 8px 12px;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  gap: 4px;
+  border-radius: 4px;
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--color-gray-800);
+  }
+
+  .name {
+    font-size: 1.25em;
+  }
+  .length {
+    font-size: 0.75em;
+  }
+}

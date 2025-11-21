@@ -30,3 +30,7 @@
     }
   }
 }
+
+.contextMenuItem {
+  cursor: pointer;
+}

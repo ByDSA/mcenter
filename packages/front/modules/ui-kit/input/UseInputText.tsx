@@ -62,6 +62,7 @@ export function useInputText(props: UseInputTextProps) {
 
   return {
     element,
+    ref: textareaRef,
     value,
     setValue,
     addOnChange,

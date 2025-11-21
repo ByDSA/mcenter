@@ -46,7 +46,7 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
   const [data, setData] = useState<D | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | undefined>(undefined);
-  const refetchDataRef = useRef<()=> Promise<void>>();
+  const refetchDataRef = useRef<()=> Promise<void>>(null);
   const dataRef = useRef(data);
   const isRefetchingRef = useRef(false);
   const lastFetchDateRef = useRef<Date | null>(null);

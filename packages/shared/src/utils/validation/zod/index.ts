@@ -17,8 +17,11 @@ export class CustomValidationError extends Error {
       return ret;
     } );
     const finalMsg = msg ?? plainErrors.join("\n");
+    const ret = new CustomValidationError(model, finalMsg);
 
-    return new CustomValidationError(model, finalMsg);
+    ret.cause = error;
+
+    return ret;
   }
 
   constructor(model: unknown, msg: string) {

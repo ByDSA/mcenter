@@ -2,7 +2,7 @@ import z from "zod";
 import { idParamsSchema } from "../../../utils/schemas/requests";
 import { createCriteriaManySchema, createCriteriaOneSchema } from "../../../utils/schemas/requests/criteria";
 import { generatePatchBodySchema } from "../../../utils/schemas/patch";
-import { musicPlaylistEntitySchema } from "../playlist";
+import { musicPlaylistEntitySchema, musicPlaylistSchema } from "../playlist";
 import { mongoDbId } from "../../../resources/partial-schemas";
 
 const criteriaConfig = {
@@ -37,5 +37,15 @@ export namespace MusicPlaylistCrudDtos {
 
   export namespace DeleteOneById {
     export const paramsSchema = idParamsSchema;
+  }
+  export namespace CreateOne {
+    export const bodySchema = musicPlaylistSchema
+      .omit( {
+        createdAt: true,
+        list: true,
+        updatedAt: true,
+        userId: true,
+      } );
+    export type Body = z.infer<typeof bodySchema>;
   }
 }

@@ -3,6 +3,7 @@ import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
+import { isTest } from "#utils";
 
 type EntryDocOdm = {
   _id: mongoose.Types.ObjectId;
@@ -55,14 +56,23 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   slug: {
     type: String,
     required: true,
+    unique: true,
   },
   list: {
     type: [entrySchemaOdm],
     required: true,
+    default: [],
   },
 } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
   collection: COLLECTION,
   timestamps: true,
+  autoIndex: isTest(),
+} );
+
+schemaOdm.index( {
+  slug: 1,
+}, {
+  unique: true,
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);

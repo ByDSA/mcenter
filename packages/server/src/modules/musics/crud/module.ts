@@ -8,7 +8,7 @@ import { MusicsUsersRepository } from "./repositories/user-info/repository";
 import { MusicBuilderService } from "./builder/music-builder.service";
 import { MusicCrudController } from "./controller";
 import { MusicsRepository } from "./repositories/music";
-import { MusicAvailableSlugGeneratorService } from "./builder/vailable-slug-generator.service";
+import { MusicAvailableSlugGeneratorService } from "./builder/available-slug-generator.service";
 import { GetManyByCriteriaMusicRepoService } from "./repositories/music/get-many-criteria";
 
 @Module( {

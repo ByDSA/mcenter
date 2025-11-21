@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, ReactElement } from "react";
 import { CloseFullscreen, OpenInFull } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import styles from "./styles.module.css";
 
 type ExpandableContainerProps = {
-  children: React.ReactNode;
+  children: ReactElement<React.HTMLAttributes<HTMLElement>>;
   className?: string;
 };
 
@@ -89,6 +89,7 @@ export const ExpandableContainer = ( { children, className = "" }: ExpandableCon
 
     const childType = children.type;
     const childProps = children.props;
+
 
     // TEXTAREA - Forzar tamaño completo
     if (childType === "textarea") {

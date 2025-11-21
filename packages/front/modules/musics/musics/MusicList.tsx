@@ -1,16 +1,28 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
 import { WithRequired } from "@tanstack/react-query";
+import { PATH_ROUTES } from "$shared/routing";
+import { JSX } from "react";
+import { assertIsDefined } from "$shared/utils/validation";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
+import { logger } from "#modules/core/logger";
+import { backendUrl } from "#modules/requests";
+import { useListContextMenu } from "#modules/ui-kit/ContextMenu";
+import { useModal } from "#modules/ui-kit/modal/useModal";
+import { useUser } from "#modules/core/auth/useUser";
 import { MusicsApi } from "../requests";
-import { MusicEntityWithFileInfos } from "../models";
+import { MusicEntity, MusicEntityWithFileInfos } from "../models";
+import { PlaylistSelector } from "../playlists/list-selector/List";
+import { useMusicPlaylistsForUser } from "../playlists/request-all";
+import { PlaylistEntity } from "../playlists/Playlist";
+import { MusicPlaylistsApi } from "../playlists/requests";
+import { useNewPlaylistButton } from "../playlists/NewPlaylistButton";
 import { MusicEntryElement } from "./entry/MusicEntry";
 import { ArrayData } from "./types";
 import styles from "./styles.module.css";
-
 import "#styles/resources/resource-list-entry.css";
 
 type Props = {
@@ -22,6 +34,7 @@ type Props = {
 type Data = ArrayData;
 
 export function MusicList(props: Props) {
+  const { user } = useUser();
   const { data, isLoading, error,
     setItem, observerTarget, totalCount } = useMusicList(props);
   const resultNumbers = <span style={{
@@ -31,6 +44,67 @@ export function MusicList(props: Props) {
     marginLeft: "1rem",
     fontSize: "0.8em",
   }}>Resultados: {data?.length} de {totalCount}</span>;
+  const userId = user?.id;
+  let genAddToPlaylistElement: ((item: MusicEntity)=> JSX.Element) | undefined;
+
+  if (userId) {
+    let musicId: string;
+    const { fetchData,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Component: PlaylistSelectorComponent,
+      newPlaylistButton } = usePlaylistSelector( {
+      // TODO: gestión user = null
+      userId: user!.id,
+      onSelect: async (playlist)=> {
+        const api = FetchApi.get(MusicPlaylistsApi);
+
+        assertIsDefined(musicId);
+
+        await api.addOneTrack(playlist.id, musicId);
+        logger.info(`Canción añadida a "${playlist.name}"`);
+        await closeModal();
+      },
+    } );
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { Modal, open: openModal, close: closeModal } = useModal( {
+      title: "Añadir a playlist",
+      onClose: ()=>closeMenu(),
+      onOpen: ()=> fetchData(),
+    } );
+
+    genAddToPlaylistElement = (item) => {
+      musicId = item.id;
+
+      return <><p className={styles.contextMenuItem} onClick={(event)=> {
+        event.stopPropagation();
+
+        openModal();
+      }}>Añadir a playlist</p>
+      <Modal>
+        <PlaylistSelectorComponent />
+        <footer>
+          {newPlaylistButton.element}
+        </footer>
+      </Modal></>;
+    };
+  }
+
+  const { openMenu,
+    renderContextMenu,
+    closeMenu, activeIndex } = useListContextMenu( {
+    renderChildren: (item: MusicEntity)=><>
+      {genAddToPlaylistElement?.(item)}
+      <p className={styles.contextMenuItem} onClick={async (event)=> {
+        event.stopPropagation();
+        await navigator.clipboard.writeText(
+          backendUrl(PATH_ROUTES.musics.slug.withParams(item.slug)),
+        );
+        logger.info("Copiada url");
+
+        closeMenu();
+      }}>Copiar backend URL</p>
+    </>,
+  } );
 
   return renderFetchedData<Data | null>( {
     data,
@@ -51,6 +125,16 @@ export function MusicList(props: Props) {
                 (newData)=>setItem(i, newData as WithRequired<MusicEntityWithFileInfos, "userInfo">)
               }
               shouldFetchFileInfo={true}
+              contextMenu={{
+                element:
+          activeIndex === i
+            ? renderContextMenu(music as MusicEntity)
+            : undefined,
+                onClick: (e) => openMenu( {
+                  event: e,
+                  index: i,
+                } ),
+              }}
               />
             </Fragment>,
           )
@@ -141,4 +225,78 @@ function getFilterFromProps(
     return undefined;
 
   return ret;
+}
+
+type UsePlaylistSelectorProps = {
+  userId: string;
+  onSelect?: (playlist: PlaylistEntity)=> void;
+};
+function usePlaylistSelector( { userId, onSelect }: UsePlaylistSelectorProps) {
+  const { data,
+    error,
+    fetchData,
+    isLoading } = useMusicPlaylistsForUser( {
+    userId: userId,
+  } );
+  const newPlaylistButton = useNewPlaylistButton( {
+    onSuccess: async (newPlaylist: PlaylistEntity) => {
+        data!.push(newPlaylist);
+        logger.debug("Nueva playlist creada: " + newPlaylist.name);
+
+        await fetchData();
+    },
+  } );
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const Component = genLazyFetchComponent( {
+    fetching: {
+      data,
+      error,
+      isLoading,
+      fetchData,
+    },
+    renderComponent: (d)=> <PlaylistSelector
+      data={d}
+      onSelect={onSelect}
+    />,
+  } );
+
+  return {
+    Component,
+    newPlaylistButton,
+    fetchData,
+  };
+}
+
+type UseLazyFetchComponentProps<T> = {
+  fetching: {
+    data: T;
+    error: unknown;
+    isLoading: boolean;
+    fetchData: ()=> Promise<void>;
+  };
+  renderComponent: (data: NonNullable<T>)=> JSX.Element;
+  };
+function genLazyFetchComponent<T>( { fetching, renderComponent }: UseLazyFetchComponentProps<T>) {
+  const { data,
+    error,
+    isLoading } = fetching;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const Component = ()=>{
+    if (isLoading)
+      return <div>Cargando...</div>;
+
+    if (!data)
+      return <div>No hay playlists disponibles</div>;
+
+    if (error)
+      return <div>Error al cargar playlists</div>;
+
+    return renderComponent(data);
+  };
+
+  return Component;
+}
+
+export async function sleep(ms: number) {
+  return await new Promise(resolve => setTimeout(resolve, ms));
 }

@@ -6,7 +6,7 @@ type DataRenderParams<T> = {
   data: T;
   error: unknown;
   scroll?: {
-    observerRef: React.RefObject<HTMLDivElement>;
+    observerRef: React.RefObject<HTMLDivElement | null>;
   };
   isLoading: boolean;
   render: (data: NonNullable<T>)=> JSX.Element;

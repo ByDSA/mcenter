@@ -4,23 +4,22 @@ import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { PlaylistEntity } from "../Playlist";
 import { formatDurationHeader } from "../utils";
 import { SettingsButton } from "../SettingsButton";
+import { ContextMenuProps } from "../PlaylistItem";
 import styles from "./Item.module.css";
 
 interface PlaylistProps {
   value: PlaylistEntity;
   setValue: (newValue: PlaylistEntity)=> void;
+  contextMenu?: ContextMenuProps;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const MusicPlaylistListItem = ( { value }: PlaylistProps) => {
+export const MusicPlaylistListItem = ( { value, contextMenu }: PlaylistProps) => {
   const totalDuration = value.list?.reduce(
     (acc, item) => acc + (item.music.fileInfos[0].mediaInfo.duration ?? 0),
     0,
   ) || 0;
   const totalSongs = value.list?.length || 0;
-  const handleMoreOptions = () => {
-    // Implementar menú de opciones para playlist
-  };
 
   return (
     <a className={styles.playlistContainer}
@@ -58,7 +57,14 @@ export const MusicPlaylistListItem = ( { value }: PlaylistProps) => {
         </div>
       </div>
       <div>
-        <SettingsButton onClick={handleMoreOptions} />
+        {contextMenu?.onClick
+        && <><SettingsButton
+          theme="dark"
+          className={styles.settingsButton}
+          onClick={(e: React.MouseEvent<HTMLElement>)=>contextMenu.onClick?.(e)}
+        />
+        {contextMenu.element}
+        </>}
       </div>
     </a>
   );

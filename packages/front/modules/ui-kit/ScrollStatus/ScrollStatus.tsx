@@ -2,7 +2,7 @@ import { PageSpinner } from "../spinner/Spinner";
 import styles from "./styles.module.css";
 
 type ScrollStatusProps = {
-  ref: React.RefObject<HTMLDivElement>;
+  ref: React.RefObject<HTMLDivElement | null>;
   isLoading: boolean;
   error?: unknown;
 };

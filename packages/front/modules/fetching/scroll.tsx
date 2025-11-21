@@ -13,7 +13,7 @@ export function useScrollData<D extends unknown[]>( { setIsLoading,
   disabled = false,
   setError,
   fetchScrollData }: Props<D>) {
-  const observerTarget = useRef(null);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

@@ -1,12 +1,14 @@
 "use client";
 
 import { ResultResponse } from "$shared/utils/http/responses";
+import { assertIsDefined } from "$shared/utils/validation";
 import { MusicPlaylist } from "#modules/musics/playlists/Playlist";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicPlaylistsApi } from "#modules/musics/playlists/requests";
 import { useCrudData } from "#modules/fetching";
 import MusicLayout from "app/music/music.layout";
 import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { useUser } from "#modules/core/auth/useUser";
 
 interface PageProps {
   params: Promise<{
@@ -14,12 +16,15 @@ interface PageProps {
   }>;
 }
 
-export default async function Page( { params }: PageProps) {
-  const resolvedParams = await params;
+export default function Page( { params }: PageProps) {
   const api = FetchApi.get(MusicPlaylistsApi);
+  const { user } = useUser();
+  const userId = user?.id;
+
+  assertIsDefined(userId);
   const { isLoading, data, error, setData } = useCrudData( {
     initialFetch: async ()=> {
-      const response = await api.getOneByUserAndSlug("test", resolvedParams.slug);
+      const response = await api.getOneByUserAndSlug(userId, (await params).slug);
       const d = response.data;
 
       if (d) {
@@ -41,7 +46,6 @@ export default async function Page( { params }: PageProps) {
   return (
     <>
       <MusicLayout>
-        <h2>Playlist</h2>
         {error && <pre>{(()=>{
           try {
             const response: ResultResponse = JSON.parse((error as any).message);

@@ -6,7 +6,7 @@
   margin: 0;
   border: none;
   border-radius: 50%; /* Hace que sea un círculo perfecto */
-  color: var(--color-gray-50) !important;
+  color: var(--color-gray-50);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,23 +14,23 @@
 
   &:hover {
     cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.25) !important;
+    background-color: rgba(0, 0, 0, 0.25);
   }
 
   &:active {
-    background-color: rgba(0, 0, 0, 0.5) !important;
+    background-color: rgba(0, 0, 0, 0.5);
   }
 
   &.overWhite {
-    color: var(--color-gray-600) !important;
+    color: var(--color-gray-600);
 
     &:hover {
       cursor: pointer;
-      background-color: rgba(0, 0, 0, 0.125) !important;
+      background-color: rgba(0, 0, 0, 0.125);
     }
 
     &:active {
-      background-color: rgba(0, 0, 0, 0.25) !important;
+      background-color: rgba(0, 0, 0, 0.25);
     }
   }
 }

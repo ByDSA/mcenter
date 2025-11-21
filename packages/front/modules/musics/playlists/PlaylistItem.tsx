@@ -8,11 +8,13 @@ import { formatDurationItem } from "./utils";
 import styles from "./PlaylistItem.module.css";
 import { SettingsButton } from "./SettingsButton";
 
+export type ContextMenuProps = {
+  onClick?: (e: React.MouseEvent<HTMLElement>)=> void;
+  element?: ReactNode;
+};
+
 interface PlaylistItemProps {
-  contextMenu?: {
-    onClick?: (e: React.MouseEvent<HTMLElement>)=> void;
-    element?: ReactNode;
-  };
+  contextMenu?: ContextMenuProps;
   value: PlaylistItemEntity;
   index: number;
   isPlaying?: boolean;
@@ -85,7 +87,8 @@ export const MusicPlaylistItem = ( { value,
         </IconButton>
         {contextMenu?.onClick
         && <><SettingsButton
-          theme="light"
+          theme="dark"
+          className={styles.settingsButton}
           onClick={(e: React.MouseEvent<HTMLElement>)=>contextMenu.onClick?.(e)}
         />
         {contextMenu.element}

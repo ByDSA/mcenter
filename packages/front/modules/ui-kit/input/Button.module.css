@@ -26,13 +26,12 @@ body:has(.button) {
   --button-disabled-color: var(--button-dark-disabled-color);
 }
 .button {
-  width: 100%;
   color: var(--button-color);
   background-color: var(--button-background-color);
   border: none;
   border-radius: 0.7rem;
-  padding: 1rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -48,6 +47,14 @@ body:has(.button) {
   &:hover:not(&:disabled) {
     background-color: var(--button-hover-background-color);
     cursor: pointer;
+  }
+
+  .left {
+    margin-right: 0.5rem;
+  }
+
+  .right {
+    margin-left: 0.5rem;
   }
 }
 

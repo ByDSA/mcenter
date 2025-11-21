@@ -1,14 +1,14 @@
 .playlistContainer {
   width: 100%;
   margin: 0 auto;
-  background: white;
+  margin-top: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .playlistHeader {
-  background: linear-gradient(135deg, #2196f3 0%, #9c27b0 100%);
+  background: var(--color-playlist);
   color: white;
   padding: 48px;
 }
@@ -112,67 +112,64 @@
 
 .playlistContent {
   padding: 24px;
-}
+  .tracksHeader {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 12px 8px;
+    border-bottom: 1px solid var(--color-gray-500);
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--color-gray-100);
+    font-weight: 500;
 
-.tracksHeader {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 0 12px 8px;
-  border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
-}
+    user-select: none;
+  }
 
-.headerIndex {
-  width: 32px;
-  text-align: center;
-}
+  .headerIndex {
+    width: 32px;
+    text-align: center;
+  }
 
-.headerTitle {
-  flex: 1;
-}
+  .headerTitle {
+    flex: 1;
+  }
 
-.headerYear {
-  width: 64px;
-}
+  .headerDuration {
+    width: 64px;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+  }
 
-.headerDuration {
-  width: 64px;
-  text-align: right;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-}
+  .headerActions {
+    width: 80px;
+  }
 
-.headerActions {
-  width: 80px;
-}
+  .tracksList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 
-.tracksList {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+  .emptyState {
+    text-align: center;
+    padding: 48px 24px;
+    color: #666;
 
-.emptyState {
-  text-align: center;
-  padding: 48px 24px;
-  color: #666;
-}
+    .emptyStateIcon {
+      color: #ccc;
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
 
-.emptyStateIcon {
-  color: #ccc;
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.emptyStateText {
-  font-size: 16px;
-  margin: 0;
+    .emptyStateText {
+      font-size: 16px;
+      margin: 0;
+    }
+  }
 }
 
 @media (max-width: 768px) {

@@ -166,8 +166,8 @@ type UseRepeatValidationProps<T> = {
   updatedValue: T;
 };
 function useRepeatValidation<T>( { updatedValue }: UseRepeatValidationProps<T>) {
-  const callValidationRef = useRef<CallValidationFn>();
-  const setterRef = useRef<(fn: CallValidationFn)=> void>();
+  const callValidationRef = useRef<CallValidationFn>(null);
+  const setterRef = useRef<(fn: CallValidationFn)=> void>(null);
 
   // Crear un "canal" para recibir la función
   useEffect(() => {

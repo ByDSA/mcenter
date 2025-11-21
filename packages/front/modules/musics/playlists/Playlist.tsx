@@ -19,6 +19,7 @@ import { arrayMove,
 import { restrictToVerticalAxis,
   restrictToParentElement } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
+import { useRouter } from "next/navigation";
 import { classes } from "#modules/utils/styles";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
@@ -28,11 +29,14 @@ import { MusicEntityWithFileInfos } from "../models";
 import { useListContextMenu } from "../../ui-kit/ContextMenu/ContextMenu";
 import { MusicPlaylistItem } from "./PlaylistItem";
 import { MusicPlaylistEntity } from "./models";
-import { formatDurationHeader } from "./utils";
+import { formatDurationHeader, playlistCopyBackendUrl } from "./utils";
 import styles from "./Playlist.module.css";
 import commonStyles from "./common.module.css";
 import { SettingsButton } from "./SettingsButton";
 import { MusicPlaylistsApi } from "./requests";
+import { RenamePlaylistContextMenuItem } from "./list/renameItem";
+import { useRenamePlaylistModal } from "./list/useRenamePlaylistModal";
+import { useDeletePlaylistContextMenuItem } from "./list/deleteItem";
 
 export type PlaylistItemEntity = MusicPlaylistEntity["list"][0]
 & {
@@ -52,7 +56,6 @@ interface PlaylistProps {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicPlaylist = ( { value, setValue }: PlaylistProps) => {
   const api = FetchApi.get(MusicPlaylistsApi);
-  const user = "user"; // TODO
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
   const [isPlaylistPlaying, setIsPlaylistPlaying] = useState(false);
   const [isDraggingGlobal, setIsDraggingGlobal] = useState(false);
@@ -151,20 +154,48 @@ newIndex: number;}[]>([]);
       }
     }
   };
+  const renameModal = useRenamePlaylistModal( {
+    onClose: async () => { await playlistCloseMenu(); },
+    onSuccess: ( { previous, current } ) => {
+      if (previous.slug !== current.slug) {
+        router.push(PATH_ROUTES.musics.frontend.playlists.withParams( {
+          slug: current.slug,
+        } ));
+      }
+    },
+  } );
+  const router = useRouter();
+  const { generateDeletePlayListContextMenuItem } = useDeletePlaylistContextMenuItem( {
+    onFinish: () => {
+      playlistCloseMenu();
+    },
+    onActionSuccess: ()=>router.push(PATH_ROUTES.musics.frontend.playlists.path),
+    getValue: ()=>value,
+  } );
   const { openMenu: playlistOpenMenu,
     renderContextMenu: renderPlaylistContextMenu,
     closeMenu: playlistCloseMenu } = useListContextMenu<undefined>( {
       renderChildren: ()=><>
-        <p className={styles.contextMenuItem}>Renombrar</p>
+        {RenamePlaylistContextMenuItem( {
+          className: styles.contextMenuItem,
+          renameModal,
+          value,
+          setValue: (v: PlaylistEntity) => {
+            setValue( {
+              ...value,
+              name: v.name,
+              slug: v.slug,
+            } );
+          },
+        } )}
         <p className={styles.contextMenuItem} onClick={async ()=> {
-          await navigator.clipboard.writeText(
-            backendUrl(PATH_ROUTES.musics.playlists.slug.withParams(user, value.slug)),
-          );
-          logger.info("Copiada url");
+          await playlistCopyBackendUrl( {
+            value,
+          } );
 
           playlistCloseMenu();
-        }}>Copiar URL</p>
-        <p className={styles.contextMenuItem}>Eliminar</p>
+        }}>Copiar backend URL</p>
+        {generateDeletePlayListContextMenuItem(value)}
       </>,
     } );
   const { openMenu: playlistItemOpenMenu,
@@ -178,8 +209,15 @@ newIndex: number;}[]>([]);
         logger.info("Copiada url");
 
         playlistItemCloseMenu();
-      }}>Copiar URL</p>
-      <p className={styles.contextMenuItem} onClick={()=> {
+      }}>Copiar backend URL</p>
+      <p className={styles.contextMenuItem} onClick={async ()=> {
+        await api.removeOneTrack(value.id, item.id);
+        const updatedList = value.list.filter((i) => i.id !== item.id);
+
+        setValue( {
+          ...value,
+          list: updatedList,
+        } );
         playlistItemCloseMenu();
       }}>Eliminar</p>
     </>,
@@ -275,6 +313,7 @@ index: number; } ) => {
             {isPlaylistPlaying ? <Pause /> : <PlayArrow />}
           </button>
           <SettingsButton
+            theme="dark"
             onClick={handleMoreOptions}
           />
           {renderPlaylistContextMenu(undefined)}

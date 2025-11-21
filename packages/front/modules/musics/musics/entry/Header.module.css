@@ -1,0 +1,26 @@
+:global(.ui-kit-accordion):has(.rows) > * > * {
+  padding-right: 0;
+}
+
+.rows {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+
+  > * {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.columns {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+
+  button:hover {
+    background-color: transparent !important;
+  }
+}

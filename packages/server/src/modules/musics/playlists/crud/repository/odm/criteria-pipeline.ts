@@ -260,7 +260,7 @@ function buildMongooseFilter(
       filter["slug"] = criteria.filter.slug;
 
     if (criteria.filter.userId)
-      filter["userId"] = criteria.filter.userId;
+      filter["userId"] = new Types.ObjectId(criteria.filter.userId);
   }
 
   return filter;

@@ -78,6 +78,7 @@ export function modelToDocOdm(model: Model): DocOdm {
 export function partialModelToUpdateQuery(model: Partial<Entity>): MongoUpdateQuery<DocOdm> {
   const ret: MongoUpdateQuery<DocOdm> = {
     name: model.name,
+    slug: model.slug,
     list: model.list?.map(entryModelToDocOdm),
   };
 

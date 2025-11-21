@@ -1,3 +1,7 @@
+import type { PlaylistEntity } from "./Playlist";
+import { PATH_ROUTES } from "$shared/routing";
+import { logger } from "#modules/core/logger";
+import { backendUrl } from "#modules/requests";
 import { secsToMmss, pad2 } from "#modules/utils/dates";
 
 export const formatDurationHeader = (seconds: number): string => {
@@ -21,3 +25,13 @@ export const formatDurationHeader = (seconds: number): string => {
 export const formatDurationItem = (seconds: number): string => {
   return secsToMmss(seconds);
 };
+
+type PlaylistCopyBackendUrlProps = {
+  value: PlaylistEntity;
+};
+export async function playlistCopyBackendUrl( { value }: PlaylistCopyBackendUrlProps) {
+  await navigator.clipboard.writeText(
+    backendUrl(PATH_ROUTES.musics.playlists.user.slug.withParams(value.userId, value.slug)),
+  );
+  logger.info("Copiada url");
+}

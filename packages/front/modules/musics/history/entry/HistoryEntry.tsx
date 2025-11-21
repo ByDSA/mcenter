@@ -1,3 +1,4 @@
+import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { MusicHistoryApi } from "../requests";
 import { Body } from "./body/Body";
@@ -7,9 +8,10 @@ type Props<T> = {
   value: T;
   setValue: (newData: T)=> void;
   showDate?: boolean;
+  contextMenu?: ContextMenuProps;
 };
 export function HistoryEntryElement(
-  { value: entry, setValue }: Props<MusicHistoryApi.GetManyByCriteria.Data>,
+  { value: entry, setValue, contextMenu }: Props<MusicHistoryApi.GetManyByCriteria.Data>,
 ) {
   return <span className="resource-list-entry">
     {
@@ -17,6 +19,7 @@ export function HistoryEntryElement(
         headerContent:
         Header( {
           entry,
+          contextMenu,
         } ),
         bodyContent: Body( {
           data: entry,

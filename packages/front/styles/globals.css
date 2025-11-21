@@ -14,6 +14,12 @@
 
   --button-link-color: var(--color-gray-50);
   --button-link-color-hover: var(--color-gray-0);
+
+  --color-playlist: linear-gradient(
+    135deg,
+    var(--color-blue-500) 0%,
+    var(--color-purple-600) 100%
+  );
 }
 
 html,

@@ -1,8 +1,11 @@
+import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { Body, BodyProps } from "./body/Body";
 import { Header } from "./Header";
 
-type Props = Omit<BodyProps, "setData"> & Partial<Pick<BodyProps, "setData">>;
+type Props = Omit<BodyProps, "setData"> & Partial<Pick<BodyProps, "setData">> & {
+  contextMenu?: ContextMenuProps;
+};
 export function MusicEntryElement(
   props: Props,
 ) {
@@ -12,6 +15,7 @@ export function MusicEntryElement(
         headerContent:
         Header( {
           entry: props.data,
+          contextMenu: props.contextMenu,
         } ),
         bodyContent: Body( {
           ...props,

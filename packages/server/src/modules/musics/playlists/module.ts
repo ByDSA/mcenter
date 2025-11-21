@@ -5,6 +5,7 @@ import { MusicHistoryModule } from "../history/module";
 import { MusicRendererModule } from "../renderer/module";
 import { MusicPlaylistsController } from "./crud/controller";
 import { MusicPlaylistsRepository } from "./crud/repository/repository";
+import { MusicPlaylistAvailableSlugGeneratorService } from "./crud/repository/available-slug-generator.service";
 
 @Module( {
   imports: [
@@ -17,6 +18,7 @@ import { MusicPlaylistsRepository } from "./crud/repository/repository";
     MusicPlaylistsController,
   ],
   providers: [
+    MusicPlaylistAvailableSlugGeneratorService,
     MusicPlaylistsRepository,
   ],
   exports: [],

@@ -1,4 +1,7 @@
 .playlistItem {
+  --color-playing: var(--color-blue-400);
+  --color-playing-hover: var(--color-blue-500);
+
   display: flex;
   align-items: center;
   gap: 16px;
@@ -7,12 +10,12 @@
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: var(--color-gray-800);
   }
 
   &.playing {
-    background-color: #e3f2fd;
-    border-left: 4px solid #2196f3;
+    background-color: var(--color-gray-900);
+    border-left: 4px solid var(--color-playing);
   }
 }
 
@@ -23,8 +26,15 @@
   align-items: center;
 }
 
+.indexNumber,
+.songDetails,
+.duration,
+.actionButton,
+.settingsButton {
+  color: var(--color-gray-400) !important;
+}
+
 .indexNumber {
-  color: #666;
   font-weight: 500;
   font-size: 14px;
 }
@@ -33,7 +43,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #2196f3;
+  background-color: var(--color-playing);
   color: white;
   border: none;
   display: flex;
@@ -44,8 +54,7 @@
 }
 
 .playButton:hover {
-  background-color: #1976d2;
-  transform: scale(1.05);
+  background-color: var(--color-playing-hover);
 }
 
 .coverImage {
@@ -66,7 +75,7 @@
 
 .songTitle {
   font-weight: 500;
-  color: #333;
+  color: var(--color-gray-25);
   margin: 0 0 4px 0;
   white-space: nowrap;
   overflow: hidden;
@@ -74,7 +83,7 @@
 }
 
 .songTitle.playing {
-  color: #2196f3;
+  color: var(--color-playing);
 }
 
 .songDetails {
@@ -82,7 +91,6 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #666;
 }
 
 .songArtist,
@@ -92,15 +100,10 @@
   text-overflow: ellipsis;
 }
 
-.separator {
-  color: #999;
-}
-
 .duration {
   width: 64px;
   text-align: right;
   font-size: 14px;
-  color: #666;
 }
 
 .actions {
@@ -120,20 +123,26 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #666;
   transition: all 0.2s ease;
 }
 
-.actionButton:hover {
-  background-color: #e0e0e0;
+.actionButton:hover,
+.settingsButton:hover {
+  color: var(--color-gray-100) !important;
 }
 
 .actionButton.favorite {
-  color: #f44336;
+  color: var(--color-red-400) !important;
 }
 
 @media (max-width: 768px) {
   .year {
     display: none;
+  }
+}
+
+.settingsButton {
+  &:hover {
+    background-color: transparent !important;
   }
 }

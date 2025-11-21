@@ -1,9 +1,11 @@
+/* eslint-disable import/no-cycle */
 import { Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { MusicEntity } from "$shared/models/musics";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { assertIsDefined } from "$shared/utils/validation";
+import { Types } from "mongoose";
 import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet, CanGetOneByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
@@ -12,11 +14,13 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicsRepository } from "#musics/crud/repositories/music";
+import { fixSlug } from "#musics/crud/builder/fix-slug";
 import { MusicPlaylist, MusicPlaylistEntity } from "../../models";
 import { MusicPlaylistCrudDtos } from "../../models/dto";
 import { MusicPlayListEvents } from "./events";
 import { MusicPlaylistOdm } from "./odm";
 import { AggregationResult } from "./odm/criteria-pipeline";
+import { MusicPlaylistAvailableSlugGeneratorService } from "./available-slug-generator.service";
 
 type Model = MusicPlaylist;
 type Entity = MusicPlaylistEntity;
@@ -30,6 +34,19 @@ type SlugProps = {
 type CriteriaOne = MusicPlaylistCrudDtos.GetOne.Criteria;
 type CriteriaMany = MusicPlaylistCrudDtos.GetMany.Criteria;
 
+type AddOneTrackProps = {
+  id: string;
+  musicId: string;
+};
+type AddManyTracksProps = {
+  id: string;
+  musics: string[];
+};
+type RemoveManyTracksProps = {
+  id: string;
+  tracks: string[];
+};
+
 @Injectable()
 export class MusicPlaylistsRepository
 implements
@@ -40,6 +57,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
     private readonly musicsRepo: MusicsRepository,
+    private readonly slugService: MusicPlaylistAvailableSlugGeneratorService,
   ) { }
 
   @OnEvent(MusicPlayListEvents.WILDCARD)
@@ -87,6 +105,81 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     } );
   }
 
+  async addOneTrack( { id, musicId }: AddOneTrackProps): Promise<MusicPlaylistEntity> {
+    const musicObjectId = new Types.ObjectId(musicId);
+    const updated = await MusicPlaylistOdm.Model.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        $push: {
+          list: {
+            musicId: musicObjectId,
+            addedAt: new Date(),
+          },
+        },
+      },
+      {
+        new: true,
+      },
+    );
+
+    assertFoundClient(updated);
+
+    return MusicPlaylistOdm.toEntity(updated);
+  }
+
+  async addManyTracks( { id, musics }: AddManyTracksProps): Promise<MusicPlaylistEntity> {
+    const trackEntries = musics.map(musicId=> ( {
+      musicId: new Types.ObjectId(musicId),
+      addedAt: new Date(),
+    } ));
+    const updated = await MusicPlaylistOdm.Model.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        $push: {
+          list: {
+            $each: trackEntries,
+          },
+        },
+      },
+      {
+        new: true,
+      },
+    );
+
+    assertFoundClient(updated);
+
+    return MusicPlaylistOdm.toEntity(updated);
+  }
+
+  async removeManyTracks( { id, tracks }: RemoveManyTracksProps): Promise<MusicPlaylistEntity> {
+    const trackObjectIds = tracks.map(t=>new Types.ObjectId(t));
+    const updated = await MusicPlaylistOdm.Model.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        $pull: {
+          list: {
+            _id: {
+              $in: trackObjectIds,
+            },
+          },
+        },
+      },
+      {
+        new: true,
+      },
+    );
+
+    assertFoundClient(updated);
+
+    return MusicPlaylistOdm.toEntity(updated);
+  }
+
   async getOneById(id: string): Promise<Entity | null> {
     const doc = await MusicPlaylistOdm.Model.findById(id);
 
@@ -109,7 +202,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
 
     const doc = docs[0];
 
-    if (criteria?.expand?.includes("musics"))
+    if (doc.list.length > 0 && criteria?.expand?.includes("musics"))
       assertIsDefined(doc.list[0].music, "Lookup musics failed");
 
     return MusicPlaylistOdm.toEntity(doc);
@@ -154,6 +247,25 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   }
 
   async patchOneByIdAndGet(id: Id, params: PatchOneParams<Entity>): Promise<Entity> {
+    let slug;
+
+    if (params.entity.slug) {
+      const baseSlug = fixSlug(params.entity.slug);
+      const userId = params.entity.userId ?? await MusicPlaylistOdm.Model.findById(id).then(doc=>{
+        assertIsDefined(doc, "Document not found for slug fix");
+
+        return doc.userId.toString();
+      } );
+
+      assertIsDefined(baseSlug, "Invalid slug");
+      assertIsDefined(userId, "User ID is required for slug fix");
+      slug = await this.slugService.getAvailable( {
+        slug: baseSlug,
+        userId,
+      } );
+      params.entity.slug = slug;
+    }
+
     const updateQuery = patchParamsToUpdateQuery( {
       ...params,
       entity: params.entity,
@@ -192,9 +304,22 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   }
 
   @EmitEntityEvent(MusicPlayListEvents.Created.TYPE)
-  async createOneAndGet(model: Model): Promise<Entity> {
-    const docOdm = MusicPlaylistOdm.toDoc(model);
-    const gotDoc = await MusicPlaylistOdm.Model.create(docOdm);
+  async createOneAndGet(
+    dto: MusicPlaylistCrudDtos.CreateOne.Body,
+    userId: string,
+  ): Promise<Entity> {
+    const baseSlug = fixSlug(dto.slug);
+
+    assertIsDefined(baseSlug, "Invalid slug");
+    const slug = await this.slugService.getAvailable( {
+      slug: baseSlug,
+      userId,
+    } );
+    const gotDoc = await MusicPlaylistOdm.Model.create( {
+      name: dto.name.trim(),
+      slug,
+      userId: new Types.ObjectId(userId),
+    } );
 
     return MusicPlaylistOdm.toEntity(gotDoc);
   }

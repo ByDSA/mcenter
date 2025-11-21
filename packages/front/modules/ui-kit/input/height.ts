@@ -181,7 +181,7 @@ lastLine: string; } {
  * Hook que dispara callback la primera vez que el elemento entra en viewport,
  * y re-calcula al redimensionar.
  */
-export function useFirstTimeVisible<E extends Element>(
+export function useFirstTimeVisible<E extends Element | null>(
   ref: React.RefObject<E>,
   callback: (current: E)=> void,
 ) {

@@ -2,6 +2,7 @@ import { createManyResultResponseSchema, createOneResultResponseSchema, type Res
 import { PATH_ROUTES } from "$shared/routing";
 import { genParseZod } from "$shared/utils/validation/zod";
 import z from "zod";
+import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -28,8 +29,47 @@ export class MusicPlaylistsApi {
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.playlists.slug.withParams(userId, slug)),
+      url: backendUrl(PATH_ROUTES.musics.playlists.user.slug.withParams(userId, slug)),
       body: undefined,
+    } );
+  }
+
+  patchOne(
+    playlistId: string,
+    props: MusicPlaylistsApi.PatchOne.Body,
+  ): Promise<MusicPlaylistsApi.PatchOne.Response> {
+    const fetcher = makeFetcher<
+      MusicPlaylistsApi.PatchOne.Body,
+      MusicPlaylistsApi.PatchOne.Response
+    >( {
+      method: "PATCH",
+      parseResponse: genParseZod(
+        MusicPlaylistsApi.GetOne.responseSchema,
+      ) as (m: unknown)=> any,
+    } );
+
+    return fetcher( {
+      url: backendUrl(PATH_ROUTES.musics.playlists.withParams(playlistId)),
+      body: props,
+    } );
+  }
+
+  createOne(
+    props: MusicPlaylistsApi.CreateOne.Body,
+  ): Promise<MusicPlaylistsApi.CreateOne.Response> {
+    const fetcher = makeFetcher<
+      MusicPlaylistsApi.CreateOne.Body,
+      MusicPlaylistsApi.CreateOne.Response
+    >( {
+      method: "POST",
+      parseResponse: genParseZod(
+        MusicPlaylistsApi.CreateOne.responseSchema,
+      ) as (m: unknown)=> any,
+    } );
+
+    return fetcher( {
+      url: backendUrl(PATH_ROUTES.musics.playlists.path),
+      body: props,
     } );
   }
 
@@ -57,6 +97,58 @@ export class MusicPlaylistsApi {
         ),
       ),
       body: undefined,
+    } );
+  }
+
+  addOneTrack(
+    playlistId: string,
+    musicId: string,
+  ): Promise<MusicPlaylistsApi.AddOneTrack.Response> {
+    const fetcher = makeFetcher<
+      MusicPlaylistsApi.AddOneTrack.Body,
+      MusicPlaylistsApi.AddOneTrack.Response
+    >( {
+      method: "POST",
+      parseResponse: genParseZod(
+        MusicPlaylistsApi.AddOneTrack.responseSchema,
+      ) as (m: unknown)=> any,
+    } );
+
+    return fetcher( {
+      url: backendUrl(
+        PATH_ROUTES.musics.playlists.track.withParams(
+          playlistId,
+        ),
+      ),
+      body: {
+        musics: [musicId],
+      },
+    } );
+  }
+
+  removeOneTrack(
+    playlistId: string,
+    itemId: string,
+  ): Promise<MusicPlaylistsApi.RemoveOneTrack.Response> {
+    const fetcher = makeFetcher<
+      MusicPlaylistsApi.RemoveOneTrack.Body,
+      MusicPlaylistsApi.RemoveOneTrack.Response
+    >( {
+      method: "DELETE",
+      parseResponse: genParseZod(
+        MusicPlaylistsApi.RemoveOneTrack.responseSchema,
+      ) as (m: unknown)=> any,
+    } );
+
+    return fetcher( {
+      url: backendUrl(
+        PATH_ROUTES.musics.playlists.track.withParams(
+          playlistId,
+        ),
+      ),
+      body: {
+        tracks: [itemId],
+      },
     } );
   }
 
@@ -106,7 +198,7 @@ export class MusicPlaylistsApi {
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.playlists.path),
+      url: backendUrl(PATH_ROUTES.musics.playlists.search.path),
       body,
     } );
   }
@@ -122,7 +214,7 @@ export class MusicPlaylistsApi {
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.history.withParams(id)),
+      url: backendUrl(PATH_ROUTES.musics.playlists.withParams(id)),
       body: undefined,
     } );
   }
@@ -137,6 +229,56 @@ export namespace MusicPlaylistsApi {
 
     export const responseSchema = createOneResultResponseSchema(dataSchema);
     export type Response = z.infer<typeof responseSchema>;
+  }
+  export namespace PatchOne {
+    export const dataSchema = musicPlaylistEntitySchema;
+
+    export type Data = z.infer<typeof dataSchema>;
+
+    export const responseSchema = createOneResultResponseSchema(dataSchema);
+    export type Response = z.infer<typeof responseSchema>;
+
+    export const bodySchema = musicPlaylistEntitySchema.pick( {
+      name: true,
+      slug: true,
+    } ).partial();
+
+    export type Body = z.infer<typeof bodySchema>;
+  }
+  export namespace CreateOne {
+    export const responseSchema = createOneResultResponseSchema(musicPlaylistEntitySchema);
+    export type Response = z.infer<typeof responseSchema>;
+
+    export const { bodySchema } = MusicPlaylistCrudDtos.CreateOne;
+
+    export type Body = z.infer<typeof bodySchema>;
+  }
+  export namespace AddOneTrack {
+    export const dataSchema = musicPlaylistEntitySchema;
+
+    export type Data = z.infer<typeof dataSchema>;
+
+    export const responseSchema = createOneResultResponseSchema(dataSchema);
+    export type Response = z.infer<typeof responseSchema>;
+
+    export const bodySchema = z.object( {
+      musics: z.array(mongoDbId),
+    } );
+
+    export type Body = z.infer<typeof bodySchema>;
+  }
+  export namespace RemoveOneTrack {
+    export const dataSchema = musicPlaylistEntitySchema;
+
+    export type Data = z.infer<typeof dataSchema>;
+
+    export const responseSchema = createOneResultResponseSchema(dataSchema);
+    export type Response = z.infer<typeof responseSchema>;
+    export const bodySchema = z.object( {
+      tracks: z.array(mongoDbId),
+    } );
+
+    export type Body = z.infer<typeof bodySchema>;
   }
 
   export namespace GetManyByCriteria {

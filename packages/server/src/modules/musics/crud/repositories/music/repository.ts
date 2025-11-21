@@ -17,7 +17,7 @@ import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { MusicsSearchService } from "#modules/search/search-services/musics.search.service";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 import { MusicBuilderService } from "../../builder/music-builder.service";
-import { MusicAvailableSlugGeneratorService } from "../../builder/vailable-slug-generator.service";
+import { MusicAvailableSlugGeneratorService } from "../../builder/available-slug-generator.service";
 import { ExpressionNode } from "./queries/query-object";
 import { MusicEvents } from "./events";
 import { MusicOdm } from "./odm";

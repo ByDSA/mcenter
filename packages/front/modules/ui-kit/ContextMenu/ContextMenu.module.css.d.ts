@@ -8,6 +8,7 @@ export interface ContextMenuStyles {
   danger: string;
   primary: string;
   success: string;
+  backdrop: string;
 }
 
 declare const styles: ContextMenuStyles;

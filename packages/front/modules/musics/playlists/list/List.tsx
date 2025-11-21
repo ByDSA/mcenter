@@ -1,33 +1,100 @@
+import type { PlaylistEntity } from "../Playlist";
 import { Fragment } from "react";
+import { assertIsDefined } from "$shared/utils/validation";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
+import { useUser } from "#modules/core/auth/useUser";
+import { useListContextMenu } from "#modules/ui-kit/ContextMenu";
+import { classes } from "#modules/utils/styles";
 import { MusicPlaylistsApi } from "../requests";
-import { PlaylistEntity } from "../Playlist";
+import { playlistCopyBackendUrl } from "../utils";
 import { MusicPlaylistListItem } from "./Item";
+import styles from "./List.module.css";
+import { RenamePlaylistContextMenuItem } from "./renameItem";
+import { useRenamePlaylistModal } from "./useRenamePlaylistModal";
+import { useDeletePlaylistContextMenuItem } from "./deleteItem";
 
 import "#styles/resources/resource-list-entry.css";
 
 type Data = MusicPlaylistsApi.GetManyByCriteria.Data[];
 
-export function MusicPlayListsList() {
-  const { data, isLoading, error,
-    setItem, observerTarget } = useMusicPlaylists();
+type Props = ReturnType<typeof useMusicPlaylists>;
+
+export function MusicPlayListsList(
+  { data, error, isLoading, observerTarget, removeItemByIndex, setItemByIndex }: Props,
+) {
+  const { user } = useUser();
+  const userId = user?.id;
+
+  assertIsDefined(userId);
+
+  const { generateDeletePlayListContextMenuItem } = useDeletePlaylistContextMenuItem( {
+    onFinish: () => {
+      closeMenu();
+    },
+    onActionSuccess: ()=>removeItemByIndex(activeIndex!),
+    getValue: ()=>data![activeIndex!],
+  } );
+  const renameModal = useRenamePlaylistModal( {
+    onClose: () => closeMenu(),
+  } );
+  const { openMenu,
+    renderContextMenu,
+    activeIndex, closeMenu } = useListContextMenu( {
+    className: styles.contextMenu,
+    renderChildren: (item: PlaylistEntity)=><>
+      <p onClick={async (e)=> {
+        e.preventDefault();
+        await playlistCopyBackendUrl( {
+          value: item,
+        } );
+
+        closeMenu();
+      }}>Copiar backend URL</p>
+      {RenamePlaylistContextMenuItem( {
+        renameModal,
+        value: item,
+        setValue: (value: PlaylistEntity) => {
+          const i = data?.findIndex((d) => d.id === value.id);
+
+          if (i === undefined || i === -1)
+            return;
+
+          setItemByIndex(i, {
+            ...item,
+            name: value.name,
+            slug: value.slug,
+          } );
+        },
+      } )}
+      {generateDeletePlayListContextMenuItem(item)}
+    </>,
+  } );
 
   return renderFetchedData<Data | null>( {
     data,
     error,
     isLoading,
     render: () => (
-      <span className="resource-list">
+      <span className={classes("resource-list", styles.list)}>
         {
           data!.map(
             (playlist, i) => <Fragment key={playlist.id}>
               <MusicPlaylistListItem
                 value={playlist as PlaylistEntity}
                 setValue={(newEntry: typeof playlist | undefined) => {
-                  setItem(i, newEntry ?? null);
+                  setItemByIndex(i, newEntry ?? null);
+                }}
+                contextMenu={{
+                  element: activeIndex === i
+                    ? renderContextMenu(playlist as PlaylistEntity)
+                    : undefined,
+                  onClick: (e) => openMenu( {
+                    event: e,
+                    index: i,
+                  } ),
                 }} />
             </Fragment>,
           )
@@ -42,16 +109,23 @@ export function MusicPlayListsList() {
           marginTop: "2em",
         }}>{error.message}</span>
         }
+        {data?.length === 0
+        && <section className={styles.noPlaylists}>
+          <p>No tienes ninguna playlist creada.</p>
+        </section>}
       </span>
     ),
   } );
 }
 
-function useMusicPlaylists() {
+export function useMusicPlaylists() {
   const api = FetchApi.get(MusicPlaylistsApi);
-  const userId = "test";
+  const { user } = useUser();
+  const userId = user?.id;
+
+  assertIsDefined(userId);
   const { data, isLoading, error,
-    setItem, observerTarget } = useCrudDataWithScroll( {
+    setItem, observerTarget, setData } = useCrudDataWithScroll( {
     initialFetch: async () => {
       const result = await api.getManyByUserCriteria(userId, {
         limit: 10,
@@ -85,7 +159,29 @@ function useMusicPlaylists() {
     data,
     isLoading,
     error,
-    setItem,
+    setItemByIndex: setItem,
+    removeItemByIndex: (index: number) => {
+      setData((oldData) => {
+        if (!oldData)
+          return oldData;
+
+        const newData = [...oldData];
+
+        newData.splice(index, 1);
+
+        return newData;
+      } );
+    },
+    addItem: (newItem: PlaylistEntity) => {
+      setData((oldData) => {
+        if (!oldData)
+          return [newItem];
+
+        const newData = [...oldData, newItem];
+
+        return newData;
+      } );
+    },
     observerTarget,
   };
 }

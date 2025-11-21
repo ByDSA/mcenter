@@ -176,11 +176,25 @@ export const PATH_ROUTES = {
         return ret;
       },
     },
+    frontend: {
+      playlists: {
+        path: "/music/playlists",
+        withParams: ( { slug }: {slug: string} ) => `/music/playlists/${slug}`,
+      },
+    },
     playlists: {
       path: MUSICS_PLAYLISTS,
+      search: {
+        path: MUSICS_PLAYLISTS + "/criteria",
+      },
       withParams: (id: string) => `${MUSICS_PLAYLISTS}/${id}`,
       track: {
-        withParams: (id: string, trackNumber: number) => `${MUSICS_PLAYLISTS}/${id}/track/${trackNumber}`,
+        withParams: (
+          id: string,
+        ) => `${MUSICS_PLAYLISTS}/${id}/track`,
+        index: {
+          withParams: (id: string, trackNumber: number) => `${MUSICS_PLAYLISTS}/${id}/track/${trackNumber}`,
+        },
         move: {
           withParams: (
             id: string,
@@ -191,9 +205,9 @@ export const PATH_ROUTES = {
       },
       user: {
         withParams: (userId: string) => `${MUSICS_PLAYLISTS}/user/${userId}`,
-      },
-      slug: {
-        withParams: (user: string, slug: string, trackNumber?: number) => `${MUSICS_PLAYLISTS}/user/${user}/${slug}${trackNumber ? `/track/${trackNumber}` : ""}`,
+        slug: {
+          withParams: (userId: string, slug: string, trackNumber?: number) => `${MUSICS_PLAYLISTS}/user/${userId}/${slug}${trackNumber ? `/track/${trackNumber}` : ""}`,
+        },
       },
     },
     pickRandom: {

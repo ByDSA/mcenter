@@ -20,6 +20,7 @@ type ContextMenuProps = {
 type UseContextMenuProps<T> = {
   renderChildren: (value: T)=> ReactNode;
   className?: string;
+  onClose?: ()=> void;
 };
 
 type SmartPositionOptions = {
@@ -39,7 +40,7 @@ const calculateSmartPosition = (
   // Obtener dimensiones de la ventana y scroll
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  const scrollX = opts.considerScroll ? window.screenX : 0;
+  const scrollX = opts.considerScroll ? window.scrollX : 0;
   const scrollY = opts.considerScroll ? window.scrollY : 0;
   // Posición inicial preferida (debajo del elemento)
   let x = triggerRect.left + scrollX;
@@ -75,14 +76,19 @@ const ContextMenu = ( { isOpen,
   onClose,
   children,
   className,
-  menuRef }: ContextMenuProps & { menuRef?: React.RefObject<HTMLDivElement> } ) => {
+  menuRef }: ContextMenuProps & { menuRef?: React.RefObject<HTMLDivElement | null> } ) => {
   const internalRef = useRef<HTMLDivElement>(null);
   const ref = menuRef || internalRef;
 
   useEffect(() => {
     const handleClickOutside = (event: Event) => {
-      if (ref.current && !ref.current.contains(event.target as Node))
+      const target = event.target as HTMLElement;
+      const isBackdrop = target?.dataset?.contextBackdrop !== undefined;
+
+      if (isBackdrop) {
+        event.preventDefault(); // Evita llamar a otros listeners al cerrar
         onClose();
+      }
     };
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape")
@@ -90,12 +96,12 @@ const ContextMenu = ( { isOpen,
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("click", handleClickOutside, true);
       document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("click", handleClickOutside, true);
       document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen, onClose]);
@@ -104,17 +110,20 @@ const ContextMenu = ( { isOpen,
     return null;
 
   return (
-    <div
-      ref={ref}
-      className={classes(styles.contextMenu, className, isOpen && styles.open)}
-      style={{
-        top: position.y,
-        left: position.x,
-      }}
-      role="menu"
-    >
-      {children}
-    </div>
+    <>
+      <div className={styles.backdrop} data-context-backdrop/>
+      <div
+        ref={ref}
+        className={classes(styles.contextMenu, className, isOpen && styles.open)}
+        style={{
+          top: position.y,
+          left: position.x,
+        }}
+        role="menu"
+      >
+        {children}
+      </div>
+    </>
   );
 };
 
@@ -140,8 +149,6 @@ export const useListContextMenu = <T, >(config: UseContextMenuProps<T>) => {
   const closeMenu = useCallback(() => {
     _closeMenu();
     setActiveIndex(null);
-
-    return true;
   }, [_closeMenu]);
 
   return {
@@ -282,7 +289,10 @@ export const useContextMenu = <T, >(config: UseContextMenuProps<T>) => {
       className={className}
       isOpen={isOpen}
       position={position}
-      onClose={closeMenu}
+      onClose={()=> {
+        closeMenu();
+        config.onClose?.();
+      }}
       menuRef={menuRef}
     >
       {renderChildren(value)}

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Query, Req, Res, UnprocessableEntityException } from "@nestjs/common";
+import { Body, Controller, Get, Param, Query, Req, Res, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
@@ -8,14 +8,15 @@ import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserPayload } from "$shared/models/auth";
-import { GetManyCriteria, GetOne } from "#utils/nestjs/rest";
+import { GetManyCriteria, GetOne, UserDeleteOne, UserPatchOne, UserPostOne } from "#utils/nestjs/rest";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { assertFoundClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { MusicRendererService } from "#musics/renderer/render.service";
 import { User } from "#core/auth/users/User.decorator";
+import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { MusicPlaylistCrudDtos } from "../models/dto";
-import { musicPlaylistEntitySchema } from "../models";
+import { musicPlaylistEntitySchema, musicPlaylistSchema } from "../models";
 import { MusicPlaylistsRepository } from "./repository/repository";
 
 class GetOneParams extends createZodDto(z.object( {
@@ -63,10 +64,34 @@ class GetOneUserPlaylistTrackParams extends createZodDto(trackPosParamsSchema.ex
 } )) {}
 
 class GetManyUserPlaylistsParams extends createZodDto(z.object( {
-  userId: z.string(),
+  userId: mongoDbId,
 } )) {}
 class GetManyUserPlaylistsBody extends createZodDto(
   MusicPlaylistCrudDtos.GetMany.criteriaSchema,
+) {}
+
+class AddManyTrackBody extends createZodDto(z.object( {
+  musics: z.array(mongoDbId),
+} )) {}
+class RemoveManyTrackBody extends createZodDto(z.object( {
+  tracks: z.array(mongoDbId),
+} )) {}
+
+class PatchBody extends createZodDto(
+  musicPlaylistSchema.pick( {
+    name: true,
+    slug: true,
+  } ).partial()
+    .refine(
+      data => data.name !== undefined || data.slug !== undefined,
+      {
+        message: "Debe incluir al menos 'name' o 'slug'.",
+      },
+    ),
+) {}
+
+class CreateOnePlaylistsBody extends createZodDto(
+  MusicPlaylistCrudDtos.CreateOne.bodySchema,
 ) {}
 
 @Controller("/")
@@ -84,10 +109,84 @@ export class MusicPlaylistsController {
     return await this.playlistsRepo.getOneById(params.id);
   }
 
+  @UserPatchOne("/:id", musicPlaylistEntitySchema)
+  async patchPlaylist(
+    @Param() params: GetOneParams,
+    @Body() body: PatchBody,
+    @User() user: UserPayload,
+  ) {
+    await this.guardEditPlaylist(user, params.id);
+    const ret = await this.playlistsRepo.patchOneByIdAndGet(params.id, {
+      entity: body,
+    } );
+
+    return ret;
+  }
+
+  @UserPostOne("/", musicPlaylistEntitySchema)
+  async createOnePlaylist(
+    @Body() body: CreateOnePlaylistsBody,
+    @User() user: UserPayload,
+  ) {
+    const ret = await this.playlistsRepo.createOneAndGet(body, user.id);
+
+    return ret;
+  }
+
+  @UserDeleteOne("/:id", musicPlaylistEntitySchema)
+  async deleteOnePlaylist(
+    @Param() params: GetOneParams,
+    @User() user: UserPayload,
+  ) {
+    await this.guardEditPlaylist(user, params.id);
+    const ret = await this.playlistsRepo.deleteOneByIdAndGet(params.id);
+
+    return ret;
+  }
+
+  @UserPostOne("/:id/track", musicPlaylistEntitySchema)
+  async addTracks(
+    @Param() params: GetOneParams,
+    @User() user: UserPayload,
+    @Body() body: AddManyTrackBody,
+  ) {
+    const playlistId = params.id;
+
+    await this.guardEditPlaylist(user, playlistId);
+    const { musics } = body;
+
+    return await this.playlistsRepo.addManyTracks( {
+      id: playlistId,
+      musics,
+    } );
+  }
+
+  @UserDeleteOne("/:id/track", musicPlaylistEntitySchema)
+  async removeManyTracks(
+    @Param() params: GetOneParams,
+    @User() user: UserPayload,
+    @Body() body: RemoveManyTrackBody,
+  ) {
+    const playlistId = params.id;
+
+    await this.guardEditPlaylist(user, playlistId);
+    const { tracks } = body;
+
+    return await this.playlistsRepo.removeManyTracks( {
+      id: playlistId,
+      tracks,
+    } );
+  }
+
+  @Authenticated()
   @GetOne("/:id/track/move/:itemId/:newIndex", musicPlaylistEntitySchema)
   async moveOneTrack(
     @Param() params: MoveOneTrackParams,
+    @User() user: UserPayload,
   ) {
+    const playlistId = params.id;
+
+    await this.guardEditPlaylist(user, playlistId);
     const playlist = await this.playlistsRepo.moveMusic(
       params.id,
       params.itemId,
@@ -112,18 +211,21 @@ export class MusicPlaylistsController {
   async getUserPlaylists(
     @Param() params: GetManyUserPlaylistsParams,
     @Body() body: GetManyUserPlaylistsBody,
+    @User() user: UserPayload | null,
   ) {
-    return await this.playlistsRepo.getManyByCriteria( {
+    const isSameUserAsRequested = user?.id === params.userId;
+    const ret = await this.playlistsRepo.getManyByCriteria( {
       ...body,
       filter: {
         ...body.filter,
         userId: params.userId,
       },
-
     } );
+
+    return ret;
   }
 
-  @GetManyCriteria("/", musicPlaylistEntitySchema)
+  @GetManyCriteria("/criteria", musicPlaylistEntitySchema)
   async getManyByCriteria(
     @Body() body: GetManyUserPlaylistsBody,
   ) {
@@ -207,5 +309,14 @@ export class MusicPlaylistsController {
       request: req,
       response: res,
     } );
+  }
+
+  private async guardEditPlaylist(user: UserPayload, playlistId: string) {
+    const playlist = await this.playlistsRepo.getOneById(playlistId);
+
+    assertFoundClient(playlist);
+
+    if (playlist.userId !== user.id)
+      throw new UnauthorizedException();
   }
 }

@@ -1,21 +1,25 @@
-import { applyDecorators, HttpCode, HttpStatus, Post, UseInterceptors } from "@nestjs/common";
+import { applyDecorators, Post } from "@nestjs/common";
 import z from "zod";
-import { createOneResultResponseSchema } from "$shared/utils/http/responses";
-import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
-import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
-import { ResponseFormatterInterceptor } from "../responses/response-formatter.interceptor";
+import { Authenticated } from "#core/auth/users/Authenticated.guard";
+import { getCommonCommandDecorators } from "./patch";
 
 type PostOneOptions = {
   _: 0;
 };
-export function PostOne(url: string, schema: z.ZodSchema, _options?: PostOneOptions) {
+export function PostOne(url: string, dataSchema: z.ZodSchema, _options?: PostOneOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
-    IsAdmin,
     Post(url),
-    // los interceptors se ejecutan al revés:
-    UseInterceptors(ResponseFormatterInterceptor),
-    ValidateResponseWithZodSchema(createOneResultResponseSchema(schema)),
-    HttpCode(HttpStatus.OK),
+    ...getCommonCommandDecorators(dataSchema),
+  ];
+
+  return applyDecorators(...decorators);
+}
+
+export function UserPostOne(url: string, dataSchema?: z.ZodSchema) {
+  const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
+    Authenticated(),
+    Post(url),
+    ...getCommonCommandDecorators(dataSchema),
   ];
 
   return applyDecorators(...decorators);
