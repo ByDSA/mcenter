@@ -1,64 +1,69 @@
 import { useMemo } from "react";
 import { Button } from "../input/Button";
-import { useModal } from "./useModal";
+import { OpenModalProps, useModal } from "./ModalContext";
 
-type Action = (obj: unknown)=> Promise<boolean> | boolean;
+type Action = (obj?: unknown)=> Promise<boolean> | boolean;
 
-type Props = Parameters<typeof useModal>[0] & {
+export type OpenConfirmModalProps = OpenModalProps & {
   action?: Action;
   onActionSuccess?: ()=> Promise<void> | void;
   onCancel?: ()=> Promise<void> | void;
   onFinish?: ()=> Promise<void> | void;
   bypass?: ()=> Promise<boolean> | boolean;
 };
-export const useConfirmModal = (props: Props) => {
-  const onClose = async (obj: unknown) => {
-    await props?.onClose?.(null);
 
-    if (obj === true) {
-      const ret = await props?.action?.(obj);
+export const useConfirmModal = () => {
+  const confirmModal = useModal();
+  const footer = useMemo(()=><footer>
+    <Button theme={"white"} onClick={async ()=> {
+      await confirmModal.closeModal(true);
+    }}>Sí</Button>
+    <Button theme={"white"} onClick={async ()=> {
+      await confirmModal.closeModal();
+    }}>Cancelar</Button>
+  </footer>, [confirmModal.closeModal]);
+  let openModal: (
+    props?: OpenConfirmModalProps
+   )=> Promise<void> = async (props)=> {
+     const bypassed = await props?.bypass?.();
+     const onClose = async (obj: unknown) => {
+       await props?.onClose?.(null);
 
-      if (ret)
-        await props.onActionSuccess?.();
-    } else
-      await props.onCancel?.();
+       if (obj === true) {
+         const ret = await props?.action?.(obj);
 
-    await props.onFinish?.();
-  };
-  const confirmModal = useModal( {
-    ...props,
-    onClose,
-  } );
-  let { open } = confirmModal;
+         if (ret)
+           await props?.onActionSuccess?.();
+       } else
+         await props?.onCancel?.();
 
-  if (props.bypass) {
-    open = async ()=> {
-      const bypassed = await props.bypass?.();
+       await props?.onFinish?.();
+     };
 
-      if (bypassed)
-        await onClose(true);
-      else
-        confirmModal.open();
-    };
-  }
-
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { Modal } = confirmModal;
-  const confirmModalModal = useMemo(()=>( { children }: {children: React.ReactNode} )=> <Modal>
-    {children}
-    <footer>
-      <Button onClick={async ()=> {
-        await confirmModal.close(true);
-      }}>Sí</Button>
-      <Button onClick={async ()=> {
-        await confirmModal.close();
-      }}>Cancelar</Button>
-    </footer>
-  </Modal>, [Modal]);
+     if (bypassed)
+       await onClose(true);
+     else {
+       await confirmModal.openModal( {
+         ...props,
+         staticContent: props?.staticContent
+           ? <>
+             {props.staticContent}
+             {footer}
+           </>
+           : undefined,
+         onClose,
+       } );
+     }
+   };
 
   return {
     ...confirmModal,
-    open,
-    Modal: confirmModalModal,
+    openModal,
+    setModalContent: (el)=>confirmModal.setModalContent(
+      <>
+        {el}
+        {footer}
+      </>,
+    ),
   };
 };

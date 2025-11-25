@@ -26,7 +26,7 @@ import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { MusicEntityWithFileInfos } from "../models";
-import { useListContextMenu } from "../../ui-kit/ContextMenu/ContextMenu";
+import { createContextMenuItem, useListContextMenu } from "../../ui-kit/ContextMenu/ContextMenu";
 import { MusicPlaylistItem } from "./PlaylistItem";
 import { MusicPlaylistEntity } from "./models";
 import { formatDurationHeader, playlistCopyBackendUrl } from "./utils";
@@ -155,7 +155,6 @@ newIndex: number;}[]>([]);
     }
   };
   const renameModal = useRenamePlaylistModal( {
-    onClose: async () => { await playlistCloseMenu(); },
     onSuccess: ( { previous, current } ) => {
       if (previous.slug !== current.slug) {
         router.push(PATH_ROUTES.musics.frontend.playlists.withParams( {
@@ -166,9 +165,7 @@ newIndex: number;}[]>([]);
   } );
   const router = useRouter();
   const { generateDeletePlayListContextMenuItem } = useDeletePlaylistContextMenuItem( {
-    onFinish: () => {
-      playlistCloseMenu();
-    },
+    onOpen: () => { playlistCloseMenu(); },
     onActionSuccess: ()=>router.push(PATH_ROUTES.musics.frontend.playlists.path),
     getValue: ()=>value,
   } );
@@ -179,6 +176,7 @@ newIndex: number;}[]>([]);
         {RenamePlaylistContextMenuItem( {
           className: styles.contextMenuItem,
           renameModal,
+          closeMenu: playlistCloseMenu,
           value,
           setValue: (v: PlaylistEntity) => {
             setValue( {
@@ -188,13 +186,16 @@ newIndex: number;}[]>([]);
             } );
           },
         } )}
-        <p className={styles.contextMenuItem} onClick={async ()=> {
-          await playlistCopyBackendUrl( {
-            value,
-          } );
-
-          playlistCloseMenu();
-        }}>Copiar backend URL</p>
+        {createContextMenuItem( {
+          label: "Copiar backend URL",
+          closeMenu: playlistCloseMenu,
+          className: styles.contextMenuItem,
+          onClick: async ()=> {
+            await playlistCopyBackendUrl( {
+              value,
+            } );
+          },
+        } )}
         {generateDeletePlayListContextMenuItem(value)}
       </>,
     } );
@@ -202,24 +203,32 @@ newIndex: number;}[]>([]);
     renderContextMenu: renderPlaylistItemContextMenu,
     activeIndex: playListItemActiveIndex, closeMenu: playlistItemCloseMenu } = useListContextMenu( {
     renderChildren: (item: PlaylistItemEntity)=><>
-      <p className={styles.contextMenuItem} onClick={async ()=> {
-        await navigator.clipboard.writeText(
-          backendUrl(PATH_ROUTES.musics.slug.withParams(item.music.slug)),
-        );
-        logger.info("Copiada url");
+      {createContextMenuItem( {
+        label: "Copiar backend URL",
+        closeMenu: playlistItemCloseMenu,
+        onClick: async () => {
+          await navigator.clipboard.writeText(
+            backendUrl(PATH_ROUTES.musics.slug.withParams(item.music.slug)),
+          );
+          logger.info("Copiada url");
+        },
+      } )}
+      {createContextMenuItem( {
+        label: "Eliminar",
+        theme: "danger",
+        onClick: async ()=> {
+          await api.removeOneTrack(value.id, item.id);
+          const updatedList = value.list.filter((i) => i.id !== item.id);
 
-        playlistItemCloseMenu();
-      }}>Copiar backend URL</p>
-      <p className={styles.contextMenuItem} onClick={async ()=> {
-        await api.removeOneTrack(value.id, item.id);
-        const updatedList = value.list.filter((i) => i.id !== item.id);
-
-        setValue( {
-          ...value,
-          list: updatedList,
-        } );
-        playlistItemCloseMenu();
-      }}>Eliminar</p>
+          setValue( {
+            ...value,
+            list: updatedList,
+          } );
+          playlistItemCloseMenu();
+        },
+        closeMenu: playlistItemCloseMenu,
+      } )
+      }
     </>,
   } );
   // eslint-disable-next-line @typescript-eslint/naming-convention

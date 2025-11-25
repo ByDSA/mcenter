@@ -11,6 +11,7 @@ import styles from "./styles.module.css";
 export default function MusicPlaylistsPage() {
   const usingMusicPlaylist = useMusicPlaylists();
   const newPlaylistButton = useNewPlaylistButton( {
+    theme: "dark-gray",
     onSuccess: (newPlaylist: PlaylistEntity) => {
       usingMusicPlaylist.addItem(newPlaylist);
       logger.debug("Nueva playlist creada: " + newPlaylist.name);

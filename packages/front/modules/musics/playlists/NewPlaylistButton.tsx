@@ -1,92 +1,84 @@
 import { Add } from "@mui/icons-material";
-import { useCallback } from "react";
+import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { Button } from "#modules/ui-kit/input/Button";
-import { useModal } from "#modules/ui-kit/modal/useModal";
 import { useInputText } from "#modules/ui-kit/input/UseInputText";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { useFormModal } from "#modules/ui-kit/modal/useFormModal";
 import { MusicPlaylistsApi } from "./requests";
-import { PlaylistEntity } from "./Playlist";
 
 type ButtonProps = {
   onClick: ()=> void;
+  theme: "dark-gray" | "white";
 };
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const NewPlaylistButton = ( { onClick }: ButtonProps) => {
+const NewPlaylistButton = ( { onClick, theme }: ButtonProps) => {
   return <Button
+    theme={theme}
     onClick={onClick}
     left={<Add />}>
     Nueva playlist
   </Button>;
 };
 
-type Props = {
+type FormProps = {
   onSuccess?: (newPlaylist: any)=> void;
 };
-export function useNewPlaylistButton(props: Props) {
-  const { element, open } = useNewPlaylistModal(props);
 
-  return {
-    element: <>
-      <NewPlaylistButton onClick={()=>open()} />
-      {element}
-    </>,
-  };
-}
-
-function useNewPlaylistModal( { onSuccess }: Props) {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { Modal, ...modal } = useModal( {
-    title: "Nueva playlist",
-  } );
-  const { element: inputNameElement, ref, setValue: setName, value: nameValue } = useInputText( {
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const NewPlaylistForm = ( { onSuccess }: FormProps) => {
+  const { element: inputName, value: nameValue } = useInputText( {
     nullChecked: false,
-    onPressEnter: ()=>send(),
+    autofocus: true,
+    onPressEnter: () => formModal.submit(),
   } );
-  const canSend = useCallback(
-    ()=>nameValue.trim().length > 0,
-    [nameValue],
+  const formModal = useFormModal( {
+    canSubmit: ()=> nameValue.trim().length > 0,
+    onSuccess,
+    onSubmit: async () => {
+      const api = FetchApi.get(MusicPlaylistsApi);
+
+      return (await api.createOne( {
+        name: nameValue.trim(),
+        slug: nameValue.trim(),
+      } )).data;
+    },
+  } );
+
+  return (
+    <>
+      <section>
+        <p>Nombre:</p>
+        {inputName}
+      </section>
+      <footer>
+        <Button
+          onClick={formModal.submit}
+          disabled={!formModal.canSubmit}
+        >
+          Crear
+        </Button>
+      </footer>
+    </>
   );
-  const send = useCallback(async () => {
-    if (!canSend())
-      return;
+};
 
-    const api = FetchApi.get(MusicPlaylistsApi);
-    const body = {
-      name: nameValue.trim(),
-      slug: nameValue.trim(),
-    };
-    const res = await api.createOne(body);
-    const newPlaylist = res.data as PlaylistEntity | null;
+type Props = {
+  onSuccess?: (newPlaylist: any)=> void;
+  theme: "dark-gray" | "white";
+};
 
-    onSuccess?.(newPlaylist);
-    await modal.close();
-  }, [canSend]);
+export function useNewPlaylistButton(props: Props) {
+  const modal = useModal();
+  const openModal = () => {
+    return modal.openModal( {
+      title: "Nueva playlist",
+      staticContent: <NewPlaylistForm onSuccess={props.onSuccess} />,
+    } );
+  };
 
   return {
-    ...modal,
-    open: () => {
-      modal.open();
-
-      setName("");
-
-      setTimeout(() => {
-        if (!ref.current)
-          return;
-
-        ref.current.focus();
-      }, 0);
-    },
-    element:
-      <Modal>
-        <section>
-          <p>Nombre:</p>
-          {inputNameElement}
-        </section>
-        <footer>
-          <Button onClick={send}
-            disabled={!canSend()}
-          >Crear</Button>
-        </footer>
-      </Modal>,
+    element: (
+      <NewPlaylistButton theme={props.theme} onClick={openModal} />
+    ),
   };
 }

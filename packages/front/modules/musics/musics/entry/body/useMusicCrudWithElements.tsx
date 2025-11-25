@@ -14,6 +14,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { useCrud, UseCrudProps } from "#modules/utils/resources/useCrud";
 import { DeleteResource, ResetResource, UpdateResource } from "#modules/utils/resources/elements/crud-buttons";
 import { MusicUserInfosApi } from "#modules/musics/user-info.requests";
+import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { MUSIC_PROPS } from "../utils";
 import { genTitleElement, genArtistElement, genWeightElement, genAlbumElement, genSlugElement, genTagsElement, genUnknownElement } from "./elements";
 import styles from "./styles.module.css";
@@ -22,6 +23,13 @@ export type UseMusicCrudWithElementsProps<T> = Pick<UseCrudProps<T>, "data" | "s
   shouldFetchFileInfo?: boolean;
 };
 
+function dataJsx(data: Music) {
+  return <div>
+    <span>Título: {data.title}</span><br/>
+    <span>Artista: {data.artist}</span>
+  </div>;
+}
+
 export function useMusicCrudWithElements
   <T extends MusicEntityWithUserInfo = MusicEntityWithUserInfo>( { data,
   setData,
@@ -29,26 +37,35 @@ export function useMusicCrudWithElements
   const api = FetchApi.get(MusicsApi);
   const userInfoApi = FetchApi.get(MusicUserInfosApi);
   const fileInfosApi = FetchApi.get(MusicFileInfosApi);
+  const { openModal } = useConfirmModal();
   const { isModified, remove, reset, addOnReset, state, update, initialState } = useCrud<T>( {
     data,
     setData,
     fetchRemove: async () => {
-      if (
-        !confirm(
-          `Borar esta entrada?\n${ JSON.stringify(data, null, 2)}`,
-        )) {
-        return Promise.resolve( {
-          data: undefined,
-          success: false,
-        } );
-      }
-
-      const res = await api.deleteOneById(data.id);
-
-      return {
-        data: res.data as T,
-        success: true,
+      let ret = {
+        data: undefined as T | undefined | void,
+        success: false,
       };
+
+      await openModal( {
+        title: "Confirmar borrado",
+        staticContent: (<>
+          <p>¿Borrar esta música?</p>
+          {dataJsx(data)}
+        </>),
+        action: async () => {
+          const res = await api.deleteOneById(data.id);
+
+          ret = {
+            data: res.data as T,
+            success: true,
+          };
+
+          return true;
+        },
+      } );
+
+      return ret;
     },
     fetchUpdate: async () => {
       const musicBody: MusicsApi.Patch.Body = generatePatchBody(

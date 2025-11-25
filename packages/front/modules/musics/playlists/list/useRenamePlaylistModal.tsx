@@ -1,150 +1,130 @@
 import type { PlaylistEntity } from "../Playlist";
-import { assertIsDefined } from "$shared/utils/validation";
-import { useState, useRef, useMemo, useCallback, useEffect } from "react";
-import { FetchApi } from "#modules/fetching/fetch-api";
-import { useInputText } from "#modules/ui-kit/input/UseInputText";
-import { useModal } from "#modules/ui-kit/modal/useModal";
+import type { MusicPlaylistEntity } from "../models";
+import { useEffect, useMemo } from "react";
 import { Button } from "#modules/ui-kit/input/Button";
+import { useInputText } from "#modules/ui-kit/input/UseInputText";
+import { useFormModal } from "#modules/ui-kit/modal/useFormModal";
+import { FetchApi } from "#modules/fetching/fetch-api";
+import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { MusicPlaylistsApi } from "../requests";
-import { MusicPlaylistEntity } from "../models";
 import styles from "./RenameModal.module.css";
 
-type UseRenameModalProps = {
-  onClose?: ()=> Promise<void> | void;
-  onSuccess?: (props: {previous: MusicPlaylistEntity;
-current: MusicPlaylistEntity;} )=> Promise<void> |
-    void;
+type RenameFormProps = {
+  initialValue: PlaylistEntity;
+  onSuccess?: (data: { previous: MusicPlaylistEntity;
+current: MusicPlaylistEntity; } )=> void;
+  updateLocalValue: (value: PlaylistEntity)=> void;
 };
-export function useRenamePlaylistModal( { onClose, onSuccess }: UseRenameModalProps) {
-  const [playlist, setPlaylist] = useState<PlaylistEntity | null>(null);
-  const setValueRef = useRef<(value: PlaylistEntity)=> void>(null);
-  const [body, setBody] = useState<{
-    name?: string;
-    slug?: string;
-  }>( {} );
-  const canSend = useMemo(() => {
-    if (!playlist)
-      return false;
 
-    if (body.name && body.name !== playlist.name)
-      return true;
-
-    if (body.slug && body.slug !== playlist.slug)
-      return true;
-
-    return false;
-  }, [body, playlist]);
-  const send = useCallback(async () => {
-    if (!canSend)
-      return;
-
-    assertIsDefined(playlist);
-
-    const api = FetchApi.get(MusicPlaylistsApi);
-    const res = await api.patchOne(playlist.id, body);
-    const newPlaylist = res.data as PlaylistEntity | null;
-
-    if (newPlaylist)
-      setValueRef.current?.(newPlaylist);
-
-    await renameModal.close();
-
-    if (newPlaylist) {
-      await onSuccess?.( {
-        current: newPlaylist,
-        previous: playlist,
-      } );
-    }
-  }, [playlist, body, canSend]);
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { Modal, ...renameModal } = useModal( {
-    title: "Renombrar",
-    onClose,
-    className: styles.renameModal,
-  } );
-  const { element: inputNameElement, setValue: setName, ref, value: nameValue } = useInputText( {
-    defaultValue: "",
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const RenamePlaylistForm = ( { initialValue,
+  onSuccess,
+  updateLocalValue }: RenameFormProps) => {
+  const { element: inputName, value: nameValue, ref: nameRef } = useInputText( {
+    defaultValue: initialValue.name,
     nullChecked: false,
-    onPressEnter: send,
+    onPressEnter: () => form.submit(),
   } );
-  const { element: inputSlugElement, setValue: setSlug, value: slugValue } = useInputText( {
+  const { element: inputSlug, value: slugValue } = useInputText( {
+    defaultValue: initialValue.slug,
     nullChecked: false,
-    defaultValue: "",
-    onPressEnter: send,
+    onPressEnter: () => form.submit(),
+  } );
+  const body = useMemo(() => {
+    const changes: { name?: string;
+slug?: string; } = {};
+
+    if (nameValue.trim() !== initialValue.name)
+      changes.name = nameValue.trim();
+
+    if (slugValue.trim() !== initialValue.slug)
+      changes.slug = slugValue.trim();
+
+    return changes;
+  }, [nameValue, slugValue, initialValue]);
+  const form = useFormModal( {
+    canSubmit: () => Object.keys(body).length > 0 && nameValue.trim().length > 0,
+    onSuccess: (newData) => {
+      updateLocalValue(newData);
+      onSuccess?.( {
+        previous: initialValue,
+        current: newData,
+      } );
+    },
+    onSubmit: async () => {
+      const api = FetchApi.get(MusicPlaylistsApi);
+      const res = await api.patchOne(initialValue.id, body);
+
+      return res.data as PlaylistEntity;
+    },
   } );
 
-  useEffect(()=> {
-    if (nameValue && playlist?.name !== nameValue) {
-      setBody((b) => ( {
-        ...b,
-        name: nameValue,
-      } ));
-    } else {
-      setBody((b) => {
-        const newBody = {
-          ...b,
-        };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (nameRef.current) {
+        nameRef.current.focus();
+        const len = nameRef.current.value.length;
 
-        delete newBody.name;
+        nameRef.current.setSelectionRange(len, len);
+      }
+    }, 0);
 
-        return newBody;
-      } );
-    }
+    return () => clearTimeout(timer);
+  }, [nameRef]);
 
-    if (slugValue && playlist?.slug !== slugValue) {
-      setBody((b) => ( {
-        ...b,
-        slug: slugValue,
-      } ));
-    } else {
-      setBody((b) => {
-        const newBody = {
-          ...b,
-        };
+  return (
+    <>
+      <section>
+        <p>Nombre:</p>
+        {inputName}
+      </section>
+      <section>
+        <p>Url slug:</p>
+        {inputSlug}
+      </section>
+      <footer>
+        <Button
+          onClick={form.submit}
+          disabled={!form.canSubmit}
+        >
+          Renombrar
+        </Button>
+      </footer>
+    </>
+  );
+};
 
-        delete newBody.slug;
+type HookProps = {
+  onSuccess?: (props: { previous: MusicPlaylistEntity;
+current: MusicPlaylistEntity; } )=> Promise<void> | void;
+};
 
-        return newBody;
-      } );
-    }
-  }, [nameValue, slugValue]);
-  const element = <Modal>
-    <section>
-      <p>Nombre:</p>
-      {inputNameElement}
-    </section>
-    <section>
-      <p>Url slug:</p>
-      {inputSlugElement}
-    </section>
-    <footer>
-      <Button onClick={send}
-        disabled={!canSend}
-      >Renombrar</Button>
-    </footer>
-  </Modal>;
+type OpenModalArgs = {
+  value: PlaylistEntity; // La playlist a editar
+  setValue: (value: PlaylistEntity)=> void; // Setter local
+  onClose?: ()=> Promise<void> | void;
+};
 
-  type OpenProps = {value: PlaylistEntity;
-setValue: (value: PlaylistEntity)=> void;};
+export function useRenamePlaylistModal(props: HookProps = {} ) {
+  const modal = useModal();
+  const openModal = ( { value, setValue, onClose }: OpenModalArgs) => {
+    modal.openModal( {
+      title: "Renombrar",
+      className: styles.renameModal,
+      onClose: onClose,
+      staticContent: (
+        <RenamePlaylistForm
+          initialValue={value}
+          updateLocalValue={setValue}
+          onSuccess={props.onSuccess}
+        />
+      ),
+    } );
+  };
 
   return {
-    element,
-    ...renameModal,
-    open: ( { setValue, value: pl }: OpenProps) => {
-      setPlaylist(pl);
-      setName(pl.name);
-      setSlug(pl.slug);
-      renameModal.open();
-      setValueRef.current = setValue;
-      setTimeout(() => {
-        if (!ref.current)
-          return;
-
-        ref.current.focus();
-        const { length } = ref.current.value;
-
-        ref.current.setSelectionRange(length, length);
-      }, 0);
-    },
+    openModal,
+    closeModal: modal.closeModal,
+    isOpen: modal.isOpen,
   };
 }

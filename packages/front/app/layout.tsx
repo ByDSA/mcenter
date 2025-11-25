@@ -11,6 +11,7 @@ import { MenuItemData } from "#modules/ui-kit/menus/Sidebar";
 import { SeriesIcon } from "#modules/series/SeriesIcon";
 import { MoviesIcon } from "#modules/movies/MoviesIcon";
 import { MusicsIcon } from "#modules/musics/MusicsIcon";
+import { ModalProvider } from "#modules/ui-kit/modal/ModalContext";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
@@ -102,11 +103,13 @@ export default async function RootLayout( { children }: {
         <InitApis />
         <NavigationWatcher />
         <UserProvider initialUser={user}>
-          {menu}
-          {sideBar}
-          <main className={styles.content}>
-            {children}
-          </main>
+          <ModalProvider>
+            {menu}
+            {sideBar}
+            <main className={styles.content}>
+              {children}
+            </main>
+          </ModalProvider>
         </UserProvider>
         <ToastContainer
           position="bottom-right"

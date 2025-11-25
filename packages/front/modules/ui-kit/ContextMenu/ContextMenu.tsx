@@ -302,3 +302,41 @@ export const useContextMenu = <T, >(config: UseContextMenuProps<T>) => {
     isOpen,
   };
 };
+
+type CreateContextMenuItemProps = {
+  label: string;
+  closeMenu?: ReturnType<typeof useContextMenu>["closeMenu"];
+  onClick?: (e: MouseEvent<HTMLParagraphElement>)=> void;
+  className?: string;
+  theme?: "danger" | "default" | "primary" | "success";
+};
+export const createContextMenuItem = ( { onClick,
+  label,
+  closeMenu,
+  theme = "default",
+  className }: CreateContextMenuItemProps) => {
+  return (
+    <p
+      className={classes(
+        styles.menuItem,
+        onClick && styles.pointer,
+        theme === "danger" && styles.danger,
+        theme === "primary" && styles.primary,
+        theme === "success" && styles.success,
+        className,
+      )}
+      onClick={(e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!onClick)
+          return;
+
+        onClick(e);
+        closeMenu?.();
+      }}
+    >
+      {label}
+    </p>
+  );
+};

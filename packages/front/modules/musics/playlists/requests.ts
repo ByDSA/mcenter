@@ -17,6 +17,7 @@ export class MusicPlaylistsApi {
   getOneByUserAndSlug(
     userId: string,
     slug: string,
+    options?: { silentErrors: true },
   ): Promise<MusicPlaylistsApi.GetOne.Response> {
     const fetcher = makeFetcher<
       undefined,
@@ -26,6 +27,7 @@ export class MusicPlaylistsApi {
       parseResponse: genParseZod(
         MusicPlaylistsApi.GetOne.responseSchema,
       ) as (m: unknown)=> any,
+      silentErrors: options?.silentErrors,
     } );
 
     return fetcher( {

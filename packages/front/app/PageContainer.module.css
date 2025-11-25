@@ -13,6 +13,8 @@
   width: 100%;
   height: 100%;
   max-width: 800px;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 .container > main h1,

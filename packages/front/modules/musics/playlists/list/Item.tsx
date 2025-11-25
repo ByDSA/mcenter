@@ -39,7 +39,7 @@ export const MusicPlaylistListItem = ( { value, contextMenu }: PlaylistProps) =>
       </div>
 
       <div className={styles.playlistInfo}>
-        <h1 className={styles.playlistTitle}>{value.name}</h1>
+        <h1 className={styles.playlistTitle} title={value.name}>{value.name}</h1>
 
         <div className={styles.playlistStats}>
           <div className={styles.statItem}>

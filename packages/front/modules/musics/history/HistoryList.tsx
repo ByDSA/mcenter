@@ -1,4 +1,4 @@
-import type { MusicHistoryEntry } from "#modules/musics/history/models";
+import type { MusicHistoryEntry, MusicHistoryEntryEntity } from "#modules/musics/history/models";
 import { Fragment } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { formatDate } from "#modules/utils/dates";
@@ -9,7 +9,7 @@ import { classes } from "#modules/utils/styles";
 import { INITIAL_FETCHING_LENGTH, FETCHING_MORE_LENGTH } from "#modules/history/lists";
 import { logger } from "#modules/core/logger";
 import { backendUrl } from "#modules/requests";
-import { useListContextMenu } from "#modules/ui-kit/ContextMenu";
+import { createContextMenuItem, useListContextMenu } from "#modules/ui-kit/ContextMenu";
 import styles from "../musics/styles.module.css";
 import { MusicHistoryApi } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
@@ -29,18 +29,33 @@ export function HistoryList(props?: Props) {
   const { openMenu,
     renderContextMenu,
     activeIndex, closeMenu } = useListContextMenu( {
-    renderChildren: (item: MusicHistoryEntry)=><>
-      <p onClick={async ()=> {
-        await navigator.clipboard.writeText(
-          backendUrl(PATH_ROUTES.musics.slug.withParams(item.resourceId)),
-        );
-        logger.info("Copiada url");
+    renderChildren: (item: MusicHistoryEntryEntity)=><>
+      {
+        createContextMenuItem( {
+          label: "Copiar backend URL",
+          closeMenu,
+          onClick: async () => {
+            await navigator.clipboard.writeText(
+              backendUrl(PATH_ROUTES.musics.slug.withParams(item.resourceId)),
+            );
+            logger.info("Copiada url");
+          },
+        } )
+      }
+      {
+        createContextMenuItem( {
+          label: "Eliminar del historial",
+          closeMenu,
+          theme: "danger",
+          onClick: async () => {
+            const api = FetchApi.get(MusicHistoryApi);
 
-        closeMenu();
-      }}>Copiar backend URL</p>
-      <p onClick={()=> {
-        closeMenu();
-      }}>Eliminar</p>
+            await api.deleteOneById(item.id);
+            logger.info("Entrada de historial eliminada");
+            setItem(activeIndex!, null);
+          },
+        } )
+      }
     </>,
   } );
 
@@ -63,7 +78,7 @@ export function HistoryList(props?: Props) {
                 }}
                 contextMenu={{
                   element: activeIndex === i
-                    ? renderContextMenu(entry as MusicHistoryEntry)
+                    ? renderContextMenu(entry)
                     : undefined,
                   onClick: (e) => openMenu( {
                     event: e,

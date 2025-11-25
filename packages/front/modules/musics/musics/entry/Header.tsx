@@ -2,7 +2,7 @@ import { Music, MusicEntityWithUserInfo } from "$shared/models/musics";
 import { createDurationElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
-import styles from "./Header.module.css";
+import styles from "../../../history/entry/Header/styles.module.css";
 
 type HeaderProps = {
   entry: MusicEntityWithUserInfo;

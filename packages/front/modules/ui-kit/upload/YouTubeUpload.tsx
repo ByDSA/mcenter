@@ -9,7 +9,7 @@ import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { classes } from "#modules/utils/styles";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
-import { PageSpinner } from "../spinner/Spinner";
+import { Spinner } from "../spinner/Spinner";
 import styles from "./YouTubeUpload.module.css";
 import { UploadButton } from "./UploadButton";
 
@@ -243,7 +243,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
       />
           }
           {
-            doing && <div className={styles.loading}><PageSpinner /></div>
+            doing && <div className={styles.loading}><Spinner /></div>
           }
         </div>
       </div>

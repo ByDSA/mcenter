@@ -13,6 +13,7 @@ import styles from "./style.module.css";
 import { useEpisodeCrudWithElements } from "./useEpisodeCrudWithElements";
 import { useEpisodeFileInfoCrudWithElements } from "./useEpisodeFileInfoCrudWithElements";
 import { useEpisodeUserInfoCrudWithElements } from "./useEpisodeUserInfoCrudWithElements";
+import { getLongDateStr } from "#modules/utils/dates";
 
 type Data = EpisodeHistoryApi.GetMany.Data;
 
@@ -76,6 +77,12 @@ export function Body( { data, setData }: Props) {
   const { state, remove } = useHistoryEntryEdition<Data>( {
     data,
     setData,
+    dataJsx: (data)=> <div>
+          <span>Fecha: {getLongDateStr(new Date(data.date.timestamp * 1_000), "datetime")}</span><br/>
+          <span>Serie: {data.resource.serie?.name ?? data.resource.compKey.seriesKey}</span><br/>
+          <span>Episodio: {data.resource.compKey.episodeKey}</span><br/>
+          <span>Título: {data.resource.title}</span><br/>
+          </div>,
     fetchRemove: async ()=> {
       const res = await historyApi.delete(data.id);
 

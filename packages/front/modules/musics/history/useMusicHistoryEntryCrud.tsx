@@ -2,6 +2,7 @@ import { useHistoryEntryEdition } from "#modules/history/entry/useHistoryEntryEd
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { UseCrudProps } from "#modules/utils/resources/useCrud";
 import { MusicHistoryApi } from "./requests";
+import { getLongDateStr } from "#modules/utils/dates";
 
 type Data = MusicHistoryApi.GetManyByCriteria.Data;
 
@@ -15,6 +16,11 @@ export function useMusicHistoryEntryEdition<T extends Data>( { data,
   const historyApi = FetchApi.get(MusicHistoryApi);
   const { remove } = useHistoryEntryEdition<T>( {
     data,
+    dataJsx: (data)=> <div>
+      <span>Fecha: {getLongDateStr(new Date(data.date.timestamp * 1_000), "datetime")}</span><br/>
+      <span>Título: {data.resource.title}</span><br/>
+      <span>Artista: {data.resource.artist}</span><br/>
+      </div>,
     setData,
     isModifiedFn: ()=>false,
     fetchRemove: async ()=> {

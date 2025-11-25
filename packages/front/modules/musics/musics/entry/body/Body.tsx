@@ -14,6 +14,8 @@ import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-
 import { createActionsBar, DeleteResource } from "#modules/utils/resources/elements/crud-buttons";
 import { OutputText } from "#modules/ui-kit/output/Text";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
+import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
+import { bytesToStr } from "#modules/utils/sizes";
 import { MUSIC_FILE_INFO_PROPS } from "../utils";
 import commonStyle from "../../../../history/entry/body-common.module.css";
 import { useMusicCrudWithElements, UseMusicCrudWithElementsProps } from "./useMusicCrudWithElements";
@@ -89,6 +91,14 @@ export function Body( { data, setData, shouldFetchFileInfo }: BodyProps) {
     </div></>;
 }
 
+function dataJsx(f: MusicFileInfoEntity) {
+  return <div>
+    <span>Path: {f.path}</span><br/>
+    <span>Duración: {f.mediaInfo.duration ? secsToMmss(f.mediaInfo.duration) : "-"}</span><br/>
+    <span>Size: {bytesToStr(f.size)}</span>
+  </div>;
+}
+
 type RenderFileInfosProps = {
   fileInfos: MusicFileInfoEntity[];
   musicId: string;
@@ -99,6 +109,7 @@ type RenderFileInfosProps = {
 };
 function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps) {
   const fileInfosApi = FetchApi.get(MusicFileInfosApi);
+  const { openModal } = useConfirmModal();
 
   return <details>
     <summary>Files ({fileInfos.length})</summary>
@@ -115,10 +126,19 @@ function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps)
               marginBottom: "0.5rem",
             }}>
               <DeleteResource action={async ()=> {
-                if (confirm(`Borar este archivo?\n${ JSON.stringify(f, null, 2)}`)) {
-                  await fileInfosApi.deleteOneById(f.id);
-                  actions.remove(f.id);
-                }
+                await openModal( {
+                  title: "Confirmar borrado",
+                  staticContent: (<>
+                    <p>¿Borrar este archivo?</p>
+                    {dataJsx(f)}
+                  </>),
+                  action: async () => {
+                    await fileInfosApi.deleteOneById(f.id);
+                    actions.remove(f.id);
+
+                    return true;
+                  },
+                } );
               }}
               isDoing={false} />
             </span>
@@ -140,7 +160,7 @@ function renderFileInfos( { fileInfos, musicId, actions }: RenderFileInfosProps)
             <span className={classes("line", "height2", styles.size)}>{
               OutputText( {
                 caption: MUSIC_FILE_INFO_PROPS.size.caption,
-                value: (f.size / (2 ** 20)).toFixed(2).toString() + " MB",
+                value: bytesToStr(f.size),
               } )}
             </span>
             <span className={classes("line", "height2", styles.createdAt)}>{

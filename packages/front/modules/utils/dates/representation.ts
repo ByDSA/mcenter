@@ -5,7 +5,7 @@ export type DateFormat = {
   ago: "no" | "yes";
 };
 
-function getLongDateStr(date: Date, format: DateFormat["dateTime"]) {
+export function getLongDateStr(date: Date, format: DateFormat["dateTime"]) {
   const day = getDD(date);
   const month = getMM(date);
   const year = getYYYY(date);

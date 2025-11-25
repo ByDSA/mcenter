@@ -123,6 +123,7 @@ export const LoginComponent = ( { handleForgotPass,
         {passwordElement}
 
         <Button
+          theme={"dark-gray"}
           type="submit"
           className={classes(styles.loginButton, isLoading && styles.loading)}
           disabled={isLoading

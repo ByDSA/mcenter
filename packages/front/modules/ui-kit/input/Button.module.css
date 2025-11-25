@@ -1,29 +1,19 @@
 body:has(.button) {
-  /* Variables dark theme */
-  --button-dark-background-color: var(--color-gray-25);
-  --button-dark-color: black;
-  --button-dark-hover-background-color: var(--color-gray-50);
-  --button-dark-disabled-background-color: var(--color-gray-200);
-  --button-dark-disabled-color: var(--color-gray-500);
+  /* Variables white theme */
+  --button-white-background-color: var(--color-gray-25);
+  --button-white-color: black;
+  --button-white-hover-background-color: var(--color-gray-50);
+  --button-white-disabled-background-color: var(--color-gray-200);
+  --button-white-disabled-color: var(--color-gray-500);
 
-  /* Variables light theme */
-  --button-light-background-color: var(--color-primary);
-  --button-light-color: white;
-  --button-light-hover-background-color: var(--color-primary-hover);
-  --button-light-disabled-background-color: hsl(
+  /* Variables blue theme */
+  --button-blue-background-color: var(--color-primary);
+  --button-blue-color: white;
+  --button-blue-hover-background-color: var(--color-primary-hover);
+  --button-blue-disabled-background-color: hsl(
     from var(--color-primary) h 30% l
   );
-
-  --button-light-disabled-color: var(--color-gray-100);
-
-  /* Por defecto: dark theme */
-  --button-background-color: var(--button-dark-background-color);
-  --button-color: var(--button-dark-color);
-  --button-hover-background-color: var(--button-dark-hover-background-color);
-  --button-disabled-background-color: var(
-    --button-dark-disabled-background-color
-  );
-  --button-disabled-color: var(--button-dark-disabled-color);
+  --button-blue-disabled-color: var(--color-gray-100);
 }
 .button {
   color: var(--button-color);
@@ -58,12 +48,30 @@ body:has(.button) {
   }
 }
 
-.light {
-  --button-background-color: var(--button-light-background-color);
-  --button-color: var(--button-light-color);
-  --button-hover-background-color: var(--button-light-hover-background-color);
+.blue {
+  --button-background-color: var(--button-blue-background-color);
+  --button-color: var(--button-blue-color);
+  --button-hover-background-color: var(--button-blue-hover-background-color);
   --button-disabled-background-color: var(
-    --button-light-disabled-background-color
+    --button-blue-disabled-background-color
   );
-  --button-disabled-color: var(--button-light-disabled-color);
+  --button-disabled-color: var(--button-blue-disabled-color);
+}
+
+.white {
+  --button-background-color: var(--button-white-background-color);
+  --button-color: var(--button-white-color);
+  --button-hover-background-color: var(--button-white-hover-background-color);
+  --button-disabled-background-color: var(
+    --button-white-disabled-background-color
+  );
+  --button-disabled-color: var(--button-white-disabled-color);
+}
+
+.darkGray {
+  --button-background-color: var(--color-gray-800);
+  --button-color: var(--color-gray-25);
+  --button-hover-background-color: var(--color-gray-900);
+  --button-disabled-background-color: var(--color-gray-700);
+  --button-disabled-color: var(--color-gray-400);
 }

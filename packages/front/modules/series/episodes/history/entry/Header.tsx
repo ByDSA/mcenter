@@ -1,11 +1,15 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { createDurationElement, createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
+import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
+import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { EpisodeHistoryApi } from "../requests";
+import headerStyles from "../../../../history/entry/Header/styles.module.css";
 
 type HeaderProps = {
   entry: EpisodeHistoryApi.GetMany.Data;
+  contextMenu?: ContextMenuProps;
 };
-export function Header( { entry }: HeaderProps) {
+export function Header( { entry, contextMenu }: HeaderProps) {
   const { resource } = entry;
   const { serie } = resource;
 
@@ -23,12 +27,25 @@ export function Header( { entry }: HeaderProps) {
 
   return <HistoryEntryHeader
     left={<>
-      {createHistoryTimeElement(timeStampDate)}
+      <span className={headerStyles.rows}>
+        {createHistoryTimeElement(timeStampDate)}
+      </span>
     </>}
     title={title}
     subtitle={subtitle}
     right={<>
-      {duration && createDurationElement(duration)}
-      {createWeightElement(resource.userInfo.weight)}
+      <span className={headerStyles.columns}>
+        <span className={headerStyles.rows}>
+          {duration && createDurationElement(duration)}
+          {createWeightElement(resource.userInfo.weight)}
+        </span>
+        {contextMenu?.onClick
+                      && <><SettingsButton
+                        theme="dark"
+                        onClick={(e: React.MouseEvent<HTMLElement>)=>contextMenu.onClick?.(e)}
+                      />
+                      {contextMenu.element}
+                      </>}
+      </span>
     </>} />;
 }

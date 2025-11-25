@@ -9,6 +9,7 @@ import { useCrudData } from "#modules/fetching";
 import MusicLayout from "app/music/music.layout";
 import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
 import { useUser } from "#modules/core/auth/useUser";
+import { PageItemNotFound } from "#modules/utils/ItemNotFound";
 
 interface PageProps {
   params: Promise<{
@@ -24,7 +25,13 @@ export default function Page( { params }: PageProps) {
   assertIsDefined(userId);
   const { isLoading, data, error, setData } = useCrudData( {
     initialFetch: async ()=> {
-      const response = await api.getOneByUserAndSlug(userId, (await params).slug);
+      const response = await api.getOneByUserAndSlug(
+        userId,
+        (await params).slug,
+        {
+          silentErrors: true,
+        },
+      );
       const d = response.data;
 
       if (d) {
@@ -42,10 +49,12 @@ export default function Page( { params }: PageProps) {
       }
     },
   } );
+  let ret = (() => {
+    if (!data && error)
+      return <PageItemNotFound />;
 
-  return (
-    <>
-      <MusicLayout>
+    return (
+      <>
         {error && <pre>{(()=>{
           try {
             const response: ResultResponse = JSON.parse((error as any).message);
@@ -59,7 +68,11 @@ export default function Page( { params }: PageProps) {
         {data
       && <MusicPlaylist value={data} setValue={(d)=>setData(d)}/>
         }
-      </MusicLayout>
-    </>
+      </>
+    );
+  } )();
+
+  return (
+    <MusicLayout>{ret}</MusicLayout>
   );
 }

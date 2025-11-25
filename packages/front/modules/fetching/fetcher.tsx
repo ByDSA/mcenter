@@ -13,19 +13,23 @@ type MakeFetcherParams<ReqBody, ResBody> = {
   reqBodyValidator?: (data: ReqBody)=> void;
   parseResponse: (data: unknown)=> ResBody;
   errorMiddleware?: (error: any)=> void;
+  silentErrors?: boolean;
 };
 export function makeFetcher<ReqBody, ResBody>(
   { method,
     parseResponse,
     reqBodyValidator,
+    silentErrors = false,
     errorMiddleware = (err)=> {
       if (err instanceof HttpErrorUnauthorized) {
-        logger.error("No estás autorizado a realizar esta acción.");
+        if (!silentErrors)
+          logger.error("No estás autorizado a realizar esta acción.");
 
         return;
       }
 
-      logger.error(err);
+      if (!silentErrors)
+        logger.error(err);
     } }: MakeFetcherParams<ReqBody, ResBody>,
 ): Fetcher<ReqBody, ResBody> {
   const ret = async (params: FetcherParams<ReqBody>) => {

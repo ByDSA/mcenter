@@ -6,7 +6,7 @@ import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
 import { useUser } from "#modules/core/auth/useUser";
-import { useListContextMenu } from "#modules/ui-kit/ContextMenu";
+import { createContextMenuItem, useListContextMenu } from "#modules/ui-kit/ContextMenu";
 import { classes } from "#modules/utils/styles";
 import { MusicPlaylistsApi } from "../requests";
 import { playlistCopyBackendUrl } from "../utils";
@@ -31,30 +31,29 @@ export function MusicPlayListsList(
   assertIsDefined(userId);
 
   const { generateDeletePlayListContextMenuItem } = useDeletePlaylistContextMenuItem( {
-    onFinish: () => {
+    onOpen: () => {
       closeMenu();
     },
     onActionSuccess: ()=>removeItemByIndex(activeIndex!),
     getValue: ()=>data![activeIndex!],
   } );
-  const renameModal = useRenamePlaylistModal( {
-    onClose: () => closeMenu(),
-  } );
+  const renameModal = useRenamePlaylistModal();
   const { openMenu,
     renderContextMenu,
     activeIndex, closeMenu } = useListContextMenu( {
     className: styles.contextMenu,
     renderChildren: (item: PlaylistEntity)=><>
-      <p onClick={async (e)=> {
-        e.preventDefault();
-        await playlistCopyBackendUrl( {
-          value: item,
-        } );
-
-        closeMenu();
-      }}>Copiar backend URL</p>
+      {createContextMenuItem( {
+        label: "Copiar backend URL",
+        onClick: async ()=> {
+          await playlistCopyBackendUrl( {
+            value: item,
+          } );
+        },
+      } )}
       {RenamePlaylistContextMenuItem( {
         renameModal,
+        closeMenu,
         value: item,
         setValue: (value: PlaylistEntity) => {
           const i = data?.findIndex((d) => d.id === value.id);

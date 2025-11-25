@@ -6,11 +6,11 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   left?: JSX.Element;
   right?: JSX.Element;
   children: React.ReactNode;
-  mode?: "dark" | "light";
+  theme?: "blue" | "dark-gray" | "white";
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const Button = ( { children, left, right, mode, ...buttonProps }: Props) => {
+export const Button = ( { children, left, right, theme = "dark-gray", ...buttonProps }: Props) => {
   let content = (<>
     {left && <section className={styles.left}>{left}</section>}
     <section className={styles.childrenSection}>{children}</section>
@@ -23,7 +23,9 @@ export const Button = ( { children, left, right, mode, ...buttonProps }: Props) 
     {...buttonProps}
     className={classes(
       styles.button,
-      mode === "light" && styles.light,
+      theme === "blue" && styles.blue,
+      theme === "white" && styles.white,
+      theme === "dark-gray" && styles.darkGray,
       buttonProps.className,
     )}
   >

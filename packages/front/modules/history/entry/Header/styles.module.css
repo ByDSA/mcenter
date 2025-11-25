@@ -1,0 +1,63 @@
+.container {
+  display: flex;
+  column-gap: 1rem;
+
+  aside {
+    font-size: 1rem;
+
+    svg {
+      transform: scale(0.7);
+    }
+
+    * {
+      white-space: nowrap;
+    }
+  }
+
+  :global(aside):first-of-type {
+    justify-content: start;
+
+    > * {
+      justify-content: start;
+    }
+  }
+
+  :global(aside):last-of-type {
+    justify-content: end;
+
+    > * {
+      justify-content: end;
+    }
+  }
+
+  .rows {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: start;
+    justify-content: center;
+
+    > * {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .columns {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+
+    button:hover {
+      background-color: transparent !important;
+    }
+  }
+
+  &:has(> aside:last-child button) {
+    padding-right: 0 !important;
+  }
+
+  &:has(> aside:first-child button) {
+    padding-left: 0 !important;
+  }
+}

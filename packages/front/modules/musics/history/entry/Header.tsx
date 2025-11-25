@@ -4,7 +4,7 @@ import { MusicHistoryEntryEntity } from "#modules/musics/history/models";
 import { createDurationElement, createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
-import headerStyles from "../../musics/entry/Header.module.css";
+import headerStyles from "../../../history/entry/Header/styles.module.css";
 
 type HeaderProps = {
   entry: Omit<MusicHistoryEntryEntity, "resource"> & {

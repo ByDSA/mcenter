@@ -9,7 +9,7 @@ import styles from "./LogginButton.module.css";
 export const LoginButton = () => {
   const router = useRouter();
 
-  return <Button className={styles.button} onClick={()=> {
+  return <Button theme="white" className={styles.button} onClick={()=> {
     router.push(PATH_ROUTES.auth.frontend.login.path);
   }}>Login</Button>;
 };

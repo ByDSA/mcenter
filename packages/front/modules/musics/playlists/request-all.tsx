@@ -11,7 +11,7 @@ export function useMusicPlaylistsForUser( { userId }: Props) {
   const api = FetchApi.get(MusicPlaylistsApi);
 
   assertIsDefined(userId);
-  const { data, isLoading, error, fetchInitData: fetchData } = useCrudData( {
+  const { data, setData, isLoading, error, fetchInitData: fetchData } = useCrudData( {
     initialFetch: async () => {
       const result = await api.getManyByUserCriteria(userId, {
         limit: 0,
@@ -26,5 +26,6 @@ export function useMusicPlaylistsForUser( { userId }: Props) {
     isLoading,
     error,
     fetchData,
+    setData,
   };
 }

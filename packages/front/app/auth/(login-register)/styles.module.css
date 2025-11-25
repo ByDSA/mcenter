@@ -272,15 +272,15 @@
 
 @media (width >= 480px) {
   .loginButton {
-    background: var(--button-light-background-color);
+    background: var(--button-blue-background-color);
     color: white;
-    --button-background-color: var(--button-light-background-color);
-    --button-color: var(--button-light-color);
-    --button-hover-background-color: var(--button-light-hover-background-color);
+    --button-background-color: var(--button-blue-background-color);
+    --button-color: var(--button-blue-color);
+    --button-hover-background-color: var(--button-blue-hover-background-color);
     --button-disabled-background-color: var(
-      --button-light-disabled-background-color
+      --button-blue-disabled-background-color
     );
-    --button-disabled-color: var(--button-light-disabled-color);
+    --button-disabled-color: var(--button-blue-disabled-color);
   }
 }
 

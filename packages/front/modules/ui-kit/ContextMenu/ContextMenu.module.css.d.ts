@@ -9,6 +9,7 @@ export interface ContextMenuStyles {
   primary: string;
   success: string;
   backdrop: string;
+  pointer: string;
 }
 
 declare const styles: ContextMenuStyles;

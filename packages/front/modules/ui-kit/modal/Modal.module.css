@@ -63,6 +63,15 @@
   }
 }
 
+.modal > .content {
+  display: flex;
+  flex-flow: column nowrap;
+
+  & > :not(footer) {
+    flex: 1;
+  }
+}
+
 .modal > .content footer {
   padding-top: 1rem;
   display: flex;

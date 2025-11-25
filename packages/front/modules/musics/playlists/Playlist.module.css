@@ -53,11 +53,13 @@
 }
 
 .playlistTitle {
-  font-size: 5rem !important;
+  font-size: 3rem !important;
   font-weight: bold;
   margin: 0 0 16px 0;
   line-height: 1.2;
   word-break: break-word;
+  text-align: left !important;
+  white-space: normal !important;
   align-self: flex-start;
 }
 
@@ -76,6 +78,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 
   &.createdAt {
     svg {
@@ -192,10 +195,6 @@
   .headerYear {
     display: none;
   }
-}
-
-.contextMenuItem {
-  cursor: pointer;
 }
 
 .isDragging {
