@@ -30,6 +30,7 @@ const entitySchema = modelSchema.extend( {
   id: idSchema,
   fileInfos: z.array(musicFileInfoEntitySchema).optional(),
   userInfo: musicUserInfoSchema.optional(),
+  isFav: z.boolean().optional(),
 } );
 
 type Entity = z.infer<typeof entitySchema>;

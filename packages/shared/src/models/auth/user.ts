@@ -9,6 +9,9 @@ export const userSchema = z.object( {
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   emailVerified: z.boolean(),
+  musics: z.object( {
+    favoritesPlaylistId: mongoDbId.nullable(),
+  } ),
 } );
 
 export type User = z.infer<typeof userSchema>;

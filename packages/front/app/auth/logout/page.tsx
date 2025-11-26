@@ -7,8 +7,8 @@ import { usePageAsyncAction } from "#modules/utils/usePageAsyncAction";
 export default function LogoutPage() {
   const { element } = usePageAsyncAction( {
     autoStart: true,
-    loadingMessage: <p>Cerrando sesión ...</p>,
-    errorMessage: <p>Error cerrando sesión.</p>,
+    loadingElement: <p>Cerrando sesión ...</p>,
+    errorElement: <p>Error cerrando sesión.</p>,
     action: async () => {
       const res = await fetch(backendUrl(PATH_ROUTES.auth.logout.path), {
         credentials: "include",

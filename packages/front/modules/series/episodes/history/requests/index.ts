@@ -9,7 +9,7 @@ import * as _GetMany from "./get-many";
 import * as _Delete from "./delete";
 
 export class EpisodeHistoryApi {
-  static register() {
+  static {
     FetchApi.register(this, new this());
   }
 

@@ -1,7 +1,6 @@
 import { ToastContainer } from "react-toastify";
 import { Home, LiveTv } from "@mui/icons-material";
 import { Topbar } from "#modules/ui-kit/menus/Topbar";
-import { InitApis } from "#modules/core/initApis";
 import { UserProvider } from "#modules/core/auth/UserProvider";
 import { getUser } from "#modules/core/auth/server";
 import { UserAvatarButton } from "#modules/core/auth/Avatar";
@@ -100,7 +99,6 @@ export default async function RootLayout( { children }: {
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       </head>
       <body>
-        <InitApis />
         <NavigationWatcher />
         <UserProvider initialUser={user}>
           <ModalProvider>

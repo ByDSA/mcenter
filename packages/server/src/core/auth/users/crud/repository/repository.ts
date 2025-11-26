@@ -2,6 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { assertIsDefined } from "$shared/utils/validation";
+import { Types } from "mongoose";
+import { User, UserEntity } from "../../models";
+import { UserRoleOdm } from "../../roles/repository/odm";
+import { UserRoleMapOdm } from "../../roles/user-role/repository/odm";
+import { UserEvents } from "./events";
+import { UserOdm } from "./odm";
+import { AlreadyExistsEmailException, isMongoErrorDupEmail } from "./errors";
 import { assertFoundClient } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
@@ -9,12 +16,7 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
-import { User, UserEntity } from "../../models";
-import { UserRoleOdm } from "../../roles/repository/odm";
-import { UserRoleMapOdm } from "../../roles/user-role/repository/odm";
-import { UserEvents } from "./events";
-import { UserOdm } from "./odm";
-import { AlreadyExistsEmailException, isMongoErrorDupEmail } from "./errors";
+import { MusicPlaylistsRepository } from "#musics/playlists/crud/repository";
 
 type Entity = UserEntity;
 type Model = User;
@@ -31,6 +33,7 @@ CanGetOneById<Entity, Entity["id"]>,
 CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
+    private readonly playlistRepo: MusicPlaylistsRepository,
   ) { }
 
   @OnEvent(UserEvents.WILDCARD)
@@ -137,6 +140,32 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     const ret = docs.map(UserOdm.toEntity);
 
     return ret;
+  }
+
+  async setMusicPlaylistFavorite(
+    userId: string,
+    playlistId: string | null,
+  ): Promise<Entity> {
+    if (playlistId !== null) {
+      await this.playlistRepo.guardOwnerPlaylist( {
+        playlistId,
+        userId,
+      } );
+    }
+
+    const got = await UserOdm.Model.findByIdAndUpdate(userId, {
+      $set: {
+        "musics.favoritesPlaylistId": playlistId
+          ? new Types.ObjectId(playlistId)
+          : null,
+      },
+    }, {
+      new: true,
+    } );
+
+    assertFoundClient(got);
+
+    return UserOdm.toEntity(got);
   }
 
   @EmitEntityEvent(UserEvents.Created.TYPE)

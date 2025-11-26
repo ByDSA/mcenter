@@ -47,6 +47,9 @@ export function getCriteriaPipeline(
 ) {
   const sort = buildMongooseSort(criteria);
   const pipeline: PipelineStage[] = [];
+  const needsMusics = criteria.expand?.includes("musics");
+  const needsFav = needsMusics && criteria.expand?.includes("musicsFavorite");
+  const userId = criteria.filter?.userId;
   // Construir filtro después del lookup si es necesario
   const filter = buildMongooseFilter(criteria);
 
@@ -136,7 +139,80 @@ export function getCriteriaPipeline(
           as: "fileInfosExpanded",
         },
       },
-      // Crear un mapa de música por ID para lookup rápido
+    );
+
+    if (needsFav) {
+      if (!userId)
+        throw new Error("User ID is required to expand favorites");
+
+      dataPipeline.push(
+        // 1. Obtener ID de la playlist de favoritos del usuario
+        {
+          $lookup: {
+            from: "users",
+            pipeline: [
+              {
+                $match: {
+                  _id: new Types.ObjectId(userId),
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                  favPlaylistId: "$musics.favoritesPlaylistId",
+                },
+              },
+            ],
+            as: "tempUserFav",
+          },
+        },
+        {
+          $unwind: {
+            path: "$tempUserFav",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        // 2. Obtener la LISTA de musicIds de esa playlist
+        {
+          $lookup: {
+            from: "music_playlists",
+            let: {
+              favPlaylistId: "$tempUserFav.favPlaylistId",
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$_id", "$$favPlaylistId"],
+                  },
+                },
+              },
+              // Solo nos interesa el array de IDs para comparar rápido
+              {
+                $project: {
+                  _id: 0,
+                  ids: "$list.musicId",
+                },
+              },
+            ],
+            as: "tempFavList",
+          },
+        },
+        // 3. Aplanar para tener un array simple de ObjectIds disponible en el root
+        {
+          $addFields: {
+            userFavMusicIds: {
+              $ifNull: [{
+                $arrayElemAt: ["$tempFavList.ids", 0],
+              }, []],
+            },
+          },
+        },
+      );
+    }
+
+    // Crear un mapa de música por ID para lookup rápido
+    dataPipeline.push(
       {
         $addFields: {
           musicMap: {
@@ -223,6 +299,13 @@ export function getCriteriaPipeline(
                             ],
                           },
                         },
+                        needsFav
+                          ? {
+                            isFav: {
+                              $in: ["$$this.musicId", "$userFavMusicIds"],
+                            },
+                          }
+                          : {},
                       ],
                     },
                   },
@@ -234,7 +317,11 @@ export function getCriteriaPipeline(
       },
       // Limpiar campos temporales
       {
-        $unset: ["musicsExpanded", "musicMap", "fileInfosExpanded", "fileInfosMap"],
+        $unset: ["musicsExpanded", "musicMap", "fileInfosExpanded", "fileInfosMap",
+          "tempUserFav",
+          "tempFavList",
+          "userFavMusicIds",
+        ],
       },
     );
   }

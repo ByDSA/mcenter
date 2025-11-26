@@ -10,15 +10,10 @@ import { logger } from "#modules/core/logger";
 import { backendUrl } from "#modules/requests";
 import { createContextMenuItem, useListContextMenu } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
-import { Spinner } from "#modules/ui-kit/spinner";
-import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { MusicsApi } from "../requests";
 import { MusicEntity, MusicEntityWithFileInfos } from "../models";
-import { PlaylistSelector } from "../playlists/list-selector/List";
-import { useMusicPlaylistsForUser } from "../playlists/request-all";
-import { PlaylistEntity } from "../playlists/Playlist";
 import { MusicPlaylistsApi } from "../playlists/requests";
-import { useNewPlaylistButton } from "../playlists/NewPlaylistButton";
+import { usePlaylistSelectorModal } from "../playlists/list-selector/modal/Modal";
 import { MusicEntryElement } from "./entry/MusicEntry";
 import { ArrayData } from "./types";
 import styles from "./styles.module.css";
@@ -40,7 +35,7 @@ export function MusicList(props: Props) {
     setItem,
     observerTarget,
     totalCount } = useMusicList(props);
-  const { openModal, closeModal } = useModal();
+  const { openModal } = usePlaylistSelectorModal();
   const resultNumbers = (
     <span style={{
       display: "flex",
@@ -59,22 +54,19 @@ export function MusicList(props: Props) {
     openModal( {
       className: styles.playlistSelectorModal,
       title: "Añadir a playlist",
-      staticContent: (
-        <AddToPlaylistModalContent
-          userId={user.id}
-          onSelect={async (playlist) => {
-            try {
-              const api = FetchApi.get(MusicPlaylistsApi);
+      onSelect: async (playlist) => {
+        if (!playlist)
+          return;
 
-              await api.addOneTrack(playlist.id, item.id);
-              logger.info(`Canción añadida a "${playlist.name}"`);
-              closeModal();
-            } catch (err) {
-              showError(err);
-            }
-          }}
-        />
-      ),
+        try {
+          const api = FetchApi.get(MusicPlaylistsApi);
+
+          await api.addOneTrack(playlist.id, item.id);
+          logger.info(`Canción añadida a "${playlist.name}"`);
+        } catch (err) {
+          showError(err);
+        }
+      },
     } )
       .catch(showError);
   };
@@ -146,69 +138,6 @@ export function MusicList(props: Props) {
   } );
 }
 
-type AddToPlaylistContentProps = {
-  userId: string;
-  onSelect: (playlist: PlaylistEntity)=> void;
-};
-function AddToPlaylistModalContent( { userId, onSelect }: AddToPlaylistContentProps) {
-  const { data, error, isLoading, fetchData, setData } = useMusicPlaylistsForUser( {
-    userId,
-  } );
-  const { element: newPlaylistButton } = useNewPlaylistButton( {
-    theme: "white",
-    onSuccess: async (newPlaylist) => {
-      logger.debug("Nueva playlist creada: " + newPlaylist.name);
-
-      setData((prevData) => {
-        if (!prevData)
-          return [newPlaylist];
-
-        return [...prevData, newPlaylist];
-      } );
-
-      await fetchData();
-    },
-  } );
-
-  if (isLoading) {
-    return (
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        padding: "2rem",
-      }}>
-        <Spinner />
-      </div>
-    );
-  }
-
-  if (error)
-    return <div>Error al cargar playlists</div>;
-
-  return (
-    <>
-      {!data || data.length === 0
-        ? (
-          <div style={{
-            padding: "1rem",
-            textAlign: "center",
-          }}>No hay playlists disponibles</div>
-        )
-        : (
-          <PlaylistSelector data={data} onSelect={onSelect} />
-        )}
-
-      <footer style={{
-        marginTop: "1rem",
-        paddingTop: "1rem",
-      }}>
-        {newPlaylistButton}
-      </footer>
-    </>
-  );
-}
-
-// 2. Hook original de la lista de música (Sin cambios lógicos)
 function useMusicList(props: Props) {
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const limitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

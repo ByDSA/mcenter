@@ -9,7 +9,7 @@ import { EpisodeEntity, EpisodeUserInfoEntity, episodeUserInfoEntitySchema } fro
 import { EpisodeInfoCrudDtos } from "./dto";
 
 export class EpisodeUserInfosApi {
-  static register() {
+  static {
     FetchApi.register(this, new this());
   }
 

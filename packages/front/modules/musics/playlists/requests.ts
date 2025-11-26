@@ -9,9 +9,32 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { musicPlaylistEntitySchema, type MusicPlaylistEntity } from "./models";
 import { MusicPlaylistCrudDtos } from "./models/dto";
 
+type AddOneTrackOptions = {
+  unique?: boolean;
+};
+
 export class MusicPlaylistsApi {
-  static register() {
+  static {
     FetchApi.register(MusicPlaylistsApi, new MusicPlaylistsApi());
+  }
+
+  getOneById(
+    playlistId: string,
+  ): Promise<MusicPlaylistsApi.GetOne.Response> {
+    const fetcher = makeFetcher<
+      undefined,
+      MusicPlaylistsApi.GetOne.Response
+    >( {
+      method: "GET",
+      parseResponse: genParseZod(
+        MusicPlaylistsApi.GetOne.responseSchema,
+      ) as (m: unknown)=> any,
+    } );
+
+    return fetcher( {
+      url: backendUrl(PATH_ROUTES.musics.playlists.withParams(playlistId)),
+      body: undefined,
+    } );
   }
 
   getOneByUserAndSlug(
@@ -105,6 +128,7 @@ export class MusicPlaylistsApi {
   addOneTrack(
     playlistId: string,
     musicId: string,
+    options?: AddOneTrackOptions,
   ): Promise<MusicPlaylistsApi.AddOneTrack.Response> {
     const fetcher = makeFetcher<
       MusicPlaylistsApi.AddOneTrack.Body,
@@ -124,6 +148,7 @@ export class MusicPlaylistsApi {
       ),
       body: {
         musics: [musicId],
+        unique: options?.unique,
       },
     } );
   }
@@ -150,6 +175,31 @@ export class MusicPlaylistsApi {
       ),
       body: {
         tracks: [itemId],
+      },
+    } );
+  }
+
+  removeAllTracksByMusicId( { playlistId,
+    musicId }: {playlistId: string;
+musicId: string;} ): Promise<MusicPlaylistsApi.RemoveOneTrack.Response> {
+    const fetcher = makeFetcher<
+      MusicPlaylistsApi.RemoveOneTrack.Body,
+      MusicPlaylistsApi.RemoveOneTrack.Response
+    >( {
+      method: "DELETE",
+      parseResponse: genParseZod(
+        MusicPlaylistsApi.RemoveOneTrack.responseSchema,
+      ) as (m: unknown)=> any,
+    } );
+
+    return fetcher( {
+      url: backendUrl(
+        PATH_ROUTES.musics.playlists.track.withParams(
+          playlistId,
+        ),
+      ),
+      body: {
+        musicIds: [musicId],
       },
     } );
   }
@@ -265,6 +315,7 @@ export namespace MusicPlaylistsApi {
 
     export const bodySchema = z.object( {
       musics: z.array(mongoDbId),
+      unique: z.boolean().optional(),
     } );
 
     export type Body = z.infer<typeof bodySchema>;
@@ -276,9 +327,16 @@ export namespace MusicPlaylistsApi {
 
     export const responseSchema = createOneResultResponseSchema(dataSchema);
     export type Response = z.infer<typeof responseSchema>;
-    export const bodySchema = z.object( {
-      tracks: z.array(mongoDbId),
-    } );
+    export const bodySchema = z.union([
+      z.object( {
+        tracks: z.array(mongoDbId),
+        musicIds: z.never().optional(),
+      } ),
+      z.object( {
+        musicIds: z.array(mongoDbId),
+        tracks: z.never().optional(),
+      } ),
+    ]);
 
     export type Body = z.infer<typeof bodySchema>;
   }

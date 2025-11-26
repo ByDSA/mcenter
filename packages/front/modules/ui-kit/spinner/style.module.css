@@ -4,8 +4,8 @@
   border-bottom: var(--spinner-width) solid var(--spinner-color);
   border-left: var(--spinner-width) solid transparent;
   border-radius: 50%;
-  width: var(--spinner-size);
-  height: var(--spinner-size);
+  width: calc(var(--spinner-size) - var(--spinner-width));
+  height: calc(var(--spinner-size) - var(--spinner-width));
   animation: spin 1s linear infinite;
 }
 

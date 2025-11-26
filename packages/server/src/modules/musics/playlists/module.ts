@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicRendererModule } from "../renderer/module";
 import { MusicPlaylistsController } from "./crud/controller";
 import { MusicPlaylistsRepository } from "./crud/repository/repository";
 import { MusicPlaylistAvailableSlugGeneratorService } from "./crud/repository/available-slug-generator.service";
+import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 
 @Module( {
   imports: [
@@ -21,6 +21,6 @@ import { MusicPlaylistAvailableSlugGeneratorService } from "./crud/repository/av
     MusicPlaylistAvailableSlugGeneratorService,
     MusicPlaylistsRepository,
   ],
-  exports: [],
+  exports: [MusicPlaylistsRepository],
 } )
 export class MusicPlaylistsModule {}

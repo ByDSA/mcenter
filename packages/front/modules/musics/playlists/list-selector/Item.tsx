@@ -1,8 +1,8 @@
-import { PlaylistEntity } from "../Playlist";
+import { MusicPlaylistEntity } from "../models";
 import styles from "./Item.module.css";
 
 type Props = {
-  data: PlaylistEntity;
+  data: MusicPlaylistEntity;
   onClick: ()=> void;
 };
 // eslint-disable-next-line @typescript-eslint/naming-convention

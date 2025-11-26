@@ -11,6 +11,9 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & {
   firstName?: string;
   lastName?: string;
   emailVerified: boolean;
+  musics: {
+    favoritesPlaylistId: mongoose.Types.ObjectId | null;
+  };
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
@@ -43,6 +46,13 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   emailVerified: {
     type: Boolean,
     required: true,
+  },
+  musics: {
+    favoritesPlaylistId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+      required: false,
+    },
   },
 } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
   collection: COLLECTION,

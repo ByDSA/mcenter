@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { Request } from "express";
 import z from "zod";
-import { UsersService } from "#core/auth/users";
-import { UsersRepository } from "#core/auth/users/crud/repository";
 import { User, UserEntityWithRoles } from "../../users/models";
 import { AppPayloadService } from "../jwt";
+import { UsersService } from "#core/auth/users";
+import { UsersRepository } from "#core/auth/users/crud/repository";
 
 type SignUpResult = {
   user: UserEntityWithRoles;
@@ -83,5 +83,8 @@ function googleUserToSignUpUser(googleUser: GoogleUser): Omit<User, "roles"> {
     lastName: googleUser.lastName,
     publicName: `${googleUser.firstName} ${googleUser.lastName}`,
     emailVerified: true,
+    musics: {
+      favoritesPlaylistId: null, // TODO
+    },
   };
 }

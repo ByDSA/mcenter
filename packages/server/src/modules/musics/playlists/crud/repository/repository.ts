@@ -1,11 +1,12 @@
 /* eslint-disable import/no-cycle */
-import { Injectable, UnprocessableEntityException } from "@nestjs/common";
+import { Injectable, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { MusicEntity } from "$shared/models/musics";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { assertIsDefined } from "$shared/utils/validation";
 import { Types } from "mongoose";
+import { UserPayload } from "$shared/models/auth";
 import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet, CanGetOneByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
@@ -15,12 +16,12 @@ import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicsRepository } from "#musics/crud/repositories/music";
 import { fixSlug } from "#musics/crud/builder/fix-slug";
-import { MusicPlaylist, MusicPlaylistEntity } from "../../models";
 import { MusicPlaylistCrudDtos } from "../../models/dto";
-import { MusicPlayListEvents } from "./events";
-import { MusicPlaylistOdm } from "./odm";
-import { AggregationResult } from "./odm/criteria-pipeline";
+import { MusicPlaylist, MusicPlaylistEntity } from "../../models";
 import { MusicPlaylistAvailableSlugGeneratorService } from "./available-slug-generator.service";
+import { AggregationResult } from "./odm/criteria-pipeline";
+import { MusicPlaylistOdm } from "./odm";
+import { MusicPlayListEvents } from "./events";
 
 type Model = MusicPlaylist;
 type Entity = MusicPlaylistEntity;
@@ -37,14 +38,20 @@ type CriteriaMany = MusicPlaylistCrudDtos.GetMany.Criteria;
 type AddOneTrackProps = {
   id: string;
   musicId: string;
+  unique?: boolean;
 };
 type AddManyTracksProps = {
   id: string;
   musics: string[];
+  unique?: boolean;
 };
 type RemoveManyTracksProps = {
   id: string;
   tracks: string[];
+};
+type RemoveManyMusicsProps = {
+  id: string;
+  musicIds: string[];
 };
 
 @Injectable()
@@ -72,6 +79,20 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     assertFoundClient(doc);
 
     return MusicPlaylistOdm.toEntity(doc);
+  }
+
+  async guardOwnerPlaylist(
+    { userId, playlistId }: {userId: UserPayload["id"];
+playlistId: string;},
+  ): Promise<MusicPlaylistEntity> {
+    const playlist = await this.getOneById(playlistId);
+
+    assertFoundClient(playlist);
+
+    if (playlist.userId !== userId)
+      throw new UnauthorizedException("User is not the owner of the playlist");
+
+    return playlist;
   }
 
   async moveMusic(id: string, itemId: string, newIndex: number): Promise<Entity> {
@@ -105,12 +126,20 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     } );
   }
 
-  async addOneTrack( { id, musicId }: AddOneTrackProps): Promise<MusicPlaylistEntity> {
+  async addOneTrack( { id, musicId, unique }: AddOneTrackProps): Promise<MusicPlaylistEntity> {
     const musicObjectId = new Types.ObjectId(musicId);
+    const query: Record<string, any> = {
+      _id: id,
+    };
+
+    if (unique) {
+      query["list.musicId"] = {
+        $ne: musicObjectId,
+      };
+    }
+
     const updated = await MusicPlaylistOdm.Model.findOneAndUpdate(
-      {
-        _id: id,
-      },
+      query,
       {
         $push: {
           list: {
@@ -129,11 +158,39 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     return MusicPlaylistOdm.toEntity(updated);
   }
 
-  async addManyTracks( { id, musics }: AddManyTracksProps): Promise<MusicPlaylistEntity> {
-    const trackEntries = musics.map(musicId=> ( {
-      musicId: new Types.ObjectId(musicId),
-      addedAt: new Date(),
-    } ));
+  async addManyTracks( { id, musics, unique }: AddManyTracksProps): Promise<MusicPlaylistEntity> {
+    const musicPlaylistId = new Types.ObjectId(id);
+    let tracksToPush: Array<{ musicId: Types.ObjectId;
+addedAt: Date; }>;
+
+    if (unique) {
+      const existingPlaylist = await MusicPlaylistOdm.Model.findOne(
+        {
+          _id: musicPlaylistId,
+        },
+      ).lean();
+
+      assertFoundClient(existingPlaylist);
+
+      const existingMusicIds = new Set(existingPlaylist.list.map(item => item.musicId.toString()));
+
+      tracksToPush = musics
+        .filter(musicId => !existingMusicIds.has(musicId))
+        .map(musicId => ( {
+          musicId: new Types.ObjectId(musicId),
+          addedAt: new Date(),
+        } ));
+
+      if (tracksToPush.length === 0)
+        return MusicPlaylistOdm.toEntity(existingPlaylist);
+    } else {
+      // Se añaden todas las canciones de entrada, permitiendo duplicados
+      tracksToPush = musics.map(musicId => ( {
+        musicId: new Types.ObjectId(musicId),
+        addedAt: new Date(),
+      } ));
+    }
+
     const updated = await MusicPlaylistOdm.Model.findOneAndUpdate(
       {
         _id: id,
@@ -141,7 +198,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
       {
         $push: {
           list: {
-            $each: trackEntries,
+            $each: tracksToPush,
           },
         },
       },
@@ -155,7 +212,9 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     return MusicPlaylistOdm.toEntity(updated);
   }
 
-  async removeManyTracks( { id, tracks }: RemoveManyTracksProps): Promise<MusicPlaylistEntity> {
+  async removeManyTracks(
+    { id, tracks }: RemoveManyTracksProps,
+  ): Promise<MusicPlaylistEntity> {
     const trackObjectIds = tracks.map(t=>new Types.ObjectId(t));
     const updated = await MusicPlaylistOdm.Model.findOneAndUpdate(
       {
@@ -166,6 +225,31 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
           list: {
             _id: {
               $in: trackObjectIds,
+            },
+          },
+        },
+      },
+      {
+        new: true,
+      },
+    );
+
+    assertFoundClient(updated);
+
+    return MusicPlaylistOdm.toEntity(updated);
+  }
+
+  async removeManyMusics( { id, musicIds }: RemoveManyMusicsProps): Promise<MusicPlaylistEntity> {
+    const musicsObjectIds = musicIds.map(t=>new Types.ObjectId(t));
+    const updated = await MusicPlaylistOdm.Model.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        $pull: {
+          list: {
+            musicId: {
+              $in: musicsObjectIds,
             },
           },
         },

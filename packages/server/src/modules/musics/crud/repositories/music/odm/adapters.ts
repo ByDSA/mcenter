@@ -31,6 +31,7 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
     releasedOn: docOdm.releasedOn,
     fileInfos: docOdm.fileInfos?.map(MusicFileInfoOdm.toEntity),
     userInfo: docOdm.userInfo ? MusicsUsersOdm.toModel(docOdm.userInfo) : undefined,
+    isFav: docOdm.isFav,
   } satisfies AllKeysOf<Entity>;
 
   return removeUndefinedDeep(entity);

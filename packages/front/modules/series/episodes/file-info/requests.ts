@@ -9,7 +9,7 @@ import { EpisodeFileInfoEntity } from "./models";
 import { EpisodeFileInfoDtos, EpisodeFileInfoCrudDtos } from "./models/dto";
 
 export class EpisodeFileInfosApi {
-  static register() {
+  static {
     FetchApi.register(this, new this());
   }
 

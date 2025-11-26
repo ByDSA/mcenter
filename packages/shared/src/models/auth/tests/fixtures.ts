@@ -10,6 +10,9 @@ const admin = {
   emailVerified: true,
   createdAt: new Date(),
   updatedAt: new Date(),
+  musics: {
+    favoritesPlaylistId: null,
+  },
 } satisfies UserEntity;
 const normal = {
   id: new mongoose.Types.ObjectId().toString(),
@@ -18,6 +21,9 @@ const normal = {
   emailVerified: true,
   createdAt: new Date(),
   updatedAt: new Date(),
+  musics: {
+    favoritesPlaylistId: null,
+  },
 } satisfies UserEntity;
 const adminRole = {
   id: new mongoose.Types.ObjectId().toString(),

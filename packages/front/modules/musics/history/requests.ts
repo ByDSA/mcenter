@@ -10,7 +10,7 @@ import { musicEntitySchema } from "../models";
 import { musicHistoryEntryEntitySchema, type MusicHistoryEntryEntity } from "./models";
 
 export class MusicHistoryApi {
-  static register() {
+  static {
     FetchApi.register(MusicHistoryApi, new MusicHistoryApi());
   }
 

@@ -56,6 +56,7 @@ export function getCriteriaPipeline(
                              || !!criteria.filter?.hash
                              || !!criteria.filter?.path;
   const needsUserInfoLookup = criteria.expand?.includes("userInfo");
+  const needsFavorite = criteria.expand?.includes("favorite");
   // Construir filtro después del lookup si es necesario
   const filter = buildMongooseFilterWithFileInfos(
     criteria,
@@ -166,6 +167,100 @@ export function getCriteriaPipeline(
         localField: "_id",
         foreignField: "musicId",
         as: "fileInfos",
+      },
+    } );
+  }
+
+  if (needsFavorite) {
+    // Assert requerido: Si se pide favorite, debe haber un usuario logueado
+    if (!userId)
+      throw new Error("User ID is required to expand favorites");
+
+    // 1. Obtener la ID de la playlist de favoritos del usuario
+    dataPipeline.push( {
+      $lookup: {
+        from: "users", // Asumo que el nombre de la colección es 'users'
+        pipeline: [
+          {
+            $match: {
+              _id: new Types.ObjectId(userId),
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              favPlaylistId: "$musics.favoritesPlaylistId",
+            },
+          },
+        ],
+        as: "tempUserFav",
+      },
+    } );
+
+    // Descomprimir para acceder fácil al campo (preservando si no encuentra al user)
+    dataPipeline.push( {
+      $unwind: {
+        path: "$tempUserFav",
+        preserveNullAndEmptyArrays: true,
+      },
+    } );
+
+    // 2. Buscar en la playlist si existe la canción actual
+    dataPipeline.push( {
+      $lookup: {
+        from: "music_playlists",
+        let: {
+          // Si el usuario no tiene playlist asignada, esto será null/undefined
+          favPlaylistId: "$tempUserFav.favPlaylistId",
+          musicId: "$_id",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$favPlaylistId"],
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              // $in busca directamente el ObjectId de la canción en el array de musicIds
+              // Mongo extrae automáticamente 'musicId' de cada objeto del array 'list'
+              isFound: {
+                $in: ["$$musicId", "$list.musicId"],
+              },
+            },
+          },
+        ],
+        as: "tempFavStatus",
+      },
+    } );
+
+    // 3. Calcular el booleano final 'isFav' y limpiar temporales
+    dataPipeline.push( {
+      $addFields: {
+        isFav: {
+          $cond: {
+            if: {
+              $gt: [{
+                $size: "$tempFavStatus",
+              }, 0],
+            },
+            then: {
+              $arrayElemAt: ["$tempFavStatus.isFound", 0],
+            },
+            else: false, // Si no hay playlist o no se encontró
+          },
+        },
+      },
+    } );
+
+    // Limpieza de campos auxiliares
+    dataPipeline.push( {
+      $project: {
+        tempUserFav: 0,
+        tempFavStatus: 0,
       },
     } );
   }

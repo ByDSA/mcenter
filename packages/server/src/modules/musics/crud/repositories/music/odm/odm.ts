@@ -23,6 +23,7 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimesta
 export type FullDocOdm = RequireId<DocOdm> & {
   fileInfos?: MusicFileInfoOdm.FullDoc[];
   userInfo?: MusicsUsersOdm.FullDoc;
+  isFav?: boolean;
 };
 
 const NAME = "Music";

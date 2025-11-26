@@ -3,6 +3,7 @@ import { idParamsSchema } from "../../utils/schemas/requests";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { musicEntitySchema } from "../music";
 import { createCriteriaOneSchema, createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
+import { mongoDbId } from "../../resources/partial-schemas";
 
 const criteriaConfig = {
   filterShape: {
@@ -12,9 +13,10 @@ const criteriaConfig = {
     artist: z.string().optional(),
     hash: z.string().optional(),
     path: z.string().optional(),
+    userId: mongoDbId.optional(), // Para playlist de favorites
   },
   sortKeys: ["added", "updated", "artist"] as const,
-  expandKeys: ["fileInfos", "userInfo"] as const,
+  expandKeys: ["fileInfos", "userInfo", "favorite"] as const,
 };
 
 export namespace MusicCrudDtos {

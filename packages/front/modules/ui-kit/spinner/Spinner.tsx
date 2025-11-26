@@ -3,14 +3,26 @@ import React from "react";
 import stylesFetching from "./fetching.style.module.css";
 import styles from "./style.module.css";
 
-type SpinnerProps = object;
+type SpinnerProps = {
+  size?: number;
+};
 
-// eslint-disable-next-line no-empty-pattern
-export const Spinner: React.FC<SpinnerProps> = ( { }: SpinnerProps) => (
-  <span className={styles.spinner}
-  ></span>
-);
+export const Spinner: React.FC<SpinnerProps> = ( { size = 1 }: SpinnerProps) => {
+  const style = {} as React.CSSProperties;
+
+  if (size === 1) {
+    style["--spinner-size"] = size + "em";
+    style["--spinner-width"] = "2px";
+  } else {
+    style["--spinner-size"] = size + "em";
+    style["--spinner-width"] = `${size}px`;
+  }
+
+  return <span className={styles.spinner}
+    style={style}
+  ></span>;
+};
 
 export const PageSpinner = () => {
-  return <div className={stylesFetching.loading}><Spinner/></div>;
+  return <div className={stylesFetching.loading}><Spinner size={6}/></div>;
 };

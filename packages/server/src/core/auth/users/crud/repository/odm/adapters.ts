@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
+import { User, UserEntity } from "../../../models";
+import { DocOdm, FullDocOdm } from "./odm";
 import { UserRoleOdm } from "#core/auth/users/roles/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
-import { User, UserEntity } from "../../../models";
-import { DocOdm, FullDocOdm } from "./odm";
 
 type Entity = UserEntity;
 type Model = User;
@@ -17,6 +17,9 @@ export function docOdmToModel(docOdm: DocOdm): Model {
     firstName: docOdm.firstName,
     lastName: docOdm.lastName,
     emailVerified: docOdm.emailVerified,
+    musics: {
+      favoritesPlaylistId: docOdm.musics.favoritesPlaylistId?.toString() ?? null,
+    },
   } satisfies AllKeysOf<Model>;
 
   return removeUndefinedDeep(entity);
@@ -43,6 +46,12 @@ export function partialToDocOdm(model: Partial<Model>): MongoUpdateQuery<DocOdm>
     emailVerified: model.emailVerified,
     createdAt: undefined,
     updatedAt: undefined,
+    musics: model.musics
+        && {
+          favoritesPlaylistId: model.musics.favoritesPlaylistId
+            ? new Types.ObjectId(model.musics.favoritesPlaylistId)
+            : null,
+        },
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(docOdm);
@@ -55,6 +64,11 @@ export function modelToDocOdm(model: Model): TimestampsOdm.OmitAutoTimestamps<Do
     firstName: model.firstName,
     lastName: model.lastName,
     emailVerified: model.emailVerified,
+    musics: {
+      favoritesPlaylistId: model.musics.favoritesPlaylistId
+        ? new Types.ObjectId(model.musics.favoritesPlaylistId)
+        : null,
+    },
   } satisfies AllKeysOf<TimestampsOdm.OmitAutoTimestamps<Omit<DocOdm, "_id">>>;
 
   return removeUndefinedDeep(docOdm);

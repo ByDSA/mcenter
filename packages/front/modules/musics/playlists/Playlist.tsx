@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { PlayArrow,
   Pause,
   MusicNote,
@@ -246,6 +246,24 @@ index: number; } ) => {
       transform: CSS.Transform.toString(transform),
       transition,
     };
+    const updateIsFav = useCallback((musicId: string, favorite: boolean) => {
+      let dirty = false;
+
+      for (const m of value.list) {
+        console.log(m.musicId, musicId, m.music.isFav, favorite);
+
+        if (m.musicId === musicId && !!m.music.isFav !== favorite) {
+          m.music.isFav = favorite;
+          dirty = true;
+        }
+      }
+
+      if (dirty) {
+        setValue( {
+          ...value,
+        } );
+      }
+    }, [setValue]);
 
     return (
       <div
@@ -258,6 +276,7 @@ index: number; } ) => {
           index={index}
           isPlaying={currentPlaying === item.id && isPlaylistPlaying}
           isDragging={isDraggingGlobal}
+          updateIsFav={updateIsFav}
           contextMenu={{
             element:
           playListItemActiveIndex === index

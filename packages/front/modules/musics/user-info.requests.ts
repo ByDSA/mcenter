@@ -9,7 +9,7 @@ import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 
 export class MusicUserInfosApi {
-  static register() {
+  static {
     FetchApi.register(this, new this());
   }
 

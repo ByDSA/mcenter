@@ -1,31 +1,56 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { useCrudData } from "#modules/fetching";
+import { useCallback, useState } from "react";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { useAsyncElement } from "#modules/utils/usePageAsyncAction";
+import { Spinner } from "#modules/ui-kit/spinner";
 import { MusicPlaylistsApi } from "./requests";
-import { PlaylistEntity } from "./Playlist";
+import { MusicPlaylistEntity } from "./models";
+import { PlaylistSelector } from "./list-selector/List";
 
 type Props = {
   userId: string;
+  onSelect: (playlist: MusicPlaylistEntity | null)=> void;
 };
-export function useMusicPlaylistsForUser( { userId }: Props) {
-  const api = FetchApi.get(MusicPlaylistsApi);
+export function useMusicPlaylistsForUser( { userId, onSelect }: Props) {
+  const [data, setData] = useState<MusicPlaylistEntity[] | null>(null);
+  const fetchData = useCallback(async () => {
+    const api = FetchApi.get(MusicPlaylistsApi);
+    const result = await api.getManyByUserCriteria(userId, {
+      limit: 0,
+    } );
+
+    setData(result.data);
+  }, [userId]);
 
   assertIsDefined(userId);
-  const { data, setData, isLoading, error, fetchInitData: fetchData } = useCrudData( {
-    initialFetch: async () => {
-      const result = await api.getManyByUserCriteria(userId, {
-        limit: 0,
-      } );
-
-      return result.data;
-    },
+  const { element } = useAsyncElement( {
+    loadingElement: (
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        padding: "2rem",
+      }}>
+        <Spinner size={4}/>
+      </div>
+    ),
+    errorElement: <div>Error al cargar playlists</div>,
+    action: fetchData,
+    renderElement: ()=>data!.length === 0
+      ? (
+        <div style={{
+          padding: "1rem",
+          textAlign: "center",
+        }}>No hay playlists disponibles</div>
+      )
+      : (
+        <PlaylistSelector data={data!} onSelect={onSelect} />
+      ),
   } );
 
   return {
-    data: data as PlaylistEntity[] | null,
-    isLoading,
-    error,
-    fetchData,
+    element,
     setData,
+    fetchData,
+    isSuccess: data !== null,
   };
 }

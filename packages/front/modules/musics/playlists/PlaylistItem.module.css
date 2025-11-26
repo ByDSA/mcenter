@@ -29,7 +29,7 @@
 .indexNumber,
 .songDetails,
 .duration,
-.actionButton,
+.favButton,
 .settingsButton {
   color: var(--color-gray-400) !important;
 }
@@ -113,7 +113,7 @@
   transition: opacity 0.2s ease;
 }
 
-.actionButton {
+.favButton {
   width: 32px;
   height: 32px;
   border: none;
@@ -122,17 +122,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   transition: all 0.2s ease;
+
+  &.active {
+    color: var(--color-red-400) !important;
+  }
+
+  &.disabled {
+    opacity: 0.25;
+
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
 }
 
-.actionButton:hover,
+.favButton:hover,
 .settingsButton:hover {
+  cursor: pointer;
   color: var(--color-gray-100) !important;
-}
-
-.actionButton.favorite {
-  color: var(--color-red-400) !important;
 }
 
 @media (max-width: 768px) {

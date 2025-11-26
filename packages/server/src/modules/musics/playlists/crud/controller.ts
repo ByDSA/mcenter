@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Query, Req, Res, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
+import { Body, Controller, Get, Param, Query, Req, Res, UnprocessableEntityException } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
@@ -15,8 +15,8 @@ import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { MusicRendererService } from "#musics/renderer/render.service";
 import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
-import { MusicPlaylistCrudDtos } from "../models/dto";
 import { musicPlaylistEntitySchema, musicPlaylistSchema } from "../models";
+import { MusicPlaylistCrudDtos } from "../models/dto";
 import { MusicPlaylistsRepository } from "./repository/repository";
 
 class GetOneParams extends createZodDto(z.object( {
@@ -72,9 +72,11 @@ class GetManyUserPlaylistsBody extends createZodDto(
 
 class AddManyTrackBody extends createZodDto(z.object( {
   musics: z.array(mongoDbId),
+  unique: z.boolean().optional(),
 } )) {}
 class RemoveManyTrackBody extends createZodDto(z.object( {
-  tracks: z.array(mongoDbId),
+  tracks: z.array(mongoDbId).optional(),
+  musicIds: z.array(mongoDbId).optional(),
 } )) {}
 
 class PatchBody extends createZodDto(
@@ -158,6 +160,7 @@ export class MusicPlaylistsController {
     return await this.playlistsRepo.addManyTracks( {
       id: playlistId,
       musics,
+      unique: body.unique,
     } );
   }
 
@@ -167,15 +170,29 @@ export class MusicPlaylistsController {
     @User() user: UserPayload,
     @Body() body: RemoveManyTrackBody,
   ) {
+    const { tracks, musicIds } = body;
+
+    assertFoundClient(tracks !== undefined || musicIds !== undefined);
     const playlistId = params.id;
 
     await this.guardEditPlaylist(user, playlistId);
-    const { tracks } = body;
+    let ret;
 
-    return await this.playlistsRepo.removeManyTracks( {
-      id: playlistId,
-      tracks,
-    } );
+    if (tracks) {
+      ret = await this.playlistsRepo.removeManyTracks( {
+        id: playlistId,
+        tracks,
+      } );
+    }
+
+    if (musicIds) {
+      ret = await this.playlistsRepo.removeManyMusics( {
+        id: playlistId,
+        musicIds,
+      } );
+    }
+
+    return ret;
   }
 
   @Authenticated()
@@ -236,6 +253,7 @@ export class MusicPlaylistsController {
   async getOneUserPlaylist(
     @Param() params: GetOneUserPlaylistParams,
     @Req() req: Request,
+    @User() user: UserPayload | null,
   ) {
     const format = this.responseFormatter.getResponseFormatByRequest(req);
 
@@ -245,6 +263,14 @@ export class MusicPlaylistsController {
     const playlistCriteria: MusicPlaylistCrudDtos.GetOne.Criteria = {
       expand: ["musics"],
     };
+
+    if (user) {
+      playlistCriteria.expand?.push("musicsFavorite");
+      playlistCriteria.filter = {
+        userId: user.id,
+      };
+    }
+
     const playlist = await this.playlistsRepo.getOneBySlug( {
       slug: params.slug,
       userId: params.user,
@@ -312,11 +338,9 @@ export class MusicPlaylistsController {
   }
 
   private async guardEditPlaylist(user: UserPayload, playlistId: string) {
-    const playlist = await this.playlistsRepo.getOneById(playlistId);
-
-    assertFoundClient(playlist);
-
-    if (playlist.userId !== user.id)
-      throw new UnauthorizedException();
+    await this.playlistsRepo.guardOwnerPlaylist( {
+      userId: user.id,
+      playlistId,
+    } );
   }
 }

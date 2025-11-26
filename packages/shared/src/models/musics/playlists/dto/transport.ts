@@ -12,7 +12,7 @@ const criteriaConfig = {
     userId: mongoDbId.optional(),
   },
   sortKeys: ["added", "updated"] as const,
-  expandKeys: ["musics"] as const,
+  expandKeys: ["musics", "musicsFavorite"] as const,
 };
 
 export namespace MusicPlaylistCrudDtos {

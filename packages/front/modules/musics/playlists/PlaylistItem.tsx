@@ -4,9 +4,13 @@ import { IconButton } from "@mui/material";
 import { PlayArrow,
   Pause, Favorite,
   FavoriteBorder } from "@mui/icons-material";
+import { useUser } from "#modules/core/auth/useUser";
+import { classes } from "#modules/utils/styles";
+import { FetchApi } from "#modules/fetching/fetch-api";
 import { formatDurationItem } from "./utils";
 import styles from "./PlaylistItem.module.css";
 import { SettingsButton } from "./SettingsButton";
+import { MusicPlaylistsApi } from "./requests";
 
 export type ContextMenuProps = {
   onClick?: (e: React.MouseEvent<HTMLElement>)=> void;
@@ -21,6 +25,7 @@ interface PlaylistItemProps {
   isDragging?: boolean;
   onPlay?: (item: PlaylistItemEntity)=> void;
   onPause?: ()=> void;
+  updateIsFav: (musicId: string, favorite: boolean)=> void;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -29,18 +34,41 @@ export const MusicPlaylistItem = ( { value,
   isPlaying = false,
   contextMenu,
   isDragging = false,
+  updateIsFav,
   onPlay,
   onPause }: PlaylistItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(!!value.music.isFav);
+  const { user } = useUser();
   const handlePlayPause = () => {
     if (isPlaying)
       onPause?.();
     else
       onPlay?.(value);
   };
-  const handleFavoriteToggle = (e: React.MouseEvent) => {
+  const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (!user || !user.musics.favoritesPlaylistId)
+      return;
+
+    const api = FetchApi.get(MusicPlaylistsApi);
+
+    if (isFavorite) {
+      await api.removeAllTracksByMusicId( {
+        playlistId: user.musics.favoritesPlaylistId,
+        musicId: value.musicId,
+      } );
+
+      updateIsFav(value.musicId, false);
+    } else {
+      await api.addOneTrack(user.musics.favoritesPlaylistId, value.musicId, {
+        unique: true,
+      } );
+
+      updateIsFav(value.musicId, true);
+    }
+
     setIsFavorite(!isFavorite);
   };
 
@@ -78,13 +106,18 @@ export const MusicPlaylistItem = ( { value,
       </div>
 
       <div className={styles.actions}>
-        <IconButton
+        {user && <IconButton
           size="small"
-          className={`${styles.actionButton} ${isFavorite ? styles.favorite : ""}`}
-          onClick={handleFavoriteToggle}
+          className={classes(
+            styles.favButton,
+            isFavorite && styles.active,
+            !user.musics.favoritesPlaylistId && styles.disabled,
+          )}
+          onClick={(e)=>user.musics.favoritesPlaylistId ? handleFavoriteToggle(e) : undefined}
         >
           {isFavorite ? <Favorite /> : <FavoriteBorder />}
         </IconButton>
+        }
         {contextMenu?.onClick
         && <><SettingsButton
           theme="dark"

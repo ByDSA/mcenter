@@ -3,15 +3,15 @@ import { compare } from "bcryptjs";
 import { assertIsDefined } from "$shared/utils/validation";
 import { hashPassword } from "$shared/models/auth/utils";
 import { User, UserPass, UserPassEntityWithUserWithRoles } from "$shared/models/auth";
+import { AppPayloadService } from "../jwt/payload/AppPayloadService";
+import { UserPassesRepository } from "./user-pass";
+import { LoginDto, SignUpDto } from "./dto";
+import { LocalUserVerificationService } from "./verification.service";
 import { assertFoundClient } from "#utils/validation/found";
 import { UserEntityWithRoles, UserPayload } from "#core/auth/users/models";
 import { AlreadyExistsEmailException } from "#core/auth/users/crud/repository/errors";
 import { UsersService } from "#core/auth/users";
 import { UsersRepository } from "#core/auth/users/crud/repository";
-import { AppPayloadService } from "../jwt/payload/AppPayloadService";
-import { UserPassesRepository } from "./user-pass";
-import { LoginDto, SignUpDto } from "./dto";
-import { LocalUserVerificationService } from "./verification.service";
 
 export enum SignUpStatus {
   EmailAlreadyExists = "email-already-exists",
@@ -52,6 +52,9 @@ export class AuthLocalService {
         firstName: dto.firstName,
         lastName: dto.lastName,
         emailVerified: false,
+        musics: {
+          favoritesPlaylistId: null, // TODO
+        },
       };
       const insertedUser = await this.usersService.signUp(insertingUser);
 

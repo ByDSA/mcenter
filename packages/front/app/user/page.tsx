@@ -1,19 +1,61 @@
 "use client";
 
 import { assertIsDefined } from "$shared/utils/validation";
+import { useState } from "react";
+import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { useUser } from "#modules/core/auth/useUser";
+import { usePlaylistSelectorModal } from "#modules/musics/playlists/list-selector/modal";
+import { Button } from "#modules/ui-kit/input/Button";
+import { UsersApi } from "#modules/core/users/requests";
+import { FetchApi } from "#modules/fetching/fetch-api";
+import { MusicPlaylistsApi } from "#modules/musics/playlists/requests";
+import { useAsyncElement } from "#modules/utils/usePageAsyncAction";
 
 export default function UserPage() {
   const { user } = useUser();
 
   assertIsDefined(user);
 
+  const [favPlaylist, setFavPlaylist] = useState<MusicPlaylistEntity | null>(null);
+  const { openModal } = usePlaylistSelectorModal( {
+    nullable: true,
+  } );
+  const { element } = useAsyncElement( {
+    // Para que no muestre el spinner si id=null
+    initialStatus: !user.musics.favoritesPlaylistId ? "iddle" : undefined,
+    action: async () => {
+      if (!user.musics.favoritesPlaylistId)
+        return;
+
+      const api = FetchApi.get(MusicPlaylistsApi);
+
+      await api.getOneById(user.musics.favoritesPlaylistId)
+        .then(r=>{
+          setFavPlaylist(r.data ?? null);
+        } );
+    },
+    renderElement: ()=>favPlaylist?.name ?? "<Ninguna>",
+  } );
+
   return (
     <div>
-      <h2>Public Name: {user.publicName}</h2>
+      <h1>Profile</h1>
+      <p>Public Name: {user.publicName}</p>
       <p>Email: {user.email}</p>
       <p>First name: {user.firstName}</p>
       <p>Last name: {user.lastName}</p>
-      <p>Roles: {user.roles.map(r=>r.name)}</p>
+      <p>Roles: {user.roles.map(r=>r.name).join(", ")}</p>
+
+      <h3>Música</h3>
+      <p>Playlist favorita: {element}
+        <Button onClick={async ()=>await openModal( {
+          onSelect: async (playlist) => {
+            const api = FetchApi.get(UsersApi);
+
+            await api.setFavoritePlaylist(playlist?.id ?? null);
+
+            setFavPlaylist(playlist);
+          },
+        } )}>Cambiar</Button></p>
     </div>);
 }

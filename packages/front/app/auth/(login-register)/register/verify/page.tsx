@@ -13,8 +13,8 @@ export default function RegisterVerifyPage() {
   const email = searchParams.get("email");
   const { element } = usePageAsyncAction( {
     autoStart: !!token,
-    loadingMessage: <p>Verificando token ...</p>,
-    errorMessage: <><p>Error: Token caducado o incorrecto.</p>
+    loadingElement: <p>Verificando token ...</p>,
+    errorElement: <><p>Error: Token caducado o incorrecto.</p>
       {email && <p>
         <a href={email}>Volver a solicitar token</a>
       </p>
