@@ -1,15 +1,12 @@
 import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
-import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
-import { MusicsUsersOdm } from "../../user-info/odm";
-import { DocOdm, FullDocOdm } from "./odm";
+import { DocOdm } from "./odm";
+import { enrichSingleMusic, MusicExpansionFlags } from "./pipeline-utils";
 
 type Criteria = MusicCrudDtos.GetMany.Criteria;
 
-function buildMongooseSort(
-  body: Criteria,
-): Record<string, -1 | 1> | undefined {
+function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
   if (!body.sort)
     return undefined;
 
@@ -29,39 +26,48 @@ function buildMongooseSort(
   if (artist)
     ret["artist"] = artist === "asc" ? 1 : -1;
 
-  // Importante para hacerlo determinista!
-  // Si dos elementos tienen el mismo valor de sort, no es determinista
-  // y puede devolver duplicados y omisiones en pagging
   if (Object.keys(ret).length > 0)
     ret["_id"] = 1;
 
   return ret;
 }
 
-export type AggregationResult = {
-  data: FullDocOdm[];
-  metadata: {
-    totalCount?: number;
-  }[];
-}[];
-
+// ... type AggregationResult ...
 export function getCriteriaPipeline(
   userId: string | null,
   criteria: Criteria,
 ) {
   const sort = buildMongooseSort(criteria);
   const pipeline: PipelineStage[] = [];
-  // Si necesitamos filtrar por hash o path, hacer lookup primero
-  const needsFileInfoLookup = criteria.expand?.includes("fileInfos")
-                             || !!criteria.filter?.hash
-                             || !!criteria.filter?.path;
-  const needsUserInfoLookup = criteria.expand?.includes("userInfo");
-  const needsFavorite = criteria.expand?.includes("favorite");
-  // Construir filtro después del lookup si es necesario
-  const filter = buildMongooseFilterWithFileInfos(
-    criteria,
-    needsFileInfoLookup,
-  );
+  // Flags de expansión
+  const expansionFlags: MusicExpansionFlags = {
+    includeFileInfos: criteria.expand?.includes("fileInfos")
+                      || !!criteria.filter?.hash
+                      || !!criteria.filter?.path,
+    includeUserInfo: criteria.expand?.includes("userInfo"),
+    includeFavorite: criteria.expand?.includes("favorite"),
+  };
+  // NOTA: Para filtrar por campos dentro de los lookups (hash, path),
+  // necesitamos hacer el lookup de fileInfos *antes* del match si se filtra por ellos,
+  // O podemos mantener la lógica original de filtrar por propiedades "virtuales" después.
+  // eslint-disable-next-line daproj/max-len
+  // En tu código original, construías el filtro asumiendo que el campo ya existe si el flag está activo.
+  // Sin embargo, para eficiencia, los lookups pesados suelen ir después del paginado si es posible.
+  // Dado que has/path son filtros, DEBEN ir antes del match.
+  // Si necesitamos filtrar por hash/path, forzamos el lookup al inicio
+  const preFilterEnrichment = !!criteria.filter?.hash || !!criteria.filter?.path;
+
+  if (preFilterEnrichment) {
+    pipeline.push(...enrichSingleMusic("_id", null, userId, {
+      includeFileInfos: true,
+      // Solo cargamos lo necesario para filtrar
+      includeUserInfo: false,
+      includeFavorite: false,
+    } ));
+  }
+
+  // Filtros
+  const filter = buildMongooseFilterWithFileInfos(criteria, preFilterEnrichment);
 
   if (Object.keys(filter).length > 0) {
     pipeline.push( {
@@ -69,84 +75,24 @@ export function getCriteriaPipeline(
     } );
   }
 
-  // Usar $facet para obtener datos paginados y total en una sola consulta
+  // Facet para data y metadatos
   const facetStage: PipelineStage = {
     $facet: {
       data: [],
-      metadata: [
-        {
-          $count: "totalCount",
-        },
-      ],
+      metadata: [{
+        $count: "totalCount",
+      }],
     },
   };
-  // Construir el pipeline de datos
   const dataPipeline: PipelineStage[] = [];
 
-  if (needsUserInfoLookup) {
-    // Si necesitamos filtrar por userId, usar lookup con pipeline
-    if (userId !== null) {
-      dataPipeline.push( {
-        $lookup: {
-          from: "musics_users",
-          let: {
-            musicId: "$_id",
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    {
-                      $eq: ["$musicId", "$$musicId"],
-                    },
-                    {
-                      $eq: ["$userId", new Types.ObjectId(userId)],
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "userInfo",
-        },
-      } );
-    } else {
-      const fakeId = new Types.ObjectId();
-
-      // Default UserInfo
-      dataPipeline.push( {
-        $addFields: {
-          userInfo: {
-            _id: fakeId,
-            musicId: "$_id" as any,
-            createdAt: new Date(),
-            lastTimePlayed: 0,
-            updatedAt: new Date(),
-            userId: fakeId,
-            weight: 0,
-          }satisfies MusicsUsersOdm.FullDoc,
-        },
-      } );
-    }
-
-    dataPipeline.push( {
-      $unwind: {
-        path: "$userInfo",
-        // Si una música no tiene su correspondiente entrada en musics_users, se preseva la música:
-        preserveNullAndEmptyArrays: true,
-      },
-    } );
-  }
-
-  // Sort antes de la paginación
+  // Sort y Paginación
   if (sort) {
     dataPipeline.push( {
       $sort: sort,
     } );
   }
 
-  // Paginación
   if (criteria.offset) {
     dataPipeline.push( {
       $skip: criteria.offset,
@@ -159,115 +105,17 @@ export function getCriteriaPipeline(
     } );
   }
 
-  // Lookups después de la paginación
-  if (needsFileInfoLookup) {
-    dataPipeline.push( {
-      $lookup: {
-        from: MusicFileInfoOdm.COLLECTION_NAME,
-        localField: "_id",
-        foreignField: "musicId",
-        as: "fileInfos",
-      },
-    } );
-  }
+  // Enrich Restante (UserInfo, Favorites, y FileInfos si no se cargó antes)
+  // Calculamos qué falta por cargar
+  const postPaginationFlags: MusicExpansionFlags = {
+    includeFileInfos: expansionFlags.includeFileInfos && !preFilterEnrichment,
+    includeUserInfo: expansionFlags.includeUserInfo,
+    includeFavorite: expansionFlags.includeFavorite,
+  };
 
-  if (needsFavorite) {
-    // Assert requerido: Si se pide favorite, debe haber un usuario logueado
-    if (!userId)
-      throw new Error("User ID is required to expand favorites");
+  dataPipeline.push(...enrichSingleMusic("_id", null, userId, postPaginationFlags));
 
-    // 1. Obtener la ID de la playlist de favoritos del usuario
-    dataPipeline.push( {
-      $lookup: {
-        from: "users", // Asumo que el nombre de la colección es 'users'
-        pipeline: [
-          {
-            $match: {
-              _id: new Types.ObjectId(userId),
-            },
-          },
-          {
-            $project: {
-              _id: 0,
-              favPlaylistId: "$musics.favoritesPlaylistId",
-            },
-          },
-        ],
-        as: "tempUserFav",
-      },
-    } );
-
-    // Descomprimir para acceder fácil al campo (preservando si no encuentra al user)
-    dataPipeline.push( {
-      $unwind: {
-        path: "$tempUserFav",
-        preserveNullAndEmptyArrays: true,
-      },
-    } );
-
-    // 2. Buscar en la playlist si existe la canción actual
-    dataPipeline.push( {
-      $lookup: {
-        from: "music_playlists",
-        let: {
-          // Si el usuario no tiene playlist asignada, esto será null/undefined
-          favPlaylistId: "$tempUserFav.favPlaylistId",
-          musicId: "$_id",
-        },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $eq: ["$_id", "$$favPlaylistId"],
-              },
-            },
-          },
-          {
-            $project: {
-              _id: 0,
-              // $in busca directamente el ObjectId de la canción en el array de musicIds
-              // Mongo extrae automáticamente 'musicId' de cada objeto del array 'list'
-              isFound: {
-                $in: ["$$musicId", "$list.musicId"],
-              },
-            },
-          },
-        ],
-        as: "tempFavStatus",
-      },
-    } );
-
-    // 3. Calcular el booleano final 'isFav' y limpiar temporales
-    dataPipeline.push( {
-      $addFields: {
-        isFav: {
-          $cond: {
-            if: {
-              $gt: [{
-                $size: "$tempFavStatus",
-              }, 0],
-            },
-            then: {
-              $arrayElemAt: ["$tempFavStatus.isFound", 0],
-            },
-            else: false, // Si no hay playlist o no se encontró
-          },
-        },
-      },
-    } );
-
-    // Limpieza de campos auxiliares
-    dataPipeline.push( {
-      $project: {
-        tempUserFav: 0,
-        tempFavStatus: 0,
-      },
-    } );
-  }
-
-  // Asignar el pipeline de datos al facet
   (facetStage.$facet as any).data = dataPipeline;
-
   pipeline.push(facetStage);
 
   return pipeline;
@@ -300,7 +148,6 @@ function buildMongooseFilterWithFileInfos(
     if (criteria.filter.slug)
       filter["url"] = criteria.filter.slug;
 
-    // Solo aplicar estos filtros si tenemos el lookup
     if (hasFileInfoLookup) {
       if (criteria.filter.hash)
         filter["fileInfos.hash"] = criteria.filter.hash;

@@ -1,7 +1,7 @@
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
 import { FilterQuery, PipelineStage, Types } from "mongoose";
 import { assertIsDefined } from "$shared/utils/validation";
-import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
+import { enrichSingleMusic, MusicExpansionFlags } from "#musics/crud/repositories/music/odm/pipeline-utils";
 import { DocOdm } from "./odm";
 
 function buildMongooseSort(
@@ -44,11 +44,9 @@ export function getCriteriaPipeline(
 ) {
   const filter = buildMongooseFilter(criteria);
   const sort = buildMongooseSort(criteria);
-  const pipeline: PipelineStage[] = [
-    {
-      $match: filter,
-    },
-  ];
+  const pipeline: PipelineStage[] = [{
+    $match: filter,
+  }];
 
   if (sort) {
     pipeline.push( {
@@ -68,95 +66,43 @@ export function getCriteriaPipeline(
     } );
   }
 
-  // Agregar lookups para expand
-  if (criteria.expand) {
-    if (criteria.expand.includes("musics")) {
-      pipeline.push( {
+  // Configurar flags heredados
+  const needsMusics = criteria.expand?.includes("musics");
+
+  if (needsMusics) {
+    // 1. Lookup básico de la música (necesario para tener el objeto music)
+    pipeline.push(
+      {
         $lookup: {
-          from: "musics", // nombre de la colección de músicas
-          let: {
-            musicId: "$musicId",
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ["$_id", "$$musicId"],
-                },
-              },
-            },
-          ],
+          from: "musics",
+          localField: "musicId",
+          foreignField: "_id",
           as: "music",
         },
-      } );
-
-      // Convertir el array a objeto único
-      pipeline.push( {
+      },
+      {
         $addFields: {
           music: {
             $arrayElemAt: ["$music", 0],
           },
         },
-      } );
+      },
+    );
 
-      // Lookup para traer userInfo desde musics_users
-      pipeline.push( {
-        $lookup: {
-          from: "musics_users", // colección musics_users
-          let: {
-            musicId: "$music._id",
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ["$musicId", "$$musicId"],
-                },
-              },
-            },
-          ],
-          as: "musicUserInfo",
-        },
-      } );
+    // 2. Usar la utilidad compartida para enriquecer "music"
+    // He añadido mapeos heurísticos para flags que quizás quieras usar en el futuro
+    const flags: MusicExpansionFlags = {
+      includeUserInfo: true, // Por defecto en historial solemos querer el user info
+      includeFileInfos: criteria.expand?.includes("musicsFileInfos"),
+      // He añadido soporte para 'favorite' aunque no estaba explicito en tu archivo original
+      includeFavorite: criteria.expand?.includes("musicsFavorite")
+        || criteria.expand?.includes("musicsFavorite"),
+    };
+    // Usamos el userId del filtro, ya que el historial pertenece a un usuario
+    const userId = criteria.filter?.userId || null;
 
-      // Añadir userInfo a music (primer elemento del array o null si está vacío)
-      pipeline.push( {
-        $addFields: {
-          "music.userInfo": {
-            $arrayElemAt: ["$musicUserInfo", 0],
-          },
-        },
-      } );
-
-      // Limpiar el campo temporal
-      pipeline.push( {
-        $unset: "musicUserInfo",
-      } );
-    }
-
-    if (criteria.expand.includes("music-file-infos") && criteria.expand.includes("musics")) {
-      // Ahora expandir los fileInfos de la música
-      pipeline.push( {
-        $lookup: {
-          from: MusicFileInfoOdm.COLLECTION_NAME,
-          localField: "music._id",
-          foreignField: "musicId",
-          as: "musicFileInfos",
-        },
-      } );
-
-      // Añadir los fileInfos a la música
-      pipeline.push( {
-        $addFields: {
-          "music.fileInfos": "$musicFileInfos",
-        },
-      } );
-
-      // Limpiar el campo temporal
-      pipeline.push( {
-        $unset: "musicFileInfos",
-      } );
-    }
+    // Llamada a la utilidad. Notar targetField = "music" y localField = "music._id"
+    pipeline.push(...enrichSingleMusic("music._id", "music", userId, flags));
   }
 
   return pipeline;

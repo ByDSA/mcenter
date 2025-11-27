@@ -21,7 +21,7 @@ export class EpisodeHistoryApi {
       },
       limit: props?.limit ?? 10,
       offset: props?.offset ?? undefined,
-      expand: ["episodes", "episode-series", "episode-file-infos", "episode-user-info"],
+      expand: ["episodes", "episodesSeries", "episodesFileInfos", "episodesUserInfo"],
     };
     const schema = _GetMany.resSchema;
     const fetcher = makeFetcher<_GetMany.Req, _GetMany.Res>( {

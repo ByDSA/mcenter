@@ -2,11 +2,12 @@ import { Body, Controller } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
+import { UserPatchOne } from "#utils/nestjs/rest";
+import { UsersMusicPlaylistsRepository } from "#musics/users-playlists/repository";
 import { Authenticated } from "../Authenticated.guard";
 import { userEntitySchema, UserPayload } from "../models";
 import { User } from "../User.decorator";
 import { UsersRepository } from "./repository";
-import { UserPatchOne } from "#utils/nestjs/rest";
 
 class MusicPlaylistFavoriteDto extends createZodDto(z.object( {
   playlistId: mongoDbId.nullable(),
@@ -17,6 +18,7 @@ class MusicPlaylistFavoriteDto extends createZodDto(z.object( {
 export class UsersController {
   constructor(
     private readonly repo: UsersRepository,
+    private readonly usersMusicPlaylistsRepo: UsersMusicPlaylistsRepository,
   ) { }
 
   @UserPatchOne("/musics/favorite-playlist", userEntitySchema)
@@ -24,7 +26,10 @@ export class UsersController {
     @User() user: UserPayload,
     @Body() body: MusicPlaylistFavoriteDto,
   ) {
-    const got = await this.repo.setMusicPlaylistFavorite(user.id, body.playlistId);
+    const got = await this.usersMusicPlaylistsRepo.setMusicPlaylistFavorite(
+      user.id,
+      body.playlistId,
+    );
 
     return got;
   }

@@ -21,7 +21,7 @@ export class RemoteSeriesTreeService {
     };
     const allEpisodesWithFileInfos: EpisodeEntityWithFileInfos[] = await this.episodesRepo
       .getManyByCriteria( {
-        expand: ["file-infos"],
+        expand: ["fileInfos"],
       } ) as EpisodeEntityWithFileInfos[];
 
     for (const episodeWithFileInfos of allEpisodesWithFileInfos)

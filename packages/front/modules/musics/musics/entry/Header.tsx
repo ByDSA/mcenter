@@ -2,16 +2,20 @@ import { Music, MusicEntityWithUserInfo } from "$shared/models/musics";
 import { createDurationElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
+import { FavButton, UpdateFavButtons } from "#modules/musics/playlists/FavButton";
+import { useUser } from "#modules/core/auth/useUser";
 import styles from "../../../history/entry/Header/styles.module.css";
 
 type HeaderProps = {
   entry: MusicEntityWithUserInfo;
   contextMenu?: ContextMenuProps;
+  updateFavButtons: UpdateFavButtons;
 };
-export function Header( { entry, contextMenu }: HeaderProps) {
-  const resource = entry;
-  const { title } = resource;
-  const duration = resource.fileInfos?.[0]?.mediaInfo.duration;
+export function Header( { entry: music, contextMenu, updateFavButtons }: HeaderProps) {
+  const { user } = useUser();
+  const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
+  const { title } = music;
+  const duration = music.fileInfos?.[0]?.mediaInfo.duration;
 
   return HistoryEntryHeader( {
     left: undefined,
@@ -19,7 +23,16 @@ export function Header( { entry, contextMenu }: HeaderProps) {
       <span className={styles.columns}>
         <span className={styles.rows}>
           {duration && createDurationElement(duration)}
-          {createWeightElement(resource.userInfo.weight)}
+          {createWeightElement(music.userInfo.weight)}
+        </span>
+        <span className={styles.rows}>
+          {FavButton( {
+            className: styles.favButton,
+            favoritesPlaylistId,
+            updateFavButtons,
+            musicId: music.id,
+            value: music.isFav,
+          } )}
         </span>
         {contextMenu?.onClick
         && <><SettingsButton
@@ -31,7 +44,7 @@ export function Header( { entry, contextMenu }: HeaderProps) {
       </span>
     </>,
     title,
-    subtitle: createMusicSubtitle(resource),
+    subtitle: createMusicSubtitle(music),
   } );
 }
 

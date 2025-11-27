@@ -88,16 +88,16 @@ CanDeleteOneByIdAndGet<Model, Id> {
     if (docsOdm.length === 0)
       return [];
 
-    if (criteria.expand?.includes("episode-series"))
+    if (criteria.expand?.includes("episodesSeries"))
       assertIsDefined(docsOdm[0].episode?.serie, "Lookup serie failed");
 
-    if (criteria.expand?.includes("episode-user-info"))
+    if (criteria.expand?.includes("episodesUserInfo"))
       assertIsDefined(docsOdm[0].episode?.userInfo, "Lookup serie failed");
 
     if (criteria.expand?.includes("episodes"))
       assertIsDefined(docsOdm[0].episode, "Lookup episode failed");
 
-    if (criteria.expand?.includes("episode-file-infos"))
+    if (criteria.expand?.includes("episodesFileInfos"))
       assertIsDefined(docsOdm[0].episode!.fileInfos, "Lookup episode file info failed");
 
     return docsOdm.map(EpisodeHistoryEntryOdm.toEntity);

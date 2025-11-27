@@ -6,7 +6,13 @@ import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 import { Music, MusicEntity } from "../../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
-import { AggregationResult } from "./criteria-pipeline";
+
+export type AggregationResult = {
+  data: FullDocOdm[];
+  metadata: {
+    totalCount?: number;
+  }[];
+}[];
 
 type Model = Music;
 type Entity = MusicEntity;

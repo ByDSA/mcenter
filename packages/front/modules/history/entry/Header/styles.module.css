@@ -5,7 +5,7 @@
   aside {
     font-size: 1rem;
 
-    svg {
+    span > svg {
       transform: scale(0.7);
     }
 
@@ -52,12 +52,12 @@
       background-color: transparent !important;
     }
   }
+}
 
-  &:has(> aside:last-child button) {
-    padding-right: 0 !important;
-  }
-
-  &:has(> aside:first-child button) {
-    padding-left: 0 !important;
+.favButton {
+  margin-right: 0.25rem;
+  margin-left: 0.5rem;
+  svg {
+    transform: scale(1) !important;
   }
 }

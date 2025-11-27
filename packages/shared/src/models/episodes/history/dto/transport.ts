@@ -12,7 +12,7 @@ export namespace EpisodeHistoryEntryCrudDtos {
         userId: mongoDbId.optional(),
       },
       sortKeys: ["timestamp"],
-      expandKeys: ["episode-series", "episodes", "episode-file-infos", "episode-user-info"],
+      expandKeys: ["episodesSeries", "episodes", "episodesFileInfos", "episodesUserInfo"],
     } );
     export type Criteria = z.infer<typeof criteriaSchema>;
   }

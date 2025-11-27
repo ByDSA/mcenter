@@ -25,7 +25,7 @@ export class EpisodeSlugHandlerService {
 
   async handle( { req, res, slug, userId }: HandleProps): Promise<StreamableFile | void> {
     const episode = await this.repo.getOneByCompKey(slug, {
-      expand: ["file-infos", "series"],
+      expand: ["fileInfos", "series"],
     } );
 
     assertFoundClient(episode);

@@ -1,16 +1,12 @@
 import type { PlaylistItemEntity } from "./Playlist";
 import React, { ReactNode, useState } from "react";
-import { IconButton } from "@mui/material";
 import { PlayArrow,
-  Pause, Favorite,
-  FavoriteBorder } from "@mui/icons-material";
+  Pause } from "@mui/icons-material";
 import { useUser } from "#modules/core/auth/useUser";
-import { classes } from "#modules/utils/styles";
-import { FetchApi } from "#modules/fetching/fetch-api";
 import { formatDurationItem } from "./utils";
 import styles from "./PlaylistItem.module.css";
 import { SettingsButton } from "./SettingsButton";
-import { MusicPlaylistsApi } from "./requests";
+import { FavButton, UpdateFavButtons } from "./FavButton";
 
 export type ContextMenuProps = {
   onClick?: (e: React.MouseEvent<HTMLElement>)=> void;
@@ -25,7 +21,7 @@ interface PlaylistItemProps {
   isDragging?: boolean;
   onPlay?: (item: PlaylistItemEntity)=> void;
   onPause?: ()=> void;
-  updateIsFav: (musicId: string, favorite: boolean)=> void;
+  updateFavButtons?: UpdateFavButtons;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -34,42 +30,16 @@ export const MusicPlaylistItem = ( { value,
   isPlaying = false,
   contextMenu,
   isDragging = false,
-  updateIsFav,
+  updateFavButtons,
   onPlay,
   onPause }: PlaylistItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(!!value.music.isFav);
   const { user } = useUser();
   const handlePlayPause = () => {
     if (isPlaying)
       onPause?.();
     else
       onPlay?.(value);
-  };
-  const handleFavoriteToggle = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (!user || !user.musics.favoritesPlaylistId)
-      return;
-
-    const api = FetchApi.get(MusicPlaylistsApi);
-
-    if (isFavorite) {
-      await api.removeAllTracksByMusicId( {
-        playlistId: user.musics.favoritesPlaylistId,
-        musicId: value.musicId,
-      } );
-
-      updateIsFav(value.musicId, false);
-    } else {
-      await api.addOneTrack(user.musics.favoritesPlaylistId, value.musicId, {
-        unique: true,
-      } );
-
-      updateIsFav(value.musicId, true);
-    }
-
-    setIsFavorite(!isFavorite);
   };
 
   return (
@@ -97,7 +67,10 @@ export const MusicPlaylistItem = ( { value,
         <div className={styles.songDetails}>
           <span className={styles.songArtist}>{value.music.artist}</span>
           <span className={styles.separator}>•</span>
-          <span className={styles.songAlbum}>{value.music.album}</span>
+          <span className={styles.songAlbum}>{
+            !value.music.album || value.music.album.trim() === ""
+              ? "(Sin álbum)"
+              : value.music.album}</span>
         </div>
       </div>
 
@@ -106,17 +79,12 @@ export const MusicPlaylistItem = ( { value,
       </div>
 
       <div className={styles.actions}>
-        {user && <IconButton
-          size="small"
-          className={classes(
-            styles.favButton,
-            isFavorite && styles.active,
-            !user.musics.favoritesPlaylistId && styles.disabled,
-          )}
-          onClick={(e)=>user.musics.favoritesPlaylistId ? handleFavoriteToggle(e) : undefined}
-        >
-          {isFavorite ? <Favorite /> : <FavoriteBorder />}
-        </IconButton>
+        {user && <FavButton
+          value={!!value.music.isFav}
+          favoritesPlaylistId={user.musics.favoritesPlaylistId}
+          musicId={value.music.id}
+          updateFavButtons={updateFavButtons}
+        />
         }
         {contextMenu?.onClick
         && <><SettingsButton

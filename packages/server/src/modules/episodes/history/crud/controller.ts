@@ -63,7 +63,7 @@ implements
         seriesKey: params.seriesKey,
         userId: user.id,
       },
-      expand: ["episode-series"],
+      expand: ["episodesSeries"],
     } );
   }
 

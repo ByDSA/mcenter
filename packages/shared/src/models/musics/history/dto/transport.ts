@@ -12,7 +12,7 @@ export namespace MusicHistoryEntryCrudDtos {
         userId: mongoDbId.optional(),
       },
       sortKeys: ["timestamp"],
-      expandKeys: ["musics", "music-file-infos"],
+      expandKeys: ["musics", "musicsFileInfos", "musicsFavorite"],
     } );
     export type Criteria = z.infer<typeof criteriaSchema>;
     export const bodySchema = criteriaSchema.default( {} );

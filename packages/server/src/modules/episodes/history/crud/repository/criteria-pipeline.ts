@@ -116,7 +116,7 @@ export function getCriteriaPipeline(
       } );
 
       // Si también se solicita series, agregarlo al episode
-      if (criteria.expand.includes("episode-series")) {
+      if (criteria.expand.includes("episodesSeries")) {
         pipeline.push( {
           $lookup: {
             from: "series",
@@ -141,7 +141,7 @@ export function getCriteriaPipeline(
         } );
       }
 
-      if (criteria.expand.includes("episode-file-infos")) {
+      if (criteria.expand.includes("episodesFileInfos")) {
         pipeline.push( {
           $lookup: {
             from: EpisodeFileInfoOdm.COLLECTION_NAME,
@@ -164,7 +164,7 @@ export function getCriteriaPipeline(
         } );
       }
 
-      if (criteria.expand.includes("episode-user-info")) {
+      if (criteria.expand.includes("episodesUserInfo")) {
         pipeline.push( {
           $lookup: {
             from: EpisodesUsersOdm.COLLECTION_NAME,

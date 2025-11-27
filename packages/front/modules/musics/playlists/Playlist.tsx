@@ -250,8 +250,6 @@ index: number; } ) => {
       let dirty = false;
 
       for (const m of value.list) {
-        console.log(m.musicId, musicId, m.music.isFav, favorite);
-
         if (m.musicId === musicId && !!m.music.isFav !== favorite) {
           m.music.isFav = favorite;
           dirty = true;
@@ -276,7 +274,7 @@ index: number; } ) => {
           index={index}
           isPlaying={currentPlaying === item.id && isPlaylistPlaying}
           isDragging={isDraggingGlobal}
-          updateIsFav={updateIsFav}
+          updateFavButtons={updateIsFav}
           contextMenu={{
             element:
           playListItemActiveIndex === index

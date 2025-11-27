@@ -19,9 +19,9 @@ import { fixSlug } from "#musics/crud/builder/fix-slug";
 import { MusicPlaylistCrudDtos } from "../../models/dto";
 import { MusicPlaylist, MusicPlaylistEntity } from "../../models";
 import { MusicPlaylistAvailableSlugGeneratorService } from "./available-slug-generator.service";
-import { AggregationResult } from "./odm/criteria-pipeline";
 import { MusicPlaylistOdm } from "./odm";
 import { MusicPlayListEvents } from "./events";
+import { AggregationResult } from "./odm/criteria-pipeline";
 
 type Model = MusicPlaylist;
 type Entity = MusicPlaylistEntity;

@@ -77,7 +77,7 @@ export class EpisodesSlugController {
         typeof this.episodesRepo.getOneByCompKey
       >[1] = format === ResponseFormat.M3U8
         ? {
-          expand: ["file-infos"],
+          expand: ["fileInfos"],
         }
         : {
           expand: [],

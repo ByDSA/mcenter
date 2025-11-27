@@ -1,15 +1,19 @@
 import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MongoFilterQuery } from "#utils/layers/db/mongoose";
 import { MusicPlaylistCrudDtos } from "#musics/playlists/models/dto";
-import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
-import { FullDocOdm } from "./odm";
-import { DocOdm } from "./odm";
+import { MusicExpansionFlags, enrichMusicList } from "#musics/crud/repositories/music/odm/pipeline-utils";
+import { DocOdm, FullDocOdm } from "./odm";
+
+export type AggregationResult = {
+  data: FullDocOdm[];
+  metadata: {
+    totalCount?: number;
+  }[];
+}[];
 
 type Criteria = MusicPlaylistCrudDtos.GetMany.Criteria;
 
-function buildMongooseSort(
-  body: Criteria,
-): Record<string, -1 | 1> | undefined {
+function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
   if (!body.sort)
     return undefined;
 
@@ -26,31 +30,17 @@ function buildMongooseSort(
   if (updated)
     ret["timestamps.updatedAt"] = updated === "asc" ? 1 : -1;
 
-  // Importante para hacerlo determinista!
-  // Si dos elementos tienen el mismo valor de sort, no es determinista
-  // y puede devolver duplicados y omisiones en pagging
   if (Object.keys(ret).length > 0)
     ret["_id"] = 1;
 
   return ret;
 }
 
-export type AggregationResult = {
-  data: FullDocOdm[];
-  metadata: {
-    totalCount?: number;
-  }[];
-}[];
-
-export function getCriteriaPipeline(
-  criteria: Criteria,
-) {
+// ... type AggregationResult ...
+export function getCriteriaPipeline(criteria: Criteria) {
   const sort = buildMongooseSort(criteria);
   const pipeline: PipelineStage[] = [];
-  const needsMusics = criteria.expand?.includes("musics");
-  const needsFav = needsMusics && criteria.expand?.includes("musicsFavorite");
-  const userId = criteria.filter?.userId;
-  // Construir filtro después del lookup si es necesario
+  const userId = criteria.filter?.userId || null;
   const filter = buildMongooseFilter(criteria);
 
   if (Object.keys(filter).length > 0) {
@@ -59,28 +49,22 @@ export function getCriteriaPipeline(
     } );
   }
 
-  // Usar $facet para obtener datos paginados y total en una sola consulta
   const facetStage: PipelineStage = {
     $facet: {
       data: [],
-      metadata: [
-        {
-          $count: "totalCount",
-        },
-      ],
+      metadata: [{
+        $count: "totalCount",
+      }],
     },
   };
-  // Construir el pipeline de datos
   const dataPipeline: PipelineStage[] = [];
 
-  // Sort antes de la paginación
   if (sort) {
     dataPipeline.push( {
       $sort: sort,
     } );
   }
 
-  // Paginación
   if (criteria.offset) {
     dataPipeline.push( {
       $skip: criteria.offset,
@@ -93,242 +77,23 @@ export function getCriteriaPipeline(
     } );
   }
 
+  // Lógica de expansión usando la utilidad compartida
   if (criteria.expand?.includes("musics")) {
-    // Esta aproximación evita el $group completamente
-    dataPipeline.push(
-      // Expandir cada elemento de la lista con lookup
-      {
-        $lookup: {
-          from: "musics",
-          let: {
-            listItems: "$list",
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $in: ["$_id", "$$listItems.musicId"],
-                },
-              },
-            },
-          ],
-          as: "musicsExpanded",
-        },
-      },
-      // Lookup para obtener fileinfos de cada música
-      {
-        $lookup: {
-          from: MusicFileInfoOdm.COLLECTION_NAME,
-          let: {
-            musicIds: {
-              $map: {
-                input: "$musicsExpanded",
-                in: "$$this._id",
-              },
-            },
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $in: ["$musicId", "$$musicIds"],
-                },
-              },
-            },
-          ],
-          as: "fileInfosExpanded",
-        },
-      },
-    );
+    const flags: MusicExpansionFlags = {
+      // eslint-disable-next-line daproj/max-len
+      // En playlists, fileInfos suele ir implícito si se piden músicas, o puedes agregar un flag especifico
+      includeFileInfos: true,
+      includeFavorite: criteria.expand?.includes("musicsFavorite"),
+      // UserInfo (stats del usuario sobre la canción) normalmente no se pide en listas de playlist,
+      // pero si lo añadieras al DTO, aquí solo tendrías que poner 'true'.
+      includeUserInfo: false,
+    };
 
-    if (needsFav) {
-      if (!userId)
-        throw new Error("User ID is required to expand favorites");
-
-      dataPipeline.push(
-        // 1. Obtener ID de la playlist de favoritos del usuario
-        {
-          $lookup: {
-            from: "users",
-            pipeline: [
-              {
-                $match: {
-                  _id: new Types.ObjectId(userId),
-                },
-              },
-              {
-                $project: {
-                  _id: 0,
-                  favPlaylistId: "$musics.favoritesPlaylistId",
-                },
-              },
-            ],
-            as: "tempUserFav",
-          },
-        },
-        {
-          $unwind: {
-            path: "$tempUserFav",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        // 2. Obtener la LISTA de musicIds de esa playlist
-        {
-          $lookup: {
-            from: "music_playlists",
-            let: {
-              favPlaylistId: "$tempUserFav.favPlaylistId",
-            },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $eq: ["$_id", "$$favPlaylistId"],
-                  },
-                },
-              },
-              // Solo nos interesa el array de IDs para comparar rápido
-              {
-                $project: {
-                  _id: 0,
-                  ids: "$list.musicId",
-                },
-              },
-            ],
-            as: "tempFavList",
-          },
-        },
-        // 3. Aplanar para tener un array simple de ObjectIds disponible en el root
-        {
-          $addFields: {
-            userFavMusicIds: {
-              $ifNull: [{
-                $arrayElemAt: ["$tempFavList.ids", 0],
-              }, []],
-            },
-          },
-        },
-      );
-    }
-
-    // Crear un mapa de música por ID para lookup rápido
-    dataPipeline.push(
-      {
-        $addFields: {
-          musicMap: {
-            $arrayToObject: {
-              $map: {
-                input: "$musicsExpanded",
-                in: {
-                  k: {
-                    $toString: "$$this._id",
-                  },
-                  v: "$$this",
-                },
-              },
-            },
-          },
-          // Crear un mapa agrupado de fileInfos por musicId
-          fileInfosMap: {
-            $arrayToObject: {
-              $map: {
-                input: {
-                  $setUnion: {
-                    $map: {
-                      input: "$fileInfosExpanded",
-                      in: {
-                        $toString: "$$this.musicId",
-                      },
-                    },
-                  },
-                },
-                in: {
-                  k: "$$this",
-                  v: {
-                    $filter: {
-                      input: "$fileInfosExpanded",
-                      as: "fileInfo",
-                      cond: {
-                        $eq: [
-                          {
-                            $toString: "$$fileInfo.musicId",
-                          },
-                          "$$this",
-                        ],
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      // Expandir la lista con la música y fileInfos correspondientes
-      {
-        $addFields: {
-          list: {
-            $map: {
-              input: "$list",
-              in: {
-                $mergeObjects: [
-                  "$$this",
-                  {
-                    music: {
-                      $mergeObjects: [
-                        {
-                          $getField: {
-                            field: {
-                              $toString: "$$this.musicId",
-                            },
-                            input: "$musicMap",
-                          },
-                        },
-                        {
-                          fileInfos: {
-                            $ifNull: [
-                              {
-                                $getField: {
-                                  field: {
-                                    $toString: "$$this.musicId",
-                                  },
-                                  input: "$fileInfosMap",
-                                },
-                              },
-                              [],
-                            ],
-                          },
-                        },
-                        needsFav
-                          ? {
-                            isFav: {
-                              $in: ["$$this.musicId", "$userFavMusicIds"],
-                            },
-                          }
-                          : {},
-                      ],
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      // Limpiar campos temporales
-      {
-        $unset: ["musicsExpanded", "musicMap", "fileInfosExpanded", "fileInfosMap",
-          "tempUserFav",
-          "tempFavList",
-          "userFavMusicIds",
-        ],
-      },
-    );
+    // Usamos la función optimizada para arrays
+    dataPipeline.push(...enrichMusicList("list", userId, flags));
   }
 
-  // Asignar el pipeline de datos al facet
   (facetStage.$facet as any).data = dataPipeline;
-
   pipeline.push(facetStage);
 
   return pipeline;

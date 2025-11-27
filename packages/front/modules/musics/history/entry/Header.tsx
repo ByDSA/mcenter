@@ -4,15 +4,21 @@ import { MusicHistoryEntryEntity } from "#modules/musics/history/models";
 import { createDurationElement, createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
+import { FavButton, UpdateFavButtons } from "#modules/musics/playlists/FavButton";
+import { useUser } from "#modules/core/auth/useUser";
 import headerStyles from "../../../history/entry/Header/styles.module.css";
+import styles from "../../../history/entry/Header/styles.module.css";
 
 type HeaderProps = {
   entry: Omit<MusicHistoryEntryEntity, "resource"> & {
     resource: MusicEntityWithUserInfo;
   };
   contextMenu?: ContextMenuProps;
+  updateFavButtons: UpdateFavButtons;
 };
-export function Header( { entry, contextMenu }: HeaderProps) {
+export function Header( { entry, contextMenu, updateFavButtons }: HeaderProps) {
+  const { user } = useUser();
+  const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
   const { resource } = entry;
   const { title } = resource;
   const duration = resource.fileInfos?.[0].mediaInfo.duration;
@@ -32,6 +38,15 @@ export function Header( { entry, contextMenu }: HeaderProps) {
         <span className={headerStyles.rows}>
           {isDefined(duration) && createDurationElement(duration)}
           {createWeightElement(resource.userInfo.weight) }
+        </span>
+        <span className={styles.rows}>
+          {FavButton( {
+            className: styles.favButton,
+            favoritesPlaylistId,
+            musicId: entry.resource.id,
+            value: entry.resource.isFav,
+            updateFavButtons,
+          } )}
         </span>
         {contextMenu?.onClick
               && <><SettingsButton

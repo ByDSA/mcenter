@@ -1,3 +1,4 @@
+import { UpdateFavButtons } from "#modules/musics/playlists/FavButton";
 import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { MusicHistoryApi } from "../requests";
@@ -9,9 +10,13 @@ type Props<T> = {
   setValue: (newData: T)=> void;
   showDate?: boolean;
   contextMenu?: ContextMenuProps;
+  updateFavButtons: UpdateFavButtons;
 };
 export function HistoryEntryElement(
-  { value: entry, setValue, contextMenu }: Props<MusicHistoryApi.GetManyByCriteria.Data>,
+  { value: entry,
+    setValue,
+    contextMenu,
+    updateFavButtons }: Props<MusicHistoryApi.GetManyByCriteria.Data>,
 ) {
   return <span className="resource-list-entry">
     {
@@ -20,6 +25,7 @@ export function HistoryEntryElement(
         Header( {
           entry,
           contextMenu,
+          updateFavButtons,
         } ),
         bodyContent: Body( {
           data: entry,

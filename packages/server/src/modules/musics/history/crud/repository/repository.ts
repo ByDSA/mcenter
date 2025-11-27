@@ -136,7 +136,7 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
       assertIsDefined(docsOdm[0].music, "Lookup music failed");
       assertIsDefined(docsOdm[0].music.userInfo, "Lookup music.userInfo failed");
 
-      if (criteria.expand?.includes("music-file-infos"))
+      if (criteria.expand?.includes("musicsFileInfos"))
         assertIsDefined(docsOdm[0].music.fileInfos, "Lookup music file info failed");
     }
 

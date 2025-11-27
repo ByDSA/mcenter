@@ -148,9 +148,10 @@ function useMusicList(props: Props) {
       added: "desc",
     },
     filter: getFilterFromProps(props),
-    expand: ["fileInfos", "userInfo"],
+    expand: ["fileInfos", "userInfo", "favorite"],
   };
   const { data,
+    setData,
     isLoading,
     error,
     setItem, observerTarget,
@@ -199,6 +200,7 @@ function useMusicList(props: Props) {
 
   return {
     data,
+    setData,
     isLoading,
     error,
     totalCount,

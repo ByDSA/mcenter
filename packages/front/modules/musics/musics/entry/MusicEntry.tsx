@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { Body, BodyProps } from "./body/Body";
@@ -9,6 +10,15 @@ type Props = Omit<BodyProps, "setData"> & Partial<Pick<BodyProps, "setData">> & 
 export function MusicEntryElement(
   props: Props,
 ) {
+  const updateIsFav = useCallback((_: string, favorite: boolean) => {
+    if (props.data.isFav !== favorite) {
+      props.setData?.( {
+        ...props.data,
+        isFav: favorite,
+      } );
+    }
+  }, [props.setData, props.data]);
+
   return <span className="resource-list-entry">
     {
       ResourceAccordion( {
@@ -16,6 +26,7 @@ export function MusicEntryElement(
         Header( {
           entry: props.data,
           contextMenu: props.contextMenu,
+          updateFavButtons: updateIsFav,
         } ),
         bodyContent: Body( {
           ...props,

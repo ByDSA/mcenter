@@ -96,7 +96,7 @@ export class PlayVideoService {
       number = query.n;
 
     const episodes = (await this.episodePickerService.getByStream(stream, number ?? 1, {
-      expand: ["series", "file-infos"],
+      expand: ["series", "fileInfos"],
     } ))
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
 
@@ -124,7 +124,7 @@ export class PlayVideoService {
         seriesKey,
         episodeKey,
       }, {
-        expand: ["series", "file-infos"],
+        expand: ["series", "fileInfos"],
       } )]
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
     const remotePlayer = await this.remotePlayersRepo.getOneById(remotePlayerId);

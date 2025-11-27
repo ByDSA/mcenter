@@ -25,7 +25,7 @@ type Data = MusicHistoryApi.GetManyByCriteria.Data[];
 export function HistoryList(props?: Props) {
   const showDate = props?.showDate ?? "groupByDay";
   const { data, isLoading, error,
-    setItem, observerTarget } = useHistoryList();
+    setItem, observerTarget, setData } = useHistoryList();
   const { openMenu,
     renderContextMenu,
     activeIndex, closeMenu } = useListContextMenu( {
@@ -58,6 +58,27 @@ export function HistoryList(props?: Props) {
       }
     </>,
   } );
+  const updateIsFav = (musicId: string, favorite: boolean) => {
+    if (!data)
+      return;
+
+    let dirty = false;
+
+    for (const entry of data) {
+      let m = entry.resource;
+
+      if (m.id === musicId && !!m.isFav !== favorite) {
+        m.isFav = favorite;
+        dirty = true;
+      }
+    }
+
+    if (dirty) {
+      setData([
+        ...data,
+      ]);
+    }
+  };
 
   return renderFetchedData<Data | null>( {
     data,
@@ -76,6 +97,7 @@ export function HistoryList(props?: Props) {
                 value={entry} setValue={(newEntry: typeof entry | undefined) => {
                   setItem(i, newEntry ?? null);
                 }}
+                updateFavButtons={updateIsFav}
                 contextMenu={{
                   element: activeIndex === i
                     ? renderContextMenu(entry)
@@ -120,7 +142,7 @@ function isSameday(timestamp1: number, timestamp2: number) {
 function useHistoryList() {
   const api = FetchApi.get(MusicHistoryApi);
   const { data, isLoading, error,
-    setItem, observerTarget } = useCrudDataWithScroll( {
+    setItem, observerTarget, setData } = useCrudDataWithScroll( {
     initialFetch: async () => {
       const result = await api.getManyByCriteria( {
         limit: INITIAL_FETCHING_LENGTH,
@@ -152,6 +174,7 @@ function useHistoryList() {
 
   return {
     data,
+    setData,
     isLoading,
     error,
     setItem,

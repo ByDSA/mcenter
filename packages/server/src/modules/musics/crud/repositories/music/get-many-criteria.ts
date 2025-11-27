@@ -5,7 +5,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { MusicsSearchService } from "#modules/search/search-services/musics.search.service";
 import { MusicsUsersOdm } from "../user-info/odm";
 import { MusicOdm } from "./odm";
-import { AggregationResult } from "./odm/criteria-pipeline";
+import { AggregationResult } from "./odm/adapters";
 
 type CriteriaMany = MusicCrudDtos.GetMany.Criteria;
 

@@ -1,0 +1,36 @@
+.favButton {
+  --color-non-active: var(--color-gray-400);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-non-active) !important;
+  opacity: 0.5;
+
+  &:hover {
+    opacity: 0.75;
+    cursor: pointer;
+    color: var(--color-gray-100) !important;
+  }
+
+  &.active {
+    opacity: 0.75;
+    color: var(--color-red-400) !important;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &.disabled {
+    opacity: 0.25;
+
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+}

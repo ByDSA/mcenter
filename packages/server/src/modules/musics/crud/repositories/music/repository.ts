@@ -1,3 +1,4 @@
+import type { AggregationResult } from "./odm/adapters";
 import { forwardRef, Inject, Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
@@ -21,7 +22,6 @@ import { MusicAvailableSlugGeneratorService } from "../../builder/available-slug
 import { ExpressionNode } from "./queries/query-object";
 import { MusicEvents } from "./events";
 import { MusicOdm } from "./odm";
-import { AggregationResult } from "./odm/criteria-pipeline";
 import { expressionToMeilisearchQuery } from "./queries/queries-meili";
 import { GetManyByCriteriaMusicRepoService } from "./get-many-criteria";
 

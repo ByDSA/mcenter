@@ -80,7 +80,7 @@ export function getCriteriaPipeline(
   const filter = buildMongooseFilter(criteria);
   const fileInfoFilter = buildFileInfoFilter(criteria);
   const sort = buildMongooseSort(criteria);
-  const needsFileInfoLookup = fileInfoFilter || criteria.expand?.includes("file-infos");
+  const needsFileInfoLookup = fileInfoFilter || criteria.expand?.includes("fileInfos");
   const pipeline: PipelineStage[] = [
     {
       $match: filter,
@@ -149,7 +149,7 @@ export function getCriteriaPipeline(
     }
 
     // Si necesitas expandir tanto series como fileInfos de las series
-    if (criteria.expand.includes("series") && criteria.expand.includes("file-infos")) {
+    if (criteria.expand.includes("series") && criteria.expand.includes("fileInfos")) {
       // Lookup para obtener fileInfos de la serie
       pipeline.push( {
         $lookup: {

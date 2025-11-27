@@ -15,7 +15,7 @@ const criteriaConfig = createCriteriaConfig( {
     seriesKeys: z.array(z.string()).optional(),
   },
   sortKeys: ["episodeCompKey", "createdAt", "updatedAt"],
-  expandKeys: ["series", "file-infos", "user-info"],
+  expandKeys: ["series", "fileInfos", "userInfo"],
 } );
 
 export namespace EpisodesCrudDtos {

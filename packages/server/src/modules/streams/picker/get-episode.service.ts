@@ -41,7 +41,7 @@ export class StreamGetRandomEpisodeService {
       stream,
       n,
       {
-        expand: ["series", "file-infos"],
+        expand: ["series", "fileInfos"],
       },
     );
 
@@ -103,7 +103,7 @@ export class StreamGetRandomEpisodeService {
           e.serie = gotSerie;
         }
 
-        if (criteria.expand.includes("file-infos")) {
+        if (criteria.expand.includes("fileInfos")) {
           const gotFileInfos = await this.fileInfosRepo.getAllByEpisodeId(e.id);
 
           assertIsNotEmpty(gotFileInfos);
