@@ -1,11 +1,11 @@
-import { isDefined } from "$shared/utils/validation";
 import { MusicEntityWithUserInfo } from "$shared/models/musics";
 import { MusicHistoryEntryEntity } from "#modules/musics/history/models";
-import { createDurationElement, createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
+import { createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { FavButton, UpdateFavButtons } from "#modules/musics/playlists/FavButton";
 import { useUser } from "#modules/core/auth/useUser";
+import { classes } from "#modules/utils/styles";
 import headerStyles from "../../../history/entry/Header/styles.module.css";
 import styles from "../../../history/entry/Header/styles.module.css";
 
@@ -21,22 +21,21 @@ export function Header( { entry, contextMenu, updateFavButtons }: HeaderProps) {
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
   const { resource } = entry;
   const { title } = resource;
-  const duration = resource.fileInfos?.[0].mediaInfo.duration;
   const subtitle = resource.game ?? resource.artist;
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return HistoryEntryHeader( {
     left: <>
-      <span className={headerStyles.rows}>
-        {createHistoryTimeElement(timeStampDate)}
+      <span className={classes(headerStyles.rows, headerStyles.small)}>
+
       </span>
     </>,
     title,
     subtitle,
     right: <>
       <span className={headerStyles.columns}>
-        <span className={headerStyles.rows}>
-          {isDefined(duration) && createDurationElement(duration)}
+        <span className={classes(headerStyles.rows, headerStyles.small)}>
+          {createHistoryTimeElement(timeStampDate)}
           {createWeightElement(resource.userInfo.weight) }
         </span>
         <span className={styles.rows}>

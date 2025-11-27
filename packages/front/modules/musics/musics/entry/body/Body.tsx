@@ -18,9 +18,10 @@ import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { bytesToStr } from "#modules/utils/sizes";
 import { MUSIC_FILE_INFO_PROPS } from "../utils";
 import commonStyle from "../../../../history/entry/body-common.module.css";
+import commonStyles from "../../../../history/entry/body-common.module.css";
 import { useMusicCrudWithElements, UseMusicCrudWithElementsProps } from "./useMusicCrudWithElements";
-import styles from "./styles.module.css";
 import { OptionalPropsButton } from "./elements";
+import styles from "./styles.module.css";
 
 export type BodyProps = UseMusicCrudWithElementsProps<MusicEntityWithUserInfo> & {
   shouldFetchFileInfo?: boolean;
@@ -49,21 +50,13 @@ export function Body( { data, setData, shouldFetchFileInfo }: BodyProps) {
   return <>
     {createActionsBarElement()}
     <div className={classes(styles.container)}>
-      <span className={classes("line", styles.lineWrap)}>
-        <span className={"height2"}>
-          {titleElement}
-        </span>
-        <span className={"height2"}>
-          {artistElement}
-        </span>
+      <span className={classes("line", "height2", commonStyles.lineWrap)}>
+        {titleElement}
+        {artistElement}
       </span>
-      <span className={classes("line", styles.lineWrap)}>
-        <span className={"height2"}>
-          {weightElement}
-        </span>
-        <span className={"height2"}>
-          {albumElement}
-        </span>
+      <span className={classes("line", "height2", commonStyles.lineWrap)}>
+        {weightElement}
+        {albumElement}
       </span>
       <span className={classes("line", "height2")}>
         {tagsElement}

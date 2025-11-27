@@ -4,6 +4,7 @@ import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { FavButton, UpdateFavButtons } from "#modules/musics/playlists/FavButton";
 import { useUser } from "#modules/core/auth/useUser";
+import { classes } from "#modules/utils/styles";
 import styles from "../../../history/entry/Header/styles.module.css";
 
 type HeaderProps = {
@@ -21,7 +22,7 @@ export function Header( { entry: music, contextMenu, updateFavButtons }: HeaderP
     left: undefined,
     right: <>
       <span className={styles.columns}>
-        <span className={styles.rows}>
+        <span className={classes(styles.rows, styles.small)}>
           {duration && createDurationElement(duration)}
           {createWeightElement(music.userInfo.weight)}
         </span>

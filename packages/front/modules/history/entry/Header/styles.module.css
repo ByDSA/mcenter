@@ -5,8 +5,43 @@
   aside {
     font-size: 1rem;
 
-    span > svg {
-      transform: scale(0.7);
+    .small {
+      &:has(> :nth-child(3):last-child) {
+        font-size: 1rem;
+        line-height: 1.2em;
+        svg {
+          height: 1rem;
+        }
+      }
+
+      &:has(> :nth-child(2):last-child) {
+        line-height: 1.7em;
+        font-size: 1rem;
+        svg {
+          height: 1rem;
+        }
+      }
+      @media (width < 800px) {
+        &:has(> :nth-child(2):last-child) {
+          line-height: 1.5em;
+        }
+        &:has(> :nth-child(3):last-child) {
+          font-size: 0.8rem;
+          line-height: 1.1em;
+          svg {
+            height: 0.8rem;
+          }
+        }
+      }
+      @media (width < 700px) {
+        &:has(> :nth-child(2):last-child) {
+          line-height: 1.6em;
+          font-size: 0.8rem;
+          svg {
+            height: 0.8rem;
+          }
+        }
+      }
     }
 
     * {

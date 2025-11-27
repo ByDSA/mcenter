@@ -2,6 +2,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { createDurationElement, createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
+import { classes } from "#modules/utils/styles";
 import { EpisodeHistoryApi } from "../requests";
 import headerStyles from "../../../../history/entry/Header/styles.module.css";
 
@@ -28,14 +29,14 @@ export function Header( { entry, contextMenu }: HeaderProps) {
   return <HistoryEntryHeader
     left={<>
       <span className={headerStyles.rows}>
-        {createHistoryTimeElement(timeStampDate)}
       </span>
     </>}
     title={title}
     subtitle={subtitle}
     right={<>
       <span className={headerStyles.columns}>
-        <span className={headerStyles.rows}>
+        <span className={classes(headerStyles.rows, headerStyles.small)}>
+          {createHistoryTimeElement(timeStampDate)}
           {duration && createDurationElement(duration)}
           {createWeightElement(resource.userInfo.weight)}
         </span>

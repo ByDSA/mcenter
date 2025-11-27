@@ -41,11 +41,8 @@ export function Body( { data, setData }: Props) {
     {createActionsBarElement()}
     <div className={classes(styles.container)}>
       <span className={classes("line", "height2", commonStyles.lineWrap)}>
-
         {musicElements.titleElement}
-
         {musicElements.artistElement}
-
       </span>
       <span className={classes("line", "height2", commonStyles.lineWrap)}>
         {musicElements.weightElement}

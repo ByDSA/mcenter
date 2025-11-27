@@ -1,6 +1,4 @@
-import { MusicNote, CalendarToday } from "@mui/icons-material";
-import { classes } from "#modules/utils/styles";
-import { formatDateDDMMYYY } from "#modules/utils/dates";
+import { MusicNote } from "@mui/icons-material";
 import { PlaylistEntity } from "../Playlist";
 import { formatDurationHeader } from "../utils";
 import { SettingsButton } from "../SettingsButton";
@@ -39,7 +37,7 @@ export const MusicPlaylistListItem = ( { value, contextMenu }: PlaylistProps) =>
       </div>
 
       <div className={styles.playlistInfo}>
-        <h1 className={styles.playlistTitle} title={value.name}>{value.name}</h1>
+        <h1 className={styles.playlistTitle} title={value.name}><span>{value.name}</span></h1>
 
         <div className={styles.playlistStats}>
           <div className={styles.statItem}>
@@ -48,11 +46,6 @@ export const MusicPlaylistListItem = ( { value, contextMenu }: PlaylistProps) =>
           <span className={styles.separator}>•</span>
           <div className={styles.statItem}>
             <span>{formatDurationHeader(totalDuration)}</span>
-          </div>
-          <span className={styles.separator}>•</span>
-          <div className={classes(styles.statItem, styles.createdAt)} title="Fecha de creación">
-            <CalendarToday />
-            <span>{formatDateDDMMYYY(value.createdAt)}</span>
           </div>
         </div>
       </div>
