@@ -3,11 +3,9 @@ import { Types } from "mongoose";
 import { UserEntity, User } from "$shared/models/auth";
 import { OnEvent } from "@nestjs/event-emitter";
 import { assertFoundClient } from "#utils/validation/found";
-import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { MusicPlaylistsRepository } from "#musics/playlists/crud/repository";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { UserEvents } from "#core/auth/users/crud/repository/events";
-import { UsersRepository } from "#core/auth/users/crud/repository";
 import { MusicPlayListEvents } from "../playlists/crud/repository/events";
 
 type Entity = UserEntity;
@@ -20,9 +18,7 @@ export type CriteriaOne = {
 @Injectable()
 export class UsersMusicPlaylistsRepository {
   constructor(
-    private readonly domainEventEmitter: DomainEventEmitter,
     private readonly playlistRepo: MusicPlaylistsRepository,
-    private readonly usersRepo: UsersRepository,
   ) { }
 
   @OnEvent(UserEvents.Created.TYPE)

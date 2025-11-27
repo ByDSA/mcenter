@@ -1,6 +1,5 @@
-import { Module, forwardRef } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
-import { UsersModule } from "#core/auth/users";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicRendererModule } from "../renderer/module";
@@ -14,7 +13,6 @@ import { MusicPlaylistAvailableSlugGeneratorService } from "./crud/repository/av
     MusicHistoryModule,
     ResourceResponseFormatterModule,
     MusicRendererModule,
-    forwardRef(()=>UsersModule),
   ],
   controllers: [
     MusicPlaylistsController,

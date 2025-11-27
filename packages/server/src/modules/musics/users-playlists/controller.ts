@@ -4,10 +4,9 @@ import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
 import { UserPatchOne } from "#utils/nestjs/rest";
 import { UsersMusicPlaylistsRepository } from "#musics/users-playlists/repository";
-import { Authenticated } from "../Authenticated.guard";
-import { userEntitySchema, UserPayload } from "../models";
-import { User } from "../User.decorator";
-import { UsersRepository } from "./repository";
+import { Authenticated } from "../../../core/auth/users/Authenticated.guard";
+import { userEntitySchema, UserPayload } from "../../../core/auth/users/models";
+import { User } from "../../../core/auth/users/User.decorator";
 
 class MusicPlaylistFavoriteDto extends createZodDto(z.object( {
   playlistId: mongoDbId.nullable(),
@@ -15,9 +14,8 @@ class MusicPlaylistFavoriteDto extends createZodDto(z.object( {
 
 @Authenticated()
 @Controller()
-export class UsersController {
+export class UsersMusicController {
   constructor(
-    private readonly repo: UsersRepository,
     private readonly usersMusicPlaylistsRepo: UsersMusicPlaylistsRepository,
   ) { }
 

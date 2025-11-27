@@ -1,6 +1,5 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { RouterModule, Routes } from "@nestjs/core";
-import { LoggingModule } from "../logging/module";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesAdminModule } from "#episodes/admin/module";
@@ -24,6 +23,8 @@ import { YoutubeImportMusicModule } from "#modules/youtube/import-music/module";
 import { UsersModule } from "#core/auth/users";
 import { AuthModule } from "#core/auth/module";
 import { AuthGoogleModule } from "#core/auth/strategies/google";
+import { UsersMusicPlaylistsModule } from "#musics/users-playlists/module";
+import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
 // y por los que se importan en AppModule
@@ -37,6 +38,7 @@ const imports = [
   MusicHistoryModule,
   MusicFileInfoModule,
   MusicPlaylistsModule,
+  UsersMusicPlaylistsModule,
 
   EpisodesSlugModule,
   EpisodesAdminModule,
@@ -79,6 +81,10 @@ const routes: Routes = [
     module: LoggingModule,
   },
   ...authRoutes,
+  {
+    path: "api/users",
+    module: UsersMusicPlaylistsModule,
+  },
   {
     path: PATH_ROUTES.episodes.path,
     module: EpisodesCrudModule,
