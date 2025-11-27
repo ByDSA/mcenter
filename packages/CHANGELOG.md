@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.14.0](https://github.com/ByDSA/mcenter/compare/v4.13.0...v4.14.0) (2025-11-27)
+
+
+### Features
+
+* add/remove favorite playlist ([0b02b64](https://github.com/ByDSA/mcenter/commit/0b02b64fc857dbdfbbff6a4bd1155492599ecf3e))
+* fav button in music search/history ([8453c00](https://github.com/ByDSA/mcenter/commit/8453c00deb01ea81bbcece94144c6025eb1454ae))
+* **front:** add-to-playlist function in history music and playlist item ([a468cc9](https://github.com/ByDSA/mcenter/commit/a468cc94e51667d56899391e546c2ff64a983206))
+
+
+### Bug Fixes
+
+* **front:** corregir nombre de propiedad en la expansión de recursos ([24812c6](https://github.com/ByDSA/mcenter/commit/24812c6e6bcba92dd029fde401cfe691ecffd43e))
+* **front:** some style fixes ([c67aad6](https://github.com/ByDSA/mcenter/commit/c67aad6a8cfe218c07326d4e448d10c67da6b602))
+* some fixes ([fe6bab6](https://github.com/ByDSA/mcenter/commit/fe6bab624c79029f9402ca18aae1955e4683fadd))
+
 ## [4.13.0](https://github.com/ByDSA/mcenter/compare/v4.12.2...v4.13.0) (2025-11-21)
 
 
