@@ -25,8 +25,10 @@ import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
+import { useUser } from "#modules/core/auth/useUser";
 import { MusicEntityWithFileInfos } from "../models";
 import { createContextMenuItem, useListContextMenu } from "../../ui-kit/ContextMenu/ContextMenu";
+import { createAddToPlaylistContextMenuItem } from "../musics/MusicList";
 import { MusicPlaylistItem } from "./PlaylistItem";
 import { MusicPlaylistEntity } from "./models";
 import { formatDurationHeader, playlistCopyBackendUrl } from "./utils";
@@ -37,6 +39,7 @@ import { MusicPlaylistsApi } from "./requests";
 import { RenamePlaylistContextMenuItem } from "./list/renameItem";
 import { useRenamePlaylistModal } from "./list/useRenamePlaylistModal";
 import { useDeletePlaylistContextMenuItem } from "./list/deleteItem";
+import { usePlaylistSelectorModal } from "./list-selector/modal";
 
 export type PlaylistItemEntity = MusicPlaylistEntity["list"][0]
 & {
@@ -199,10 +202,20 @@ newIndex: number;}[]>([]);
         {generateDeletePlayListContextMenuItem(value)}
       </>,
     } );
+  const playlistModal = usePlaylistSelectorModal();
+  const { user } = useUser();
   const { openMenu: playlistItemOpenMenu,
     renderContextMenu: renderPlaylistItemContextMenu,
     activeIndex: playListItemActiveIndex, closeMenu: playlistItemCloseMenu } = useListContextMenu( {
     renderChildren: (item: PlaylistItemEntity)=><>
+      {
+        createAddToPlaylistContextMenuItem( {
+          musicId: item.musicId,
+          user,
+          closeMenu: playlistItemCloseMenu,
+          modal: playlistModal,
+        } )
+      }
       {createContextMenuItem( {
         label: "Copiar backend URL",
         closeMenu: playlistItemCloseMenu,

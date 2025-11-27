@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
 import { WithRequired } from "@tanstack/react-query";
 import { PATH_ROUTES } from "$shared/routing";
+import { UserPayload } from "$shared/models/auth";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -35,7 +36,6 @@ export function MusicList(props: Props) {
     setItem,
     observerTarget,
     totalCount } = useMusicList(props);
-  const { openModal } = usePlaylistSelectorModal();
   const resultNumbers = (
     <span style={{
       display: "flex",
@@ -47,40 +47,17 @@ export function MusicList(props: Props) {
       Resultados: {data?.length} de {totalCount}
     </span>
   );
-  const handleAddToPlaylist = (item: MusicEntity) => {
-    if (!user)
-      return;
-
-    openModal( {
-      className: styles.playlistSelectorModal,
-      title: "Añadir a playlist",
-      onSelect: async (playlist) => {
-        if (!playlist)
-          return;
-
-        try {
-          const api = FetchApi.get(MusicPlaylistsApi);
-
-          await api.addOneTrack(playlist.id, item.id);
-          logger.info(`Canción añadida a "${playlist.name}"`);
-        } catch (err) {
-          showError(err);
-        }
-      },
-    } )
-      .catch(showError);
-  };
+  const playlistModal = usePlaylistSelectorModal();
   const { openMenu, renderContextMenu, closeMenu, activeIndex } = useListContextMenu( {
     renderChildren: (item: MusicEntity) => (
       <>
-        {user && createContextMenuItem( {
-          label: "Añadir a playlist",
-          onClick: (e) => {
-            e.stopPropagation();
-            closeMenu();
-            handleAddToPlaylist(item);
-          },
-        } )
+        {
+          createAddToPlaylistContextMenuItem( {
+            musicId: item.id,
+            user,
+            modal: playlistModal,
+            closeMenu,
+          } )
         }
         {
           createContextMenuItem( {
@@ -225,4 +202,53 @@ function getFilterFromProps(
 
 export async function sleep(ms: number) {
   return await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+type CreateAddToPlaylistContextMenuItemProps =
+  Pick<Parameters<typeof createContextMenuItem>[0], "closeMenu"> & {
+  user: UserPayload | null;
+  musicId: MusicEntity["id"];
+  modal: ReturnType<typeof usePlaylistSelectorModal>;
+};
+export function createAddToPlaylistContextMenuItem(
+  props: CreateAddToPlaylistContextMenuItemProps,
+) {
+  const { user } = props;
+  const { openModal } = props.modal;
+
+  if (!user)
+    return null;
+
+  const handleAddToPlaylist = (musicId: MusicEntity["id"]) => {
+    if (!user)
+      return;
+
+    openModal( {
+      className: styles.playlistSelectorModal,
+      title: "Añadir a playlist",
+      onSelect: async (playlist) => {
+        if (!playlist)
+          return;
+
+        try {
+          const api = FetchApi.get(MusicPlaylistsApi);
+
+          await api.addOneTrack(playlist.id, musicId);
+          logger.info(`Canción añadida a "${playlist.name}"`);
+        } catch (err) {
+          showError(err);
+        }
+      },
+    } )
+      .catch(showError);
+  };
+
+  return (createContextMenuItem( {
+    label: "Añadir a playlist",
+    onClick: () => {
+      handleAddToPlaylist(props.musicId);
+    },
+    closeMenu: props.closeMenu,
+  } )
+  );
 }

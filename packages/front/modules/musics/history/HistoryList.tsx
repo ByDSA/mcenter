@@ -10,7 +10,10 @@ import { INITIAL_FETCHING_LENGTH, FETCHING_MORE_LENGTH } from "#modules/history/
 import { logger } from "#modules/core/logger";
 import { backendUrl } from "#modules/requests";
 import { createContextMenuItem, useListContextMenu } from "#modules/ui-kit/ContextMenu";
+import { useUser } from "#modules/core/auth/useUser";
 import styles from "../musics/styles.module.css";
+import { createAddToPlaylistContextMenuItem } from "../musics/MusicList";
+import { usePlaylistSelectorModal } from "../playlists/list-selector/modal";
 import { MusicHistoryApi } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 
@@ -26,10 +29,20 @@ export function HistoryList(props?: Props) {
   const showDate = props?.showDate ?? "groupByDay";
   const { data, isLoading, error,
     setItem, observerTarget, setData } = useHistoryList();
+  const playlistModal = usePlaylistSelectorModal();
+  const { user } = useUser();
   const { openMenu,
     renderContextMenu,
     activeIndex, closeMenu } = useListContextMenu( {
     renderChildren: (item: MusicHistoryEntryEntity)=><>
+      {
+        createAddToPlaylistContextMenuItem( {
+          musicId: item.resourceId,
+          user,
+          modal: playlistModal,
+          closeMenu,
+        } )
+      }
       {
         createContextMenuItem( {
           label: "Copiar backend URL",
