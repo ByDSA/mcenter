@@ -80,7 +80,7 @@ export default function RemotePlayer( { params }: PageProps) {
               path,
             },
             expand: [
-              "series", "file-infos",
+              "series", "fileInfos",
             ],
           };
 
