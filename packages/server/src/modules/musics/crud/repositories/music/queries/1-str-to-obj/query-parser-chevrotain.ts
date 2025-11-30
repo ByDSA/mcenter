@@ -1,5 +1,5 @@
 import { CstParser } from "chevrotain";
-import { addedIdentifier, additionOperator, colon, comma, greaterEqual, greaterThan, isoDateLiteral, lBracket, lessEqual, lessThan, lParen, multiplicationOperator, numberLiteral, playedIdentifier, playlistIdentifier, privatePlaylistLiteral, publicPlaylistLiteral, rBracket, relativeDateLiteral, rParen, stringLiteral, tagIdentifier, tokens, weightIdentifier, yearIdentifier } from "./query-lexer";
+import { addedIdentifier, additionOperator, colon, comma, greaterEqual, greaterThan, hashPrefix, isoDateLiteral, lBracket, lessEqual, lessThan, lParen, multiplicationOperator, not, numberLiteral, playedIdentifier, playlistIdentifier, publicPlaylistLiteral, rBracket, relativeDateLiteral, rParen, slugLiteral, tagIdentifier, tokens, weightIdentifier, yearIdentifier } from "./query-lexer";
 
 export class QueryParser extends CstParser {
   constructor() {
@@ -8,9 +8,17 @@ export class QueryParser extends CstParser {
   }
 
   public expression = this.RULE("expression", () => {
-    this.SUBRULE(this.additionExpression);
+    this.OR([
+      {
+        ALT: () => this.SUBRULE(this.notOperation),
+      },
+      {
+        ALT: () => this.SUBRULE(this.additionExpression),
+      },
+    ]);
   } );
 
+  // Operadores +/-
   private additionExpression = this.RULE("additionExpression", () => {
     this.SUBRULE(this.multiplicationExpression);
     this.MANY(() => {
@@ -19,12 +27,19 @@ export class QueryParser extends CstParser {
     } );
   } );
 
+  // Operador *
   private multiplicationExpression = this.RULE("multiplicationExpression", () => {
     this.SUBRULE(this.atomicExpression);
     this.MANY(() => {
       this.CONSUME(multiplicationOperator);
       this.SUBRULE2(this.atomicExpression);
     } );
+  } );
+
+  // Operador !
+  private notOperation = this.RULE("notOperation", () => {
+    this.CONSUME(not);
+    this.SUBRULE(this.atomicExpression);
   } );
 
   private atomicExpression = this.RULE("atomicExpression", () => {
@@ -35,7 +50,7 @@ export class QueryParser extends CstParser {
         ALT: () => this.SUBRULE(this.parenthesisExpression),
       },
       {
-        ALT: () => this.SUBRULE2(this.filter),
+        ALT: () => this.SUBRULE(this.filter),
       },
     ]);
   } );
@@ -46,15 +61,6 @@ export class QueryParser extends CstParser {
     this.CONSUME(rParen);
   } );
 
-  // private andOperation = this.RULE("andOperation", () => {
-  //   this.SUBRULE1(this.filter);
-  //   this.CONSUME(Plus);
-  //   this.SUBRULE2(this.filter);
-  // } );
-  // private notOperation = this.RULE("notOperation", () => {
-  //   this.CONSUME(Not);
-  //   this.SUBRULE(this.filter);
-  // } );
   private filter = this.RULE("filter", () => {
     this.OR([
       {
@@ -73,6 +79,8 @@ export class QueryParser extends CstParser {
         ALT: () => this.SUBRULE(this.addedFilter),
       },
       {
+        // Porque los dos filtros de playlist empiezan igual:
+        GATE: this.BACKTRACK(this.publicPlaylistFilter),
         ALT: () => this.SUBRULE(this.publicPlaylistFilter),
       },
       {
@@ -128,13 +136,16 @@ export class QueryParser extends CstParser {
   private tagFilter = this.RULE("tagFilter", () => {
     this.CONSUME(tagIdentifier); // tag
     this.CONSUME(colon);
-    this.CONSUME(stringLiteral); // tag value
+    this.OPTION(() => {
+      this.CONSUME(hashPrefix);
+    } );
+    this.CONSUME(slugLiteral);
   } );
 
   private privatePlaylistFilter = this.RULE("privatePlaylistFilter", () => {
     this.CONSUME(playlistIdentifier);
     this.CONSUME(colon);
-    this.CONSUME(privatePlaylistLiteral);
+    this.CONSUME(slugLiteral);
   } );
 
   private publicPlaylistFilter = this.RULE("publicPlaylistFilter", () => {

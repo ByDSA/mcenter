@@ -1,4 +1,4 @@
-import { IntersectionNode, TagNode, UnionNode, WeightNode } from "../../query-object";
+import { IntersectionNode, PrivatePlaylistNode, TagNode, UnionNode, WeightNode } from "../../query-object";
 import { parseQuery } from "../query-parser";
 
 const OR1_EXPECTED = {
@@ -205,7 +205,7 @@ it("mix union and intersection operators with parentehsis 3", () => {
 } );
 
 it("difference operator", () => {
-  const query = "tag:rock - tag:pop";
+  const query = "tag:rock ~ tag:pop";
   const obj = parseQuery(query);
   const expected = {
     root: {
@@ -224,9 +224,95 @@ it("difference operator", () => {
   expect(obj).toEqual(expected);
 } );
 
+it("negation operator", () => {
+  const query = "!tag:rock";
+  const obj = parseQuery(query);
+  const expected = {
+    root: {
+      type: "negation",
+      child: {
+        type: "tag",
+        value: "rock",
+      } satisfies TagNode,
+    },
+  };
+
+  expect(obj).toEqual(expected);
+} );
+
+it("negation operator with parenths", () => {
+  const query = "!(tag:rock*tag:pop)";
+  const obj = parseQuery(query);
+  const expected = {
+    root: {
+      type: "negation",
+      child: {
+        type: "intersection",
+        child1: {
+          type: "tag",
+          value: "rock",
+        } satisfies TagNode,
+        child2: {
+          type: "tag",
+          value: "pop",
+        } satisfies TagNode,
+      } satisfies IntersectionNode,
+    },
+  };
+
+  expect(obj).toEqual(expected);
+} );
+
+it("multiple words tag", () => {
+  const query = "tag:multiple-words ~ tag:pop";
+  const obj = parseQuery(query);
+  const expected = {
+    root: {
+      type: "difference",
+      child1: {
+        type: "tag",
+        value: "multiple-words",
+      } satisfies TagNode,
+      child2: {
+        type: "tag",
+        value: "pop",
+      } satisfies TagNode,
+    },
+  };
+
+  expect(obj).toEqual(expected);
+} );
+
 it("test query", () => {
-  const query = "(tag:\"rock\" + tag:\"pop\") * year:[1990,2000] - weight:>0.7";
+  const query = "(tag:rock + tag:pop) * year:[1990,2000] ~ weight:>0.7";
   const obj = parseQuery(query);
 
   expect(obj).toBeDefined();
+} );
+
+it("test query 2", () => {
+  const query = "playlist:favorites~(tag:#metal*tag:#vg)";
+  const obj = parseQuery(query);
+  const expected = {
+    root: {
+      type: "difference",
+      child1: {
+        type: "privatePlaylist",
+        value: "favorites",
+      } satisfies PrivatePlaylistNode,
+      child2: {
+        type: "intersection",
+        child1: {
+          type: "tag",
+          value: "#metal",
+        },
+        child2: {
+          type: "tag",
+          value: "#vg",
+        },
+      } satisfies IntersectionNode,
+    },
+  };
+
+  expect(obj).toEqual(expected);
 } );

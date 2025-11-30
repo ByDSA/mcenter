@@ -1,6 +1,6 @@
 export type ExpressionNode = FilterNode | OperationNode;
 
-export type OperationNode = BinaryOperationNode | ComplementNode;
+export type OperationNode = BinaryOperationNode | NegationNode;
 
 export type BinaryOperationNode = AdditionNode | MultiplicationNode;
 
@@ -97,8 +97,9 @@ export type UnionNode = OperationBinaryNode & {
 export type DifferenceNode = OperationBinaryNode & {
   type: "difference";
 };
-type ComplementNode = {
-  type: "complement";
+
+export type NegationNode = {
+  type: "negation";
   child: ExpressionNode;
 };
 

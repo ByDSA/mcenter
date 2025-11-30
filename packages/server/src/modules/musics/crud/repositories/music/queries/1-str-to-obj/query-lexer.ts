@@ -14,7 +14,7 @@ export const plus = createToken( {
 
 export const minus = createToken( {
   name: "Minus",
-  pattern: /-/,
+  pattern: /~/, // El - se usa como separador
   categories: additionOperator,
 } );
 
@@ -132,9 +132,14 @@ export const stringLiteral = createToken( {
 
 const slugPattern = /(?:[a-zA-Z0-9-])+/;
 
-export const privatePlaylistLiteral = createToken( {
-  name: "PrivatePlaylistLiteral",
+export const slugLiteral = createToken( {
+  name: "SlugLiteral",
   pattern: slugPattern,
+} );
+
+export const hashPrefix = createToken( {
+  name: "HashPrefix",
+  pattern: /#/,
 } );
 
 export const publicPlaylistLiteral = createToken( {
@@ -157,14 +162,15 @@ export const whiteSpace = createToken( {
 
 // Tokens y Lexer
 export const tokens = [
-  whiteSpace,
+  whiteSpace, not,
   plus, star, minus,
   additionOperator, multiplicationOperator,
   colon, lParen, rParen, lBracket, rBracket, comma,
   greaterEqual, lessEqual, greaterThan, lessThan,
   relativeDateLiteral, isoDateLiteral,
   tagIdentifier, yearIdentifier, playedIdentifier, addedIdentifier, weightIdentifier,
-  playlistIdentifier, numberLiteral, publicPlaylistLiteral, privatePlaylistLiteral, stringLiteral,
+  playlistIdentifier, numberLiteral, slugLiteral, publicPlaylistLiteral, hashPrefix,
+  stringLiteral,
 ];
 
 export const queryLexer = new Lexer(tokens);

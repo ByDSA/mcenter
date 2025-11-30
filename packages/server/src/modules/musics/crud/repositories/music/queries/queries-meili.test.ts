@@ -10,6 +10,8 @@ describe.each([
   ["year:<1990", "year < 1990"],
   ["weight:100", "weight = 100"],
   ["weight:>=100", "weight >= 100"],
+  ["!weight:>=100", "NOT (weight >= 100)"],
+  ["weight:>=100 ~ weight:>=200", "(weight >= 100) AND NOT (weight >= 200)"],
   ["tag:rock",
     "(tags IN [\"rock\"] AND onlyTags IS NULL) OR onlyTags IN [\"rock\"]",
   ],
@@ -39,21 +41,22 @@ OR ((tags IN [\"jazz\"] AND onlyTags IS NULL) OR onlyTags IN [\"jazz\"])"],
     "((tags IN [\"rock\"] AND onlyTags IS NULL) OR onlyTags IN [\"rock\"]) \
 AND (weight > 50)",
   ],
+  ["playlist:favorites~(tag:#metal*tag:#vg)", "AA"],
 ] as [string, string | null][])(
   "tests",
   (query: string, expected: string | null) => {
-    it(`query=${query}`, () => {
-      const f = (q: string) => {
+    it(`query=${query}`, async () => {
+      const f = async (q: string) => {
         const expr = parseQuery(q);
-        const obj = expressionToMeilisearchQuery(expr.root, null);
+        const obj = await expressionToMeilisearchQuery(expr.root, null);
 
         return obj;
       };
 
       if (expected === null)
-        expect(() => f(query)).toThrow();
+        expect(async () => await f(query)).toThrow();
       else {
-        const actual = f(query);
+        const actual = await f(query);
 
         expect(actual).toEqual(expected);
       }

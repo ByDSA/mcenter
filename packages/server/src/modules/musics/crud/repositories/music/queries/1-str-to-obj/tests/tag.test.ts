@@ -9,25 +9,17 @@ const createTag = (tag: string) => ( {
   } satisfies TagNode,
 } );
 const TAG_ROCK_OBJ = createTag("rock");
+const invalidCharacters = "áéíóúàèìòùäëïöüÑÇñçÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ?!¿¡\"'()";
 
 describe.each([
-  ["tag:\"rock\"", TAG_ROCK_OBJ],
   ["tag:rock", TAG_ROCK_OBJ],
-  ["tag:", null],
-  ["tag:\"rock", null],
-  ["tag:rock\"", null],
-  ["tag:aáéíóúàèìòù", createTag("aáéíóúàèìòù")],
-  ["tag:aäëïöü", createTag("aäëïöü")],
-  ["tag:ÑÇñç", createTag("ÑÇñç")],
-  ["tag:ÁÉÍÓÚÀÈÌÒÙ", createTag("ÁÉÍÓÚÀÈÌÒÙ")],
-  ["tag:ÄËÏÖÜ", createTag("ÄËÏÖÜ")],
-  ["tag:?gim", createTag("?gim")],
-  ["tag:!¿¡", createTag("!¿¡")],
-  ["tag:\"?gim\"", createTag("?gim")],
   ["tag:#metal", createTag("#metal")],
-  ["tag:\"#metal\"", createTag("#metal")],
+  ["tag:", null],
+  ["tag:rock\"", null],
+  ["tag:?gim", null],
+  ...[...invalidCharacters].map(c=>(["tag:" + c, null] as [string, null])),
 ])("parseQuery with different inputs", (query, expected) => {
-  it(`should parse query: ${query}`, () => {
+  it(`should ${!expected ? "NOT " : ""}parse query: ${query}`, () => {
     if (expected === null)
       expect(() => parseQuery(query)).toThrow();
     else {

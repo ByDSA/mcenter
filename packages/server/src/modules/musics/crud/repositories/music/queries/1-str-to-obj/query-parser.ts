@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { CstElement, CstNode, IToken } from "@chevrotain/types";
-import { AddedNode, BinaryOperationNode, DifferenceNode, FilterNode, IntersectionNode, NumberLiteral, PlayedNode, PrivatePlaylistNode, PublicPlaylistNode, QueryObject, RangeDate, RangeNumber, UnionNode, WeightNode, YearNode } from "../query-object";
+import { AddedNode, BinaryOperationNode, DifferenceNode, FilterNode, IntersectionNode, NegationNode, NumberLiteral, PlayedNode, PrivatePlaylistNode, PublicPlaylistNode, QueryObject, RangeDate, RangeNumber, UnionNode, WeightNode, YearNode } from "../query-object";
 import { queryLexer } from "./query-lexer";
 import { QueryParser } from "./query-parser-chevrotain";
 
@@ -44,8 +44,9 @@ const expressionToObj = (node: CstNode): any => {
 
   switch (n.name) {
     case "additionExpression": return additionExpressionToObj(n);
+    case "notOperation": return notOperationToObj(n);
     default:
-      throw new Error("D");
+      throw new Error("Unknown name: " + n.name);
   }
 };
 
@@ -69,11 +70,23 @@ function additionExpressionToObj(
   throw new Error("Error");
 }
 
+function notOperationToObj(
+  node: CstNode,
+): NegationNode {
+  const atomicExpression = node.children.atomicExpression[0] as CstNode;
+  const atomicExpressionObj = atomicExpressionToObj(atomicExpression);
+
+  return {
+    type: "negation",
+    child: atomicExpressionObj,
+  };
+}
+
 function getOperatorType(op: IToken): BinaryOperationNode["type"] {
   const operator = op.image;
 
   switch (operator) {
-    case "-": return "difference";
+    case "~": return "difference";
     case "|":
     case "+": return "union";
     case "*": return "intersection";
@@ -156,15 +169,23 @@ const filterToObj = (node: CstNode): FilterNode => {
       case "addedFilter":
         return addedFilterToObj(filter);
       case "tagFilter": {
+        const slugLiteral = stringLiteralToString(filter.children.SlugLiteral);
+        let value: string;
+
+        if (filter.children.HashPrefix)
+          value = `#${slugLiteral}`;
+        else
+          value = slugLiteral;
+
         return {
           type: "tag",
-          value: stringLiteralToString(filter.children.StringLiteral),
+          value,
         };
       }
       case "privatePlaylistFilter": {
         return {
           type: "privatePlaylist",
-          value: slugLiteralToString(filter.children.PrivatePlaylistLiteral),
+          value: slugLiteralToString(filter.children.SlugLiteral),
         } as PrivatePlaylistNode;
       }
       case "publicPlaylistFilter": {

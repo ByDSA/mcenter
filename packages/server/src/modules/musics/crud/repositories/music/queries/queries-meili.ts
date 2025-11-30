@@ -84,21 +84,31 @@ export async function expressionToMeilisearchQuery(
     }
     case "union": {
       const { child1, child2 } = expression;
-      const qChild1 = expressionToMeilisearchQuery(child1, userId);
-      const qChild2 = expressionToMeilisearchQuery(child2, userId);
+      const qChild1 = await expressionToMeilisearchQuery(child1, userId);
+      const qChild2 = await expressionToMeilisearchQuery(child2, userId);
 
       return `(${qChild1}) OR (${qChild2})`;
     }
     case "intersection": {
       const { child1, child2 } = expression;
-      const qChild1 = expressionToMeilisearchQuery(child1, userId);
-      const qChild2 = expressionToMeilisearchQuery(child2, userId);
+      const qChild1 = await expressionToMeilisearchQuery(child1, userId);
+      const qChild2 = await expressionToMeilisearchQuery(child2, userId);
 
       return `(${qChild1}) AND (${qChild2})`;
     }
-    case "complement":
-    case "difference":
-      throw new Error("Not implemented for Meilisearch: " + expression.type);
+    case "difference": {
+      const { child1, child2 } = expression;
+      const qChild1 = await expressionToMeilisearchQuery(child1, userId);
+      const qChild2 = await expressionToMeilisearchQuery(child2, userId);
+
+      return `(${qChild1}) AND NOT (${qChild2})`;
+    }
+    case "negation": {
+      const { child } = expression;
+      const qChild = await expressionToMeilisearchQuery(child, userId);
+
+      return `NOT (${qChild})`;
+    }
     default: {
       neverCase(type);
     }
