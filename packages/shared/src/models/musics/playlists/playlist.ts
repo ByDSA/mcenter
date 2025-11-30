@@ -22,6 +22,7 @@ const modelSchema = z.object( {
   list: z.array(entrySchema),
   slug: z.string(),
   userId: mongoDbId,
+  visibility: z.enum(["public", "private"]),
 } ).merge(autoTimestampsSchema);
 
 type Model = z.infer<typeof modelSchema>;

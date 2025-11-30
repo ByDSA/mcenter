@@ -112,7 +112,7 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
     const ret = MusicOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(MusicEvents.Patched.TYPE, {
-      entity: validEntity,
+      partialEntity: validEntity,
       id,
       unset: params.unset,
     } );
@@ -188,7 +188,7 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
     params: ExpressionNode,
     criteria?: Pick<CriteriaMany, "expand">,
   ): Promise<MusicEntity[]> {
-    const query = expressionToMeilisearchQuery(params);
+    const query = await expressionToMeilisearchQuery(params, userId);
     const meiliRet = await this.musicsSearchService.filter(userId, query, {
       limit: 0,
     } );

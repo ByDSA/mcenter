@@ -20,8 +20,9 @@ import { MusicPlaylistCrudDtos } from "../../models/dto";
 import { MusicPlaylist, MusicPlaylistEntity } from "../../models";
 import { MusicPlaylistAvailableSlugGeneratorService } from "./available-slug-generator.service";
 import { MusicPlaylistOdm } from "./odm";
-import { MusicPlayListEvents } from "./events";
+import { MusicPlayListEvents } from "./events/playlist";
 import { AggregationResult } from "./odm/criteria-pipeline";
+import { MusicPlayListTrackEvents } from "./events/track";
 
 type Model = MusicPlaylist;
 type Entity = MusicPlaylistEntity;
@@ -119,10 +120,28 @@ playlistId: string;},
 
     list.splice(newIndex, 0, movedItem);
 
-    return await this.patchOneByIdAndGet(id, {
-      entity: {
-        list: list.map(MusicPlaylistOdm.entryDocToModel),
-      },
+    const patchedDoc = await MusicPlaylistOdm.Model.findByIdAndUpdate(id, {
+      list,
+    } );
+
+    assertFoundClient(patchedDoc);
+    const ret = MusicPlaylistOdm.toEntity(patchedDoc);
+
+    this.domainEventEmitter.emit(MusicPlayListTrackEvents.Moved.TYPE, {
+      playlist: ret,
+      trackListOldPosition: oldIndex,
+      trackListNewPosition: newIndex,
+    } as MusicPlayListTrackEvents.Moved.Event);
+
+    this.emitPatch(ret);
+
+    return ret;
+  }
+
+  private emitPatch(playlist: MusicPlaylistEntity) {
+    this.domainEventEmitter.emitPatch(MusicPlayListEvents.Patched.TYPE, {
+      partialEntity: playlist,
+      id: playlist.id,
     } );
   }
 
@@ -155,16 +174,26 @@ playlistId: string;},
 
     assertFoundClient(updated);
 
-    return MusicPlaylistOdm.toEntity(updated);
+    const ret = MusicPlaylistOdm.toEntity(updated);
+
+    this.domainEventEmitter.emit(MusicPlayListTrackEvents.Added.TYPE, {
+      playlist: ret,
+      trackListPosition: ret.list.length - 1,
+    } as MusicPlayListTrackEvents.Added.Event);
+
+    this.emitPatch(ret);
+
+    return ret;
   }
 
   async addManyTracks( { id, musics, unique }: AddManyTracksProps): Promise<MusicPlaylistEntity> {
     const musicPlaylistId = new Types.ObjectId(id);
+    let existingPlaylist: MusicPlaylistOdm.FullDoc | null = null;
     let tracksToPush: Array<{ musicId: Types.ObjectId;
 addedAt: Date; }>;
 
     if (unique) {
-      const existingPlaylist = await MusicPlaylistOdm.Model.findOne(
+      existingPlaylist = await MusicPlaylistOdm.Model.findOne(
         {
           _id: musicPlaylistId,
         },
@@ -209,14 +238,27 @@ addedAt: Date; }>;
 
     assertFoundClient(updated);
 
-    return MusicPlaylistOdm.toEntity(updated);
+    const ret = MusicPlaylistOdm.toEntity(updated);
+    const startIndex = existingPlaylist?.list.length ?? 0;
+
+    for (let i = startIndex; i < updated.list.length; i++) {
+      this.domainEventEmitter.emit(MusicPlayListTrackEvents.Added.TYPE, {
+        playlist: ret,
+        trackListPosition: i,
+      } as MusicPlayListTrackEvents.Added.Event);
+    }
+
+    this.emitPatch(ret);
+
+    return ret;
   }
 
   async removeManyTracks(
     { id, tracks }: RemoveManyTracksProps,
   ): Promise<MusicPlaylistEntity> {
-    const trackObjectIds = tracks.map(t=>new Types.ObjectId(t));
-    const updated = await MusicPlaylistOdm.Model.findOneAndUpdate(
+    const trackObjectIds = tracks.map(t => new Types.ObjectId(t));
+    const tracksToRemoveSet = new Set(tracks.map(t => t.toString()));
+    const originalDoc = await MusicPlaylistOdm.Model.findOneAndUpdate(
       {
         _id: id,
       },
@@ -230,18 +272,51 @@ addedAt: Date; }>;
         },
       },
       {
-        new: true,
+        new: false,
       },
     );
 
-    assertFoundClient(updated);
+    assertFoundClient(originalDoc);
 
-    return MusicPlaylistOdm.toEntity(updated);
+    // Procesamiento en Memoria
+    // (Mucho más rápido que una segunda query, porque podría ser una lista de >1000 canciones)
+    const oldEntity = MusicPlaylistOdm.toEntity(originalDoc);
+    const keptTracks: MusicPlaylistOdm.FullDoc["list"] = [];
+    const eventsToEmit: Array<{ trackListPosition: number }> = [];
+
+    if (originalDoc.list && originalDoc.list.length > 0) {
+      originalDoc.list.forEach((track, index) => {
+        if (tracksToRemoveSet.has(track._id.toString())) {
+          eventsToEmit.push( {
+            trackListPosition: index,
+          } );
+        } else
+          keptTracks.push(track);
+      } );
+    }
+
+    originalDoc.list = keptTracks;
+    const newEntity = MusicPlaylistOdm.toEntity(originalDoc);
+
+    for (const eventData of eventsToEmit) {
+      this.domainEventEmitter.emit(MusicPlayListTrackEvents.Deleted.TYPE, {
+        newPlaylist: newEntity,
+        oldPlaylist: oldEntity,
+        trackListPosition: eventData.trackListPosition,
+      } as MusicPlayListTrackEvents.Deleted.Event);
+    }
+
+    this.emitPatch(newEntity);
+
+    return newEntity;
   }
 
-  async removeManyMusics( { id, musicIds }: RemoveManyMusicsProps): Promise<MusicPlaylistEntity> {
-    const musicsObjectIds = musicIds.map(t=>new Types.ObjectId(t));
-    const updated = await MusicPlaylistOdm.Model.findOneAndUpdate(
+  async removeManyMusics(
+    { id, musicIds }: RemoveManyMusicsProps,
+  ): Promise<MusicPlaylistEntity> {
+    const musicObjectIds = musicIds.map(m => new Types.ObjectId(m));
+    const musicIdsToRemoveSet = new Set(musicIds.map(m => m.toString()));
+    const originalDoc = await MusicPlaylistOdm.Model.findOneAndUpdate(
       {
         _id: id,
       },
@@ -249,19 +324,48 @@ addedAt: Date; }>;
         $pull: {
           list: {
             musicId: {
-              $in: musicsObjectIds,
+              $in: musicObjectIds,
             },
           },
         },
       },
       {
-        new: true,
+        new: false,
       },
     );
 
-    assertFoundClient(updated);
+    assertFoundClient(originalDoc);
 
-    return MusicPlaylistOdm.toEntity(updated);
+    const oldEntity = MusicPlaylistOdm.toEntity(originalDoc);
+    const keptTracks: any[] = [];
+    const eventsToEmit: Array<{ trackListPosition: number }> = [];
+
+    if (originalDoc.list && originalDoc.list.length > 0) {
+      originalDoc.list.forEach((track, index) => {
+      // Comparamos por musicId.
+        if (track.musicId && musicIdsToRemoveSet.has(track.musicId.toString())) {
+          eventsToEmit.push( {
+            trackListPosition: index,
+          } );
+        } else
+          keptTracks.push(track);
+      } );
+    }
+
+    originalDoc.list = keptTracks;
+    const newEntity = MusicPlaylistOdm.toEntity(originalDoc);
+
+    for (const eventData of eventsToEmit) {
+      this.domainEventEmitter.emit(MusicPlayListTrackEvents.Deleted.TYPE, {
+        newPlaylist: newEntity,
+        oldPlaylist: oldEntity,
+        trackListPosition: eventData.trackListPosition,
+      } as MusicPlayListTrackEvents.Deleted.Event);
+    }
+
+    this.emitPatch(newEntity);
+
+    return newEntity;
   }
 
   async getOneById(id: string): Promise<Entity | null> {
@@ -330,16 +434,15 @@ addedAt: Date; }>;
     return ret;
   }
 
-  async patchOneByIdAndGet(id: Id, params: PatchOneParams<Entity>): Promise<Entity> {
+  async patchOneByIdAndGet(id: Id, params: PatchOneParams<Omit<Entity, "list">>): Promise<Entity> {
     let slug;
+    const oldDoc = await MusicPlaylistOdm.Model.findById(id);
+
+    assertFoundClient(oldDoc);
 
     if (params.entity.slug) {
       const baseSlug = fixSlug(params.entity.slug);
-      const userId = params.entity.userId ?? await MusicPlaylistOdm.Model.findById(id).then(doc=>{
-        assertIsDefined(doc, "Document not found for slug fix");
-
-        return doc.userId.toString();
-      } );
+      const userId = params.entity.userId ?? oldDoc.userId.toString();
 
       assertIsDefined(baseSlug, "Invalid slug");
       assertIsDefined(userId, "User ID is required for slug fix");
@@ -372,7 +475,9 @@ addedAt: Date; }>;
     const ret = MusicPlaylistOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(MusicPlayListEvents.Patched.TYPE, {
-      entity: params.entity,
+      partialEntity: params.entity,
+      newEntity: ret,
+      oldEntity: MusicPlaylistOdm.toEntity(oldDoc),
       id,
       unset: params.unset,
     } );

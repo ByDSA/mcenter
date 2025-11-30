@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { CstElement, CstNode, IToken } from "@chevrotain/types";
-import { AddedNode, BinaryOperationNode, DifferenceNode, FilterNode, IntersectionNode, NumberLiteral, PlayedNode, QueryObject, RangeDate, RangeNumber, UnionNode, WeightNode, YearNode } from "../query-object";
+import { AddedNode, BinaryOperationNode, DifferenceNode, FilterNode, IntersectionNode, NumberLiteral, PlayedNode, PrivatePlaylistNode, PublicPlaylistNode, QueryObject, RangeDate, RangeNumber, UnionNode, WeightNode, YearNode } from "../query-object";
 import { queryLexer } from "./query-lexer";
 import { QueryParser } from "./query-parser-chevrotain";
 
@@ -155,15 +155,32 @@ const filterToObj = (node: CstNode): FilterNode => {
         return playedFilterToObj(filter);
       case "addedFilter":
         return addedFilterToObj(filter);
-      case "tagFilter":
-      {
+      case "tagFilter": {
         return {
           type: "tag",
           value: stringLiteralToString(filter.children.StringLiteral),
         };
       }
-      default:
-        throw new Error("D");
+      case "privatePlaylistFilter": {
+        return {
+          type: "privatePlaylist",
+          value: slugLiteralToString(filter.children.PrivatePlaylistLiteral),
+        } as PrivatePlaylistNode;
+      }
+      case "publicPlaylistFilter": {
+        const token = filter.children.PublicPlaylistLiteral[0];
+        const rawText = (token as IToken).image;
+        const parts = rawText.substring(1).split("/");
+
+        return {
+          type: "publicPlaylist",
+          user: parts[0],
+          value: parts[1],
+        } as PublicPlaylistNode;
+      }
+      default: {
+        throw new Error("Unknown filter type: " + filterType);
+      }
     }
   }
 
@@ -171,10 +188,16 @@ const filterToObj = (node: CstNode): FilterNode => {
 };
 
 function stringLiteralToString(stringLiteral: CstElement[]): string {
-  const StringLiteralItem = (stringLiteral[0] as IToken);
-  const StringLiteralImage = StringLiteralItem.image;
+  const StringLiteralImage = slugLiteralToString(stringLiteral);
 
   return removeQuotes(StringLiteralImage);
+}
+
+function slugLiteralToString(slugLiteral: CstElement[]): string {
+  const StringLiteralItem = (slugLiteral[0] as IToken);
+  const StringLiteralImage = StringLiteralItem.image;
+
+  return StringLiteralImage;
 }
 
 function removeQuotes(input: string): string {

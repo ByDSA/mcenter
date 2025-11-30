@@ -84,22 +84,27 @@ describe("controller", () => {
     testingSetup.getMock(MusicsSearchService).filter
       // eslint-disable-next-line require-await
       .mockImplementation(async (_userId, queryFilter)=> ( {
-        data: fixtureMusics.Disk.WithUserInfo.List.map(music=>( {
-          addedAt: music.addedAt.getTime(),
-          artist: music.artist,
-          id: music.userInfo.id,
-          lastTimePlayedAt: music.userInfo.lastTimePlayed,
-          musicId: music.id,
-          title: music.title,
-          userId: music.userInfo.userId,
-          weight: music.userInfo.weight,
-          country: music.country,
-          game: music.game,
-          tags: [...music.tags ?? [], ...music.userInfo.tags ?? []],
-          onlyTags: [],
-        } )).filter(e=>{
+        data: fixtureMusics.Disk.WithUserInfo.List.map(music=>{
+          const ret: SearchRet["data"][0] = {
+            addedAt: music.addedAt.getTime(),
+            artist: music.artist,
+            id: music.userInfo.id,
+            lastTimePlayedAt: music.userInfo.lastTimePlayed,
+            musicId: music.id,
+            title: music.title,
+            userId: music.userInfo.userId,
+            weight: music.userInfo.weight,
+            country: music.country,
+            game: music.game,
+            tags: [...music.tags ?? [], ...music.userInfo.tags ?? []],
+            onlyTags: [],
+            privatePlaylistSlugs: [],
+          };
+
+          return ret;
+        } ).filter(e=>{
           if (queryFilter.includes("tag"))
-            return e.tags.includes(getPrimerSubstringEntreComillas(queryFilter) ?? "nope");
+            return e.tags!.includes(getPrimerSubstringEntreComillas(queryFilter) ?? "nope");
           else if (queryFilter.includes("weight")) {
             if (queryFilter.includes("> 10"))
               return e.weight > 10;

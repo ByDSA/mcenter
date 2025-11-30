@@ -1,9 +1,17 @@
+import { neverCase } from "$shared/utils/validation";
+import { MusicPlaylistOdm } from "#musics/playlists/crud/repository/odm";
+import { UserOdm } from "#core/auth/users/crud/repository/odm";
+import { assertFoundClient } from "#utils/validation/found";
 import { ExpressionNode, RangeDate, RangeNumber } from "./query-object";
 
-export function expressionToMeilisearchQuery(expression: ExpressionNode): string {
-  switch (expression.type) {
-    case "year":
-    {
+export async function expressionToMeilisearchQuery(
+  expression: ExpressionNode,
+  userId: string | null,
+): Promise<string> {
+  const { type } = expression;
+
+  switch (type) {
+    case "year": {
       const value1 = expression.value;
 
       if (value1.type === "number")
@@ -13,8 +21,7 @@ export function expressionToMeilisearchQuery(expression: ExpressionNode): string
       else
         throw new Error("Year: unexpected value type: " + (value1 as any).type);
     }
-    case "played":
-    {
+    case "played": {
       const { value } = expression;
 
       if (value.type === "range-date")
@@ -22,8 +29,7 @@ export function expressionToMeilisearchQuery(expression: ExpressionNode): string
       else
         throw new Error("Played: unexpected value type: " + (value as any).type);
     }
-    case "added":
-    {
+    case "added": {
       const { value } = expression;
 
       if (value.type === "range-date")
@@ -31,8 +37,7 @@ export function expressionToMeilisearchQuery(expression: ExpressionNode): string
       else
         throw new Error("Added: unexpected value type: " + (value as any).type);
     }
-    case "weight":
-    {
+    case "weight": {
       const value1 = expression.value;
 
       if (value1.type === "number")
@@ -42,32 +47,61 @@ export function expressionToMeilisearchQuery(expression: ExpressionNode): string
       else
         throw new Error("Weight: unexpected value type: " + (value1 as any).type);
     }
-    case "tag":
-    {
+    case "tag": {
       const tag = expression.value;
 
       return `(tags IN ["${tag}"] AND onlyTags IS NULL) OR onlyTags IN ["${tag}"]`;
     }
-    case "union":
-    {
+    case "privatePlaylist": {
+      const slugPlaylist = expression.value;
+
+      return `privatePlaylistSlugs IN ["${slugPlaylist}"]`;
+    }
+    case "publicPlaylist": {
+      const { value: slugPlaylist, user: userPublicUsername } = expression;
+      const user = await UserOdm.Model.findOne( {
+        publicUsername: userPublicUsername,
+      } );
+
+      assertFoundClient(user);
+
+      const playlist = await MusicPlaylistOdm.Model.findOne( {
+        userId: user.id,
+        slug: slugPlaylist,
+      } );
+
+      assertFoundClient(playlist);
+
+      if (playlist.visibility === "private" && (userId === null || !playlist.userId.equals(userId)))
+        assertFoundClient(null);
+
+      if (playlist.list.length === 0)
+        return "FALSE";
+
+      const ids = playlist.list.map(entry => `"${entry.musicId}"`).join(",");
+
+      return `musicId IN [${ids}]`;
+    }
+    case "union": {
       const { child1, child2 } = expression;
-      const qChild1 = expressionToMeilisearchQuery(child1);
-      const qChild2 = expressionToMeilisearchQuery(child2);
+      const qChild1 = expressionToMeilisearchQuery(child1, userId);
+      const qChild2 = expressionToMeilisearchQuery(child2, userId);
 
       return `(${qChild1}) OR (${qChild2})`;
     }
-    case "intersection":
-    {
+    case "intersection": {
       const { child1, child2 } = expression;
-      const qChild1 = expressionToMeilisearchQuery(child1);
-      const qChild2 = expressionToMeilisearchQuery(child2);
+      const qChild1 = expressionToMeilisearchQuery(child1, userId);
+      const qChild2 = expressionToMeilisearchQuery(child2, userId);
 
       return `(${qChild1}) AND (${qChild2})`;
     }
     case "complement":
     case "difference":
-    default:
       throw new Error("Not implemented for Meilisearch: " + expression.type);
+    default: {
+      neverCase(type);
+    }
   }
 }
 

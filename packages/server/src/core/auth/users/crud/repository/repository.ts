@@ -48,14 +48,23 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   }
 
   async getOneById(id: string, criteria?: Omit<CriteriaOne, "filter">): Promise<Entity | null> {
-    const doc = await UserOdm.Model.findById(id) as UserOdm.FullDoc;
+    const doc = await UserOdm.Model.findById(id) as UserOdm.FullDoc | null;
 
-    assertFoundClient(doc);
+    if (!doc)
+      return null;
 
     if (criteria?.expand?.includes("roles"))
       await this.#expandRoles(doc);
 
     return UserOdm.toEntity(doc);
+  }
+
+  async isPublicUsernameAvailable(publicUsername: string): Promise<boolean> {
+    const doc = await UserOdm.Model.findOne( {
+      publicUsername,
+    } ) as UserOdm.FullDoc | null;
+
+    return !doc;
   }
 
   async #expandRoles(doc: UserOdm.FullDoc): Promise<UserOdm.FullDoc> {
@@ -112,7 +121,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     const ret = UserOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(UserEvents.Patched.TYPE, {
-      entity: validEntity,
+      partialEntity: validEntity,
       id,
       unset: params.unset,
     } );

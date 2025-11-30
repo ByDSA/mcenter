@@ -110,7 +110,7 @@ CanGetAll<Entity> {
     this.domainEventEmitter.emitPatch(
       EpisodeFileInfoEvents.Patch.TYPE,
       {
-        entity: params.entity,
+        partialEntity: params.entity,
         id,
         unset: params.unset,
       },

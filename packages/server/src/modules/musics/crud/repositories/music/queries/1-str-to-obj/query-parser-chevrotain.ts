@@ -1,5 +1,5 @@
 import { CstParser } from "chevrotain";
-import { addedIdentifier, additionOperator, colon, comma, greaterEqual, greaterThan, isoDateLiteral, lBracket, lessEqual, lessThan, lParen, multiplicationOperator, numberLiteral, playedIdentifier, rBracket, relativeDateLiteral, rParen, stringLiteral, tagIdentifier, tokens, weightIdentifier, yearIdentifier } from "./query-lexer";
+import { addedIdentifier, additionOperator, colon, comma, greaterEqual, greaterThan, isoDateLiteral, lBracket, lessEqual, lessThan, lParen, multiplicationOperator, numberLiteral, playedIdentifier, playlistIdentifier, privatePlaylistLiteral, publicPlaylistLiteral, rBracket, relativeDateLiteral, rParen, stringLiteral, tagIdentifier, tokens, weightIdentifier, yearIdentifier } from "./query-lexer";
 
 export class QueryParser extends CstParser {
   constructor() {
@@ -72,6 +72,12 @@ export class QueryParser extends CstParser {
       {
         ALT: () => this.SUBRULE(this.addedFilter),
       },
+      {
+        ALT: () => this.SUBRULE(this.publicPlaylistFilter),
+      },
+      {
+        ALT: () => this.SUBRULE(this.privatePlaylistFilter),
+      },
     ]);
   } );
 
@@ -123,6 +129,18 @@ export class QueryParser extends CstParser {
     this.CONSUME(tagIdentifier); // tag
     this.CONSUME(colon);
     this.CONSUME(stringLiteral); // tag value
+  } );
+
+  private privatePlaylistFilter = this.RULE("privatePlaylistFilter", () => {
+    this.CONSUME(playlistIdentifier);
+    this.CONSUME(colon);
+    this.CONSUME(privatePlaylistLiteral);
+  } );
+
+  private publicPlaylistFilter = this.RULE("publicPlaylistFilter", () => {
+    this.CONSUME(playlistIdentifier);
+    this.CONSUME(colon);
+    this.CONSUME(publicPlaylistLiteral);
   } );
 
   // Nueva regla para rangos

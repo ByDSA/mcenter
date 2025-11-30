@@ -45,7 +45,7 @@ AND (weight > 50)",
     it(`query=${query}`, () => {
       const f = (q: string) => {
         const expr = parseQuery(q);
-        const obj = expressionToMeilisearchQuery(expr.root);
+        const obj = expressionToMeilisearchQuery(expr.root, null);
 
         return obj;
       };

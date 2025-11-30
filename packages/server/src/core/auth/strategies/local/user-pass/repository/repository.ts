@@ -109,7 +109,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     const ret = UserPassOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(UserPassEvents.Patched.TYPE, {
-      entity: validEntity,
+      partialEntity: validEntity,
       id,
       unset: params.unset,
     } );

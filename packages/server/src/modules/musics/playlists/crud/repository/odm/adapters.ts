@@ -48,6 +48,7 @@ function commonModelToDocOdm(model: Model): Omit<DocOdm, "_id" | "list"> {
     userId: new Types.ObjectId(model.userId),
     createdAt: model.createdAt,
     updatedAt: model.updatedAt,
+    visibility: model.visibility,
   };
 }
 
@@ -61,6 +62,7 @@ export function fullDocOdmToEntity(docOdm: FullDocOdm): Entity {
     list: docOdm.list.map(entryFullDocOdmToEntity),
     createdAt: docOdm.createdAt,
     updatedAt: docOdm.updatedAt,
+    visibility: docOdm.visibility,
   } satisfies AllKeysOf<Entity>;
 
   return entity;

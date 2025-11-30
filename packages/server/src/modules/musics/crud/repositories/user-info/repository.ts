@@ -104,7 +104,7 @@ CanGetOneById<Entity, UserInfoKey> {
     const ret = MusicsUsersOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(MusicsUsersEvents.Patched.TYPE, {
-      entity,
+      partialEntity: entity,
       id: {
         musicId: key.musicId,
         userId: key.userId,

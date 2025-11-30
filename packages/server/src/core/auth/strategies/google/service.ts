@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { Request } from "express";
 import z from "zod";
-import { User, UserEntityWithRoles } from "../../users/models";
-import { AppPayloadService } from "../jwt";
 import { UsersService } from "#core/auth/users";
 import { UsersRepository } from "#core/auth/users/crud/repository";
+import { UserPublicUsernameService } from "#core/auth/users/public-username.service";
+import { AppPayloadService } from "../jwt";
+import { User, UserEntityWithRoles } from "../../users/models";
 
 type SignUpResult = {
   user: UserEntityWithRoles;
@@ -27,6 +28,7 @@ export class AuthGoogleService {
     private readonly usersService: UsersService,
     private readonly usersRepo: UsersRepository,
     private readonly appPayloadService: AppPayloadService,
+    private readonly publicUsernameService: UserPublicUsernameService,
   ) { }
 
   async googleRedirect(req: Request) {
@@ -48,7 +50,7 @@ export class AuthGoogleService {
     } ) as UserEntityWithRoles | null;
 
     if (!userWithRoles) {
-      const insertingUser = googleUserToSignUpUser(googleUser);
+      const insertingUser = await this.googleUserToSignUpUser(googleUser);
 
       userWithRoles = await this.usersService.signUp(insertingUser);
       state = "created";
@@ -57,7 +59,7 @@ export class AuthGoogleService {
       const user = await this.usersRepo.patchOneByIdAndGet(
         userWithRoles.id,
         {
-          entity: googleUserToSignUpUser(googleUser),
+          entity: await this.googleUserToSignUpUser(googleUser),
         },
       );
 
@@ -74,17 +76,22 @@ export class AuthGoogleService {
       state,
     };
   }
-}
 
-function googleUserToSignUpUser(googleUser: GoogleUser): Omit<User, "roles"> {
-  return {
-    email: googleUser.email,
-    firstName: googleUser.firstName,
-    lastName: googleUser.lastName,
-    publicName: `${googleUser.firstName} ${googleUser.lastName}`,
-    emailVerified: true,
-    musics: {
-      favoritesPlaylistId: null, // TODO
-    },
-  };
+  private async googleUserToSignUpUser(googleUser: GoogleUser): Promise<Omit<User, "roles">> {
+    const publicName = `${googleUser.firstName} ${googleUser.lastName}`;
+
+    return {
+      email: googleUser.email,
+      firstName: googleUser.firstName,
+      lastName: googleUser.lastName,
+      publicName,
+      publicUsername: await this.publicUsernameService.getUniqueFromRegisteringUser( {
+        publicName,
+      } ),
+      emailVerified: true,
+      musics: {
+        favoritesPlaylistId: null, // TODO
+      },
+    };
+  }
 }

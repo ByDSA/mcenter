@@ -188,7 +188,7 @@ remotePlayerId: string;} ): Promise<boolean> {
     const ret = RemotePlayerOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(RemotePlayerEvents.Patched.TYPE, {
-      entity: paramEntity,
+      partialEntity: paramEntity,
       id,
       unset: params.unset,
     } );

@@ -3,15 +3,16 @@ import { compare } from "bcryptjs";
 import { assertIsDefined } from "$shared/utils/validation";
 import { hashPassword } from "$shared/models/auth/utils";
 import { User, UserPass, UserPassEntityWithUserWithRoles } from "$shared/models/auth";
-import { AppPayloadService } from "../jwt/payload/AppPayloadService";
-import { UserPassesRepository } from "./user-pass";
-import { LoginDto, SignUpDto } from "./dto";
-import { LocalUserVerificationService } from "./verification.service";
 import { assertFoundClient } from "#utils/validation/found";
 import { UserEntityWithRoles, UserPayload } from "#core/auth/users/models";
 import { AlreadyExistsEmailException } from "#core/auth/users/crud/repository/errors";
 import { UsersService } from "#core/auth/users";
 import { UsersRepository } from "#core/auth/users/crud/repository";
+import { UserPublicUsernameService } from "#core/auth/users/public-username.service";
+import { AppPayloadService } from "../jwt/payload/AppPayloadService";
+import { LocalUserVerificationService } from "./verification.service";
+import { LoginDto, SignUpDto } from "./dto";
+import { UserPassesRepository } from "./user-pass";
 
 export enum SignUpStatus {
   EmailAlreadyExists = "email-already-exists",
@@ -31,6 +32,7 @@ export class AuthLocalService {
     private readonly usersRepo: UsersRepository,
     private readonly appPayloadService: AppPayloadService,
     private readonly verificationService: LocalUserVerificationService,
+    private readonly publicUsernameService: UserPublicUsernameService,
   ) {
   }
 
@@ -49,6 +51,9 @@ export class AuthLocalService {
       const insertingUser: User = {
         email: dto.email,
         publicName: dto.username,
+        publicUsername: await this.publicUsernameService.getUniqueFromRegisteringUser( {
+          publicName: dto.username,
+        } ),
         firstName: dto.firstName,
         lastName: dto.lastName,
         emailVerified: false,

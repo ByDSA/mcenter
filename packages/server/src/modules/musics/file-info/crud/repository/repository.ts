@@ -245,7 +245,7 @@ música si desea borrar el archivo.",
       this.domainEventEmitter.emitPatch(
         MusicFileInfoEvents.Patched.TYPE,
         {
-          entity:
+          partialEntity:
         {
           path: newPath,
         },

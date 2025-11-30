@@ -33,6 +33,7 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & {
   slug: string;
   userId: UserOdm.FullDoc["_id"];
   list: EntryDocOdm[];
+  visibility: "private" | "public";
 };
 
 export type FullDocOdm = Omit<RequireId<DocOdm>, "list"> & {
@@ -44,30 +45,38 @@ const NAME = "MusicPlaylist";
 
 export const COLLECTION = "music_playlists";
 
-export const schemaOdm = new mongoose.Schema<DocOdm>( {
-  name: {
-    type: String,
-    required: true,
+export const schemaOdm = new mongoose.Schema<DocOdm>(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    list: {
+      type: [entrySchemaOdm],
+      required: true,
+      default: [],
+    },
+    visibility: {
+      type: String,
+      enum: ["private", "public"],
+      default: "private",
+    },
+  } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>,
+  {
+    collection: COLLECTION,
+    timestamps: true,
+    autoIndex: isTest(),
   },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
-  slug: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  list: {
-    type: [entrySchemaOdm],
-    required: true,
-    default: [],
-  },
-} satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
-  collection: COLLECTION,
-  timestamps: true,
-  autoIndex: isTest(),
-} );
+);
 
 schemaOdm.index( {
   slug: 1,

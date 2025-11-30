@@ -80,8 +80,8 @@ export const localRegisterAction: Action<Props, Ret> = async (
   };
 };
 type OauthRegisterProps = {
-  user: WithRequired<Omit<User, "emailVerified" | "publicName" | "roles">, "firstName" |
-    "lastName">;
+  user: WithRequired<Omit<User, "emailVerified" | "musics" | "publicName" | "publicUsername" |
+    "roles">, "firstName" | "lastName">;
 };
 type OauthRes = {
   result: {
@@ -97,7 +97,7 @@ export const oauthRegisterMockAction: Action<OauthRegisterProps, OauthRes> = asy
       user: {
         ...user,
         emailVerified: true,
-      } satisfies Omit<User, "publicName">,
+      } satisfies Omit<User, "musics" | "publicName" | "publicUsername">,
     },
   } );
 

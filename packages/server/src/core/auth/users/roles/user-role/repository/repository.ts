@@ -67,7 +67,7 @@ CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
     const ret = UserRoleMapOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(UserRoleMapEvents.Patched.TYPE, {
-      entity: validEntity,
+      partialEntity: validEntity,
       id,
       unset: params.unset,
     } );

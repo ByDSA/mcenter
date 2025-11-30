@@ -1,11 +1,11 @@
 import mongoose, { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { User, UserEntity } from "../../../models";
-import { DocOdm, FullDocOdm } from "./odm";
 import { UserRoleOdm } from "#core/auth/users/roles/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
+import { User, UserEntity } from "../../../models";
+import { DocOdm, FullDocOdm } from "./odm";
 
 type Entity = UserEntity;
 type Model = User;
@@ -14,6 +14,7 @@ export function docOdmToModel(docOdm: DocOdm): Model {
   const entity: Model = {
     email: docOdm.email,
     publicName: docOdm.publicName,
+    publicUsername: docOdm.publicUsername,
     firstName: docOdm.firstName,
     lastName: docOdm.lastName,
     emailVerified: docOdm.emailVerified,
@@ -41,6 +42,7 @@ export function partialToDocOdm(model: Partial<Model>): MongoUpdateQuery<DocOdm>
   const docOdm: Partial<DocOdm> = {
     email: model.email,
     publicName: model.publicName,
+    publicUsername: model.publicUsername,
     firstName: model.firstName,
     lastName: model.lastName,
     emailVerified: model.emailVerified,
@@ -61,6 +63,7 @@ export function modelToDocOdm(model: Model): TimestampsOdm.OmitAutoTimestamps<Do
   const docOdm: TimestampsOdm.OmitAutoTimestamps<DocOdm> = {
     email: model.email,
     publicName: model.publicName,
+    publicUsername: model.publicUsername,
     firstName: model.firstName,
     lastName: model.lastName,
     emailVerified: model.emailVerified,

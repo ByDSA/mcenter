@@ -18,6 +18,11 @@ type PatchPayload<M extends object, ID extends unknown> = {
   entityId: ID;
   key: keyof M;
   value: M[keyof M];
+  oldValue?: M[keyof M];
+  hasOld: boolean;
+  partialEntity: M;
+  newEntity?: M;
+  oldEntity?: M;
 };
 
 export type PatchEvent<M extends object, ID extends unknown = string> =

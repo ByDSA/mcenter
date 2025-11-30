@@ -198,7 +198,7 @@ CanGetOneById<Entity, UserInfoKey> {
     const ret = EpisodesUsersOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(EpisodesUsersEvents.Patched.TYPE, {
-      entity,
+      partialEntity: entity,
       id: {
         episodeId: key.episodeId,
         userId: key.userId,

@@ -8,6 +8,7 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & {
   _id?: mongoose.Types.ObjectId;
   email: string;
   publicName: string;
+  publicUsername: string;
   firstName?: string;
   lastName?: string;
   emailVerified: boolean;
@@ -31,6 +32,11 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     unique: true,
   },
   publicName: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  publicUsername: {
     type: String,
     required: true,
     unique: true,

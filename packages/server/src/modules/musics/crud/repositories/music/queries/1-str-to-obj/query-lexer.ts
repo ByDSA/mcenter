@@ -119,10 +119,27 @@ export const tagIdentifier = createToken( {
   pattern: /tag/,
 } );
 
+export const playlistIdentifier = createToken( {
+  name: "Playlist",
+  pattern: /playlist/,
+} );
+
 export const stringLiteral = createToken( {
   name: "StringLiteral",
   // eslint-disable-next-line no-control-regex
   pattern: /(?:["'?!#a-zA-Z0-9._~-]|[^\x00-\x7F])+/,
+} );
+
+const slugPattern = /(?:[a-zA-Z0-9-])+/;
+
+export const privatePlaylistLiteral = createToken( {
+  name: "PrivatePlaylistLiteral",
+  pattern: slugPattern,
+} );
+
+export const publicPlaylistLiteral = createToken( {
+  name: "PublicPlaylistLiteral",
+  pattern: new RegExp(`@${slugPattern.source}\\/${slugPattern.source}`),
 } );
 
 export const relativeDateLiteral = createToken( {
@@ -147,7 +164,7 @@ export const tokens = [
   greaterEqual, lessEqual, greaterThan, lessThan,
   relativeDateLiteral, isoDateLiteral,
   tagIdentifier, yearIdentifier, playedIdentifier, addedIdentifier, weightIdentifier,
-  numberLiteral, stringLiteral,
+  playlistIdentifier, numberLiteral, publicPlaylistLiteral, privatePlaylistLiteral, stringLiteral,
 ];
 
 export const queryLexer = new Lexer(tokens);

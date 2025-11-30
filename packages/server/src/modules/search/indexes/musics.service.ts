@@ -1,7 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, UnprocessableEntityException } from "@nestjs/common";
 import { Index, MeiliSearch, SearchParams, SearchResponse } from "meilisearch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Music, MusicEntity, MusicUserInfoEntity } from "$shared/models/musics";
+import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { MusicEvents } from "#musics/crud/repositories/music/events";
 import { DomainEvent, EntityEvent, PatchEvent } from "#core/domain-event-emitter";
@@ -9,6 +10,9 @@ import { assertFoundServer } from "#utils/validation/found";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 import { MusicsUsersEvents } from "#musics/crud/repositories/user-info/events";
+import { MusicPlaylistOdm } from "#musics/playlists/crud/repository/odm";
+import { MusicPlayListTrackEvents } from "#musics/playlists/crud/repository/events/track";
+import { MusicPlayListEvents } from "#musics/playlists/crud/repository/events/playlist";
 import { waitForTask } from "./utils";
 import { countries, generateSynonymsFromGroup } from "./synonyms";
 
@@ -30,13 +34,20 @@ type UserInfoDoc = {
   weight: number;
   tags: string[] | null;
   onlyTags: string[] | null;
+  privatePlaylistSlugs: string[];
 };
-type Doc = MusicDoc & Omit<UserInfoDoc, "musicId"> & {
+type Doc = MusicDoc & UserInfoDoc & {
   id: string;
 };
 
 export {
   Doc as MusicDocMeili,
+};
+
+type AddPrivatePlaylistProps = {
+  musicId: string;
+  userId: string;
+  slug: string;
 };
 
 export const MEILISEARCH_MUSICS_MAX_HITS = 10_000;
@@ -110,10 +121,113 @@ export class MusicsIndexService {
       throw new Error("Event type not handled: " + ev.type);
   }
 
+  @OnEvent(MusicPlayListTrackEvents.WILDCARD)
+  async handleAddMusicToPlaylistEvents(ev: DomainEvent<unknown>) {
+    if (ev.type === MusicPlayListTrackEvents.Added.TYPE) {
+      const { playlist, trackListPosition } = ev.payload as MusicPlayListTrackEvents.Added.Event;
+
+      if (playlist.visibility !== "private")
+        return;
+
+      await this.addPrivatePlaylist( {
+        musicId: playlist.list[trackListPosition].musicId,
+        slug: playlist.slug,
+        userId: playlist.userId,
+      } );
+    } else if (ev.type === MusicPlayListTrackEvents.Deleted.TYPE) {
+      const { oldPlaylist,
+        newPlaylist,
+        trackListPosition } = ev.payload as MusicPlayListTrackEvents.Deleted.Event;
+
+      if (newPlaylist.visibility !== "private")
+        return;
+
+      await this.removePrivatePlaylist( {
+        musicId: oldPlaylist.list[trackListPosition].musicId,
+        slug: oldPlaylist.slug,
+        userId: oldPlaylist.userId,
+      } );
+    }
+  }
+
+  @OnEvent(MusicPlayListEvents.Patched.TYPE)
+  async handleChangePlaylist(ev: MusicPlayListEvents.Patched.Event) {
+    if (ev.payload.key === "slug") {
+      if (!ev.payload.oldEntity || !ev.payload.newEntity)
+        throw new UnprocessableEntityException();
+
+      const oldSlug = ev.payload.oldValue as string;
+      const newSlug = ev.payload.value as string;
+      const { newEntity, oldEntity } = ev.payload;
+
+      for (const track of oldEntity.list) {
+        await this.replacePrivatePlaylist( {
+          musicId: track.musicId,
+          oldSlug,
+          slug: newSlug,
+          userId: newEntity.userId,
+        } );
+      }
+    } else if (ev.payload.key === "visibility") {
+      const { newEntity } = ev.payload;
+
+      if (!ev.payload.oldEntity || !newEntity)
+        throw new UnprocessableEntityException();
+
+      const oldVisibility = ev.payload.oldValue as MusicPlaylistEntity["visibility"];
+      const newVisibility = ev.payload.value as MusicPlaylistEntity["visibility"];
+
+      if (oldVisibility === newVisibility) // Por si acaso, aunque se supone que nunca pasa
+        return;
+
+      if (oldVisibility === "private" && newVisibility === "public") {
+        for (const track of newEntity.list) {
+          await this.removePrivatePlaylist( {
+            musicId: track.musicId,
+            slug: newEntity.slug,
+            userId: newEntity.userId,
+          } );
+        }
+      } else if (oldVisibility === "public" && newVisibility === "private") {
+        for (const track of newEntity.list) {
+          await this.addPrivatePlaylist( {
+            musicId: track.musicId,
+            slug: newEntity.slug,
+            userId: newEntity.userId,
+          } );
+        }
+      }
+    }
+  }
+
   async syncAll() {
     const musics = await MusicOdm.Model.find().lean(); // .lean() elimina overhead de Mongoose
     const musicsUsers = await MusicsUsersOdm.Model.find().lean();
+    const privatePlaylists = await MusicPlaylistOdm.Model.find().lean();
     const usersIds: (string)[] = await this.getUserIds();
+    const playlistsByUser = new Map<string, Map<string, string[]>>();
+
+    for (const playlist of privatePlaylists) {
+      const uId = playlist.userId.toString();
+
+      // Si este usuario no está en el mapa, lo inicializamos
+      if (!playlistsByUser.has(uId))
+        playlistsByUser.set(uId, new Map());
+
+      const userMusicsMap = playlistsByUser.get(uId)!;
+      const { slug } = playlist;
+
+      for (const item of playlist.list) {
+        const mId = item.musicId.toString();
+
+        if (!userMusicsMap.has(mId))
+          userMusicsMap.set(mId, []);
+
+        // Hacemos push del slug
+        userMusicsMap.get(mId)!.push(slug);
+      }
+    }
+
     // OPTIMIZACIÓN: Crear mapa de musicsUsers eficientemente
     const musicsUsersMap = new Map<string, Map<string, MusicsUsersOdm.FullDoc>>();
 
@@ -142,6 +256,7 @@ export class MusicsIndexService {
     await this.index.deleteAllDocuments();
 
     let total = 0;
+    const EMPTY_SLUGS: string[] = [];
 
     for (let i = 0; i < usersIds.length; i += BATCH_SIZE) {
       const usersBatch = usersIds.slice(i, i + BATCH_SIZE);
@@ -149,12 +264,14 @@ export class MusicsIndexService {
 
       for (const userId of usersBatch) {
         const userMusicsMap = musicsUsersMap.get(userId);
+        const userPlaylistMap = playlistsByUser.get(userId);
 
         for (const music of musics) {
           const musicId = music._id.toString();
           const musicPart = musicsParts.get(musicId)!; // Ya mapeado
           const userMusic = userMusicsMap?.get(musicId);
-          const doc = {
+          const privateSlugs = userPlaylistMap?.get(musicId) ?? EMPTY_SLUGS;
+          const doc: Doc = {
             id: genId( {
               userId,
               musicId,
@@ -164,6 +281,7 @@ export class MusicsIndexService {
             lastTimePlayedAt: userMusic?.lastTimePlayed ?? 0,
             userId,
             weight: userMusic?.weight ?? 0,
+            privatePlaylistSlugs: privateSlugs,
           };
 
           documentsForSearch.push(doc);
@@ -217,6 +335,77 @@ export class MusicsIndexService {
     await this.index.updateDocuments(docs);
   }
 
+  async removePrivatePlaylist( { musicId, slug, userId }: AddPrivatePlaylistProps) {
+    const id = genId( {
+      musicId,
+      userId,
+    } );
+    const doc = await this.index.getDocument<Doc>(id);
+    const existingSlugs = doc?.privatePlaylistSlugs ?? [];
+    const index = existingSlugs.indexOf(slug);
+
+    if (index > -1)
+      existingSlugs.splice(index, 1);
+
+    const updateDoc = {
+      id,
+      userId,
+      privatePlaylistSlugs: existingSlugs,
+    } as Partial<Doc>;
+
+    await this.index.updateDocuments([updateDoc]);
+  }
+
+  async addPrivatePlaylist( { musicId, slug, userId }: AddPrivatePlaylistProps) {
+    const id = genId( {
+      musicId,
+      userId,
+    } );
+    const doc = await this.index.getDocument<Doc>(id);
+    const existingSlugs = doc?.privatePlaylistSlugs ?? [];
+
+    if (!existingSlugs.includes(slug))
+      existingSlugs.push(slug);
+
+    const updateDoc = {
+      id,
+      userId,
+      privatePlaylistSlugs: existingSlugs,
+    } as Partial<Doc>;
+
+    await this.index.updateDocuments([updateDoc]);
+  }
+
+  async replacePrivatePlaylist( { musicId,
+    slug,
+    userId,
+    oldSlug }: AddPrivatePlaylistProps & {oldSlug: string} ) {
+    const id = genId( {
+      musicId,
+      userId,
+    } );
+    const doc = await this.index.getDocument<Doc>(id);
+    const existingSlugs = doc?.privatePlaylistSlugs;
+
+    if (!existingSlugs)
+      return;
+
+    const index = existingSlugs.indexOf(oldSlug);
+
+    if (index === -1)
+      return;
+
+    existingSlugs[index] = slug;
+
+    const updateDoc = {
+      id,
+      userId,
+      privatePlaylistSlugs: existingSlugs,
+    } as Partial<Doc>;
+
+    await this.index.updateDocuments([updateDoc]);
+  }
+
   async updateUserInfo(
     userInfoDoc: UserInfoDoc,
   ): Promise<void> {
@@ -254,6 +443,7 @@ export class MusicsIndexService {
       weight: m.weight,
       tags: m.tags ?? null,
       onlyTags: null,
+      privatePlaylistSlugs: [],
     } satisfies UserInfoDoc;
   }
 
@@ -278,6 +468,7 @@ export class MusicsIndexService {
       weight: m.weight,
       tags: m.tags ?? null,
       onlyTags: null,
+      privatePlaylistSlugs: [],
     } satisfies UserInfoDoc;
   }
 
@@ -299,6 +490,7 @@ export class MusicsIndexService {
       // internos:
       "musicId",
       "userId",
+      "privatePlaylistSlugs",
     ]);
 
     await this.index.updateSortableAttributes([

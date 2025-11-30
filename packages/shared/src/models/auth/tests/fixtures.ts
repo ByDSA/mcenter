@@ -10,6 +10,7 @@ const admin = {
   emailVerified: true,
   createdAt: new Date(),
   updatedAt: new Date(),
+  publicUsername: "admin",
   musics: {
     favoritesPlaylistId: null,
   },
@@ -17,6 +18,7 @@ const admin = {
 const normal = {
   id: new mongoose.Types.ObjectId().toString(),
   publicName: "Normal user",
+  publicUsername: "normal",
   email: "test2@mail.com",
   emailVerified: true,
   createdAt: new Date(),

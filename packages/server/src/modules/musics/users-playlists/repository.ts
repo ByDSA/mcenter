@@ -6,7 +6,7 @@ import { assertFoundClient } from "#utils/validation/found";
 import { MusicPlaylistsRepository } from "#musics/playlists/crud/repository";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { UserEvents } from "#core/auth/users/crud/repository/events";
-import { MusicPlayListEvents } from "../playlists/crud/repository/events";
+import { MusicPlayListEvents } from "../playlists/crud/repository/events/playlist";
 
 type Entity = UserEntity;
 type Model = User;
@@ -27,6 +27,7 @@ export class UsersMusicPlaylistsRepository {
     const newPlaylist = await this.playlistRepo.createOneAndGet( {
       name: "Favorites",
       slug: "favorites",
+      visibility: "private",
     }, userId);
 
     await this.setMusicPlaylistFavorite(userId, newPlaylist.id);

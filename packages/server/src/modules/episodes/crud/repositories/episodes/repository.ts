@@ -93,7 +93,7 @@ CanGetAll<EpisodeEntity> {
     const episodeId = updateResult.upsertedId!.toString();
 
     this.domainEventEmitter.emitPatch(EpisodeEvents.Patched.TYPE, {
-      entity: episode,
+      partialEntity: episode,
       id: episodeId,
     } );
 
@@ -203,7 +203,7 @@ CanGetAll<EpisodeEntity> {
     const episodeId = updateResult._id.toString();
 
     this.domainEventEmitter.emitPatch(EpisodeEvents.Patched.TYPE, {
-      entity: episode,
+      partialEntity: episode,
       id: episodeId,
     } );
 

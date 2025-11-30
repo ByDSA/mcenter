@@ -9,6 +9,7 @@ export const userSchema = z.object( {
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   emailVerified: z.boolean(),
+  publicUsername: z.string(),
   musics: z.object( {
     favoritesPlaylistId: mongoDbId.nullable(),
   } ),
