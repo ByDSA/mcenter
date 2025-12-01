@@ -7,19 +7,8 @@ export class QueryParser extends CstParser {
     this.performSelfAnalysis();
   }
 
+  // Esta es la entrada principal y la operación de menor prioridad.
   public expression = this.RULE("expression", () => {
-    this.OR([
-      {
-        ALT: () => this.SUBRULE(this.notOperation),
-      },
-      {
-        ALT: () => this.SUBRULE(this.additionExpression),
-      },
-    ]);
-  } );
-
-  // Operadores +/-
-  private additionExpression = this.RULE("additionExpression", () => {
     this.SUBRULE(this.multiplicationExpression);
     this.MANY(() => {
       this.CONSUME(additionOperator);
@@ -27,25 +16,36 @@ export class QueryParser extends CstParser {
     } );
   } );
 
-  // Operador *
+  // Tiene prioridad sobre la suma. Llama a unaryExpression como operandos.
   private multiplicationExpression = this.RULE("multiplicationExpression", () => {
-    this.SUBRULE(this.atomicExpression);
+    this.SUBRULE(this.unaryExpression);
     this.MANY(() => {
       this.CONSUME(multiplicationOperator);
-      this.SUBRULE2(this.atomicExpression);
+      this.SUBRULE2(this.unaryExpression);
     } );
   } );
 
-  // Operador !
-  private notOperation = this.RULE("notOperation", () => {
-    this.CONSUME(not);
-    this.SUBRULE(this.atomicExpression);
+  // Tiene la prioridad más alta de los operadores lógicos.
+  private unaryExpression = this.RULE("unaryExpression", () => {
+    this.OR([
+      {
+        ALT: () => {
+          this.CONSUME(not);
+          this.SUBRULE(this.unaryExpression); // Recursión para permitir múltiple negación
+        },
+      },
+      {
+        ALT: () => {
+          this.SUBRULE(this.atomicExpression);
+        },
+      },
+    ]);
   } );
 
+  // Paréntesis y filtros específicos.
   private atomicExpression = this.RULE("atomicExpression", () => {
     this.OR([
-      // parenthesisExpression has the highest precedence and thus it appears
-      // in the "lowest" leaf in the expression ParseTree.
+      // Los paréntesis reinician la jerarquía llamando a 'expression'
       {
         ALT: () => this.SUBRULE(this.parenthesisExpression),
       },

@@ -50,7 +50,7 @@ export async function expressionToMeilisearchQuery(
     case "tag": {
       const tag = expression.value;
 
-      return `(tags IN ["${tag}"] AND onlyTags IS NULL) OR onlyTags IN ["${tag}"]`;
+      return `tags IN ["${tag}"]`;
     }
     case "privatePlaylist": {
       const slugPlaylist = expression.value;

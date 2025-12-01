@@ -24,7 +24,6 @@ type MusicDoc = {
   country?: string;
   addedAt: number;
   tags: string[] | null;
-  onlyTags: string[] | null;
 };
 
 type UserInfoDoc = {
@@ -33,7 +32,6 @@ type UserInfoDoc = {
   lastTimePlayedAt: number;
   weight: number;
   tags: string[] | null;
-  onlyTags: string[] | null;
   privatePlaylistSlugs: string[];
 };
 type Doc = MusicDoc & UserInfoDoc & {
@@ -431,7 +429,6 @@ export class MusicsIndexService {
       country: m.country,
       addedAt: Math.floor(m.addedAt.getTime() / 1000),
       tags: m.tags ?? null,
-      onlyTags: m.onlyTags ?? null,
     } satisfies MusicDoc;
   }
 
@@ -442,7 +439,6 @@ export class MusicsIndexService {
       lastTimePlayedAt: m.lastTimePlayed,
       weight: m.weight,
       tags: m.tags ?? null,
-      onlyTags: null,
       privatePlaylistSlugs: [],
     } satisfies UserInfoDoc;
   }
@@ -456,7 +452,6 @@ export class MusicsIndexService {
       country: m.country,
       addedAt: Math.floor(m.addedAt.getTime() / 1000),
       tags: m.tags ?? null,
-      onlyTags: null,
     } satisfies MusicDoc;
   }
 
@@ -467,7 +462,6 @@ export class MusicsIndexService {
       lastTimePlayedAt: m.lastTimePlayed,
       weight: m.weight,
       tags: m.tags ?? null,
-      onlyTags: null,
       privatePlaylistSlugs: [],
     } satisfies UserInfoDoc;
   }
@@ -484,7 +478,6 @@ export class MusicsIndexService {
     await this.index.updateFilterableAttributes([
       "weight",
       "tags",
-      "onlyTags",
       "addedAt",
       "lastTimePlayedAt",
       // internos:

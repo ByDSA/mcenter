@@ -10,7 +10,6 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimesta
   artist: string;
   album?: string;
   tags?: string[];
-  onlyTags?: string[];
   url: string;
   game?: string;
   year?: number;
@@ -56,11 +55,6 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: String,
   },
   tags: {
-    type: [String],
-    required: false,
-    default: undefined,
-  },
-  onlyTags: {
     type: [String],
     required: false,
     default: undefined,

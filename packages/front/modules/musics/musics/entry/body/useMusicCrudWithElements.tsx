@@ -338,7 +338,6 @@ function calcIsModified(r1: MusicEntityWithUserInfo, r2: MusicEntityWithUserInfo
     shouldMatch: {
       weight: true,
       tags: true,
-      // onlyTags: true, // TODO
     },
   } );
 }

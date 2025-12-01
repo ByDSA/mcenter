@@ -17,7 +17,7 @@ export const A_AOT4: MusicEntity = {
   id: new ObjectId().toString(),
   title: "undefined",
   slug: "a_aot4",
-  tags: ["t1", "only-t2"],
+  tags: ["t1", "t2"],
   ...AOT4_COMMON,
 };
 
@@ -41,7 +41,7 @@ const DRIFTVEIL: MusicEntity = {
   slug: "driftveil",
   artist: "artist",
   title: "Driftveil",
-  tags: ["only-t2", "t4"],
+  tags: ["t2", "t4"],
 };
 const MUSIC_FILE_SAMPLES: MusicEntity[] = deepFreeze([
   A_AOT4,

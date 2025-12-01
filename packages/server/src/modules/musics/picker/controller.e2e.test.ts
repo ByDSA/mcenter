@@ -97,7 +97,6 @@ describe("controller", () => {
             country: music.country,
             game: music.game,
             tags: [...music.tags ?? [], ...music.userInfo.tags ?? []],
-            onlyTags: [],
             privatePlaylistSlugs: [],
           };
 

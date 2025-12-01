@@ -23,7 +23,7 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
     title: docOdm.title,
     slug: docOdm.url,
     artist: docOdm.artist,
-    tags: docOdmToModelTags(docOdm),
+    tags: docOdm.tags,
     disabled: docOdm.disabled,
     uploaderUserId: docOdm.uploaderUserId.toString(),
     album: docOdm.album,
@@ -44,7 +44,6 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
 }
 
 export function modelToDocOdm(model: Model): DocOdm {
-  const docOdmTags = model.tags ? modelTagsToDocOdmTags(model.tags) : undefined;
   const docOdm: DocOdm = {
     title: model.title,
     url: model.slug,
@@ -56,8 +55,7 @@ export function modelToDocOdm(model: Model): DocOdm {
     game: model.game,
     year: model.year,
     spotifyId: model.spotifyId,
-    tags: docOdmTags?.tags,
-    onlyTags: docOdmTags?.onlyTags,
+    tags: model.tags,
     addedAt: model.addedAt,
     createdAt: model.createdAt,
     releasedOn: model.releasedOn,
@@ -74,30 +72,12 @@ export function musicEntityToDocOdm(entity: Entity): FullDocOdm {
   };
 }
 
-function modelTagsToDocOdmTags(
-  tags: string[] | undefined,
-): { tags?: string[];
-onlyTags?: string[]; } {
-  if (!tags)
-    return {};
-
-  const retTags = tags.filter((tag) => !tag.startsWith("only-"));
-  const retOnlyTags = tags.filter((tag) => tag.startsWith("only-")).map((tag) => tag.slice(5));
-
-  return {
-    tags: retTags.length > 0 ? retTags : undefined,
-    onlyTags: retOnlyTags.length > 0 ? retOnlyTags : undefined,
-  };
-}
-
 export function partialToDocOdm(partial: Partial<Model>): Partial<DocOdm> {
-  const docOdmTags = modelTagsToDocOdmTags(partial.tags);
   const ret: Partial<DocOdm> = {
     title: partial.title,
     url: partial.slug,
     artist: partial.artist,
-    tags: docOdmTags.tags,
-    onlyTags: docOdmTags.onlyTags,
+    tags: partial.tags,
     disabled: partial.disabled,
     album: partial.album,
     country: partial.country,
@@ -129,25 +109,4 @@ export function aggregationResultToResponse(
     data,
     metadata,
   };
-}
-
-function docOdmToModelTags(docOdm: DocOdm): string[] | undefined {
-  if (!docOdm.tags && !docOdm.onlyTags)
-    return undefined;
-
-  let tags: string[] | undefined;
-
-  if (docOdm.tags)
-    tags = [...docOdm.tags];
-
-  if (docOdm.onlyTags) {
-    if (!tags)
-      tags = [];
-
-    tags.push(...docOdm.onlyTags.map((tag) => `only-${tag}`));
-
-    return tags;
-  }
-
-  return tags;
 }

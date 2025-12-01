@@ -54,9 +54,11 @@ it("should emit Patch Event", async () => {
   expect(fn).toHaveBeenCalledWith( {
     type: EpisodeEvents.Patched.TYPE,
     payload: {
+      hasOld: false,
       entityId: fixtureEpisodes.Simpsons.Samples.EP1x01.id,
       key: "title",
       value: partialModel.title,
+      partialEntity: partialModel,
     },
   } );
 } );

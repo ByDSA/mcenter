@@ -6,6 +6,7 @@ import { useHistoryEntryEdition } from "#modules/history";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { createActionsBar } from "#modules/utils/resources/elements/crud-buttons";
 import { mergeCrudOp } from "#modules/utils/resources/useCrud";
+import { getLongDateStr } from "#modules/utils/dates";
 import { EpisodeHistoryApi } from "../../requests";
 import commonStyle from "../../../../../history/entry/body-common.module.css";
 import { LastestComponent } from "./Lastest";
@@ -13,7 +14,6 @@ import styles from "./style.module.css";
 import { useEpisodeCrudWithElements } from "./useEpisodeCrudWithElements";
 import { useEpisodeFileInfoCrudWithElements } from "./useEpisodeFileInfoCrudWithElements";
 import { useEpisodeUserInfoCrudWithElements } from "./useEpisodeUserInfoCrudWithElements";
-import { getLongDateStr } from "#modules/utils/dates";
 
 type Data = EpisodeHistoryApi.GetMany.Data;
 
@@ -77,12 +77,12 @@ export function Body( { data, setData }: Props) {
   const { state, remove } = useHistoryEntryEdition<Data>( {
     data,
     setData,
-    dataJsx: (data)=> <div>
-          <span>Fecha: {getLongDateStr(new Date(data.date.timestamp * 1_000), "datetime")}</span><br/>
-          <span>Serie: {data.resource.serie?.name ?? data.resource.compKey.seriesKey}</span><br/>
-          <span>Episodio: {data.resource.compKey.episodeKey}</span><br/>
-          <span>Título: {data.resource.title}</span><br/>
-          </div>,
+    dataJsx: (d)=> <div>
+      <span>Fecha: {getLongDateStr(new Date(d.date.timestamp * 1_000), "datetime")}</span><br/>
+      <span>Serie: {d.resource.serie?.name ?? d.resource.compKey.seriesKey}</span><br/>
+      <span>Episodio: {d.resource.compKey.episodeKey}</span><br/>
+      <span>Título: {d.resource.title}</span><br/>
+    </div>,
     fetchRemove: async ()=> {
       const res = await historyApi.delete(data.id);
 

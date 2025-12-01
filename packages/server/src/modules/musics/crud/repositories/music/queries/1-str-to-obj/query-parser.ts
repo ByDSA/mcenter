@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { CstElement, CstNode, IToken } from "@chevrotain/types";
-import { AddedNode, BinaryOperationNode, DifferenceNode, FilterNode, IntersectionNode, NegationNode, NumberLiteral, PlayedNode, PrivatePlaylistNode, PublicPlaylistNode, QueryObject, RangeDate, RangeNumber, UnionNode, WeightNode, YearNode } from "../query-object";
+import { AddedNode, BinaryOperationNode, FilterNode, NegationNode, NumberLiteral, PlayedNode, PrivatePlaylistNode, PublicPlaylistNode, QueryObject, RangeDate, RangeNumber, WeightNode, YearNode } from "../query-object";
 import { queryLexer } from "./query-lexer";
 import { QueryParser } from "./query-parser-chevrotain";
 
@@ -36,51 +36,21 @@ function transformCSTToQueryObject(cst: CstNode): QueryObject {
 }
 
 const expressionToObj = (node: CstNode): any => {
-  if (node.name !== "expression")
-    throw new Error("Error");
+  // Ahora 'expression' maneja la lógica de Unión/Suma directamente
+  const multiplicationExpressions = node.children.multiplicationExpression as CstNode[];
+  // Procesamos los hijos (que son intersecciones)
+  const operands = multiplicationExpressions.map(multiplicationExpressionToObj);
 
-  const childrenEntries = Object.entries(node.children);
-  const n = childrenEntries[0][1][0] as CstNode;
+  // Si hay operadores de suma (+, |, ~), construimos el árbol
+  if (node.children.AdditionOperator) {
+    const operators = node.children.AdditionOperator as IToken[];
 
-  switch (n.name) {
-    case "additionExpression": return additionExpressionToObj(n);
-    case "notOperation": return notOperationToObj(n);
-    default:
-      throw new Error("Unknown name: " + n.name);
+    return arrayFilterToTree(operands, operators);
   }
+
+  // Si no hay suma, devolvemos el único hijo
+  return operands[0];
 };
-
-function additionExpressionToObj(
-  node: CstNode,
-): DifferenceNode | FilterNode | IntersectionNode | UnionNode {
-  const multiplicationExpressionArray = node.children.multiplicationExpression as CstNode[];
-
-  if (multiplicationExpressionArray.length > 1) {
-    const AdditionOperatorArray = node.children.AdditionOperator as IToken[];
-    const filters = multiplicationExpressionArray.map(
-      me=> atomicExpressionToObj(me.children.atomicExpression[0] as CstNode),
-    );
-
-    return arrayFilterToTree(filters, AdditionOperatorArray);
-  }
-
-  if (multiplicationExpressionArray.length === 1)
-    return multiplicationExpressionToObj(multiplicationExpressionArray[0] as CstNode);
-
-  throw new Error("Error");
-}
-
-function notOperationToObj(
-  node: CstNode,
-): NegationNode {
-  const atomicExpression = node.children.atomicExpression[0] as CstNode;
-  const atomicExpressionObj = atomicExpressionToObj(atomicExpression);
-
-  return {
-    type: "negation",
-    child: atomicExpressionObj,
-  };
-}
 
 function getOperatorType(op: IToken): BinaryOperationNode["type"] {
   const operator = op.image;
@@ -94,26 +64,52 @@ function getOperatorType(op: IToken): BinaryOperationNode["type"] {
   }
 }
 
-function multiplicationExpressionToObj(node: CstNode): BinaryOperationNode | FilterNode {
-  const atomicExpressionArray = node.children.atomicExpression as CstNode[];
-  const filters = atomicExpressionArray.map(atomicExpressionToObj);
-  const operators = node.children.MultiplicationOperator as IToken[];
+function unaryExpressionToObj(node: CstNode): BinaryOperationNode | FilterNode | NegationNode {
+  // Caso 1: Es una negación (tiene el token Not)
+  if (node.children.Not) {
+    // Recursividad: !tag o !!tag. El hijo es otra unaryExpression
+    const childUnary = node.children.unaryExpression[0] as CstNode;
 
-  if (filters.length === 1)
-    return filters[0];
+    return {
+      type: "negation",
+      child: unaryExpressionToObj(childUnary),
+    };
+  }
 
-  if (filters.length > 1)
-    return arrayFilterToTree(filters, operators);
+  // Caso 2: No es negación, bajamos al nivel atómico
+  if (node.children.atomicExpression)
+    return atomicExpressionToObj(node.children.atomicExpression[0] as CstNode);
 
-  throw new Error("Error");
+  throw new Error("Error en unaryExpression: estructura desconocida");
 }
 
-function arrayFilterToTree(filters: FilterNode[], operatorsArray: IToken[]): BinaryOperationNode {
+function multiplicationExpressionToObj(
+  node: CstNode,
+): BinaryOperationNode | FilterNode | NegationNode {
+  // Ahora los hijos son 'unaryExpression', no 'atomicExpression'
+  const unaryExpressions = node.children.unaryExpression as CstNode[];
+  // Procesamos los hijos (que son negaciones o atómicos)
+  const operands = unaryExpressions.map(unaryExpressionToObj);
+
+  // Si hay operadores de multiplicación (*), construimos el árbol
+  if (node.children.MultiplicationOperator) {
+    const operators = node.children.MultiplicationOperator as IToken[];
+
+    return arrayFilterToTree(operands, operators);
+  }
+
+  return operands[0];
+}
+
+function arrayFilterToTree(
+  nodes: (BinaryOperationNode | FilterNode | NegationNode)[],
+  operatorsArray: IToken[],
+): BinaryOperationNode {
   // Construir de izquierda a derecha
   let result: BinaryOperationNode = {
     type: getOperatorType(operatorsArray[0]),
-    child1: filters[0],
-    child2: filters[1],
+    child1: nodes[0],
+    child2: nodes[1],
   };
 
   // Para el resto de operadores, ir construyendo hacia la izquierda
@@ -121,7 +117,7 @@ function arrayFilterToTree(filters: FilterNode[], operatorsArray: IToken[]): Bin
     result = {
       type: getOperatorType(operatorsArray[i]),
       child1: result,
-      child2: filters[i + 1],
+      child2: nodes[i + 1],
     };
   }
 

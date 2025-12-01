@@ -31,6 +31,9 @@ const NewPlaylistForm = ( { onSuccess }: FormProps) => {
     autofocus: true,
     onPressEnter: () => formModal.submit(),
   } );
+  const { element: inputVisibility, value: visibilityValue } = useInputText( {
+    nullChecked: false,
+  } ); // TODO
   const formModal = useFormModal( {
     canSubmit: ()=> nameValue.trim().length > 0,
     onSuccess,
@@ -40,6 +43,7 @@ const NewPlaylistForm = ( { onSuccess }: FormProps) => {
       return (await api.createOne( {
         name: nameValue.trim(),
         slug: nameValue.trim(),
+        visibility: visibilityValue ? "public" : "private",
       } )).data;
     },
   } );
@@ -49,6 +53,8 @@ const NewPlaylistForm = ( { onSuccess }: FormProps) => {
       <section>
         <p>Nombre:</p>
         {inputName}
+        <p>Visibilidad:</p>
+        {inputVisibility}
       </section>
       <footer>
         <Button
