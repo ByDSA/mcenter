@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.15.0](https://github.com/ByDSA/mcenter/compare/v4.14.0...v4.15.0) (2025-12-01)
+
+
+### Features
+
+* **back:** add negation and difference operators ([41b042c](https://github.com/ByDSA/mcenter/commit/41b042c7a1b58356eee3908a8d69c5063996b4a5))
+* **back:** use playlist in queries ([758ac6f](https://github.com/ByDSA/mcenter/commit/758ac6fcf50520a9aeb01fff1022ae3721256416))
+
+
+### Bug Fixes
+
+* **back:** move controller to usersmusic module ([09a71e5](https://github.com/ByDSA/mcenter/commit/09a71e5c1121e5cd527feb14067f6a41229b4483))
+* remove "only-" tags ([11db9ed](https://github.com/ByDSA/mcenter/commit/11db9edc73a4bd999732fd427de85682686c8cf6))
+
 ## [4.14.0](https://github.com/ByDSA/mcenter/compare/v4.13.0...v4.14.0) (2025-11-27)
 
 
