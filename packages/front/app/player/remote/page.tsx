@@ -10,7 +10,7 @@ import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 import { useUser } from "#modules/core/auth/useUser";
 import stylesFetching from "#modules/ui-kit/spinner/fetching.style.module.css";
-import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
 import { RemotePlayerEntry } from "./RemotePlayerEntry";
 import { sseRemotePlayers } from "./sse";
 import styles from "./styles.module.css";
@@ -144,7 +144,7 @@ export default function RemotePlayerSelector() {
     <>
       <h1>Remote players</h1>
 
-      {isLoading && <PageSpinner />}
+      {isLoading && <ContentSpinner />}
       {!isLoading && remotePlayers.length === 0
         && <p className={classes(
           stylesFetching.loading,

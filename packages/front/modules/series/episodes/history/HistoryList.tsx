@@ -1,14 +1,17 @@
 import { Fragment } from "react";
+import { PATH_ROUTES } from "$shared/routing";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
 import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
+import { logger } from "#modules/core/logger";
+import { backendUrl } from "#modules/requests";
+import { useContextMenuTrigger, ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 import { EpisodeHistoryApi } from "./requests";
 import { getDateStr } from "./utils";
 import styles from "./styles.module.css";
-
 import "#styles/resources/resource-list-entry.css";
 
 type Data = EpisodeHistoryApi.GetMany.Data[];
@@ -16,11 +19,14 @@ type Data = EpisodeHistoryApi.GetMany.Data[];
 export function HistoryList() {
   const { data, isLoading, error,
     setItem, observerTarget } = useHistoryList();
+  const { openMenu, closeMenu } = useContextMenuTrigger();
 
   return renderFetchedData<Data | null>( {
     data,
     error,
-    isLoading,
+    loader: {
+      isLoading,
+    },
     scroll: {
       observerRef: observerTarget,
     },
@@ -40,26 +46,50 @@ export function HistoryList() {
               return <Fragment
                 key={entry.date.timestamp}>
                 {dayTitle}
-                <HistoryEntryElement value={entry} setValue={(newEntry: typeof entry |
+                <HistoryEntryElement
+                  onClickMenu={(e) => openMenu( {
+                    event: e,
+                    content: (
+                      <>
+                        <ContextMenuItem
+                          label="Copiar backend URL"
+                          onClick={async (event) => {
+                            event.stopPropagation();
+                            const { episodeKey, seriesKey } = entry.resource!.compKey;
+
+                            await navigator.clipboard.writeText(
+                              backendUrl(
+                                PATH_ROUTES.episodes.slug.withParams(seriesKey, episodeKey),
+                              ),
+                            );
+                            logger.info("Copiada url");
+                            closeMenu();
+                          }}
+                        />
+                      </>
+                    ),
+                  } )}
+                  value={entry}
+                  setValue={(newEntry: typeof entry |
                   undefined) => {
-                  if (!newEntry) {
-                    setItem(i, null);
+                    if (!newEntry) {
+                      setItem(i, null);
 
-                    return;
-                  }
+                      return;
+                    }
 
-                  const oldEntry = data![i];
-                  const newData = {
-                    ...oldEntry,
-                    resource: {
-                      ...oldEntry.resource,
-                      ...newEntry.resource,
-                      serie: newEntry.resource.serie ?? oldEntry.resource.serie,
-                    },
-                  };
+                    const oldEntry = data![i];
+                    const newData = {
+                      ...oldEntry,
+                      resource: {
+                        ...oldEntry.resource,
+                        ...newEntry.resource,
+                        serie: newEntry.resource.serie ?? oldEntry.resource.serie,
+                      },
+                    };
 
-                  setItem(i, newData);
-                }}/>
+                    setItem(i, newData);
+                  }}/>
               </Fragment>;
             } )
           }

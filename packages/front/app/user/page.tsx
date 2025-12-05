@@ -47,7 +47,8 @@ export default function UserPage() {
       <p>Roles: {user.roles.map(r=>r.name).join(", ")}</p>
 
       <h3>Música</h3>
-      <p>Playlist favorita: {element}
+      <p>Playlist favorita: {element}</p>
+      <div>
         <Button onClick={async ()=>await openModal( {
           onSelect: async (playlist) => {
             const api = FetchApi.get(UsersApi);
@@ -56,6 +57,7 @@ export default function UserPage() {
 
             setFavPlaylist(playlist);
           },
-        } )}>Cambiar</Button></p>
+        } )}>Cambiar</Button>
+      </div>
     </div>);
 }

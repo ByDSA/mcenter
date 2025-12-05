@@ -13,10 +13,12 @@
 
   .header {
     background-color: var(--color-header, var(--color-container));
-    &:hover {
-      cursor: pointer;
-      background-color: var(--color-hover);
-      color: var(--color-hover-text);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        cursor: pointer;
+        background-color: var(--color-hover);
+        color: var(--color-hover-text);
+      }
     }
 
     &:has(+ *:not([style*="display: none"])) {

@@ -57,7 +57,7 @@ export function createActionsBar( { isModified = false,
   const isDoing = update?.isDoing || remove?.isDoing || false;
 
   return <span className={classes("line", styles.actionsBar)}>
-    {spinnerSide === "left" && isDoing && <Spinner/> }
+    {spinnerSide === "left" && isDoing && <Spinner size={1}/> }
     {update && isModified && <UpdateResource
       action={async ()=>{
         await update.action();
@@ -75,6 +75,6 @@ export function createActionsBar( { isModified = false,
       disabled={isDoing}
       spinnerSide="none"
     />}
-    {spinnerSide === "right" && isDoing && <Spinner/> }
+    {spinnerSide === "right" && isDoing && <Spinner size={1}/> }
   </span>;
 }

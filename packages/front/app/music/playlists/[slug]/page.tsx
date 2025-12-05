@@ -7,7 +7,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicPlaylistsApi } from "#modules/musics/playlists/requests";
 import { useCrudData } from "#modules/fetching";
 import MusicLayout from "app/music/music.layout";
-import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
 import { useUser } from "#modules/core/auth/useUser";
 import { PageItemNotFound } from "#modules/utils/ItemNotFound";
 
@@ -64,7 +64,7 @@ export default function Page( { params }: PageProps) {
             return error.toString();
           }
         } )()}</pre>}
-        {isLoading && <PageSpinner />}
+        {isLoading && <ContentSpinner />}
         {data
       && <MusicPlaylist value={data} setValue={(d)=>setData(d)}/>
         }

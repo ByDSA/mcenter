@@ -1,23 +1,27 @@
 import { MusicNote } from "@mui/icons-material";
+import { useContextMenuTrigger, ContextMenuItem } from "#modules/ui-kit/ContextMenu";
+import { useArrayData } from "#modules/utils/array-data-context";
 import { PlaylistEntity } from "../Playlist";
-import { formatDurationHeader } from "../utils";
+import { formatDurationHeader, playlistCopyBackendUrl } from "../utils";
 import { SettingsButton } from "../SettingsButton";
-import { ContextMenuProps } from "../PlaylistItem";
 import styles from "./Item.module.css";
+import { RenamePlaylistContextMenuItem } from "./renameItem";
+import { DeletePlaylistContextMenuItem } from "./deleteItem";
 
 interface PlaylistProps {
   value: PlaylistEntity;
-  setValue: (newValue: PlaylistEntity)=> void;
-  contextMenu?: ContextMenuProps;
+  index: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const MusicPlaylistListItem = ( { value, contextMenu }: PlaylistProps) => {
+export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
+  const { removeItemByIndex, data, setItemByIndex } = useArrayData<PlaylistEntity>();
   const totalDuration = value.list?.reduce(
     (acc, item) => acc + (item.music.fileInfos[0].mediaInfo.duration ?? 0),
     0,
   ) || 0;
   const totalSongs = value.list?.length || 0;
+  const { openMenu, closeMenu } = useContextMenuTrigger();
 
   return (
     <a className={styles.playlistContainer}
@@ -50,13 +54,48 @@ export const MusicPlaylistListItem = ( { value, contextMenu }: PlaylistProps) =>
         </div>
       </div>
       <div>
-        {contextMenu?.onClick
-        && <><SettingsButton
+        {<><SettingsButton
           theme="dark"
           className={styles.settingsButton}
-          onClick={(e: React.MouseEvent<HTMLElement>)=>contextMenu.onClick?.(e)}
+          onClick={(e: React.MouseEvent<HTMLElement>)=>openMenu( {
+            event: e,
+            className: styles.contextMenu,
+            content: <>
+              <ContextMenuItem
+                label="Copiar backend URL"
+                onClick={async () => {
+                  await playlistCopyBackendUrl( {
+                    value,
+                  } );
+                }}
+              />
+              <RenamePlaylistContextMenuItem
+                value={value}
+                setValue={(newPlaylist: PlaylistEntity) => {
+                  // Para optimistic case
+                  const i = data?.findIndex((d) => d.id === newPlaylist.id);
+
+                  if (i === undefined || i === -1)
+                    return;
+
+                  setItemByIndex(i, v=>{
+                    return {
+                      ...v,
+                      name: newPlaylist.name,
+                      slug: newPlaylist.slug,
+                    };
+                  } );
+                }}
+              />
+              <DeletePlaylistContextMenuItem
+                value={value}
+                onOpen={() => closeMenu()}
+                onActionSuccess={() => removeItemByIndex(index)}
+                getValue={() => data[index]}
+              />
+            </>,
+          } )}
         />
-        {contextMenu.element}
         </>}
       </div>
     </a>

@@ -3,10 +3,13 @@ import React, { ReactNode, useState } from "react";
 import { PlayArrow,
   Pause } from "@mui/icons-material";
 import { useUser } from "#modules/core/auth/useUser";
+import { classes } from "#modules/utils/styles";
+import { OnClickMenu } from "../history/entry/Header";
 import { formatDurationItem } from "./utils";
-import styles from "./PlaylistItem.module.css";
 import { SettingsButton } from "./SettingsButton";
 import { FavButton, UpdateFavButtons } from "./FavButton";
+import styles from "./PlaylistItem.module.css";
+import playlistStyles from "./Playlist.module.css";
 
 export type ContextMenuProps = {
   onClick?: (e: React.MouseEvent<HTMLElement>)=> void;
@@ -14,7 +17,7 @@ export type ContextMenuProps = {
 };
 
 interface PlaylistItemProps {
-  contextMenu?: ContextMenuProps;
+  onClickMenu?: OnClickMenu;
   value: PlaylistItemEntity;
   index: number;
   isPlaying?: boolean;
@@ -22,13 +25,15 @@ interface PlaylistItemProps {
   onPlay?: (item: PlaylistItemEntity)=> void;
   onPause?: ()=> void;
   updateFavButtons?: UpdateFavButtons;
+  className?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicPlaylistItem = ( { value,
   index,
   isPlaying = false,
-  contextMenu,
+  onClickMenu,
+  className,
   isDragging = false,
   updateFavButtons,
   onPlay,
@@ -44,11 +49,15 @@ export const MusicPlaylistItem = ( { value,
 
   return (
     <div
-      className={`${styles.playlistItem} ${isPlaying ? styles.playing : ""}`}
+      className={classes(
+        styles.playlistItem,
+        isPlaying && styles.playing,
+        className,
+      )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={styles.indexContainer}>
+      <div className={classes(styles.indexContainer, playlistStyles.headerIndex)}>
         {(isHovered && !isDragging) || isPlaying
           ? (
             <button className={styles.playButton} onClick={handlePlayPause}>
@@ -56,29 +65,30 @@ export const MusicPlaylistItem = ( { value,
             </button>
           )
           : (
-            <span className={styles.indexNumber}>{index + 1}</span>
+            <span className={styles.indexNumber}>{index
+              + 1}</span>
           )}
       </div>
 
-      <div className={styles.songInfo}>
+      <div className={classes(playlistStyles.headerTitle, styles.songInfo)}>
         <h4 className={`${styles.songTitle} ${isPlaying ? styles.playing : ""}`}>
           {value.music.title}
         </h4>
         <div className={styles.songDetails}>
           <span className={styles.songArtist}>{value.music.artist}</span>
-          <span className={styles.separator}>•</span>
-          <span className={styles.songAlbum}>{
+          <span className={classes(styles.separator, styles.albumShowHide)}>•</span>
+          <span className={classes(styles.songAlbum, styles.albumShowHide)}>{
             !value.music.album || value.music.album.trim() === ""
               ? "(Sin álbum)"
               : value.music.album}</span>
         </div>
       </div>
 
-      <div className={styles.duration}>
+      <div className={classes(playlistStyles.headerDuration, styles.duration)}>
         {formatDurationItem(value.music.fileInfos[0].mediaInfo.duration ?? 0)}
       </div>
 
-      <div className={styles.actions}>
+      <div className={classes(playlistStyles.headerActions, styles.actions)}>
         {user && <FavButton
           value={!!value.music.isFav}
           favoritesPlaylistId={user.musics.favoritesPlaylistId}
@@ -86,13 +96,11 @@ export const MusicPlaylistItem = ( { value,
           updateFavButtons={updateFavButtons}
         />
         }
-        {contextMenu?.onClick
-        && <><SettingsButton
+        {onClickMenu && <><SettingsButton
           theme="dark"
           className={styles.settingsButton}
-          onClick={(e: React.MouseEvent<HTMLElement>)=>contextMenu.onClick?.(e)}
+          onClick={(e: React.MouseEvent<HTMLElement>)=>onClickMenu?.(e)}
         />
-        {contextMenu.element}
         </>}
       </div>
     </div>

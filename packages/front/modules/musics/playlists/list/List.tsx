@@ -6,15 +6,10 @@ import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
 import { useUser } from "#modules/core/auth/useUser";
-import { createContextMenuItem, useListContextMenu } from "#modules/ui-kit/ContextMenu";
 import { classes } from "#modules/utils/styles";
 import { MusicPlaylistsApi } from "../requests";
-import { playlistCopyBackendUrl } from "../utils";
 import { MusicPlaylistListItem } from "./Item";
 import styles from "./List.module.css";
-import { RenamePlaylistContextMenuItem } from "./renameItem";
-import { useRenamePlaylistModal } from "./useRenamePlaylistModal";
-import { useDeletePlaylistContextMenuItem } from "./deleteItem";
 
 import "#styles/resources/resource-list-entry.css";
 
@@ -23,78 +18,28 @@ type Data = MusicPlaylistsApi.GetManyByCriteria.Data[];
 type Props = ReturnType<typeof useMusicPlaylists>;
 
 export function MusicPlayListsList(
-  { data, error, isLoading, observerTarget, removeItemByIndex, setItemByIndex }: Props,
+  { data, error, isLoading, observerTarget }: Props,
 ) {
   const { user } = useUser();
   const userId = user?.id;
 
   assertIsDefined(userId);
 
-  const { generateDeletePlayListContextMenuItem } = useDeletePlaylistContextMenuItem( {
-    onOpen: () => {
-      closeMenu();
-    },
-    onActionSuccess: ()=>removeItemByIndex(activeIndex!),
-    getValue: ()=>data![activeIndex!],
-  } );
-  const renameModal = useRenamePlaylistModal();
-  const { openMenu,
-    renderContextMenu,
-    activeIndex, closeMenu } = useListContextMenu( {
-    className: styles.contextMenu,
-    renderChildren: (item: PlaylistEntity)=><>
-      {createContextMenuItem( {
-        label: "Copiar backend URL",
-        onClick: async ()=> {
-          await playlistCopyBackendUrl( {
-            value: item,
-          } );
-        },
-      } )}
-      {RenamePlaylistContextMenuItem( {
-        renameModal,
-        closeMenu,
-        value: item,
-        setValue: (value: PlaylistEntity) => {
-          const i = data?.findIndex((d) => d.id === value.id);
-
-          if (i === undefined || i === -1)
-            return;
-
-          setItemByIndex(i, {
-            ...item,
-            name: value.name,
-            slug: value.slug,
-          } );
-        },
-      } )}
-      {generateDeletePlayListContextMenuItem(item)}
-    </>,
-  } );
-
   return renderFetchedData<Data | null>( {
     data,
     error,
-    isLoading,
+    loader: {
+      isLoading,
+    },
     render: () => (
-      <span className={classes("resource-list", styles.list)}>
+      <span className={classes("resource-list", styles.list)} key={data?.length}>
         {
           data!.map(
             (playlist, i) => <Fragment key={playlist.id}>
               <MusicPlaylistListItem
+                index={i}
                 value={playlist as PlaylistEntity}
-                setValue={(newEntry: typeof playlist | undefined) => {
-                  setItemByIndex(i, newEntry ?? null);
-                }}
-                contextMenu={{
-                  element: activeIndex === i
-                    ? renderContextMenu(playlist as PlaylistEntity)
-                    : undefined,
-                  onClick: (e) => openMenu( {
-                    event: e,
-                    index: i,
-                  } ),
-                }} />
+              />
             </Fragment>,
           )
         }

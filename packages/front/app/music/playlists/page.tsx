@@ -5,6 +5,7 @@ import { PlayListsList } from "#modules/musics/playlists";
 import { useMusicPlaylists } from "#modules/musics/playlists/list/List";
 import { useNewPlaylistButton } from "#modules/musics/playlists/NewPlaylistButton";
 import { PlaylistEntity } from "#modules/musics/playlists/Playlist";
+import { ArrayDataProvider } from "#modules/utils/array-data-context";
 import MusicLayout from "../music.layout";
 import styles from "./styles.module.css";
 
@@ -23,7 +24,14 @@ export default function MusicPlaylistsPage() {
       <section className={styles.newPlaylistSection}>
         {newPlaylistButton.element}
       </section>
-      <PlayListsList {...usingMusicPlaylist} />
+      <ArrayDataProvider
+        data={usingMusicPlaylist.data ?? []}
+        addItem={usingMusicPlaylist.addItem}
+        removeItemByIndex={usingMusicPlaylist.removeItemByIndex}
+        setItemByIndex={usingMusicPlaylist.setItemByIndex}
+      >
+        <PlayListsList {...usingMusicPlaylist} />
+      </ArrayDataProvider>
     </MusicLayout>
   );
 }

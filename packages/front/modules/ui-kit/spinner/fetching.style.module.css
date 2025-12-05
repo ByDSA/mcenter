@@ -1,3 +1,17 @@
+/* content inline. Ej: LatestComponent */
+.loading {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Variables */
+  --spinner-size: 5rem;
+  --spinner-width: 0.4rem;
+}
+
+/* full page. Ej: MusicList */
 main:has(> .loading) {
   min-height: inherit;
   position: relative;

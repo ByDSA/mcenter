@@ -16,13 +16,14 @@ export type UseCrudProps<T> = {
   setData: (newData: T | undefined)=> void;
   isModifiedFn?: (base: T, current: T)=> boolean;
   fetchUpdate?: FetchFn<T>;
+  beforeFetchRemove?: ()=> Promise<boolean>;
   fetchRemove?: FetchFn<T>;
 };
 
 export type RetCrudOp<T> = Promise<{
   data: T | void;
   success: boolean;
-}>;
+} | undefined>;
 
 export type CrudOp<T> = {
   action: ()=> RetCrudOp<T>;
@@ -39,9 +40,12 @@ export type UseCrudRet<T> = {
   initialState: ResourceState<T>;
 };
 
-export function useCrud<T>(
-  { data, setData: setResponseData, isModifiedFn, fetchRemove, fetchUpdate }: UseCrudProps<T>,
-): UseCrudRet<T> {
+export function useCrud<T>( { data,
+  setData: setResponseData,
+  isModifiedFn,
+  beforeFetchRemove,
+  fetchRemove,
+  fetchUpdate }: UseCrudProps<T>): UseCrudRet<T> {
   const initialDataState = useInitialData(data, isModifiedFn);
   const [initialData] = initialDataState;
   const dataState = useState(
@@ -93,6 +97,9 @@ export function useCrud<T>(
   const remove = fetchRemove
     ? async () => {
       const { done, start } = asyncRemoveAction;
+
+      if (beforeFetchRemove && !(await beforeFetchRemove()))
+        return;
 
       start();
 

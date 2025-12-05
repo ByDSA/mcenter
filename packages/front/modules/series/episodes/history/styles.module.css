@@ -1,11 +1,9 @@
 .list {
   :global(.resource-list-entry) {
     :global(.ui-kit-accordion) {
-      @media (hover: hover) {
-        --color-hover: var(--color-yellow-750);
-        --color-hover-text: var(--yellow-yellow-25);
-      }
-      --color-open: var(--color-yellow-800);
+      --color-hover: var(--color-yellow-750);
+      --color-hover-text: var(--yellow-yellow-25);
+      --color-open: var(--color-hover);
       --color-header: var(--color-yellow-800);
       --color-container: var(--color-yellow-850);
 

@@ -2,22 +2,27 @@ import { showError } from "$shared/utils/errors/showError";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
-import { createContextMenuItem } from "#modules/ui-kit/ContextMenu";
+import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { MusicPlaylistEntity, musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistsApi } from "../requests";
 import styles from "./Delete.module.css";
 
-type Props = {
+type Props = Parameters<typeof useDeletePlayList>[0] & {
   value: MusicPlaylistEntity;
-  confirmModal: ReturnType<typeof useConfirmModal>;
   onOpen?: ()=> void;
   className?: string;
 };
 
-export function DeletePlaylistContextMenuItem( { value, confirmModal, onOpen }: Props) {
-  const { openModal } = confirmModal;
+export function DeletePlaylistContextMenuItem(
+  { value, onOpen, getValue, onActionSuccess, onFinish }: Props,
+) {
+  const { openModal } = useDeletePlayList( {
+    getValue,
+    onActionSuccess,
+    onFinish,
+  } );
 
-  return createContextMenuItem( {
+  return ContextMenuItem( {
     label: "Eliminar",
     theme: "danger",
     className: styles.contextMenuItem,
@@ -74,23 +79,6 @@ export function useDeletePlayList(
           return false;
         },
         ...props,
-      } );
-    },
-  };
-}
-
-export function useDeletePlaylistContextMenuItem(
-  props: Parameters<typeof useDeletePlayList>[0] & {onOpen?: (
-)=> void;},
-) {
-  const using = useDeletePlayList(props);
-
-  return {
-    generateDeletePlayListContextMenuItem: (value: MusicPlaylistEntity)=> {
-      return DeletePlaylistContextMenuItem( {
-        value,
-        onOpen: props.onOpen,
-        confirmModal: using,
       } );
     },
   };

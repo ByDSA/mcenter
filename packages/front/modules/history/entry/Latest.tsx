@@ -68,7 +68,9 @@ T extends Entry<any, any>,
   return renderFetchedData<T[] | null>( {
     data,
     error,
-    isLoading,
+    loader: {
+      isLoading,
+    },
     render: () => {
       assertIsDefined(data);
 

@@ -27,7 +27,9 @@ export function List() {
   return renderFetchedData( {
     data,
     error,
-    isLoading,
+    loader: {
+      isLoading,
+    },
     render: (d) => {
       const playStream: (
         stream: string

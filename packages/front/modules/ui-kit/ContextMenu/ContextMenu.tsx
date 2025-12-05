@@ -1,12 +1,25 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/naming-convention */
-import { useState, useRef, useEffect, ReactNode, MouseEvent, useCallback } from "react";
+import { useState, useRef, useEffect, ReactNode, MouseEvent, useCallback, createContext, useContext, useMemo } from "react";
 import { classes } from "#modules/utils/styles";
 import styles from "./ContextMenu.module.css";
 
-// Types
+// --- TIPOS ---
 type Position = {
   x: number;
   y: number;
+};
+type OpenMenuProps = {
+  className?: string;
+  event: MouseEvent<HTMLElement>;
+  content: ReactNode;
+};
+type OpenMenuFn = (props: OpenMenuProps)=> void;
+
+type ContextMenuContextType = {
+  openMenu: OpenMenuFn;
+  closeMenu: ()=> void;
 };
 
 type ContextMenuProps = {
@@ -15,19 +28,14 @@ type ContextMenuProps = {
   onClose: ()=> void;
   children: ReactNode;
   className?: string;
-};
-
-type UseContextMenuProps<T> = {
-  renderChildren: (value: T)=> ReactNode;
-  className?: string;
-  onClose?: ()=> void;
+  menuRef?: React.RefObject<HTMLDivElement | null>;
 };
 
 type SmartPositionOptions = {
   considerScroll?: boolean;
 };
 
-// Función para calcular la posición inteligente
+// --- HELPERS (Igual que antes) ---
 const calculateSmartPosition = (
   triggerRect: DOMRect,
   menuWidth: number,
@@ -37,33 +45,25 @@ const calculateSmartPosition = (
   const opts: Required<SmartPositionOptions> = {
     considerScroll: optsParam?.considerScroll ?? true,
   };
-  // Obtener dimensiones de la ventana y scroll
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const scrollX = opts.considerScroll ? window.scrollX : 0;
   const scrollY = opts.considerScroll ? window.scrollY : 0;
-  // Posición inicial preferida (debajo del elemento)
   let x = triggerRect.left + scrollX;
   let y = triggerRect.bottom + scrollY + 4;
 
-  // Ajustar horizontalmente si se sale de la ventana
   if (x + menuWidth > viewportWidth + scrollX) {
-    // Si no cabe a la derecha, alinear por la derecha
     x = triggerRect.right + scrollX - menuWidth;
 
-    // Si aún se sale por la izquierda, alinear con el borde izquierdo de la ventana
     if (x < scrollX)
-      x = scrollX + 8; // 8px de margen
+      x = scrollX + 8;
   }
 
-  // Ajustar verticalmente si se sale de la ventana
   if (y + menuHeight > viewportHeight + scrollY) {
-    // Intentar posicionar arriba del elemento
     y = triggerRect.top + scrollY - menuHeight - 4;
 
-    // Si tampoco cabe arriba, posicionar dentro de la ventana
     if (y < scrollY)
-      y = scrollY + 8; // 8px de margen desde el top
+      y = scrollY + 8;
   }
 
   return {
@@ -71,12 +71,30 @@ const calculateSmartPosition = (
     y,
   };
 };
+
+function isInsideFixedElement(target: Element) {
+  let element = target.parentElement;
+  let considerScroll = true;
+
+  while (element) {
+    if (getComputedStyle(element).position === "fixed") {
+      considerScroll = false;
+      break;
+    }
+
+    element = element.parentElement;
+  }
+
+  return considerScroll;
+}
+
+// --- COMPONENTE VISUAL (Igual que antes) ---
 const ContextMenu = ( { isOpen,
   position,
   onClose,
   children,
   className,
-  menuRef }: ContextMenuProps & { menuRef?: React.RefObject<HTMLDivElement | null> } ) => {
+  menuRef }: ContextMenuProps) => {
   const internalRef = useRef<HTMLDivElement>(null);
   const ref = menuRef || internalRef;
 
@@ -86,7 +104,7 @@ const ContextMenu = ( { isOpen,
       const isBackdrop = target?.dataset?.contextBackdrop !== undefined;
 
       if (isBackdrop) {
-        event.preventDefault(); // Evita llamar a otros listeners al cerrar
+        event.preventDefault();
         onClose();
       }
     };
@@ -111,13 +129,14 @@ const ContextMenu = ( { isOpen,
 
   return (
     <>
-      <div className={styles.backdrop} data-context-backdrop/>
+      <div className={styles.backdrop} data-context-backdrop />
       <div
         ref={ref}
         className={classes(styles.contextMenu, className, isOpen && styles.open)}
         style={{
           top: position.y,
           left: position.x,
+          visibility: position.x === -9999 ? "hidden" : "visible",
         }}
         role="menu"
       >
@@ -126,70 +145,29 @@ const ContextMenu = ( { isOpen,
     </>
   );
 };
+// --- CONTEXTO Y PROVIDER ---
+const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
 
-export const useListContextMenu = <T, >(config: UseContextMenuProps<T>) => {
-  const { closeMenu: _closeMenu,
-    isOpen, openMenu: _openMenu,
-    renderContextMenu } = useContextMenu(config);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const openMenu = ( { index, event }: {
-    index: number;
-    event: MouseEvent<HTMLElement>;
-  } ): boolean => {
-    const ret = _openMenu( {
-      event,
-      forceOpen: index !== activeIndex,
-    } );
-
-    if (ret)
-      setActiveIndex(index);
-
-    return ret;
-  };
-  const closeMenu = useCallback(() => {
-    _closeMenu();
-    setActiveIndex(null);
-  }, [_closeMenu]);
-
-  return {
-    renderContextMenu,
-    openMenu,
-    closeMenu,
-    activeIndex,
-    isOpen,
-  };
-};
-
-function isInsideFixedElement(target: Element) {
-  let element = target.parentElement;
-  let considerScroll = true;
-
-  while (element) {
-    if (getComputedStyle(element).position === "fixed") {
-      considerScroll = false;
-      break;
-    }
-
-    element = element.parentElement;
-  }
-
-  return considerScroll;
-}
-
-export const useContextMenu = <T, >(config: UseContextMenuProps<T>) => {
-  const { renderChildren, className } = config;
-  const [isOpen, setIsOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
-  const [position, setPosition] = useState<Position>( {
-    x: 0,
-    y: 0,
+export const ContextMenuProvider = ( { children }: { children: ReactNode } ) => {
+  const [state, setState] = useState<{
+    isOpen: boolean;
+    position: Position;
+    content: ReactNode | null;
+    className?: string;
+  }>( {
+    isOpen: false,
+    position: {
+      x: 0,
+      y: 0,
+    },
+    content: null,
   } );
+  // CAMBIO CLAVE: Usamos useRef en lugar de useState.
+  // Esto permite leer/escribir el estado "cerrando" sin forzar re-renders,
+  // y lo más importante: sin cambiar la dependencia de 'openMenu'.
+  const isClosingRef = useRef(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  // Función para prevenir scroll
-  const preventDefault = useCallback((e: Event) => {
-    e.preventDefault();
-  }, []);
-  // Funciones para manejar el scroll
+  const preventDefault = useCallback((e: Event) => e.preventDefault(), []);
   const disableScroll = useCallback(() => {
     document.body.style.overflow = "hidden";
     document.addEventListener("wheel", preventDefault, {
@@ -204,117 +182,140 @@ export const useContextMenu = <T, >(config: UseContextMenuProps<T>) => {
     document.removeEventListener("wheel", preventDefault);
     document.removeEventListener("touchmove", preventDefault);
   }, [preventDefault]);
-  const openMenu = ( { event, forceOpen = false }: {
-    event: MouseEvent<HTMLElement>;
-    forceOpen?: boolean;
-  } ) => {
-    if (isClosing && !forceOpen)
-      return false;
+  const openMenu: OpenMenuFn = useCallback(
+    ( { content, event, className } ) => {
+      // Leemos la referencia actual. Esto NO crea una dependencia de renderizado.
+      if (isClosingRef.current)
+        return;
 
-    // Deshabilitar scroll
-    disableScroll();
+      event.preventDefault();
+      event.stopPropagation();
 
-    const triggerRect = event.currentTarget.getBoundingClientRect();
-    const considerScroll = isInsideFixedElement(event.currentTarget);
+      const trigger = event.currentTarget;
+      const triggerRect = trigger.getBoundingClientRect();
+      // Asegúrate de tener esta función importada o definida
+      const considerScroll = isInsideFixedElement(trigger);
 
-    setPosition( {
-      x: -9999,
-      y: -9999,
-    } );
-    setIsOpen(true);
+      disableScroll();
 
-    requestAnimationFrame(() => {
-      if (menuRef.current) {
-        const menuWidth = menuRef.current.offsetWidth;
-        const menuHeight = menuRef.current.offsetHeight;
-        const smartPosition = calculateSmartPosition(triggerRect, menuWidth, menuHeight, {
-          considerScroll,
-        } );
+      setState( {
+        className,
+        isOpen: true,
+        content,
+        position: {
+          x: -9999,
+          y: -9999,
+        },
+      } );
 
-        setPosition(smartPosition);
-      } else {
-        const smartPosition = calculateSmartPosition(triggerRect, 200, 200, {
-          considerScroll,
-        } );
+      requestAnimationFrame(() => {
+        if (menuRef.current) {
+          const menuWidth = menuRef.current.offsetWidth;
+          const menuHeight = menuRef.current.offsetHeight;
+          const smartPosition = calculateSmartPosition(
+            triggerRect,
+            menuWidth,
+            menuHeight,
+            {
+              considerScroll,
+            },
+          ); // Asegúrate de tener calculateSmartPosition disponible
 
-        setPosition(smartPosition);
-      }
-    } );
-
-    return true;
-  };
+          setState((prev) => ( {
+            ...prev,
+            position: smartPosition,
+          } ));
+        }
+      } );
+    },
+    [disableScroll],
+  );
   const closeMenu = useCallback(() => {
-    setIsOpen(false);
-    setIsClosing(true);
-
-    // Rehabilitar scroll
+    // Actualizamos la referencia sin provocar re-renders
+    isClosingRef.current = true;
     enableScroll();
 
-    setTimeout(() => {
-      setIsClosing(false);
-    }, 100);
+    setState((prev) => ( {
+      ...prev,
+      isOpen: false,
+    } ));
 
-    return true;
+    setTimeout(() => {
+      isClosingRef.current = false;
+    }, 150);
   }, [enableScroll]);
 
-  // Cleanup en caso de que el componente se desmonte con el menú abierto
+  // Listeners globales
   useEffect(() => {
-    return () => {
-      if (isOpen)
-        enableScroll();
-    };
-  }, [isOpen, enableScroll]);
-
-  // Resto del código sin cambios...
-  useEffect(() => {
-    if (!isOpen)
+    if (!state.isOpen)
       return;
 
-    const handleScroll = preventDefault;
-    const handleResize = preventDefault;
+    const handleScrollResize = preventDefault;
 
-    window.addEventListener("scroll", handleScroll, {
+    window.addEventListener("scroll", handleScrollResize, {
       passive: true,
     } );
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleScrollResize);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScrollResize);
+      window.removeEventListener("resize", handleScrollResize);
     };
-  }, [isOpen]);
+  }, [state.isOpen, preventDefault]);
 
-  return {
-    renderContextMenu: (value: T) =><ContextMenu
-      className={className}
-      isOpen={isOpen}
-      position={position}
-      onClose={()=> {
-        closeMenu();
-        config.onClose?.();
-      }}
-      menuRef={menuRef}
-    >
-      {renderChildren(value)}
-    </ContextMenu>,
+  useEffect(() => {
+    return () => enableScroll();
+  }, [enableScroll]);
+
+  // MEMOIZACIÓN FINAL
+  // Como openMenu y closeMenu ya no dependen de ningún estado que cambie frecuentemente
+  // (solo dependen de enable/disableScroll que son estables),
+  // contextValue NUNCA cambiará tras el primer render.
+  const contextValue = useMemo(() => ( {
     openMenu,
     closeMenu,
-    isOpen,
-  };
+  } ), [openMenu, closeMenu]);
+
+  return (
+    <ContextMenuContext.Provider value={contextValue}>
+      {children}
+      <ContextMenu // Asumiendo que ContextMenu está definido arriba o importado
+        className={state.className}
+        isOpen={state.isOpen}
+        position={state.position}
+        onClose={closeMenu}
+        menuRef={menuRef}
+      >
+        {state.content}
+      </ContextMenu>
+    </ContextMenuContext.Provider>
+  );
 };
 
+// --- HOOK ---
+export const useContextMenuTrigger = () => {
+  const context = useContext(ContextMenuContext);
+
+  if (!context)
+    throw new Error("useContextMenuTrigger must be used within a ContextMenuProvider");
+
+  return context;
+};
+
+// --- HELPER ITEMS ---
 type CreateContextMenuItemProps = {
   label: string;
-  closeMenu?: ReturnType<typeof useContextMenu>["closeMenu"];
   onClick?: (e: MouseEvent<HTMLParagraphElement>)=> void;
   className?: string;
   theme?: "danger" | "default" | "primary" | "success";
 };
-export const createContextMenuItem = ( { onClick,
-  label,
-  closeMenu,
-  theme = "default",
-  className }: CreateContextMenuItemProps) => {
+
+export const ContextMenuItem = ( { label,
+  onClick,
+  className,
+  theme = "default" }: CreateContextMenuItemProps) => {
+  const { closeMenu } = useContextMenuTrigger();
+
   return (
     <p
       className={classes(
@@ -325,15 +326,14 @@ export const createContextMenuItem = ( { onClick,
         theme === "success" && styles.success,
         className,
       )}
-      onClick={(e)=>{
+      onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!onClick)
-          return;
-
-        onClick(e);
-        closeMenu?.();
+        if (onClick) {
+          onClick(e);
+          closeMenu();
+        }
       }}
     >
       {label}

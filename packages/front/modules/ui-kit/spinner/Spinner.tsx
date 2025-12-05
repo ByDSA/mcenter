@@ -11,10 +11,10 @@ export const Spinner: React.FC<SpinnerProps> = ( { size = 1 }: SpinnerProps) => 
   const style = {} as React.CSSProperties;
 
   if (size === 1) {
-    style["--spinner-size"] = size + "em";
+    style["--spinner-size"] = size + "rem";
     style["--spinner-width"] = "2px";
   } else {
-    style["--spinner-size"] = size + "em";
+    style["--spinner-size"] = size + "rem";
     style["--spinner-width"] = `${size}px`;
   }
 
@@ -23,6 +23,9 @@ export const Spinner: React.FC<SpinnerProps> = ( { size = 1 }: SpinnerProps) => 
   ></span>;
 };
 
-export const PageSpinner = () => {
-  return <div className={stylesFetching.loading}><Spinner size={6}/></div>;
+type ContentSpinnerProps = {
+  size?: number;
+};
+export const ContentSpinner = (props?: ContentSpinnerProps) => {
+  return <div className={stylesFetching.loading}><Spinner size={props?.size ?? 6}/></div>;
 };

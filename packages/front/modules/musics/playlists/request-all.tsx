@@ -2,7 +2,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { useCallback, useState } from "react";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useAsyncElement } from "#modules/utils/usePageAsyncAction";
-import { Spinner } from "#modules/ui-kit/spinner";
+import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
 import { MusicPlaylistsApi } from "./requests";
 import { MusicPlaylistEntity } from "./models";
 import { PlaylistSelector } from "./list-selector/List";
@@ -30,7 +30,7 @@ export function useMusicPlaylistsForUser( { userId, onSelect }: Props) {
         justifyContent: "center",
         padding: "2rem",
       }}>
-        <Spinner size={4}/>
+        <ContentSpinner size={4}/>
       </div>
     ),
     errorElement: <div>Error al cargar playlists</div>,

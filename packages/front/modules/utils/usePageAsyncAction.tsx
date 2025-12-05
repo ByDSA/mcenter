@@ -1,5 +1,5 @@
 import { ReactNode, useState, useEffect } from "react";
-import { PageSpinner, Spinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner, Spinner } from "#modules/ui-kit/spinner/Spinner";
 
 type Status = "error" | "iddle" | "loading" | "success";
 
@@ -22,7 +22,7 @@ export function usePageAsyncAction(
     initialStatus,
     loadingElement: <div>
       {loadingMessage ?? "Loading..."}
-      <PageSpinner />
+      <ContentSpinner />
     </div>,
     errorElement: <div>
       {errorMessage ?? "Error"}

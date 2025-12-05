@@ -4,7 +4,6 @@
 
   display: flex;
   align-items: center;
-  gap: 16px;
   padding: 12px;
   border-radius: 8px;
   transition: all 0.2s ease;
@@ -19,11 +18,19 @@
   }
 }
 
-.indexContainer {
-  width: 32px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+@media (width < 500px) {
+  .albumShowHide {
+    display: none;
+  }
+
+  .actions {
+    gap: 0 !important;
+  }
+
+  .songArtist {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .indexNumber,
@@ -67,11 +74,6 @@
   font-size: 20px;
 }
 
-.songInfo {
-  flex: 1;
-  min-width: 0;
-}
-
 .songTitle {
   font-weight: 500;
   color: var(--color-gray-25);
@@ -88,11 +90,20 @@
 .songDetails {
   display: flex;
   align-items: center;
-  gap: 8px;
+  min-width: 0; /* Permite que los hijos se encojan más allá de su contenido */
+  width: 100%;
   font-size: 14px;
+
+  .separator {
+    white-space: pre; /* Evita que colapse */
+    margin: 0 5px;
+  }
 }
 
-.songArtist,
+.songArtist {
+  white-space: nowrap;
+}
+
 .songAlbum {
   white-space: nowrap;
   overflow: hidden;
@@ -100,8 +111,6 @@
 }
 
 .duration {
-  width: 64px;
-  text-align: right;
   font-size: 14px;
 }
 

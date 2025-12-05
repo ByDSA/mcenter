@@ -108,7 +108,7 @@ type OpenModalArgs = {
 export function useRenamePlaylistModal(props: HookProps = {} ) {
   const modal = useModal();
   const openModal = ( { value, setValue, onClose }: OpenModalArgs) => {
-    modal.openModal( {
+    return modal.openModal( {
       title: "Renombrar",
       className: styles.renameModal,
       onClose: onClose,

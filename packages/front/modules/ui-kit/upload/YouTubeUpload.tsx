@@ -243,7 +243,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
       />
           }
           {
-            doing && <div className={styles.loading}><Spinner /></div>
+            doing && <div className={styles.loading}><Spinner size={2} /></div>
           }
         </div>
       </div>

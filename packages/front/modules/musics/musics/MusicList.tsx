@@ -1,20 +1,12 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
 import { WithRequired } from "@tanstack/react-query";
-import { PATH_ROUTES } from "$shared/routing";
-import { UserPayload } from "$shared/models/auth";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
-import { logger } from "#modules/core/logger";
-import { backendUrl } from "#modules/requests";
-import { createContextMenuItem, useListContextMenu } from "#modules/ui-kit/ContextMenu";
-import { useUser } from "#modules/core/auth/useUser";
 import { MusicsApi } from "../requests";
-import { MusicEntity, MusicEntityWithFileInfos } from "../models";
-import { MusicPlaylistsApi } from "../playlists/requests";
-import { usePlaylistSelectorModal } from "../playlists/list-selector/modal/Modal";
+import { MusicEntityWithFileInfos } from "../models";
 import { MusicEntryElement } from "./entry/MusicEntry";
 import { ArrayData } from "./types";
 import styles from "./styles.module.css";
@@ -29,7 +21,6 @@ type Props = {
 type Data = ArrayData;
 
 export function MusicList(props: Props) {
-  const { user } = useUser();
   const { data,
     isLoading,
     error,
@@ -47,34 +38,6 @@ export function MusicList(props: Props) {
       Resultados: {data?.length} de {totalCount}
     </span>
   );
-  const playlistModal = usePlaylistSelectorModal();
-  const { openMenu, renderContextMenu, closeMenu, activeIndex } = useListContextMenu( {
-    renderChildren: (item: MusicEntity) => (
-      <>
-        {
-          createAddToPlaylistContextMenuItem( {
-            musicId: item.id,
-            user,
-            modal: playlistModal,
-            closeMenu,
-          } )
-        }
-        {
-          createContextMenuItem( {
-            label: "Copiar backend URL",
-            onClick: async (event) => {
-              event.stopPropagation();
-              await navigator.clipboard.writeText(
-                backendUrl(PATH_ROUTES.musics.slug.withParams(item.slug)),
-              );
-              logger.info("Copiada url");
-              closeMenu();
-            },
-          } )
-        }
-      </>
-    ),
-  } );
 
   return renderFetchedData<Data | null>( {
     data,
@@ -82,7 +45,9 @@ export function MusicList(props: Props) {
     scroll: {
       observerRef: observerTarget,
     },
-    isLoading,
+    loader: {
+      isLoading,
+    },
     render: () => (
       <>
         {resultNumbers}
@@ -98,13 +63,6 @@ export function MusicList(props: Props) {
                 )
                 }
                 shouldFetchFileInfo={true}
-                contextMenu={{
-                  element: activeIndex === i ? renderContextMenu(music as MusicEntity) : undefined,
-                  onClick: (e) => openMenu( {
-                    event: e,
-                    index: i,
-                  } ),
-                }}
               />
             </Fragment>
           ))}
@@ -202,53 +160,4 @@ function getFilterFromProps(
 
 export async function sleep(ms: number) {
   return await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-type CreateAddToPlaylistContextMenuItemProps =
-  Pick<Parameters<typeof createContextMenuItem>[0], "closeMenu"> & {
-  user: UserPayload | null;
-  musicId: MusicEntity["id"];
-  modal: ReturnType<typeof usePlaylistSelectorModal>;
-};
-export function createAddToPlaylistContextMenuItem(
-  props: CreateAddToPlaylistContextMenuItemProps,
-) {
-  const { user } = props;
-  const { openModal } = props.modal;
-
-  if (!user)
-    return null;
-
-  const handleAddToPlaylist = (musicId: MusicEntity["id"]) => {
-    if (!user)
-      return;
-
-    openModal( {
-      className: styles.playlistSelectorModal,
-      title: "Añadir a playlist",
-      onSelect: async (playlist) => {
-        if (!playlist)
-          return;
-
-        try {
-          const api = FetchApi.get(MusicPlaylistsApi);
-
-          await api.addOneTrack(playlist.id, musicId);
-          logger.info(`Canción añadida a "${playlist.name}"`);
-        } catch (err) {
-          showError(err);
-        }
-      },
-    } )
-      .catch(showError);
-  };
-
-  return (createContextMenuItem( {
-    label: "Añadir a playlist",
-    onClick: () => {
-      handleAddToPlaylist(props.musicId);
-    },
-    closeMenu: props.closeMenu,
-  } )
-  );
 }

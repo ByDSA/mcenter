@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { ScrollStatus } from "#modules/ui-kit/ScrollStatus";
-import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
 
 type DataRenderParams<T> = {
   data: T;
@@ -8,11 +8,13 @@ type DataRenderParams<T> = {
   scroll?: {
     observerRef: React.RefObject<HTMLDivElement | null>;
   };
-  isLoading: boolean;
+  loader: {
+    isLoading: boolean;
+  };
   render: (data: NonNullable<T>)=> JSX.Element;
 };
 export function renderFetchedData<T>(
-  { error, isLoading, render, data, scroll }: DataRenderParams<T>,
+  { error, loader, render, data, scroll }: DataRenderParams<T>,
 ): JSX.Element {
   if (!data && error) {
     const errorShown = {
@@ -44,8 +46,8 @@ export function renderFetchedData<T>(
     </>;
   }
 
-  if (!data && isLoading)
-    return <PageSpinner />;
+  if (!data && loader.isLoading)
+    return <ContentSpinner />;
 
   if (!data)
     return <span>Empty data.</span>;
@@ -53,6 +55,6 @@ export function renderFetchedData<T>(
   return <>
     {render(data)}
     {scroll
-      && <ScrollStatus ref={scroll.observerRef} isLoading={isLoading} error={error}/>}
+      && <ScrollStatus ref={scroll.observerRef} isLoading={loader.isLoading} error={error}/>}
   </>;
 }

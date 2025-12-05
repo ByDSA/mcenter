@@ -6,7 +6,7 @@
       "request": "launch",
       "serverReadyAction": {
         "action": "debugWithChrome",
-        "pattern": "Local:        (https?://.+)",
+        "pattern": "Local:[\\s]+(https?://.+)",
         "uriFormat": "%s"
       },
       "type": "node-terminal"

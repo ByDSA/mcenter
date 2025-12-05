@@ -1,4 +1,4 @@
-import type { MusicHistoryEntry, MusicHistoryEntryEntity } from "#modules/musics/history/models";
+import type { MusicHistoryEntry } from "#modules/musics/history/models";
 import { Fragment } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { formatDate } from "#modules/utils/dates";
@@ -9,11 +9,10 @@ import { classes } from "#modules/utils/styles";
 import { INITIAL_FETCHING_LENGTH, FETCHING_MORE_LENGTH } from "#modules/history/lists";
 import { logger } from "#modules/core/logger";
 import { backendUrl } from "#modules/requests";
-import { createContextMenuItem, useListContextMenu } from "#modules/ui-kit/ContextMenu";
+import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
 import styles from "../musics/styles.module.css";
-import { createAddToPlaylistContextMenuItem } from "../musics/MusicList";
-import { usePlaylistSelectorModal } from "../playlists/list-selector/modal";
+import { AddToPlaylistContextMenuItem } from "../playlists/AddToPlaylistContextMenuItem";
 import { MusicHistoryApi } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 
@@ -29,48 +28,8 @@ export function HistoryList(props?: Props) {
   const showDate = props?.showDate ?? "groupByDay";
   const { data, isLoading, error,
     setItem, observerTarget, setData } = useHistoryList();
-  const playlistModal = usePlaylistSelectorModal();
   const { user } = useUser();
-  const { openMenu,
-    renderContextMenu,
-    activeIndex, closeMenu } = useListContextMenu( {
-    renderChildren: (item: MusicHistoryEntryEntity)=><>
-      {
-        createAddToPlaylistContextMenuItem( {
-          musicId: item.resourceId,
-          user,
-          modal: playlistModal,
-          closeMenu,
-        } )
-      }
-      {
-        createContextMenuItem( {
-          label: "Copiar backend URL",
-          closeMenu,
-          onClick: async () => {
-            await navigator.clipboard.writeText(
-              backendUrl(PATH_ROUTES.musics.slug.withParams(item.resourceId)),
-            );
-            logger.info("Copiada url");
-          },
-        } )
-      }
-      {
-        createContextMenuItem( {
-          label: "Eliminar del historial",
-          closeMenu,
-          theme: "danger",
-          onClick: async () => {
-            const api = FetchApi.get(MusicHistoryApi);
-
-            await api.deleteOneById(item.id);
-            logger.info("Entrada de historial eliminada");
-            setItem(activeIndex!, null);
-          },
-        } )
-      }
-    </>,
-  } );
+  const { openMenu } = useContextMenuTrigger();
   const updateIsFav = (musicId: string, favorite: boolean) => {
     if (!data)
       return;
@@ -96,7 +55,9 @@ export function HistoryList(props?: Props) {
   return renderFetchedData<Data | null>( {
     data,
     error,
-    isLoading,
+    loader: {
+      isLoading,
+    },
     scroll: {
       observerRef: observerTarget,
     },
@@ -111,15 +72,38 @@ export function HistoryList(props?: Props) {
                   setItem(i, newEntry ?? null);
                 }}
                 updateFavButtons={updateIsFav}
-                contextMenu={{
-                  element: activeIndex === i
-                    ? renderContextMenu(entry)
-                    : undefined,
-                  onClick: (e) => openMenu( {
+                onClickMenu={(e)=> {
+                  openMenu( {
                     event: e,
-                    index: i,
-                  } ),
-                }} />
+                    content: <>
+                      <AddToPlaylistContextMenuItem
+                        musicId={entry.resourceId}
+                        user={user}
+                      />
+                      <ContextMenuItem
+                        label="Copiar backend URL"
+                        onClick={async () => {
+                          await navigator.clipboard.writeText(
+                            backendUrl(PATH_ROUTES.musics.slug.withParams(entry.resource.slug)),
+                          );
+                          logger.info("Copiada url");
+                        }}
+                      />
+                      <ContextMenuItem
+                        label="Eliminar del historial"
+                        theme="danger"
+                        onClick={async () => {
+                          const api = FetchApi.get(MusicHistoryApi);
+
+                          await api.deleteOneById(entry.id);
+                          logger.info("Entrada de historial eliminada");
+                          setItem(i, null);
+                        }}
+                      />
+                    </>,
+                  } );
+                }}
+              />
             </Fragment>,
           )
         }

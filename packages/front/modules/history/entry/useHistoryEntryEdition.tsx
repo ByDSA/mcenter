@@ -13,33 +13,26 @@ export function useHistoryEntryEdition<T>(
   const { isModified, remove, reset, addOnReset, state, update, initialState } = useCrud<T>( {
     data: params.data,
     setData: params.setData,
-    fetchRemove: params.fetchRemove
-      ? (async () => {
-        const { data } = params;
-        let ret = {
-          data: undefined as typeof data | undefined | void,
-          success: false,
-        };
+    beforeFetchRemove: async () => {
+      const { data } = params;
+      let ret = false;
 
-        await openModal( {
-          title: "Confirmar borrado",
-          staticContent: (<>
-            <p>¿Borrar esta entrada del historial?</p>
-            {params.dataJsx(data)}
-          </>),
-          action: async () => {
-            const got = await params.fetchRemove?.();
+      await openModal( {
+        title: "Confirmar borrado",
+        staticContent: (<>
+          <p>¿Borrar esta entrada del historial?</p>
+          {params.dataJsx(data)}
+        </>),
+        action: () => {
+          ret = true;
 
-            if (got)
-              ret = got;
+          return true;
+        },
+      } );
 
-            return true;
-          },
-        } );
-
-        return ret;
-      } )
-      : undefined,
+      return ret;
+    },
+    fetchRemove: params.fetchRemove,
     fetchUpdate: params.fetchUpdate,
     isModifiedFn: params.isModifiedFn,
   } );

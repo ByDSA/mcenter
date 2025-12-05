@@ -1,16 +1,16 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { createDurationElement, createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
+import { createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
-import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { classes } from "#modules/utils/styles";
+import { OnClickMenu } from "#modules/musics/history/entry/Header";
 import { EpisodeHistoryApi } from "../requests";
 import headerStyles from "../../../../history/entry/Header/styles.module.css";
 
 type HeaderProps = {
   entry: EpisodeHistoryApi.GetMany.Data;
-  contextMenu?: ContextMenuProps;
+  onClickMenu?: OnClickMenu;
 };
-export function Header( { entry, contextMenu }: HeaderProps) {
+export function Header( { entry, onClickMenu }: HeaderProps) {
   const { resource } = entry;
   const { serie } = resource;
 
@@ -20,11 +20,8 @@ export function Header( { entry, contextMenu }: HeaderProps) {
     ? `${resource.title}`
     : resource.compKey.episodeKey
     ?? "(Sin título)";
-  const subtitle = <>{resource.compKey.episodeKey} • {serie.name ?? resource.compKey.seriesKey}</>;
+  const subtitle = <>{serie.name ?? resource.compKey.seriesKey} • {resource.compKey.episodeKey}</>;
   const timeStampDate = new Date(entry.date.timestamp * 1000);
-  const start = resource.fileInfos[0].start ?? 0;
-  const end = resource.fileInfos[0].end ?? resource.fileInfos[0].mediaInfo.duration;
-  const duration = end ? (end - start) : undefined;
 
   return <HistoryEntryHeader
     left={<>
@@ -35,18 +32,15 @@ export function Header( { entry, contextMenu }: HeaderProps) {
     subtitle={subtitle}
     right={<>
       <span className={headerStyles.columns}>
-        <span className={classes(headerStyles.rows, headerStyles.small)}>
+        <span className={classes(headerStyles.rows, headerStyles.small, headerStyles.info)}>
           {createHistoryTimeElement(timeStampDate)}
-          {duration && createDurationElement(duration)}
           {createWeightElement(resource.userInfo.weight)}
         </span>
-        {contextMenu?.onClick
-                      && <><SettingsButton
-                        theme="dark"
-                        onClick={(e: React.MouseEvent<HTMLElement>)=>contextMenu.onClick?.(e)}
-                      />
-                      {contextMenu.element}
-                      </>}
+        {onClickMenu && <><SettingsButton
+          theme="dark"
+          onClick={(e: React.MouseEvent<HTMLElement>)=>onClickMenu?.(e)}
+        />
+        </>}
       </span>
     </>} />;
 }

@@ -1,6 +1,7 @@
 import { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
+import { NewItem, NewItemFn } from "#modules/utils/array-data-context";
 
 export type Action<D> = {
   fn: (data: D | null)=> Promise<D>;
@@ -36,7 +37,7 @@ type UseCrudDataReturn<
       setError: (error: unknown | undefined)=> void;
       isLoading: boolean;
       setIsLoading: (loading: boolean)=> void;
-      setItem: (i: number, item: D[0] | null)=> void;
+      setItem: (i: number, newItem: NewItem<D[0] | null>)=> void;
     };
 
 export function useCrudData<D extends unknown[], T extends Record<string, Action<D>> | undefined>(
@@ -160,7 +161,7 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
     };
   }, []);
 
-  const setItem = useCallback((i: number, item: D[0] | null) => {
+  const setItem = useCallback((i: number, item: NewItem<D[0] | null>) => {
     setData((old: D | null) => {
       if (!old)
         return null;
@@ -173,7 +174,10 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
         return newData as D;
       }
 
-      newData[i] = item;
+      if (typeof item === "function")
+        newData[i] = (item as NewItemFn<D[0] | null>)(old[i]);
+      else
+        newData[i] = item;
 
       return newData as D;
     } );

@@ -93,7 +93,10 @@ body:has(.content) {
   }
 
   .topbar {
+    display: flex;
+
     > aside:first-of-type {
+      display: contents;
       > .mini {
         display: flex !important;
         border-right: var(--color-gray-900) solid 1px;
@@ -103,11 +106,33 @@ body:has(.content) {
       }
     }
 
+    > main > a,
+    > aside:first-of-type > a {
+      padding: 0 clamp(0.5rem, calc(6dvw - 0.7rem), 4rem) !important;
+    }
+
     > main {
       display: flex !important;
       > * {
-        padding: 0 clamp(10px, calc(6dvw - 10px), 5rem);
         border-right: var(--color-gray-900) solid 1px;
+      }
+    }
+
+    > aside:last-of-type {
+      padding: 0;
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (width < 360px) {
+  .topbar {
+    min-width: 262px;
+
+    > aside:last-of-type {
+      > button:not(:has(svg)) {
+        padding: 0.3rem clamp(0.5rem, calc(9dvw - 1rem), 1.5rem) !important;
       }
     }
   }

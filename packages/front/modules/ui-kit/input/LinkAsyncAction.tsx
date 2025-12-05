@@ -24,7 +24,7 @@ export function LinkAsyncAction(
   { isDoing, action, disabled, spinnerSide = "right", title, children }: LabelAsyncActionProps,
 ) {
   const element = (<span>
-    {spinnerSide === "left" && isDoing && <Spinner/> }
+    {spinnerSide === "left" && isDoing && <Spinner size={1}/> }
     <a
       title={title}
       style={
@@ -38,7 +38,7 @@ export function LinkAsyncAction(
     >
       {children}
     </a>
-    {spinnerSide === "right" && isDoing && <Spinner/> }
+    {spinnerSide === "right" && isDoing && <Spinner size={1}/> }
   </span>);
 
   return element;

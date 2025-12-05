@@ -68,7 +68,7 @@
   .rows {
     display: flex;
     flex-flow: column nowrap;
-    align-items: start;
+    align-items: flex-start;
     justify-content: center;
 
     > * {
@@ -90,9 +90,15 @@
 }
 
 .favButton {
-  margin-right: 0.25rem;
-  margin-left: 0.5rem;
   svg {
     transform: scale(1) !important;
+  }
+}
+
+.info {
+  margin-right: 1rem;
+
+  @media (width < 450px) {
+    margin-right: 0.5rem;
   }
 }

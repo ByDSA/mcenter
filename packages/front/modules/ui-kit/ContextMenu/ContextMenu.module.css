@@ -1,6 +1,9 @@
+:global(body):has(.contextMenu) {
+  --context-menu-z-index: 10;
+}
+
 /* Context Menu Styles */
 .contextMenu {
-  --z-index: 10;
   position: absolute;
   background: white;
   border: 1px solid var(--color-gray-100);
@@ -9,7 +12,7 @@
     0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
   min-width: 160px;
-  z-index: var(--z-index);
+  z-index: var(--context-menu-z-index);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
@@ -37,7 +40,8 @@
     align-items: center;
     color: inherit;
 
-    &:hover {
+    &:hover,
+    &:active {
       background-color: var(--color-gray-100);
       color: inherit;
     }
@@ -50,7 +54,8 @@
     border-top-right-radius: 2px;
   }
 
-  > a:hover {
+  > a:hover,
+  > a:active {
     text-decoration: none;
   }
 }
@@ -102,7 +107,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: calc(var(--z-index) - 1);
+  z-index: calc(var(--context-menu-z-index) - 1);
   background: transparent;
   pointer-events: auto;
   cursor: default;

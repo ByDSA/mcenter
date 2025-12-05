@@ -1,11 +1,9 @@
 .list {
   :global(.resource-list-entry) {
     :global(.ui-kit-accordion) {
-      @media (hover: hover) {
-        --color-hover: var(--color-teal-750);
-        --color-hover-text: var(--color-teal-25);
-      }
-      --color-open: var(--color-teal-800);
+      --color-hover: var(--color-teal-750);
+      --color-hover-text: var(--color-teal-25);
+      --color-open: var(--color-hover);
       --color-header: var(--color-teal-800);
       --color-container: var(--color-teal-850);
 
@@ -29,12 +27,4 @@
       border-color: var(--color-teal-750);
     }
   }
-}
-
-.playlistSelectorModal > section {
-  > :first-child {
-    max-height: 300px;
-    overflow-y: auto;
-  }
-  width: 300px;
 }

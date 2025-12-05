@@ -11,7 +11,7 @@ import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-playe
 import { EpisodesApi } from "#modules/series/episodes/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { logger } from "#modules/core/logger";
-import { PageSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
 import styles from "./Player.module.css";
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;
@@ -139,7 +139,7 @@ export default function RemotePlayer( { params }: PageProps) {
   return (
     <>
       <h1>Player</h1>
-      { isLoading && <PageSpinner /> }
+      { isLoading && <ContentSpinner /> }
       {(isDefined(status?.status) && statusRepresentaton(status.status, resource))}
     </>
   );

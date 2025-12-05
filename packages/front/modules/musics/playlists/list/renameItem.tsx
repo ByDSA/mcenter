@@ -1,25 +1,25 @@
-import type { useRenamePlaylistModal } from "./useRenamePlaylistModal";
 import type { PlaylistEntity } from "../Playlist";
-import { createContextMenuItem, useContextMenu } from "#modules/ui-kit/ContextMenu";
+import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
+import { useRenamePlaylistModal } from "./useRenamePlaylistModal";
 
-type Props = {
+type Props = Parameters<typeof useRenamePlaylistModal>[0] & {
   value: PlaylistEntity;
-  closeMenu?: ReturnType<typeof useContextMenu>["closeMenu"];
   setValue: (value: PlaylistEntity)=> void;
-  renameModal: ReturnType<typeof useRenamePlaylistModal>;
   className?: string;
 };
 
 export function RenamePlaylistContextMenuItem(
-  { value, setValue, renameModal, className, closeMenu }: Props,
+  { value, setValue, className, ...useProps }: Props,
 ) {
-  return createContextMenuItem( {
+  const { openModal } = useRenamePlaylistModal(useProps);
+
+  return ContextMenuItem( {
     label: "Renombrar",
     className,
-    closeMenu,
     onClick: (e) => {
       e.preventDefault();
-      renameModal.openModal( {
+
+      return openModal( {
         value,
         setValue,
       } );

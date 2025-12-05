@@ -1,11 +1,14 @@
 import { assertIsDefined } from "$shared/utils/validation";
+import { useCallback } from "react";
 import { useUser } from "#modules/core/auth/useUser";
 import { logger } from "#modules/core/logger";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { Button } from "#modules/ui-kit/input/Button";
+import { classes } from "#modules/utils/styles";
 import { useNewPlaylistButton } from "../../NewPlaylistButton";
 import { PlaylistEntity } from "../../Playlist";
 import { useMusicPlaylistsForUser } from "../../request-all";
+import styles from "./Modal.module.css";
 
 type OpenModalProps = Omit<
   Partial<NonNullable<Parameters<ReturnType<typeof useModal>["openModal"]>[0]>>,
@@ -19,31 +22,36 @@ type Props = {
 };
 export function usePlaylistSelectorModal(props?: Props) {
   const { closeOnSelect = true, nullable = false } = props ?? {};
-  const { openModal: _openModal, setModalContent: _, ...modal } = useModal();
+  const { openModal: _openModal, setModalContent: _, closeModal, id, isOpen } = useModal();
   const { user } = useUser();
 
   assertIsDefined(user);
 
-  return {
-    modal,
-    openModal: async (openModalProps: OpenModalProps) => {
-      await _openModal( {
-        ...openModalProps,
-        title: openModalProps.title ?? "Seleccionar playlist",
-        staticContent: (
-          <AddToPlaylistModalContent
-            userId={user.id}
-            nullable={nullable}
-            onSelect={async p=>{
-              await openModalProps.onSelect(p);
+  const openModal = useCallback(async (openModalProps: OpenModalProps) => {
+    await _openModal( {
+      ...openModalProps,
+      className: classes(styles.playlistSelectorModal, openModalProps.className),
+      title: openModalProps.title ?? "Seleccionar playlist",
+      staticContent: (
+        <AddToPlaylistModalContent
+          userId={user.id}
+          nullable={nullable}
+          onSelect={async p=>{
+            await openModalProps.onSelect(p);
 
-              if (closeOnSelect)
-                modal.closeModal();
-            }}
-          />
-        ),
-      } );
-    },
+            if (closeOnSelect)
+              closeModal();
+          }}
+        />
+      ),
+    } );
+  }, [user, nullable, closeModal]);
+
+  return {
+    id,
+    isOpen,
+    closeModal,
+    openModal,
   };
 }
 

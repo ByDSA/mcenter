@@ -2,21 +2,22 @@ import { MusicEntityWithUserInfo } from "$shared/models/musics";
 import { MusicHistoryEntryEntity } from "#modules/musics/history/models";
 import { createHistoryTimeElement, createWeightElement, HistoryEntryHeader } from "#modules/history";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
-import { ContextMenuProps } from "#modules/musics/playlists/PlaylistItem";
 import { FavButton, UpdateFavButtons } from "#modules/musics/playlists/FavButton";
 import { useUser } from "#modules/core/auth/useUser";
 import { classes } from "#modules/utils/styles";
 import headerStyles from "../../../history/entry/Header/styles.module.css";
 import styles from "../../../history/entry/Header/styles.module.css";
 
+export type OnClickMenu = (e: React.MouseEvent<HTMLElement>)=> void;
+
 type HeaderProps = {
   entry: Omit<MusicHistoryEntryEntity, "resource"> & {
     resource: MusicEntityWithUserInfo;
   };
-  contextMenu?: ContextMenuProps;
+  onClickMenu?: (e: React.MouseEvent<HTMLElement>)=> void;
   updateFavButtons: UpdateFavButtons;
 };
-export function Header( { entry, contextMenu, updateFavButtons }: HeaderProps) {
+export function Header( { entry, onClickMenu, updateFavButtons }: HeaderProps) {
   const { user } = useUser();
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
   const { resource } = entry;
@@ -25,16 +26,11 @@ export function Header( { entry, contextMenu, updateFavButtons }: HeaderProps) {
   const timeStampDate = new Date(entry.date.timestamp * 1000);
 
   return HistoryEntryHeader( {
-    left: <>
-      <span className={classes(headerStyles.rows, headerStyles.small)}>
-
-      </span>
-    </>,
     title,
     subtitle,
     right: <>
       <span className={headerStyles.columns}>
-        <span className={classes(headerStyles.rows, headerStyles.small)}>
+        <span className={classes(headerStyles.rows, headerStyles.small, headerStyles.info)}>
           {createHistoryTimeElement(timeStampDate)}
           {createWeightElement(resource.userInfo.weight) }
         </span>
@@ -47,12 +43,11 @@ export function Header( { entry, contextMenu, updateFavButtons }: HeaderProps) {
             updateFavButtons,
           } )}
         </span>
-        {contextMenu?.onClick
+        {onClickMenu
               && <><SettingsButton
                 theme="dark"
-                onClick={(e: React.MouseEvent<HTMLElement>)=>contextMenu.onClick?.(e)}
+                onClick={(e: React.MouseEvent<HTMLElement>)=>onClickMenu?.(e)}
               />
-              {contextMenu.element}
               </>}
       </span>
     </>,

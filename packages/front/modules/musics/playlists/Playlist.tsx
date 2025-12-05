@@ -27,8 +27,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { useUser } from "#modules/core/auth/useUser";
 import { MusicEntityWithFileInfos } from "../models";
-import { createContextMenuItem, useListContextMenu } from "../../ui-kit/ContextMenu/ContextMenu";
-import { createAddToPlaylistContextMenuItem } from "../musics/MusicList";
+import { ContextMenuItem, useContextMenuTrigger } from "../../ui-kit/ContextMenu/ContextMenu";
 import { MusicPlaylistItem } from "./PlaylistItem";
 import { MusicPlaylistEntity } from "./models";
 import { formatDurationHeader, playlistCopyBackendUrl } from "./utils";
@@ -37,9 +36,8 @@ import commonStyles from "./common.module.css";
 import { SettingsButton } from "./SettingsButton";
 import { MusicPlaylistsApi } from "./requests";
 import { RenamePlaylistContextMenuItem } from "./list/renameItem";
-import { useRenamePlaylistModal } from "./list/useRenamePlaylistModal";
-import { useDeletePlaylistContextMenuItem } from "./list/deleteItem";
-import { usePlaylistSelectorModal } from "./list-selector/modal";
+import { DeletePlaylistContextMenuItem } from "./list/deleteItem";
+import { AddToPlaylistContextMenuItem } from "./AddToPlaylistContextMenuItem";
 
 export type PlaylistItemEntity = MusicPlaylistEntity["list"][0]
 & {
@@ -99,8 +97,44 @@ newIndex: number;}[]>([]);
   };
   const handleMoreOptions = (e: React.MouseEvent<HTMLElement>) => {
     playlistOpenMenu( {
-      index: 0,
       event: e,
+      content: (
+        <>
+          <RenamePlaylistContextMenuItem
+            className={styles.contextMenuItem}
+            onSuccess={( { previous, current } ) => {
+              if (previous.slug !== current.slug) {
+                router.push(PATH_ROUTES.musics.frontend.playlists.withParams( {
+                  slug: current.slug,
+                } ));
+              }
+            }}
+            value={value}
+            setValue={(v: PlaylistEntity) => {
+              setValue( {
+                ...value,
+                name: v.name,
+                slug: v.slug,
+              } );
+            }}
+          />
+          <ContextMenuItem
+            label="Copiar backend URL"
+            className={styles.contextMenuItem}
+            onClick={async ()=> {
+              await playlistCopyBackendUrl( {
+                value,
+              } );
+            }}
+          />
+          <DeletePlaylistContextMenuItem
+            value={value}
+            onOpen={() => { playlistCloseMenu(); }}
+            onActionSuccess={()=>router.push(PATH_ROUTES.musics.frontend.playlists.path)}
+            getValue={()=>value}
+          />
+        </>
+      ),
     } );
   };
   const handleDragStart = () => {
@@ -157,93 +191,12 @@ newIndex: number;}[]>([]);
       }
     }
   };
-  const renameModal = useRenamePlaylistModal( {
-    onSuccess: ( { previous, current } ) => {
-      if (previous.slug !== current.slug) {
-        router.push(PATH_ROUTES.musics.frontend.playlists.withParams( {
-          slug: current.slug,
-        } ));
-      }
-    },
-  } );
   const router = useRouter();
-  const { generateDeletePlayListContextMenuItem } = useDeletePlaylistContextMenuItem( {
-    onOpen: () => { playlistCloseMenu(); },
-    onActionSuccess: ()=>router.push(PATH_ROUTES.musics.frontend.playlists.path),
-    getValue: ()=>value,
-  } );
   const { openMenu: playlistOpenMenu,
-    renderContextMenu: renderPlaylistContextMenu,
-    closeMenu: playlistCloseMenu } = useListContextMenu<undefined>( {
-      renderChildren: ()=><>
-        {RenamePlaylistContextMenuItem( {
-          className: styles.contextMenuItem,
-          renameModal,
-          closeMenu: playlistCloseMenu,
-          value,
-          setValue: (v: PlaylistEntity) => {
-            setValue( {
-              ...value,
-              name: v.name,
-              slug: v.slug,
-            } );
-          },
-        } )}
-        {createContextMenuItem( {
-          label: "Copiar backend URL",
-          closeMenu: playlistCloseMenu,
-          className: styles.contextMenuItem,
-          onClick: async ()=> {
-            await playlistCopyBackendUrl( {
-              value,
-            } );
-          },
-        } )}
-        {generateDeletePlayListContextMenuItem(value)}
-      </>,
-    } );
-  const playlistModal = usePlaylistSelectorModal();
+    closeMenu: playlistCloseMenu } = useContextMenuTrigger();
   const { user } = useUser();
   const { openMenu: playlistItemOpenMenu,
-    renderContextMenu: renderPlaylistItemContextMenu,
-    activeIndex: playListItemActiveIndex, closeMenu: playlistItemCloseMenu } = useListContextMenu( {
-    renderChildren: (item: PlaylistItemEntity)=><>
-      {
-        createAddToPlaylistContextMenuItem( {
-          musicId: item.musicId,
-          user,
-          closeMenu: playlistItemCloseMenu,
-          modal: playlistModal,
-        } )
-      }
-      {createContextMenuItem( {
-        label: "Copiar backend URL",
-        closeMenu: playlistItemCloseMenu,
-        onClick: async () => {
-          await navigator.clipboard.writeText(
-            backendUrl(PATH_ROUTES.musics.slug.withParams(item.music.slug)),
-          );
-          logger.info("Copiada url");
-        },
-      } )}
-      {createContextMenuItem( {
-        label: "Eliminar",
-        theme: "danger",
-        onClick: async ()=> {
-          await api.removeOneTrack(value.id, item.id);
-          const updatedList = value.list.filter((i) => i.id !== item.id);
-
-          setValue( {
-            ...value,
-            list: updatedList,
-          } );
-          playlistItemCloseMenu();
-        },
-        closeMenu: playlistItemCloseMenu,
-      } )
-      }
-    </>,
-  } );
+    closeMenu: playlistItemCloseMenu } = useContextMenuTrigger();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const SortablePlaylistItem = ( { item, index }: { item: PlaylistItemEntity;
 index: number; } ) => {
@@ -288,16 +241,39 @@ index: number; } ) => {
           isPlaying={currentPlaying === item.id && isPlaylistPlaying}
           isDragging={isDraggingGlobal}
           updateFavButtons={updateIsFav}
-          contextMenu={{
-            element:
-          playListItemActiveIndex === index
-            ? renderPlaylistItemContextMenu(item)
-            : undefined,
-            onClick: (e) => playlistItemOpenMenu( {
-              event: e,
-              index,
-            } ),
-          }}
+          className={styles.playlistItem}
+          onClickMenu={ (e) => playlistItemOpenMenu( {
+            event: e,
+            content: <>
+              <AddToPlaylistContextMenuItem
+                musicId={item.musicId}
+                user={user}
+              />
+              <ContextMenuItem
+                label="Copiar backend URL"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(
+                    backendUrl(PATH_ROUTES.musics.slug.withParams(item.music.slug)),
+                  );
+                  logger.info("Copiada url");
+                }}
+              />
+              <ContextMenuItem
+                label="Eliminar"
+                theme="danger"
+                onClick={async () => {
+                  await api.removeOneTrack(value.id, item.id);
+                  const updatedList = value.list.filter((i) => i.id !== item.id);
+
+                  setValue( {
+                    ...value,
+                    list: updatedList,
+                  } );
+                  playlistItemCloseMenu();
+                }}
+              />
+            </>,
+          } )}
           onPlay={handlePlayMusic}
           onPause={handlePauseMusic}
         />
@@ -324,7 +300,10 @@ index: number; } ) => {
           </div>
 
           <div className={styles.playlistInfo}>
-            <h1 className={styles.playlistTitle}>{value.name}</h1>
+            <span className={styles.playlistTitle}>
+
+              <h1>{value.name}</h1>
+            </span>
 
             <div className={styles.playlistStats}>
               <div className={styles.statItem}>
@@ -334,11 +313,14 @@ index: number; } ) => {
               <div className={styles.statItem}>
                 <span>{formatDurationHeader(totalDuration)}</span>
               </div>
-              <span className={commonStyles.separator}>•</span>
-              <div className={classes(styles.statItem, styles.createdAt)} title="Fecha de creación">
-                <CalendarToday />
-                <span>{formatDateDDMMYYY(value.createdAt)}</span>
-              </div>
+              <span className={styles.hideLt500}>
+                <span className={commonStyles.separator}>•</span>
+                <div className={classes(styles.statItem, styles.createdAt)}
+                  title="Fecha de creación">
+                  <CalendarToday />
+                  <span>{formatDateDDMMYYY(value.createdAt)}</span>
+                </div>
+              </span>
             </div>
           </div>
         </div>
@@ -355,7 +337,6 @@ index: number; } ) => {
             theme="dark"
             onClick={handleMoreOptions}
           />
-          {renderPlaylistContextMenu(undefined)}
         </div>
       </div>
 
