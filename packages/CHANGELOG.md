@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.16.0](https://github.com/ByDSA/mcenter/compare/v4.15.0...v4.16.0) (2025-12-06)
+
+
+### Features
+
+* playlist front-back redirection ([43fe050](https://github.com/ByDSA/mcenter/commit/43fe0505950f5f1509fb62751e12dfa793707d44))
+
+
+### Bug Fixes
+
+* **front:** some styles and performance  problems ([4082aa9](https://github.com/ByDSA/mcenter/commit/4082aa91457cae124c2687b28d589fd178e5943b))
+
 ## [4.15.0](https://github.com/ByDSA/mcenter/compare/v4.14.0...v4.15.0) (2025-12-01)
 
 
