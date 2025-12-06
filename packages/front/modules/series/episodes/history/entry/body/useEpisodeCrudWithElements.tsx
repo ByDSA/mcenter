@@ -1,19 +1,13 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { EpisodeEntity } from "$shared/models/episodes";
-import { PATH_ROUTES } from "$shared/routing";
 import { ResourceInputArrayString, ResourceInputText } from "#uikit/input";
 import { isModified as isModifiedd } from "#modules/utils/objects";
-import { backendUrl } from "#modules/requests";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
 import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useCrud, UseCrudProps } from "#modules/utils/resources/useCrud";
-import { classes } from "#modules/utils/styles";
-import { OutputText } from "#modules/ui-kit/output/Text";
 import { EpisodesApi } from "../../../requests";
 import { EPISODE_PROPS } from "../utils";
-import commonStyle from "../../../../../history/entry/body-common.module.css";
-import styles from "./style.module.css";
 
 function getAndUpdateEpisodeByProp<V>(
   prop: string,
@@ -89,20 +83,10 @@ export function useEpisodeCrudWithElements<T extends EpisodeEntity = EpisodeEnti
     addOnReset,
     onEmptyPressEnter: commonEpisodeInputProps.onPressEnter,
   } );
-  const resource = state[0];
-  const slug = fullUrlOf(resource);
-  const urlElement = <span className={classes(styles.url)}>
-    {OutputText( {
-      caption: <><a href={slug}>Url</a>:</>,
-      className: commonStyle.autoBreakUrl,
-      value: slug,
-    } )}
-  </span>;
 
   return {
     elements: {
       titleElement,
-      urlElement,
       tagsElement,
     },
     actions: {
@@ -113,12 +97,6 @@ export function useEpisodeCrudWithElements<T extends EpisodeEntity = EpisodeEnti
     state,
     isModified,
   };
-}
-
-function fullUrlOf(resource: EpisodeEntity) {
-  return backendUrl(
-    PATH_ROUTES.episodes.slug.withParams(resource.compKey.seriesKey, resource.compKey.episodeKey),
-  );
 }
 
 function calcIsModified(r1: EpisodeEntity, r2: EpisodeEntity) {

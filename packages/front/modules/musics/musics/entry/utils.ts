@@ -6,7 +6,7 @@ export const MUSIC_PROPS = schemaToProps<Music>(schema)( {
   artist: "Artista:",
   title: "Título:",
   tags: "Tags:",
-  slug: "Url:",
+  slug: "Slug:",
   album: "Álbum:",
   game: "Juego:",
   year: "Año:",

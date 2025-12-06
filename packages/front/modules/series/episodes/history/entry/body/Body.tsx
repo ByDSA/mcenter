@@ -26,6 +26,7 @@ export function Body( { data, setData }: Props) {
     return Promise.all([
       episodeActions.update.action(),
       fileInfoActions.update.action(),
+      userInfoActions.update.action(),
     ]);
   };
   const { actions: episodeActions,
@@ -113,7 +114,7 @@ export function Body( { data, setData }: Props) {
     fileInfoIsModified,
     userInfoIsModified,
   ]);
-  const { titleElement, tagsElement, urlElement } = elements;
+  const { titleElement, tagsElement } = elements;
   const { resource } = state[0];
   const { startElement,
     endElement,
@@ -135,9 +136,6 @@ export function Body( { data, setData }: Props) {
       </span>
       <span className={classes("line", "height2")}>
         {tagsElement}
-      </span>
-      <span className={classes("line", "height2")}>
-        {urlElement}
       </span>
       <span className={classes("line", "height2")}>
         {pathElement}

@@ -1,8 +1,6 @@
 import { MusicEntity } from "$shared/models/musics";
-import { PATH_ROUTES } from "$shared/routing";
 import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
 import { WithRequired } from "$shared/utils/objects/types";
-import { backendUrl } from "#modules/requests";
 import { ResourceInputText, ResourceInputNumber, ResourceInputArrayString } from "#modules/ui-kit/input";
 import { ResourceInputCommonProps } from "#modules/ui-kit/input/ResourceInputCommonProps";
 import { ResourceInputBoolean } from "#modules/ui-kit/input/ResourceInputBoolean";
@@ -93,7 +91,7 @@ export function genAlbumElement(props: TextProps) {
 export function genSlugElement(props: TextProps) {
   return <span className={classes(styles.url)}>{
     ResourceInputText<MusicEntity>( {
-      caption: <><a href={fullUrlOf(props.resourceState[0].slug)}>Url</a>:</>,
+      caption: MUSIC_PROPS.slug.caption,
       ...getAndUpdateMusicByProp<string>("slug"),
       ...props,
     } )
@@ -151,10 +149,6 @@ export function genUnknownElement(
       } );
     }
   }
-}
-
-function fullUrlOf(url: string) {
-  return backendUrl(PATH_ROUTES.musics.slug.withParams(url));
 }
 
 type OptionalPropsButtonProps = {
