@@ -1,6 +1,7 @@
 import z from "zod";
+import { slugSchema } from "../../utils/schemas/slug";
 import { dateSchema } from "../../utils/schemas/timestamps/date";
-import { userEntitySchema } from "../../auth";
+import { userEntitySchema, userPublicSchema } from "../../auth";
 import { mongoDbId } from "../../resources/partial-schemas";
 import { musicEntitySchema } from "../music";
 import { autoTimestampsSchema } from "../../utils/schemas/timestamps";
@@ -20,15 +21,16 @@ type EntryEntity = z.infer<typeof entryEntitySchema>;
 const modelSchema = z.object( {
   name: z.string(),
   list: z.array(entrySchema),
-  slug: z.string(),
-  userId: mongoDbId,
+  slug: slugSchema,
+  ownerUserId: mongoDbId,
   visibility: z.enum(["public", "private"]),
 } ).merge(autoTimestampsSchema);
 
 type Model = z.infer<typeof modelSchema>;
 const entitySchema = modelSchema.extend( {
   id: mongoDbId,
-  user: userEntitySchema.optional(),
+  ownerUser: userEntitySchema.optional(),
+  ownerUserPublic: userPublicSchema.optional(),
   list: z.array(entryEntitySchema),
 } );
 

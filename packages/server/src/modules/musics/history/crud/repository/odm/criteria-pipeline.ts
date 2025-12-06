@@ -95,8 +95,7 @@ export function getCriteriaPipeline(
       includeUserInfo: true, // Por defecto en historial solemos querer el user info
       includeFileInfos: criteria.expand?.includes("musicsFileInfos"),
       // He añadido soporte para 'favorite' aunque no estaba explicito en tu archivo original
-      includeFavorite: criteria.expand?.includes("musicsFavorite")
-        || criteria.expand?.includes("musicsFavorite"),
+      includeFavorite: criteria.expand?.includes("musicsFavorite"),
     };
     // Usamos el userId del filtro, ya que el historial pertenece a un usuario
     const userId = criteria.filter?.userId || null;

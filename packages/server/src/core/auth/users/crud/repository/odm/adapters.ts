@@ -14,7 +14,7 @@ export function docOdmToModel(docOdm: DocOdm): Model {
   const entity: Model = {
     email: docOdm.email,
     publicName: docOdm.publicName,
-    publicUsername: docOdm.publicUsername,
+    slug: docOdm.publicUsername,
     firstName: docOdm.firstName,
     lastName: docOdm.lastName,
     emailVerified: docOdm.emailVerified,
@@ -42,7 +42,7 @@ export function partialToDocOdm(model: Partial<Model>): MongoUpdateQuery<DocOdm>
   const docOdm: Partial<DocOdm> = {
     email: model.email,
     publicName: model.publicName,
-    publicUsername: model.publicUsername,
+    publicUsername: model.slug,
     firstName: model.firstName,
     lastName: model.lastName,
     emailVerified: model.emailVerified,
@@ -63,7 +63,7 @@ export function modelToDocOdm(model: Model): TimestampsOdm.OmitAutoTimestamps<Do
   const docOdm: TimestampsOdm.OmitAutoTimestamps<DocOdm> = {
     email: model.email,
     publicName: model.publicName,
-    publicUsername: model.publicUsername,
+    publicUsername: model.slug,
     firstName: model.firstName,
     lastName: model.lastName,
     emailVerified: model.emailVerified,

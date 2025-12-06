@@ -9,6 +9,7 @@ import { assertIsDefined } from "../../../utils/validation";
 type Options = {
   local?: boolean;
   prefix?: string;
+  token?: string;
 };
 
 export function episodeToMediaElement(
@@ -31,6 +32,7 @@ export function episodeToMediaElement(
       episode.compKey.episodeKey,
       {
         format: ResponseFormat.RAW,
+        token: options?.token,
       },
     );
   }
@@ -60,6 +62,7 @@ export function musicToMediaElement(music: MusicEntity, options?: Options): Medi
   } else {
     path = PATH_ROUTES.musics.slug.withParams(music.slug, {
       format: ResponseFormat.RAW,
+      token: options?.token,
     } );
   }
 

@@ -130,7 +130,7 @@ export class MusicsIndexService {
       await this.addPrivatePlaylist( {
         musicId: playlist.list[trackListPosition].musicId,
         slug: playlist.slug,
-        userId: playlist.userId,
+        userId: playlist.ownerUserId,
       } );
     } else if (ev.type === MusicPlayListTrackEvents.Deleted.TYPE) {
       const { oldPlaylist,
@@ -143,7 +143,7 @@ export class MusicsIndexService {
       await this.removePrivatePlaylist( {
         musicId: oldPlaylist.list[trackListPosition].musicId,
         slug: oldPlaylist.slug,
-        userId: oldPlaylist.userId,
+        userId: oldPlaylist.ownerUserId,
       } );
     }
   }
@@ -163,7 +163,7 @@ export class MusicsIndexService {
           musicId: track.musicId,
           oldSlug,
           slug: newSlug,
-          userId: newEntity.userId,
+          userId: newEntity.ownerUserId,
         } );
       }
     } else if (ev.payload.key === "visibility") {
@@ -183,7 +183,7 @@ export class MusicsIndexService {
           await this.removePrivatePlaylist( {
             musicId: track.musicId,
             slug: newEntity.slug,
-            userId: newEntity.userId,
+            userId: newEntity.ownerUserId,
           } );
         }
       } else if (oldVisibility === "public" && newVisibility === "private") {
@@ -191,7 +191,7 @@ export class MusicsIndexService {
           await this.addPrivatePlaylist( {
             musicId: track.musicId,
             slug: newEntity.slug,
-            userId: newEntity.userId,
+            userId: newEntity.ownerUserId,
           } );
         }
       }

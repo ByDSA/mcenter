@@ -13,6 +13,11 @@ type AddOneTrackOptions = {
   unique?: boolean;
 };
 
+type GetOneByUserAndSlugProps = {
+  userSlug: string;
+  playlistSlug: string;
+};
+
 export class MusicPlaylistsApi {
   static {
     FetchApi.register(MusicPlaylistsApi, new MusicPlaylistsApi());
@@ -38,8 +43,7 @@ export class MusicPlaylistsApi {
   }
 
   getOneByUserAndSlug(
-    userId: string,
-    slug: string,
+    { playlistSlug, userSlug }: GetOneByUserAndSlugProps,
     options?: { silentErrors: true },
   ): Promise<MusicPlaylistsApi.GetOne.Response> {
     const fetcher = makeFetcher<
@@ -54,7 +58,10 @@ export class MusicPlaylistsApi {
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.playlists.user.slug.withParams(userId, slug)),
+      url: backendUrl(PATH_ROUTES.musics.playlists.slug.withParams( {
+        userSlug,
+        playlistSlug,
+      } )),
       body: undefined,
     } );
   }
@@ -215,7 +222,7 @@ musicId: string;} ): Promise<MusicPlaylistsApi.RemoveOneTrack.Response> {
       },
       limit: criteria?.limit ?? 10,
       offset: criteria?.offset ?? undefined,
-      expand: ["musics"],
+      expand: ["musics", "ownerUserPublic"],
     };
     const fetcher = makeFetcher<
       MusicPlaylistsApi.GetManyByCriteria.RequestBody,

@@ -24,3 +24,9 @@ function getRootBackendUrl(): string {
 export function backendUrl(path: string) {
   return `${rootBackendUrl}${path}`;
 }
+
+export function frontendUrl(path: string) {
+  const { origin } = window.location;
+
+  return `${origin}${path}`;
+}

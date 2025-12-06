@@ -29,9 +29,18 @@ type Entity = MusicPlaylistEntity;
 type Id = Entity["id"];
 
 type SlugProps = {
-  slug: string;
-  userId: string;
-};
+  playlistSlug: string;
+  requestUserId: string | undefined;
+} & (
+  {
+  ownerUserId: string;
+  ownerUserSlug?: never;
+} |
+  {
+  ownerUserId?: never;
+  ownerUserSlug: string;
+}
+);
 
 type CriteriaOne = MusicPlaylistCrudDtos.GetOne.Criteria;
 type CriteriaMany = MusicPlaylistCrudDtos.GetMany.Criteria;
@@ -90,7 +99,7 @@ playlistId: string;},
 
     assertFoundClient(playlist);
 
-    if (playlist.userId !== userId)
+    if (playlist.ownerUserId !== userId)
       throw new UnauthorizedException("User is not the owner of the playlist");
 
     return playlist;
@@ -397,15 +406,17 @@ addedAt: Date; }>;
   }
 
   async getOneBySlug(
-    { slug, userId }: SlugProps,
+    { playlistSlug: slug, ownerUserId, ownerUserSlug, requestUserId }: SlugProps,
     criteria?: CriteriaOne,
   ): Promise<Entity | null> {
     criteria = {
       ...criteria,
       filter: {
         ...criteria?.filter,
-        slug: slug,
-        userId,
+        musicSlug: slug,
+        ownerUserId,
+        ownerUserSlug,
+        requestUserId, // Para cuando se expande con favorites
       },
     };
 
@@ -442,7 +453,7 @@ addedAt: Date; }>;
 
     if (params.entity.slug) {
       const baseSlug = fixSlug(params.entity.slug);
-      const userId = params.entity.userId ?? oldDoc.userId.toString();
+      const userId = params.entity.ownerUserId ?? oldDoc.userId.toString();
 
       assertIsDefined(baseSlug, "Invalid slug");
       assertIsDefined(userId, "User ID is required for slug fix");

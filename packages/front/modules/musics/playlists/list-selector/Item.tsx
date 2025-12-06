@@ -1,4 +1,5 @@
 import { MusicPlaylistEntity } from "../models";
+import { PlaylistCover } from "../PlaylistCover";
 import styles from "./Item.module.css";
 
 type Props = {
@@ -10,7 +11,13 @@ export const PlaylistSelectorItem = (props: Props) => {
   const { data } = props;
 
   return <div className={styles.item} onClick={props.onClick}>
-    <div className={styles.name}>{data.name}</div>
-    <div className={styles.length}>{data.list.length} canciones</div>
+    <PlaylistCover
+      className={styles.cover}
+      alt={data.name}
+    />
+    <section>
+      <div className={styles.name}>{data.name}</div>
+      <div className={styles.length}>{data.list.length} canciones</div>
+    </section>
   </div>;
 };

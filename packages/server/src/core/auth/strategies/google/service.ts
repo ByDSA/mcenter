@@ -3,7 +3,7 @@ import { Request } from "express";
 import z from "zod";
 import { UsersService } from "#core/auth/users";
 import { UsersRepository } from "#core/auth/users/crud/repository";
-import { UserPublicUsernameService } from "#core/auth/users/public-username.service";
+import { UserSlugService } from "#core/auth/users/user-slug.service";
 import { AppPayloadService } from "../jwt";
 import { User, UserEntityWithRoles } from "../../users/models";
 
@@ -28,7 +28,7 @@ export class AuthGoogleService {
     private readonly usersService: UsersService,
     private readonly usersRepo: UsersRepository,
     private readonly appPayloadService: AppPayloadService,
-    private readonly publicUsernameService: UserPublicUsernameService,
+    private readonly userSlugService: UserSlugService,
   ) { }
 
   async googleRedirect(req: Request) {
@@ -85,7 +85,7 @@ export class AuthGoogleService {
       firstName: googleUser.firstName,
       lastName: googleUser.lastName,
       publicName,
-      publicUsername: await this.publicUsernameService.getUniqueFromRegisteringUser( {
+      slug: await this.userSlugService.getUniqueFromRegisteringUser( {
         publicName,
       } ),
       emailVerified: true,

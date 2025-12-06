@@ -5,7 +5,7 @@ import { UserRolesRepository } from "./roles/repository";
 import { UsersService } from "./service";
 import { UserRoleMapRepository } from "./roles/user-role";
 import { UsersRepository } from "./crud/repository";
-import { UserPublicUsernameService } from "./public-username.service";
+import { UserSlugService } from "./user-slug.service";
 
 @Module( {
   imports: [
@@ -17,9 +17,9 @@ import { UserPublicUsernameService } from "./public-username.service";
     UsersService,
     UsersRepository,
     UserRoleMapRepository,
-    UserPublicUsernameService,
+    UserSlugService,
   ],
   controllers: [],
-  exports: [UsersService, UsersRepository, UserRolesRepository, UserPublicUsernameService],
+  exports: [UsersService, UsersRepository, UserRolesRepository, UserSlugService],
 } )
 export class UsersModule {}

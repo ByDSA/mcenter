@@ -27,29 +27,7 @@
 }
 
 .playlistCover {
-  width: 64px;
-  height: 64px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.playlistCoverImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.playlistCoverIcon {
-  color: rgba(255, 255, 255, 0.6);
-
-  --size: 50%;
-  width: var(--size) !important;
-  height: var(--size) !important;
+  --size: 6rem;
 }
 
 .playlistInfo {
@@ -94,6 +72,10 @@
   .playlistTitle {
     font-size: 1.5rem !important;
     margin: 0 0 6px 0 !important;
+  }
+
+  .playlistCover {
+    --size: 4rem;
   }
 }
 

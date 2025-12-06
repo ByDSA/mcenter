@@ -4,15 +4,18 @@ import { createCriteriaManySchema, createCriteriaOneSchema } from "../../../util
 import { generatePatchBodySchema } from "../../../utils/schemas/patch";
 import { musicPlaylistEntitySchema, musicPlaylistSchema } from "../playlist";
 import { mongoDbId } from "../../../resources/partial-schemas";
+import { slugSchema } from "../../../utils/schemas/slug";
 
 const criteriaConfig = {
   filterShape: {
     id: mongoDbId.optional(),
-    slug: z.string().optional(),
-    userId: mongoDbId.optional(),
+    musicSlug: slugSchema.optional(),
+    ownerUserId: mongoDbId.optional(),
+    ownerUserSlug: slugSchema.optional(),
+    requestUserId: mongoDbId.optional(),
   },
   sortKeys: ["added", "updated"] as const,
-  expandKeys: ["musics", "musicsFavorite"] as const,
+  expandKeys: ["musics", "musicsFavorite", "ownerUserPublic"] as const,
 };
 
 export namespace MusicPlaylistCrudDtos {
@@ -44,7 +47,7 @@ export namespace MusicPlaylistCrudDtos {
         createdAt: true,
         list: true,
         updatedAt: true,
-        userId: true,
+        ownerUserId: true,
       } );
     export type Body = z.infer<typeof bodySchema>;
   }

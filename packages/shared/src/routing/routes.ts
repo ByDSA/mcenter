@@ -27,6 +27,7 @@ const AUTH_EMAIL_VERIFICATION_FRONT = "/auth/register/verify";
 
 type MusicSlugQueryParams = {
   format?: ResponseFormat;
+  token?: string;
 };
 
 type YoutubeImportMusicOneOptions = {
@@ -170,16 +171,52 @@ export const PATH_ROUTES = {
       withParams: (slug: string, query?: MusicSlugQueryParams) => {
         let ret = `${MUSICS_SLUG}/${slug}`;
 
-        if (query && Object.entries(query).length > 0)
-          ret += `?${new URLSearchParams(query).toString()}`;
+        if (query) {
+          const nonEmptyQuery = Object.entries(query).filter(([_, v])=> !!v);
+
+          if (nonEmptyQuery.length > 0)
+            ret += `?${new URLSearchParams(nonEmptyQuery).toString()}`;
+        }
 
         return ret;
       },
     },
     frontend: {
+      path: "/musics",
+      slug: {
+        withParams: ( { slug, token }: {slug: string;
+token?: string;} ) => {
+          const url = `/musics/slug/${slug}`;
+
+          if (token)
+            return `${url}?token=${token}`;
+
+          return url;
+        },
+      },
       playlists: {
-        path: "/music/playlists",
-        withParams: ( { slug }: {slug: string} ) => `/music/playlists/${slug}`,
+        path: "/musics/playlists",
+        slug: {
+          withParams: ( { playlistSlug, userSlug, token }: {
+          playlistSlug: string;
+          userSlug: string;
+          token?: string;
+} ) => {
+            const url = `/musics/playlists/slug/${userSlug}/${playlistSlug}`;
+
+            if (token)
+              return `${url}?token=${token}`;
+
+            return url;
+          },
+        },
+      },
+      history: {
+        path: "/musics/history",
+        withParams: (id: string) => `/musics/history/${id}`,
+      },
+      search: {
+        path: "/musics/search",
       },
     },
     playlists: {
@@ -204,10 +241,18 @@ export const PATH_ROUTES = {
         },
       },
       user: {
-        withParams: (userId: string) => `${MUSICS_PLAYLISTS}/user/${userId}`,
-        slug: {
-          withParams: (userId: string, slug: string, trackNumber?: number) => `${MUSICS_PLAYLISTS}/user/${userId}/${slug}${trackNumber ? `/track/${trackNumber}` : ""}`,
-        },
+        withParams: (userId: string) =>`${MUSICS_PLAYLISTS}/user/${userId}`,
+      },
+      slug: {
+        withParams: ( { userSlug, playlistSlug, trackNumber }: {
+            userSlug: string;
+            playlistSlug?: string;
+            trackNumber?: number;
+          } ) => `${MUSICS_PLAYLISTS}/user/${userSlug}${
+          playlistSlug ? `/${playlistSlug}` : ""
+        }${
+          playlistSlug && trackNumber ? `/track/${trackNumber}` : ""
+        }`,
       },
     },
     pickRandom: {
@@ -245,8 +290,12 @@ export const PATH_ROUTES = {
       withParams: (seriesKey: string, episodeKey: string, query?: MusicSlugQueryParams) => {
         let ret = `${EPISODES_SLUG}/${seriesKey}/${episodeKey}`;
 
-        if (query && Object.entries(query).length > 0)
-          ret += `?${new URLSearchParams(query).toString()}`;
+        if (query) {
+          const nonEmptyQuery = Object.entries(query).filter(([_, v])=> !!v);
+
+          if (nonEmptyQuery.length > 0)
+            ret += `?${new URLSearchParams(query).toString()}`;
+        }
 
         return ret;
       },

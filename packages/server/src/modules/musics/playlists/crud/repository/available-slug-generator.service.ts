@@ -23,8 +23,9 @@ export class MusicPlaylistAvailableSlugGeneratorService {
 
     while (true) {
       playlist = await this.repo.getOneBySlug( {
-        slug: currentSlug,
-        userId,
+        playlistSlug: currentSlug,
+        ownerUserId: userId,
+        requestUserId: userId,
       } );
 
       if (!playlist)

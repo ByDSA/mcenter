@@ -199,7 +199,7 @@ export function enrichSingleMusic(
  */
 export function enrichMusicList(
   listPath: string, // Ej: "list"
-  userId: string | null,
+  requestUserId: string | null,
   flags: MusicExpansionFlags,
 ): PipelineStage[] {
   const pipeline: PipelineStage[] = [];
@@ -253,7 +253,7 @@ export function enrichMusicList(
 
   // 3. Preparación de Favoritos (Obtener lista de IDs favoritos del usuario una sola vez)
   if (flags.includeFavorite) {
-    if (!userId)
+    if (!requestUserId)
       throw new Error("User ID is required to expand favorites");
 
     pipeline.push(
@@ -263,7 +263,7 @@ export function enrichMusicList(
           pipeline: [
             {
               $match: {
-                _id: new Types.ObjectId(userId),
+                _id: new Types.ObjectId(requestUserId),
               },
             },
             {

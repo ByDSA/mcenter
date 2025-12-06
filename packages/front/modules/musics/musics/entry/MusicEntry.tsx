@@ -1,8 +1,9 @@
 import { useCallback } from "react";
 import { PATH_ROUTES } from "$shared/routing";
+import { Music } from "$shared/models/musics";
 import { ResourceAccordion } from "#modules/ui-kit/accordion";
 import { logger } from "#modules/core/logger";
-import { backendUrl } from "#modules/requests";
+import { frontendUrl } from "#modules/requests";
 import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
 import { AddToPlaylistContextMenuItem } from "#modules/musics/playlists/AddToPlaylistContextMenuItem";
@@ -29,18 +30,19 @@ export function MusicEntryElement(
       event: e,
       content: (
         <>
-          <AddToPlaylistContextMenuItem
+          {user && <AddToPlaylistContextMenuItem
             musicId={music.id}
             user={user}
           />
+          }
           <ContextMenuItem
-            label="Copiar backend URL"
+            label="Copiar URL"
             onClick={async (event) => {
               event.stopPropagation();
-              await navigator.clipboard.writeText(
-                backendUrl(PATH_ROUTES.musics.slug.withParams(music.slug)),
-              );
-              logger.info("Copiada url");
+              await copyMusicUrl( {
+                music,
+                token: user?.id,
+              } );
             }}
           />
         </>
@@ -65,4 +67,20 @@ export function MusicEntryElement(
       } )
     }
   </span>;
+}
+
+type CopyMusicProps = {
+  music: Music;
+  token?: string;
+};
+export async function copyMusicUrl( { music, token }: CopyMusicProps) {
+  await navigator.clipboard.writeText(
+    frontendUrl(
+      PATH_ROUTES.musics.frontend.slug.withParams( {
+        slug: music.slug,
+        token: token,
+      } ),
+    ),
+  );
+  logger.info("Copiada url");
 }

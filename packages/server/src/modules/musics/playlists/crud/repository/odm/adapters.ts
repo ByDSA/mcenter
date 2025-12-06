@@ -45,7 +45,7 @@ function commonModelToDocOdm(model: Model): Omit<DocOdm, "_id" | "list"> {
   return {
     name: model.name,
     slug: model.slug,
-    userId: new Types.ObjectId(model.userId),
+    userId: new Types.ObjectId(model.ownerUserId),
     createdAt: model.createdAt,
     updatedAt: model.updatedAt,
     visibility: model.visibility,
@@ -57,8 +57,14 @@ export function fullDocOdmToEntity(docOdm: FullDocOdm): Entity {
     id: docOdm._id.toString(),
     name: docOdm.name,
     slug: docOdm.slug,
-    user: docOdm.user ? UserOdm.toEntity(docOdm.user) : undefined,
-    userId: docOdm.userId.toString(),
+    ownerUser: docOdm.ownerUser ? UserOdm.toEntity(docOdm.ownerUser) : undefined,
+    ownerUserId: docOdm.userId.toString(),
+    ownerUserPublic: docOdm.ownerUserPublic
+      ? {
+        slug: docOdm.ownerUserPublic.publicUsername,
+        publicName: docOdm.ownerUserPublic.publicName,
+      }
+      : undefined,
     list: docOdm.list.map(entryFullDocOdmToEntity),
     createdAt: docOdm.createdAt,
     updatedAt: docOdm.updatedAt,

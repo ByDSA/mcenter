@@ -3,6 +3,7 @@ import { getHostFromRequest } from "$shared/models/resources";
 import { Request, Response } from "express";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { ResourceSlugService } from "#modules/resources/slug/service";
+import { M3u8ViewOptions } from "#modules/resources/response-formatter/retource-to-media-element";
 import { ResponseFormat, ResponseFormatterService } from "../../resources/response-formatter";
 import { MusicEntity, musicEntitySchema } from "../models";
 import { MusicFileInfoEntity } from "../file-info/models";
@@ -16,6 +17,15 @@ type RenderProps = {
   request: Request;
   response: Response;
 };
+function getM3u8OptionsFromRequest(req: Request): M3u8ViewOptions {
+  const token = (req.query.token as string) || undefined;
+  const ret: M3u8ViewOptions = {};
+
+  if (token)
+    ret.token = token;
+
+  return ret;
+}
 
 @Injectable()
 export class MusicRendererService {
@@ -28,6 +38,7 @@ export class MusicRendererService {
     return this.responseFormatter.formatOneRemoteM3u8Response(
       music,
       getHostFromRequest(req),
+      getM3u8OptionsFromRequest(req),
     );
   }
 
@@ -35,6 +46,7 @@ export class MusicRendererService {
     return this.responseFormatter.formatManyRemoteM3u8Response(
       musics,
       getHostFromRequest(req),
+      getM3u8OptionsFromRequest(req),
     );
   }
 

@@ -8,7 +8,7 @@ import { UserEntityWithRoles, UserPayload } from "#core/auth/users/models";
 import { AlreadyExistsEmailException } from "#core/auth/users/crud/repository/errors";
 import { UsersService } from "#core/auth/users";
 import { UsersRepository } from "#core/auth/users/crud/repository";
-import { UserPublicUsernameService } from "#core/auth/users/public-username.service";
+import { UserSlugService } from "#core/auth/users/user-slug.service";
 import { AppPayloadService } from "../jwt/payload/AppPayloadService";
 import { LocalUserVerificationService } from "./verification.service";
 import { LoginDto, SignUpDto } from "./dto";
@@ -32,7 +32,7 @@ export class AuthLocalService {
     private readonly usersRepo: UsersRepository,
     private readonly appPayloadService: AppPayloadService,
     private readonly verificationService: LocalUserVerificationService,
-    private readonly publicUsernameService: UserPublicUsernameService,
+    private readonly userSlugService: UserSlugService,
   ) {
   }
 
@@ -51,7 +51,7 @@ export class AuthLocalService {
       const insertingUser: User = {
         email: dto.email,
         publicName: dto.username,
-        publicUsername: await this.publicUsernameService.getUniqueFromRegisteringUser( {
+        slug: await this.userSlugService.getUniqueFromRegisteringUser( {
           publicName: dto.username,
         } ),
         firstName: dto.firstName,

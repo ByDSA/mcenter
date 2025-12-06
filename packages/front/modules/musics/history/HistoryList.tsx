@@ -1,6 +1,5 @@
 import type { MusicHistoryEntry } from "#modules/musics/history/models";
 import { Fragment } from "react";
-import { PATH_ROUTES } from "$shared/routing";
 import { formatDate } from "#modules/utils/dates";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
@@ -8,11 +7,11 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
 import { INITIAL_FETCHING_LENGTH, FETCHING_MORE_LENGTH } from "#modules/history/lists";
 import { logger } from "#modules/core/logger";
-import { backendUrl } from "#modules/requests";
 import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
 import styles from "../musics/styles.module.css";
 import { AddToPlaylistContextMenuItem } from "../playlists/AddToPlaylistContextMenuItem";
+import { copyMusicUrl } from "../musics/entry/MusicEntry";
 import { MusicHistoryApi } from "./requests";
 import { HistoryEntryElement } from "./entry/HistoryEntry";
 
@@ -81,12 +80,12 @@ export function HistoryList(props?: Props) {
                         user={user}
                       />
                       <ContextMenuItem
-                        label="Copiar backend URL"
+                        label="Copiar URL"
                         onClick={async () => {
-                          await navigator.clipboard.writeText(
-                            backendUrl(PATH_ROUTES.musics.slug.withParams(entry.resource.slug)),
-                          );
-                          logger.info("Copiada url");
+                          await copyMusicUrl( {
+                            music: entry.resource,
+                            token: user?.id,
+                          } );
                         }}
                       />
                       <ContextMenuItem

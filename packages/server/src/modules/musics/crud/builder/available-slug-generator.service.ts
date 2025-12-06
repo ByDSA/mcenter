@@ -1,4 +1,5 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { slugSchema } from "$shared/models/utils/schemas/slug";
 import { Music } from "#musics/models";
 import { MusicsRepository } from "../repositories/music";
 
@@ -19,7 +20,7 @@ export class MusicAvailableSlugGeneratorService {
       music = await this.musicRepo.getOneBySlug(null, currentSlug);
 
       if (!music)
-        return currentSlug;
+        return slugSchema.parse(currentSlug);
 
       i++;
       currentSlug = `${base}-${i}`;

@@ -4,6 +4,7 @@ import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { ResponseFormat } from "$shared/models/resources/response-format.enum";
 import { mediaElementWithAbsolutePath } from "$shared/models/player/media-element";
 import { genM3u8Item, getHostFromRequest, genM3u8Playlist, genM3u8PlaylistWithNext } from "$shared/models/resources/m3u8.view";
+import { isMediaPlayerUserAgent } from "$shared/utils/http/user-agent";
 import { resourceToMediaElement, type M3u8ViewOptions } from "./retource-to-media-element";
 
 export type FormatResponseOptions = M3u8ViewOptions & {
@@ -36,7 +37,7 @@ export class ResponseFormatterService {
     }
 
     const userAgent = req.headers["user-agent"] ?? "";
-    const isPlayer = isMediaPlayer(userAgent);
+    const isPlayer = isMediaPlayerUserAgent(userAgent);
 
     if (isPlayer)
       return ResponseFormat.M3U8;
@@ -131,19 +132,4 @@ export class ResponseFormatterService {
 
     return createSuccessResultResponse(data);
   }
-}
-
-function isMediaPlayer(userAgent: string): boolean {
-  const mediaPlayers = [
-    /VLC/i,
-    /iTunes/i,
-    /foobar2000/i,
-    /Winamp/i,
-    /mpv/i,
-    /MPlayer/i,
-    /XBMC/i,
-    /Kodi/i,
-  ];
-
-  return mediaPlayers.some(pattern => pattern.test(userAgent));
 }

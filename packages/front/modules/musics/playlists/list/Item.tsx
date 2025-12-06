@@ -1,9 +1,13 @@
-import { MusicNote } from "@mui/icons-material";
+import { assertIsDefined } from "$shared/utils/validation";
+import { PATH_ROUTES } from "$shared/routing";
 import { useContextMenuTrigger, ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { useArrayData } from "#modules/utils/array-data-context";
+import { useUser } from "#modules/core/auth/useUser";
+import { frontendUrl } from "#modules/requests";
 import { PlaylistEntity } from "../Playlist";
-import { formatDurationHeader, playlistCopyBackendUrl } from "../utils";
+import { formatDurationHeader, playlistCopySlugUrl } from "../utils";
 import { SettingsButton } from "../SettingsButton";
+import { PlaylistCover } from "../PlaylistCover";
 import styles from "./Item.module.css";
 import { RenamePlaylistContextMenuItem } from "./renameItem";
 import { DeletePlaylistContextMenuItem } from "./deleteItem";
@@ -22,23 +26,22 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
   ) || 0;
   const totalSongs = value.list?.length || 0;
   const { openMenu, closeMenu } = useContextMenuTrigger();
+  const { user } = useUser();
+  const userSlug = value.ownerUserPublic?.slug;
+
+  assertIsDefined(userSlug);
 
   return (
     <a className={styles.playlistContainer}
-      href={`${window.location.pathname}/${value.slug}`}>
-      <div className={styles.playlistCover}>
-        {value.coverUrl
-          ? (
-            <img
-              src={value.coverUrl}
-              alt={value.name}
-              className={styles.playlistCoverImage}
-            />
-          )
-          : (
-            <MusicNote className={styles.playlistCoverIcon} />
-          )}
-      </div>
+      href={frontendUrl(PATH_ROUTES.musics.frontend.playlists.slug.withParams( {
+        playlistSlug: value.slug,
+        userSlug,
+      } ))}>
+      <PlaylistCover
+        className={styles.playlistCover}
+        alt={value.name}
+        coverUrl={value.coverUrl}
+      />
 
       <div className={styles.playlistInfo}>
         <h1 className={styles.playlistTitle} title={value.name}><span>{value.name}</span></h1>
@@ -62,14 +65,17 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
             className: styles.contextMenu,
             content: <>
               <ContextMenuItem
-                label="Copiar backend URL"
+                label="Copiar URL"
                 onClick={async () => {
-                  await playlistCopyBackendUrl( {
-                    value,
+                  assertIsDefined(value.ownerUserPublic);
+                  await playlistCopySlugUrl( {
+                    userSlug: value.ownerUserPublic.slug,
+                    playlistSlug: value.slug,
+                    token: user?.id,
                   } );
                 }}
               />
-              <RenamePlaylistContextMenuItem
+              {user?.id === value.ownerUserId && <><RenamePlaylistContextMenuItem
                 value={value}
                 setValue={(newPlaylist: PlaylistEntity) => {
                   // Para optimistic case
@@ -93,6 +99,8 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
                 onActionSuccess={() => removeItemByIndex(index)}
                 getValue={() => data[index]}
               />
+              </>
+              }
             </>,
           } )}
         />

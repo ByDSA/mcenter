@@ -1,5 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import { Home, LiveTv } from "@mui/icons-material";
+import { PATH_ROUTES } from "$shared/routing";
+import { UserPayload } from "$shared/models/auth";
 import { Topbar } from "#modules/ui-kit/menus/Topbar";
 import { UserProvider } from "#modules/core/auth/UserProvider";
 import { getUser } from "#modules/core/auth/server";
@@ -19,7 +21,7 @@ import { NavigationWatcher } from "./NavigationWatcher";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 
-const sideData: ()=> MenuItemData[] = ()=>[
+const sideData: (user: UserPayload | null)=> MenuItemData[] = (user)=>[
   {
     icon: <Home />,
     label: "Inicio",
@@ -31,9 +33,9 @@ const sideData: ()=> MenuItemData[] = ()=>[
   {
     icon: <MusicsIcon />,
     label: "Música",
-    path: "/music/history",
+    path: user ? PATH_ROUTES.musics.frontend.history.path : PATH_ROUTES.musics.frontend.search.path,
     matchPath: {
-      startsWith: "/music",
+      startsWith: PATH_ROUTES.musics.frontend.path,
     },
   },
   {
@@ -58,18 +60,18 @@ const sideData: ()=> MenuItemData[] = ()=>[
     },
   },
 ];
-const topbarData: MenuItemData[] = [
-  ...sideData().map(e=>( {
-    ...e,
-    title: e.label?.toString(),
-    label: undefined,
-  } )),
-];
 
 export default async function RootLayout( { children }: {
   children: React.ReactNode;
 } ) {
   const user = await getUser();
+  const topbarData: MenuItemData[] = [
+    ...sideData(user).map(e=>( {
+      ...e,
+      title: e.label?.toString(),
+      label: undefined,
+    } )),
+  ];
   const menu = <Topbar
     className={classes(styles.topbar, styles.fixed)}
     leftAside={
@@ -88,7 +90,7 @@ export default async function RootLayout( { children }: {
   />;
   const sideBar = <SidebarClient
     className={classes(styles.fixed, styles.sidebar)}
-    data={sideData()}/>;
+    data={sideData(user)}/>;
 
   return (
     <html lang="es">

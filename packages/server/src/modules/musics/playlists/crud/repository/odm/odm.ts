@@ -36,8 +36,11 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & {
   visibility: "private" | "public";
 };
 
+export type OwnerUserPublic = Pick<UserOdm.FullDoc, "publicName" | "publicUsername">;
+
 export type FullDocOdm = Omit<RequireId<DocOdm>, "list"> & {
-  user?: UserOdm.FullDoc;
+  ownerUser?: UserOdm.FullDoc;
+  ownerUserPublic?: OwnerUserPublic;
   list: EntryFullDocOdm[];
 };
 

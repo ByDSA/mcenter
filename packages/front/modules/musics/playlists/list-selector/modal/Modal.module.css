@@ -1,8 +1,12 @@
-.playlistSelectorModal > section {
-  min-height: 375px;
-  width: 300px;
-  > :first-child {
-    max-height: 60dvh;
-    overflow-y: auto;
+.playlistSelectorModal {
+  min-width: 300px;
+  overflow-x: hidden;
+  & > section {
+    min-height: 375px;
+    > :first-child {
+      overflow-x: hidden;
+      max-height: 60dvh;
+      overflow-y: auto;
+    }
   }
 }

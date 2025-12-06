@@ -1,4 +1,5 @@
 import z from "zod";
+import { slugSchema } from "../../utils/schemas/slug";
 import { idParamsSchema } from "../../utils/schemas/requests";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { musicEntitySchema } from "../music";
@@ -8,7 +9,7 @@ import { mongoDbId } from "../../resources/partial-schemas";
 const criteriaConfig = {
   filterShape: {
     id: z.string().optional(),
-    slug: z.string().optional(),
+    slug: slugSchema.optional(),
     title: z.string().optional(),
     artist: z.string().optional(),
     hash: z.string().optional(),

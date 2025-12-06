@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { slugSchema } from "$shared/models/utils/schemas/slug";
 import { fixSlug } from "#musics/crud/builder/fix-slug";
 import { assertFoundClient } from "#utils/validation/found";
 import { User } from "./models";
@@ -9,7 +10,7 @@ type Props = {
 };
 
 @Injectable()
-export class UserPublicUsernameService {
+export class UserSlugService {
   constructor(
     private readonly usersRepo: UsersRepository,
   ) {
@@ -36,7 +37,7 @@ export class UserPublicUsernameService {
       available = await this.usersRepo.isPublicUsernameAvailable(currentSlug);
 
       if (available)
-        return currentSlug;
+        return slugSchema.parse(currentSlug);
 
       i++;
       currentSlug = `${base}-${i}`;

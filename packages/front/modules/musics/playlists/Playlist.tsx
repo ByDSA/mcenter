@@ -20,17 +20,17 @@ import { restrictToVerticalAxis,
   restrictToParentElement } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
-import { classes } from "#modules/utils/styles";
-import { backendUrl } from "#modules/requests";
-import { logger } from "#modules/core/logger";
-import { FetchApi } from "#modules/fetching/fetch-api";
-import { formatDateDDMMYYY } from "#modules/utils/dates";
+import { assertIsDefined } from "$shared/utils/validation";
 import { useUser } from "#modules/core/auth/useUser";
+import { formatDateDDMMYYY } from "#modules/utils/dates";
+import { FetchApi } from "#modules/fetching/fetch-api";
+import { classes } from "#modules/utils/styles";
 import { MusicEntityWithFileInfos } from "../models";
 import { ContextMenuItem, useContextMenuTrigger } from "../../ui-kit/ContextMenu/ContextMenu";
+import { copyMusicUrl } from "../musics/entry/MusicEntry";
 import { MusicPlaylistItem } from "./PlaylistItem";
 import { MusicPlaylistEntity } from "./models";
-import { formatDurationHeader, playlistCopyBackendUrl } from "./utils";
+import { formatDurationHeader, playlistCopySlugUrl } from "./utils";
 import styles from "./Playlist.module.css";
 import commonStyles from "./common.module.css";
 import { SettingsButton } from "./SettingsButton";
@@ -38,6 +38,7 @@ import { MusicPlaylistsApi } from "./requests";
 import { RenamePlaylistContextMenuItem } from "./list/renameItem";
 import { DeletePlaylistContextMenuItem } from "./list/deleteItem";
 import { AddToPlaylistContextMenuItem } from "./AddToPlaylistContextMenuItem";
+import { PlaylistCover } from "./PlaylistCover";
 
 export type PlaylistItemEntity = MusicPlaylistEntity["list"][0]
 & {
@@ -100,12 +101,17 @@ newIndex: number;}[]>([]);
       event: e,
       content: (
         <>
-          <RenamePlaylistContextMenuItem
+          {user?.id === value.ownerUserId && <RenamePlaylistContextMenuItem
             className={styles.contextMenuItem}
             onSuccess={( { previous, current } ) => {
               if (previous.slug !== current.slug) {
-                router.push(PATH_ROUTES.musics.frontend.playlists.withParams( {
-                  slug: current.slug,
+                const userSlug = current.ownerUserPublic?.slug;
+
+                assertIsDefined(userSlug);
+
+                router.push(PATH_ROUTES.musics.frontend.playlists.slug.withParams( {
+                  playlistSlug: current.slug,
+                  userSlug,
                 } ));
               }
             }}
@@ -118,21 +124,30 @@ newIndex: number;}[]>([]);
               } );
             }}
           />
+          }
           <ContextMenuItem
-            label="Copiar backend URL"
+            label="Copiar URL"
             className={styles.contextMenuItem}
             onClick={async ()=> {
-              await playlistCopyBackendUrl( {
-                value,
+              const userSlug = value.ownerUserPublic?.slug;
+
+              assertIsDefined(userSlug);
+
+              await playlistCopySlugUrl( {
+                userSlug,
+                playlistSlug: value.slug,
+                token: user?.id,
               } );
             }}
           />
-          <DeletePlaylistContextMenuItem
+          {user?.id === value.ownerUserId
+          && <DeletePlaylistContextMenuItem
             value={value}
             onOpen={() => { playlistCloseMenu(); }}
             onActionSuccess={()=>router.push(PATH_ROUTES.musics.frontend.playlists.path)}
             getValue={()=>value}
           />
+          }
         </>
       ),
     } );
@@ -245,20 +260,20 @@ index: number; } ) => {
           onClickMenu={ (e) => playlistItemOpenMenu( {
             event: e,
             content: <>
-              <AddToPlaylistContextMenuItem
+              {user && <AddToPlaylistContextMenuItem
                 musicId={item.musicId}
                 user={user}
-              />
+              />}
               <ContextMenuItem
-                label="Copiar backend URL"
+                label="Copiar URL"
                 onClick={async () => {
-                  await navigator.clipboard.writeText(
-                    backendUrl(PATH_ROUTES.musics.slug.withParams(item.music.slug)),
-                  );
-                  logger.info("Copiada url");
+                  await copyMusicUrl( {
+                    music: item.music,
+                    token: user?.id,
+                  } );
                 }}
               />
-              <ContextMenuItem
+              {user?.id === value.ownerUserId && <ContextMenuItem
                 label="Eliminar"
                 theme="danger"
                 onClick={async () => {
@@ -272,6 +287,7 @@ index: number; } ) => {
                   playlistItemCloseMenu();
                 }}
               />
+              }
             </>,
           } )}
           onPlay={handlePlayMusic}
@@ -285,19 +301,10 @@ index: number; } ) => {
     <div className={styles.playlistContainer}>
       <div className={styles.playlistHeader}>
         <div className={styles.headerContent}>
-          <div className={styles.playlistCover}>
-            {value.coverUrl
-              ? (
-                <img
-                  src={value.coverUrl}
-                  alt={value.name}
-                  className={styles.playlistCoverImage}
-                />
-              )
-              : (
-                <MusicNote className={styles.playlistCoverIcon} />
-              )}
-          </div>
+          <PlaylistCover
+            alt={value.name}
+            coverUrl={value.coverUrl}
+            className={styles.playlistCover}/>
 
           <div className={styles.playlistInfo}>
             <span className={styles.playlistTitle}>

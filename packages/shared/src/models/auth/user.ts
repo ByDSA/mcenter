@@ -9,10 +9,15 @@ export const userSchema = z.object( {
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   emailVerified: z.boolean(),
-  publicUsername: z.string(),
+  slug: z.string(),
   musics: z.object( {
     favoritesPlaylistId: mongoDbId.nullable(),
   } ),
+} );
+
+export const userPublicSchema = userSchema.pick( {
+  publicName: true,
+  slug: true,
 } );
 
 export type User = z.infer<typeof userSchema>;

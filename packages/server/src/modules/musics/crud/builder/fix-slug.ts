@@ -1,3 +1,4 @@
+import { slugSchema } from "$shared/models/utils/schemas/slug";
 import { fixTxt } from "../../../resources/fix-text";
 
 const cyrillicToLatinMap: { [key: string]: string } = {
@@ -107,7 +108,7 @@ export function fixSlug(slug: string): string | null {
   // Remove end ans start "-"
   fixed = fixed.replace(/^-+|-+$/g, "");
 
-  return fixed;
+  return slugSchema.parse(fixed);
 }
 
 function isValidCharacter(c: string): boolean {

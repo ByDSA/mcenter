@@ -5,6 +5,7 @@ import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
+import { useUser } from "#modules/core/auth/useUser";
 import { MusicsApi } from "../requests";
 import { MusicEntityWithFileInfos } from "../models";
 import { MusicEntryElement } from "./entry/MusicEntry";
@@ -77,13 +78,22 @@ function useMusicList(props: Props) {
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const limitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fetchingMoreLimitRef = useRef<number>(5);
+  const { user } = useUser();
   const api = FetchApi.get(MusicsApi);
+  const expand: NonNullable<MusicsApi.GetManyByCriteria.Criteria["expand"]> = [
+    "fileInfos",
+    "userInfo",
+  ];
+
+  if (user)
+    expand.push("favorite");
+
   const criteriaCommon: MusicsApi.GetManyByCriteria.Criteria = {
     sort: {
       added: "desc",
     },
     filter: getFilterFromProps(props),
-    expand: ["fileInfos", "userInfo", "favorite"],
+    expand,
   };
   const { data,
     setData,

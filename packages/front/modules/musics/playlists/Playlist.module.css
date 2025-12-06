@@ -24,29 +24,6 @@
 
 .playlistCover {
   --size: 12rem;
-  width: var(--size);
-  height: var(--size);
-  border-radius: 8px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.playlistCoverImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.playlistCoverIcon {
-  color: rgba(255, 255, 255, 0.6);
-
-  --size: 50%;
-  width: var(--size) !important;
-  height: var(--size) !important;
 }
 
 .playlistInfo {

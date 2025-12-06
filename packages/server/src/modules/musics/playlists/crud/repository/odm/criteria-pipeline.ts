@@ -3,6 +3,7 @@ import { MongoFilterQuery } from "#utils/layers/db/mongoose";
 import { MusicPlaylistCrudDtos } from "#musics/playlists/models/dto";
 import { MusicExpansionFlags, enrichMusicList } from "#musics/crud/repositories/music/odm/pipeline-utils";
 import { DocOdm, FullDocOdm } from "./odm";
+import { enrichOwnerUserPublic } from "./pipeline-utils";
 
 export type AggregationResult = {
   data: FullDocOdm[];
@@ -40,13 +41,34 @@ function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
 export function getCriteriaPipeline(criteria: Criteria) {
   const sort = buildMongooseSort(criteria);
   const pipeline: PipelineStage[] = [];
-  const userId = criteria.filter?.userId || null;
+  const requestUserId = criteria.filter?.requestUserId || null;
   const filter = buildMongooseFilter(criteria);
 
   if (Object.keys(filter).length > 0) {
     pipeline.push( {
       $match: filter,
     } );
+  }
+
+  if (criteria.filter?.ownerUserSlug) {
+    pipeline.push(
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "__userFilterInfo", // Campo temporal
+        },
+      },
+      {
+        $match: {
+          "__userFilterInfo.publicUsername": criteria.filter.ownerUserSlug,
+        },
+      },
+      {
+        $unset: "__userFilterInfo", // Limpiamos el documento para no ensuciar el resultado
+      },
+    );
   }
 
   const facetStage: PipelineStage = {
@@ -90,7 +112,16 @@ export function getCriteriaPipeline(criteria: Criteria) {
     };
 
     // Usamos la función optimizada para arrays
-    dataPipeline.push(...enrichMusicList("list", userId, flags));
+    dataPipeline.push(...enrichMusicList("list", requestUserId, flags));
+  }
+
+  if (criteria.expand?.includes("ownerUserPublic")) {
+    dataPipeline.push(
+      ...enrichOwnerUserPublic( {
+        localField: "userId",
+        targetField: "ownerUserPublic",
+      } ),
+    );
   }
 
   (facetStage.$facet as any).data = dataPipeline;
@@ -108,11 +139,11 @@ function buildMongooseFilter(
     if (criteria.filter.id)
       filter["_id"] = new Types.ObjectId(criteria.filter.id);
 
-    if (criteria.filter.slug)
-      filter["slug"] = criteria.filter.slug;
+    if (criteria.filter.musicSlug)
+      filter["slug"] = criteria.filter.musicSlug;
 
-    if (criteria.filter.userId)
-      filter["userId"] = new Types.ObjectId(criteria.filter.userId);
+    if (criteria.filter.ownerUserId)
+      filter["userId"] = new Types.ObjectId(criteria.filter.ownerUserId);
   }
 
   return filter;

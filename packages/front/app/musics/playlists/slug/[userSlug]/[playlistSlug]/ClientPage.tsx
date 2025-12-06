@@ -1,33 +1,29 @@
 "use client";
 
+import type { Params } from "./page";
 import { ResultResponse } from "$shared/utils/http/responses";
-import { assertIsDefined } from "$shared/utils/validation";
+import MusicLayout from "app/musics/music.layout";
 import { MusicPlaylist } from "#modules/musics/playlists/Playlist";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicPlaylistsApi } from "#modules/musics/playlists/requests";
 import { useCrudData } from "#modules/fetching";
-import MusicLayout from "app/music/music.layout";
 import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
-import { useUser } from "#modules/core/auth/useUser";
 import { PageItemNotFound } from "#modules/utils/ItemNotFound";
 
 interface PageProps {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<Params>;
 }
 
-export default function Page( { params }: PageProps) {
+export function ClientPage( { params }: PageProps) {
   const api = FetchApi.get(MusicPlaylistsApi);
-  const { user } = useUser();
-  const userId = user?.id;
-
-  assertIsDefined(userId);
   const { isLoading, data, error, setData } = useCrudData( {
     initialFetch: async ()=> {
+      const { playlistSlug, userSlug } = (await params);
       const response = await api.getOneByUserAndSlug(
-        userId,
-        (await params).slug,
+        {
+          playlistSlug,
+          userSlug,
+        },
         {
           silentErrors: true,
         },
