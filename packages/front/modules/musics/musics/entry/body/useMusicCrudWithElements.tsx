@@ -93,6 +93,13 @@ export function useMusicCrudWithElements
           "tags",
         ],
       );
+
+      if (
+        (data.userInfo.tags?.length ?? 0) === 0 && userInfoBody.entity.tags
+        && userInfoBody.entity.tags.length === 0
+      )
+        delete userInfoBody.entity.tags;
+
       let userInfoPromise: Promise<MusicUserInfoEntity> = Promise.resolve() as Promise<any>;
 
       if (shouldSendPatchWithBody(musicBody)) {
@@ -134,6 +141,8 @@ export function useMusicCrudWithElements
         newData.userInfo = await userInfoPromise;
       else
         newData.userInfo = state[0].userInfo;
+
+      newData.isFav = state[0].isFav; // Porque isFav no se devuelve en el update
 
       return {
         data: newData as T,
