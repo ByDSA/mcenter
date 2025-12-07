@@ -31,24 +31,16 @@ type ContextMenuProps = {
   menuRef?: React.RefObject<HTMLDivElement | null>;
 };
 
-type SmartPositionOptions = {
-  considerScroll?: boolean;
-};
-
-// --- HELPERS (Igual que antes) ---
+// --- HELPERS ---
 const calculateSmartPosition = (
   triggerRect: DOMRect,
   menuWidth: number,
   menuHeight: number,
-  optsParam?: SmartPositionOptions,
 ): Position => {
-  const opts: Required<SmartPositionOptions> = {
-    considerScroll: optsParam?.considerScroll ?? true,
-  };
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  const scrollX = opts.considerScroll ? window.scrollX : 0;
-  const scrollY = opts.considerScroll ? window.scrollY : 0;
+  const { scrollX } = window;
+  const { scrollY } = window;
   let x = triggerRect.left + scrollX;
   let y = triggerRect.bottom + scrollY + 4;
 
@@ -71,24 +63,6 @@ const calculateSmartPosition = (
     y,
   };
 };
-
-function isInsideFixedElement(target: Element) {
-  let element = target.parentElement;
-  let considerScroll = true;
-
-  while (element) {
-    if (getComputedStyle(element).position === "fixed") {
-      considerScroll = false;
-      break;
-    }
-
-    element = element.parentElement;
-  }
-
-  return considerScroll;
-}
-
-// --- COMPONENTE VISUAL (Igual que antes) ---
 const ContextMenu = ( { isOpen,
   position,
   onClose,
@@ -193,8 +167,6 @@ export const ContextMenuProvider = ( { children }: { children: ReactNode } ) => 
 
       const trigger = event.currentTarget;
       const triggerRect = trigger.getBoundingClientRect();
-      // Asegúrate de tener esta función importada o definida
-      const considerScroll = isInsideFixedElement(trigger);
 
       disableScroll();
 
@@ -216,9 +188,6 @@ export const ContextMenuProvider = ( { children }: { children: ReactNode } ) => 
             triggerRect,
             menuWidth,
             menuHeight,
-            {
-              considerScroll,
-            },
           ); // Asegúrate de tener calculateSmartPosition disponible
 
           setState((prev) => ( {
@@ -267,10 +236,6 @@ export const ContextMenuProvider = ( { children }: { children: ReactNode } ) => 
     return () => enableScroll();
   }, [enableScroll]);
 
-  // MEMOIZACIÓN FINAL
-  // Como openMenu y closeMenu ya no dependen de ningún estado que cambie frecuentemente
-  // (solo dependen de enable/disableScroll que son estables),
-  // contextValue NUNCA cambiará tras el primer render.
   const contextValue = useMemo(() => ( {
     openMenu,
     closeMenu,
@@ -279,7 +244,7 @@ export const ContextMenuProvider = ( { children }: { children: ReactNode } ) => 
   return (
     <ContextMenuContext.Provider value={contextValue}>
       {children}
-      <ContextMenu // Asumiendo que ContextMenu está definido arriba o importado
+      <ContextMenu
         className={state.className}
         isOpen={state.isOpen}
         position={state.position}
