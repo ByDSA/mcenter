@@ -91,13 +91,6 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
       ...updateQuery.$set,
     };
 
-    if (paramEntity.tags?.length === 0) {
-      updateQuery.$unset = {
-        ...updateQuery.$unset,
-        tags: true,
-      };
-    }
-
     const doc = await MusicOdm.Model.findByIdAndUpdate(
       id,
       updateQuery,
