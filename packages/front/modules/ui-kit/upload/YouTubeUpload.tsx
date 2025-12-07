@@ -234,16 +234,14 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
         </div>
 
         <div className={styles.actions}>
-          {!doing
+          {(!doing
       && <UploadButton
         onClick={handleSubmit}
         className={styles.uploadButton}
         titleAccess={"Subir"}
         disabled={!url.trim() || !isValidYouTubeURL(url.trim())}
-      />
-          }
-          {
-            doing && <div className={styles.loading}><Spinner size={2} /></div>
+      />)
+          || <Spinner />
           }
         </div>
       </div>

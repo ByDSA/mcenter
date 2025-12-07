@@ -7,15 +7,17 @@ type SpinnerProps = {
   size?: number;
 };
 
-export const Spinner: React.FC<SpinnerProps> = ( { size = 1 }: SpinnerProps) => {
+export const Spinner: React.FC<SpinnerProps> = ( { size }: SpinnerProps) => {
   const style = {} as React.CSSProperties;
 
-  if (size === 1) {
-    style["--spinner-size"] = size + "rem";
-    style["--spinner-width"] = "2px";
-  } else {
-    style["--spinner-size"] = size + "rem";
-    style["--spinner-width"] = `${size}px`;
+  if (size !== undefined) {
+    if (size < 2) {
+      style["--spinner-size"] = size + "rem";
+      style["--spinner-width"] = "2px";
+    } else {
+      style["--spinner-size"] = size + "rem";
+      style["--spinner-width"] = `${size}px`;
+    }
   }
 
   return <span className={styles.spinner}
