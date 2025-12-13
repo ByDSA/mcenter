@@ -2,7 +2,6 @@ import { DeleteForever, SaveAs, Undo } from "@mui/icons-material";
 import { LinkAsyncAction } from "#modules/ui-kit/input/LinkAsyncAction";
 import { classes } from "#modules/utils/styles";
 import { Spinner } from "#modules/ui-kit/spinner";
-import { CrudOp } from "../useCrud";
 import styles from "./crud-buttons.module.css";
 
 type Props = {
@@ -49,8 +48,14 @@ type CreateActionsBarProps = {
   spinnerSide: "left" | "right";
   isModified?: boolean;
   reset?: ()=> Promise<void>;
-  update?: CrudOp<unknown>;
-  remove?: CrudOp<unknown>;
+  update?: {
+    isDoing: boolean;
+    action: ()=> Promise<void>;
+  };
+  remove?: {
+    isDoing: boolean;
+    action: ()=> Promise<void>;
+  };
 };
 export function createActionsBar( { isModified = false,
   update, remove, reset, spinnerSide }: CreateActionsBarProps) {

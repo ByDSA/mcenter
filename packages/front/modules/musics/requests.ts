@@ -34,6 +34,28 @@ export class MusicsApi {
     } );
   }
 
+  async getOneByCriteria(
+    criteria: MusicCrudDtos.GetOne.Criteria,
+  ): Promise<MusicCrudDtos.GetOne.Response> {
+    const method = "POST";
+    const fetcher = makeFetcher<
+      MusicCrudDtos.GetOne.Criteria,
+      MusicCrudDtos.GetOne.Response
+    >( {
+      method,
+      reqBodyValidator: genAssertZod(MusicCrudDtos.GetOne.criteriaSchema),
+      parseResponse: genParseZod(
+        MusicCrudDtos.GetOne.responseSchema,
+      ) as (m: unknown)=> MusicCrudDtos.GetOne.Response,
+    } );
+    const URL = backendUrl(PATH_ROUTES.musics.search.path + "-one");
+
+    return fetcher( {
+      url: URL,
+      body: criteria,
+    } );
+  }
+
   async getManyByCriteria(
     criteria: MusicsApi.GetManyByCriteria.Criteria,
   ): Promise<MusicsApi.GetManyByCriteria.Response> {

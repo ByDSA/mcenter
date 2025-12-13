@@ -2,36 +2,237 @@ import type { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
-import { DocOdm as EpisodeDocOdm } from "./odm";
+import { DocOdm } from "./odm";
 
-// Asumiendo que tienes un ODM para Episode
-function buildMongooseSort(
-  body: EpisodesCrudDtos.GetManyByCriteria.Criteria,
-): MongoSortQuery<EpisodeDocOdm> | undefined {
+// Definimos flags similares a MusicExpansionFlags
+export interface EpisodeExpansionFlags {
+  includeFileInfos: boolean;
+  includeUserInfo: boolean; // Ahora busca en episodes_users
+  includeSeries: boolean;
+}
+
+type Criteria = EpisodesCrudDtos.GetManyByCriteria.Criteria;
+
+function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
   if (!body.sort)
     return undefined;
 
-  const sortObj: MongoSortQuery<EpisodeDocOdm> = {};
+  const ret: MongoSortQuery<DocOdm> = {};
 
-  // Ejemplo de ordenación por diferentes campos
   if (body.sort.episodeCompKey) {
-    sortObj["seriesKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
-    sortObj["episodeKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
+    // Orden compuesto
+    ret["seriesKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
+    ret["episodeKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
   }
 
   if (body.sort.createdAt)
-    sortObj["createdAt"] = body.sort.createdAt === "asc" ? 1 : -1;
+    ret["createdAt"] = body.sort.createdAt === "asc" ? 1 : -1;
 
   if (body.sort.updatedAt)
-    sortObj["updatedAt"] = body.sort.updatedAt === "asc" ? 1 : -1;
+    ret["updatedAt"] = body.sort.updatedAt === "asc" ? 1 : -1;
 
-  return Object.keys(sortObj).length > 0 ? sortObj as Record<string, -1 | 1> : undefined;
+  // Tie-breaker para paginación consistente
+  if (Object.keys(ret).length > 0)
+    ret["_id"] = 1;
+
+  return ret as Record<string, -1 | 1>;
 }
 
-function buildMongooseFilter(
-  criteria: EpisodesCrudDtos.GetManyByCriteria.Criteria,
-): FilterQuery<EpisodeDocOdm> {
-  const filter: MongoFilterQuery<EpisodeDocOdm> = {};
+/**
+ * Función helper equivalente a enrichSingleMusic pero para Episodes.
+ * Maneja los Lookups complejos.
+ */
+function enrichSingleEpisode(
+  _localField: string,
+  targetField: string | null,
+  userId: string | null | undefined,
+  flags: EpisodeExpansionFlags,
+): PipelineStage[] {
+  const pipeline: PipelineStage[] = [];
+  const rootPrefix = targetField ? `${targetField}.` : "";
+
+  // 1. File Infos
+  if (flags.includeFileInfos) {
+    pipeline.push( {
+      $lookup: {
+        from: EpisodeFileInfoOdm.COLLECTION_NAME,
+        localField: `${rootPrefix}_id`,
+        foreignField: "episodeId",
+        as: `${rootPrefix}fileInfos`,
+      },
+    } );
+  }
+
+  // 2. User Info (CORREGIDO: Busca en episodes_users)
+  if (flags.includeUserInfo && userId) {
+    pipeline.push( {
+      $lookup: {
+        from: "episodes_users", // Colección pivote
+        let: {
+          episodeId: targetField ? `$${targetField}._id` : "$_id",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {
+                    $eq: ["$episodeId", "$$episodeId"],
+                  },
+                  {
+                    $eq: ["$userId", new Types.ObjectId(userId)],
+                  },
+                ],
+              },
+            },
+          },
+          {
+            $limit: 1,
+          }, // Solo 1 registro por usuario/episodio
+        ],
+        as: `${rootPrefix}userInfo`,
+      },
+    } );
+
+    // Unwind para tener un objeto en lugar de array
+    pipeline.push( {
+      $addFields: {
+        [`${rootPrefix}userInfo`]: {
+          $arrayElemAt: [`$${rootPrefix}userInfo`, 0],
+        },
+      },
+    } );
+  }
+
+  // 3. Series (y sus fileInfos si aplica)
+  if (flags.includeSeries) {
+    pipeline.push( {
+      $lookup: {
+        from: "series",
+        localField: `${rootPrefix}seriesKey`,
+        foreignField: "key", // Asumiendo que 'key' es el identificador en Series
+        as: `${rootPrefix}serie`,
+      },
+    } );
+
+    pipeline.push( {
+      $addFields: {
+        [`${rootPrefix}serie`]: {
+          $arrayElemAt: [`$${rootPrefix}serie`, 0],
+        },
+      },
+    } );
+
+    // Si también pedimos fileInfos, solemos querer los fileInfos de la serie también
+    // según tu código original
+    if (flags.includeFileInfos) {
+      pipeline.push( {
+        $lookup: {
+          from: EpisodeFileInfoOdm.COLLECTION_NAME,
+          localField: `${rootPrefix}serie._id`, // ID de la serie recién poblada
+          foreignField: "seriesKey", // Asumiendo relación en FileInfos
+          as: "serieFileInfosTemp",
+        },
+      } );
+
+      pipeline.push( {
+        $addFields: {
+          [`${rootPrefix}serie.fileInfos`]: "$serieFileInfosTemp",
+        },
+      } );
+
+      pipeline.push( {
+        $unset: "serieFileInfosTemp",
+      } );
+    }
+  }
+
+  return pipeline;
+}
+
+export function getCriteriaPipeline(
+  userId: string | null | undefined = null,
+  criteria: Criteria,
+) {
+  const sort = buildMongooseSort(criteria);
+  const pipeline: PipelineStage[] = [];
+  // Flags de expansión
+  const expansionFlags: EpisodeExpansionFlags = {
+    includeFileInfos: criteria.expand?.includes("fileInfos")
+                      || !!criteria.filter?.path, // Necesario si filtramos por path
+    includeUserInfo: criteria.expand?.includes("userInfo") ?? false,
+    includeSeries: criteria.expand?.includes("series") ?? false,
+  };
+  // Pre-filter: Si filtramos por 'path', necesitamos 'fileInfos' ANTES del match
+  const preFilterEnrichment = !!criteria.filter?.path;
+
+  if (preFilterEnrichment) {
+    pipeline.push(...enrichSingleEpisode("_id", null, userId, {
+      includeFileInfos: true, // Forzamos carga
+      includeUserInfo: false,
+      includeSeries: false,
+    } ));
+  }
+
+  // Filtros
+  const filter = buildMongooseFilterWithFileInfos(criteria, preFilterEnrichment);
+
+  if (Object.keys(filter).length > 0) {
+    pipeline.push( {
+      $match: filter,
+    } );
+  }
+
+  // Facet para data y metadatos
+  const facetStage: PipelineStage = {
+    $facet: {
+      data: [],
+      metadata: [{
+        $count: "totalCount",
+      }],
+    },
+  };
+  const dataPipeline: PipelineStage[] = [];
+
+  // Sort, Skip, Limit (Dentro de 'data')
+  if (sort) {
+    dataPipeline.push( {
+      $sort: sort,
+    } );
+  }
+
+  if (criteria.offset) {
+    dataPipeline.push( {
+      $skip: criteria.offset,
+    } );
+  }
+
+  if (criteria.limit) {
+    dataPipeline.push( {
+      $limit: criteria.limit,
+    } );
+  }
+
+  // Enrich Restante (UserInfo, Series, y FileInfos si no se cargó antes)
+  const postPaginationFlags: EpisodeExpansionFlags = {
+    includeFileInfos: expansionFlags.includeFileInfos && !preFilterEnrichment,
+    includeUserInfo: expansionFlags.includeUserInfo,
+    includeSeries: expansionFlags.includeSeries,
+  };
+
+  dataPipeline.push(...enrichSingleEpisode("_id", null, userId, postPaginationFlags));
+
+  (facetStage.$facet as any).data = dataPipeline;
+  pipeline.push(facetStage);
+
+  return pipeline;
+}
+
+function buildMongooseFilterWithFileInfos(
+  criteria: Criteria,
+  hasFileInfoLookup: boolean,
+): FilterQuery<any> {
+  const filter: MongoFilterQuery<any> = {};
 
   if (criteria.filter) {
     if (criteria.filter.id)
@@ -43,9 +244,7 @@ function buildMongooseFilter(
     if (criteria.filter.episodeKey)
       filter["episodeKey"] = criteria.filter.episodeKey;
 
-    if (
-      criteria.filter.episodeKeys && criteria.filter.episodeKeys.length > 0
-    ) {
+    if (criteria.filter.episodeKeys && criteria.filter.episodeKeys.length > 0) {
       filter["episodeKey"] = {
         $in: criteria.filter.episodeKeys,
       };
@@ -57,122 +256,10 @@ function buildMongooseFilter(
       };
     }
 
-    // No incluimos el filtro de path aquí porque necesita el lookup primero
+    // Filtro por path (solo funciona si hasFileInfoLookup es true)
+    if (hasFileInfoLookup && criteria.filter.path)
+      filter["fileInfos.path"] = criteria.filter.path;
   }
 
   return filter;
-}
-
-function buildFileInfoFilter(
-  criteria: EpisodesCrudDtos.GetManyByCriteria.Criteria,
-): FilterQuery<any> | null {
-  if (!criteria.filter?.path)
-    return null;
-
-  return {
-    "fileInfos.path": criteria.filter.path,
-  };
-}
-
-export function getCriteriaPipeline(
-  criteria: EpisodesCrudDtos.GetManyByCriteria.Criteria,
-) {
-  const filter = buildMongooseFilter(criteria);
-  const fileInfoFilter = buildFileInfoFilter(criteria);
-  const sort = buildMongooseSort(criteria);
-  const needsFileInfoLookup = fileInfoFilter || criteria.expand?.includes("fileInfos");
-  const pipeline: PipelineStage[] = [
-    {
-      $match: filter,
-    },
-  ];
-
-  // Si necesitamos filtrar por fileInfo o expandir fileInfos,
-  // hacemos el lookup ANTES de la paginación
-  if (needsFileInfoLookup) {
-    pipeline.push( {
-      $lookup: {
-        from: EpisodeFileInfoOdm.COLLECTION_NAME,
-        localField: "_id",
-        foreignField: "episodeId",
-        as: "fileInfos",
-      },
-    } );
-
-    // Si hay filtro por path, aplicarlo después del lookup
-    if (fileInfoFilter) {
-      pipeline.push( {
-        $match: fileInfoFilter,
-      } );
-    }
-  }
-
-  if (sort) {
-    pipeline.push( {
-      $sort: sort,
-    } );
-  }
-
-  // Aplicar paginación después de los filtros y lookups necesarios
-  if (criteria.offset) {
-    pipeline.push( {
-      $skip: criteria.offset,
-    } );
-  }
-
-  if (criteria.limit) {
-    pipeline.push( {
-      $limit: criteria.limit,
-    } );
-  }
-
-  // Agregar lookups para expand (excepto fileInfos que ya se hizo si era necesario)
-  if (criteria.expand) {
-    if (criteria.expand.includes("series")) {
-      pipeline.push( {
-        $lookup: {
-          from: "series", // nombre de la colección de series
-          localField: "seriesKey",
-          foreignField: "key",
-          as: "serie",
-        },
-      } );
-
-      // Convertir el array a objeto único
-      pipeline.push( {
-        $addFields: {
-          serie: {
-            $arrayElemAt: ["$serie", 0],
-          },
-        },
-      } );
-    }
-
-    // Si necesitas expandir tanto series como fileInfos de las series
-    if (criteria.expand.includes("series") && criteria.expand.includes("fileInfos")) {
-      // Lookup para obtener fileInfos de la serie
-      pipeline.push( {
-        $lookup: {
-          from: EpisodeFileInfoOdm.COLLECTION_NAME,
-          localField: "serie._id",
-          foreignField: "seriesKey",
-          as: "serieFileInfos",
-        },
-      } );
-
-      // Añadir los fileInfos a la serie
-      pipeline.push( {
-        $addFields: {
-          "serie.fileInfos": "$serieFileInfos",
-        },
-      } );
-
-      // Limpiar el campo temporal
-      pipeline.push( {
-        $unset: "serieFileInfos",
-      } );
-    }
-  }
-
-  return pipeline;
 }

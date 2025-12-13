@@ -18,7 +18,7 @@ export type OpenModalProps = {
   title?: string;
   onClose?: (returnObj?: unknown)=> Promise<void> | void;
   onOpen?: ()=> void;
-  staticContent?: ReactNode;
+  content?: ReactNode;
 };
 
 // ... (Tus tipos ModalInstance, etc. se mantienen igual)
@@ -48,7 +48,7 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
       const newInstance: ModalInstance = {
         id,
         isOpen: true,
-        content: options.staticContent || null,
+        content: options.content || null,
         options,
       };
 
@@ -129,7 +129,7 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
   );
 };
 
-export const useModal = () => {
+export const useModal = (useParent: boolean = false) => {
   const context = useContext(ModalContext);
   const parentModalId = useContext(CurrentModalIdContext);
 
@@ -139,7 +139,7 @@ export const useModal = () => {
   const myIdRef = useRef(`modal-${Math.random().toString(36)
     .substring(2, 9)}`);
   const myOwnId = myIdRef.current;
-  const targetId = parentModalId || myOwnId;
+  const targetId = (parentModalId && useParent) ? parentModalId : myOwnId;
   // 1. Refs para controlar la promesa y su resolución
   // Guardamos la función 'resolve' para llamarla cuando el modal se cierre.
   const resolverRef = useRef<((value: unknown)=> void) | null>(null);
@@ -188,17 +188,10 @@ export const useModal = () => {
     },
     [context, targetId],
   );
-  const setModalContent = useCallback(
-    (content: ReactNode) => {
-      return context._setContent(targetId, content);
-    },
-    [context, targetId],
-  );
 
   return {
     openModal,
     closeModal,
-    setModalContent,
     // Helper: devuelve true si el modal relevante está abierto
     isOpen: context._isModalOpen(targetId),
     id: targetId,

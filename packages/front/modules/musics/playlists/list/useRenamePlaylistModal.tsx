@@ -84,6 +84,7 @@ slug?: string; } = {};
       </section>
       <footer>
         <Button
+          theme="white"
           onClick={form.submit}
           disabled={!form.canSubmit}
         >
@@ -100,31 +101,33 @@ current: MusicPlaylistEntity; } )=> Promise<void> | void;
 };
 
 type OpenModalArgs = {
-  value: PlaylistEntity; // La playlist a editar
-  setValue: (value: PlaylistEntity)=> void; // Setter local
+  value: PlaylistEntity;
+  setValue: (value: PlaylistEntity)=> void;
   onClose?: ()=> Promise<void> | void;
 };
 
 export function useRenamePlaylistModal(props: HookProps = {} ) {
-  const modal = useModal();
+  const { openModal: _openModal, ...usingModal } = useModal();
   const openModal = ( { value, setValue, onClose }: OpenModalArgs) => {
-    return modal.openModal( {
+    return _openModal( {
       title: "Renombrar",
       className: styles.renameModal,
       onClose: onClose,
-      staticContent: (
+      content: (
         <RenamePlaylistForm
           initialValue={value}
           updateLocalValue={setValue}
-          onSuccess={props.onSuccess}
+          onSuccess={async (v)=>{
+            await props.onSuccess?.(v);
+            usingModal.closeModal();
+          }}
         />
       ),
     } );
   };
 
   return {
+    ...usingModal,
     openModal,
-    closeModal: modal.closeModal,
-    isOpen: modal.isOpen,
   };
 }

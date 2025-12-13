@@ -96,7 +96,10 @@ export class PlayVideoService {
       number = query.n;
 
     const episodes = (await this.episodePickerService.getByStream(stream, number ?? 1, {
-      expand: ["series", "fileInfos"],
+      requestingUserId: userId,
+      criteria: {
+        expand: ["series", "fileInfos"],
+      },
     } ))
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
 
@@ -118,22 +121,25 @@ export class PlayVideoService {
     const serie = await this.seriesRepo.getOneByKey(seriesKey);
 
     assertFoundClient(serie);
+    const remotePlayer = await this.remotePlayersRepo.getOneById(remotePlayerId);
 
+    assertFoundClient(remotePlayer);
+    const requestingUserId = remotePlayer.ownerId.toString();
     const episodes = [await this.episodesRepo
       .getOneByCompKey( {
         seriesKey,
         episodeKey,
       }, {
-        expand: ["series", "fileInfos"],
+        criteria: {
+          expand: ["series", "fileInfos"],
+        },
+        requestingUserId,
       } )]
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
-    const remotePlayer = await this.remotePlayersRepo.getOneById(remotePlayerId);
-
-    assertFoundClient(remotePlayer);
 
     assertFoundClient(episodes[0]);
     const stream = await this.streamsRepo.getOneOrCreateBySeriesKey(
-      remotePlayer.ownerId.toString(),
+      requestingUserId,
       seriesKey,
     );
 

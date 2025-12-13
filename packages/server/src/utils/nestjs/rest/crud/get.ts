@@ -72,3 +72,20 @@ export function GetManyCriteria(
 
   return applyDecorators(...decorators);
 }
+
+type GetOneCriteriaOptions = {
+  url?: string;
+};
+export function GetOneCriteria(
+  schema: z.ZodSchema,
+  options?: GetOneCriteriaOptions,
+) {
+  const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
+    Post(options?.url ?? "search-one"),
+    UseInterceptors(ResponseFormatterInterceptor),
+    ValidateResponseWithZodSchema(createOneResultResponseSchema(schema)),
+    HttpCode(HttpStatus.OK),
+  ];
+
+  return applyDecorators(...decorators);
+}

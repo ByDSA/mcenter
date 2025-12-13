@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import React from "react";
+import { classes } from "#modules/utils/styles";
 import stylesFetching from "./fetching.style.module.css";
 import styles from "./style.module.css";
 
@@ -29,5 +30,9 @@ type ContentSpinnerProps = {
   size?: number;
 };
 export const ContentSpinner = (props?: ContentSpinnerProps) => {
-  return <div className={stylesFetching.loading}><Spinner size={props?.size ?? 6}/></div>;
+  return <span className={classes(stylesFetching.loading, stylesFetching.contentSpinner)}><Spinner size={props?.size ?? 6}/></span>;
+};
+
+export const InlineSpinner = (props?: ContentSpinnerProps) => {
+  return <span className={classes(stylesFetching.loading, stylesFetching.inlineSpinner)}><Spinner size={props?.size ?? 1}/></span>;
 };

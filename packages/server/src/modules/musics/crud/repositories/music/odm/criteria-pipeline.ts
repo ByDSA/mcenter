@@ -34,7 +34,7 @@ function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
 
 // ... type AggregationResult ...
 export function getCriteriaPipeline(
-  userId: string | null,
+  userId: string | null | undefined = null,
   criteria: Criteria,
 ) {
   const sort = buildMongooseSort(criteria);

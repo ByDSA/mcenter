@@ -41,7 +41,9 @@ export class StreamGetRandomEpisodeService {
       stream,
       n,
       {
-        expand: ["series", "fileInfos"],
+        criteria: {
+          expand: ["series", "fileInfos"],
+        },
       },
     );
 
@@ -51,16 +53,18 @@ export class StreamGetRandomEpisodeService {
   async getByStream(
     stream: StreamEntity,
     n = 1,
-    criteria?: Parameters<typeof this.episodesRepo
+    props?: Parameters<typeof this.episodesRepo
       .getManyBySerieKey>[1],
   ): Promise<EpisodeEntity[]> {
     const seriesKey = getSeriesKeyFromStream(stream);
 
     assertIsDefined(seriesKey);
-    criteria ??= {};
+    props ??= {
+      criteria: {},
+    };
 
     if (stream.mode === StreamMode.SEQUENTIAL) {
-      criteria.sort = {
+      props.criteria.sort = {
         episodeCompKey: "asc",
       };
     }
@@ -69,7 +73,7 @@ export class StreamGetRandomEpisodeService {
       .getFullSerieForUser( {
         userId: stream.userId,
         seriesKey,
-      }, criteria);
+      }, props);
     const lastEntry = await this.historyRepo.findLast( {
       streamId: stream.id,
     } );
@@ -93,9 +97,9 @@ export class StreamGetRandomEpisodeService {
     } );
     const episodes = await picker.pick(n);
 
-    if (criteria.expand) {
+    if (props.criteria.expand) {
       for (const e of episodes) {
-        if (criteria.expand.includes("series")) {
+        if (props.criteria.expand.includes("series")) {
           const gotSerie = await this.seriesRepo.getOneByKey(e.compKey.seriesKey);
 
           assertIsDefined(gotSerie);
@@ -103,7 +107,7 @@ export class StreamGetRandomEpisodeService {
           e.serie = gotSerie;
         }
 
-        if (criteria.expand.includes("fileInfos")) {
+        if (props.criteria.expand.includes("fileInfos")) {
           const gotFileInfos = await this.fileInfosRepo.getAllByEpisodeId(e.id);
 
           assertIsNotEmpty(gotFileInfos);

@@ -1,0 +1,51 @@
+.container {
+  *:has(> .album),
+  *:has(> .title),
+  *:has(> .artist) {
+    flex-grow: 1;
+  }
+
+  :global(.line):has(.title),
+  :global(.line):has(.weight) {
+    gap: 1rem;
+  }
+
+  .album,
+  .title,
+  .artist {
+    flex-grow: 1;
+  }
+
+  .title,
+  .artist,
+  .album,
+  .url {
+    width: 100%;
+
+    :global(.ui-kit-resource-input-number),
+    :global(.ui-kit-resource-input-text) {
+      width: 100%;
+    }
+  }
+
+  .weight :global(.ui-kit-input-number) {
+    width: 4rem;
+  }
+
+  .optionalButton {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 1rem !important;
+  }
+
+  .optionalButton,
+  details > summary {
+    color: var(--color-blue-200);
+
+    &:hover {
+      cursor: pointer;
+      user-select: none;
+    }
+  }
+}

@@ -55,7 +55,9 @@ crudTestsSuite( {
             seriesKey: "seriesKey",
             episodeKey: "episodeKey",
           }, {
-            expand: ["series"],
+            criteria: {
+              expand: ["series"],
+            },
           }],
         },
         returned: EPISODES_SIMPSONS[0],

@@ -1,4 +1,5 @@
 import z from "zod";
+import { createOneResultResponseSchema } from "../../../utils/http/responses";
 import { slugSchema } from "../../utils/schemas/slug";
 import { idParamsSchema } from "../../utils/schemas/requests";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
@@ -29,6 +30,9 @@ export namespace MusicCrudDtos {
   export namespace GetOne {
     export const criteriaSchema = createCriteriaOneSchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;
+    export const responseDataSchema = musicEntitySchema;
+    export const responseSchema = createOneResultResponseSchema(responseDataSchema);
+    export type Response = z.infer<typeof responseSchema>;
     export namespace ById {
       export const paramsSchema = idParamsSchema;
     }

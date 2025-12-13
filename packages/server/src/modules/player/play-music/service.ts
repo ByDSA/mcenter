@@ -32,8 +32,10 @@ export class PlayMusicService {
   ) {
     const { force } = query;
     const musics = [await this.musicsRepo
-      .getOneBySlug(null, slug, {
-        expand: ["fileInfos"],
+      .getOneBySlug(slug, {
+        criteria: {
+          expand: ["fileInfos"],
+        },
       } )]
       .filter(Boolean) as MusicEntityWithFileInfos[];
 

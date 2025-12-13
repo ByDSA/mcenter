@@ -11,7 +11,7 @@ export default function RegisterVerifyPage() {
   const router = useRouter();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
-  const { element } = usePageAsyncAction( {
+  const { statusElement: element } = usePageAsyncAction( {
     autoStart: !!token,
     loadingElement: <p>Verificando token ...</p>,
     errorElement: <><p>Error: Token caducado o incorrecto.</p>
@@ -37,7 +37,8 @@ export default function RegisterVerifyPage() {
 
       if (!res.ok)
         throw new Error("Verification failed");
-
+    },
+    onSuccess: ()=> {
       router.replace("/"); // Redirige a "/" y borra la página de verificación del historial
     },
   } );

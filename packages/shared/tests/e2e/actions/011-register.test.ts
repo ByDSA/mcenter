@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { PATH_ROUTES } from "../../../src/routing";
 import { fixtureAuthLocal } from "../../../src/models/auth/tests/auth-local-fixtures";
-import { frontEndUrl, MatchUrlError, sleep } from "../utils";
+import { frontEndUrl, MatchUrlError } from "../utils";
 import { expectLoggedAuthCookie, expectNotLoggedAuthCookie } from "../auth-cookies";
 import { fixtureUsers } from "../../../src/models/auth/tests/fixtures";
+import { sleep } from "../../../src/utils/sleep";
 import { localRegisterAction, oauthLoginMockAction, oauthRegisterMockAction } from "./register";
 import { validateEmailAction } from "./validate-email";
 import { localLoginAction } from "./login";

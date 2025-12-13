@@ -4,7 +4,7 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
-import { CanCreateManyAndGet, CanGetAll, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { assertFoundClient } from "#utils/validation/found";
 import { SeriesKey } from "#modules/series";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
@@ -30,13 +30,21 @@ type EpisodeId = EpisodeEntity["id"];
 type Criteria = EpisodesCrudDtos.GetManyByCriteria.Criteria;
 type CriteriaOne = EpisodesCrudDtos.GetOne.Criteria;
 
+type GetOneProps = {
+  criteria: CriteriaOne;
+  requestingUserId?: string;
+};
+type GetManyProps = {
+  criteria: Criteria;
+  requestingUserId?: string;
+};
+
 @Injectable()
 export class EpisodesRepository
 implements
 CanCreateManyAndGet<EpisodeEntity>,
 CanGetOneById<EpisodeEntity, EpisodeId>,
 CanPatchOneByIdAndGet<Episode, EpisodeId>,
-CanGetManyByCriteria<EpisodeEntity, Criteria>,
 CanGetAll<EpisodeEntity> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
@@ -59,9 +67,11 @@ CanGetAll<EpisodeEntity> {
     ;
   }
 
-  async getManyByCriteria(criteria: Criteria): Promise<EpisodeEntity[]> {
-    const pipeline = getCriteriaPipeline(criteria);
-    const episodesOdm = await EpisodeOdm.Model.aggregate(pipeline, {
+  async getMany(props: GetManyProps): Promise<EpisodeEntity[]> {
+    const { requestingUserId } = props;
+    const { criteria } = props;
+    const pipeline = getCriteriaPipeline(requestingUserId, criteria);
+    const res = await EpisodeOdm.Model.aggregate(pipeline, {
       ...(criteria.sort?.episodeCompKey && {
         collation: {
           locale: "en_US",
@@ -70,7 +80,7 @@ CanGetAll<EpisodeEntity> {
       } ),
     } );
 
-    return episodesOdm.map(EpisodeOdm.toEntity);
+    return res[0].data.map(EpisodeOdm.toEntity);
   }
 
   async patchOneByIdAndGet(
@@ -106,9 +116,11 @@ CanGetAll<EpisodeEntity> {
 
   async getOneById(
     id: EpisodeId,
-    criteria?: Pick<CriteriaOne, "expand">,
+    props?: Omit<GetOneProps, "criteria"> & {criteria: Pick<GetOneProps["criteria"], "expand">},
   ): Promise<EpisodeEntity | null> {
-  // Si no hay criteria, usar findById (más eficiente)
+    const criteria = props?.criteria;
+
+    // Si no hay criteria, usar findById (más eficiente)
     if (!criteria?.expand || Object.keys(criteria.expand).length === 0) {
       const episodeOdm = await EpisodeOdm.Model.findById(id);
 
@@ -116,12 +128,14 @@ CanGetAll<EpisodeEntity> {
     }
 
     // Si hay expand, usar aggregate para poder aplicar las transformaciones
-    const [episode] = await this.getManyByCriteria( {
-      ...criteria,
-      filter: {
-        id,
+    const [episode] = await this.getMany( {
+      criteria: {
+        ...criteria,
+        filter: {
+          id,
+        },
+        limit: 1,
       },
-      limit: 1,
     } );
 
     return episode;
@@ -148,10 +162,13 @@ CanGetAll<EpisodeEntity> {
     return episodesOdm.map(EpisodeOdm.toEntity);
   }
 
-  async getOneByCriteria(criteria: CriteriaOne): Promise<EpisodeEntity | null> {
-    const [episode] = await this.getManyByCriteria( {
-      ...criteria,
-      limit: 1,
+  async getOne(props: GetOneProps): Promise<EpisodeEntity | null> {
+    const [episode] = await this.getMany( {
+      criteria: {
+        ...props.criteria,
+        limit: 1,
+      },
+      requestingUserId: props.requestingUserId,
     } );
 
     return episode;
@@ -159,25 +176,31 @@ CanGetAll<EpisodeEntity> {
 
   async getOneByCompKey(
     compKey: EpisodeCompKey,
-    criteria?: Omit<CriteriaOne, "filter">,
+    props?: Omit<GetOneProps, "criteria"> & {criteria: Omit<GetOneProps["criteria"], "filter"> },
   ): Promise<EpisodeEntity | null> {
-    return await this.getOneByCriteria( {
-      ...criteria,
-      filter: {
-        episodeKey: compKey.episodeKey,
-        seriesKey: compKey.seriesKey,
+    return await this.getOne( {
+      criteria: {
+        ...props?.criteria,
+        filter: {
+          episodeKey: compKey.episodeKey,
+          seriesKey: compKey.seriesKey,
+        },
       },
+      requestingUserId: props?.requestingUserId,
     } );
   }
 
   async getManyBySerieKey(
     seriesKey: SeriesKey,
-    criteria?: Omit<Criteria, "filter">,
+    props?: Omit<GetManyProps, "criteria"> & {criteria: Omit<GetManyProps["criteria"], "filter">},
   ): Promise<EpisodeEntity[]> {
-    return await this.getManyByCriteria( {
-      ...criteria,
-      filter: {
-        seriesKey,
+    return await this.getMany( {
+      requestingUserId: props?.requestingUserId,
+      criteria: {
+        ...props?.criteria,
+        filter: {
+          seriesKey,
+        },
       },
     } );
   }

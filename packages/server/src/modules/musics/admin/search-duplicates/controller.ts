@@ -15,7 +15,7 @@ export class SearchDuplicatesController {
 
   @Get()
   async search() {
-    const all = await this.musicRepo.getAll(null);
+    const all = await this.musicRepo.getAll();
     const ignoreGroupsDocOdms = await MusicDuplicatesIgnoreGroupsOdm.Model.find();
     const ignoreGroups = MusicDuplicatesIgnoreGroupsOdm.toModels(ignoreGroupsDocOdms);
     const dupTitleArtist = getTitleArtistDups(all, {

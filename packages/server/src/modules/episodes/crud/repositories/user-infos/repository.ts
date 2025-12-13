@@ -62,7 +62,7 @@ CanGetOneById<Entity, UserInfoKey> {
   async getFullSerieForUser(
     { seriesKey: serieKey,
       userId }: GetFullSerieForUserProps,
-    criteria?: Parameters<EpisodesRepository["getManyBySerieKey"]>[1],
+    props?: Parameters<EpisodesRepository["getManyBySerieKey"]>[1],
   ): Promise<EpisodeEntityWithUserInfo[]> {
     const docs: WithRequired<EpisodeOdm.FullDoc, "userInfo">[] = await EpisodeOdm.Model.aggregate([
       {
@@ -123,8 +123,8 @@ CanGetOneById<Entity, UserInfoKey> {
     ]);
 
     // TODO: hacer sort en aggregate
-    if (criteria?.sort) {
-      if (criteria.sort.episodeCompKey)
+    if (props?.criteria?.sort) {
+      if (props?.criteria.sort.episodeCompKey)
         docs.sort((a, b)=>a.episodeKey.localeCompare(b.episodeKey));
     }
 

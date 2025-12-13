@@ -6,12 +6,10 @@ import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
 import { useUser } from "#modules/core/auth/useUser";
-import { classes } from "#modules/utils/styles";
+import { ResourceList } from "#modules/resources/ResourceList";
 import { MusicPlaylistsApi } from "../requests";
 import { MusicPlaylistListItem } from "./Item";
 import styles from "./List.module.css";
-
-import "#styles/resources/resource-list-entry.css";
 
 type Data = MusicPlaylistsApi.GetManyByCriteria.Data[];
 
@@ -32,7 +30,7 @@ export function MusicPlayListsList(
       isLoading,
     },
     render: () => (
-      <span className={classes("resource-list", styles.list)} key={data?.length}>
+      <ResourceList>
         {
           data!.map(
             (playlist, i) => <Fragment key={playlist.id}>
@@ -57,7 +55,7 @@ export function MusicPlayListsList(
         && <section className={styles.noPlaylists}>
           <p>No tienes ninguna playlist creada.</p>
         </section>}
-      </span>
+      </ResourceList>
     ),
   } );
 }

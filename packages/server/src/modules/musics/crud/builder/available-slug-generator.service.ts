@@ -17,7 +17,7 @@ export class MusicAvailableSlugGeneratorService {
     let i = 1;
 
     while (true) {
-      music = await this.musicRepo.getOneBySlug(null, currentSlug);
+      music = await this.musicRepo.getOneBySlug(currentSlug);
 
       if (!music)
         return slugSchema.parse(currentSlug);

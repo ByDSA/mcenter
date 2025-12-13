@@ -39,12 +39,19 @@ const NewPlaylistForm = ( { onSuccess }: FormProps) => {
     onSuccess,
     onSubmit: async () => {
       const api = FetchApi.get(MusicPlaylistsApi);
-
-      return (await api.createOne( {
+      const res1 = await api.createOne( {
         name: nameValue.trim(),
         slug: nameValue.trim(),
         visibility: visibilityValue ? "public" : "private",
-      } )).data;
+      } );
+      const res = await api.getManyByCriteria( {
+        expand: ["ownerUserPublic"],
+        filter: {
+          id: res1.data!.id,
+        },
+      } );
+
+      return res.data[0];
     },
   } );
 
@@ -58,6 +65,7 @@ const NewPlaylistForm = ( { onSuccess }: FormProps) => {
       </section>
       <footer>
         <Button
+          theme="white"
           onClick={formModal.submit}
           disabled={!formModal.canSubmit}
         >
@@ -74,11 +82,14 @@ type Props = {
 };
 
 export function useNewPlaylistButton(props: Props) {
-  const modal = useModal();
+  const usingModal = useModal();
   const openModal = () => {
-    return modal.openModal( {
+    return usingModal.openModal( {
       title: "Nueva playlist",
-      staticContent: <NewPlaylistForm onSuccess={props.onSuccess} />,
+      content: <NewPlaylistForm onSuccess={v=> {
+        props.onSuccess?.(v);
+        usingModal.closeModal();
+      }} />,
     } );
   };
 

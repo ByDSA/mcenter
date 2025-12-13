@@ -1,190 +1,133 @@
 import clone from "just-clone";
-import React, { useEffect, useState } from "react";
-import { useAsyncAction } from "#modules/ui-kit/input";
-import { ResourceState } from "#modules/ui-kit/input/ResourceInputCommonProps";
+import { useState, useEffect, useMemo } from "react";
 import { useObserver } from "#modules/ui-kit/input/InputCommon";
+import { Op } from "./UseCrudComps/op";
 
 export type AddOnReset<R> = (fn: OnReset<R>)=> void;
-
 type OnReset<R> = (resource: R)=> void;
+export type SetState<T> = ReturnType<typeof useState<T>>[1];
 
-type FetchFn<T> = ()=> Promise<{data: T | void;
-success: boolean;}>;
+export const createFullOp = <R, P, >(op: Op<R, P>)=>async () => {
+  let param: P;
+
+  if (op.beforeAction) {
+    const beforeActionRet = await op.beforeAction();
+
+    if (!beforeActionRet.shouldDo) {
+      return {
+        data: undefined,
+        success: false,
+      };
+    }
+
+    param = beforeActionRet.param;
+  }
+
+  const obj = await op.action(param!);
+
+  if (op.afterAction)
+    await op.afterAction(obj);
+
+  return {
+    data: obj,
+    success: true,
+  };
+};
 
 export type UseCrudProps<T> = {
   data: T;
-  setData: (newData: T | undefined)=> void;
   isModifiedFn?: (base: T, current: T)=> boolean;
-  fetchUpdate?: FetchFn<T>;
-  beforeFetchRemove?: ()=> Promise<boolean>;
-  fetchRemove?: FetchFn<T>;
 };
 
-export type RetCrudOp<T> = Promise<{
-  data: T | void;
-  success: boolean;
-} | undefined>;
-
-export type CrudOp<T> = {
-  action: ()=> RetCrudOp<T>;
+export type CrudOp<T, P> = {
+  op: Op<T, P>;
   isDoing: boolean;
 };
 
-export type UseCrudRet<T> = {
-  isModified: boolean;
-  update?: CrudOp<T>;
-  remove?: CrudOp<T>;
-  addOnReset: AddOnReset<T>;
-  reset: ()=> Promise<void>;
-  state: ResourceState<T>;
-  initialState: ResourceState<T>;
-};
-
-export function useCrud<T>( { data,
-  setData: setResponseData,
-  isModifiedFn,
-  beforeFetchRemove,
-  fetchRemove,
-  fetchUpdate }: UseCrudProps<T>): UseCrudRet<T> {
-  const initialDataState = useInitialData(data, isModifiedFn);
-  const [initialData] = initialDataState;
-  const dataState = useState(
-    typeof initialData === "object" && initialData !== null
-      ? clone(initialData)
-      : initialData,
-  );
-  const [currentData, setData] = dataState;
-  const [isModified] = useIsModified(initialData, currentData, isModifiedFn);
-  const asyncUpdateAction = useAsyncAction();
-  const asyncRemoveAction = useAsyncAction();
+function useCrudState<T>(
+  data: T,
+) {
+  const [initialData, setInitialData] = useState<T>(data);
+  const [currentData, setCurrentData] = useState<T>(() => typeof initialData === "object"
+    && initialData !== null
+    ? clone(initialData)
+    : initialData);
   const { addObserver: addOnReset, handle: handleOnReset } = useObserver<[T]>();
   // eslint-disable-next-line require-await
-  const genReset = (initData: T) => async () => {
-    setData(initData);
+  const reset = async (newData?: T) => {
+    const target = newData ?? initialData;
 
-    handleOnReset(initData);
-  };
-  const update = fetchUpdate
-    ? async () => {
-      if (!isModified) {
-        return {
-          data: undefined,
-          success: false,
-        };
-      }
+    setCurrentData(
+      typeof target === "object" && target !== null ? clone(target) : target,
+    );
 
-      const { done, start } = asyncUpdateAction;
+    if (newData)
+      setInitialData(target);
 
-      start();
-
-      return await fetchUpdate()
-        .then(async (obj)=>{
-          const r = obj.data;
-
-          if (obj.success && r) {
-            initialDataState[1](r);
-            setResponseData(r);
-            await genReset(r)();
-          }
-
-          return obj;
-        } )
-        .finally(()=> {
-          done();
-        } );
-    }
-    : undefined;
-  const remove = fetchRemove
-    ? async () => {
-      const { done, start } = asyncRemoveAction;
-
-      if (beforeFetchRemove && !(await beforeFetchRemove()))
-        return;
-
-      start();
-
-      return await fetchRemove()
-        .then((obj)=>{
-          if (obj.success)
-            setResponseData(undefined);
-
-          return obj;
-        } )
-        .finally(()=> {
-          done();
-        } );
-    }
-    : undefined;
-  const ret: UseCrudRet<T> = {
-    isModified,
-    update: update
-      ? {
-        action: update,
-        isDoing: asyncUpdateAction.isDoing,
-      }
-      : undefined,
-    remove: remove
-      ? {
-        action: remove,
-        isDoing: asyncRemoveAction.isDoing,
-      }
-      : undefined,
-    reset: genReset(initialData),
-    addOnReset,
-    state: dataState,
-    initialState: initialDataState,
+    handleOnReset(target);
   };
 
-  return ret;
-}
-
-type CompareFn<T> = (r1: T, r2: T)=> boolean;
-function useInitialData<T>(data: T, compare?: CompareFn<T>) {
-  const [initialData, setInitialData] = React.useState(data);
-
-  useEffect(() => {
-    if (compare?.(data, initialData))
-      setInitialData(data);
-  }, [data]);
-
-  return [
-    initialData,
-    setInitialData,
-  ] as const;
-}
-
-function useIsModified<T>(base: T, current: T, compare?: CompareFn<T>) {
-  const [isModified, setIsModified] = useState(false);
-
-  useEffect(() => {
-    const v = compare?.(base, current) ?? false;
-
-    setIsModified(v);
-  }, [base, current]);
-
-  return [
-    isModified,
-    setIsModified,
-  ] as const;
-}
-
-export function mergeCrudOp(...ops: CrudOp<unknown>[]): CrudOp<undefined> {
   return {
-    isDoing: ops.some(op=>op.isDoing),
-    action: async () => {
-      try {
-        await Promise.all(ops.map(op=>op.action()));
-      } catch {
-        return {
-          data: undefined,
-          success: false,
-        };
-      }
+    initialDataState: [initialData, setInitialData] as const,
+    currentData,
+    setCurrentData,
+    reset,
+    addOnReset,
+  };
+}
 
-      return {
-        data: undefined,
-        success: true,
-      };
-    },
+type UseIsDiferentProps<T> = {
+  isModifiedFn: (current: T, initial: T)=> boolean;
+  initialData: T;
+  currentData: T;
+  setInitialData: (newInitialData: T)=> void;
+  dataProp: T;
+};
+function useIsModified<T>(props: UseIsDiferentProps<T>) {
+  const { currentData,
+    initialData,
+    dataProp,
+    setInitialData,
+    isModifiedFn } = props;
+
+  useEffect(() => {
+    const areDifferent = isModifiedFn(dataProp, initialData);
+
+    if (areDifferent)
+      setInitialData(dataProp);
+  }, [dataProp]);
+
+  const isModified = useMemo(() => {
+    return isModifiedFn(initialData, currentData);
+  }, [initialData, currentData, isModifiedFn]);
+
+  return isModified;
+}
+
+export function useCrud<T>( { data,
+  isModifiedFn = (
+    current,
+    initial,
+  ) => JSON.stringify(current) !== JSON.stringify(initial) }: UseCrudProps<T>) {
+  const { initialDataState,
+    currentData,
+    setCurrentData,
+    addOnReset,
+    reset } = useCrudState(data);
+  const isModified = useIsModified( {
+    currentData,
+    initialData: initialDataState[0],
+    setInitialData: initialDataState[1],
+    isModifiedFn,
+    dataProp: data,
+  } );
+
+  return {
+    isModified,
+    reset,
+    addOnReset,
+    currentData,
+    setCurrentData,
+    initialState: initialDataState[0],
   };
 }

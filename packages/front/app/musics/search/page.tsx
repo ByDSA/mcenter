@@ -19,7 +19,6 @@ export default function Search() {
   const { element: searchInput, value: titleFilterValue } = useInputText( {
     nullChecked: false,
     onPressEnter,
-    autofocus: true,
   } );
 
   useEffect(() => {
@@ -35,11 +34,9 @@ export default function Search() {
         }
         <Button className={styles.searchButton} onClick={onPressEnter}>Buscar</Button>
       </span>
-      {
-        MusicList( {
-          filters,
-        } )
-      }
+      <MusicList
+        filters={filters}
+      />
     </MusicLayout>
   );
 }

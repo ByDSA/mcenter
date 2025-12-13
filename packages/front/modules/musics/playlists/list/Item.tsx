@@ -9,7 +9,7 @@ import { formatDurationHeader, playlistCopySlugUrl } from "../utils";
 import { SettingsButton } from "../SettingsButton";
 import { PlaylistCover } from "../PlaylistCover";
 import styles from "./Item.module.css";
-import { RenamePlaylistContextMenuItem } from "./renameItem";
+import { RenamePlaylistContextMenuItem } from "./renameMenuItem";
 import { DeletePlaylistContextMenuItem } from "./deleteItem";
 
 interface PlaylistProps {
@@ -65,7 +65,7 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
             className: styles.contextMenu,
             content: <>
               <ContextMenuItem
-                label="Copiar URL"
+                label="Copiar enlace"
                 onClick={async () => {
                   assertIsDefined(value.ownerUserPublic);
                   await playlistCopySlugUrl( {
@@ -85,11 +85,13 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
                     return;
 
                   setItemByIndex(i, v=>{
-                    return {
-                      ...v,
-                      name: newPlaylist.name,
-                      slug: newPlaylist.slug,
-                    };
+                    if (v) {
+                      return {
+                        ...v,
+                        name: newPlaylist.name,
+                        slug: newPlaylist.slug,
+                      };
+                    }
                   } );
                 }}
               />

@@ -2,6 +2,12 @@ export const SECS_IN_HOUR = 60 * 60;
 
 export const SECS_IN_DAY = 24 * SECS_IN_HOUR;
 
+export const DAYS_IN_WEEK = 7;
+
+export const DAYS_IN_MONTH = 30;
+
+export const DAYS_IN_YEAR = 365;
+
 export const secsBetween = (date1: Date, date2: Date = new Date()) => {
   const diff = date2.getTime() - date1.getTime();
 

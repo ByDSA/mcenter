@@ -39,13 +39,15 @@ export class MusicsSlugController {
     mongoDbId.or(z.undefined()).parse(token);
     const format = this.responseFormatter.getResponseFormatByRequest(req);
     let got: MusicEntity | null = await this.musicRepo.getOneBySlug(
-      token ?? user?.id ?? null,
       params.slug,
-      format === ResponseFormat.RAW
-        ? {
-          expand: ["fileInfos"],
-        }
-        : {},
+      {
+        criteria: format === ResponseFormat.RAW
+          ? {
+            expand: ["fileInfos"],
+          }
+          : {},
+        requestingUserId: token ?? user?.id,
+      },
     );
 
     assertFoundClient(got);

@@ -69,10 +69,6 @@ export const frontEndUrl = (url: string) => {
   return `${baseUrl}/${cleanUrl}`;
 };
 
-export async function sleep(ms: number) {
-  return await new Promise(resolve => setTimeout(resolve, ms));
-}
-
 export async function safeGoto(page: Page, ...params: Parameters<Page["goto"]>) {
   if (page.url() !== params[0])
     return await page.goto(...params);

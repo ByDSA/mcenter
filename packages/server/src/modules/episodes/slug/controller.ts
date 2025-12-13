@@ -73,19 +73,25 @@ export class EpisodesSlugController {
     let got: EpisodeEntity | null;
 
     if (format === ResponseFormat.M3U8 || format === ResponseFormat.JSON) {
-      const criteria: Parameters<
+      const props: Parameters<
         typeof this.episodesRepo.getOneByCompKey
       >[1] = format === ResponseFormat.M3U8
         ? {
-          expand: ["fileInfos"],
+          criteria: {
+            expand: ["fileInfos"],
+          },
         }
         : {
-          expand: [],
+          criteria: {
+            expand: [],
+          },
         };
 
-      criteria.expand?.push("series");
+      props.requestingUserId = userId ?? undefined;
 
-      got = await this.episodesRepo.getOneByCompKey(params, criteria);
+      props.criteria.expand?.push("series");
+
+      got = await this.episodesRepo.getOneByCompKey(params, props);
 
       assertFoundClient(got);
     }

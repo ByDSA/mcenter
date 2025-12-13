@@ -30,7 +30,7 @@ export function DeletePlaylistContextMenuItem(
       e.preventDefault();
       onOpen?.();
       openModal( {
-        staticContent: <>
+        content: <>
           <p>¿Estás seguro de que deseas eliminar esta playlist?</p>
           <p style={{
             textAlign: "center",

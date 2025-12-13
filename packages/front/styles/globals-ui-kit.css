@@ -61,11 +61,12 @@
 
 .ui-kit-input-text,
 .ui-kit-input-number {
+  --border-color: var(--color-gray-200);
   resize: none;
   padding: 0.2em;
   line-height: 1.3em;
   background: white;
-  border: 1px solid black;
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   overflow: hidden;
 
@@ -74,10 +75,24 @@
   }
 }
 
+.ui-kit-input-text,
+.ui-kit-input-number,
+.ui-kit-resource-input-array-string {
+  --border-color: var(--color-gray-700);
+
+  textarea {
+    border-color: var(--border-color);
+  }
+}
+
 .ui-kit-resource-input-array-string {
   display: flex;
   gap: 0.25em 0.5em;
   flex-wrap: wrap;
+
+  .ui-kit-array-item {
+    background: var(--color-gray-850);
+  }
 
   .ui-kit-input-text {
     min-width: 0;
@@ -85,14 +100,14 @@
   }
 
   svg {
-    stroke: rgba(0, 0, 0, 0.5);
+    stroke: color-mix(in srgb, var(--border-color) 50%, transparent);
     stroke-width: 0.25px;
   }
 }
 
 .ui-kit-resource-input-array-string .ui-kit-array-item {
   border-radius: 0.5em;
-  border: 1px solid #000;
+  border: 1px solid var(--border-color);
   padding: 0 0.5em;
   display: flex;
   align-items: center;
@@ -182,7 +197,7 @@
     border-bottom-right-radius: 0px;
     border-top-right-radius: 0px;
     border-right: none;
-    border: 1px solid black;
+    border: 1px solid var(--border-color);
     gap: 0px;
 
     &:has(.is-null) {
@@ -247,7 +262,7 @@
   .time-control-btn {
     width: 1rem;
     padding: 0;
-    border: 1px solid black;
+    border: 1px solid var(--border-color);
     border-left: none;
     background: var(--color-gray-100);
     cursor: pointer;

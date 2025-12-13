@@ -6,12 +6,11 @@ import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
 import { useUser } from "#modules/core/auth/useUser";
+import listStyles from "#modules/resources/List.module.css";
 import { MusicsApi } from "../requests";
 import { MusicEntityWithFileInfos } from "../models";
-import { MusicEntryElement } from "./entry/MusicEntry";
+import { MusicEntryElement } from "./MusicEntry/MusicEntry";
 import { ArrayData } from "./types";
-import styles from "./styles.module.css";
-import "#styles/resources/resource-list-entry.css";
 
 type Props = {
   filters: {
@@ -53,17 +52,18 @@ export function MusicList(props: Props) {
       <>
         {resultNumbers}
         <br />
-        <span className={classes("resource-list", styles.list)}>
+        <span className={classes(listStyles.list)}>
           {data!.map((music, i) => (
             <Fragment key={`${music.id}`}>
               <MusicEntryElement
+                index={i + 1}
                 data={music}
-                setData={(newData) => setItem(
-                  i,
+                setData={(newData) => {
+                  return setItem(
+                    i,
                   newData as WithRequired<MusicEntityWithFileInfos, "userInfo">,
-                )
-                }
-                shouldFetchFileInfo={true}
+                  );
+                }}
               />
             </Fragment>
           ))}
@@ -166,8 +166,4 @@ function getFilterFromProps(
     return undefined;
 
   return ret;
-}
-
-export async function sleep(ms: number) {
-  return await new Promise((resolve) => setTimeout(resolve, ms));
 }

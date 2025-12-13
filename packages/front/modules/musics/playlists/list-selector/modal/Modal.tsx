@@ -22,7 +22,7 @@ type Props = {
 };
 export function usePlaylistSelectorModal(props?: Props) {
   const { closeOnSelect = true, nullable = false } = props ?? {};
-  const { openModal: _openModal, setModalContent: _, closeModal, id, isOpen } = useModal();
+  const { openModal: _openModal, closeModal, id, isOpen } = useModal();
   const { user } = useUser();
 
   assertIsDefined(user);
@@ -32,7 +32,7 @@ export function usePlaylistSelectorModal(props?: Props) {
       ...openModalProps,
       className: classes(styles.playlistSelectorModal, openModalProps.className),
       title: openModalProps.title ?? "Seleccionar playlist",
-      staticContent: (
+      content: (
         <AddToPlaylistModalContent
           userId={user.id}
           nullable={nullable}

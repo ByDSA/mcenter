@@ -33,7 +33,7 @@ export class MusicGetRandomController {
     @User() user: UserPayload | null,
   ): Promise<Music> {
     mongoDbId.or(z.undefined()).parse(token);
-    const userId = user?.id ?? token ?? null;
+    const userId = user?.id ?? token;
     const musics = await this.#findMusics(userId, req);
 
     assertIsNotEmptyClient(musics);
@@ -80,17 +80,23 @@ export class MusicGetRandomController {
     return picked;
   }
 
-  async #findMusics(userId: string | null, req: Request): Promise<MusicEntityWithUserInfo[]> {
+  async #findMusics(userId: string | undefined, req: Request): Promise<MusicEntityWithUserInfo[]> {
     const params = requestToFindMusicParams(req);
 
     if (params) {
-      return await this.musicRepo.getManyByQuery(userId, params, {
-        expand: ["userInfo"],
+      return await this.musicRepo.getManyByQuery(params, {
+        criteria: {
+          expand: ["userInfo"],
+        },
+        requestingUserId: userId,
       } ) as MusicEntityWithUserInfo[];
     }
 
-    return (await this.musicRepo.getAll(userId, {
-      expand: ["userInfo"],
+    return (await this.musicRepo.getAll( {
+      criteria: {
+        expand: ["userInfo"],
+      },
+      requestingUserId: userId,
     } )) as MusicEntityWithUserInfo[];
   }
 }

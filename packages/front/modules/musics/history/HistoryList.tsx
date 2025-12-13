@@ -4,18 +4,10 @@ import { formatDate } from "#modules/utils/dates";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { classes } from "#modules/utils/styles";
 import { INITIAL_FETCHING_LENGTH, FETCHING_MORE_LENGTH } from "#modules/history/lists";
-import { logger } from "#modules/core/logger";
-import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
-import { useUser } from "#modules/core/auth/useUser";
-import styles from "../musics/styles.module.css";
-import { AddToPlaylistContextMenuItem } from "../playlists/AddToPlaylistContextMenuItem";
-import { copyMusicUrl } from "../musics/entry/MusicEntry";
+import { ResourceList } from "#modules/resources/ResourceList";
 import { MusicHistoryApi } from "./requests";
-import { HistoryEntryElement } from "./entry/HistoryEntry";
-
-import "#styles/resources/resource-list-entry.css";
+import { MusicHistoryEntryElement } from "./HistoryEntry";
 
 type Props = {
   showDate?: "eachOne" | "groupByDay" | "none";
@@ -26,30 +18,7 @@ type Data = MusicHistoryApi.GetManyByCriteria.Data[];
 export function HistoryList(props?: Props) {
   const showDate = props?.showDate ?? "groupByDay";
   const { data, isLoading, error,
-    setItem, observerTarget, setData } = useHistoryList();
-  const { user } = useUser();
-  const { openMenu } = useContextMenuTrigger();
-  const updateIsFav = (musicId: string, favorite: boolean) => {
-    if (!data)
-      return;
-
-    let dirty = false;
-
-    for (const entry of data) {
-      let m = entry.resource;
-
-      if (m.id === musicId && !!m.isFav !== favorite) {
-        m.isFav = favorite;
-        dirty = true;
-      }
-    }
-
-    if (dirty) {
-      setData([
-        ...data,
-      ]);
-    }
-  };
+    setItem, observerTarget } = useHistoryList();
 
   return renderFetchedData<Data | null>( {
     data,
@@ -61,52 +30,20 @@ export function HistoryList(props?: Props) {
       observerRef: observerTarget,
     },
     render: () => (
-      <span className={classes("resource-list", styles.list)}>
+      <ResourceList>
         {
           data!.map(
             (entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
               {showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
-              <HistoryEntryElement showDate={showDate === "eachOne"}
-                value={entry} setValue={(newEntry: typeof entry | undefined) => {
-                  setItem(i, newEntry ?? null);
-                }}
-                updateFavButtons={updateIsFav}
-                onClickMenu={(e)=> {
-                  openMenu( {
-                    event: e,
-                    content: <>
-                      <AddToPlaylistContextMenuItem
-                        musicId={entry.resourceId}
-                        user={user}
-                      />
-                      <ContextMenuItem
-                        label="Copiar URL"
-                        onClick={async () => {
-                          await copyMusicUrl( {
-                            music: entry.resource,
-                            token: user?.id,
-                          } );
-                        }}
-                      />
-                      <ContextMenuItem
-                        label="Eliminar del historial"
-                        theme="danger"
-                        onClick={async () => {
-                          const api = FetchApi.get(MusicHistoryApi);
-
-                          await api.deleteOneById(entry.id);
-                          logger.info("Entrada de historial eliminada");
-                          setItem(i, null);
-                        }}
-                      />
-                    </>,
-                  } );
+              <MusicHistoryEntryElement showDate={showDate === "eachOne"}
+                value={entry} setValue={(newEntry: typeof entry) => {
+                  setItem(i, newEntry);
                 }}
               />
             </Fragment>,
           )
         }
-      </span>
+      </ResourceList>
     ),
   } );
 }

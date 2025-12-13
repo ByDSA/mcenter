@@ -6,6 +6,7 @@ import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types, UpdateQuery } from "mongoose";
 import { MusicFileInfoEntity, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
+import { WithOptional } from "$shared/utils/objects";
 import { assertFoundClient } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { MusicEntity, Music, MusicId } from "#musics/models";
@@ -25,8 +26,14 @@ import { MusicOdm } from "./odm";
 import { expressionToMeilisearchQuery } from "./queries/queries-meili";
 import { GetManyByCriteriaMusicRepoService } from "./get-many-criteria";
 
-type CriteriaOne = MusicCrudDtos.GetOne.Criteria;
-type CriteriaMany = MusicCrudDtos.GetMany.Criteria;
+type GetOneProps = {
+  criteria: MusicCrudDtos.GetOne.Criteria;
+  requestingUserId?: string;
+};
+type GetManyProps = {
+  criteria: MusicCrudDtos.GetMany.Criteria;
+  requestingUserId?: string;
+};
 
 @Injectable()
 export class MusicsRepository
@@ -69,8 +76,11 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
     return MusicOdm.toEntity(doc);
   }
 
-  async getManyByCriteria(userId: string | null, criteria: CriteriaMany): Promise<any> {
-    return await this.getManyByCriteriaMusicRepoService.doAction(userId, criteria);
+  async getMany(props: GetManyProps): Promise<any> {
+    return await this.getManyByCriteriaMusicRepoService.doAction(
+      props.requestingUserId ?? null,
+      props.criteria,
+    );
   }
 
   async patchOneByIdAndGet(
@@ -113,8 +123,9 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
     return ret;
   }
 
-  async getOne(userId: string | null, criteria: CriteriaOne): Promise<MusicEntity | null> {
-    const pipeline = MusicOdm.getCriteriaPipeline(userId, criteria);
+  async getOne(props: GetOneProps): Promise<MusicEntity | null> {
+    const { criteria } = props;
+    const pipeline = MusicOdm.getCriteriaPipeline(props.requestingUserId ?? null, criteria);
 
     if (pipeline.length === 0)
       throw new UnprocessableEntityException(criteria);
@@ -134,33 +145,32 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
   }
 
   async getOneByHash(
-    userId: string | null,
     hash: string,
-    criteria?: CriteriaOne,
+    props: WithOptional<GetOneProps, "criteria">,
   ): Promise<MusicEntity | null> {
-    return await this.getOneByFilter(userId, {
+    return await this.getOneByFilter( {
       hash,
-    }, criteria);
+    }, props);
   }
 
   async getOneBySlug(
-    userId: string | null,
     slug: string,
-    criteria?: CriteriaOne,
+    props?: WithOptional<GetOneProps, "criteria">,
   ): Promise<MusicEntity | null> {
-    return await this.getOneByFilter(userId, {
+    return await this.getOneByFilter( {
       slug,
-    }, criteria);
+    }, props);
   }
 
   async getAll(
-    userId: string | null,
-    criteria?: CriteriaMany,
+    props?: WithOptional<GetManyProps, "criteria">,
   ): Promise<MusicEntity[]> {
+    const requestingUserId = props?.requestingUserId;
+    const criteria = props?.criteria;
     let docs;
 
     if (criteria) {
-      const pipeline = MusicOdm.getCriteriaPipeline(userId, criteria);
+      const pipeline = MusicOdm.getCriteriaPipeline(requestingUserId, criteria);
 
       if (pipeline.length === 0)
         throw new UnprocessableEntityException(criteria);
@@ -177,10 +187,11 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
   }
 
   async getManyByQuery(
-    userId: string | null,
     params: ExpressionNode,
-    criteria?: Pick<CriteriaMany, "expand">,
+    props?: WithOptional<GetManyProps, "criteria">,
   ): Promise<MusicEntity[]> {
+    const userId = props?.requestingUserId ?? null;
+    const criteria = props?.criteria;
     const query = await expressionToMeilisearchQuery(params, userId);
     const meiliRet = await this.musicsSearchService.filter(userId, query, {
       limit: 0,
@@ -244,16 +255,21 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
   }
 
   private async getOneByFilter(
-    userId: string | null,
-    filter: CriteriaOne["filter"],
-    criteria?: CriteriaOne,
+    filter: GetOneProps["criteria"]["filter"],
+    props?: WithOptional<GetOneProps, "criteria">,
   ) {
-    return await this.getOne(userId, {
-      ...criteria,
-      filter: {
-        ...criteria?.filter,
-        ...filter,
+    const criteria = props?.criteria;
+
+    return await this.getOne( {
+      criteria: {
+        ...criteria,
+        filter: {
+          ...criteria?.filter,
+          ...filter,
+        },
       },
+      requestingUserId: props?.requestingUserId,
+
     } );
   }
 

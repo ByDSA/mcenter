@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { PlayArrow,
   Pause,
   MusicNote,
@@ -27,7 +27,8 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
 import { MusicEntityWithFileInfos } from "../models";
 import { ContextMenuItem, useContextMenuTrigger } from "../../ui-kit/ContextMenu/ContextMenu";
-import { copyMusicUrl } from "../musics/entry/MusicEntry";
+import { CopyMusicMenuItem } from "../musics/MusicEntry/MusicEntry";
+import { EditMusicContextMenuItem } from "../musics/EditMusic/ContextMenu";
 import { MusicPlaylistItem } from "./PlaylistItem";
 import { MusicPlaylistEntity } from "./models";
 import { formatDurationHeader, playlistCopySlugUrl } from "./utils";
@@ -35,7 +36,7 @@ import styles from "./Playlist.module.css";
 import commonStyles from "./common.module.css";
 import { SettingsButton } from "./SettingsButton";
 import { MusicPlaylistsApi } from "./requests";
-import { RenamePlaylistContextMenuItem } from "./list/renameItem";
+import { RenamePlaylistContextMenuItem } from "./list/renameMenuItem";
 import { DeletePlaylistContextMenuItem } from "./list/deleteItem";
 import { AddToPlaylistContextMenuItem } from "./AddToPlaylistContextMenuItem";
 import { PlaylistCover } from "./PlaylistCover";
@@ -126,7 +127,7 @@ newIndex: number;}[]>([]);
           />
           }
           <ContextMenuItem
-            label="Copiar URL"
+            label="Copiar enlace"
             className={styles.contextMenuItem}
             onClick={async ()=> {
               const userSlug = value.ownerUserPublic?.slug;
@@ -227,22 +228,6 @@ index: number; } ) => {
       transform: CSS.Transform.toString(transform),
       transition,
     };
-    const updateIsFav = useCallback((musicId: string, favorite: boolean) => {
-      let dirty = false;
-
-      for (const m of value.list) {
-        if (m.musicId === musicId && !!m.music.isFav !== favorite) {
-          m.music.isFav = favorite;
-          dirty = true;
-        }
-      }
-
-      if (dirty) {
-        setValue( {
-          ...value,
-        } );
-      }
-    }, [setValue]);
 
     return (
       <div
@@ -255,7 +240,6 @@ index: number; } ) => {
           index={index}
           isPlaying={currentPlaying === item.id && isPlaylistPlaying}
           isDragging={isDraggingGlobal}
-          updateFavButtons={updateIsFav}
           className={styles.playlistItem}
           onClickMenu={ (e) => playlistItemOpenMenu( {
             event: e,
@@ -264,15 +248,11 @@ index: number; } ) => {
                 musicId={item.musicId}
                 user={user}
               />}
-              <ContextMenuItem
-                label="Copiar URL"
-                onClick={async () => {
-                  await copyMusicUrl( {
-                    music: item.music,
-                    token: user?.id,
-                  } );
-                }}
+              <CopyMusicMenuItem
+                music={item.music}
+                token={user?.id}
               />
+              {user && <EditMusicContextMenuItem initialData={item.music}/>}
               {user?.id === value.ownerUserId && <ContextMenuItem
                 label="Eliminar"
                 theme="danger"

@@ -8,15 +8,12 @@ import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/trans
 import { assertIsDefined } from "$shared/utils/validation";
 import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
 import { backendUrl } from "#modules/requests";
-import { MusicEntryElement } from "#musics/musics/entry/MusicEntry";
+import { MusicEntryElement } from "#modules/musics/musics/MusicEntry/MusicEntry";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
-import { classes } from "#modules/utils/styles";
-import musicListStyles from "#modules/musics/musics/styles.module.css";
 import { useUser } from "#modules/core/auth/useUser";
+import { ResourceList } from "#modules/resources/ResourceList";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
-
-import "#styles/resources/resource-list-entry.css";
 
 function injectDefaultUserInfo(music: MusicEntity, userId: string): MusicEntityWithUserInfo {
   music.userInfo = {
@@ -75,18 +72,20 @@ export default function Upload() {
 
   return (
     <MusicLayout>
-      <h2>Upload</h2>
+      <h2>Subir músicas</h2>
       <div className={styles.uploaders}>
+        <p>Desde YouTube:</p>
         <YouTubeUpload
           withCredentials
           onCreateMusic={onCreateMusic}/>
+        <p>Desde local:</p>
         <FileUpload
           acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
           multiple={true}
           onUpload={onUpload}
         />
         <hr/>
-        <span className={classes("resource-list", musicListStyles.list)}>
+        <ResourceList>
           {
           uploaded!.map(
             (music) => <Fragment key={`${music.id}`}>
@@ -102,11 +101,11 @@ export default function Upload() {
                   ...old.slice(index + 1),
                 ]));
               }
-              } shouldFetchFileInfo={false} />
+              } />
             </Fragment>,
           )
           }
-        </span>
+        </ResourceList>
       </div>
     </MusicLayout>
   );

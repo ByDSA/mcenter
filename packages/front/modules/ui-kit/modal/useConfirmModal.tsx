@@ -45,9 +45,10 @@ export const useConfirmModal = () => {
      else {
        await confirmModal.openModal( {
          ...props,
-         staticContent: props?.staticContent
+         title: props?.title ?? "Confirmar",
+         content: props?.content
            ? <>
-             {props.staticContent}
+             {props.content}
              {footer}
            </>
            : undefined,
@@ -59,11 +60,5 @@ export const useConfirmModal = () => {
   return {
     ...confirmModal,
     openModal,
-    setModalContent: (el)=>confirmModal.setModalContent(
-      <>
-        {el}
-        {footer}
-      </>,
-    ),
   };
 };

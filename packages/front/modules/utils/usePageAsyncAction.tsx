@@ -1,24 +1,28 @@
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, useMemo, useCallback } from "react";
 import { ContentSpinner, Spinner } from "#modules/ui-kit/spinner/Spinner";
 
 type Status = "error" | "iddle" | "loading" | "success";
 
-type Props = {
-  action: ()=> Promise<void>;
+export type Props<T> = {
+  action: ()=> Promise<T>;
   autoStart?: boolean;
   loadingElement?: ReactNode;
   errorElement?: ReactNode;
   initialStatus?: Status;
+  onSuccess: (data: T)=> void;
 };
-export function usePageAsyncAction(
+
+export function usePageAsyncAction<T>(
   { action,
     autoStart = true, loadingElement: loadingMessage,
     errorElement: errorMessage,
-    initialStatus }: Props,
+    onSuccess,
+    initialStatus }: Props<T>,
 ) {
   return useAsyncAction( {
     action,
     autoStart,
+    onSuccess,
     initialStatus,
     loadingElement: <div>
       {loadingMessage ?? "Loading..."}
@@ -30,58 +34,41 @@ export function usePageAsyncAction(
   } );
 }
 
-export function useAsyncAction(
+export function useAsyncAction<T>(
   { action, autoStart = true,
     loadingElement: loading,
     errorElement: error,
-    initialStatus }: Props,
+    initialStatus, onSuccess }: Props<T>,
 ) {
   const [status, setStatus] = useState<Status>(initialStatus ?? (autoStart ? "loading" : "iddle"));
-  const start = (force?: boolean) => {
+  const start = useCallback((force?: boolean) => {
     if (status === "loading" && !force)
       return;
 
     setStatus("loading");
     action()
-      .then(() => setStatus("success"))
+      .then((r) => {
+        onSuccess?.(r);
+        setStatus("success");
+      } )
       .catch(()=> setStatus("error"));
-  };
+  }, [action, setStatus, status]);
 
   useEffect(() => {
     if (autoStart)
       start(true);
   }, []);
 
-  let element: ReactNode;
-
-  if (status === "loading")
-    element = loading ?? <Spinner />;
-  else if (status === "error")
-    element = error ?? <span>Error</span>;
+  let statusElement = useMemo(()=> {
+    if (status === "loading")
+      return loading ?? <Spinner />;
+    else if (status === "error")
+      return error ?? <span>Error</span>;
+  }, [status]);
 
   return {
-    element,
+    status,
+    statusElement,
     start,
-  };
-}
-
-export function useAsyncElement(
-  props: Omit<Props, "autoStart"> & {
-    renderElement: ()=> ReactNode;
-  },
-) {
-  const { element } = useAsyncAction( {
-    loadingElement: <span style={{
-      display: "inline-flex",
-      padding: "0 0.5em",
-    }}>
-      <Spinner />
-    </span>,
-    ...props,
-    autoStart: true,
-  } );
-
-  return {
-    element: element ?? props.renderElement(),
   };
 }

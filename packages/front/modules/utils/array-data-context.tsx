@@ -2,19 +2,16 @@
 
 import { assertIsDefined } from "$shared/utils/validation";
 import { createContext, useContext, useCallback, ReactNode } from "react";
+import { SetState } from "./resources/useCrud";
 
-type SetData<T> = (fn: T[] | ((oldData: T[])=> T[]))=> void;
-
-export type NewItemFn<T> = ((oldItem: T)=> T);
-
-export type NewItem<T> = NewItemFn<T> | T;
+type NewItemOrFn<T> = Parameters<SetState<T>>[0];
 
 interface ArrayDataContextType<T> {
   data: T[];
   addItem: (item: T)=> void;
   removeItemByIndex: (index: number)=> void;
-  setItemByIndex: (index: number, newItem: NewItem<T>)=> void;
-  setData: SetData<T>;
+  setItemByIndex: (index: number, newItemOrFn: NewItemOrFn<T>)=> void;
+  setData: SetState<T[]>;
 }
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const ArrayDataContext = createContext<ArrayDataContextType<any> | undefined>(undefined);
@@ -32,30 +29,34 @@ export const ArrayDataProvider = <T, >( { children,
   removeItemByIndex: _removeItemByIndex,
   setItemByIndex: _setItemByIndex,
   addItem: _addItem }: ArrayDataProviderProps<T>): React.ReactNode => {
-  const setData: SetData<T> = _setData ?? useCallback(()=> {
+  const setData: SetState<T[]> = _setData ?? useCallback(()=> {
     throw new Error();
   }, []);
   // Agregar elemento
   const addItem = _addItem ?? useCallback((item: T) => {
     assertIsDefined(_setData);
-    setData(prev => [...prev, item]);
+    setData(prev => prev ? [...prev, item] : [item]);
   }, []);
   // Eliminar por índice
   const removeItemByIndex = _removeItemByIndex ?? useCallback((index: number) => {
     assertIsDefined(_setData);
-    setData(prev => prev.filter((_, i) => i !== index));
+    setData(prev => prev?.filter((_, i) => i !== index));
   }, []);
   // Actualizar por índice
   const setItemByIndex = _setItemByIndex
-    ?? useCallback((index: number, newItem: NewItem<T>) => {
+    ?? useCallback((index: number, newItem: NewItemOrFn<T>) => {
       assertIsDefined(_setData);
 
       if (typeof newItem === "function") {
         setData(
-          prev => prev.map((item, i) => i === index ? (newItem as NewItemFn<T>)(prev[i]) : item),
+          prev => prev?.map(
+            (item, i) => i === index
+              ? (newItem as (e: T)=> T)(prev[i])
+              : item,
+          ),
         );
       } else
-        setData(prev => prev.map((item, i) => i === index ? newItem : item));
+        setData(prev => prev?.map((item, i) => i === index ? (newItem as T) : item));
     }, []);
   const value: ArrayDataContextType<T> = {
     data,

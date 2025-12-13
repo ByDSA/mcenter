@@ -4,13 +4,14 @@ import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { UserPayload } from "$shared/models/auth";
 import { MusicInfoCrudDtos } from "$shared/models/musics/user-info/dto/transport";
 import { MusicEntity, musicEntitySchema, musicUserInfoEntitySchema } from "#musics/models";
-import { AdminDeleteOne, GetManyCriteria, GetOne, UserPatchOne } from "#utils/nestjs/rest";
+import { AdminDeleteOne, GetManyCriteria, GetOne, GetOneCriteria, UserPatchOne } from "#utils/nestjs/rest";
 import { User } from "#core/auth/users/User.decorator";
 import { MusicsUsersRepository } from "./repositories/user-info/repository";
 import { MusicsRepository } from "./repositories/music";
 
 class GetOneByIdParamsDto extends createZodDto(MusicCrudDtos.GetOne.ById.paramsSchema) {}
 class GetManyByCriteriaDto extends createZodDto(MusicCrudDtos.GetMany.criteriaSchema) {}
+class GetManyOneByCriteriaDto extends createZodDto(MusicCrudDtos.GetOne.criteriaSchema) {}
 class PatchParamsDto extends createZodDto(MusicCrudDtos.PatchOneById.paramsSchema) {}
 class DeleteOneParamsDto extends createZodDto(MusicCrudDtos.DeleteOneById.paramsSchema) {}
 class PatchBodyDto extends createZodDto(MusicCrudDtos.PatchOneById.bodySchema) {}
@@ -30,7 +31,10 @@ export class MusicCrudController {
     @Body() criteria: GetManyByCriteriaDto,
     @User() user: UserPayload | null,
   ): Promise<MusicEntity[]> {
-    return await this.musicRepo.getManyByCriteria(user?.id ?? null, criteria);
+    return await this.musicRepo.getMany( {
+      criteria,
+      requestingUserId: user?.id,
+    } );
   }
 
   @UserPatchOne(":id", musicEntitySchema)
@@ -74,5 +78,16 @@ export class MusicCrudController {
     const { id } = params;
 
     return await this.musicRepo.getOneById(id);
+  }
+
+  @GetOneCriteria(MusicCrudDtos.GetOne.responseDataSchema)
+  async getOneCriteria(
+    @Body() criteria: GetManyOneByCriteriaDto,
+    @User() user: UserPayload | null,
+  ): Promise<MusicEntity | null> {
+    return await this.musicRepo.getOne( {
+      criteria,
+      requestingUserId: user?.id,
+    } );
   }
 }

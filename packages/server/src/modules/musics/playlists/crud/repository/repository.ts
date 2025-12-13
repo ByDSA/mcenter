@@ -432,11 +432,13 @@ addedAt: Date; }>;
 
     assertFoundClient(track, "Track position invalid");
 
-    const ret = await this.musicsRepo.getOne(null, {
-      ...musicCriteria,
-      filter: {
-        ...musicCriteria?.filter,
-        id: track.musicId,
+    const ret = await this.musicsRepo.getOne( {
+      criteria: {
+        ...musicCriteria,
+        filter: {
+          ...musicCriteria?.filter,
+          id: track.musicId,
+        },
       },
     } );
 

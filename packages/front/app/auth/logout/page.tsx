@@ -5,7 +5,7 @@ import { backendUrl } from "#modules/requests";
 import { usePageAsyncAction } from "#modules/utils/usePageAsyncAction";
 
 export default function LogoutPage() {
-  const { element } = usePageAsyncAction( {
+  const { statusElement: element } = usePageAsyncAction( {
     autoStart: true,
     loadingElement: <p>Cerrando sesión ...</p>,
     errorElement: <p>Error cerrando sesión.</p>,
@@ -16,7 +16,8 @@ export default function LogoutPage() {
 
       if (!res.ok)
         throw new Error("Logout failed");
-
+    },
+    onSuccess: ()=> {
       window.location.replace("/"); // Redirige a "/" (obliga llamada a backend) y borra la página de logout del historial
     },
   } );

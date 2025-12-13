@@ -1,8 +1,7 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { useCallback, useState } from "react";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { useAsyncElement } from "#modules/utils/usePageAsyncAction";
-import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { MusicPlaylistsApi } from "./requests";
 import { MusicPlaylistEntity } from "./models";
 import { PlaylistSelector } from "./list-selector/List";
@@ -19,33 +18,27 @@ export function useMusicPlaylistsForUser( { userId, onSelect }: Props) {
       limit: 0,
     } );
 
-    setData(result.data);
+    return result.data;
   }, [userId]);
 
   assertIsDefined(userId);
-  const { element } = useAsyncElement( {
-    loadingElement: (
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        padding: "2rem",
-      }}>
-        <ContentSpinner size={4}/>
-      </div>
-    ),
-    errorElement: <div>Error al cargar playlists</div>,
-    action: fetchData,
-    renderElement: ()=>data!.length === 0
-      ? (
-        <div style={{
-          padding: "1rem",
-          textAlign: "center",
-        }}>No hay playlists disponibles</div>
-      )
-      : (
-        <PlaylistSelector data={data!} onSelect={onSelect} />
-      ),
-  } );
+  const element = <AsyncLoader
+    errorElement={<div>Error al cargar playlists</div>}
+    action={fetchData}
+    onSuccess={r=>setData(r)}
+  >{
+      (data?.length ?? 0) === 0
+        ? (
+          <div style={{
+            padding: "1rem",
+            textAlign: "center",
+          }}>No hay playlists disponibles</div>
+        )
+        : (
+          <PlaylistSelector data={data!} onSelect={onSelect} />
+        )
+    }
+  </AsyncLoader>;
 
   return {
     element,

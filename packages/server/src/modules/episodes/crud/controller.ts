@@ -36,8 +36,12 @@ export class EpisodesCrudController {
   @GetManyCriteria("/search", schema)
   async getManyByCriteria(
     @Body() body: GetManyByCriteriaBodyDto,
+    @User() user: UserPayload | null,
   ) {
-    return await this.episodesRepo.getManyByCriteria(body);
+    return await this.episodesRepo.getMany( {
+      requestingUserId: user?.id,
+      criteria: body,
+    } );
   }
 
   @UserPatchOne("/:id/user-info", episodeUserInfoEntitySchema)

@@ -9,7 +9,8 @@ import { Button } from "#modules/ui-kit/input/Button";
 import { UsersApi } from "#modules/core/users/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicPlaylistsApi } from "#modules/musics/playlists/requests";
-import { useAsyncElement } from "#modules/utils/usePageAsyncAction";
+import { AsyncLoader } from "#modules/utils/AsyncLoader";
+import { InlineSpinner } from "#modules/ui-kit/spinner/Spinner";
 
 export default function UserPage() {
   const { user } = useUser();
@@ -20,22 +21,23 @@ export default function UserPage() {
   const { openModal } = usePlaylistSelectorModal( {
     nullable: true,
   } );
-  const { element } = useAsyncElement( {
+  const element = <AsyncLoader
+    onSuccess={r=>setFavPlaylist(r)}
+    loadingElement={<InlineSpinner />}
     // Para que no muestre el spinner si id=null
-    initialStatus: !user.musics.favoritesPlaylistId ? "iddle" : undefined,
-    action: async () => {
+    // initialStatus={!user.musics.favoritesPlaylistId ? "iddle" : undefined}
+    action={async () => {
       if (!user.musics.favoritesPlaylistId)
-        return;
+        return null;
 
       const api = FetchApi.get(MusicPlaylistsApi);
+      const res = await api.getOneById(user.musics.favoritesPlaylistId);
 
-      await api.getOneById(user.musics.favoritesPlaylistId)
-        .then(r=>{
-          setFavPlaylist(r.data ?? null);
-        } );
-    },
-    renderElement: ()=>favPlaylist?.name ?? "<Ninguna>",
-  } );
+      return res.data ?? null;
+    }}
+  >
+    {favPlaylist?.name ?? "<Ninguna>"}
+  </AsyncLoader>;
 
   return (
     <div>

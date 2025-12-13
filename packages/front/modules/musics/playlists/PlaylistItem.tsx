@@ -4,10 +4,10 @@ import { PlayArrow,
   Pause } from "@mui/icons-material";
 import { useUser } from "#modules/core/auth/useUser";
 import { classes } from "#modules/utils/styles";
-import { OnClickMenu } from "../history/entry/Header";
+import { OnClickMenu } from "#modules/resources/ResourceEntry";
 import { formatDurationItem } from "./utils";
 import { SettingsButton } from "./SettingsButton";
-import { FavButton, UpdateFavButtons } from "./FavButton";
+import { PlaylistFavButton } from "./PlaylistFavButton";
 import styles from "./PlaylistItem.module.css";
 import playlistStyles from "./Playlist.module.css";
 
@@ -24,7 +24,6 @@ interface PlaylistItemProps {
   isDragging?: boolean;
   onPlay?: (item: PlaylistItemEntity)=> void;
   onPause?: ()=> void;
-  updateFavButtons?: UpdateFavButtons;
   className?: string;
 }
 
@@ -35,7 +34,6 @@ export const MusicPlaylistItem = ( { value,
   onClickMenu,
   className,
   isDragging = false,
-  updateFavButtons,
   onPlay,
   onPause }: PlaylistItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -89,11 +87,10 @@ export const MusicPlaylistItem = ( { value,
       </div>
 
       <div className={classes(playlistStyles.headerActions, styles.actions)}>
-        {user && <FavButton
-          value={!!value.music.isFav}
+        {user && <PlaylistFavButton
+          initialValue={!!value.music.isFav}
           favoritesPlaylistId={user.musics.favoritesPlaylistId}
           musicId={value.music.id}
-          updateFavButtons={updateFavButtons}
         />
         }
         {onClickMenu && <><SettingsButton

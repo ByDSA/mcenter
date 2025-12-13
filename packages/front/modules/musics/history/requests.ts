@@ -23,7 +23,7 @@ export class MusicHistoryApi {
       },
       limit: props?.limit ?? 10,
       offset: props?.offset ?? undefined,
-      expand: ["musics", "musicsFileInfos", "musicsFavorite"],
+      expand: ["musics", "musicsFavorite"],
     };
     const fetcher = makeFetcher<
       MusicHistoryApi.GetManyByCriteria.Request,
@@ -74,7 +74,6 @@ export namespace MusicHistoryApi {
       } )
       .extend( {
         resource: musicEntitySchema.required( {
-          fileInfos: true,
           userInfo: true,
         } ),
       } );

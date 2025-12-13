@@ -1,7 +1,6 @@
-import { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { MutableRefObject, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
-import { NewItem, NewItemFn } from "#modules/utils/array-data-context";
 
 export type Action<D> = {
   fn: (data: D | null)=> Promise<D>;
@@ -37,7 +36,7 @@ type UseCrudDataReturn<
       setError: (error: unknown | undefined)=> void;
       isLoading: boolean;
       setIsLoading: (loading: boolean)=> void;
-      setItem: (i: number, newItem: NewItem<D[0] | null>)=> void;
+      setItem: (i: number, newItemOrFn: SetStateAction<D[0]>)=> void;
     };
 
 export function useCrudData<D extends unknown[], T extends Record<string, Action<D>> | undefined>(
@@ -161,23 +160,23 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
     };
   }, []);
 
-  const setItem = useCallback((i: number, item: NewItem<D[0] | null>) => {
+  const setItem = useCallback((i: number, itemOrFn: SetStateAction<D[0]>) => {
     setData((old: D | null) => {
       if (!old)
         return null;
 
       let newData = [...old];
 
-      if (!item) {
+      if (!itemOrFn) {
         newData = [...newData.slice(0, i), ...newData.slice(i + 1)];
 
         return newData as D;
       }
 
-      if (typeof item === "function")
-        newData[i] = (item as NewItemFn<D[0] | null>)(old[i]);
+      if (typeof itemOrFn === "function")
+        newData[i] = (itemOrFn as (e: D[0])=> D[0])(old[i]);
       else
-        newData[i] = item;
+        newData[i] = itemOrFn;
 
       return newData as D;
     } );

@@ -1,0 +1,14 @@
+.artist {
+  white-space: nowrap;
+}
+
+@media (width < 500px) {
+  .albumShowHide {
+    display: none;
+  }
+
+  .artist {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
