@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.17.0](https://github.com/ByDSA/mcenter/compare/v4.11.0...v4.17.0) (2025-12-13)
+
+
+### Features
+
+* add/remove favorite playlist ([0b02b64](https://github.com/ByDSA/mcenter/commit/0b02b64fc857dbdfbbff6a4bd1155492599ecf3e))
+* **back:** add negation and difference operators ([41b042c](https://github.com/ByDSA/mcenter/commit/41b042c7a1b58356eee3908a8d69c5063996b4a5))
+* **back:** use playlist in queries ([758ac6f](https://github.com/ByDSA/mcenter/commit/758ac6fcf50520a9aeb01fff1022ae3721256416))
+* episodes by user ([57aa8c5](https://github.com/ByDSA/mcenter/commit/57aa8c5103290ad3dc2060874b1c0c8c5628e603))
+* fav button in music search/history ([8453c00](https://github.com/ByDSA/mcenter/commit/8453c00deb01ea81bbcece94144c6025eb1454ae))
+* **front:** add-to-playlist function in history music and playlist item ([a468cc9](https://github.com/ByDSA/mcenter/commit/a468cc94e51667d56899391e546c2ff64a983206))
+* music playlists ([b8ca2bb](https://github.com/ByDSA/mcenter/commit/b8ca2bb5904c8a1490424dcdca59be08c002939b))
+* playlist front-back redirection ([43fe050](https://github.com/ByDSA/mcenter/commit/43fe0505950f5f1509fb62751e12dfa793707d44))
+* use modals and context menu instead accordion ([5b16907](https://github.com/ByDSA/mcenter/commit/5b1690730d0cb1c9890b35043f35489d40f35dae))
+
+
+### Bug Fixes
+
+* **back:** add new episodes ([f286deb](https://github.com/ByDSA/mcenter/commit/f286debe73d349a4d43cde05e12a50d2cd0eab93))
+* **back:** get episodes in stream by url ([8bcac9d](https://github.com/ByDSA/mcenter/commit/8bcac9d7411426fc8a66cd6fe1da3bce5827cb8c))
+* **back:** move controller to usersmusic module ([09a71e5](https://github.com/ByDSA/mcenter/commit/09a71e5c1121e5cd527feb14067f6a41229b4483))
+* **back:** music time elapsed filter ([a108c71](https://github.com/ByDSA/mcenter/commit/a108c71ca21f4a758a74cf35ebb02796bc9c6509))
+* **back:** tags updating ([3d32153](https://github.com/ByDSA/mcenter/commit/3d32153e83a89a9225a9ed9525f59cea22097f75))
+* **back:** user and tag in picking ([c46a9de](https://github.com/ByDSA/mcenter/commit/c46a9de4b20700adee96e25dacf988d5df10d7cd))
+* **front:** context menu top position inside fixed elements ([9ec164c](https://github.com/ByDSA/mcenter/commit/9ec164ce287c8952002fef5e60d1742c084bcb42))
+* **front:** corregir nombre de propiedad en la expansión de recursos ([24812c6](https://github.com/ByDSA/mcenter/commit/24812c6e6bcba92dd029fde401cfe691ecffd43e))
+* **front:** isFav no-fetching replace ([ec89726](https://github.com/ByDSA/mcenter/commit/ec897264bd2e8de175e95e11bc28e94c09649e2c))
+* **front:** slug representation and episode weight updating ([e53b119](https://github.com/ByDSA/mcenter/commit/e53b1194b9c9a92e1bfdfc847c4f7cd94d479636))
+* **front:** some style fixes ([c67aad6](https://github.com/ByDSA/mcenter/commit/c67aad6a8cfe218c07326d4e448d10c67da6b602))
+* **front:** some styles and performance  problems ([4082aa9](https://github.com/ByDSA/mcenter/commit/4082aa91457cae124c2687b28d589fd178e5943b))
+* **front:** spinner in YT Upload ([361cfa2](https://github.com/ByDSA/mcenter/commit/361cfa23aa4cd622ddd70197838791eeacf8b2a8))
+* latest episodes in history ([8b8875f](https://github.com/ByDSA/mcenter/commit/8b8875f67ef92c74827236688fad67e62f7b7986))
+* remove "only-" tags ([11db9ed](https://github.com/ByDSA/mcenter/commit/11db9edc73a4bd999732fd427de85682686c8cf6))
+* some fixes ([fe6bab6](https://github.com/ByDSA/mcenter/commit/fe6bab624c79029f9402ca18aae1955e4683fadd))
+
 ## [4.16.0](https://github.com/ByDSA/mcenter/compare/v4.15.0...v4.16.0) (2025-12-06)
 
 
