@@ -380,7 +380,8 @@ addedAt: Date; }>;
   async getOneById(id: string): Promise<Entity | null> {
     const doc = await MusicPlaylistOdm.Model.findById(id);
 
-    assertFoundClient(doc);
+    if (!doc)
+      return null;
 
     return MusicPlaylistOdm.toEntity(doc);
   }

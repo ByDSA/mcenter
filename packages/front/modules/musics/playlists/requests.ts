@@ -161,8 +161,10 @@ export class MusicPlaylistsApi {
   }
 
   removeOneTrack(
-    playlistId: string,
-    itemId: string,
+    { itemId, playlistId }: {
+    playlistId: string;
+    itemId: string;
+  },
   ): Promise<MusicPlaylistsApi.RemoveOneTrack.Response> {
     const fetcher = makeFetcher<
       MusicPlaylistsApi.RemoveOneTrack.Body,
