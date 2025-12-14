@@ -7,7 +7,7 @@ import { ListEntryColumn, ListEntryRow } from "./ListEntry";
 
 export type OnClickMenu = (e: React.MouseEvent<HTMLElement>)=> void;
 
-type Props = {
+export type ResourceEntryProps = {
   title: string;
   subtitle?: ReactNode;
   right?: ReactNode;
@@ -15,15 +15,20 @@ type Props = {
     onClick: OnClickMenu;
   };
   favButton?: JSX.Element;
-  isDragging?: boolean;
+  drag?: {
+    isDragging: boolean;
+    isDraggingGlobal: boolean;
+    element: ReactNode;
+  };
   play?: {
     onClick: ()=> void;
     isPlaying: boolean;
   };
   index?: number;
 };
+
 export function ResourceEntry(
-  { title, subtitle, settings, right, favButton, play, isDragging, index }: Props,
+  { title, subtitle, settings, right, favButton, play, drag, index }: ResourceEntryProps,
 ) {
   const [isHovered, setIsHovered] = useState(false);
   const shouldHaveLeftDiv = !!play || index !== undefined;
@@ -36,8 +41,9 @@ export function ResourceEntry(
     onMouseEnter={() => setIsHovered(true)}
     onMouseLeave={() => setIsHovered(false)}
   >
+    {drag?.element}
     {shouldHaveLeftDiv && <div className={classes(styles.leftDiv)}>
-      {play && ((isHovered && !isDragging) || play?.isPlaying)
+      {play && ((isHovered && !drag?.isDraggingGlobal) || play?.isPlaying)
         ? (
           <button className={styles.playButton} onClick={play?.onClick}>
             {play?.isPlaying ? <Pause /> : <PlayArrow />}

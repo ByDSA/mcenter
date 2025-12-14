@@ -62,7 +62,7 @@ export function ClientPage( { params }: PageProps) {
         } )()}</pre>}
         {isLoading && <ContentSpinner />}
         {data
-      && <MusicPlaylist value={data} setValue={(d)=>setData(d)}/>
+      && <MusicPlaylist value={data} setValue={setData}/>
         }
       </>
     );

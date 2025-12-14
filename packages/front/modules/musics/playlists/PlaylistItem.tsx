@@ -1,105 +1,109 @@
-import type { PlaylistItemEntity } from "./Playlist";
-import React, { ReactNode, useState } from "react";
-import { PlayArrow,
-  Pause } from "@mui/icons-material";
+import type { PlaylistEntity } from "./Playlist";
+import React, { ReactNode } from "react";
+import { SetState } from "#modules/utils/resources/useCrud";
+import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
-import { classes } from "#modules/utils/styles";
-import { OnClickMenu } from "#modules/resources/ResourceEntry";
-import { formatDurationItem } from "./utils";
-import { SettingsButton } from "./SettingsButton";
-import { PlaylistFavButton } from "./PlaylistFavButton";
-import styles from "./PlaylistItem.module.css";
-import playlistStyles from "./Playlist.module.css";
+import { FetchApi } from "#modules/fetching/fetch-api";
+import { MusicEntryElement } from "../musics/MusicEntry/MusicEntry";
+import { MusicEntity } from "../models";
+import { genMusicEntryContextMenuContent } from "../musics/MusicEntry/ContextMenu";
+import { MusicPlaylistsApi } from "./requests";
 
 export type ContextMenuProps = {
   onClick?: (e: React.MouseEvent<HTMLElement>)=> void;
   element?: ReactNode;
 };
 
-interface PlaylistItemProps {
-  onClickMenu?: OnClickMenu;
-  value: PlaylistItemEntity;
+type PlaylistItemProps = NonNullable<Pick<Parameters<typeof MusicEntryElement>[0], "drag">> & {
+  playlist: PlaylistEntity;
+  setPlaylist: SetState<PlaylistEntity>;
   index: number;
-  isPlaying?: boolean;
-  isDragging?: boolean;
-  onPlay?: (item: PlaylistItemEntity)=> void;
-  onPause?: ()=> void;
-  className?: string;
-}
+};
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const MusicPlaylistItem = ( { value,
+export const MusicPlaylistItem = ( { playlist,
   index,
-  isPlaying = false,
-  onClickMenu,
-  className,
-  isDragging = false,
-  onPlay,
-  onPause }: PlaylistItemProps) => {
-  const [isHovered, setIsHovered] = useState(false);
+  setPlaylist,
+  drag }: PlaylistItemProps) => {
   const { user } = useUser();
-  const handlePlayPause = () => {
-    if (isPlaying)
-      onPause?.();
-    else
-      onPlay?.(value);
-  };
+  const { openMenu: _openMenu } = useContextMenuTrigger();
+  const value = playlist.list[index];
+  const { music } = value;
+  const api = FetchApi.get(MusicPlaylistsApi);
+  const setData: SetState<MusicEntity> = a => {
+    const musicUpdateData = typeof a === "function" ? a(undefined) : a;
 
-  return (
-    <div
-      className={classes(
-        styles.playlistItem,
-        isPlaying && styles.playing,
-        className,
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className={classes(styles.indexContainer, playlistStyles.headerIndex)}>
-        {(isHovered && !isDragging) || isPlaying
-          ? (
-            <button className={styles.playButton} onClick={handlePlayPause}>
-              {isPlaying ? <Pause /> : <PlayArrow />}
-            </button>
-          )
-          : (
-            <span className={styles.indexNumber}>{index
-              + 1}</span>
-          )}
-      </div>
+    if (!musicUpdateData)
+      return;
 
-      <div className={classes(playlistStyles.headerTitle, styles.songInfo)}>
-        <h4 className={`${styles.songTitle} ${isPlaying ? styles.playing : ""}`}>
-          {value.music.title}
-        </h4>
-        <div className={styles.songDetails}>
-          <span className={styles.songArtist}>{value.music.artist}</span>
-          <span className={classes(styles.separator, styles.albumShowHide)}>•</span>
-          <span className={classes(styles.songAlbum, styles.albumShowHide)}>{
-            !value.music.album || value.music.album.trim() === ""
-              ? "(Sin álbum)"
-              : value.music.album}</span>
-        </div>
-      </div>
+    const newMusic = musicUpdateData;
+    const targetMusicId = musicUpdateData.id;
 
-      <div className={classes(playlistStyles.headerDuration, styles.duration)}>
-        {formatDurationItem(value.music.fileInfos[0].mediaInfo.duration ?? 0)}
-      </div>
+    setPlaylist(old => {
+      if (!old || !old.list)
+        return old;
 
-      <div className={classes(playlistStyles.headerActions, styles.actions)}>
-        {user && <PlaylistFavButton
-          initialValue={!!value.music.isFav}
-          favoritesPlaylistId={user.musics.favoritesPlaylistId}
-          musicId={value.music.id}
-        />
+      const updatedList = old.list.map(listItem => {
+        if (listItem.musicId === targetMusicId) {
+          const oldMusic = listItem.music;
+          const mergedMusic = {
+            ...oldMusic,
+            ...newMusic,
+          };
+
+          return {
+            ...listItem,
+            music: mergedMusic,
+          } as PlaylistEntity["list"][0];
         }
-        {onClickMenu && <><SettingsButton
-          theme="dark"
-          className={styles.settingsButton}
-          onClick={(e: React.MouseEvent<HTMLElement>)=>onClickMenu?.(e)}
-        />
-        </>}
-      </div>
-    </div>
-  );
+
+        return listItem;
+      } );
+
+      return {
+        ...old,
+        list: updatedList,
+      } as PlaylistEntity;
+    } );
+  };
+  const contextMenuContent = <>
+    {genMusicEntryContextMenuContent( {
+      music,
+      setMusic: setData,
+      user,
+    } )}
+    {user?.id === playlist.ownerUserId && <ContextMenuItem
+      label="Eliminar"
+      theme="danger"
+      onClick={async () => {
+        await api.removeOneTrack( {
+          playlistId: playlist.id,
+          itemId: value.id,
+        } );
+
+        setPlaylist(old=> {
+          if (!old)
+            return old;
+
+          const updatedList = old.list.filter((i) => i.id !== value.id);
+
+          return {
+            ...old,
+            list: updatedList,
+          };
+        } );
+      }}
+    />
+    }
+  </>;
+
+  return <MusicEntryElement
+    data={music}
+    setData={setData}
+    index={index + 1}
+    drag={drag}
+    contextMenu={{
+      customContent: contextMenuContent,
+    }}
+  />;
 };

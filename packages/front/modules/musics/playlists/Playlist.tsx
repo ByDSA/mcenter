@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { PlayArrow,
   Pause,
-  MusicNote,
-  AccessTime,
-  CalendarToday } from "@mui/icons-material";
+  MusicNote, CalendarToday, DragHandle } from "@mui/icons-material";
 import { PATH_ROUTES } from "$shared/routing";
 import { DndContext,
   closestCenter,
@@ -25,10 +23,10 @@ import { useUser } from "#modules/core/auth/useUser";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
+import { SetState } from "#modules/utils/resources/useCrud";
 import { MusicEntityWithFileInfos } from "../models";
 import { ContextMenuItem, useContextMenuTrigger } from "../../ui-kit/ContextMenu/ContextMenu";
-import { CopyMusicMenuItem } from "../musics/MusicEntry/MusicEntry";
-import { EditMusicContextMenuItem } from "../musics/EditMusic/ContextMenu";
+import listEntryStyles from "../../resources/ListEntry.module.css";
 import { MusicPlaylistItem } from "./PlaylistItem";
 import { MusicPlaylistEntity } from "./models";
 import { formatDurationHeader, playlistCopySlugUrl } from "./utils";
@@ -38,7 +36,6 @@ import { SettingsButton } from "./SettingsButton";
 import { MusicPlaylistsApi } from "./requests";
 import { RenamePlaylistContextMenuItem } from "./list/renameMenuItem";
 import { DeletePlaylistContextMenuItem } from "./list/deleteItem";
-import { AddToPlaylistContextMenuItem } from "./AddToPlaylistContextMenuItem";
 import { PlaylistCover } from "./PlaylistCover";
 
 export type PlaylistItemEntity = MusicPlaylistEntity["list"][0]
@@ -53,13 +50,12 @@ export type PlaylistEntity = Omit<MusicPlaylistEntity, "list"> & {
 
 interface PlaylistProps {
   value: PlaylistEntity;
-  setValue: (newValue: PlaylistEntity)=> void;
+  setValue: SetState<PlaylistEntity>;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicPlaylist = ( { value, setValue }: PlaylistProps) => {
   const api = FetchApi.get(MusicPlaylistsApi);
-  const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
   const [isPlaylistPlaying, setIsPlaylistPlaying] = useState(false);
   const [isDraggingGlobal, setIsDraggingGlobal] = useState(false);
   const [pendingMotions, setPendingMotions] = useState<{oldIndex: number;
@@ -80,21 +76,12 @@ newIndex: number;}[]>([]);
       coordinateGetter: sortableKeyboardCoordinates,
     } ),
   );
-  const handlePlayMusic = (item: PlaylistItemEntity) => {
-    setCurrentPlaying(item.id);
-    setIsPlaylistPlaying(true);
-  };
-  const handlePauseMusic = () => {
-    setIsPlaylistPlaying(false);
-  };
   const handlePlayPlaylist = () => {
     if (value.list.length > 0) {
       if (isPlaylistPlaying)
         setIsPlaylistPlaying(false);
-      else {
-        setCurrentPlaying(value.list[0].id);
+      else
         setIsPlaylistPlaying(true);
-      }
     }
   };
   const handleMoreOptions = (e: React.MouseEvent<HTMLElement>) => {
@@ -211,8 +198,7 @@ newIndex: number;}[]>([]);
   const { openMenu: playlistOpenMenu,
     closeMenu: playlistCloseMenu } = useContextMenuTrigger();
   const { user } = useUser();
-  const { openMenu: playlistItemOpenMenu,
-    closeMenu: playlistItemCloseMenu } = useContextMenuTrigger();
+  const draggable = value.ownerUserId === user?.id;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const SortablePlaylistItem = ( { item, index }: { item: PlaylistItemEntity;
 index: number; } ) => {
@@ -220,6 +206,7 @@ index: number; } ) => {
     const { attributes,
       listeners,
       setNodeRef,
+      isDragging,
       transform,
       transition } = useSortable( {
       id,
@@ -232,46 +219,26 @@ index: number; } ) => {
     return (
       <div
         ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}>
-        <MusicPlaylistItem
-          value={item}
-          index={index}
-          isPlaying={currentPlaying === item.id && isPlaylistPlaying}
-          isDragging={isDraggingGlobal}
-          className={styles.playlistItem}
-          onClickMenu={ (e) => playlistItemOpenMenu( {
-            event: e,
-            content: <>
-              {user && <AddToPlaylistContextMenuItem
-                musicId={item.musicId}
-                user={user}
-              />}
-              <CopyMusicMenuItem
-                music={item.music}
-                token={user?.id}
-              />
-              {user && <EditMusicContextMenuItem initialData={item.music}/>}
-              {user?.id === value.ownerUserId && <ContextMenuItem
-                label="Eliminar"
-                theme="danger"
-                onClick={async () => {
-                  await api.removeOneTrack(value.id, item.id);
-                  const updatedList = value.list.filter((i) => i.id !== item.id);
+        className={classes(styles.sortableItemWrapper)}
+        style={style}>
 
-                  setValue( {
-                    ...value,
-                    list: updatedList,
-                  } );
-                  playlistItemCloseMenu();
-                }}
-              />
-              }
-            </>,
-          } )}
-          onPlay={handlePlayMusic}
-          onPause={handlePauseMusic}
+        <MusicPlaylistItem
+          playlist={value}
+          setPlaylist={setValue}
+          index={index}
+          drag={ draggable
+            ? {
+              isDragging,
+              isDraggingGlobal,
+              element: <div
+                className={classes(styles.dragHandle, isDragging && styles.isDragging)}
+                {...attributes}
+                {...listeners}
+              >
+                <DragHandle />
+              </div>,
+            }
+            : undefined}
         />
       </div>
     );
@@ -327,14 +294,11 @@ index: number; } ) => {
         </div>
       </div>
 
-      <div className={styles.playlistContent}>
-        <div className={styles.tracksHeader}>
-          <div className={styles.headerIndex}>#</div>
+      <div className={classes(styles.playlistItems, draggable && styles.draggable)}>
+        <div className={classes(styles.tracksHeader, listEntryStyles.sidePadding)}>
+          {draggable && <div className={styles.headerDrag}></div>}
+          <div className={classes(styles.headerIndex, listEntryStyles.leftDiv)}>#</div>
           <div className={styles.headerTitle}>CANCIÓN</div>
-          <div className={styles.headerDuration} title="Duración">
-            <AccessTime />
-          </div>
-          <div className={styles.headerActions}></div>
         </div>
 
         <DndContext
@@ -348,7 +312,7 @@ index: number; } ) => {
             items={value.list?.map(item => item.id) ?? []}
             strategy={verticalListSortingStrategy}
           >
-            <div className={classes(styles.tracksList, isDraggingGlobal && styles.isDragging)}>
+            <div className={classes(isDraggingGlobal && styles.isDraggingGlobal)}>
               {value.list.length > 0
                 ? (
                   <>

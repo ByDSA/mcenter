@@ -1,60 +1,32 @@
-import { memo, useCallback } from "react";
+import { memo, ReactNode } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { Music, MusicEntity } from "$shared/models/musics";
 import { logger } from "#modules/core/logger";
 import { frontendUrl } from "#modules/requests";
-import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
-import { AddToPlaylistContextMenuItem } from "#modules/musics/playlists/AddToPlaylistContextMenuItem";
 import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
 import { DurationView, WeightView } from "#modules/history";
 import { classes } from "#modules/utils/styles";
-import { ResourceEntry } from "#modules/resources/ResourceEntry";
+import { ResourceEntry, ResourceEntryProps } from "#modules/resources/ResourceEntry";
 import listEntryStyles from "#modules/resources/ListEntry.module.css";
-import { MusicLatestViewsContextMenuItem } from "#modules/musics/history/LatestViews/ContextMenuItem";
+import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { BodyProps } from "../EditMusic/EditMusic";
-import { EditMusicContextMenuItem } from "../EditMusic/ContextMenu";
 import styles from "./MusicEntry.module.css";
+import { genMusicEntryContextMenuContent } from "./ContextMenu";
 
-type Props = BodyProps & {
+type Props = BodyProps & Pick<ResourceEntryProps, "drag"> & {
   index?: number;
+  contextMenu?: {
+    customContent: ReactNode;
+  };
 };
 export function MusicEntryElement(
   props: Props,
 ) {
   const { data: music } = props;
-  const { openMenu } = useContextMenuTrigger();
-  const { user } = useUser();
   const duration = music.fileInfos?.[0]?.mediaInfo.duration;
-  const onClickMenu = useCallback((e)=> {
-    openMenu( {
-      event: e,
-      content: (
-        <>
-          {
-            user && <AddToPlaylistContextMenuItem
-              musicId={music.id}
-              user={user}
-            />
-          }
-          <EditMusicContextMenuItem
-            initialData={music}
-            setData={a=>props.setData(a)}
-          />
-          {
-            user && <MusicLatestViewsContextMenuItem
-              music={music}
-              musicId={music.id}
-            />
-          }
-          <CopyMusicMenuItem
-            music={music}
-            token={user?.id}
-          />
-        </>
-      ),
-    } );
-  }, []);
+  const { user } = useUser();
+  const { openMenu } = useContextMenuTrigger();
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
   const right = <>
     {duration && <DurationView duration={duration} />}
@@ -74,13 +46,21 @@ export function MusicEntryElement(
     } )}
     right={right}
     settings={{
-      onClick: onClickMenu,
+      onClick: (e)=>openMenu( {
+        event: e,
+        content: props.contextMenu?.customContent ?? genMusicEntryContextMenuContent( {
+          music,
+          setMusic: props.setData,
+          user,
+        } ),
+      } ),
     }}
     play={{
       isPlaying: false,
       // eslint-disable-next-line no-empty-function
       onClick: ()=>{},
     }}
+    drag={props.drag}
   />;
 }
 
@@ -99,24 +79,6 @@ export async function copyMusicUrl( { music, token }: CopyMusicProps) {
   );
   logger.info("Copiada url");
 }
-
-type CopyMusicMenuItemProps = {
-  music: MusicEntity;
-  token?: string;
-};
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const CopyMusicMenuItem = (props: CopyMusicMenuItemProps) => {
-  return <ContextMenuItem
-    label="Copiar enlace"
-    onClick={async (event) => {
-      event.stopPropagation();
-      await copyMusicUrl( {
-        music: props.music,
-        token: props.token,
-      } );
-    }}
-  />;
-};
 
 type MusicSubtitleProps = {
   music: MusicEntity;

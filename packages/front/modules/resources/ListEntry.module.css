@@ -1,3 +1,23 @@
+.sidePadding,
+.container {
+  --padding-side: 1rem;
+  padding-right: var(--padding-side);
+  padding-left: var(--padding-side);
+
+  @media (width < 500px) {
+    --padding-side: 0;
+  }
+}
+
+.leftDiv {
+  width: 32px;
+  margin-right: 1rem;
+
+  @media (width < 500px) {
+    margin-right: 0.5rem;
+  }
+}
+
 .container {
   --color-playing: var(--color-blue-400);
   --color-playing-hover: var(--color-blue-500);
@@ -5,10 +25,16 @@
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 0.5rem 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
   border-radius: 8px;
   transition: all 0.2s ease;
   color: var(--color-gray-400);
+
+  @media (width < 500px) {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
 
   &:hover {
     background-color: var(--color-gray-800);
@@ -28,6 +54,11 @@
       display: flex;
       flex-flow: column nowrap;
       justify-content: space-evenly;
+
+      svg {
+        height: 1rem;
+      }
+
       &:has(> :nth-child(3):last-child) {
         font-size: 0.8rem;
         svg {
@@ -93,11 +124,6 @@
     }
   }
 
-  .leftDiv {
-    width: 32px;
-    margin-right: 1rem;
-  }
-
   .main.noLeftDiv {
     @media (width < 500px) {
       margin-left: 1rem;
@@ -132,10 +158,6 @@
     button:hover {
       background-color: transparent !important;
     }
-  }
-
-  @media (width < 500px) {
-    padding: 0.25rem 0;
   }
 }
 
