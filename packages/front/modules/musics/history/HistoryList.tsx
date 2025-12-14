@@ -1,22 +1,16 @@
-import type { MusicHistoryEntry } from "#modules/musics/history/models";
 import { Fragment } from "react";
-import { formatDate } from "#modules/utils/dates";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { INITIAL_FETCHING_LENGTH, FETCHING_MORE_LENGTH } from "#modules/history/lists";
 import { ResourceList } from "#modules/resources/ResourceList";
+import { dayTitle } from "#modules/history/utils";
 import { MusicHistoryApi } from "./requests";
 import { MusicHistoryEntryElement } from "./HistoryEntry";
 
-type Props = {
-  showDate?: "eachOne" | "groupByDay" | "none";
-};
-
 type Data = MusicHistoryApi.GetManyByCriteria.Data[];
 
-export function HistoryList(props?: Props) {
-  const showDate = props?.showDate ?? "groupByDay";
+export function HistoryList() {
   const { data, isLoading, error,
     setItem, observerTarget } = useHistoryList();
 
@@ -33,43 +27,25 @@ export function HistoryList(props?: Props) {
       <ResourceList>
         {
           data!.map(
-            (entry, i, array) => <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
-              {showDate === "groupByDay" ? dayTitle(entry, i, array) : null}
-              <MusicHistoryEntryElement showDate={showDate === "eachOne"}
-                value={entry} setValue={(newEntry: typeof entry) => {
-                  setItem(i, newEntry);
-                }}
-              />
-            </Fragment>,
+            (entry, i, array) => {
+              return <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
+                {dayTitle( {
+                  currentDateTimestamp: entry.date.timestamp,
+                  previousDateTimestamp: i > 0 ? array[i - 1].date.timestamp : undefined,
+                } )}
+                <MusicHistoryEntryElement
+                  value={entry}
+                  setValue={(newEntry: typeof entry) => {
+                    setItem(i, newEntry);
+                  }}
+                />
+              </Fragment>;
+            },
           )
         }
       </ResourceList>
     ),
   } );
-}
-
-function dayTitle(
-  entry: Required<MusicHistoryEntry>,
-  i: number,
-  array: Required<MusicHistoryEntry>[],
-) {
-  if (i === 0 || !isSameday(array[i - 1].date.timestamp, entry.date.timestamp)) {
-    return <h3 key={entry.date.timestamp}>{formatDate(new Date(entry.date.timestamp * 1000), {
-      ago: "no",
-      dateTime: "fullDate",
-    } )}</h3>;
-  }
-
-  return null;
-}
-
-function isSameday(timestamp1: number, timestamp2: number) {
-  const date1 = new Date(timestamp1 * 1000);
-  const date2 = new Date(timestamp2 * 1000);
-
-  return date1.getFullYear() === date2.getFullYear()
-    && date1.getMonth() === date2.getMonth()
-    && date1.getDate() === date2.getDate();
 }
 
 function useHistoryList() {

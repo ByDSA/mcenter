@@ -4,9 +4,9 @@ import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
 import { ResourceList } from "#modules/resources/ResourceList";
+import { dayTitle } from "#modules/history/utils";
 import { EpisodeHistoryEntryElement } from "./entry/HistoryEntry";
 import { EpisodeHistoryApi } from "./requests";
-import { getDateStr } from "./utils";
 
 type Data = EpisodeHistoryApi.GetMany.Data[];
 
@@ -27,18 +27,13 @@ export function HistoryList() {
       return (
         <ResourceList>
           {
-            data!.map((entry: EpisodeHistoryApi.GetMany.Data, i: number) => {
-              let dayTitle;
-
-              if (i === 0 || !isSameday(data![i - 1].date.timestamp, entry.date.timestamp)) {
-                const dateStr = getDateStr(new Date(entry.date.timestamp * 1000));
-
-                dayTitle = <h3 key={dateStr}>{dateStr}</h3>;
-              }
-
+            data!.map((entry: EpisodeHistoryApi.GetMany.Data, i: number, array) => {
               return <Fragment
                 key={entry.date.timestamp}>
-                {dayTitle}
+                {dayTitle( {
+                  currentDateTimestamp: entry.date.timestamp,
+                  previousDateTimestamp: i > 0 ? array[i - 1].date.timestamp : undefined,
+                } )}
                 <EpisodeHistoryEntryElement
                   value={entry}
                   setValue={(fnOrData) => {
@@ -72,15 +67,6 @@ export function HistoryList() {
       );
     },
   } );
-}
-
-function isSameday(timestamp1: number, timestamp2: number) {
-  const date1 = new Date(timestamp1 * 1000);
-  const date2 = new Date(timestamp2 * 1000);
-
-  return date1.getFullYear() === date2.getFullYear()
-    && date1.getMonth() === date2.getMonth()
-    && date1.getDate() === date2.getDate();
 }
 
 function useHistoryList() {

@@ -6,7 +6,7 @@ import MusicLayout from "../music.layout";
 export default function MusicHistoryPage() {
   return (
     <MusicLayout>
-      <MusicHistoryList showDate="groupByDay"/>
+      <MusicHistoryList />
     </MusicLayout>
   );
 }

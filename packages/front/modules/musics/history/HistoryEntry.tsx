@@ -11,7 +11,6 @@ import { MusicHistoryApi } from "./requests";
 type Props<T> = {
   value: T;
   setValue: (newData: T | undefined)=> void;
-  showDate?: boolean;
 };
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicHistoryEntryElement = React.memo((

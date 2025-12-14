@@ -3,9 +3,5 @@
 import { EpisodeHistoryList } from "#modules/series";
 
 export default function SeriesHistoryPage() {
-  return (
-    <>
-      <EpisodeHistoryList />
-    </>
-  );
+  return <EpisodeHistoryList />;
 }
