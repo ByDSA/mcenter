@@ -69,7 +69,8 @@ newIndex: number;}[]>([]);
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 4, // Mínimo 8px de movimiento para activar drag
+        distance: 0, // Mínimo movimiento para activar drag
+        delay: 0,
       },
     } ),
     useSensor(KeyboardSensor, {

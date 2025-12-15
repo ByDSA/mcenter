@@ -12,6 +12,7 @@
 .leftDiv {
   width: 32px;
   margin-right: 1rem;
+  user-select: none;
 
   @media (width < 500px) {
     margin-right: 0.5rem;
