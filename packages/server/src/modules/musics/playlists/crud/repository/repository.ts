@@ -7,6 +7,7 @@ import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { assertIsDefined } from "$shared/utils/validation";
 import { Types } from "mongoose";
 import { UserPayload } from "$shared/models/auth";
+import { WithRequired } from "$shared/utils/objects";
 import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet, CanGetOneByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
@@ -142,12 +143,15 @@ playlistId: string;},
       trackListNewPosition: newIndex,
     } as MusicPlayListTrackEvents.Moved.Event);
 
-    this.emitPatch(ret);
+    this.emitPatch( {
+      id: ret.id,
+      list: ret.list,
+    } );
 
     return ret;
   }
 
-  private emitPatch(playlist: MusicPlaylistEntity) {
+  private emitPatch(playlist: WithRequired<Partial<MusicPlaylistEntity>, "id">) {
     this.domainEventEmitter.emitPatch(MusicPlayListEvents.Patched.TYPE, {
       partialEntity: playlist,
       id: playlist.id,
