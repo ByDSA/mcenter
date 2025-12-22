@@ -1,0 +1,31 @@
+:root {
+  --bg-scroll: #1e1e1e; /* Fondo de la barra */
+  --thumb-scroll: #444444; /* Color del scroll (tirador) */
+  --thumb-hover: #555555; /* Color al pasar el mouse */
+}
+
+/* 1. Estándar moderno (Firefox) */
+html {
+  scrollbar-width: auto;
+  scrollbar-color: var(--thumb-scroll) var(--bg-scroll);
+}
+
+/* 2. Motores Webkit (Chrome, Safari, Edge, Opera) */
+::-webkit-scrollbar {
+  width: 12px; /* Ancho del scroll vertical */
+  height: 12px; /* Alto del scroll horizontal */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-scroll); /* Color del carril */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--thumb-scroll); /* Color de la barra */
+  border-radius: 10px; /* Bordes redondeados */
+  border: 3px solid var(--bg-scroll); /* Crea un efecto de margen */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--thumb-hover); /* Color al pasar el mouse */
+}

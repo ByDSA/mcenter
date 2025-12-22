@@ -7,10 +7,6 @@
   overflow: hidden;
 }
 
-.hideLt500 {
-  display: contents;
-}
-
 .playlistHeader {
   background: var(--color-playlist);
   color: white;
@@ -20,10 +16,11 @@
 .headerContent {
   display: flex;
   gap: 1.5rem;
+  align-items: flex-end;
 }
 
 .playlistCover {
-  --size: 12rem;
+  --size: 13rem;
 }
 
 .playlistInfo {
@@ -64,27 +61,39 @@
 
 .playlistStats {
   display: flex;
-  align-items: center;
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.8);
-  justify-content: left;
 
-  flex-flow: row nowrap;
-  gap: 0.5rem;
+  flex-flow: column nowrap;
+  gap: 0.75rem;
+
+  .row {
+    align-items: center;
+    justify-content: left;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 0.5rem;
+  }
 }
 
 .statItem {
+  --font-size: 1rem;
+  font-size: var(--font-size);
   display: flex;
   align-items: center;
   gap: 4px;
   white-space: nowrap;
 
-  &.createdAt {
-    svg {
-      width: 1rem;
-      height: 1rem;
-    }
+  &:has(> svg),
+  svg {
+    height: var(--font-size);
+    width: var(--font-size);
   }
+}
+
+.visibility {
+  display: flex;
+  flex-flow: row wrap;
 }
 
 .playlistControls {
@@ -95,21 +104,17 @@
 }
 
 .playAllButton {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background-color: var(--color-green-700);
-  color: white;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
+  --size: 3.5rem;
+  width: var(--size);
+  height: var(--size);
+  margin: 0 1rem;
+  --color-playing: var(--color-blue-400);
+  --color-playing-hover: var(--color-blue-500);
 
-.playAllButton:hover {
-  background-color: var(--color-green-600);
+  svg {
+    width: calc(var(--size) / 1.5);
+    height: calc(var(--size) / 1.5);
+  }
 }
 
 .playlistItems {
@@ -168,10 +173,18 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .playlistContainer {
     margin-top: 0;
     border-radius: 0;
+  }
+
+  .playlistStats {
+    gap: 0.5rem;
+  }
+
+  .statItem {
+    --font-size: calc(1rem / 18 * 16);
   }
 
   .playlistHeader {
@@ -179,13 +192,13 @@
   }
 
   .headerContent {
-    align-items: center;
+    align-items: self-end;
     text-align: center;
     gap: 1rem;
   }
 
   .playlistCover {
-    --size: 8rem;
+    --size: 7.4rem;
   }
 
   .playlistTitle {
@@ -205,8 +218,16 @@
 }
 
 @media (width < 500px) {
-  .hideLt500 {
-    display: none;
+  .playAllButton {
+    --size: 3rem;
+  }
+
+  .playlistStats {
+    gap: 0.25rem;
+
+    .statItem {
+      --font-size: 0.8rem;
+    }
   }
 
   .playlistHeader {
@@ -214,7 +235,7 @@
   }
 
   .playlistCover {
-    --size: 5.375rem;
+    --size: 6.5rem;
   }
 
   .playlistControls {
@@ -255,6 +276,7 @@
   align-self: stretch;
   width: var(--drag-width);
   opacity: 0.7;
+  margin-left: var(--drag-margin-left);
 
   &:active {
     cursor: grabbing;
@@ -282,12 +304,14 @@
 
 .draggable {
   --drag-width: 2.5rem;
+  --drag-margin-left: 0px;
 
   @media (width < 500px) {
     --drag-width: 1.5rem;
+    --drag-margin-left: 0.5rem;
   }
 }
 
 .draggable .tracksHeader .headerDrag {
-  width: var(--drag-width);
+  width: calc(var(--drag-width) + var(--drag-margin-left));
 }

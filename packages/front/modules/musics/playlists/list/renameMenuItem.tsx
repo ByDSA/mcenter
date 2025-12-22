@@ -1,4 +1,4 @@
-import type { PlaylistEntity } from "../Playlist";
+import type { PlaylistEntity } from "../Playlist/types";
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { useRenamePlaylistModal } from "./useRenamePlaylistModal";
 

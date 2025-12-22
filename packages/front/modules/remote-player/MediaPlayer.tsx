@@ -163,7 +163,7 @@ function progressBarOnClick(seek: SeekFunction, start: number, length: number) {
   };
 }
 
-const TIME_UNDEFINED = "--:--";
+export const TIME_UNDEFINED = "--:--";
 
 function secToHMS(sec: number): string {
   if (sec < 0)

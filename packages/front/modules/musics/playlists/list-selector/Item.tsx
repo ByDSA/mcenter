@@ -1,5 +1,5 @@
 import { MusicPlaylistEntity } from "../models";
-import { PlaylistCover } from "../PlaylistCover";
+import { MusicImageCover } from "../../MusicCover";
 import styles from "./Item.module.css";
 
 type Props = {
@@ -11,9 +11,11 @@ export const PlaylistSelectorItem = (props: Props) => {
   const { data } = props;
 
   return <div className={styles.item} onClick={props.onClick}>
-    <PlaylistCover
+    <MusicImageCover
       className={styles.cover}
-      alt={data.name}
+      img={{
+        alt: data.name,
+      }}
     />
     <section>
       <div className={styles.name}>{data.name}</div>

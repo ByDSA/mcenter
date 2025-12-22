@@ -9,7 +9,7 @@ import { copyMusicUrl } from "./MusicEntry";
 
 type Props = {
   music: MusicEntity;
-  setMusic: SetState<MusicEntity>;
+  setMusic?: SetState<MusicEntity>;
   user: UserPayload | null;
 };
 export function genMusicEntryContextMenuContent( { music,
@@ -22,10 +22,12 @@ export function genMusicEntryContextMenuContent( { music,
         user={user}
       />
     }
-    <EditMusicContextMenuItem
-      initialData={music}
-      setData={setMusic}
-    />
+    {
+      user && <EditMusicContextMenuItem
+        initialData={music}
+        setData={setMusic}
+      />
+    }
     {
       user && <MusicLatestViewsContextMenuItem
         music={music}

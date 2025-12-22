@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-// hooks/useAutoFitText.js
 import { useEffect, useRef, useCallback } from "react";
 
 export const useAutoFitText = (options: any = {} ) => {

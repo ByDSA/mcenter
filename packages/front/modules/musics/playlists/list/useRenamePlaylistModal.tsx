@@ -1,9 +1,9 @@
-import type { PlaylistEntity } from "../Playlist";
+import type { PlaylistEntity } from "../Playlist/types";
 import type { MusicPlaylistEntity } from "../models";
 import { useEffect, useMemo } from "react";
 import { Button } from "#modules/ui-kit/input/Button";
 import { useInputText } from "#modules/ui-kit/input/UseInputText";
-import { useFormModal } from "#modules/ui-kit/modal/useFormModal";
+import { useFormInModal } from "#modules/ui-kit/modal/useFormModal";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { MusicPlaylistsApi } from "../requests";
@@ -42,7 +42,7 @@ slug?: string; } = {};
 
     return changes;
   }, [nameValue, slugValue, initialValue]);
-  const form = useFormModal( {
+  const form = useFormInModal( {
     canSubmit: () => Object.keys(body).length > 0 && nameValue.trim().length > 0,
     onSuccess: (newData) => {
       updateLocalValue(newData);

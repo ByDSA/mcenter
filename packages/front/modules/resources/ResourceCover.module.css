@@ -1,22 +1,25 @@
-.playlistCover {
-  width: var(--size, 100%);
+.cover {
   height: var(--size, 100%);
+
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  flex-shrink: 0;
+
   border-radius: 8px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
-.playlistCoverImage {
+.image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.playlistCoverIcon {
+.icon {
   color: var(--color-gray-200);
 
   --size: 50%;

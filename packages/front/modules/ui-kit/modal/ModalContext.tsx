@@ -12,6 +12,8 @@ import { Modal } from "./Modal";
 
 export type OpenModalProps = {
   closeOnClickOutside?: boolean;
+  showBox?: boolean;
+  showHeader?: boolean;
   showCloseButton?: boolean;
   addBackdrop?: boolean;
   className?: string;
@@ -117,6 +119,8 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
           onClose={(ret) => _close(modal.id, ret)}
           closeOnClickOutside={modal.options.closeOnClickOutside}
           showCloseButton={modal.options.showCloseButton}
+          showHeader={modal.options.showHeader}
+          showBox={modal.options.showBox}
           addBackdrop={modal.options.addBackdrop}
           className={modal.options.className}
         >

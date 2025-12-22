@@ -2,6 +2,7 @@ import { ToastContainer } from "react-toastify";
 import { Home, LiveTv } from "@mui/icons-material";
 import { PATH_ROUTES } from "$shared/routing";
 import { UserPayload } from "$shared/models/auth";
+import { ReactNode } from "react";
 import { Topbar } from "#modules/ui-kit/menus/Topbar";
 import { UserProvider } from "#modules/core/auth/UserProvider";
 import { getUser } from "#modules/core/auth/server";
@@ -14,6 +15,7 @@ import { MoviesIcon } from "#modules/movies/MoviesIcon";
 import { MusicsIcon } from "#modules/musics/MusicsIcon";
 import { ModalProvider } from "#modules/ui-kit/modal/ModalContext";
 import { ContextMenuProvider } from "#modules/ui-kit/ContextMenu";
+import { MediaPlayerPageLayout } from "#modules/player/browser/MediaPlayer/MediaPlayerPageLayout";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
@@ -21,7 +23,7 @@ import { NavigationWatcher } from "./NavigationWatcher";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 
-const sideData: (user: UserPayload | null)=> MenuItemData[] = (user)=>[
+const sideData: (user: UserPayload | null)=> MenuItemData[] = (_user)=>[
   {
     icon: <Home />,
     label: "Inicio",
@@ -33,7 +35,7 @@ const sideData: (user: UserPayload | null)=> MenuItemData[] = (user)=>[
   {
     icon: <MusicsIcon />,
     label: "Música",
-    path: user ? PATH_ROUTES.musics.frontend.history.path : PATH_ROUTES.musics.frontend.search.path,
+    path: PATH_ROUTES.musics.frontend.path,
     matchPath: {
       startsWith: PATH_ROUTES.musics.frontend.path,
     },
@@ -103,17 +105,15 @@ export default async function RootLayout( { children }: {
       </head>
       <body>
         <NavigationWatcher />
-        <UserProvider initialUser={user}>
-          <ModalProvider>
-            <ContextMenuProvider>
-              {menu}
-              {sideBar}
-              <main className={styles.content}>
-                {children}
-              </main>
-            </ContextMenuProvider>
-          </ModalProvider>
-        </UserProvider>
+        <GlobalProviders user={user}>
+          <MediaPlayerPageLayout>
+            {menu}
+            {sideBar}
+            <main className={styles.content}>
+              {children}
+            </main>
+          </MediaPlayerPageLayout>
+        </GlobalProviders>
         <ToastContainer
           position="bottom-right"
           autoClose={5000}
@@ -128,4 +128,18 @@ export default async function RootLayout( { children }: {
       </body>
     </html>
   );
+}
+
+type GlobalProvidersProps = {
+  children: ReactNode;
+  user: UserPayload | null;
+};
+function GlobalProviders( { children, user }: GlobalProvidersProps) {
+  return <UserProvider initialUser={user}>
+    <ModalProvider>
+      <ContextMenuProvider>
+        {children}
+      </ContextMenuProvider>
+    </ModalProvider>
+  </UserProvider>;
 }

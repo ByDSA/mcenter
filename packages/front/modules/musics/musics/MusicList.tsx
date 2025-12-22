@@ -7,6 +7,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
 import { useUser } from "#modules/core/auth/useUser";
 import listStyles from "#modules/resources/List.module.css";
+import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { MusicsApi } from "../requests";
 import { MusicEntityWithFileInfos } from "../models";
 import { MusicEntryElement } from "./MusicEntry/MusicEntry";
@@ -38,6 +39,7 @@ export function MusicList(props: Props) {
       Resultados: {data?.length} de {totalCount}
     </span>
   );
+  const player = useBrowserPlayer();
 
   return renderFetchedData<Data | null>( {
     data,
@@ -53,20 +55,46 @@ export function MusicList(props: Props) {
         {resultNumbers}
         <br />
         <span className={classes(listStyles.list)}>
-          {data!.map((music, i) => (
-            <Fragment key={`${music.id}`}>
+          {data!.map((music, i) => {
+            const playingThisMusicStatus: typeof player.status = (()=>{
+              if (player.currentResource?.type !== "music")
+                return "stopped";
+
+              if (player.currentResource?.resourceId !== music.id)
+                return "stopped";
+
+              return player.status;
+            } )();
+
+            return <Fragment key={`${music.id}`}>
               <MusicEntryElement
-                index={i + 1}
+                index={i}
+                play={{
+                  status: playingThisMusicStatus,
+                  onClick: ()=>{
+                    if (playingThisMusicStatus === "playing") {
+                      player.pause();
+
+                      return;
+                    } else if (playingThisMusicStatus === "paused") {
+                      player.resume();
+
+                      return;
+                    }
+
+                    player.playMusic(music);
+                  },
+                }}
                 data={music}
                 setData={(newData) => {
                   return setItem(
                     i,
-                  newData as WithRequired<MusicEntityWithFileInfos, "userInfo">,
+                    newData as WithRequired<MusicEntityWithFileInfos, "userInfo">,
                   );
                 }}
               />
-            </Fragment>
-          ))}
+            </Fragment>;
+          } )}
         </span>
         {(data?.length ?? 0) > 10 && data?.length === totalCount && resultNumbers}
       </>

@@ -2,10 +2,9 @@ import React, { memo, ReactNode } from "react";
 import { EpisodeEntity } from "$shared/models/episodes";
 import { PATH_ROUTES } from "$shared/routing";
 import { HistoryTimeView, WeightView } from "#modules/history";
-import { ResourceEntry } from "#modules/resources/ResourceEntry";
+import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ResourceEntry";
 import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { classes } from "#modules/utils/styles";
-import listEntryStyles from "#modules/resources/ListEntry.module.css";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 import { SetState } from "#modules/utils/resources/useCrud";
@@ -100,12 +99,13 @@ type EpisodeSubtitleProps = {
 };
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const EpisodeSubtitle = memo(( { episode }: EpisodeSubtitleProps) => {
-  return <>
-    <span className={classes(styles.subtitle, "ellipsis")}>{episode.serie?.name}</span>
-    <span className={classes(listEntryStyles.separator)}>•</span>
-    <span className={classes(styles.subtitle)}>{episode.compKey.episodeKey}</span>
-
-  </>;
+  return <ResourceSubtitle items={[{
+    text: episode.serie?.name!,
+    className: classes(styles.subtitle, "ellipsis"),
+  }, {
+    text: episode.compKey.episodeKey,
+    className: classes(styles.subtitle),
+  }]} />;
 } );
 
 type DeleteHistoryEntryModalContentWrapperProps = {

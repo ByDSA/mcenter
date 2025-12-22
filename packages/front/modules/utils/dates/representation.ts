@@ -6,11 +6,11 @@ export type DateFormat = {
 };
 
 export function secsToMmss(secs: number) {
-  const minutes = Math.floor(secs / 60);
-  const seconds = secs - (minutes * 60);
-  const secondsInt = Math.round(seconds);
+  const secsInt = Math.round(secs);
+  const minutes = Math.floor(secsInt / 60);
+  const seconds = secsInt - (minutes * 60);
 
-  return `${pad2(minutes)}:${pad2(secondsInt)}`;
+  return `${pad2(minutes)}:${pad2(seconds)}`;
 }
 
 export function getLongDateStr(date: Date, format: DateFormat["dateTime"]) {

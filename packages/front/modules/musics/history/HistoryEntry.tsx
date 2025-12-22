@@ -1,10 +1,12 @@
 import React from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useUser } from "#modules/core/auth/useUser";
 import { HistoryTimeView, WeightView } from "#modules/history";
 import { MusicSubtitle } from "#modules/musics/musics/MusicEntry/MusicEntry";
 import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
 import { ResourceEntry } from "#modules/resources/ResourceEntry";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
+import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { HistoryEntryContextMenu } from "./ContextMenu";
 import { MusicHistoryApi } from "./requests";
 
@@ -20,6 +22,15 @@ export const MusicHistoryEntryElement = React.memo((
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
   const { resource: music } = value;
   const { openMenu } = useContextMenuTrigger();
+  const { currentResource, playMusic, status, pause, resume } = useBrowserPlayer(
+    useShallow(s=> ( {
+      currentResource: s.currentResource,
+      playMusic: s.playMusic,
+      status: s.status,
+      pause: s.pause,
+      resume: s.resume,
+    } )),
+  );
 
   return ResourceEntry( {
     title: music.title,
@@ -46,9 +57,22 @@ export const MusicHistoryEntryElement = React.memo((
       initialValue: value.resource.isFav,
     } ),
     play: {
-      isPlaying: false,
-      // eslint-disable-next-line no-empty-function
-      onClick: ()=>{},
+      status: currentResource?.resourceId === value.resource.id ? status : "stopped",
+      onClick: ()=>{
+        if (currentResource?.resourceId === value.resource.id) {
+          if (status === "paused") {
+            resume();
+
+            return;
+          } else if (status === "playing") {
+            pause();
+
+            return;
+          }
+        }
+
+        playMusic(value.resource);
+      },
     },
   } );
 } );

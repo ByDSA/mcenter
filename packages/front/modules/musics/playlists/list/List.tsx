@@ -1,4 +1,4 @@
-import type { PlaylistEntity } from "../Playlist";
+import type { PlaylistEntity } from "../Playlist/types";
 import { Fragment } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
 import { renderFetchedData } from "#modules/fetching";

@@ -35,6 +35,7 @@ export class MusicsSlugController {
     @Req() req: Request,
     @User() user: UserPayload | null,
     @Query("token") token: string | undefined,
+    @Query("skip-history") shouldNotAddToHistory: string | undefined,
   ) {
     mongoDbId.or(z.undefined()).parse(token);
     const format = this.responseFormatter.getResponseFormatByRequest(req);
@@ -55,7 +56,7 @@ export class MusicsSlugController {
     if (format === ResponseFormat.RAW) {
       const userId = user?.id ?? token;
 
-      if (userId) {
+      if (userId && !shouldNotAddToHistory) {
         await this.historyRepo.createNewEntryNowIfShouldFor( {
           musicId: got.id,
           userId,

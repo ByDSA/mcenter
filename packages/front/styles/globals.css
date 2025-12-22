@@ -2,6 +2,7 @@
 @import "./globals-resolution.css";
 @import "./globals-ui-kit.css";
 @import "./globals-animation.css";
+@import "./scrollbar.css";
 
 :root {
   --color-link: var(--color-blue-300);

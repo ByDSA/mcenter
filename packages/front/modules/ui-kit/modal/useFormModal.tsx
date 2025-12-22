@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { useModal } from "#modules/ui-kit/modal/ModalContext";
 
 type UseFormModalProps<R> = {
   // Función que hace la llamada a la API (debe devolver los datos)
@@ -10,8 +9,7 @@ type UseFormModalProps<R> = {
   onSuccess?: (data: R)=> void;
 };
 
-export const useFormModal = <R, >( { onSubmit, canSubmit, onSuccess }: UseFormModalProps<R>) => {
-  const modal = useModal();
+export const useFormInModal = <R, >( { onSubmit, canSubmit, onSuccess }: UseFormModalProps<R>) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submit = useCallback(async () => {
     if (canSubmit && !canSubmit())
@@ -26,18 +24,16 @@ export const useFormModal = <R, >( { onSubmit, canSubmit, onSuccess }: UseFormMo
       const result = await onSubmit();
 
       onSuccess?.(result);
-      modal.closeModal();
     } catch (error) {
       console.error("Error en modal form:", error);
     } finally {
       setIsSubmitting(false);
     }
-  }, [onSubmit, canSubmit, onSuccess, modal, isSubmitting]);
+  }, [onSubmit, canSubmit, onSuccess, isSubmitting]);
 
   return {
     submit,
     isSubmitting,
     canSubmit: (!canSubmit || canSubmit()) && !isSubmitting,
-    ...modal,
   };
 };

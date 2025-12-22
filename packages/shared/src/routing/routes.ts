@@ -257,6 +257,19 @@ token?: string;} ) => {
     },
     pickRandom: {
       path: MUSICS_RANDOM,
+      withParams: ( { q, token }: {
+        q: string;
+        token?: string;
+      } ) => {
+        const params = new URLSearchParams( {
+          q,
+        } );
+
+        if (token)
+          params.append("token", token);
+
+        return `${MUSICS_RANDOM}?${params.toString()}`;
+      },
     },
     admin: {
       fixInfo: {

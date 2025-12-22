@@ -1,0 +1,6 @@
+.imageCover {
+  background: var(--color-gray-800) !important;
+  .icon {
+    color: var(--color-gray-100) !important;
+  }
+}

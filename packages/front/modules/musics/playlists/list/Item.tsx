@@ -4,10 +4,10 @@ import { useContextMenuTrigger, ContextMenuItem } from "#modules/ui-kit/ContextM
 import { useArrayData } from "#modules/utils/array-data-context";
 import { useUser } from "#modules/core/auth/useUser";
 import { frontendUrl } from "#modules/requests";
-import { PlaylistEntity } from "../Playlist";
+import { PlaylistEntity } from "../Playlist/types";
 import { formatDurationHeader, playlistCopySlugUrl } from "../utils";
 import { SettingsButton } from "../SettingsButton";
-import { PlaylistCover } from "../PlaylistCover";
+import { MusicImageCover } from "../../MusicCover";
 import styles from "./Item.module.css";
 import { RenamePlaylistContextMenuItem } from "./renameMenuItem";
 import { DeletePlaylistContextMenuItem } from "./deleteItem";
@@ -37,10 +37,12 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
         playlistSlug: value.slug,
         userSlug,
       } ))}>
-      <PlaylistCover
+      <MusicImageCover
         className={styles.playlistCover}
-        alt={value.name}
-        coverUrl={value.coverUrl}
+        img={{
+          alt: value.name,
+          url: value.coverUrl,
+        }}
       />
 
       <div className={styles.playlistInfo}>

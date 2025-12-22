@@ -3,7 +3,7 @@ import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { Button } from "#modules/ui-kit/input/Button";
 import { useInputText } from "#modules/ui-kit/input/UseInputText";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { useFormModal } from "#modules/ui-kit/modal/useFormModal";
+import { useFormInModal } from "#modules/ui-kit/modal/useFormModal";
 import { MusicPlaylistsApi } from "./requests";
 
 type ButtonProps = {
@@ -34,7 +34,7 @@ const NewPlaylistForm = ( { onSuccess }: FormProps) => {
   const { element: inputVisibility, value: visibilityValue } = useInputText( {
     nullChecked: false,
   } ); // TODO
-  const formModal = useFormModal( {
+  const formModal = useFormInModal( {
     canSubmit: ()=> nameValue.trim().length > 0,
     onSuccess,
     onSubmit: async () => {

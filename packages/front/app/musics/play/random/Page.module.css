@@ -1,0 +1,13 @@
+.button {
+  padding: 1rem;
+  font-size: 1.5rem;
+
+  > * > *:first-child {
+    font-size: 0.7rem;
+    margin-bottom: 0.25em;
+  }
+
+  p {
+    margin: 0;
+  }
+}

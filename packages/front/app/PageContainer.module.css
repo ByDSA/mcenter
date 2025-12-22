@@ -22,7 +22,7 @@
 .container > main h3 {
   margin-top: 1rem;
   margin-bottom: 1rem;
-  line-height: 1;
+  line-height: 1.1;
   text-align: center;
   white-space: nowrap;
 }

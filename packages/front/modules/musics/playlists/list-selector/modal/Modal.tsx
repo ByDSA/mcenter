@@ -6,7 +6,7 @@ import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { Button } from "#modules/ui-kit/input/Button";
 import { classes } from "#modules/utils/styles";
 import { useNewPlaylistButton } from "../../NewPlaylistButton";
-import { PlaylistEntity } from "../../Playlist";
+import { PlaylistEntity } from "../../Playlist/types";
 import { useMusicPlaylistsForUser } from "../../request-all";
 import styles from "./Modal.module.css";
 

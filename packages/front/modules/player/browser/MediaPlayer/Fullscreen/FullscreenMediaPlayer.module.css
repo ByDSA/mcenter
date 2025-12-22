@@ -1,0 +1,62 @@
+html:has(.container:not(.closed)) {
+  overflow: hidden;
+}
+
+.container {
+  --z-index: 210;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(
+    var(--color-gray-900),
+    var(--color-gray-975) 61.8%
+  );
+  color: var(--color-gray-400);
+  z-index: var(--z-index);
+
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
+  padding: 1.5rem;
+
+  transition: transform 0.2s;
+
+  @starting-style {
+    transform: translateY(100%);
+  }
+
+  &.closed {
+    transform: translateY(100%);
+  }
+}
+
+.closeButton {
+  --padding: 0rem;
+}
+
+.header,
+.footer {
+  --button-size: 2rem;
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.header {
+  margin-bottom: 1rem;
+  justify-content: flex-end;
+}
+
+.footer {
+  margin-top: 1rem;
+  justify-content: space-between;
+}
+
+.playQueue {
+  height: 100%;
+  overflow-y: auto;
+}

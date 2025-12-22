@@ -28,7 +28,7 @@ export function HistoryList() {
         {
           data!.map(
             (entry, i, array) => {
-              return <Fragment key={`${entry.resourceId} ${entry.date.timestamp}`}>
+              return <Fragment key={`${entry.id}`}>
                 {dayTitle( {
                   currentDateTimestamp: entry.date.timestamp,
                   previousDateTimestamp: i > 0 ? array[i - 1].date.timestamp : undefined,

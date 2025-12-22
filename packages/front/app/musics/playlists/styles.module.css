@@ -1,5 +1,7 @@
 .newPlaylistSection {
   display: flex;
+  flex-flow: row nowrap;
+  gap: 2rem;
   justify-content: right;
   margin: 0.5rem 0;
 }

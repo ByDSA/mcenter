@@ -1,0 +1,12 @@
+.playButton {
+  --factor: 1.5;
+  --size: calc(var(--button-size) * var(--factor));
+  width: var(--size) !important;
+  height: var(--size) !important;
+  background-color: var(--color-gray-50);
+
+  svg {
+    width: calc(var(--size) * 24 / 32) !important;
+    height: calc(var(--size) * 24 / 32) !important;
+  }
+}

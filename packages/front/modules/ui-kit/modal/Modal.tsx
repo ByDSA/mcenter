@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { classes } from "#modules/utils/styles";
 import styles from "./Modal.module.css";
 
 interface ModalProps {
@@ -10,6 +11,8 @@ interface ModalProps {
   children: ReactNode;
   closeOnClickOutside?: boolean;
   showCloseButton?: boolean;
+  showBox?: boolean;
+  showHeader?: boolean;
   addBackdrop?: boolean;
   className?: string;
   title?: string;
@@ -21,6 +24,8 @@ export function Modal( { isOpen,
   title,
   closeOnClickOutside = true,
   showCloseButton = true,
+  showBox = true,
+  showHeader = true,
   addBackdrop = false,
   className = "" }: ModalProps) {
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -89,28 +94,35 @@ export function Modal( { isOpen,
       className={`${styles.backdrop} ${addBackdrop ? styles.withBackground : ""}`}
       onClick={handleBackdropClick}
     >
+
       <div ref={modalRef}
-        className={`${styles.modal} ${className}`}
+        className={classes(showBox && styles.modal, showBox && className)}
       >
-        <header>
-          {
-            title && <span className={styles.title}>{title}</span>
-          }
-          {showCloseButton && (
-            <button
-              className={styles.closeButton}
-              onClick={()=>onClose()}
-              title="Cerrar"
-              aria-label="Cerrar"
-            >
+        {
+          showBox && showHeader && <header>
+            {
+              title && <span className={styles.title}>{title}</span>
+            }
+            {showCloseButton && (
+              <button
+                className={styles.closeButton}
+                onClick={()=>onClose()}
+                title="Cerrar"
+                aria-label="Cerrar"
+              >
             ×
-            </button>
-          )}
-        </header>
-        <section className={styles.content}>
-          {children}
-        </section>
+              </button>
+            )}
+          </header>}
+
+        {showBox
+          ? <section className={styles.content}>
+            {children}
+          </section>
+          : children
+        }
       </div>
+
     </div>
   );
 

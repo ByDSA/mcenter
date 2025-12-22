@@ -1,0 +1,15 @@
+.modal {
+  width: 50rem;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  padding: 2rem;
+}
+
+:global(body):has(.container) > div {
+  margin-bottom: 0;
+}

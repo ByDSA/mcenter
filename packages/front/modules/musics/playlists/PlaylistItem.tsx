@@ -1,9 +1,10 @@
-import type { PlaylistEntity } from "./Playlist";
+import type { PlaylistEntity } from "./Playlist/types";
 import React, { ReactNode } from "react";
 import { SetState } from "#modules/utils/resources/useCrud";
 import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { MusicEntryElement } from "../musics/MusicEntry/MusicEntry";
 import { MusicEntity } from "../models";
 import { genMusicEntryContextMenuContent } from "../musics/MusicEntry/ContextMenu";
@@ -96,11 +97,41 @@ export const MusicPlaylistItem = ( { playlist,
     />
     }
   </>;
+  const playingThisItemStatus = useBrowserPlayer(s=> {
+    const item = playlist.list[index];
+
+    if (item.id === s.currentResource?.playlist?.itemId)
+      return s.status;
+    else
+      return "stopped";
+  } );
 
   return <MusicEntryElement
     data={music}
+    play={{
+      status: playingThisItemStatus,
+      onClick: ()=>{
+        const player = useBrowserPlayer.getState();
+
+        if (playingThisItemStatus === "playing") {
+          player.pause();
+
+          return;
+        } else if (playingThisItemStatus === "paused") {
+          player.resume();
+
+          return;
+        }
+
+        player.playPlaylistItem( {
+          playlist,
+          index,
+          ownerSlug: playlist.ownerUser?.slug,
+        } );
+      },
+    }}
     setData={setData}
-    index={index + 1}
+    index={index}
     drag={drag}
     contextMenu={{
       customContent: contextMenuContent,

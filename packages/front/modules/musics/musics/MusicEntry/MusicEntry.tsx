@@ -7,14 +7,13 @@ import { useUser } from "#modules/core/auth/useUser";
 import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
 import { DurationView, WeightView } from "#modules/history";
 import { classes } from "#modules/utils/styles";
-import { ResourceEntry, ResourceEntryProps } from "#modules/resources/ResourceEntry";
-import listEntryStyles from "#modules/resources/ListEntry.module.css";
+import { ResourceEntry, ResourceEntryProps, ResourceSubtitle } from "#modules/resources/ResourceEntry";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { BodyProps } from "../EditMusic/EditMusic";
 import styles from "./MusicEntry.module.css";
 import { genMusicEntryContextMenuContent } from "./ContextMenu";
 
-type Props = BodyProps & Pick<ResourceEntryProps, "drag"> & {
+type Props = BodyProps & Pick<ResourceEntryProps, "drag" | "play"> & {
   index?: number;
   contextMenu?: {
     customContent: ReactNode;
@@ -55,11 +54,7 @@ export function MusicEntryElement(
         } ),
       } ),
     }}
-    play={{
-      isPlaying: false,
-      // eslint-disable-next-line no-empty-function
-      onClick: ()=>{},
-    }}
+    play={props.play}
     drag={props.drag}
   />;
 }
@@ -85,13 +80,16 @@ type MusicSubtitleProps = {
 };
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicSubtitle = memo(( { music }: MusicSubtitleProps) => {
-  return <>
-    <span className={classes(styles.artist)}>{music.game ?? music.artist}</span>
-    {music.album
-      && <>
-        <span className={classes(listEntryStyles.separator, styles.albumShowHide)}>•</span>
-        <span className={classes("ellipsis", styles.albumShowHide)}>{music.album}</span>
-      </>
+  return <ResourceSubtitle items={[{
+    text: music.game ?? music.artist,
+    className: styles.artist,
+  }, music.album
+    ? {
+      text: music.album,
+      className: classes("ellipsis", styles.albumShowHide),
+      separatorClassName: styles.albumShowHide,
     }
-  </>;
+    : undefined,
+
+  ]} />;
 } );

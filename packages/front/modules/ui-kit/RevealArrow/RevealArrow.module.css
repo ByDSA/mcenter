@@ -1,0 +1,55 @@
+.container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-gray-100);
+}
+
+.container.left {
+  justify-content: flex-end;
+}
+
+.container.right {
+  justify-content: flex-start;
+}
+
+.iconWrapper {
+  position: absolute;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.contentWrapper {
+  position: absolute;
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+}
+
+.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.expandedMode {
+  pointer-events: none;
+}
+
+.expandedMode .iconWrapper {
+  pointer-events: none;
+}
+
+.expandedMode .contentWrapper {
+  pointer-events: auto;
+}
