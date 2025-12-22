@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.18.0](https://github.com/ByDSA/mcenter/compare/v4.17.0...v4.18.0) (2025-12-22)
+
+
+### Features
+
+* **front:** music media player ([35d1952](https://github.com/ByDSA/mcenter/commit/35d1952ae53117953048d2950556015b3614bc39))
+
+
+### Bug Fixes
+
+* **back:** only send patch event for list ([d314bc2](https://github.com/ByDSA/mcenter/commit/d314bc22a3d3c0e0314abc995102d60283756323))
+* delete playlist entry ([c3a31dd](https://github.com/ByDSA/mcenter/commit/c3a31dd819ba28bf1eb0f34ad354573c0f865343))
+* drag behaviour ([9d67025](https://github.com/ByDSA/mcenter/commit/9d6702561aa81cf2de09b6dfd8c4c656a07a5c49))
+* **front:** use resource entry for playlists items. dragging at left ([5e5d5dd](https://github.com/ByDSA/mcenter/commit/5e5d5dd10ffb968344322071c2d5ea423f5f45f7))
+* use relative days ([3eaa201](https://github.com/ByDSA/mcenter/commit/3eaa2019246655e45f3657f1028a0ed5be81ff25))
+
 ## [4.17.0](https://github.com/ByDSA/mcenter/compare/v4.11.0...v4.17.0) (2025-12-13)
 
 
