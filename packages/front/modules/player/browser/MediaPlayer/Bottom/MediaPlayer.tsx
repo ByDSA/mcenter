@@ -1,12 +1,10 @@
 "use client";
 
-import { createPortal } from "react-dom";
 import { useState, useEffect, useMemo } from "react";
 import { KeyboardArrowUp } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { RevealArrow } from "#modules/ui-kit/RevealArrow/RevealArrow";
 import { PlayerResource, useBrowserPlayer } from "../BrowserPlayerContext";
-import { AudioRef } from "../AudioTag";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, ControlButton } from "../OtherButtons";
 import { ProgressBar } from "../ProgressBar";
@@ -16,22 +14,33 @@ import { useAudioRef } from "../AudioContext";
 import styles from "./MediaPlayer.module.css";
 import { TrackInfo } from "./TrackInfo";
 import { PlayQueueButtonView } from "./PlayQueue/PlayQueueButtonView";
-import { PlayQueueWindow } from "./PlayQueue/PlayQueueWindow";
+import { PlayQueueWindowContent } from "./PlayQueue/PlayQueueWindow";
+import { useWindowContext } from "./PlayQueue/WindowProvider";
 
 const SMALL_BREAKPOINT = 600;
 
 export function BottomMediaPlayer() {
   const currentResource = useBrowserPlayer(s=>s.currentResource);
-  const [playQueueMountNode, setPlayQueueMountNode] = useState<HTMLDivElement | null>(null);
-  const [fullscreenMountNode, setFullscreenMountNode] = useState<HTMLDivElement | null>(null);
+  const { mountNode: windowMountNode, open, close, isOpen, isFullscreen } = useWindowContext();
   const width = useWindowWidth();
   const audioRef = useAudioRef();
   const extraControls = useMemo(()=><div className={styles.extraControls}>
     <VolumeController />
     <ShuffleButton />
     <RepeatButton />
-    <QueueMusicButton targetNode={playQueueMountNode} />
-  </div>, [audioRef, playQueueMountNode]);
+    <QueueMusicButton/>
+  </div>, [audioRef]);
+
+  useEffect(()=> {
+    if (isOpen) {
+      if (
+        (isFullscreen && width >= SMALL_BREAKPOINT) || (!isFullscreen && width < SMALL_BREAKPOINT)
+      ) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        close();
+      }
+    }
+  }, [width, isOpen, isFullscreen]);
 
   useMediaSessionHandlers(currentResource);
 
@@ -40,8 +49,7 @@ export function BottomMediaPlayer() {
 
   return (
     <>
-      <div ref={setFullscreenMountNode} />
-      <div ref={setPlayQueueMountNode} />
+      {windowMountNode}
       <div
         className={styles.playerContainer}>
         {(width >= SMALL_BREAKPOINT
@@ -58,12 +66,13 @@ export function BottomMediaPlayer() {
           className={styles.playerContent}
           onClick={
             width < SMALL_BREAKPOINT
-              ? ((e)=> {
+              ? (async (e)=> {
                 e.stopPropagation();
 
-                const { setIsOpenFullscreen } = useBrowserPlayer.getState();
-
-                setIsOpenFullscreen(true);
+                await open( {
+                  fullscreen: true,
+                  content: <FullscreenMediaPlayer />,
+                } );
               } )
               : undefined}
         >
@@ -78,9 +87,7 @@ export function BottomMediaPlayer() {
 
             <NextButton className={styles.nextButton} />
             {
-              width < SMALL_BREAKPOINT && <FullscreenButton
-                audioRef={audioRef}
-                targetNode={fullscreenMountNode}/>
+              width < SMALL_BREAKPOINT && <FullscreenButton />
             }
           </div>
 
@@ -101,79 +108,43 @@ export function BottomMediaPlayer() {
   );
 }
 
-function useDelayedRender(active: boolean, delay: number) {
-  const [shouldRender, setShouldRender] = useState(active);
-
-  useEffect(() => {
-    if (active)
-      setShouldRender(true);
-    else {
-      const timeout = setTimeout(() => setShouldRender(false), delay);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [active, delay]);
-
-  return shouldRender;
-}
-
-type QueueMusicButtonProps = {
-targetNode: HTMLDivElement | null;
-};
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const QueueMusicButton = ( { targetNode }: QueueMusicButtonProps) => {
-  const [isOpen, setIsQueueOpen] = useState(false);
-  const shouldRender = useDelayedRender(isOpen, 200);
+const QueueMusicButton = () => {
+  const { open, isOpen, close } = useWindowContext();
 
   return <>
     <PlayQueueButtonView
       active={isOpen}
-      onClick={() => setIsQueueOpen((o) => !o)}
+      onClick={async () => {
+        if (isOpen)
+          await close();
+        else {
+          await open( {
+            content: <PlayQueueWindowContent />,
+          } );
+        }
+      }}
     />
-    {targetNode && shouldRender && createPortal(
-      <PlayQueueWindow
-        closeQueue={() => setIsQueueOpen(false)}
-        state={isOpen ? "open" : "closed"}
-      />,
-      targetNode,
-    )}
   </>;
 };
-
-type FullscreenButtonProps = QueueMusicButtonProps & {
-  audioRef: AudioRef;
-};
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const FullscreenButton = ( { audioRef, targetNode }: FullscreenButtonProps) => {
-  const isOpen = useBrowserPlayer(s=>s.isOpenFullscreen);
-  const setIsOpen = useBrowserPlayer(s=>s.setIsOpenFullscreen);
-  const shouldRender = useDelayedRender(isOpen, 200);
-  const width = useWindowWidth();
-
-  useEffect(()=> {
-    if (width >= SMALL_BREAKPOINT && isOpen)
-      setIsOpen(false);
-  }, [width]);
+const FullscreenButton = () => {
+  const { open } = useWindowContext();
 
   return <>
     <ControlButton
       className={classes(styles.fullscreenButton)}
       title="Reproductor completo"
-      onClick={(e) => {
+      onClick={async (e) => {
         e.stopPropagation();
-        setIsOpen(true);
+        await open( {
+          fullscreen: true,
+          content: <FullscreenMediaPlayer />,
+        } );
       }}
     >
       <KeyboardArrowUp />
     </ControlButton>
-    {targetNode && shouldRender && createPortal(
-      <FullscreenMediaPlayer
-        audioRef={audioRef}
-        isOpen={isOpen}
-        close={()=>setIsOpen(false)}
-      />,
-      targetNode,
-    )}
   </>;
 };
 

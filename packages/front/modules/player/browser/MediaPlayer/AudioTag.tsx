@@ -1,6 +1,6 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { showError } from "$shared/utils/errors/showError";
-import { RefObject, useEffect, useMemo } from "react";
+import { RefObject, useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { backendUrl } from "#modules/requests";
 import { useBrowserPlayer, RepeatMode } from "./BrowserPlayerContext";
@@ -84,6 +84,8 @@ export const AudioTag = () => {
     return () => audio.removeEventListener("timeupdate", update);
   }, [audioRef.current]);
 
+  useAudioContext(audioRef);
+
   return <audio
     ref={audioRef}
     src={urlSkipHistory}
@@ -121,3 +123,85 @@ export const AudioTag = () => {
     }}
   />;
 };
+
+function useAudioContext(audioRef: AudioRef) {
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const compressorRef = useRef<DynamicsCompressorNode | null>(null);
+  const limiterRef = useRef<DynamicsCompressorNode | null>(null);
+  const compressionValue = useBrowserPlayer(s=>s.compressionValue);
+
+  useEffect(() => {
+    if (!compressorRef.current || !limiterRef.current || !audioContextRef.current)
+      return;
+
+    const ctx = audioContextRef.current;
+    const t = ctx.currentTime;
+    // Threshold: de 0 (nada) a -40 (máximo)
+    const compThreshold = 0 + (compressionValue * -40);
+    // Ratio: de 1 (nada) a 15 (máximo)
+    const compRatio = 1 + (compressionValue * 14);
+
+    compressorRef.current.threshold.setValueAtTime(compThreshold, t);
+    compressorRef.current.ratio.setValueAtTime(compRatio, t);
+
+    // Threshold: de 0 (nada) a -20 (máximo)
+    const limThreshold = 0 + (compressionValue * -20);
+    // Ratio: de 1 (nada) a 20 (máximo)
+    const limRatio = 1 + (compressionValue * 19);
+
+    limiterRef.current.threshold.setValueAtTime(limThreshold, t);
+    limiterRef.current.ratio.setValueAtTime(limRatio, t);
+  }, [compressionValue]);
+
+  useEffect(() => {
+    if (audioContextRef.current)
+      return;
+
+    const initAudioPipeline = () => {
+      if (!audioRef.current || typeof window === "undefined")
+        return;
+
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioContextClass();
+
+      audioContextRef.current = ctx;
+
+      const source = ctx.createMediaElementSource(audioRef.current);
+      // Crear Nodos
+      const compressor = ctx.createDynamicsCompressor();
+      const limiter = ctx.createDynamicsCompressor();
+
+      // Configuración fija (tiempos de reacción)
+      compressor.attack.setValueAtTime(0.003, ctx.currentTime);
+      compressor.release.setValueAtTime(0.25, ctx.currentTime);
+
+      limiter.knee.setValueAtTime(0, ctx.currentTime);
+      limiter.attack.setValueAtTime(0.001, ctx.currentTime);
+      limiter.release.setValueAtTime(0.1, ctx.currentTime);
+
+      // Referencias para poder actualizarlos luego
+      compressorRef.current = compressor;
+      limiterRef.current = limiter;
+
+      // CONEXIÓN CORRECTA EN SERIE:
+      // Source -> Compressor -> Limiter -> Destination
+      source.connect(compressor);
+      compressor.connect(limiter);
+      limiter.connect(ctx.destination);
+    };
+    const resumeContext = async () => {
+      if (!audioContextRef.current)
+        initAudioPipeline();
+
+      if (audioContextRef.current?.state === "suspended")
+        await audioContextRef.current.resume();
+    };
+
+    window.addEventListener("click", resumeContext, {
+      once: true,
+    } );
+
+    return () => window.removeEventListener("click", resumeContext);
+  }, []);
+}

@@ -8,6 +8,7 @@ import { useBrowserPlayer } from "./BrowserPlayerContext";
 import styles from "./MediaPlayerPageLayout.module.css";
 import { AudioTag } from "./AudioTag";
 import { AudioProvider } from "./AudioContext";
+import { WindowProvider } from "./Bottom/PlayQueue/WindowProvider";
 
 type Props = {
   children: ReactNode;
@@ -31,6 +32,8 @@ function MediaPlayerPageLayoutContent( { children }: Props) {
 const MediaPlayer = () => {
   return <AudioProvider>
     <AudioTag />
-    <BottomMediaPlayer />
+    <WindowProvider>
+      <BottomMediaPlayer />
+    </WindowProvider>
   </AudioProvider>;
 };

@@ -95,7 +95,7 @@ interface PlayerState {
   currentTime: number; // seconds
   duration?: number; // seconds
   query?: string;
-  isOpenFullscreen: boolean;
+  compressionValue: number; // 0 = nada, 1 = máximo
 
   // Acciones
   play: (props: PlayProps)=> void;
@@ -121,10 +121,9 @@ interface PlayerState {
   hasPrev: ()=> boolean;
   hasNext: ()=> boolean;
   setVolume: (newValue: number)=> void;
-  setIsOpenFullscreen: (newValue: boolean)=> void;
+  setCompressionValue: (newValue: number)=> void;
 }
 
-// --- Store ---
 export const useBrowserPlayer = create<PlayerState>()(
   persist(
     (set, get) => ( {
@@ -136,11 +135,12 @@ export const useBrowserPlayer = create<PlayerState>()(
       isShuffle: false,
       volume: 1,
       currentTime: 0,
-      duration: 0,
+      duration: undefined,
       query: undefined,
       isOpenFullscreen: false,
-      setIsOpenFullscreen: (newValue) => set( {
-        isOpenFullscreen: newValue,
+      compressionValue: 0,
+      setCompressionValue: (newValue) => set( {
+        compressionValue: newValue,
       } ),
       setDuration: (newValue) => set( {
         duration: newValue,

@@ -1,39 +1,14 @@
-import { KeyboardArrowDown } from "@mui/icons-material";
-import { classes } from "#modules/utils/styles";
-import buttonStyles from "../../OtherButtons.module.css";
 import styles from "./PlayQueueWindow.module.css";
 import { PlayQueue } from "./PlayQueue";
-
-type Props = {
-  closeQueue: ()=> void;
-  className?: string;
-  state: "closed" | "open";
-};
+import { WindowTitle } from "./WindowTitle";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const PlayQueueWindow = ( { closeQueue, className, state }: Props) => {
+export const PlayQueueWindowContent = () => {
   return (
     <>
-      <div
-        className={classes(styles.backdrop, state === "closed" && styles.closed)}
-        onClick={closeQueue}
-      />
-      <div className={classes(styles.container, state === "closed" && styles.closed, className)}>
-        <main>
-          <h2 className={styles.title}>Lista de reproducción</h2>
+      <WindowTitle>Lista de reproducción</WindowTitle>
 
-          <PlayQueue className={styles.queue} />
-        </main>
-
-        <footer>
-          <button
-            onClick={closeQueue}
-            className={classes(buttonStyles.controlButton, styles.closeButton)}
-          >
-            <KeyboardArrowDown />
-          </button>
-        </footer>
-      </div>
+      <PlayQueue className={styles.queue} />
     </>
   );
 };
