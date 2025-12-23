@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.19.0](https://github.com/ByDSA/mcenter/compare/v4.18.0...v4.19.0) (2025-12-23)
+
+
+### Features
+
+* add compression effect ([019ea4b](https://github.com/ByDSA/mcenter/commit/019ea4b2feecf7a7a7a5a55292f9f5f04a35160e))
+* **front:** add mediaSession support ([f88b9ed](https://github.com/ByDSA/mcenter/commit/f88b9ede1a5eab72918507eb673fc097d34ce12b))
+
+
+### Bug Fixes
+
+* **front:** ensure playQuery is called on modal close ([d4cf860](https://github.com/ByDSA/mcenter/commit/d4cf860d92b6d2f86786548c69eec483075aabbb))
+* **front:** styles adjusts ([4dd645a](https://github.com/ByDSA/mcenter/commit/4dd645ad3cf9988d070f26e9eb6345fa2cfe7382))
+
 ## [4.18.0](https://github.com/ByDSA/mcenter/compare/v4.17.0...v4.18.0) (2025-12-22)
 
 
