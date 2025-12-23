@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.19.1](https://github.com/ByDSA/mcenter/compare/v4.19.0...v4.19.1) (2025-12-23)
+
+
+### Bug Fixes
+
+* **front:** effects button and window ([45b40ce](https://github.com/ByDSA/mcenter/commit/45b40ce36e1849af572f7bdf98cfdadfee846aa5))
+
 ## [4.19.0](https://github.com/ByDSA/mcenter/compare/v4.18.0...v4.19.0) (2025-12-23)
 
 
