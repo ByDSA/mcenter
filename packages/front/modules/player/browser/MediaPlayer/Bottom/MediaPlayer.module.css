@@ -155,3 +155,15 @@
     position: relative;
   }
 }
+
+.effectsWindow {
+  .wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+    > * {
+      max-width: 30rem;
+    }
+  }
+}

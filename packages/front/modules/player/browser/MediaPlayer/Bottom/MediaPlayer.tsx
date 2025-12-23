@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { KeyboardArrowUp } from "@mui/icons-material";
+import { Equalizer, KeyboardArrowUp } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { RevealArrow } from "#modules/ui-kit/RevealArrow/RevealArrow";
 import { PlayerResource, useBrowserPlayer } from "../BrowserPlayerContext";
@@ -11,6 +11,7 @@ import { ProgressBar } from "../ProgressBar";
 import { ProgressBarOnlyView } from "../ProgressBarOnlyView";
 import { FullscreenMediaPlayer } from "../Fullscreen/FullscreenMediaPlayer";
 import { useAudioRef } from "../AudioContext";
+import { Effects } from "../Fullscreen/Effects";
 import styles from "./MediaPlayer.module.css";
 import { TrackInfo } from "./TrackInfo";
 import { PlayQueueButtonView } from "./PlayQueue/PlayQueueButtonView";
@@ -21,7 +22,8 @@ const SMALL_BREAKPOINT = 600;
 
 export function BottomMediaPlayer() {
   const currentResource = useBrowserPlayer(s=>s.currentResource);
-  const { mountNode: windowMountNode, open, close, isOpen, isFullscreen } = useWindowContext();
+  const { mountNode: windowMountNode, open, close, isOpen,
+    isFullscreen, currentWindowName } = useWindowContext();
   const width = useWindowWidth();
   const audioRef = useAudioRef();
   const extraControls = useMemo(()=><div className={styles.extraControls}>
@@ -29,7 +31,22 @@ export function BottomMediaPlayer() {
     <ShuffleButton />
     <RepeatButton />
     <QueueMusicButton/>
-  </div>, [audioRef]);
+    <ControlButton onClick={async (e)=> {
+      e.stopPropagation();
+
+      if (isOpen && currentWindowName === "effects")
+        await close();
+      else {
+        await open( {
+          name: "effects",
+          className: styles.effectsWindow,
+          content: <div className={styles.wrapper}><Effects /> </div>,
+        } );
+      }
+    }}>
+      <Equalizer />
+    </ControlButton>
+  </div>, [audioRef, open, close]);
 
   useEffect(()=> {
     if (isOpen) {
@@ -93,7 +110,7 @@ export function BottomMediaPlayer() {
 
           {(width < SMALL_BREAKPOINT
             ? null
-            : width < 800
+            : width < 850
             && <div className={styles.revealArrowWrapper}>
               <RevealArrow>
                 <div className={styles.revealArrowInside}>
@@ -110,16 +127,17 @@ export function BottomMediaPlayer() {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const QueueMusicButton = () => {
-  const { open, isOpen, close } = useWindowContext();
+  const { open, isOpen, close, currentWindowName } = useWindowContext();
 
   return <>
     <PlayQueueButtonView
       active={isOpen}
       onClick={async () => {
-        if (isOpen)
+        if (isOpen && currentWindowName === "queue")
           await close();
         else {
           await open( {
+            name: "queue",
             content: <PlayQueueWindowContent />,
           } );
         }

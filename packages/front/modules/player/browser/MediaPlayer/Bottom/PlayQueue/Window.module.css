@@ -57,6 +57,6 @@
   }
 }
 
-.closed {
+:not(.backdrop).closed {
   transform: translateY(100%);
 }

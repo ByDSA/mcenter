@@ -11,10 +11,12 @@ type WindowContextType = {
     content: ReactNode;
     className?: string;
     fullscreen?: boolean;
+    name?: string;
   } )=> Promise<void>;
   close: ()=> Promise<void>;
   isOpen: boolean;
   isFullscreen: boolean;
+  currentWindowName?: string;
 };
 
 const WindowContext = createContext<WindowContextType | undefined>(undefined);
@@ -25,6 +27,9 @@ export const WindowProvider = ( { children }: { children: ReactNode } ) => {
   const [windowMountNode, setWindowMountNode] = useState<HTMLSpanElement | null>(null);
   const [config, setConfig] = useState<Parameters<WindowContextType["open"]>[0] | null>(null);
   const open: WindowContextType["open"] = async (props) => {
+    if (isOpen)
+      await close();
+
     setConfig(props);
     await setIsOpen(true);
   };
@@ -41,6 +46,7 @@ export const WindowProvider = ( { children }: { children: ReactNode } ) => {
     close,
     isOpen,
     isFullscreen: !!config?.fullscreen,
+    currentWindowName: config?.name,
   };
 
   return (
