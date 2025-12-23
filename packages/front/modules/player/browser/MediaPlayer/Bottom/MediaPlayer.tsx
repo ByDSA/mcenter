@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import { KeyboardArrowUp } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { RevealArrow } from "#modules/ui-kit/RevealArrow/RevealArrow";
-import { useBrowserPlayer } from "../BrowserPlayerContext";
+import { PlayerResource, useBrowserPlayer } from "../BrowserPlayerContext";
 import { AudioRef } from "../AudioTag";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, ControlButton } from "../OtherButtons";
@@ -32,6 +32,8 @@ export function BottomMediaPlayer() {
     <RepeatButton />
     <QueueMusicButton targetNode={playQueueMountNode} />
   </div>, [audioRef, playQueueMountNode]);
+
+  useMediaSessionHandlers(currentResource);
 
   if (!currentResource)
     return null;
@@ -190,4 +192,71 @@ function useWindowWidth() {
   }, []);
 
   return width;
+}
+
+function useMediaSessionHandlers(currentResource: PlayerResource | null) {
+  const audioRef = useAudioRef();
+
+  useEffect(() => {
+    if (!("mediaSession" in navigator) || !currentResource)
+      return;
+
+    const { next, prev, resume, pause, stop, hasPrev, hasNext } = useBrowserPlayer.getState();
+
+    navigator.mediaSession.metadata = new MediaMetadata( {
+      title: currentResource.ui.title,
+      artist: currentResource.ui.artist,
+      album: currentResource.ui.album,
+      artwork: currentResource.ui.coverImg
+        ? [{
+          src: currentResource.ui.coverImg,
+          sizes: "512x512",
+          type: "image/png",
+        }]
+        : undefined,
+    } );
+
+  type Action = [MediaSessionAction, ()=>(Promise<void> | void)];
+  const actionHandlers: Action[] = [
+    ["play", () => {
+      resume();
+      navigator.mediaSession.playbackState = "playing";
+    }],
+    ["pause", () => {
+      pause();
+      navigator.mediaSession.playbackState = "paused";
+    }],
+    ["stop", () => {
+      stop();
+      navigator.mediaSession.playbackState = "none";
+    }],
+    ...(hasPrev()
+      ? [["previoustrack", () => prev()] as Action]
+      : []),
+    ...(hasNext() ? [["nexttrack", () => next()] as Action] : []),
+    ["seekbackward", () => {
+      audioRef.current!.currentTime = Math.max(audioRef.current!.currentTime - 10, 0);
+    }],
+    ["seekforward", () => {
+      audioRef.current!.currentTime = Math.min(
+        audioRef.current!.currentTime + 10,
+        audioRef.current!.duration,
+      );
+    }],
+  ];
+
+  actionHandlers.forEach(([action, handler]) => {
+    try {
+      navigator.mediaSession.setActionHandler(action, handler);
+    } catch {
+      console.warn(`El handler ${action} no es soportado.`);
+    }
+  } );
+
+  return () => {
+    actionHandlers.forEach(([action]) => {
+      navigator.mediaSession.setActionHandler(action, null);
+    } );
+  };
+  }, [currentResource, audioRef]);
 }
