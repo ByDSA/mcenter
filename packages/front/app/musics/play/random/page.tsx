@@ -26,7 +26,8 @@ export default function PlayQueryPage() {
         else {
           await modal.openModal( {
             showBox: false,
-            onClose: ()=> {
+            onClose: async ()=> {
+              await playQuery(q!).catch(showError);
               router.push(redirectPage);
             },
             content: <>
