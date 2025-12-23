@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.sliderWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.slider {
+  flex: 1;
+  cursor: pointer;
+  accent-color: var(--color-blue);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.valueDisplay {
+  font-variant-numeric: tabular-nums; /* Evita que el texto salte al cambiar de número */
+  font-weight: 500;
+  text-align: right;
+  width: 1.5rem;
+}

@@ -1,0 +1,8 @@
+.container {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  height: 100%;
+  width: 100%;
+  color: var(--color-gray-25);
+}
