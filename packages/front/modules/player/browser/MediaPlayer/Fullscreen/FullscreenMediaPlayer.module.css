@@ -7,8 +7,8 @@ html:has(.container:not(.closed)) {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
   background: linear-gradient(
     var(--color-gray-900),
     var(--color-gray-975) 61.8%
@@ -56,7 +56,18 @@ html:has(.container:not(.closed)) {
   justify-content: space-between;
 }
 
-.playQueue {
+.playQueueWrapper {
   height: 100%;
-  overflow-y: auto;
+
+  .playQueue {
+    font-size: 0.9em;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .playQueueTitle {
+    margin-top: 0;
+    text-align: center;
+    color: var(--color-gray-25);
+  }
 }

@@ -66,7 +66,6 @@
   }
 
   .right {
-    font-size: 0.8rem;
     margin-right: 0.5rem;
 
     .small {
@@ -75,37 +74,18 @@
       flex-flow: column nowrap;
       justify-content: space-evenly;
 
-      svg {
-        height: 1rem;
-      }
-
-      &:has(> :nth-child(3):last-child) {
-        font-size: 0.8rem;
+      &:has(> :nth-child(1):last-child) {
+        font-size: 1em;
         svg {
-          height: 1rem;
+          height: 0.75em;
         }
       }
 
+      &:has(> :nth-child(3):last-child),
       &:has(> :nth-child(2):last-child) {
-        font-size: 0.8rem;
+        font-size: 0.8em;
         svg {
-          height: 0.8rem;
-        }
-      }
-      @media (width < 800px) {
-        &:has(> :nth-child(3):last-child) {
-          font-size: 0.8rem;
-          svg {
-            height: 0.8rem;
-          }
-        }
-      }
-      @media (width < 700px) {
-        &:has(> :nth-child(2):last-child) {
-          font-size: 0.8rem;
-          svg {
-            height: 0.8rem;
-          }
+          height: 0.6em;
         }
       }
     }
@@ -203,7 +183,7 @@
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: calc(1em / 16 * 14);
   display: flex;
   justify-content: start;
   width: 100%;

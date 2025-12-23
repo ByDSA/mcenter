@@ -33,13 +33,16 @@ export function FullscreenMediaPlayer( { audioRef, close, isOpen }: Props) {
   const content = useMemo(()=>{
     switch (view) {
       case AppView.Queue:
-        return <PlayQueue
-          className={styles.playQueue}
-          onClickPlay={(_, prevStatus)=> {
-            if (prevStatus === "stopped")
-              setView(AppView.Player);
-          }}
-        />;
+        return <main className={styles.playQueueWrapper}>
+          <h2 className={styles.playQueueTitle}>Lista de reproducción</h2>
+          <PlayQueue
+            className={styles.playQueue}
+            onClickPlay={(_, prevStatus)=> {
+              if (prevStatus === "stopped")
+                setView(AppView.Player);
+            }}
+          />
+        </main>;
       case AppView.Player:
       default:
         return <Player audioRef={audioRef}/>;

@@ -93,9 +93,6 @@
   z-index: 200;
 }
 
-.showOnSmall {
-  display: none;
-}
 @media (width < 600px) {
   .extraControls {
     display: none;
@@ -103,10 +100,6 @@
 
   .hideOnSmall {
     display: none;
-  }
-
-  .showOnSmall {
-    display: block;
   }
 
   .ellipsisOnSmall {

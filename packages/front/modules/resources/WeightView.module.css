@@ -1,0 +1,21 @@
+.txt,
+.invisibleTxt {
+  font-size: 0.85em;
+  position: absolute;
+  left: 0;
+  width: 3rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invisibleTxt {
+  width: 2.46rem;
+  visibility: hidden;
+  position: inherit;
+}
+
+.parent {
+  position: relative;
+  display: flex;
+  align-items: center;
+}

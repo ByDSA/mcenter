@@ -3,6 +3,8 @@ import { AccessTime, Balance, CalendarToday } from "@mui/icons-material";
 import { memo } from "react";
 import { formatDurationItem } from "#modules/musics/playlists/utils";
 import { formatDateHHmm } from "#modules/utils/dates";
+import { classes } from "#modules/utils/styles";
+import styles from "./WeightView.module.css";
 
 type DurationProps = {
   duration: number;
@@ -31,10 +33,25 @@ type WeightProps = {
   weight: number;
 };
 export const WeightView = memo(( { weight }: WeightProps) => {
+  const txt = formatWeight(weight);
+  let title = "Peso";
+  let change = txt.length >= 7;
+
+  if (change)
+    title += ": " + txt;
+
   return (
-    <span title="Peso">
+    <span title={title} >
       <Balance />
-      <span>{formatWeight(weight)}</span>
+      <span className={classes(change && styles.parent)}>
+        {
+          change
+         && <span className={styles.invisibleTxt}>
+           {txt}
+         </span>
+        }
+        <span className={classes(change && styles.txt)}>{txt}</span>
+      </span>
     </span>);
 } );
 

@@ -68,14 +68,18 @@ export function BottomMediaPlayer() {
           <TrackInfo />
 
           <div className={styles.controlsSection}>
-            <PrevButton audioRef={audioRef} className={styles.hideOnSmall} />
+            {
+              width >= SMALL_BREAKPOINT && <PrevButton audioRef={audioRef} />
+            }
 
             <PlayButton />
 
             <NextButton className={styles.nextButton} />
-            <FullscreenButton
-              audioRef={audioRef}
-              targetNode={fullscreenMountNode}/>
+            {
+              width < SMALL_BREAKPOINT && <FullscreenButton
+                audioRef={audioRef}
+                targetNode={fullscreenMountNode}/>
+            }
           </div>
 
           {(width < SMALL_BREAKPOINT
@@ -151,7 +155,7 @@ const FullscreenButton = ( { audioRef, targetNode }: FullscreenButtonProps) => {
 
   return <>
     <ControlButton
-      className={classes(styles.showOnSmall, styles.fullscreenButton)}
+      className={classes(styles.fullscreenButton)}
       title="Reproductor completo"
       onClick={(e) => {
         e.stopPropagation();
