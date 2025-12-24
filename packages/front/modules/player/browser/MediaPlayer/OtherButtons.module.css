@@ -24,12 +24,14 @@
     height: var(--button-size, 1em);
   }
 
-  &:hover:not(:disabled) {
-    background-color: var(--color-gray-800);
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: var(--color-gray-950);
+    }
   }
 
   &.inactive {
-    color: var(--color-gray-400);
+    color: var(--color-gray-700);
   }
 
   &.active {

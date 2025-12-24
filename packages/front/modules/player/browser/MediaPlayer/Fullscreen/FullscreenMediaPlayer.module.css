@@ -20,11 +20,32 @@
 .footer {
   margin-top: 1rem;
   justify-content: space-between;
+  --active-button-color: var(--color-blue-300);
 
   > aside {
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
+  }
+
+  .activeViewButton {
+    cursor: default !important;
+    color: var(--active-button-color) !important;
+    opacity: 1 !important;
+  }
+
+  *:has(> .activeViewButton) {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+
+    .underline {
+      position: absolute;
+      height: 0.25rem;
+      bottom: -0.25rem;
+      width: 100%;
+      background-color: var(--active-button-color);
+    }
   }
 }
 
@@ -40,24 +61,6 @@
   .playQueue {
     font-size: 0.9em;
   }
-}
-
-.activeViewButton {
-  cursor: default !important;
-}
-
-*:has(> .activeViewButton) {
-  position: relative;
-  display: flex;
-  flex-flow: column nowrap;
-}
-
-.underline {
-  position: absolute;
-  height: 0.25rem;
-  bottom: -0.25rem;
-  width: 100%;
-  background-color: var(--color-blue);
 }
 
 .title {

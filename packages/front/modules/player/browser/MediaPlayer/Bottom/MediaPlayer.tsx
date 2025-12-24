@@ -31,22 +31,24 @@ export function BottomMediaPlayer() {
     <ShuffleButton />
     <RepeatButton />
     <QueueMusicButton/>
-    <ControlButton onClick={async (e)=> {
-      e.stopPropagation();
+    <ControlButton
+      active={isOpen && currentWindowName === "effects"}
+      onClick={async (e)=> {
+        e.stopPropagation();
 
-      if (isOpen && currentWindowName === "effects")
-        await close();
-      else {
-        await open( {
-          name: "effects",
-          className: styles.effectsWindow,
-          content: <div className={styles.wrapper}><Effects /> </div>,
-        } );
-      }
-    }}>
+        if (isOpen && currentWindowName === "effects")
+          await close();
+        else {
+          await open( {
+            name: "effects",
+            className: styles.effectsWindow,
+            content: <div className={styles.wrapper}><Effects /> </div>,
+          } );
+        }
+      }}>
       <Equalizer />
     </ControlButton>
-  </div>, [audioRef, open, close]);
+  </div>, [audioRef, open, close, currentWindowName]);
 
   useEffect(()=> {
     if (isOpen) {
@@ -128,12 +130,13 @@ export function BottomMediaPlayer() {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const QueueMusicButton = () => {
   const { open, isOpen, close, currentWindowName } = useWindowContext();
+  const active = isOpen && currentWindowName === "queue";
 
   return <>
     <PlayQueueButtonView
-      active={isOpen}
+      active={active}
       onClick={async () => {
-        if (isOpen && currentWindowName === "queue")
+        if (active)
           await close();
         else {
           await open( {
