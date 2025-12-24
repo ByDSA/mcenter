@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.20.1](https://github.com/ByDSA/mcenter/compare/v4.20.0...v4.20.1) (2025-12-24)
+
+
+### Bug Fixes
+
+* compression 0 in init ([d3b4b15](https://github.com/ByDSA/mcenter/commit/d3b4b15e2c8ce3cfd651a58a77dede78259741bb))
+* fullscreen player queue ([7410401](https://github.com/ByDSA/mcenter/commit/7410401f70982fb32cbf5436e8bca0c4626b912e))
+* hasNext and auto-stop ([44a7e4a](https://github.com/ByDSA/mcenter/commit/44a7e4a48fad7e471c0b8a3eca9ab8bd97f83065))
+* retry load music on error ([9673216](https://github.com/ByDSA/mcenter/commit/967321611db6fadfc17bac7efdcb9d36c89f3976))
+
 ## [4.20.0](https://github.com/ByDSA/mcenter/compare/v4.19.1...v4.20.0) (2025-12-24)
 
 
