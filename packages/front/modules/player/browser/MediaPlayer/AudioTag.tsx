@@ -1,8 +1,9 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { showError } from "$shared/utils/errors/showError";
-import { RefObject, useEffect, useMemo, useRef } from "react";
+import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { backendUrl } from "#modules/requests";
+import { logger } from "#modules/core/logger";
 import { useBrowserPlayer, RepeatMode } from "./BrowserPlayerContext";
 import { playExoticAudio } from "./exotic-audio";
 import { useAudioRef } from "./AudioContext";
@@ -21,6 +22,8 @@ export const AudioTag = () => {
     hasNext: s.hasNext,
   } )));
   const audioRef = useAudioRef();
+  const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
 
   // Efecto para controlar el play/pause
   useEffect(() => {
@@ -38,9 +41,23 @@ export const AudioTag = () => {
 
           if (useBrowserPlayer.getState().status === "playing")
             await audio.play();
+        } else {
+          logger.error(e.name + ": " + e.message);
+
+          if (retryCount < MAX_RETRIES) {
+            setTimeout(() => {
+              audio.load(); // Recarga el recurso
+              audio.play()
+                .then(()=> setRetryCount(0))
+                .catch(showError);
+              setRetryCount(prev => prev + 1);
+            }, 1000);
+          }
+
           // Ignorar error de interrupción por carga (común en navegación rápida)
-        } else if (e.name !== "AbortError")
-          console.error(e);
+          if (e.name !== "AbortError")
+            console.error(e);
+        }
       } );
     } else
       audio.pause();
