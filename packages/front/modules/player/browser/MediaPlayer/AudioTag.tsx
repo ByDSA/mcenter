@@ -151,7 +151,7 @@ function useAudioContext(audioRef: AudioRef) {
 
     limiterRef.current.threshold.setValueAtTime(limThreshold, t);
     limiterRef.current.ratio.setValueAtTime(limRatio, t);
-  }, [compressionValue]);
+  }, [compressionValue, compressorRef.current, limiterRef.current, audioContextRef.current]);
 
   useEffect(() => {
     if (audioContextRef.current)
@@ -203,5 +203,5 @@ function useAudioContext(audioRef: AudioRef) {
     } );
 
     return () => window.removeEventListener("click", resumeContext);
-  }, []);
+  }, [audioRef.current, audioContextRef.current]);
 }
