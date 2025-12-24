@@ -38,7 +38,7 @@ export function FullscreenMediaPlayer( { onClose }: Props) {
   const content = useMemo(()=>{
     switch (view) {
       case AppView.Queue:
-        return <main className={styles.playQueueWrapper}>
+        return <section className={styles.playQueueWrapper}>
           <Title>Lista de reproducción</Title>
           <PlayQueue
             className={styles.playQueue}
@@ -47,7 +47,7 @@ export function FullscreenMediaPlayer( { onClose }: Props) {
                 setView(AppView.Player);
             }}
           />
-        </main>;
+        </section>;
       case AppView.Effects:
         return <Effects />;
       case AppView.Player:
@@ -70,7 +70,9 @@ export function FullscreenMediaPlayer( { onClose }: Props) {
         } ),
       } )} />}
     </header>
-    {content}
+    <main className={styles.main}>
+      {content}
+    </main>
     <footer className={styles.footer}>
       <aside>
         <article>

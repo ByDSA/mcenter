@@ -17,8 +17,8 @@ html:has(.container:not(.closed)) {
   z-index: var(--z-index);
 
   display: flex;
-  flex-flow: column nowrap;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: flex-start;
   padding: 1.5rem;
 
   transition: transform 0.2s;

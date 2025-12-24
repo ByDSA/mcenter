@@ -28,13 +28,17 @@
   }
 }
 
+.main {
+  overflow: hidden;
+  height: 100%;
+}
+
 .playQueueWrapper {
   height: 100%;
+  overflow-y: auto;
 
   .playQueue {
     font-size: 0.9em;
-    height: 100%;
-    overflow-y: auto;
   }
 }
 
