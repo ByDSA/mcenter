@@ -150,6 +150,10 @@ className?: string;
 export const NextButton = ( { className }: NextButtonProps) => {
   const next = useBrowserPlayer(s=>s.next);
   const hasNext = useBrowserPlayer(s=>s.hasNext);
+  // eslint-disable-next-line no-underscore-dangle
+  const _1 = useBrowserPlayer(s=>s.isShuffle);
+  // eslint-disable-next-line no-underscore-dangle
+  const _2 = useBrowserPlayer(s=>s.repeatMode);
 
   return <ControlButton
     className={classes(styles.prevNextButton, className)}

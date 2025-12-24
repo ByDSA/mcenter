@@ -122,6 +122,7 @@ interface PlayerState {
   hasNext: ()=> boolean;
   setVolume: (newValue: number)=> void;
   setCompressionValue: (newValue: number)=> void;
+  getPlayingType: ()=> "one" | "playlist" | "query";
 }
 
 export const useBrowserPlayer = create<PlayerState>()(
@@ -288,6 +289,17 @@ export const useBrowserPlayer = create<PlayerState>()(
       addToQueue: (resource) => set((state) => ( {
         queue: [...state.queue, resource],
       } )),
+      getPlayingType: () => {
+        const { currentResource, query } = get();
+
+        if (currentResource?.playlist.id)
+          return "playlist";
+
+        if (query)
+          return "query";
+
+        return "one";
+      },
 
       next: async () => {
         const { queueIndex, queue, repeatMode, isShuffle, currentResource, query } = get();
@@ -302,15 +314,7 @@ export const useBrowserPlayer = create<PlayerState>()(
 
           get().playQueueIndex(normalRandomIndex);
         };
-        const playingType = (() => {
-          if (currentResource?.playlist.id)
-            return "playlist";
-
-          if (query)
-            return "query";
-
-          return "one";
-        } )();
+        const playingType = get().getPlayingType();
 
         if ((!isShuffle && (playingType === "playlist" || playingType === "one"))
           || (playingType === "query" && queueIndex < queue.length - 1)) {
@@ -418,10 +422,10 @@ export const useBrowserPlayer = create<PlayerState>()(
         return queueIndex > 0 || repeatMode === RepeatMode.All;
       },
       hasNext: () => {
-        const { queueIndex, queue, repeatMode, isShuffle, query } = get();
+        const { queueIndex, queue, repeatMode, isShuffle, getPlayingType } = get();
 
         return queueIndex + 1 < queue.length || repeatMode === RepeatMode.All
-         || (isShuffle && queue.length > 1) || !!query;
+         || (isShuffle && queue.length > 1) || getPlayingType() === "query";
       },
     } ),
     {
