@@ -38,6 +38,7 @@ export function MusicEntryElement(
     subtitle={<MusicSubtitle
       music={music}
     />}
+    coverUrl={music.coverUrlSmall ?? music.coverUrl}
     favButton={ PlaylistFavButton( {
       favoritesPlaylistId,
       initialValue: music.isFav,

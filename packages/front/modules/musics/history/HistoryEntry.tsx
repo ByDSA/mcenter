@@ -74,5 +74,6 @@ export const MusicHistoryEntryElement = React.memo((
         playMusic(value.resource);
       },
     },
+    coverUrl: value.resource.coverUrlSmall ?? value.resource.coverUrl,
   } );
 } );

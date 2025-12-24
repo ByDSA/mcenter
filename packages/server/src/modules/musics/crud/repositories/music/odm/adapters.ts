@@ -2,10 +2,10 @@ import mongoose, { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { PaginatedResult } from "$shared/utils/http/responses";
-import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
-import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 import { Music, MusicEntity } from "../../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
+import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
+import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 
 export type AggregationResult = {
   data: FullDocOdm[];
@@ -38,6 +38,8 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
     fileInfos: docOdm.fileInfos?.map(MusicFileInfoOdm.toEntity),
     userInfo: docOdm.userInfo ? MusicsUsersOdm.toModel(docOdm.userInfo) : undefined,
     isFav: docOdm.isFav,
+    coverUrl: docOdm.coverUrl,
+    coverUrlSmall: docOdm.coverUrlSmall,
   } satisfies AllKeysOf<Entity>;
 
   return removeUndefinedDeep(entity);
@@ -60,6 +62,8 @@ export function modelToDocOdm(model: Model): DocOdm {
     createdAt: model.createdAt,
     releasedOn: model.releasedOn,
     updatedAt: model.updatedAt,
+    coverUrl: model.coverUrl,
+    coverUrlSmall: model.coverUrlSmall,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(docOdm);
@@ -89,6 +93,8 @@ export function partialToDocOdm(partial: Partial<Model>): Partial<DocOdm> {
     updatedAt: partial.updatedAt,
     addedAt: partial.addedAt,
     releasedOn: partial.releasedOn,
+    coverUrl: partial.coverUrl,
+    coverUrlSmall: partial.coverUrlSmall,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return ret;

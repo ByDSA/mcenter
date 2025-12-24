@@ -4,6 +4,7 @@
   aspect-ratio: 1 / 1;
   object-fit: contain;
   flex-shrink: 0;
+  position: relative;
 
   border-radius: 8px;
   overflow: hidden;

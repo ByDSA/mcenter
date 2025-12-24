@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import Image from "next/image";
 import { classes } from "#modules/utils/styles";
 import styles from "./ResourceCover.module.css";
 
@@ -20,9 +21,11 @@ export const ResourceImageCover = (props: ResourceImageCoverProps) => {
   return <div className={classes(styles.cover, props.className)}>
     {props.img?.url
       ? (
-        <img
+        <Image
           src={props.img.url}
-          alt={props.img.alt}
+          alt={props.img.alt ?? "Cover"}
+          fill
+          unoptimized
           className={classes(styles.image, props.img.className)}
         />
       )

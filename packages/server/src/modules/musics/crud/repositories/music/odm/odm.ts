@@ -14,6 +14,8 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimesta
   game?: string;
   year?: number;
   spotifyId?: string;
+  coverUrl?: string;
+  coverUrlSmall?: string;
   disabled?: boolean;
   country?: string;
   uploaderUserId: mongoose.Types.ObjectId;
@@ -66,6 +68,12 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: String,
   },
   country: {
+    type: String,
+  },
+  coverUrl: {
+    type: String,
+  },
+  coverUrlSmall: {
     type: String,
   },
   year: {

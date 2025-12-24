@@ -12,6 +12,8 @@ const optionalPropsSchema = z.object( {
   year: z.number().int()
     .optional(),
   country: z.string().optional(),
+  coverUrl: z.string().optional(),
+  coverUrlSmall: z.string().optional(),
   spotifyId: z.string().optional(),
 } );
 const idSchema = z.string();

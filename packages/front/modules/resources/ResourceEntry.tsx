@@ -27,10 +27,11 @@ export type ResourceEntryProps = {
     status: PlayerStatus;
   };
   index?: number;
+  coverUrl?: string;
 };
 
 export function ResourceEntry(
-  { title, subtitle, settings, right, favButton, play, drag, index }: ResourceEntryProps,
+  { title, subtitle, settings, right, favButton, play, drag, index, coverUrl }: ResourceEntryProps,
 ) {
   const shouldHaveLeftDiv = !!play || index !== undefined;
   const isPlaying = play !== undefined && play.status !== "stopped";
@@ -45,7 +46,13 @@ export function ResourceEntry(
     {drag?.element}
     {shouldHaveLeftDiv && (
       <div className={styles.leftDiv}>
-        <MusicImageCover className={classes(styles.cover)}/>
+        <MusicImageCover
+          className={classes(styles.cover)}
+          img={{
+            alt: "Cover",
+            url: coverUrl,
+          }}
+        />
         {play && <PlayButtonView
           theme="triangle-white"
           className={classes(styles.playButton)}

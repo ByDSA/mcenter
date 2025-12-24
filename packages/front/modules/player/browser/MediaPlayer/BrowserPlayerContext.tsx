@@ -64,7 +64,7 @@ function musicToResource(music: MusicEntity): PlayerResource {
       artist: music.artist,
       album: music.album,
       length: duration ? secsToMmss(duration) : "00:00",
-      coverImg: undefined,
+      coverImg: music.coverUrl,
     },
   };
 }
