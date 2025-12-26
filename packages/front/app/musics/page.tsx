@@ -43,7 +43,7 @@ const PlayQueryForm = ( { onSuccess }: FormProps) => {
     canSubmit: ()=> value.trim().length > 0,
     onSuccess,
     onSubmit: async () => {
-      await useBrowserPlayer.getState().playQuery(value);
+      await useBrowserPlayer.getState().playQuery(value.toLowerCase());
 
       if (useBrowserPlayer.getState().status === "stopped")
         logger.error("Query inválida");
