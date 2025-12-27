@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.20.2](https://github.com/ByDSA/mcenter/compare/v4.20.1...v4.20.2) (2025-12-27)
+
+
+### Bug Fixes
+
+* **front:** some fixes ([71e2ea3](https://github.com/ByDSA/mcenter/commit/71e2ea310f57ea2fa6106f564faccf97fa420230))
+* query always in lowercase ([cbe4d41](https://github.com/ByDSA/mcenter/commit/cbe4d4119c7f55e775c971163bcb53d9b9178b86))
+
 ### [4.20.1](https://github.com/ByDSA/mcenter/compare/v4.20.0...v4.20.1) (2025-12-24)
 
 
