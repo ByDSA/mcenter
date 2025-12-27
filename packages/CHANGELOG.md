@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.21.0](https://github.com/ByDSA/mcenter/compare/v4.17.0...v4.21.0) (2025-12-27)
+
+
+### Features
+
+* add compression effect ([019ea4b](https://github.com/ByDSA/mcenter/commit/019ea4b2feecf7a7a7a5a55292f9f5f04a35160e))
+* **front:** add mediaSession support ([f88b9ed](https://github.com/ByDSA/mcenter/commit/f88b9ede1a5eab72918507eb673fc097d34ce12b))
+* **front:** music media player ([35d1952](https://github.com/ByDSA/mcenter/commit/35d1952ae53117953048d2950556015b3614bc39))
+* music covers ([77ab231](https://github.com/ByDSA/mcenter/commit/77ab2315e22c03098ce292e1778a877cfd0dc0d9))
+
+
+### Bug Fixes
+
+* **back:** only send patch event for list ([d314bc2](https://github.com/ByDSA/mcenter/commit/d314bc22a3d3c0e0314abc995102d60283756323))
+* compression 0 in init ([d3b4b15](https://github.com/ByDSA/mcenter/commit/d3b4b15e2c8ce3cfd651a58a77dede78259741bb))
+* delete playlist entry ([c3a31dd](https://github.com/ByDSA/mcenter/commit/c3a31dd819ba28bf1eb0f34ad354573c0f865343))
+* drag behaviour ([9d67025](https://github.com/ByDSA/mcenter/commit/9d6702561aa81cf2de09b6dfd8c4c656a07a5c49))
+* **front:** effects button and window ([45b40ce](https://github.com/ByDSA/mcenter/commit/45b40ce36e1849af572f7bdf98cfdadfee846aa5))
+* **front:** ensure playQuery is called on modal close ([d4cf860](https://github.com/ByDSA/mcenter/commit/d4cf860d92b6d2f86786548c69eec483075aabbb))
+* **front:** some fixes ([71e2ea3](https://github.com/ByDSA/mcenter/commit/71e2ea310f57ea2fa6106f564faccf97fa420230))
+* **front:** styles adjusts ([4dd645a](https://github.com/ByDSA/mcenter/commit/4dd645ad3cf9988d070f26e9eb6345fa2cfe7382))
+* **front:** use resource entry for playlists items. dragging at left ([5e5d5dd](https://github.com/ByDSA/mcenter/commit/5e5d5dd10ffb968344322071c2d5ea423f5f45f7))
+* fullscreen player queue ([7410401](https://github.com/ByDSA/mcenter/commit/7410401f70982fb32cbf5436e8bca0c4626b912e))
+* hasNext and auto-stop ([44a7e4a](https://github.com/ByDSA/mcenter/commit/44a7e4a48fad7e471c0b8a3eca9ab8bd97f83065))
+* height in fullscreen > main ([476ad08](https://github.com/ByDSA/mcenter/commit/476ad082aa4ed12e25674e6a4350e257646b0133))
+* progress bar for mobile ([3cd9e5e](https://github.com/ByDSA/mcenter/commit/3cd9e5e212f334398b7ea6a0f2e81ac66f05da04))
+* query always in lowercase ([cbe4d41](https://github.com/ByDSA/mcenter/commit/cbe4d4119c7f55e775c971163bcb53d9b9178b86))
+* retry load music on error ([9673216](https://github.com/ByDSA/mcenter/commit/967321611db6fadfc17bac7efdcb9d36c89f3976))
+* secure play after load ([dedc0f3](https://github.com/ByDSA/mcenter/commit/dedc0f3bb29abe74d78613f4fd92825e7e3123c1))
+* use relative days ([3eaa201](https://github.com/ByDSA/mcenter/commit/3eaa2019246655e45f3657f1028a0ed5be81ff25))
+
 ### [4.20.2](https://github.com/ByDSA/mcenter/compare/v4.20.1...v4.20.2) (2025-12-27)
 
 
