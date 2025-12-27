@@ -28,6 +28,9 @@ export function makeFetcher<ReqBody, ResBody>(
         return;
       }
 
+      if (err instanceof Error && err.message.includes("Failed to fetch"))
+        return;
+
       if (!silentErrors)
         logger.error(err);
     } }: MakeFetcherParams<ReqBody, ResBody>,
