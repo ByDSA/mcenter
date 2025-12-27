@@ -187,10 +187,13 @@ function useWindowWidth() {
 }
 
 function useMediaSessionHandlers(currentResource: PlayerResource | null) {
+  if (!("mediaSession" in navigator))
+    return;
+
   const audioRef = useAudioRef();
 
   useEffect(() => {
-    if (!("mediaSession" in navigator) || !currentResource)
+    if (!currentResource)
       return;
 
     const { next, prev, resume, pause, stop, hasPrev, hasNext } = useBrowserPlayer.getState();
@@ -211,12 +214,12 @@ function useMediaSessionHandlers(currentResource: PlayerResource | null) {
   type Action = [MediaSessionAction, ()=>(Promise<void> | void)];
   const actionHandlers: Action[] = [
     ["play", () => {
-      resume();
       navigator.mediaSession.playbackState = "playing";
+      resume();
     }],
     ["pause", () => {
-      pause();
       navigator.mediaSession.playbackState = "paused";
+      pause();
     }],
     ["stop", () => {
       stop();
@@ -251,4 +254,15 @@ function useMediaSessionHandlers(currentResource: PlayerResource | null) {
     } );
   };
   }, [currentResource, audioRef]);
+
+  const status = useBrowserPlayer(s=>s.status);
+
+  useEffect(()=> {
+    if (status === "paused")
+      navigator.mediaSession.playbackState = "paused";
+    else if (status === "playing")
+      navigator.mediaSession.playbackState = "playing";
+    else
+      navigator.mediaSession.playbackState = "none";
+  }, [status]);
 }

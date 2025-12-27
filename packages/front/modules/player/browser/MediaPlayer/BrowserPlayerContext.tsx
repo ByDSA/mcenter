@@ -6,6 +6,7 @@ import { RefObject } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { secsToMmss } from "#modules/utils/dates";
 import { backendUrl } from "#modules/requests";
+import { withRetries } from "#modules/utils/retries";
 
 export type PlayerStatus = "paused" | "playing" | "stopped";
 
@@ -302,7 +303,7 @@ export const useBrowserPlayer = create<PlayerState>()(
       },
 
       next: async () => {
-        const { queueIndex, queue, repeatMode, isShuffle, currentResource, query } = get();
+        const { queueIndex, queue, repeatMode, isShuffle, query } = get();
         const playOfflineRandom = () => {
           const normalRandomIndex = getRandomExcludePrevious(queue.length - 1, queueIndex);
 
@@ -316,6 +317,7 @@ export const useBrowserPlayer = create<PlayerState>()(
         };
         const playingType = get().getPlayingType();
 
+        // Siguiente en orden
         if ((!isShuffle && (playingType === "playlist" || playingType === "one"))
           || (playingType === "query" && queueIndex < queue.length - 1)) {
           let newIndex = queueIndex + 1;
@@ -332,30 +334,39 @@ export const useBrowserPlayer = create<PlayerState>()(
           return;
         }
 
-        // query / playlist con shuffle
-        if (playingType === "query" || playingType === "playlist") {
-          const music = await fetchQueryMusic(query!);
-
+        // playlist con shuffle
+        if (playingType === "playlist") {
           try {
+            const music = await withRetries(()=> fetchQueryMusic(query!), {
+              retries: 3,
+            } );
+
             if (!music)
               throw new Error("Not found");
 
-            if (currentResource?.playlist.id) {
-              const index = queue.findIndex(item=>item.music.id === music.id);
+            const index = queue.findIndex(item=>item.music.id === music.id);
 
-              if (index === -1)
-                throw new Error("Not found");
+            if (index === -1)
+              throw new Error("Not found");
 
-              get().playQueueIndex(index);
-            } else {
-              get().playMusic(music, {
-                addToEnd: true,
-                keepQuery: true,
-              } );
-            }
+            get().playQueueIndex(index);
           } catch {
             playOfflineRandom();
           }
+
+          return;
+        } else if (playingType === "query") {
+          const music = await withRetries(()=> fetchQueryMusic(query!), {
+            retries: 3,
+          } );
+
+          if (!music)
+            throw new Error("Not found");
+
+          get().playMusic(music, {
+            addToEnd: true,
+            keepQuery: true,
+          } );
 
           return;
         }
@@ -424,7 +435,7 @@ export const useBrowserPlayer = create<PlayerState>()(
       hasNext: () => {
         const { queueIndex, queue, repeatMode, isShuffle, getPlayingType } = get();
 
-        return queueIndex + 1 < queue.length || repeatMode === RepeatMode.All
+        return queueIndex + 1 < queue.length || (repeatMode === RepeatMode.All && queue.length > 1)
          || (isShuffle && queue.length > 1) || getPlayingType() === "query";
       },
     } ),
@@ -434,6 +445,7 @@ export const useBrowserPlayer = create<PlayerState>()(
         repeatMode: state.repeatMode,
         isShuffle: state.isShuffle,
         volume: state.volume,
+        compressionValue: state.compressionValue,
       } ),
     },
   ),
