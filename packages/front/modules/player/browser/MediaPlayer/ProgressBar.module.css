@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   user-select: none;
+  touch-action: none;
 
   .progressBackground {
     width: 100%;

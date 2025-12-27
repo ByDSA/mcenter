@@ -19,12 +19,13 @@ export const ProgressBar = ( { audioRef, className }: Props) => {
 time: string; } | null>(null);
   const isClick = useRef(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
-  const handleInteraction = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const handleInteraction = useCallback((e: PointerEvent | React.PointerEvent<HTMLDivElement>) => {
     if (!progressBarRef.current)
       return;
 
     const rect = progressBarRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    // 'clientX' existe en PointerEvents de forma nativa, igual que en MouseEvents
+    const x = (e as PointerEvent).clientX - rect.left;
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
     const hoverTime = duration ? (duration / 100) * percentage : undefined;
 
@@ -36,18 +37,18 @@ time: string; } | null>(null);
 
     setHover( {
       pos: percentage,
-      time: hoverTime ? secsToMmss(hoverTime) : TIME_UNDEFINED,
+      time: hoverTime !== undefined ? secsToMmss(hoverTime) : TIME_UNDEFINED,
     } );
-  }, [duration]);
+  }, [duration, audioRef, setCurrentTime]);
 
   useEffect(() => {
-    const handleGlobalMouseMove = (e) => {
+    const handleGlobalPointerMove = (e: PointerEvent) => {
       if (!isClick.current)
         return;
 
       handleInteraction(e);
     };
-    const handleGlobalMouseUp = () => {
+    const handleGlobalPointerUp = () => {
       if (!isClick.current)
         return;
 
@@ -55,14 +56,14 @@ time: string; } | null>(null);
       setHover(null);
     };
 
-    window.addEventListener("mousemove", handleGlobalMouseMove);
-    window.addEventListener("mouseup", handleGlobalMouseUp);
+    window.addEventListener("pointermove", handleGlobalPointerMove);
+    window.addEventListener("pointerup", handleGlobalPointerUp);
 
     return () => {
-      window.removeEventListener("mousemove", handleGlobalMouseMove);
-      window.removeEventListener("mouseup", handleGlobalMouseUp);
+      window.removeEventListener("pointermove", handleGlobalPointerMove);
+      window.removeEventListener("pointerup", handleGlobalPointerUp);
     };
-  }, [handleInteraction, setHover]);
+  }, [handleInteraction]);
 
   const percentage = duration ? currentTime / duration * 100 : 0;
 
@@ -70,23 +71,23 @@ time: string; } | null>(null);
     <div
       ref={progressBarRef}
       className={classes(styles.container, className)}
-      onMouseDown={(e) => {
+      onPointerDown={(e) => {
         isClick.current = true;
         handleInteraction(e);
       }}
-      onMouseEnter={(e)=>{
+      onPointerEnter={(e)=>{
         if (isClick.current)
           return;
 
         handleInteraction(e);
       }}
-      onMouseOut={()=>{
+      onPointerOut={()=>{
         if (isClick.current)
           return;
 
         setHover(null);
       }}
-      onMouseMove={(e)=>{
+      onPointerMove={(e)=>{
         if (isClick.current)
           return;
 
