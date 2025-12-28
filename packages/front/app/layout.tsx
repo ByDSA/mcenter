@@ -1,5 +1,5 @@
 import { ToastContainer } from "react-toastify";
-import { Home, LiveTv } from "@mui/icons-material";
+import { Home, SettingsRemote } from "@mui/icons-material";
 import { PATH_ROUTES } from "$shared/routing";
 import { UserPayload } from "$shared/models/auth";
 import { ReactNode } from "react";
@@ -55,8 +55,8 @@ const sideData: (user: UserPayload | null)=> MenuItemData[] = (_user)=>[
     path: "/movies",
   },
   {
-    icon: <LiveTv />,
-    label: "Player",
+    icon: <SettingsRemote />,
+    label: "Remote",
     path: "/player/remote",
     matchPath: {
       startsWith: "/player",

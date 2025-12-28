@@ -11,6 +11,7 @@ import { logger } from "#modules/core/logger";
 import { useUser } from "#modules/core/auth/useUser";
 import stylesFetching from "#modules/ui-kit/spinner/fetching.style.module.css";
 import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { PageContainer } from "app/PageContainer";
 import { RemotePlayerEntry } from "./RemotePlayerEntry";
 import { sseRemotePlayers } from "./sse";
 import styles from "./styles.module.css";
@@ -141,7 +142,7 @@ export default function RemotePlayerSelector() {
   }, [remotePlayers]);
 
   return (
-    <>
+    <PageContainer>
       <h1>Remote players</h1>
 
       {isLoading && <ContentSpinner />}
@@ -153,6 +154,6 @@ export default function RemotePlayerSelector() {
       <section className={styles.list}>
         {remotePlayers.map(r=>(<RemotePlayerEntry key={r.id} value={r}/>))}
       </section>
-    </>
+    </PageContainer>
   );
 }
