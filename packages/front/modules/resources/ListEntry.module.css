@@ -150,32 +150,37 @@
   }
 }
 
+.container {
+  --is-active: 0;
+
+  @media (width < 600px) {
+    --is-active: 1;
+  }
+}
+
+.container:hover,
+.container.playing {
+  --is-active: 1;
+}
+
 .playButton {
-  opacity: 0 !important;
   position: absolute;
   top: 0;
 
   width: var(--size) !important;
   height: var(--size) !important;
+
+  opacity: var(--is-active) !important;
 }
 
 *:has(> .playButton) {
   position: relative;
 }
 
-.container:hover .playButton,
-.container.playing .playButton {
-  opacity: 1 !important;
-}
-
 .cover {
   background-color: var(--color-gray-900);
   transition: all 0.2s;
-}
-
-.container:hover:has(.playButton) .cover,
-.container.playing:has(.playButton) .cover {
-  filter: brightness(0.5);
+  filter: brightness(calc(1 - (var(--is-active) * 0.5)));
 }
 
 *:has(> .cover):hover .cover {
