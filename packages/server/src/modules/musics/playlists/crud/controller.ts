@@ -9,7 +9,7 @@ import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserPayload } from "$shared/models/auth";
 import { slugSchema } from "$shared/models/utils/schemas/slug";
-import { GetManyCriteria, GetOne, UserDeleteOne, UserPatchOne, UserPostOne } from "#utils/nestjs/rest";
+import { GetManyCriteria, GetOne, GetOneCriteria, UserDeleteOne, UserPatchOne, UserPostOne } from "#utils/nestjs/rest";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { assertFoundClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
@@ -20,15 +20,20 @@ import { musicPlaylistEntitySchema, musicPlaylistSchema } from "../models";
 import { MusicPlaylistCrudDtos } from "../models/dto";
 import { MusicPlaylistsRepository } from "./repository/repository";
 
-type GuardVisibilityProps = {
+type GuardVisibilityBySlugProps = {
   requestUserId: string | undefined;
   userSlug: string;
   playlistSlug: string;
+};
+type GuardVisibilityByIdProps = {
+  requestUserId: string | undefined;
+  playlistId: string;
 };
 
 class GetOneParams extends createZodDto(z.object( {
   id: mongoDbId,
 } )) {}
+class GetOneByCriteriaBody extends createZodDto(MusicPlaylistCrudDtos.GetOne.criteriaSchema) {}
 const numTrackZeroBasedSchema = z
   .string()
   .transform((val) => {
@@ -113,9 +118,68 @@ export class MusicPlaylistsController {
   ) {
   }
 
-  @GetOne("/:id", musicPlaylistEntitySchema)
-  async getOne(@Param() params: GetOneParams) {
-    return await this.playlistsRepo.getOneById(params.id);
+  @Get("/:id")
+  async getOne(
+    @Param() params: GetOneParams,
+    @Req() req: Request,
+    @User() user: UserPayload | null,
+    @Query("token") token: string | undefined,
+  ) {
+    mongoDbId.or(z.undefined()).parse(token);
+    await this.guardVisibilityById( {
+      requestUserId: token ?? user?.id,
+      playlistId: params.id,
+    } );
+    const format = this.responseFormatter.getResponseFormatByRequest(req);
+
+    if (format === ResponseFormat.RAW)
+      throw new UnprocessableEntityException("Raw format not supported");
+
+    const playlistCriteria: MusicPlaylistCrudDtos.GetOne.Criteria = {
+      filter: {
+        id: params.id,
+      },
+      expand: ["musics", "ownerUserPublic"],
+    };
+
+    if (user) {
+      playlistCriteria.expand?.push("musicsFavorite");
+      playlistCriteria.filter!.ownerUserId = user.id;
+    }
+
+    const playlist = await this.playlistsRepo.getOneByCriteria(playlistCriteria);
+
+    assertFoundClient(playlist);
+
+    if (format === ResponseFormat.M3U8) {
+      assertIsDefined(playlist.list[0].music);
+
+      return this.musicRenderer.renderM3u8Many(playlist.list.map(e=>e.music!), req);
+    }
+
+    return createSuccessResultResponse(playlist);
+  }
+
+  @GetOneCriteria(musicPlaylistEntitySchema)
+  async getOneByCriteria(
+    @Body() body: GetOneByCriteriaBody,
+    @User() user: UserPayload | null,
+  ) {
+    if (body.expand?.includes("musicsFavorite")) {
+      body.filter ??= {};
+      body.filter.requestUserId = user?.id;
+    }
+
+    const ret = await this.playlistsRepo.getOneByCriteria(body);
+
+    if (ret) {
+      await this.guardVisibilityById( {
+        requestUserId: user?.id,
+        playlistId: ret.id,
+      } );
+    }
+
+    return ret;
   }
 
   @UserPatchOne("/:id", musicPlaylistEntitySchema)
@@ -267,7 +331,7 @@ export class MusicPlaylistsController {
     @Query("token") token: string | undefined,
   ) {
     mongoDbId.or(z.undefined()).parse(token);
-    await this.guardVisibility( {
+    await this.guardVisibilityBySlugs( {
       requestUserId: token ?? user?.id,
       userSlug: params.userSlug,
       playlistSlug: params.playlistSlug,
@@ -317,7 +381,7 @@ export class MusicPlaylistsController {
   ) {
     mongoDbId.or(z.undefined()).parse(token);
 
-    await this.guardVisibility( {
+    await this.guardVisibilityBySlugs( {
       requestUserId: token ?? user?.id,
       userSlug: params.userSlug,
       playlistSlug: params.playlistSlug,
@@ -369,12 +433,24 @@ export class MusicPlaylistsController {
     } );
   }
 
-  private async guardVisibility( { playlistSlug, requestUserId, userSlug }: GuardVisibilityProps) {
+  private async guardVisibilityBySlugs( { playlistSlug,
+    requestUserId,
+    userSlug }: GuardVisibilityBySlugProps) {
     const playlist = await this.playlistsRepo.getOneBySlug( {
       playlistSlug,
       ownerUserSlug: userSlug,
       requestUserId,
     } );
+
+    assertFoundClient(playlist);
+
+    if (playlist.visibility === "private" && playlist.ownerUserId !== requestUserId)
+      throw new UnauthorizedException();
+  }
+
+  private async guardVisibilityById( { playlistId,
+    requestUserId }: GuardVisibilityByIdProps) {
+    const playlist = await this.playlistsRepo.getOneById(playlistId);
 
     assertFoundClient(playlist);
 

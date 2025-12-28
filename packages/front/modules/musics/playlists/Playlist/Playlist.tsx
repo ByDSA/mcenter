@@ -19,6 +19,7 @@ interface PlaylistProps {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicPlaylist = ( { value, setValue }: PlaylistProps) => {
+  assertIsDefined(value.list[0].music);
   const { playlistStatus, handlePlayPlaylist } = usePlaylistPlayer(value);
   const { sensors,
     handleDragStart,
@@ -34,7 +35,7 @@ export const MusicPlaylist = ( { value, setValue }: PlaylistProps) => {
     handleDeleteSuccess } = usePlaylistMenu(value);
   const totalDuration = useMemo(
     () => value.list?.reduce(
-      (acc, e) => acc + (e.music.fileInfos[0].mediaInfo.duration ?? 0),
+      (acc, e) => acc + (e.music.fileInfos?.[0].mediaInfo.duration ?? 0),
       0,
     ) ?? 0,
     [value.list],

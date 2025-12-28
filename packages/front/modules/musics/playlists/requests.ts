@@ -23,22 +23,22 @@ export class MusicPlaylistsApi {
     FetchApi.register(MusicPlaylistsApi, new MusicPlaylistsApi());
   }
 
-  getOneById(
-    playlistId: string,
+  getOneByCriteria(
+    criteria: MusicPlaylistsApi.GetOne.Body,
   ): Promise<MusicPlaylistsApi.GetOne.Response> {
     const fetcher = makeFetcher<
-      undefined,
+      MusicPlaylistsApi.GetOne.Body,
       MusicPlaylistsApi.GetOne.Response
     >( {
-      method: "GET",
+      method: "POST",
       parseResponse: genParseZod(
         MusicPlaylistsApi.GetOne.responseSchema,
       ) as (m: unknown)=> any,
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.playlists.withParams(playlistId)),
-      body: undefined,
+      url: backendUrl(PATH_ROUTES.musics.playlists.path + "/search-one"),
+      body: criteria,
     } );
   }
 
@@ -284,6 +284,8 @@ musicId: string;} ): Promise<MusicPlaylistsApi.RemoveOneTrack.Response> {
 // eslint-disable-next-line no-redeclare
 export namespace MusicPlaylistsApi {
   export namespace GetOne {
+    export const body = MusicPlaylistCrudDtos.GetOne.criteriaSchema;
+    export type Body = z.infer<typeof body>;
     export const dataSchema = musicPlaylistEntitySchema;
 
     export type Data = z.infer<typeof dataSchema>;

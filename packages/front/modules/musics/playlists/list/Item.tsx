@@ -37,10 +37,11 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
     <a
       className={styles.playlistContainer}
       onClick={()=> {
-        router.push(frontendUrl(PATH_ROUTES.musics.frontend.playlists.slug.withParams( {
-          playlistSlug: value.slug,
-          userSlug,
-        } )));
+        router.push(
+          frontendUrl(PATH_ROUTES.musics.frontend.playlists.withParams( {
+            playlistId: value.id,
+          } )),
+        );
       }}
     >
       <MusicImageCover

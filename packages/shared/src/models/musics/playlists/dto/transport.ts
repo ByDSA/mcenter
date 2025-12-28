@@ -27,9 +27,17 @@ export namespace MusicPlaylistCrudDtos {
   export namespace GetOne {
     export const criteriaSchema = createCriteriaOneSchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;
-    export namespace ById {
-      export const paramsSchema = idParamsSchema;
-    }
+
+  }
+
+  export namespace GetOneById {
+    const { id: _, ...filterShape } = criteriaConfig.filterShape;
+    export const criteriaSchema = createCriteriaOneSchema( {
+      ...criteriaConfig,
+      filterShape,
+    } );
+    export type Criteria = z.infer<typeof criteriaSchema>;
+    export const paramsSchema = idParamsSchema;
   }
 
   export namespace PatchOneById {

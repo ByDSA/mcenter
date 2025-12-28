@@ -1,32 +1,25 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { SearchParams } from "next/dist/server/request/search-params";
-import { assertIsDefined } from "$shared/utils/validation";
 import { backendUrl } from "#modules/requests";
 import { redirectIfMediaPlayer } from "#modules/utils/redirect-media-player";
-import { ClientPage } from "../../../[playlistId]/ClientPage";
+import { ClientPage } from "./ClientPage";
 
 export type Params = {
   trackNumber?: number;
-  userSlug: string;
-  playlistSlug: string;
+  playlistId: string;
 };
 
 interface PageProps {
   params: Promise<Params>;
   searchParams: Promise<SearchParams>;
-  }
+}
 
 export default async function Page( { params, searchParams }: PageProps) {
-  const { playlistSlug, userSlug, trackNumber } = (await params);
+  const { playlistId } = (await params);
 
-  assertIsDefined(userSlug);
   await redirectIfMediaPlayer( {
     url: backendUrl(
-      PATH_ROUTES.musics.playlists.slug.withParams( {
-        userSlug,
-        playlistSlug,
-        trackNumber,
-      } ),
+      PATH_ROUTES.musics.playlists.withParams(playlistId),
     ),
     searchParams,
   } );

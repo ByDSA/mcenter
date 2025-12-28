@@ -196,6 +196,17 @@ token?: string;} ) => {
       },
       playlists: {
         path: "/musics/playlists",
+        withParams: ( { playlistId, token }: {
+          playlistId: string;
+          token?: string;
+        } ) => {
+          const url = `/musics/playlists/${playlistId}`;
+
+          if (token)
+            return `${url}?token=${token}`;
+
+          return url;
+        },
         slug: {
           withParams: ( { playlistSlug, userSlug, token }: {
           playlistSlug: string;
