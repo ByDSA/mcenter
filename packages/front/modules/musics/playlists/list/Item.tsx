@@ -1,5 +1,6 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
+import { useRouter } from "next/navigation";
 import { useContextMenuTrigger, ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { useArrayData } from "#modules/utils/array-data-context";
 import { useUser } from "#modules/core/auth/useUser";
@@ -28,15 +29,20 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
   const { openMenu, closeMenu } = useContextMenuTrigger();
   const { user } = useUser();
   const userSlug = value.ownerUserPublic?.slug;
+  const router = useRouter();
 
   assertIsDefined(userSlug);
 
   return (
-    <a className={styles.playlistContainer}
-      href={frontendUrl(PATH_ROUTES.musics.frontend.playlists.slug.withParams( {
-        playlistSlug: value.slug,
-        userSlug,
-      } ))}>
+    <a
+      className={styles.playlistContainer}
+      onClick={()=> {
+        router.push(frontendUrl(PATH_ROUTES.musics.frontend.playlists.slug.withParams( {
+          playlistSlug: value.slug,
+          userSlug,
+        } )));
+      }}
+    >
       <MusicImageCover
         className={styles.playlistCover}
         img={{
