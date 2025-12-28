@@ -7,12 +7,14 @@ import styles from "./TabsContainer.module.css";
 type Props = {
   data: MenuItemData[];
   children: ReactNode;
+  before?: ReactNode;
+  className?: string;
 };
 
-export function TabsContainer( { children, data }: Props) {
+export function TabsContainer( { children, data, before, className }: Props) {
   return (
     <div className={classes(styles.container)}>
-      {<TabsClient className={styles.tabs} data={data} />}
+      {<TabsClient className={classes(styles.tabs, className)} data={data} before={before} />}
       {children}
     </div>
   );

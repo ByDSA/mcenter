@@ -1,13 +1,12 @@
 .container {
-  --tabs-height: 2rem;
-  margin-top: var(--topbar-height);
-  padding-top: var(--tabs-height);
+  margin-top: var(--topbar-height, 2rem);
+  padding-top: var(--tabs-height, 2rem);
 
   .tabs {
     position: fixed;
     z-index: 100;
     top: var(--topbar-height);
     width: calc(100dvw - var(--content-margin-left));
-    height: var(--tabs-height);
+    height: var(--tabs-height, 2rem);
   }
 }

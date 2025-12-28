@@ -31,7 +31,11 @@ export default function UserPage() {
         return null;
 
       const api = FetchApi.get(MusicPlaylistsApi);
-      const res = await api.getOneById(user.musics.favoritesPlaylistId);
+      const res = await api.getOneByCriteria( {
+        filter: {
+          id: user.musics.favoritesPlaylistId,
+        },
+      } );
 
       return res.data ?? null;
     }}

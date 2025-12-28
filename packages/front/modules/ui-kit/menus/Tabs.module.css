@@ -1,13 +1,20 @@
 .tabs {
   width: 100%;
-  height: 2rem;
 
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+}
+
+.tabs main {
+  width: 100%;
+  height: 2rem;
 
   color: var(--button-link-color);
   background: var(--color-gray-900);
   border-bottom: 1px solid var(--color-gray-800);
+
+  display: flex;
+  flex-direction: row;
 
   user-select: none;
 }

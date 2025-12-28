@@ -24,7 +24,14 @@
   user-select: none;
 
   > main {
+    height: 100%;
+    width: 100%;
+  }
+
+  .menu {
     display: none !important;
+    height: 100%;
+    width: 100%;
   }
 
   aside:has(> .topbarLeftAsideChild) {
@@ -106,13 +113,14 @@ body:has(.content) {
       }
     }
 
-    > main > a,
+    .menu > a,
     > aside:first-of-type > a {
       padding: 0 clamp(0.5rem, calc(6dvw - 0.7rem), 4rem) !important;
     }
 
-    > main {
+    .menu {
       display: flex !important;
+
       > * {
         border-right: var(--color-gray-900) solid 1px;
       }

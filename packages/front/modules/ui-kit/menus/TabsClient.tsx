@@ -1,10 +1,14 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
+import { ReactNode } from "react";
 import { Tabs } from "./Tabs";
 import { MenuItemData } from "./Sidebar";
 
-export function TabsClient(props: Parameters<typeof Tabs>[0]) {
+type Props = Parameters<typeof Tabs>[0] & {
+  before?: ReactNode;
+};
+export function TabsClient(props: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const matchPath = (itemPath: string) => {
@@ -18,7 +22,7 @@ export function TabsClient(props: Parameters<typeof Tabs>[0]) {
   for (const d of data) {
     d.active = matchPath(d.matchPath?.startsWith ?? d.path);
     d.onClick = (e) => {
-    // Si es click con cmd/ctrl (nueva pestaña) o click derecho, deja el comportamiento normal
+      // Si es click con cmd/ctrl (nueva pestaña) o click derecho, deja el comportamiento normal
       if (e.metaKey || e.ctrlKey || e.button !== 0)
         return;
 

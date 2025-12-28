@@ -13,3 +13,31 @@
 :global(body):has(.container) > div {
   margin-bottom: 0;
 }
+
+body:has(.tabs) {
+  --tabs-height: 75px;
+
+  &:has(.tabs > main:empty) {
+    --tabs-height: 2rem;
+  }
+
+  *:has(> .searchBar) {
+    background: var(--color-gray-950);
+  }
+
+  .tabs > main:empty {
+    display: none !important;
+  }
+
+  @media (width >= 600px) {
+    --tabs-height: 2rem;
+
+    &:has(.tabs > main:empty) {
+      --tabs-height: 0;
+    }
+
+    .searchBar {
+      display: none;
+    }
+  }
+}

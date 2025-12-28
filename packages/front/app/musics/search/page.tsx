@@ -1,39 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { MusicList } from "#modules/musics/musics/MusicList";
-import { useInputText } from "#modules/ui-kit/input/UseInputText";
-import { Button } from "#modules/ui-kit/input/Button";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 
 export default function Search() {
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q") || "";
   const [filters, setFilters] = useState<Parameters<typeof MusicList>[0]["filters"]>( {} );
-  const titleFilterRef = useRef("");
   const onPressEnter = useCallback(() => {
     setFilters(old => ( {
       ...old,
-      title: titleFilterRef.current,
+      title: query,
     } ));
-  }, []);
-  const { element: searchInput, value: titleFilterValue } = useInputText( {
-    nullChecked: false,
-    onPressEnter,
-  } );
+  }, [query]);
 
   useEffect(() => {
-    titleFilterRef.current = titleFilterValue;
-  }, [titleFilterValue]);
+    onPressEnter();
+  }, [query]);
 
   return (
     <MusicLayout>
-      <h2>Search</h2>
-      <span className={styles.topbar}>
-        {
-          searchInput
-        }
-        <Button className={styles.searchButton} onClick={onPressEnter}>Buscar</Button>
-      </span>
+      <header className={styles.marginTop}></header>
       <MusicList
         filters={filters}
       />

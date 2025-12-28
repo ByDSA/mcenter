@@ -3,6 +3,8 @@ import { PATH_ROUTES } from "$shared/routing";
 import { PageContainer } from "app/PageContainer";
 import { TabsContainer } from "app/TabsContainer";
 import { useUser } from "#modules/core/auth/useUser";
+import styles from "./Page.module.css";
+import { SearchBar } from "./search/SearchBar";
 
 type Props = {
   children: React.ReactNode;
@@ -20,11 +22,6 @@ path: string;}[] = [];
     } );
   }
 
-  data.push( {
-    label: "Buscar",
-    path: PATH_ROUTES.musics.frontend.search.path,
-  } );
-
   if (user) {
     data.push(
       {
@@ -38,9 +35,11 @@ path: string;}[] = [];
     );
   }
 
+  const before = <span className={styles.searchBar}><SearchBar /></span>;
+
   return (
     <>
-      <TabsContainer data={data}>
+      <TabsContainer data={data} before={before} className={styles.tabs}>
         <PageContainer>
           {children}
         </PageContainer>

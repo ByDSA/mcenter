@@ -16,6 +16,7 @@ import { MusicsIcon } from "#modules/musics/MusicsIcon";
 import { ModalProvider } from "#modules/ui-kit/modal/ModalContext";
 import { ContextMenuProvider } from "#modules/ui-kit/ContextMenu";
 import { MediaPlayerPageLayout } from "#modules/player/browser/MediaPlayer/MediaPlayerPageLayout";
+import { TopbarMainClient } from "#modules/ui-kit/menus/TopbarClient";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
@@ -63,36 +64,11 @@ const sideData: (user: UserPayload | null)=> MenuItemData[] = (_user)=>[
   },
 ];
 
-export default async function RootLayout( { children }: {
-  children: React.ReactNode;
+export default async function RootLayout( { children, customMain }: {
+  children: ReactNode;
+  customMain: ReactNode;
 } ) {
   const user = await getUser();
-  const topbarData: MenuItemData[] = [
-    ...sideData(user).map(e=>( {
-      ...e,
-      title: e.label?.toString(),
-      label: undefined,
-    } )),
-  ];
-  const menu = <Topbar
-    className={classes(styles.topbar, styles.fixed)}
-    leftAside={
-      <>
-        <a className={classes(styles.topbarLeftAsideChild, styles.normal)} href="/">M<span className={styles.logoCenter}>Center</span></a>
-        <a className={classes(styles.topbarLeftAsideChild, styles.mini)} href="/">M</a>
-      </>
-    }
-    rightAside={
-      <>
-        {user && <UserAvatarButton user={user}/>}
-        {!user && <LoginButton />}
-      </>
-    }
-    mainData={topbarData}
-  />;
-  const sideBar = <SidebarClient
-    className={classes(styles.fixed, styles.sidebar)}
-    data={sideData(user)}/>;
 
   return (
     <html lang="es">
@@ -107,8 +83,8 @@ export default async function RootLayout( { children }: {
         <NavigationWatcher />
         <GlobalProviders user={user}>
           <MediaPlayerPageLayout>
-            {menu}
-            {sideBar}
+            {await Menu(customMain)}
+            {await SideBar()}
             <main className={styles.content}>
               {children}
             </main>
@@ -142,4 +118,48 @@ function GlobalProviders( { children, user }: GlobalProvidersProps) {
       </ContextMenuProvider>
     </ModalProvider>
   </UserProvider>;
+}
+
+async function Menu(customMainSlot: React.ReactNode) {
+  const user = await getUser();
+  const topbarData: MenuItemData[] = [
+    ...sideData(user).map(e=>( {
+      ...e,
+      title: e.label?.toString(),
+      label: undefined,
+    } )),
+  ];
+  const main = <>
+    <span className={styles.menu}>
+      <TopbarMainClient data={topbarData} />
+    </span>
+    {customMainSlot}
+  </>;
+  const menu = <Topbar
+    className={classes(styles.topbar, styles.fixed)}
+    leftAside={
+      <>
+        <a className={classes(styles.topbarLeftAsideChild, styles.normal)} href="/">M<span className={styles.logoCenter}>Center</span></a>
+        <a className={classes(styles.topbarLeftAsideChild, styles.mini)} href="/">M</a>
+      </>
+    }
+    rightAside={
+      <>
+        {user && <UserAvatarButton user={user}/>}
+        {!user && <LoginButton />}
+      </>
+    }
+    main={main}
+  />;
+
+  return menu;
+}
+
+async function SideBar() {
+  const user = await getUser();
+  const sideBar = <SidebarClient
+    className={classes(styles.fixed, styles.sidebar)}
+    data={sideData(user)}/>;
+
+  return sideBar;
 }

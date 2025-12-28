@@ -130,6 +130,9 @@ function useMusicList(props: Props) {
     setItem, observerTarget,
     fetchInitData } = useCrudDataWithScroll( {
     initialFetch: async () => {
+      if (!props.filters.title)
+        return [];
+
       const result = await api.getManyByCriteria( {
         limit: 20,
         ...criteriaCommon,
