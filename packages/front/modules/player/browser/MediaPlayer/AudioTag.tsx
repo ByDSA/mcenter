@@ -132,10 +132,10 @@ export const AudioTag = () => {
   const isOnline = useOnlineStatus();
 
   useEffect(()=> {
-    const { status } = useBrowserPlayer.getState();
+    const { status: currentStatus } = useBrowserPlayer.getState();
 
     if (
-      isOnline === true && audioRef.current?.paused && status === "playing"
+      isOnline === true && audioRef.current?.paused && currentStatus === "playing"
     ) {
       securePlay()
         .catch(showError);
@@ -162,6 +162,10 @@ export const AudioTag = () => {
           },
         } ).catch(showError);
       }
+    }}
+    onPause={()=> {
+      if (player.status === "playing")
+        securePlay().catch(showError);
     }}
     onEnded={async () => {
       if (player.status !== "playing")
