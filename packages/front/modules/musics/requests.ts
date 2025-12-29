@@ -5,7 +5,7 @@ import { createOneResultResponseSchema, createPaginatedResultResponseSchema, Pag
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
 import { MusicEntity, musicEntitySchema, MusicEntityWithUserInfo, MusicId } from "#musics/models";
-import { makeFetcher } from "#modules/fetching";
+import { makeFetcher } from "#modules/fetching/fetcher";
 import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 

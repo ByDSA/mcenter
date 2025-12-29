@@ -3,7 +3,7 @@ import { classes } from "#modules/utils/styles";
 import styles from "./SettingsButton.module.css";
 
 type Props = {
-  onClick?: (e: React.MouseEvent)=> void;
+  onClick?: (e: React.MouseEvent<HTMLElement>)=> void;
   theme?: "dark" | "light";
   className?: string;
 };

@@ -2,8 +2,8 @@ import { CalendarToday, Public, PublicOff } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { MusicImageCover } from "#modules/musics/MusicCover";
-import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonView";
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { ResourcePlayButtonView } from "#modules/resources/PlayButton";
 import { formatDurationHeader } from "../../utils";
 import styles from "../Playlist.module.css";
 import commonStyles from "../../common.module.css";
@@ -71,9 +71,7 @@ export const PlaylistHeader = ( { value,
       </div>
 
       <div className={styles.playlistControls}>
-        <PlayButtonView
-          theme="blue"
-          className={styles.playAllButton}
+        <ResourcePlayButtonView
           onClick={onPlay}
           disabled={totalSongs === 0}
           status={playlistStatus}

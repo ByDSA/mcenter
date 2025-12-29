@@ -205,8 +205,8 @@ function useMediaSessionHandlers(currentResource: PlayerResource | null) {
       artwork: currentResource.ui.coverImg
         ? [{
           src: currentResource.ui.coverImg,
-          sizes: "512x512",
-          type: "image/png",
+          sizes: "600x600",
+          type: "image/jpeg",
         }]
         : undefined,
     } );

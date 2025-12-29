@@ -19,3 +19,15 @@
   display: flex;
   align-items: center;
 }
+
+.element {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 0.25em;
+
+  svg {
+    height: 0.75em;
+    width: 0.75em;
+  }
+}

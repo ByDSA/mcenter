@@ -4,9 +4,10 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { useRouter, useSearchParams } from "next/navigation";
 import { backendUrl } from "#modules/requests";
-import { AuthApi, HttpErrorUnauthorized } from "#modules/core/auth/requests";
+import { AuthApi } from "#modules/core/auth/requests";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { HttpErrorUnauthorized } from "#modules/core/errors/custom-http-errors";
 import { LoginComponent } from "./Login";
 
 function useLoginGoogle() {

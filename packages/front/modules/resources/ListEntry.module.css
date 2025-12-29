@@ -106,6 +106,9 @@
       font-weight: 500;
       color: var(--color-gray-25);
 
+      width: fit-content;
+      max-width: 100%; /* Evita que se salga del padre y activa el ellipsis */
+
       &.playing {
         color: var(--color-playing);
       }

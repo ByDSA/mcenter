@@ -103,20 +103,6 @@
   margin-top: 32px;
 }
 
-.playAllButton {
-  --size: 3.5rem;
-  width: var(--size);
-  height: var(--size);
-  margin: 0 1rem;
-  --color-playing: var(--color-blue-400);
-  --color-playing-hover: var(--color-blue-500);
-
-  svg {
-    width: calc(var(--size) / 1.5);
-    height: calc(var(--size) / 1.5);
-  }
-}
-
 .playlistItems {
   margin-top: 1rem;
   margin-bottom: 1rem;

@@ -53,6 +53,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
       color: var(--color-gray-25);
+
+      width: fit-content;
+      max-width: 100%; /* Evita que se salga del padre y activa el ellipsis */
     }
 
     .trackSubtitle {

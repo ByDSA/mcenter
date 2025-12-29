@@ -1,11 +1,13 @@
-import { Body, Controller, Param } from "@nestjs/common";
+import { Body, Controller, Get, Param, Query, Req, Res } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { UserPayload } from "$shared/models/auth";
 import { MusicInfoCrudDtos } from "$shared/models/musics/user-info/dto/transport";
+import { Response, Request } from "express";
 import { MusicEntity, musicEntitySchema, musicUserInfoEntitySchema } from "#musics/models";
-import { AdminDeleteOne, GetManyCriteria, GetOne, GetOneCriteria, UserPatchOne } from "#utils/nestjs/rest";
+import { AdminDeleteOne, GetManyCriteria, GetOneCriteria, UserPatchOne } from "#utils/nestjs/rest";
 import { User } from "#core/auth/users/User.decorator";
+import { MusicFlowService } from "../MusicFlow.service";
 import { MusicsUsersRepository } from "./repositories/user-info/repository";
 import { MusicsRepository } from "./repositories/music";
 
@@ -23,6 +25,7 @@ export class MusicCrudController {
   constructor(
     private readonly musicRepo: MusicsRepository,
     private readonly musicsUsersrepo: MusicsUsersRepository,
+    private readonly flow: MusicFlowService,
   ) {
   }
 
@@ -71,13 +74,28 @@ export class MusicCrudController {
     return await this.musicRepo.deleteOneByIdAndGet(id);
   }
 
-  @GetOne("/:id", musicEntitySchema)
+  @Get("/:id")
   async getOneById(
     @Param() params: GetOneByIdParamsDto,
-  ): Promise<MusicEntity | null> {
+     @Res( {
+       passthrough: true,
+     } ) res: Response,
+    @Req() req: Request,
+    @User() user: UserPayload | null,
+    @Query("token") token: string | undefined,
+    @Query("skip-history") shouldNotAddToHistory: string | undefined,
+  ) {
     const { id } = params;
 
-    return await this.musicRepo.getOneById(id);
+    return await this.flow.fetchAndRender((_format)=> {
+      return this.musicRepo.getOneById(id);
+    }, {
+      req,
+      res,
+      user,
+      shouldNotAddToHistory: !!shouldNotAddToHistory,
+      token,
+    } );
   }
 
   @GetOneCriteria(MusicCrudDtos.GetOne.responseDataSchema)

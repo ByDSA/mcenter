@@ -1,12 +1,12 @@
-import { STATUS_CODES } from "node:http";
 import { PATH_ROUTES } from "$shared/routing";
 import { LocalLoginBody, localLoginBodySchema, localLoginResponseSchema, LocalSignUpBody, localSignUpBodySchema } from "$shared/models/auth/dto";
 import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { backendUrl } from "#modules/requests";
-import { makeFetcher } from "#modules/fetching";
+import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { logger } from "../logger";
+import { HttpErrorUnauthorized } from "../errors/custom-http-errors";
 
 export class AuthApi {
   static {
@@ -53,17 +53,5 @@ export class AuthApi {
     } );
 
     return res;
-  }
-}
-
-export class HttpError extends Error {
-  constructor(status: number, msg?: string) {
-    super(`Error HTTP ${status} ${STATUS_CODES[status] ?? ""}${msg ? ": " + msg : ""}`);
-  }
-}
-
-export class HttpErrorUnauthorized extends HttpError {
-  constructor(msg?: string) {
-    super(401, msg);
   }
 }

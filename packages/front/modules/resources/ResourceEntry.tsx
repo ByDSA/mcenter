@@ -1,9 +1,11 @@
 import { Fragment, JSX, memo, ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { classes } from "#modules/utils/styles";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonView";
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { anchorOnClick } from "#modules/ui-kit/menus/TabsClient";
 import styles from "./ListEntry.module.css";
 import { ListEntryColumn, ListEntryRow } from "./ListEntry";
 
@@ -11,6 +13,7 @@ export type OnClickMenu = (e: React.MouseEvent<HTMLElement>)=> void;
 
 export type ResourceEntryProps = {
   title: string;
+  titleHref?: string;
   subtitle?: ReactNode;
   right?: ReactNode;
   settings?: {
@@ -31,10 +34,14 @@ export type ResourceEntryProps = {
 };
 
 export function ResourceEntry(
-  { title, subtitle, settings, right, favButton, play, drag, index, coverUrl }: ResourceEntryProps,
+  { title, subtitle, settings, right, favButton, play, drag, index, coverUrl,
+    titleHref }: ResourceEntryProps,
 ) {
+  const router = useRouter();
   const shouldHaveLeftDiv = !!play || index !== undefined;
   const isPlaying = play !== undefined && play.status !== "stopped";
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const TitleTag = titleHref ? "a" : "span";
 
   return <span
     className={classes(
@@ -63,7 +70,17 @@ export function ResourceEntry(
       </div>
     )}
     <span className={classes(styles.main, !shouldHaveLeftDiv && styles.noLeftDiv)}>
-      <span className={classes(styles.title, "ellipsis")} title={title}>{title}</span>
+      <TitleTag className={classes(styles.title, "ellipsis")}
+        title={title}
+        href={titleHref}
+        onClick={titleHref
+          ? anchorOnClick( {
+            href: titleHref,
+            router,
+          } )
+          : undefined}
+      >{title}
+      </TitleTag>
       {subtitle}
     </span>
     <ListEntryRow className={styles.right}>

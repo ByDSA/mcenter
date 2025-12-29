@@ -1,4 +1,6 @@
 import { memo } from "react";
+import { PATH_ROUTES } from "$shared/routing";
+import { useRouter } from "next/navigation";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { ResourceSubtitle } from "#modules/resources/ResourceEntry";
 import { classes } from "#modules/utils/styles";
@@ -11,6 +13,7 @@ import styles from "./MediaPlayer.module.css";
 export const TrackInfo = memo(
   () => {
     const resource = useBrowserPlayer(s=>s.currentResource);
+    const router = useRouter();
 
     if (!resource)
       return null;
@@ -27,10 +30,13 @@ export const TrackInfo = memo(
           }}
         />
         <div className={styles.trackDetails}>
-          <span
+          <a
             className={styles.trackTitle}
             title={resource.ui.title}
-          >{resource.ui.title}</span>
+            onClick={()=> {
+              router.push(PATH_ROUTES.musics.frontend.path + "/" + resource.resourceId);
+            }}
+          >{resource.ui.title}</a>
           <ResourceSubtitle
             className={styles.trackSubtitle}
             items={[

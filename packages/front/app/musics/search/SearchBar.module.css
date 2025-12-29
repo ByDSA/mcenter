@@ -23,8 +23,7 @@
 
     &:focus {
       outline: none;
-      background-color: var(--color-gray-975);
-      border: 1px solid var(--color-gray-400);
+      border: 1px solid var(--color-gray-600);
     }
   }
 }

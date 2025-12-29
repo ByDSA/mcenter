@@ -1,5 +1,6 @@
 import React from "react";
 import { useShallow } from "zustand/react/shallow";
+import { PATH_ROUTES } from "$shared/routing";
 import { useUser } from "#modules/core/auth/useUser";
 import { HistoryTimeView, WeightView } from "#modules/history";
 import { MusicSubtitle } from "#modules/musics/musics/MusicEntry/MusicEntry";
@@ -34,6 +35,7 @@ export const MusicHistoryEntryElement = React.memo((
 
   return ResourceEntry( {
     title: music.title,
+    titleHref: PATH_ROUTES.musics.frontend.path + "/" + music.id,
     subtitle: <MusicSubtitle music={music} />,
     right: <>
       <HistoryTimeView timestamp={value.date.timestamp} />

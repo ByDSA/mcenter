@@ -1,21 +1,36 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { AccessTime, Balance, CalendarToday } from "@mui/icons-material";
-import { memo } from "react";
+import { memo, ReactNode } from "react";
 import { formatDurationItem } from "#modules/musics/playlists/utils";
 import { formatDateHHmm } from "#modules/utils/dates";
 import { classes } from "#modules/utils/styles";
 import styles from "./WeightView.module.css";
 
-type DurationProps = {
-  duration: number;
+type MetadataViewProps = {
+  icon: ReactNode;
+  txt: string;
+  title: string;
+  className?: string;
 };
-export const DurationView = memo(( { duration }: DurationProps) => {
+export const MetadataView = memo(( { txt, icon, title, className }: MetadataViewProps) => {
   return (
-    <span title="Duración">
-      <AccessTime />
-      <span>{formatDurationItem(duration)}</span>
+    <span title={title} className={classes(styles.element, className)}>
+      {icon}
+      <span>{txt}</span>
     </span>
   );
+} );
+type DurationProps = {
+  duration: number;
+  className?: string;
+};
+export const DurationView = memo(( { duration, className }: DurationProps) => {
+  return <MetadataView
+    icon={<AccessTime />}
+    title="Duración"
+    className={className}
+    txt={formatDurationItem(duration)}
+  />;
 } );
 
 type HistoryTimeProps = {

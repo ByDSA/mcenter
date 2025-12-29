@@ -1,0 +1,11 @@
+.button {
+  --size: 3.5rem;
+  width: var(--size) !important;
+  height: var(--size) !important;
+  margin: 0 1rem;
+
+  svg {
+    width: calc(var(--size) / 1.5) !important;
+    height: calc(var(--size) / 1.5) !important;
+  }
+}

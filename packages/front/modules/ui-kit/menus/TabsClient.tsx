@@ -1,7 +1,8 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { ReactNode } from "react";
+import { MouseEventHandler, ReactNode } from "react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { Tabs } from "./Tabs";
 import { MenuItemData } from "./Sidebar";
 
@@ -21,17 +22,10 @@ export function TabsClient(props: Props) {
 
   for (const d of data) {
     d.active = matchPath(d.matchPath?.startsWith ?? d.path);
-    d.onClick = (e) => {
-      // Si es click con cmd/ctrl (nueva pestaña) o click derecho, deja el comportamiento normal
-      if (e.metaKey || e.ctrlKey || e.button !== 0)
-        return;
-
-      // Previene la navegación normal del <a>
-      e.preventDefault();
-
-      // Usa router.push para navegación client-side
-      router.push(d.path);
-    };
+    d.onClick = anchorOnClick( {
+      router,
+      href: d.path,
+    } );
   }
 
   return (
@@ -41,4 +35,19 @@ export function TabsClient(props: Props) {
 
 export function makeSubMenu(data: MenuItemData[]) {
   return <TabsClient data={data} />;
+}
+
+export function anchorOnClick( { router, href }: {href: string;
+router: AppRouterInstance;} ): MouseEventHandler<HTMLAnchorElement> {
+  return (e) => {
+    // Si es click con cmd/ctrl (nueva pestaña) o click derecho, deja el comportamiento normal
+    if (e.metaKey || e.ctrlKey || e.button !== 0)
+      return;
+
+    // Previene la navegación normal del <a>
+    e.preventDefault();
+
+    // Usa router.push para navegación client-side
+    router.push(href);
+  };
 }

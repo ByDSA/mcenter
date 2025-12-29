@@ -1,8 +1,6 @@
 import { memo, ReactNode } from "react";
 import { PATH_ROUTES } from "$shared/routing";
-import { Music, MusicEntity } from "$shared/models/musics";
-import { logger } from "#modules/core/logger";
-import { frontendUrl } from "#modules/requests";
+import { MusicEntity } from "$shared/models/musics";
 import { useUser } from "#modules/core/auth/useUser";
 import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
 import { DurationView, WeightView } from "#modules/history";
@@ -35,6 +33,7 @@ export function MusicEntryElement(
   return <ResourceEntry
     index={props.index}
     title={music.title}
+    titleHref={PATH_ROUTES.musics.frontend.path + "/" + music.id}
     subtitle={<MusicSubtitle
       music={music}
     />}
@@ -58,22 +57,6 @@ export function MusicEntryElement(
     play={props.play}
     drag={props.drag}
   />;
-}
-
-type CopyMusicProps = {
-  music: Music;
-  token?: string;
-};
-export async function copyMusicUrl( { music, token }: CopyMusicProps) {
-  await navigator.clipboard.writeText(
-    frontendUrl(
-      PATH_ROUTES.musics.frontend.slug.withParams( {
-        slug: music.slug,
-        token: token,
-      } ),
-    ),
-  );
-  logger.info("Copiada url");
 }
 
 type MusicSubtitleProps = {

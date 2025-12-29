@@ -4,6 +4,12 @@ import { toast } from "react-toastify";
 
 class ToastTransport extends Transport {
   log(info, callback) {
+    if (!isBrowser) {
+      callback();
+
+      return;
+    }
+
     const { level, message } = info;
 
     switch (level) {
@@ -28,28 +34,36 @@ class ToastTransport extends Transport {
   }
 }
 
-const transports: Transport[] = [
-  new ToastTransport(),
-];
+const transports: Transport[] = [];
+const isBrowser = typeof window !== "undefined";
 const isDev = process.env.NODE_ENV === "development";
 
-if (isDev) {
-  class FrontendConsoleTransport extends Transport {
-    log(info, callback) {
-      const { level, message } = info;
-      let fn = console.log;
+if (isBrowser) {
+  transports.push(new ToastTransport());
 
-      if (level === "debug" && isDev)
-        fn = console.debug;
-      else
-        fn = console[level] ?? console.log;
+  if (isDev) {
+    class FrontendConsoleTransport extends Transport {
+      log(info, callback) {
+        const { level, message } = info;
+        let fn = console.log;
 
-      fn(message);
+        if (level === "debug" && isDev)
+          fn = console.debug;
+        else
+          fn = console[level] ?? console.log;
 
-      callback();
+        fn(message);
+
+        callback();
+      }
     }
+    transports.push(new FrontendConsoleTransport());
   }
-  transports.push(new FrontendConsoleTransport());
+} else {
+  // --- BACKEND ---
+  transports.push(new winston.transports.Console( {
+    format: winston.format.simple(),
+  } ));
 }
 
 export const logger = winston.createLogger( {

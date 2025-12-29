@@ -13,5 +13,3 @@ export * from "./patch";
 export * from "./fetcher";
 
 export * from "./scroll";
-
-export * from "./scroll";
