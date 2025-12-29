@@ -71,8 +71,15 @@ export const AudioTag = () => {
   useEffect(() => {
     const audio = audioRef.current;
 
-    if (!audio || !player.currentResource)
+    if (!audio)
       return;
+
+    if (!player.currentResource) {
+      if (audio.paused === false)
+        audio.pause();
+
+      return;
+    }
 
     if (player.status === "playing") {
       securePlay()
