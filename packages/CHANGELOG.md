@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.22.0](https://github.com/ByDSA/mcenter/compare/v4.21.0...v4.22.0) (2025-12-30)
+
+
+### Features
+
+* music page ([01372b4](https://github.com/ByDSA/mcenter/commit/01372b4695753122a6fc0b41d3bd03ef4e81f1d7))
+* music search in every page in music/* ([cbc8bd3](https://github.com/ByDSA/mcenter/commit/cbc8bd39b9f0d6c1ee358bdfabb640fb5c0e42d6))
+* playlist with id access ([e32833c](https://github.com/ByDSA/mcenter/commit/e32833c64f7dd942009ca3c93632a49e4e6a417e))
+* sync all musics data under react query ([f7f38f1](https://github.com/ByDSA/mcenter/commit/f7f38f1845661ef87543f1f8d1e04d9d44355c9f))
+
+
+### Bug Fixes
+
+*  use router ([2c82aa2](https://github.com/ByDSA/mcenter/commit/2c82aa2210cef9e834b3966d08e49b69c9806a61))
+* change remote players icon and section name ([26bec78](https://github.com/ByDSA/mcenter/commit/26bec78ac6e872352208e7defb84ba18b2d8cea5))
+* no reloop in background when stops ([51b98ed](https://github.com/ByDSA/mcenter/commit/51b98edb75c150cabe5706e1c47b33bae012fc81))
+* repeat one ([ee209db](https://github.com/ByDSA/mcenter/commit/ee209db6361870d5d4e11d736c76a3f4fcb8ffb7))
+
 ## [4.21.0](https://github.com/ByDSA/mcenter/compare/v4.17.0...v4.21.0) (2025-12-27)
 
 
