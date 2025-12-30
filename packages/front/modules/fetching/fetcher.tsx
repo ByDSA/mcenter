@@ -1,4 +1,4 @@
-import { HttpError, HttpErrorUnauthorized } from "#modules/core/errors/custom-http-errors";
+import { HttpError, HttpErrorUnauthorized } from "#modules/core/errors/custom-errors";
 import { logger } from "#modules/core/logger";
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";

@@ -7,11 +7,11 @@ import { ResourcePlayButtonView } from "#modules/resources/PlayButton";
 import { formatDurationHeader } from "../../utils";
 import styles from "../Playlist.module.css";
 import commonStyles from "../../common.module.css";
-import { PlaylistEntity } from "../types";
 import { SettingsButton } from "../../SettingsButton";
+import { MusicPlaylistEntity } from "../../models";
 
 interface PlaylistHeaderProps {
-  value: PlaylistEntity;
+  value: MusicPlaylistEntity;
   totalSongs: number;
   totalDuration: number;
   playlistStatus: PlayerStatus;
@@ -32,7 +32,7 @@ export const PlaylistHeader = ( { value,
         <MusicImageCover
           img={{
             alt: value.name,
-            url: value.coverUrl,
+            url: undefined, // value.coverUrl,
           }}
           className={styles.playlistCover}
         />

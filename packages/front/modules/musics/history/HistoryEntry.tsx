@@ -8,6 +8,8 @@ import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
 import { ResourceEntry } from "#modules/resources/ResourceEntry";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { ResourceEntryLoading } from "#modules/resources/ResourceEntryLoading";
+import { useMusic } from "../hooks";
 import { HistoryEntryContextMenu } from "./ContextMenu";
 import { MusicHistoryApi } from "./requests";
 
@@ -21,7 +23,6 @@ export const MusicHistoryEntryElement = React.memo((
 ) =>{
   const { user } = useUser();
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
-  const { resource: music } = value;
   const { openMenu } = useContextMenuTrigger();
   const { currentResource, playMusic, status, pause, resume } = useBrowserPlayer(
     useShallow(s=> ( {
@@ -32,17 +33,25 @@ export const MusicHistoryEntryElement = React.memo((
       resume: s.resume,
     } )),
   );
+  const { data: music } = useMusic(value.resourceId, {
+    expand: ["favorite", "fileInfos", "userInfo"],
+  } );
 
-  return ResourceEntry( {
-    title: music.title,
-    titleHref: PATH_ROUTES.musics.frontend.path + "/" + music.id,
-    subtitle: <MusicSubtitle music={music} />,
-    right: <>
-      <HistoryTimeView timestamp={value.date.timestamp} />
-      <WeightView weight={music.userInfo.weight} />
-    </>,
-    settings: {
-      onClick: (e)=> {
+  if (!music)
+    return <ResourceEntryLoading />;
+
+  return <ResourceEntry
+    title={music.title}
+    titleHref={PATH_ROUTES.musics.frontend.path + "/" + music.id}
+    subtitle={<MusicSubtitle music={music} />}
+    right={
+      <>
+        <HistoryTimeView timestamp={value.date.timestamp} />
+        <WeightView weight={music.userInfo!.weight} />
+      </>
+    }
+    settings={{
+      onClick: (e) => {
         openMenu( {
           event: e,
           content: <HistoryEntryContextMenu
@@ -52,15 +61,16 @@ export const MusicHistoryEntryElement = React.memo((
           />,
         } );
       },
-    },
-    favButton: PlaylistFavButton( {
-      favoritesPlaylistId,
-      musicId: value.resource.id,
-      initialValue: value.resource.isFav,
-    } ),
-    play: {
+    }}
+    favButton={
+      <PlaylistFavButton
+        favoritesPlaylistId={favoritesPlaylistId}
+        musicId={value.resource.id}
+      />
+    }
+    play={{
       status: currentResource?.resourceId === value.resource.id ? status : "stopped",
-      onClick: ()=>{
+      onClick: async () => {
         if (currentResource?.resourceId === value.resource.id) {
           if (status === "paused") {
             resume();
@@ -73,9 +83,9 @@ export const MusicHistoryEntryElement = React.memo((
           }
         }
 
-        playMusic(value.resource);
+        await playMusic(value.resourceId);
       },
-    },
-    coverUrl: value.resource.coverUrlSmall ?? value.resource.coverUrl,
-  } );
+    }}
+    coverUrl={value.resource.coverUrlSmall ?? value.resource.coverUrl}
+  />;
 } );

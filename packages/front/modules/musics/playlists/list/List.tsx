@@ -4,7 +4,6 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceList } from "#modules/resources/ResourceList";
 import { MusicPlaylistsApi } from "../requests";
@@ -74,16 +73,6 @@ export function useMusicPlaylists() {
       } );
 
       return result.data;
-    },
-    refetching: {
-      fn: async (d)=> {
-        const result = await api.getManyByUserCriteria(userId, {
-          limit: Math.max(d?.length ?? 0, INITIAL_FETCHING_LENGTH),
-        } );
-
-        return result.data;
-      },
-      everyMs: 5_000,
     },
     fetchingMore: {
       fn: async (d) => {

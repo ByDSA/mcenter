@@ -5,6 +5,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { INITIAL_FETCHING_LENGTH, FETCHING_MORE_LENGTH } from "#modules/history/lists";
 import { ResourceList } from "#modules/resources/ResourceList";
 import { dayTitle } from "#modules/history/utils";
+import { useMusic } from "../hooks";
 import { MusicHistoryApi } from "./requests";
 import { MusicHistoryEntryElement } from "./HistoryEntry";
 
@@ -13,6 +14,13 @@ type Data = MusicHistoryApi.GetManyByCriteria.Data[];
 export function HistoryList() {
   const { data, isLoading, error,
     setItem, observerTarget } = useHistoryList();
+
+  if (data) {
+    for (const entry of data) {
+      if (entry.resource)
+        useMusic.updateCache(entry.resourceId, entry.resource);
+    }
+  }
 
   return renderFetchedData<Data | null>( {
     data,

@@ -10,19 +10,18 @@ import { isModified as isModifiedd } from "#modules/utils/objects";
 import { generatePatchBody, shouldSendPatchWithBody } from "#modules/fetching";
 import { MusicsApi } from "#modules/musics/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { createFullOp, SetState, useCrud, UseCrudProps } from "#modules/utils/resources/useCrud";
+import { createFullOp, useCrud, UseCrudProps } from "#modules/utils/resources/useCrud";
 import { DeleteResource, ResetResource, UpdateResource } from "#modules/utils/resources/elements/crud-buttons";
 import { MusicUserInfosApi } from "#modules/musics/user-info.requests";
 import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { useUpdateCrud } from "#modules/utils/resources/UseCrudComps/update";
 import { useOpCrud } from "#modules/utils/resources/UseCrudComps/op";
+import { useMusic } from "#modules/musics/hooks";
 import { MUSIC_PROPS } from "../MusicEntry/utils";
 import { genTitleElement, genArtistElement, genWeightElement, genAlbumElement, genSlugElement, genTagsElement, genUnknownElement } from "./elements";
 import styles from "./styles.module.css";
 
-export type UseMusicCrudWithElementsProps<T> = Pick<UseCrudProps<T>, "data"> & {
-  setData: SetState<T>;
-};
+export type UseMusicCrudWithElementsProps<T> = Pick<UseCrudProps<T>, "data">;
 
 function dataJsx(data: Music) {
   return <div>
@@ -32,8 +31,7 @@ function dataJsx(data: Music) {
 }
 
 export function useMusicCrudWithElements
-  <T extends MusicEntity = MusicEntity>( { data,
-  setData }: UseMusicCrudWithElementsProps<T>) {
+  <T extends MusicEntity = MusicEntity>( { data }: UseMusicCrudWithElementsProps<T>) {
   const api = FetchApi.get(MusicsApi);
   const userInfoApi = FetchApi.get(MusicUserInfosApi);
   const { openModal } = useConfirmModal();
@@ -44,7 +42,9 @@ export function useMusicCrudWithElements
   const update = useUpdateCrud( {
     isModified,
     reset,
-    setData,
+    setData: (music) => {
+      useMusic.updateCache(music.id, music);
+    },
     config: {
       action: async () => {
         const musicBody: MusicsApi.Patch.Body = generatePatchBody(

@@ -1,0 +1,33 @@
+import { FavButton } from "#modules/ui-kit/FavButton";
+import { HistoryTimeView, WeightView } from "./metadata";
+import { ResourceEntry } from "./ResourceEntry";
+
+type Props = Pick<Parameters<typeof ResourceEntry>[0], "drag">;
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const ResourceEntryLoading = (props?: Props) => {
+  return <ResourceEntry
+    title=""
+    subtitle=""
+    drag={props?.drag}
+    play={{
+      onClick: ()=> { /* empty */ },
+      status: "stopped",
+    }}
+    settings={{
+      onClick: () => { /* empty */ },
+    }}
+    favButton={
+      <FavButton
+        value={false}
+        disabled={true}
+      />
+    }
+    right={
+      <>
+        <HistoryTimeView timestamp={0} />
+        <WeightView weight={0} />
+      </>
+    }
+  />;
+};

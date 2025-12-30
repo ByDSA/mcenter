@@ -9,12 +9,13 @@ import { PlaylistEntity } from "../Playlist/types";
 import { formatDurationHeader, playlistCopySlugUrl } from "../utils";
 import { SettingsButton } from "../SettingsButton";
 import { MusicImageCover } from "../../MusicCover";
+import { MusicPlaylistEntity } from "../models";
 import styles from "./Item.module.css";
 import { RenamePlaylistContextMenuItem } from "./renameMenuItem";
 import { DeletePlaylistContextMenuItem } from "./deleteItem";
 
 interface PlaylistProps {
-  value: PlaylistEntity;
+  value: MusicPlaylistEntity;
   index: number;
 }
 
@@ -22,7 +23,7 @@ interface PlaylistProps {
 export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
   const { removeItemByIndex, data, setItemByIndex } = useArrayData<PlaylistEntity>();
   const totalDuration = value.list?.reduce(
-    (acc, item) => acc + (item.music.fileInfos[0].mediaInfo.duration ?? 0),
+    (acc, item) => acc + (item.music?.fileInfos?.[0].mediaInfo.duration ?? 0),
     0,
   ) || 0;
   const totalSongs = value.list?.length || 0;
@@ -48,7 +49,7 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
         className={styles.playlistCover}
         img={{
           alt: value.name,
-          url: value.coverUrl,
+          url: undefined, // value.coverUrl,
         }}
       />
 

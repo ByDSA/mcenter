@@ -78,6 +78,7 @@
         font-size: 1em;
         svg {
           height: 0.75em;
+          width: 0.75em;
         }
       }
 
@@ -86,6 +87,7 @@
         font-size: 0.8em;
         svg {
           height: 0.6em;
+          width: 0.6em;
         }
       }
     }
@@ -146,6 +148,7 @@
 }
 
 .info {
+  width: 4rem;
   margin-right: 1rem;
 
   @media (width < 450px) {

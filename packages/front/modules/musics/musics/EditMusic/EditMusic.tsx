@@ -8,20 +8,20 @@ import { MusicsApi } from "#modules/musics/requests";
 import { Button } from "#modules/ui-kit/input/Button";
 import { useFileInfosModal } from "#modules/musics/file-info/EditFileInfos/Modal";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
-import { createFullOp, SetState } from "#modules/utils/resources/useCrud";
+import { createFullOp } from "#modules/utils/resources/useCrud";
 import { usePublishEvent, useSubscription } from "#modules/utils/EventBus";
+import { useMusic } from "#modules/musics/hooks";
 import commonStyles from "../../../history/entry/body-common.module.css";
 import { useMusicCrudWithElements, UseMusicCrudWithElementsProps } from "./useMusicCrudWithElements";
 import { OptionalPropsButton } from "./elements";
 import styles from "./styles.module.css";
 
-export type BodyProps = UseMusicCrudWithElementsProps<MusicEntity>;
+export type BodyProps = Omit<UseMusicCrudWithElementsProps<MusicEntity>, "setData">;
 
-function EditMusicView( { data, setData }: BodyProps) {
+function EditMusicView( { data }: BodyProps) {
   const { actions,
     elements, optionalProps, isModified } = useMusicCrudWithElements( {
     data,
-    setData,
   } );
   const createActionsBarElement = useCallback(()=>createActionsBar( {
     spinnerSide: "left",
@@ -103,22 +103,15 @@ export function useMusicSubscription(id: string, cb: (d: MusicEntity)=> void) {
 
 type UseEditMusicProps = {
   initialData: MusicEntity;
-  setData?: SetState<MusicEntity>;
 };
-export function EditMusic( { initialData,
-  setData: parentSetData }: UseEditMusicProps) {
+export function EditMusic( { initialData }: UseEditMusicProps) {
   const [data, setData] = useState<MusicEntity>(initialData);
 
   useMusicSubscription(initialData.id, (d)=> setData(d));
 
   useEffect(() => {
-    parentSetData?.(old=>{
-      return {
-        ...old,
-        ...data,
-      };
-    } );
-  }, [data, parentSetData]);
+    useMusic.updateCache(initialData.id, data);
+  }, [data]);
   const fetchData = useCallback(async () => {
     const api = FetchApi.get(MusicsApi);
     const result = await api.getOneByCriteria( {
@@ -136,7 +129,7 @@ export function EditMusic( { initialData,
     action={fetchData}
     onSuccess={d=>setData(d)}
   >
-    <EditMusicView data={data} setData={setData}/>
+    <EditMusicView data={data}/>
   </AsyncLoader>;
 }
 

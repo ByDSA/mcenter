@@ -1,12 +1,11 @@
-import type { PlaylistEntity } from "#modules/musics/playlists/Playlist/types";
 import type { MusicEntity } from "$shared/models/musics";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { RefObject } from "react";
 import { PATH_ROUTES } from "$shared/routing";
-import { secsToMmss } from "#modules/utils/dates";
+import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { backendUrl } from "#modules/requests";
 import { withRetries } from "#modules/utils/retries";
+import { useMusic } from "#modules/musics/hooks";
 
 export type PlayerStatus = "paused" | "playing" | "stopped";
 
@@ -14,30 +13,17 @@ export enum RepeatMode {
   Off = 0, All = 1, One = 2
 }
 
-export type PlayerResource = {
+type PlayerResourceId = {
   type: "episode" | "music";
   resourceId: string;
-  music: MusicEntity;
-  playlist: {
-    id: string | null;
-    itemId: string | null;
-  };
-  slug: string;
-  ui: {
-    title: string;
-    artist: string;
-    album?: string;
-    length: string;
-    coverImg?: string;
-  };
 };
 
 type PlayProps = {
-  resource: PlayerResource;
+  resource: PlaylistQueueItem;
 };
 
 type PlayPlaylistItemProps = {
-  playlist: PlaylistEntity;
+  playlist: MusicPlaylistEntity;
   index: number;
   ownerSlug?: string;
 };
@@ -48,47 +34,38 @@ type PlayMusicProps = {
 };
 
 // --- Helpers ---
-function musicToResource(music: MusicEntity): PlayerResource {
-  const duration = music.fileInfos?.[0].mediaInfo.duration;
-
+function musicToResource(music: MusicEntity): PlaylistQueueItem {
   return {
     type: "music",
     resourceId: music.id,
-    slug: music.slug,
-    music,
-    playlist: {
-      id: null,
-      itemId: null,
-    },
-    ui: {
-      title: music.title,
-      artist: music.artist,
-      album: music.album,
-      length: duration ? secsToMmss(duration) : "00:00",
-      coverImg: music.coverUrl,
-    },
+    itemId: null,
+    playlistId: null,
   };
 }
 
-export function playlistToQueue(playlist: PlaylistEntity): PlayerResource[] {
+export function playlistToQueue(playlist: MusicPlaylistEntity): PlaylistQueueItem[] {
   return playlist.list.map(item => ( {
-    ...musicToResource(item.music),
-    playlist: {
-      itemId: item.id,
-      id: playlist.id,
-    },
+    itemId: item.id,
+    playlistId: playlist.id,
+    resourceId: item.musicId,
+    type: "music",
   } ));
 }
 
+export type PlaylistQueueItem = PlayerResourceId & {
+  itemId: string | null;
+  playlistId: string | null;
+};
+
 type SetCurrentTimeProps = {
-  audioRef?: RefObject<HTMLAudioElement | null>;
+  audioElement?: HTMLAudioElement | null;
 };
 
 // --- Interface del Store ---
 interface PlayerState {
   status: PlayerStatus;
-  currentResource: PlayerResource | null;
-  queue: PlayerResource[];
+  currentResource: PlaylistQueueItem | null;
+  queue: PlaylistQueueItem[];
   queueIndex: number;
   repeatMode: RepeatMode;
   isShuffle: boolean;
@@ -100,19 +77,19 @@ interface PlayerState {
 
   // Acciones
   play: (props: PlayProps)=> void;
-  playMusic: (music: MusicEntity, props?: PlayMusicProps)=> void;
-  playPlaylistItem: (props: PlayPlaylistItemProps)=> void;
-  playQueueIndex: (index: number, props?: SetCurrentTimeProps)=> void;
+  playMusic: (musicId: MusicEntity["id"], props?: PlayMusicProps)=> Promise<void>;
+  playPlaylistItem: (props: PlayPlaylistItemProps)=> Promise<void>;
+  playQueueIndex: (index: number, props?: SetCurrentTimeProps)=> Promise<void>;
   playQuery: (q: string)=> Promise<void>;
   pause: ()=> void;
   resume: ()=> void;
   stop: ()=> void;
-  addToQueue: (resource: PlayerResource)=> void;
+  addToQueue: (resource: PlaylistQueueItem)=> void;
   next: ()=> Promise<void>;
   prev: ()=> Promise<void>;
   setStatus: (newVale: PlayerStatus)=> void;
   setDuration: (newValue: number | undefined)=> void;
-  setQueue: (resources: PlayerResource[])=> void;
+  setQueue: (resources: PlaylistQueueItem[])=> void;
   setQueueIndex: (index: number)=> void;
   cycleRepeatMode: ()=> void;
   setIsShuffle: (isShuffle: boolean)=> void;
@@ -155,7 +132,13 @@ export const useBrowserPlayer = create<PlayerState>()(
         status: "playing",
       } ),
 
-      playMusic: (music, props) => {
+      playMusic: async (musicId, props) => {
+        await useMusic.invalidateCache(musicId); // TODO
+        const music = await useMusic.get(musicId);
+
+        if (!music)
+          return;
+
         const resource = musicToResource(music);
         const { currentResource } = get();
         const isSameAsLatest = currentResource
@@ -166,7 +149,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           ...(isSameAsLatest
             ? {}
             : {
-              duration: music.fileInfos?.[0]?.mediaInfo.duration ?? undefined,
+              duration: music.fileInfos![0]?.mediaInfo.duration ?? undefined,
             } ),
           currentResource: resource,
           status: "playing",
@@ -180,31 +163,27 @@ export const useBrowserPlayer = create<PlayerState>()(
         } );
       },
 
-      playPlaylistItem: (props) => {
-        const { index, playlist, ownerSlug } = props;
-        const { list } = playlist;
-
-        if (index >= list.length)
-          return;
-
-        const currentItem = list[index];
-        const resource = {
-          ...musicToResource(currentItem.music),
-          playlist: {
-            itemId: currentItem.id,
-            id: playlist.id,
-          },
+      playPlaylistItem: async (props) => {
+        const { playlist, index, ownerSlug } = props;
+        const currentItem = playlist.list[index];
+        const resource: PlaylistQueueItem = {
+          itemId: currentItem.id,
+          playlistId: playlist.id,
+          resourceId: currentItem.musicId,
+          type: "music",
         };
-        const { currentResource, queue } = get();
+        const { currentResource } = get();
         const isSameAsLatest = currentResource
-        && currentResource.resourceId === queue[index].resourceId;
+        && currentResource.resourceId === resource.resourceId;
 
         set( {
           currentTime: 0,
           ...(isSameAsLatest
             ? {}
             : {
-              duration: currentItem.music.fileInfos?.[0]?.mediaInfo.duration ?? undefined,
+              duration: (await useMusic.get(currentItem.musicId))
+                ?.fileInfos?.[0]?.mediaInfo.duration
+               ?? undefined,
             } ),
           currentResource: resource,
           status: "playing",
@@ -224,9 +203,10 @@ export const useBrowserPlayer = create<PlayerState>()(
           return;
         }
 
-        const currentResource = musicToResource(music);
+        const { currentResource } = get();
         const isSameAsLatest = currentResource
         && currentResource.resourceId === music.id;
+        const queueItem: PlaylistQueueItem = musicToResource(music);
 
         set( {
           query: q,
@@ -236,24 +216,28 @@ export const useBrowserPlayer = create<PlayerState>()(
             : {
               duration: music.fileInfos?.[0]?.mediaInfo.duration ?? undefined,
             } ),
-          currentResource,
-          queue: [currentResource],
+          currentResource: queueItem,
+          queue: [queueItem],
           status: "playing",
           queueIndex: 0,
         } );
       },
-      playQueueIndex: (index, props) => {
+      playQueueIndex: async (index, props) => {
         const { queue, currentResource, setCurrentTime } = get();
 
         if (index < 0 || index >= queue.length)
           return;
 
-        const { music } = queue[index];
+        const queueItem = queue[index];
         const isSameAsLatest = currentResource
         && currentResource.resourceId === queue[index].resourceId;
+        const music = await useMusic.get(queueItem.resourceId);
+
+        if (!music)
+          return;
 
         setCurrentTime(0, {
-          audioRef: props?.audioRef,
+          audioElement: props?.audioElement,
         } );
         set( {
           ...(isSameAsLatest
@@ -266,11 +250,9 @@ export const useBrowserPlayer = create<PlayerState>()(
           queueIndex: index,
         } );
       },
-
       pause: () => set( {
         status: "paused",
       } ),
-
       resume: () => {
         if (get().currentResource) {
           set( {
@@ -278,7 +260,6 @@ export const useBrowserPlayer = create<PlayerState>()(
           } );
         }
       },
-
       stop: () => set( {
         currentTime: 0,
         status: "stopped",
@@ -286,14 +267,13 @@ export const useBrowserPlayer = create<PlayerState>()(
         currentResource: null,
         queue: [],
       } ),
-
       addToQueue: (resource) => set((state) => ( {
         queue: [...state.queue, resource],
       } )),
       getPlayingType: () => {
         const { currentResource, query } = get();
 
-        if (currentResource?.playlist.id)
+        if (currentResource?.playlistId)
           return "playlist";
 
         if (query)
@@ -301,10 +281,9 @@ export const useBrowserPlayer = create<PlayerState>()(
 
         return "one";
       },
-
       next: async () => {
         const { queueIndex, queue, repeatMode, isShuffle, query } = get();
-        const playOfflineRandom = () => {
+        const playOfflineRandom = async () => {
           const normalRandomIndex = getRandomExcludePrevious(queue.length - 1, queueIndex);
 
           if (normalRandomIndex === -1) {
@@ -313,7 +292,7 @@ export const useBrowserPlayer = create<PlayerState>()(
             return;
           }
 
-          get().playQueueIndex(normalRandomIndex);
+          await get().playQueueIndex(normalRandomIndex);
         };
         const playingType = get().getPlayingType();
 
@@ -329,7 +308,7 @@ export const useBrowserPlayer = create<PlayerState>()(
               return;
           }
 
-          get().playQueueIndex(newIndex);
+          await get().playQueueIndex(newIndex);
 
           return;
         }
@@ -342,16 +321,16 @@ export const useBrowserPlayer = create<PlayerState>()(
             } );
 
             if (!music)
-              throw new Error("Not found");
+              throw new Error("Error fetching query music");
 
-            const index = queue.findIndex(item=>item.music.id === music.id);
+            const index = queue.findIndex(item=>item.resourceId === music.id);
 
             if (index === -1)
-              throw new Error("Not found");
+              throw new Error("Index not found");
 
-            get().playQueueIndex(index);
+            await get().playQueueIndex(index);
           } catch {
-            playOfflineRandom();
+            await playOfflineRandom();
           }
 
           return;
@@ -361,9 +340,9 @@ export const useBrowserPlayer = create<PlayerState>()(
           } );
 
           if (!music)
-            throw new Error("Not found");
+            return;
 
-          get().playMusic(music, {
+          await get().playMusic(music.id, {
             addToEnd: true,
             keepQuery: true,
           } );
@@ -372,10 +351,8 @@ export const useBrowserPlayer = create<PlayerState>()(
         }
 
         // one con shuffle
-        playOfflineRandom();
+        await playOfflineRandom();
       },
-
-      // eslint-disable-next-line require-await
       prev: async () => {
         const { queueIndex, queue, repeatMode } = get();
         let newIndex = queueIndex - 1;
@@ -387,9 +364,8 @@ export const useBrowserPlayer = create<PlayerState>()(
             return;
         }
 
-        get().playQueueIndex(newIndex);
+        await get().playQueueIndex(newIndex);
       },
-
       setQueue: (queue) => set( {
         queue,
       } ),
@@ -418,11 +394,11 @@ export const useBrowserPlayer = create<PlayerState>()(
         } );
       },
       setCurrentTime: (newValue, props) => {
-        if (props?.audioRef?.current)
-          props.audioRef.current.currentTime = newValue;
+        if (props?.audioElement)
+          props.audioElement.currentTime = newValue;
 
         return set( {
-          currentTime: newValue,
+          currentTime: Math.min(newValue, get().duration ?? 0),
         } );
       },
 
@@ -475,8 +451,11 @@ async function fetchQueryMusic(q: string) {
       credentials: "include",
     } );
     const json = await res.json();
+    const data = json.data as MusicEntity;
 
-    return json.data as MusicEntity;
+    useMusic.updateCache(data.id, data);
+
+    return data;
   } catch {
     return null;
   }

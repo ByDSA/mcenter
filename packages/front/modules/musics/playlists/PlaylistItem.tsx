@@ -1,14 +1,15 @@
-import type { PlaylistEntity } from "./Playlist/types";
 import React, { ReactNode } from "react";
 import { SetState } from "#modules/utils/resources/useCrud";
 import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { ResourceEntryLoading } from "#modules/resources/ResourceEntryLoading";
 import { MusicEntryElement } from "../musics/MusicEntry/MusicEntry";
-import { MusicEntity } from "../models";
 import { genMusicEntryContextMenuContent } from "../musics/MusicEntry/ContextMenu";
+import { useMusic } from "../hooks";
 import { MusicPlaylistsApi } from "./requests";
+import { MusicPlaylistEntity } from "./models";
 
 export type ContextMenuProps = {
   onClick?: (e: React.MouseEvent<HTMLElement>)=> void;
@@ -16,8 +17,8 @@ export type ContextMenuProps = {
 };
 
 type PlaylistItemProps = NonNullable<Pick<Parameters<typeof MusicEntryElement>[0], "drag">> & {
-  playlist: PlaylistEntity;
-  setPlaylist: SetState<PlaylistEntity>;
+  playlist: MusicPlaylistEntity;
+  setPlaylist: SetState<MusicPlaylistEntity>;
   index: number;
 };
 
@@ -29,48 +30,24 @@ export const MusicPlaylistItem = ( { playlist,
   const { user } = useUser();
   const { openMenu: _openMenu } = useContextMenuTrigger();
   const value = playlist.list[index];
-  const { music } = value;
+  const usingMusic = useMusic(value.musicId);
+  const { data: music } = usingMusic;
   const api = FetchApi.get(MusicPlaylistsApi);
-  const setData: SetState<MusicEntity> = a => {
-    const musicUpdateData = typeof a === "function" ? a(undefined) : a;
+  const playingThisItemStatus = useBrowserPlayer(s=> {
+    const item = playlist.list[index];
 
-    if (!musicUpdateData)
-      return;
+    if (item.id === s.currentResource?.itemId)
+      return s.status;
+    else
+      return "stopped";
+  } );
 
-    const newMusic = musicUpdateData;
-    const targetMusicId = musicUpdateData.id;
+  if (!music)
+    return <ResourceEntryLoading drag={drag}/>;
 
-    setPlaylist(old => {
-      if (!old || !old.list)
-        return old;
-
-      const updatedList = old.list.map(listItem => {
-        if (listItem.musicId === targetMusicId) {
-          const oldMusic = listItem.music;
-          const mergedMusic = {
-            ...oldMusic,
-            ...newMusic,
-          };
-
-          return {
-            ...listItem,
-            music: mergedMusic,
-          } as PlaylistEntity["list"][0];
-        }
-
-        return listItem;
-      } );
-
-      return {
-        ...old,
-        list: updatedList,
-      } as PlaylistEntity;
-    } );
-  };
   const contextMenuContent = <>
     {genMusicEntryContextMenuContent( {
       music,
-      setMusic: setData,
       user,
     } )}
     {user?.id === playlist.ownerUserId && <ContextMenuItem
@@ -97,20 +74,12 @@ export const MusicPlaylistItem = ( { playlist,
     />
     }
   </>;
-  const playingThisItemStatus = useBrowserPlayer(s=> {
-    const item = playlist.list[index];
-
-    if (item.id === s.currentResource?.playlist?.itemId)
-      return s.status;
-    else
-      return "stopped";
-  } );
 
   return <MusicEntryElement
-    data={music}
+    musicId={music.id}
     play={{
       status: playingThisItemStatus,
-      onClick: ()=>{
+      onClick: async ()=>{
         const player = useBrowserPlayer.getState();
 
         if (playingThisItemStatus === "playing") {
@@ -123,14 +92,13 @@ export const MusicPlaylistItem = ( { playlist,
           return;
         }
 
-        player.playPlaylistItem( {
+        await player.playPlaylistItem( {
           playlist,
           index,
           ownerSlug: playlist.ownerUser?.slug,
         } );
       },
     }}
-    setData={setData}
     index={index}
     drag={drag}
     contextMenu={{

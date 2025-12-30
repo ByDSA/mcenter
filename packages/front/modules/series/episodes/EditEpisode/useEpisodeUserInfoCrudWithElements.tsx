@@ -64,7 +64,7 @@ export function useEpisodeUserInfoCrudWithElements<T extends Data =
         return res.data;
       },
     },
-    setData,
+    setData: (a)=>setData(a as any),
     reset,
     isModified,
   } );

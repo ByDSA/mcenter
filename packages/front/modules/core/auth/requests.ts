@@ -6,7 +6,7 @@ import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { logger } from "../logger";
-import { HttpErrorUnauthorized } from "../errors/custom-http-errors";
+import { HttpErrorUnauthorized } from "../errors/custom-errors";
 
 export class AuthApi {
   static {

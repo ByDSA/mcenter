@@ -19,9 +19,9 @@ export const PlayMusicButton = ( { music, disabled }: Props) => {
   const isPlayingSameMusic = player.currentResource?.type === "music"
     && player.currentResource?.resourceId === music.id;
   const status: PlayerStatus = isPlayingSameMusic ? player.status : "stopped";
-  const onClick = () => {
+  const onClick = async () => {
     if (status === "stopped")
-      player.playMusic(music);
+      await player.playMusic(music.id);
     else if (status === "paused")
       player.resume();
     else

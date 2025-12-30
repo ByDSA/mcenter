@@ -7,12 +7,13 @@ import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { genMusicEntryContextMenuContent } from "#modules/musics/musics/MusicEntry/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
+import { useMusic } from "#modules/musics/hooks";
 import { ControlButton } from "../OtherButtons";
 import { PlayQueueButtonView } from "../Bottom/PlayQueue/PlayQueueButtonView";
 import { PlayQueue } from "../Bottom/PlayQueue/PlayQueue";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import { useWindowContext } from "../Bottom/PlayQueue/WindowProvider";
-import { useAudioRef } from "../AudioContext";
+import { useAudioElement } from "../AudioContext";
 import styles from "./FullscreenMediaPlayer.module.css";
 import { Player } from "./Player";
 import { Effects } from "./Effects";
@@ -32,9 +33,9 @@ type Props = {
 export function FullscreenMediaPlayer( { onClose }: Props) {
   const [view, setView] = useState<AppView>(AppView.Player);
   const { user } = useUser();
-  const audioRef = useAudioRef();
+  const [audioElement] = useAudioElement();
   const { close } = useWindowContext();
-  const currentRsource = useBrowserPlayer(s=>s.currentResource);
+  const currentResource = useBrowserPlayer(s=>s.currentResource);
   const content = useMemo(()=>{
     switch (view) {
       case AppView.Queue:
@@ -52,20 +53,21 @@ export function FullscreenMediaPlayer( { onClose }: Props) {
         return <Effects />;
       case AppView.Player:
       default:
-        return <Player audioRef={audioRef}/>;
+        return <Player audioElement={audioElement}/>;
     }
-  }, [view, audioRef]);
+  }, [view, audioElement]);
   const { openMenu } = useContextMenuTrigger();
   const isActiveQueue = view === AppView.Queue;
   const isActivePlayer = view === AppView.Player;
   const isActiveEffects = view === AppView.Effects;
+  const { data: music } = useMusic(currentResource?.resourceId ?? null);
 
   return <>
     <header className={styles.header}>
-      {currentRsource && <SettingsButton onClick={(e)=>openMenu( {
+      {music && <SettingsButton onClick={(e)=>openMenu( {
         event: e as any,
         content: genMusicEntryContextMenuContent( {
-          music: currentRsource.music,
+          music,
           user,
         } ),
       } )} />}

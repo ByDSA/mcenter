@@ -1,14 +1,16 @@
 import assert from "node:assert";
 import { PATH_ROUTES } from "$shared/routing";
 import { showError } from "$shared/utils/errors/showError";
-import { RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 import { withRetries } from "#modules/utils/retries";
-import { useBrowserPlayer, RepeatMode } from "./BrowserPlayerContext";
+import { useMusic } from "#modules/musics/hooks";
+import { ErrorNoConnection } from "#modules/core/errors/custom-errors";
+import { useBrowserPlayer, RepeatMode, PlaylistQueueItem } from "./BrowserPlayerContext";
 import { playExoticAudio } from "./exotic-audio";
-import { useAudioRef } from "./AudioContext";
+import { useAudioElement } from "./AudioContext";
 
 export type AudioRef = RefObject<HTMLAudioElement | null>;
 
@@ -23,18 +25,34 @@ export const AudioTag = () => {
     stop: s.stop,
     hasNext: s.hasNext,
   } )));
-  const audioRef = useAudioRef();
+  const [audioElement, setAudioElement] = useAudioElement();
+  const [urlSkipHistory, setUrlSkipHistory] = useState<string>("");
+  const [url, setUrl] = useState<URL | null>(null);
+  const exoticAudioProcess = useRef(false);
 
-  function securePlay() {
-    const audio = audioRef.current;
+  useEffect(() => {
+    getUrlSkipHistory(player.currentResource)
+      .then(setUrlSkipHistory)
+      .catch(showError);
+    getUrl(player.currentResource)
+      .then(setUrl)
+      .catch(showError);
+  }, [player.currentResource]);
 
-    assert(!!audio);
+  async function securePlay() {
+    assert(!!audioElement);
 
-    return withRetries(async ( { attempt } )=> {
+    if (exoticAudioProcess.current)
+      return;
+
+    return await withRetries(async ( { attempt } )=> {
+      if (exoticAudioProcess.current)
+        return;
+
       if (attempt !== 1)
-        audio.load(); // Recarga el recurso
+        audioElement.load(); // Recarga el recurso
 
-      await audio.play();
+      await audioElement.play();
     }, {
       retries: 3,
       delay: 1_000,
@@ -45,22 +63,36 @@ export const AudioTag = () => {
           return true;
         }
 
-        // Ignorar error de interrupción por carga (común en navegación rápida)
-        if (e.name === "AbortError")
+        // AbortError: Ignorar error de interrupción por carga (común en navegación rápida)
+        if (e.name === "AbortError" || e instanceof ErrorNoConnection)
           return false;
 
-        logger.error(e.name + ": " + e.message + " retryCount: " + i);
-
         if (e.name === "NotSupportedError") {
-          const newUrl = await playExoticAudio(urlSkipHistory);
+          logger.info("Convirtiendo archivo ...");
+          const skipUrl = await getUrlSkipHistory(player.currentResource);
 
-          audio.src = newUrl;
+          try {
+            exoticAudioProcess.current = true;
+            const newUrl = await playExoticAudio(skipUrl);
+
+            exoticAudioProcess.current = false;
+            logger.info("Convertido!");
+
+            audioElement.src = newUrl;
+          } catch (e2) {
+            exoticAudioProcess.current = false;
+            logger.error(e2);
+
+            return true;
+          }
 
           if (useBrowserPlayer.getState().status === "playing")
             await securePlay();
 
           return false;
         }
+
+        logger.error(e.name + ": " + e.message + " retryCount: " + i);
 
         return true;
       },
@@ -69,95 +101,56 @@ export const AudioTag = () => {
 
   // Efecto para controlar el play/pause
   useEffect(() => {
-    const audio = audioRef.current;
-
-    if (!audio)
+    if (!audioElement)
       return;
-
-    if (!player.currentResource) {
-      if (audio.paused === false)
-        audio.pause();
-
-      return;
-    }
 
     if (player.status === "playing") {
-      securePlay()
-        .then(()=> {
-          const { status } = useBrowserPlayer.getState();
+      if (audioElement.paused) {
+        securePlay()
+          .then(()=> {
+            const { status } = useBrowserPlayer.getState();
 
-          if (status === "paused")
-            audio.pause();
-        } )
-        .catch(showError);
-    } else
-      audio.pause();
-  }, [player.status, player.currentResource]);
-
-  const url = useMemo(() => {
-    if (!player.currentResource)
-      return null;
-
-    const base = backendUrl(PATH_ROUTES.musics.slug.withParams(player.currentResource.slug));
-    const u = new URL(base);
-
-    u.searchParams.set("format", "raw");
-
-    return u;
-  }, [player.currentResource]);
-  const urlSkipHistory = useMemo(() => {
-    if (!url)
-      return "";
-
-    const u = new URL(url.href);
-
-    u.searchParams.set("skip-history", "1");
-
-    return u.href;
-  }, [url]);
+            if (status !== "playing")
+              audioElement.pause();
+          } )
+          .catch(showError);
+      }
+    } else if (!audioElement.paused)
+      audioElement.pause();
+  }, [player.status, audioElement]);
 
   useEffect(() => {
-    const audio = audioRef.current;
-
-    if (!audio)
+    if (!audioElement)
       return;
 
     const update = () => {
-      if (audioRef.current)
-        player.setCurrentTime(audioRef.current.currentTime);
+      if (audioElement)
+        player.setCurrentTime(audioElement.currentTime);
     };
 
-    audio.addEventListener("timeupdate", update);
+    audioElement.addEventListener("timeupdate", update);
 
-    return () => audio.removeEventListener("timeupdate", update);
-  }, [audioRef.current]);
+    return () => audioElement.removeEventListener("timeupdate", update);
+  }, [audioElement]);
 
-  useAudioContext(audioRef);
+  useAudioContext(audioElement);
 
   useAudioSilenceRef();
 
-  const isOnline = useOnlineStatus();
+  useOnlineAutoPlay(audioElement, securePlay);
 
-  useEffect(()=> {
-    const { status: currentStatus } = useBrowserPlayer.getState();
-
-    if (
-      isOnline === true && audioRef.current?.paused && currentStatus === "playing"
-    ) {
-      securePlay()
-        .catch(showError);
-    }
-  }, [isOnline]);
+  if (!urlSkipHistory)
+    return null;
 
   return <audio
-    ref={audioRef}
+    ref={(node)=>setAudioElement(node)}
     src={urlSkipHistory}
     crossOrigin="use-credentials"
     onDurationChange={()=> {
       const { duration, setDuration } = useBrowserPlayer.getState();
 
       if (duration === undefined)
-        setDuration(audioRef.current!.duration);
+        setDuration(audioElement!.duration);
     }}
     onLoadedData={() => {
       if (url) {
@@ -169,70 +162,126 @@ export const AudioTag = () => {
           },
         } ).catch(showError);
       }
+
+      if (audioElement?.paused && player.status === "playing")
+        securePlay().catch(showError);
     }}
     onPause={()=> {
-      if (player.status === "playing")
+      if (player.status === "playing" && audioElement?.currentTime !== audioElement?.duration)
         securePlay().catch(showError);
     }}
     onEnded={async () => {
       if (player.status !== "playing")
         return;
 
-      if (player.repeatMode === RepeatMode.One && audioRef.current) {
+      if (player.repeatMode === RepeatMode.One && audioElement) {
         player.setCurrentTime(0, {
-          audioRef: audioRef,
+          audioElement,
         } );
-      } else if (player.hasNext())
-        await player.next();
-      else
+      } else if (player.hasNext()) {
+        try {
+          await player.next();
+        } catch (e) {
+          if (e instanceof Error && !(e instanceof ErrorNoConnection))
+            logger.error(e.message);
+        }
+      } else
         player.stop();
     }}
   />;
 };
 
-function useAudioContext(audioRef: AudioRef) {
+function useAudioContext(audioElement: HTMLAudioElement | null) {
   const audioContextRef = useRef<AudioContext | null>(null);
   const compressorRef = useRef<DynamicsCompressorNode | null>(null);
   const limiterRef = useRef<DynamicsCompressorNode | null>(null);
-  const compressionValue = useBrowserPlayer(s=>s.compressionValue);
+  const compressionValue = useBrowserPlayer(s => s.compressionValue);
+  const initAudioPipeline = useCallback(() => {
+    if (!audioElement || typeof window === "undefined")
+      return;
+
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
+    const ctx = new AudioContextClass();
+
+    audioContextRef.current = ctx;
+
+    const source = ctx.createMediaElementSource(audioElement);
+    const compressor = ctx.createDynamicsCompressor();
+    const limiter = ctx.createDynamicsCompressor();
+
+    // ---------------------------------------------------------
+    // CORRECCIÓN: Inicializar con valores NEUTROS (Bypass)
+    // ---------------------------------------------------------
+    // 1. Matar el "Knee" por defecto (era 30, causaba compresión suave siempre)
+    compressor.knee.setValueAtTime(0, ctx.currentTime);
+    // 2. Quitar valores agresivos por defecto (eran -24dB y Ratio 12)
+    compressor.threshold.setValueAtTime(0, ctx.currentTime);
+    compressor.ratio.setValueAtTime(1, ctx.currentTime);
+
+    // Configuración de tiempos (esto estaba bien)
+    compressor.attack.setValueAtTime(0.003, ctx.currentTime);
+    compressor.release.setValueAtTime(0.25, ctx.currentTime);
+
+    // Configuración del Limitador (Bypass inicial)
+    limiter.threshold.setValueAtTime(0, ctx.currentTime);
+    limiter.ratio.setValueAtTime(1, ctx.currentTime);
+
+    // Tiempos del limitador
+    limiter.knee.setValueAtTime(0, ctx.currentTime);
+    limiter.attack.setValueAtTime(0.001, ctx.currentTime);
+    limiter.release.setValueAtTime(0.1, ctx.currentTime);
+
+    compressorRef.current = compressor;
+    limiterRef.current = limiter;
+
+    source.connect(compressor);
+    compressor.connect(limiter);
+    limiter.connect(ctx.destination);
+
+    // Forzamos una actualización inmediata con el valor actual del estado
+    // por si el useEffect tarda un ciclo en entrar.
+    updateCompressionParams(compressor, limiter, ctx, useBrowserPlayer.getState().compressionValue);
+  }, [audioElement]);
+  // Extraje la lógica de actualización para poder reusarla
+  const updateCompressionParams = (
+    comp: DynamicsCompressorNode,
+    lim: DynamicsCompressorNode,
+    ctx: AudioContext,
+    val: number,
+  ) => {
+    const t = ctx.currentTime;
+    // Threshold: de 0 a -40
+    const compThreshold = 0 + (val * -40);
+    // Ratio: de 1 a 15 (Ratio 1 = Sin compresión)
+    const compRatio = 1 + (val * 14);
+
+    comp.threshold.setTargetAtTime(compThreshold, t, 0.1); // setTargetAtTime suaviza la transición
+    comp.ratio.setTargetAtTime(compRatio, t, 0.1);
+
+    const limThreshold = 0 + (val * -20);
+    const limRatio = 1 + (val * 19);
+
+    lim.threshold.setTargetAtTime(limThreshold, t, 0.1);
+    lim.ratio.setTargetAtTime(limRatio, t, 0.1);
+  };
+
+  useEffect(() => {
+    if (!compressorRef.current || !limiterRef.current || !audioContextRef.current)
+      return;
+
+    updateCompressionParams(
+      compressorRef.current,
+      limiterRef.current,
+      audioContextRef.current,
+      compressionValue,
+    );
+  }, [compressionValue]); // Quitamos las otras dependencias que son refs estables
 
   useEffect(() => {
     if (audioContextRef.current)
       return;
 
-    const initAudioPipeline = () => {
-      if (!audioRef.current || typeof window === "undefined")
-        return;
-
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioContextClass();
-
-      audioContextRef.current = ctx;
-
-      const source = ctx.createMediaElementSource(audioRef.current);
-      // Crear Nodos
-      const compressor = ctx.createDynamicsCompressor();
-      const limiter = ctx.createDynamicsCompressor();
-
-      // Configuración fija (tiempos de reacción)
-      compressor.attack.setValueAtTime(0.003, ctx.currentTime);
-      compressor.release.setValueAtTime(0.25, ctx.currentTime);
-
-      limiter.knee.setValueAtTime(0, ctx.currentTime);
-      limiter.attack.setValueAtTime(0.001, ctx.currentTime);
-      limiter.release.setValueAtTime(0.1, ctx.currentTime);
-
-      // Referencias para poder actualizarlos luego
-      compressorRef.current = compressor;
-      limiterRef.current = limiter;
-
-      // CONEXIÓN CORRECTA EN SERIE:
-      // Source -> Compressor -> Limiter -> Destination
-      source.connect(compressor);
-      compressor.connect(limiter);
-      limiter.connect(ctx.destination);
-    };
     const resumeContext = async () => {
       if (!audioContextRef.current)
         initAudioPipeline();
@@ -245,33 +294,11 @@ function useAudioContext(audioRef: AudioRef) {
       once: true,
     } );
 
-    initAudioPipeline();
+    if (!audioContextRef.current)
+      initAudioPipeline();
 
     return () => window.removeEventListener("click", resumeContext);
-  }, [audioRef.current, audioContextRef.current]);
-
-  useEffect(() => {
-    if (!compressorRef.current || !limiterRef.current || !audioContextRef.current)
-      return;
-
-    const ctx = audioContextRef.current;
-    const t = ctx.currentTime;
-    // Threshold: de 0 (nada) a -40 (máximo)
-    const compThreshold = 0 + (compressionValue * -40);
-    // Ratio: de 1 (nada) a 15 (máximo)
-    const compRatio = 1 + (compressionValue * 14);
-
-    compressorRef.current.threshold.setValueAtTime(compThreshold, t);
-    compressorRef.current.ratio.setValueAtTime(compRatio, t);
-
-    // Threshold: de 0 (nada) a -20 (máximo)
-    const limThreshold = 0 + (compressionValue * -20);
-    // Ratio: de 1 (nada) a 20 (máximo)
-    const limRatio = 1 + (compressionValue * 19);
-
-    limiterRef.current.threshold.setValueAtTime(limThreshold, t);
-    limiterRef.current.ratio.setValueAtTime(limRatio, t);
-  }, [compressionValue, compressorRef.current, limiterRef.current, audioContextRef.current]);
+  }, [audioElement, audioContextRef.current]);
 }
 
 function useAudioSilenceRef() {
@@ -303,7 +330,11 @@ function useAudioSilenceRef() {
   return silenceRef;
 }
 
-export function useOnlineStatus() {
+export function useOnlineAutoPlay(
+  audioElement: HTMLAudioElement | null,
+  securePlay: (
+)=> Promise<void>,
+) {
   const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
@@ -326,5 +357,57 @@ export function useOnlineStatus() {
     };
   }, []);
 
+  useEffect(()=> {
+    if (!audioElement)
+      return;
+
+    const fn = async () => {
+      const { status: currentStatus, hasNext, next } = useBrowserPlayer.getState();
+
+      while (isOnline && audioElement.paused && currentStatus === "playing") {
+        try {
+          if (audioElement.currentTime >= audioElement.duration && hasNext())
+            await next();
+          else
+            await securePlay();
+        } catch (e) {
+          if (e instanceof Error && !(e instanceof ErrorNoConnection))
+            logger.error(e.message);
+        }
+      }
+    };
+
+    fn().catch(showError);
+  }, [isOnline]);
+
   return isOnline;
 }
+
+const getUrl = async (currentResource: PlaylistQueueItem | null) => {
+  if (!currentResource)
+    return null;
+
+  const music = await useMusic.get(currentResource.resourceId);
+
+  if (!music)
+    return null;
+
+  const base = backendUrl(PATH_ROUTES.musics.slug.withParams(music.slug));
+  const u = new URL(base);
+
+  u.searchParams.set("format", "raw");
+
+  return u;
+};
+const getUrlSkipHistory = async (currentResource: PlaylistQueueItem | null) => {
+  const url = await getUrl(currentResource);
+
+  if (!url)
+    return "";
+
+  const u = new URL(url.href);
+
+  u.searchParams.set("skip-history", "1");
+
+  return u.href;
+};

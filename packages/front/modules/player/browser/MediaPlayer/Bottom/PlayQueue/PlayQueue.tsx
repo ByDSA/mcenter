@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { PlayerResource, PlayerStatus, useBrowserPlayer } from "../../BrowserPlayerContext";
+import { PlayerStatus, PlaylistQueueItem as QItem, useBrowserPlayer } from "../../BrowserPlayerContext";
 import { QueueItem } from "./PlayQueueItem";
 
 type Props = {
   className?: string;
-  onClickPlay?: (item: PlayerResource, prevStatus: PlayerStatus)=> void;
+  onClickPlay?: (item: QItem, prevStatus: PlayerStatus)=> void;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

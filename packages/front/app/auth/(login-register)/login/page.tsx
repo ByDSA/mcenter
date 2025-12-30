@@ -7,7 +7,7 @@ import { backendUrl } from "#modules/requests";
 import { AuthApi } from "#modules/core/auth/requests";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { HttpErrorUnauthorized } from "#modules/core/errors/custom-http-errors";
+import { HttpErrorUnauthorized } from "#modules/core/errors/custom-errors";
 import { LoginComponent } from "./Login";
 
 function useLoginGoogle() {

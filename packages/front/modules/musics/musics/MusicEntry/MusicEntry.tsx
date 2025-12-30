@@ -7,11 +7,13 @@ import { DurationView, WeightView } from "#modules/history";
 import { classes } from "#modules/utils/styles";
 import { ResourceEntry, ResourceEntryProps, ResourceSubtitle } from "#modules/resources/ResourceEntry";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
-import { BodyProps } from "../EditMusic/EditMusic";
+import { useMusic } from "#modules/musics/hooks";
+import { ResourceEntryLoading } from "#modules/resources/ResourceEntryLoading";
 import styles from "./MusicEntry.module.css";
 import { genMusicEntryContextMenuContent } from "./ContextMenu";
 
-type Props = BodyProps & Pick<ResourceEntryProps, "drag" | "play"> & {
+type Props = Pick<ResourceEntryProps, "drag" | "play"> & {
+  musicId: string;
   index?: number;
   contextMenu?: {
     customContent: ReactNode;
@@ -20,10 +22,15 @@ type Props = BodyProps & Pick<ResourceEntryProps, "drag" | "play"> & {
 export function MusicEntryElement(
   props: Props,
 ) {
-  const { data: music } = props;
-  const duration = music.fileInfos?.[0]?.mediaInfo.duration;
   const { user } = useUser();
   const { openMenu } = useContextMenuTrigger();
+  const { musicId } = props;
+  const { data: music } = useMusic(musicId);
+
+  if (!music)
+    return <ResourceEntryLoading />;
+
+  const duration = music.fileInfos?.[0]?.mediaInfo.duration;
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
   const right = <>
     {duration && <DurationView duration={duration} />}
@@ -38,18 +45,16 @@ export function MusicEntryElement(
       music={music}
     />}
     coverUrl={music.coverUrlSmall ?? music.coverUrl}
-    favButton={ PlaylistFavButton( {
-      favoritesPlaylistId,
-      initialValue: music.isFav,
-      musicId: music.id,
-    } )}
+    favButton={ <PlaylistFavButton
+      favoritesPlaylistId={favoritesPlaylistId}
+      musicId={music.id}
+    />}
     right={right}
     settings={{
       onClick: (e)=>openMenu( {
         event: e,
         content: props.contextMenu?.customContent ?? genMusicEntryContextMenuContent( {
           music,
-          setMusic: props.setData,
           user,
         } ),
       } ),

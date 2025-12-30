@@ -12,6 +12,7 @@ import { MusicEntryElement } from "#modules/musics/musics/MusicEntry/MusicEntry"
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceList } from "#modules/resources/ResourceList";
+import { useMusic } from "#modules/musics/hooks";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 
@@ -57,6 +58,8 @@ export default function Upload() {
         injectDefaultUserInfo(music, user.id),
       ]));
 
+      useMusic.updateCache(music.id, music);
+
       options?.setSelectedFiles?.((old)=> {
         return old.filter(
           f2=> f2.id !== fileData.id,
@@ -68,6 +71,7 @@ export default function Upload() {
     setUploaded(old => ([
       ...old,
       injectDefaultUserInfo(music, user.id)]));
+    useMusic.updateCache(music.id, music);
   };
 
   return (
@@ -89,19 +93,9 @@ export default function Upload() {
           {
           uploaded!.map(
             (music) => <Fragment key={`${music.id}`}>
-              <MusicEntryElement data={music} setData={(newMusic: MusicEntityWithUserInfo) => {
-                const index = uploaded.findIndex(m=>m.id === music.id);
-
-                if (index === -1)
-                  return;
-
-                setUploaded((old: MusicEntityWithUserInfo[]) => ([
-                  ...old.slice(0, index),
-                  newMusic,
-                  ...old.slice(index + 1),
-                ]));
-              }
-              } />
+              <MusicEntryElement
+                musicId={music.id}
+              />
             </Fragment>,
           )
           }

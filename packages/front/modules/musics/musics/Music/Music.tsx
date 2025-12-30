@@ -80,7 +80,6 @@ export const Music = ( { value }: Props) => {
           }}/>
 
           {user && <PlaylistFavButton
-            initialValue={isFav}
             musicId={value.id}
             favoritesPlaylistId={user.musics.favoritesPlaylistId}
           />}

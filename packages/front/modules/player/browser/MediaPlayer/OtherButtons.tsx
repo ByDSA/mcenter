@@ -3,10 +3,9 @@ import { RepeatOne, Repeat, Shuffle, VolumeOff, VolumeDown, VolumeUp, SkipPrevio
 import { useEffect, useState, useCallback, ComponentProps } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { classes } from "#modules/utils/styles";
-import { AudioRef } from "./AudioTag";
 import { useBrowserPlayer, RepeatMode } from "./BrowserPlayerContext";
 import styles from "./OtherButtons.module.css";
-import { useAudioRef } from "./AudioContext";
+import { useAudioElement } from "./AudioContext";
 
 export const ControlButton = ( { active = true,
   className,
@@ -55,7 +54,7 @@ export const ShuffleButton = () => {
   return (
     <ControlButton
       active={isShuffle}
-      disabled={!!query && currentResource?.playlist.id === null}
+      disabled={!!query && currentResource?.playlistId === null}
       onClick={(e) => {
         e.stopPropagation();
         setIsShuffle(!isShuffle);
@@ -74,18 +73,18 @@ export const VolumeController = () => {
     }
     )),
   );
+  const [audioElement] = useAudioElement();
 
   useEffect(()=> {
     updateAudioTagVolume(volume);
-  }, []);
+  }, [audioElement]);
   const [prevVolume, setPrevVolume] = useState(1);
-  const audioRef = useAudioRef();
   const updateAudioTagVolume = useCallback((val: number) => {
-    if (audioRef.current) {
-      audioRef.current.volume = val;
-      audioRef.current.muted = val === 0;
+    if (audioElement) {
+      audioElement.volume = val;
+      audioElement.muted = val === 0;
     }
-  }, [audioRef]);
+  }, [audioElement]);
   const handleVolumeChange = (newVol: number) => {
     setVolume(newVol);
     updateAudioTagVolume(newVol);
@@ -124,7 +123,7 @@ export const VolumeController = () => {
   );
 };
 
-export const PrevButton = ( { audioRef, className }: {audioRef: AudioRef;
+export const PrevButton = ( { audioElement, className }: {audioElement: HTMLAudioElement | null;
 className?: string;} ) => {
   return <ControlButton
     className={classes(styles.prevNextButton, className)}
@@ -136,7 +135,7 @@ className?: string;} ) => {
         await prev();
       else {
         setCurrentTime(0, {
-          audioRef,
+          audioElement,
         } );
       }
     }}

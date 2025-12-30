@@ -224,7 +224,7 @@ musicId: string;} ): Promise<MusicPlaylistsApi.RemoveOneTrack.Response> {
       },
       limit: criteria?.limit ?? 10,
       offset: criteria?.offset ?? undefined,
-      expand: ["musics", "ownerUserPublic"],
+      expand: ["ownerUserPublic"],
     };
     const fetcher = makeFetcher<
       MusicPlaylistsApi.GetManyByCriteria.RequestBody,

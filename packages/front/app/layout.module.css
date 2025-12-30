@@ -127,7 +127,6 @@ body:has(.content) {
     }
 
     > aside:last-of-type {
-      padding: 0;
       width: 100%;
       justify-content: center;
     }

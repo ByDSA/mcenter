@@ -6,15 +6,15 @@ import { classes } from "#modules/utils/styles";
 import { SetState } from "#modules/utils/resources/useCrud";
 import { MusicPlaylistItem } from "../../PlaylistItem";
 import styles from "../Playlist.module.css";
-import { PlaylistEntity, PlaylistItemEntity } from "../types";
+import { MusicPlaylistEntity } from "../../models";
 
 interface Props {
-  item: PlaylistItemEntity;
+  item: MusicPlaylistEntity["list"][0];
   index: number;
   start: number;
   size: number;
-  value: PlaylistEntity;
-  setValue: SetState<PlaylistEntity>;
+  value: MusicPlaylistEntity;
+  setValue: SetState<MusicPlaylistEntity>;
   draggable: boolean;
   isDraggingGlobal: boolean;
   scrollMargin: number;

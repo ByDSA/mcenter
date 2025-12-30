@@ -139,14 +139,8 @@ export class MusicPlaylistsController {
       filter: {
         id: params.id,
       },
-      expand: ["musics", "ownerUserPublic"],
+      expand: ["ownerUserPublic"],
     };
-
-    if (user) {
-      playlistCriteria.expand?.push("musicsFavorite");
-      playlistCriteria.filter!.ownerUserId = user.id;
-    }
-
     const playlist = await this.playlistsRepo.getOneByCriteria(playlistCriteria);
 
     assertFoundClient(playlist);

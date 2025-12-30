@@ -1,10 +1,9 @@
-import { SetState } from "../useCrud";
 import { Op, useOpCrud } from "./op";
 
 export function useUpdateCrud<T, P>(params: {
   config: Op<T, P>;
   isModified: boolean;
-  setData: SetState<T>;
+  setData: (newData: T)=> void;
   reset: (newData?: T)=> Promise<void>;
 } ) {
   const { config, isModified, reset, setData } = params;

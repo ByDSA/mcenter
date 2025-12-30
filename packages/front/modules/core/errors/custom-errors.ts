@@ -11,3 +11,9 @@ export class HttpErrorUnauthorized extends HttpError {
     super(401, msg);
   }
 }
+
+export class ErrorNoConnection extends Error {
+  constructor() {
+    super("No internet connection");
+  }
+}

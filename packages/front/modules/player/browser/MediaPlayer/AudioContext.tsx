@@ -1,20 +1,27 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { AudioRef } from "./AudioTag";
-import { createContext, useContext, useRef } from "react";
+import { createContext, useContext, useState } from "react";
 
-const AudioContext = createContext<AudioRef>(null!);
+type Obj = [
+  HTMLAudioElement | null,
+  (newValue: HTMLAudioElement | null)=> void
+];
+
+const AudioContext = createContext<Obj>(null!);
 
 export const AudioProvider = ( { children } ) => {
-  const audioRef = useRef(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
   return (
-    <AudioContext.Provider value={audioRef}>
+    <AudioContext.Provider value={[
+      audioElement,
+      setAudioElement,
+    ]}>
       {children}
     </AudioContext.Provider>
   );
 };
 
-export const useAudioRef = () => {
+export const useAudioElement = () => {
   const context = useContext(AudioContext);
 
   if (context === undefined)

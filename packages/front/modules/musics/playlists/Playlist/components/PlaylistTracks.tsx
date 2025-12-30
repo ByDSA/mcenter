@@ -9,12 +9,12 @@ import { SetState } from "#modules/utils/resources/useCrud";
 import listEntryStyles from "#modules/resources/ListEntry.module.css";
 import { MusicPlaylistItem } from "../../PlaylistItem";
 import styles from "../Playlist.module.css";
-import { PlaylistEntity } from "../types";
+import { MusicPlaylistEntity } from "../../models";
 import { SortablePlaylistItem } from "./SortablePlaylistItem";
 
 interface PlaylistTracksProps {
-  value: PlaylistEntity;
-  setValue: SetState<PlaylistEntity>;
+  value: MusicPlaylistEntity;
+  setValue: SetState<MusicPlaylistEntity>;
   draggable: boolean;
   // DnD Props pasadas desde el hook
   dndSensors: any;

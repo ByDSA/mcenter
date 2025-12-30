@@ -17,6 +17,7 @@ import { ModalProvider } from "#modules/ui-kit/modal/ModalContext";
 import { ContextMenuProvider } from "#modules/ui-kit/ContextMenu";
 import { MediaPlayerPageLayout } from "#modules/player/browser/MediaPlayer/MediaPlayerPageLayout";
 import { TopbarMainClient } from "#modules/ui-kit/menus/TopbarClient";
+import { GlobalQueryClientProvider } from "#modules/fetching/QueryClientProvider";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
@@ -112,11 +113,13 @@ type GlobalProvidersProps = {
 };
 function GlobalProviders( { children, user }: GlobalProvidersProps) {
   return <UserProvider initialUser={user}>
-    <ModalProvider>
-      <ContextMenuProvider>
-        {children}
-      </ContextMenuProvider>
-    </ModalProvider>
+    <GlobalQueryClientProvider>
+      <ModalProvider>
+        <ContextMenuProvider>
+          {children}
+        </ContextMenuProvider>
+      </ModalProvider>
+    </GlobalQueryClientProvider>
   </UserProvider>;
 }
 

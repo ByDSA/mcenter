@@ -1,9 +1,9 @@
 import { useEffect } from "react";
+import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { playlistToQueue, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { PlaylistEntity } from "../types";
 
-export const usePlaylistPlayer = (value: PlaylistEntity) => {
-  const playlistStatus = useBrowserPlayer(s=>s.currentResource?.playlist?.id === value.id
+export const usePlaylistPlayer = (value: MusicPlaylistEntity) => {
+  const playlistStatus = useBrowserPlayer(s=>s.currentResource?.playlistId === value.id
     ? s.status
     : "stopped");
 
@@ -11,23 +11,23 @@ export const usePlaylistPlayer = (value: PlaylistEntity) => {
   useEffect(() => {
     const player = useBrowserPlayer.getState();
 
-    if (!player.currentResource?.playlist)
+    if (!player.currentResource?.playlistId)
       return;
 
     player.setQueue(playlistToQueue(value));
     player.setQueueIndex(
-      value.list.findIndex((item) => item.id === player.currentResource?.playlist?.itemId),
+      value.list.findIndex((item) => item.id === player.currentResource?.itemId),
     );
   }, [value]);
 
-  const handlePlayPlaylist = () => {
+  const handlePlayPlaylist = async () => {
     if (value.list.length === 0)
       return;
 
     const player = useBrowserPlayer.getState();
 
     if (playlistStatus === "stopped") {
-      player.playPlaylistItem( {
+      await player.playPlaylistItem( {
         playlist: value,
         index: 0,
         ownerSlug: value.ownerUser?.slug,

@@ -8,10 +8,11 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { SetState } from "#modules/utils/resources/useCrud";
 import { MusicPlaylistsApi } from "../../requests";
 import { PlaylistEntity } from "../types";
+import { MusicPlaylistEntity } from "../../models";
 
 export const usePlaylistDragAndDrop = (
-  value: PlaylistEntity,
-  setValue: SetState<PlaylistEntity>,
+  value: MusicPlaylistEntity,
+  setValue: SetState<MusicPlaylistEntity>,
 ) => {
   const [isDraggingGlobal, setIsDraggingGlobal] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);

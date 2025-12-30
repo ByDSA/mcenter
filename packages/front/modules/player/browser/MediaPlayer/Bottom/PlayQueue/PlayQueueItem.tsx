@@ -1,11 +1,11 @@
 import { memo } from "react";
 import { MusicEntryElement } from "#modules/musics/musics/MusicEntry/MusicEntry";
-import { PlayerResource, PlayerStatus, useBrowserPlayer } from "../../BrowserPlayerContext";
-import { useAudioRef } from "../../AudioContext";
+import { PlayerStatus, PlaylistQueueItem as QItem, useBrowserPlayer } from "../../BrowserPlayerContext";
+import { useAudioElement } from "../../AudioContext";
 
 interface QueueItemProps {
   index: number;
-  item: PlayerResource;
+  item: QItem;
   playerStatus: PlayerStatus;
   start: number;
   size: number;
@@ -20,14 +20,14 @@ export const QueueItem = memo(( { index,
   onClickPlay,
   size }: QueueItemProps) => {
   const queueIndex = useBrowserPlayer(s=>s.queueIndex);
-  const audioRef = useAudioRef();
+  const [audioElement] = useAudioElement();
   const playingThisItemStatus: PlayerStatus = (() => {
     if (index === queueIndex)
       return playerStatus;
 
     return "stopped";
   } )();
-  const handlePlay = () => {
+  const handlePlay = async () => {
     const player = useBrowserPlayer.getState();
 
     if (playingThisItemStatus === "playing")
@@ -35,8 +35,8 @@ export const QueueItem = memo(( { index,
     else if (playingThisItemStatus === "paused")
       player.resume();
     else {
-      player.playQueueIndex(index, {
-        audioRef,
+      await player.playQueueIndex(index, {
+        audioElement,
       } );
     }
 
@@ -55,8 +55,7 @@ export const QueueItem = memo(( { index,
       }}
     >
       <MusicEntryElement
-        data={item.music}
-        setData={() => { /* */ }}
+        musicId={item.resourceId}
         index={index}
         play={{
           status: playingThisItemStatus,

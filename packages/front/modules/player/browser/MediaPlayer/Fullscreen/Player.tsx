@@ -3,23 +3,26 @@ import { MusicImageCover } from "#modules/musics/MusicCover";
 import { classes } from "#modules/utils/styles";
 import { secsToMmss } from "#modules/utils/dates";
 import { TIME_UNDEFINED } from "#modules/remote-player/MediaPlayer";
+import { useMusic } from "#modules/musics/hooks";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, ShuffleButton, RepeatButton } from "../OtherButtons";
 import { ProgressBar } from "../ProgressBar";
 import commonStyles from "../MediaPlayerCommon.module.css";
-import { AudioRef } from "../AudioTag";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import styles from "./Player.module.css";
 
 type Props = {
-  audioRef: AudioRef;
+  audioElement: HTMLAudioElement | null;
 };
 
-export const Player = ( { audioRef }: Props) => {
+export const Player = ( { audioElement }: Props) => {
   const currentResource = useBrowserPlayer(s=>s.currentResource);
+  const { data: music } = useMusic(currentResource?.resourceId ?? null);
 
-  if (!currentResource)
+  if (!music)
     return null;
+
+  const { coverUrl, title, artist } = music;
 
   return <section className={styles.content}>
     <section className={styles.coverSection}>
@@ -27,7 +30,7 @@ export const Player = ( { audioRef }: Props) => {
         <MusicImageCover
           className={classes(commonStyles.imageCover, styles.imageCover)}
           img={{
-            url: currentResource.ui.coverImg,
+            url: coverUrl,
           }}
           icon={{
             className: commonStyles.icon,
@@ -39,15 +42,15 @@ export const Player = ( { audioRef }: Props) => {
       <article className={styles.trackInfo}>
         <p
           className={classes(styles.title, "ellipsis")}
-          title={currentResource.ui.title}
-        >{currentResource.ui.title}</p>
+          title={title}
+        >{title}</p>
         <p
           className={classes(styles.artist, "ellipsis")}
-          title={currentResource.ui.artist}
-        >{currentResource.ui.artist}</p>
+          title={artist}
+        >{artist}</p>
       </article>
       <article className={styles.progressBarWrapper}>
-        <ProgressBar audioRef={audioRef} />
+        <ProgressBar audioElement={audioElement} />
         <footer className={styles.timeLabelsRow}>
           <CurrentTime />
           <Duration />
@@ -56,7 +59,7 @@ export const Player = ( { audioRef }: Props) => {
       <div className={styles.controlsRow}>
         <ShuffleButton />
         <section className={styles.controls}>
-          <PrevButton audioRef={audioRef}/>
+          <PrevButton audioElement={audioElement}/>
 
           <PlayButton />
 

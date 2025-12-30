@@ -4,6 +4,7 @@ import type { Params as SlugPageParams } from "../slug/[userSlug]/[playlistSlug]
 import type { Params } from "./page";
 import { useState } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
+import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import MusicLayout from "app/musics/music.layout";
 import { MusicPlaylist } from "#modules/musics/playlists/Playlist/Playlist";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -11,7 +12,7 @@ import { MusicPlaylistsApi } from "#modules/musics/playlists/requests";
 import { PageItemNotFound } from "#modules/utils/ItemNotFound";
 import { useUser } from "#modules/core/auth/useUser";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
-import { PlaylistEntity } from "#modules/musics/playlists/Playlist/types";
+import { useMusic } from "#modules/musics/hooks";
 
 interface PageProps {
   params: Promise<Params | SlugPageParams>;
@@ -20,13 +21,20 @@ interface PageProps {
 export function ClientPage( { params }: PageProps) {
   const api = FetchApi.get(MusicPlaylistsApi);
   const { user } = useUser();
-  const [data, setData] = useState<PlaylistEntity>();
+  const [data, setData] = useState<MusicPlaylistEntity>();
   const ret = <AsyncLoader
-    onSuccess={(d)=>setData(d)}
+    onSuccess={(d)=>{
+      setData(d);
+
+      for (const entry of d.list) {
+        if (entry.music)
+          useMusic.updateCache(entry.musicId, entry.music);
+      }
+    }}
     errorElement={<PageItemNotFound />}
     action={async ()=> {
       const p = (await params);
-      let d: PlaylistEntity | undefined = undefined;
+      let d: MusicPlaylistEntity | undefined = undefined;
 
       if ("userSlug" in p) {
         const { userSlug, playlistSlug } = p;
@@ -40,7 +48,7 @@ export function ClientPage( { params }: PageProps) {
           },
         );
 
-        d = response.data as PlaylistEntity;
+        d = response.data as MusicPlaylistEntity;
 
         if (d.ownerUserId !== user?.id && d.visibility === "public" && !d.ownerUser) {
           d.ownerUser = {
@@ -52,10 +60,10 @@ export function ClientPage( { params }: PageProps) {
           filter: {
             id: p.playlistId,
           },
-          expand: ["musics", "ownerUserPublic", ...(user ? ["musicsFavorite" as const] : [])],
+          expand: ["ownerUserPublic"],
         } );
 
-        d = response.data as PlaylistEntity;
+        d = response.data as MusicPlaylistEntity;
       }
 
       assertIsDefined(d);
@@ -70,7 +78,7 @@ export function ClientPage( { params }: PageProps) {
             }
             : undefined,
         } )),
-      } as PlaylistEntity;
+      } as MusicPlaylistEntity;
     }}>
     <MusicPlaylist value={data!} setValue={setData}/>
   </AsyncLoader>;

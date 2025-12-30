@@ -3,35 +3,33 @@ import { UserPayload } from "$shared/models/auth";
 import { MusicLatestViewsContextMenuItem } from "#modules/musics/history/LatestViews/ContextMenuItem";
 import { AddToPlaylistContextMenuItem } from "#modules/musics/playlists/AddToPlaylistContextMenuItem";
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
-import { SetState } from "#modules/utils/resources/useCrud";
 import { EditMusicContextMenuItem } from "../EditMusic/ContextMenu";
 import { copyMusicUrl } from "./copy-music-url";
 
 type Props = {
   music: MusicEntity;
-  setMusic?: SetState<MusicEntity>;
   user: UserPayload | null;
 };
 export function genMusicEntryContextMenuContent( { music,
-  user,
-  setMusic }: Props) {
+  user }: Props) {
+  const musicId = music.id;
+
   return <>
     {
       user && <AddToPlaylistContextMenuItem
-        musicId={music.id}
+        musicId={musicId}
         user={user}
       />
     }
     {
       user && <EditMusicContextMenuItem
         initialData={music}
-        setData={setMusic}
       />
     }
     {
       user && <MusicLatestViewsContextMenuItem
         music={music}
-        musicId={music.id}
+        musicId={musicId}
       />
     }
     <CopyMusicMenuItem

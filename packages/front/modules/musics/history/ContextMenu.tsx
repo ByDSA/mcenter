@@ -34,15 +34,6 @@ export const HistoryEntryContextMenu = ( { value,
     />
     <EditMusicContextMenuItem
       initialData={value.resource}
-      setData={(d) => {
-        setValue( {
-          ...value,
-          resource: {
-            ...value.resource,
-            ...d,
-          },
-        } );
-      }}
     />
     <MusicLatestViewsContextMenuItem
       music={value.resource}

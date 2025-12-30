@@ -1,25 +1,13 @@
-.txt,
-.invisibleTxt {
-  font-size: 0.85em;
-  position: absolute;
-  left: 0;
-  width: 3rem;
+.txt {
+  font-size: 1em;
+  width: 3.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.invisibleTxt {
-  width: 2.46rem;
-  visibility: hidden;
-  position: inherit;
+.txt.change {
+  font-size: 0.85em;
 }
-
-.parent {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
 .element {
   display: flex;
   flex-flow: row nowrap;

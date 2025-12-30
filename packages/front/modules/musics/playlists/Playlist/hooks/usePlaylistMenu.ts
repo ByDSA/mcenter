@@ -4,10 +4,10 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { useUser } from "#modules/core/auth/useUser";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { playlistCopySlugUrl } from "../../utils";
-import { PlaylistEntity } from "../types";
+import { MusicPlaylistEntity } from "../../models";
 
 export const usePlaylistMenu = (
-  value: PlaylistEntity,
+  value: MusicPlaylistEntity,
 ) => {
   const router = useRouter();
   const { user } = useUser();

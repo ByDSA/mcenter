@@ -1,4 +1,4 @@
-import { RefObject, useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { secsToMmss } from "#modules/utils/dates";
 import { classes } from "#modules/utils/styles";
 import { TIME_UNDEFINED } from "#modules/remote-player/MediaPlayer";
@@ -6,12 +6,12 @@ import { useBrowserPlayer } from "./BrowserPlayerContext";
 import styles from "./ProgressBar.module.css";
 
 type Props = {
-  audioRef: RefObject<HTMLAudioElement | null>;
+  audioElement: HTMLAudioElement | null;
   className?: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const ProgressBar = ( { audioRef, className }: Props) => {
+export const ProgressBar = ( { audioElement, className }: Props) => {
   const currentTime = useBrowserPlayer(s=>s.currentTime);
   const duration = useBrowserPlayer(s=>s.duration);
   const setCurrentTime = useBrowserPlayer(s=>s.setCurrentTime);
@@ -31,7 +31,7 @@ time: string; } | null>(null);
 
     if (isClick.current && hoverTime !== undefined) {
       setCurrentTime(hoverTime, {
-        audioRef,
+        audioElement,
       } );
     }
 
@@ -39,7 +39,7 @@ time: string; } | null>(null);
       pos: percentage,
       time: hoverTime !== undefined ? secsToMmss(hoverTime) : TIME_UNDEFINED,
     } );
-  }, [duration, audioRef, setCurrentTime]);
+  }, [duration, audioElement, setCurrentTime]);
 
   useEffect(() => {
     const handleGlobalPointerMove = (e: PointerEvent) => {

@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { ResourceSubtitle } from "#modules/resources/ResourceEntry";
 import { classes } from "#modules/utils/styles";
+import { useMusic } from "#modules/musics/hooks";
+import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import commonStyles from "../MediaPlayerCommon.module.css";
 import { CurrentTimeLabel } from "./CurrentTimeLabel";
@@ -14,9 +16,10 @@ export const TrackInfo = memo(
   () => {
     const resource = useBrowserPlayer(s=>s.currentResource);
     const router = useRouter();
+    const { data: music } = useMusic(resource!.resourceId);
 
-    if (!resource)
-      return null;
+    if (!music)
+      return <ContentSpinner size={2}/>;
 
     return (
       <div className={styles.trackInfo}>
@@ -26,28 +29,28 @@ export const TrackInfo = memo(
             className: commonStyles.icon,
           }}
           img={{
-            url: resource.ui.coverImg,
+            url: music.coverUrl,
           }}
         />
         <div className={styles.trackDetails}>
           <a
             className={styles.trackTitle}
-            title={resource.ui.title}
+            title={music.title}
             onClick={()=> {
-              router.push(PATH_ROUTES.musics.frontend.path + "/" + resource.resourceId);
+              router.push(PATH_ROUTES.musics.frontend.path + "/" + music.id);
             }}
-          >{resource.ui.title}</a>
+          >{music.title}</a>
           <ResourceSubtitle
             className={styles.trackSubtitle}
             items={[
               {
-                text: resource.ui.artist,
+                text: music.artist,
                 className: classes(styles.ellipsisOnSmall),
               },
-              resource.ui.album
+              music.album
                 ? {
                   className: classes("ellipsis", styles.hideOnSmall),
-                  text: resource.ui.album,
+                  text: music.album,
                   separatorClassName: styles.hideOnSmall,
                 }
                 : undefined,

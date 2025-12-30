@@ -1,6 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
-import { WithRequired } from "@tanstack/react-query";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -9,7 +8,6 @@ import { useUser } from "#modules/core/auth/useUser";
 import listStyles from "#modules/resources/List.module.css";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { MusicsApi } from "../requests";
-import { MusicEntityWithFileInfos } from "../models";
 import { MusicEntryElement } from "./MusicEntry/MusicEntry";
 import { ArrayData } from "./types";
 
@@ -25,7 +23,6 @@ export function MusicList(props: Props) {
   const { data,
     isLoading,
     error,
-    setItem,
     observerTarget,
     totalCount } = useMusicList(props);
   const resultNumbers = (
@@ -71,7 +68,7 @@ export function MusicList(props: Props) {
                 index={i}
                 play={{
                   status: playingThisMusicStatus,
-                  onClick: ()=>{
+                  onClick: async ()=>{
                     if (playingThisMusicStatus === "playing") {
                       player.pause();
 
@@ -82,16 +79,10 @@ export function MusicList(props: Props) {
                       return;
                     }
 
-                    player.playMusic(music);
+                    await player.playMusic(music.id);
                   },
                 }}
-                data={music}
-                setData={(newData) => {
-                  return setItem(
-                    i,
-                    newData as WithRequired<MusicEntityWithFileInfos, "userInfo">,
-                  );
-                }}
+                musicId={music.id}
               />
             </Fragment>;
           } )}

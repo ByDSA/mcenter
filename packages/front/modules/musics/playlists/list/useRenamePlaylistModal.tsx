@@ -10,7 +10,7 @@ import { MusicPlaylistsApi } from "../requests";
 import styles from "./RenameModal.module.css";
 
 type RenameFormProps = {
-  initialValue: PlaylistEntity;
+  initialValue: MusicPlaylistEntity;
   onSuccess?: (data: { previous: MusicPlaylistEntity;
 current: MusicPlaylistEntity; } )=> void;
   updateLocalValue: (value: PlaylistEntity)=> void;
@@ -101,8 +101,8 @@ current: MusicPlaylistEntity; } )=> Promise<void> | void;
 };
 
 type OpenModalArgs = {
-  value: PlaylistEntity;
-  setValue: (value: PlaylistEntity)=> void;
+  value: MusicPlaylistEntity;
+  setValue: (value: MusicPlaylistEntity)=> void;
   onClose?: ()=> Promise<void> | void;
 };
 

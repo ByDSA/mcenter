@@ -11,15 +11,18 @@ type MetadataViewProps = {
   txt: string;
   title: string;
   className?: string;
+  classNameTxt?: string;
 };
-export const MetadataView = memo(( { txt, icon, title, className }: MetadataViewProps) => {
-  return (
-    <span title={title} className={classes(styles.element, className)}>
-      {icon}
-      <span>{txt}</span>
-    </span>
-  );
-} );
+export const MetadataView = memo(
+  ( { txt, icon, title, className, classNameTxt }: MetadataViewProps) => {
+    return (
+      <span title={title} className={classes(styles.element, className)}>
+        {icon}
+        <span className={classNameTxt}>{txt}</span>
+      </span>
+    );
+  },
+);
 type DurationProps = {
   duration: number;
   className?: string;
@@ -37,11 +40,11 @@ type HistoryTimeProps = {
   timestamp: number;
 };
 export const HistoryTimeView = memo(( { timestamp }: HistoryTimeProps) => {
-  return (
-    <span title="Hora de reproducción">
-      <CalendarToday />
-      <span>{formatDateHHmm(new Date(timestamp * 1_000))}h</span>
-    </span>);
+  return <MetadataView
+    title={"Hora de reproducción"}
+    icon={<CalendarToday />}
+    txt={`${formatDateHHmm(new Date(timestamp * 1_000))}h`}
+  />;
 } );
 
 type WeightProps = {
@@ -55,19 +58,12 @@ export const WeightView = memo(( { weight }: WeightProps) => {
   if (change)
     title += ": " + txt;
 
-  return (
-    <span title={title} >
-      <Balance />
-      <span className={classes(change && styles.parent)}>
-        {
-          change
-         && <span className={styles.invisibleTxt}>
-           {txt}
-         </span>
-        }
-        <span className={classes(change && styles.txt)}>{txt}</span>
-      </span>
-    </span>);
+  return <MetadataView
+    title={title}
+    icon={<Balance />}
+    classNameTxt={classes(styles.txt, change && styles.change)}
+    txt={txt}
+  />;
 } );
 
 function formatWeight(weight: number): string {

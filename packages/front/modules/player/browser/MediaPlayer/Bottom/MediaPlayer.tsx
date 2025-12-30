@@ -4,13 +4,14 @@ import { useState, useEffect, useMemo } from "react";
 import { Equalizer, KeyboardArrowUp } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { RevealArrow } from "#modules/ui-kit/RevealArrow/RevealArrow";
-import { PlayerResource, useBrowserPlayer } from "../BrowserPlayerContext";
+import { useMusic } from "#modules/musics/hooks";
+import { PlaylistQueueItem, useBrowserPlayer } from "../BrowserPlayerContext";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, ControlButton } from "../OtherButtons";
 import { ProgressBar } from "../ProgressBar";
 import { ProgressBarOnlyView } from "../ProgressBarOnlyView";
 import { FullscreenMediaPlayer } from "../Fullscreen/FullscreenMediaPlayer";
-import { useAudioRef } from "../AudioContext";
+import { useAudioElement } from "../AudioContext";
 import { Effects } from "../Fullscreen/Effects";
 import styles from "./MediaPlayer.module.css";
 import { TrackInfo } from "./TrackInfo";
@@ -25,7 +26,7 @@ export function BottomMediaPlayer() {
   const { mountNode: windowMountNode, open, close, isOpen,
     isFullscreen, currentWindowName } = useWindowContext();
   const width = useWindowWidth();
-  const audioRef = useAudioRef();
+  const [audioElement] = useAudioElement();
   const extraControls = useMemo(()=><div className={styles.extraControls}>
     <VolumeController />
     <ShuffleButton />
@@ -48,7 +49,7 @@ export function BottomMediaPlayer() {
       }}>
       <Equalizer />
     </ControlButton>
-  </div>, [audioRef, open, close, currentWindowName]);
+  </div>, [audioElement, open, close, currentWindowName]);
 
   useEffect(()=> {
     if (isOpen) {
@@ -73,7 +74,7 @@ export function BottomMediaPlayer() {
         className={styles.playerContainer}>
         {(width >= SMALL_BREAKPOINT
          && <ProgressBar
-           audioRef={audioRef}
+           audioElement={audioElement}
            className={styles.progressBar}
          />)
            || <ProgressBarOnlyView
@@ -99,7 +100,7 @@ export function BottomMediaPlayer() {
 
           <div className={styles.controlsSection}>
             {
-              width >= SMALL_BREAKPOINT && <PrevButton audioRef={audioRef} />
+              width >= SMALL_BREAKPOINT && <PrevButton audioElement={audioElement} />
             }
 
             <PlayButton />
@@ -186,25 +187,26 @@ function useWindowWidth() {
   return width;
 }
 
-function useMediaSessionHandlers(currentResource: PlayerResource | null) {
+function useMediaSessionHandlers(currentResource: PlaylistQueueItem | null) {
   if (!("mediaSession" in navigator))
     return;
 
-  const audioRef = useAudioRef();
+  const [audioElement] = useAudioElement();
+  const { data: music } = useMusic(currentResource?.resourceId ?? null);
 
   useEffect(() => {
-    if (!currentResource)
+    if (!currentResource || !music)
       return;
 
     const { next, prev, resume, pause, stop, hasPrev, hasNext } = useBrowserPlayer.getState();
 
     navigator.mediaSession.metadata = new MediaMetadata( {
-      title: currentResource.ui.title,
-      artist: currentResource.ui.artist,
-      album: currentResource.ui.album,
-      artwork: currentResource.ui.coverImg
+      title: music.title,
+      artist: music.artist,
+      album: music.album,
+      artwork: music.coverUrl
         ? [{
-          src: currentResource.ui.coverImg,
+          src: music.coverUrl,
           sizes: "600x600",
           type: "image/jpeg",
         }]
@@ -230,12 +232,12 @@ function useMediaSessionHandlers(currentResource: PlayerResource | null) {
       : []),
     ...(hasNext() ? [["nexttrack", () => next()] as Action] : []),
     ["seekbackward", () => {
-      audioRef.current!.currentTime = Math.max(audioRef.current!.currentTime - 10, 0);
+      audioElement!.currentTime = Math.max(audioElement!.currentTime - 10, 0);
     }],
     ["seekforward", () => {
-      audioRef.current!.currentTime = Math.min(
-        audioRef.current!.currentTime + 10,
-        audioRef.current!.duration,
+      audioElement!.currentTime = Math.min(
+        audioElement!.currentTime + 10,
+        audioElement!.duration,
       );
     }],
   ];
@@ -253,7 +255,7 @@ function useMediaSessionHandlers(currentResource: PlayerResource | null) {
       navigator.mediaSession.setActionHandler(action, null);
     } );
   };
-  }, [currentResource, audioRef]);
+  }, [currentResource, audioElement]);
 
   const status = useBrowserPlayer(s=>s.status);
 

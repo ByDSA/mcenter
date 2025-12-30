@@ -1,10 +1,10 @@
-import type { PlaylistEntity } from "../Playlist/types";
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
+import { MusicPlaylistEntity } from "../models";
 import { useRenamePlaylistModal } from "./useRenamePlaylistModal";
 
 type Props = Parameters<typeof useRenamePlaylistModal>[0] & {
-  value: PlaylistEntity;
-  setValue: (value: PlaylistEntity)=> void;
+  value: MusicPlaylistEntity;
+  setValue: (value: MusicPlaylistEntity)=> void;
   className?: string;
 };
 
