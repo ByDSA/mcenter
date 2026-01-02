@@ -13,7 +13,7 @@ import { PlayQueueButtonView } from "../Bottom/PlayQueue/PlayQueueButtonView";
 import { PlayQueue } from "../Bottom/PlayQueue/PlayQueue";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import { useWindowContext } from "../Bottom/PlayQueue/WindowProvider";
-import { useAudioElement } from "../AudioContext";
+import { useAudioElement } from "../Audio/AudioContext";
 import styles from "./FullscreenMediaPlayer.module.css";
 import { Player } from "./Player";
 import { Effects } from "./Effects";

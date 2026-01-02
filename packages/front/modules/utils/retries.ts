@@ -15,7 +15,7 @@ type State = {
 export async function withRetries<T>(
   fn: (state: State)=> Promise<T>,
   options: RetryOptions,
-): Promise<T> {
+): Promise<T | undefined> {
   const { retries, delay = 1000, shouldRetry, onFailure } = options;
   let lastError: unknown;
 
@@ -29,11 +29,11 @@ export async function withRetries<T>(
       lastError = error;
 
       // Si tenemos una condición de reintento y no se cumple, lanzamos el error de inmediato
-      if (shouldRetry && await !shouldRetry( {
+      if (shouldRetry && !await shouldRetry( {
         lastError: error,
         attempt,
       } ))
-        throw error;
+        return;
 
       // Si es el último intento, no esperamos y salimos del bucle
       if (attempt === retries)

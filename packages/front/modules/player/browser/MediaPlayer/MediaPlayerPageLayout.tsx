@@ -6,8 +6,8 @@ import { classes } from "#modules/utils/styles";
 import { BottomMediaPlayer } from "./Bottom/MediaPlayer";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
 import styles from "./MediaPlayerPageLayout.module.css";
-import { AudioTag } from "./AudioTag";
-import { AudioProvider } from "./AudioContext";
+import { AudioTag } from "./Audio/AudioTag";
+import { AudioProvider } from "./Audio/AudioContext";
 import { WindowProvider } from "./Bottom/PlayQueue/WindowProvider";
 
 type Props = {

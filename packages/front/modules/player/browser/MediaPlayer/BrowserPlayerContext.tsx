@@ -1,4 +1,5 @@
 import type { MusicEntity } from "$shared/models/musics";
+import assert from "assert";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { PATH_ROUTES } from "$shared/routing";
@@ -6,6 +7,7 @@ import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { backendUrl } from "#modules/requests";
 import { withRetries } from "#modules/utils/retries";
 import { useMusic } from "#modules/musics/hooks";
+import { useAudioCache } from "./Audio/AudioCacheContext";
 
 export type PlayerStatus = "paused" | "playing" | "stopped";
 
@@ -61,10 +63,24 @@ type SetCurrentTimeProps = {
   audioElement?: HTMLAudioElement | null;
 };
 
+export type NextAction = {
+  type: "INDEX";
+  payload: number;
+} | {
+  type: "NEW_MUSIC";
+  payload: MusicEntity;
+};
+
+type NextResource = {
+  nextAction: NextAction | null;
+  date: number;
+};
+
 // --- Interface del Store ---
 interface PlayerState {
   status: PlayerStatus;
   currentResource: PlaylistQueueItem | null;
+  nextResource: NextResource | null;
   queue: PlaylistQueueItem[];
   queueIndex: number;
   repeatMode: RepeatMode;
@@ -76,6 +92,7 @@ interface PlayerState {
   compressionValue: number; // 0 = nada, 1 = máximo
 
   // Acciones
+  setNextResource: (newValue: NextResource)=> void;
   play: (props: PlayProps)=> void;
   playMusic: (musicId: MusicEntity["id"], props?: PlayMusicProps)=> Promise<void>;
   playPlaylistItem: (props: PlayPlaylistItemProps)=> Promise<void>;
@@ -85,6 +102,7 @@ interface PlayerState {
   resume: ()=> void;
   stop: ()=> void;
   addToQueue: (resource: PlaylistQueueItem)=> void;
+  getNext: ()=> Promise<NextAction | null>;
   next: ()=> Promise<void>;
   prev: ()=> Promise<void>;
   setStatus: (newVale: PlayerStatus)=> void;
@@ -108,6 +126,7 @@ export const useBrowserPlayer = create<PlayerState>()(
     (set, get) => ( {
       status: "stopped",
       currentResource: null,
+      nextResource: null,
       queue: [],
       queueIndex: -1,
       repeatMode: RepeatMode.Off,
@@ -130,6 +149,7 @@ export const useBrowserPlayer = create<PlayerState>()(
       play: ( { resource } ) => set( {
         currentResource: resource,
         status: "playing",
+        nextResource: null,
       } ),
 
       playMusic: async (musicId, props) => {
@@ -152,6 +172,7 @@ export const useBrowserPlayer = create<PlayerState>()(
               duration: music.fileInfos![0]?.mediaInfo.duration ?? undefined,
             } ),
           currentResource: resource,
+          nextResource: null,
           status: "playing",
           ...(props?.keepQuery
             ? {}
@@ -248,6 +269,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           currentResource: queue[index],
           status: "playing",
           queueIndex: index,
+          nextResource: null,
         } );
       },
       pause: () => set( {
@@ -265,10 +287,12 @@ export const useBrowserPlayer = create<PlayerState>()(
         status: "stopped",
         query: undefined,
         currentResource: null,
+        nextResource: null,
         queue: [],
       } ),
       addToQueue: (resource) => set((state) => ( {
         queue: [...state.queue, resource],
+        nextResource: null,
       } )),
       getPlayingType: () => {
         const { currentResource, query } = get();
@@ -281,77 +305,108 @@ export const useBrowserPlayer = create<PlayerState>()(
 
         return "one";
       },
-      next: async () => {
+      getNext: async () => {
         const { queueIndex, queue, repeatMode, isShuffle, query } = get();
-        const playOfflineRandom = async () => {
-          const normalRandomIndex = getRandomExcludePrevious(queue.length - 1, queueIndex);
-
-          if (normalRandomIndex === -1) {
-            get().stop();
-
-            return;
-          }
-
-          await get().playQueueIndex(normalRandomIndex);
-        };
         const playingType = get().getPlayingType();
 
-        // Siguiente en orden
+        // 1. LÓGICA DE ORDEN SECUENCIAL
         if ((!isShuffle && (playingType === "playlist" || playingType === "one"))
-          || (playingType === "query" && queueIndex < queue.length - 1)) {
+      || (playingType === "query" && queueIndex < queue.length - 1)) {
           let newIndex = queueIndex + 1;
 
           if (newIndex >= queue.length) {
-            if (repeatMode === RepeatMode.All)
-              newIndex = 0;
-            else
-              return;
+            if (repeatMode === RepeatMode.All) {
+              return {
+                type: "INDEX",
+                payload: 0,
+              };
+            }
+
+            return null; // No hay más canciones
           }
 
-          await get().playQueueIndex(newIndex);
-
-          return;
+          return {
+            type: "INDEX",
+            payload: newIndex,
+          };
         }
 
-        // playlist con shuffle
-        if (playingType === "playlist") {
+        // 2. LÓGICA DE SHUFFLE / DISCOVERY (CON API)
+        if (playingType === "playlist" || playingType === "query") {
           try {
-            const music = await withRetries(()=> fetchQueryMusic(query!), {
+            assert(!!query);
+            const music = await withRetries(() => fetchQueryMusic(query), {
               retries: 3,
             } );
 
             if (!music)
-              throw new Error("Error fetching query music");
+              throw new Error("No music found");
 
-            const index = queue.findIndex(item=>item.resourceId === music.id);
+            if (playingType === "playlist") {
+              const index = queue.findIndex(item => item.resourceId === music.id);
 
-            if (index === -1)
-              throw new Error("Index not found");
+              // Si está en la cola, devolvemos el índice, si no, fallback a random offline
+              return {
+                type: "INDEX",
+                payload: index !== -1 ? index : getOfflineRandomIndex(get),
+              };
+            }
 
-            await get().playQueueIndex(index);
+            // Si es tipo query, devolvemos el objeto de música para agregarlo
+            return {
+              type: "NEW_MUSIC",
+              payload: music,
+            };
           } catch {
-            await playOfflineRandom();
+            return {
+              type: "INDEX",
+              payload: getOfflineRandomIndex(get),
+            };
           }
+        }
 
-          return;
-        } else if (playingType === "query") {
-          const music = await withRetries(()=> fetchQueryMusic(query!), {
-            retries: 3,
-          } );
+        // 3. CASO DEFAULT (One con shuffle o fallbacks)
+        return {
+          type: "INDEX",
+          payload: getOfflineRandomIndex(get),
+        };
+      },
 
-          if (!music)
-            return;
+      /**
+   * Ejecuta la acción de ir a la siguiente canción.
+   */
+      next: async () => {
+        const { getNext, nextResource, queue } = get();
+        const { has } = useAudioCache.getState();
+        const isValidNextResourceAction = nextResource?.nextAction
+        && has(
+          nextResource.nextAction.type === "INDEX"
+            ? queue[nextResource.nextAction.payload].resourceId
+            : nextResource.nextAction.payload.id,
+        );
+        const nextAction = isValidNextResourceAction ? nextResource.nextAction : await getNext();
 
-          await get().playMusic(music.id, {
-            addToEnd: true,
-            keepQuery: true,
-          } );
+        if (!nextAction) {
+          get().stop();
 
           return;
         }
 
-        // one con shuffle
-        await playOfflineRandom();
+        switch (nextAction.type) {
+          case "INDEX":
+            if (nextAction.payload === -1)
+              get().stop();
+            else
+              await get().playQueueIndex(nextAction.payload);
+
+            break;
+          case "NEW_MUSIC":
+            await get().playMusic(nextAction.payload.id, {
+              addToEnd: true,
+              keepQuery: true,
+            } );
+            break;
+        }
       },
       prev: async () => {
         const { queueIndex, queue, repeatMode } = get();
@@ -399,6 +454,11 @@ export const useBrowserPlayer = create<PlayerState>()(
 
         return set( {
           currentTime: Math.min(newValue, get().duration ?? 0),
+        } );
+      },
+      setNextResource: (newValue) => {
+        return set( {
+          nextResource: newValue,
         } );
       },
 
@@ -460,3 +520,10 @@ async function fetchQueryMusic(q: string) {
     return null;
   }
 }
+
+const getOfflineRandomIndex = (get) => {
+  const { queue, queueIndex } = get();
+  const normalRandomIndex = getRandomExcludePrevious(queue.length - 1, queueIndex);
+
+  return normalRandomIndex;
+};

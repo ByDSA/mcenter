@@ -5,7 +5,7 @@ import { useShallow } from "zustand/react/shallow";
 import { classes } from "#modules/utils/styles";
 import { useBrowserPlayer, RepeatMode } from "./BrowserPlayerContext";
 import styles from "./OtherButtons.module.css";
-import { useAudioElement } from "./AudioContext";
+import { useAudioElement } from "./Audio/AudioContext";
 
 export const ControlButton = ( { active = true,
   className,

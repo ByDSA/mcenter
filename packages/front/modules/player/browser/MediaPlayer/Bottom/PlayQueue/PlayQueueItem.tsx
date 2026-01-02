@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { MusicEntryElement } from "#modules/musics/musics/MusicEntry/MusicEntry";
 import { PlayerStatus, PlaylistQueueItem as QItem, useBrowserPlayer } from "../../BrowserPlayerContext";
-import { useAudioElement } from "../../AudioContext";
+import { useAudioElement } from "../../Audio/AudioContext";
 
 interface QueueItemProps {
   index: number;

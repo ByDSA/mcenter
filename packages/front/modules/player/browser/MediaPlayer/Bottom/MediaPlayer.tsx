@@ -4,14 +4,13 @@ import { useState, useEffect, useMemo } from "react";
 import { Equalizer, KeyboardArrowUp } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { RevealArrow } from "#modules/ui-kit/RevealArrow/RevealArrow";
-import { useMusic } from "#modules/musics/hooks";
-import { PlaylistQueueItem, useBrowserPlayer } from "../BrowserPlayerContext";
+import { useBrowserPlayer } from "../BrowserPlayerContext";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, ControlButton } from "../OtherButtons";
 import { ProgressBar } from "../ProgressBar";
 import { ProgressBarOnlyView } from "../ProgressBarOnlyView";
 import { FullscreenMediaPlayer } from "../Fullscreen/FullscreenMediaPlayer";
-import { useAudioElement } from "../AudioContext";
+import { useAudioElement } from "../Audio/AudioContext";
 import { Effects } from "../Fullscreen/Effects";
 import styles from "./MediaPlayer.module.css";
 import { TrackInfo } from "./TrackInfo";
@@ -61,8 +60,6 @@ export function BottomMediaPlayer() {
       }
     }
   }, [width, isOpen, isFullscreen]);
-
-  useMediaSessionHandlers(currentResource);
 
   if (!currentResource)
     return null;
@@ -185,86 +182,4 @@ function useWindowWidth() {
   }, []);
 
   return width;
-}
-
-function useMediaSessionHandlers(currentResource: PlaylistQueueItem | null) {
-  if (!("mediaSession" in navigator))
-    return;
-
-  const [audioElement] = useAudioElement();
-  const { data: music } = useMusic(currentResource?.resourceId ?? null);
-
-  useEffect(() => {
-    if (!currentResource || !music)
-      return;
-
-    const { next, prev, resume, pause, stop, hasPrev, hasNext } = useBrowserPlayer.getState();
-
-    navigator.mediaSession.metadata = new MediaMetadata( {
-      title: music.title,
-      artist: music.artist,
-      album: music.album,
-      artwork: music.coverUrl
-        ? [{
-          src: music.coverUrl,
-          sizes: "600x600",
-          type: "image/jpeg",
-        }]
-        : undefined,
-    } );
-
-  type Action = [MediaSessionAction, ()=>(Promise<void> | void)];
-  const actionHandlers: Action[] = [
-    ["play", () => {
-      navigator.mediaSession.playbackState = "playing";
-      resume();
-    }],
-    ["pause", () => {
-      navigator.mediaSession.playbackState = "paused";
-      pause();
-    }],
-    ["stop", () => {
-      stop();
-      navigator.mediaSession.playbackState = "none";
-    }],
-    ...(hasPrev()
-      ? [["previoustrack", () => prev()] as Action]
-      : []),
-    ...(hasNext() ? [["nexttrack", () => next()] as Action] : []),
-    ["seekbackward", () => {
-      audioElement!.currentTime = Math.max(audioElement!.currentTime - 10, 0);
-    }],
-    ["seekforward", () => {
-      audioElement!.currentTime = Math.min(
-        audioElement!.currentTime + 10,
-        audioElement!.duration,
-      );
-    }],
-  ];
-
-  actionHandlers.forEach(([action, handler]) => {
-    try {
-      navigator.mediaSession.setActionHandler(action, handler);
-    } catch {
-      console.warn(`El handler ${action} no es soportado.`);
-    }
-  } );
-
-  return () => {
-    actionHandlers.forEach(([action]) => {
-      navigator.mediaSession.setActionHandler(action, null);
-    } );
-  };
-  }, [currentResource, audioElement]);
-
-  const status = useBrowserPlayer(s=>s.status);
-
-  useEffect(()=> {
-    if (status === "paused")
-      navigator.mediaSession.playbackState = "paused";
-    else if (status === "playing")
-      navigator.mediaSession.playbackState = "playing";
-    else
-      navigator.mediaSession.playbackState = "none";
-  }, [status]);
 }

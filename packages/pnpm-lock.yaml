@@ -126,10 +126,10 @@ importers:
         specifier: 11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.1))(@types/react@19.2.7)(react@19.2.1)
       '@ffmpeg/ffmpeg':
-        specifier: ^0.12.15
+        specifier: 0.12.15
         version: 0.12.15
       '@ffmpeg/util':
-        specifier: ^0.12.2
+        specifier: 0.12.2
         version: 0.12.2
       '@mui/icons-material':
         specifier: 5.14.9
@@ -146,6 +146,9 @@ importers:
       '@textea/json-viewer':
         specifier: 4.0.1
         version: 4.0.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.1))(@types/react@19.2.7)(react@19.2.1))(@mui/material@5.14.9(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.1))(@types/react@19.2.7)(react@19.2.1))(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      async-mutex:
+        specifier: ^0.5.0
+        version: 0.5.0
       just-clone:
         specifier: 6.2.0
         version: 6.2.0
