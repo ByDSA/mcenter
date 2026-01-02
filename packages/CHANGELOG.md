@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.23.0](https://github.com/ByDSA/mcenter/compare/v4.22.0...v4.23.0) (2026-01-02)
+
+
+### Features
+
+* prefetching music ([43a7305](https://github.com/ByDSA/mcenter/commit/43a7305c10e5e284a15eb229e3da69b3dd669fb5))
+
 ## [4.22.0](https://github.com/ByDSA/mcenter/compare/v4.21.0...v4.22.0) (2025-12-30)
 
 
