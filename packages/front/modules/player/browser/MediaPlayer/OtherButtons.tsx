@@ -186,9 +186,9 @@ export const CloseButton = ( { className }: {className?: string} ) => {
     title="Cerrar"
     onClick={(e) => {
       e.stopPropagation();
-      const { stop } = useBrowserPlayer.getState();
+      const { close } = useBrowserPlayer.getState();
 
-      stop();
+      close();
     }}
   >
     <HighlightOff />

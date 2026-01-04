@@ -103,6 +103,7 @@ interface PlayerState {
   pause: ()=> void;
   resume: ()=> void;
   stop: ()=> void;
+  close: ()=> void;
   addToQueue: (resource: PlaylistQueueItem)=> void;
   getNext: ()=> Promise<NextAction | null>;
   next: ()=> Promise<void>;
@@ -292,11 +293,16 @@ export const useBrowserPlayer = create<PlayerState>()(
           } );
         }
       },
+      close: () => {
+        stop();
+        set( {
+          currentResource: null,
+        } );
+      },
       stop: () => set( {
         currentTime: 0,
         status: "stopped",
         query: undefined,
-        currentResource: null,
         nextResource: null,
         queue: [],
       } ),
