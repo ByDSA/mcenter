@@ -9,6 +9,7 @@ import { createActionsBar } from "#modules/utils/resources/elements/crud-buttons
 import { createFullOp, SetState } from "#modules/utils/resources/useCrud";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { usePublishEvent, useSubscription } from "#modules/utils/EventBus";
+import { Separator } from "#modules/resources/Separator";
 import commonStyle from "../../../history/entry/body-common.module.css";
 import { EpisodesApi } from "../requests";
 import styles from "./style.module.css";
@@ -98,6 +99,9 @@ function EditEpisodeView( { data, setData }: Props) {
   return <>
     {createActionsBarElement()}
     <div className={classes(styles.container, commonStyle.container)}>
+      <span className={classes("line", "height2")}>
+        <span>Episodio: {data.serie?.name ?? data.compKey.seriesKey}</span><Separator/><span>{data.compKey.episodeKey}</span>
+      </span>
       <span className={classes("line", "height2")}>
         {titleElement}
       </span>

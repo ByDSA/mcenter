@@ -8,6 +8,7 @@ import { DateFormat } from "#modules/utils/dates";
 import { backendUrl } from "#modules/requests";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { LatestViewsView } from "#modules/history/Latest/LatestViewsDisplay";
+import { Separator } from "#modules/resources/Separator";
 import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 
@@ -72,7 +73,7 @@ export function EpisodeLatestViews(props: Props) {
     <p>
       <span>Título: {props.episode.title}</span><br />
       <span>Episodio: {props.episode.serie?.name
-        ?? props.episode.compKey.seriesKey} · {props.episode.compKey.episodeKey}</span>
+        ?? props.episode.compKey.seriesKey}</span><Separator /><span>{props.episode.compKey.episodeKey}</span>
     </p>
     {element}
   </>;

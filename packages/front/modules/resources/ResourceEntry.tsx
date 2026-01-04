@@ -8,6 +8,7 @@ import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerC
 import { anchorOnClick } from "#modules/ui-kit/menus/TabsClient";
 import styles from "./ListEntry.module.css";
 import { ListEntryColumn, ListEntryRow } from "./ListEntry";
+import { Separator } from "./Separator";
 
 export type OnClickMenu = (e: React.MouseEvent<HTMLElement>)=> void;
 
@@ -121,8 +122,11 @@ export const ResourceSubtitle = memo(( { items, className }: ResourceSubtitlePro
     {items.filter(Boolean).map((item, i) => {
       return <Fragment key={i}>
         {i > 0
-        && <span key={"sep" + i}
-          className={classes(styles.separator, item?.separatorClassName)}>•</span>}
+        && <Separator
+          key={"sep" + i}
+          collapsable={false}
+          className={classes(item?.separatorClassName)}/>
+        }
         <span
           key={i}
           className={item!.className}

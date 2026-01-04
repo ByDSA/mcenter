@@ -4,9 +4,9 @@ import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { ResourcePlayButtonView } from "#modules/resources/PlayButton";
+import { Separator } from "#modules/resources/Separator";
 import { formatDurationHeader } from "../../utils";
 import styles from "../Playlist.module.css";
-import commonStyles from "../../common.module.css";
 import { SettingsButton } from "../../SettingsButton";
 import { MusicPlaylistEntity } from "../../models";
 
@@ -47,11 +47,11 @@ export const PlaylistHeader = ( { value,
               <div className={styles.statItem}>
                 <span>{totalSongs} {totalSongs === 1 ? "canción" : "canciones"}</span>
               </div>
-              <span className={commonStyles.separator}>•</span>
+              <Separator />
               <div className={styles.statItem}>
                 <span>{formatDurationHeader(totalDuration)}</span>
               </div>
-              <span className={commonStyles.separator}>•</span>
+              <Separator />
               <span
                 className={classes(styles.statItem, styles.visibility)}
                 title={value.visibility === "public" ? "Playlist pública" : "Playlist privada"}

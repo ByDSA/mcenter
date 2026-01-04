@@ -1,0 +1,9 @@
+.separator {
+  color: var(--color-gray-300);
+  margin: 0 5px;
+  user-select: none;
+
+  .nonCollapsable {
+    white-space: pre; /* Evita que colapse */
+  }
+}

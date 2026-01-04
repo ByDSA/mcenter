@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { CloudUpload, InsertDriveFile, Close, CheckCircle, Error as ErrorIcon } from "@mui/icons-material";
 import { showError } from "$shared/utils/errors/showError";
 import { classes } from "#modules/utils/styles";
+import { Separator } from "#modules/resources/Separator";
 import { Button } from "../input/Button";
 import styles from "./FileUpload.module.css";
 import { UploadButton } from "./UploadButton";
@@ -262,7 +263,7 @@ ${acceptedTypesDisplay}`,
                   <div className={styles.fileDetails}>
                     <p className={styles.fileName}>{fileObj.name}</p>
                     <p className={styles.fileSize}>
-                      {formatFileSize(fileObj.size)} • {fileObj.type ?? "Tipo desconocido"}
+                      <span>{formatFileSize(fileObj.size)}</span><Separator /><span>{fileObj.type ?? "Tipo desconocido"}</span>
                     </p>
 
                     <div className={classes(

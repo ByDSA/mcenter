@@ -5,6 +5,7 @@ import { useContextMenuTrigger, ContextMenuItem } from "#modules/ui-kit/ContextM
 import { useArrayData } from "#modules/utils/array-data-context";
 import { useUser } from "#modules/core/auth/useUser";
 import { frontendUrl } from "#modules/requests";
+import { Separator } from "#modules/resources/Separator";
 import { PlaylistEntity } from "../Playlist/types";
 import { formatDurationHeader, playlistCopySlugUrl } from "../utils";
 import { SettingsButton } from "../SettingsButton";
@@ -60,7 +61,7 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
           <div className={styles.statItem}>
             <span>{totalSongs} canciones</span>
           </div>
-          <span className={styles.separator}>•</span>
+          <Separator />
           <div className={styles.statItem}>
             <span>{formatDurationHeader(totalDuration)}</span>
           </div>

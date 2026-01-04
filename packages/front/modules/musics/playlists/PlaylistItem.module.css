@@ -93,11 +93,6 @@
   min-width: 0; /* Permite que los hijos se encojan más allá de su contenido */
   width: 100%;
   font-size: 14px;
-
-  .separator {
-    white-space: pre; /* Evita que colapse */
-    margin: 0 5px;
-  }
 }
 
 .songArtist {
