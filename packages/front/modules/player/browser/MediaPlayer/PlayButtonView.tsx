@@ -35,6 +35,9 @@ export const PlayButtonView = ( { status,
       disabled && styles.disabled,
       className,
     )}
+    onMouseDown={(e) => {
+      e.preventDefault(); // Evita que el botón pida el foco al navegador
+    }}
     onClick={disabled ? undefined : onClick}
   >
     {symbol}

@@ -36,7 +36,8 @@ export const TrackInfo = memo(
           <a
             className={styles.trackTitle}
             title={music.title}
-            onClick={()=> {
+            onClick={(e)=> {
+              e.stopPropagation();
               router.push(PATH_ROUTES.musics.frontend.path + "/" + music.id);
             }}
           >{music.title}</a>

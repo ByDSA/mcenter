@@ -58,3 +58,10 @@
     accent-color: white;
   }
 }
+
+.closeButton {
+  --button-size: 1em;
+  svg {
+    color: var(--color-red-300);
+  }
+}

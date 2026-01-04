@@ -1,5 +1,6 @@
+/* eslint-disable import/no-cycle */
 import { create } from "zustand";
-import { NextAction, useBrowserPlayer } from "../BrowserPlayerContext";
+import { type NextAction, useBrowserPlayer } from "../BrowserPlayerContext";
 
 interface CacheEntry {
   blobUrl: string;

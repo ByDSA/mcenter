@@ -1,8 +1,11 @@
 import { useRef, useEffect } from "react";
-import { fetchAddToHistory } from "./audioUtils";
+import { useBrowserPlayer } from "../BrowserPlayerContext";
+import { getUrl } from "./audioUtils";
 
-export function useHistoryLogger(engine: HTMLAudioElement | null, resourceId: string | undefined) {
+export function useHistoryLogger(engine: HTMLAudioElement | null) {
   const lastLoggedId = useRef<string | null>(null);
+  const currentResource = useBrowserPlayer(s=>s.currentResource);
+  const resourceId = currentResource?.resourceId;
 
   useEffect(() => {
     if (!engine || !resourceId)
@@ -24,4 +27,18 @@ export function useHistoryLogger(engine: HTMLAudioElement | null, resourceId: st
 
     return () => engine.removeEventListener("playing", handleActualPlayback);
   }, [engine, resourceId]);
+}
+
+async function fetchAddToHistory(musicId: string, _timestamp: number = new Date().getTime()) {
+  const url = await getUrl(musicId);
+
+  if (url) {
+    await fetch(url.href, {
+      credentials: "include",
+      cache: "no-store",
+      headers: {
+        Range: "bytes=0-0",
+      },
+    } );
+  }
 }

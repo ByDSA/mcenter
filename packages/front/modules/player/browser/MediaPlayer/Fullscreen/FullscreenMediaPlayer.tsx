@@ -53,7 +53,7 @@ export function FullscreenMediaPlayer( { onClose }: Props) {
         return <Effects />;
       case AppView.Player:
       default:
-        return <Player audioElement={audioElement}/>;
+        return <Player />;
     }
   }, [view, audioElement]);
   const { openMenu } = useContextMenuTrigger();

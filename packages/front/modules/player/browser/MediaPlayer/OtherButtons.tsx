@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { RepeatOne, Repeat, Shuffle, VolumeOff, VolumeDown, VolumeUp, SkipPrevious, SkipNext } from "@mui/icons-material";
+import { RepeatOne, Repeat, Shuffle, VolumeOff, VolumeDown, VolumeUp, SkipPrevious, SkipNext, Replay10, Forward10, HighlightOff } from "@mui/icons-material";
 import { useEffect, useState, useCallback, ComponentProps } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { classes } from "#modules/utils/styles";
@@ -33,6 +33,7 @@ export const RepeatButton = () => {
   return (
     <ControlButton
       active={repeatMode !== RepeatMode.Off}
+      title="Repetición"
       onClick={(e)=>{
         e.stopPropagation();
         cycleRepeatMode();
@@ -44,9 +45,10 @@ export const RepeatButton = () => {
 };
 
 export const ShuffleButton = () => {
-  const { isShuffle, setIsShuffle } = useBrowserPlayer(useShallow(s => ( {
+  const { isShuffle, setIsShuffle, setNextResource } = useBrowserPlayer(useShallow(s => ( {
     isShuffle: s.isShuffle,
     setIsShuffle: s.setIsShuffle,
+    setNextResource: s.setNextResource,
   } )));
   const query = useBrowserPlayer(s=>s.query);
   const currentResource = useBrowserPlayer(s=>s.currentResource);
@@ -54,10 +56,12 @@ export const ShuffleButton = () => {
   return (
     <ControlButton
       active={isShuffle}
+      title="Aleatoriedad"
       disabled={!!query && currentResource?.playlistId === null}
       onClick={(e) => {
         e.stopPropagation();
         setIsShuffle(!isShuffle);
+        setNextResource(null);
       }}
     >
       <Shuffle fontSize="small" />
@@ -99,6 +103,23 @@ export const VolumeController = () => {
       handleVolumeChange(0);
     }
   };
+
+  useEffect(()=> {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target !== document.body)
+        return;
+
+      if (e.code === "KeyM")
+        toggleMute(e);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return ()=> {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [toggleMute]);
+
   // eslint-disable-next-line no-nested-ternary
   const volumeIcon = volume === 0 ? <VolumeOff /> : volume < 0.5 ? <VolumeDown /> : <VolumeUp />;
 
@@ -123,10 +144,63 @@ export const VolumeController = () => {
   );
 };
 
-export const PrevButton = ( { audioElement, className }: {audioElement: HTMLAudioElement | null;
-className?: string;} ) => {
+export const BackwardButton = ( { className }: {className?: string} ) => {
+  const [audioElement] = useAudioElement();
+
+  return <ControlButton
+    className={classes(className)}
+    title="Ir atrás 10 segundos"
+    disabled={!audioElement}
+    onClick={(e) => {
+      e.stopPropagation();
+      const { backward } = useBrowserPlayer.getState();
+
+      backward(10, audioElement!);
+    }}
+  >
+    <Replay10 />
+  </ControlButton>;
+};
+
+export const ForwardButton = ( { className }: {className?: string} ) => {
+  const [audioElement] = useAudioElement();
+
+  return <ControlButton
+    className={classes(className)}
+    disabled={!audioElement}
+    title="Ir adelante 10 segundos"
+    onClick={(e) => {
+      e.stopPropagation();
+      const { forward } = useBrowserPlayer.getState();
+
+      forward(10, audioElement!);
+    }}
+  >
+    <Forward10 />
+  </ControlButton>;
+};
+
+export const CloseButton = ( { className }: {className?: string} ) => {
+  return <ControlButton
+    className={classes(styles.closeButton, className)}
+    title="Cerrar"
+    onClick={(e) => {
+      e.stopPropagation();
+      const { stop } = useBrowserPlayer.getState();
+
+      stop();
+    }}
+  >
+    <HighlightOff />
+  </ControlButton>;
+};
+
+export const PrevButton = ( { className }: {className?: string} ) => {
+  const [audioElement] = useAudioElement();
+
   return <ControlButton
     className={classes(styles.prevNextButton, className)}
+    title="Anterior"
     onClick={async (e) => {
       e.stopPropagation();
       const { currentTime, hasPrev, setCurrentTime, prev } = useBrowserPlayer.getState();
@@ -156,6 +230,7 @@ export const NextButton = ( { className }: NextButtonProps) => {
 
   return <ControlButton
     className={classes(styles.prevNextButton, className)}
+    title="Siguiente"
     disabled={!hasNext()}
     onClick={async (e) => {
       e.stopPropagation();

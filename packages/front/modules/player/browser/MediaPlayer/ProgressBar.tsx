@@ -4,14 +4,15 @@ import { classes } from "#modules/utils/styles";
 import { TIME_UNDEFINED } from "#modules/remote-player/MediaPlayer";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
 import styles from "./ProgressBar.module.css";
+import { useAudioElement } from "./Audio/AudioContext";
 
 type Props = {
-  audioElement: HTMLAudioElement | null;
   className?: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const ProgressBar = ( { audioElement, className }: Props) => {
+export const ProgressBar = ( { className }: Props) => {
+  const [audioElement] = useAudioElement();
   const currentTime = useBrowserPlayer(s=>s.currentTime);
   const duration = useBrowserPlayer(s=>s.duration);
   const setCurrentTime = useBrowserPlayer(s=>s.setCurrentTime);

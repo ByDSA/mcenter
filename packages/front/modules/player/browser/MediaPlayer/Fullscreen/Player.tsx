@@ -5,17 +5,13 @@ import { secsToMmss } from "#modules/utils/dates";
 import { TIME_UNDEFINED } from "#modules/remote-player/MediaPlayer";
 import { useMusic } from "#modules/musics/hooks";
 import { PlayButton } from "../PlayButton";
-import { PrevButton, NextButton, ShuffleButton, RepeatButton } from "../OtherButtons";
+import { PrevButton, NextButton, ShuffleButton, RepeatButton, BackwardButton, ForwardButton, CloseButton } from "../OtherButtons";
 import { ProgressBar } from "../ProgressBar";
 import commonStyles from "../MediaPlayerCommon.module.css";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import styles from "./Player.module.css";
 
-type Props = {
-  audioElement: HTMLAudioElement | null;
-};
-
-export const Player = ( { audioElement }: Props) => {
+export const Player = () => {
   const currentResource = useBrowserPlayer(s=>s.currentResource);
   const { data: music } = useMusic(currentResource?.resourceId ?? null);
 
@@ -50,21 +46,27 @@ export const Player = ( { audioElement }: Props) => {
         >{artist}</p>
       </article>
       <article className={styles.progressBarWrapper}>
-        <ProgressBar audioElement={audioElement} />
+        <ProgressBar />
         <footer className={styles.timeLabelsRow}>
           <CurrentTime />
           <Duration />
         </footer>
       </article>
       <div className={styles.controlsRow}>
-        <ShuffleButton />
+        <BackwardButton />
         <section className={styles.controls}>
-          <PrevButton audioElement={audioElement}/>
+
+          <PrevButton/>
 
           <PlayButton />
 
           <NextButton />
         </section>
+        <ForwardButton />
+      </div>
+      <div className={styles.controlsRow}>
+        <ShuffleButton />
+        <CloseButton />
         <RepeatButton />
       </div>
     </section>

@@ -8,7 +8,7 @@ interface AudioNodes {
   limiter: DynamicsCompressorNode;
 }
 
-export function useAudioPipeline(audioElement: HTMLAudioElement | null) {
+export function useAudioEffects(audioElement: HTMLAudioElement | null) {
   const ctxRef = useRef<AudioContext | null>(null);
   const nodesRef = useRef<AudioNodes | null>(null);
   const compressionValue = useBrowserPlayer(s => s.compressionValue);

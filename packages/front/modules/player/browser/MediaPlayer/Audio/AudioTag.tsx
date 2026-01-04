@@ -1,16 +1,17 @@
 import { showError } from "$shared/utils/errors/showError";
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { withRetries } from "#modules/utils/retries";
 import { ErrorNoConnection } from "#modules/core/errors/custom-errors";
 import { RepeatMode, useBrowserPlayer } from "../BrowserPlayerContext";
 import { useAudioElement } from "./AudioContext";
-import { getUrlSkipHistory, useMediaSession } from "./audioUtils";
+import { getUrlSkipHistory } from "./audioUtils";
 import { handleExoticAudio } from "./exotic-audio";
-import { useAudioPipeline } from "./useAudioPipeline";
+import { useAudioEffects } from "./useAudioEffects";
 import { useHistoryLogger } from "./useHistoryLogger";
 import { usePrefetching } from "./usePrefetching";
 import { useAudioCache } from "./AudioCacheContext";
+import { useMediaSession } from "./useMediaSession";
 
 export type AudioRef = RefObject<HTMLAudioElement | null>;
 
@@ -22,6 +23,7 @@ export type AudioRef = RefObject<HTMLAudioElement | null>;
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const AudioTag = () => {
   const player = useBrowserPlayer(useShallow((s) => ( {
+    isOnline: s.isOnline,
     currentResource: s.currentResource,
     status: s.status,
     setCurrentTime: s.setCurrentTime,
@@ -35,33 +37,142 @@ export const AudioTag = () => {
     hasNext: s.hasNext,
   } )));
   const engineRef = useRef<HTMLAudioElement | null>(null);
+  const syncingRef = useRef(false);
+  const sync = useCallback(async () => {
+    if (syncingRef.current)
+      return;
 
-  // Inicialización única del Engine
-  if (!engineRef.current && typeof Audio !== "undefined") {
-    const audio = new Audio();
+    syncingRef.current = true;
 
-    // IMPORTANTE: crossOrigin debe ir antes de cualquier src para evitar tainted canvas/audio context errors
-    audio.crossOrigin = "use-credentials";
-    audio.preload = "auto";
-    engineRef.current = audio;
-  }
+    try {
+      const engine = engineRef.current;
 
-  // Contexto Global para la UI (ProgressBar, etc)
+      if (!engine)
+        return;
+
+      await waitForPrefetching();
+
+      const { status } = useBrowserPlayer.getState();
+
+      if (status === "playing") {
+        if (engine.paused || engine.error || engine.readyState === 0)
+          await securePlayEngine();
+      } else
+        engine.pause();
+    } finally {
+      syncingRef.current = false;
+    }
+  }, []);
   const [, setGlobalAudioElement] = useAudioElement();
 
   useEffect(() => {
-    if (engineRef.current)
-      setGlobalAudioElement(engineRef.current);
+    if (engineRef.current || typeof Audio === "undefined")
+      return;
+
+    const audio = new Audio();
+
+    audio.crossOrigin = "use-credentials";
+    audio.preload = "auto";
+    engineRef.current = audio;
+
+    setGlobalAudioElement(engineRef.current);
+
+    const onTimeUpdate = () => player.setCurrentTime(audio.currentTime);
+    const onDurationChange = () => {
+      const d = audio.duration;
+
+      if (isFinite(d))
+        useBrowserPlayer.getState().setDuration(d);
+    };
+    const onEnded = async () => {
+      const { repeatMode } = useBrowserPlayer.getState();
+
+      if (repeatMode === RepeatMode.One)
+        audio.currentTime = 0;
+      else if (player.hasNext())
+        await player.next();
+      else
+        player.stop();
+
+      await sync();
+    };
+    const onError = async (_e) => {
+      await sync();
+    };
+    const checkBlobAndFix = async () => {
+      if (!engineRef.current || !engineRef.current.src.startsWith("blob"))
+        return;
+
+      const { currentResource } = useBrowserPlayer.getState();
+
+      if (!currentResource)
+        return;
+
+      try {
+        const response = await fetch(audio.src, {
+          cache: "no-store",
+          headers: {
+            Range: "bytes=0-0",
+          },
+        } );
+
+        if (!response.ok)
+          throw new Error("Blob muerto");
+      } catch {
+        const fallbackUrl = await getUrlSkipHistory(currentResource.resourceId);
+        const saveTime = audio.currentTime;
+
+        audio.src = fallbackUrl;
+        audio.pause(); // Para que el tiempo que tarda en sync no se reproduzca
+        audio.currentTime = saveTime;
+        await sync();
+      }
+    };
+
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("durationchange", onDurationChange);
+    audio.addEventListener("ended", onEnded);
+    audio.addEventListener("error", onError);
+    audio.addEventListener("waiting", checkBlobAndFix);
+    audio.addEventListener("seeking", checkBlobAndFix);
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.target !== document.body)
+        return;
+
+      if (e.code === "Space") {
+        e.preventDefault();
+        const { status, pause, resume } = useBrowserPlayer.getState();
+
+        status === "playing" ? pause() : resume();
+      } else if (e.code === "ArrowLeft") {
+        const { backward } = useBrowserPlayer.getState();
+
+        backward(10, audio);
+      } else if (e.code === "ArrowRight") {
+        const { forward } = useBrowserPlayer.getState();
+
+        forward(10, audio);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+      engineRef.current = null;
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("durationchange", onDurationChange);
+      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("error", onError);
+      audio.removeEventListener("waiting", checkBlobAndFix);
+      audio.removeEventListener("seeking", checkBlobAndFix);
+      window.removeEventListener("keydown", onKeyDown);
+      setGlobalAudioElement(null);
+    };
   }, [setGlobalAudioElement]);
-
-  const isOnline = useOnline();
-  const syncingRef = useRef(false);
-
-  usePrefetching();
-
-  useAudioPipeline(engineRef.current);
-
-  useHistoryLogger(engineRef.current, player.currentResource?.resourceId);
 
   useEffect(() => {
     const loadResource = async () => {
@@ -79,6 +190,8 @@ export const AudioTag = () => {
         return;
       }
 
+      abortPrefetchingFetch();
+      await waitForPrefetching(); // Por si está convirtiendo el audio
       const { get } = useAudioCache.getState();
       let newUrl = get(player.currentResource.resourceId);
 
@@ -94,34 +207,10 @@ export const AudioTag = () => {
     loadResource().catch(showError);
   }, [player.currentResource]);
 
-  const sync = useCallback(async () => {
-    if (syncingRef.current)
-      return;
-
-    syncingRef.current = true;
-
-    try {
-      const engine = engineRef.current;
-
-      if (!engine)
-        return;
-
-      const { status } = useBrowserPlayer.getState();
-
-      if (status === "playing") {
-        if (engine.paused || engine.error || engine.readyState === 0)
-          await securePlayEngine();
-      } else
-        engine.pause();
-    } finally {
-      syncingRef.current = false;
-    }
-  }, []);
-
   useEffect(() => {
-    if (isOnline && engineRef.current?.src)
+    if (player.isOnline && engineRef.current?.src)
       sync().catch(showError);
-  }, [player.status, sync, isOnline]);
+  }, [player.status, sync, player.isOnline]);
 
   useEffect(() => {
     const interval = setInterval(() => sync().catch(showError), 2_000);
@@ -140,7 +229,9 @@ export const AudioTag = () => {
         engine.load();
 
       try {
-        await engine.play();
+        await withTimeout(async ()=> {
+          await engine.play();
+        }, 5_000);
       } catch (e) {
         if (!(e instanceof Error && e.name === "AbortError"))
           throw e;
@@ -167,89 +258,20 @@ export const AudioTag = () => {
     } );
   }
 
-  useEffect(() => {
-    const engine = engineRef.current;
-
-    if (!engine)
-      return;
-
-    const onTimeUpdate = () => player.setCurrentTime(engine.currentTime);
-    const onDurationChange = () => {
-      const d = engine.duration;
-
-      if (isFinite(d))
-        useBrowserPlayer.getState().setDuration(d);
-    };
-    const onEnded = async () => {
-      if (player.repeatMode === RepeatMode.One)
-        engine.currentTime = 0;
-      else if (player.hasNext())
-        await player.next();
-      else
-        player.stop();
-
-      await sync();
-    };
-    const onError = async (_e) => {
-      await sync();
-    };
-    const checkBlobAndFix = async () => {
-      if (!engineRef.current || !engineRef.current.src.startsWith("blob"))
-        return;
-
-      const { currentResource } = useBrowserPlayer.getState();
-
-      if (!currentResource)
-        return;
-
-      const audio = engineRef.current;
-
-      try {
-        const response = await fetch(audio.src, {
-          cache: "no-store",
-          headers: {
-            Range: "bytes=0-0",
-          },
-        } );
-
-        if (!response.ok)
-          throw new Error("Blob muerto");
-      } catch {
-        const fallbackUrl = await getUrlSkipHistory(currentResource.resourceId);
-        const saveTime = audio.currentTime;
-
-        audio.src = fallbackUrl;
-        audio.currentTime = saveTime;
-        await sync();
-      }
-    };
-
-    engine.addEventListener("timeupdate", onTimeUpdate);
-    engine.addEventListener("durationchange", onDurationChange);
-    engine.addEventListener("ended", onEnded);
-    engine.addEventListener("error", onError);
-    engine.addEventListener("waiting", checkBlobAndFix);
-    engine.addEventListener("seeking", checkBlobAndFix);
-
-    return () => {
-      engine.removeEventListener("timeupdate", onTimeUpdate);
-      engine.removeEventListener("durationchange", onDurationChange);
-      engine.removeEventListener("ended", onEnded);
-      engine.removeEventListener("error", onError);
-      engine.removeEventListener("waiting", checkBlobAndFix);
-      engine.removeEventListener("seeking", checkBlobAndFix);
-    };
-  }, [player.repeatMode]);
-
-  useMediaSession(engineRef.current, player);
+  useAudioSilence();
+  useMediaSession(engineRef.current);
+  useOnline();
+  useAudioEffects(engineRef.current);
+  useHistoryLogger(engineRef.current);
+  const { abort: abortPrefetchingFetch, waitForPrefetching } = usePrefetching();
 
   return null;
 };
 
 export function useOnline() {
-  const [isOnline, setIsOnline] = useState(true);
-
   useEffect(() => {
+    const { setIsOnline } = useBrowserPlayer.getState();
+
     if (typeof navigator !== "undefined")
       setIsOnline(navigator.onLine);
 
@@ -264,8 +286,6 @@ export function useOnline() {
       window.removeEventListener("offline", setOff);
     };
   }, []);
-
-  return isOnline;
 }
 
 export async function withTimeout<T>(
@@ -285,4 +305,41 @@ export async function withTimeout<T>(
   } finally {
     clearTimeout(timeoutId);
   }
+}
+
+function useAudioSilence() {
+  const status = useBrowserPlayer(s=>s.status);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    const audio = new Audio();
+
+    audioRef.current = audio;
+
+    // eslint-disable-next-line daproj/max-len
+    audio.src = "data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==";
+    audio.loop = true;
+    audio.volume = 0;
+    audio.play()
+      .catch(() => {
+
+      /* empty */
+      } );
+
+    return () => {
+      audio.pause();
+      audio.removeAttribute("src");
+    };
+  }, []);
+
+  useEffect(()=> {
+    if (!audioRef.current)
+      return;
+
+    if (status === "playing") {
+      if (audioRef.current.paused)
+        audioRef.current.play().catch(showError);
+    } else
+      audioRef.current.pause();
+  }, [status]);
 }

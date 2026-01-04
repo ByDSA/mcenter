@@ -6,11 +6,10 @@ import { classes } from "#modules/utils/styles";
 import { RevealArrow } from "#modules/ui-kit/RevealArrow/RevealArrow";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import { PlayButton } from "../PlayButton";
-import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, ControlButton } from "../OtherButtons";
+import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, ControlButton, CloseButton } from "../OtherButtons";
 import { ProgressBar } from "../ProgressBar";
 import { ProgressBarOnlyView } from "../ProgressBarOnlyView";
 import { FullscreenMediaPlayer } from "../Fullscreen/FullscreenMediaPlayer";
-import { useAudioElement } from "../Audio/AudioContext";
 import { Effects } from "../Fullscreen/Effects";
 import styles from "./MediaPlayer.module.css";
 import { TrackInfo } from "./TrackInfo";
@@ -25,7 +24,6 @@ export function BottomMediaPlayer() {
   const { mountNode: windowMountNode, open, close, isOpen,
     isFullscreen, currentWindowName } = useWindowContext();
   const width = useWindowWidth();
-  const [audioElement] = useAudioElement();
   const extraControls = useMemo(()=><div className={styles.extraControls}>
     <VolumeController />
     <ShuffleButton />
@@ -48,7 +46,8 @@ export function BottomMediaPlayer() {
       }}>
       <Equalizer />
     </ControlButton>
-  </div>, [audioElement, open, close, currentWindowName]);
+    <CloseButton />
+  </div>, [open, close, currentWindowName]);
 
   useEffect(()=> {
     if (isOpen) {
@@ -71,7 +70,6 @@ export function BottomMediaPlayer() {
         className={styles.playerContainer}>
         {(width >= SMALL_BREAKPOINT
          && <ProgressBar
-           audioElement={audioElement}
            className={styles.progressBar}
          />)
            || <ProgressBarOnlyView
@@ -97,7 +95,7 @@ export function BottomMediaPlayer() {
 
           <div className={styles.controlsSection}>
             {
-              width >= SMALL_BREAKPOINT && <PrevButton audioElement={audioElement} />
+              width >= SMALL_BREAKPOINT && <PrevButton />
             }
 
             <PlayButton />
@@ -110,7 +108,7 @@ export function BottomMediaPlayer() {
 
           {(width < SMALL_BREAKPOINT
             ? null
-            : width < 850
+            : width < 900
             && <div className={styles.revealArrowWrapper}>
               <RevealArrow>
                 <div className={styles.revealArrowInside}>

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import type { MusicEntity } from "$shared/models/musics";
 import assert from "assert";
 import { create } from "zustand";
@@ -90,9 +91,10 @@ interface PlayerState {
   duration?: number; // seconds
   query?: string;
   compressionValue: number; // 0 = nada, 1 = máximo
+  isOnline: boolean;
 
   // Acciones
-  setNextResource: (newValue: NextResource)=> void;
+  setNextResource: (newValue: NextResource | null)=> void;
   play: (props: PlayProps)=> void;
   playMusic: (musicId: MusicEntity["id"], props?: PlayMusicProps)=> Promise<void>;
   playPlaylistItem: (props: PlayPlaylistItemProps)=> Promise<void>;
@@ -112,6 +114,9 @@ interface PlayerState {
   cycleRepeatMode: ()=> void;
   setIsShuffle: (isShuffle: boolean)=> void;
   setCurrentTime: (newTime: number, props?: SetCurrentTimeProps)=> void;
+  backward: (relativeTimeSecs: number, audioElement: HTMLAudioElement)=> void;
+  forward: (relativeTimeSecs: number, audioElement: HTMLAudioElement)=> void;
+  setIsOnline: (newValue: boolean)=> void;
 
   // Getters (Computados)
   hasPrev: ()=> boolean;
@@ -137,6 +142,10 @@ export const useBrowserPlayer = create<PlayerState>()(
       query: undefined,
       isOpenFullscreen: false,
       compressionValue: 0,
+      isOnline: false,
+      setIsOnline: (newValue)=> set( {
+        isOnline: newValue,
+      } ),
       setCompressionValue: (newValue) => set( {
         compressionValue: newValue,
       } ),
@@ -153,7 +162,8 @@ export const useBrowserPlayer = create<PlayerState>()(
       } ),
 
       playMusic: async (musicId, props) => {
-        await useMusic.invalidateCache(musicId); // TODO
+        // Para que fetchee fileinfos. (TODO: alguna forma más eficiente):
+        await useMusic.invalidateCache(musicId);
         const music = await useMusic.get(musicId);
 
         if (!music)
@@ -371,10 +381,6 @@ export const useBrowserPlayer = create<PlayerState>()(
           payload: getOfflineRandomIndex(get),
         };
       },
-
-      /**
-   * Ejecuta la acción de ir a la siguiente canción.
-   */
       next: async () => {
         const { getNext, nextResource, queue } = get();
         const { has } = useAudioCache.getState();
@@ -454,6 +460,22 @@ export const useBrowserPlayer = create<PlayerState>()(
 
         return set( {
           currentTime: Math.min(newValue, get().duration ?? 0),
+        } );
+      },
+      backward: (newRelativeTime, audioElement)=> {
+        const { currentTime, setCurrentTime } = useBrowserPlayer.getState();
+        const newTime = Math.max(currentTime - newRelativeTime, 0);
+
+        setCurrentTime(newTime, {
+          audioElement,
+        } );
+      },
+      forward: (newRelativeTime, audioElement)=> {
+        const { currentTime, setCurrentTime, duration } = useBrowserPlayer.getState();
+        const newTime = Math.min(currentTime + newRelativeTime, duration ?? 0);
+
+        setCurrentTime(newTime, {
+          audioElement,
         } );
       },
       setNextResource: (newValue) => {
