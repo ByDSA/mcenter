@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.24.0](https://github.com/ByDSA/mcenter/compare/v4.23.0...v4.24.0) (2026-01-05)
+
+
+### Features
+
+* **front:** some info in notificactions ([4ddaed1](https://github.com/ByDSA/mcenter/commit/4ddaed19018b98c998a56e0ee1a7ab46a82c1e43))
+
+
+### Bug Fixes
+
+* **front:** add episodeKey in EpisodeEdit ([59ffa5d](https://github.com/ByDSA/mcenter/commit/59ffa5d482d9a17629cbd930c26e7da882ae68bc))
+* **front:** some fixes ([477d09d](https://github.com/ByDSA/mcenter/commit/477d09d57f9dff04ec12574cedaf88fd350793b9))
+* **front:** some fixes to player ([7c0f8ae](https://github.com/ByDSA/mcenter/commit/7c0f8ae5ae9d8d4d1f8cca0eeb1437a707bcae48))
+* **front:** stops and not close on end song ([fb0cf31](https://github.com/ByDSA/mcenter/commit/fb0cf31903aea3b2b59b94a0999cc4c3f56c7427))
+
 ## [4.23.0](https://github.com/ByDSA/mcenter/compare/v4.22.0...v4.23.0) (2026-01-02)
 
 
