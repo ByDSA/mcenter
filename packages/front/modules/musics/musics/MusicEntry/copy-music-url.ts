@@ -1,6 +1,5 @@
 import { Music } from "$shared/models/musics";
 import { PATH_ROUTES } from "$shared/routing";
-import { logger } from "#modules/core/logger";
 import { frontendUrl } from "#modules/requests";
 
 type CopyMusicProps = {
@@ -16,5 +15,4 @@ export async function copyMusicUrl( { music, token }: CopyMusicProps) {
       } ),
     ),
   );
-  logger.info("Copiada url");
 }

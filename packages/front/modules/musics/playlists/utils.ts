@@ -1,5 +1,4 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { logger } from "#modules/core/logger";
 import { frontendUrl } from "#modules/requests";
 import { secsToMmss, pad2 } from "#modules/utils/dates";
 
@@ -42,5 +41,4 @@ export async function playlistCopySlugUrl(
       } ),
     ),
   );
-  logger.info("Copiada url");
 }

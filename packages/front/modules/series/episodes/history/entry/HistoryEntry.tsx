@@ -78,7 +78,6 @@ export const EpisodeHistoryEntryElement = React.memo((
                     PATH_ROUTES.episodes.slug.withParams(seriesKey, episodeKey),
                   ),
                 );
-                logger.info("Copiada url");
               }}
             />
             <EpisodeLatestViewsContextMenuItem
@@ -125,7 +124,7 @@ function DeleteHistoryEntryContextMenuItem( { setValue, value }: Props<Data>) {
   const { openModal } = useConfirmModal();
 
   return <ContextMenuItem
-    label="Eliminar del historial"
+    label="Quitar del historial"
     theme="danger"
     onClick={async () => {
       await openModal( {
@@ -140,7 +139,7 @@ function DeleteHistoryEntryContextMenuItem( { setValue, value }: Props<Data>) {
           const api = FetchApi.get(EpisodeHistoryApi);
 
           await api.delete(value.id);
-          logger.info("Entrada de historial eliminada");
+          logger.info("Quitada entrada de historial");
           setValue(undefined);
 
           return true;

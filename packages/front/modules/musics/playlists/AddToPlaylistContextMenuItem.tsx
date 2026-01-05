@@ -4,6 +4,7 @@ import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu/ContextMenu";
 import { MusicEntity } from "../models";
+import { useMusic } from "../hooks";
 import { usePlaylistSelectorModal } from "./list-selector/modal";
 import { MusicPlaylistsApi } from "./requests";
 
@@ -34,7 +35,9 @@ export function AddToPlaylistContextMenuItem(
           const api = FetchApi.get(MusicPlaylistsApi);
 
           await api.addOneTrack(playlist.id, musicId);
-          logger.info(`Canción añadida a "${playlist.name}"`);
+          const musicTitle = (await useMusic.get(musicId))?.title;
+
+          logger.info(`"${musicTitle}" añadida a "${playlist.name}"`);
         } catch (err) {
           showError(err);
         }

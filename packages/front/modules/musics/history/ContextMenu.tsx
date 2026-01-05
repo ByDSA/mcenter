@@ -49,7 +49,7 @@ function DeleteHistoryEntryContextMenuItem( { setValue, value }: Omit<Props<Data
   const { openModal } = useConfirmModal();
 
   return <ContextMenuItem
-    label="Eliminar del historial"
+    label="Quitar del historial"
     theme="danger"
     onClick={async () => {
       await openModal( {
@@ -63,7 +63,7 @@ function DeleteHistoryEntryContextMenuItem( { setValue, value }: Omit<Props<Data
           const api = FetchApi.get(MusicHistoryApi);
 
           await api.deleteOneById(value.id);
-          logger.info("Entrada de historial eliminada");
+          logger.info("Quitada entrada de historial");
           setValue(undefined);
 
           return true;
