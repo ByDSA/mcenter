@@ -4,7 +4,6 @@ import { useShallow } from "zustand/react/shallow";
 import { withRetries } from "#modules/utils/retries";
 import { ErrorNoConnection } from "#modules/core/errors/custom-errors";
 import { RepeatMode, useBrowserPlayer } from "../BrowserPlayerContext";
-import { useAudioElement } from "./AudioContext";
 import { getUrlSkipHistory } from "./audioUtils";
 import { handleExoticAudio } from "./exotic-audio";
 import { useAudioEffects } from "./useAudioEffects";
@@ -63,7 +62,7 @@ export const AudioTag = () => {
       syncingRef.current = false;
     }
   }, []);
-  const [, setGlobalAudioElement] = useAudioElement();
+  const setGlobalAudioElement = useBrowserPlayer(s=>s.setAudioElement);
 
   useEffect(() => {
     if (engineRef.current || typeof Audio === "undefined")
@@ -148,11 +147,11 @@ export const AudioTag = () => {
       } else if (e.code === "ArrowLeft") {
         const { backward } = useBrowserPlayer.getState();
 
-        backward(10, audio);
+        backward(10);
       } else if (e.code === "ArrowRight") {
         const { forward } = useBrowserPlayer.getState();
 
-        forward(10, audio);
+        forward(10);
       }
     };
 

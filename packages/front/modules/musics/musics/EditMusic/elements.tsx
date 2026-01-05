@@ -1,4 +1,4 @@
-import { MusicEntity } from "$shared/models/musics";
+import { MusicEntity, MusicUserInfo } from "$shared/models/musics";
 import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
 import { WithRequired } from "$shared/utils/objects/types";
 import { ResourceInputText, ResourceInputNumber, ResourceInputArrayString } from "#modules/ui-kit/input";
@@ -18,21 +18,6 @@ function getAndUpdateMusicByProp<V>(
       [prop]: v,
     } ),
     getValue: (r)=>r[prop],
-    name: prop,
-  };
-}
-function getAndUpdateMusicUserInfoByProp<V>(
-  prop: string,
-): Pick<ResourceInputCommonProps<Data, V>, "getUpdatedResource" | "getValue" | "name"> {
-  return {
-    getUpdatedResource: (v, r) => ( {
-      ...r,
-      userInfo: {
-        ...r.userInfo,
-        [prop]: v,
-      },
-    } ),
-    getValue: (r)=>r.userInfo[prop],
     name: prop,
   };
 }
@@ -71,7 +56,30 @@ export function genWeightElement(props: NumberProps) {
   return <span className={styles.weight}>{
     ResourceInputNumber<MusicEntity>( {
       caption: MUSIC_USER_INFO_PROPS.weight.caption,
-      ...getAndUpdateMusicUserInfoByProp<number>("weight"),
+      getUpdatedResource: (v, r) => {
+        let userInfo: MusicUserInfo;
+
+        if (!r.userInfo) {
+          userInfo = {
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            lastTimePlayed: 0,
+            musicId: "",
+            userId: "",
+            weight: 0,
+            tags: [],
+          };
+        } else
+          userInfo = r.userInfo;
+
+        userInfo.weight = v ?? 0;
+
+        return {
+          ...r,
+          userInfo,
+        };
+      },
+      getValue: (r)=> r.userInfo ? r.userInfo.weight : 0,
       ...props,
     } )
   }</span>;

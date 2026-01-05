@@ -13,7 +13,6 @@ import { PlayQueueButtonView } from "../Bottom/PlayQueue/PlayQueueButtonView";
 import { PlayQueue } from "../Bottom/PlayQueue/PlayQueue";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import { useWindowContext } from "../Bottom/PlayQueue/WindowProvider";
-import { useAudioElement } from "../Audio/AudioContext";
 import styles from "./FullscreenMediaPlayer.module.css";
 import { Player } from "./Player";
 import { Effects } from "./Effects";
@@ -33,7 +32,7 @@ type Props = {
 export function FullscreenMediaPlayer( { onClose }: Props) {
   const [view, setView] = useState<AppView>(AppView.Player);
   const { user } = useUser();
-  const [audioElement] = useAudioElement();
+  const audioElement = useBrowserPlayer(s=>s.audioElement);
   const { close } = useWindowContext();
   const currentResource = useBrowserPlayer(s=>s.currentResource);
   const content = useMemo(()=>{

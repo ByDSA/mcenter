@@ -78,7 +78,7 @@ export function useMusicCrudWithElements
 
         let userInfoPromise: Promise<MusicUserInfoEntity> = Promise.resolve() as Promise<any>;
 
-        if (data.userInfo && currentData.userInfo) {
+        if (currentData.userInfo) {
           const userInfoBody: MusicsApi.Patch.Body = generatePatchBody(
             data.userInfo,
             currentData.userInfo,
@@ -89,7 +89,7 @@ export function useMusicCrudWithElements
           );
 
           if (
-            (data.userInfo.tags?.length ?? 0) === 0 && userInfoBody.entity.tags
+            (data.userInfo?.tags?.length ?? 0) === 0 && userInfoBody.entity.tags
         && userInfoBody.entity.tags.length === 0
           )
             delete userInfoBody.entity.tags;
@@ -351,8 +351,8 @@ function calcIsModified(r1: MusicEntity, r2: MusicEntity) {
   if (calcMusicIsModified(r1, r2))
     return true;
 
-  if (r1.userInfo && r2.userInfo) {
-    return isModifiedd(r1.userInfo, r2.userInfo, {
+  if (r2.userInfo) {
+    return !r1.userInfo || isModifiedd(r1.userInfo, r2.userInfo, {
       ignoreNewUndefined: true,
       shouldMatch: {
         weight: true,

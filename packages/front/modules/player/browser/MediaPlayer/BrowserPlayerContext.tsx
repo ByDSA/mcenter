@@ -60,10 +60,6 @@ export type PlaylistQueueItem = PlayerResourceId & {
   playlistId: string | null;
 };
 
-type SetCurrentTimeProps = {
-  audioElement?: HTMLAudioElement | null;
-};
-
 export type NextAction = {
   type: "INDEX";
   payload: number;
@@ -75,6 +71,10 @@ export type NextAction = {
 type NextResource = {
   nextAction: NextAction | null;
   date: number;
+};
+
+type SetCurrentTimeProps = {
+  shouldUpdateAudioElement?: boolean;
 };
 
 // --- Interface del Store ---
@@ -92,13 +92,17 @@ interface PlayerState {
   query?: string;
   compressionValue: number; // 0 = nada, 1 = máximo
   isOnline: boolean;
+  audioElement: HTMLAudioElement | null;
+
+  // Setters
+  setAudioElement: (newValue: HTMLAudioElement | null)=> void;
 
   // Acciones
   setNextResource: (newValue: NextResource | null)=> void;
   play: (props: PlayProps)=> void;
   playMusic: (musicId: MusicEntity["id"], props?: PlayMusicProps)=> Promise<void>;
   playPlaylistItem: (props: PlayPlaylistItemProps)=> Promise<void>;
-  playQueueIndex: (index: number, props?: SetCurrentTimeProps)=> Promise<void>;
+  playQueueIndex: (index: number)=> Promise<void>;
   playQuery: (q: string)=> Promise<void>;
   pause: ()=> void;
   resume: ()=> void;
@@ -115,8 +119,8 @@ interface PlayerState {
   cycleRepeatMode: ()=> void;
   setIsShuffle: (isShuffle: boolean)=> void;
   setCurrentTime: (newTime: number, props?: SetCurrentTimeProps)=> void;
-  backward: (relativeTimeSecs: number, audioElement: HTMLAudioElement)=> void;
-  forward: (relativeTimeSecs: number, audioElement: HTMLAudioElement)=> void;
+  backward: (relativeTimeSecs: number)=> void;
+  forward: (relativeTimeSecs: number)=> void;
   setIsOnline: (newValue: boolean)=> void;
 
   // Getters (Computados)
@@ -144,6 +148,10 @@ export const useBrowserPlayer = create<PlayerState>()(
       isOpenFullscreen: false,
       compressionValue: 0,
       isOnline: false,
+      audioElement: null,
+      setAudioElement: (newValue) => set( {
+        audioElement: newValue,
+      } ),
       setIsOnline: (newValue)=> set( {
         isOnline: newValue,
       } ),
@@ -204,12 +212,14 @@ export const useBrowserPlayer = create<PlayerState>()(
           resourceId: currentItem.musicId,
           type: "music",
         };
-        const { currentResource } = get();
+        const { currentResource, setCurrentTime } = get();
         const isSameAsLatest = currentResource
         && currentResource.resourceId === resource.resourceId;
 
+        setCurrentTime(0, {
+          shouldUpdateAudioElement: true,
+        } );
         set( {
-          currentTime: 0,
           ...(isSameAsLatest
             ? {}
             : {
@@ -254,7 +264,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           queueIndex: 0,
         } );
       },
-      playQueueIndex: async (index, props) => {
+      playQueueIndex: async (index) => {
         const { queue, currentResource, setCurrentTime } = get();
 
         if (index < 0 || index >= queue.length)
@@ -269,7 +279,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           return;
 
         setCurrentTime(0, {
-          audioElement: props?.audioElement,
+          shouldUpdateAudioElement: true,
         } );
         set( {
           ...(isSameAsLatest
@@ -461,27 +471,30 @@ export const useBrowserPlayer = create<PlayerState>()(
         } );
       },
       setCurrentTime: (newValue, props) => {
-        if (props?.audioElement)
-          props.audioElement.currentTime = newValue;
+        const { duration, audioElement } = get();
+        const finalValue = Math.min(newValue, duration ?? 0);
+
+        if (props?.shouldUpdateAudioElement && audioElement)
+          audioElement.currentTime = finalValue;
 
         return set( {
-          currentTime: Math.min(newValue, get().duration ?? 0),
+          currentTime: finalValue,
         } );
       },
-      backward: (newRelativeTime, audioElement)=> {
+      backward: (newRelativeTime)=> {
         const { currentTime, setCurrentTime } = useBrowserPlayer.getState();
         const newTime = Math.max(currentTime - newRelativeTime, 0);
 
         setCurrentTime(newTime, {
-          audioElement,
+          shouldUpdateAudioElement: true,
         } );
       },
-      forward: (newRelativeTime, audioElement)=> {
+      forward: (newRelativeTime)=> {
         const { currentTime, setCurrentTime, duration } = useBrowserPlayer.getState();
         const newTime = Math.min(currentTime + newRelativeTime, duration ?? 0);
 
         setCurrentTime(newTime, {
-          audioElement,
+          shouldUpdateAudioElement: true,
         } );
       },
       setNextResource: (newValue) => {

@@ -4,7 +4,6 @@ import { classes } from "#modules/utils/styles";
 import { TIME_UNDEFINED } from "#modules/remote-player/MediaPlayer";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
 import styles from "./ProgressBar.module.css";
-import { useAudioElement } from "./Audio/AudioContext";
 
 type Props = {
   className?: string;
@@ -12,7 +11,6 @@ type Props = {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ProgressBar = ( { className }: Props) => {
-  const [audioElement] = useAudioElement();
   const currentTime = useBrowserPlayer(s=>s.currentTime);
   const duration = useBrowserPlayer(s=>s.duration);
   const setCurrentTime = useBrowserPlayer(s=>s.setCurrentTime);
@@ -32,7 +30,7 @@ time: string; } | null>(null);
 
     if (isClick.current && hoverTime !== undefined) {
       setCurrentTime(hoverTime, {
-        audioElement,
+        shouldUpdateAudioElement: true,
       } );
     }
 
@@ -40,7 +38,7 @@ time: string; } | null>(null);
       pos: percentage,
       time: hoverTime !== undefined ? secsToMmss(hoverTime) : TIME_UNDEFINED,
     } );
-  }, [duration, audioElement, setCurrentTime]);
+  }, [duration, setCurrentTime]);
 
   useEffect(() => {
     const handleGlobalPointerMove = (e: PointerEvent) => {

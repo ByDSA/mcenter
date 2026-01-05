@@ -30,16 +30,15 @@ export type ResourceEntryProps = {
     onClick: (e: React.MouseEvent<HTMLElement>)=> Promise<void> | void;
     status: PlayerStatus;
   };
-  index?: number;
   coverUrl?: string;
 };
 
 export function ResourceEntry(
-  { title, subtitle, settings, right, favButton, play, drag, index, coverUrl,
+  { title, subtitle, settings, right, favButton, play, drag, coverUrl,
     titleHref }: ResourceEntryProps,
 ) {
   const router = useRouter();
-  const shouldHaveLeftDiv = !!play || index !== undefined;
+  const shouldHaveLeftDiv = !!play || coverUrl;
   const isPlaying = play !== undefined && play.status !== "stopped";
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const TitleTag = titleHref ? "a" : "span";

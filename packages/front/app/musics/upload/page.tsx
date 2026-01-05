@@ -95,6 +95,7 @@ export default function Upload() {
             (music) => <Fragment key={`${music.id}`}>
               <MusicEntryElement
                 musicId={music.id}
+                playable={true}
               />
             </Fragment>,
           )

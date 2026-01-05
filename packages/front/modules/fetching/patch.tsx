@@ -11,12 +11,12 @@ export function shouldSendPatchWithBody(body: ReturnType<typeof generatePatchBod
 }
 
 export function generatePatchBody<T extends object>(
-  initial: T,
+  initial: T | undefined,
   current: T,
   allowedProps: readonly (keyof T)[],
 ) {
   const filteredInitial = allowedProps.reduce((acc, prop) => {
-    if (prop in initial)
+    if (initial !== undefined && prop in initial)
       (acc as any)[prop] = initial[prop];
 
     return acc;

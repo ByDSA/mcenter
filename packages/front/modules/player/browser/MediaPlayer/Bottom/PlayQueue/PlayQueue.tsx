@@ -10,7 +10,6 @@ type Props = {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlayQueue = ( { className, onClickPlay }: Props) => {
-  const status = useBrowserPlayer(s=>s.status);
   const queue = useBrowserPlayer(s=>s.queue);
   const queueIndex = useBrowserPlayer(s=>s.queueIndex);
   const parentRef = useRef<HTMLDivElement>(null);
@@ -68,7 +67,6 @@ export const PlayQueue = ( { className, onClickPlay }: Props) => {
             key={vItem.key}
             index={index}
             item={item}
-            playerStatus={status}
             start={vItem.start}
             size={vItem.size}
             onClickPlay={onClickPlay ? (prevStatus) => onClickPlay(item, prevStatus) : undefined}
@@ -76,7 +74,7 @@ export const PlayQueue = ( { className, onClickPlay }: Props) => {
         );
       } )}
     </div>;
-  }, [items, status, queue]);
+  }, [items, queue]);
 
   return <div
     ref={parentRef}

@@ -150,9 +150,11 @@
 .info {
   width: 4rem;
   margin-right: 1rem;
+  margin-left: 0.5rem;
 
   @media (width < 450px) {
     margin-right: 0.5rem;
+    margin-left: 0rem;
   }
 }
 

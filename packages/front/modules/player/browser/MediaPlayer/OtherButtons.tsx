@@ -5,7 +5,6 @@ import { useShallow } from "zustand/react/shallow";
 import { classes } from "#modules/utils/styles";
 import { useBrowserPlayer, RepeatMode } from "./BrowserPlayerContext";
 import styles from "./OtherButtons.module.css";
-import { useAudioElement } from "./Audio/AudioContext";
 
 export const ControlButton = ( { active = true,
   className,
@@ -45,7 +44,8 @@ export const RepeatButton = () => {
 };
 
 export const ShuffleButton = () => {
-  const { isShuffle, setIsShuffle, setNextResource } = useBrowserPlayer(useShallow(s => ( {
+  const { isShuffle, setIsShuffle,
+    setNextResource } = useBrowserPlayer(useShallow(s => ( {
     isShuffle: s.isShuffle,
     setIsShuffle: s.setIsShuffle,
     setNextResource: s.setNextResource,
@@ -70,14 +70,14 @@ export const ShuffleButton = () => {
 };
 
 export const VolumeController = () => {
-  const { volume, setVolume } = useBrowserPlayer(
+  const { volume, setVolume, audioElement } = useBrowserPlayer(
     useShallow(s => ( {
       volume: s.volume,
       setVolume: s.setVolume,
+      audioElement: s.audioElement,
     }
     )),
   );
-  const [audioElement] = useAudioElement();
 
   useEffect(()=> {
     updateAudioTagVolume(volume);
@@ -145,7 +145,7 @@ export const VolumeController = () => {
 };
 
 export const BackwardButton = ( { className }: {className?: string} ) => {
-  const [audioElement] = useAudioElement();
+  const audioElement = useBrowserPlayer(s=>s.audioElement);
 
   return <ControlButton
     className={classes(className)}
@@ -155,7 +155,7 @@ export const BackwardButton = ( { className }: {className?: string} ) => {
       e.stopPropagation();
       const { backward } = useBrowserPlayer.getState();
 
-      backward(10, audioElement!);
+      backward(10);
     }}
   >
     <Replay10 />
@@ -163,7 +163,7 @@ export const BackwardButton = ( { className }: {className?: string} ) => {
 };
 
 export const ForwardButton = ( { className }: {className?: string} ) => {
-  const [audioElement] = useAudioElement();
+  const audioElement = useBrowserPlayer(s=>s.audioElement);
 
   return <ControlButton
     className={classes(className)}
@@ -173,7 +173,7 @@ export const ForwardButton = ( { className }: {className?: string} ) => {
       e.stopPropagation();
       const { forward } = useBrowserPlayer.getState();
 
-      forward(10, audioElement!);
+      forward(10);
     }}
   >
     <Forward10 />
@@ -196,8 +196,6 @@ export const CloseButton = ( { className }: {className?: string} ) => {
 };
 
 export const PrevButton = ( { className }: {className?: string} ) => {
-  const [audioElement] = useAudioElement();
-
   return <ControlButton
     className={classes(styles.prevNextButton, className)}
     title="Anterior"
@@ -209,7 +207,7 @@ export const PrevButton = ( { className }: {className?: string} ) => {
         await prev();
       else {
         setCurrentTime(0, {
-          audioElement,
+          shouldUpdateAudioElement: true,
         } );
       }
     }}

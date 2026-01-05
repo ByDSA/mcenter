@@ -3,7 +3,6 @@ import { SetState } from "#modules/utils/resources/useCrud";
 import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { ResourceEntryLoading } from "#modules/resources/ResourceEntryLoading";
 import { MusicEntryElement } from "../musics/MusicEntry/MusicEntry";
 import { genMusicEntryContextMenuContent } from "../musics/MusicEntry/ContextMenu";
@@ -33,14 +32,6 @@ export const MusicPlaylistItem = ( { playlist,
   const usingMusic = useMusic(value.musicId);
   const { data: music } = usingMusic;
   const api = FetchApi.get(MusicPlaylistsApi);
-  const playingThisItemStatus = useBrowserPlayer(s=> {
-    const item = playlist.list[index];
-
-    if (item.id === s.currentResource?.itemId)
-      return s.status;
-    else
-      return "stopped";
-  } );
 
   if (!music)
     return <ResourceEntryLoading drag={drag}/>;
@@ -77,29 +68,11 @@ export const MusicPlaylistItem = ( { playlist,
 
   return <MusicEntryElement
     musicId={music.id}
-    play={{
-      status: playingThisItemStatus,
-      onClick: async ()=>{
-        const player = useBrowserPlayer.getState();
-
-        if (playingThisItemStatus === "playing") {
-          player.pause();
-
-          return;
-        } else if (playingThisItemStatus === "paused") {
-          player.resume();
-
-          return;
-        }
-
-        await player.playPlaylistItem( {
-          playlist,
-          index,
-          ownerSlug: playlist.ownerUser?.slug,
-        } );
-      },
+    playable
+    playlistInfo={{
+      playlist,
+      index,
     }}
-    index={index}
     drag={drag}
     contextMenu={{
       customContent: contextMenuContent,

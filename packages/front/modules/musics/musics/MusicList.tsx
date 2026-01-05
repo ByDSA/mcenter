@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
@@ -6,7 +6,6 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
 import { useUser } from "#modules/core/auth/useUser";
 import listStyles from "#modules/resources/List.module.css";
-import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { MusicsApi } from "../requests";
 import { MusicEntryElement } from "./MusicEntry/MusicEntry";
 import { ArrayData } from "./types";
@@ -36,7 +35,6 @@ export function MusicList(props: Props) {
       Resultados: {data?.length} de {totalCount}
     </span>
   );
-  const player = useBrowserPlayer();
 
   return renderFetchedData<Data | null>( {
     data,
@@ -53,38 +51,11 @@ export function MusicList(props: Props) {
         <br />
         <span className={classes(listStyles.list)}>
           {data!.map((music, i) => {
-            const playingThisMusicStatus: typeof player.status = (()=>{
-              if (player.currentResource?.type !== "music")
-                return "stopped";
-
-              if (player.currentResource?.resourceId !== music.id)
-                return "stopped";
-
-              return player.status;
-            } )();
-
-            return <Fragment key={`${music.id}`}>
-              <MusicEntryElement
-                index={i}
-                play={{
-                  status: playingThisMusicStatus,
-                  onClick: async ()=>{
-                    if (playingThisMusicStatus === "playing") {
-                      player.pause();
-
-                      return;
-                    } else if (playingThisMusicStatus === "paused") {
-                      player.resume();
-
-                      return;
-                    }
-
-                    await player.playMusic(music.id);
-                  },
-                }}
-                musicId={music.id}
-              />
-            </Fragment>;
+            return <MusicEntryElement
+              key={i + ": " + music.id}
+              playable
+              musicId={music.id}
+            />;
           } )}
         </span>
         {(data?.length ?? 0) > 10 && data?.length === totalCount && resultNumbers}
