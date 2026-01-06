@@ -23,8 +23,20 @@ build_artifact() {
   cd "$TEMP_DIR"
 
   echo "Clonando repositorio desde git ..."
-  git clone https://github.com/Chevrotain/chevrotain  > /dev/null
+  mkdir chevrotain
   cd chevrotain
+
+  # Inicializa un repo vacío
+  git init
+
+  # Añade el origen remoto
+  git remote add origin https://github.com/Chevrotain/chevrotain.git
+
+  # Trae solo el commit específico
+  git fetch --depth 1 origin 82f78ab9a3a3944d496babd2da103f8efde08e92 # v11.1.0
+
+  # Haz el checkout
+  git checkout FETCH_HEAD
 
   echo "Instalando dependencias ..."
   pnpm i
@@ -63,6 +75,7 @@ get_latest_version() {
 # ============================================
 ARTIFACT_NAME="chevrotain"
 PLATFORM=$(get_platform)
-VERSION=$(get_latest_version)
+VERSION=11.0.3 #$(get_latest_version)
+# No sé por qué, si harcodeo 11.0.3 funciona, aunque realmente sea la versión 11.1.0
 
 run_artifact_workflow "$ARTIFACT_NAME" "$VERSION" "$PLATFORM"
