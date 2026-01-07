@@ -46,7 +46,8 @@ export const AudioTag = () => {
     try {
       const engine = engineRef.current;
 
-      if (!engine)
+      // Evitar play si no hay fuente definida aún
+      if (!engine || !engine.src || engine.src === "")
         return;
 
       await waitForPrefetching();
@@ -179,6 +180,8 @@ export const AudioTag = () => {
 
       if (!engine)
         return;
+
+      engine.pause();
 
       if (!player.currentResource) {
         engine.pause();

@@ -216,9 +216,12 @@ export const useBrowserPlayer = create<PlayerState>()(
         const isSameAsLatest = currentResource
         && currentResource.resourceId === resource.resourceId;
 
-        setCurrentTime(0, {
-          shouldUpdateAudioElement: true,
-        } );
+        if (isSameAsLatest) {
+          setCurrentTime(0, {
+            shouldUpdateAudioElement: true,
+          } );
+        }
+
         set( {
           ...(isSameAsLatest
             ? {}
@@ -237,7 +240,13 @@ export const useBrowserPlayer = create<PlayerState>()(
         } );
       },
       playQuery: async (q: string) => {
-        const music = await fetchQueryMusic(q);
+        let music: MusicEntity | null = null;
+
+        try {
+          music = await withRetries(() => fetchQueryMusic(q), {
+            retries: 3,
+          } );
+        } catch { /* empty */ }
 
         if (!music) {
           get().stop();
@@ -259,6 +268,7 @@ export const useBrowserPlayer = create<PlayerState>()(
               duration: music.fileInfos?.[0]?.mediaInfo.duration ?? undefined,
             } ),
           currentResource: queueItem,
+          nextResource: null,
           queue: [queueItem],
           status: "playing",
           queueIndex: 0,
@@ -278,9 +288,12 @@ export const useBrowserPlayer = create<PlayerState>()(
         if (!music)
           return;
 
-        setCurrentTime(0, {
-          shouldUpdateAudioElement: true,
-        } );
+        if (isSameAsLatest) {
+          setCurrentTime(0, {
+            shouldUpdateAudioElement: true,
+          } );
+        }
+
         set( {
           ...(isSameAsLatest
             ? {}
@@ -309,13 +322,19 @@ export const useBrowserPlayer = create<PlayerState>()(
           currentResource: null,
         } );
       },
-      stop: () => set( {
-        currentTime: 0,
-        status: "stopped",
-        query: undefined,
-        nextResource: null,
-        queue: [],
-      } ),
+      stop: () => {
+        const { setCurrentTime } = get();
+
+        setCurrentTime(0, {
+          shouldUpdateAudioElement: true,
+        } );
+        set( {
+          status: "stopped",
+          query: undefined,
+          nextResource: null,
+          queue: [],
+        } );
+      },
       addToQueue: (resource) => set((state) => ( {
         queue: [...state.queue, resource],
         nextResource: null,
@@ -365,8 +384,12 @@ export const useBrowserPlayer = create<PlayerState>()(
               retries: 3,
             } );
 
-            if (!music)
-              throw new Error("No music found");
+            if (!music) {
+              if (playingType === "playlist")
+                throw new Error("No music found");
+              else
+                return null;
+            }
 
             if (playingType === "playlist") {
               const index = queue.findIndex(item => item.resourceId === music.id);
@@ -543,23 +566,22 @@ function getRandomExcludePrevious(max: number, previousValue?: number): number {
 }
 
 async function fetchQueryMusic(q: string) {
-  try {
-    const url = backendUrl(PATH_ROUTES.musics.pickRandom.withParams( {
-      q,
-    } ));
-    const res = await fetch(url, {
-      cache: "no-cache",
-      credentials: "include",
-    } );
-    const json = await res.json();
-    const data = json.data as MusicEntity;
+  const url = backendUrl(PATH_ROUTES.musics.pickRandom.withParams( {
+    q,
+  } ));
+  const res = await fetch(url, {
+    cache: "no-cache",
+    credentials: "include",
+  } );
+  const json = await res.json();
+  const data = json.data as MusicEntity | null;
 
-    useMusic.updateCache(data.id, data);
-
-    return data;
-  } catch {
+  if (data === null)
     return null;
-  }
+
+  useMusic.updateCache(data.id, data);
+
+  return data;
 }
 
 const getOfflineRandomIndex = (get) => {
