@@ -371,8 +371,8 @@ importers:
         specifier: workspace:../shared/tests
         version: link:../shared/tests
       '@chevrotain/types':
-        specifier: 11.0.3
-        version: 11.0.3
+        specifier: 11.1.0
+        version: 11.1.0
       '@nestjs/cli':
         specifier: 11.0.7
         version: 11.0.7(@types/node@24.0.14)
@@ -1400,8 +1400,8 @@ packages:
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
-  '@chevrotain/types@11.0.3':
-    resolution: {integrity: sha512-gsiM3G8b58kZC2HaWR50gu6Y1440cHiJ+i3JUvcp/35JchYejb2+5MVeJK0iKThYpAa/P2PYFV4hoi44HD+aHQ==}
+  '@chevrotain/types@11.1.0':
+    resolution: {integrity: sha512-GXni/dwJAkClMfwCtrbGU19RXQ9O76hFxq3sgy/zufXNj3ov6J/8FOWIXxJLhnKx7gzSweATmRccjlpmr5W2nA==}
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -10115,7 +10115,7 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@chevrotain/types@11.0.3': {}
+  '@chevrotain/types@11.1.0': {}
 
   '@colors/colors@1.5.0':
     optional: true

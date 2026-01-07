@@ -26,16 +26,9 @@ build_artifact() {
   mkdir chevrotain
   cd chevrotain
 
-  # Inicializa un repo vacío
   git init
-
-  # Añade el origen remoto
   git remote add origin https://github.com/Chevrotain/chevrotain.git
-
-  # Trae solo el commit específico
-  git fetch --depth 1 origin 82f78ab9a3a3944d496babd2da103f8efde08e92 # v11.1.0
-
-  # Haz el checkout
+  git fetch --depth 1 origin $HASH_COMMIT
   git checkout FETCH_HEAD
 
   echo "Instalando dependencias ..."
@@ -53,6 +46,7 @@ build_artifact() {
   pnpm bundle:cjs:min  > /dev/null
 
   echo "Modificando package.json con los nuevos bundles ..."
+  sed -i '/"exports": {/,/}/ { /"require":/d }' package.json
   sed -i '/"import": ".\/lib\/src\/api.js",/a \ \ \ \ \ \ "require": ".\/lib\/chevrotain.cjs",' package.json
 
   echo "Eliminando archivos no necesarios ..."
@@ -66,7 +60,7 @@ build_artifact() {
 }
 
 get_latest_version() {
-    version=$(wget -qO- https://raw.githubusercontent.com/Chevrotain/chevrotain/master/packages/chevrotain/package.json 2>/dev/null | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | head -n1 | sed 's/.*"\([^"]*\)".*/\1/')
+    version=$(wget -qO- https://raw.githubusercontent.com/Chevrotain/chevrotain/$HASH_COMMIT/packages/chevrotain/package.json 2>/dev/null | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | head -n1 | sed 's/.*"\([^"]*\)".*/\1/')
     echo "$version"
 }
 
@@ -74,8 +68,8 @@ get_latest_version() {
 # Script principal
 # ============================================
 ARTIFACT_NAME="chevrotain"
+HASH_COMMIT=82f78ab9a3a3944d496babd2da103f8efde08e92 # v11.1.0
 PLATFORM=$(get_platform)
-VERSION=11.0.3 #$(get_latest_version)
-# No sé por qué, si harcodeo 11.0.3 funciona, aunque realmente sea la versión 11.1.0
+VERSION=$(get_latest_version)
 
-run_artifact_workflow "$ARTIFACT_NAME" "$VERSION" "$PLATFORM"
+run_artifact_workflow "$ARTIFACT_NAME" "$VERSION-$HASH_COMMIT" "$PLATFORM"
