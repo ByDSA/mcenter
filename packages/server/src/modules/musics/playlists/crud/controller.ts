@@ -9,7 +9,7 @@ import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserPayload } from "$shared/models/auth";
 import { slugSchema } from "$shared/models/utils/schemas/slug";
-import { GetManyCriteria, GetOne, GetOneCriteria, UserDeleteOne, UserPatchOne, UserPostOne } from "#utils/nestjs/rest";
+import { GetManyCriteria, GetOne, GetOneCriteria, UserDeleteOne, UserPatchOne, UserPost } from "#utils/nestjs/rest";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { assertFoundClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
@@ -190,7 +190,7 @@ export class MusicPlaylistsController {
     return ret;
   }
 
-  @UserPostOne("/", musicPlaylistEntitySchema)
+  @UserPost("/", musicPlaylistEntitySchema)
   async createOnePlaylist(
     @Body() body: CreateOnePlaylistsBody,
     @User() user: UserPayload,
@@ -211,7 +211,7 @@ export class MusicPlaylistsController {
     return ret;
   }
 
-  @UserPostOne("/:id/track", musicPlaylistEntitySchema)
+  @UserPost("/:id/track", musicPlaylistEntitySchema)
   async addTracks(
     @Param() params: GetOneParams,
     @User() user: UserPayload,

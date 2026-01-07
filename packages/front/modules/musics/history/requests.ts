@@ -56,6 +56,23 @@ export class MusicHistoryApi {
       body: undefined,
     } );
   }
+
+  createOne(
+    body: MusicHistoryApi.CreateOne.Body,
+  ): Promise<MusicHistoryApi.CreateOne.Response> {
+    const fetcher = makeFetcher<
+      MusicHistoryApi.CreateOne.Body,
+      MusicHistoryApi.CreateOne.Response
+     >( {
+       method: "POST",
+       parseResponse: genParseZod(MusicHistoryApi.CreateOne.responseSchema) as (m: unknown)=> any,
+     } );
+
+    return fetcher( {
+      url: backendUrl(PATH_ROUTES.musics.history.path),
+      body,
+    } );
+  }
 }
 
 // eslint-disable-next-line no-redeclare
@@ -86,5 +103,17 @@ export namespace MusicHistoryApi {
 
   export namespace DeleteOneById {
     export type Response = ResultResponse<MusicHistoryEntryEntity>;
+  }
+
+  export namespace CreateOne {
+    export type Body = {
+      musicId: string;
+      timestamp?: number;
+    };
+
+    export const responseSchema = createOneResultResponseSchema(
+      musicHistoryEntryEntitySchema,
+    );
+    export type Response = z.infer<typeof responseSchema>;
   }
 }

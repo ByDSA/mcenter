@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useMusic } from "#musics/hooks";
 import { backendUrl } from "#modules/requests";
 
-export const getUrl = async (musicId: string | null) => {
+const getUrl = async (musicId: string | null) => {
   if (!musicId)
     return null;
 

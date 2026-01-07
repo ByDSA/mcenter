@@ -15,7 +15,7 @@ export function PostOne(url: string, dataSchema: z.ZodSchema, _options?: PostOne
   return applyDecorators(...decorators);
 }
 
-export function UserPostOne(url: string, dataSchema?: z.ZodSchema) {
+export function UserPost(url: string, dataSchema?: z.ZodSchema) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Authenticated(),
     Post(url),

@@ -23,4 +23,11 @@ export namespace MusicHistoryEntryCrudDtos {
   export namespace GetOneById {
     export const paramsSchema = idParamsSchema;
   }
+  export namespace CreateOne {
+    export const bodySchema = z.object( {
+      musicId: mongoDbId,
+      timestamp: z.number().optional(),
+    } );
+    export type Body = z.infer<typeof bodySchema>;
+  }
 };
