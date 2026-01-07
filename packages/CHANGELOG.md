@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.24.4](https://github.com/ByDSA/mcenter/compare/v4.24.3...v4.24.4) (2026-01-07)
+
+
+### Bug Fixes
+
+* auto fetching remaining music history ([437efc0](https://github.com/ByDSA/mcenter/commit/437efc0802b01c3adde7bf02ef742c8f51a77bc9))
+* **front:** styles and show forward & backward controls in desktop ([1f26b50](https://github.com/ByDSA/mcenter/commit/1f26b5060473ada275fc0a83bddd91e3f7260676))
+
 ### [4.24.3](https://github.com/ByDSA/mcenter/compare/v4.24.2...v4.24.3) (2026-01-07)
 
 
