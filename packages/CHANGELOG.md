@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.24.2](https://github.com/ByDSA/mcenter/compare/v4.24.1...v4.24.2) (2026-01-07)
+
+
+### Bug Fixes
+
+* **front:** some music player fixes ([363c1ce](https://github.com/ByDSA/mcenter/commit/363c1cedb33333634ae90bc605d2f877c9aee0be))
+* **server:** chevrotain dependency ([97d4e9f](https://github.com/ByDSA/mcenter/commit/97d4e9f654b742e527a73c156206bcd54df77577))
+
 ### [4.24.1](https://github.com/ByDSA/mcenter/compare/v4.24.0...v4.24.1) (2026-01-06)
 
 
