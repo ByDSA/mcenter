@@ -10,6 +10,7 @@ import { useBrowserPlayer } from "../BrowserPlayerContext";
 import commonStyles from "../MediaPlayerCommon.module.css";
 import { CurrentTimeLabel } from "./CurrentTimeLabel";
 import styles from "./MediaPlayer.module.css";
+import { BIG_BREAKPOINT, useWindowWidth } from "./MediaPlayer";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const TrackInfo = memo(
@@ -17,6 +18,7 @@ export const TrackInfo = memo(
     const resource = useBrowserPlayer(s=>s.currentResource);
     const router = useRouter();
     const { data: music } = useMusic(resource!.resourceId);
+    const width = useWindowWidth();
 
     if (!music)
       return <ContentSpinner size={2}/>;
@@ -57,7 +59,7 @@ export const TrackInfo = memo(
                 : undefined,
             ]}/>
         </div>
-        <CurrentTimeLabel />
+        {width >= BIG_BREAKPOINT && <CurrentTimeLabel />}
       </div>
     );
   },

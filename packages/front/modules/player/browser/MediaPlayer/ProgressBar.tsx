@@ -7,10 +7,11 @@ import styles from "./ProgressBar.module.css";
 
 type Props = {
   className?: string;
+  includeTimes?: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const ProgressBar = ( { className }: Props) => {
+export const ProgressBar = ( { className, includeTimes }: Props) => {
   const currentTime = useBrowserPlayer(s=>s.currentTime);
   const duration = useBrowserPlayer(s=>s.duration);
   const setCurrentTime = useBrowserPlayer(s=>s.setCurrentTime);
@@ -66,7 +67,7 @@ time: string; } | null>(null);
 
   const percentage = duration ? currentTime / duration * 100 : 0;
 
-  return (
+  return (<>
     <div
       ref={progressBarRef}
       className={classes(styles.container, className)}
@@ -112,5 +113,26 @@ time: string; } | null>(null);
         }}
       />
     </div>
+    {
+      includeTimes && <footer className={styles.timeLabelsRow}>
+        <CurrentTime />
+        <Duration />
+      </footer>
+    }
+  </>
   );
+};
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const CurrentTime = () => {
+  const currentTime = useBrowserPlayer(s=>s.currentTime);
+
+  return <span>{secsToMmss(currentTime)}</span>;
+};
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const Duration = () => {
+  const duration = useBrowserPlayer(s=>s.duration);
+
+  return <span>{duration !== undefined ? secsToMmss(duration) : TIME_UNDEFINED}</span>;
 };

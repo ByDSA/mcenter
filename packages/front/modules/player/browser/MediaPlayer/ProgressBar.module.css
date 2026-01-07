@@ -63,3 +63,14 @@
   transform: scale(1.5);
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
 }
+
+.timeLabelsRow {
+  position: absolute;
+  top: 2rem;
+  width: 100%;
+  font-size: 0.9em;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  user-select: none;
+}

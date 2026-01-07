@@ -6,7 +6,7 @@ import { classes } from "#modules/utils/styles";
 import { RevealArrow } from "#modules/ui-kit/RevealArrow/RevealArrow";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import { PlayButton } from "../PlayButton";
-import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, ControlButton, CloseButton } from "../OtherButtons";
+import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, ControlButton, CloseButton, BackwardButton, ForwardButton } from "../OtherButtons";
 import { ProgressBar } from "../ProgressBar";
 import { ProgressBarOnlyView } from "../ProgressBarOnlyView";
 import { FullscreenMediaPlayer } from "../Fullscreen/FullscreenMediaPlayer";
@@ -16,8 +16,11 @@ import { TrackInfo } from "./TrackInfo";
 import { PlayQueueButtonView } from "./PlayQueue/PlayQueueButtonView";
 import { PlayQueueWindowContent } from "./PlayQueue/PlayQueueWindow";
 import { useWindowContext } from "./PlayQueue/WindowProvider";
+import { CurrentTimeLabel } from "./CurrentTimeLabel";
 
-const SMALL_BREAKPOINT = 600;
+export const SMALL_BREAKPOINT = 600;
+
+export const BIG_BREAKPOINT = 930;
 
 export function BottomMediaPlayer() {
   const currentResource = useBrowserPlayer(s=>s.currentResource);
@@ -46,8 +49,8 @@ export function BottomMediaPlayer() {
       }}>
       <Equalizer />
     </ControlButton>
-    <CloseButton />
-  </div>, [open, close, currentWindowName]);
+    { width >= BIG_BREAKPOINT && <CloseButton className={styles.closeButton}/>}
+  </div>, [open, close, currentWindowName, width]);
 
   useEffect(()=> {
     if (isOpen) {
@@ -69,9 +72,11 @@ export function BottomMediaPlayer() {
       <div
         className={styles.playerContainer}>
         {(width >= SMALL_BREAKPOINT
-         && <ProgressBar
-           className={styles.progressBar}
-         />)
+         && <>
+           <ProgressBar
+             className={styles.progressBar}
+           />
+         </>)
            || <ProgressBarOnlyView
              className={styles.progressBar}
            />
@@ -95,12 +100,20 @@ export function BottomMediaPlayer() {
 
           <div className={styles.controlsSection}>
             {
-              width >= SMALL_BREAKPOINT && <PrevButton />
+              width >= SMALL_BREAKPOINT && <>
+                <BackwardButton className={styles.backwardButton}/>
+                <PrevButton className={styles.previousButton}/>
+              </>
             }
 
             <PlayButton />
 
             <NextButton className={styles.nextButton} />
+            {
+              width >= SMALL_BREAKPOINT && <>
+                <ForwardButton className={styles.backwardButton}/>
+              </>
+            }
             {
               width < SMALL_BREAKPOINT && <FullscreenButton />
             }
@@ -108,13 +121,20 @@ export function BottomMediaPlayer() {
 
           {(width < SMALL_BREAKPOINT
             ? null
-            : width < 900
+            : width < BIG_BREAKPOINT
             && <div className={styles.revealArrowWrapper}>
+              {
+                width < BIG_BREAKPOINT && <footer className={styles.progressBarFooter}>
+                  <CurrentTimeLabel />
+                </footer>
+              }
               <RevealArrow>
                 <div className={styles.revealArrowInside}>
                   {extraControls}
                 </div>
-              </RevealArrow></div>)
+              </RevealArrow>
+              <CloseButton className={styles.closeButton}/>
+            </div>)
           || extraControls
           }
         </div>
@@ -165,7 +185,7 @@ const FullscreenButton = () => {
   </>;
 };
 
-function useWindowWidth() {
+export function useWindowWidth() {
   const [width, setWidth] = useState(window.innerWidth);
 
   useEffect(() => {

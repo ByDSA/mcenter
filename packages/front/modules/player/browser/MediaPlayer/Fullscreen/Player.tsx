@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { classes } from "#modules/utils/styles";
-import { secsToMmss } from "#modules/utils/dates";
-import { TIME_UNDEFINED } from "#modules/remote-player/MediaPlayer";
 import { useMusic } from "#modules/musics/hooks";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, ShuffleButton, RepeatButton, BackwardButton, ForwardButton, CloseButton } from "../OtherButtons";
-import { ProgressBar } from "../ProgressBar";
+import { CurrentTime, Duration, ProgressBar } from "../ProgressBar";
 import commonStyles from "../MediaPlayerCommon.module.css";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import styles from "./Player.module.css";
@@ -71,15 +69,4 @@ export const Player = () => {
       </div>
     </section>
   </section>;
-};
-
-const CurrentTime = () => {
-  const currentTime = useBrowserPlayer(s=>s.currentTime);
-
-  return <span>{secsToMmss(currentTime)}</span>;
-};
-const Duration = () => {
-  const duration = useBrowserPlayer(s=>s.duration);
-
-  return <span>{duration !== undefined ? secsToMmss(duration) : TIME_UNDEFINED}</span>;
 };
