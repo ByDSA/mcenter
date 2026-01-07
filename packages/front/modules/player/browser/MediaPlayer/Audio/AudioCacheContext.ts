@@ -29,12 +29,16 @@ export const useAudioCache = create<AudioCacheState>((set, get) => ( {
   },
   hasNextAction: (nextAction: NextAction) => {
     const { queue } = useBrowserPlayer.getState();
+    const { has } = get();
 
-    return get().has(
-      nextAction.type === "INDEX"
-        ? queue[nextAction.payload].resourceId
-        : nextAction.payload.id,
-    );
+    if (nextAction.type === "INDEX") {
+      if (nextAction.payload === -1)
+        return false;
+
+      return has(queue[nextAction.payload].resourceId);
+    }
+
+    return has(nextAction.payload.id);
   },
   add: (resourceId, blob, options) => {
     // 1. Limpiamos si ya existe para evitar duplicados y timers huérfanos

@@ -49,7 +49,7 @@ export const useMusic = (id: string | null, options?: GenQueryOptions) => {
 };
 
 useMusic.get = (id: string, options?: GenQueryOptions) => {
-  return getQueryClient().fetchQuery(genQuery(id, options));
+  return getQueryClient().ensureQueryData(genQuery(id, options));
 };
 
 useMusic.getCache = (id: string) => {
@@ -57,7 +57,7 @@ useMusic.getCache = (id: string) => {
 };
 
 useMusic.fetch = (id: string, options?: GenQueryOptions) => {
-  return getQueryClient().ensureQueryData(genQuery(id, options));
+  return getQueryClient().fetchQuery(genQuery(id, options));
 };
 
 useMusic.updateCache = (id: string, entity: Partial<MusicEntity>) => {

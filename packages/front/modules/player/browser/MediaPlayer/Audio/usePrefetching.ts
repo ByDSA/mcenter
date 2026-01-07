@@ -67,7 +67,13 @@ export function usePrefetching() {
           return;
 
         const url = await getUrlSkipHistory(resourceId);
-        const music = await useMusic.get(resourceId);
+        let music = await useMusic.get(resourceId);
+
+        if (!music?.fileInfos) {
+          await useMusic.invalidateCache(resourceId);
+          music = await useMusic.fetch(resourceId);
+        }
+
         const ext = music?.fileInfos?.[0].path.split(".").pop();
         let blob: Blob;
         let ttl: number;

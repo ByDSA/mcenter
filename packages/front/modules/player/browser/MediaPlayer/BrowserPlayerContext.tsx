@@ -171,9 +171,15 @@ export const useBrowserPlayer = create<PlayerState>()(
       } ),
 
       playMusic: async (musicId, props) => {
+        let music = await useMusic.get(musicId);
+
+        if (!music?.fileInfos) {
         // Para que fetchee fileinfos. (TODO: alguna forma más eficiente):
-        await useMusic.invalidateCache(musicId);
-        const music = await useMusic.get(musicId);
+          await useMusic.invalidateCache(musicId);
+          music = await useMusic.fetch(musicId, {
+            expand: ["fileInfos"],
+          } );
+        }
 
         if (!music)
           return;
@@ -378,40 +384,29 @@ export const useBrowserPlayer = create<PlayerState>()(
 
         // 2. LÓGICA DE SHUFFLE / DISCOVERY (CON API)
         if (playingType === "playlist" || playingType === "query") {
-          try {
-            assert(!!query);
-            const music = await withRetries(() => fetchQueryMusic(query), {
-              retries: 3,
-            } );
+          assert(!!query);
+          const music = await withRetries(() => fetchQueryMusic(query), {
+            retries: 3,
+          } );
 
-            if (!music) {
-              if (playingType === "playlist")
-                throw new Error("No music found");
-              else
-                return null;
-            }
+          if (!music)
+            return null;
 
-            if (playingType === "playlist") {
-              const index = queue.findIndex(item => item.resourceId === music.id);
+          if (playingType === "playlist") {
+            const index = queue.findIndex(item => item.resourceId === music.id);
 
-              // Si está en la cola, devolvemos el índice, si no, fallback a random offline
-              return {
-                type: "INDEX",
-                payload: index !== -1 ? index : getOfflineRandomIndex(get),
-              };
-            }
-
-            // Si es tipo query, devolvemos el objeto de música para agregarlo
-            return {
-              type: "NEW_MUSIC",
-              payload: music,
-            };
-          } catch {
+            // Si está en la cola, devolvemos el índice, si no, fallback a random offline
             return {
               type: "INDEX",
-              payload: getOfflineRandomIndex(get),
+              payload: index !== -1 ? index : getOfflineRandomIndex(get),
             };
           }
+
+          // Si es tipo query, devolvemos el objeto de música para agregarlo
+          return {
+            type: "NEW_MUSIC",
+            payload: music,
+          };
         }
 
         // 3. CASO DEFAULT (One con shuffle o fallbacks)

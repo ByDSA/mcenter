@@ -1,6 +1,7 @@
 import { showError } from "$shared/utils/errors/showError";
 import { RefObject, useCallback, useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { Mutex } from "async-mutex";
 import { withRetries } from "#modules/utils/retries";
 import { ErrorNoConnection } from "#modules/core/errors/custom-errors";
 import { RepeatMode, useBrowserPlayer } from "../BrowserPlayerContext";
@@ -37,33 +38,54 @@ export const AudioTag = () => {
   } )));
   const engineRef = useRef<HTMLAudioElement | null>(null);
   const syncingRef = useRef(false);
+  const mutexRef = useRef(new Mutex());
   const sync = useCallback(async () => {
     if (syncingRef.current)
       return;
 
+    const release = await mutexRef.current.acquire();
+
     syncingRef.current = true;
 
     try {
-      const engine = engineRef.current;
+      const audio = engineRef.current;
 
       // Evitar play si no hay fuente definida aún
-      if (!engine || !engine.src || engine.src === "")
+      if (!audio || !audio.src || audio.src === "")
         return;
 
-      await waitForPrefetching();
+      if (audio.currentTime >= audio.duration) {
+        await waitForPrefetching();
+        await onEnded();
+      }
 
       const { status } = useBrowserPlayer.getState();
 
       if (status === "playing") {
-        if (engine.paused || engine.error || engine.readyState === 0)
+        if (audio.paused || audio.error || audio.readyState === 0)
           await securePlayEngine();
       } else
-        engine.pause();
+        audio.pause();
     } finally {
       syncingRef.current = false;
+      release();
     }
   }, []);
   const setGlobalAudioElement = useBrowserPlayer(s=>s.setAudioElement);
+  const onEnded = useCallback(async () => {
+    if (!engineRef.current)
+      return;
+
+    const audio = engineRef.current;
+    const { repeatMode } = useBrowserPlayer.getState();
+
+    if (repeatMode === RepeatMode.One)
+      audio.currentTime = 0;
+    else if (player.hasNext())
+      await player.next();
+    else
+      player.stop();
+  }, [player]);
 
   useEffect(() => {
     if (engineRef.current || typeof Audio === "undefined")
@@ -83,18 +105,6 @@ export const AudioTag = () => {
 
       if (isFinite(d))
         useBrowserPlayer.getState().setDuration(d);
-    };
-    const onEnded = async () => {
-      const { repeatMode } = useBrowserPlayer.getState();
-
-      if (repeatMode === RepeatMode.One)
-        audio.currentTime = 0;
-      else if (player.hasNext())
-        await player.next();
-      else
-        player.stop();
-
-      await sync();
     };
     const onError = async (_e) => {
       await sync();
@@ -128,13 +138,29 @@ export const AudioTag = () => {
         await sync();
       }
     };
+    const onEndedHandler = async () => {
+      const release = await mutexRef.current.acquire();
+
+      try {
+        if (!isNaN(audio.duration) && audio.currentTime >= audio.duration)
+          await onEnded();
+      } finally {
+        release();
+      }
+
+      await sync();
+    };
+    const onLoadedData = async () => {
+      await sync();
+    };
 
     audio.addEventListener("timeupdate", onTimeUpdate);
     audio.addEventListener("durationchange", onDurationChange);
-    audio.addEventListener("ended", onEnded);
+    audio.addEventListener("ended", onEndedHandler);
     audio.addEventListener("error", onError);
     audio.addEventListener("waiting", checkBlobAndFix);
     audio.addEventListener("seeking", checkBlobAndFix);
+    audio.addEventListener("loadeddata", onLoadedData);
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.target !== document.body)
@@ -165,10 +191,11 @@ export const AudioTag = () => {
       engineRef.current = null;
       audio.removeEventListener("timeupdate", onTimeUpdate);
       audio.removeEventListener("durationchange", onDurationChange);
-      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("ended", onEndedHandler);
       audio.removeEventListener("error", onError);
       audio.removeEventListener("waiting", checkBlobAndFix);
       audio.removeEventListener("seeking", checkBlobAndFix);
+      audio.removeEventListener("loadeddata", onLoadedData);
       window.removeEventListener("keydown", onKeyDown);
       setGlobalAudioElement(null);
     };
@@ -187,7 +214,6 @@ export const AudioTag = () => {
         engine.pause();
         engine.removeAttribute("src");
         engine.load();
-        await sync();
 
         return;
       }
@@ -202,24 +228,36 @@ export const AudioTag = () => {
       if (engine.src !== newUrl) {
         engine.src = newUrl;
         engine.load();
-        await sync();
       }
     };
 
-    loadResource().catch(showError);
+    loadResource()
+      .catch(showError)
+      .finally(async ()=> {
+        await sync();
+      } );
   }, [player.currentResource]);
 
   useEffect(() => {
-    if (player.isOnline && engineRef.current?.src)
-      sync().catch(showError);
-  }, [player.status, sync, player.isOnline]);
+    const fn = async () => {
+      if (player.isOnline && engineRef.current?.src)
+        await sync();
+    };
 
+    fn().catch(showError);
+  }, [player.isOnline]);
   useEffect(() => {
-    const interval = setInterval(() => sync().catch(showError), 2_000);
+    const fn = async () => {
+      await sync();
+    };
 
-    return () => clearInterval(interval);
-  }, [sync]);
+    fn().catch(showError);
+  }, [player.status]);
 
+  // useEffect(() => {
+  //   const interval = setInterval(() => sync().catch(showError), 1_000);
+  //   return () => clearInterval(interval);
+  // }, [sync]);
   async function securePlayEngine() {
     const engine = engineRef.current;
 

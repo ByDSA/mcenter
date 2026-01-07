@@ -6,6 +6,7 @@ const queryClient = new QueryClient( {
   defaultOptions: {
     queries: {
       refetchInterval: 1_000 * 60 * 10,
+      networkMode: "offlineFirst", // Si no hay conexión a internet, devuelve caché
     },
   },
 } );
