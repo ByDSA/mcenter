@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.24.3](https://github.com/ByDSA/mcenter/compare/v4.24.2...v4.24.3) (2026-01-07)
+
+
+### Bug Fixes
+
+* **front:** music player ([a77fabc](https://github.com/ByDSA/mcenter/commit/a77fabcebe6a4ae45b5be421b756ba765d3cbbf9))
+
 ### [4.24.2](https://github.com/ByDSA/mcenter/compare/v4.24.1...v4.24.2) (2026-01-07)
 
 
