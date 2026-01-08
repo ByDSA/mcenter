@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.25.0](https://github.com/ByDSA/mcenter/compare/v4.24.4...v4.25.0) (2026-01-08)
+
+
+### Features
+
+* internal covers system ([f0158a5](https://github.com/ByDSA/mcenter/commit/f0158a58710aeca775db55870b0129c2be076b23))
+
 ### [4.24.4](https://github.com/ByDSA/mcenter/compare/v4.24.3...v4.24.4) (2026-01-07)
 
 
