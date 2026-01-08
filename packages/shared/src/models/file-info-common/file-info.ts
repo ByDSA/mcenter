@@ -2,7 +2,7 @@ import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
 import { timestampsFileSchema } from "../utils/schemas/timestamps";
 
-const md5HashSchema = z.string()
+export const md5HashSchema = z.string()
   .refine((hash) => (hash && /^[a-f0-9]{32}$/.test(hash)) || !hash, {
     message: "hash must be a md5 hash",
   } );

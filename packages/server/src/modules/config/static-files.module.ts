@@ -30,11 +30,15 @@ export class StaticFilesModule implements NestModule {
         .forRoutes(`/raw/${item}`);
     }
 
-    for (const item of ["docs"]) {
+    for (const item of ["docs", "image-covers"]) {
       consumer
         .apply(
           express.static(join(mediaFolderPath, item), {
             acceptRanges: false, // Evita que a veces salga el error de "Range Not Satisfiable"
+            setHeaders: (res) => {
+              // Permite que cualquier dominio cargue el recurso
+              res.set("Cross-Origin-Resource-Policy", "cross-origin");
+            },
           } ),
         )
         .forRoutes(`/raw/${item}`);

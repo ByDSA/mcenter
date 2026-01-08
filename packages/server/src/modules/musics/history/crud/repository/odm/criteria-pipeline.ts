@@ -1,8 +1,8 @@
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
 import { FilterQuery, PipelineStage, Types } from "mongoose";
 import { assertIsDefined } from "$shared/utils/validation";
-import { enrichSingleMusic, MusicExpansionFlags } from "#musics/crud/repositories/music/odm/pipeline-utils";
 import { DocOdm } from "./odm";
+import { enrichSingleMusic, MusicExpansionFlags } from "#musics/crud/repositories/music/odm/pipeline-utils";
 
 function buildMongooseSort(
   body: MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
@@ -96,12 +96,18 @@ export function getCriteriaPipeline(
       includeFileInfos: criteria.expand?.includes("musicsFileInfos"),
       // He añadido soporte para 'favorite' aunque no estaba explicito en tu archivo original
       includeFavorite: criteria.expand?.includes("musicsFavorite"),
+      includeImageCover: criteria.expand?.includes("musicsImageCover"),
     };
     // Usamos el userId del filtro, ya que el historial pertenece a un usuario
     const userId = criteria.filter?.userId || null;
 
     // Llamada a la utilidad. Notar targetField = "music" y localField = "music._id"
-    pipeline.push(...enrichSingleMusic("music._id", "music", userId, flags));
+    pipeline.push(...enrichSingleMusic( {
+      localMusicIdField: "music._id",
+      targetField: "music",
+      userId,
+      flags,
+    } ));
   }
 
   return pipeline;

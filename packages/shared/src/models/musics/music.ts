@@ -1,8 +1,9 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
 import { resourceSchema } from "../resources";
-import { taggableSchema } from "../resources/partial-schemas";
+import { mongoDbId, taggableSchema } from "../resources/partial-schemas";
 import { slugSchema } from "../utils/schemas/slug";
+import { imageCoverEntitySchema } from "../image-cover";
 import { musicFileInfoEntitySchema } from "./file-info";
 import { musicUserInfoSchema } from "./user-info/user-info";
 
@@ -12,8 +13,6 @@ const optionalPropsSchema = z.object( {
   year: z.number().int()
     .optional(),
   country: z.string().optional(),
-  coverUrl: z.string().optional(),
-  coverUrlSmall: z.string().optional(),
   spotifyId: z.string().optional(),
 } );
 const idSchema = z.string();
@@ -23,6 +22,7 @@ type Id = z.infer<typeof idSchema>;
 const modelSchema = optionalPropsSchema.extend( {
   artist: z.string(),
   slug: slugSchema,
+  imageCoverId: mongoDbId.optional(),
 } )
   .merge(resourceSchema)
   .merge(taggableSchema);
@@ -33,6 +33,7 @@ const entitySchema = modelSchema.extend( {
   id: idSchema,
   fileInfos: z.array(musicFileInfoEntitySchema).optional(),
   userInfo: musicUserInfoSchema.optional(),
+  imageCover: imageCoverEntitySchema.optional(),
   isFav: z.boolean().optional(),
 } );
 

@@ -143,6 +143,14 @@ export const PATH_ROUTES = {
       },
     },
   },
+  imageCovers: {
+    withParams: (filename: string) => {
+      const [id] = filename.split(/\.|_/);
+      const subfolder = id.slice(-2);
+
+      return `/raw/image-covers/${subfolder}/${filename}`;
+    },
+  },
   musics: {
     path: MUSICS,
     withParams: (id: string)=>`${MUSICS}/${id}`,

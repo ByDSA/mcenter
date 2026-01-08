@@ -12,6 +12,7 @@ import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useMusic } from "#modules/musics/hooks";
 import { ResourceEntryLoading } from "#modules/resources/ResourceEntryLoading";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { backendUrl } from "#modules/requests";
 import styles from "./MusicEntry.module.css";
 import { genMusicEntryContextMenuContent } from "./ContextMenu";
 
@@ -115,7 +116,7 @@ export function MusicEntryElement(
     subtitle={<MusicSubtitle
       music={music}
     />}
-    coverUrl={music.coverUrlSmall ?? music.coverUrl}
+    coverUrl={getSmallCoverUrlFromMusic(music)}
     favButton={ <PlaylistFavButton
       favoritesPlaylistId={favoritesPlaylistId}
       musicId={music.id}
@@ -153,3 +154,21 @@ export const MusicSubtitle = memo(( { music }: MusicSubtitleProps) => {
 
   ]} />;
 } );
+
+export function getSmallCoverUrlFromMusic(music: MusicEntity) {
+  if (music.imageCover) {
+    if (music.imageCover.versions.small)
+      return backendUrl(PATH_ROUTES.imageCovers.withParams(music.imageCover.versions.small));
+
+    return getLargeCoverUrlFromMusic(music);
+  }
+
+  return undefined;
+}
+
+export function getLargeCoverUrlFromMusic(music: MusicEntity) {
+  if (music.imageCover)
+    return backendUrl(PATH_ROUTES.imageCovers.withParams(music.imageCover.versions.original));
+
+  return undefined;
+}

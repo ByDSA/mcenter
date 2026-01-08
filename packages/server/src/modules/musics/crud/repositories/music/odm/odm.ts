@@ -3,6 +3,7 @@ import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
+import { ImageCoverOdm } from "#modules/image-covers/odm";
 
 export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimestamps & {
   _id?: mongoose.Types.ObjectId;
@@ -14,10 +15,9 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimesta
   game?: string;
   year?: number;
   spotifyId?: string;
-  coverUrl?: string;
-  coverUrlSmall?: string;
   disabled?: boolean;
   country?: string;
+  imageCoverId?: mongoose.Types.ObjectId;
   uploaderUserId: mongoose.Types.ObjectId;
 };
 
@@ -25,6 +25,7 @@ export type FullDocOdm = RequireId<DocOdm> & {
   fileInfos?: MusicFileInfoOdm.FullDoc[];
   userInfo?: MusicsUsersOdm.FullDoc;
   isFav?: boolean;
+  imageCover?: ImageCoverOdm.FullDoc;
 };
 
 const NAME = "Music";
@@ -70,11 +71,9 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   country: {
     type: String,
   },
-  coverUrl: {
-    type: String,
-  },
-  coverUrlSmall: {
-    type: String,
+  imageCoverId: {
+    type: Schema.Types.ObjectId,
+    required: false,
   },
   year: {
     type: Number,

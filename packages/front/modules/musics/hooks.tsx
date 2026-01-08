@@ -16,7 +16,7 @@ function genQueryFn(id: string, _options?: GenQueryOptions) {
       filter: {
         id,
       },
-      expand: ["favorite", "fileInfos", "userInfo"],
+      expand: ["favorite", "fileInfos", "userInfo", "imageCover"],
     } );
 
     return res.data;

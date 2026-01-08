@@ -7,6 +7,7 @@ import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { DurationView, MetadataView } from "#modules/history";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
+import { getLargeCoverUrlFromMusic } from "../MusicEntry/MusicEntry";
 import styles from "./Music.module.css";
 import { PlayMusicButton } from "./PlayMusicButton";
 import { genContextMenuContent } from "./ContextMenu";
@@ -17,7 +18,7 @@ type Props = {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Music = ( { value }: Props) => {
-  const { id, title, album, coverUrl, artist, disabled,
+  const { id, title, album, artist, disabled,
     year, createdAt, updatedAt, addedAt,
     slug, tags,
     isFav,
@@ -34,7 +35,7 @@ export const Music = ( { value }: Props) => {
         <main>
           <div className={styles.coverContainer}>
             <MusicImageCover img={{
-              url: coverUrl,
+              url: getLargeCoverUrlFromMusic(value),
             }} />
           </div>
 

@@ -3,6 +3,7 @@
 // music-pipeline-utils.ts
 import { PipelineStage, Types } from "mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
+import { ImageCoverOdm } from "#modules/image-covers/odm";
 import { MusicsUsersOdm } from "../../user-info/odm";
 
 // Ajusta el path según tu estructura
@@ -10,18 +11,23 @@ export interface MusicExpansionFlags {
   includeUserInfo?: boolean;
   includeFileInfos?: boolean;
   includeFavorite?: boolean;
+  includeImageCover?: boolean;
 }
 
 /**
  * Estrategia para documentos "Singulares" (Musics Collection o History)
  * Asume que el documento principal fluye por el pipeline uno a uno.
  */
-export function enrichSingleMusic(
-  localMusicIdField: string, // Ej: "_id" o "musicId"
-  targetField: string | null, // Ej: null (merge en root) o "music"
-  userId: string | null,
-  flags: MusicExpansionFlags,
-): PipelineStage[] {
+type EnrichMusicProps = {
+  localMusicIdField: string; // Ej: "_id" o "musicId"
+  targetField: string | null; // Ej: null (merge en root) o "music"
+  userId: string | null;
+  flags: MusicExpansionFlags;
+};
+export function enrichSingleMusic( { localMusicIdField,
+  flags,
+  targetField,
+  userId }: EnrichMusicProps): PipelineStage[] {
   const pipeline: PipelineStage[] = [];
   const isRoot = targetField === null;
   const prefix = isRoot ? "" : `${targetField}.`;
@@ -102,6 +108,36 @@ export function enrichSingleMusic(
         as: isRoot ? "fileInfos" : `${targetField}.fileInfos`,
       },
     } );
+  }
+
+  if (flags.includeImageCover) {
+    const fieldPath = isRoot ? "imageCoverId" : `${targetField}.imageCoverId`;
+    const targetPath = isRoot ? "imageCover" : `${targetField}.imageCover`;
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: ImageCoverOdm.COLLECTION_NAME,
+          localField: fieldPath,
+          foreignField: "_id",
+          as: "temp_imageCover",
+        },
+      },
+      {
+        $unwind: {
+          path: "$temp_imageCover",
+          preserveNullAndEmptyArrays: true, // Importante por si la canción no tiene cover
+        },
+      },
+      {
+        $addFields: {
+          [targetPath]: "$temp_imageCover", // Lo movemos a su sitio final (ej: music.imageCover)
+        },
+      },
+      {
+        $unset: "temp_imageCover", // Limpiamos el temporal
+      },
+    );
   }
 
   // 3. Favorites (Lógica compleja de User -> Playlist -> isFound)

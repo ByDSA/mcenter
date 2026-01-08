@@ -23,7 +23,7 @@ export class MusicHistoryApi {
       },
       limit: props?.limit ?? 10,
       offset: props?.offset ?? undefined,
-      expand: ["musics", "musicsFavorite"],
+      expand: ["musics", "musicsFavorite", "musicsImageCover"],
     };
     const fetcher = makeFetcher<
       MusicHistoryApi.GetManyByCriteria.Request,

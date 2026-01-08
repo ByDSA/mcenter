@@ -2,6 +2,7 @@
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { classes } from "#modules/utils/styles";
 import { useMusic } from "#modules/musics/hooks";
+import { getLargeCoverUrlFromMusic } from "#modules/musics/musics/MusicEntry/MusicEntry";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, ShuffleButton, RepeatButton, BackwardButton, ForwardButton, CloseButton } from "../OtherButtons";
 import { CurrentTime, Duration, ProgressBar } from "../ProgressBar";
@@ -16,7 +17,8 @@ export const Player = () => {
   if (!music)
     return null;
 
-  const { coverUrl, title, artist } = music;
+  const { title, artist } = music;
+  const coverUrl = getLargeCoverUrlFromMusic(music);
 
   return <section className={styles.content}>
     <section className={styles.coverSection}>

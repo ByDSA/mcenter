@@ -2,6 +2,7 @@ import { showError } from "$shared/utils/errors/showError";
 import { useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useMusic } from "#musics/hooks";
+import { getLargeCoverUrlFromMusic } from "#musics/musics/MusicEntry/MusicEntry";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 
 export function useMediaSession(
@@ -24,13 +25,15 @@ export function useMediaSession(
     if (!navigator.mediaSession || !music || !engine)
       return;
 
+    const coverUrl = getLargeCoverUrlFromMusic(music);
+
     navigator.mediaSession.metadata = new MediaMetadata( {
       title: music.title,
       artist: music.artist,
       album: music.album,
-      artwork: music.coverUrl
+      artwork: coverUrl
         ? [{
-          src: music.coverUrl,
+          src: coverUrl,
           sizes: "512x512",
           type: "image/jpeg",
         }]

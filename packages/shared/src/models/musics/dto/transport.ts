@@ -18,7 +18,7 @@ const criteriaConfig = {
     userId: mongoDbId.optional(), // Para playlist de favorites
   },
   sortKeys: ["added", "updated", "artist"] as const,
-  expandKeys: ["fileInfos", "userInfo", "favorite"] as const,
+  expandKeys: ["fileInfos", "userInfo", "favorite", "imageCover"] as const,
 };
 
 export namespace MusicCrudDtos {

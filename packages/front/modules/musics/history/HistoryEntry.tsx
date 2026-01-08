@@ -3,7 +3,7 @@ import { useShallow } from "zustand/react/shallow";
 import { PATH_ROUTES } from "$shared/routing";
 import { useUser } from "#modules/core/auth/useUser";
 import { HistoryTimeView, WeightView } from "#modules/history";
-import { MusicSubtitle } from "#modules/musics/musics/MusicEntry/MusicEntry";
+import { getSmallCoverUrlFromMusic, MusicSubtitle } from "#modules/musics/musics/MusicEntry/MusicEntry";
 import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
 import { ResourceEntry } from "#modules/resources/ResourceEntry";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
@@ -86,6 +86,6 @@ export const MusicHistoryEntryElement = React.memo((
         await playMusic(value.resourceId);
       },
     }}
-    coverUrl={value.resource.coverUrlSmall ?? value.resource.coverUrl}
+    coverUrl={getSmallCoverUrlFromMusic(value.resource)}
   />;
 } );

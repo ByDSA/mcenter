@@ -1,8 +1,8 @@
 import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
-import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { DocOdm } from "./odm";
 import { enrichSingleMusic, MusicExpansionFlags } from "./pipeline-utils";
+import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 
 type Criteria = MusicCrudDtos.GetMany.Criteria;
 
@@ -46,6 +46,7 @@ export function getCriteriaPipeline(
                       || !!criteria.filter?.path,
     includeUserInfo: criteria.expand?.includes("userInfo"),
     includeFavorite: criteria.expand?.includes("favorite"),
+    includeImageCover: criteria.expand?.includes("imageCover"),
   };
   // NOTA: Para filtrar por campos dentro de los lookups (hash, path),
   // necesitamos hacer el lookup de fileInfos *antes* del match si se filtra por ellos,
@@ -58,11 +59,17 @@ export function getCriteriaPipeline(
   const preFilterEnrichment = !!criteria.filter?.hash || !!criteria.filter?.path;
 
   if (preFilterEnrichment) {
-    pipeline.push(...enrichSingleMusic("_id", null, userId, {
-      includeFileInfos: true,
-      // Solo cargamos lo necesario para filtrar
-      includeUserInfo: false,
-      includeFavorite: false,
+    pipeline.push(...enrichSingleMusic( {
+      localMusicIdField: "_id",
+      targetField: null,
+      userId,
+      flags: {
+        includeFileInfos: true,
+        // Solo cargamos lo necesario para filtrar
+        includeUserInfo: false,
+        includeFavorite: false,
+        includeImageCover: false,
+      },
     } ));
   }
 
@@ -111,9 +118,15 @@ export function getCriteriaPipeline(
     includeFileInfos: expansionFlags.includeFileInfos && !preFilterEnrichment,
     includeUserInfo: expansionFlags.includeUserInfo,
     includeFavorite: expansionFlags.includeFavorite,
+    includeImageCover: expansionFlags.includeImageCover,
   };
 
-  dataPipeline.push(...enrichSingleMusic("_id", null, userId, postPaginationFlags));
+  dataPipeline.push(...enrichSingleMusic( {
+    localMusicIdField: "_id",
+    targetField: null,
+    userId,
+    flags: postPaginationFlags,
+  } ));
 
   (facetStage.$facet as any).data = dataPipeline;
   pipeline.push(facetStage);
