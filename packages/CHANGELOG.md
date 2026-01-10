@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.26.2](https://github.com/ByDSA/mcenter/compare/v4.26.1...v4.26.2) (2026-01-10)
+
+
+### Bug Fixes
+
+* url slug ([838581b](https://github.com/ByDSA/mcenter/commit/838581b8855434514573cd7db5bb1c0880722683))
+
 ### [4.26.1](https://github.com/ByDSA/mcenter/compare/v4.26.0...v4.26.1) (2026-01-10)
 
 
