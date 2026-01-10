@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.26.1](https://github.com/ByDSA/mcenter/compare/v4.26.0...v4.26.1) (2026-01-10)
+
+
+### Bug Fixes
+
+* **back:** limit music url to 100 chars ([cb44864](https://github.com/ByDSA/mcenter/commit/cb44864e97e3243642d6b1814476955676a65b57))
+
 ## [4.26.0](https://github.com/ByDSA/mcenter/compare/v4.25.0...v4.26.0) (2026-01-10)
 
 
