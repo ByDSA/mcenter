@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { slugSchema } from "$shared/models/utils/schemas/slug";
+import { slugSchema, SLUG_MAX_LENGTH } from "$shared/models/utils/schemas/slug";
 import { Music } from "#musics/models";
 import { MusicsRepository } from "../repositories/music";
 
@@ -12,7 +12,7 @@ export class MusicAvailableSlugGeneratorService {
   }
 
   async getAvailableSlugFromSlug(base: string): Promise<string> {
-    let currentSlug = base;
+    let currentSlug = slugSchema.parse(base.substring(0, SLUG_MAX_LENGTH));
     let music: Music | null;
     let i = 1;
 
@@ -23,7 +23,9 @@ export class MusicAvailableSlugGeneratorService {
         return slugSchema.parse(currentSlug);
 
       i++;
-      currentSlug = `${base}-${i}`;
+      const append = `-${i}`;
+
+      currentSlug = `${base.substring(0, SLUG_MAX_LENGTH - append.length)}${append}`;
     }
   }
 }
