@@ -1,4 +1,4 @@
-import { slugSchema } from "$shared/models/utils/schemas/slug";
+import { SLUG_MAX_LENGTH, slugSchema } from "$shared/models/utils/schemas/slug";
 import { fixTxt } from "../../../resources/fix-text";
 
 const cyrillicToLatinMap: { [key: string]: string } = {
@@ -107,6 +107,8 @@ export function fixSlug(slug: string): string | null {
 
   // Remove end ans start "-"
   fixed = fixed.replace(/^-+|-+$/g, "");
+
+  fixed = fixed.substring(0, SLUG_MAX_LENGTH);
 
   return slugSchema.parse(fixed);
 }

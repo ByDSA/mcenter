@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { slugSchema } from "$shared/models/utils/schemas/slug";
+import { SLUG_MAX_LENGTH, slugSchema } from "$shared/models/utils/schemas/slug";
 import { fixSlug } from "#musics/crud/builder/fix-slug";
 import { assertFoundClient } from "#utils/validation/found";
 import { User } from "./models";
@@ -29,7 +29,7 @@ export class UserSlugService {
   }
 
   private async getAvailable( { slug: base }: Props): Promise<string> {
-    let currentSlug = base;
+    let currentSlug = base.substring(0, SLUG_MAX_LENGTH);
     let available: boolean;
     let i = 1;
 
@@ -40,7 +40,9 @@ export class UserSlugService {
         return slugSchema.parse(currentSlug);
 
       i++;
-      currentSlug = `${base}-${i}`;
+      const append = `-${i}`;
+
+      currentSlug = `${base.substring(0, SLUG_MAX_LENGTH - append.length)}${append}`;
     }
   }
 }
