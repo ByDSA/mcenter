@@ -7,7 +7,7 @@ import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { DurationView, MetadataView } from "#modules/history";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
-import { getLargeCoverUrlFromMusic } from "../MusicEntry/MusicEntry";
+import { getMediumCoverUrlFromMusic } from "../MusicEntry/MusicEntry";
 import styles from "./Music.module.css";
 import { PlayMusicButton } from "./PlayMusicButton";
 import { genContextMenuContent } from "./ContextMenu";
@@ -35,7 +35,7 @@ export const Music = ( { value }: Props) => {
         <main>
           <div className={styles.coverContainer}>
             <MusicImageCover img={{
-              url: getLargeCoverUrlFromMusic(value),
+              url: getMediumCoverUrlFromMusic(value),
             }} />
           </div>
 

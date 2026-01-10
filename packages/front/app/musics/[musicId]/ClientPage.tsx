@@ -23,7 +23,7 @@ export function ClientPage( { params }: PageProps) {
   const { user } = useUser();
   const usingMusic = useMusic(musicId);
   const ret = <AsyncLoader
-    onSuccess={(d)=>useMusic.updateCache(musicId, d)}
+    onSuccess={(d)=>useMusic.updateCacheWithMerging(musicId, d)}
     errorElement={<PageItemNotFound />}
     action={async ()=> {
       const response = await api.getOneByCriteria( {

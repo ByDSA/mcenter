@@ -4,7 +4,8 @@ import { COLLECTION, DocOdm,
   ModelOdm,
   schemaOdm } from "./odm";
 import { docOdmToEntity,
-  modelToDocOdm } from "./adapters";
+  modelToDocOdm,
+  partialToDocOdm } from "./adapters";
 
 export namespace ImageCoverOdm {
   export const Model = ModelOdm;
@@ -13,5 +14,6 @@ export namespace ImageCoverOdm {
   export type FullDoc = FullDocOdm;
   export const toEntity = docOdmToEntity;
   export const toDoc = modelToDocOdm;
+  export const partialToDoc = partialToDocOdm;
   export const COLLECTION_NAME = COLLECTION;
 };

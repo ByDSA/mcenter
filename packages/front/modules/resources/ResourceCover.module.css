@@ -1,5 +1,6 @@
 .cover {
   height: var(--size, 100%);
+  width: var(--size, auto);
 
   aspect-ratio: 1 / 1;
   object-fit: contain;

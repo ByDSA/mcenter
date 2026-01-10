@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeTasks } from "$shared/models/episodes/admin";
+import { ImageCoverTasks } from "$shared/models/image-covers/admin";
 import { MusicTasks } from "$shared/models/musics/admin";
 import { assertIsDefined } from "$shared/utils/validation";
 import { backendUrl } from "#modules/requests";
@@ -23,6 +24,12 @@ type Action = {
 );
 const ACTION_LOG_NAME = "Get logs";
 const ACTIONS: Action[] = [
+  {
+    path: PATH_ROUTES.imageCovers.path + "/admin/rebuild-all",
+    name: "Image Covers: rebuild all",
+    type: "task",
+    taskName: ImageCoverTasks.rebuildAll.name,
+  },
   {
     path: PATH_ROUTES.episodes.admin.updateLastTimePlayed.path,
     name: "Episodes: updateLastTimePlayed",

@@ -24,6 +24,8 @@ import { UsersModule } from "#core/auth/users";
 import { AuthModule } from "#core/auth/module";
 import { AuthGoogleModule } from "#core/auth/strategies/google";
 import { UsersMusicPlaylistsModule } from "#musics/users-playlists/module";
+import { ImageCoversCrudModule } from "#modules/image-covers/module";
+import { ImageCoversAdminModule } from "#modules/image-covers/admin/module";
 import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
@@ -31,6 +33,8 @@ import { LoggingModule } from "../logging/module";
 const imports = [
   StaticFilesModule,
   ConfigModule,
+  ImageCoversCrudModule,
+  ImageCoversAdminModule,
 
   MusicsGetRandomModule, // El primero para que "random" no se considere una UUID
   MusicsSlugModule,
@@ -81,6 +85,14 @@ const routes: Routes = [
     module: LoggingModule,
   },
   ...authRoutes,
+  {
+    path: PATH_ROUTES.imageCovers.path,
+    module: ImageCoversCrudModule,
+  },
+  {
+    path: PATH_ROUTES.imageCovers.path + "/admin",
+    module: ImageCoversAdminModule,
+  },
   {
     path: "api/users",
     module: UsersMusicPlaylistsModule,

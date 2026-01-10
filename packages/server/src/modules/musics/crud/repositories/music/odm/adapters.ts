@@ -2,11 +2,11 @@ import mongoose, { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { PaginatedResult } from "$shared/utils/http/responses";
-import { Music, MusicEntity } from "../../../../models";
-import { DocOdm, FullDocOdm } from "./odm";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
-import { ImageCoverOdm } from "#modules/image-covers/odm";
+import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { Music, MusicEntity } from "../../../../models";
+import { DocOdm, FullDocOdm } from "./odm";
 
 export type AggregationResult = {
   data: FullDocOdm[];

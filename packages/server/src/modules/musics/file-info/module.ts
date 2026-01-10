@@ -4,7 +4,7 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicFileInfoRepository } from "./crud/repository";
 import { MusicFileInfoController } from "./controller";
-import { MusicFileInfoUploadRepository } from "./upload.repository";
+import { MusicFileInfoUploadRepository } from "./upload.service";
 
 @Module( {
   imports: [

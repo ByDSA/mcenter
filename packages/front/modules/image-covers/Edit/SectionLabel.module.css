@@ -1,0 +1,7 @@
+.sectionLabel {
+  color: var(--color-gray-200);
+  font-weight: 600;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}

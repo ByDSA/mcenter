@@ -1,0 +1,13 @@
+.button {
+  --size: 50px;
+  transition: all 0.1s;
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 1rem;
+  align-items: center;
+  font-size: 0.8em;
+  &:hover {
+    cursor: pointer;
+    filter: brightness(0.5);
+  }
+}

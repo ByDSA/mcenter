@@ -3,7 +3,7 @@ import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { getQueryClient } from "#modules/fetching/QueryClientProvider";
 import { MusicsApi } from "./requests";
-import { MusicEntity } from "./models";
+import { MusicEntity, musicEntitySchema } from "./models";
 
 type GenQueryOptions = {
   expand: MusicCrudDtos.GetOne.Criteria["expand"];
@@ -60,14 +60,18 @@ useMusic.fetch = (id: string, options?: GenQueryOptions) => {
   return getQueryClient().fetchQuery(genQuery(id, options));
 };
 
-useMusic.updateCache = (id: string, entity: Partial<MusicEntity>) => {
-  getQueryClient().setQueryData(["music", id], (oldData: MusicEntity | undefined) => {
-    // Reutilizamos tu lógica de merge, manejando el caso de que oldData sea undefined
+useMusic.updateCacheWithMerging = (id: string, entity: Partial<MusicEntity>) => {
+  useMusic.updateCache(id, (oldData: MusicEntity | undefined) => {
     if (!oldData)
-      return entity as MusicEntity;
+      return musicEntitySchema.parse(entity);
 
     return merge(oldData, entity);
   } );
+};
+
+type CustomFn = (oldData: MusicEntity | undefined)=> MusicEntity;
+useMusic.updateCache = (id: string, fn: CustomFn) => {
+  getQueryClient().setQueryData(["music", id], fn);
 };
 
 useMusic.invalidateCache = (id: string) => {
@@ -92,10 +96,17 @@ export const useMusics = (ids: string[]) => {
 };
 
 function merge(oldData: MusicEntity | undefined, newData: Partial<MusicEntity>): MusicEntity {
-  return {
+  const ret = {
     ...oldData,
     ...newData,
     userInfo: newData.userInfo ?? oldData?.userInfo,
     fileInfos: newData.fileInfos ?? oldData?.fileInfos,
   } as MusicEntity;
+
+  if (newData.imageCoverId === null) {
+    delete ret.imageCoverId;
+    delete ret.imageCover;
+  }
+
+  return ret;
 }

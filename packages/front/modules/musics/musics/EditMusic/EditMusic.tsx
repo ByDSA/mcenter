@@ -1,6 +1,7 @@
 import type { MusicEntityWithUserInfo } from "#modules/musics/models";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { MusicEntity } from "$shared/models/musics";
+import { MusicEntity, musicEntitySchema } from "$shared/models/musics";
+import { ImageCoverEntity } from "$shared/models/image-covers";
 import { classes } from "#modules/utils/styles";
 import { createActionsBar } from "#modules/utils/resources/elements/crud-buttons";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -11,6 +12,8 @@ import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { createFullOp } from "#modules/utils/resources/useCrud";
 import { usePublishEvent, useSubscription } from "#modules/utils/EventBus";
 import { useMusic } from "#modules/musics/hooks";
+import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
+import { ImageCoversApi } from "#modules/image-covers/requests";
 import commonStyles from "../../../history/entry/body-common.module.css";
 import { useMusicCrudWithElements, UseMusicCrudWithElementsProps } from "./useMusicCrudWithElements";
 import { OptionalPropsButton } from "./elements";
@@ -47,6 +50,7 @@ function EditMusicView( { data }: BodyProps) {
     }}
     musicId={data.id}
   />, [data.id]);
+  const { data: music } = useMusic(data.id);
 
   if (!data)
     return <p>Música no encontrada</p>;
@@ -81,7 +85,68 @@ function EditMusicView( { data }: BodyProps) {
         .map(([key, element]) => <span key={key}>{element}</span>)}
 
       <span className={"break"} />
-      {fileInfosElement}
+      <span className={classes("line", "height2")}>
+        <span style={{
+          marginRight: "1rem",
+        }}>Imagen:</span>
+        <ImageCoverSelectorButton current={music?.imageCover ?? null} onSelect={async (selected)=>{
+          const api = FetchApi.get(MusicsApi);
+          const field: keyof MusicEntity = "imageCoverId";
+          let res: Awaited<ReturnType<typeof api.patch>> | undefined;
+
+          if (selected === null) {
+            res = await api.patch(data.id, {
+              unset: [[field]],
+              entity: {},
+            } );
+          } else if (selected) {
+            res = await api.patch(data.id, {
+              entity: {
+                [field]: selected?.id,
+              },
+            } );
+          }
+
+          const resData = res?.data;
+
+          if (resData) {
+            let newImageCover: ImageCoverEntity | null;
+
+            if (resData.imageCoverId && resData.imageCoverId !== music?.imageCoverId) {
+              const imageCoversApi = FetchApi.get(ImageCoversApi);
+
+              newImageCover = (await imageCoversApi.getOneByCriteria( {
+                filter: {
+                  id: resData.imageCoverId,
+                },
+              } )).data;
+            }
+
+            useMusic.updateCache(data.id, (oldData)=> {
+              if (!oldData)
+                return musicEntitySchema.parse(resData);
+
+              const newData: MusicEntity = {
+                ...oldData,
+                ...resData,
+              };
+
+              if (!resData.imageCoverId)
+                newData.imageCoverId = null;
+              else if (resData.imageCoverId !== oldData.imageCoverId) {
+                if (newImageCover)
+                  newData.imageCover = newImageCover;
+              }
+
+              return newData;
+            } );
+          }
+        }}/>
+      </span>
+      <span className={"break"} />
+      <footer className={styles.footer}>
+        {fileInfosElement}
+      </footer>
     </div></>;
 }
 
@@ -110,7 +175,7 @@ export function EditMusic( { initialData }: UseEditMusicProps) {
   useMusicSubscription(initialData.id, (d)=> setData(d));
 
   useEffect(() => {
-    useMusic.updateCache(initialData.id, data);
+    useMusic.updateCacheWithMerging(initialData.id, data);
   }, [data]);
   const fetchData = useCallback(async () => {
     const api = FetchApi.get(MusicsApi);

@@ -144,11 +144,17 @@ export const PATH_ROUTES = {
     },
   },
   imageCovers: {
-    withParams: (filename: string) => {
-      const [id] = filename.split(/\.|_/);
-      const subfolder = id.slice(-2);
+    withParams: (id: string) => {
+      return `/api/image-covers/${id}`;
+    },
+    path: "/api/image-covers",
+    raw: {
+      withParams: (filename: string) => {
+        const [id] = filename.split(/\.|_/);
+        const subfolder = id.slice(-2);
 
-      return `/raw/image-covers/${subfolder}/${filename}`;
+        return `/raw/image-covers/${subfolder}/${filename}`;
+      },
     },
   },
   musics: {

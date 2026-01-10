@@ -1,0 +1,128 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.mainSection {
+  display: flex;
+  gap: 24px;
+  flex-flow: column nowrap;
+}
+
+.imagesSection {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.imageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+
+  .largePreview {
+    width: 100%;
+    max-width: 200px;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 8px;
+    background-color: var(--color-black);
+    border: 1px solid var(--color-gray-900);
+  }
+}
+
+.replaceImageSection {
+  display: flex;
+  flex-flow: column nowrap;
+
+  & > div {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1rem;
+  }
+}
+
+/* Input con botón pegado */
+.inputWithAction {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--color-gray-700);
+    border-radius: 4px;
+    background: var(--color-gray-900);
+    color: white;
+
+    &:focus {
+      border-color: var(--color-blue-600);
+      outline: none;
+    }
+  }
+}
+
+/* Dropzone rediseñado */
+.dropZone {
+  border: 2px dashed var(--color-gray-600);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s;
+  background-color: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--color-gray-400);
+
+  &.active {
+    border-color: var(--color-blue-500);
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9em;
+  }
+}
+
+.dropActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+}
+
+.selectionButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Acciones inferiores (Delete y Close) */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-gray-800);
+}
+
+.error {
+  color: var(--color-red-300);
+  font-size: 0.85em;
+  margin-top: 4px;
+}

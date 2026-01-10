@@ -58,7 +58,7 @@ export default function Upload() {
         injectDefaultUserInfo(music, user.id),
       ]));
 
-      useMusic.updateCache(music.id, music);
+      useMusic.updateCacheWithMerging(music.id, music);
 
       options?.setSelectedFiles?.((old)=> {
         return old.filter(
@@ -71,7 +71,7 @@ export default function Upload() {
     setUploaded(old => ([
       ...old,
       injectDefaultUserInfo(music, user.id)]));
-    useMusic.updateCache(music.id, music);
+    useMusic.updateCacheWithMerging(music.id, music);
   };
 
   return (

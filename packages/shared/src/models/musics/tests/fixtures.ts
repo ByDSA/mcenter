@@ -59,7 +59,7 @@ const userInfo: MusicUserInfoEntity = {
   updatedAt: new Date(),
   tags: ["userTag"],
 };
-const samples = {
+const samples: Record<string, MusicEntity> = {
   A_AOT4,
   AOT4_COPY,
   DK,

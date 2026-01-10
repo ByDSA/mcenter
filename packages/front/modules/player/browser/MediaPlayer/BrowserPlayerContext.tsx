@@ -574,7 +574,7 @@ async function fetchQueryMusic(q: string) {
   if (data === null)
     return null;
 
-  useMusic.updateCache(data.id, data);
+  useMusic.updateCacheWithMerging(data.id, data);
 
   return data;
 }

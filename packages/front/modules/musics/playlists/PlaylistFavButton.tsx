@@ -27,7 +27,7 @@ export const PlaylistFavButton = ( { favoritesPlaylistId,
         unique: true,
       } );
 
-      useMusic.updateCache(musicId, {
+      useMusic.updateCacheWithMerging(musicId, {
         isFav: true,
       } );
     }, [favoritesPlaylistId, musicId])}
@@ -38,7 +38,7 @@ export const PlaylistFavButton = ( { favoritesPlaylistId,
         playlistId: favoritesPlaylistId!,
         musicId: musicId,
       } );
-      useMusic.updateCache(musicId, {
+      useMusic.updateCacheWithMerging(musicId, {
         isFav: false,
       } );
     }, [favoritesPlaylistId, musicId])}

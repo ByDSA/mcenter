@@ -3,7 +3,7 @@ import { genAssertZod } from "../../utils/validation/zod";
 import { resourceSchema } from "../resources";
 import { mongoDbId, taggableSchema } from "../resources/partial-schemas";
 import { slugSchema } from "../utils/schemas/slug";
-import { imageCoverEntitySchema } from "../image-cover";
+import { imageCoverEntitySchema } from "../image-covers";
 import { musicFileInfoEntitySchema } from "./file-info";
 import { musicUserInfoSchema } from "./user-info/user-info";
 
@@ -22,7 +22,7 @@ type Id = z.infer<typeof idSchema>;
 const modelSchema = optionalPropsSchema.extend( {
   artist: z.string(),
   slug: slugSchema,
-  imageCoverId: mongoDbId.optional(),
+  imageCoverId: mongoDbId.nullable().optional(),
 } )
   .merge(resourceSchema)
   .merge(taggableSchema);

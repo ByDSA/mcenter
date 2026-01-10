@@ -9,8 +9,11 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & {
   };
   versions: {
     original: string;
+    large?: string;
+    medium?: string;
     small?: string;
   };
+  uploaderUserId: mongoose.Types.ObjectId;
 };
 
 export type FullDocOdm = RequireId<DocOdm>;
@@ -35,8 +38,19 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
       type: String,
       required: false,
     },
+    medium: {
+      type: String,
+      required: false,
+    },
+    large: {
+      type: String,
+      required: false,
+    },
   },
-  ...TimestampsOdm.nonAutoTimestampsSchemaDefinition,
+  uploaderUserId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
 } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
   collection: COLLECTION,
   versionKey: false,

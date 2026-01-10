@@ -5,12 +5,16 @@ import styles from "./MusicCover.module.css";
 
 type Props =
   Omit<ResourceImageCoverProps, "icon"> &
-    {icon?: Omit<ResourceImageCoverProps["icon"], "element">};
+    {
+      icon?: Omit<ResourceImageCoverProps["icon"], "element">;
+      onClick?: ()=> void;
+    };
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicImageCover = (props?: Props) => {
   return <ResourceImageCover
     className={props?.className}
     img={props?.img}
+    onClick={props?.onClick}
     icon={{
       element: <MusicsIcon />,
       className: classes(styles.icon, props?.icon?.className),

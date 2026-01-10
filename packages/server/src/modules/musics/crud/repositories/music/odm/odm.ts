@@ -3,7 +3,7 @@ import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
-import { ImageCoverOdm } from "#modules/image-covers/odm";
+import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
 
 export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimestamps & {
   _id?: mongoose.Types.ObjectId;
@@ -17,7 +17,7 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimesta
   spotifyId?: string;
   disabled?: boolean;
   country?: string;
-  imageCoverId?: mongoose.Types.ObjectId;
+  imageCoverId?: mongoose.Types.ObjectId | null;
   uploaderUserId: mongoose.Types.ObjectId;
 };
 
@@ -73,6 +73,7 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
   imageCoverId: {
     type: Schema.Types.ObjectId,
+    default: null,
     required: false,
   },
   year: {

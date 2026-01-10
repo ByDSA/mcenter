@@ -1,6 +1,7 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
 import { autoTimestampsSchema } from "../utils/schemas/timestamps";
+import { mongoDbId } from "../resources/partial-schemas";
 
 const idSchema = z.string();
 
@@ -12,8 +13,11 @@ const modelSchema = z.object( {
   } ),
   versions: z.object( {
     original: z.string(),
+    large: z.string().optional(),
+    medium: z.string().optional(),
     small: z.string().optional(),
   } ),
+  uploaderUserId: mongoDbId,
 } ).merge(autoTimestampsSchema);
 
 type Model = z.infer<typeof modelSchema>;

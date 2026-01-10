@@ -2,6 +2,7 @@ import { join } from "path";
 import { Module, NestModule, MiddlewareConsumer, Logger } from "@nestjs/common";
 import express from "express";
 import serveIndex from "serve-index";
+import { IMAGE_COVERS_FOLDER } from "#modules/image-covers/utils";
 
 const mediaFolderPath = process.env.MEDIA_FOLDER_PATH;
 
@@ -30,7 +31,7 @@ export class StaticFilesModule implements NestModule {
         .forRoutes(`/raw/${item}`);
     }
 
-    for (const item of ["docs", "image-covers"]) {
+    for (const item of ["docs", IMAGE_COVERS_FOLDER]) {
       consumer
         .apply(
           express.static(join(mediaFolderPath, item), {

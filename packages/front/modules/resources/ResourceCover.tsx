@@ -14,6 +14,7 @@ export type ResourceImageCoverProps = {
     element: ReactNode;
     className?: string;
   };
+  onClick?: ()=> Promise<void> | void;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -24,13 +25,17 @@ export const ResourceImageCover = (props: ResourceImageCoverProps) => {
         <Image
           src={props.img.url}
           alt={props.img.alt ?? "Cover"}
+          onClick={props.onClick}
           fill
           unoptimized
           className={classes(styles.image, props.img.className)}
         />
       )
       : (
-        <span className={classes(styles.icon, props.icon.className)}>
+        <span
+          className={classes(styles.icon, props.icon.className)}
+          onClick={props.onClick}
+        >
           {props.icon.element}
         </span>
       )}

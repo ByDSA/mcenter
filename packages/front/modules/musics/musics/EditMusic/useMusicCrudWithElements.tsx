@@ -43,7 +43,7 @@ export function useMusicCrudWithElements
     isModified,
     reset,
     setData: (music) => {
-      useMusic.updateCache(music.id, music);
+      useMusic.updateCacheWithMerging(music.id, music);
     },
     config: {
       action: async () => {

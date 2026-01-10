@@ -28,7 +28,7 @@ export function ClientPage( { params }: PageProps) {
 
       for (const entry of d.list) {
         if (entry.music)
-          useMusic.updateCache(entry.musicId, entry.music);
+          useMusic.updateCacheWithMerging(entry.musicId, entry.music);
       }
     }}
     errorElement={<PageItemNotFound />}

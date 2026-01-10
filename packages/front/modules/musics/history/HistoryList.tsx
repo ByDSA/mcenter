@@ -18,7 +18,7 @@ export function HistoryList() {
   if (data) {
     for (const entry of data) {
       if (entry.resource)
-        useMusic.updateCache(entry.resourceId, entry.resource);
+        useMusic.updateCacheWithMerging(entry.resourceId, entry.resource);
     }
   }
 

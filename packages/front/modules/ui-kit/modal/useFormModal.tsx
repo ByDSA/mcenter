@@ -2,10 +2,8 @@ import { useCallback, useState } from "react";
 
 type UseFormModalProps<R> = {
   // Función que hace la llamada a la API (debe devolver los datos)
-  onSubmit: ()=> Promise<R>;
-  // Validación opcional
+  onSubmit: ()=> Promise<R> | R;
   canSubmit?: ()=> boolean;
-  // Callback que viene desde fuera (props del componente)
   onSuccess?: (data: R)=> void;
 };
 
