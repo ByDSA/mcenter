@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.26.0](https://github.com/ByDSA/mcenter/compare/v4.25.0...v4.26.0) (2026-01-10)
+
+
+### Features
+
+* image covers upload and edit managing ([d805eba](https://github.com/ByDSA/mcenter/commit/d805eba925be34932cb4b110b01a06f99abb2650))
+
 ## [4.25.0](https://github.com/ByDSA/mcenter/compare/v4.24.4...v4.25.0) (2026-01-08)
 
 
