@@ -39,7 +39,14 @@ export namespace MusicCrudDtos {
   }
 
   export namespace PatchOneById {
-    export const bodySchema = generatePatchBodySchema(musicEntitySchema);
+    export const bodySchema = generatePatchBodySchema(musicEntitySchema.omit( {
+      uploaderUserId: true,
+      createdAt: true,
+      updatedAt: true,
+      addedAt: true,
+    } ).extend( {
+      slug: z.string(),
+    } ));
     export type Body = z.infer<typeof bodySchema>;
     export const paramsSchema = idParamsSchema;
   }

@@ -102,8 +102,7 @@ export function fixSlug(slug: string): string | null {
   if (fixed.length === 0)
     return null;
 
-  while (fixed.includes("--"))
-    fixed = fixed.replace("--", "-");
+  fixed = fixed.replace(/-+/g, "-");
 
   // Remove end ans start "-"
   fixed = fixed.replace(/^-+|-+$/g, "");
