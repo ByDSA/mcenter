@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "#modules/ui-kit/input/Button";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { ImageCoverEntity } from "../models";
 import { SectionLabel } from "../Edit/SectionLabel";
-import { ImageCoverUpload } from "../Edit/Editor";
+import { ImageCoverUpload, ImageCoverUploadRef } from "../Edit/UploadImage";
 import styles from "./Content.module.css";
 
 export type NewImageCoverProps = {
@@ -13,36 +13,60 @@ export type NewImageCoverProps = {
 export function NewImageCover( { onSuccess }: NewImageCoverProps) {
   const modal = useModal(true);
   const [label, setLabel] = useState<string>("");
+  const [hasFile, setHasFile] = useState(false);
+  const uploadRef = useRef<ImageCoverUploadRef>(null);
 
   return (
-    <div className={styles.editor}>
+    <div className={styles.content}>
       <div className={styles.mainSection}>
+        <div className={styles.fieldGroup}>
+          <SectionLabel>Etiqueta</SectionLabel>
+          <ImageCoverLabelView
+            value={label}
+            onChange={(value) => setLabel(value)}
+          />
+        </div>
         <section className={styles.imagesSection}>
           <SectionLabel>Subir Imagen</SectionLabel>
           <ImageCoverUpload
-            label={label}
+            ref={uploadRef}
+            hideUploadButton
             onSuccess={created=>{
               onSuccess?.(created);
               modal.closeModal();
             }}
+            onFileChange={(file)=>setHasFile(!!file)}
           />
         </section>
-        <div className={styles.fieldGroup}>
-          <SectionLabel>Etiqueta</SectionLabel>
-          <div className={styles.inputWithAction}>
-            <input
-              type="text"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              placeholder="Nombre del cover..."
-            />
-          </div>
-        </div>
       </div>
 
       <div className={styles.actions}>
         <Button onClick={modal.closeModal} theme="white">Cerrar</Button>
+        <Button onClick={async ()=> {
+          await uploadRef.current!.upload( {
+            label,
+          } );
+          modal.closeModal();
+        }}
+        theme="white"
+        disabled={!(hasFile && label)}
+        >Subir</Button>
       </div>
     </div>
   );
 }
+
+type ImageCoverLabelViewProps = {
+value: string;
+onChange: (newValue: string)=> void;
+};
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const ImageCoverLabelView = (props: ImageCoverLabelViewProps) => {
+  return <input
+    type="text"
+    className={styles.inputLabel}
+    value={props.value}
+    onChange={(e) => props.onChange(e.target.value)}
+    placeholder="Nombre del cover..."
+  />;
+};

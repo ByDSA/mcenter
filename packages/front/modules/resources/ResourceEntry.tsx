@@ -1,5 +1,6 @@
 import { Fragment, JSX, memo, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { ImageCover } from "$shared/models/image-covers";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
 import { classes } from "#modules/utils/styles";
 import { MusicImageCover } from "#modules/musics/MusicCover";
@@ -55,10 +56,14 @@ export function ResourceEntry(
       <div className={styles.leftDiv}>
         <MusicImageCover
           className={classes(styles.cover)}
-          img={{
-            alt: "Cover",
-            url: coverUrl,
-          }}
+          size="small"
+          cover={coverUrl
+            ? {
+              versions: {
+                original: coverUrl,
+              },
+            } as ImageCover
+            : undefined}
         />
         {play && <PlayButtonView
           theme="triangle-white"

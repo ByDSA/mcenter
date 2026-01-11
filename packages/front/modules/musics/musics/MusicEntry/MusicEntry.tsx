@@ -12,7 +12,7 @@ import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useMusic } from "#modules/musics/hooks";
 import { ResourceEntryLoading } from "#modules/resources/ResourceEntryLoading";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { getMediumCoverUrl, getSmallCoverUrl } from "#modules/image-covers/Selector/Selector";
+import { getMediumCoverUrl, getSmallCoverUrl } from "#modules/image-covers/Selector/image-cover-utils";
 import styles from "./MusicEntry.module.css";
 import { genMusicEntryContextMenuContent } from "./ContextMenu";
 

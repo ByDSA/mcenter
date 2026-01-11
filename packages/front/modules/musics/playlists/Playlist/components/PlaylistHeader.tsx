@@ -30,10 +30,7 @@ export const PlaylistHeader = ( { value,
     <div className={styles.playlistHeader}>
       <div className={styles.headerContent}>
         <MusicImageCover
-          img={{
-            alt: value.name,
-            url: undefined, // value.coverUrl,
-          }}
+          title={value.name}
           className={styles.playlistCover}
         />
 

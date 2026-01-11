@@ -48,10 +48,7 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
     >
       <MusicImageCover
         className={styles.playlistCover}
-        img={{
-          alt: value.name,
-          url: undefined, // value.coverUrl,
-        }}
+        title={value.name}
       />
 
       <div className={styles.playlistInfo}>

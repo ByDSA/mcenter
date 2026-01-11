@@ -2,7 +2,6 @@
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { classes } from "#modules/utils/styles";
 import { useMusic } from "#modules/musics/hooks";
-import { getMediumCoverUrlFromMusic } from "#modules/musics/musics/MusicEntry/MusicEntry";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, ShuffleButton, RepeatButton, BackwardButton, ForwardButton, CloseButton } from "../OtherButtons";
 import { CurrentTime, Duration, ProgressBar } from "../ProgressBar";
@@ -18,16 +17,14 @@ export const Player = () => {
     return null;
 
   const { title, artist } = music;
-  const coverUrl = getMediumCoverUrlFromMusic(music);
 
   return <section className={styles.content}>
     <section className={styles.coverSection}>
       <div className={styles.coverWrapper}>
         <MusicImageCover
           className={classes(commonStyles.imageCover, styles.imageCover)}
-          img={{
-            url: coverUrl,
-          }}
+          size="large"
+          cover={music.imageCover}
           icon={{
             className: commonStyles.icon,
           }}

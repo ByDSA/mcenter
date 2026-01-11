@@ -1,7 +1,7 @@
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import styles from "./Button.module.css";
 import { useImageCoverSelectorModal } from "./Modal";
-import { getSmallCoverUrl, ImageCoverSelectorProps } from "./Selector";
+import { ImageCoverSelectorProps } from "./Selector";
 
 export function ImageCoverSelectorButton(props: ImageCoverSelectorProps) {
   const { openModal } = useImageCoverSelectorModal(props);
@@ -13,9 +13,9 @@ export function ImageCoverSelectorButton(props: ImageCoverSelectorProps) {
     }}
   >
     <MusicImageCover
-      img={{
-        url: props.current ? getSmallCoverUrl(props.current) : undefined,
-      }} />
+      size="small"
+      cover={props.current}
+    />
     <span>{props.current?.metadata.label}</span>
   </span>;
 }

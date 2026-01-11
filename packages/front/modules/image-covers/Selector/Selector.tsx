@@ -1,14 +1,12 @@
 import { useState, useCallback } from "react";
-import { PATH_ROUTES } from "$shared/routing";
 import { Button } from "#modules/ui-kit/input/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { backendUrl } from "#modules/requests";
 import { useFormInModal } from "#modules/ui-kit/modal/useFormModal";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { MusicImageCover } from "#modules/musics/MusicCover";
+import { SearchBarView } from "#modules/ui-kit/SearchBar";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
-import { ImageCoverEditButton } from "../Edit/Button";
 import { SectionLabel } from "../Edit/SectionLabel";
 import { NewImageCoverButton } from "../New/Button";
 import styles from "./Selector.module.css";
@@ -22,7 +20,6 @@ export function ImageCoverSelector( { onSelect, current }: ImageCoverSelectorPro
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<ImageCoverEntity[]>([]);
   const [selectedId, setSelectedId] = useState<string | null | undefined>();
-  const [isLoading, setIsLoading] = useState(false);
   const modal = useModal(true);
   const form = useFormInModal( {
     onSubmit: () => {
@@ -48,62 +45,53 @@ export function ImageCoverSelector( { onSelect, current }: ImageCoverSelectorPro
       () => !(selectedId === undefined
             || (selectedId !== null && !results.find(p=>p.id === selectedId))),
   } );
-  const handleSearch = useCallback(async () => {
-    if (!searchQuery.trim())
+  const handleSearch = useCallback(async (value: string) => {
+    if (!value.trim())
       return;
 
-    setIsLoading(true);
-    try {
-      const api = FetchApi.get(ImageCoversApi);
-      const res = await api.getManyByCriteria( {
-        filter: {
-          searchLabel: searchQuery,
-        },
-      } );
+    const api = FetchApi.get(ImageCoversApi);
+    const res = await api.getManyByCriteria( {
+      filter: {
+        searchLabel: value,
+      },
+    } );
 
-      setResults(res.data);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchQuery]);
+    setResults(res.data);
+  }, []);
 
   return (
     <div className={styles.selector}>
       <header className={styles.header}>
-        {current !== undefined && <section className={styles.currentCoverSection}>
+        {current !== undefined && <aside className={styles.currentCoverSection}>
           <SectionLabel>Actual</SectionLabel>
           <MusicImageCover
+            size="medium"
+            editable
             className={styles.currentCover}
-            img={current
-              ? {
-                url: getMediumCoverUrl(current),
-              }
-              : undefined} /></section>}
-        <NewImageCoverButton onSuccess={(created)=> {
-          setResults(old => {
-            return [
-              created,
-              ...old,
-            ];
-          } );
-        }}/>
+            cover={current} /></aside>}
+        <aside className={styles.searchAside}>
+          <NewImageCoverButton
+            className={styles.newImageButton}
+            onSuccess={(created)=> {
+              setResults(old => {
+                return [
+                  created,
+                  ...old,
+                ];
+              } );
+            }}/>
+          <div className={styles.searchSection}>
+            <SearchBarView
+              placeholder="Buscar covers..."
+              autoFocus
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              action={handleSearch}
+            />
+          </div>
+
+        </aside>
       </header>
-      <div className={styles.searchSection}>
-        <input
-          type="text"
-          placeholder="Buscar covers..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-        />
-        <Button
-          onClick={handleSearch}
-          disabled={isLoading}
-          theme="white"
-        >
-          {isLoading ? "Buscando..." : "Buscar"}
-        </Button>
-      </div>
 
       {results.length > 0 && (
         <div className={styles.resultsInfo}>
@@ -119,12 +107,8 @@ export function ImageCoverSelector( { onSelect, current }: ImageCoverSelectorPro
             title={cover.metadata.label}
             onClick={() => setSelectedId(cover.id)}
           >
-            <img
-              src={getMediumCoverUrl(cover)}
-              alt={cover.metadata.label}
-              className={styles.coverImage} />
-            <ImageCoverEditButton
-              imageCover={cover}
+            <MusicImageCover
+              editable
               onUpdate={(data)=>{
                 if (!data)
                   setResults(old=>old.filter(o=>o.id !== cover.id));
@@ -134,7 +118,10 @@ export function ImageCoverSelector( { onSelect, current }: ImageCoverSelectorPro
                   } );
                 }
               }}
-            />
+              cover={cover}
+              size="medium"
+              className={styles.coverImage} />
+
             <div
               className={styles.coverLabel}
             >{cover.metadata.label}</div>
@@ -164,26 +151,5 @@ export function ImageCoverSelector( { onSelect, current }: ImageCoverSelectorPro
         </Button>
       </div>
     </div>
-  );
-}
-
-export function getLargeCoverUrl(imageCover: ImageCoverEntity): string {
-  return backendUrl(
-    PATH_ROUTES.imageCovers.raw.withParams(imageCover.versions.large
-      ?? imageCover.versions.original),
-  );
-}
-
-export function getMediumCoverUrl(imageCover: ImageCoverEntity): string {
-  return backendUrl(
-    PATH_ROUTES.imageCovers.raw.withParams(imageCover.versions.medium
-    ?? imageCover.versions.large ?? imageCover.versions.original),
-  );
-}
-
-export function getSmallCoverUrl(imageCover: ImageCoverEntity): string {
-  return backendUrl(
-    PATH_ROUTES.imageCovers.raw.withParams(imageCover.versions.small
-      ?? imageCover.versions.medium ?? imageCover.versions.large ?? imageCover.versions.original),
   );
 }

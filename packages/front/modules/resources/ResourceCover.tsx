@@ -8,6 +8,7 @@ export type ResourceImageCoverProps = {
   img?: {
     url?: string;
     alt?: string;
+    title?: string;
     className?: string;
   };
   icon: {
@@ -25,6 +26,7 @@ export const ResourceImageCover = (props: ResourceImageCoverProps) => {
         <Image
           src={props.img.url}
           alt={props.img.alt ?? "Cover"}
+          title={props.img.title}
           onClick={props.onClick}
           fill
           unoptimized

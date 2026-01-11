@@ -14,6 +14,13 @@ body:has(.button) {
     from var(--color-primary) h 30% l
   );
   --button-blue-disabled-color: var(--color-gray-100);
+
+  /* Variables red theme */
+  --button-red-background-color: var(--color-red-700);
+  --button-red-color: white;
+  --button-red-hover-background-color: var(--color-red-600);
+  --button-red-disabled-background-color: hsl(from var(--color-red) h 30% l);
+  --button-red-disabled-color: var(--color-gray-100);
 }
 .button {
   color: var(--button-color);
@@ -56,6 +63,16 @@ body:has(.button) {
     --button-blue-disabled-background-color
   );
   --button-disabled-color: var(--button-blue-disabled-color);
+}
+
+.red {
+  --button-background-color: var(--button-red-background-color);
+  --button-color: var(--button-red-color);
+  --button-hover-background-color: var(--button-red-hover-background-color);
+  --button-disabled-background-color: var(
+    --button-red-disabled-background-color
+  );
+  --button-disabled-color: var(--button-red-disabled-color);
 }
 
 .white {

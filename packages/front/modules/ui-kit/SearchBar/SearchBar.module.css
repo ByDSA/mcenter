@@ -1,0 +1,56 @@
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.searchInput {
+  flex: 1;
+  border-radius: 1rem;
+  color: white;
+  font-size: 1rem;
+  /* Padding izquierdo para la lupa y derecho para la X */
+  padding: 0 2.5rem 0 2.75rem;
+  border: 1px solid transparent;
+  height: 2.5rem;
+  background-color: color-mix(in srgb, var(--color-gray-1000), transparent 50%);
+  border: 1px solid var(--color-gray-800);
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-gray-600);
+    background-color: color-mix(in srgb, var(--color-gray-0), transparent 90%);
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  color: var(--color-gray-500);
+  pointer-events: none;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clearIcon {
+  --size: 1rem;
+  --padding: 0.125rem;
+  position: absolute;
+  right: 1rem;
+  color: white;
+  cursor: pointer;
+  width: calc(var(--size) + 2 * var(--padding)) !important;
+  height: calc(var(--size) + 2 * var(--padding)) !important;
+  transition: background-color 0.2s;
+  border-radius: 50%;
+  padding: var(--padding);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}

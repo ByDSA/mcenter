@@ -1,3 +1,21 @@
 .icon {
   color: var(--color-gray-200);
 }
+
+.wrap {
+  display: block;
+  width: auto;
+  position: relative;
+
+  .editButton {
+    position: absolute;
+    bottom: 0.25rem;
+    right: 0.25rem;
+    opacity: 0.75;
+    padding: 0.33rem;
+
+    &:hover {
+      opacity: 0.75;
+    }
+  }
+}

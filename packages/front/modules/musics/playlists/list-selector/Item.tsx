@@ -13,9 +13,7 @@ export const PlaylistSelectorItem = (props: Props) => {
   return <div className={styles.item} onClick={props.onClick}>
     <MusicImageCover
       className={styles.cover}
-      img={{
-        alt: data.name,
-      }}
+      title={data.name}
     />
     <section>
       <div className={styles.name}>{data.name}</div>

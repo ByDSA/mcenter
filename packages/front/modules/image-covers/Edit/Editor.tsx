@@ -1,24 +1,16 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useRef } from "react";
-import { assertIsDefined } from "$shared/utils/validation";
 import { Button } from "#modules/ui-kit/input/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { UploadButton } from "#modules/ui-kit/upload/UploadButton";
 import { logger } from "#modules/core/logger";
-import { classes } from "#modules/utils/styles";
 import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
-import { getMediumCoverUrl } from "../Selector/Selector";
+import { getMediumCoverUrl } from "../Selector/image-cover-utils";
+import { ImageCoverLabelView } from "../New/Content";
 import styles from "./Editor.module.css";
 import { SectionLabel } from "./SectionLabel";
-
-type EntityModifierProps = {
-  entityId: string;
-  initialValue?: any;
-  onSuccess: (updatedEntity: ImageCoverEntity)=> void;
-};
+import { ImageCoverUpload, PreviewImage, ImageCoverUploadRef } from "./UploadImage";
 
 export type ImageCoverEditorProps = {
   imageCover: ImageCoverEntity;
@@ -27,271 +19,129 @@ export type ImageCoverEditorProps = {
 
 export function ImageCoverEditor( { imageCover, onUpdate }: ImageCoverEditorProps) {
   const modal = useModal(true);
+  const confirmModal = useConfirmModal();
+  // Estado local del componente
   const [currentEntity, setCurrentEntity] = useState(imageCover);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [label, setLabel] = useState(imageCover.metadata.label);
+  // Estados de control y UI
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [hasNewFile, setHasNewFile] = useState(false);
+  // Referencia al componente de subida
+  const uploadRef = useRef<ImageCoverUploadRef>(null);
+  // Determinar si hay cambios pendientes para habilitar el botón Guardar
+  const hasChanges = label !== currentEntity.metadata.label || hasNewFile;
   const handleEntityUpdate = (updated: ImageCoverEntity) => {
     setCurrentEntity(updated);
     onUpdate?.(updated);
   };
-  const confirmModal = useConfirmModal();
   const handleDelete = async () => {
     await confirmModal.openModal( {
-      content: <>
-        <p>¿Borrar cover?</p>
-        <p>{imageCover.metadata.label}</p>
-      </>,
-      action: async ()=> {
-        setIsDeleting(true);
+      content: (
+        <>
+          <p>¿Borrar cover?</p>
+          <p>{currentEntity.metadata.label}</p>
+        </>
+      ),
+      action: async () => {
+        setIsProcessing(true);
         try {
           await FetchApi.get(ImageCoversApi).deleteOneById(currentEntity.id);
           onUpdate?.(null);
           modal.closeModal();
         } catch (err) {
           logger.error((err as Error).message);
-          setIsDeleting(false);
+          setIsProcessing(false);
         }
 
         return true;
       },
     } );
   };
+  const handleGlobalSave = async () => {
+    setIsProcessing(true);
+    try {
+      let updatedData: ImageCoverEntity | null | undefined = null;
+
+      if (label !== currentEntity.metadata.label) {
+        const api = FetchApi.get(ImageCoversApi);
+        const res = await api.patch(currentEntity.id, {
+          entity: {
+            metadata: {
+              label,
+            },
+          },
+        } );
+
+        updatedData = res.data;
+      }
+
+      // La imagen después para que devuelva el param "?t=timestamp"
+      if (hasNewFile && uploadRef.current)
+        updatedData = await uploadRef.current.upload();
+
+      if (updatedData) {
+        handleEntityUpdate(updatedData);
+        modal.closeModal();
+      }
+    } catch (err) {
+      console.error("Error al guardar:", err);
+      // Aquí podrías poner un toast de error
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className={styles.editor}>
       <div className={styles.mainSection}>
+        <section className={styles.fieldGroup}>
+          <SectionLabel>Etiqueta</SectionLabel>
+          <ImageCoverLabelView
+            value={label}
+            onChange={(value) => setLabel(value)}
+
+          />
+        </section>
         <section className={styles.imagesSection}>
           <article className={styles.currentImageSection}>
             <SectionLabel>Actual</SectionLabel>
-
-            <PreviewImage
-              src={getMediumCoverUrl(currentEntity)}
-            />
+            <PreviewImage src={getMediumCoverUrl(currentEntity)} />
           </article>
 
-          <ImageUploadManager
-            entityId={currentEntity.id}
-            onSuccess={handleEntityUpdate}
-          />
+          <article className={styles.replaceImageSection}>
+            <SectionLabel>Reemplazar Imagen</SectionLabel>
+            <ImageCoverUpload
+              ref={uploadRef}
+              entityId={currentEntity.id}
+              hideUploadButton={true}
+              onFileChange={(file)=>setHasNewFile(!!file)}
+            />
+          </article>
         </section>
-        <LabelManager
-          entityId={currentEntity.id}
-          initialValue={currentEntity.metadata.label}
-          onSuccess={handleEntityUpdate}
-        />
       </div>
 
       <div className={styles.actions}>
-        <Button onClick={handleDelete} theme="blue" disabled={isDeleting}>Borrar</Button>
-        <Button onClick={modal.closeModal} theme="white">Cerrar</Button>
-      </div>
-    </div>
-  );
-}
-
-function LabelManager( { entityId, initialValue, onSuccess }: EntityModifierProps) {
-  const [label, setLabel] = useState(initialValue);
-  const [status, setStatus] = useState<"error" | "idle" | "saving">("idle");
-  const handleSave = async () => {
-    if (label === initialValue)
-      return;
-
-    setStatus("saving");
-    try {
-      const api = FetchApi.get(ImageCoversApi);
-      const res = await api.patch(entityId, {
-        entity: {
-          metadata: {
-            label,
-          },
-        },
-      } );
-
-      setStatus("idle");
-      onSuccess(res.data);
-    } catch (err) {
-      setStatus("error");
-      console.error(err);
-    }
-  };
-
-  return (
-    <div className={styles.fieldGroup}>
-      <SectionLabel>Etiqueta</SectionLabel>
-      <div className={styles.inputWithAction}>
-        <input
-          type="text"
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          disabled={status === "saving"}
-          placeholder="Nombre del cover..."
-        />
-        <Button
-          onClick={handleSave}
-          theme="white"
-          disabled={status === "saving" || label === initialValue}
-        >
-          {status === "saving" ? "..." : "💾"}
-        </Button>
-      </div>
-      {status === "error" && <span className={styles.error}>Error al guardar</span>}
-    </div>
-  );
-}
-
-function ImageUploadManager( { entityId, onSuccess }: EntityModifierProps) {
-  return (
-    <article className={styles.replaceImageSection}>
-      <SectionLabel>Reemplazar Imagen</SectionLabel>
-
-      <ImageCoverUpload entityId={entityId} onSuccess={onSuccess}/>
-    </article>
-  );
-}
-
-type ImageCoverUploadProps = {
-  entityId?: string;
-  label?: string;
-  onSuccess?: (updatedEntity: ImageCoverEntity)=> void;
-};
-export function ImageCoverUpload( { entityId, label, onSuccess }: ImageCoverUploadProps) {
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [status, setStatus] = useState<"error" | "idle" | "uploading">("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  // Lógica de selección de archivo
-  const handleFileSelect = (selectedFile: File) => {
-    if (!selectedFile.type.startsWith("image/")) {
-      setErrorMessage("El archivo debe ser una imagen");
-
-      return;
-    }
-
-    setFile(selectedFile);
-    setPreviewUrl(URL.createObjectURL(selectedFile));
-    setErrorMessage(null);
-    setStatus("idle");
-  };
-  // Lógica de subida a la API
-  const handleUpload = async () => {
-    if (!file)
-      return;
-
-    setStatus("uploading");
-
-    try {
-      const api = FetchApi.get(ImageCoversApi);
-      const res = await api.updateImage(file, {
-        id: entityId ?? null,
-        label,
-      } );
-      const resData = res.data.imageCover;
-
-      assertIsDefined(resData);
-
-      // Limpieza post-exito
-      setFile(null);
-      setPreviewUrl(null);
-
-      for (const [k, v] of Object.entries(resData.versions))
-        resData.versions[k] = v + "?t=" + new Date().getTime();
-
-      onSuccess?.(resData);
-      setErrorMessage("");
-    } catch (err) {
-      setErrorMessage(`Error subida: ${(err as Error).message}`);
-      setStatus("error");
-    } finally {
-      setStatus("idle"); // Opcional: dejar en idle o mantener estado de éxito
-    }
-  };
-
-  return (
-    <div>
-      {previewUrl && (<PreviewImage src={previewUrl} />)}
-
-      <DragAndDropArea
-        onFileReady={handleFileSelect}
-        isLoading={status === "uploading"}
-        onError={setErrorMessage}
-      >
-        {file && (
-          <div className={styles.uploadAction}>
-            <UploadButton onClick={handleUpload} disabled={status === "uploading"} />
-          </div>
-        )}
-      </DragAndDropArea>
-
-      {errorMessage && <div className={styles.error}>{errorMessage}</div>}
-    </div>
-  );
-}
-
-/**
- * Componente puramente de UI/Interacción para Drag&Drop y pegado de URL.
- * No sabe nada de APIs ni de modelos de negocio.
- */
-function DragAndDropArea( { onFileReady, onError, isLoading, children }: any) {
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const handleUrlPaste = async () => {
-    const url = window.prompt("Pega la URL:");
-
-    if (!url?.trim())
-      return;
-
-    try {
-      new URL(url);
-      const res = await fetch(url);
-      const blob = await res.blob();
-
-      onFileReady(new File([blob], "pasted-image.jpg", {
-        type: blob.type,
-      } ));
-    } catch {
-      onError("URL no válida o inaccesible");
-    }
-  };
-
-  return (
-    <div
-      className={classes(styles.dropZone, isDragging && styles.active)}
-      onDragOver={(e) => {
-        e.preventDefault();
-        setIsDragging(true);
-      }}
-      onDragLeave={() => setIsDragging(false)}
-      onDrop={(e) => {
-        e.preventDefault();
-        setIsDragging(false);
-
-        if (e.dataTransfer.files[0])
-          onFileReady(e.dataTransfer.files[0]);
-      }}
-    >
-      <div className={styles.dropActions}>
-        <p>Arrastra o selecciona...</p>
-        <div className={styles.selectionButtons}>
+        <aside>
           <Button
-            onClick={() => fileInputRef.current?.click()}
-            theme="white"
-            disabled={isLoading}>📂 Disco</Button>
-          <Button onClick={handleUrlPaste} theme="white" disabled={isLoading}>📋 URL</Button>
-        </div>
-        <input
-          type="file"
-          ref={fileInputRef}
-          hidden
-          accept="image/*"
-          onChange={(e) => e.target.files?.[0] && onFileReady(e.target.files[0])}
-        />
+            onClick={handleDelete}
+            theme="blue"
+            disabled={isProcessing}
+          >
+            Borrar
+          </Button>
+        </aside>
+        <aside>
+          <Button onClick={modal.closeModal} theme="white">Cerrar</Button>
+          <Button
+            onClick={handleGlobalSave}
+            theme="blue"
+            disabled={isProcessing
+              || !hasChanges} // Deshabilitado si no hay cambios o está guardando
+          >
+            {isProcessing ? "Guardando..." : "Guardar"}
+          </Button>
+        </aside>
       </div>
-      {children}
     </div>
   );
 }
-
-const PreviewImage = ( { src }: {src: string} ) => {
-  return <div className={styles.imageContainer}>
-    <img src={src} alt="Preview" className={styles.largePreview} />
-  </div>;
-};

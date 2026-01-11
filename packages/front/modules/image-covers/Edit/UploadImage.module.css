@@ -1,0 +1,67 @@
+.imageContainer {
+  width: 200px;
+}
+
+.dropZone {
+  border: 2px dashed var(--color-gray-600);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s;
+  background-color: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--color-gray-400);
+
+  &.active {
+    border-color: var(--color-blue-500);
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9em;
+  }
+}
+
+.dropActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+}
+
+.selectionButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.error {
+  color: var(--color-red-300);
+  font-size: 0.85em;
+  margin-top: 4px;
+}
+
+.imageCoverUpload {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  min-width: 0;
+  justify-content: center;
+
+  .uploadAction svg {
+    margin: 0;
+  }
+}
+
+.previewWithActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}

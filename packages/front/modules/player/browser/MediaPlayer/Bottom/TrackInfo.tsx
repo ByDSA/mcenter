@@ -6,7 +6,6 @@ import { ResourceSubtitle } from "#modules/resources/ResourceEntry";
 import { classes } from "#modules/utils/styles";
 import { useMusic } from "#modules/musics/hooks";
 import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
-import { getSmallCoverUrlFromMusic } from "#modules/musics/musics/MusicEntry/MusicEntry";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import commonStyles from "../MediaPlayerCommon.module.css";
 import { CurrentTimeLabel } from "./CurrentTimeLabel";
@@ -27,13 +26,12 @@ export const TrackInfo = memo(
     return (
       <div className={styles.trackInfo}>
         <MusicImageCover
-          className={commonStyles.imageCover}
+          className={classes(commonStyles.imageCover, styles.imageCover)}
           icon={{
             className: commonStyles.icon,
           }}
-          img={{
-            url: getSmallCoverUrlFromMusic(music),
-          }}
+          size="small"
+          cover={music.imageCover}
         />
         <div className={styles.trackDetails}>
           <a

@@ -193,3 +193,7 @@
 .previousButton {
   margin-right: 0.5rem;
 }
+
+.imageCover {
+  --size: 58px;
+}

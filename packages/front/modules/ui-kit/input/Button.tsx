@@ -6,7 +6,7 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   left?: JSX.Element;
   right?: JSX.Element;
   children: React.ReactNode;
-  theme?: "blue" | "dark-gray" | "white";
+  theme?: "blue" | "dark-gray" | "red" | "white";
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -26,6 +26,7 @@ export const Button = ( { children, left, right, theme = "dark-gray", ...buttonP
       theme === "blue" && styles.blue,
       theme === "white" && styles.white,
       theme === "dark-gray" && styles.darkGray,
+      theme === "red" && styles.red,
       buttonProps.className,
     )}
   >

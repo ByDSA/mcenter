@@ -26,6 +26,7 @@
 
 .leftDiv {
   width: 40px;
+  --size: 40px;
   user-select: none;
 }
 
@@ -59,10 +60,6 @@
   &.playing {
     background-color: var(--color-gray-900);
     box-shadow: inset 4px 0 0 0 var(--color-playing);
-  }
-
-  *:has(> .cover) {
-    --size: 40px;
   }
 
   .right {
@@ -191,7 +188,7 @@
   filter: brightness(calc(1 - (var(--is-active) * 0.5)));
 }
 
-*:has(> .cover):hover .cover {
+*:has(> .playButton):hover .cover {
   filter: brightness(0.25) !important;
 }
 

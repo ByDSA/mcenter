@@ -3,7 +3,9 @@ import { Button } from "#modules/ui-kit/input/Button";
 import { NewImageCoverProps } from "./Content";
 import { useNewImageCoverModal } from "./Modal";
 
-type Props = NewImageCoverProps;
+type Props = NewImageCoverProps & {
+  className?: string;
+};
 
 export function NewImageCoverButton(props: Props) {
   const { openModal } = useNewImageCoverModal(props);
@@ -12,6 +14,7 @@ export function NewImageCoverButton(props: Props) {
   return (
     <Button
       theme="white"
+      className={props.className}
       onClick={async (e) => {
         e.stopPropagation(); // Evitar triggers padres si los hay
         await openModal();
