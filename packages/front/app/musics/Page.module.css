@@ -15,7 +15,7 @@
 }
 
 body:has(.tabs) {
-  --tabs-height: 75px;
+  --tabs-height: calc(2rem + 40px + 0.5rem);
 
   &:has(.tabs > main:empty) {
     --tabs-height: 2rem;
@@ -27,6 +27,10 @@ body:has(.tabs) {
 
   .tabs > main:empty {
     display: none !important;
+  }
+
+  header:has(.searchBar) {
+    margin: 0.25rem 0;
   }
 
   @media (width >= 600px) {
