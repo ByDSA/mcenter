@@ -15,7 +15,7 @@ export default function MusicPlaylistsPage() {
     theme: "dark-gray",
     onSuccess: (newPlaylist: PlaylistEntity) => {
       usingMusicPlaylist.addItem(newPlaylist);
-      logger.debug("Nueva playlist creada: " + newPlaylist.name);
+      logger.debug("Nueva lista creada: " + newPlaylist.name);
     },
   } );
 

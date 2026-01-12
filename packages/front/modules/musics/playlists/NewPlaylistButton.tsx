@@ -16,7 +16,7 @@ const NewPlaylistButton = ( { onClick, theme }: ButtonProps) => {
     theme={theme}
     onClick={onClick}
     left={<Add />}>
-    Nueva playlist
+    Nueva lista
   </Button>;
 };
 
@@ -85,7 +85,7 @@ export function useNewPlaylistButton(props: Props) {
   const usingModal = useModal();
   const openModal = () => {
     return usingModal.openModal( {
-      title: "Nueva playlist",
+      title: "Nueva lista",
       content: <NewPlaylistForm onSuccess={v=> {
         props.onSuccess?.(v);
         usingModal.closeModal();

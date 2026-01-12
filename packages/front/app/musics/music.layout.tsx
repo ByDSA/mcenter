@@ -16,17 +16,14 @@ path: string;}[] = [];
   const { user } = useUser();
 
   if (user) {
-    data.push( {
-      label: "Historial",
-      path: PATH_ROUTES.musics.frontend.history.path,
-    } );
-  }
-
-  if (user) {
     data.push(
       {
-        label: "Playlists",
+        label: "Listas",
         path: PATH_ROUTES.musics.frontend.playlists.path,
+      },
+      {
+        label: "Historial",
+        path: PATH_ROUTES.musics.frontend.history.path,
       },
       {
         label: "Subir",

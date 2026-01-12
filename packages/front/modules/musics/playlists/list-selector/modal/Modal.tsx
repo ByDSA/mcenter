@@ -68,7 +68,7 @@ function AddToPlaylistModalContent( { userId, onSelect, nullable }: AddToPlaylis
   const { element: newPlaylistButton } = useNewPlaylistButton( {
     theme: "white",
     onSuccess: async (newPlaylist) => {
-      logger.debug("Nueva playlist creada: " + newPlaylist.name);
+      logger.debug("Nueva lista creada: " + newPlaylist.name);
 
       setData((prevData) => {
         if (!prevData)
