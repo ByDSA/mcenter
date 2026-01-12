@@ -21,16 +21,13 @@ body:has(.tabs) {
     --tabs-height: 2rem;
   }
 
-  *:has(> .searchBar) {
-    background: var(--color-gray-950);
-  }
-
   .tabs > main:empty {
     display: none !important;
   }
 
   header:has(.searchBar) {
     margin: 0.25rem 0;
+    background: var(--color-gray-950);
   }
 
   @media (width >= 600px) {
@@ -40,8 +37,11 @@ body:has(.tabs) {
       --tabs-height: 0;
     }
 
-    .searchBar {
-      display: none;
+    header:has(.searchBar) {
+      margin: 0;
+      .searchBar {
+        display: none;
+      }
     }
   }
 }
