@@ -73,12 +73,11 @@ function useSearchMusicList(props: Props) {
   const api = FetchApi.get(MusicsApi);
   const expand: NonNullable<MusicsApi.GetManyByCriteria.Criteria["expand"]> = [
     "fileInfos",
-    "userInfo",
     "imageCover",
   ];
 
   if (user)
-    expand.push("favorite");
+    expand.push("favorite", "userInfo");
 
   const criteriaCommon: MusicsApi.GetManyByCriteria.Criteria = {
     sort: {
