@@ -103,4 +103,11 @@ export function useMediaSession(
       engine.removeEventListener("durationchange", updatePosition);
     };
   }, [engine]);
+
+  useEffect(() => {
+    if (!player.currentResource) {
+      if (!player.currentResource && "mediaSession" in navigator)
+        navigator.mediaSession.metadata = null;
+    }
+  }, [player.currentResource]);
 }
