@@ -57,7 +57,7 @@ export function useCrudData<D extends unknown[], T extends Record<string, Action
   const refetchData = useCallback(async () => {
     const fn = refetching?.fn;
 
-    if (!fn)
+    if (!fn || !lastFetchDateRef.current)
       return;
 
     const result = await fn(dataRef.current);

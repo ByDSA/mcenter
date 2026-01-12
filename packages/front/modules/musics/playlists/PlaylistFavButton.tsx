@@ -15,7 +15,9 @@ type Props = Omit<PropsOf<typeof FavButton>, "disabled" | "onFavorite" |
 export const PlaylistFavButton = ( { favoritesPlaylistId,
   musicId, ...props }: Props) => {
   const disabled = useMemo(()=>favoritesPlaylistId === null, [favoritesPlaylistId]);
-  const { data: music } = useMusic(musicId);
+  const { data: music } = useMusic(musicId, {
+    debounce: true,
+  } );
 
   return <FavButton
     value={music?.isFav ?? false}

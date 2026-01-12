@@ -35,6 +35,7 @@ export const MusicHistoryEntryElement = React.memo((
   );
   const { data: music } = useMusic(value.resourceId, {
     expand: ["favorite", "fileInfos", "userInfo"],
+    debounce: true,
   } );
 
   if (!music)

@@ -9,7 +9,8 @@ import { mongoDbId } from "../../resources/partial-schemas";
 
 const criteriaConfig = {
   filterShape: {
-    id: z.string().optional(),
+    id: mongoDbId.optional(),
+    ids: z.array(mongoDbId).optional(),
     slug: slugSchema.optional(),
     title: z.string().optional(),
     artist: z.string().optional(),

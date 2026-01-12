@@ -29,7 +29,9 @@ export const MusicPlaylistItem = ( { playlist,
   const { user } = useUser();
   const { openMenu: _openMenu } = useContextMenuTrigger();
   const value = playlist.list[index];
-  const usingMusic = useMusic(value.musicId);
+  const usingMusic = useMusic(value.musicId, {
+    debounce: true,
+  } );
   const { data: music } = usingMusic;
   const api = FetchApi.get(MusicPlaylistsApi);
 

@@ -7,6 +7,7 @@ import { classes } from "#modules/utils/styles";
 import { useUser } from "#modules/core/auth/useUser";
 import listStyles from "#modules/resources/List.module.css";
 import { MusicsApi } from "../requests";
+import { useMusic } from "../hooks";
 import { MusicEntryElement } from "./MusicEntry/MusicEntry";
 import { ArrayData } from "./types";
 
@@ -18,12 +19,12 @@ type Props = {
 
 type Data = ArrayData;
 
-export function MusicList(props: Props) {
+export function SearchMusicList(props: Props) {
   const { data,
     isLoading,
     error,
     observerTarget,
-    totalCount } = useMusicList(props);
+    totalCount } = useSearchMusicList(props);
   const resultNumbers = (
     <span style={{
       display: "flex",
@@ -64,15 +65,16 @@ export function MusicList(props: Props) {
   } );
 }
 
-function useMusicList(props: Props) {
+function useSearchMusicList(props: Props) {
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const limitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const fetchingMoreLimitRef = useRef<number>(5);
+  const fetchingMoreLimitRef = useRef<number>(15);
   const { user } = useUser();
   const api = FetchApi.get(MusicsApi);
   const expand: NonNullable<MusicsApi.GetManyByCriteria.Criteria["expand"]> = [
     "fileInfos",
     "userInfo",
+    "imageCover",
   ];
 
   if (user)
@@ -96,13 +98,16 @@ function useMusicList(props: Props) {
         return [];
 
       const result = await api.getManyByCriteria( {
-        limit: 20,
+        limit: 30,
         ...criteriaCommon,
       } );
       const gotTotalCount = result.metadata?.totalCount;
 
       if (gotTotalCount !== undefined)
         setTotalCount(gotTotalCount);
+
+      for (const m of result.data)
+        useMusic.updateCacheWithMerging(m.id, m);
 
       return result.data as Data;
     },
@@ -126,6 +131,9 @@ function useMusicList(props: Props) {
 
         if (gotTotalCount !== undefined)
           setTotalCount(gotTotalCount);
+
+        for (const m of result.data)
+          useMusic.updateCacheWithMerging(m.id, m);
 
         return result.data as Data;
       },

@@ -6,12 +6,17 @@ import { MusicsApi } from "./requests";
 import { MusicEntity, musicEntitySchema } from "./models";
 
 type GenQueryOptions = {
-  expand: MusicCrudDtos.GetOne.Criteria["expand"];
+  expand?: MusicCrudDtos.GetOne.Criteria["expand"];
+  debounce?: boolean;
 };
 
-function genQueryFn(id: string, _options?: GenQueryOptions) {
+function genQueryFn(id: string, options?: GenQueryOptions) {
   return async ()=> {
     const api = FetchApi.get(MusicsApi);
+
+    if (options?.debounce)
+      return fetchMusicDebounced(id);
+
     const res = await api.getOneByCriteria( {
       filter: {
         id,
@@ -30,7 +35,7 @@ function genQuery(id: string, options?: GenQueryOptions) {
     staleTime: 1_000 * 60 * 5,
     structuralSharing: (oldData: MusicEntity | undefined, newData: Partial<MusicEntity>) => {
       if (!oldData)
-        return newData;
+        return newData as MusicEntity;
 
       return merge(oldData, newData);
     },
@@ -110,3 +115,67 @@ function merge(oldData: MusicEntity | undefined, newData: Partial<MusicEntity>):
 
   return ret;
 }
+
+/*  ------------------------- */
+let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+
+// Cola de promesas esperando resolución:
+type BatchPromise = {
+  resolve: (data: MusicEntity)=> void;
+  reject: (err: any)=> void;
+};
+const batchQueue = new Map<MusicEntity["id"], Array<BatchPromise>>();
+const flushBatch = async () => {
+  const currentBatch = new Map(batchQueue);
+
+  batchQueue.clear();
+
+  const ids = Array.from(currentBatch.keys());
+
+  if (ids.length === 0)
+    return;
+
+  try {
+    const api = FetchApi.get(MusicsApi);
+    const res = await api.getManyByCriteria( {
+      filter: {
+        ids,
+      },
+      expand: ["favorite", "fileInfos", "userInfo", "imageCover"],
+    } );
+
+    currentBatch.forEach((subscribers, id) => {
+      const found = res.data.find((item) => item.id === id);
+
+      if (found) {
+        // Resolvemos con el mismo dato TODAS las promesas que esperaban este ID
+        subscribers.forEach(sub => sub.resolve(found));
+      } else {
+        const err = new Error(`Music entity ${id} not found`);
+
+        subscribers.forEach(sub => sub.reject(err));
+      }
+    } );
+  } catch (error) {
+    // Si falla la red, fallan todas las promesas pendientes
+    currentBatch.forEach((subscribers) => {
+      subscribers.forEach(sub => sub.reject(error));
+    } );
+  }
+};
+const fetchMusicDebounced = (id: string): Promise<MusicEntity> => {
+  return new Promise((resolve, reject) => {
+    const existingSubscribers = batchQueue.get(id) || [];
+
+    existingSubscribers.push( {
+      resolve,
+      reject,
+    } );
+    batchQueue.set(id, existingSubscribers);
+
+    if (debounceTimeout)
+      clearTimeout(debounceTimeout);
+
+    debounceTimeout = setTimeout(flushBatch, 200); // debounce = 200ms
+  } );
+};

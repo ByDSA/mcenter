@@ -34,7 +34,9 @@ export function MusicEntryElement(
   const { user } = useUser();
   const { openMenu } = useContextMenuTrigger();
   const { musicId } = props;
-  const { data: music } = useMusic(musicId);
+  const { data: music } = useMusic(musicId, {
+    debounce: true,
+  } );
   let play: Parameters<typeof ResourceEntry>[0]["play"];
   const player = useBrowserPlayer(useShallow((s) => ( {
     currentResource: s.currentResource,

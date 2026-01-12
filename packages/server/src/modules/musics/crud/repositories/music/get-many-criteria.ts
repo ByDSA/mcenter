@@ -9,6 +9,11 @@ import { AggregationResult } from "./odm/adapters";
 
 type CriteriaMany = MusicCrudDtos.GetMany.Criteria;
 
+type MusicIds = {
+  stringIds: string[];
+  objectIds: Types.ObjectId[];
+};
+
 @Injectable()
 export class GetManyByCriteriaMusicRepoService {
   constructor(
@@ -49,12 +54,37 @@ export class GetManyByCriteriaMusicRepoService {
   ): Promise<AggregationResult> {
     const searchQuery = Object.values(criteria.filter!).join(" ");
     const searchOptions = this.buildSearchOptions(criteria);
-    const { data: docs, total } = await this.musicsSearchService.search(
-      userId,
-      searchQuery,
-      searchOptions,
-    );
-    const musicIds = this.extractMusicIds(docs);
+    let musicIds: MusicIds;
+    let total: number;
+
+    if (criteria.filter?.ids && criteria.filter.ids.length > 0) {
+      total = criteria.filter.ids.length;
+      musicIds = criteria.filter.ids.map(
+        id => ( {
+          stringIds: id,
+          objectIds: new Types.ObjectId(id),
+        } ),
+      ).reduce((acc, curr) => {
+        acc.stringIds.push(curr.stringIds);
+        acc.objectIds.push(curr.objectIds);
+
+        return acc;
+      }, {
+        stringIds: [] as string[],
+        objectIds: [] as Types.ObjectId[],
+      } );
+    } else {
+      const { data: docs, total: totalTmp } = await this.musicsSearchService.search(
+        userId,
+        searchQuery,
+        searchOptions,
+      );
+
+      total = totalTmp;
+
+      musicIds = this.extractMusicIds(docs);
+    }
+
     const pipeline = this.buildPipelineWithFilters(userId, criteria, musicIds);
     const aggregationResult = await MusicOdm.Model.aggregate(pipeline) as AggregationResult;
 
