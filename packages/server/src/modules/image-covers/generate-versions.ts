@@ -37,7 +37,7 @@ export async function generateImageVersions(
   await cropToSquare(filePath);
 
   const result: ImageVersionsResult = {
-    original: filePath,
+    original: path.basename(filePath),
   };
   // 2. Obtener nuevas dimensiones (post-recorte) para verificar si redimensionar
   const metadata = await getMetadata(filePath);
