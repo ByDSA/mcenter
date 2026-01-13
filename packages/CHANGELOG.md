@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.27.0](https://github.com/ByDSA/mcenter/compare/v4.26.2...v4.27.0) (2026-01-13)
+
+
+### Features
+
+* image cover in playlist ([5e48707](https://github.com/ByDSA/mcenter/commit/5e48707287f38a715bbe544b61f5d31f4e1d9cf0))
+* playlist list as resource list, and play playlist from list ([cf8d805](https://github.com/ByDSA/mcenter/commit/cf8d805afccc5c903fe797e5e376b50ccd49a999))
+
+
+### Bug Fixes
+
+* **front:** fix some styles ([81ea556](https://github.com/ByDSA/mcenter/commit/81ea556abadfdbebbc8db40fb9ef3cf04e951cc7))
+* minor fixes ([3ff39f9](https://github.com/ByDSA/mcenter/commit/3ff39f922e58ef97a0beb80658003704e81f230a))
+* music debounce requests ([12946dc](https://github.com/ByDSA/mcenter/commit/12946dc9df5f93a2949c32d6a09793fce6ee68c2))
+* remove mediaSession on stops ([1de4cef](https://github.com/ByDSA/mcenter/commit/1de4cef301fcbeb1a75a621e7f7f483a3eccc09d))
+* save only filename instead of full path ([87f984d](https://github.com/ByDSA/mcenter/commit/87f984df7ddaf8279de6eb1ddb1938bba6f33665))
+* slug in music schema in patch request ([0944f78](https://github.com/ByDSA/mcenter/commit/0944f7806e3156c0b8fea2c26dc9f6c4c7316da2))
+
 ### [4.26.2](https://github.com/ByDSA/mcenter/compare/v4.26.1...v4.26.2) (2026-01-10)
 
 
