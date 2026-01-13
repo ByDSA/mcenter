@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
+import { usePathname } from "next/navigation";
+import { PATH_ROUTES } from "$shared/routing";
 import { SetState } from "#modules/utils/resources/useCrud";
 import { ContextMenuItem } from "../../../ui-kit/ContextMenu/ContextMenu";
 import { EditPlaylistContextMenuItem } from "../list/EditMenuItem";
@@ -45,6 +47,7 @@ export const MusicPlaylist = ( { value, setValue }: PlaylistProps) => {
   const totalDuration = 0;
   const totalSongs = useMemo(() => value.list?.length ?? 0, [value.list]);
   const draggable = useMemo(()=>value.ownerUserId === user?.id, [value.ownerUserId]);
+  const pathname = usePathname();
   const handleMoreOptions = (e: React.MouseEvent<HTMLElement>) => {
     openMenu( {
       event: e,
@@ -54,7 +57,9 @@ export const MusicPlaylist = ( { value, setValue }: PlaylistProps) => {
             <EditPlaylistContextMenuItem
               className={styles.contextMenuItem}
               onSuccess={( { previous, current } ) => {
-                if (previous.slug !== current.slug) {
+                if (
+                  pathname.startsWith(PATH_ROUTES.musics.frontend.playlists.slug.path)
+                    && previous.slug !== current.slug) {
                   const userSlug = current.ownerUserPublic?.slug;
 
                   assertIsDefined(userSlug);

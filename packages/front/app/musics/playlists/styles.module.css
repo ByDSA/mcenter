@@ -18,3 +18,7 @@
     width: auto;
   }
 }
+
+.playQueryModal {
+  width: 50rem;
+}

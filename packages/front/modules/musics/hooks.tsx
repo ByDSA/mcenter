@@ -8,6 +8,7 @@ import { MusicEntity, musicEntitySchema } from "./models";
 type GenQueryOptions = {
   expand?: MusicCrudDtos.GetOne.Criteria["expand"];
   debounce?: boolean;
+  hasUser?: boolean;
 };
 
 function genQueryFn(id: string, options?: GenQueryOptions) {
@@ -15,13 +16,13 @@ function genQueryFn(id: string, options?: GenQueryOptions) {
     const api = FetchApi.get(MusicsApi);
 
     if (options?.debounce)
-      return fetchMusicDebounced(id);
+      return fetchMusicDebounced(id, options);
 
     const res = await api.getOneByCriteria( {
       filter: {
         id,
       },
-      expand: ["favorite", "fileInfos", "userInfo", "imageCover"],
+      expand: getExpand(options?.hasUser ?? false),
     } );
 
     return res.data;
@@ -125,7 +126,7 @@ type BatchPromise = {
   reject: (err: any)=> void;
 };
 const batchQueue = new Map<MusicEntity["id"], Array<BatchPromise>>();
-const flushBatch = async () => {
+const flushBatch = async (options?: GenQueryOptions) => {
   const currentBatch = new Map(batchQueue);
 
   batchQueue.clear();
@@ -141,7 +142,7 @@ const flushBatch = async () => {
       filter: {
         ids,
       },
-      expand: ["favorite", "fileInfos", "userInfo", "imageCover"],
+      expand: getExpand(options?.hasUser ?? false),
     } );
 
     currentBatch.forEach((subscribers, id) => {
@@ -163,7 +164,7 @@ const flushBatch = async () => {
     } );
   }
 };
-const fetchMusicDebounced = (id: string): Promise<MusicEntity> => {
+const fetchMusicDebounced = (id: string, options?: GenQueryOptions): Promise<MusicEntity> => {
   return new Promise((resolve, reject) => {
     const existingSubscribers = batchQueue.get(id) || [];
 
@@ -176,6 +177,13 @@ const fetchMusicDebounced = (id: string): Promise<MusicEntity> => {
     if (debounceTimeout)
       clearTimeout(debounceTimeout);
 
-    debounceTimeout = setTimeout(flushBatch, 200); // debounce = 200ms
+    debounceTimeout = setTimeout(()=>flushBatch(options), 200); // debounce = 200ms
   } );
 };
+
+function getExpand(hasUser: boolean) {
+  return [
+    ...(hasUser ? ["favorite", "userInfo"] as any[] : []), "fileInfos",
+    "imageCover",
+  ];
+}

@@ -4,6 +4,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Mutex } from "async-mutex";
 import { withRetries } from "#modules/utils/retries";
 import { ErrorNoConnection } from "#modules/core/errors/custom-errors";
+import { useUser } from "#modules/core/auth/useUser";
 import { RepeatMode, useBrowserPlayer } from "../BrowserPlayerContext";
 import { getUrlSkipHistory } from "./audioUtils";
 import { handleExoticAudio } from "./exotic-audio";
@@ -302,7 +303,11 @@ export const AudioTag = () => {
   useMediaSession(engineRef.current);
   useOnline();
   useAudioEffects(engineRef.current);
-  useHistoryLogger(engineRef.current);
+  const { user } = useUser();
+
+  if (user)
+    useHistoryLogger(engineRef.current);
+
   const { abort: abortPrefetchingFetch, waitForPrefetching } = usePrefetching();
 
   return null;

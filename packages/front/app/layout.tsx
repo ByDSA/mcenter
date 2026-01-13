@@ -37,7 +37,7 @@ const sideData: (user: UserPayload | null)=> MenuItemData[] = (_user)=>[
   {
     icon: <MusicsIcon />,
     label: "Música",
-    path: PATH_ROUTES.musics.frontend.path,
+    path: PATH_ROUTES.musics.frontend.playlists.path,
     matchPath: {
       startsWith: PATH_ROUTES.musics.frontend.path,
     },

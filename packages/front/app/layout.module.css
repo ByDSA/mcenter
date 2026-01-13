@@ -88,6 +88,7 @@ body:has(.content) {
   color: white;
   min-height: calc(100dvh - var(--content-margin-top));
   min-width: calc(100dvw - var(--content-margin-left));
+  position: relative;
 }
 
 @media (width < 600px) {

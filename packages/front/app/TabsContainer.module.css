@@ -1,5 +1,4 @@
 .container {
-  margin-top: var(--topbar-height, 2rem);
   padding-top: var(--tabs-height, 2rem);
 
   .tabs {

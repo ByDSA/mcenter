@@ -234,6 +234,7 @@ token?: string;} ) => {
 
             return url;
           },
+          path: "/musics/playlists/slug",
         },
       },
       history: {

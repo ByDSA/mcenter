@@ -1,24 +1,13 @@
-.modal {
-  width: 50rem;
-}
-
-.container {
-  width: 100%;
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
-  padding: 2rem;
-}
-
 :global(body):has(.container) > div {
   margin-bottom: 0;
 }
 
 body:has(.tabs) {
-  --tabs-height: calc(2rem + 40px + 0.5rem);
+  --searchBar-height: calc(40px + 0.5rem);
+  --tabs-height: calc(2rem + var(--searchBar-height));
 
   &:has(.tabs > main:empty) {
-    --tabs-height: 2rem;
+    --tabs-height: var(--searchBar-height);
   }
 
   .tabs > main:empty {
