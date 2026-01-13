@@ -1,4 +1,4 @@
-import { Fragment, JSX, memo, ReactNode } from "react";
+import { AnchorHTMLAttributes, Fragment, JSX, memo, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ImageCover } from "$shared/models/image-covers";
 import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
@@ -14,8 +14,9 @@ import { Separator } from "./Separator";
 export type OnClickMenu = (e: React.MouseEvent<HTMLElement>)=> void;
 
 export type ResourceEntryProps = {
-  title: string;
-  titleHref?: string;
+  mainTitle: string;
+  mainTitleHref?: string;
+  href?: string;
   subtitle?: ReactNode;
   right?: ReactNode;
   settings?: {
@@ -31,18 +32,18 @@ export type ResourceEntryProps = {
     onClick: (e: React.MouseEvent<HTMLElement>)=> Promise<void> | void;
     status: PlayerStatus;
   };
-  coverUrl?: string;
+  imageCover?: ImageCover | null;
 };
 
 export function ResourceEntry(
-  { title, subtitle, settings, right, favButton, play, drag, coverUrl,
-    titleHref }: ResourceEntryProps,
+  { mainTitle, subtitle, settings, right, favButton, play, drag, imageCover,
+    mainTitleHref, href }: ResourceEntryProps,
 ) {
-  const router = useRouter();
-  const shouldHaveLeftDiv = !!play || coverUrl;
+  const shouldHaveLeftDiv = !!play || imageCover !== undefined;
   const isPlaying = play !== undefined && play.status !== "stopped";
+  const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const TitleTag = titleHref ? "a" : "span";
+  const Tag = href ? "a" : "span";
 
   return <span
     className={classes(
@@ -57,13 +58,7 @@ export function ResourceEntry(
         <MusicImageCover
           className={classes(styles.cover)}
           size="small"
-          cover={coverUrl
-            ? {
-              versions: {
-                original: coverUrl,
-              },
-            } as ImageCover
-            : undefined}
+          cover={imageCover}
         />
         {play && <PlayButtonView
           theme="triangle-white"
@@ -74,20 +69,21 @@ export function ResourceEntry(
         }
       </div>
     )}
-    <span className={classes(styles.main, !shouldHaveLeftDiv && styles.noLeftDiv)}>
-      <TitleTag className={classes(styles.title, "ellipsis")}
-        title={title}
-        href={titleHref}
-        onClick={titleHref
-          ? anchorOnClick( {
-            href: titleHref,
+    <Tag
+      className={classes(styles.main, !shouldHaveLeftDiv && styles.noLeftDiv)}
+      href={href}
+      onClick={href
+        ? (e)=> {
+          anchorOnClick( {
+            href,
             router,
-          } )
-          : undefined}
-      >{title}
-      </TitleTag>
+          } )(e);
+        }
+        : undefined}
+    >
+      <ResourceTitle title={mainTitle} href={mainTitleHref} />
       {subtitle}
-    </span>
+    </Tag>
     <ListEntryRow className={styles.right}>
       {favButton}
       {right && <ListEntryColumn className={classes(styles.small, styles.info)}>
@@ -108,6 +104,7 @@ type ResourceSubtitleProps = {
   className?: string;
   items: ( {
     text: string;
+    customContent?: ReactNode;
     className?: string;
     separatorClassName?: string;
   } | undefined)[];
@@ -135,8 +132,34 @@ export const ResourceSubtitle = memo(( { items, className }: ResourceSubtitlePro
           key={i}
           className={item!.className}
           title={title}
-        >{item!.text}</span>
+        >{item!.customContent ?? item!.text}</span>
       </Fragment>;
     } )}
   </ListEntryRow>;
 } );
+
+type ResourceTitleProps = AnchorHTMLAttributes<HTMLAnchorElement>;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const ResourceTitle = (props: ResourceTitleProps) => {
+  const router = useRouter();
+  const { onClick: onClickProp, href, children, ...otherProps } = props;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const TitleTag = href ? "a" : "span";
+  let onClick: ResourceTitleProps["onClick"];
+
+  if (onClickProp)
+    onClick = onClickProp;
+  else if (href) {
+    onClick = anchorOnClick( {
+      href,
+      router,
+    } );
+  }
+
+  return <TitleTag className={classes(styles.title, "ellipsis")}
+    {...otherProps}
+    href={href}
+    onClick={onClick}
+  >{children ?? props.title ?? "Title"}
+  </TitleTag>;
+};

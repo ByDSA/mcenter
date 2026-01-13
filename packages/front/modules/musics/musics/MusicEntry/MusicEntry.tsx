@@ -42,7 +42,7 @@ export function MusicEntryElement(
     currentResource: s.currentResource,
     status: s.status,
     playMusic: s.playMusic,
-    playPlaylistItem: s.playPlaylistItem,
+    playPlaylistItem: s.playPlaylist,
     playQueueIndex: s.playQueueIndex,
     resume: s.resume,
     pause: s.pause,
@@ -113,12 +113,12 @@ export function MusicEntryElement(
   }
 
   return <ResourceEntry
-    title={music.title}
-    titleHref={PATH_ROUTES.musics.frontend.path + "/" + music.id}
+    mainTitle={music.title}
+    mainTitleHref={PATH_ROUTES.musics.frontend.path + "/" + music.id}
     subtitle={<MusicSubtitle
       music={music}
     />}
-    coverUrl={getSmallCoverUrlFromMusic(music)}
+    imageCover={music.imageCover}
     favButton={ <PlaylistFavButton
       favoritesPlaylistId={favoritesPlaylistId}
       musicId={music.id}

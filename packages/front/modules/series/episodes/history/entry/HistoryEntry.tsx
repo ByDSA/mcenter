@@ -35,7 +35,7 @@ export const EpisodeHistoryEntryElement = React.memo((
   usePublishEpisodeEvent(episode);
 
   return ResourceEntry( {
-    title: episode.title,
+    mainTitle: episode.title,
     subtitle: <EpisodeSubtitle episode={episode} />,
     right: <>
       <HistoryTimeView timestamp={value.date.timestamp} />

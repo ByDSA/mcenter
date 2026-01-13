@@ -1,15 +1,13 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
-import { useRouter } from "next/navigation";
 import { useContextMenuTrigger, ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { useArrayData } from "#modules/utils/array-data-context";
 import { useUser } from "#modules/core/auth/useUser";
-import { frontendUrl } from "#modules/requests";
-import { Separator } from "#modules/resources/Separator";
+import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ResourceEntry";
+import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
 import { PlaylistEntity } from "../Playlist/types";
 import { formatDurationHeader, playlistCopySlugUrl } from "../utils";
-import { SettingsButton } from "../SettingsButton";
-import { MusicImageCover } from "../../MusicCover";
 import { MusicPlaylistEntity } from "../models";
 import styles from "./Item.module.css";
 import { RenamePlaylistContextMenuItem } from "./renameMenuItem";
@@ -30,92 +28,110 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
   const totalSongs = value.list?.length || 0;
   const { openMenu, closeMenu } = useContextMenuTrigger();
   const { user } = useUser();
+
+  assertIsDefined(user);
   const userSlug = value.ownerUserPublic?.slug;
-  const router = useRouter();
 
   assertIsDefined(userSlug);
 
-  return (
-    <a
-      className={styles.playlistContainer}
-      onClick={()=> {
-        router.push(
-          frontendUrl(PATH_ROUTES.musics.frontend.playlists.withParams( {
-            playlistId: value.id,
-          } )),
-        );
-      }}
-    >
-      <MusicImageCover
-        className={styles.playlistCover}
-        title={value.name}
-      />
+  const playerStatus = useBrowserPlayer(s=>s.status);
+  const currentResource = useBrowserPlayer(s=>s.currentResource);
+  let status: PlayerStatus = "stopped";
 
-      <div className={styles.playlistInfo}>
-        <h1 className={styles.playlistTitle} title={value.name}><span>{value.name}</span></h1>
+  if (currentResource?.playlistId === value.id) {
+    if (playerStatus === "playing")
+      status = "playing";
+    else
+      status = "paused";
+  }
 
-        <div className={styles.playlistStats}>
-          <div className={styles.statItem}>
-            <span>{totalSongs} canciones</span>
-          </div>
-          <Separator />
-          <div className={styles.statItem}>
-            <span>{formatDurationHeader(totalDuration)}</span>
-          </div>
-        </div>
-      </div>
-      <div>
-        {<><SettingsButton
-          theme="dark"
-          className={styles.settingsButton}
-          onClick={(e: React.MouseEvent<HTMLElement>)=>openMenu( {
-            event: e,
-            className: styles.contextMenu,
-            content: <>
-              <ContextMenuItem
-                label="Copiar enlace"
-                onClick={async () => {
-                  assertIsDefined(value.ownerUserPublic);
-                  await playlistCopySlugUrl( {
-                    userSlug: value.ownerUserPublic.slug,
-                    playlistSlug: value.slug,
-                    token: user?.id,
-                  } );
-                }}
-              />
-              {user?.id === value.ownerUserId && <><RenamePlaylistContextMenuItem
-                value={value}
-                setValue={(newPlaylist: PlaylistEntity) => {
-                  // Para optimistic case
-                  const i = data?.findIndex((d) => d.id === newPlaylist.id);
+  const isPublic = value.visibility === "public";
+  const isUserOwner = value.ownerUserId === user.id;
 
-                  if (i === undefined || i === -1)
-                    return;
+  return <ResourceEntry
+    mainTitle={value.name}
+    href={PATH_ROUTES.musics.frontend.playlists.withParams( {
+      playlistId: value.id,
+    } )}
+    settings={{
+      onClick: (e: React.MouseEvent<HTMLElement>)=>openMenu( {
+        event: e,
+        className: styles.contextMenu,
+        content: <>
+          <ContextMenuItem
+            label="Copiar enlace"
+            onClick={async () => {
+              assertIsDefined(value.ownerUserPublic);
+              await playlistCopySlugUrl( {
+                userSlug: value.ownerUserPublic.slug,
+                playlistSlug: value.slug,
+                token: user.id,
+              } );
+            }}
+          />
+          {isUserOwner && <><RenamePlaylistContextMenuItem
+            value={value}
+            setValue={(newPlaylist: PlaylistEntity) => {
+            // Para optimistic case
+              const i = data?.findIndex((d) => d.id === newPlaylist.id);
 
-                  setItemByIndex(i, v=>{
-                    if (v) {
-                      return {
-                        ...v,
-                        name: newPlaylist.name,
-                        slug: newPlaylist.slug,
-                      };
-                    }
-                  } );
-                }}
-              />
-              <DeletePlaylistContextMenuItem
-                value={value}
-                onOpen={() => closeMenu()}
-                onActionSuccess={() => removeItemByIndex(index)}
-                getValue={() => data[index]}
-              />
-              </>
-              }
-            </>,
-          } )}
-        />
-        </>}
-      </div>
-    </a>
-  );
+              if (i === undefined || i === -1)
+                return;
+
+              setItemByIndex(i, v=>{
+                if (v) {
+                  return {
+                    ...v,
+                    name: newPlaylist.name,
+                    slug: newPlaylist.slug,
+                  };
+                }
+              } );
+            }}
+          />
+          <DeletePlaylistContextMenuItem
+            value={value}
+            onOpen={() => closeMenu()}
+            onActionSuccess={() => removeItemByIndex(index)}
+            getValue={() => data[index]}
+          />
+          </>
+          }
+        </>,
+      } ),
+    }}
+
+    subtitle={<ResourceSubtitle items={[{
+      text: `${totalSongs} canciones`,
+    }, {
+      text: formatDurationHeader(totalDuration),
+    }, {
+      text: isPublic ? "Lista pública" : "Lista privada",
+      customContent: <VisibilityTag isPublic={isPublic} className={styles.visibility}/>,
+    },
+    ...(isPublic && !isUserOwner
+      ? [{
+        text: value.ownerUserPublic?.publicName ?? "AA",
+      }]
+      : [] as any),
+    ]}
+    />}
+    imageCover={null}
+    play={{
+      onClick: async ()=> {
+        if (status === "stopped") {
+          const { playPlaylist } = useBrowserPlayer.getState();
+
+          await playPlaylist( {
+            playlist: value,
+            ownerSlug: value.ownerUser?.slug,
+          } );
+        } else if (status === "playing")
+          useBrowserPlayer.getState().pause();
+        else if (status === "paused")
+          useBrowserPlayer.getState().resume();
+      },
+      status,
+    }}
+  />;
 };

@@ -1,10 +1,11 @@
-import { CalendarToday, Public, PublicOff } from "@mui/icons-material";
+import { CalendarToday } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { ResourcePlayButtonView } from "#modules/resources/PlayButton";
 import { Separator } from "#modules/resources/Separator";
+import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
 import { formatDurationHeader } from "../../utils";
 import styles from "../Playlist.module.css";
 import { SettingsButton } from "../../SettingsButton";
@@ -49,10 +50,10 @@ export const PlaylistHeader = ( { value,
                 <span>{formatDurationHeader(totalDuration)}</span>
               </div>
               <Separator />
-              <span
-                className={classes(styles.statItem, styles.visibility)}
-                title={value.visibility === "public" ? "Playlist pública" : "Playlist privada"}
-              >{value.visibility === "public" ? <Public /> : <PublicOff /> }</span>
+              <VisibilityTag
+                isPublic={value.visibility === "public"}
+                className={styles.statItem}
+              />
             </div>
             <div className={styles.row}>
               <div

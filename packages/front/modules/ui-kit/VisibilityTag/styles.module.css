@@ -1,0 +1,10 @@
+.visibility {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.wrap {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 0.25rem;
+}

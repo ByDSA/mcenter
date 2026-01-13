@@ -91,11 +91,6 @@
   }
 }
 
-.visibility {
-  display: flex;
-  flex-flow: row wrap;
-}
-
 .playlistControls {
   display: flex;
   align-items: center;

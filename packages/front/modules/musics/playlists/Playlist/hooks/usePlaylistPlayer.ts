@@ -27,7 +27,7 @@ export const usePlaylistPlayer = (value: MusicPlaylistEntity) => {
     const player = useBrowserPlayer.getState();
 
     if (playlistStatus === "stopped") {
-      await player.playPlaylistItem( {
+      await player.playPlaylist( {
         playlist: value,
         index: 0,
         ownerSlug: value.ownerUser?.slug,

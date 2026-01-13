@@ -25,9 +25,9 @@ type PlayProps = {
   resource: PlaylistQueueItem;
 };
 
-type PlayPlaylistItemProps = {
+type PlayPlaylistProps = {
   playlist: MusicPlaylistEntity;
-  index: number;
+  index?: number;
   ownerSlug?: string;
 };
 
@@ -101,7 +101,7 @@ interface PlayerState {
   setNextResource: (newValue: NextResource | null)=> void;
   play: (props: PlayProps)=> void;
   playMusic: (musicId: MusicEntity["id"], props?: PlayMusicProps)=> Promise<void>;
-  playPlaylistItem: (props: PlayPlaylistItemProps)=> Promise<void>;
+  playPlaylist: (props: PlayPlaylistProps)=> Promise<void>;
   playQueueIndex: (index: number)=> Promise<void>;
   playQuery: (q: string)=> Promise<void>;
   pause: ()=> void;
@@ -209,41 +209,36 @@ export const useBrowserPlayer = create<PlayerState>()(
         } );
       },
 
-      playPlaylistItem: async (props) => {
-        const { playlist, index, ownerSlug } = props;
-        const currentItem = playlist.list[index];
-        const resource: PlaylistQueueItem = {
-          itemId: currentItem.id,
-          playlistId: playlist.id,
-          resourceId: currentItem.musicId,
-          type: "music",
-        };
-        const { currentResource, setCurrentTime } = get();
-        const isSameAsLatest = currentResource
-        && currentResource.resourceId === resource.resourceId;
-
-        if (isSameAsLatest) {
-          setCurrentTime(0, {
-            shouldUpdateAudioElement: true,
-          } );
-        }
+      playPlaylist: async (props) => {
+        const { playlist, index: propsIndex, ownerSlug } = props;
+        const query = ownerSlug
+          ? `playlist:@${ownerSlug}/${playlist.slug}`
+          : `playlist:${playlist.slug}`;
 
         set( {
-          ...(isSameAsLatest
-            ? {}
-            : {
-              duration: (await useMusic.get(currentItem.musicId))
-                ?.fileInfos?.[0]?.mediaInfo.duration
-               ?? undefined,
-            } ),
-          currentResource: resource,
-          status: "playing",
           queue: playlistToQueue(playlist),
-          query: ownerSlug
-            ? `playlist:@${ownerSlug}/${playlist.slug}`
-            : `playlist:${playlist.slug}`,
-          queueIndex: index,
+          query,
+          queueIndex: Infinity,
         } );
+        const isShufle = get().isShuffle;
+        let index = isShufle ? propsIndex : 0;
+
+        if (index === undefined) {
+          const nextAction = await get().getNext();
+
+          if (!nextAction) {
+            get().stop();
+
+            return;
+          }
+
+          if (nextAction.type === "INDEX")
+            index = nextAction.payload;
+          else
+            index = playlist.list.findIndex(e=>e.musicId === nextAction.payload.id);
+        }
+
+        return get().playQueueIndex(index);
       },
       playQuery: async (q: string) => {
         let music: MusicEntity | null = null;
@@ -357,63 +352,17 @@ export const useBrowserPlayer = create<PlayerState>()(
         return "one";
       },
       getNext: async () => {
-        const { queueIndex, queue, repeatMode, isShuffle, query } = get();
-        const playingType = get().getPlayingType();
+        const { queueIndex, queue, repeatMode, isShuffle, query, getPlayingType } = get();
+        const playingType = getPlayingType();
 
-        // 1. LÓGICA DE ORDEN SECUENCIAL
-        if ((!isShuffle && (playingType === "playlist" || playingType === "one"))
-      || (playingType === "query" && queueIndex < queue.length - 1)) {
-          let newIndex = queueIndex + 1;
-
-          if (newIndex >= queue.length) {
-            if (repeatMode === RepeatMode.All) {
-              return {
-                type: "INDEX",
-                payload: 0,
-              };
-            }
-
-            return null; // No hay más canciones
-          }
-
-          return {
-            type: "INDEX",
-            payload: newIndex,
-          };
-        }
-
-        // 2. LÓGICA DE SHUFFLE / DISCOVERY (CON API)
-        if (playingType === "playlist" || playingType === "query") {
-          assert(!!query);
-          const music = await withRetries(() => fetchQueryMusic(query), {
-            retries: 3,
-          } );
-
-          if (!music)
-            return null;
-
-          if (playingType === "playlist") {
-            const index = queue.findIndex(item => item.resourceId === music.id);
-
-            // Si está en la cola, devolvemos el índice, si no, fallback a random offline
-            return {
-              type: "INDEX",
-              payload: index !== -1 ? index : getOfflineRandomIndex(get),
-            };
-          }
-
-          // Si es tipo query, devolvemos el objeto de música para agregarlo
-          return {
-            type: "NEW_MUSIC",
-            payload: music,
-          };
-        }
-
-        // 3. CASO DEFAULT (One con shuffle o fallbacks)
-        return {
-          type: "INDEX",
-          payload: getOfflineRandomIndex(get),
-        };
+        return await getNextByParams( {
+          queueIndex,
+          queue,
+          repeatMode,
+          isShuffle,
+          query,
+          playingType,
+        } );
       },
       next: async () => {
         const { getNext, nextResource, queue } = get();
@@ -574,14 +523,90 @@ async function fetchQueryMusic(q: string) {
   if (data === null)
     return null;
 
-  useMusic.updateCacheWithMerging(data.id, data);
+  // Para que tenga todos los campos (favorites, imageCover...) que no trae el pickRandom:
+  await useMusic.fetch(data.id);
 
   return data;
 }
 
-const getOfflineRandomIndex = (get) => {
-  const { queue, queueIndex } = get();
-  const normalRandomIndex = getRandomExcludePrevious(queue.length - 1, queueIndex);
+const getOfflineRandomIndex = ( { queueLength, queueIndex }: {queueLength: number;
+queueIndex: number;} ) => {
+  const normalRandomIndex = getRandomExcludePrevious(queueLength - 1, queueIndex);
 
   return normalRandomIndex;
 };
+
+type GetNextProps = {
+  queueIndex: number;
+  queue: PlaylistQueueItem[];
+  repeatMode: RepeatMode;
+  isShuffle: boolean;
+  query?: string;
+  playingType: "one" | "playlist" | "query";
+};
+export async function getNextByParams(props: GetNextProps): Promise<NextAction | null> {
+  const { queueIndex, queue, repeatMode, isShuffle, query, playingType } = props;
+
+  // 1.async  LÓGICA DE ORDEN SECUENCIAL
+  if ((!isShuffle && (playingType === "playlist" || playingType === "one"))
+      || (playingType === "query" && queueIndex < queue.length - 1)) {
+    let newIndex = queueIndex + 1;
+
+    if (newIndex >= queue.length) {
+      if (repeatMode === RepeatMode.All) {
+        return {
+          type: "INDEX",
+          payload: 0,
+        };
+      }
+
+      return null; // No hay más canciones
+    }
+
+    return {
+      type: "INDEX",
+      payload: newIndex,
+    };
+  }
+
+  // 2. LÓGICA DE SHUFFLE / DISCOVERY (CON API)
+  if (playingType === "playlist" || playingType === "query") {
+    assert(!!query);
+    const music = await withRetries(() => fetchQueryMusic(query), {
+      retries: 3,
+    } );
+
+    if (!music)
+      return null;
+
+    if (playingType === "playlist") {
+      const index = queue.findIndex(item => item.resourceId === music.id);
+
+      // Si está en la cola, devolvemos el índice, si no, fallback a random offline
+      return {
+        type: "INDEX",
+        payload: index !== -1
+          ? index
+          : getOfflineRandomIndex( {
+            queueLength: queue.length,
+            queueIndex,
+          } ),
+      };
+    }
+
+    // Si es tipo query, devolvemos el objeto de música para agregarlo
+    return {
+      type: "NEW_MUSIC",
+      payload: music,
+    };
+  }
+
+  // 3. CASO DEFAULT (One con shuffle o fallbacks)
+  return {
+    type: "INDEX",
+    payload: getOfflineRandomIndex( {
+      queueLength: queue.length,
+      queueIndex,
+    } ),
+  };
+}

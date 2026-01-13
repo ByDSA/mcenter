@@ -69,7 +69,7 @@ export function useMusicPlaylists() {
     setItem, observerTarget, setData } = useCrudDataWithScroll( {
     initialFetch: async () => {
       const result = await api.getManyByUserCriteria(userId, {
-        limit: 10,
+        limit: 12,
       } );
 
       return result.data;
@@ -77,7 +77,7 @@ export function useMusicPlaylists() {
     fetchingMore: {
       fn: async (d) => {
         const result = await api.getManyByUserCriteria(userId, {
-          limit: 5,
+          limit: 10,
           offset: d?.length ?? 0,
         } );
 
