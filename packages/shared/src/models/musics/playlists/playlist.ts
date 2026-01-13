@@ -1,4 +1,5 @@
 import z from "zod";
+import { imageCoverEntitySchema } from "../../../models/image-covers";
 import { slugSchema } from "../../utils/schemas/slug";
 import { dateSchema } from "../../utils/schemas/timestamps/date";
 import { userEntitySchema, userPublicSchema } from "../../auth";
@@ -24,6 +25,7 @@ const modelSchema = z.object( {
   slug: slugSchema,
   ownerUserId: mongoDbId,
   visibility: z.enum(["public", "private"]),
+  imageCoverId: mongoDbId.nullable().optional(),
 } ).merge(autoTimestampsSchema);
 
 type Model = z.infer<typeof modelSchema>;
@@ -32,6 +34,7 @@ const entitySchema = modelSchema.extend( {
   ownerUser: userEntitySchema.optional(),
   ownerUserPublic: userPublicSchema.optional(),
   list: z.array(entryEntitySchema),
+  imageCover: imageCoverEntitySchema.optional(),
 } );
 
 type Entity = z.infer<typeof entitySchema>;

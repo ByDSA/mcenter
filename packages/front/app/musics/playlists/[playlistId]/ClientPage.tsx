@@ -38,15 +38,13 @@ export function ClientPage( { params }: PageProps) {
 
       if ("userSlug" in p) {
         const { userSlug, playlistSlug } = p;
-        const response = await api.getOneByUserAndSlug(
-          {
-            playlistSlug,
-            userSlug,
+        const response = await api.getOneByCriteria( {
+          filter: {
+            slug: playlistSlug,
+            ownerUserSlug: userSlug,
           },
-          {
-            silentErrors: true,
-          },
-        );
+          expand: ["ownerUserPublic", "imageCover"],
+        } );
 
         d = response.data as MusicPlaylistEntity;
 
@@ -60,7 +58,7 @@ export function ClientPage( { params }: PageProps) {
           filter: {
             id: p.playlistId,
           },
-          expand: ["ownerUserPublic"],
+          expand: ["ownerUserPublic", "imageCover"],
         } );
 
         d = response.data as MusicPlaylistEntity;
@@ -78,7 +76,7 @@ export function ClientPage( { params }: PageProps) {
             }
             : undefined,
         } )),
-      } as MusicPlaylistEntity;
+      };
     }}>
     <MusicPlaylist value={data!} setValue={setData}/>
   </AsyncLoader>;

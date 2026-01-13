@@ -33,6 +33,7 @@ export const PlaylistHeader = ( { value,
         <MusicImageCover
           title={value.name}
           className={styles.playlistCover}
+          cover={value.imageCover}
         />
 
         <div className={styles.playlistInfo}>

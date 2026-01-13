@@ -3,7 +3,7 @@
 // music-pipeline-utils.ts
 import { PipelineStage, Types } from "mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
-import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { enrichImageCover } from "#modules/image-covers/repositories/odm/utils";
 import { MusicsUsersOdm } from "../../user-info/odm";
 
 // Ajusta el path según tu estructura
@@ -111,33 +111,14 @@ export function enrichSingleMusic( { localMusicIdField,
   }
 
   if (flags.includeImageCover) {
-    const fieldPath = isRoot ? "imageCoverId" : `${targetField}.imageCoverId`;
-    const targetPath = isRoot ? "imageCover" : `${targetField}.imageCover`;
+    // Calculamos los paths relativos o absolutos según si es root o nested
+    const sourceIdPath = isRoot ? "imageCoverId" : `${targetField}.imageCoverId`;
+    const destinationPath = isRoot ? "imageCover" : `${targetField}.imageCover`;
 
-    pipeline.push(
-      {
-        $lookup: {
-          from: ImageCoverOdm.COLLECTION_NAME,
-          localField: fieldPath,
-          foreignField: "_id",
-          as: "temp_imageCover",
-        },
-      },
-      {
-        $unwind: {
-          path: "$temp_imageCover",
-          preserveNullAndEmptyArrays: true, // Importante por si la canción no tiene cover
-        },
-      },
-      {
-        $addFields: {
-          [targetPath]: "$temp_imageCover", // Lo movemos a su sitio final (ej: music.imageCover)
-        },
-      },
-      {
-        $unset: "temp_imageCover", // Limpiamos el temporal
-      },
-    );
+    pipeline.push(...enrichImageCover( {
+      imageCoverIdField: sourceIdPath,
+      imageCoverField: destinationPath,
+    } ));
   }
 
   // 3. Favorites (Lógica compleja de User -> Playlist -> isFound)

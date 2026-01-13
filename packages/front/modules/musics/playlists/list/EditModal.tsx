@@ -1,25 +1,25 @@
-import type { PlaylistEntity } from "../Playlist/types";
 import type { MusicPlaylistEntity } from "../models";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "#modules/ui-kit/input/Button";
 import { useInputText } from "#modules/ui-kit/input/UseInputText";
 import { useFormInModal } from "#modules/ui-kit/modal/useFormModal";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
+import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
 import { MusicPlaylistsApi } from "../requests";
-import styles from "./RenameModal.module.css";
+import styles from "./EditModal.module.css";
 
-type RenameFormProps = {
+type Props = {
   initialValue: MusicPlaylistEntity;
   onSuccess?: (data: { previous: MusicPlaylistEntity;
 current: MusicPlaylistEntity; } )=> void;
-  updateLocalValue: (value: PlaylistEntity)=> void;
+  updateLocalValue: (value: MusicPlaylistEntity)=> void;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const RenamePlaylistForm = ( { initialValue,
+export const EditPlaylistForm = ( { initialValue,
   onSuccess,
-  updateLocalValue }: RenameFormProps) => {
+  updateLocalValue }: Props) => {
   const { element: inputName, value: nameValue, ref: nameRef } = useInputText( {
     defaultValue: initialValue.name,
     nullChecked: false,
@@ -30,9 +30,11 @@ export const RenamePlaylistForm = ( { initialValue,
     nullChecked: false,
     onPressEnter: () => form.submit(),
   } );
+  const [currentImageCover, setCurrentImageCover] = useState(initialValue.imageCover ?? null);
   const body = useMemo(() => {
     const changes: { name?: string;
-slug?: string; } = {};
+slug?: string;
+imageCoverId?: string | null; } = {};
 
     if (nameValue.trim() !== initialValue.name)
       changes.name = nameValue.trim();
@@ -40,12 +42,18 @@ slug?: string; } = {};
     if (slugValue.trim() !== initialValue.slug)
       changes.slug = slugValue.trim();
 
+    if (currentImageCover?.id !== initialValue.imageCoverId)
+      changes.imageCoverId = currentImageCover?.id ?? null;
+
     return changes;
-  }, [nameValue, slugValue, initialValue]);
+  }, [nameValue, slugValue, initialValue, currentImageCover]);
   const form = useFormInModal( {
-    canSubmit: () => Object.keys(body).length > 0 && nameValue.trim().length > 0,
+    canSubmit: () => Object.keys(body).length > 0
+    && nameValue.trim().length > 0
+    && slugValue.trim().length > 0,
     onSuccess: (newData) => {
       updateLocalValue(newData);
+
       onSuccess?.( {
         previous: initialValue,
         current: newData,
@@ -53,9 +61,18 @@ slug?: string; } = {};
     },
     onSubmit: async () => {
       const api = FetchApi.get(MusicPlaylistsApi);
-      const res = await api.patchOne(initialValue.id, body);
 
-      return res.data as PlaylistEntity;
+      await api.patchOne(initialValue.id, body);
+
+      // Para que devuelva el imageCover:
+      const res = await api.getOneByCriteria( {
+        filter: {
+          id: initialValue.id,
+        },
+        expand: ["imageCover", "ownerUserPublic"],
+      } );
+
+      return res.data as MusicPlaylistEntity;
     },
   } );
 
@@ -82,13 +99,22 @@ slug?: string; } = {};
         <p>Url slug:</p>
         {inputSlug}
       </section>
+      <section>
+        <p>Imagen:</p>
+        <ImageCoverSelectorButton
+          onSelect={(imageCover) => {
+            setCurrentImageCover(imageCover);
+          }}
+          current={currentImageCover}
+        />
+      </section>
       <footer>
         <Button
           theme="white"
           onClick={form.submit}
           disabled={!form.canSubmit}
         >
-          Renombrar
+          Editar
         </Button>
       </footer>
     </>
@@ -106,15 +132,15 @@ type OpenModalArgs = {
   onClose?: ()=> Promise<void> | void;
 };
 
-export function useRenamePlaylistModal(props: HookProps = {} ) {
+export function useEditPlaylistModal(props: HookProps = {} ) {
   const { openModal: _openModal, ...usingModal } = useModal();
   const openModal = ( { value, setValue, onClose }: OpenModalArgs) => {
     return _openModal( {
-      title: "Renombrar",
-      className: styles.renameModal,
+      title: "Editar",
+      className: styles.modal,
       onClose: onClose,
       content: (
-        <RenamePlaylistForm
+        <EditPlaylistForm
           initialValue={value}
           updateLocalValue={setValue}
           onSuccess={async (v)=>{

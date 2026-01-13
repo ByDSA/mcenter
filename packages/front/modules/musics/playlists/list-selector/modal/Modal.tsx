@@ -6,15 +6,15 @@ import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { Button } from "#modules/ui-kit/input/Button";
 import { classes } from "#modules/utils/styles";
 import { useNewPlaylistButton } from "../../NewPlaylistButton";
-import { PlaylistEntity } from "../../Playlist/types";
 import { useMusicPlaylistsForUser } from "../../request-all";
+import { MusicPlaylistEntity } from "../../models";
 import styles from "./Modal.module.css";
 
 type OpenModalProps = Omit<
   Partial<NonNullable<Parameters<ReturnType<typeof useModal>["openModal"]>[0]>>,
   "staticContent"
 > & {
-  onSelect: (playlist: PlaylistEntity | null)=> Promise<void>;
+  onSelect: (playlist: MusicPlaylistEntity | null)=> Promise<void>;
 };
 type Props = {
   closeOnSelect?: boolean;
@@ -57,7 +57,7 @@ export function usePlaylistSelectorModal(props?: Props) {
 
 type AddToPlaylistContentProps = {
   userId: string;
-  onSelect: (playlist: PlaylistEntity | null)=> void;
+  onSelect: (playlist: MusicPlaylistEntity | null)=> void;
   nullable?: boolean;
 };
 function AddToPlaylistModalContent( { userId, onSelect, nullable }: AddToPlaylistContentProps) {

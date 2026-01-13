@@ -418,7 +418,7 @@ addedAt: Date; }>;
       ...criteria,
       filter: {
         ...criteria?.filter,
-        musicSlug: slug,
+        slug,
         ownerUserId,
         ownerUserSlug,
         requestUserId, // Para cuando se expande con favorites

@@ -95,11 +95,12 @@ class PatchBody extends createZodDto(
   musicPlaylistSchema.pick( {
     name: true,
     slug: true,
+    imageCoverId: true,
   } ).partial()
     .refine(
-      data => data.name !== undefined || data.slug !== undefined,
+      data => data.name !== undefined || data.slug !== undefined || data.imageCoverId !== undefined,
       {
-        message: "Debe incluir al menos 'name' o 'slug'.",
+        message: "Debe incluir al menos name, slug o imageCoverId.",
       },
     ),
 ) {}

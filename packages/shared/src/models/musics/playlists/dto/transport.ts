@@ -9,13 +9,13 @@ import { slugSchema } from "../../../utils/schemas/slug";
 const criteriaConfig = {
   filterShape: {
     id: mongoDbId.optional(),
-    musicSlug: slugSchema.optional(),
+    slug: slugSchema.optional(),
     ownerUserId: mongoDbId.optional(),
     ownerUserSlug: slugSchema.optional(),
     requestUserId: mongoDbId.optional(),
   },
   sortKeys: ["added", "updated"] as const,
-  expandKeys: ["musics", "musicsFavorite", "ownerUserPublic"] as const,
+  expandKeys: ["musics", "musicsFavorite", "ownerUserPublic", "imageCover"] as const,
 };
 
 export namespace MusicPlaylistCrudDtos {

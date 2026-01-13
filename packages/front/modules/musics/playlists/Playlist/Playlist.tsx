@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
 import { SetState } from "#modules/utils/resources/useCrud";
 import { ContextMenuItem } from "../../../ui-kit/ContextMenu/ContextMenu";
-import { RenamePlaylistContextMenuItem } from "../list/renameMenuItem";
+import { EditPlaylistContextMenuItem } from "../list/EditMenuItem";
 import { DeletePlaylistContextMenuItem } from "../list/deleteItem";
 import { MusicPlaylistEntity } from "../models";
 import { usePlaylistPlayer } from "./hooks/usePlaylistPlayer";
@@ -32,6 +32,7 @@ export const MusicPlaylist = ( { value, setValue }: PlaylistProps) => {
     copyLink,
     navigateToRenamed,
     handleDeleteSuccess } = usePlaylistMenu(value);
+    // TODO: duration
   // const musicIds = value.list.map(e=>e.musicId);
   // const usingMusics = useMusics(musicIds);
   // const totalDuration = useMemo(
@@ -50,7 +51,7 @@ export const MusicPlaylist = ( { value, setValue }: PlaylistProps) => {
       content: (
         <>
           {user?.id === value.ownerUserId && (
-            <RenamePlaylistContextMenuItem
+            <EditPlaylistContextMenuItem
               className={styles.contextMenuItem}
               onSuccess={( { previous, current } ) => {
                 if (previous.slug !== current.slug) {
@@ -66,6 +67,8 @@ export const MusicPlaylist = ( { value, setValue }: PlaylistProps) => {
                   ...value,
                   name: v.name,
                   slug: v.slug,
+                  imageCoverId: v.imageCoverId,
+                  imageCover: v.imageCover,
                 } );
               }}
             />

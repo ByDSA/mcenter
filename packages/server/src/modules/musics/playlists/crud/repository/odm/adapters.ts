@@ -4,6 +4,7 @@ import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues
 import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
+import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
 import { MusicPlaylist, MusicPlaylistEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
@@ -69,6 +70,8 @@ export function fullDocOdmToEntity(docOdm: FullDocOdm): Entity {
     createdAt: docOdm.createdAt,
     updatedAt: docOdm.updatedAt,
     visibility: docOdm.visibility,
+    imageCoverId: docOdm.imageCoverId ? docOdm.imageCoverId.toString() : null,
+    imageCover: docOdm.imageCover ? ImageCoverOdm.toEntity(docOdm.imageCover) : undefined,
   } satisfies AllKeysOf<Entity>;
 
   return entity;
@@ -78,6 +81,7 @@ export function modelToDocOdm(model: Model): DocOdm {
   const docOdm: DocOdm = {
     ...commonModelToDocOdm(model),
     list: model.list.map(entryModelToDocOdm),
+    imageCoverId: model.imageCoverId ? new Types.ObjectId(model.imageCoverId) : null,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(docOdm);
@@ -89,6 +93,13 @@ export function partialModelToUpdateQuery(model: Partial<Entity>): MongoUpdateQu
     slug: model.slug,
     list: model.list?.map(entryModelToDocOdm),
   };
+
+  if (model.imageCoverId !== undefined) {
+    if (model.imageCoverId === null)
+      ret.imageCoverId = null;
+    else
+      ret.imageCoverId = new Types.ObjectId(model.imageCoverId);
+  }
 
   return removeUndefinedDeep(ret);
 }

@@ -7,7 +7,6 @@ import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { SetState } from "#modules/utils/resources/useCrud";
 import { MusicPlaylistsApi } from "../../requests";
-import { PlaylistEntity } from "../types";
 import { MusicPlaylistEntity } from "../../models";
 
 export const usePlaylistDragAndDrop = (
@@ -88,7 +87,7 @@ newIndex: number; }[]>([]);
 
       // Aseguramos el tipo antes de setear
       if (res.data[0])
-        setValue(res.data[0] as PlaylistEntity);
+        setValue(res.data[0]);
     }
   };
   const itemIds = useMemo(() => value.list.map((item) => item.id), [value.list]);

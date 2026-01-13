@@ -6,11 +6,10 @@ import { useUser } from "#modules/core/auth/useUser";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ResourceEntry";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
-import { PlaylistEntity } from "../Playlist/types";
 import { formatDurationHeader, playlistCopySlugUrl } from "../utils";
 import { MusicPlaylistEntity } from "../models";
 import styles from "./Item.module.css";
-import { RenamePlaylistContextMenuItem } from "./renameMenuItem";
+import { EditPlaylistContextMenuItem } from "./EditMenuItem";
 import { DeletePlaylistContextMenuItem } from "./deleteItem";
 
 interface PlaylistProps {
@@ -20,7 +19,7 @@ interface PlaylistProps {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
-  const { removeItemByIndex, data, setItemByIndex } = useArrayData<PlaylistEntity>();
+  const { removeItemByIndex, data, setItemByIndex } = useArrayData<MusicPlaylistEntity>();
   const totalDuration = value.list?.reduce(
     (acc, item) => acc + (item.music?.fileInfos?.[0].mediaInfo.duration ?? 0),
     0,
@@ -69,9 +68,9 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
               } );
             }}
           />
-          {isUserOwner && <><RenamePlaylistContextMenuItem
+          {isUserOwner && <><EditPlaylistContextMenuItem
             value={value}
-            setValue={(newPlaylist: PlaylistEntity) => {
+            setValue={(newPlaylist: MusicPlaylistEntity) => {
             // Para optimistic case
               const i = data?.findIndex((d) => d.id === newPlaylist.id);
 
@@ -84,6 +83,8 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
                     ...v,
                     name: newPlaylist.name,
                     slug: newPlaylist.slug,
+                    imageCoverId: newPlaylist.imageCoverId,
+                    imageCover: newPlaylist.imageCover,
                   };
                 }
               } );
@@ -111,12 +112,12 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
     },
     ...(isPublic && !isUserOwner
       ? [{
-        text: value.ownerUserPublic?.publicName ?? "AA",
+        text: value.ownerUserPublic?.publicName ?? "(User)",
       }]
       : [] as any),
     ]}
     />}
-    imageCover={null}
+    imageCover={value.imageCover}
     play={{
       onClick: async ()=> {
         if (status === "stopped") {

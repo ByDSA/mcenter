@@ -1,4 +1,3 @@
-import type { PlaylistEntity } from "../Playlist/types";
 import { Fragment } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
 import { renderFetchedData } from "#modules/fetching";
@@ -7,6 +6,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceList } from "#modules/resources/ResourceList";
 import { MusicPlaylistsApi } from "../requests";
+import { MusicPlaylistEntity } from "../models";
 import { MusicPlaylistListItem } from "./Item";
 import styles from "./List.module.css";
 
@@ -35,7 +35,7 @@ export function MusicPlayListsList(
             (playlist, i) => <Fragment key={playlist.id}>
               <MusicPlaylistListItem
                 index={i}
-                value={playlist as PlaylistEntity}
+                value={playlist}
               />
             </Fragment>,
           )
@@ -70,6 +70,7 @@ export function useMusicPlaylists() {
     initialFetch: async () => {
       const result = await api.getManyByUserCriteria(userId, {
         limit: 12,
+        expand: ["imageCover", "ownerUserPublic"],
       } );
 
       return result.data;
@@ -79,6 +80,7 @@ export function useMusicPlaylists() {
         const result = await api.getManyByUserCriteria(userId, {
           limit: 10,
           offset: d?.length ?? 0,
+          expand: ["imageCover", "ownerUserPublic"],
         } );
 
         return result.data;
@@ -103,7 +105,7 @@ export function useMusicPlaylists() {
         return newData;
       } );
     },
-    addItem: (newItem: PlaylistEntity) => {
+    addItem: (newItem: MusicPlaylistEntity) => {
       setData((oldData) => {
         if (!oldData)
           return [newItem];
