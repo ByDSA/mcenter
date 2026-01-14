@@ -29,6 +29,7 @@ body:has(.button) {
   border-radius: 0.7rem;
   font-size: 0.9rem;
   padding: 0.5rem 0.75rem;
+  height: fit-content;
   font-weight: 600;
   cursor: pointer;
   display: flex;

@@ -5,6 +5,7 @@ import { useInputText } from "#modules/ui-kit/input/UseInputText";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useFormInModal } from "#modules/ui-kit/modal/useFormModal";
 import { MusicPlaylistsApi } from "./requests";
+import styles from "./NewPlaylistButton.module.css";
 
 type ButtonProps = {
   onClick: ()=> void;
@@ -15,7 +16,7 @@ const NewPlaylistButton = ( { onClick, theme }: ButtonProps) => {
   return <Button
     theme={theme}
     onClick={onClick}
-    left={<Add />}>
+    left={<span className={styles.left}><Add /></span>}>
     Nueva lista
   </Button>;
 };

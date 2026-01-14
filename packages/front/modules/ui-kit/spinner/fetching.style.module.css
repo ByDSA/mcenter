@@ -16,24 +16,15 @@
   display: inline-flex;
 }
 
-/* full page. Ej: MusicList */
-main:has(> .loading) {
-  min-height: inherit;
-  position: relative;
+.loading {
   width: 100%;
-  min-height: calc(100dvh - var(--content-margin-top));
+  height: 100%;
+
+  display: flex;
   justify-content: center;
   align-items: center;
 
-  .loading {
-    position: absolute;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    /* Variables */
-    --spinner-size: 5rem;
-    --spinner-width: 0.4rem;
-  }
+  /* Variables */
+  --spinner-size: 5rem;
+  --spinner-width: 0.4rem;
 }
