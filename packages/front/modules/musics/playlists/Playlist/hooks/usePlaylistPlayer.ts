@@ -29,7 +29,6 @@ export const usePlaylistPlayer = (value: MusicPlaylistEntity) => {
     if (playlistStatus === "stopped") {
       await player.playPlaylist( {
         playlist: value,
-        index: 0,
         ownerSlug: value.ownerUser?.slug,
       } );
     } else if (playlistStatus === "paused")

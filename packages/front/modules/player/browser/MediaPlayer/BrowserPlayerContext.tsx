@@ -221,21 +221,25 @@ export const useBrowserPlayer = create<PlayerState>()(
           queueIndex: Infinity,
         } );
         const isShufle = get().isShuffle;
-        let index = isShufle ? propsIndex : 0;
+        let index = propsIndex;
 
         if (index === undefined) {
-          const nextAction = await get().getNext();
+          if (!isShufle)
+            index = 0;
+          else {
+            const nextAction = await get().getNext();
 
-          if (!nextAction) {
-            get().stop();
+            if (!nextAction) {
+              get().stop();
 
-            return;
+              return;
+            }
+
+            if (nextAction.type === "INDEX")
+              index = nextAction.payload;
+            else
+              index = playlist.list.findIndex(e=>e.musicId === nextAction.payload.id);
           }
-
-          if (nextAction.type === "INDEX")
-            index = nextAction.payload;
-          else
-            index = playlist.list.findIndex(e=>e.musicId === nextAction.payload.id);
         }
 
         return get().playQueueIndex(index);
