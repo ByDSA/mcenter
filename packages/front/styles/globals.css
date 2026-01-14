@@ -10,6 +10,7 @@
 
   --topbar-height: 3rem;
   --sidebar-width: 18dvw;
+  --sidebar-max-width: 14rem;
   --sidebar-min-width: 10rem;
   --sidebar-margin-top: var(--topbar-height);
 

@@ -1,6 +1,7 @@
 .sidebar {
   width: var(--sidebar-width, 240px);
   min-width: var(--sidebar-min-width, 10rem);
+  max-width: var(--sidebar-max-width, 15rem);
   height: 100dvh;
   padding: 20px;
   margin-top: var(--sidebar-margin-top, 0);

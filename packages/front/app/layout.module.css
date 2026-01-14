@@ -68,14 +68,17 @@
 }
 
 body:has(.content) {
-  /* if --sidebar-width == 0px
-      => 0px
-    else
-      => max(--sidebar-width, --sidebar-min-width)
+  /* 1. Si --sidebar-width es 0px, el multiplicador lo mantiene en 0px.
+     2. Si tiene valor, elige el mayor entre width y min-width...
+     3. ...pero ahora nunca superará el --sidebar-max-width.
   */
   --content-margin-left: min(
     calc(var(--sidebar-width) * 999999),
-    max(var(--sidebar-width), var(--sidebar-min-width))
+    clamp(
+      var(--sidebar-min-width),
+      var(--sidebar-width),
+      var(--sidebar-max-width)
+    )
   );
 }
 
@@ -84,7 +87,7 @@ body:has(.content) {
   margin-left: var(--content-margin-left);
   margin-top: var(--content-margin-top);
 
-  background: var(--color-gray-950);
+  background: var(--color-gray-1000);
   color: white;
   min-height: calc(100dvh - var(--content-margin-top));
   min-width: calc(100dvw - var(--content-margin-left));
