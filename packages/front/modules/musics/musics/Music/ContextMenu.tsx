@@ -1,7 +1,7 @@
 import { MusicEntity } from "$shared/models/musics";
 import { UserPayload } from "$shared/models/auth";
 import { MusicLatestViewsContextMenuItem } from "#modules/musics/history/LatestViews/ContextMenuItem";
-import { AddToPlaylistContextMenuItem } from "#modules/musics/playlists/AddToPlaylistContextMenuItem";
+import { AddToPlaylistContextMenuItem } from "#modules/musics/lists/playlists/AddToPlaylistContextMenuItem";
 import { EditMusicContextMenuItem } from "../EditMusic/ContextMenu";
 import { CopyMusicMenuItem } from "../MusicEntry/ContextMenu";
 

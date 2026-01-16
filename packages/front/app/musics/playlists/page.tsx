@@ -2,14 +2,15 @@
 
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { logger } from "#modules/core/logger";
-import { PlayListsList } from "#modules/musics/playlists";
-import { useMusicPlaylists } from "#modules/musics/playlists/list/List";
-import { NewPlaylistButton } from "#modules/musics/playlists/NewPlaylistButton";
+import { PlayListsList } from "#modules/musics/lists/playlists";
+import { useMusicPlaylists } from "#modules/musics/lists/List";
+import { NewPlaylistButton } from "#modules/musics/lists/playlists/New/NewPlaylistButton";
 import { ArrayDataProvider } from "#modules/utils/array-data-context";
-import { NewQueryButton } from "#modules/musics/queries/New/Button";
+import { NewQueryButton } from "#modules/musics/lists/queries/New/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { MusicUsersListsApi } from "#modules/musics/users-lists/requests";
-import { PlayQueryButton } from "#modules/musics/queries/PlayQuery";
+import { MusicUsersListsApi } from "#modules/musics/lists/users-lists/requests";
+import { PlayQueryButton } from "#modules/musics/lists/queries/PlayQuery";
+import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
 import MusicLayout from "../music.layout";
 import styles from "./styles.module.css";
 
@@ -67,7 +68,7 @@ export default function MusicPlaylistsPage() {
         removeItemByIndex={usingMusicPlaylist.removeItemByIndex}
         setItemByIndex={usingMusicPlaylist.setItemByIndex}
       >
-        <PlayListsList {...usingMusicPlaylist} />
+        {(usingMusicPlaylist.data && <PlayListsList {...usingMusicPlaylist} />) || <ContentSpinner /> }
       </ArrayDataProvider>
     </MusicLayout>
   );

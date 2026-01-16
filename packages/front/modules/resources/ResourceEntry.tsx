@@ -1,7 +1,7 @@
 import { AnchorHTMLAttributes, Fragment, JSX, memo, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ImageCover } from "$shared/models/image-covers";
-import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
+import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { classes } from "#modules/utils/styles";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonView";

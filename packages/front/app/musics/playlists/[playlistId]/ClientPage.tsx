@@ -6,9 +6,9 @@ import { useState } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import MusicLayout from "app/musics/music.layout";
-import { MusicPlaylist } from "#modules/musics/playlists/Playlist/Playlist";
+import { MusicPlaylistFullPage } from "#modules/musics/lists/playlists/FullPage/Playlist";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { MusicPlaylistsApi } from "#modules/musics/playlists/requests";
+import { MusicPlaylistsApi } from "#modules/musics/lists/playlists/requests";
 import { PageItemNotFound } from "#modules/utils/ItemNotFound";
 import { useUser } from "#modules/core/auth/useUser";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
@@ -78,7 +78,7 @@ export function ClientPage( { params }: PageProps) {
         } )),
       };
     }}>
-    <MusicPlaylist value={data!} setValue={setData}/>
+    <MusicPlaylistFullPage value={data!} setValue={setData}/>
   </AsyncLoader>;
 
   return (

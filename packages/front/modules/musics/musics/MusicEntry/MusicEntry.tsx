@@ -4,7 +4,7 @@ import { MusicEntity } from "$shared/models/musics";
 import { useShallow } from "zustand/react/shallow";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { useUser } from "#modules/core/auth/useUser";
-import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
+import { PlaylistFavButton } from "#modules/musics/lists/playlists/PlaylistFavButton";
 import { DurationView, WeightView } from "#modules/history";
 import { classes } from "#modules/utils/styles";
 import { ResourceEntry, ResourceEntryProps, ResourceSubtitle } from "#modules/resources/ResourceEntry";

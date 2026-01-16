@@ -4,7 +4,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { useUser } from "#modules/core/auth/useUser";
 import { HistoryTimeView, WeightView } from "#modules/history";
 import { MusicSubtitle } from "#modules/musics/musics/MusicEntry/MusicEntry";
-import { PlaylistFavButton } from "#modules/musics/playlists/PlaylistFavButton";
+import { PlaylistFavButton } from "#modules/musics/lists/playlists/PlaylistFavButton";
 import { ResourceEntry } from "#modules/resources/ResourceEntry";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";

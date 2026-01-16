@@ -2,6 +2,7 @@ import z from "zod";
 import { createCriteriaManySchema, createCriteriaOneSchema } from "../../../utils/schemas/requests/criteria";
 import { musicQuerySchema } from "..";
 import { mongoDbId } from "../../../resources/partial-schemas";
+import { generatePatchBodySchema } from "../../../../models/utils/schemas/patch";
 
 const criteriaConfig = {
   filterShape: {
@@ -31,7 +32,7 @@ export namespace MusicQueryCrudDtos {
     export const paramsSchema = z.object( {
       id: mongoDbId,
     } );
-    export const bodySchema = musicQuerySchema.partial();
+    export const bodySchema = generatePatchBodySchema(musicQuerySchema);
     export type Body = z.infer<typeof bodySchema>;
   }
 

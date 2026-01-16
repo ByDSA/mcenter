@@ -16,7 +16,7 @@ import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { MusicRendererService } from "#musics/renderer/render.service";
 import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
-import { musicPlaylistEntitySchema, musicPlaylistSchema } from "../models";
+import { musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistCrudDtos } from "../models/dto";
 import { MusicPlaylistsRepository } from "./repository/repository";
 
@@ -91,19 +91,7 @@ class RemoveManyTrackBody extends createZodDto(z.object( {
   musicIds: z.array(mongoDbId).optional(),
 } )) {}
 
-class PatchBody extends createZodDto(
-  musicPlaylistSchema.pick( {
-    name: true,
-    slug: true,
-    imageCoverId: true,
-  } ).partial()
-    .refine(
-      data => data.name !== undefined || data.slug !== undefined || data.imageCoverId !== undefined,
-      {
-        message: "Debe incluir al menos name, slug o imageCoverId.",
-      },
-    ),
-) {}
+class PatchBody extends createZodDto(MusicPlaylistCrudDtos.PatchOneById.bodySchema) {}
 
 class CreateOnePlaylistsBody extends createZodDto(
   MusicPlaylistCrudDtos.CreateOne.bodySchema,
@@ -184,9 +172,7 @@ export class MusicPlaylistsController {
     @User() user: UserPayload,
   ) {
     await this.guardEditPlaylist(user, params.id);
-    const ret = await this.playlistsRepo.patchOneByIdAndGet(params.id, {
-      entity: body,
-    } );
+    const ret = await this.playlistsRepo.patchOneByIdAndGet(params.id, body);
 
     return ret;
   }

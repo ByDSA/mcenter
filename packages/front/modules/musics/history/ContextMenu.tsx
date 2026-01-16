@@ -7,7 +7,7 @@ import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { getLongDateStr } from "#modules/utils/dates";
 import { DeleteHistoryEntryModalContentWrapper } from "#modules/series/episodes/history/entry/HistoryEntry";
 import { EditMusicContextMenuItem } from "../musics/EditMusic/ContextMenu";
-import { AddToPlaylistContextMenuItem } from "../playlists/AddToPlaylistContextMenuItem";
+import { AddToPlaylistContextMenuItem } from "../lists/playlists/AddToPlaylistContextMenuItem";
 import { CopyMusicMenuItem } from "../musics/MusicEntry/ContextMenu";
 import { MusicLatestViewsContextMenuItem } from "./LatestViews/ContextMenuItem";
 import { MusicHistoryApi } from "./requests";

@@ -3,7 +3,7 @@
 import { Equalizer, KeyboardArrowDown, LiveTv } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import { classes } from "#modules/utils/styles";
-import { SettingsButton } from "#modules/musics/playlists/SettingsButton";
+import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { genMusicEntryContextMenuContent } from "#modules/musics/musics/MusicEntry/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";

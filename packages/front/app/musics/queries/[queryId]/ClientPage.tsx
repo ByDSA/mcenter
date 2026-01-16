@@ -6,10 +6,10 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { MusicQueryEntity } from "$shared/models/musics/queries";
 import MusicLayout from "app/musics/music.layout";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { MusicQueriesApi } from "#modules/musics/queries/requests";
+import { MusicQueriesApi } from "#modules/musics/lists/queries/requests";
 import { PageItemNotFound } from "#modules/utils/ItemNotFound";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
-import { MusicQueryFullPage } from "#modules/musics/queries/FullPage/FullPage";
+import { MusicQueryFullPage } from "#modules/musics/lists/queries/FullPage/FullPage";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 
 type Params = { queryId: string };

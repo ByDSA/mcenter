@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { AccessTime, Balance, CalendarToday } from "@mui/icons-material";
 import { memo, ReactNode } from "react";
-import { formatDurationItem } from "#modules/musics/playlists/utils";
+import { formatDurationItem } from "#modules/musics/lists/playlists/utils";
 import { formatDateHHmm } from "#modules/utils/dates";
 import { classes } from "#modules/utils/styles";
 import styles from "./WeightView.module.css";
