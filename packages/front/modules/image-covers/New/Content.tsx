@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Button } from "#modules/ui-kit/input/Button";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { ImageCoverEntity } from "../models";
-import { SectionLabel } from "../Edit/SectionLabel";
+import { FormLabel } from "../../ui-kit/form/Label/FormLabel";
 import { ImageCoverUpload, ImageCoverUploadRef } from "../Edit/UploadImage";
 import styles from "./Content.module.css";
 
@@ -20,14 +20,14 @@ export function NewImageCover( { onSuccess }: NewImageCoverProps) {
     <div className={styles.content}>
       <div className={styles.mainSection}>
         <div className={styles.fieldGroup}>
-          <SectionLabel>Etiqueta</SectionLabel>
+          <FormLabel>Etiqueta</FormLabel>
           <ImageCoverLabelView
             value={label}
             onChange={(value) => setLabel(value)}
           />
         </div>
         <section className={styles.imagesSection}>
-          <SectionLabel>Subir Imagen</SectionLabel>
+          <FormLabel>Subir Imagen</FormLabel>
           <ImageCoverUpload
             ref={uploadRef}
             hideUploadButton

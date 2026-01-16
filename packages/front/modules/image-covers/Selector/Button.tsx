@@ -1,10 +1,12 @@
 import { MusicImageCover } from "#modules/musics/MusicCover";
+import { useImageCover } from "../hooks";
 import styles from "./Button.module.css";
 import { useImageCoverSelectorModal } from "./Modal";
 import { ImageCoverSelectorProps } from "./Selector";
 
 export function ImageCoverSelectorButton(props: ImageCoverSelectorProps) {
   const { openModal } = useImageCoverSelectorModal(props);
+  const { data: current } = useImageCover(props.currentId ?? null);
 
   return <span
     className={styles.button}
@@ -14,8 +16,8 @@ export function ImageCoverSelectorButton(props: ImageCoverSelectorProps) {
   >
     <MusicImageCover
       size="small"
-      cover={props.current}
+      cover={current}
     />
-    <span>{props.current?.metadata.label}</span>
+    <span>{current?.metadata.label ?? "(Imagen no definida)"}</span>
   </span>;
 }

@@ -5,9 +5,9 @@ import { logger } from "#modules/core/logger";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { Button } from "#modules/ui-kit/input/Button";
 import { classes } from "#modules/utils/styles";
-import { useNewPlaylistButton } from "../../NewPlaylistButton";
 import { useMusicPlaylistsForUser } from "../../request-all";
 import { MusicPlaylistEntity } from "../../models";
+import { NewPlaylistButton } from "../../NewPlaylistButton";
 import styles from "./Modal.module.css";
 
 type OpenModalProps = Omit<
@@ -65,9 +65,9 @@ function AddToPlaylistModalContent( { userId, onSelect, nullable }: AddToPlaylis
     userId,
     onSelect,
   } );
-  const { element: newPlaylistButton } = useNewPlaylistButton( {
-    theme: "white",
-    onSuccess: async (newPlaylist) => {
+  const newPlaylistButton = <NewPlaylistButton
+    theme="white"
+    onSuccess= {async (newPlaylist) => {
       logger.debug("Nueva lista creada: " + newPlaylist.name);
 
       setData((prevData) => {
@@ -78,8 +78,7 @@ function AddToPlaylistModalContent( { userId, onSelect, nullable }: AddToPlaylis
       } );
 
       await fetchData();
-    },
-  } );
+    }} />;
 
   return (
     <>

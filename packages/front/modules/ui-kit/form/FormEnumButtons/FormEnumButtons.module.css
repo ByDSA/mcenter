@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  padding-left: 0.25rem;
+}
+
+.toggleButton {
+  transition: background var(--transition-duration) ease-in-out;
+}
+
+.active {
+  opacity: 1;
+  outline: 3px solid var(--color-blue-600);
+}
+
+.inactive {
+  opacity: 0.4;
+}

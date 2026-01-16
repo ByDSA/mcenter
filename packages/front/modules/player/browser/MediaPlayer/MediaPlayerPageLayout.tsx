@@ -5,7 +5,6 @@ import { ReactNode } from "react";
 import { classes } from "#modules/utils/styles";
 import { BottomMediaPlayer } from "./Bottom/MediaPlayer";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
-import styles from "./MediaPlayerPageLayout.module.css";
 import { AudioTag } from "./Audio/AudioTag";
 import { WindowProvider } from "./Bottom/PlayQueue/WindowProvider";
 
@@ -23,7 +22,7 @@ function MediaPlayerPageLayoutContent( { children }: Props) {
   const hasCurrentResource = currentResource !== null;
 
   return <><div className={classes(hasCurrentResource
-    && styles.layout)}>{children}</div>
+    && "mcenter-media-player-open")}>{children}</div>
   {hasCurrentResource && <MediaPlayer />}
   </>;
 }

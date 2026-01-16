@@ -24,7 +24,7 @@ const modelSchema = z.object( {
   list: z.array(entrySchema),
   slug: slugSchema,
   ownerUserId: mongoDbId,
-  visibility: z.enum(["public", "private"]),
+  visibility: z.enum(["public", "private"]).default("private"),
   imageCoverId: mongoDbId.nullable().optional(),
 } ).merge(autoTimestampsSchema);
 

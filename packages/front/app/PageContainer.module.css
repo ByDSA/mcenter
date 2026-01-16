@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: flex-start;
   width: calc(100dvw - var(--content-margin-left));
   min-height: calc(
     100dvh - var(--topbar-height, 0px) - var(--tabs-height, 0px)
@@ -11,11 +10,15 @@
 
 .container > main {
   width: 100%;
-  height: 100%;
-  min-height: calc(100dvh - var(--content-margin-top));
+  flex-grow: 1; /* height 100% */
   max-width: 800px;
   display: flex;
   flex-flow: column nowrap;
+}
+
+:global(.mcenter-media-player-open) .container > main {
+  padding-bottom: var(--media-player-height);
+  box-sizing: border-box;
 }
 
 .container > main h1,

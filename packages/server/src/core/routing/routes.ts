@@ -1,5 +1,5 @@
-import { PATH_ROUTES } from "$shared/routing";
 import { RouterModule, Routes } from "@nestjs/core";
+import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesAdminModule } from "#episodes/admin/module";
@@ -26,6 +26,8 @@ import { AuthGoogleModule } from "#core/auth/strategies/google";
 import { UsersMusicPlaylistsModule } from "#musics/users-playlists/module";
 import { ImageCoversCrudModule } from "#modules/image-covers/module";
 import { ImageCoversAdminModule } from "#modules/image-covers/admin/module";
+import { MusicQueriesCrudModule } from "#musics/queries/crud/module";
+import { MusicUsersListsModule } from "#musics/users-lists/crud/module";
 import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
@@ -43,6 +45,8 @@ const imports = [
   MusicFileInfoModule,
   MusicPlaylistsModule,
   UsersMusicPlaylistsModule,
+  MusicQueriesCrudModule,
+  MusicUsersListsModule,
 
   EpisodesSlugModule,
   EpisodesAdminModule,
@@ -144,6 +148,14 @@ const routes: Routes = [
   {
     path: PATH_ROUTES.musics.history.path,
     module: MusicHistoryModule,
+  },
+  {
+    path: PATH_ROUTES.musics.queries.path,
+    module: MusicQueriesCrudModule,
+  },
+  {
+    path: "api/musics/users-lists",
+    module: MusicUsersListsModule,
   },
   {
     path: PATH_ROUTES.musics.path + "/admin",

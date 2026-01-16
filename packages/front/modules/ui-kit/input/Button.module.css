@@ -47,6 +47,10 @@ body:has(.button) {
     cursor: pointer;
   }
 
+  &.isSubmitting {
+    cursor: progress;
+  }
+
   .left {
     margin-right: 0.5rem;
   }

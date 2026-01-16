@@ -532,14 +532,10 @@ addedAt: Date; }>;
   }
 
   async getManyByCriteria(criteria: CriteriaMany): Promise<Entity[]> {
-    const actualCriteria: CriteriaMany = {
-      ...criteria,
-      limit: criteria.limit ?? 10,
-    };
-    const pipeline = MusicPlaylistOdm.getCriteriaPipeline(actualCriteria);
+    const pipeline = MusicPlaylistOdm.getCriteriaPipeline(criteria);
 
     if (pipeline.length === 0)
-      throw new UnprocessableEntityException(actualCriteria);
+      throw new UnprocessableEntityException(criteria);
 
     const aggregationResult = await MusicPlaylistOdm.Model.aggregate(pipeline) as AggregationResult;
 

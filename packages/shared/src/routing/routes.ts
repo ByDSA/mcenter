@@ -195,6 +195,21 @@ export const PATH_ROUTES = {
         return ret;
       },
     },
+    queries: {
+      path: `${MUSICS}/queries`,
+      withParams: (id: string) => `${MUSICS}/queries/${id}`,
+      searchOne: {
+        path: `${MUSICS}/queries/search-one`,
+      },
+      slug: {
+        withParams: ( { userSlug, querySlug }: {
+            userSlug: string;
+            querySlug?: string;
+          } ) => `${MUSICS_PLAYLISTS}/user/${userSlug}${
+          querySlug ? `/${querySlug}` : ""
+        }`,
+      },
+    },
     frontend: {
       path: "/musics",
       slug: {
@@ -235,6 +250,13 @@ token?: string;} ) => {
             return url;
           },
           path: "/musics/playlists/slug",
+        },
+      },
+      queries: {
+        path: "/musics/queries",
+        withParams: (id: string) => `/musics/queries/${id}`,
+        slug: {
+          withParams: (userSlug: string, querySlug: string) => `/musics/queries/slug/${userSlug}/${querySlug}`,
         },
       },
       history: {

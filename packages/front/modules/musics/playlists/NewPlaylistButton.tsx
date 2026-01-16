@@ -8,14 +8,25 @@ import { MusicPlaylistsApi } from "./requests";
 import styles from "./NewPlaylistButton.module.css";
 
 type ButtonProps = {
-  onClick: ()=> void;
+  onSuccess?: (newPlaylist: any)=> void;
   theme: "dark-gray" | "white";
 };
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const NewPlaylistButton = ( { onClick, theme }: ButtonProps) => {
+export const NewPlaylistButton = ( { onSuccess, theme }: ButtonProps) => {
+  const usingModal = useModal();
+  const openModal = () => {
+    return usingModal.openModal( {
+      title: "Nueva lista",
+      content: <NewPlaylistForm onSuccess={v=> {
+        onSuccess?.(v);
+        usingModal.closeModal();
+      }} />,
+    } );
+  };
+
   return <Button
     theme={theme}
-    onClick={onClick}
+    onClick={openModal}
     left={<span className={styles.left}><Add /></span>}>
     Nueva lista
   </Button>;
@@ -76,27 +87,3 @@ const NewPlaylistForm = ( { onSuccess }: FormProps) => {
     </>
   );
 };
-
-type Props = {
-  onSuccess?: (newPlaylist: any)=> void;
-  theme: "dark-gray" | "white";
-};
-
-export function useNewPlaylistButton(props: Props) {
-  const usingModal = useModal();
-  const openModal = () => {
-    return usingModal.openModal( {
-      title: "Nueva lista",
-      content: <NewPlaylistForm onSuccess={v=> {
-        props.onSuccess?.(v);
-        usingModal.closeModal();
-      }} />,
-    } );
-  };
-
-  return {
-    element: (
-      <NewPlaylistButton theme={props.theme} onClick={openModal} />
-    ),
-  };
-}

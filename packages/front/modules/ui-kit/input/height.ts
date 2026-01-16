@@ -217,9 +217,9 @@ export function useFirstTimeVisible<E extends Element | null>(
 }
 
 export const updateHeight = (
-  { value, element }: { value: string;
-element: HTMLTextAreaElement; },
+  { element }: { element: HTMLTextAreaElement },
 ) => {
+  const { value } = element;
   const rows = Math.max(getVisualLines(element, value), 1);
   const styles = window.getComputedStyle(element);
   const padding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);

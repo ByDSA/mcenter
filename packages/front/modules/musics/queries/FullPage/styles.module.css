@@ -1,0 +1,15 @@
+.body {
+  font-size: 1.2rem;
+}
+
+.queryTitle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+}
+
+.queryText {
+  font-family: monospace;
+  overflow-wrap: break-word;
+}

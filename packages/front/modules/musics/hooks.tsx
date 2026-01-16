@@ -23,6 +23,7 @@ function genQueryFn(id: string, options?: GenQueryOptions) {
         id,
       },
       expand: getExpand(options?.hasUser ?? false),
+      skipCache: true,
     } );
 
     return res.data;

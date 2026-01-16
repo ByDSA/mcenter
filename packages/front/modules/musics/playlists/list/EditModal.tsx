@@ -105,7 +105,7 @@ imageCoverId?: string | null; } = {};
           onSelect={(imageCover) => {
             setCurrentImageCover(imageCover);
           }}
-          current={currentImageCover}
+          currentId={currentImageCover?.id}
         />
       </section>
       <footer>

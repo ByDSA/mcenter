@@ -1,4 +1,3 @@
-/* eslint-disable require-await */
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { createOneResultResponseSchema, createPaginatedResultResponseSchema, PaginatedResult, ResultResponse } from "$shared/utils/http/responses";
@@ -8,6 +7,8 @@ import { MusicEntity, musicEntitySchema, MusicId } from "#musics/models";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { useImageCover } from "#modules/image-covers/hooks";
+import { useMusic } from "./hooks";
 
 export class MusicsApi {
   static {
@@ -27,15 +28,21 @@ export class MusicsApi {
       ) as (m: unknown)=> MusicsApi.Patch.Response,
     } );
     const URL = backendUrl(PATH_ROUTES.musics.withParams(id));
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: URL,
       body,
     } );
+
+    if (ret.data)
+      useMusic.updateCacheWithMerging(ret.data.id, ret.data);
+
+    return ret;
   }
 
   async getOneByCriteria(
-    criteria: MusicCrudDtos.GetOne.Criteria,
+    { skipCache, ...criteria }: MusicCrudDtos.GetOne.Criteria & {
+      skipCache?: boolean;
+    },
   ): Promise<MusicCrudDtos.GetOne.Response> {
     const method = "POST";
     const fetcher = makeFetcher<
@@ -49,11 +56,20 @@ export class MusicsApi {
       ) as (m: unknown)=> MusicCrudDtos.GetOne.Response,
     } );
     const URL = backendUrl(PATH_ROUTES.musics.search.path + "-one");
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: URL,
       body: criteria,
     } );
+
+    if (ret.data) {
+      if (!skipCache)
+        useMusic.updateCacheWithMerging(ret.data.id, ret.data);
+
+      if (ret.data?.imageCover)
+        useImageCover.updateCache(ret.data.imageCoverId!, ()=>ret.data!.imageCover!);
+    }
+
+    return ret;
   }
 
   async getManyByCriteria(
@@ -71,11 +87,21 @@ export class MusicsApi {
       ) as (m: unknown)=> any,
     } );
     const URL = backendUrl(PATH_ROUTES.musics.search.path);
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: URL,
       body: criteria,
     } );
+
+    if (ret.data) {
+      for (const m of ret.data) {
+        useMusic.updateCacheWithMerging(m.id, m);
+
+        if (m.imageCover)
+          useImageCover.updateCache(m.imageCoverId!, ()=>m.imageCover!);
+      }
+    }
+
+    return ret;
   }
 
   async deleteOneById(id: MusicEntity["id"]): Promise<MusicsApi.DeleteOneById.Response> {
@@ -90,11 +116,14 @@ export class MusicsApi {
       ) as (m: unknown)=> any,
     } );
     const URL = backendUrl(PATH_ROUTES.musics.withParams(id));
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: URL,
       body: undefined,
     } );
+
+    await useMusic.invalidateCache(id);
+
+    return ret;
   }
 }
 

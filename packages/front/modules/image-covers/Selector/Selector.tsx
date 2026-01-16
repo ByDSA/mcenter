@@ -7,16 +7,19 @@ import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SearchBarView } from "#modules/ui-kit/SearchBar";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
-import { SectionLabel } from "../Edit/SectionLabel";
+import { FormLabel } from "../../ui-kit/form/Label/FormLabel";
 import { NewImageCoverButton } from "../New/Button";
+import { useImageCover } from "../hooks";
 import styles from "./Selector.module.css";
 
 export type ImageCoverSelectorProps = {
-  current?: ImageCoverEntity | null;
+  currentId?: ImageCoverEntity["id"] | null;
   onSelect: (imageCover: ImageCoverEntity | null)=> void;
 };
 
-export function ImageCoverSelector( { onSelect, current }: ImageCoverSelectorProps) {
+export function ImageCoverSelector(
+  { onSelect, currentId }: ImageCoverSelectorProps,
+) {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<ImageCoverEntity[]>([]);
   const [selectedId, setSelectedId] = useState<string | null | undefined>();
@@ -58,12 +61,13 @@ export function ImageCoverSelector( { onSelect, current }: ImageCoverSelectorPro
 
     setResults(res.data);
   }, []);
+  const { data: current } = useImageCover(currentId ?? null);
 
   return (
     <div className={styles.selector}>
       <header className={styles.header}>
-        {current !== undefined && <aside className={styles.currentCoverSection}>
-          <SectionLabel>Actual</SectionLabel>
+        {current !== null && <aside className={styles.currentCoverSection}>
+          <FormLabel>Actual</FormLabel>
           <MusicImageCover
             size="medium"
             editable

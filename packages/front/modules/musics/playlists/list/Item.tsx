@@ -1,11 +1,13 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
+import { MusicUserListResourceItem } from "$shared/models/musics/users-lists";
 import { useContextMenuTrigger, ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { useArrayData } from "#modules/utils/array-data-context";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ResourceEntry";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
+import { useLocalData } from "#modules/utils/local-data-context";
 import { formatDurationHeader, playlistCopySlugUrl } from "../utils";
 import { MusicPlaylistEntity } from "../models";
 import styles from "./Item.module.css";
@@ -13,13 +15,13 @@ import { EditPlaylistContextMenuItem } from "./EditMenuItem";
 import { DeletePlaylistContextMenuItem } from "./deleteItem";
 
 interface PlaylistProps {
-  value: MusicPlaylistEntity;
   index: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
-  const { removeItemByIndex, data, setItemByIndex } = useArrayData<MusicPlaylistEntity>();
+export const MusicPlaylistListItem = ( { index }: PlaylistProps) => {
+  const { removeItemByIndex } = useArrayData<MusicUserListResourceItem>();
+  const { data: value, setData: setValue } = useLocalData<MusicPlaylistEntity>();
   const totalDuration = value.list?.reduce(
     (acc, item) => acc + (item.music?.fileInfos?.[0].mediaInfo.duration ?? 0),
     0,
@@ -71,30 +73,14 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
           {isUserOwner && <><EditPlaylistContextMenuItem
             value={value}
             setValue={(newPlaylist: MusicPlaylistEntity) => {
-            // Para optimistic case
-              const i = data?.findIndex((d) => d.id === newPlaylist.id);
-
-              if (i === undefined || i === -1)
-                return;
-
-              setItemByIndex(i, v=>{
-                if (v) {
-                  return {
-                    ...v,
-                    name: newPlaylist.name,
-                    slug: newPlaylist.slug,
-                    imageCoverId: newPlaylist.imageCoverId,
-                    imageCover: newPlaylist.imageCover,
-                  };
-                }
-              } );
+              setValue(newPlaylist);
             }}
           />
           <DeletePlaylistContextMenuItem
             value={value}
             onOpen={() => closeMenu()}
             onActionSuccess={() => removeItemByIndex(index)}
-            getValue={() => data[index]}
+            getValue={() => value}
           />
           </>
           }
@@ -108,7 +94,7 @@ export const MusicPlaylistListItem = ( { value, index }: PlaylistProps) => {
       text: formatDurationHeader(totalDuration),
     }, {
       text: isPublic ? "Lista pública" : "Lista privada",
-      customContent: <VisibilityTag isPublic={isPublic} className={styles.visibility}/>,
+      customContent: <VisibilityTag isPublic={isPublic} iconClassName={styles.visibility}/>,
     },
     ...(isPublic && !isUserOwner
       ? [{

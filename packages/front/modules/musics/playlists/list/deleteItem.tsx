@@ -5,7 +5,6 @@ import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/us
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { MusicPlaylistEntity, musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistsApi } from "../requests";
-import styles from "./Delete.module.css";
 
 type Props = Parameters<typeof useDeletePlayList>[0] & {
   value: MusicPlaylistEntity;
@@ -25,7 +24,6 @@ export function DeletePlaylistContextMenuItem(
   return ContextMenuItem( {
     label: "Eliminar",
     theme: "danger",
-    className: styles.contextMenuItem,
     onClick: (e)=> {
       e.preventDefault();
       onOpen?.();

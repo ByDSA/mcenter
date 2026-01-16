@@ -8,8 +8,8 @@ import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
 import { getMediumCoverUrl } from "../Selector/image-cover-utils";
 import { ImageCoverLabelView } from "../New/Content";
+import { FormLabel } from "../../ui-kit/form/Label/FormLabel";
 import styles from "./Editor.module.css";
-import { SectionLabel } from "./SectionLabel";
 import { ImageCoverUpload, PreviewImage, ImageCoverUploadRef } from "./UploadImage";
 
 export type ImageCoverEditorProps = {
@@ -95,7 +95,7 @@ export function ImageCoverEditor( { imageCover, onUpdate }: ImageCoverEditorProp
     <div className={styles.editor}>
       <div className={styles.mainSection}>
         <section className={styles.fieldGroup}>
-          <SectionLabel>Etiqueta</SectionLabel>
+          <FormLabel>Etiqueta</FormLabel>
           <ImageCoverLabelView
             value={label}
             onChange={(value) => setLabel(value)}
@@ -104,12 +104,12 @@ export function ImageCoverEditor( { imageCover, onUpdate }: ImageCoverEditorProp
         </section>
         <section className={styles.imagesSection}>
           <article className={styles.currentImageSection}>
-            <SectionLabel>Actual</SectionLabel>
+            <FormLabel>Actual</FormLabel>
             <PreviewImage src={getMediumCoverUrl(currentEntity)} />
           </article>
 
           <article className={styles.replaceImageSection}>
-            <SectionLabel>Reemplazar Imagen</SectionLabel>
+            <FormLabel>Reemplazar Imagen</FormLabel>
             <ImageCoverUpload
               ref={uploadRef}
               entityId={currentEntity.id}

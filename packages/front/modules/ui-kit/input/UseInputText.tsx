@@ -1,6 +1,6 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { classes } from "#modules/utils/styles";
-import { keyDownHandlerGenerator, UseInputProps, useOnChanges } from "./InputCommon";
+import { keyDownHandlerGenerator, OnChange, UseInputProps, useOnChanges } from "./InputCommon";
 import { updateHeight, useFirstTimeVisible } from "./height";
 import { defaultValuesMap, ResourceInputType } from "./ResourceInput";
 
@@ -15,56 +15,121 @@ export type OnPressEnter<T> = OnPressEnterFn<T> | "newLine" | "nothing";
 
 export function useInputText(props: UseInputTextProps) {
   const { onPressEnter, defaultValue, disabled = false } = props;
+  const [currentValue, setCurrentValue] = useState(defaultValue ?? "");
   const id = useId();
-  const [value, setValue] = useState(defaultValue ?? defaultValuesMap[ResourceInputType.Text]);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const updateH = useMemo(() => () => textareaRef?.current && updateHeight( {
-    value: textareaRef.current.value,
-    element: textareaRef.current,
-  } ), [textareaRef]);
-
-  useEffect(() => {
-    updateH();
-  }, [updateH, value]);
-
-  useFirstTimeVisible(textareaRef, () => {
-    updateH();
-  } );
-
+  const domRef = useRef<HTMLTextAreaElement>(null);
+  const elementRef = useRef<InputTextLineRef>(null);
   const keyDownHandler = useMemo(
     () => keyDownHandlerGenerator<string, InputElement>( {
       onPressEnter,
-      value,
+      value: elementRef.current?.getValue() ?? currentValue,
     } ),
-    [onPressEnter, value],
+    [onPressEnter, elementRef.current],
   );
-  const { addOnChange, handleChange } = useOnChanges<string, InputElement>( {
-    inputToValue: (t)=>t.value,
-    setValue,
-    value,
+  const element = useMemo(()=><InputTextLine
+    ref={elementRef}
+    domRef={domRef}
+    id={id}
+    className={classes(props.nullChecked && "is-null")}
+    defaultValue={defaultValue}
+    disabled={disabled}
+    autoFocus={props.autofocus}
+    onKeyDown={keyDownHandler}
+    style={{
+      resize: "none",
+      overflow: "hidden",
+    }}
+  />, [id, props.nullChecked, defaultValue, disabled, keyDownHandler, props.autofocus]);
+  const updateH = useMemo(() => () => domRef?.current && updateHeight( {
+    element: domRef.current!,
+  } ), [domRef.current]);
+
+  useEffect(() => {
+    elementRef.current?.addOnChange((newValue) => {
+      setCurrentValue(newValue);
+      updateH();
+    } );
+  }, [elementRef.current]);
+
+  useFirstTimeVisible(domRef, () => {
+    updateH();
   } );
-  const element = (
-    <textarea
-      ref={textareaRef}
-      id={id}
-      className={classes("ui-kit-input-text", props.nullChecked ? "is-null" : "")}
-      disabled={disabled}
-      value={value}
-      autoFocus={props.autofocus}
-      onChange={handleChange}
-      onKeyDown={keyDownHandler}
-      style={{
-        resize: "none",
-        overflow: "hidden",
-      }}
-    />
-  );
 
   return {
     element,
-    ref: textareaRef,
-    value,
-    setValue,
-    addOnChange,
+    ref: domRef,
+    value: currentValue,
+    setValue: elementRef.current?.setValue ?? (()=>{
+      throw new Error("InputTextLine ref not assigned yet");
+    } ),
+    addOnChange: elementRef.current?.addOnChange ?? (()=>{
+      throw new Error("InputTextLine ref not assigned yet");
+    } ),
   };
 }
+
+type InputTextProps =
+  Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange" | "value"> & {
+    defaultValue?: string;
+    onChange?: OnChange<string>;
+    domRef?: React.RefObject<HTMLTextAreaElement | null>;
+};
+type InputTextLineRef = {
+  setValue: (value: string)=> void;
+  getValue: ()=> string;
+  addOnChange: (fn: OnChange<string>)=> void;
+};
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const InputTextLine = forwardRef<InputTextLineRef, InputTextProps>(
+  (props, ref) => {
+    const { defaultValue, onChange, className, style, domRef, ...textAreaProps } = props;
+    const internalDomRef = useRef<HTMLTextAreaElement>(null);
+    const resolvedDomRef = domRef || internalDomRef;
+    const [value, setValue] = useState(defaultValue ?? defaultValuesMap[ResourceInputType.Text]);
+    const { addOnChange, handleChange } = useOnChanges<string, InputElement>( {
+      inputToValue: (t)=>t.value,
+      setValue,
+      value,
+    } );
+
+    useImperativeHandle(ref, () => ( {
+      setValue,
+      getValue: () => value,
+      addOnChange,
+    } ));
+
+    return <InputTextLineView
+      ref={resolvedDomRef}
+      className={classes("ui-kit-input-text", className)}
+      value={value}
+      onChange={handleChange}
+      {...textAreaProps}
+      style={{
+        resize: "none",
+        overflow: "hidden",
+        ...style,
+      }}
+    />;
+  },
+);
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const InputTextLineView = forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>
+>(
+  (props, ref) => {
+    const { className, ...textAreaProps } = props;
+
+    return <textarea
+      ref={ref}
+      className={classes("ui-kit-input-text", className)}
+      {...textAreaProps}
+      style={{
+        resize: "none",
+        overflow: "hidden",
+        ...props.style,
+      }}
+    />;
+  },
+);

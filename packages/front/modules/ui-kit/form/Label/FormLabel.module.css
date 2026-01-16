@@ -1,8 +1,12 @@
-.sectionLabel {
+.label {
   color: var(--color-gray-200);
   font-weight: 600;
   text-align: left;
   width: 100%;
   margin-bottom: 0.5rem;
   display: block;
+}
+
+* + .label {
+  margin-top: 1rem;
 }

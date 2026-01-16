@@ -33,11 +33,11 @@ export function ClientPage( { params }: PageProps) {
     }}
     errorElement={<PageItemNotFound />}
     action={async ()=> {
-      const p = (await params);
+      const resolvedParams = (await params);
       let d: MusicPlaylistEntity | undefined = undefined;
 
-      if ("userSlug" in p) {
-        const { userSlug, playlistSlug } = p;
+      if ("userSlug" in resolvedParams) {
+        const { userSlug, playlistSlug } = resolvedParams;
         const response = await api.getOneByCriteria( {
           filter: {
             slug: playlistSlug,
@@ -53,10 +53,10 @@ export function ClientPage( { params }: PageProps) {
             slug: userSlug,
           } as any;
         }
-      } else if ("playlistId" in p) {
+      } else if ("playlistId" in resolvedParams) {
         const response = await api.getOneByCriteria( {
           filter: {
-            id: p.playlistId,
+            id: resolvedParams.playlistId,
           },
           expand: ["ownerUserPublic", "imageCover"],
         } );

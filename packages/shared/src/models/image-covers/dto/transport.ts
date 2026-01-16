@@ -10,6 +10,7 @@ const criteriaConfig = {
   filterShape: {
     searchLabel: z.string().optional(),
     id: mongoDbId.optional(),
+    ids: mongoDbId.array().optional(),
   },
   sortKeys: [] as const,
   expandKeys: [] as const,

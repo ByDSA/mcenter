@@ -89,59 +89,61 @@ function EditMusicView( { data }: BodyProps) {
         <span style={{
           marginRight: "1rem",
         }}>Imagen:</span>
-        <ImageCoverSelectorButton current={music?.imageCover ?? null} onSelect={async (selected)=>{
-          const api = FetchApi.get(MusicsApi);
-          const field: keyof MusicEntity = "imageCoverId";
-          let res: Awaited<ReturnType<typeof api.patch>> | undefined;
+        <ImageCoverSelectorButton
+          currentId={music?.imageCover?.id ?? null}
+          onSelect={async (selected)=>{
+            const api = FetchApi.get(MusicsApi);
+            const field: keyof MusicEntity = "imageCoverId";
+            let res: Awaited<ReturnType<typeof api.patch>> | undefined;
 
-          if (selected === null) {
-            res = await api.patch(data.id, {
-              unset: [[field]],
-              entity: {},
-            } );
-          } else if (selected) {
-            res = await api.patch(data.id, {
-              entity: {
-                [field]: selected?.id,
-              },
-            } );
-          }
-
-          const resData = res?.data;
-
-          if (resData) {
-            let newImageCover: ImageCoverEntity | null;
-
-            if (resData.imageCoverId && resData.imageCoverId !== music?.imageCoverId) {
-              const imageCoversApi = FetchApi.get(ImageCoversApi);
-
-              newImageCover = (await imageCoversApi.getOneByCriteria( {
-                filter: {
-                  id: resData.imageCoverId,
+            if (selected === null) {
+              res = await api.patch(data.id, {
+                unset: [[field]],
+                entity: {},
+              } );
+            } else if (selected) {
+              res = await api.patch(data.id, {
+                entity: {
+                  [field]: selected?.id,
                 },
-              } )).data;
+              } );
             }
 
-            useMusic.updateCache(data.id, (oldData)=> {
-              if (!oldData)
-                return musicEntitySchema.parse(resData);
+            const resData = res?.data;
 
-              const newData: MusicEntity = {
-                ...oldData,
-                ...resData,
-              };
+            if (resData) {
+              let newImageCover: ImageCoverEntity | null;
 
-              if (!resData.imageCoverId)
-                newData.imageCoverId = null;
-              else if (resData.imageCoverId !== oldData.imageCoverId) {
-                if (newImageCover)
-                  newData.imageCover = newImageCover;
+              if (resData.imageCoverId && resData.imageCoverId !== music?.imageCoverId) {
+                const imageCoversApi = FetchApi.get(ImageCoversApi);
+
+                newImageCover = (await imageCoversApi.getOneByCriteria( {
+                  filter: {
+                    id: resData.imageCoverId,
+                  },
+                } )).data;
               }
 
-              return newData;
-            } );
-          }
-        }}/>
+              useMusic.updateCache(data.id, (oldData)=> {
+                if (!oldData)
+                  return musicEntitySchema.parse(resData);
+
+                const newData: MusicEntity = {
+                  ...oldData,
+                  ...resData,
+                };
+
+                if (!resData.imageCoverId)
+                  newData.imageCoverId = null;
+                else if (resData.imageCoverId !== oldData.imageCoverId) {
+                  if (newImageCover)
+                    newData.imageCover = newImageCover;
+                }
+
+                return newData;
+              } );
+            }
+          }}/>
       </span>
       <span className={"break"} />
       <footer className={styles.footer}>

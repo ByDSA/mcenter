@@ -7,10 +7,13 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   right?: JSX.Element;
   children: React.ReactNode;
   theme?: "blue" | "dark-gray" | "red" | "white";
+  isSubmitting?: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const Button = ( { children, left, right, theme = "dark-gray", ...buttonProps }: Props) => {
+export const Button = ( { children, left, right,
+  isSubmitting = false,
+  theme = "dark-gray", disabled, ...buttonProps }: Props) => {
   let content = (<>
     {left && <section className={styles.left}>{left}</section>}
     <section className={styles.childrenSection}>{children}</section>
@@ -20,6 +23,7 @@ export const Button = ( { children, left, right, theme = "dark-gray", ...buttonP
 
   return <button
     type="button"
+    disabled={disabled || isSubmitting}
     {...buttonProps}
     className={classes(
       styles.button,
@@ -28,6 +32,7 @@ export const Button = ( { children, left, right, theme = "dark-gray", ...buttonP
       theme === "dark-gray" && styles.darkGray,
       theme === "red" && styles.red,
       buttonProps.className,
+      isSubmitting && styles.isSubmitting,
     )}
   >
     {content}

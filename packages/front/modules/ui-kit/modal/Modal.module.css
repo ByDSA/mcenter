@@ -74,10 +74,3 @@
   flex: 1;
   overflow: auto;
 }
-
-.modal > .content > footer {
-  padding-top: 1rem;
-  display: flex;
-  justify-content: right;
-  gap: 1rem;
-}

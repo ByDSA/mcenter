@@ -9,7 +9,9 @@ import { makeFetcher } from "#modules/fetching/fetcher";
 import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { uploadFile } from "#modules/utils/upload-files";
+import { useMusic } from "#musics/hooks";
 import { ImageCoverEntity, imageCoverEntitySchema } from "./models";
+import { useImageCover } from "./hooks";
 
 type UpdateImageProps = {
   id: string | null;
@@ -42,7 +44,9 @@ export class ImageCoversApi {
   }
 
   async getOneByCriteria(
-    criteria: ImageCoverCrudDtos.GetOne.Criteria,
+    { skipCache, ...criteria }: ImageCoverCrudDtos.GetOne.Criteria & {
+      skipCache?: boolean;
+    },
   ): Promise<ImageCoverCrudDtos.GetOne.Response> {
     const method = "POST";
     const fetcher = makeFetcher<
@@ -56,11 +60,15 @@ export class ImageCoversApi {
       ) as (m: unknown)=> ImageCoverCrudDtos.GetOne.Response,
     } );
     const URL = backendUrl(PATH_ROUTES.imageCovers.path + "/search-one");
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: URL,
       body: criteria,
     } );
+
+    if (ret.data && !skipCache)
+      useImageCover.updateCacheWithMerging(ret.data.id, ret.data);
+
+    return ret;
   }
 
   async getManyByCriteria(
@@ -78,11 +86,17 @@ export class ImageCoversApi {
       ) as (m: unknown)=> any,
     } );
     const URL = backendUrl(PATH_ROUTES.imageCovers.path + "/search-many");
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: URL,
       body: criteria,
     } );
+
+    if (ret.data) {
+      for (const im of ret.data)
+        useImageCover.updateCacheWithMerging(im.id, im);
+    }
+
+    return ret;
   }
 
   async deleteOneById(id: ImageCoverEntity["id"]): Promise<ImageCoversApi.DeleteOneById.Response> {
@@ -97,11 +111,14 @@ export class ImageCoversApi {
       ) as (m: unknown)=> any,
     } );
     const URL = backendUrl(PATH_ROUTES.imageCovers.withParams(id));
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: URL,
       body: undefined,
     } );
+
+    await useMusic.invalidateCache(id);
+
+    return ret;
   }
 
   async updateImage(
@@ -128,6 +145,9 @@ export class ImageCoversApi {
       file,
       metadata,
     } );
+
+    if (res.data.imageCover)
+      useImageCover.updateCacheWithMerging(res.data.imageCover.id, res.data.imageCover);
 
     return res;
   }

@@ -2,43 +2,63 @@
 
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { logger } from "#modules/core/logger";
-import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { Button } from "#modules/ui-kit/input/Button";
-import { useInputText } from "#modules/ui-kit/input/UseInputText";
-import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { useFormInModal } from "#modules/ui-kit/modal/useFormModal";
 import { PlayListsList } from "#modules/musics/playlists";
 import { useMusicPlaylists } from "#modules/musics/playlists/list/List";
-import { useNewPlaylistButton } from "#modules/musics/playlists/NewPlaylistButton";
+import { NewPlaylistButton } from "#modules/musics/playlists/NewPlaylistButton";
 import { ArrayDataProvider } from "#modules/utils/array-data-context";
+import { NewQueryButton } from "#modules/musics/queries/New/Button";
+import { FetchApi } from "#modules/fetching/fetch-api";
+import { MusicUsersListsApi } from "#modules/musics/users-lists/requests";
+import { PlayQueryButton } from "#modules/musics/queries/PlayQuery";
 import MusicLayout from "../music.layout";
 import styles from "./styles.module.css";
 
 export default function MusicPlaylistsPage() {
   const usingMusicPlaylist = useMusicPlaylists();
-  const newPlaylistButton = useNewPlaylistButton( {
-    theme: "dark-gray",
-    onSuccess: (newPlaylist: MusicPlaylistEntity) => {
-      usingMusicPlaylist.addItem(newPlaylist);
+  const newPlaylistButton = <NewPlaylistButton
+    theme="dark-gray"
+    onSuccess= {async (newPlaylist: MusicPlaylistEntity) => {
+      const api = FetchApi.get(MusicUsersListsApi);
+      const res = await api.getMyList( {
+        expand: false,
+      } );
+      const item = res.data?.list.find(i=>i.resourceId === newPlaylist.id);
+
+      if (item) {
+        usingMusicPlaylist.addItem( {
+          ...item,
+          resource: newPlaylist,
+        } );
+      }
+
       logger.debug("Nueva lista creada: " + newPlaylist.name);
-    },
-  } );
-  const modal = useModal();
+    }} />;
+  const newQueryButton = <NewQueryButton
+    theme="dark-gray"
+    onSuccess={async (newQuery) => {
+      const api = FetchApi.get(MusicUsersListsApi);
+      const res = await api.getMyList( {
+        expand: false,
+      } );
+      const item = res.data?.list.find(i=>i.resourceId === newQuery.id);
+
+      if (item) {
+        usingMusicPlaylist.addItem( {
+          ...item,
+          resource: newQuery,
+        } );
+      }
+
+      logger.debug("Nueva query creada: " + newQuery.name);
+    }} />;
 
   return (
     <MusicLayout>
       <div>
         <section className={styles.newPlaylistSection}>
-          <Button
-            theme="blue"
-            onClick={async ()=> {
-              await modal.openModal( {
-                title: "Query",
-                className: styles.playQueryModal,
-                content: <PlayQueryForm onSuccess={()=>modal.closeModal()}/>,
-              } );
-            }}>Reproducir query</Button>
-          {newPlaylistButton.element}
+          <PlayQueryButton />
+          {newQueryButton}
+          {newPlaylistButton}
         </section>
       </div>
       <ArrayDataProvider
@@ -52,45 +72,3 @@ export default function MusicPlaylistsPage() {
     </MusicLayout>
   );
 }
-
-type FormProps = {
-  onSuccess?: (newPlaylist: any)=> void;
-};
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const PlayQueryForm = ( { onSuccess }: FormProps) => {
-  const { element, value } = useInputText( {
-    nullChecked: false,
-    autofocus: true,
-    defaultValue: useBrowserPlayer.getState().query,
-    onPressEnter: () => form.submit(),
-  } );
-  const form = useFormInModal( {
-    canSubmit: ()=> value.trim().length > 0,
-    onSuccess,
-    onSubmit: async () => {
-      await useBrowserPlayer.getState().playQuery(value.toLowerCase());
-
-      if (useBrowserPlayer.getState().status === "stopped")
-        logger.error("Query inválida");
-    },
-  } );
-
-  return (
-    <>
-      <section>
-        <p>Query:</p>
-        {element}
-      </section>
-      <footer>
-        <Button
-          theme="white"
-          onClick={form.submit}
-          disabled={!form.canSubmit}
-        >
-          Reproducir
-        </Button>
-      </footer>
-    </>
-  );
-};

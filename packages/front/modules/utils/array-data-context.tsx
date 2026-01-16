@@ -4,7 +4,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { createContext, useContext, useCallback, ReactNode } from "react";
 import { SetState } from "./resources/useCrud";
 
-type NewItemOrFn<T> = Parameters<SetState<T>>[0];
+export type NewItemOrFn<T> = Parameters<SetState<T>>[0];
 
 interface ArrayDataContextType<T> {
   data: T[];

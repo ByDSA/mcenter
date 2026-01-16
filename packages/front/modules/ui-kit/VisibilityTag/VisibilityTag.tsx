@@ -4,16 +4,17 @@ import styles from "./styles.module.css";
 
 type Props = {
   isPublic: boolean;
+  iconClassName?: string;
   className?: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const VisibilityTag = ( { isPublic, className }: Props) => {
+export const VisibilityTag = ( { isPublic, iconClassName, className }: Props) => {
   const icon = isPublic ? <Public /> : <PublicOff />;
 
-  return <span className={styles.wrap}>
+  return <span className={classes(styles.wrap, className)}>
     <span
-      className={classes(className, styles.visibility)}
+      className={classes(iconClassName, styles.visibility)}
       title={isPublic ? "Lista pública" : "Lista privada"}
     >{icon}</span>
     <span>{isPublic ? "Pública" : "Privada"}</span>
