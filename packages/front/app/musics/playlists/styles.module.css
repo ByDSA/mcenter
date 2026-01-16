@@ -3,18 +3,10 @@
   flex-flow: row nowrap;
   gap: 2rem;
   justify-content: right;
-  margin: 0.5rem 0;
 }
 
-.noPlaylists {
+.header {
+  margin-top: 1rem;
   display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-
-  p {
-    text-align: center;
-  }
-  button {
-    width: auto;
-  }
+  justify-content: space-between;
 }

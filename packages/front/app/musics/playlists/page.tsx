@@ -54,13 +54,13 @@ export default function MusicPlaylistsPage() {
 
   return (
     <MusicLayout>
-      <div>
+      <header className={styles.header}>
+        <PlayQueryButton />
         <section className={styles.newPlaylistSection}>
-          <PlayQueryButton />
           {newQueryButton}
           {newPlaylistButton}
         </section>
-      </div>
+      </header>
       <ArrayDataProvider
         data={usingMusicPlaylist.data ?? []}
         addItem={usingMusicPlaylist.addItem}
