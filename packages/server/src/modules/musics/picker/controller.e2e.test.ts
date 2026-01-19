@@ -6,12 +6,14 @@ import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { createMockClass } from "$sharedTests/jest/mocking";
 import { Music, MusicEntityWithUserInfo } from "#musics/models";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { createTestingAppModuleAndInit,
+  TestingSetup } from "#core/app/tests/app";
 import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { MusicsIndexService } from "#modules/search/indexes/musics.service";
 import { loadFixtureMusicsUsersInDisk } from "#core/db/tests/fixtures/sets/MusicsUsers";
-import { MusicsSearchService, SearchRet } from "#modules/search/search-services/musics.search.service";
+import { MusicsSearchService,
+  SearchRet } from "#modules/search/search-services/musics.search.service";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicHistoryEntryOdm } from "../history/crud/repository/odm";
@@ -26,7 +28,10 @@ async function loadFixtures() {
   await loadFixtureMusicsUsersInDisk();
 }
 
-function expectResponseIncludeAnyOfMusics(response: request.Response, musics: Music[]) {
+function expectResponseIncludeAnyOfMusics(
+  response: request.Response,
+  musics: Music[],
+) {
   const expectedPossibleSlugs = musics.map((music) => music.slug);
   let found = false;
 
@@ -46,29 +51,32 @@ function expectNotEmpty(array: unknown[]) {
 
 describe("controller", () => {
   beforeAll(async () => {
-    testingSetup = await createTestingAppModuleAndInit( {
-      imports: [
-        DomainEventEmitterModule,
-        MusicHistoryModule,
-        MusicsCrudModule,
-        ResourceResponseFormatterModule,
-      ],
-      controllers: [MusicGetRandomController],
-      providers: [
-      ],
-    }, {
-      beforeCompile: (module) => {
-        module.overrideProvider(MusicsSearchService)
-          .useClass(createMockClass(MusicsSearchService));
+    testingSetup = await createTestingAppModuleAndInit(
+      {
+        imports: [
+          DomainEventEmitterModule,
+          MusicHistoryModule,
+          MusicsCrudModule,
+          ResourceResponseFormatterModule,
+        ],
+        controllers: [MusicGetRandomController],
+        providers: [],
       },
-      db: {
-        using: "default",
+      {
+        beforeCompile: (module) => {
+          module
+            .overrideProvider(MusicsSearchService)
+            .useClass(createMockClass(MusicsSearchService));
+        },
+        db: {
+          using: "default",
+        },
+        auth: {
+          repositories: "mock",
+          cookies: "mock",
+        },
       },
-      auth: {
-        repositories: "mock",
-        cookies: "mock",
-      },
-    } );
+    );
     routerApp = testingSetup.routerApp;
 
     await loadFixtures();
@@ -81,10 +89,10 @@ describe("controller", () => {
 
       return match ? match[1] : null;
     }
-    testingSetup.getMock(MusicsSearchService).filter
+    testingSetup.getMock(MusicsSearchService).filter.mockImplementation(
       // eslint-disable-next-line require-await
-      .mockImplementation(async (_userId, queryFilter)=> ( {
-        data: fixtureMusics.Disk.WithUserInfo.List.map(music=>{
+      async (_userId, queryFilter) => ( {
+        data: fixtureMusics.Disk.WithUserInfo.List.map((music) => {
           const ret: SearchRet["data"][0] = {
             addedAt: music.addedAt.getTime(),
             artist: music.artist,
@@ -96,15 +104,17 @@ describe("controller", () => {
             weight: music.userInfo.weight,
             country: music.country,
             game: music.game,
-            tags: [...music.tags ?? [], ...music.userInfo.tags ?? []],
+            tags: [...(music.tags ?? []), ...(music.userInfo.tags ?? [])],
             privatePlaylistSlugs: [],
           };
 
           return ret;
-        } ).filter(e=>{
-          if (queryFilter.includes("tag"))
-            return e.tags!.includes(getPrimerSubstringEntreComillas(queryFilter) ?? "nope");
-          else if (queryFilter.includes("weight")) {
+        } ).filter((e) => {
+          if (queryFilter.includes("tag")) {
+            return e.tags!.includes(
+              getPrimerSubstringEntreComillas(queryFilter) ?? "nope",
+            );
+          } else if (queryFilter.includes("weight")) {
             if (queryFilter.includes("> 10"))
               return e.weight > 10;
             else
@@ -113,7 +123,8 @@ describe("controller", () => {
             return false;
         } ),
         total: fixtureMusics.Disk.WithUserInfo.List.length,
-      } as SearchRet));
+      } ) as SearchRet,
+    );
 
     await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
   } );
@@ -145,8 +156,10 @@ describe("controller", () => {
     } );
 
     it("should get a music if query weight is put", async () => {
-      const possibleMusics: MusicEntityWithUserInfo[] = fixtureMusics.Disk.WithUserInfo.List
-        .filter((music) => music.userInfo.weight > 10);
+      const list = fixtureMusics.Disk.WithUserInfo.List;
+      const possibleMusics: MusicEntityWithUserInfo[] = list.filter(
+        (music) => music.userInfo.weight > 10,
+      );
 
       expectNotEmpty(possibleMusics);
       const response = await request(routerApp)
@@ -159,8 +172,9 @@ describe("controller", () => {
 
     it("should get a music with tag t1", async () => {
       const query = "tag:t1";
-      const musicsWithTagT1 = MUSICS_WITH_TAGS_SAMPLES
-        .filter((music) => music.tags?.includes("t1") || music.userInfo?.tags?.includes("t1"));
+      const musicsWithTagT1 = MUSICS_WITH_TAGS_SAMPLES.filter(
+        (music) => music.tags?.includes("t1") || music.userInfo?.tags?.includes("t1"),
+      );
 
       expectNotEmpty(musicsWithTagT1);
 
@@ -172,39 +186,6 @@ describe("controller", () => {
 
         expectResponseIncludeAnyOfMusics(response, musicsWithTagT1);
       }
-    } );
-
-    // TODO
-    it.skip("should get a music with tag only-t2 using t2 query", async () => {
-      const query = "tag:t2";
-      const response = await request(routerApp)
-        .get(`/?format=m3u8&q=${query}`)
-        .expect(200)
-        .send();
-      const musicsWithTagT2Only = MUSICS_WITH_TAGS_SAMPLES.filter(
-        (music) => music.tags?.includes("only-t2"),
-      );
-      const expectedPossibleSlugs = musicsWithTagT2Only.map((music) => music.slug);
-      let found = false;
-
-      for (const slug of expectedPossibleSlugs) {
-        if (response.text.includes(PATH_ROUTES.musics.slug.withParams(slug))) {
-          found = true;
-          break;
-        }
-      }
-
-      expect(found).toBeTruthy();
-    } );
-
-    // TODO
-    it.skip("should ignore t4 tag of music with only-t2 tag", async () => {
-      const query = "tag:t4";
-
-      await request(routerApp)
-        .get(`/?q=${query}`)
-        .expect(422)
-        .send();
     } );
   } );
 } );

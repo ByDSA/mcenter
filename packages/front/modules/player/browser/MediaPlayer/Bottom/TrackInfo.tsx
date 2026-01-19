@@ -10,7 +10,8 @@ import { useBrowserPlayer } from "../BrowserPlayerContext";
 import commonStyles from "../MediaPlayerCommon.module.css";
 import { CurrentTimeLabel } from "./CurrentTimeLabel";
 import styles from "./MediaPlayer.module.css";
-import { BIG_BREAKPOINT, useWindowWidth } from "./MediaPlayer";
+import { BIG_BREAKPOINT } from "./breakpoints";
+import { useWindowWidth } from "./useWindowWidth";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const TrackInfo = memo(

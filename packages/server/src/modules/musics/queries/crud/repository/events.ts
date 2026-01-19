@@ -1,5 +1,5 @@
-import { MusicQueryEntity } from "../../models";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
+import { MusicQueryEntity } from "../../models";
 
 type Entity = MusicQueryEntity;
 export namespace MusicQueryEvents {

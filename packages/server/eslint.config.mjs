@@ -14,11 +14,13 @@ const generatedConfigs = await generateConfigs( {
 const packageDir = path.join(import.meta.url, "..").slice("file:".length);
 const restrictedImportPatternsCommon = [
   {
-    group: [ // No funciona usar {episodes,musics}
+    group: [
+      // No funciona usar {episodes,musics}
       "\\#modules/episodes",
       "\\#modules/musics",
     ],
-    message: "Usa el alias interno correspondiente en lugar de #modules/* (Ej: '#musics/models').",
+    message:
+      "Usa el alias interno correspondiente en lugar de #modules/* (Ej: '#musics/models').",
   },
 ];
 const packageConfig = [
@@ -28,9 +30,12 @@ const packageConfig = [
   {
     files: ["**/*.ts"],
     rules: {
-      "import/no-extraneous-dependencies": ["error", {
-        packageDir,
-      }],
+      "import/no-extraneous-dependencies": [
+        "error",
+        {
+          packageDir,
+        },
+      ],
       "no-restricted-imports": [
         "error",
         {
@@ -61,8 +66,4 @@ const packageConfig = [
   },
 ];
 
-export default [
-  ...generatedConfigs,
-  ...projectConfigs,
-  ...packageConfig,
-];
+export default [...generatedConfigs, ...projectConfigs, ...packageConfig];

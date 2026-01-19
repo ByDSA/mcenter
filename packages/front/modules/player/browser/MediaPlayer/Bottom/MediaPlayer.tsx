@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Equalizer, KeyboardArrowUp } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { RevealArrow } from "#modules/ui-kit/RevealArrow/RevealArrow";
@@ -17,10 +17,8 @@ import { PlayQueueButtonView } from "./PlayQueue/PlayQueueButtonView";
 import { PlayQueueWindowContent } from "./PlayQueue/PlayQueueWindow";
 import { useWindowContext } from "./PlayQueue/WindowProvider";
 import { CurrentTimeLabel } from "./CurrentTimeLabel";
-
-export const SMALL_BREAKPOINT = 600;
-
-export const BIG_BREAKPOINT = 930;
+import { useWindowWidth } from "./useWindowWidth";
+import { BIG_BREAKPOINT, SMALL_BREAKPOINT } from "./breakpoints";
 
 export function BottomMediaPlayer() {
   const currentResource = useBrowserPlayer(s=>s.currentResource);
@@ -184,20 +182,3 @@ const FullscreenButton = () => {
     </ControlButton>
   </>;
 };
-
-export function useWindowWidth() {
-  const [width, setWidth] = useState(window.innerWidth);
-
-  useEffect(() => {
-    // Función que actualiza el estado
-    const handleResize = () => setWidth(window.innerWidth);
-
-    // Suscribirse al evento de cambio de tamaño
-    window.addEventListener("resize", handleResize);
-
-    // Limpiar el evento al desmontar el componente para evitar fugas de memoria
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return width;
-}

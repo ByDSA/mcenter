@@ -90,7 +90,6 @@ export const ExpandableContainer = ( { children, className = "" }: ExpandableCon
     const childType = children.type;
     const childProps = children.props;
 
-
     // TEXTAREA - Forzar tamaño completo
     if (childType === "textarea") {
       return (

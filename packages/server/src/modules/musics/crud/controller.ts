@@ -4,21 +4,40 @@ import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { UserPayload } from "$shared/models/auth";
 import { MusicInfoCrudDtos } from "$shared/models/musics/user-info/dto/transport";
 import { Response, Request } from "express";
-import { MusicEntity, musicEntitySchema, musicUserInfoEntitySchema } from "#musics/models";
-import { AdminDeleteOne, GetManyCriteria, GetOneCriteria, UserPatchOne } from "#utils/nestjs/rest";
+import { MusicEntity,
+  musicEntitySchema,
+  musicUserInfoEntitySchema } from "#musics/models";
+import { AdminDeleteOne,
+  GetManyCriteria,
+  GetOneCriteria,
+  UserPatchOne } from "#utils/nestjs/rest";
 import { User } from "#core/auth/users/User.decorator";
 import { MusicFlowService } from "../MusicFlow.service";
 import { MusicsUsersRepository } from "./repositories/user-info/repository";
 import { MusicsRepository } from "./repositories/music";
 
-class GetOneByIdParamsDto extends createZodDto(MusicCrudDtos.GetOne.ById.paramsSchema) {}
-class GetManyByCriteriaDto extends createZodDto(MusicCrudDtos.GetMany.criteriaSchema) {}
-class GetManyOneByCriteriaDto extends createZodDto(MusicCrudDtos.GetOne.criteriaSchema) {}
-class PatchParamsDto extends createZodDto(MusicCrudDtos.PatchOneById.paramsSchema) {}
-class DeleteOneParamsDto extends createZodDto(MusicCrudDtos.DeleteOneById.paramsSchema) {}
-class PatchBodyDto extends createZodDto(MusicCrudDtos.PatchOneById.bodySchema) {}
+class GetOneByIdParamsDto extends createZodDto(
+  MusicCrudDtos.GetOne.ById.paramsSchema,
+) {}
+class GetManyByCriteriaDto extends createZodDto(
+  MusicCrudDtos.GetMany.criteriaSchema,
+) {}
+class GetManyOneByCriteriaDto extends createZodDto(
+  MusicCrudDtos.GetOne.criteriaSchema,
+) {}
+class PatchParamsDto extends createZodDto(
+  MusicCrudDtos.PatchOneById.paramsSchema,
+) {}
+class DeleteOneParamsDto extends createZodDto(
+  MusicCrudDtos.DeleteOneById.paramsSchema,
+) {}
+class PatchBodyDto extends createZodDto(
+  MusicCrudDtos.PatchOneById.bodySchema,
+) {}
 
-class PatchUserInfoBodyDto extends createZodDto(MusicInfoCrudDtos.PatchOneById.bodySchema) {}
+class PatchUserInfoBodyDto extends createZodDto(
+  MusicInfoCrudDtos.PatchOneById.bodySchema,
+) {}
 
 @Controller("/")
 export class MusicCrudController {
@@ -26,8 +45,7 @@ export class MusicCrudController {
     private readonly musicRepo: MusicsRepository,
     private readonly musicsUsersrepo: MusicsUsersRepository,
     private readonly flow: MusicFlowService,
-  ) {
-  }
+  ) {}
 
   @GetManyCriteria("/search", musicEntitySchema)
   async getManyByCriteria(
@@ -44,7 +62,7 @@ export class MusicCrudController {
   async patchOneByIdAndGet(
     @Param() params: DeleteOneParamsDto,
     @Body() body: PatchBodyDto,
-    @User() user: UserPayload,
+    @User() _user: UserPayload,
   ) {
     const { id } = params;
 
@@ -58,16 +76,17 @@ export class MusicCrudController {
     @Body() body: PatchUserInfoBodyDto,
     @User() user: UserPayload,
   ) {
-    return await this.musicsUsersrepo.patchOneByIdAndGet( {
-      musicId: params.id,
-      userId: user.id,
-    }, body);
+    return await this.musicsUsersrepo.patchOneByIdAndGet(
+      {
+        musicId: params.id,
+        userId: user.id,
+      },
+      body,
+    );
   }
 
   @AdminDeleteOne(":id", musicEntitySchema)
-  async deleteOneByIdAndGet(
-    @Param() params: PatchParamsDto,
-  ) {
+  async deleteOneByIdAndGet(@Param() params: PatchParamsDto) {
     const { id } = params;
 
     // TODO: filtro por uploader
@@ -77,9 +96,10 @@ export class MusicCrudController {
   @Get("/:id")
   async getOneById(
     @Param() params: GetOneByIdParamsDto,
-     @Res( {
-       passthrough: true,
-     } ) res: Response,
+    @Res( {
+      passthrough: true,
+    } )
+      res: Response,
     @Req() req: Request,
     @User() user: UserPayload | null,
     @Query("token") token: string | undefined,
@@ -87,15 +107,18 @@ export class MusicCrudController {
   ) {
     const { id } = params;
 
-    return await this.flow.fetchAndRender((_format)=> {
-      return this.musicRepo.getOneById(id);
-    }, {
-      req,
-      res,
-      user,
-      shouldNotAddToHistory: !!shouldNotAddToHistory,
-      token,
-    } );
+    return await this.flow.fetchAndRender(
+      (_format) => {
+        return this.musicRepo.getOneById(id);
+      },
+      {
+        req,
+        res,
+        user,
+        shouldNotAddToHistory: !!shouldNotAddToHistory,
+        token,
+      },
+    );
   }
 
   @GetOneCriteria(MusicCrudDtos.GetOne.responseDataSchema)
