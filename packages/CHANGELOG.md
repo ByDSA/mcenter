@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.28.0](https://github.com/ByDSA/mcenter/compare/v4.27.0...v4.28.0) (2026-01-19)
+
+
+### Features
+
+* add music queries ([ef6e7c5](https://github.com/ByDSA/mcenter/commit/ef6e7c52afecd291a652f21210a224166c23c604))
+
+
+### Bug Fixes
+
+* minor style changes ([c45c0c9](https://github.com/ByDSA/mcenter/commit/c45c0c96e6491919f9f2068265993b59a1b296f1))
+* play playlist shuffle ([717f07e](https://github.com/ByDSA/mcenter/commit/717f07e869f47e24e1e04df965af6051a2e603a1))
+* style left sidebar ([b8a7fc5](https://github.com/ByDSA/mcenter/commit/b8a7fc56a4972aa75748abfcb7a84323d10ea1ee))
+* use new UI system ([a7ae535](https://github.com/ByDSA/mcenter/commit/a7ae535ea500bddf4cc86c52bd9a76edc75a891e))
+
 ## [4.27.0](https://github.com/ByDSA/mcenter/compare/v4.26.2...v4.27.0) (2026-01-13)
 
 
