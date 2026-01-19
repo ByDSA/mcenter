@@ -1,6 +1,6 @@
 import { Add } from "@mui/icons-material";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import styles from "../../playlists/New/NewPlaylistButton.module.css";
 import { MusicQueryEntity } from "../models";
 import { NewQueryForm } from "./Form";

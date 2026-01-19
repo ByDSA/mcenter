@@ -7,7 +7,8 @@ import { createContext,
   useState,
   useCallback,
   useRef,
-  ReactNode } from "react";
+  ReactNode,
+  useEffect } from "react";
 import { Modal } from "./Modal";
 
 export type OpenModalProps = {
@@ -19,11 +20,11 @@ export type OpenModalProps = {
   className?: string;
   title?: string;
   onClose?: (returnObj?: unknown)=> Promise<void> | void;
+  onBeforeClose?: ()=> Promise<boolean> | boolean;
   onOpen?: ()=> void;
   content?: ReactNode;
 };
 
-// ... (Tus tipos ModalInstance, etc. se mantienen igual)
 type ModalInstance = {
   id: string;
   isOpen: boolean;
@@ -101,6 +102,39 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
     (id: string) => modals.some((m) => m.id === id && m.isOpen),
     [modals],
   );
+  const handleRequestClose = useCallback(async (id: string, returnObj?: unknown) => {
+    const modalInstance = modals.find((m) => m.id === id);
+
+    if (!modalInstance)
+      return;
+
+    // Si existe onBeforeClose, lo ejecutamos
+    if (modalInstance.options.onBeforeClose) {
+      const shouldClose = await modalInstance.options.onBeforeClose();
+
+      // Si devuelve false, detenemos el cierre aquí
+      if (shouldClose === false)
+        return;
+    }
+
+    // Si pasa la validación (o no tiene), cerramos de verdad
+    await _close(id, returnObj);
+  }, [modals, _close]);
+
+  useEffect(() => {
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      if (e.key === "Escape" && modals.length > 0) {
+        const topModal = modals[modals.length - 1];
+
+        // Llamamos al intermediario en lugar de a _close directo
+        await handleRequestClose(topModal.id);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [modals, handleRequestClose]); // Dependencia actualizada
 
   return (
     <ModalContext.Provider value={{
@@ -116,7 +150,7 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
           key={modal.id}
           isOpen={modal.isOpen}
           title={modal.options.title}
-          onClose={(ret) => _close(modal.id, ret)}
+          onClose={(ret) => handleRequestClose(modal.id, ret)}
           closeOnClickOutside={modal.options.closeOnClickOutside}
           showCloseButton={modal.options.showCloseButton}
           showHeader={modal.options.showHeader}

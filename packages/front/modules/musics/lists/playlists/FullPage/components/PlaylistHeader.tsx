@@ -1,4 +1,7 @@
 import { CalendarToday } from "@mui/icons-material";
+import { usePathname, useRouter } from "next/navigation";
+import { PATH_ROUTES } from "$shared/routing";
+import { assertIsDefined } from "$shared/utils/validation";
 import { classes } from "#modules/utils/styles";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { MusicImageCover } from "#modules/musics/MusicCover";
@@ -6,39 +9,40 @@ import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerC
 import { ResourcePlayButtonView } from "#modules/resources/PlayButton";
 import { Separator } from "#modules/resources/Separator";
 import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
+import { useLocalData } from "#modules/utils/local-data-context";
 import { formatDurationHeader } from "../../utils";
 import styles from "../Playlist.module.css";
-import { SettingsButton } from "../../../../../ui-kit/SettingsButton/SettingsButton";
 import { MusicPlaylistEntity } from "../../models";
+import { MusicPlaylistSettingsButton } from "../../SettingsButton/Settings";
 
 interface PlaylistHeaderProps {
-  value: MusicPlaylistEntity;
   totalSongs: number;
   totalDuration: number;
   playlistStatus: PlayerStatus;
   onPlay: ()=> void;
-  onMoreOptions: (e: React.MouseEvent<HTMLElement>)=> void;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const PlaylistHeader = ( { value,
-  totalSongs,
+export const PlaylistHeader = ( { totalSongs,
   totalDuration,
   playlistStatus,
-  onPlay,
-  onMoreOptions }: PlaylistHeaderProps) => {
+  onPlay }: PlaylistHeaderProps) => {
+  const { data } = useLocalData<MusicPlaylistEntity>();
+  const pathname = usePathname();
+  const router = useRouter();
+
   return (
     <div className={styles.playlistHeader}>
       <div className={styles.headerContent}>
         <MusicImageCover
-          title={value.name}
+          title={data.name}
           className={styles.playlistCover}
-          cover={value.imageCover}
+          cover={data.imageCover}
         />
 
         <div className={styles.playlistInfo}>
           <span className={styles.playlistTitle}>
-            <h1>{value.name}</h1>
+            <h1>{data.name}</h1>
           </span>
 
           <div className={styles.playlistStats}>
@@ -52,7 +56,7 @@ export const PlaylistHeader = ( { value,
               </div>
               <Separator />
               <VisibilityTag
-                isPublic={value.visibility === "public"}
+                isPublic={data.visibility === "public"}
                 className={styles.statItem}
               />
             </div>
@@ -62,7 +66,7 @@ export const PlaylistHeader = ( { value,
                 title="Fecha de creación"
               >
                 <CalendarToday />
-                <span>{formatDateDDMMYYY(value.createdAt)}</span>
+                <span>{formatDateDDMMYYY(data.createdAt)}</span>
               </div>
             </div>
           </div>
@@ -75,7 +79,26 @@ export const PlaylistHeader = ( { value,
           disabled={totalSongs === 0}
           status={playlistStatus}
         />
-        <SettingsButton theme="dark" onClick={onMoreOptions} />
+        <MusicPlaylistSettingsButton
+          onEdit={(current, previous)=> {
+            if (
+              pathname.startsWith(PATH_ROUTES.musics.frontend.playlists.slug.path)
+                              && previous.slug !== current.slug) {
+              const userSlug = current.ownerUserPublic?.slug;
+
+              assertIsDefined(userSlug);
+              router.push(
+                PATH_ROUTES.musics.frontend.playlists.slug.withParams( {
+                  playlistSlug: current.slug,
+                  userSlug,
+                } ),
+              );
+            }
+          }}
+          onDelete={()=> {
+            router.push(PATH_ROUTES.musics.frontend.playlists.path);
+          }}
+        />
       </div>
     </div>
   );

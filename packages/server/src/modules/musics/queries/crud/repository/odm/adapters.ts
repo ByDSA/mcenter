@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { MusicQueryModel, MusicQueryEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
@@ -27,6 +28,13 @@ export function docOdmToEntity(doc: FullDocOdm): MusicQueryEntity {
     query: doc.query,
     slug: doc.slug,
     ownerUserId: doc.ownerUserId.toString(),
+    ownerUser: doc.ownerUser ? UserOdm.toEntity(doc.ownerUser) : undefined,
+    ownerUserPublic: doc.ownerUserPublic
+      ? {
+        slug: doc.ownerUserPublic.publicUsername,
+        publicName: doc.ownerUserPublic.publicName,
+      }
+      : undefined,
     visibility: doc.visibility,
     imageCoverId: doc.imageCoverId?.toString() ?? null,
     imageCover: doc.imageCover ? ImageCoverOdm.toEntity(doc.imageCover) : undefined,

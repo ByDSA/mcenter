@@ -2,7 +2,7 @@ import { ImageCover, ImageCoverEntity } from "$shared/models/image-covers";
 import { ResourceImageCover, ResourceImageCoverProps } from "#modules/resources/ResourceCover";
 import { classes } from "#modules/utils/styles";
 import { ImageCoverEditButton } from "#modules/image-covers/Edit/Button";
-import { ImageCoverEditorProps } from "#modules/image-covers/Edit/Editor";
+import { ImageCoverEditorProps } from "#modules/image-covers/Edit/Form";
 import { getLargeCoverUrl, getMediumCoverUrl, getOriginalCoverUrl, getSmallCoverUrl } from "#modules/image-covers/Selector/image-cover-utils";
 import { MusicsIcon } from "./MusicsIcon";
 import styles from "./MusicCover.module.css";

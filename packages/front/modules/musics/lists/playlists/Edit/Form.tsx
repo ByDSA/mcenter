@@ -2,8 +2,8 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import { Button } from "#modules/ui-kit/input/Button";
-import { InputTextLineView } from "#modules/ui-kit/input/UseInputText";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { FormInputText } from "#modules/ui-kit/form/input/Text/FormInputText";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
 import { ErrorView } from "#modules/ui-kit/input/Error";
@@ -47,26 +47,22 @@ export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }:
   } );
   const currentVisibility = watch("visibility");
   const currentImageCoverId = watch("imageCoverId");
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Evitar salto de línea
-      await handleSubmit(onSubmit)();
-    }
-  };
   const onSubmit = async (data: z.infer<typeof schema>) => {
-    const changes: MusicPlaylistsApi.PatchOne.Body = {};
+    const changes: MusicPlaylistsApi.PatchOne.Body = {
+      entity: {},
+    };
 
     if (data.name !== initialValue.name)
-      changes.name = data.name;
+      changes.entity.name = data.name;
 
     if (data.slug !== initialValue.slug)
-      changes.slug = data.slug;
+      changes.entity.slug = data.slug;
 
     if (data.visibility !== initialValue.visibility)
-      changes.visibility = data.visibility;
+      changes.entity.visibility = data.visibility;
 
     if (data.imageCoverId !== initialValue.imageCoverId)
-      changes.imageCoverId = data.imageCoverId;
+      changes.entity.imageCoverId = data.imageCoverId;
 
     if (Object.keys(changes).length === 0)
       return;
@@ -94,17 +90,15 @@ export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }:
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormLabel>Nombre</FormLabel>
-        <InputTextLineView
+        <FormInputText
           {...register("name")}
-          onKeyDown={handleKeyDown}
           autoFocus
         />
         <ErrorView errors={errors} keyName="name" touchedFields={touchedFields} />
 
         <FormLabel>Url slug</FormLabel>
-        <InputTextLineView
+        <FormInputText
           {...register("slug")}
-          onKeyDown={handleKeyDown}
         />
         <ErrorView errors={errors} keyName="slug" touchedFields={touchedFields} />
 

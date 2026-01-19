@@ -4,8 +4,9 @@ import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextM
 import { useUser } from "#modules/core/auth/useUser";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { ResourceEntryLoading } from "#modules/resources/ResourceEntryLoading";
-import { MusicEntryElement } from "../../../musics/MusicEntry/MusicEntry";
-import { genMusicEntryContextMenuContent } from "../../../musics/MusicEntry/ContextMenu";
+import { MusicContextMenu } from "#modules/musics/musics/SettingsButton/Button";
+import { LocalDataProvider } from "#modules/utils/local-data-context";
+import { MusicEntryElement } from "../../../musics/ListItem/MusicEntry";
 import { useMusic } from "../../../hooks";
 import { MusicPlaylistsApi } from "../requests";
 import { MusicPlaylistEntity } from "../models";
@@ -38,13 +39,14 @@ export const MusicPlaylistItem = ( { playlist,
   if (!music)
     return <ResourceEntryLoading drag={drag}/>;
 
-  const contextMenuContent = <>
-    {genMusicEntryContextMenuContent( {
-      music,
-      user,
-    } )}
+  const contextMenuContent = <LocalDataProvider
+    data={music}
+  >
+    <MusicContextMenu
+      music={music}
+    />
     {user?.id === playlist.ownerUserId && <ContextMenuItem
-      label="Eliminar"
+      label="Quitar de la playlist"
       theme="danger"
       onClick={async () => {
         await api.removeOneTrack( {
@@ -66,7 +68,7 @@ export const MusicPlaylistItem = ( { playlist,
       }}
     />
     }
-  </>;
+  </LocalDataProvider>;
 
   return <MusicEntryElement
     musicId={music.id}

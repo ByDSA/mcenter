@@ -34,16 +34,6 @@ export function Modal( { isOpen,
     if (closeOnClickOutside && e.target === backdropRef.current)
       await onClose();
   };
-  const handleKeyDown = async (e: KeyboardEvent) => {
-    if (e.key === "Escape" && isOpen)
-      await onClose();
-  };
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
 
   useEffect(() => {
     const modal = modalRef.current;
@@ -91,7 +81,7 @@ export function Modal( { isOpen,
   const modalContent = (
     <div
       ref={backdropRef}
-      className={`${styles.backdrop} ${addBackdrop ? styles.withBackground : ""}`}
+      className={classes(styles.backdrop, addBackdrop && styles.withBackground)}
       onClick={handleBackdropClick}
     >
 

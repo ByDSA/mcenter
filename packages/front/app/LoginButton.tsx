@@ -2,7 +2,7 @@
 
 import { PATH_ROUTES } from "$shared/routing";
 import { useRouter } from "next/navigation";
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import styles from "./LogginButton.module.css";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

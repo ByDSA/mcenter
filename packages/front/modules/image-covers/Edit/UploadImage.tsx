@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useRef, forwardRef, useImperativeHandle, useCallback, useEffect } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { UploadButton } from "#modules/ui-kit/upload/UploadButton";
 import { classes } from "#modules/utils/styles";

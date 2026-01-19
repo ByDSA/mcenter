@@ -5,7 +5,7 @@ import { useState } from "react";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { useUser } from "#modules/core/auth/useUser";
 import { usePlaylistSelectorModal } from "#modules/musics/lists/playlists/Selector/modal";
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { UsersApi } from "#modules/core/users/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicPlaylistsApi } from "#modules/musics/lists/playlists/requests";

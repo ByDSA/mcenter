@@ -1,3 +1,3 @@
 export {
   HistoryList,
-} from "./HistoryList";
+} from "./List";

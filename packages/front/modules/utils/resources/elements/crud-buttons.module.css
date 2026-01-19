@@ -4,11 +4,6 @@
   }
 }
 
-.resetButton {
-  a {
-    color: var(--color-gray-50);
-  }
-}
 
 .disabled a {
   filter: saturate(0.5) opacity(0.4) !important;
@@ -18,23 +13,6 @@
   }
 }
 
-.updateButton {
-  a {
-    color: var(--color-green-600);
-  }
-}
-
-.actionsBar {
-  display: flex;
-  justify-content: flex-end !important;
-  gap: 1.5rem !important;
-  margin: 0.5rem 0 !important;
-
-  svg {
-    stroke: rgba(0, 0, 0, 0.5);
-    stroke-width: 0.25px;
-  }
-}
 
 :global(.ui-kit-accordion .body):has(> .actionsBar:first-child) {
   padding-top: 0 !important;

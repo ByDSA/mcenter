@@ -1,4 +1,4 @@
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import styles from "./FormEnumButtons.module.css";
 

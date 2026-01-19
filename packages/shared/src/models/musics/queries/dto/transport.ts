@@ -13,7 +13,7 @@ const criteriaConfig = {
     ownerUserSlug: z.string().optional(),
   },
   sortKeys: ["updated"] as const,
-  expandKeys: ["ownerUser", "imageCover"] as const,
+  expandKeys: ["ownerUser", "ownerUserPublic", "imageCover"] as const,
 };
 
 export namespace MusicQueryCrudDtos {

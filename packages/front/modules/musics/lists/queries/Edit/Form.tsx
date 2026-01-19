@@ -2,22 +2,22 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import { Button } from "#modules/ui-kit/input/Button";
-import { InputTextLineView } from "#modules/ui-kit/input/UseInputText";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
 import { ErrorView } from "#modules/ui-kit/input/Error";
 import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
 import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
+import { FormInputText, FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";
 import { MusicQueriesApi } from "../requests";
 import { MusicQueryEntity } from "../models";
 import { FormVisibility } from "../../FormVisibility";
 
 type Props = {
-  initialValue: MusicQueryEntity;
+  initialData: MusicQueryEntity;
   onSuccess?: (data: { previous: MusicQueryEntity;
 current: MusicQueryEntity; } )=> void;
-  updateLocalValue: (value: MusicQueryEntity)=> void;
+  updateLocalData: (value: MusicQueryEntity)=> void;
 };
 
 const schema = z.object( {
@@ -32,7 +32,7 @@ const schema = z.object( {
 } );
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const EditQueryForm = ( { initialValue, onSuccess, updateLocalValue }: Props) => {
+export const EditQueryForm = ( { initialData, onSuccess, updateLocalData }: Props) => {
   const { register,
     handleSubmit,
     watch,
@@ -41,55 +41,58 @@ export const EditQueryForm = ( { initialValue, onSuccess, updateLocalValue }: Pr
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
-      name: initialValue.name,
-      slug: initialValue.slug,
-      query: initialValue.query,
-      visibility: initialValue.visibility,
-      imageCoverId: initialValue.imageCoverId ?? null,
+      name: initialData.name,
+      slug: initialData.slug,
+      query: initialData.query,
+      visibility: initialData.visibility,
+      imageCoverId: initialData.imageCoverId ?? null,
     },
   } );
   const currentVisibility = watch("visibility");
   const currentImageCoverId = watch("imageCoverId");
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Evitar salto de línea
-      await handleSubmit(onSubmit)();
-    }
-  };
   const onSubmit = async (data: z.infer<typeof schema>) => {
-    const changes: MusicQueriesApi.PatchOne.Body = {};
+    const changes: MusicQueriesApi.PatchOne.Body = {
+      entity: {},
+    };
 
-    if (data.name !== initialValue.name)
-      changes.name = data.name;
+    if (data.name !== initialData.name)
+      changes.entity.name = data.name;
 
-    if (data.slug !== initialValue.slug)
-      changes.slug = data.slug;
+    if (data.slug !== initialData.slug)
+      changes.entity.slug = data.slug;
 
-    if (data.query !== initialValue.query)
-      changes.query = data.query;
+    if (data.query !== initialData.query)
+      changes.entity.query = data.query;
 
-    if (data.visibility !== initialValue.visibility)
-      changes.visibility = data.visibility;
+    if (data.visibility !== initialData.visibility)
+      changes.entity.visibility = data.visibility;
 
-    if (data.imageCoverId !== initialValue.imageCoverId)
-      changes.imageCoverId = data.imageCoverId;
+    if (data.imageCoverId !== initialData.imageCoverId)
+      changes.entity.imageCoverId = data.imageCoverId;
 
     if (Object.keys(changes).length === 0)
       return;
 
     const api = FetchApi.get(MusicQueriesApi);
-    const res = await api.patchOne(initialValue.id, changes);
+
+    await api.patchOne(initialData.id, changes);
+    const res = await api.getOneByCriteria( {
+      filter: {
+        id: initialData.id,
+      },
+      expand: ["imageCover", "ownerUser"],
+    } );
     const newData: MusicQueryEntity = {
-      ...initialValue,
+      ...initialData,
       ...res.data!,
     };
 
     if (newData.imageCover && newData.imageCoverId !== newData.imageCover.id)
       newData.imageCover = undefined;
 
-    updateLocalValue(newData);
+    updateLocalData(newData);
     onSuccess?.( {
-      previous: initialValue,
+      previous: initialData,
       current: newData,
     } );
   };
@@ -98,24 +101,21 @@ export const EditQueryForm = ( { initialValue, onSuccess, updateLocalValue }: Pr
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormLabel>Nombre</FormLabel>
-        <InputTextLineView
+        <FormInputText
           {...register("name")}
-          onKeyDown={handleKeyDown}
           autoFocus
         />
         <ErrorView errors={errors} keyName="name" touchedFields={touchedFields} />
 
         <FormLabel>Url slug</FormLabel>
-        <InputTextLineView
+        <FormInputText
           {...register("slug")}
-          onKeyDown={handleKeyDown}
         />
         <ErrorView errors={errors} keyName="slug" touchedFields={touchedFields} />
 
         <FormLabel>Query</FormLabel>
-        <InputTextLineView
+        <FormInputTextMultiline
           {...register("query")}
-          onKeyDown={handleKeyDown}
         />
         <ErrorView errors={errors} keyName="query" touchedFields={touchedFields} />
 

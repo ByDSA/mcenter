@@ -69,6 +69,7 @@
   border: 1px solid var(--border-color);
   border-radius: 5px;
   overflow: hidden;
+  font-family: monospace;
 
   &.is-null:not(:focus) {
     background-color: var(--color-gray-500);
@@ -80,9 +81,7 @@
 .ui-kit-resource-input-array-string {
   --border-color: var(--color-gray-700);
 
-  textarea {
     border-color: var(--border-color);
-  }
 }
 
 .ui-kit-resource-input-array-string {

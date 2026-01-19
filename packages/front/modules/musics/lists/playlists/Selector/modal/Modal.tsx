@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { useUser } from "#modules/core/auth/useUser";
 import { logger } from "#modules/core/logger";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import { useMusicPlaylistsForUser } from "../../request-all";
 import { MusicPlaylistEntity } from "../../models";
@@ -33,7 +33,7 @@ export function usePlaylistSelectorModal(props?: Props) {
       className: classes(styles.playlistSelectorModal, openModalProps.className),
       title: openModalProps.title ?? "Seleccionar playlist",
       content: (
-        <AddToPlaylistModalContent
+        <AddToPlaylistForm
           userId={user.id}
           nullable={nullable}
           onSelect={async p=>{
@@ -60,7 +60,7 @@ type AddToPlaylistContentProps = {
   onSelect: (playlist: MusicPlaylistEntity | null)=> void;
   nullable?: boolean;
 };
-function AddToPlaylistModalContent( { userId, onSelect, nullable }: AddToPlaylistContentProps) {
+function AddToPlaylistForm( { userId, onSelect, nullable }: AddToPlaylistContentProps) {
   const { element, setData, fetchData, isSuccess } = useMusicPlaylistsForUser( {
     userId,
     onSelect,

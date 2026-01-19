@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { createOneResultResponseSchema, createPaginatedResultResponseSchema, PaginatedResult, ResultResponse } from "$shared/utils/http/responses";

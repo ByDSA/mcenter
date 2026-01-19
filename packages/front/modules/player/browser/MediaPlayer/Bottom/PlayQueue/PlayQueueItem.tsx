@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { MusicEntryElement } from "#modules/musics/musics/MusicEntry/MusicEntry";
+import { MusicEntryElement } from "#modules/musics/musics/ListItem/MusicEntry";
 import { PlayerStatus, PlaylistQueueItem as QItem } from "../../BrowserPlayerContext";
 
 interface QueueItemProps {

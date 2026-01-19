@@ -10,7 +10,7 @@ import { PageItemNotFound } from "#modules/utils/ItemNotFound";
 import { useUser } from "#modules/core/auth/useUser";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { MusicsApi } from "#modules/musics/requests";
-import { Music } from "#modules/musics/musics/Music/Music";
+import { Music } from "#modules/musics/musics/FullPage/Music";
 import { useMusic } from "#modules/musics/hooks";
 
 interface PageProps {

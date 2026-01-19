@@ -1,5 +1,0 @@
-.createdAt,
-.updatedAt,
-.hash > *:first-child {
-  white-space: nowrap;
-}

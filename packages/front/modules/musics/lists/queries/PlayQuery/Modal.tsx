@@ -2,12 +2,12 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { Button } from "#modules/ui-kit/input/Button";
-import { InputTextLineView } from "#modules/ui-kit/input/UseInputText";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { ErrorView } from "#modules/ui-kit/input/Error";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
+import { FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";
 import styles from "./Modal.module.css";
 
 type FormProps = {
@@ -31,12 +31,6 @@ const PlayQueryForm = ( { initialValue }: FormProps) => {
       query: initialValue ?? "",
     },
   } );
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Evitar salto de línea
-      await handleSubmit(onSubmit)();
-    }
-  };
   const onSubmit = async (data: z.infer<typeof schema>) => {
     await useBrowserPlayer.getState().playQuery(data.query.toLowerCase());
 
@@ -54,9 +48,8 @@ const PlayQueryForm = ( { initialValue }: FormProps) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <section>
           <FormLabel>Query</FormLabel>
-          <InputTextLineView
+          <FormInputTextMultiline
             {...register("query")}
-            onKeyDown={handleKeyDown}
             autoFocus
           />
           <ErrorView errors={errors} keyName="query" touchedFields={touchedFields} />

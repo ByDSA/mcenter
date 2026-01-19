@@ -3,11 +3,8 @@
 import { Equalizer, KeyboardArrowDown, LiveTv } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import { classes } from "#modules/utils/styles";
-import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
-import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
-import { genMusicEntryContextMenuContent } from "#modules/musics/musics/MusicEntry/ContextMenu";
-import { useUser } from "#modules/core/auth/useUser";
 import { useMusic } from "#modules/musics/hooks";
+import { MusicSettingsButton } from "#modules/musics/musics/SettingsButton/Button";
 import { ControlButton } from "../OtherButtons";
 import { PlayQueueButtonView } from "../Bottom/PlayQueue/PlayQueueButtonView";
 import { PlayQueue } from "../Bottom/PlayQueue/PlayQueue";
@@ -31,7 +28,6 @@ type Props = {
 };
 export function FullscreenMediaPlayer( { onClose }: Props) {
   const [view, setView] = useState<AppView>(AppView.Player);
-  const { user } = useUser();
   const audioElement = useBrowserPlayer(s=>s.audioElement);
   const { close } = useWindowContext();
   const currentResource = useBrowserPlayer(s=>s.currentResource);
@@ -55,7 +51,6 @@ export function FullscreenMediaPlayer( { onClose }: Props) {
         return <Player />;
     }
   }, [view, audioElement]);
-  const { openMenu } = useContextMenuTrigger();
   const isActiveQueue = view === AppView.Queue;
   const isActivePlayer = view === AppView.Player;
   const isActiveEffects = view === AppView.Effects;
@@ -63,13 +58,7 @@ export function FullscreenMediaPlayer( { onClose }: Props) {
 
   return <>
     <header className={styles.header}>
-      {music && <SettingsButton onClick={(e)=>openMenu( {
-        event: e as any,
-        content: genMusicEntryContextMenuContent( {
-          music,
-          user,
-        } ),
-      } )} />}
+      {music && <MusicSettingsButton musicId={music.id}/>}
     </header>
     <main className={styles.main}>
       {content}

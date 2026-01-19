@@ -1,15 +1,13 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
-import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useArrayData } from "#modules/utils/array-data-context";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ResourceEntry";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
-import { LocalDataProvider, useLocalData } from "#modules/utils/local-data-context";
+import { useLocalData } from "#modules/utils/local-data-context";
 import { MusicQueryEntity } from "../models";
-import { EditQueryContextMenuItem } from "../Edit/ContextMenuItem";
-import { DeleteQueryContextMenuItem } from "../Delete/ContextMenuItem";
+import { MusicQuerySettingsButton } from "../SettingsButton/Settings";
 import styles from "./ListItem.module.css";
 
 interface QueryProps {
@@ -19,8 +17,7 @@ interface QueryProps {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicQueryListItem = ( { index }: QueryProps) => {
   const { removeItemByIndex } = useArrayData<MusicQueryEntity>();
-  const { data, setData } = useLocalData<MusicQueryEntity>();
-  const { openMenu } = useContextMenuTrigger();
+  const { data } = useLocalData<MusicQueryEntity>();
   const { user } = useUser();
 
   assertIsDefined(user);
@@ -36,26 +33,12 @@ export const MusicQueryListItem = ( { index }: QueryProps) => {
       status = "paused";
   }
 
-  const isUserOwner = data.ownerUserId === user.id;
-
   return <ResourceEntry
     mainTitle={data.name}
     href={PATH_ROUTES.musics.frontend.queries.withParams(data.id)}
-    settings={{
-      onClick: (e: React.MouseEvent<HTMLElement>) => openMenu( {
-        event: e,
-        content: <LocalDataProvider data={data} setData={setData}>
-          {isUserOwner && (
-            <>
-              <EditQueryContextMenuItem />
-              <DeleteQueryContextMenuItem
-                onActionSuccess={() => removeItemByIndex(index)}
-              />
-            </>
-          )}
-        </LocalDataProvider>,
-      } ),
-    }}
+    settings={ <MusicQuerySettingsButton
+      onDelete={() => removeItemByIndex(index)}
+    />}
     subtitle={<ResourceSubtitle items={[{
       text: "Query",
     }, {

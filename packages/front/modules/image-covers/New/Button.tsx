@@ -1,6 +1,6 @@
 import { Add } from "@mui/icons-material";
-import { Button } from "#modules/ui-kit/input/Button";
-import { NewImageCoverProps } from "./Content";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { NewImageCoverProps } from "./Form";
 import { useNewImageCoverModal } from "./Modal";
 
 type Props = NewImageCoverProps & {

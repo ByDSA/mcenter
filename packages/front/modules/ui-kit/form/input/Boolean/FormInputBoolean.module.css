@@ -1,0 +1,23 @@
+.checkboxWrap {
+  display: inline-flex;
+  align-items: center;
+
+   input[type="checkbox"] {
+    accent-color: var(--color-primary);
+    margin:0;
+  }
+
+  label {
+    color: inherit;
+    padding-left: 0.25rem;
+  }
+
+  input[type="checkbox"]:hover ~ label {
+    color: inherit;
+  }
+
+  input[type="checkbox"],
+  label {
+    cursor: pointer;
+  }
+}

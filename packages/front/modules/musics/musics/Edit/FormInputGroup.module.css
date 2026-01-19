@@ -1,0 +1,37 @@
+.group {
+  padding-bottom: 0.5rem;
+}
+.group + .group {
+  padding-top: 0.5rem;
+}
+
+.group {
+  display: flex;
+  width: 100%;
+  gap: 0.5rem;
+  flex-flow: column wrap;
+}
+
+.inline {
+  display: inline-flex;
+  flex-flow: row wrap !important;
+  gap: 0 1rem;
+}
+
+.group.inline:has(>.item) {
+  gap: 1rem;
+}
+
+.item {
+  display: flex;
+  flex-flow: column nowrap;
+  flex: 1;
+}
+
+.item.inline {
+  align-self: flex-start;
+}
+
+.group.inline > .item.inline {
+  align-self: center;
+}

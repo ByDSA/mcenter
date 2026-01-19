@@ -1,12 +1,12 @@
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "#modules/ui-kit/input/Button";
-import { InputTextLineView } from "#modules/ui-kit/input/UseInputText";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
 import { ErrorView } from "#modules/ui-kit/input/Error";
 import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
+import { FormInputText, FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";
 import { MusicQueriesApi } from "../requests";
 import { MusicQueryEntity } from "../models";
 import { FormVisibility } from "../../FormVisibility";
@@ -39,13 +39,6 @@ export const NewQueryForm = ( { onSuccess }: FormProps) => {
     },
   } );
   const currentVisibility = watch("visibility");
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Evita el salto de línea
-
-      await handleSubmit(onSubmit)();
-    }
-  };
   const onSubmit = async (data: z.infer<typeof schema>) => {
     const api = FetchApi.get(MusicQueriesApi);
     const res = await api.createOne( {
@@ -62,16 +55,14 @@ export const NewQueryForm = ( { onSuccess }: FormProps) => {
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormLabel>Nombre</FormLabel>
-        <InputTextLineView
+        <FormInputText
           {...register("name")}
-          onKeyDown={handleKeyDown}
           autoFocus
         />
         <ErrorView errors={errors} keyName="name" touchedFields={touchedFields} />
         <FormLabel>Query</FormLabel>
-        <InputTextLineView
+        <FormInputTextMultiline
           {...register("query")}
-          onKeyDown={handleKeyDown}
         />
         <ErrorView errors={errors} keyName="query" touchedFields={touchedFields} />
         <FormLabel>Visibilidad</FormLabel>

@@ -16,6 +16,7 @@ export function useMusicPlaylistsForUser( { userId, onSelect }: Props) {
     const api = FetchApi.get(MusicPlaylistsApi);
     const result = await api.getManyByUserCriteria(userId, {
       limit: 0,
+      expand: ["imageCover"],
     } );
 
     return result.data;

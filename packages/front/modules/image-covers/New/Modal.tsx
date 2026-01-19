@@ -1,5 +1,5 @@
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { NewImageCover, NewImageCoverProps } from "./Content";
+import { NewImageCoverForm, NewImageCoverProps } from "./Form";
 
 export function useNewImageCoverModal(props: NewImageCoverProps) {
   const { openModal, ...usingModal } = useModal();
@@ -9,7 +9,7 @@ export function useNewImageCoverModal(props: NewImageCoverProps) {
     openModal: () => {
       return openModal( {
         title: "Nueva Image Cover",
-        content: <NewImageCover {...props} />,
+        content: <NewImageCoverForm {...props} />,
       } );
     },
   };

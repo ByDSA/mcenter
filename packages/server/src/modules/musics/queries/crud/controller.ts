@@ -103,9 +103,7 @@ export class QueriesCrudController {
   ) {
     await this.repo.guardOwner(user.id, params.id);
 
-    return await this.repo.patchOneByIdAndGet(params.id, {
-      entity: body,
-    } );
+    return await this.repo.patchOneByIdAndGet(params.id, body);
   }
 
   @Authenticated()

@@ -21,7 +21,7 @@ export function TabsClient(props: Props) {
   const { data, ...otherProps } = props;
 
   for (const d of data) {
-    d.active = matchPath(d.matchPath?.startsWith ?? d.path);
+    d.active = d.matchPath?.customMatch?.(pathname) ?? matchPath(d.matchPath?.startsWith ?? d.path);
     d.onClick = anchorOnClick( {
       router,
       href: d.path,

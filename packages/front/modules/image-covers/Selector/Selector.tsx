@@ -1,10 +1,12 @@
 import { useState, useCallback } from "react";
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useFormInModal } from "#modules/ui-kit/modal/useFormModal";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SearchBarView } from "#modules/ui-kit/SearchBar";
+import { classes } from "#modules/utils/styles";
+import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
 import { FormLabel } from "../../ui-kit/form/Label/FormLabel";
@@ -133,27 +135,32 @@ export function ImageCoverSelector(
         ))}
       </div>
 
-      <div className={styles.actions}>
-        <Button
-          onClick={() => setSelectedId(null)}
-          theme={selectedId === null ? "blue" : "white"}
-        >
+      <FormFooterButtons>
+        <aside>
+          <Button
+            onClick={() => setSelectedId(null)}
+            className={classes(styles.null, selectedId === null && styles.selected)}
+            theme="white"
+          >
           Ninguna
-        </Button>
-        <Button
-          onClick={modal.closeModal}
-          theme="white"
-        >
+          </Button>
+        </aside>
+        <aside>
+          <Button
+            onClick={modal.closeModal}
+            theme="white"
+          >
           Cancelar
-        </Button>
-        <Button
-          onClick={form.submit}
-          disabled={!form.canSubmit}
-          theme="white"
-        >
+          </Button>
+          <Button
+            onClick={form.submit}
+            disabled={!form.canSubmit}
+            theme="blue"
+          >
           Aceptar
-        </Button>
-      </div>
+          </Button>
+        </aside>
+      </FormFooterButtons>
     </div>
   );
 }

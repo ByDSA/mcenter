@@ -8,7 +8,7 @@ import { useUser } from "#modules/core/auth/useUser";
 import listStyles from "#modules/resources/List.module.css";
 import { MusicsApi } from "../requests";
 import { useMusic } from "../hooks";
-import { MusicEntryElement } from "./MusicEntry/MusicEntry";
+import { MusicEntryElement } from "./ListItem/MusicEntry";
 import { ArrayData } from "./types";
 
 type Props = {

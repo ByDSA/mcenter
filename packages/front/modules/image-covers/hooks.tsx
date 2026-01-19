@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { FetchApi } from "#modules/fetching/fetch-api";

@@ -1,7 +1,7 @@
 import z from "zod";
+import { generatePatchBodySchema } from "../../../../models/utils/schemas/patch";
 import { idParamsSchema } from "../../../utils/schemas/requests";
 import { createCriteriaManySchema, createCriteriaOneSchema } from "../../../utils/schemas/requests/criteria";
-import { generatePatchBodySchema } from "../../../utils/schemas/patch";
 import { musicPlaylistEntitySchema, musicPlaylistSchema } from "../playlist";
 import { mongoDbId } from "../../../resources/partial-schemas";
 import { slugSchema } from "../../../utils/schemas/slug";

@@ -1,9 +1,9 @@
-import { FieldErrors, FieldPath, FieldValues } from "react-hook-form";
+import { FieldErrors, FieldNamesMarkedBoolean, FieldPath, FieldValues } from "react-hook-form";
 import styles from "./Error.module.css";
 
 type ErrorProps<T extends FieldValues> = {
   errors: FieldErrors<T>;
-  touchedFields: Partial<Record<FieldPath<T>, boolean>>;
+  touchedFields: FieldNamesMarkedBoolean<T>;
   keyName: FieldPath<T>;
 };
 
@@ -13,7 +13,7 @@ export const ErrorView = <T extends FieldValues>( { errors,
   touchedFields }: ErrorProps<T>) => {
   const error = errors[keyName];
 
-  if (!touchedFields[keyName] || !error || !error.message)
+  if (!touchedFields[keyName as any] || !error || !error.message)
     return null;
 
   return (

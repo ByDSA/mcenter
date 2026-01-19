@@ -1,5 +1,5 @@
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { usePlayQueryModal } from "./Modal";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -1,3 +1,4 @@
+import { assertIsDefined } from "$shared/utils/validation";
 import { OpenModalProps, useModal } from "#modules/ui-kit/modal/ModalContext";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { classes } from "#modules/utils/styles";
@@ -13,13 +14,15 @@ type HookProps = {
 export function useEditQueryModal(props: HookProps = {} ) {
   const { openModal: _openModal, ...usingModal } = useModal();
   const { data, setData } = useLocalData<MusicQueryEntity>();
+
+  assertIsDefined(setData);
   const openModal = (openProps?: OpenModalProps) => {
     return _openModal( {
       title: "Editar query",
       content: (
         <EditQueryForm
-          initialValue={data}
-          updateLocalValue={setData}
+          initialData={data}
+          updateLocalData={setData}
           onSuccess={async (v) => {
             await props.onSuccess?.(v);
             usingModal.closeModal();

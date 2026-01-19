@@ -2,14 +2,21 @@
 
 import { PATH_ROUTES } from "$shared/routing";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import styles from "./SearchBar.module.css";
+import { useEffect } from "react";
 import { SearchBarView } from "#modules/ui-kit/SearchBar";
+import { useMusicSearch } from "#modules/musics/MusicSearchContext";
+import styles from "./SearchBar.module.css";
 
 export function SearchBar() {
   const searchParams = useSearchParams();
-  const query = searchParams.get("q") || "";
-  const [txt, setTxt] = useState(query);
+  const { filters, setQueryFilter } = useMusicSearch();
+
+  useEffect(()=> {
+    const query = searchParams.get("q");
+
+    if (query)
+      setQueryFilter(query);
+  }, []);
   const router = useRouter();
   const search = (value: string) => {
     const cleanTxt = value.trim();
@@ -21,8 +28,8 @@ export function SearchBar() {
   return <section className={styles.searchRow}>
     <SearchBarView
       action={search}
-      value={txt}
-      onChange={(e) => setTxt(e.target.value)}
+      value={filters.query}
+      onChange={(e) => setQueryFilter(e.target.value)}
       placeholder="Buscar música..."
     />
   </section>;

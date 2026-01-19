@@ -1,5 +1,6 @@
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { EditFileInfos, UseEditFileInfosContentModalProps } from "./EditFilesModal";
+import { EditFileInfosLoader, UseEditFileInfosContentModalProps } from "./Form";
+import styles from "./Modal.module.css";
 
 export function useFileInfosModal(props: UseEditFileInfosContentModalProps) {
   const { openModal, ...usingModal } = useModal();
@@ -9,7 +10,8 @@ export function useFileInfosModal(props: UseEditFileInfosContentModalProps) {
     openModal: ()=> {
       return openModal( {
         title: "Editar archivos de música",
-        content: <EditFileInfos {...props}/>,
+        className: styles.modal,
+        content: <EditFileInfosLoader {...props}/>,
       } );
     },
   };

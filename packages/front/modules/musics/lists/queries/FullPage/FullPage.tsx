@@ -1,29 +1,26 @@
 import { CalendarToday, Code } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
+import { PATH_ROUTES } from "$shared/routing";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { ResourcePlayButtonView } from "#modules/resources/PlayButton";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { classes } from "#modules/utils/styles";
-import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
-import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useImageCover } from "#modules/image-covers/hooks";
-import { LocalDataProvider, useLocalData } from "#modules/utils/local-data-context";
-import { useUser } from "#modules/core/auth/useUser";
+import { useLocalData } from "#modules/utils/local-data-context";
 import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
-import playlistStyles from "../../playlists/Playlist/Playlist.module.css";
+import playlistStyles from "../../playlists/FullPage/Playlist.module.css";
 import { MusicQueryEntity } from "../models";
-import { EditQueryContextMenuItem } from "../Edit/ContextMenuItem";
-import { usePlayQueryModal } from "../PlayQuery/Modal";
+import { MusicQuerySettingsButton } from "../SettingsButton/Settings";
 import styles from "./styles.module.css";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicQueryFullPage = () => {
-  const { data, setData } = useLocalData<MusicQueryEntity>();
+  const { data } = useLocalData<MusicQueryEntity>();
   const playerStatus = useBrowserPlayer(s => s.status);
   const queryPlaying = useBrowserPlayer(s => s.query);
-  const { openMenu } = useContextMenuTrigger();
   const { data: imageCover } = useImageCover(data.imageCoverId ?? null);
-  const { user } = useUser();
+  const router = useRouter();
   let status: PlayerStatus = "stopped";
 
   if (queryPlaying === data.query)
@@ -39,7 +36,6 @@ export const MusicQueryFullPage = () => {
     else
       player.pause();
   };
-  const playQueryModal = usePlayQueryModal();
 
   return (
     <div className={playlistStyles.playlistContainer}>
@@ -82,22 +78,9 @@ export const MusicQueryFullPage = () => {
             onClick={handlePlay}
             status={status}
           />
-          <SettingsButton theme="dark" onClick={(e)=> {
-            openMenu( {
-              event: e,
-              content: <LocalDataProvider data={data!} setData={setData}>
-                <ContextMenuItem
-                  label="Reproducir modificación"
-                  onClick={async ()=> {
-                    await playQueryModal.openModal( {
-                      initialValue: data.query,
-                    } );
-                  }}
-                />
-                {user && <EditQueryContextMenuItem />}
-              </LocalDataProvider>,
-            } );
-          }} />
+          <MusicQuerySettingsButton
+            onDelete={() => router.push(PATH_ROUTES.musics.frontend.playlists.path)}
+          />
         </div>
       </div>
 

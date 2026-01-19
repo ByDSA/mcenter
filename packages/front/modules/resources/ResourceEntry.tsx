@@ -1,7 +1,6 @@
 import { AnchorHTMLAttributes, Fragment, JSX, memo, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ImageCover } from "$shared/models/image-covers";
-import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { classes } from "#modules/utils/styles";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonView";
@@ -19,9 +18,7 @@ export type ResourceEntryProps = {
   href?: string;
   subtitle?: ReactNode;
   right?: ReactNode;
-  settings?: {
-    onClick: OnClickMenu;
-  };
+  settings?: ReactNode;
   favButton?: JSX.Element;
   drag?: {
     isDragging: boolean;
@@ -90,12 +87,7 @@ export function ResourceEntry(
         {right}
       </ListEntryColumn>
       }
-      {settings
-        && <><SettingsButton
-          theme="dark"
-          onClick={(e: React.MouseEvent<HTMLElement>)=>settings!.onClick(e)}
-        />
-        </>}
+      {settings}
     </ListEntryRow>
   </span>;
 }

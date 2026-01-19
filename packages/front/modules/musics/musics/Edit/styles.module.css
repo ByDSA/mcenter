@@ -1,0 +1,26 @@
+.container {
+  .weight {
+    width: 5rem;
+  }
+
+  .optionalButton {
+    display: flex;
+    justify-content: center;
+    color: var(--color-blue-200);
+    margin-top:1rem;
+    margin-bottom:0.8rem;
+
+    &:hover {
+      cursor: pointer;
+      user-select: none;
+    }
+  }
+}
+
+.year {
+  width: 4rem;
+}
+
+.flex0 {
+  flex: 0;
+}

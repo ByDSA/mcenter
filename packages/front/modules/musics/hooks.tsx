@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -102,6 +103,9 @@ export const useMusics = (ids: string[]) => {
   } );
 };
 
+const OPTIONAL_KEYS = ["disabled", "album", "country",
+  "game", "tags", "spotifyId", "year"] as (keyof MusicEntity)[];
+
 function merge(oldData: MusicEntity | undefined, newData: Partial<MusicEntity>): MusicEntity {
   const ret = {
     ...oldData,
@@ -113,6 +117,11 @@ function merge(oldData: MusicEntity | undefined, newData: Partial<MusicEntity>):
   if (newData.imageCoverId === null) {
     delete ret.imageCoverId;
     delete ret.imageCover;
+  }
+
+  for (const op of OPTIONAL_KEYS) {
+    if (newData[op] === undefined)
+      delete ret[op];
   }
 
   return ret;

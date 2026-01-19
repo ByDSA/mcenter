@@ -167,13 +167,7 @@ export namespace MusicQueriesApi {
     export const dataSchema = musicQueryEntitySchema;
     export const responseSchema = createOneResultResponseSchema(dataSchema);
     export type Response = z.infer<typeof responseSchema>;
-    export const bodySchema = musicQueryEntitySchema.pick( {
-      name: true,
-      query: true,
-      slug: true,
-      visibility: true,
-      imageCoverId: true,
-    } ).partial();
+    export const { bodySchema } = MusicQueryCrudDtos.PatchOneById;
     export type Body = z.infer<typeof bodySchema>;
   }
 

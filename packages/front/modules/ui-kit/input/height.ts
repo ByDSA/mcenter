@@ -121,7 +121,7 @@ export function getVisualLines(
     // El -1 se ha puesto de forma empírica:
     const testWidth = getTextWidth(ctx, fontSpec, maxWidth, testLine) - 1;
 
-    if (testWidth > maxWidth) {
+    if (Math.floor(testWidth) >= Math.floor(maxWidth)) {
       // Si hay contenido en la línea actual, necesitamos una nueva línea
       if (currentLine !== "") {
         visualLineCount++;

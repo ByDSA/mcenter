@@ -3,12 +3,15 @@ import { MusicHistoryEntry, MusicHistoryEntryEntity, musicHistoryEntryEntitySche
 import { PATH_ROUTES } from "$shared/routing";
 import { createManyResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
 import { genParseZod } from "$shared/utils/validation/zod";
-import { MusicEntity } from "$shared/models/musics";
 import { makeFetcher } from "#modules/fetching";
 import { DateFormat } from "#modules/utils/dates";
 import { backendUrl } from "#modules/requests";
 import { MusicHistoryEntryCrudDtos } from "#modules/musics/history/models/dto";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
+import { useMusic } from "#modules/musics/hooks";
+import { FormInputGroup, FormInputGroupItem } from "#modules/musics/musics/Edit/FormInputGroup";
+import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
+import { FormInputErrorWrap } from "#modules/musics/musics/Edit/FormInputErrorWrap";
 import { LatestViewsView } from "../../../history/Latest/LatestViewsDisplay";
 
 type Body = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
@@ -18,7 +21,6 @@ const parseResponse = genParseZod(
 ) as (m: unknown)=> ResultResponse<MusicHistoryEntryEntity[]>;
 
 type Props = {
-  music?: MusicEntity;
   musicId: string;
   maxTimestamp?: number;
   dateFormat?: DateFormat;
@@ -28,6 +30,7 @@ type Props = {
 export function MusicLatestViews(props: Props) {
   const [data, setData] = useState<MusicHistoryEntry[]>([]);
   const { musicId, maxTimestamp = new Date().getTime(), dateFormat } = props;
+  const { data: music } = useMusic(props.musicId);
   const fetchData = useCallback(async () => {
     const url = backendUrl(PATH_ROUTES.musics.history.search.path);
     const body: Body = {
@@ -62,14 +65,24 @@ export function MusicLatestViews(props: Props) {
     />
   </AsyncLoader>;
 
-  if (!props.music)
+  if (!music)
     return element;
 
   return <>
-    <p>
-      <span>Título: {props.music?.title}</span><br />
-      <span>Artista: {props.music?.artist}</span>
-    </p>
+    <FormInputGroup>
+      <FormInputGroupItem inline>
+        <FormLabel>Título</FormLabel>
+        <FormInputErrorWrap>
+          <span>{music.title}</span>
+        </FormInputErrorWrap>
+      </FormInputGroupItem>
+      <FormInputGroupItem inline>
+        <FormLabel>Artista</FormLabel>
+        <FormInputErrorWrap>
+          <span>{music.artist}</span>
+        </FormInputErrorWrap>
+      </FormInputGroupItem>
+    </FormInputGroup>
     {element}
   </>;
 }

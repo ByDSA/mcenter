@@ -525,6 +525,7 @@ addedAt: Date; }>;
     const gotDoc = await MusicPlaylistOdm.Model.create( {
       name: dto.name.trim(),
       slug,
+      visibility: dto.visibility,
       userId: new Types.ObjectId(userId),
     } );
 

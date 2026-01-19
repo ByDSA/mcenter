@@ -10,7 +10,7 @@ import { MusicQueryListItem } from "#modules/musics/lists/queries/ListItem";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { NewItemOrFn, useArrayData } from "#modules/utils/array-data-context";
 import { MusicPlaylistEntity } from "./playlists/models";
-import { MusicPlaylistListItem } from "./playlists/ListItem/Item";
+import { MusicPlaylistListItem } from "./playlists/ListItem/ListItem";
 import styles from "./List.module.css";
 
 type Data = NonNullable<MusicUsersListsApi.GetMyList.Response["data"]>;

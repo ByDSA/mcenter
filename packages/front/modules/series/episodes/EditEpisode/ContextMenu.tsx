@@ -18,8 +18,6 @@ export const EditEpisodeContextMenuItem = (props: Props) => {
 
   return <ContextMenuItem
     label="Editar"
-    onClick={()=> {
-      return openModal();
-    }}
+    onClick={openModal}
   />;
 };

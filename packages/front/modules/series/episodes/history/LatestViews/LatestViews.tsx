@@ -9,6 +9,8 @@ import { backendUrl } from "#modules/requests";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { LatestViewsView } from "#modules/history/Latest/LatestViewsDisplay";
 import { Separator } from "#modules/resources/Separator";
+import { FormInputGroup, FormInputGroupItem } from "#modules/musics/musics/Edit/FormInputGroup";
+import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
 import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 
@@ -70,11 +72,17 @@ export function EpisodeLatestViews(props: Props) {
     return element;
 
   return <>
-    <p>
-      <span>Título: {props.episode.title}</span><br />
-      <span>Episodio: {props.episode.serie?.name
-        ?? props.episode.compKey.seriesKey}</span><Separator /><span>{props.episode.compKey.episodeKey}</span>
-    </p>
+    <FormInputGroup>
+      <FormInputGroupItem inline>
+        <FormLabel>Título</FormLabel>
+        <span>{props.episode.title}</span>
+      </FormInputGroupItem>
+      <FormInputGroupItem inline>
+        <FormLabel>Episodio</FormLabel>
+        <span><span>{props.episode.serie?.name
+        ?? props.episode.compKey.seriesKey}</span><Separator /><span>{props.episode.compKey.episodeKey}</span></span>
+      </FormInputGroupItem>
+    </FormInputGroup>
     {element}
   </>;
 }

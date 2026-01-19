@@ -92,6 +92,7 @@ export function partialModelToUpdateQuery(model: Partial<Entity>): MongoUpdateQu
     name: model.name,
     slug: model.slug,
     list: model.list?.map(entryModelToDocOdm),
+    visibility: model.visibility,
   };
 
   if (model.imageCoverId !== undefined) {

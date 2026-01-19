@@ -1,5 +1,7 @@
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { FormInputGroup } from "#modules/musics/musics/Edit/FormInputGroup";
+import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
 import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { MusicQueryEntity } from "../models";
@@ -19,11 +21,14 @@ export function useDeleteQueryModal(
     ...modal,
     openModal: (props) => {
       return openModal( {
-        title: "Confirmar eliminación",
-        content: <><p>¿Estás seguro de que deseas eliminar esta query?</p>
-          <p style={{
-            textAlign: "center",
-          }}>{data.name}</p></>,
+        title: "Confirmar borrado",
+        content: <>
+          <p>¿Estás seguro de que deseas eliminar esta query?</p>
+          <FormInputGroup inline>
+            <FormLabel>Nombre</FormLabel>
+            <span>{data.name}</span>
+          </FormInputGroup>
+        </>,
         onFinish,
         onActionSuccess,
         action: async () => {

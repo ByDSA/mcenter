@@ -3,6 +3,7 @@ import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { OwnerUserPublic } from "#musics/playlists/crud/repository/odm/odm";
 
 export type DocOdm = TimestampsOdm.AutoTimestamps & {
   _id?: mongoose.Types.ObjectId;
@@ -17,6 +18,7 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & {
 export type FullDocOdm = RequireId<DocOdm> & {
   ownerUser?: UserOdm.FullDoc;
   imageCover?: ImageCoverOdm.FullDoc;
+  ownerUserPublic?: OwnerUserPublic;
 };
 
 const NAME = "MusicQuery";

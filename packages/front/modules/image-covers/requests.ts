@@ -1,4 +1,4 @@
-/* eslint-disable require-await */
+/* eslint-disable import/no-cycle */
 import assert from "assert";
 import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { createOneResultResponseSchema, createPaginatedResultResponseSchema, PaginatedResult, ResultResponse } from "$shared/utils/http/responses";
@@ -36,11 +36,14 @@ export class ImageCoversApi {
       ) as (m: unknown)=> ImageCoversApi.Patch.Response,
     } );
     const URL = backendUrl(PATH_ROUTES.imageCovers.withParams(id));
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: URL,
       body,
     } );
+
+    useImageCover.updateCacheWithMerging(ret.data.id, ret.data);
+
+    return ret;
   }
 
   async getOneByCriteria(

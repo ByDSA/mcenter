@@ -1,0 +1,3 @@
+.null:not(:focus) {
+  background-color: var(--color-gray-500);
+}

@@ -1,6 +1,23 @@
 .footer {
   padding-top: 1rem;
   display: flex;
-  justify-content: right;
-  gap: 1rem;
+  flex-flow: row nowrap;
+
+  &:not(:has(>aside)) {
+    justify-content: right;
+  }
+
+  &:not(:has(>aside)), >aside {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1rem;
+  }
+
+  &:has(>aside:nth-child(2)) {
+    justify-content: space-between;
+  }
+
+  > aside {
+    justify-content: center;
+  }
 }

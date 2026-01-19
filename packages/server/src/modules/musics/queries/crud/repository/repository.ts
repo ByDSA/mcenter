@@ -13,6 +13,7 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEventEmitter, DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { enrichImageCover } from "#modules/image-covers/repositories/odm/utils";
+import { enrichOwnerUserPublic } from "#musics/playlists/crud/repository/odm/pipeline-utils";
 import { MusicQueryModel, MusicQueryEntity } from "../../models";
 import { MusicQueryAvailableSlugGeneratorService } from "./available-slug-generator.service";
 import { MusicQueryEvents } from "./events";
@@ -150,7 +151,7 @@ export class MusicQueriesRepository implements
     }
 
     // Si queremos expandir el usuario propietario (similar a playlists)
-    if (criteria.expand?.includes("ownerUser" as any)) {
+    if (criteria.expand?.includes("ownerUser")) {
       pipeline.push(
         {
           $lookup: {
@@ -166,6 +167,15 @@ export class MusicQueriesRepository implements
             preserveNullAndEmptyArrays: true,
           },
         },
+      );
+    }
+
+    if (criteria.expand?.includes("ownerUserPublic")) {
+      pipeline.push(
+        ...enrichOwnerUserPublic( {
+          localField: "ownerUserId",
+          targetField: "ownerUserPublic",
+        } ),
       );
     }
 

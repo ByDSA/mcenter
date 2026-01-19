@@ -9,7 +9,7 @@ export type Props<T> = {
   loadingElement?: ReactNode;
   errorElement?: ReactNode;
   initialStatus?: Status;
-  onSuccess: (data: T)=> void;
+  onSuccess?: (data: T)=> void;
 };
 
 export function usePageAsyncAction<T>(

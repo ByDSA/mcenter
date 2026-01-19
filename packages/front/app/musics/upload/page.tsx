@@ -8,11 +8,13 @@ import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/trans
 import { assertIsDefined } from "$shared/utils/validation";
 import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
 import { backendUrl } from "#modules/requests";
-import { MusicEntryElement } from "#modules/musics/musics/MusicEntry/MusicEntry";
+import { MusicEntryElement } from "#modules/musics/musics/ListItem/MusicEntry";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceList } from "#modules/resources/ResourceList";
 import { useMusic } from "#modules/musics/hooks";
+import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
+import { FormInputGroup } from "#modules/musics/musics/Edit/FormInputGroup";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 
@@ -78,16 +80,18 @@ export default function Upload() {
     <MusicLayout>
       <h2>Subir músicas</h2>
       <div className={styles.uploaders}>
-        <p>Desde YouTube:</p>
-        <YouTubeUpload
-          withCredentials
-          onCreateMusic={onCreateMusic}/>
-        <p>Desde local:</p>
-        <FileUpload
-          acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
-          multiple={true}
-          onUpload={onUpload}
-        />
+        <FormInputGroup className={styles.group}>
+          <FormLabel>Desde YouTube</FormLabel>
+          <YouTubeUpload
+            withCredentials
+            onCreateMusic={onCreateMusic}/>
+          <FormLabel>Desde local</FormLabel>
+          <FileUpload
+            acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
+            multiple={true}
+            onUpload={onUpload}
+          />
+        </FormInputGroup>
         <hr/>
         <ResourceList>
           {

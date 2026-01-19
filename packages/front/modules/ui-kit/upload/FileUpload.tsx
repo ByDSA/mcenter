@@ -3,7 +3,7 @@ import { CloudUpload, InsertDriveFile, Close, CheckCircle, Error as ErrorIcon } 
 import { showError } from "$shared/utils/errors/showError";
 import { classes } from "#modules/utils/styles";
 import { Separator } from "#modules/resources/Separator";
-import { Button } from "../input/Button";
+import { Button } from "../form/input/Button/Button";
 import styles from "./FileUpload.module.css";
 import { UploadButton } from "./UploadButton";
 

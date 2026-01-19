@@ -1,4 +1,5 @@
 import type { MusicPlaylistEntity } from "../models";
+import { assertIsDefined } from "$shared/utils/validation";
 import { OpenModalProps, useModal } from "#modules/ui-kit/modal/ModalContext";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { classes } from "#modules/utils/styles";
@@ -13,6 +14,8 @@ current: MusicPlaylistEntity; } )=> Promise<void> | void;
 export function useEditPlaylistModal(props: HookProps = {} ) {
   const { openModal: _openModal, ...usingModal } = useModal();
   const { data, setData } = useLocalData<MusicPlaylistEntity>();
+
+  assertIsDefined(setData);
   const openModal = (openProps?: OpenModalProps) => {
     return _openModal( {
       title: "Editar lista",

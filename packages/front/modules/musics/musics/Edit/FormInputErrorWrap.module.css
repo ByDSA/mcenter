@@ -1,0 +1,13 @@
+.container {
+  display: flex;
+  flex:1;
+
+  &:not(.inline) {
+    flex-flow: column nowrap;
+  }
+
+  &.inline {
+    flex-flow: row nowrap;
+    gap: 1rem;
+  }
+}

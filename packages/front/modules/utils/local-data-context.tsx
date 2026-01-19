@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useCallback, ReactNode, useMemo } from "react";
+import { createContext, useContext, ReactNode, useMemo } from "react";
 import { SetState } from "./resources/useCrud";
 
 // 1. Definimos una constante para cuando no se usa key
@@ -9,7 +9,7 @@ const DEFAULT_KEY = "default_context_key";
 // La forma de la data individual
 interface LocalDataValue<T> {
   data: T;
-  setData: SetState<T>;
+  setData?: SetState<T>;
 }
 
 type LocalContextRegistry = Record<string, LocalDataValue<any>>;
@@ -25,12 +25,9 @@ type LocalDataProviderProps<T> = LocalDataValue<T> & {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const LocalDataProvider = <T, >( { children,
   data,
-  setData: _setData,
+  setData,
   dataKey = DEFAULT_KEY }: LocalDataProviderProps<T>): React.ReactNode => {
   const parentRegistry = useContext(LocalDataContext);
-  const setData: SetState<T> = _setData ?? useCallback(() => {
-    throw new Error("setData no definido");
-  }, []);
   const value = useMemo(() => {
     const currentEntry: LocalDataValue<T> = {
       data,

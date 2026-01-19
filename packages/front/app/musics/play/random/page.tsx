@@ -5,7 +5,7 @@ import { showError } from "$shared/utils/errors/showError";
 import { useEffect } from "react";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { useUser } from "#modules/core/auth/useUser";
 import styles from "./Page.module.css";
 

@@ -11,7 +11,8 @@ export type MenuItemData = {
   label: ReactNode;
   path: string;
   matchPath?: {
-    startsWith: string;
+    startsWith?: string;
+    customMatch?: (currentPath: string)=> boolean;
   };
   active?: boolean;
   onClick?: SidebarItemProps["onClick"];

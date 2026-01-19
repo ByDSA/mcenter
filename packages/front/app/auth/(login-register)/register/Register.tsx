@@ -3,7 +3,7 @@ import { LocalSignUpBody } from "$shared/models/auth/dto";
 import { Email, Person } from "@mui/icons-material";
 import { showError } from "$shared/utils/errors/showError";
 import z from "zod";
-import { Button } from "#modules/ui-kit/input/Button";
+import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import styles from "../styles.module.css";
 import { LoginRegisterForm } from "../Form";
