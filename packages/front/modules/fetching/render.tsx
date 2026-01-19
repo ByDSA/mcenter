@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { ScrollStatus } from "#modules/ui-kit/ScrollStatus";
-import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 
 type DataRenderParams<T> = {
   data: T;

@@ -1,7 +1,7 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { FormInputGroup } from "#modules/musics/musics/Edit/FormInputGroup";
+import { FormInputGroup } from "#modules/ui-kit/form/FormInputGroup";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
 import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { getLongDateStr } from "#modules/utils/dates";

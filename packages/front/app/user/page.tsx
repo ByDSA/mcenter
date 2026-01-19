@@ -10,7 +10,7 @@ import { UsersApi } from "#modules/core/users/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicPlaylistsApi } from "#modules/musics/lists/playlists/requests";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
-import { InlineSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { InlineSpinner } from "#modules/ui-kit/Spinner/Spinner";
 
 export default function UserPage() {
   const { user } = useUser();

@@ -1,4 +1,4 @@
-import { ContentSpinner } from "../spinner/Spinner";
+import { ContentSpinner } from "../Spinner/Spinner";
 import styles from "./styles.module.css";
 
 type ScrollStatusProps = {

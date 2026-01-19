@@ -1,4 +1,4 @@
-import { AnchorHTMLAttributes, Fragment, JSX, memo, ReactNode } from "react";
+import { AnchorHTMLAttributes, Fragment, JSX, memo, ReactNode, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ImageCover } from "$shared/models/image-covers";
 import { classes } from "#modules/utils/styles";
@@ -6,9 +6,9 @@ import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonView";
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { anchorOnClick } from "#modules/ui-kit/menus/TabsClient";
-import styles from "./ListEntry.module.css";
-import { ListEntryColumn, ListEntryRow } from "./ListEntry";
-import { Separator } from "./Separator";
+import { Separator } from "../Separator/Separator";
+import styles from "./ListItem.module.css";
+import { ListItemColumn, ListItemRow } from "./ListItem";
 
 export type OnClickMenu = (e: React.MouseEvent<HTMLElement>)=> void;
 
@@ -81,14 +81,14 @@ export function ResourceEntry(
       <ResourceTitle title={mainTitle} href={mainTitleHref} />
       {subtitle}
     </Tag>
-    <ListEntryRow className={styles.right}>
+    <ListItemRow className={styles.right}>
       {favButton}
-      {right && <ListEntryColumn className={classes(styles.small, styles.info)}>
+      {right && <ListItemColumn className={classes(styles.small, styles.info)}>
         {right}
-      </ListEntryColumn>
+      </ListItemColumn>
       }
       {settings}
-    </ListEntryRow>
+    </ListItemRow>
   </span>;
 }
 
@@ -103,14 +103,14 @@ type ResourceSubtitleProps = {
 };
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ResourceSubtitle = memo(( { items, className }: ResourceSubtitleProps) => {
-  const title = items.reduce((acc, item) => {
+  const title = useMemo(()=>items.reduce((acc, item) => {
     if (!item?.text)
       return acc;
 
     return acc + (acc !== "" ? " • " : "") + item?.text;
-  }, "");
+  }, ""), [items]);
 
-  return <ListEntryRow className={classes(styles.subtitle, "ellipsis", className)}>
+  return <ListItemRow className={classes(styles.subtitle, "ellipsis", className)}>
 
     {items.filter(Boolean).map((item, i) => {
       return <Fragment key={i}>
@@ -127,7 +127,7 @@ export const ResourceSubtitle = memo(( { items, className }: ResourceSubtitlePro
         >{item!.customContent ?? item!.text}</span>
       </Fragment>;
     } )}
-  </ListEntryRow>;
+  </ListItemRow>;
 } );
 
 type ResourceTitleProps = AnchorHTMLAttributes<HTMLAnchorElement>;

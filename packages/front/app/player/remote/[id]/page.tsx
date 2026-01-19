@@ -11,7 +11,7 @@ import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-playe
 import { EpisodesApi } from "#modules/series/episodes/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { logger } from "#modules/core/logger";
-import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import styles from "./Player.module.css";
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;

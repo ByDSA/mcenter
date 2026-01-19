@@ -1,7 +1,7 @@
 import { MusicEntity } from "$shared/models/musics";
 import { useShallow } from "zustand/react/shallow";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { ResourcePlayButtonView } from "#modules/resources/PlayButton";
+import { ResourcePlayButtonView } from "#modules/resources/PlayButton/PlayButton";
 
 type Props = {
   music: MusicEntity;

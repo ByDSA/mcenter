@@ -1,8 +1,8 @@
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { EditFileInfosLoader, UseEditFileInfosContentModalProps } from "./Form";
+import { EditFileInfosLoader, LoaderProps } from "./Loader";
 import styles from "./Modal.module.css";
 
-export function useFileInfosModal(props: UseEditFileInfosContentModalProps) {
+export function useFileInfosModal(props: LoaderProps) {
   const { openModal, ...usingModal } = useModal();
 
   return {

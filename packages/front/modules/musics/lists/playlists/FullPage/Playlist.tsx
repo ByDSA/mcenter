@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { SetState } from "#modules/utils/resources/useCrud";
+import { SetState } from "#modules/utils/react";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { useUser } from "#modules/core/auth/useUser";
 import { MusicPlaylistEntity } from "../models";

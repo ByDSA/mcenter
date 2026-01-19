@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { Button } from "#modules/ui-kit/form/input/Button/Button";
-import { ErrorView } from "#modules/ui-kit/input/Error";
+import { ErrorView } from "#modules/ui-kit/form/Error";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";

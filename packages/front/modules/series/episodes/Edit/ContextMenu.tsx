@@ -1,5 +1,5 @@
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
-import { SetState } from "#modules/utils/resources/useCrud";
+import { SetState } from "#modules/utils/react";
 import { EpisodeHistoryApi } from "../history/requests";
 import { useEditEpisodeModal } from "./EditModal";
 

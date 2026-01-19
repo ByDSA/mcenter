@@ -9,7 +9,7 @@ import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { classes } from "#modules/utils/styles";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
-import { Spinner } from "../spinner/Spinner";
+import { Spinner } from "../Spinner/Spinner";
 import styles from "./YouTubeUpload.module.css";
 import { UploadButton } from "./UploadButton";
 

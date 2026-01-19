@@ -1,5 +1,5 @@
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { SetState } from "#modules/utils/resources/useCrud";
+import { SetState } from "#modules/utils/react";
 import { EpisodeHistoryApi } from "../history/requests";
 import { EditEpisodeLoader } from "./Loader";
 import styles from "./EditModal.module.css";

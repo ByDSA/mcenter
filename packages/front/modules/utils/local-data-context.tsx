@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, ReactNode, useMemo } from "react";
-import { SetState } from "./resources/useCrud";
+import { SetState } from "./react";
 
 // 1. Definimos una constante para cuando no se usa key
 const DEFAULT_KEY = "default_context_key";

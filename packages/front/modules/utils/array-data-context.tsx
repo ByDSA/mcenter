@@ -2,7 +2,7 @@
 
 import { assertIsDefined } from "$shared/utils/validation";
 import { createContext, useContext, useCallback, ReactNode } from "react";
-import { SetState } from "./resources/useCrud";
+import { SetState } from "./react";
 
 export type NewItemOrFn<T> = Parameters<SetState<T>>[0];
 

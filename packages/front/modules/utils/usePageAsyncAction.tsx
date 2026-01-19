@@ -1,5 +1,5 @@
 import { ReactNode, useState, useEffect, useMemo, useCallback } from "react";
-import { ContentSpinner, Spinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner, Spinner } from "#modules/ui-kit/Spinner/Spinner";
 
 type Status = "error" | "iddle" | "loading" | "success";
 

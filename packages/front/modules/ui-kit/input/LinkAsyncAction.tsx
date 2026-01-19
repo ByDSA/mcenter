@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Spinner } from "../spinner/Spinner";
+import { Spinner } from "../Spinner/Spinner";
 
 type LabelAsyncActionProps = {
   title?: string;

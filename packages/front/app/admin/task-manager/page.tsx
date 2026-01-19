@@ -9,7 +9,7 @@ import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
 import { logger } from "#modules/core/logger";
 import { useCrudData } from "#modules/fetching";
-import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 
 const QUEUE_NAME = "mcenter-tasks-main";
 const N = 10;

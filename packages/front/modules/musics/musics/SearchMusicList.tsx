@@ -5,11 +5,12 @@ import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { classes } from "#modules/utils/styles";
 import { useUser } from "#modules/core/auth/useUser";
-import listStyles from "#modules/resources/List.module.css";
+import listStyles from "#modules/resources/List/List.module.css";
 import { MusicsApi } from "../requests";
 import { useMusic } from "../hooks";
 import { MusicEntryElement } from "./ListItem/MusicEntry";
 import { ArrayData } from "./types";
+import styles from "./SearchMusicList.module.css";
 
 type Props = {
   filters: {
@@ -26,13 +27,7 @@ export function SearchMusicList(props: Props) {
     observerTarget,
     totalCount } = useSearchMusicList(props);
   const resultNumbers = (
-    <span style={{
-      display: "flex",
-      justifyContent: "left",
-      marginTop: "0.5rem",
-      marginLeft: "1rem",
-      fontSize: "0.8em",
-    }}>
+    <span className={styles.resultNumbers}>
       Resultados: {data?.length} de {totalCount}
     </span>
   );

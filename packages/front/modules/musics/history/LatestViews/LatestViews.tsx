@@ -9,9 +9,9 @@ import { backendUrl } from "#modules/requests";
 import { MusicHistoryEntryCrudDtos } from "#modules/musics/history/models/dto";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { useMusic } from "#modules/musics/hooks";
-import { FormInputGroup, FormInputGroupItem } from "#modules/musics/musics/Edit/FormInputGroup";
+import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { FormInputErrorWrap } from "#modules/musics/musics/Edit/FormInputErrorWrap";
+import { FormInputErrorWrap } from "#modules/ui-kit/form/FormInputErrorWrap";
 import { LatestViewsView } from "../../../history/Latest/LatestViewsDisplay";
 
 type Body = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;

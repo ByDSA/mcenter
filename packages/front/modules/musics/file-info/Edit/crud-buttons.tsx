@@ -12,7 +12,7 @@ export const DeleteResource = ( { className, action,
   <span className={classes(styles.deleteButton, disabled && styles.disabled, className)}>{
     <LinkAsyncAction
       title="Eliminar"
-      action={action as ()=> Promise<any>}
+      action={action}
       isDoing={isDoing}
       spinnerSide={spinnerSide ?? "right"}
       disabled={disabled}

@@ -5,8 +5,8 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { MusicNote, DragHandle } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
-import { SetState } from "#modules/utils/resources/useCrud";
-import listEntryStyles from "#modules/resources/ListEntry.module.css";
+import { SetState } from "#modules/utils/react";
+import listItemStyles from "#modules/resources/ListItem/ListItem.module.css";
 import { MusicPlaylistItem } from "../PlaylistItem";
 import styles from "../Playlist.module.css";
 import { MusicPlaylistEntity } from "../../models";
@@ -68,9 +68,9 @@ export const PlaylistTracks = ( { value,
 
   return (
     <div className={classes(styles.playlistItems, draggable && styles.draggable)}>
-      <div className={classes(styles.tracksHeader, listEntryStyles.sidePadding)}>
+      <div className={classes(styles.tracksHeader, listItemStyles.sidePadding)}>
         {draggable && <div className={styles.headerDrag}></div>}
-        <div className={classes(styles.headerIndex, listEntryStyles.leftDiv)}>#</div>
+        <div className={classes(styles.headerIndex, listItemStyles.leftDiv)}>#</div>
         <div className={styles.headerTitle}>CANCIÓN</div>
       </div>
 

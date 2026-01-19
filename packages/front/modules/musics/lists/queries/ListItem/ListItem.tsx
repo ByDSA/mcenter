@@ -2,7 +2,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
 import { useArrayData } from "#modules/utils/array-data-context";
 import { useUser } from "#modules/core/auth/useUser";
-import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ResourceEntry";
+import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
 import { useLocalData } from "#modules/utils/local-data-context";

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { formatDate, DateFormat } from "#modules/utils/dates";
 import { classes } from "#modules/utils/styles";
-import { FormInputGroup } from "#modules/musics/musics/Edit/FormInputGroup";
+import { FormInputGroup } from "#modules/ui-kit/form/FormInputGroup";
 import styles from "./Latest.module.css";
 
 const DATE_FORMAT_DEFAULT: DateFormat = {

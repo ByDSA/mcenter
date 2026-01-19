@@ -1,37 +1,7 @@
 import { useState } from "react";
 import { AddBox, Cancel } from "@mui/icons-material";
 import { FormInputText } from "#modules/ui-kit/form/input/Text/FormInputText";
-
-// Estilos inline básicos para simplificar
-const styles = {
-  container: {
-    display: "flex",
-    flexWrap: "wrap" as const,
-    gap: "0.5rem",
-    alignItems: "center",
-  },
-  item: {
-    background: "var(--color-gray-850)",
-    padding: "0.2rem 0.5rem",
-    borderRadius: "0.5rem",
-    display: "flex",
-    alignItems: "center",
-    border: "1px solid var(--color-gray-700)",
-    fontSize: "0.9rem",
-  },
-  remove: {
-    marginLeft: "0.5rem",
-    cursor: "pointer",
-    color: "var(--color-red)",
-    display: "flex",
-  },
-  addBtn: {
-    marginLeft: "0.25rem",
-    cursor: "pointer",
-    color: "var(--color-green-600)",
-    display: "flex",
-  },
-};
+import styles from "./styles.module.css";
 
 type Props = {
   value: string[];
@@ -71,34 +41,36 @@ export const FormInputTags = ( { value = [], onChange, onEmptyEnter }: Props) =>
   };
 
   return (
-    <div style={styles.container}>
+    <div className={styles.container}>
       {value.map((tag, index) => (
-        <span key={`${tag}-${index}`} style={styles.item}>
+        <span key={`${tag}-${index}`} className={styles.item}>
           {tag}
-          <a onClick={() => handleRemove(index)} style={styles.remove}>
-            <Cancel style={{
-              width: "1rem",
-              height: "1rem",
-            }} />
-          </a>
+          <button
+            type="button"
+            onClick={() => handleRemove(index)}
+            className={styles.remove}
+            aria-label="Eliminar tag"
+          >
+            <Cancel />
+          </button>
         </span>
       ))}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-      }}>
+
+      <div className={styles.inputWrapper}>
         <FormInputText
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          style={{
-            width: "8rem",
-            minWidth: "8rem",
-          }}
+          className={styles.inputField}
         />
-        <a onClick={handleAdd} style={styles.addBtn}>
+        <button
+          type="button"
+          onClick={handleAdd}
+          className={styles.addBtn}
+          aria-label="Agregar tag"
+        >
           <AddBox />
-        </a>
+        </button>
       </div>
     </div>
   );

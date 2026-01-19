@@ -8,7 +8,7 @@ import { backendUrl } from "#modules/requests";
 import { genOnUpload, FileData, OnUploadOptions, FileUpload } from "#modules/ui-kit/upload/FileUpload";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { FormInputGroup, FormInputGroupItem } from "#modules/musics/musics/Edit/FormInputGroup";
+import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
 import { useLocalData } from "#modules/utils/local-data-context";
 import styles from "./UploadMusicFileModal.module.css";

@@ -3,7 +3,7 @@ import { useSortable, defaultAnimateLayoutChanges } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { DragHandle } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
-import { SetState } from "#modules/utils/resources/useCrud";
+import { SetState } from "#modules/utils/react";
 import { MusicPlaylistItem } from "../PlaylistItem";
 import styles from "../Playlist.module.css";
 import { MusicPlaylistEntity } from "../../models";

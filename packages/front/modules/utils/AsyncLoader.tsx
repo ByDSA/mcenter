@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { Props, useAsyncAction } from "./usePageAsyncAction";
 
 type AsyncElementProps<T> = Omit<Props<T>, "autoStart" | "initialStatus"> & {

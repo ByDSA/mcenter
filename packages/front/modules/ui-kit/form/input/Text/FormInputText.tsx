@@ -43,7 +43,7 @@ export const FormInputTextMultiline = (
   },
 ) => {
   const { className, nullable, onChange, submitOnEnter, ...textAreaProps } = props;
-  const externalRef = (props as any).ref;
+  const externalRef = props.ref;
   const internalRef = useRef<HTMLTextAreaElement | null>(null);
   // Callback Ref: Se ejecuta automáticamente cuando el nodo se monta
   const setRef = useCallback((node: HTMLTextAreaElement | null) => {
@@ -87,7 +87,7 @@ export const FormInputText = (props: Omit<React.InputHTMLAttributes<HTMLInputEle
     submitOnEnter?: boolean;
 } ) => {
   const { className, nullable, onChange, submitOnEnter, ...inputProps } = props;
-  const externalRef = (props as any).ref;
+  const externalRef = props.ref;
   const internalRef = useRef<HTMLInputElement | null>(null);
   // Callback Ref: Se ejecuta automáticamente cuando el nodo se monta
   const setRef = useCallback((node: HTMLInputElement | null) => {

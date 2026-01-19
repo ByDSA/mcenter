@@ -5,7 +5,7 @@ import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { ErrorView } from "#modules/ui-kit/input/Error";
+import { ErrorView } from "#modules/ui-kit/form/Error";
 import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
 import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
 import { FormInputText, FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";

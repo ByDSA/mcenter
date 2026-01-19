@@ -11,10 +11,10 @@ import { backendUrl } from "#modules/requests";
 import { MusicEntryElement } from "#modules/musics/musics/ListItem/MusicEntry";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import { useUser } from "#modules/core/auth/useUser";
-import { ResourceList } from "#modules/resources/ResourceList";
+import { ResourceList } from "#modules/resources/List/ResourceList";
 import { useMusic } from "#modules/musics/hooks";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { FormInputGroup } from "#modules/musics/musics/Edit/FormInputGroup";
+import { FormInputGroup } from "#modules/ui-kit/form/FormInputGroup";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 

@@ -3,7 +3,7 @@ import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
-import { ResourceList } from "#modules/resources/ResourceList";
+import { ResourceList } from "#modules/resources/List/ResourceList";
 import { dayTitle } from "#modules/history/utils";
 import { EpisodeHistoryEntryElement } from "./ListItem/HistoryEntry";
 import { EpisodeHistoryApi } from "./requests";

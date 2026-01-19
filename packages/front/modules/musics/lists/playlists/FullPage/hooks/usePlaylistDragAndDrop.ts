@@ -5,7 +5,7 @@ import { useSensor,
   KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { SetState } from "#modules/utils/resources/useCrud";
+import { SetState } from "#modules/utils/react";
 import { MusicPlaylistsApi } from "../../requests";
 import { MusicPlaylistEntity } from "../../models";
 

@@ -1,11 +1,11 @@
 import React, { ReactNode } from "react";
-import { SetState } from "#modules/utils/resources/useCrud";
 import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { ResourceEntryLoading } from "#modules/resources/ResourceEntryLoading";
+import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryLoading";
 import { MusicContextMenu } from "#modules/musics/musics/SettingsButton/Button";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
+import { SetState } from "#modules/utils/react";
 import { MusicEntryElement } from "../../../musics/ListItem/MusicEntry";
 import { useMusic } from "../../../hooks";
 import { MusicPlaylistsApi } from "../requests";

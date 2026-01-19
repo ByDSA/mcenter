@@ -4,9 +4,9 @@ import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { getLongDateStr } from "#modules/utils/dates";
-import { FormInputGroup, FormInputGroupItem } from "#modules/musics/musics/Edit/FormInputGroup";
+import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { SetState } from "#modules/utils/resources/useCrud";
+import { SetState } from "#modules/utils/react";
 import { EpisodeHistoryApi } from "../requests";
 import styles from "./DeleteEntryModal.module.css";
 

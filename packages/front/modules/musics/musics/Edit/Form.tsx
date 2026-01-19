@@ -10,20 +10,20 @@ import { MusicUserInfosApi } from "#modules/musics/user-info.requests";
 import { ImageCoversApi } from "#modules/image-covers/requests";
 import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { ErrorView } from "#modules/ui-kit/input/Error";
+import { ErrorView } from "#modules/ui-kit/form/Error";
 import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
 import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
-import { useFileInfosModal } from "#modules/musics/file-info/EditFileInfos/Modal";
+import { useFileInfosModal } from "#modules/musics/file-info/Edit/Modal";
 import { classes } from "#modules/utils/styles";
 import { FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";
 import { useMusic } from "#modules/musics/hooks";
 import { FormInputNumber } from "../../../ui-kit/form/input/Number/FormInputNumber";
 import { FormInputBooleanCheckbox } from "../../../ui-kit/form/input/Boolean/FormInputBoolean";
-import { FormInputTags } from "./FormInputTags";
+import { FormInputGroup, FormInputGroupItem } from "../../../ui-kit/form/FormInputGroup";
+import { FormInputErrorWrap } from "../../../ui-kit/form/FormInputErrorWrap";
+import { FormInputTags } from "../../../resources/FormInputTags/FormInputTags";
 import styles from "./styles.module.css";
-import { FormInputGroup, FormInputGroupItem } from "./FormInputGroup";
-import { FormInputErrorWrap } from "./FormInputErrorWrap";
 
 const schema = musicSchema.pick( {
   album: true,
@@ -436,10 +436,6 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
         <aside>
           <EditFileInfosButton
             musicId={initialData.id}
-            actions={{
-              add: () => { /* cache update handled internally */ },
-              remove: () => { /* cache update handled internally */ },
-            }}
           />
         </aside>
         <aside>

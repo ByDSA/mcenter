@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { CloudUpload, InsertDriveFile, Close, CheckCircle, Error as ErrorIcon } from "@mui/icons-material";
 import { showError } from "$shared/utils/errors/showError";
 import { classes } from "#modules/utils/styles";
-import { Separator } from "#modules/resources/Separator";
+import { Separator } from "#modules/resources/Separator/Separator";
 import { Button } from "../form/input/Button/Button";
 import styles from "./FileUpload.module.css";
 import { UploadButton } from "./UploadButton";

@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { ErrorView } from "#modules/ui-kit/input/Error";
+import { ErrorView } from "#modules/ui-kit/form/Error";
 import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
 import { FormInputText, FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";
 import { MusicQueriesApi } from "../requests";

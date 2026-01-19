@@ -1,0 +1,7 @@
+.resultNumbers {
+  display: flex;
+  justify-content: left;
+  margin-top: 0.5rem;
+  margin-left: 1rem;
+  font-size: 0.8em;
+}

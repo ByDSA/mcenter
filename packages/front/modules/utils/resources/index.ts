@@ -1,3 +1,0 @@
-export {
-  useResourceEdition,
-} from "./useResourceEdition";

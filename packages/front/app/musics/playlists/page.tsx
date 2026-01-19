@@ -10,7 +10,7 @@ import { NewQueryButton } from "#modules/musics/lists/queries/New/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicUsersListsApi } from "#modules/musics/lists/users-lists/requests";
 import { PlayQueryButton } from "#modules/musics/lists/queries/PlayQuery";
-import { ContentSpinner } from "#modules/ui-kit/spinner/Spinner";
+import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import MusicLayout from "../music.layout";
 import styles from "./styles.module.css";
 

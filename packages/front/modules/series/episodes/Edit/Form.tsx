@@ -8,14 +8,14 @@ import { EpisodeUserInfosApi } from "#modules/series/episodes/user-info/requests
 import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
 import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { ErrorView } from "#modules/ui-kit/input/Error";
+import { ErrorView } from "#modules/ui-kit/form/Error";
 import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
 import { FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";
-import { FormInputGroup, FormInputGroupItem } from "#modules/musics/musics/Edit/FormInputGroup";
-import { FormInputErrorWrap } from "#modules/musics/musics/Edit/FormInputErrorWrap";
-import { FormInputTags } from "#modules/musics/musics/Edit/FormInputTags";
+import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
+import { FormInputErrorWrap } from "#modules/ui-kit/form/FormInputErrorWrap";
+import { FormInputTags } from "#modules/resources/FormInputTags/FormInputTags";
 import { FormInputNumber } from "#modules/ui-kit/form/input/Number/FormInputNumber";
-import { Separator } from "#modules/resources/Separator";
+import { Separator } from "#modules/resources/Separator/Separator";
 import { FormInputTime } from "../../../ui-kit/form/input/Time/FormInputTime";
 import styles from "./style.module.css";
 

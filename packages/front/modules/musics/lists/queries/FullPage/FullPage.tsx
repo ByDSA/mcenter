@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { ResourcePlayButtonView } from "#modules/resources/PlayButton";
+import { ResourcePlayButtonView } from "#modules/resources/PlayButton/PlayButton";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { classes } from "#modules/utils/styles";
 import { useImageCover } from "#modules/image-covers/hooks";

@@ -4,7 +4,7 @@ import { showError } from "$shared/utils/errors/showError";
 import { MusicQueryEntity } from "$shared/models/musics/queries";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useUser } from "#modules/core/auth/useUser";
-import { ResourceList } from "#modules/resources/ResourceList";
+import { ResourceList } from "#modules/resources/List/ResourceList";
 import { MusicUsersListsApi } from "#modules/musics/lists/users-lists/requests";
 import { MusicQueryListItem } from "#modules/musics/lists/queries/ListItem";
 import { LocalDataProvider } from "#modules/utils/local-data-context";

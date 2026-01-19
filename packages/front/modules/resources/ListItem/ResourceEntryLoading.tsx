@@ -1,6 +1,6 @@
 import { FavButton } from "#modules/ui-kit/FavButton";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
-import { HistoryTimeView, WeightView } from "./metadata";
+import { HistoryTimeView, WeightView } from "../metadata";
 import { ResourceEntry } from "./ResourceEntry";
 
 type Props = Pick<Parameters<typeof ResourceEntry>[0], "drag">;
