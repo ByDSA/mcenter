@@ -41,9 +41,7 @@ export const MusicPlaylistItem = ( { playlist,
   const contextMenuContent = <LocalDataProvider
     data={music}
   >
-    <MusicContextMenu
-      music={music}
-    />
+    <MusicContextMenu />
     {user?.id === playlist.ownerUserId && <ContextMenuItem
       label="Quitar de la playlist"
       theme="danger"

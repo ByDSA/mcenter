@@ -14,6 +14,7 @@ import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryL
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { getMediumCoverUrl, getSmallCoverUrl } from "#modules/image-covers/Selector/image-cover-utils";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
+import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { MusicContextMenu } from "../SettingsButton/Button";
 import styles from "./MusicEntry.module.css";
 
@@ -130,7 +131,9 @@ export function MusicEntryElement(
       onClick={(e)=>openMenu( {
         event: e,
         content: props.contextMenu?.customContent
-         ?? <MusicContextMenu music={music} />,
+         ?? <LocalDataProvider data={music}>
+           <MusicContextMenu />
+         </LocalDataProvider>,
       } )
       }
     />}

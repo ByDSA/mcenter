@@ -5,7 +5,7 @@ import { useMusic } from "#modules/musics/hooks";
 import { MusicLatestViewsContextMenuItem } from "#modules/musics/history/LatestViews/ContextMenuItem";
 import { AddToPlaylistContextMenuItem } from "#modules/musics/lists/playlists/AddToPlaylistContextMenuItem";
 import { useUser } from "#modules/core/auth/useUser";
-import { LocalDataProvider } from "#modules/utils/local-data-context";
+import { LocalDataProvider, useLocalData } from "#modules/utils/local-data-context";
 import { EditMusicContextMenuItem } from "../Edit/ContextMenuItem";
 import { CopyMusicLinkContextMenuItem } from "./CopyMusicLinkContextMenuItem";
 
@@ -25,17 +25,14 @@ export const MusicSettingsButton = ( { musicId }: Props) => {
       event: e,
       content: <LocalDataProvider
         data={data}>
-        <MusicContextMenu
-          music={data}
-        /></LocalDataProvider>,
+        <MusicContextMenu/
+        ></LocalDataProvider>,
     } );
   }}/>;
 };
 
-type Props2 = {
-  music: MusicEntity;
-};
-export function MusicContextMenu( { music }: Props2) {
+export function MusicContextMenu() {
+  const { data: music } = useLocalData<MusicEntity>();
   const musicId = music.id;
   const { user } = useUser();
 
