@@ -50,13 +50,17 @@
         text-decoration: none;
       }
 
-      &.normal .logoCenter {
-        color: var(--color-blue-200) !important;
+      &.normal {
+        & :first-child {
+          margin-right: 0.1rem;
+        }
+        .logoCenter {
+          color: var(--color-blue-200) !important;
+        }
       }
 
       &.mini {
         display: none;
-        width: 3rem;
         justify-content: center;
       }
     }
@@ -92,6 +96,17 @@ body:has(.content) {
   min-height: calc(100dvh - var(--content-margin-top));
   min-width: calc(100dvw - var(--content-margin-left));
   position: relative;
+}
+
+.mini, .normal {
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.normal svg {
+  margin-bottom: -2px;
 }
 
 @media (width < 600px) {

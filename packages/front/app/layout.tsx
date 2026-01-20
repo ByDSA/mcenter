@@ -18,6 +18,7 @@ import { ContextMenuProvider } from "#modules/ui-kit/ContextMenu";
 import { MediaPlayerPageLayout } from "#modules/player/browser/MediaPlayer/MediaPlayerPageLayout";
 import { TopbarMainClient } from "#modules/ui-kit/menus/TopbarClient";
 import { GlobalQueryClientProvider } from "#modules/fetching/QueryClientProvider";
+import { Favicon } from "#modules/utils/Favicon/Favicon";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
@@ -142,8 +143,8 @@ async function Menu(customMainSlot: React.ReactNode) {
     className={classes(styles.topbar, styles.fixed)}
     leftAside={
       <>
-        <a className={classes(styles.topbarLeftAsideChild, styles.normal)} href="/">M<span className={styles.logoCenter}>Center</span></a>
-        <a className={classes(styles.topbarLeftAsideChild, styles.mini)} href="/">M</a>
+        <a className={classes(styles.topbarLeftAsideChild, styles.normal)} href="/"><Favicon/><span className={styles.logoCenter}>Center</span></a>
+        <a className={classes(styles.topbarLeftAsideChild, styles.mini)} href="/"><Favicon/></a>
       </>
     }
     rightAside={
