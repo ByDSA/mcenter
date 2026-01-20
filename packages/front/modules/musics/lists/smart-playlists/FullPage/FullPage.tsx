@@ -9,6 +9,7 @@ import { classes } from "#modules/utils/styles";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
+import { Separator } from "#modules/resources/Separator/Separator";
 import playlistStyles from "../../playlists/FullPage/Playlist.module.css";
 import { MusicSmartPlaylistEntity } from "../models";
 import { MusicSmartPlaylistSettingsButton } from "../SettingsButton/Settings";
@@ -53,6 +54,13 @@ export const MusicSmartPlaylistFullPage = () => {
 
             <div className={playlistStyles.playlistStats}>
               <div className={playlistStyles.row}>
+                <div
+                  className={classes(playlistStyles.statItem)}
+                  title="Smart Playlist"
+                >
+                  Smart Playlist
+                </div>
+                <Separator />
                 <VisibilityTag
                   isPublic={data.visibility === "public"}
                   className={playlistStyles.statItem}

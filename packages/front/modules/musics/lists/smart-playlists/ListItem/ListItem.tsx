@@ -39,7 +39,7 @@ export const MusicSmartPlaylistListItem = ( { index }: Props) => {
       onDelete={() => removeItemByIndex(index)}
     />}
     subtitle={<ResourceSubtitle items={[{
-      text: "Query",
+      text: "Smart Playlist",
     }, {
       text: data.visibility === "public" ? "Pública" : "Privada",
       customContent: <VisibilityTag
