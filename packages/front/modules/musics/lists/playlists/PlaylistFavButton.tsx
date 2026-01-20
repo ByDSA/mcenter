@@ -11,7 +11,6 @@ type Props = Omit<PropsOf<typeof FavButton>, "disabled" | "onFavorite" |
   musicId: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlaylistFavButton = ( { favoritesPlaylistId,
   musicId, ...props }: Props) => {
   const disabled = useMemo(()=>favoritesPlaylistId === null, [favoritesPlaylistId]);

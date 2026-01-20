@@ -14,7 +14,6 @@ type Props = {
   value: MusicEntity;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Music = ( { value }: Props) => {
   const { id, title, album, artist, disabled,
     year, createdAt, updatedAt, addedAt,

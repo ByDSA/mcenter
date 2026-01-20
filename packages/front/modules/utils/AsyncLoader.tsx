@@ -5,7 +5,6 @@ import { Props, useAsyncAction } from "./usePageAsyncAction";
 type AsyncElementProps<T> = Omit<Props<T>, "autoStart" | "initialStatus"> & {
   children: ReactNode;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const AsyncLoader = <T, >( { children, loadingElement, ...props }: AsyncElementProps<T>) => {
   const { statusElement, status } = useAsyncAction( {
     loadingElement: loadingElement ?? <ContentSpinner size={4}/>,

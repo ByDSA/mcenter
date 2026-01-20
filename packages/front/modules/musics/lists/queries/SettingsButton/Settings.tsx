@@ -11,7 +11,6 @@ import { CopyQueryLinkContextMenuItem } from "./CopyQueryLinkContextMenuItem";
 type Props = {
   onDelete: ()=> void;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicQuerySettingsButton = (props: Props) => {
   const { data, setData } = useLocalData<MusicQueryEntity>();
   const { openMenu } = useContextMenuTrigger();

@@ -10,7 +10,6 @@ type Props = {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>)=> void;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const LoginRegisterForm = ( { title, subtitle, children, className, onSubmit }: Props) => {
   return (
     <form className={classes(styles.box, className)} onSubmit={onSubmit}>

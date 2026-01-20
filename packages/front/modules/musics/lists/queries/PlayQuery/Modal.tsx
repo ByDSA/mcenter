@@ -18,7 +18,6 @@ const schema = z.object( {
   query: z.string().trim()
     .min(1, "La query es obligatoria"),
 } );
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const PlayQueryForm = ( { initialValue }: FormProps) => {
   const modal = useModal(true);
   const { register,

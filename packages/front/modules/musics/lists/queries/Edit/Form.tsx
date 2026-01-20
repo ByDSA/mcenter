@@ -31,7 +31,6 @@ const schema = z.object( {
   imageCoverId: mongoDbId.nullable(),
 } );
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EditQueryForm = ( { initialData, onSuccess, updateLocalData }: Props) => {
   const { register,
     handleSubmit,

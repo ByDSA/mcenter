@@ -3,7 +3,6 @@ import { classes } from "#modules/utils/styles";
 import styles from "./PlayButton.module.css";
 
 type Props = Omit<Parameters<typeof PlayButtonView>[0], "theme">;
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ResourcePlayButtonView = ( { className, ...props }: Props) => {
   return <PlayButtonView
     theme={"blue"}

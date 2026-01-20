@@ -13,7 +13,6 @@ import { useMusic } from "../hooks";
 import { MusicHistoryEntrySettingsButton } from "./SettingsButton/SettingsButton";
 import { MusicHistoryApi } from "./requests";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicHistoryListItem = React.memo(() =>{
   const { data } = useLocalData<MusicHistoryApi.GetManyByCriteria.Data>();
   const { user } = useUser();

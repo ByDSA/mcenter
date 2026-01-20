@@ -6,7 +6,6 @@ import { frontendUrl } from "#modules/requests";
 import { CopyLinkContextMenuItem } from "../../CopyLinkContextMenuItem";
 import { MusicPlaylistEntity } from "../models";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const CopyPlaylistLinkContextMenuItem = ()=> {
   const { user } = useUser();
   const { data } = useLocalData<MusicPlaylistEntity>();

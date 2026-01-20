@@ -18,7 +18,6 @@ type Props = {
   handleGotoSignUp?: ()=> Promise<void>;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const LoginComponent = ( { handleForgotPass,
   handleLocalLogin,
   handleGotoSignUp,

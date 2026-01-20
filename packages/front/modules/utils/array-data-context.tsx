@@ -13,7 +13,6 @@ interface ArrayDataContextType<T> {
   setItemByIndex: (index: number, newItemOrFn: NewItemOrFn<T>)=> void;
   setData: SetState<T[]>;
 }
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const ArrayDataContext = createContext<ArrayDataContextType<any> | undefined>(undefined);
 
 // Provider
@@ -22,7 +21,6 @@ type ArrayDataProviderProps<T> = Partial<Omit<ArrayDataContextType<T>, "data">> 
   children: ReactNode;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ArrayDataProvider = <T, >( { children,
   data,
   setData: _setData,

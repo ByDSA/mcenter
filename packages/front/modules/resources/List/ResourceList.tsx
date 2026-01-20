@@ -6,7 +6,6 @@ type Props = {
   children: ReactNode;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ResourceList = (props: Props) => {
   return <section className={classes(styles.list)}>{props.children}</section>;
 };

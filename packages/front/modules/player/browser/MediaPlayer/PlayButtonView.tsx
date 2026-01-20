@@ -10,7 +10,6 @@ type Props = {
   disabled?: boolean;
   theme?: "blue" | "transparent-white" | "triangle-white" | "white";
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlayButtonView = ( { status,
   onClick,
   className,

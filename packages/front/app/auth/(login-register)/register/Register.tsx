@@ -16,7 +16,6 @@ type Props = {
   className?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const RegisterComponent = ( { handleRegister, handleGotoLogin, className }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const { element: usernameElement,

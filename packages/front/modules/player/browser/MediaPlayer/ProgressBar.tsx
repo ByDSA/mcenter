@@ -10,7 +10,6 @@ type Props = {
   includeTimes?: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ProgressBar = ( { className, includeTimes }: Props) => {
   const currentTime = useBrowserPlayer(s=>s.currentTime);
   const duration = useBrowserPlayer(s=>s.duration);
@@ -123,14 +122,12 @@ time: string; } | null>(null);
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const CurrentTime = () => {
   const currentTime = useBrowserPlayer(s=>s.currentTime);
 
   return <span>{secsToMmss(currentTime)}</span>;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Duration = () => {
   const duration = useBrowserPlayer(s=>s.duration);
 

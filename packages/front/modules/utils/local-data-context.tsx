@@ -14,7 +14,6 @@ interface LocalDataValue<T> {
 
 type LocalContextRegistry = Record<string, LocalDataValue<any>>;
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const LocalDataContext = createContext<LocalContextRegistry | undefined>(undefined);
 
 type LocalDataProviderProps<T> = LocalDataValue<T> & {
@@ -22,7 +21,6 @@ type LocalDataProviderProps<T> = LocalDataValue<T> & {
   dataKey?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const LocalDataProvider = <T, >( { children,
   data,
   setData,

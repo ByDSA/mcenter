@@ -54,7 +54,6 @@ const getStatusClass = (status: TaskStatusAny["status"]): string => {
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Task = ( { value, onClick }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const handleCardClick = async (e: React.MouseEvent) => {

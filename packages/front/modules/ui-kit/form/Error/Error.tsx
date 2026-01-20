@@ -7,7 +7,6 @@ type ErrorProps<T extends FieldValues> = {
   keyName: FieldPath<T>;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ErrorView = <T extends FieldValues>( { errors,
   keyName,
   touchedFields }: ErrorProps<T>) => {

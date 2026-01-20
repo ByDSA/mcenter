@@ -10,7 +10,6 @@ import { MusicLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem"
 import { MusicHistoryApi } from "../requests";
 import { DeleteHistoryEntryContextMenuItem } from "../Delete/ContextMenuItem";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const HistoryEntryContextMenu = () => {
   const { data } = useLocalData<MusicHistoryApi.GetManyByCriteria.Data>();
   const { user } = useUser();
@@ -37,7 +36,6 @@ const HistoryEntryContextMenu = () => {
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicHistoryEntrySettingsButton = () => {
   const { data, setData } = useLocalData<MusicHistoryApi.GetManyByCriteria.Data>();
   const { openMenu } = useContextMenuTrigger();

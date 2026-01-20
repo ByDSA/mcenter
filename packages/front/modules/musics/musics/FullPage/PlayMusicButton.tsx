@@ -7,7 +7,6 @@ type Props = {
   music: MusicEntity;
   disabled?: boolean;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlayMusicButton = ( { music, disabled }: Props) => {
   const player = useBrowserPlayer(useShallow((s) => ( {
     currentResource: s.currentResource,

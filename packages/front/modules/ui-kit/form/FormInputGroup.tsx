@@ -6,7 +6,6 @@ type Props = HTMLAttributes<HTMLElement> & {
   inline?: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const FormInputGroup = ( { children, inline, className, ...otherProps }: Props) => {
   return <section
     className={classes(
@@ -20,7 +19,6 @@ export const FormInputGroup = ( { children, inline, className, ...otherProps }: 
   </section>;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const FormInputGroupItem = ( { children, inline, className, ...otherProps }: Props) => {
   return <article
     className={classes(

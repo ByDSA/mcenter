@@ -8,7 +8,6 @@ type ExpandableContainerProps = {
   className?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ExpandableContainer = ( { children, className = "" }: ExpandableContainerProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isClosing, setIsClosing] = useState(false);

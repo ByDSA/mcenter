@@ -10,7 +10,6 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isSubmitting?: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Button = ( { children, left, right,
   isSubmitting = false,
   theme = "dark-gray", disabled, ...buttonProps }: Props) => {

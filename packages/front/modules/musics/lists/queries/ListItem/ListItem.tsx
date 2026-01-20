@@ -14,7 +14,6 @@ interface QueryProps {
   index: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicQueryListItem = ( { index }: QueryProps) => {
   const { removeItemByIndex } = useArrayData<MusicQueryEntity>();
   const { data } = useLocalData<MusicQueryEntity>();

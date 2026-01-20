@@ -23,7 +23,6 @@ const schema = z.object( {
   visibility: z.enum(["public", "private"]),
 } );
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const NewQueryForm = ( { onSuccess }: FormProps) => {
   const { register,
     handleSubmit,

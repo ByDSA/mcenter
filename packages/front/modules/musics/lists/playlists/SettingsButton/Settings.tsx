@@ -11,7 +11,6 @@ type Props = {
   onEdit?: (current: MusicPlaylistEntity, previous: MusicPlaylistEntity)=> void;
   onDelete?: ()=> void;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicPlaylistSettingsButton = (props: Props) => {
   const { openMenu } = useContextMenuTrigger();
   const { user } = useUser();

@@ -6,7 +6,6 @@ type Props = {
   className?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ProgressBarOnlyView = ( { className }: Props) => {
   const currentTime = useBrowserPlayer(s=>s.currentTime);
   const duration = useBrowserPlayer(s=>s.duration);

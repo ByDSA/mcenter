@@ -21,7 +21,6 @@ export type AudioRef = RefObject<HTMLAudioElement | null>;
  * - Carrier (DOM): Mantiene la sesión viva con silencio.
  * - Engine (Memoria): Procesa el audio real a través del AudioContext.
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const AudioTag = () => {
   const player = useBrowserPlayer(useShallow((s) => ( {
     isOnline: s.isOnline,

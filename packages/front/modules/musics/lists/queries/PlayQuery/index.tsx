@@ -2,7 +2,6 @@ import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPla
 import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import { usePlayQueryModal } from "./Modal";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlayQueryButton = () => {
   const modal = usePlayQueryModal();
 

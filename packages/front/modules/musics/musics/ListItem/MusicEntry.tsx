@@ -142,7 +142,6 @@ export function MusicEntryElement(
 type MusicSubtitleProps = {
   music: MusicEntity;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicSubtitle = memo(( { music }: MusicSubtitleProps) => {
   return <ResourceSubtitle items={[{
     text: music.game ?? music.artist,

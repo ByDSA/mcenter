@@ -13,7 +13,6 @@ type Props = {
   musicId: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicSettingsButton = ( { musicId }: Props) => {
   const { openMenu } = useContextMenuTrigger();
   const { data } = useMusic(musicId);

@@ -16,7 +16,6 @@ export function useAudioEffects(audioElement: HTMLAudioElement | null) {
     if (!audioElement || typeof window === "undefined" || nodesRef.current)
       return;
 
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
 
     if (!ctxRef.current)

@@ -29,7 +29,6 @@ export function createMockClass<T>(OriginalClass: new (...args: any[])=> T) {
 }
 
 export function createMockInstance<T>(OriginalClass: new (...args: any[])=> T) {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const MockClass = createMockClass(OriginalClass);
 
   // Retornar la clase con el tipo correcto

@@ -22,7 +22,6 @@ type PlaylistItemProps = NonNullable<Pick<Parameters<typeof MusicEntryElement>[0
   index: number;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicPlaylistItem = ( { playlist,
   index,
   setPlaylist,

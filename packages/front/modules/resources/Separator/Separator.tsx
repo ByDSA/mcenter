@@ -5,7 +5,6 @@ type Props = {
   className?: string;
   collapsable?: boolean;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Separator = (props?: Props) =><span
   className={classes(
     styles.separator,

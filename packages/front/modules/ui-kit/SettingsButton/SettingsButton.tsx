@@ -7,7 +7,6 @@ type Props = {
   theme?: "dark" | "light";
   className?: string;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const SettingsButton = ( { onClick, className, theme: mode }: Props) => <button
   className={classes(styles.controlButton, className, mode === "light" && styles.overWhite)}
   onClick={(e)=> {

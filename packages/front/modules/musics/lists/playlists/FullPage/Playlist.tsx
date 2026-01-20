@@ -14,7 +14,6 @@ interface PlaylistProps {
   setValue: SetState<MusicPlaylistEntity>;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicPlaylistFullPage = ( { value, setValue }: PlaylistProps) => {
   const { playlistStatus, handlePlayPlaylist } = usePlaylistPlayer(value);
   const { sensors,

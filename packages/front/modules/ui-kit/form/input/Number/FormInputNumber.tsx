@@ -26,7 +26,6 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   minDecimals?: number;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const FormInputNumber = forwardRef<HTMLInputElement, Props>(
   (
     { className,

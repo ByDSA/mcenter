@@ -1,7 +1,6 @@
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { useMusicLatestViewsModal } from "./Modal";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicLatestViewsContextMenuItem = (
   props: Parameters<typeof useMusicLatestViewsModal>[0],
 ) => {

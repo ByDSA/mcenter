@@ -25,7 +25,6 @@ interface PlaylistTracksProps {
   itemIds: string[];
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const EmptyPlaylist = memo(()=><div className={styles.emptyState}>
   <MusicNote className={styles.emptyStateIcon} />
   <p className={styles.emptyStateText}>
@@ -33,7 +32,6 @@ const EmptyPlaylist = memo(()=><div className={styles.emptyState}>
   </p>
 </div>);
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlaylistTracks = ( { value,
   setValue,
   draggable,

@@ -34,7 +34,6 @@ const update = (target: HTMLTextAreaElement, nullable: boolean | undefined) => {
   } );
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const FormInputTextMultiline = (
   props: React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
     ref?: RefCallBack | RefObject<HTMLTextAreaElement | null>;
@@ -80,7 +79,6 @@ export const FormInputTextMultiline = (
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const FormInputText = (props: Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> & {
     ref?: RefCallBack | RefObject<HTMLInputElement | null>;
     nullable?: boolean;

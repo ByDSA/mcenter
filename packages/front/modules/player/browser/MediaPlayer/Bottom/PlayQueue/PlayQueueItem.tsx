@@ -10,7 +10,6 @@ interface QueueItemProps {
   onClickPlay?: (prevStatus: PlayerStatus)=> void;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const QueueItem = memo(( { index, item,
   start,
   onClickPlay,

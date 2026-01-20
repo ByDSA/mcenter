@@ -4,7 +4,6 @@ import { TIME_UNDEFINED } from "#modules/remote-player/MediaPlayer";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import styles from "./MediaPlayer.module.css";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const CurrentTimeLabel = () => {
   const currentTime = useBrowserPlayer(s=>s.currentTime);
   const duration = useBrowserPlayer(s=>s.duration);

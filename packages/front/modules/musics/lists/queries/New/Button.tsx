@@ -11,7 +11,6 @@ type ButtonProps = {
   theme: "dark-gray" | "white";
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const NewQueryButton = ( { onSuccess, theme }: ButtonProps) => {
   const usingModal = useModal();
   const openModal = () => {

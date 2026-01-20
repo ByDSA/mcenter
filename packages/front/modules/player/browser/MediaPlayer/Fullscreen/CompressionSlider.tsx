@@ -2,7 +2,6 @@ import React from "react";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import styles from "./CompressionSlider.module.css";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const CompressionSlider = () => {
   // Obtenemos el valor interno (0 a 1) y la función para actualizarlo
   const compressionValue = useBrowserPlayer((s) => s.compressionValue);

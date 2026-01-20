@@ -8,7 +8,6 @@ import styles from "./Modal.module.css";
 // Se necesita como hook-wrapper, porque si se pone dentro del ContextMenu,
 // al cerrarse el menú se destruyen los hooks del modal
 // y no se puede actualizar cuando llegan los datos
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EditMusicContextMenuItem = () => {
   const { openModal } = useModal();
   const { data, setData } = useLocalData<MusicEntity>();

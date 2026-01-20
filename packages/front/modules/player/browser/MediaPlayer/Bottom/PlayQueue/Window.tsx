@@ -11,7 +11,6 @@ type Props = {
   children: ReactNode;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlayerWindowView = ( { close, className, state, children }: Props) => {
   return (
     <>

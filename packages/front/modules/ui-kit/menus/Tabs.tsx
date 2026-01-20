@@ -8,7 +8,6 @@ type Props = {
   data: MenuItemData[];
   before?: ReactNode;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Tabs = ( { data, className, before }: Props) =>{
   return (
     <nav className={classes(styles.tabs, className)}>

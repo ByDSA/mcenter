@@ -38,7 +38,6 @@ type Props = {
   onCancel?: ()=> void;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EditEpisodeForm = ( { initialData, onSuccess, onCancel }: Props) => {
   // Asumimos que editamos el primer archivo si existe, igual que en la versión anterior
   const fileInfo = initialData.fileInfos?.[0];

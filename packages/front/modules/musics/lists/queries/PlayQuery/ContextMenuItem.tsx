@@ -5,7 +5,6 @@ import { usePlayQueryModal } from "./Modal";
 
 type Props = Parameters<ReturnType<typeof usePlayQueryModal>["openModal"]>[0];
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlayQueryModContextMenuItem = (props?: Props) => {
   const playQueryModal = usePlayQueryModal();
   const { data } = useLocalData<MusicQueryEntity>();

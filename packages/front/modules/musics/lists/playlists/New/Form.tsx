@@ -20,7 +20,6 @@ const schema = z.object( {
   visibility: z.enum(["public", "private"]),
 } );
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
   const { register,
     handleSubmit,

@@ -155,7 +155,6 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState<YoutubeTaskStatus | null>(null);
   // Validar URL de YouTube
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const isValidYouTubeURL = (u: string) => {
     const patterns = [
       /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/,

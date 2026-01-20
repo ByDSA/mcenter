@@ -23,7 +23,6 @@ type Props<T> = {
   setValue: SetState<T>;
   showDate?: boolean;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EpisodeHistoryEntryElement = React.memo((
   { value, setValue }: Props<Data>,
 ) =>{
@@ -96,7 +95,6 @@ export const EpisodeHistoryEntryElement = React.memo((
 type EpisodeSubtitleProps = {
   episode: EpisodeEntity;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EpisodeSubtitle = memo(( { episode }: EpisodeSubtitleProps) => {
   return <ResourceSubtitle items={[{
     text: episode.serie?.name!,

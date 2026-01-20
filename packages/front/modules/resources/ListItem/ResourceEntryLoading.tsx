@@ -5,7 +5,6 @@ import { ResourceEntry } from "./ResourceEntry";
 
 type Props = Pick<Parameters<typeof ResourceEntry>[0], "drag">;
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ResourceEntryLoading = (props?: Props) => {
   return <ResourceEntry
     mainTitle=""

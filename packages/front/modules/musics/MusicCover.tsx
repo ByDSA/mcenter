@@ -18,7 +18,7 @@ type Props =
       size?: "large" | "medium" | "small";
       title?: string;
     };
-// eslint-disable-next-line @typescript-eslint/naming-convention
+
 export const MusicImageCover = (props?: Props) => {
   const img = props?.cover
     ? {

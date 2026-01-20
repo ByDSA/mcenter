@@ -18,7 +18,7 @@ import { useUploadMusicFileModal } from "./UploadMusicFileModal";
 import styles from "./Form.module.css";
 
 type EditFileInfosViewProps = LoaderProps;
-// eslint-disable-next-line @typescript-eslint/naming-convention
+
 export const EditFileInfosForm = ( { musicId }: EditFileInfosViewProps) => {
   const { openModal: openUploadModal } = useUploadMusicFileModal();
   const fileInfosApi = FetchApi.get(MusicFileInfosApi);

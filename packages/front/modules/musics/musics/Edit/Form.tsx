@@ -52,7 +52,6 @@ type Props = {
   onDelete?: ()=> void;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
   const [showOptional, setShowOptional] = useState(false);
   const { register,
@@ -472,7 +471,6 @@ type OptionalPropsButtonProps = {
   onClick: ()=> void;
   isVisible: boolean;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const OptionalPropsButton = ( { isVisible, onClick }: OptionalPropsButtonProps)=><span
   onClick={onClick}
   className={classes(styles.optionalButton)}>

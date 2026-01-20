@@ -13,7 +13,6 @@ type Props<T extends string> = {
   onChange: (value: T)=> void;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const FormEnumButtons = <T extends string>( { options,
   currentValue,
   onChange }: Props<T>) => {

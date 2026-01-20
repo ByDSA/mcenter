@@ -15,7 +15,7 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   rightIcon?: ReactNode;
   errors?: string[] | null;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
+
 export const FormInputText = ( { icon, rightIcon, errors, className, ...props }: Props) => {
   return <div>
     <div className={classes(styles.inputWrapper)}>

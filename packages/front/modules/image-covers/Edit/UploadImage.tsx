@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useRef, forwardRef, useImperativeHandle, useCallback, useEffect } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
 import { Button } from "#modules/ui-kit/form/input/Button/Button";

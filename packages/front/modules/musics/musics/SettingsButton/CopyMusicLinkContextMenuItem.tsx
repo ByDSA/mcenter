@@ -7,7 +7,6 @@ import { useLocalData } from "#modules/utils/local-data-context";
 type CopyMusicMenuItemProps = {
   token?: string;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const CopyMusicLinkContextMenuItem = (props: CopyMusicMenuItemProps) => {
   const { data: music } = useLocalData<MusicEntity>();
 

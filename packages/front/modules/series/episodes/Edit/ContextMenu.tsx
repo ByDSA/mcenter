@@ -12,7 +12,6 @@ type Props = {
   initialData: Data;
   setData: SetState<Data>;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EditEpisodeContextMenuItem = (props: Props) => {
   const { openModal } = useEditEpisodeModal(props);
 

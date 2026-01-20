@@ -16,7 +16,6 @@ interface PlaylistProps {
   index: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicPlaylistListItem = ( { index }: PlaylistProps) => {
   const { removeItemByIndex } = useArrayData<MusicUserListResourceItem>();
   const { data } = useLocalData<MusicPlaylistEntity>();

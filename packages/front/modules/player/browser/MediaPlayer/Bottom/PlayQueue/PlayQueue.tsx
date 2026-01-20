@@ -8,7 +8,6 @@ type Props = {
   onClickPlay?: (item: QItem, prevStatus: PlayerStatus)=> void;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlayQueue = ( { className, onClickPlay }: Props) => {
   const queue = useBrowserPlayer(s=>s.queue);
   const queueIndex = useBrowserPlayer(s=>s.queueIndex);

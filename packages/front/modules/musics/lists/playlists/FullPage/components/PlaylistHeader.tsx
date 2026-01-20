@@ -22,7 +22,6 @@ interface PlaylistHeaderProps {
   onPlay: ()=> void;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlaylistHeader = ( { totalSongs,
   totalDuration,
   playlistStatus,

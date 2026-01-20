@@ -14,7 +14,6 @@ import { MusicQueryEntity } from "../models";
 import { MusicQuerySettingsButton } from "../SettingsButton/Settings";
 import styles from "./styles.module.css";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const MusicQueryFullPage = () => {
   const { data } = useLocalData<MusicQueryEntity>();
   const playerStatus = useBrowserPlayer(s => s.status);

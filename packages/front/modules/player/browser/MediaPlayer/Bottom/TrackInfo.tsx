@@ -13,7 +13,6 @@ import styles from "./MediaPlayer.module.css";
 import { BIG_BREAKPOINT } from "./breakpoints";
 import { useWindowWidth } from "./useWindowWidth";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const TrackInfo = memo(
   () => {
     const resource = useBrowserPlayer(s=>s.currentResource);

@@ -9,7 +9,6 @@ type Props = {
   onEmptyEnter?: (e: React.KeyboardEvent<HTMLInputElement>)=> void;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const FormInputTags = ( { value = [], onChange, onEmptyEnter }: Props) => {
   const [inputValue, setInputValue] = useState("");
   const handleAdd = () => {

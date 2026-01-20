@@ -39,7 +39,6 @@ export function ResourceEntry(
   const shouldHaveLeftDiv = !!play || imageCover !== undefined;
   const isPlaying = play !== undefined && play.status !== "stopped";
   const router = useRouter();
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const Tag = href ? "a" : "span";
 
   return <span
@@ -101,7 +100,6 @@ type ResourceSubtitleProps = {
     separatorClassName?: string;
   } | undefined)[];
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ResourceSubtitle = memo(( { items, className }: ResourceSubtitleProps) => {
   const title = useMemo(()=>items.reduce((acc, item) => {
     if (!item?.text)
@@ -131,11 +129,9 @@ export const ResourceSubtitle = memo(( { items, className }: ResourceSubtitlePro
 } );
 
 type ResourceTitleProps = AnchorHTMLAttributes<HTMLAnchorElement>;
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ResourceTitle = (props: ResourceTitleProps) => {
   const router = useRouter();
   const { onClick: onClickProp, href, children, ...otherProps } = props;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const TitleTag = href ? "a" : "span";
   let onClick: ResourceTitleProps["onClick"];
 

@@ -29,7 +29,6 @@ const schema = z.object( {
   imageCoverId: mongoDbId.nullable(),
 } );
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }: Props) => {
   const { register,
     handleSubmit,

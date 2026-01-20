@@ -7,7 +7,6 @@ type Props = {
   data: MusicPlaylistEntity;
   onClick: ()=> void;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PlaylistSelectorItem = (props: Props) => {
   const { data } = props;
   let { data: cover } = useImageCover(data.imageCoverId ?? null);

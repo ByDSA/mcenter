@@ -7,7 +7,6 @@ import { CopyLinkContextMenuItem } from "../../CopyLinkContextMenuItem";
 import { MusicQueryEntity } from "../models";
 import { MusicQueriesApi } from "../requests";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const CopyQueryLinkContextMenuItem = ()=> {
   const { data } = useLocalData<MusicQueryEntity>();
 

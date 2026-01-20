@@ -141,7 +141,6 @@ export function BottomMediaPlayer() {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const QueueMusicButton = () => {
   const { open, isOpen, close, currentWindowName } = useWindowContext();
   const active = isOpen && currentWindowName === "queue";
@@ -162,7 +161,6 @@ const QueueMusicButton = () => {
     />
   </>;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const FullscreenButton = () => {
   const { open } = useWindowContext();
 

@@ -9,7 +9,6 @@ type Props = {
   disabled?: boolean;
   titleAccess?: string;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const UploadButton = ( { disabled = true,
   isUploading = false,
   onClick, className, titleAccess = "Subir archivos" }: Props) => {

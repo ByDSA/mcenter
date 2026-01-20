@@ -13,7 +13,7 @@ type Props = {
   dates: number[];
   dateFormat?: DateFormat;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
+
 export const LatestViewsView = ( { dates, dateFormat = DATE_FORMAT_DEFAULT }: Props) => {
   // Estado "dummy" solo para forzar re-render cada X segundos
   const [, setTick] = useState(0);

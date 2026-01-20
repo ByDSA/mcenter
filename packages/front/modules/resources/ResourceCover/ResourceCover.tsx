@@ -18,7 +18,6 @@ export type ResourceImageCoverProps = {
   onClick?: ()=> Promise<void> | void;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ResourceImageCover = (props: ResourceImageCoverProps) => {
   return <div className={classes(styles.cover, props.className)}>
     {props.img?.url

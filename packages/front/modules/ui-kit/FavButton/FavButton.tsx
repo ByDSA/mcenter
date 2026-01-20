@@ -12,7 +12,6 @@ type Props = {
   disabled?: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const FavButton = ( { className,
   value = false,
   disabled,

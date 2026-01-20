@@ -32,7 +32,6 @@ const getStatusInfo = (status: RemotePlayerDtos.Front.Dto["status"]) => {
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const RemotePlayerEntry = ( { value }: Props) => {
   const router = useRouter();
   const statusInfo = getStatusInfo(value.status);

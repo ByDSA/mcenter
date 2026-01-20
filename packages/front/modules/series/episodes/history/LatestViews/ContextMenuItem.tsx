@@ -1,7 +1,6 @@
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { useEpisodeLatestViewsModal } from "./Modal";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EpisodeLatestViewsContextMenuItem = (
   props: Parameters<typeof useEpisodeLatestViewsModal>[0],
 ) => {

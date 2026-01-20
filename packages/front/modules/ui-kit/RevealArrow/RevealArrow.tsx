@@ -8,7 +8,6 @@ type Props = {
   className?: string;
   position?: "left" | "right";
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const RevealArrow = ( { children, position = "left", className }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);

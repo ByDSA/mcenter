@@ -6,7 +6,6 @@ type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "onKeyDown" | "type"> &
   action: (value: string)=> void;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const SearchBarView = (props: Props) => {
   const { action, onChange, ...inputProps } = props;
   const handleClearClick = () => {

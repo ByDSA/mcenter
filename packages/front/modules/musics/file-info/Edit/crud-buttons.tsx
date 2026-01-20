@@ -6,7 +6,7 @@ import styles from "./crud-buttons.module.css";
 type UpdateDeleteProps = Omit<Parameters<typeof LinkAsyncAction>[0], "children"> & {
   className?: string;
 };
-// eslint-disable-next-line @typescript-eslint/naming-convention
+
 export const DeleteResource = ( { className, action,
   disabled, isDoing, spinnerSide }: UpdateDeleteProps) => (
   <span className={classes(styles.deleteButton, disabled && styles.disabled, className)}>{
