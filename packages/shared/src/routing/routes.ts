@@ -195,18 +195,18 @@ export const PATH_ROUTES = {
         return ret;
       },
     },
-    queries: {
-      path: `${MUSICS}/queries`,
-      withParams: (id: string) => `${MUSICS}/queries/${id}`,
+    smartPlaylists: {
+      path: `${MUSICS}/smart-playlists`,
+      withParams: (id: string) => `${MUSICS}/smart-playlists/${id}`,
       searchOne: {
-        path: `${MUSICS}/queries/search-one`,
+        path: `${MUSICS}/smart-playlists/search-one`,
       },
       slug: {
-        withParams: ( { userSlug, querySlug }: {
+        withParams: ( { userSlug, smartPlaylistSlug }: {
             userSlug: string;
-            querySlug?: string;
+            smartPlaylistSlug?: string;
           } ) => `${MUSICS_PLAYLISTS}/user/${userSlug}${
-          querySlug ? `/${querySlug}` : ""
+          smartPlaylistSlug ? `/${smartPlaylistSlug}` : ""
         }`,
       },
     },
@@ -252,11 +252,11 @@ token?: string;} ) => {
           path: "/musics/playlists/slug",
         },
       },
-      queries: {
-        path: "/musics/queries",
-        withParams: (id: string) => `/musics/queries/${id}`,
+      smartPlaylists: {
+        path: "/musics/smart-playlists",
+        withParams: (id: string) => `/musics/smart-playlists/${id}`,
         slug: {
-          withParams: (userSlug: string, querySlug: string) => `/musics/queries/slug/${userSlug}/${querySlug}`,
+          withParams: (userSlug: string, smartPlaylistSlug: string) => `/musics/smart-playlists/slug/${userSlug}/${smartPlaylistSlug}`,
         },
       },
       history: {

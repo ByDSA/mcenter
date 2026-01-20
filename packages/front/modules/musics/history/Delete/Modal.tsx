@@ -10,12 +10,12 @@ import { DeleteHistoryEntryModalContentWrapper } from "#modules/series/episodes/
 import { MusicHistoryEntryEntity } from "../models";
 import { MusicHistoryApi } from "../requests";
 
-type UseDeleteMusicQueryProps = Pick<OpenConfirmModalProps, "onFinish"> & {
+type UseDeleteMusicHistoryEntryProps = Pick<OpenConfirmModalProps, "onFinish"> & {
   onActionSuccess?: ()=> void;
 };
 
 export function useDeleteMusicHistoryEntryModal(
-  { onFinish, onActionSuccess }: UseDeleteMusicQueryProps,
+  { onFinish, onActionSuccess }: UseDeleteMusicHistoryEntryProps,
 ): ReturnType<typeof useConfirmModal> {
   const { openModal, ...modal } = useConfirmModal();
   const { data, setData } = useLocalData<MusicHistoryEntryEntity>();

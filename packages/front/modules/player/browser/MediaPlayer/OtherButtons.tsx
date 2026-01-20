@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { RepeatOne, Repeat, Shuffle, VolumeOff, VolumeDown, VolumeUp, SkipPrevious, SkipNext, Replay10, Forward10, HighlightOff } from "@mui/icons-material";
 import { useEffect, useState, useCallback, ComponentProps } from "react";
 import { useShallow } from "zustand/react/shallow";
@@ -22,7 +21,6 @@ export const ControlButton = ( { active = true,
   );
 };
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const RepeatButton = () => {
   const { cycleRepeatMode, repeatMode } = useBrowserPlayer(useShallow(s => ( {
     cycleRepeatMode: s.cycleRepeatMode,

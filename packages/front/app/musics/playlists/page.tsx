@@ -31,7 +31,9 @@ export default function MusicPlaylistsPage() {
             } );
           }
 
-          logger.debug(`Nueva ${type} creada: ${newValue.name}`);
+          logger.debug(
+            `Nueva ${type === "playlist" ? "playlist" : "Smart Playlist"} creada: ${newValue.name}`,
+          );
         }}/>
       </header>
       <ArrayDataProvider

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import styles from "./ItemNotFound.module.css";
 
 export const ItemNotFound = () => <section className={styles.main}>

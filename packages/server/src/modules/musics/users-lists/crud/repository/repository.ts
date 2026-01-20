@@ -2,11 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
-import { MusicUserList, MusicUserListEntity, MusicUserListResourceItem } from "$shared/models/musics/users-lists";
+import { MusicUserList,
+  MusicUserListEntity,
+  MusicUserListResourceItem } from "$shared/models/musics/users-lists";
 import { MusicPlayListEvents } from "#musics/playlists/crud/repository/events/playlist";
-import { MusicQueryEvents } from "#musics/queries/crud/repository/events";
+import { MusicSmartPlaylistEvents } from "#musics/smart-playlists/crud/repository/events";
 import { MusicPlaylistsRepository } from "#musics/playlists/crud/repository";
-import { MusicQueriesRepository } from "#musics/queries/crud/repository";
+import { MusicSmartPlaylistsRepository } from "#musics/smart-playlists/crud/repository";
 import { DomainEventEmitter, DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { assertFoundClient } from "#utils/validation/found";
@@ -20,7 +22,7 @@ export class MusicUsersListsRepository {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
     private readonly playlistsRepo: MusicPlaylistsRepository,
-    private readonly queriesRepo: MusicQueriesRepository,
+    private readonly queriesRepo: MusicSmartPlaylistsRepository,
   ) {}
 
   @OnEvent(MusicUserListEvents.WILDCARD)
@@ -31,22 +33,36 @@ export class MusicUsersListsRepository {
   // --- Event Listeners (Actualizados a resourceId) ---
   @OnEvent(MusicPlayListEvents.Created.TYPE)
   async handlePlaylistCreated(ev: MusicPlayListEvents.Created.Event) {
-    await this.addItemToList(ev.payload.entity.ownerUserId, ev.payload.entity.id, "playlist");
+    await this.addItemToList(
+      ev.payload.entity.ownerUserId,
+      ev.payload.entity.id,
+      "playlist",
+    );
   }
 
   @OnEvent(MusicPlayListEvents.Deleted.TYPE)
   async handlePlaylistDeleted(ev: MusicPlayListEvents.Deleted.Event) {
-    await this.removeItemFromList(ev.payload.entity.ownerUserId, ev.payload.entity.id);
+    await this.removeItemFromList(
+      ev.payload.entity.ownerUserId,
+      ev.payload.entity.id,
+    );
   }
 
-  @OnEvent(MusicQueryEvents.Created.TYPE)
-  async handleQueryCreated(ev: MusicQueryEvents.Created.Event) {
-    await this.addItemToList(ev.payload.entity.ownerUserId, ev.payload.entity.id, "query");
+  @OnEvent(MusicSmartPlaylistEvents.Created.TYPE)
+  async handleQueryCreated(ev: MusicSmartPlaylistEvents.Created.Event) {
+    await this.addItemToList(
+      ev.payload.entity.ownerUserId,
+      ev.payload.entity.id,
+      "query",
+    );
   }
 
-  @OnEvent(MusicQueryEvents.Deleted.TYPE)
-  async handleQueryDeleted(ev: MusicQueryEvents.Deleted.Event) {
-    await this.removeItemFromList(ev.payload.entity.ownerUserId, ev.payload.entity.id);
+  @OnEvent(MusicSmartPlaylistEvents.Deleted.TYPE)
+  async handleQueryDeleted(ev: MusicSmartPlaylistEvents.Deleted.Event) {
+    await this.removeItemFromList(
+      ev.payload.entity.ownerUserId,
+      ev.payload.entity.id,
+    );
   }
 
   // --- CRUD Básico ---
@@ -73,7 +89,7 @@ export class MusicUsersListsRepository {
 
     // Al hacer patch de la lista entera, debemos respetar la estructura de subdocumentos
     if (params.entity.list) {
-      updateQuery.list = params.entity.list.map(item => ( {
+      updateQuery.list = params.entity.list.map((item) => ( {
         _id: item.id ? new Types.ObjectId(item.id) : new Types.ObjectId(),
         resourceId: new Types.ObjectId(item.resourceId),
         type: item.type,
@@ -106,7 +122,7 @@ export class MusicUsersListsRepository {
 
   async getAllResourcesSorted(
     userId: string,
-    criteria: {expand?: boolean},
+    criteria: { expand?: boolean },
   ): Promise<MusicUserListEntity> {
     // 1. Obtener la lista ordenada guardada en DB
     const userListEntity = await this.getOneByUserId(userId);
@@ -147,7 +163,8 @@ index: number; }>();
         id: entryInfo?.id ?? new Types.ObjectId().toString(),
         resourceId: playlist.id,
         resource: criteria.expand ? playlist : undefined,
-        sortIndex: entryInfo !== undefined ? entryInfo.index : Number.MAX_SAFE_INTEGER,
+        sortIndex:
+          entryInfo !== undefined ? entryInfo.index : Number.MAX_SAFE_INTEGER,
       } );
     }
 
@@ -156,11 +173,12 @@ index: number; }>();
       const entryInfo = listMap.get(query.id);
 
       items.push( {
-        type: "query",
+        type: "smart-playlist",
         id: entryInfo?.id ?? new Types.ObjectId().toString(),
         resourceId: query.id,
         resource: criteria.expand ? query : undefined,
-        sortIndex: entryInfo !== undefined ? entryInfo.index : Number.MAX_SAFE_INTEGER,
+        sortIndex:
+          entryInfo !== undefined ? entryInfo.index : Number.MAX_SAFE_INTEGER,
       } );
     }
 
@@ -180,7 +198,11 @@ index: number; }>();
   }
 
   // --- Helpers Privados ---
-  private async addItemToList(userId: string, resourceId: string, type: "playlist" | "query") {
+  private async addItemToList(
+    userId: string,
+    resourceId: string,
+    type: "playlist" | "query",
+  ) {
     // Solo añadimos si no existe ya ese resourceId en la lista para evitar duplicados lógicos
     const exists = await MusicUserListOdm.Model.exists( {
       ownerUserId: new Types.ObjectId(userId),

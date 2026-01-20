@@ -23,9 +23,9 @@ export default function MusicLayout( { children }: Props) {
         matchPath: {
           customMatch: (p) => {
             const playlistsPath = PATH_ROUTES.musics.frontend.playlists.path;
-            const queriesPath = PATH_ROUTES.musics.frontend.queries.path;
+            const smartPlaylistsPath = PATH_ROUTES.musics.frontend.smartPlaylists.path;
 
-            return p.startsWith(playlistsPath) || p.startsWith(queriesPath);
+            return p.startsWith(playlistsPath) || p.startsWith(smartPlaylistsPath);
           },
         },
       },

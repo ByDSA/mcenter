@@ -26,7 +26,7 @@ import { AuthGoogleModule } from "#core/auth/strategies/google";
 import { UsersMusicPlaylistsModule } from "#musics/users-playlists/module";
 import { ImageCoversCrudModule } from "#modules/image-covers/module";
 import { ImageCoversAdminModule } from "#modules/image-covers/admin/module";
-import { MusicQueriesCrudModule } from "#musics/queries/crud/module";
+import { MusicSmartPlaylistsCrudModule } from "#musics/smart-playlists/crud/module";
 import { MusicUsersListsModule } from "#musics/users-lists/crud/module";
 import { LoggingModule } from "../logging/module";
 
@@ -45,7 +45,7 @@ const imports = [
   MusicFileInfoModule,
   MusicPlaylistsModule,
   UsersMusicPlaylistsModule,
-  MusicQueriesCrudModule,
+  MusicSmartPlaylistsCrudModule,
   MusicUsersListsModule,
 
   EpisodesSlugModule,
@@ -150,8 +150,8 @@ const routes: Routes = [
     module: MusicHistoryModule,
   },
   {
-    path: PATH_ROUTES.musics.queries.path,
-    module: MusicQueriesCrudModule,
+    path: PATH_ROUTES.musics.smartPlaylists.path,
+    module: MusicSmartPlaylistsCrudModule,
   },
   {
     path: "api/musics/users-lists",
@@ -183,7 +183,4 @@ const routes: Routes = [
   },
 ];
 
-export const routeModules = [
-  ...imports,
-  RouterModule.register(routes),
-];
+export const routeModules = [...imports, RouterModule.register(routes)];

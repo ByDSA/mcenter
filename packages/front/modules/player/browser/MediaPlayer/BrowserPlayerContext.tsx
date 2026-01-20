@@ -103,7 +103,7 @@ interface PlayerState {
   playMusic: (musicId: MusicEntity["id"], props?: PlayMusicProps)=> Promise<void>;
   playPlaylist: (props: PlayPlaylistProps)=> Promise<void>;
   playQueueIndex: (index: number)=> Promise<void>;
-  playQuery: (q: string)=> Promise<void>;
+  playSmartPlaylist: (q: string)=> Promise<void>;
   pause: ()=> void;
   resume: ()=> void;
   stop: ()=> void;
@@ -128,7 +128,7 @@ interface PlayerState {
   hasNext: ()=> boolean;
   setVolume: (newValue: number)=> void;
   setCompressionValue: (newValue: number)=> void;
-  getPlayingType: ()=> "one" | "playlist" | "query";
+  getPlayingType: ()=> "one" | "playlist" | "smart-playlist";
 }
 
 export const useBrowserPlayer = create<PlayerState>()(
@@ -244,11 +244,11 @@ export const useBrowserPlayer = create<PlayerState>()(
 
         return get().playQueueIndex(index);
       },
-      playQuery: async (q: string) => {
+      playSmartPlaylist: async (q: string) => {
         let music: MusicEntity | null = null;
 
         try {
-          music = await withRetries(() => fetchQueryMusic(q), {
+          music = await withRetries(() => fetchMusicByQuery(q), {
             retries: 3,
           } );
         } catch { /* empty */ }
@@ -322,7 +322,7 @@ export const useBrowserPlayer = create<PlayerState>()(
         }
       },
       close: () => {
-        stop();
+        get().stop();
         set( {
           currentResource: null,
         } );
@@ -351,7 +351,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           return "playlist";
 
         if (query)
-          return "query";
+          return "smart-playlist";
 
         return "one";
       },
@@ -484,7 +484,7 @@ export const useBrowserPlayer = create<PlayerState>()(
         const { queueIndex, queue, repeatMode, isShuffle, getPlayingType } = get();
 
         return queueIndex + 1 < queue.length || (repeatMode === RepeatMode.All && queue.length > 1)
-         || (isShuffle && queue.length > 1) || getPlayingType() === "query";
+         || (isShuffle && queue.length > 1) || getPlayingType() === "smart-playlist";
       },
     } ),
     {
@@ -513,7 +513,7 @@ function getRandomExcludePrevious(max: number, previousValue?: number): number {
   return newValue;
 }
 
-async function fetchQueryMusic(q: string) {
+async function fetchMusicByQuery(q: string) {
   const url = backendUrl(PATH_ROUTES.musics.pickRandom.withParams( {
     q,
   } ));
@@ -546,14 +546,14 @@ type GetNextProps = {
   repeatMode: RepeatMode;
   isShuffle: boolean;
   query?: string;
-  playingType: "one" | "playlist" | "query";
+  playingType: "one" | "playlist" | "smart-playlist";
 };
 export async function getNextByParams(props: GetNextProps): Promise<NextAction | null> {
   const { queueIndex, queue, repeatMode, isShuffle, query, playingType } = props;
 
   // 1.async  LÓGICA DE ORDEN SECUENCIAL
   if ((!isShuffle && (playingType === "playlist" || playingType === "one"))
-      || (playingType === "query" && queueIndex < queue.length - 1)) {
+      || (playingType === "smart-playlist" && queueIndex < queue.length - 1)) {
     let newIndex = queueIndex + 1;
 
     if (newIndex >= queue.length) {
@@ -574,9 +574,9 @@ export async function getNextByParams(props: GetNextProps): Promise<NextAction |
   }
 
   // 2. LÓGICA DE SHUFFLE / DISCOVERY (CON API)
-  if (playingType === "playlist" || playingType === "query") {
+  if (playingType === "playlist" || playingType === "smart-playlist") {
     assert(!!query);
-    const music = await withRetries(() => fetchQueryMusic(query), {
+    const music = await withRetries(() => fetchMusicByQuery(query), {
       retries: 3,
     } );
 
@@ -598,7 +598,7 @@ export async function getNextByParams(props: GetNextProps): Promise<NextAction |
       };
     }
 
-    // Si es tipo query, devolvemos el objeto de música para agregarlo
+    // Si es tipo smart-playlist, devolvemos el objeto de música para agregarlo
     return {
       type: "NEW_MUSIC",
       payload: music,

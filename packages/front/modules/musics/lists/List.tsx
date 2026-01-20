@@ -1,12 +1,12 @@
 import { Fragment, useEffect, useState } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
 import { showError } from "$shared/utils/errors/showError";
-import { MusicQueryEntity } from "$shared/models/musics/queries";
+import { MusicSmartPlaylistEntity } from "$shared/models/musics/smart-playlists";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceList } from "#modules/resources/List/ResourceList";
 import { MusicUsersListsApi } from "#modules/musics/lists/users-lists/requests";
-import { MusicQueryListItem } from "#modules/musics/lists/queries/ListItem";
+import { MusicSmartPlaylistListItem } from "#modules/musics/lists/smart-playlists/ListItem";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { NewItemOrFn, useArrayData } from "#modules/utils/array-data-context";
 import { MusicPlaylistEntity } from "./playlists/models";
@@ -63,10 +63,10 @@ export function MusicPlayListsList(
               </LocalDataProvider>
           }
           {
-            item.type === "query"
+            item.type === "smart-playlist"
               && <LocalDataProvider
                 data={item.resource!}
-                setData={(newData: MusicQueryEntity)=> {
+                setData={(newData: MusicSmartPlaylistEntity)=> {
                   if (!newData)
                     return newData;
 
@@ -83,7 +83,7 @@ export function MusicPlayListsList(
                     } as Item;
                   } );
                 }}>
-                <MusicQueryListItem
+                <MusicSmartPlaylistListItem
                   index={i}
                 />
               </LocalDataProvider>
