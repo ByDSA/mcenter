@@ -1,21 +1,17 @@
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
-import { useLocalData } from "#modules/utils/local-data-context";
-import { MusicQueryEntity } from "../models";
 import { usePlayQueryModal } from "./Modal";
 
-type Props = Parameters<ReturnType<typeof usePlayQueryModal>["openModal"]>[0];
+type Props = Parameters<ReturnType<typeof usePlayQueryModal>["openModal"]>[0] & {
+  label?: string;
+};
 
-export const PlayQueryModContextMenuItem = (props?: Props) => {
+export const PlayQueryContextMenuItem = (props?: Props) => {
   const playQueryModal = usePlayQueryModal();
-  const { data } = useLocalData<MusicQueryEntity>();
 
   return <ContextMenuItem
-    label="Reproducir modificación"
+    label={props?.label ?? "Reproducir query"}
     onClick={async ()=> {
-      await playQueryModal.openModal( {
-        initialValue: data.query,
-        ...props,
-      } );
+      await playQueryModal.openModal(props);
     }}
   />;
 };

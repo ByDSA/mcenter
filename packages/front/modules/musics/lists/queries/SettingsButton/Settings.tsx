@@ -4,7 +4,7 @@ import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
 import { DeleteQueryContextMenuItem } from "../Delete/ContextMenuItem";
 import { EditQueryContextMenuItem } from "../Edit/ContextMenuItem";
-import { PlayQueryModContextMenuItem } from "../PlayQuery/ContextMenuItem";
+import { PlayQueryContextMenuItem } from "../PlayQuery/ContextMenuItem";
 import { MusicQueryEntity } from "../models";
 import { CopyQueryLinkContextMenuItem } from "./CopyQueryLinkContextMenuItem";
 
@@ -21,7 +21,10 @@ export const MusicQuerySettingsButton = (props: Props) => {
     openMenu( {
       event: e,
       content: <LocalDataProvider data={data!} setData={setData}>
-        <PlayQueryModContextMenuItem />
+        <PlayQueryContextMenuItem
+          initialValue={data.query}
+          label="Reproducir modificación"
+        />
         <CopyQueryLinkContextMenuItem />
         {isUserOwner && <>
           <EditQueryContextMenuItem />

@@ -1,29 +1,16 @@
 import { Add } from "@mui/icons-material";
-import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { Button } from "#modules/ui-kit/form/input/Button/Button";
 import styles from "./NewPlaylistButton.module.css";
-import { NewPlaylistForm } from "./Form";
+import { NewPlaylistModalProps, useNewPlaylistModal } from "./Modal";
 
-type ButtonProps = {
-  onSuccess?: (newPlaylist: any)=> void;
+type ButtonProps = NewPlaylistModalProps & {
   theme: "dark-gray" | "white";
 };
 
 export const NewPlaylistButton = ( { onSuccess, theme }: ButtonProps) => {
-  const usingModal = useModal();
-  const openModal = () => {
-    return usingModal.openModal( {
-      title: "Nueva lista",
-      content: (
-        <NewPlaylistForm
-          onSuccess={(v) => {
-            onSuccess?.(v);
-            usingModal.closeModal();
-          }}
-        />
-      ),
-    } );
-  };
+  const { openModal } = useNewPlaylistModal( {
+    onSuccess,
+  } );
 
   return (
     <Button

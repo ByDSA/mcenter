@@ -1,12 +1,14 @@
-.newPlaylistSection {
+.header {
   display: flex;
   flex-flow: row nowrap;
   gap: 2rem;
   justify-content: right;
+
+  @media(width < 500px) {
+    gap: 0.5rem;
+  }
 }
 
-.header {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: space-between;
+*:has(>.header) {
+  padding-top: 1rem;
 }
