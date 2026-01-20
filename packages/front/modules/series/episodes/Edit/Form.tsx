@@ -161,7 +161,6 @@ export const EditEpisodeForm = ( { initialData, onSuccess, onCancel }: Props) =>
         <FormInputErrorWrap>
           <FormInputTextMultiline
             {...register("title")}
-            submitOnEnter
           />
           <ErrorView errors={errors} keyName="title" touchedFields={dirtyFields} />
         </FormInputErrorWrap>

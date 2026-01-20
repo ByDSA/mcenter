@@ -38,10 +38,10 @@ export const FormInputTextMultiline = (
   props: React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
     ref?: RefCallBack | RefObject<HTMLTextAreaElement | null>;
     nullable?: boolean;
-    submitOnEnter?: boolean;
+    newLineOnEnter?: boolean;
   },
 ) => {
-  const { className, nullable, onChange, submitOnEnter, ...textAreaProps } = props;
+  const { className, nullable, onChange, newLineOnEnter, ...textAreaProps } = props;
   const externalRef = props.ref;
   const internalRef = useRef<HTMLTextAreaElement | null>(null);
   // Callback Ref: Se ejecuta automáticamente cuando el nodo se monta
@@ -69,7 +69,7 @@ export const FormInputTextMultiline = (
       ref={setRef}
       className={classes("ui-kit-input-text", className)}
       onChange={handleChange}
-      onKeyDown={submitOnEnter
+      onKeyDown={!newLineOnEnter
         ? (e)=>{
           pressEnterSubmit(e);
           props.onKeyDown?.(e);
@@ -82,9 +82,8 @@ export const FormInputTextMultiline = (
 export const FormInputText = (props: Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> & {
     ref?: RefCallBack | RefObject<HTMLInputElement | null>;
     nullable?: boolean;
-    submitOnEnter?: boolean;
 } ) => {
-  const { className, nullable, onChange, submitOnEnter, ...inputProps } = props;
+  const { className, nullable, onChange, ...inputProps } = props;
   const externalRef = props.ref;
   const internalRef = useRef<HTMLInputElement | null>(null);
   // Callback Ref: Se ejecuta automáticamente cuando el nodo se monta
@@ -112,11 +111,5 @@ export const FormInputText = (props: Omit<React.InputHTMLAttributes<HTMLInputEle
     type="text"
     className={classes("ui-kit-input-text", className)}
     onChange={handleChange}
-    onKeyDown={submitOnEnter
-      ? (e)=>{
-        pressEnterSubmit(e);
-        props.onKeyDown?.(e);
-      }
-      : props.onKeyDown}
   />;
 };

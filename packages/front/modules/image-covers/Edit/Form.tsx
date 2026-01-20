@@ -123,7 +123,6 @@ export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditor
           <FormInputErrorWrap>
             <FormInputText
               {...register("label")}
-              submitOnEnter
             />
             <ErrorView errors={errors} keyName="label" touchedFields={dirtyFields} />
           </FormInputErrorWrap>

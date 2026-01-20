@@ -270,7 +270,6 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
         <FormInputErrorWrap>
           <FormInputTextMultiline
             {...register("title")}
-            submitOnEnter
           />
           <ErrorView errors={errors} keyName="title" touchedFields={dirtyFields} />
         </FormInputErrorWrap>
@@ -280,7 +279,6 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
         <FormInputErrorWrap>
           <FormInputTextMultiline
             {...register("artist")}
-            submitOnEnter
           />
           <ErrorView errors={errors} keyName="artist" touchedFields={dirtyFields} />
         </FormInputErrorWrap>
@@ -303,7 +301,6 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
           <FormLabel>Álbum</FormLabel>
           <FormInputTextMultiline
             {...register("album")}
-            submitOnEnter
             nullable
           />
         </FormInputGroupItem>
@@ -331,7 +328,6 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
         <FormInputErrorWrap>
           <FormInputTextMultiline
             {...register("slug")}
-            submitOnEnter
           />
           <ErrorView errors={errors} keyName="slug" touchedFields={dirtyFields} />
         </FormInputErrorWrap>
@@ -396,7 +392,6 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
           <FormInputErrorWrap>
             <FormInputTextMultiline
               {...register("country")}
-              submitOnEnter
               nullable
             />
           </FormInputErrorWrap>
@@ -410,7 +405,6 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
           <FormInputErrorWrap>
             <FormInputTextMultiline
               {...register("game")}
-              submitOnEnter
               nullable
             />
           </FormInputErrorWrap>
@@ -423,7 +417,6 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
           <FormInputErrorWrap>
             <FormInputTextMultiline
               {...register("spotifyId")}
-              submitOnEnter
               nullable
             />
           </FormInputErrorWrap>
