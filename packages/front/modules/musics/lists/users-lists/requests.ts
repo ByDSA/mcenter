@@ -1,12 +1,12 @@
 import { createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { genParseZod } from "$shared/utils/validation/zod";
 import z from "zod";
+import { MusicUserListsCrudDtos } from "$shared/models/musics/users-lists/dto/transport";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { musicUserListEntitySchema, musicUserListSchema } from "./models";
 
-// Asumiendo que has exportado todo desde index/models
 export class MusicUsersListsApi {
   static {
     FetchApi.register(MusicUsersListsApi, new MusicUsersListsApi());
@@ -31,9 +31,6 @@ export class MusicUsersListsApi {
     } );
   }
 
-  /**
-   * Actualiza la lista del usuario (orden y composición)
-   */
   patchMyList(
     body: MusicUsersListsApi.PatchMyList.Body,
   ): Promise<MusicUsersListsApi.PatchMyList.Response> {
@@ -49,6 +46,27 @@ export class MusicUsersListsApi {
 
     return fetcher( {
       url: backendUrl(this.baseUrl),
+      body,
+    } );
+  }
+
+  moveOneList(
+    body: MusicUserListsCrudDtos.MoveOne.Body,
+  ): Promise<MusicUsersListsApi.GetMyList.Response> {
+    const fetcher = makeFetcher<
+        MusicUserListsCrudDtos.MoveOne.Body,
+        MusicUsersListsApi.GetMyList.Response
+      >( {
+        method: "PATCH",
+        parseResponse: genParseZod(
+          MusicUsersListsApi.GetMyList.responseSchema,
+        ) as (m: unknown)=> any,
+      } );
+
+    return fetcher( {
+      url: backendUrl(
+        `${this.baseUrl}/move`,
+      ),
       body,
     } );
   }

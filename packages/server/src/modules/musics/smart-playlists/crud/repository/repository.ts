@@ -1,5 +1,6 @@
 /* eslint-disable import/no-cycle */
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable,
+  UnauthorizedException } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { PipelineStage, Types } from "mongoose";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";

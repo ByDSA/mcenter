@@ -12,9 +12,10 @@ import styles from "./ListItem.module.css";
 
 type Props = {
   index: number;
+  drag?: Parameters<typeof ResourceEntry>[0]["drag"];
 };
 
-export const MusicSmartPlaylistListItem = ( { index }: Props) => {
+export const MusicSmartPlaylistListItem = ( { index, drag }: Props) => {
   const { removeItemByIndex } = useArrayData<MusicSmartPlaylistEntity>();
   const { data } = useLocalData<MusicSmartPlaylistEntity>();
   const { user } = useUser();
@@ -62,5 +63,6 @@ export const MusicSmartPlaylistListItem = ( { index }: Props) => {
       },
       status,
     }}
+    drag={drag}
   />;
 };

@@ -10,3 +10,59 @@
     width: auto;
   }
 }
+
+.sortableItemWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.dragHandle {
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  min-width: 2.5rem;
+  opacity: 0.5;
+  color: var(--color-gray-400);
+  cursor: grab;
+  margin-right: 0.5rem;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dragHandle:hover {
+  opacity: 1;
+  color: var(--color-gray-100);
+}
+
+.isDraggingGlobal :not(:has(.isDragging)) {
+  pointer-events: none;
+}
+
+.isDraggingGlobal,
+.isDraggingGlobal .dragHandle:hover {
+  cursor: grabbing;
+}
+
+.isDragging.dragHandle {
+  opacity: 1;
+  color: white !important;
+}
+
+/* Estilo para el elemento que flota (Overlay) */
+.overlayItem {
+  background-color: var(--color-gray-900);
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  border: 1px solid var(--color-gray-700);
+
+  /* Mantener el handle visible en el overlay */
+  .dragHandle {
+    opacity: 1;
+    cursor: grabbing;
+  }
+}

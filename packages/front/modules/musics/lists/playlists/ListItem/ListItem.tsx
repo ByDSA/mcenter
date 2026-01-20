@@ -14,9 +14,10 @@ import styles from "./ListItem.module.css";
 
 interface PlaylistProps {
   index: number;
+  drag?: Parameters<typeof ResourceEntry>[0]["drag"];
 }
 
-export const MusicPlaylistListItem = ( { index }: PlaylistProps) => {
+export const MusicPlaylistListItem = ( { index, drag }: PlaylistProps) => {
   const { removeItemByIndex } = useArrayData<MusicUserListResourceItem>();
   const { data } = useLocalData<MusicPlaylistEntity>();
   const totalDuration = data.list?.reduce(
@@ -86,5 +87,6 @@ export const MusicPlaylistListItem = ( { index }: PlaylistProps) => {
       },
       status,
     }}
+    drag={drag}
   />;
 };

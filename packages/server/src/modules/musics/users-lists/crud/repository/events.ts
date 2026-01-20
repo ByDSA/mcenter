@@ -15,4 +15,12 @@ export namespace MusicUserListEvents {
     export const TYPE = `${MAIN_TYPE}.created`;
     export type Event = EntityEvent<Entity>;
   }
+  export namespace Moved {
+    export const TYPE = `${MAIN_TYPE}.moved`;
+    export type Event = {
+      userList: MusicUserListEntity;
+      trackListOldPosition: number;
+      trackListNewPosition: number;
+    };
+  }
 }

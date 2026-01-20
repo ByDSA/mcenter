@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
@@ -16,6 +16,12 @@ import { MusicUserListOdm } from "./odm";
 import { MusicUserListEvents } from "./events";
 
 type Entity = MusicUserListEntity;
+
+type MoveOneListProps = {
+  ownerUserId: string;
+  entryId: string;
+  newIndex: number;
+};
 
 @Injectable()
 export class MusicUsersListsRepository {
@@ -243,5 +249,54 @@ index: number; }>();
         },
       },
     );
+  }
+
+  async moveOneList( { ownerUserId,
+    entryId,
+    newIndex }: MoveOneListProps): Promise<Entity> {
+    let fixedNewIndex = newIndex;
+
+    if (fixedNewIndex < 0)
+      fixedNewIndex = 0;
+
+    const doc = await MusicUserListOdm.Model.findOne( {
+      ownerUserId: new Types.ObjectId(ownerUserId),
+    } );
+
+    assertFoundClient(doc);
+
+    const { list } = doc;
+
+    if (newIndex >= list.length)
+      fixedNewIndex = list.length - 1;
+
+    const oldIndex = list.findIndex((e) => e._id?.toString() === entryId);
+
+    if (oldIndex === -1)
+      throw new UnprocessableEntityException("Invalid entry id: " + entryId);
+
+    const [movedItem] = list.splice(oldIndex, 1);
+
+    list.splice(newIndex, 0, movedItem);
+
+    const patchedDoc = await MusicUserListOdm.Model.findByIdAndUpdate(doc._id, {
+      list,
+    } );
+
+    assertFoundClient(patchedDoc);
+    const ret = MusicUserListOdm.toEntity(patchedDoc);
+
+    this.domainEventEmitter.emit(MusicUserListEvents.Moved.TYPE, {
+      userList: ret,
+      trackListOldPosition: oldIndex,
+      trackListNewPosition: newIndex,
+    } as MusicUserListEvents.Moved.Event);
+
+    this.domainEventEmitter.emitPatch(MusicUserListEvents.Patched.TYPE, {
+      partialEntity: ret,
+      id: ret.id,
+    } );
+
+    return ret;
   }
 }

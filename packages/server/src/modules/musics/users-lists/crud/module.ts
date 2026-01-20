@@ -1,7 +1,7 @@
 import { Module, forwardRef } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MusicPlaylistsModule } from "#musics/playlists/module";
-import { MusicSmartPlaylistsCrudModule } from "#modules/musics/smart-playlists/crud/module";
+import { MusicSmartPlaylistsCrudModule } from "#musics/smart-playlists/crud/module";
 import { MusicUsersListsController } from "./controller";
 import { MusicUsersListsRepository } from "./repository/repository";
 
