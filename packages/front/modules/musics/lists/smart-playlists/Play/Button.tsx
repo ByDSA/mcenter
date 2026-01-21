@@ -2,7 +2,7 @@ import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPla
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { usePlaySmartPlaylistModal } from "./Modal";
 
-export const PlayQueryButton = () => {
+export const PlaySmartPlaylistButton = () => {
   const modal = usePlaySmartPlaylistModal();
 
   return <DaButton
@@ -11,5 +11,5 @@ export const PlayQueryButton = () => {
       await modal.openModal( {
         initialValue: useBrowserPlayer.getState().query,
       } );
-    }}>Reproducir query</DaButton>;
+    }}>Reproducir Smart Playlist</DaButton>;
 };

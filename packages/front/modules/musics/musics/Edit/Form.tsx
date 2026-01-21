@@ -18,6 +18,9 @@ import { useFileInfosModal } from "#modules/musics/file-info/Edit/Modal";
 import { classes } from "#modules/utils/styles";
 import { DaInputTextMultiline } from "#modules/ui-kit/form/input/Text/InputText";
 import { useMusic } from "#modules/musics/hooks";
+import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
+import { DaDeleteButton } from "#modules/ui-kit/DeleteButton";
+import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { DaInputNumber } from "../../../ui-kit/form/input/Number/InputNumber";
 import { DaInputBooleanCheckbox } from "../../../ui-kit/form/input/Boolean/InputBoolean";
 import { DaInputGroup, DaInputGroupItem } from "../../../ui-kit/form/InputGroup";
@@ -431,19 +434,15 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
           />
         </aside>
         <aside>
-          <DaButton theme="red"
+          <DaDeleteButton
             onClick={handleDelete}
-            disabled={isSubmitting}>
-            Eliminar
-          </DaButton>
-          <DaButton
-            type="submit"
-            theme="blue"
+            disabled={isSubmitting}
+          />
+          <DaCloseModalButton />
+          <DaSaveButton
             disabled={!isDirty || !isValid || isSubmitting}
             isSubmitting={isSubmitting}
-          >
-            Guardar
-          </DaButton>
+          />
         </aside>
       </DaFooterButtons>
     </form>

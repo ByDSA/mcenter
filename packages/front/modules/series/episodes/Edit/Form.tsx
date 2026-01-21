@@ -6,7 +6,6 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { EpisodesApi } from "#modules/series/episodes/requests";
 import { EpisodeUserInfosApi } from "#modules/series/episodes/user-info/requests";
 import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
-import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
@@ -16,6 +15,8 @@ import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { FormInputTags } from "#modules/resources/FormInputTags/FormInputTags";
 import { DaInputNumber } from "#modules/ui-kit/form/input/Number/InputNumber";
 import { Separator } from "#modules/resources/Separator/Separator";
+import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
+import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { DaInputTime } from "../../../ui-kit/form/input/Time/InputTime";
 import styles from "./style.module.css";
 
@@ -35,10 +36,9 @@ type FormData = z.infer<typeof schema>;
 type Props = {
   initialData: EpisodeEntity;
   onSuccess?: (newData: EpisodeEntity)=> void;
-  onCancel?: ()=> void;
 };
 
-export const EditEpisodeForm = ( { initialData, onSuccess, onCancel }: Props) => {
+export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
   // Asumimos que editamos el primer archivo si existe, igual que en la versión anterior
   const fileInfo = initialData.fileInfos?.[0];
   const { register,
@@ -230,17 +230,11 @@ export const EditEpisodeForm = ( { initialData, onSuccess, onCancel }: Props) =>
       </DaInputGroup>
 
       <DaFooterButtons>
-        <DaButton theme="white" onClick={onCancel}>
-          Cancelar
-        </DaButton>
-        <DaButton
-          type="submit"
-          theme="blue"
+        <DaCloseModalButton />
+        <DaSaveButton
           disabled={!isDirty || !isValid || isSubmitting}
           isSubmitting={isSubmitting}
-        >
-          Guardar
-        </DaButton>
+        />
       </DaFooterButtons>
     </form>
   );

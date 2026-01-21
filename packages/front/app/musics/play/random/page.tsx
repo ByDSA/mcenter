@@ -5,7 +5,7 @@ import { showError } from "$shared/utils/errors/showError";
 import { useEffect } from "react";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { useUser } from "#modules/core/auth/useUser";
-import { useRequireActiveAction } from "#modules/utils/autoplay/useRequireActiveAction/useRequreActiveAction";
+import { useRequireActiveAction } from "#modules/utils/autoplay/useRequireActiveAction/useRequireActiveAction";
 
 export default function PlaySmartPlaylistPage() {
   const router = useRouter();

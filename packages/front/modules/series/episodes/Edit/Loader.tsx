@@ -48,7 +48,6 @@ export function EditEpisodeLoader( { initialData, onSuccess }: Props) {
           onSuccess(d);
           closeModal();
         }}
-        onCancel={() => closeModal()}
       />
     </AsyncLoader>
   );

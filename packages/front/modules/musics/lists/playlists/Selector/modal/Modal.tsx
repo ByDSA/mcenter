@@ -5,6 +5,7 @@ import { logger } from "#modules/core/logger";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
+import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { useMusicPlaylistsForUser } from "../../request-all";
 import { MusicPlaylistEntity } from "../../models";
 import { NewPlaylistButton } from "../../New/NewPlaylistButton";
@@ -84,15 +85,12 @@ function AddToPlaylistForm( { userId, onSelect, nullable }: AddToPlaylistContent
     <>
       {element}
 
-      {isSuccess && <footer style={{
-        marginTop: "1rem",
-        paddingTop: "1rem",
-      }}>
+      {isSuccess && <DaFooterButtons>
         {nullable && <DaButton theme="white" onClick={()=> {
           onSelect(null);
         }}>Ninguna</DaButton>}
         {newPlaylistButton}
-      </footer>
+      </DaFooterButtons>
       }
     </>
   );

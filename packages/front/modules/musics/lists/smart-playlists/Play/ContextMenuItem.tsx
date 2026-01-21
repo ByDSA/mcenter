@@ -9,7 +9,7 @@ export const PlaySmartPlaylistContextMenuItem = (props?: Props) => {
   const playQueryModal = usePlaySmartPlaylistModal();
 
   return <ContextMenuItem
-    label={props?.label ?? "Reproducir query"}
+    label={props?.label ?? "Reproducir Smart Playlist"}
     onClick={async ()=> {
       await playQueryModal.openModal(props);
     }}

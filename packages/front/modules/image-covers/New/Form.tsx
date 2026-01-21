@@ -9,6 +9,7 @@ import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButto
 import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
+import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { ImageCoverEntity } from "../models";
 import { DaLabel } from "../../ui-kit/form/Label/Label";
 import { ImageCoverUpload, ImageCoverUploadRef } from "../Edit/UploadImage";
@@ -77,9 +78,7 @@ export function NewImageCoverForm( { onSuccess }: NewImageCoverProps) {
       </DaInputGroup>
 
       <DaFooterButtons>
-        <DaButton onClick={modal.closeModal} theme="white" disabled={isSubmitting}>
-          Cerrar
-        </DaButton>
+        <DaCloseModalButton disabled={isSubmitting} />
         <DaButton
           type="submit"
           theme="blue"

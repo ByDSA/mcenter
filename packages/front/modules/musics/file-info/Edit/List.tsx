@@ -1,26 +1,20 @@
-import type { LoaderProps } from "./Loader";
 import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { Fragment } from "react/jsx-runtime";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { secsToMmss, formatDateDDMMYYYHHmm } from "#modules/utils/dates";
-import { DeleteResource } from "#modules/musics/file-info/Edit/crud-buttons";
+import { DaDeleteButton } from "#modules/ui-kit/DeleteButton";
 import { bytesToStr } from "#modules/utils/sizes";
-import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaText } from "#modules/ui-kit/form/Text/Text";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { MusicFileInfosApi } from "../requests";
 import { MUSIC_FILE_INFO_PROPS } from "../utils";
-import { useUploadMusicFileModal } from "./UploadMusicFileModal";
-import styles from "./Form.module.css";
+import styles from "./List.module.css";
 
-type EditFileInfosViewProps = LoaderProps;
-
-export const EditFileInfosForm = ( { musicId }: EditFileInfosViewProps) => {
-  const { openModal: openUploadModal } = useUploadMusicFileModal();
+export const EditFileInfosList = () => {
   const fileInfosApi = FetchApi.get(MusicFileInfosApi);
   const { openModal } = useConfirmModal();
   const { data, setData } = useLocalData<MusicFileInfoEntity[]>();
@@ -28,18 +22,6 @@ export const EditFileInfosForm = ( { musicId }: EditFileInfosViewProps) => {
   assertIsDefined(setData);
 
   return <>
-    <header className={styles.header}>
-      <DaButton
-        theme="white"
-        onClick={async () => {
-          await openUploadModal( {
-            musicId,
-          } );
-        }}
-      >
-            Subir nuevo archivo
-      </DaButton>
-    </header>
     <p>Archivos: ({data.length})</p>
     {
       data.map((f)=>{
@@ -49,7 +31,7 @@ export const EditFileInfosForm = ( { musicId }: EditFileInfosViewProps) => {
           <Fragment key={f.hash}>
             <hr/>
             <span className={styles.item}>
-              <DeleteResource action={async ()=> {
+              <DaDeleteButton onClick={async ()=> {
                 await openModal( {
                   title: "Confirmar borrado",
                   content: (<>
@@ -81,8 +63,7 @@ export const EditFileInfosForm = ( { musicId }: EditFileInfosViewProps) => {
                     return true;
                   },
                 } );
-              }}
-              isDoing={false} />
+              }} />
             </span>
             <DaInputGroup>
               <DaInputGroupItem inline>

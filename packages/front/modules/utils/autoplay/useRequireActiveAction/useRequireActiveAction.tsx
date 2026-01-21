@@ -24,8 +24,8 @@ export const useRequireActiveAction = (props: Props) => {
             <DaButton
               className={styles.button}
               theme="blue"
-              onClick={async ()=> {
-                await props.action;
+              onClick={()=> {
+                props.action;
                 modal.closeModal();
               }}><p>Click para</p><p>Reproducir música</p></DaButton>
           </>,

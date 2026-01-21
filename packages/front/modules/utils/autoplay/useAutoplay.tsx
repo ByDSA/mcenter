@@ -1,7 +1,7 @@
 import { showError } from "$shared/utils/errors/showError";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { useRequireActiveAction } from "./useRequireActiveAction/useRequreActiveAction";
+import { useRequireActiveAction } from "./useRequireActiveAction/useRequireActiveAction";
 
 type UseAutoplayProps<T> = {
   play: (data: NonNullable<T>)=> Promise<void> | void;

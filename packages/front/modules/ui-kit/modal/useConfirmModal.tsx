@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { DaButton } from "../form/input/Button/Button";
 import { DaFooterButtons } from "../form/Footer/Buttons/FooterButtons";
 import { OpenModalProps, useModal } from "./ModalContext";
@@ -14,52 +13,53 @@ export type OpenConfirmModalProps = OpenModalProps & {
 };
 
 export const useConfirmModal = () => {
-  const confirmModal = useModal();
-  const footer = useMemo(()=><DaFooterButtons>
-    <DaButton theme={"white"} onClick={async ()=> {
-      await confirmModal.closeModal(true);
-    }}>Sí</DaButton>
-    <DaButton theme={"white"} onClick={async ()=> {
-      await confirmModal.closeModal();
-    }}>Cancelar</DaButton>
-  </DaFooterButtons>, [confirmModal.closeModal]);
+  const usingModal = useModal();
   let openModal: (
     props?: OpenConfirmModalProps
    )=> Promise<void> = async (props)=> {
+     const footer = <DaFooterButtons>
+       <DaButton type="submit">Sí</DaButton>
+       <DaButton theme={"white"} onClick={async ()=> {
+         await doCancel();
+         usingModal.closeModal();
+       }}>Cancelar</DaButton>
+     </DaFooterButtons>;
      const bypassed = await props?.bypass?.();
-     const onClose = async (obj: unknown) => {
-       await props?.onClose?.(null);
+     const doAction = async () => {
+       const ret = await props?.action?.();
 
-       if (obj === true) {
-         const ret = await props?.action?.(obj);
+       if (ret)
+         await props?.onActionSuccess?.();
 
-         if (ret)
-           await props?.onActionSuccess?.();
-       } else
-         await props?.onCancel?.();
+       await props?.onFinish?.();
+     };
+     const doCancel = async () => {
+       await props?.onCancel?.();
 
        await props?.onFinish?.();
      };
 
      if (bypassed)
-       await onClose(true);
+       await doAction();
      else {
-       await confirmModal.openModal( {
+       await usingModal.openModal( {
          ...props,
-         title: props?.title ?? "Confirmar",
+         title: props?.title ?? "Confirmar acción",
          content: props?.content
-           ? <>
+           ? <form onSubmit={async ()=> {
+             await doAction();
+             usingModal.closeModal();
+           }}>
              {props.content}
              {footer}
-           </>
+           </form>
            : undefined,
-         onClose,
        } );
      }
    };
 
   return {
-    ...confirmModal,
+    ...usingModal,
     openModal,
   };
 };

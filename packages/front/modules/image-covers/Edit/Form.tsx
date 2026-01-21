@@ -12,6 +12,8 @@ import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButto
 import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
+import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
+import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
 import { getMediumCoverUrl } from "../Selector/image-cover-utils";
@@ -160,17 +162,12 @@ export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditor
           </DaButton>
         </aside>
         <aside>
-          <DaButton onClick={modal.closeModal} theme="white" type="button" disabled={isSubmitting}>
-            Cerrar
-          </DaButton>
-          <DaButton
+          <DaCloseModalButton disabled={isSubmitting} />
+          <DaSaveButton
             type="submit"
-            theme="blue"
             disabled={!canSave || isSubmitting}
             isSubmitting={isSubmitting}
-          >
-            Guardar
-          </DaButton>
+          />
         </aside>
       </DaFooterButtons>
     </form>

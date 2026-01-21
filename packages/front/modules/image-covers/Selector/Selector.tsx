@@ -7,6 +7,7 @@ import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SearchBarView } from "#modules/ui-kit/SearchBar";
 import { classes } from "#modules/utils/styles";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
+import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
 import { DaLabel } from "../../ui-kit/form/Label/Label";
@@ -146,12 +147,7 @@ export function ImageCoverSelector(
           </DaButton>
         </aside>
         <aside>
-          <DaButton
-            onClick={modal.closeModal}
-            theme="white"
-          >
-          Cancelar
-          </DaButton>
+          <DaCloseModalButton />
           <DaButton
             onClick={form.submit}
             disabled={!form.canSubmit}

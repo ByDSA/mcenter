@@ -6,7 +6,7 @@
   align-items: center;
   overflow: hidden;
 
-  @media (width<600px) {
+  @media (width < 600px) {
     display: none;
   }
 }

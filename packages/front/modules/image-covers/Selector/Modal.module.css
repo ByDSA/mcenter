@@ -1,6 +1,5 @@
 .modal {
-  width: 100%;
-  max-width: 1000px;
+  width: 1000px;
   max-height: 90dvh;
 
   > section {

@@ -22,7 +22,7 @@ export const NewPlaylistButton = ( { onSuccess, theme }: ButtonProps) => {
         </span>
       }
     >
-      Nueva lista
+      Nueva
     </DaButton>
   );
 };
