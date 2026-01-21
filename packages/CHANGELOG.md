@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.29.0](https://github.com/ByDSA/mcenter/compare/v4.28.0...v4.29.0) (2026-01-21)
+
+
+### Features
+
+* **front:** autoplay music (included playlists) ([871116e](https://github.com/ByDSA/mcenter/commit/871116e2a5d4bb63cc3f50376d238c3cf614b528))
+* **front:** new main icon ([8bb37d7](https://github.com/ByDSA/mcenter/commit/8bb37d775a7f86c8bf121bf2b6ececd221407ab4))
+* move music lists ([10c69d7](https://github.com/ByDSA/mcenter/commit/10c69d7c720c50abad3bea228b60014c931755c1))
+
+
+### Bug Fixes
+
+* **front:** context menu ([85abde1](https://github.com/ByDSA/mcenter/commit/85abde193622c91012ba333431ad4e8ca9616291))
+* **front:** merge buttons in context menu ([83d6d02](https://github.com/ByDSA/mcenter/commit/83d6d0208fddc57e3e2b876a83173edf1b805d81))
+* **front:** minor fixes ([50ae95a](https://github.com/ByDSA/mcenter/commit/50ae95a01fdbaeb71d039b10c91bbe2eb1a0a966))
+* **front:** rename music query to music smart playlist (except in database) ([5875ba0](https://github.com/ByDSA/mcenter/commit/5875ba021ee58df587dd84978eaa9ec9239351cf))
+
 ## [4.28.0](https://github.com/ByDSA/mcenter/compare/v4.27.0...v4.28.0) (2026-01-19)
 
 
