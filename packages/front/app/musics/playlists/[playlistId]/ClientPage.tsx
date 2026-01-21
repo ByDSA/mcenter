@@ -13,6 +13,8 @@ import { PageItemNotFound } from "#modules/utils/ItemNotFound";
 import { useUser } from "#modules/core/auth/useUser";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { useMusic } from "#modules/musics/hooks";
+import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { useAutoplay } from "#modules/utils/autoplay/useAutoplay";
 
 interface PageProps {
   params: Promise<Params | SlugPageParams>;
@@ -22,6 +24,13 @@ export function ClientPage( { params }: PageProps) {
   const api = FetchApi.get(MusicPlaylistsApi);
   const { user } = useUser();
   const [data, setData] = useState<MusicPlaylistEntity>();
+
+  useAutoplay( {
+    data,
+    play: (d)=>useBrowserPlayer.getState().playPlaylist( {
+      playlist: d,
+    } ),
+  } );
   const ret = <AsyncLoader
     onSuccess={(d)=>{
       setData(d);

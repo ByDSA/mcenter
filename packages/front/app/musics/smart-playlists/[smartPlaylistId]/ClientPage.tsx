@@ -11,6 +11,8 @@ import { PageItemNotFound } from "#modules/utils/ItemNotFound";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { MusicSmartPlaylistFullPage } from "#modules/musics/lists/smart-playlists/FullPage/FullPage";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
+import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { useAutoplay } from "#modules/utils/autoplay/useAutoplay";
 
 type Params = { smartPlaylistId: string };
 
@@ -21,6 +23,11 @@ interface PageProps {
 export function ClientPage( { params }: PageProps) {
   const api = FetchApi.get(MusicSmartPlaylistsApi);
   const [data, setData] = useState<MusicSmartPlaylistEntity>();
+
+  useAutoplay( {
+    data,
+    play: (d)=>useBrowserPlayer.getState().playSmartPlaylist(d.query),
+  } );
   const ret = <AsyncLoader
     onSuccess={(d) => setData(d)}
     errorElement={<PageItemNotFound />}

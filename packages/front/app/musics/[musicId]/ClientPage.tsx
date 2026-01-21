@@ -12,6 +12,8 @@ import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { MusicsApi } from "#modules/musics/requests";
 import { Music } from "#modules/musics/musics/FullPage/Music";
 import { useMusic } from "#modules/musics/hooks";
+import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { useAutoplay } from "#modules/utils/autoplay/useAutoplay";
 
 interface PageProps {
   params: Promise<Params>;
@@ -22,6 +24,11 @@ export function ClientPage( { params }: PageProps) {
   const api = FetchApi.get(MusicsApi);
   const { user } = useUser();
   const usingMusic = useMusic(musicId);
+
+  useAutoplay( {
+    data: usingMusic.data,
+    play: (d)=>useBrowserPlayer.getState().playMusic(d.id),
+  } );
   const ret = <AsyncLoader
     onSuccess={(d)=>useMusic.updateCacheWithMerging(musicId, d)}
     errorElement={<PageItemNotFound />}

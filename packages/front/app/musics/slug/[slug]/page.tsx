@@ -21,6 +21,7 @@ export default async function Page( { params, searchParams }: PageProps) {
   } );
   const api = FetchApi.get(MusicsApi);
   const res = await api.getOneByCriteria( {
+    skipCache: true, // Porque se ejecuta en backend
     filter: {
       slug,
     },
