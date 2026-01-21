@@ -6,6 +6,7 @@ import { MusicEntity, MusicEntityWithUserInfo } from "$shared/models/musics";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { assertIsDefined } from "$shared/utils/validation";
+import { MusicNote } from "@mui/icons-material";
 import { FileData, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
 import { backendUrl } from "#modules/requests";
 import { MusicEntryElement } from "#modules/musics/musics/ListItem/MusicEntry";
@@ -15,6 +16,7 @@ import { ResourceList } from "#modules/resources/List/ResourceList";
 import { useMusic } from "#modules/musics/hooks";
 import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
 import { FormInputGroup } from "#modules/ui-kit/form/FormInputGroup";
+import { EmptyList, EmptyListTopIconWrap } from "#modules/history/EmptyList/EmptyList";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 
@@ -93,7 +95,12 @@ export default function Upload() {
           />
         </FormInputGroup>
         <hr/>
+        <FormLabel>Músicas subidas</FormLabel>
         <ResourceList>
+          {uploaded.length === 0 && <EmptyList
+            top={<EmptyListTopIconWrap><MusicNote /></EmptyListTopIconWrap>}
+            label="No has subido músicas todavía."/>
+          }
           {
           uploaded!.map(
             (music) => <Fragment key={`${music.id}`}>

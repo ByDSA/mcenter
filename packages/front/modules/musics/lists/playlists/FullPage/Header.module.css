@@ -1,0 +1,166 @@
+.playlistHeader {
+  background: var(--color-playlist);
+  color: white;
+  padding: 48px;
+}
+
+.headerContent {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-end;
+}
+
+.playlistCover {
+  --size: 13rem;
+}
+
+.playlistInfo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  align-self: stretch;
+}
+
+.playlistTitle {
+  font-size: 3rem !important;
+  font-weight: bold;
+  margin: 1rem 0;
+  line-height: 1.2;
+  word-break: break-word;
+  text-align: left !important;
+  white-space: normal !important;
+  align-self: flex-start;
+
+  display: flex;
+  align-items: center;
+  min-height: 3em;
+
+  *:first-child {
+    margin: 0;
+    white-space: wrap;
+    text-align: left;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Número de líneas deseadas */
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: inherit;
+  }
+}
+
+.playlistStats {
+  display: flex;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+
+  flex-flow: column nowrap;
+  gap: 0.75rem;
+
+  .row {
+    align-items: center;
+    justify-content: left;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 0.5rem;
+  }
+}
+
+.statItem {
+  --font-size: 1rem;
+  font-size: var(--font-size);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+
+  &:has(> svg),
+  svg {
+    height: var(--font-size);
+    width: var(--font-size);
+  }
+}
+
+.playlistControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+@media (width <= 768px) {
+  .playlistStats {
+    gap: 0.5rem;
+  }
+
+  .statItem {
+    --font-size: calc(1rem / 18 * 16);
+  }
+
+  .playlistHeader {
+    padding: 2rem;
+  }
+
+  .headerContent {
+    align-items: self-end;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .playlistCover {
+    --size: 7.4rem;
+  }
+
+  .playlistTitle {
+    max-height: 2em;
+    font-size: 2rem !important;
+    margin: 0;
+
+    *:first-child {
+      -webkit-line-clamp: 2; /* Número de líneas deseadas */
+      line-clamp: 2;
+    }
+  }
+
+  .headerYear {
+    display: none;
+  }
+}
+
+@media (width < 500px) {
+  .playAllButton {
+    --size: 3rem;
+  }
+
+  .playlistStats {
+    gap: 0.25rem;
+
+    .statItem {
+      --font-size: 0.8rem;
+    }
+  }
+
+  .playlistHeader {
+    padding: 1rem;
+  }
+
+  .playlistCover {
+    --size: 6.5rem;
+  }
+
+  .playlistControls {
+    margin-top: 1rem;
+  }
+
+  .playlistTitle {
+    font-size: 1.5rem !important;
+    max-height: 2em;
+    margin: 0;
+
+    *:first-child {
+      -webkit-line-clamp: 2; /* Número de líneas deseadas */
+      line-clamp: 2;
+    }
+  }
+}

@@ -1,0 +1,44 @@
+.playlistItems {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  .tracksHeader {
+    --height: 1.25rem;
+    display: flex;
+    flex-flow: row nowrap;
+    border-radius: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-gray-500);
+    margin-bottom: 0.25rem;
+    font-size: var(--height);
+    color: var(--color-gray-100);
+    font-weight: 500;
+    user-select: none;
+
+    &:hover,
+    &:active {
+      background: inherit;
+    }
+
+    user-select: none;
+
+    svg {
+      width: var(--height);
+      height: var(--height);
+    }
+  }
+
+  .headerIndex {
+    text-align: center;
+  }
+
+  .headerTitle {
+    flex: 1;
+    min-width: 0;
+  }
+
+  @media(width < 500px) {
+    .tracksHeader {
+      --height: 1rem !important;
+    }
+  }
+}

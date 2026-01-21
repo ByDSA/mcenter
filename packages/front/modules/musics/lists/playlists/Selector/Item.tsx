@@ -19,7 +19,7 @@ export const PlaylistSelectorItem = (props: Props) => {
     />
     <section>
       <div className={styles.name}>{data.name}</div>
-      <div className={styles.length}>{data.list.length} canciones</div>
+      <div className={styles.length}>{data.list.length} músicas</div>
     </section>
   </div>;
 };

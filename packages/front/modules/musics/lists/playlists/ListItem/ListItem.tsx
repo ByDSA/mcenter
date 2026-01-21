@@ -56,7 +56,7 @@ export const MusicPlaylistListItem = ( { index, drag }: PlaylistProps) => {
     />}
 
     subtitle={<ResourceSubtitle items={[{
-      text: `${totalSongs} canciones`,
+      text: `${totalSongs} músicas`,
     }, {
       text: formatDurationHeader(totalDuration),
     }, {

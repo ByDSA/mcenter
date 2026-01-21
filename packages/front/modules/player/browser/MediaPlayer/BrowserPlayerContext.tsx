@@ -572,7 +572,7 @@ export async function getNextByParams(props: GetNextProps): Promise<NextAction |
         };
       }
 
-      return null; // No hay más canciones
+      return null; // No hay más músicas
     }
 
     return {

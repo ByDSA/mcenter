@@ -5,8 +5,8 @@ import { useUser } from "#modules/core/auth/useUser";
 import { MusicPlaylistEntity } from "../models";
 import { usePlaylistPlayer } from "./hooks/usePlaylistPlayer";
 import { usePlaylistDragAndDrop } from "./hooks/usePlaylistDragAndDrop";
-import { PlaylistHeader } from "./components/PlaylistHeader";
-import { PlaylistTracks } from "./components/PlaylistTracks";
+import { PlaylistHeader } from "./Header";
+import { MusicPlaylistTrackList } from "./Tracks/List";
 import styles from "./Playlist.module.css";
 
 interface PlaylistProps {
@@ -39,7 +39,7 @@ export const MusicPlaylistFullPage = ( { value, setValue }: PlaylistProps) => {
 
   return <LocalDataProvider data={value} setData={setValue}>
 
-    <div className={styles.playlistContainer}>
+    <div className={styles.container}>
       <PlaylistHeader
         totalSongs={totalSongs}
         totalDuration={totalDuration}
@@ -47,7 +47,7 @@ export const MusicPlaylistFullPage = ( { value, setValue }: PlaylistProps) => {
         onPlay={handlePlayPlaylist}
       />
 
-      <PlaylistTracks
+      <MusicPlaylistTrackList
         value={value}
         setValue={setValue}
         draggable={draggable}

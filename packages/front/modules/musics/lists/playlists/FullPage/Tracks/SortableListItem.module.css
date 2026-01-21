@@ -1,0 +1,54 @@
+
+.sortableItemWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.dragHandle {
+  touch-action: none; /* Importante para evitar scroll al arrastrar en móvil */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: var(--drag-width);
+  opacity: 0.7;
+  margin-left: var(--drag-margin-left);
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dragHandle:hover {
+  cursor: grab;
+}
+
+.isDraggingGlobal :not(:has(.isDragging)) {
+  pointer-events: none;
+}
+
+.isDraggingGlobal,
+.isDraggingGlobal .dragHandle:hover {
+  cursor: grabbing;
+}
+
+.dragHandle:hover,
+.isDragging.dragHandle {
+  opacity: 1;
+  color: white !important;
+}
+
+.draggable {
+  --drag-width: 2.5rem;
+  --drag-margin-left: 0px;
+
+  @media (width < 500px) {
+    --drag-width: 1.5rem;
+    --drag-margin-left: 0.5rem;
+  }
+}
+
+.draggable .headerDrag {
+  width: calc(var(--drag-width) + var(--drag-margin-left));
+}

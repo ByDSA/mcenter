@@ -10,10 +10,10 @@ import { ResourcePlayButtonView } from "#modules/resources/PlayButton/PlayButton
 import { Separator } from "#modules/resources/Separator/Separator";
 import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
 import { useLocalData } from "#modules/utils/local-data-context";
-import { formatDurationHeader } from "../../utils";
-import styles from "../Playlist.module.css";
-import { MusicPlaylistEntity } from "../../models";
-import { MusicPlaylistSettingsButton } from "../../SettingsButton/Settings";
+import { formatDurationHeader } from "../utils";
+import { MusicPlaylistEntity } from "../models";
+import { MusicPlaylistSettingsButton } from "../SettingsButton/Settings";
+import styles from "./Header.module.css";
 
 interface PlaylistHeaderProps {
   totalSongs: number;
@@ -47,7 +47,7 @@ export const PlaylistHeader = ( { totalSongs,
           <div className={styles.playlistStats}>
             <div className={styles.row}>
               <div className={styles.statItem}>
-                <span>{totalSongs} {totalSongs === 1 ? "canción" : "canciones"}</span>
+                <span>{totalSongs} {totalSongs === 1 ? "música" : "músicas"}</span>
               </div>
               <Separator />
               <div className={styles.statItem}>

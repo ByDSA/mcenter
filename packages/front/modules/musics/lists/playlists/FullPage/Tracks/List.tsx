@@ -7,10 +7,11 @@ import { MusicNote, DragHandle } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { SetState } from "#modules/utils/react";
 import listItemStyles from "#modules/resources/ListItem/ListItem.module.css";
-import { MusicPlaylistItem } from "../PlaylistItem";
-import styles from "../Playlist.module.css";
+import { EmptyList, EmptyListTopIconWrap } from "#modules/history/EmptyList/EmptyList";
 import { MusicPlaylistEntity } from "../../models";
-import { SortablePlaylistItem } from "./SortablePlaylistItem";
+import styles from "./List.module.css";
+import { SortablePlaylistItem } from "./SortableListItem";
+import { MusicPlaylistItem } from "./ListItem";
 
 interface PlaylistTracksProps {
   value: MusicPlaylistEntity;
@@ -25,14 +26,14 @@ interface PlaylistTracksProps {
   itemIds: string[];
 }
 
-const EmptyPlaylist = memo(()=><div className={styles.emptyState}>
-  <MusicNote className={styles.emptyStateIcon} />
-  <p className={styles.emptyStateText}>
-                    No hay canciones en esta playlist
-  </p>
-</div>);
+const EmptyPlaylist = memo(()=>{
+  return <EmptyList
+    top={<EmptyListTopIconWrap><MusicNote /></EmptyListTopIconWrap>}
+    label="No hay músicas en esta playlist."
+  />;
+} );
 
-export const PlaylistTracks = ( { value,
+export const MusicPlaylistTrackList = ( { value,
   setValue,
   draggable,
   dndSensors,
@@ -69,12 +70,13 @@ export const PlaylistTracks = ( { value,
       <div className={classes(styles.tracksHeader, listItemStyles.sidePadding)}>
         {draggable && <div className={styles.headerDrag}></div>}
         <div className={classes(styles.headerIndex, listItemStyles.leftDiv)}>#</div>
-        <div className={styles.headerTitle}>CANCIÓN</div>
+        <div className={styles.headerTitle}>MÚSICA</div>
       </div>
 
       <div ref={parentRef} style={{
         position: "relative",
       }}>
+        {value.list.length === 0 && <EmptyPlaylist />}
         <DndContext
           sensors={dndSensors}
           collisionDetection={closestCenter}
@@ -95,24 +97,22 @@ export const PlaylistTracks = ( { value,
                 position: "relative",
               }}
             >
-              {value.list.length > 0
-                ? (
-                  virtualItems.map((vItem) => (
-                    <SortablePlaylistItem
-                      key={value.list[vItem.index].id}
-                      start={vItem.start}
-                      size={vItem.size}
-                      item={value.list[vItem.index]}
-                      index={vItem.index}
-                      draggable={draggable}
-                      isDraggingGlobal={isDraggingGlobal}
-                      setValue={setValue}
-                      value={value}
-                      scrollMargin={offsetTop}
-                    />
-                  ))
-                )
-                : <EmptyPlaylist />}
+              {
+                virtualItems.map((vItem) => (
+                  <SortablePlaylistItem
+                    key={value.list[vItem.index].id}
+                    start={vItem.start}
+                    size={vItem.size}
+                    item={value.list[vItem.index]}
+                    index={vItem.index}
+                    draggable={draggable}
+                    isDraggingGlobal={isDraggingGlobal}
+                    setValue={setValue}
+                    value={value}
+                    scrollMargin={offsetTop}
+                  />
+                ))
+              }
             </div>
           </SortableContext>
 

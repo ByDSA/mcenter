@@ -6,10 +6,10 @@ import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryL
 import { MusicContextMenu } from "#modules/musics/musics/SettingsButton/Button";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { SetState } from "#modules/utils/react";
-import { MusicEntryElement } from "../../../musics/ListItem/MusicEntry";
-import { useMusic } from "../../../hooks";
-import { MusicPlaylistsApi } from "../requests";
-import { MusicPlaylistEntity } from "../models";
+import { MusicEntryElement } from "../../../../musics/ListItem/MusicEntry";
+import { useMusic } from "../../../../hooks";
+import { MusicPlaylistsApi } from "../../requests";
+import { MusicPlaylistEntity } from "../../models";
 
 export type ContextMenuProps = {
   onClick?: (e: React.MouseEvent<HTMLElement>)=> void;
