@@ -5,6 +5,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
 import { ResourceList } from "#modules/resources/List/ResourceList";
 import { dayTitle } from "#modules/history/utils";
+import { EmptyHistory } from "#modules/history/EmptyHistory";
 import { EpisodeHistoryEntryElement } from "./ListItem/HistoryEntry";
 import { EpisodeHistoryApi } from "./requests";
 
@@ -26,6 +27,7 @@ export function HistoryList() {
     render: () => {
       return (
         <ResourceList>
+          {(!data || data.length === 0) && <EmptyHistory />}
           {
             data!.map((entry: EpisodeHistoryApi.GetMany.Data, i: number, array) => {
               return <Fragment

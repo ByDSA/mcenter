@@ -8,6 +8,7 @@ import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { backendUrl } from "#modules/requests";
 import { withRetries } from "#modules/utils/retries";
 import { useMusic } from "#modules/musics/hooks";
+import { logger } from "#modules/core/logger";
 import { useAudioCache } from "./Audio/AudioCacheContext";
 
 export type PlayerStatus = "paused" | "playing" | "stopped";
@@ -211,6 +212,13 @@ export const useBrowserPlayer = create<PlayerState>()(
 
       playPlaylist: async (props) => {
         const { playlist, index: propsIndex, ownerSlug } = props;
+
+        if (playlist.list.length === 0) {
+          logNoMusic();
+
+          return;
+        }
+
         const query = ownerSlug
           ? `playlist:@${ownerSlug}/${playlist.slug}`
           : `playlist:${playlist.slug}`;
@@ -613,4 +621,8 @@ export async function getNextByParams(props: GetNextProps): Promise<NextAction |
       queueIndex,
     } ),
   };
+}
+
+function logNoMusic() {
+  logger.error("No hay ninguna música para reproducir.");
 }

@@ -6,6 +6,11 @@
   min-height: calc(
     100dvh - var(--topbar-height, 0px) - var(--tabs-height, 0px)
   );
+  padding: 1rem;
+
+  @media(width < 500px) {
+    padding: 1rem 0.25rem;
+  }
 }
 
 .container > main {

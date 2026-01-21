@@ -5,13 +5,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { RemotePlayerDtos } from "$shared/models/player/remote-player/dto/domain";
 import { useRouter } from "next/navigation";
 import { getPreviousPath } from "app/NavigationWatcher";
-import { classes } from "#modules/utils/styles";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 import { useUser } from "#modules/core/auth/useUser";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { PageContainer } from "app/PageContainer";
-import stylesFetching from "#modules/ui-kit/Spinner/fetching.style.module.css";
+import { EmptyList } from "#modules/history/EmptyList/EmptyList";
 import { RemotePlayerEntry } from "./RemotePlayerEntry";
 import { sseRemotePlayers } from "./sse";
 import styles from "./styles.module.css";
@@ -143,15 +142,12 @@ export default function RemotePlayerSelector() {
 
   return (
     <PageContainer>
-      <h1>Remote players</h1>
+      <h1>Reproductores</h1>
 
-      {isLoading && <ContentSpinner />}
-      {!isLoading && remotePlayers.length === 0
-        && <p className={classes(
-          stylesFetching.loading,
-          styles.error,
-        )}>No se ha detectado ningún reproductor remoto.</p>}
       <section className={styles.list}>
+        {isLoading && <ContentSpinner />}
+        {!isLoading && remotePlayers.length === 0
+        && <EmptyList label="No se ha detectado ningún reproductor remoto."/>}
         {remotePlayers.map(r=>(<RemotePlayerEntry key={r.id} value={r}/>))}
       </section>
     </PageContainer>

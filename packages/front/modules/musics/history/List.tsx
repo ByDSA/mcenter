@@ -6,13 +6,14 @@ import { INITIAL_FETCHING_LENGTH, FETCHING_MORE_LENGTH } from "#modules/history/
 import { ResourceList } from "#modules/resources/List/ResourceList";
 import { dayTitle } from "#modules/history/utils";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
+import { EmptyHistory } from "#modules/history/EmptyHistory";
 import { useMusic } from "../hooks";
 import { MusicHistoryApi } from "./requests";
 import { MusicHistoryListItem } from "./ListItem";
 
 type Data = MusicHistoryApi.GetManyByCriteria.Data[];
 
-export function HistoryList() {
+export function MusicHistoryList() {
   const { data, isLoading, error,
     setItem, observerTarget } = useHistoryList();
 
@@ -34,6 +35,7 @@ export function HistoryList() {
     },
     render: () => (
       <ResourceList>
+        {(!data || data.length === 0) && <EmptyHistory />}
         {
           data!.map(
             (entry, i, array) => {

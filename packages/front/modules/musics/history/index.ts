@@ -1,3 +1,3 @@
 export {
-  HistoryList,
+  MusicHistoryList as HistoryList,
 } from "./List";

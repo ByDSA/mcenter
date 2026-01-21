@@ -58,7 +58,7 @@ const sideData: (user: UserPayload | null)=> MenuItemData[] = (_user)=>[
   },
   {
     icon: <SettingsRemote />,
-    label: "Remote",
+    label: "Remoto",
     path: "/player/remote",
     matchPath: {
       startsWith: "/player",
