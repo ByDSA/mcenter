@@ -2,15 +2,15 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { FormInputGroup } from "#modules/ui-kit/form/FormInputGroup";
-import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
-import { FormInputText } from "#modules/ui-kit/form/input/Text/FormInputText";
-import { ErrorView } from "#modules/ui-kit/form/Error";
-import { FormInputErrorWrap } from "#modules/ui-kit/form/FormInputErrorWrap";
+import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
+import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
+import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
+import { DaErrorView } from "#modules/ui-kit/form/Error";
+import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { ImageCoverEntity } from "../models";
-import { FormLabel } from "../../ui-kit/form/Label/FormLabel";
+import { DaLabel } from "../../ui-kit/form/Label/Label";
 import { ImageCoverUpload, ImageCoverUploadRef } from "../Edit/UploadImage";
 import styles from "./Content.module.css";
 
@@ -56,39 +56,39 @@ export function NewImageCoverForm( { onSuccess }: NewImageCoverProps) {
 
   return (
     <form className={styles.content} onSubmit={handleSubmit(onSubmit)}>
-      <FormInputGroup>
-        <FormLabel>Etiqueta</FormLabel>
-        <FormInputErrorWrap>
-          <FormInputText
+      <DaInputGroup>
+        <DaLabel>Etiqueta</DaLabel>
+        <DaInputErrorWrap>
+          <DaInputText
             {...register("label")}
           />
-          <ErrorView errors={errors} keyName="label" touchedFields={dirtyFields} />
-        </FormInputErrorWrap>
-      </FormInputGroup>
+          <DaErrorView errors={errors} keyName="label" touchedFields={dirtyFields} />
+        </DaInputErrorWrap>
+      </DaInputGroup>
 
-      <FormInputGroup>
-        <FormLabel>Subir Imagen</FormLabel>
+      <DaInputGroup>
+        <DaLabel>Subir Imagen</DaLabel>
         <ImageCoverUpload
           ref={uploadRef}
           hideUploadButton
           // onSuccess se maneja manualmente en el onSubmit del formulario padre
           onFileChange={(file) => setHasFile(!!file)}
         />
-      </FormInputGroup>
+      </DaInputGroup>
 
-      <FormFooterButtons>
-        <Button onClick={modal.closeModal} theme="white" disabled={isSubmitting}>
+      <DaFooterButtons>
+        <DaButton onClick={modal.closeModal} theme="white" disabled={isSubmitting}>
           Cerrar
-        </Button>
-        <Button
+        </DaButton>
+        <DaButton
           type="submit"
           theme="blue"
           disabled={!hasFile || !isValid || isSubmitting}
           isSubmitting={isSubmitting}
         >
           Subir
-        </Button>
-      </FormFooterButtons>
+        </DaButton>
+      </DaFooterButtons>
     </form>
   );
 }

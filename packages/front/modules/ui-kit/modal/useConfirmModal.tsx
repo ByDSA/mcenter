@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { Button } from "../form/input/Button/Button";
-import { FormFooterButtons } from "../form/Footer/Buttons/FormFooterButtons";
+import { DaButton } from "../form/input/Button/Button";
+import { DaFooterButtons } from "../form/Footer/Buttons/FooterButtons";
 import { OpenModalProps, useModal } from "./ModalContext";
 
 type Action = (obj?: unknown)=> Promise<boolean> | boolean;
@@ -15,14 +15,14 @@ export type OpenConfirmModalProps = OpenModalProps & {
 
 export const useConfirmModal = () => {
   const confirmModal = useModal();
-  const footer = useMemo(()=><FormFooterButtons>
-    <Button theme={"white"} onClick={async ()=> {
+  const footer = useMemo(()=><DaFooterButtons>
+    <DaButton theme={"white"} onClick={async ()=> {
       await confirmModal.closeModal(true);
-    }}>Sí</Button>
-    <Button theme={"white"} onClick={async ()=> {
+    }}>Sí</DaButton>
+    <DaButton theme={"white"} onClick={async ()=> {
       await confirmModal.closeModal();
-    }}>Cancelar</Button>
-  </FormFooterButtons>, [confirmModal.closeModal]);
+    }}>Cancelar</DaButton>
+  </DaFooterButtons>, [confirmModal.closeModal]);
   let openModal: (
     props?: OpenConfirmModalProps
    )=> Promise<void> = async (props)=> {

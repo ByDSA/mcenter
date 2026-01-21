@@ -1,8 +1,8 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { FormInputGroup } from "#modules/ui-kit/form/FormInputGroup";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
+import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { getLongDateStr } from "#modules/utils/dates";
 import { useLocalData } from "#modules/utils/local-data-context";
@@ -28,18 +28,18 @@ export function useDeleteMusicHistoryEntryModal(
       return openModal( {
         title: "Confirmar borrado",
         content: <DeleteHistoryEntryModalContentWrapper>
-          <FormInputGroup inline>
-            <FormLabel>Fecha</FormLabel>
+          <DaInputGroup inline>
+            <DaLabel>Fecha</DaLabel>
             <span>{getLongDateStr(new Date(data.date.timestamp * 1_000), "datetime")}</span>
-          </FormInputGroup>
-          <FormInputGroup inline>
-            <FormLabel>Título</FormLabel>
+          </DaInputGroup>
+          <DaInputGroup inline>
+            <DaLabel>Título</DaLabel>
             <span>{data.resource?.title}</span>
-          </FormInputGroup>
-          <FormInputGroup inline>
-            <FormLabel>Artista</FormLabel>
+          </DaInputGroup>
+          <DaInputGroup inline>
+            <DaLabel>Artista</DaLabel>
             <span>{data.resource?.artist}</span>
-          </FormInputGroup>
+          </DaInputGroup>
         </DeleteHistoryEntryModalContentWrapper>,
         onFinish,
         onActionSuccess,

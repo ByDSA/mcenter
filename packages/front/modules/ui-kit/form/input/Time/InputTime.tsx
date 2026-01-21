@@ -1,8 +1,8 @@
 import React, { useCallback, useRef, useState, useEffect } from "react";
-import { FormInputNumber } from "#modules/ui-kit/form/input/Number/FormInputNumber";
-import { FormInputBooleanCheckbox } from "#modules/ui-kit/form/input/Boolean/FormInputBoolean";
+import { DaInputNumber } from "#modules/ui-kit/form/input/Number/InputNumber";
+import { DaInputBooleanCheckbox } from "#modules/ui-kit/form/input/Boolean/InputBoolean";
 import { classes } from "#modules/utils/styles";
-import styles from "./FormInputTime.module.css";
+import styles from "./styles.module.css";
 
 type Props = {
   value: number | null | undefined;
@@ -12,7 +12,7 @@ type Props = {
   disabled?: boolean;
 };
 
-export const FormInputTime = ( { value,
+export const DaInputTime = ( { value,
   onChange,
   nullable,
   isOptional,
@@ -119,7 +119,7 @@ export const FormInputTime = ( { value,
         disabled && styles.disabled,
       )}>
         <div className={styles.timeGroup}>
-          <FormInputNumber
+          <DaInputNumber
             value={minutes}
             onChange={(e) => {
               const val = parseInt(e.target.value, 10);
@@ -132,7 +132,7 @@ export const FormInputTime = ( { value,
             decimals="integer"
           />
           <span className={styles.separator}>:</span>
-          <FormInputNumber
+          <DaInputNumber
             value={seconds}
             onChange={(e) => {
               const val = parseFloat(e.target.value);
@@ -172,7 +172,7 @@ export const FormInputTime = ( { value,
 
       {isNullable && (
         <div className={styles.toggleWrapper}>
-          <FormInputBooleanCheckbox
+          <DaInputBooleanCheckbox
             className={styles.nullCheckbox}
             value={isNull}
             onChange={handleToggleNullable}

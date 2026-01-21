@@ -8,8 +8,8 @@ import { backendUrl } from "#modules/requests";
 import { genOnUpload, FileData, OnUploadOptions, FileUpload } from "#modules/ui-kit/upload/FileUpload";
 import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
+import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { useLocalData } from "#modules/utils/local-data-context";
 import styles from "./UploadMusicFileModal.module.css";
 
@@ -36,9 +36,9 @@ export const useUploadMusicFileModal = () => {
       title: "Añadir nuevos archivos a música",
       className: styles.modal,
       content: (
-        <FormInputGroup>
-          <FormInputGroupItem>
-            <FormLabel>Desde YouTube</FormLabel>
+        <DaInputGroup>
+          <DaInputGroupItem>
+            <DaLabel>Desde YouTube</DaLabel>
             <YouTubeUpload
               musicId={props.musicId}
               withCredentials
@@ -46,9 +46,9 @@ export const useUploadMusicFileModal = () => {
                 add(musicFileInfo);
               }}
             />
-          </FormInputGroupItem>
-          <FormInputGroupItem>
-            <FormLabel>Desde local</FormLabel>
+          </DaInputGroupItem>
+          <DaInputGroupItem>
+            <DaLabel>Desde local</DaLabel>
             <FileUpload
               acceptedTypes={AUDIO_EXTENSIONS.map(s => `.${s}`)}
               multiple={true}
@@ -74,8 +74,8 @@ export const useUploadMusicFileModal = () => {
                 },
               } )}
             />
-          </FormInputGroupItem>
-        </FormInputGroup>
+          </DaInputGroupItem>
+        </DaInputGroup>
       ),
     } ),
   };

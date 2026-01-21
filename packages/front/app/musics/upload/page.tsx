@@ -14,8 +14,8 @@ import { YouTubeUpload } from "#modules/ui-kit/upload/YouTubeUpload";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceList } from "#modules/resources/List/ResourceList";
 import { useMusic } from "#modules/musics/hooks";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { FormInputGroup } from "#modules/ui-kit/form/FormInputGroup";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
+import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
 import { EmptyList, EmptyListTopIconWrap } from "#modules/history/EmptyList/EmptyList";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
@@ -82,20 +82,20 @@ export default function Upload() {
     <MusicLayout>
       <h2>Subir músicas</h2>
       <div className={styles.uploaders}>
-        <FormInputGroup className={styles.group}>
-          <FormLabel>Desde YouTube</FormLabel>
+        <DaInputGroup className={styles.group}>
+          <DaLabel>Desde YouTube</DaLabel>
           <YouTubeUpload
             withCredentials
             onCreateMusic={onCreateMusic}/>
-          <FormLabel>Desde local</FormLabel>
+          <DaLabel>Desde local</DaLabel>
           <FileUpload
             acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
             multiple={true}
             onUpload={onUpload}
           />
-        </FormInputGroup>
+        </DaInputGroup>
         <hr/>
-        <FormLabel>Músicas subidas</FormLabel>
+        <DaLabel>Músicas subidas</DaLabel>
         <ResourceList>
           {uploaded.length === 0 && <EmptyList
             top={<EmptyListTopIconWrap><MusicNote /></EmptyListTopIconWrap>}

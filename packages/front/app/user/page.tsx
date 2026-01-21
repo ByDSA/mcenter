@@ -5,7 +5,7 @@ import { useState } from "react";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { useUser } from "#modules/core/auth/useUser";
 import { usePlaylistSelectorModal } from "#modules/musics/lists/playlists/Selector/modal";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { UsersApi } from "#modules/core/users/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicPlaylistsApi } from "#modules/musics/lists/playlists/requests";
@@ -55,7 +55,7 @@ export default function UserPage() {
       <h3>Música</h3>
       <p>Playlist favorita: {element}</p>
       <div>
-        <Button onClick={async ()=>await openModal( {
+        <DaButton onClick={async ()=>await openModal( {
           onSelect: async (playlist) => {
             const api = FetchApi.get(UsersApi);
 
@@ -63,7 +63,7 @@ export default function UserPage() {
 
             setFavPlaylist(playlist);
           },
-        } )}>Cambiar</Button>
+        } )}>Cambiar</DaButton>
       </div>
     </div>);
 }

@@ -2,7 +2,7 @@ import { RefObject, useRef, useCallback } from "react";
 import { RefCallBack } from "react-hook-form";
 import { classes } from "#modules/utils/styles";
 import { updateHeight } from "../../../input/height";
-import styles from "./FormInputText.module.css";
+import styles from "./styles.module.css";
 
 const pressEnterSubmit = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
   if (e.key === "Enter" && !e.shiftKey) {
@@ -34,7 +34,7 @@ const update = (target: HTMLTextAreaElement, nullable: boolean | undefined) => {
   } );
 };
 
-export const FormInputTextMultiline = (
+export const DaInputTextMultiline = (
   props: React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
     ref?: RefCallBack | RefObject<HTMLTextAreaElement | null>;
     nullable?: boolean;
@@ -79,7 +79,7 @@ export const FormInputTextMultiline = (
   );
 };
 
-export const FormInputText = (props: Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> & {
+export const DaInputText = (props: Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> & {
     ref?: RefCallBack | RefObject<HTMLInputElement | null>;
     nullable?: boolean;
 } ) => {

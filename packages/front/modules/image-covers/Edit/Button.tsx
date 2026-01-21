@@ -1,5 +1,5 @@
 import { Edit } from "@mui/icons-material";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import { ImageCoverEntity } from "../models";
 import styles from "./Button.module.css";
@@ -15,7 +15,7 @@ export function ImageCoverEditButton(props: EditProps) {
   const { openModal } = useImageCoverEditorModal(props);
 
   return (
-    <Button
+    <DaButton
       className={classes(styles.button, props.className)}
       onClick={async (e) => {
         e.stopPropagation(); // Evitar triggers padres si los hay
@@ -24,6 +24,6 @@ export function ImageCoverEditButton(props: EditProps) {
       title="Editar Cover"
     >
       <Edit />
-    </Button>
+    </DaButton>
   );
 }

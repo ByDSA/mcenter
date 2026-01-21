@@ -1,11 +1,11 @@
-import { FormEnumButtons } from "#modules/ui-kit/form/FormEnumButtons/FormEnumButtons";
+import { DaEnumButtons } from "#modules/ui-kit/form/EnumButtons/EnumButtons";
 
 type FormVisibilityProps = {
   value: "private" | "public";
   setValue: (newValue: "private" | "public")=> void;
 };
 export function FormVisibility( { value, setValue }: FormVisibilityProps) {
-  return <FormEnumButtons
+  return <DaEnumButtons
     options={[
       {
         value: "private",

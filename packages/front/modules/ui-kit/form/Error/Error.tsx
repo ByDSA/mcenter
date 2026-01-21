@@ -7,7 +7,7 @@ type ErrorProps<T extends FieldValues> = {
   keyName: FieldPath<T>;
 };
 
-export const ErrorView = <T extends FieldValues>( { errors,
+export const DaErrorView = <T extends FieldValues>( { errors,
   keyName,
   touchedFields }: ErrorProps<T>) => {
   const error = errors[keyName];

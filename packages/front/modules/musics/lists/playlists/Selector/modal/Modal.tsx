@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { useUser } from "#modules/core/auth/useUser";
 import { logger } from "#modules/core/logger";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import { useMusicPlaylistsForUser } from "../../request-all";
 import { MusicPlaylistEntity } from "../../models";
@@ -88,9 +88,9 @@ function AddToPlaylistForm( { userId, onSelect, nullable }: AddToPlaylistContent
         marginTop: "1rem",
         paddingTop: "1rem",
       }}>
-        {nullable && <Button theme="white" onClick={()=> {
+        {nullable && <DaButton theme="white" onClick={()=> {
           onSelect(null);
-        }}>Ninguna</Button>}
+        }}>Ninguna</DaButton>}
         {newPlaylistButton}
       </footer>
       }

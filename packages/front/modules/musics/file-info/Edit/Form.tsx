@@ -7,10 +7,10 @@ import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { secsToMmss, formatDateDDMMYYYHHmm } from "#modules/utils/dates";
 import { DeleteResource } from "#modules/musics/file-info/Edit/crud-buttons";
 import { bytesToStr } from "#modules/utils/sizes";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
-import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { FormText } from "#modules/ui-kit/form/Text/FormText";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
+import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
+import { DaText } from "#modules/ui-kit/form/Text/Text";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { MusicFileInfosApi } from "../requests";
 import { MUSIC_FILE_INFO_PROPS } from "../utils";
@@ -29,7 +29,7 @@ export const EditFileInfosForm = ( { musicId }: EditFileInfosViewProps) => {
 
   return <>
     <header className={styles.header}>
-      <Button
+      <DaButton
         theme="white"
         onClick={async () => {
           await openUploadModal( {
@@ -38,7 +38,7 @@ export const EditFileInfosForm = ( { musicId }: EditFileInfosViewProps) => {
         }}
       >
             Subir nuevo archivo
-      </Button>
+      </DaButton>
     </header>
     <p>Archivos: ({data.length})</p>
     {
@@ -55,18 +55,18 @@ export const EditFileInfosForm = ( { musicId }: EditFileInfosViewProps) => {
                   content: (<>
                     <p>¿Borrar este archivo?</p>
                     <div>
-                      <FormInputGroup inline>
-                        <FormLabel>Path</FormLabel>
+                      <DaInputGroup inline>
+                        <DaLabel>Path</DaLabel>
                         <span>{f.path}</span>
-                      </FormInputGroup>
-                      <FormInputGroup inline>
-                        <FormLabel>Duración</FormLabel>
+                      </DaInputGroup>
+                      <DaInputGroup inline>
+                        <DaLabel>Duración</DaLabel>
                         <span>{f.mediaInfo.duration ? secsToMmss(f.mediaInfo.duration) : "-"}</span>
-                      </FormInputGroup>
-                      <FormInputGroup inline>
-                        <FormLabel>Size</FormLabel>
+                      </DaInputGroup>
+                      <DaInputGroup inline>
+                        <DaLabel>Size</DaLabel>
                         <span>{bytesToStr(f.size)}</span>
-                      </FormInputGroup>
+                      </DaInputGroup>
                     </div>
                   </>),
                   action: async () => {
@@ -84,37 +84,37 @@ export const EditFileInfosForm = ( { musicId }: EditFileInfosViewProps) => {
               }}
               isDoing={false} />
             </span>
-            <FormInputGroup>
-              <FormInputGroupItem inline>
-                <FormLabel>{MUSIC_FILE_INFO_PROPS.path.caption}</FormLabel>
-                <FormText>{f.path}</FormText>
-              </FormInputGroupItem>
+            <DaInputGroup>
+              <DaInputGroupItem inline>
+                <DaLabel>{MUSIC_FILE_INFO_PROPS.path.caption}</DaLabel>
+                <DaText>{f.path}</DaText>
+              </DaInputGroupItem>
 
-              <FormInputGroupItem inline>
-                <FormLabel>{MUSIC_FILE_INFO_PROPS["mediaInfo.duration"].caption}</FormLabel>
-                <FormText>{isDefined(duration) ? secsToMmss(duration) : "-"}</FormText>
-              </FormInputGroupItem>
+              <DaInputGroupItem inline>
+                <DaLabel>{MUSIC_FILE_INFO_PROPS["mediaInfo.duration"].caption}</DaLabel>
+                <DaText>{isDefined(duration) ? secsToMmss(duration) : "-"}</DaText>
+              </DaInputGroupItem>
 
-              <FormInputGroupItem inline>
-                <FormLabel>{MUSIC_FILE_INFO_PROPS.size.caption}</FormLabel>
-                <FormText>{bytesToStr(f.size)}</FormText>
-              </FormInputGroupItem>
+              <DaInputGroupItem inline>
+                <DaLabel>{MUSIC_FILE_INFO_PROPS.size.caption}</DaLabel>
+                <DaText>{bytesToStr(f.size)}</DaText>
+              </DaInputGroupItem>
 
-              <FormInputGroupItem inline>
-                <FormLabel>{MUSIC_FILE_INFO_PROPS["timestamps.createdAt"].caption}</FormLabel>
-                <FormText>{formatDateDDMMYYYHHmm(f.timestamps.createdAt)}</FormText>
-              </FormInputGroupItem>
+              <DaInputGroupItem inline>
+                <DaLabel>{MUSIC_FILE_INFO_PROPS["timestamps.createdAt"].caption}</DaLabel>
+                <DaText>{formatDateDDMMYYYHHmm(f.timestamps.createdAt)}</DaText>
+              </DaInputGroupItem>
 
-              <FormInputGroupItem inline>
-                <FormLabel>{MUSIC_FILE_INFO_PROPS["timestamps.updatedAt"].caption}</FormLabel>
-                <FormText>{formatDateDDMMYYYHHmm(f.timestamps.updatedAt)}</FormText>
-              </FormInputGroupItem>
+              <DaInputGroupItem inline>
+                <DaLabel>{MUSIC_FILE_INFO_PROPS["timestamps.updatedAt"].caption}</DaLabel>
+                <DaText>{formatDateDDMMYYYHHmm(f.timestamps.updatedAt)}</DaText>
+              </DaInputGroupItem>
 
-              <FormInputGroupItem inline>
-                <FormLabel>{MUSIC_FILE_INFO_PROPS.hash.caption}</FormLabel>
-                <FormText>{f.hash}</FormText>
-              </FormInputGroupItem>
-            </FormInputGroup>
+              <DaInputGroupItem inline>
+                <DaLabel>{MUSIC_FILE_INFO_PROPS.hash.caption}</DaLabel>
+                <DaText>{f.hash}</DaText>
+              </DaInputGroupItem>
+            </DaInputGroup>
           </Fragment>
         );
       } )

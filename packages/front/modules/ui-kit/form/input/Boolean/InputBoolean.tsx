@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { useId } from "react";
 import { classes } from "#modules/utils/styles";
-import styles from "./FormInputBoolean.module.css";
+import styles from "./styles.module.css";
 
-// Reutilizamos estilos existentes si quieres
 type Props = {
   className?: string;
   value: boolean;
@@ -11,7 +9,7 @@ type Props = {
   label?: string;
 };
 
-export const FormInputBooleanCheckbox = ( { value, onChange, label, className }: Props) => {
+export const DaInputBooleanCheckbox = ( { value, onChange, label, className }: Props) => {
   const id = useId();
 
   return (

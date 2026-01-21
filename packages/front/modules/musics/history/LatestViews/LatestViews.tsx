@@ -9,9 +9,9 @@ import { backendUrl } from "#modules/requests";
 import { MusicHistoryEntryCrudDtos } from "#modules/musics/history/models/dto";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { useMusic } from "#modules/musics/hooks";
-import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { FormInputErrorWrap } from "#modules/ui-kit/form/FormInputErrorWrap";
+import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
+import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { LatestViewsView } from "../../../history/Latest/LatestViewsDisplay";
 
 type Body = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
@@ -69,20 +69,20 @@ export function MusicLatestViews(props: Props) {
     return element;
 
   return <>
-    <FormInputGroup>
-      <FormInputGroupItem inline>
-        <FormLabel>Título</FormLabel>
-        <FormInputErrorWrap>
+    <DaInputGroup>
+      <DaInputGroupItem inline>
+        <DaLabel>Título</DaLabel>
+        <DaInputErrorWrap>
           <span>{music.title}</span>
-        </FormInputErrorWrap>
-      </FormInputGroupItem>
-      <FormInputGroupItem inline>
-        <FormLabel>Artista</FormLabel>
-        <FormInputErrorWrap>
+        </DaInputErrorWrap>
+      </DaInputGroupItem>
+      <DaInputGroupItem inline>
+        <DaLabel>Artista</DaLabel>
+        <DaInputErrorWrap>
           <span>{music.artist}</span>
-        </FormInputErrorWrap>
-      </FormInputGroupItem>
-    </FormInputGroup>
+        </DaInputErrorWrap>
+      </DaInputGroupItem>
+    </DaInputGroup>
     {element}
   </>;
 }

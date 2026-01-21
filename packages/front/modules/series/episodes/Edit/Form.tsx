@@ -6,17 +6,17 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { EpisodesApi } from "#modules/series/episodes/requests";
 import { EpisodeUserInfosApi } from "#modules/series/episodes/user-info/requests";
 import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { ErrorView } from "#modules/ui-kit/form/Error";
-import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
-import { FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";
-import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
-import { FormInputErrorWrap } from "#modules/ui-kit/form/FormInputErrorWrap";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
+import { DaErrorView } from "#modules/ui-kit/form/Error";
+import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
+import { DaInputTextMultiline } from "#modules/ui-kit/form/input/Text/InputText";
+import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
+import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { FormInputTags } from "#modules/resources/FormInputTags/FormInputTags";
-import { FormInputNumber } from "#modules/ui-kit/form/input/Number/FormInputNumber";
+import { DaInputNumber } from "#modules/ui-kit/form/input/Number/InputNumber";
 import { Separator } from "#modules/resources/Separator/Separator";
-import { FormInputTime } from "../../../ui-kit/form/input/Time/FormInputTime";
+import { DaInputTime } from "../../../ui-kit/form/input/Time/InputTime";
 import styles from "./style.module.css";
 
 const schema = z.object( {
@@ -148,70 +148,70 @@ export const EditEpisodeForm = ( { initialData, onSuccess, onCancel }: Props) =>
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.container}>
-      <FormInputGroup inline>
-        <FormLabel>Episodio</FormLabel>
+      <DaInputGroup inline>
+        <DaLabel>Episodio</DaLabel>
         <span>
           <span>{initialData.serie?.name ?? initialData.compKey.seriesKey}</span>
           <Separator />
           <span>{initialData.compKey.episodeKey}</span>
         </span>
-      </FormInputGroup>
-      <FormInputGroup inline>
-        <FormLabel>Título</FormLabel>
-        <FormInputErrorWrap>
-          <FormInputTextMultiline
+      </DaInputGroup>
+      <DaInputGroup inline>
+        <DaLabel>Título</DaLabel>
+        <DaInputErrorWrap>
+          <DaInputTextMultiline
             {...register("title")}
           />
-          <ErrorView errors={errors} keyName="title" touchedFields={dirtyFields} />
-        </FormInputErrorWrap>
-      </FormInputGroup>
+          <DaErrorView errors={errors} keyName="title" touchedFields={dirtyFields} />
+        </DaInputErrorWrap>
+      </DaInputGroup>
 
-      <FormInputGroup inline>
-        <FormInputGroupItem inline className={styles.weight}>
-          <FormLabel>Peso</FormLabel>
-          <FormInputNumber
+      <DaInputGroup inline>
+        <DaInputGroupItem inline className={styles.weight}>
+          <DaLabel>Peso</DaLabel>
+          <DaInputNumber
             {...register("weight", {
               valueAsNumber: true,
             } )}
           />
-        </FormInputGroupItem>
-      </FormInputGroup>
+        </DaInputGroupItem>
+      </DaInputGroup>
 
       {fileInfo && (
-        <FormInputGroup inline>
-          <FormInputGroupItem inline>
-            <FormLabel>Inicio</FormLabel>
+        <DaInputGroup inline>
+          <DaInputGroupItem inline>
+            <DaLabel>Inicio</DaLabel>
             <Controller
               control={control}
               name="start"
               render={( { field } ) => (
-                <FormInputTime
+                <DaInputTime
                   value={field.value}
                   onChange={field.onChange}
                   nullable
                 />
               )}
             />
-          </FormInputGroupItem>
-          <FormInputGroupItem inline>
-            <FormLabel>Fin</FormLabel>
+          </DaInputGroupItem>
+          <DaInputGroupItem inline>
+            <DaLabel>Fin</DaLabel>
             <Controller
               control={control}
               name="end"
               render={( { field } ) => (
-                <FormInputTime
+                <DaInputTime
                   value={field.value}
                   onChange={field.onChange}
                   nullable
                 />
               )}
             />
-          </FormInputGroupItem>
-        </FormInputGroup>
+          </DaInputGroupItem>
+        </DaInputGroup>
       )}
 
-      <FormInputGroup inline>
-        <FormLabel>Tags</FormLabel>
+      <DaInputGroup inline>
+        <DaLabel>Tags</DaLabel>
         <Controller
           control={control}
           name="tags"
@@ -223,25 +223,25 @@ export const EditEpisodeForm = ( { initialData, onSuccess, onCancel }: Props) =>
             />
           )}
         />
-      </FormInputGroup>
-      <FormInputGroup inline>
-        <FormLabel>Path</FormLabel>
+      </DaInputGroup>
+      <DaInputGroup inline>
+        <DaLabel>Path</DaLabel>
         <span>{initialData.fileInfos?.[0].path}</span>
-      </FormInputGroup>
+      </DaInputGroup>
 
-      <FormFooterButtons>
-        <Button theme="white" onClick={onCancel}>
+      <DaFooterButtons>
+        <DaButton theme="white" onClick={onCancel}>
           Cancelar
-        </Button>
-        <Button
+        </DaButton>
+        <DaButton
           type="submit"
           theme="blue"
           disabled={!isDirty || !isValid || isSubmitting}
           isSubmitting={isSubmitting}
         >
           Guardar
-        </Button>
-      </FormFooterButtons>
+        </DaButton>
+      </DaFooterButtons>
     </form>
   );
 };

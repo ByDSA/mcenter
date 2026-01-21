@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AddBox, Cancel } from "@mui/icons-material";
-import { FormInputText } from "#modules/ui-kit/form/input/Text/FormInputText";
+import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
 import styles from "./styles.module.css";
 
 type Props = {
@@ -56,7 +56,7 @@ export const FormInputTags = ( { value = [], onChange, onEmptyEnter }: Props) =>
       ))}
 
       <div className={styles.inputWrapper}>
-        <FormInputText
+        <DaInputText
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}

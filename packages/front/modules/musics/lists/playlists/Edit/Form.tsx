@@ -2,12 +2,12 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
-import { FormInputText } from "#modules/ui-kit/form/input/Text/FormInputText";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
+import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { ErrorView } from "#modules/ui-kit/form/Error";
-import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
+import { DaErrorView } from "#modules/ui-kit/form/Error";
+import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
 import { MusicPlaylistsApi } from "../requests";
 import { MusicPlaylistEntity } from "../models";
@@ -88,20 +88,20 @@ export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }:
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FormLabel>Nombre</FormLabel>
-        <FormInputText
+        <DaLabel>Nombre</DaLabel>
+        <DaInputText
           {...register("name")}
           autoFocus
         />
-        <ErrorView errors={errors} keyName="name" touchedFields={touchedFields} />
+        <DaErrorView errors={errors} keyName="name" touchedFields={touchedFields} />
 
-        <FormLabel>Url slug</FormLabel>
-        <FormInputText
+        <DaLabel>Url slug</DaLabel>
+        <DaInputText
           {...register("slug")}
         />
-        <ErrorView errors={errors} keyName="slug" touchedFields={touchedFields} />
+        <DaErrorView errors={errors} keyName="slug" touchedFields={touchedFields} />
 
-        <FormLabel>Visibilidad</FormLabel>
+        <DaLabel>Visibilidad</DaLabel>
         <FormVisibility
           value={currentVisibility}
           setValue= {(newVal) => {
@@ -110,9 +110,9 @@ export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }:
               shouldDirty: true,
             } );
           }} />
-        <ErrorView errors={errors} keyName="visibility" touchedFields={touchedFields} />
+        <DaErrorView errors={errors} keyName="visibility" touchedFields={touchedFields} />
 
-        <FormLabel>Imagen</FormLabel>
+        <DaLabel>Imagen</DaLabel>
         <ImageCoverSelectorButton
           onSelect={(imageCover) => {
             setValue("imageCoverId", imageCover?.id ?? null, {
@@ -122,18 +122,18 @@ export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }:
           }}
           currentId={currentImageCoverId}
         />
-        <ErrorView errors={errors} keyName="imageCoverId" touchedFields={touchedFields} />
+        <DaErrorView errors={errors} keyName="imageCoverId" touchedFields={touchedFields} />
 
-        <FormFooterButtons>
-          <Button
+        <DaFooterButtons>
+          <DaButton
             type="submit"
             theme="white"
             isSubmitting={isSubmitting}
             disabled={!isValid || !isDirty}
           >
             Editar
-          </Button>
-        </FormFooterButtons>
+          </DaButton>
+        </DaFooterButtons>
       </form>
     </>
   );

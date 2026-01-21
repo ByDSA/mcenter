@@ -1,4 +1,4 @@
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import styles from "./styles.module.css";
 
@@ -21,13 +21,13 @@ export const useRequireActiveAction = (props: Props) => {
             await props.onFinally?.();
           },
           content: <>
-            <Button
+            <DaButton
               className={styles.button}
               theme="blue"
               onClick={async ()=> {
                 await props.action;
                 modal.closeModal();
-              }}><p>Click para</p><p>Reproducir música</p></Button>
+              }}><p>Click para</p><p>Reproducir música</p></DaButton>
           </>,
         } );
       }

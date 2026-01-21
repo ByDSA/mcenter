@@ -1,12 +1,12 @@
 import { HTMLAttributes } from "react";
 import { classes } from "#modules/utils/styles";
-import styles from "./FormInputGroup.module.css";
+import styles from "./InputGroup.module.css";
 
 type Props = HTMLAttributes<HTMLElement> & {
   inline?: boolean;
 };
 
-export const FormInputGroup = ( { children, inline, className, ...otherProps }: Props) => {
+export const DaInputGroup = ( { children, inline, className, ...otherProps }: Props) => {
   return <section
     className={classes(
       styles.group,
@@ -19,7 +19,7 @@ export const FormInputGroup = ( { children, inline, className, ...otherProps }: 
   </section>;
 };
 
-export const FormInputGroupItem = ( { children, inline, className, ...otherProps }: Props) => {
+export const DaInputGroupItem = ( { children, inline, className, ...otherProps }: Props) => {
   return <article
     className={classes(
       styles.item,

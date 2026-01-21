@@ -1,12 +1,12 @@
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
-import { FormInputText } from "#modules/ui-kit/form/input/Text/FormInputText";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
+import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { ErrorView } from "#modules/ui-kit/form/Error";
-import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
+import { DaErrorView } from "#modules/ui-kit/form/Error";
+import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { MusicPlaylistsApi } from "../requests";
 import { FormVisibility } from "../../FormVisibility";
 
@@ -53,14 +53,14 @@ export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <FormLabel>Nombre</FormLabel>
-      <FormInputText
+      <DaLabel>Nombre</DaLabel>
+      <DaInputText
         {...register("name")}
         autoFocus
       />
-      <ErrorView errors={errors} keyName="name" touchedFields={touchedFields} />
+      <DaErrorView errors={errors} keyName="name" touchedFields={touchedFields} />
 
-      <FormLabel>Visibilidad</FormLabel>
+      <DaLabel>Visibilidad</DaLabel>
       <FormVisibility
         value={currentVisibility}
         setValue={(newVal) => {
@@ -69,18 +69,18 @@ export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
           } );
         }}
       />
-      <ErrorView errors={errors} keyName="visibility" touchedFields={touchedFields} />
+      <DaErrorView errors={errors} keyName="visibility" touchedFields={touchedFields} />
 
-      <FormFooterButtons>
-        <Button
+      <DaFooterButtons>
+        <DaButton
           type="submit"
           theme="white"
           isSubmitting={isSubmitting}
           disabled={!isValid}
         >
           Crear
-        </Button>
-      </FormFooterButtons>
+        </DaButton>
+      </DaFooterButtons>
     </form>
   );
 };

@@ -4,8 +4,8 @@ import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { getLongDateStr } from "#modules/utils/dates";
-import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
+import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { SetState } from "#modules/utils/react";
 import { EpisodeHistoryApi } from "../requests";
 import styles from "./DeleteEntryModal.module.css";
@@ -41,24 +41,24 @@ export function DeleteHistoryEntryContextMenuItem( { setValue, value }: Props<Da
       await openModal( {
         title: "Confirmar borrado",
         content: <DeleteHistoryEntryModalContentWrapper>
-          <FormInputGroup>
-            <FormInputGroupItem inline>
-              <FormLabel>Fecha</FormLabel>
+          <DaInputGroup>
+            <DaInputGroupItem inline>
+              <DaLabel>Fecha</DaLabel>
               <span>{getLongDateStr(new Date(value.date.timestamp * 1_000), "datetime")}</span>
-            </FormInputGroupItem>
-            <FormInputGroupItem inline>
-              <FormLabel>Serie</FormLabel>
+            </DaInputGroupItem>
+            <DaInputGroupItem inline>
+              <DaLabel>Serie</DaLabel>
               <span>{value.resource.serie?.name ?? value.resource.compKey.seriesKey}</span>
-            </FormInputGroupItem>
-            <FormInputGroupItem inline>
-              <FormLabel>Episodio</FormLabel>
+            </DaInputGroupItem>
+            <DaInputGroupItem inline>
+              <DaLabel>Episodio</DaLabel>
               <span>{value.resource.compKey.episodeKey}</span>
-            </FormInputGroupItem>
-            <FormInputGroupItem inline>
-              <FormLabel>Título</FormLabel>
+            </DaInputGroupItem>
+            <DaInputGroupItem inline>
+              <DaLabel>Título</DaLabel>
               <span>{value.resource.title}</span>
-            </FormInputGroupItem>
-          </FormInputGroup>
+            </DaInputGroupItem>
+          </DaInputGroup>
         </DeleteHistoryEntryModalContentWrapper>,
         action: async ()=> {
           const api = FetchApi.get(EpisodeHistoryApi);

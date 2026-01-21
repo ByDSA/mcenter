@@ -1,6 +1,6 @@
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
-import styles from "./FormEnumButtons.module.css";
+import styles from "./styles.module.css";
 
 type Option<T extends string> = {
   value: T;
@@ -13,7 +13,7 @@ type Props<T extends string> = {
   onChange: (value: T)=> void;
 };
 
-export const FormEnumButtons = <T extends string>( { options,
+export const DaEnumButtons = <T extends string>( { options,
   currentValue,
   onChange }: Props<T>) => {
   return (
@@ -22,7 +22,7 @@ export const FormEnumButtons = <T extends string>( { options,
         const isActive = currentValue === opt.value;
 
         return (
-          <Button
+          <DaButton
             key={opt.value}
             type="button"
             onClick={() => onChange(opt.value)}
@@ -30,7 +30,7 @@ export const FormEnumButtons = <T extends string>( { options,
             className={classes(styles.toggleButton, isActive ? styles.active : styles.inactive)}
           >
             {opt.label}
-          </Button>
+          </DaButton>
         );
       } )}
     </div>

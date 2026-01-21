@@ -5,7 +5,7 @@ type Props = {
   children: React.ReactNode;
   className?: string;
 };
-export const FormFooterButtons = ( { className, children }: Props) => {
+export const DaFooterButtons = ( { className, children }: Props) => {
   return (
     <footer className={classes(styles.footer, className)}>
       {children}

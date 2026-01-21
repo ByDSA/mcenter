@@ -9,8 +9,8 @@ import { backendUrl } from "#modules/requests";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { LatestViewsView } from "#modules/history/Latest/LatestViewsDisplay";
 import { Separator } from "#modules/resources/Separator/Separator";
-import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
+import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
 import { EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
 
@@ -72,17 +72,17 @@ export function EpisodeLatestViews(props: Props) {
     return element;
 
   return <>
-    <FormInputGroup>
-      <FormInputGroupItem inline>
-        <FormLabel>Título</FormLabel>
+    <DaInputGroup>
+      <DaInputGroupItem inline>
+        <DaLabel>Título</DaLabel>
         <span>{props.episode.title}</span>
-      </FormInputGroupItem>
-      <FormInputGroupItem inline>
-        <FormLabel>Episodio</FormLabel>
+      </DaInputGroupItem>
+      <DaInputGroupItem inline>
+        <DaLabel>Episodio</DaLabel>
         <span><span>{props.episode.serie?.name
         ?? props.episode.compKey.seriesKey}</span><Separator /><span>{props.episode.compKey.episodeKey}</span></span>
-      </FormInputGroupItem>
-    </FormInputGroup>
+      </DaInputGroupItem>
+    </DaInputGroup>
     {element}
   </>;
 }

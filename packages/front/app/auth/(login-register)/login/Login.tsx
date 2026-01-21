@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { Facebook, GitHub, Person, Twitter } from "@mui/icons-material";
 import { LocalLoginBody } from "$shared/models/auth/dto";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import styles from "../styles.module.css";
 import { LoginRegisterForm } from "../Form";
@@ -121,7 +121,7 @@ export const LoginComponent = ( { handleForgotPass,
 
         {passwordElement}
 
-        <Button
+        <DaButton
           theme={"dark-gray"}
           type="submit"
           className={classes(styles.loginButton, isLoading && styles.loading)}
@@ -142,7 +142,7 @@ export const LoginComponent = ( { handleForgotPass,
                 Iniciar Sesión
               </>
             )}
-        </Button>
+        </DaButton>
         {handleForgotPass
         && <div className={styles.forgotPassword}>
           <a onClick={()=>handleForgotPass()}>¿Olvidaste tu contraseña?</a>

@@ -1,15 +1,15 @@
 import { useState, useCallback } from "react";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useFormInModal } from "#modules/ui-kit/modal/useFormModal";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SearchBarView } from "#modules/ui-kit/SearchBar";
 import { classes } from "#modules/utils/styles";
-import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
+import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
-import { FormLabel } from "../../ui-kit/form/Label/FormLabel";
+import { DaLabel } from "../../ui-kit/form/Label/Label";
 import { NewImageCoverButton } from "../New/Button";
 import { useImageCover } from "../hooks";
 import styles from "./Selector.module.css";
@@ -69,7 +69,7 @@ export function ImageCoverSelector(
     <div className={styles.selector}>
       <header className={styles.header}>
         {current !== null && <aside className={styles.currentCoverSection}>
-          <FormLabel>Actual</FormLabel>
+          <DaLabel>Actual</DaLabel>
           <MusicImageCover
             size="medium"
             editable
@@ -135,32 +135,32 @@ export function ImageCoverSelector(
         ))}
       </div>
 
-      <FormFooterButtons>
+      <DaFooterButtons>
         <aside>
-          <Button
+          <DaButton
             onClick={() => setSelectedId(null)}
             className={classes(styles.null, selectedId === null && styles.selected)}
             theme="white"
           >
           Ninguna
-          </Button>
+          </DaButton>
         </aside>
         <aside>
-          <Button
+          <DaButton
             onClick={modal.closeModal}
             theme="white"
           >
           Cancelar
-          </Button>
-          <Button
+          </DaButton>
+          <DaButton
             onClick={form.submit}
             disabled={!form.canSubmit}
             theme="blue"
           >
           Aceptar
-          </Button>
+          </DaButton>
         </aside>
-      </FormFooterButtons>
+      </DaFooterButtons>
     </div>
   );
 }

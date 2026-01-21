@@ -1,6 +1,6 @@
 import { useState, useRef, forwardRef, useImperativeHandle, useCallback, useEffect } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { UploadButton } from "#modules/ui-kit/upload/UploadButton";
 import { classes } from "#modules/utils/styles";
@@ -94,7 +94,7 @@ export const ImageCoverUpload = forwardRef<ImageCoverUploadRef, ImageCoverUpload
       <div className={styles.imageCoverUpload}>
         <div className={styles.previewWithActions}>
           <PreviewImage src={previewUrl ?? undefined} />
-          {file && <Button onClick={()=>clear()} theme="red">Quitar</Button> }
+          {file && <DaButton onClick={()=>clear()} theme="red">Quitar</DaButton> }
         </div>
         <DragAndDropArea
           onFileReady={handleFileSelect}
@@ -161,18 +161,18 @@ function DragAndDropArea( { onFileReady, onError, isLoading, children }: any) {
       <div className={styles.dropActions}>
         <p>Arrastra o selecciona...</p>
         <div className={styles.selectionButtons}>
-          <Button
+          <DaButton
             onClick={() => fileInputRef.current?.click()}
             theme="white"
             left={<span>📂</span>}
             disabled={isLoading}
-          >Disco</Button>
-          <Button
+          >Disco</DaButton>
+          <DaButton
             onClick={handleUrlPaste}
             theme="white"
             disabled={isLoading}
             left={<span>📋</span>}
-          >URL</Button>
+          >URL</DaButton>
         </div>
         <input
           type="file"

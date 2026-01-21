@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { formatDate, DateFormat } from "#modules/utils/dates";
 import { classes } from "#modules/utils/styles";
-import { FormInputGroup } from "#modules/ui-kit/form/FormInputGroup";
+import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
 import styles from "./Latest.module.css";
 
 const DATE_FORMAT_DEFAULT: DateFormat = {
@@ -30,7 +30,7 @@ export const LatestViewsView = ( { dates, dateFormat = DATE_FORMAT_DEFAULT }: Pr
     return <span>No se había reproducido antes.</span>;
 
   return (
-    <FormInputGroup className={styles.group}>
+    <DaInputGroup className={styles.group}>
       {dates.map((ts, i) => {
         const firstLine = formatDate(new Date(ts * 1000), {
           ...dateFormat,
@@ -48,6 +48,6 @@ export const LatestViewsView = ( { dates, dateFormat = DATE_FORMAT_DEFAULT }: Pr
           </div>
         );
       } )}
-    </FormInputGroup>
+    </DaInputGroup>
   );
 };

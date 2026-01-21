@@ -1,5 +1,5 @@
 import { Add } from "@mui/icons-material";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import styles from "./NewPlaylistButton.module.css";
 import { NewPlaylistModalProps, useNewPlaylistModal } from "./Modal";
 
@@ -13,7 +13,7 @@ export const NewPlaylistButton = ( { onSuccess, theme }: ButtonProps) => {
   } );
 
   return (
-    <Button
+    <DaButton
       theme={theme}
       onClick={openModal}
       left={
@@ -23,6 +23,6 @@ export const NewPlaylistButton = ( { onSuccess, theme }: ButtonProps) => {
       }
     >
       Nueva lista
-    </Button>
+    </DaButton>
   );
 };

@@ -3,7 +3,7 @@ import { LocalSignUpBody } from "$shared/models/auth/dto";
 import { Email, Person } from "@mui/icons-material";
 import { showError } from "$shared/utils/errors/showError";
 import z from "zod";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import styles from "../styles.module.css";
 import { LoginRegisterForm } from "../Form";
@@ -134,7 +134,7 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
       {passwordRepeatElement}
       {firstNameElement}
       {lastNameElement}
-      <Button
+      <DaButton
         className={classes(styles.loginButton, isLoading && styles.loading)}
         disabled={isLoading || !allIsValid}
         onClick={handleSubmit}
@@ -150,7 +150,7 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
                 Crear cuenta
             </>
           )}
-      </Button>
+      </DaButton>
     </div>
     {handleGotoLogin
     && <div className={styles.signupPrompt}>

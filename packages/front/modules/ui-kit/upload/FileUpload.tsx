@@ -3,7 +3,7 @@ import { CloudUpload, InsertDriveFile, Close, CheckCircle, Error as ErrorIcon } 
 import { showError } from "$shared/utils/errors/showError";
 import { classes } from "#modules/utils/styles";
 import { Separator } from "#modules/resources/Separator/Separator";
-import { Button } from "../form/input/Button/Button";
+import { DaButton } from "../form/input/Button/Button";
 import styles from "./FileUpload.module.css";
 import { UploadButton } from "./UploadButton";
 
@@ -225,13 +225,13 @@ ${acceptedTypesDisplay}`,
           onClick={uploadFiles}
         />
 
-        <Button
+        <DaButton
           className={styles.selectButton}
           onClick={onButtonClick}
           disabled={isUploading}
         >
           {buttonText}
-        </Button>
+        </DaButton>
         <span className={styles.dragText}>o arrastra y suelta</span>
         {acceptedTypes.length > 0 && (
           <p className={styles.fileRestrictions}>

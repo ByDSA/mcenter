@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { classes } from "#modules/utils/styles";
-import styles from "./Button.module.css";
+import styles from "./styles.module.css";
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   left?: JSX.Element;
@@ -10,7 +10,7 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isSubmitting?: boolean;
 };
 
-export const Button = ( { children, left, right,
+export const DaButton = ( { children, left, right,
   isSubmitting = false,
   theme = "dark-gray", disabled, ...buttonProps }: Props) => {
   let content = (<>

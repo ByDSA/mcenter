@@ -2,20 +2,20 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { logger } from "#modules/core/logger";
 import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
-import { FormInputGroup, FormInputGroupItem } from "#modules/ui-kit/form/FormInputGroup";
-import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
-import { FormInputText } from "#modules/ui-kit/form/input/Text/FormInputText";
-import { ErrorView } from "#modules/ui-kit/form/Error";
-import { FormInputErrorWrap } from "#modules/ui-kit/form/FormInputErrorWrap";
+import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
+import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
+import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
+import { DaErrorView } from "#modules/ui-kit/form/Error";
+import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
 import { getMediumCoverUrl } from "../Selector/image-cover-utils";
-import { FormLabel } from "../../ui-kit/form/Label/FormLabel";
+import { DaLabel } from "../../ui-kit/form/Label/Label";
 import styles from "./Editor.module.css";
 import { ImageCoverUpload, PreviewImage, ImageCoverUploadRef } from "./UploadImage";
 
@@ -118,61 +118,61 @@ export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditor
   return (
     <form className={styles.editor} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.mainSection}>
-        <FormInputGroup className={styles.fieldGroup}>
-          <FormLabel>Etiqueta</FormLabel>
-          <FormInputErrorWrap>
-            <FormInputText
+        <DaInputGroup className={styles.fieldGroup}>
+          <DaLabel>Etiqueta</DaLabel>
+          <DaInputErrorWrap>
+            <DaInputText
               {...register("label")}
             />
-            <ErrorView errors={errors} keyName="label" touchedFields={dirtyFields} />
-          </FormInputErrorWrap>
-        </FormInputGroup>
+            <DaErrorView errors={errors} keyName="label" touchedFields={dirtyFields} />
+          </DaInputErrorWrap>
+        </DaInputGroup>
 
-        <FormInputGroup className={styles.imagesSection}>
-          <FormInputGroupItem>
-            <FormLabel>Actual</FormLabel>
+        <DaInputGroup className={styles.imagesSection}>
+          <DaInputGroupItem>
+            <DaLabel>Actual</DaLabel>
             <div className={styles.currentCoverWrap}>
               <PreviewImage src={getMediumCoverUrl(currentEntity)} />
             </div>
-          </FormInputGroupItem>
+          </DaInputGroupItem>
 
-          <FormInputGroupItem>
-            <FormLabel>Reemplazar Imagen</FormLabel>
+          <DaInputGroupItem>
+            <DaLabel>Reemplazar Imagen</DaLabel>
             <ImageCoverUpload
               ref={uploadRef}
               entityId={currentEntity.id}
               hideUploadButton={true}
               onFileChange={(file) => setHasNewFile(!!file)}
             />
-          </FormInputGroupItem>
-        </FormInputGroup>
+          </DaInputGroupItem>
+        </DaInputGroup>
       </div>
 
-      <FormFooterButtons>
+      <DaFooterButtons>
         <aside>
-          <Button
+          <DaButton
             onClick={handleDelete}
             theme="red"
             disabled={isSubmitting}
             type="button" // Importante para no disparar el submit del form
           >
             Borrar
-          </Button>
+          </DaButton>
         </aside>
         <aside>
-          <Button onClick={modal.closeModal} theme="white" type="button" disabled={isSubmitting}>
+          <DaButton onClick={modal.closeModal} theme="white" type="button" disabled={isSubmitting}>
             Cerrar
-          </Button>
-          <Button
+          </DaButton>
+          <DaButton
             type="submit"
             theme="blue"
             disabled={!canSave || isSubmitting}
             isSubmitting={isSubmitting}
           >
             Guardar
-          </Button>
+          </DaButton>
         </aside>
-      </FormFooterButtons>
+      </DaFooterButtons>
     </form>
   );
 }

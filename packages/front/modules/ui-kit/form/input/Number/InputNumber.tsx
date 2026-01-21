@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { classes } from "#modules/utils/styles";
-import { updateNull } from "../Text/FormInputText";
-import styles from "../Text/FormInputText.module.css";
+import { updateNull } from "../Text/InputText";
+import textStyles from "../Text/styles.module.css";
 
 type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   nullable?: boolean;
@@ -26,7 +26,7 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   minDecimals?: number;
 };
 
-export const FormInputNumber = forwardRef<HTMLInputElement, Props>(
+export const DaInputNumber = forwardRef<HTMLInputElement, Props>(
   (
     { className,
       nullable,
@@ -136,7 +136,7 @@ export const FormInputNumber = forwardRef<HTMLInputElement, Props>(
         step={derivedStep}
         className={classes(
           "ui-kit-input-number",
-          nullable && styles.nullable,
+          nullable && textStyles.nullable,
           className,
         )}
         value={props.value !== undefined ? getFormattedValue(props.value.toString()) : props.value}
@@ -147,4 +147,4 @@ export const FormInputNumber = forwardRef<HTMLInputElement, Props>(
   },
 );
 
-FormInputNumber.displayName = "FormInputNumber";
+DaInputNumber.displayName = "DaInputNumber";

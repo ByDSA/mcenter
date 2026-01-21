@@ -8,20 +8,20 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicsApi } from "#modules/musics/requests";
 import { MusicUserInfosApi } from "#modules/musics/user-info.requests";
 import { ImageCoversApi } from "#modules/image-covers/requests";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { ErrorView } from "#modules/ui-kit/form/Error";
-import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
+import { DaErrorView } from "#modules/ui-kit/form/Error";
+import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
 import { useFileInfosModal } from "#modules/musics/file-info/Edit/Modal";
 import { classes } from "#modules/utils/styles";
-import { FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";
+import { DaInputTextMultiline } from "#modules/ui-kit/form/input/Text/InputText";
 import { useMusic } from "#modules/musics/hooks";
-import { FormInputNumber } from "../../../ui-kit/form/input/Number/FormInputNumber";
-import { FormInputBooleanCheckbox } from "../../../ui-kit/form/input/Boolean/FormInputBoolean";
-import { FormInputGroup, FormInputGroupItem } from "../../../ui-kit/form/FormInputGroup";
-import { FormInputErrorWrap } from "../../../ui-kit/form/FormInputErrorWrap";
+import { DaInputNumber } from "../../../ui-kit/form/input/Number/InputNumber";
+import { DaInputBooleanCheckbox } from "../../../ui-kit/form/input/Boolean/InputBoolean";
+import { DaInputGroup, DaInputGroupItem } from "../../../ui-kit/form/InputGroup";
+import { DaInputErrorWrap } from "../../../ui-kit/form/InputErrorWrap";
 import { FormInputTags } from "../../../resources/FormInputTags/FormInputTags";
 import styles from "./styles.module.css";
 
@@ -247,10 +247,10 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
       title: "Confirmar borrado",
       content: <>
         <p>¿Estás seguro de borrar esta música?</p>
-        <FormInputGroup inline>
-          <FormLabel>Título</FormLabel>
+        <DaInputGroup inline>
+          <DaLabel>Título</DaLabel>
           <span>{initialData.title}</span>
-        </FormInputGroup>
+        </DaInputGroup>
       </>,
       action: async () => {
         const api = FetchApi.get(MusicsApi);
@@ -265,49 +265,49 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.container}>
-      <FormInputGroup inline>
-        <FormLabel>Título</FormLabel>
-        <FormInputErrorWrap>
-          <FormInputTextMultiline
+      <DaInputGroup inline>
+        <DaLabel>Título</DaLabel>
+        <DaInputErrorWrap>
+          <DaInputTextMultiline
             {...register("title")}
           />
-          <ErrorView errors={errors} keyName="title" touchedFields={dirtyFields} />
-        </FormInputErrorWrap>
-      </FormInputGroup>
-      <FormInputGroup inline>
-        <FormLabel>Artista</FormLabel>
-        <FormInputErrorWrap>
-          <FormInputTextMultiline
+          <DaErrorView errors={errors} keyName="title" touchedFields={dirtyFields} />
+        </DaInputErrorWrap>
+      </DaInputGroup>
+      <DaInputGroup inline>
+        <DaLabel>Artista</DaLabel>
+        <DaInputErrorWrap>
+          <DaInputTextMultiline
             {...register("artist")}
           />
-          <ErrorView errors={errors} keyName="artist" touchedFields={dirtyFields} />
-        </FormInputErrorWrap>
-      </FormInputGroup>
+          <DaErrorView errors={errors} keyName="artist" touchedFields={dirtyFields} />
+        </DaInputErrorWrap>
+      </DaInputGroup>
 
-      <FormInputGroup inline>
+      <DaInputGroup inline>
         <article>
-          <FormLabel>Peso</FormLabel>
-          <FormInputErrorWrap>
-            <FormInputNumber
+          <DaLabel>Peso</DaLabel>
+          <DaInputErrorWrap>
+            <DaInputNumber
               {...register("weight", {
                 valueAsNumber: true,
               } )}
               className={styles.weight}
             />
-            <ErrorView errors={errors} keyName="weight" touchedFields={dirtyFields} />
-          </FormInputErrorWrap>
+            <DaErrorView errors={errors} keyName="weight" touchedFields={dirtyFields} />
+          </DaInputErrorWrap>
         </article>
-        <FormInputGroupItem>
-          <FormLabel>Álbum</FormLabel>
-          <FormInputTextMultiline
+        <DaInputGroupItem>
+          <DaLabel>Álbum</DaLabel>
+          <DaInputTextMultiline
             {...register("album")}
             nullable
           />
-        </FormInputGroupItem>
-      </FormInputGroup>
+        </DaInputGroupItem>
+      </DaInputGroup>
 
-      <FormInputGroup>
-        <FormLabel>Tags (usa # para tags globales)</FormLabel>
+      <DaInputGroup>
+        <DaLabel>Tags (usa # para tags globales)</DaLabel>
         <Controller
           control={control}
           name="tags"
@@ -321,20 +321,20 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
             />
           )}
         />
-      </FormInputGroup>
+      </DaInputGroup>
 
-      <FormInputGroup inline>
-        <FormLabel>Slug</FormLabel>
-        <FormInputErrorWrap>
-          <FormInputTextMultiline
+      <DaInputGroup inline>
+        <DaLabel>Slug</DaLabel>
+        <DaInputErrorWrap>
+          <DaInputTextMultiline
             {...register("slug")}
           />
-          <ErrorView errors={errors} keyName="slug" touchedFields={dirtyFields} />
-        </FormInputErrorWrap>
-      </FormInputGroup>
+          <DaErrorView errors={errors} keyName="slug" touchedFields={dirtyFields} />
+        </DaInputErrorWrap>
+      </DaInputGroup>
 
-      <FormInputGroup inline>
-        <FormLabel>Imagen</FormLabel>
+      <DaInputGroup inline>
+        <DaLabel>Imagen</DaLabel>
         <Controller
           control={control}
           name="imageCoverId"
@@ -345,7 +345,7 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
             />
           )}
         />
-      </FormInputGroup>
+      </DaInputGroup>
 
       <OptionalPropsButton
         isVisible={showOptional}
@@ -353,99 +353,99 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
       />
 
       <div>
-        <FormInputGroup inline>
+        <DaInputGroup inline>
           {(showOptional || initialData.year !== undefined || dirtyFields.year !== undefined)
-          && <FormInputGroupItem className={styles.flex0}>
-            <FormLabel>Año</FormLabel>
-            <FormInputErrorWrap>
-              <FormInputNumber
+          && <DaInputGroupItem className={styles.flex0}>
+            <DaLabel>Año</DaLabel>
+            <DaInputErrorWrap>
+              <DaInputNumber
                 {...register("year", {
                   setValueAs: (v) => (v === "" || isNaN(v) ? undefined : Number(v)),
                 } )}
                 className={styles.year}
                 nullable
               />
-              <ErrorView errors={errors} keyName="year" touchedFields={dirtyFields} />
-            </FormInputErrorWrap>
-          </FormInputGroupItem>}
+              <DaErrorView errors={errors} keyName="year" touchedFields={dirtyFields} />
+            </DaInputErrorWrap>
+          </DaInputGroupItem>}
           {(showOptional || initialData.disabled !== undefined
             || dirtyFields.disabled !== undefined)
-        && <FormInputGroupItem className={styles.flex0}>
-          <FormLabel>Desactivado</FormLabel>
-          <FormInputErrorWrap>
+        && <DaInputGroupItem className={styles.flex0}>
+          <DaLabel>Desactivado</DaLabel>
+          <DaInputErrorWrap>
             <Controller
               control={control}
               name="disabled"
               render={( { field } ) => (
-                <FormInputBooleanCheckbox
+                <DaInputBooleanCheckbox
                   value={field.value!}
                   onChange={field.onChange}
                 />
               )}
             />
-          </FormInputErrorWrap>
-        </FormInputGroupItem>
+          </DaInputErrorWrap>
+        </DaInputGroupItem>
           }
           {(showOptional || initialData.country !== undefined || dirtyFields.country !== undefined)
-        && <FormInputGroupItem>
-          <FormLabel>País</FormLabel>
-          <FormInputErrorWrap>
-            <FormInputTextMultiline
+        && <DaInputGroupItem>
+          <DaLabel>País</DaLabel>
+          <DaInputErrorWrap>
+            <DaInputTextMultiline
               {...register("country")}
               nullable
             />
-          </FormInputErrorWrap>
-        </FormInputGroupItem>
+          </DaInputErrorWrap>
+        </DaInputGroupItem>
           }
-        </FormInputGroup>
+        </DaInputGroup>
 
         {(showOptional || initialData.game !== undefined || dirtyFields.game !== undefined)
-        && <FormInputGroup inline>
-          <FormLabel>Juego</FormLabel>
-          <FormInputErrorWrap>
-            <FormInputTextMultiline
+        && <DaInputGroup inline>
+          <DaLabel>Juego</DaLabel>
+          <DaInputErrorWrap>
+            <DaInputTextMultiline
               {...register("game")}
               nullable
             />
-          </FormInputErrorWrap>
-        </FormInputGroup>
+          </DaInputErrorWrap>
+        </DaInputGroup>
         }
         {(showOptional || initialData.spotifyId !== undefined
           || dirtyFields.spotifyId !== undefined)
-        && <FormInputGroup inline>
-          <FormLabel>Spotify ID</FormLabel>
-          <FormInputErrorWrap>
-            <FormInputTextMultiline
+        && <DaInputGroup inline>
+          <DaLabel>Spotify ID</DaLabel>
+          <DaInputErrorWrap>
+            <DaInputTextMultiline
               {...register("spotifyId")}
               nullable
             />
-          </FormInputErrorWrap>
-        </FormInputGroup>
+          </DaInputErrorWrap>
+        </DaInputGroup>
         }
       </div>
 
-      <FormFooterButtons className={styles.footer}>
+      <DaFooterButtons className={styles.footer}>
         <aside>
           <EditFileInfosButton
             musicId={initialData.id}
           />
         </aside>
         <aside>
-          <Button theme="red"
+          <DaButton theme="red"
             onClick={handleDelete}
             disabled={isSubmitting}>
             Eliminar
-          </Button>
-          <Button
+          </DaButton>
+          <DaButton
             type="submit"
             theme="blue"
             disabled={!isDirty || !isValid || isSubmitting}
             isSubmitting={isSubmitting}
           >
             Guardar
-          </Button>
+          </DaButton>
         </aside>
-      </FormFooterButtons>
+      </DaFooterButtons>
     </form>
   );
 };
@@ -454,9 +454,9 @@ export function EditFileInfosButton(props: Parameters<typeof useFileInfosModal>[
   const { openModal } = useFileInfosModal(props);
 
   return (
-    <Button theme="white" onClick={async () => await openModal()}>
+    <DaButton theme="white" onClick={async () => await openModal()}>
       Editar archivos
-    </Button>
+    </DaButton>
   );
 }
 

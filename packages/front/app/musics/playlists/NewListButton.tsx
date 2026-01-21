@@ -1,7 +1,7 @@
 import { Add } from "@mui/icons-material";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { MusicSmartPlaylistEntity } from "$shared/models/musics/smart-playlists";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { NewSmartPlaylistContextMenuItem } from "#modules/musics/lists/smart-playlists/New/ContextMenuItem";
 import { NewPlaylistContextMenuItem } from "#modules/musics/lists/playlists/New/ContextMenuItem";
@@ -15,7 +15,7 @@ type Props = {
 export const NewListButton = (props: Props) => {
   const { openMenu } = useContextMenuTrigger();
 
-  return <Button
+  return <DaButton
     theme="dark-gray"
     left={<span className={styles.left}><Add /></span>}
     onClick={(e)=>openMenu( {
@@ -26,5 +26,5 @@ export const NewListButton = (props: Props) => {
         <PlaySmartPlaylistContextMenuItem />
       </>,
     } )}
-  >Nueva</Button>;
+  >Nueva</DaButton>;
 };

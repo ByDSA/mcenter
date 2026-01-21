@@ -2,12 +2,12 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
-import { ErrorView } from "#modules/ui-kit/form/Error";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
+import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
-import { FormFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FormFooterButtons";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
-import { FormInputTextMultiline } from "#modules/ui-kit/form/input/Text/FormInputText";
+import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
+import { DaInputTextMultiline } from "#modules/ui-kit/form/input/Text/InputText";
 import styles from "./Modal.module.css";
 
 type FormProps = {
@@ -46,24 +46,24 @@ const PlaySmartPlaylistForm = ( { initialValue }: FormProps) => {
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <section>
-          <FormLabel>Query</FormLabel>
-          <FormInputTextMultiline
+          <DaLabel>Query</DaLabel>
+          <DaInputTextMultiline
             {...register("query")}
             autoFocus
           />
-          <ErrorView errors={errors} keyName="query" touchedFields={touchedFields} />
+          <DaErrorView errors={errors} keyName="query" touchedFields={touchedFields} />
         </section>
 
-        <FormFooterButtons>
-          <Button
+        <DaFooterButtons>
+          <DaButton
             type="submit"
             theme="white"
             isSubmitting={isSubmitting}
             disabled={!isValid}
           >
             Reproducir
-          </Button>
-        </FormFooterButtons>
+          </DaButton>
+        </DaFooterButtons>
       </form>
     </>
   );

@@ -1,7 +1,7 @@
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { FormInputGroup } from "#modules/ui-kit/form/FormInputGroup";
-import { FormLabel } from "#modules/ui-kit/form/Label/FormLabel";
+import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
+import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { MusicPlaylistEntity, musicPlaylistEntitySchema } from "../models";
@@ -23,10 +23,10 @@ export function useDeletePlayListModal(
         title: "Confirmar borrado",
         content: <>
           <p>¿Estás seguro de que deseas eliminar esta lista?</p>
-          <FormInputGroup inline>
-            <FormLabel>Nombre</FormLabel>
+          <DaInputGroup inline>
+            <DaLabel>Nombre</DaLabel>
             <span>{data.name}</span>
-          </FormInputGroup>
+          </DaInputGroup>
         </>,
         onFinish,
         onActionSuccess,

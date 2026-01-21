@@ -1,5 +1,5 @@
 import { Add } from "@mui/icons-material";
-import { Button } from "#modules/ui-kit/form/input/Button/Button";
+import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { NewImageCoverProps } from "./Form";
 import { useNewImageCoverModal } from "./Modal";
 
@@ -12,7 +12,7 @@ export function NewImageCoverButton(props: Props) {
   const txt = "Nueva imagen";
 
   return (
-    <Button
+    <DaButton
       theme="white"
       className={props.className}
       onClick={async (e) => {
@@ -21,6 +21,6 @@ export function NewImageCoverButton(props: Props) {
       }}
       title={txt}
       left={<Add />}
-    >{txt}</Button>
+    >{txt}</DaButton>
   );
 }
