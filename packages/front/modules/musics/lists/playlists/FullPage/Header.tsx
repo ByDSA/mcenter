@@ -58,15 +58,8 @@ export const PlaylistHeader = ( { totalSongs,
                 isPublic={data.visibility === "public"}
                 className={styles.statItem}
               />
-            </div>
-            <div className={styles.row}>
-              <div
-                className={classes(styles.statItem)}
-                title="Fecha de creación"
-              >
-                <CalendarToday />
-                <span>{formatDateDDMMYYY(data.createdAt)}</span>
-              </div>
+              <Separator />
+              <DateTag date={data.createdAt} />
             </div>
           </div>
         </div>
@@ -101,4 +94,16 @@ export const PlaylistHeader = ( { totalSongs,
       </div>
     </div>
   );
+};
+
+export const DateTag = ( { date }: {date: Date} ) => {
+  return <div
+    className={classes(styles.statItem)}
+    title="Fecha de creación"
+  >
+    <span>
+      <CalendarToday />
+    </span>
+    <span>{formatDateDDMMYYY(date)}</span>
+  </div>;
 };

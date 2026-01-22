@@ -21,8 +21,7 @@
   background: var(--color-gray-900);
   color: var(--color-gray-100);
   border-radius: 8px;
-  padding: 24px;
-  padding-top: 0;
+  padding: 0;
   position: relative;
   max-width: 90%;
   max-height: 90vh;
@@ -33,6 +32,9 @@
   justify-content: center;
   flex-flow: column nowrap;
   overflow: hidden;
+
+  /* Esto evita que el scroll "burbujee" al padre (body) cuando el modal llega al tope */
+  overscroll-behavior: contain;
 }
 
 .modal > header {
@@ -77,4 +79,9 @@
   flex-flow: column nowrap;
   flex: 1;
   overflow: auto;
+  padding-bottom: 24px;
+}
+
+.modal > header, .content {
+  padding: 0 24px;
 }

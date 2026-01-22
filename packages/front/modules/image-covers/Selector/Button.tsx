@@ -8,7 +8,8 @@ export function ImageCoverSelectorButton(props: ImageCoverSelectorProps) {
   const { openModal } = useImageCoverSelectorModal(props);
   const { data: current } = useImageCover(props.currentId ?? null);
 
-  return <span
+  return <button
+    type="button"
     className={styles.button}
     onClick={async ()=> {
       await openModal();
@@ -19,5 +20,5 @@ export function ImageCoverSelectorButton(props: ImageCoverSelectorProps) {
       cover={current}
     />
     <span>{current?.metadata.label ?? "(Imagen no definida)"}</span>
-  </span>;
+  </button>;
 }

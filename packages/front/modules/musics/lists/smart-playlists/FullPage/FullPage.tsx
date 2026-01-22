@@ -1,18 +1,19 @@
-import { CalendarToday, Code } from "@mui/icons-material";
+import { Code } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { ResourcePlayButtonView } from "#modules/resources/PlayButton/PlayButton";
-import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { classes } from "#modules/utils/styles";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
 import { Separator } from "#modules/resources/Separator/Separator";
 import playlistStyles from "../../playlists/FullPage/Playlist.module.css";
+import playlistHeaderStyles from "../../playlists/FullPage/Header.module.css";
 import { MusicSmartPlaylistEntity } from "../models";
 import { MusicSmartPlaylistSettingsButton } from "../SettingsButton/Settings";
+import { DateTag } from "../../playlists/FullPage/Header";
 import styles from "./styles.module.css";
 
 export const MusicSmartPlaylistFullPage = () => {
@@ -38,24 +39,24 @@ export const MusicSmartPlaylistFullPage = () => {
   };
 
   return (
-    <div className={playlistStyles.playlistContainer}>
-      <div className={playlistStyles.playlistHeader}>
-        <div className={playlistStyles.headerContent}>
+    <div className={playlistStyles.container}>
+      <div className={playlistHeaderStyles.playlistHeader}>
+        <div className={playlistHeaderStyles.headerContent}>
           <MusicImageCover
             title={data.name}
-            className={playlistStyles.playlistCover}
+            className={playlistHeaderStyles.playlistCover}
             cover={imageCover}
           />
 
-          <div className={playlistStyles.playlistInfo}>
-            <span className={playlistStyles.playlistTitle}>
+          <div className={playlistHeaderStyles.playlistInfo}>
+            <span className={playlistHeaderStyles.playlistTitle}>
               <h1>{data.name}</h1>
             </span>
 
-            <div className={playlistStyles.playlistStats}>
-              <div className={playlistStyles.row}>
+            <div className={playlistHeaderStyles.playlistStats}>
+              <div className={playlistHeaderStyles.row}>
                 <div
-                  className={classes(playlistStyles.statItem)}
+                  className={classes(playlistHeaderStyles.statItem)}
                   title="Smart Playlist"
                 >
                   Smart Playlist
@@ -63,24 +64,16 @@ export const MusicSmartPlaylistFullPage = () => {
                 <Separator />
                 <VisibilityTag
                   isPublic={data.visibility === "public"}
-                  className={playlistStyles.statItem}
+                  className={playlistHeaderStyles.statItem}
                 />
-
-              </div>
-              <div className={playlistStyles.row}>
-                <div
-                  className={classes(playlistStyles.statItem)}
-                  title="Fecha de creación"
-                >
-                  <CalendarToday />
-                  <span>{formatDateDDMMYYY(data.createdAt)}</span>
-                </div>
+                <Separator />
+                <DateTag date={data.createdAt} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className={playlistStyles.playlistControls}>
+        <div className={playlistHeaderStyles.playlistControls}>
           <ResourcePlayButtonView
             onClick={handlePlay}
             status={status}

@@ -1,7 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { useFormInModal } from "#modules/ui-kit/modal/useFormModal";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SearchBarView } from "#modules/ui-kit/SearchBar";
@@ -27,30 +26,26 @@ export function ImageCoverSelector(
   const [results, setResults] = useState<ImageCoverEntity[]>([]);
   const [selectedId, setSelectedId] = useState<string | null | undefined>();
   const modal = useModal(true);
-  const form = useFormInModal( {
-    onSubmit: () => {
-      let selected: ImageCoverEntity | null | undefined;
+  const canSubmit = useMemo(()=>!(selectedId === undefined
+            || (selectedId !== null
+              && !results.find(p=>p.id === selectedId))), [selectedId, results]);
+  const onSubmit = () => {
+    let selected: ImageCoverEntity | null | undefined;
 
-      if (selectedId === null)
-        selected = null;
-      else {
-        selected = results.find(r => r.id === selectedId);
+    if (selectedId === null)
+      selected = null;
+    else {
+      selected = results.find(r => r.id === selectedId);
 
-        if (!selected)
-          return;
-      }
+      if (!selected)
+        return;
+    }
 
-      onSelect(selected);
+    onSelect(selected);
+    modal.closeModal();
 
-      return selected;
-    },
-    onSuccess: (_data) => {
-      modal.closeModal();
-    },
-    canSubmit:
-      () => !(selectedId === undefined
-            || (selectedId !== null && !results.find(p=>p.id === selectedId))),
-  } );
+    return selected;
+  };
   const handleSearch = useCallback(async (value: string) => {
     if (!value.trim())
       return;
@@ -67,7 +62,7 @@ export function ImageCoverSelector(
   const { data: current } = useImageCover(currentId ?? null);
 
   return (
-    <div className={styles.selector}>
+    <form className={styles.selector} onSubmit={onSubmit}>
       <header className={styles.header}>
         {current !== null && <aside className={styles.currentCoverSection}>
           <DaLabel>Actual</DaLabel>
@@ -149,14 +144,13 @@ export function ImageCoverSelector(
         <aside>
           <DaCloseModalButton />
           <DaButton
-            onClick={form.submit}
-            disabled={!form.canSubmit}
+            disabled={!canSubmit}
             theme="blue"
           >
           Aceptar
           </DaButton>
         </aside>
       </DaFooterButtons>
-    </div>
+    </form>
   );
 }

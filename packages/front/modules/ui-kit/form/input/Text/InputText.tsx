@@ -67,7 +67,7 @@ export const DaInputTextMultiline = (
     <textarea
       {...textAreaProps}
       ref={setRef}
-      className={classes("ui-kit-input-text", className)}
+      className={classes("ui-kit-input-text", styles.input, className)}
       onChange={handleChange}
       onKeyDown={!newLineOnEnter
         ? (e)=>{
@@ -109,7 +109,7 @@ export const DaInputText = (props: Omit<React.InputHTMLAttributes<HTMLInputEleme
     {...inputProps}
     ref={setRef}
     type="text"
-    className={classes("ui-kit-input-text", className)}
+    className={classes("ui-kit-input-text", styles.input, className)}
     onChange={handleChange}
   />;
 };

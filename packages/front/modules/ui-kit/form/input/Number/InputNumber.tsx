@@ -136,6 +136,7 @@ export const DaInputNumber = forwardRef<HTMLInputElement, Props>(
         step={derivedStep}
         className={classes(
           "ui-kit-input-number",
+          textStyles.input,
           nullable && textStyles.nullable,
           className,
         )}

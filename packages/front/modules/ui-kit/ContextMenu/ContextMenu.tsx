@@ -1,8 +1,8 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useRef, useEffect, ReactNode, MouseEvent, useCallback, createContext, useContext, useMemo } from "react";
 import { classes } from "#modules/utils/styles";
+import { disableInput, enableInput } from "../modal/utils";
 import styles from "./ContextMenu.module.css";
 
 // --- TIPOS ---
@@ -136,29 +136,10 @@ export const ContextMenuProvider = ( { children }: { children: ReactNode } ) => 
     },
     content: null,
   } );
-  // CAMBIO CLAVE: Usamos useRef en lugar de useState.
-  // Esto permite leer/escribir el estado "cerrando" sin forzar re-renders,
-  // y lo más importante: sin cambiar la dependencia de 'openMenu'.
   const isClosingRef = useRef(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const preventDefault = useCallback((e: Event) => e.preventDefault(), []);
-  const disableScroll = useCallback(() => {
-    document.body.style.overflow = "hidden";
-    document.addEventListener("wheel", preventDefault, {
-      passive: false,
-    } );
-    document.addEventListener("touchmove", preventDefault, {
-      passive: false,
-    } );
-  }, [preventDefault]);
-  const enableScroll = useCallback(() => {
-    document.body.style.overflow = "";
-    document.removeEventListener("wheel", preventDefault);
-    document.removeEventListener("touchmove", preventDefault);
-  }, [preventDefault]);
   const openMenu: OpenMenuFn = useCallback(
     ( { content, event, className } ) => {
-      // Leemos la referencia actual. Esto NO crea una dependencia de renderizado.
       if (isClosingRef.current)
         return;
 
@@ -168,7 +149,7 @@ export const ContextMenuProvider = ( { children }: { children: ReactNode } ) => 
       const trigger = event.currentTarget;
       const triggerRect = trigger.getBoundingClientRect();
 
-      disableScroll();
+      disableInput();
 
       setState( {
         className,
@@ -197,12 +178,12 @@ export const ContextMenuProvider = ( { children }: { children: ReactNode } ) => 
         }
       } );
     },
-    [disableScroll],
+    [],
   );
   const closeMenu = useCallback(() => {
     // Actualizamos la referencia sin provocar re-renders
     isClosingRef.current = true;
-    enableScroll();
+    enableInput();
 
     setState((prev) => ( {
       ...prev,
@@ -212,29 +193,11 @@ export const ContextMenuProvider = ( { children }: { children: ReactNode } ) => 
     setTimeout(() => {
       isClosingRef.current = false;
     }, 150);
-  }, [enableScroll]);
-
-  // Listeners globales
-  useEffect(() => {
-    if (!state.isOpen)
-      return;
-
-    const handleScrollResize = preventDefault;
-
-    window.addEventListener("scroll", handleScrollResize, {
-      passive: true,
-    } );
-    window.addEventListener("resize", handleScrollResize);
-
-    return () => {
-      window.removeEventListener("scroll", handleScrollResize);
-      window.removeEventListener("resize", handleScrollResize);
-    };
-  }, [state.isOpen, preventDefault]);
+  }, []);
 
   useEffect(() => {
-    return () => enableScroll();
-  }, [enableScroll]);
+    return () => enableInput();
+  }, []);
 
   const contextValue = useMemo(() => ( {
     openMenu,

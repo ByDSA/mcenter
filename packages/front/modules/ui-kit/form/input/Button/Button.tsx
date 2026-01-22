@@ -1,4 +1,4 @@
-import { JSX, useLayoutEffect, useRef, useState } from "react";
+import { JSX, RefObject, useLayoutEffect, useRef, useState } from "react";
 import { classes } from "#modules/utils/styles";
 import styles from "./styles.module.css";
 
@@ -12,24 +12,12 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export const DaButton = ( { children, left, right,
   isSubmitting = false,
-  theme: propTheme, disabled, type = "button", ...buttonProps }: Props) => {
+  theme: propTheme, disabled, type = "button", onMouseUp, ...buttonProps }: Props) => {
   const ref = useRef<HTMLButtonElement>(null);
-  const [isTheSubmitter, setIsTheSubmitter] = useState(false);
-
-  useLayoutEffect(() => {
-    if (ref.current) {
-      const parentForm = ref.current.form;
-      // Verificamos si es type="submit" o si no tiene type (lo cual es submit implícito)
-      // Nota: Como ahora forzamos type="button" por defecto en las props (arriba),
-      // 'isSubmitType' solo será true si explícitamente pasas type="submit"
-      // o si cambiamos la lógica para permitir undefined.
-      const isSubmitType = type === "submit";
-
-      // Si hay un formulario y este botón es de tipo submit, asumimos que es el submitter.
-      // (Ignoramos el chequeo de onsubmit porque en React no es fiable vía DOM)
-      setIsTheSubmitter(!!parentForm && isSubmitType);
-    }
-  }, [type]);
+  const isTheSubmitter = useButtonIsSubmitter( {
+    ref,
+    type,
+  } );
   let content = (<>
     {left && <section className={styles.left}>{left}</section>}
     <section className={styles.childrenSection}>{children}</section>
@@ -37,11 +25,17 @@ export const DaButton = ( { children, left, right,
   </>
   );
   const theme = propTheme ?? (isTheSubmitter ? "blue" : "dark-gray");
+  const handleMouseUp = (e: React.MouseEvent<HTMLButtonElement>) => {
+    onMouseUp?.(e);
+    // Quita el foco visual tras el click
+    e.currentTarget.blur();
+  };
 
   return <button
     ref={ref}
-    type={type}
     disabled={disabled || isSubmitting}
+    type={isTheSubmitter ? "submit" : type}
+    onMouseUp={handleMouseUp}
     {...buttonProps}
     className={classes(
       styles.button,
@@ -55,4 +49,60 @@ export const DaButton = ( { children, left, right,
   >
     {content}
   </button>;
+};
+
+type SubmitterProps = {
+  ref: RefObject<HTMLButtonElement | null>;
+  type: string;
+};
+const useButtonIsSubmitter = ( { ref, type }: SubmitterProps) => {
+  const [isTheSubmitter, setIsTheSubmitter] = useState(false);
+
+  useLayoutEffect(() => {
+    if (!ref.current)
+      return;
+
+    const button = ref.current;
+    const { form } = button;
+
+    if (!form) {
+      setIsTheSubmitter(false);
+
+      return;
+    }
+
+    // 1. Caso explícito: type="submit"
+    if (type === "submit") {
+      setIsTheSubmitter(true);
+
+      return;
+    }
+
+    // 2. Buscar si existe algún submit explícito en el form
+    const hasExplicitSubmit = form.querySelector(
+      "button[type=\"submit\"], input[type=\"submit\"]",
+    );
+
+    if (hasExplicitSubmit) {
+    // Si existe un submit explícito, este botón nunca es submitter
+      setIsTheSubmitter(false);
+
+      return;
+    }
+
+    // 3. No hay submit explícito: buscamos botones type="button" o sin type
+    const candidateButtons = Array.from(
+      form.querySelectorAll<HTMLButtonElement>("button"),
+    ).filter((btn) => {
+      const btnType = btn.getAttribute("type");
+
+      return btnType === null || btnType === "button";
+    } );
+    const isLastCandidate = candidateButtons.length > 0
+    && candidateButtons[candidateButtons.length - 1] === button;
+
+    setIsTheSubmitter(isLastCandidate);
+  }, [type]);
+
+  return isTheSubmitter;
 };

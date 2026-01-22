@@ -36,6 +36,10 @@ body:has(.button) {
   align-items: center;
   justify-content: center;
 
+  &:focus-visible {
+   box-shadow: 0 0 0 3px var(--color-ui-focus);
+  }
+
   &:disabled {
     background-color: var(--button-disabled-background-color);
     color: var(--button-disabled-color);

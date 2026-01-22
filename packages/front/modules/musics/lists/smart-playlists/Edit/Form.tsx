@@ -9,6 +9,7 @@ import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
 import { DaInputText, DaInputTextMultiline } from "#modules/ui-kit/form/input/Text/InputText";
+import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { MusicSmartPlaylistsApi } from "../requests";
 import { MusicSmartPlaylistEntity } from "../models";
 import { FormVisibility } from "../../FormVisibility";
@@ -141,9 +142,9 @@ export const EditSmartPlaylistForm = ( { initialData, onSuccess, updateLocalData
         <DaErrorView errors={errors} keyName="imageCoverId" touchedFields={touchedFields} />
 
         <DaFooterButtons>
+          <DaCloseModalButton />
           <DaButton
             type="submit"
-            theme="white"
             isSubmitting={isSubmitting}
             disabled={!isValid || !isDirty}
           >

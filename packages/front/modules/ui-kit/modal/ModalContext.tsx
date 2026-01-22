@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-underscore-dangle */
 import { createContext,
   useContext,
@@ -10,6 +9,7 @@ import { createContext,
   ReactNode,
   useEffect } from "react";
 import { Modal } from "./Modal";
+import { disableInput, enableInput } from "./utils";
 
 export type OpenModalProps = {
   closeOnClickOutside?: boolean;
@@ -43,9 +43,18 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
 // Para guardar la id entre los renders y poder cerrar el modal
 const CurrentModalIdContext = createContext<string | null>(null);
 
+type ModalElements = {
+  modal: HTMLDivElement | null;
+  backdrop: HTMLDivElement | null;
+};
+
 export const ModalProvider = ( { children }: { children: ReactNode } ) => {
   const [modals, setModals] = useState<ModalInstance[]>([]);
+  const modalRefs = useRef<Record<string, ModalElements>>( {} );
   const _open = useCallback((id: string, options: OpenModalProps) => {
+    if (modals.length === 0)
+      disableInput();
+
     setModals((prev) => {
       const existingIndex = prev.findIndex((m) => m.id === id);
       const newInstance: ModalInstance = {
@@ -87,6 +96,13 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
       } );
     } );
 
+    if (modals.length === 0)
+      enableInput();
+
+    // Limpieza de referencias
+    if (modalRefs.current[id])
+      delete modalRefs.current[id];
+
     if (modalOptions?.onClose)
       await modalOptions.onClose(returnObj);
   }, []);
@@ -120,21 +136,75 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
     // Si pasa la validación (o no tiene), cerramos de verdad
     await _close(id, returnObj);
   }, [modals, _close]);
+  const handleRequestDone = useCallback(async (id: string, returnObj?: unknown) => {
+    const refs = modalRefs.current[id];
+    const modalElement = refs?.modal;
+    const backdropElement = refs?.backdrop;
+
+    if (!modalElement)
+      return;
+
+    const active = document.activeElement as HTMLElement | null;
+
+    // Si hay un elemento con foco y es interactivo, no hacemos nada
+    if (
+      active
+      && active !== document.body
+      && active !== backdropElement
+      && active !== modalElement
+    )
+      return;
+
+    const forms = modalElement.querySelectorAll("form");
+
+    // Solo si hay exactamente un form
+    if (forms.length !== 1)
+      return;
+
+    const form = forms[0];
+    const submitters = Array.from(
+      form.querySelectorAll("button[type=\"submit\"]"),
+    ) as HTMLButtonElement[];
+
+    if (submitters.length !== 1 || submitters[0].disabled)
+      return;
+
+    // Disparo de submit estándar (respeta onSubmit, validaciones, etc.)
+    if (typeof form.requestSubmit === "function")
+      form.requestSubmit();
+    else {
+      // Fallback para navegadores antiguos
+      form.dispatchEvent(
+        new Event("submit", {
+          bubbles: true,
+          cancelable: true,
+        } ),
+      );
+    }
+
+    await _close(id, returnObj);
+  }, [modals, _close]);
 
   useEffect(() => {
     const handleKeyDown = async (e: KeyboardEvent) => {
-      if (e.key === "Escape" && modals.length > 0) {
-        const topModal = modals[modals.length - 1];
+      if (modals.length > 0) {
+        if (e.key === "Escape") {
+          const topModal = modals[modals.length - 1];
 
-        // Llamamos al intermediario en lugar de a _close directo
-        await handleRequestClose(topModal.id);
+          // Llamamos al intermediario en lugar de a _close directo
+          await handleRequestClose(topModal.id);
+        } else if (e.key === "Enter") {
+          const topModal = modals[modals.length - 1];
+
+          await handleRequestDone(topModal.id);
+        }
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
 
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [modals, handleRequestClose]); // Dependencia actualizada
+  }, [modals, handleRequestClose, handleRequestDone]);
 
   return (
     <ModalContext.Provider value={{
@@ -157,6 +227,9 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
           showBox={modal.options.showBox}
           addBackdrop={modal.options.addBackdrop}
           className={modal.options.className}
+          onRefs={(refs) => {
+            modalRefs.current[modal.id] = refs;
+          }}
         >
           <CurrentModalIdContext.Provider value={modal.id}>
             {modal.content}
