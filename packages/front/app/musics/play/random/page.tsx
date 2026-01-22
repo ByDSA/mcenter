@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { useUser } from "#modules/core/auth/useUser";
 import { useRequireActiveAction } from "#modules/utils/autoplay/useRequireActiveAction/useRequireActiveAction";
+import { getMusicMainUrl } from "../../utils";
 
 export default function PlaySmartPlaylistPage() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function PlaySmartPlaylistPage() {
     onFinally: ()=>router.push(redirectPage),
   } );
   const { user } = useUser();
-  const redirectPage = user ? "/musics/playlists" : "/musics/searchssss";
+  const redirectPage = getMusicMainUrl(user);
 
   useEffect(() => {
     const fn = async () => {

@@ -22,11 +22,12 @@ import { Favicon } from "#modules/utils/Favicon/Favicon";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
+import { getMusicMainUrl } from "./musics/utils";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 
-const sideData: (user: UserPayload | null)=> MenuItemData[] = (_user)=>[
+const sideData: (user: UserPayload | null)=> MenuItemData[] = (user)=>[
   {
     icon: <Home />,
     label: "Inicio",
@@ -38,7 +39,7 @@ const sideData: (user: UserPayload | null)=> MenuItemData[] = (_user)=>[
   {
     icon: <MusicsIcon />,
     label: "Música",
-    path: PATH_ROUTES.musics.frontend.playlists.path,
+    path: getMusicMainUrl(user),
     matchPath: {
       startsWith: PATH_ROUTES.musics.frontend.path,
     },
