@@ -4,7 +4,7 @@
   "description": "",
   "main": "build/index.js",
   "scripts": {
-    "build": "./bin/build.sh",
+    "build": "./bin/build.mjs",
     "db:migrate": "./bin/migrations/migrate.mjs",
     "lint": "bin/lint.mjs",
     "start": "NODE_ENV=production node build/index.js",
@@ -24,7 +24,7 @@
     "@nestjs/passport": "11.0.5",
     "@nestjs/platform-express": "11.1.6",
     "@nestjs/serve-static": "5.0.3",
-    "$shared": "workspace:../shared/build",
+    "$shared": "workspace:../shared/src",
     "axios": "1.12.2",
     "bcryptjs": "3.0.2",
     "bullmq": "5.58.8",
