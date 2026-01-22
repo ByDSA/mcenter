@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { createContext, useContext, useState, ReactNode, JSX } from "react";
 import { sleep } from "$shared/utils/sleep";
 import { createPortal } from "react-dom";

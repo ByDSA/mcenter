@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/naming-convention */
 import { ReactNode } from "react";
 import { classes } from "#modules/utils/styles";
 import { BottomMediaPlayer } from "./Bottom/MediaPlayer";

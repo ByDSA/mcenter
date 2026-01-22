@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { classes } from "#modules/utils/styles";
 import { MenuItemData } from "./Sidebar";
 import styles from "./Topbar.module.css";

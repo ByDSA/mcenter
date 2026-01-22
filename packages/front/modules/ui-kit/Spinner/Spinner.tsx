@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import React from "react";
 import { classes } from "#modules/utils/styles";
 import stylesFetching from "./fetching.style.module.css";

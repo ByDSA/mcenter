@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { JSX } from "react";
 import svg from "./SeriesIcon.svg?raw";
 

@@ -2,7 +2,6 @@ import { useBrowserPlayer } from "./BrowserPlayerContext";
 import { PlayButtonView } from "./PlayButtonView";
 import styles from "./PlayButton.module.css";
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const PlayButton = () => {
   const status = useBrowserPlayer(s=>s.status);
 

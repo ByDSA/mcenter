@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { ReactNode } from "react";
 import { classes } from "#modules/utils/styles";
 import styles from "./Topbar.module.css";

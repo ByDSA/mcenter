@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { JsonViewer } from "@textea/json-viewer";
 import { useState, useEffect, useRef } from "react";
 import { ExpandableContainer } from "#modules/ui-kit/expandable/Expandable";

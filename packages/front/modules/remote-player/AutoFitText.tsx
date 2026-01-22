@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { useEffect, useRef, useCallback } from "react";
 
 export const useAutoFitText = (options: any = {} ) => {

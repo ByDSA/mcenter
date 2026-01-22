@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { AccessTime, Balance, CalendarToday } from "@mui/icons-material";
 import { memo, ReactNode } from "react";
 import { formatDurationItem } from "#modules/musics/lists/playlists/utils";

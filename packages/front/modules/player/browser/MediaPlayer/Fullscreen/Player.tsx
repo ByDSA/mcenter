@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { classes } from "#modules/utils/styles";
 import { useMusic } from "#modules/musics/hooks";
