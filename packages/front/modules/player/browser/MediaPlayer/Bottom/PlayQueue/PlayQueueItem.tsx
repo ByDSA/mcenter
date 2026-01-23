@@ -1,4 +1,3 @@
-import { memo } from "react";
 import { MusicEntryElement } from "#modules/musics/musics/ListItem/MusicEntry";
 import { PlayerStatus, PlaylistQueueItem as QItem } from "../../BrowserPlayerContext";
 
@@ -10,7 +9,7 @@ interface QueueItemProps {
   onClickPlay?: (prevStatus: PlayerStatus)=> void;
 }
 
-export const QueueItem = memo(( { index, item,
+export const QueueItem = ( { index, item,
   start,
   onClickPlay,
   size }: QueueItemProps) => {
@@ -36,4 +35,4 @@ export const QueueItem = memo(( { index, item,
       />
     </div>
   );
-} );
+};

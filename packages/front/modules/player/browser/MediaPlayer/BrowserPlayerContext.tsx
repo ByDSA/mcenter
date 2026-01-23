@@ -39,10 +39,12 @@ type PlayMusicProps = {
 
 // --- Helpers ---
 function musicToResource(music: MusicEntity): PlaylistQueueItem {
+  const uuid = crypto.randomUUID();
+
   return {
     type: "music",
     resourceId: music.id,
-    itemId: null,
+    itemId: uuid,
     playlistId: null,
   };
 }
