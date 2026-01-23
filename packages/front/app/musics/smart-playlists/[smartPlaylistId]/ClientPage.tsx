@@ -25,8 +25,7 @@ export function ClientPage( { params }: PageProps) {
   const [data, setData] = useState<MusicSmartPlaylistEntity>();
 
   useAutoplay( {
-    data,
-    play: (d)=>useBrowserPlayer.getState().playSmartPlaylist(d.query),
+    play: ()=>useBrowserPlayer.getState().playSmartPlaylist(data!.query),
   } );
   const ret = <AsyncLoader
     onSuccess={(d) => setData(d)}

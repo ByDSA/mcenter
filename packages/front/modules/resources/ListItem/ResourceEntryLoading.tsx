@@ -25,8 +25,8 @@ export const ResourceEntryLoading = (props?: Props) => {
     }
     right={
       <>
-        <HistoryTimeView timestamp={0} />
-        <WeightView weight={0} />
+        <HistoryTimeView timestamp={null} />
+        <WeightView weight={null} />
       </>
     }
   />;

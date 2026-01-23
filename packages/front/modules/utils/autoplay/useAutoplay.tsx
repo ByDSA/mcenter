@@ -3,18 +3,17 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useRequireActiveAction } from "./useRequireActiveAction/useRequireActiveAction";
 
-type UseAutoplayProps<T> = {
-  play: (data: NonNullable<T>)=> Promise<void> | void;
-  data: T;
+type UseAutoplayProps = {
+  play: ()=> Promise<void> | void;
 };
-export const useAutoplay = <T, >( { play, data }: UseAutoplayProps<T>) => {
+export const useAutoplay = ( { play }: UseAutoplayProps) => {
   const { action } = useRequireActiveAction( {
-    action: ()=>play(data!),
+    action: ()=>play(),
   } );
   const queryParams = useSearchParams();
 
   useEffect(()=> {
-    if (data && queryParams.get("autoplay") === "1")
+    if (queryParams.get("autoplay") === "1")
       action().catch(showError);
-  }, [data]);
+  }, []);
 };

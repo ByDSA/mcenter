@@ -176,14 +176,6 @@ export const useBrowserPlayer = create<PlayerState>()(
       playMusic: async (musicId, props) => {
         let music = await useMusic.get(musicId);
 
-        if (!music?.fileInfos) {
-        // Para que fetchee fileinfos. (TODO: alguna forma más eficiente):
-          await useMusic.invalidateCache(musicId);
-          music = await useMusic.fetch(musicId, {
-            expand: ["fileInfos"],
-          } );
-        }
-
         if (!music)
           return;
 

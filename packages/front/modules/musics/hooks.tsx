@@ -1,13 +1,12 @@
 /* eslint-disable import/no-cycle */
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { getQueryClient } from "#modules/fetching/QueryClientProvider";
+import { useUser } from "#modules/core/auth/useUser";
 import { MusicsApi } from "./requests";
 import { MusicEntity, musicEntitySchema } from "./models";
 
 type GenQueryOptions = {
-  expand?: MusicCrudDtos.GetOne.Criteria["expand"];
   debounce?: boolean;
   hasUser?: boolean;
 };
@@ -36,6 +35,19 @@ function genQuery(id: string, options?: GenQueryOptions) {
     queryKey: ["music", id],
     queryFn: genQueryFn(id, options),
     staleTime: 1_000 * 60 * 5,
+    refetchOnMount: (query) => {
+      const data = query.state.data as MusicEntity | undefined;
+
+      // Si no hay datos, refetch normal
+      if (!data)
+        return true;
+
+      const missingFields = data.userInfo === undefined;
+
+      // Si faltan campos, retornamos 'always' para forzar el refetch AHORA MISMO
+      // Si no faltan, retornamos false (o undefined) para respetar el staleTime global
+      return missingFields ? "always" : false;
+    },
     structuralSharing: (oldData: MusicEntity | undefined, newData: Partial<MusicEntity>) => {
       if (!oldData)
         return newData as MusicEntity;
@@ -45,10 +57,15 @@ function genQuery(id: string, options?: GenQueryOptions) {
   };
 }
 
-export const useMusic = (id: string | null, options?: GenQueryOptions) => {
+export const useMusic = (id: string | null, options?: Omit<GenQueryOptions, "hasUser">) => {
+  const { user } = useUser();
+
   return useQuery(
     id
-      ? genQuery(id, options)
+      ? genQuery(id, {
+        ...options,
+        hasUser: !!user,
+      } )
       : {
         queryKey: ["music", null],
         queryFn: () => null,
@@ -57,6 +74,13 @@ export const useMusic = (id: string | null, options?: GenQueryOptions) => {
 };
 
 useMusic.get = (id: string, options?: GenQueryOptions) => {
+  if (options?.hasUser) {
+    const isMissingUserFields = !!useMusic.getCache(id)?.userInfo;
+
+    if (isMissingUserFields)
+      return useMusic.fetch(id, options);
+  }
+
   return getQueryClient().ensureQueryData(genQuery(id, options));
 };
 

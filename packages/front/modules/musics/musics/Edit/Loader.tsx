@@ -5,6 +5,7 @@ import { MusicsApi } from "#modules/musics/requests";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { useLocalData } from "#modules/utils/local-data-context";
+import { useMusic } from "#modules/musics/hooks";
 import { EditMusicForm } from "./Form";
 
 export function EditMusicLoader() {
@@ -28,7 +29,7 @@ export function EditMusicLoader() {
       action={fetchData}
     >
       <EditMusicForm
-        initialData={initialData}
+        initialData={()=>useMusic.getCache(initialData.id)!}
         onSuccess={() => {
           closeModal();
         }}

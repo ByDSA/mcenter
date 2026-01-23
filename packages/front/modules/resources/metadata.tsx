@@ -36,21 +36,25 @@ export const DurationView = memo(( { duration, className }: DurationProps) => {
 } );
 
 type HistoryTimeProps = {
-  timestamp: number;
+  timestamp: number | null;
 };
 export const HistoryTimeView = memo(( { timestamp }: HistoryTimeProps) => {
   return <MetadataView
     title={"Hora de reproducción"}
     icon={<CalendarToday />}
-    txt={`${formatDateHHmm(new Date(timestamp * 1_000))}h`}
+    txt={timestamp !== null
+      ? `${formatDateHHmm(new Date(timestamp * 1_000))}h`
+      : ""}
   />;
 } );
 
 type WeightProps = {
-  weight: number;
+  weight: number | null;
 };
 export const WeightView = memo(( { weight }: WeightProps) => {
-  const txt = formatWeight(weight);
+  const txt = weight !== null
+    ? formatWeight(weight)
+    : "";
   let title = "Peso";
   let change = txt.length >= 7;
 

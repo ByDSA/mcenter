@@ -51,13 +51,16 @@ const schema = musicSchema.pick( {
 type FormData = z.infer<typeof schema>;
 
 type Props = {
-  initialData: MusicEntity;
+  initialData: MusicEntity | (()=> MusicEntity);
   onSuccess?: (newData: MusicEntity)=> void;
   onDelete?: ()=> void;
 };
 
-export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
+export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDelete }: Props) => {
   const [showOptional, setShowOptional] = useState(false);
+  const initialData = typeof propInitialData === "function"
+    ? propInitialData()
+    : propInitialData;
   const { register,
     handleSubmit,
     control,

@@ -27,7 +27,6 @@ export const MusicHistoryListItem = React.memo(() =>{
     } )),
   );
   const { data: music } = useMusic(data.resourceId, {
-    expand: ["favorite", "fileInfos", "userInfo"],
     debounce: true,
   } );
 

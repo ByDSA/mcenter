@@ -1,20 +1,24 @@
-import { MusicEntity } from "$shared/models/musics";
 import { Album, Person } from "@mui/icons-material";
+import { assertIsDefined } from "$shared/utils/validation";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { useUser } from "#modules/core/auth/useUser";
 import { formatDate } from "#modules/utils/dates";
 import { PlaylistFavButton } from "#modules/musics/lists/playlists/PlaylistFavButton";
 import { DurationView, MetadataView } from "#modules/history";
 import { useImageCover } from "#modules/image-covers/hooks";
+import { useMusic } from "#modules/musics/hooks";
 import { MusicSettingsButton } from "../SettingsButton/Button";
 import styles from "./Music.module.css";
 import { PlayMusicButton } from "./PlayMusicButton";
 
 type Props = {
-  value: MusicEntity;
+  musicId: string;
 };
 
-export const Music = ( { value }: Props) => {
+export const Music = ( { musicId }: Props) => {
+  const value = useMusic.getCache(musicId);
+
+  assertIsDefined(value);
   const { id, title, album, artist, disabled,
     year, createdAt, updatedAt, addedAt,
     slug, tags,
