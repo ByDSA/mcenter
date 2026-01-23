@@ -14,7 +14,6 @@ import { DaForm } from "#modules/ui-kit/form/Form";
 import { ImageCoverEntity } from "../models";
 import { DaLabel } from "../../ui-kit/form/Label/Label";
 import { ImageCoverUpload, ImageCoverUploadRef } from "../Edit/UploadImage";
-import styles from "./Content.module.css";
 
 // Asegúrate de que este import sea correcto o ajusta la ruta según tu estructura
 const schema = z.object( {
@@ -58,7 +57,6 @@ export function NewImageCoverForm( { onSuccess }: NewImageCoverProps) {
 
   return (
     <DaForm
-      className={styles.content}
       onSubmit={handleSubmit(onSubmit)}
       isDirty={isDirty}
       isValid={isValid && hasFile}

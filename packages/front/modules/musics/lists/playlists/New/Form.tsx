@@ -26,7 +26,7 @@ export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, touchedFields, isValid } } = useForm( {
+    formState: { errors, touchedFields, isValid, isDirty } } = useForm( {
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
@@ -56,6 +56,7 @@ export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
     <DaForm
       onSubmit={handleSubmit(onSubmit)}
       isValid={isValid}
+      isDirty={isDirty}
     >
       <DaLabel>Nombre</DaLabel>
       <DaInputText
@@ -70,6 +71,7 @@ export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
         setValue={(newVal) => {
           setValue("visibility", newVal, {
             shouldValidate: true,
+            shouldDirty: true,
           } );
         }}
       />

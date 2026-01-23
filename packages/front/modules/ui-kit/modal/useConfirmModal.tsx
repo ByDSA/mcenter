@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { DaFooterButtons } from "../form/Footer/Buttons/FooterButtons";
 import { DaForm } from "../form/Form";
 import { DaSaveButton } from "../form/SaveButton";
@@ -41,21 +42,19 @@ export const useConfirmModal = () => {
          ...props,
          title: props?.title ?? "Confirmar acción",
          content: props?.content
-           ? <DaForm onSubmit={async ()=> {
-             await doAction();
-             usingModal.closeModal();
-           }}>
-             {props.content}
-             <DaFooterButtons>
-               <DaSaveButton>Sí</DaSaveButton>
-               <DaCloseModalButton
-                 onClick={async ()=> {
-                   await doCancel();
-                 }}
-                 showOnSmallWidth
-               >Cancelar</DaCloseModalButton>
-             </DaFooterButtons>
-           </DaForm>
+           ? (
+             <ConfirmModalContent
+               onConfirm={async () => {
+                 await doAction();
+                 usingModal.closeModal();
+               }}
+               onCancel={async () => {
+                 await doCancel();
+               }}
+             >
+               {props.content}
+             </ConfirmModalContent>
+           )
            : undefined,
        } );
      }
@@ -65,4 +64,24 @@ export const useConfirmModal = () => {
     ...usingModal,
     openModal,
   };
+};
+
+export const ConfirmModalContent = ( { children,
+  onConfirm,
+  onCancel }: {
+  children: ReactNode;
+  onConfirm: ()=> Promise<void> | void;
+  onCancel?: ()=> Promise<void> | void;
+} ) => {
+  return (
+    <DaForm onSubmit={onConfirm}>
+      {children}
+      <DaFooterButtons>
+        <DaSaveButton>Sí</DaSaveButton>
+        <DaCloseModalButton onClick={onCancel} showOnSmallWidth>
+          Cancelar
+        </DaCloseModalButton>
+      </DaFooterButtons>
+    </DaForm>
+  );
 };

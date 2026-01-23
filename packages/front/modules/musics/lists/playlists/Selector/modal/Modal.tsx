@@ -69,7 +69,7 @@ function AddToPlaylistForm( { userId, onSelect, nullable }: AddToPlaylistContent
   const newPlaylistButton = <NewPlaylistButton
     theme="white"
     onSuccess= {async (newPlaylist) => {
-      logger.debug("Nueva lista creada: " + newPlaylist.name);
+      logger.debug("Nueva playlist creada: " + newPlaylist.name);
 
       setData((prevData) => {
         if (!prevData)

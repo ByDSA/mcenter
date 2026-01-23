@@ -10,7 +10,7 @@ export const useNewPlaylistModal = ( { onSuccess }: NewPlaylistModalProps) => {
   const usingModal = useModal();
   const openModal = () => {
     return usingModal.openModal( {
-      title: "Nueva lista",
+      title: "Nueva playlist",
       content: (
         <NewPlaylistForm
           onSuccess={(v) => {

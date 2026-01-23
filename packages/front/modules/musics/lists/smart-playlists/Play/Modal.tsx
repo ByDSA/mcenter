@@ -24,7 +24,7 @@ const PlaySmartPlaylistForm = ( { initialValue }: FormProps) => {
   const { register,
     handleSubmit,
     setError,
-    formState: { errors, touchedFields, isValid } } = useForm( {
+    formState: { errors, touchedFields, isValid, isDirty } } = useForm( {
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
@@ -48,6 +48,7 @@ const PlaySmartPlaylistForm = ( { initialValue }: FormProps) => {
       <DaForm
         onSubmit={handleSubmit(onSubmit)}
         isValid={isValid}
+        isDirty={isDirty}
       >
         <section>
           <DaLabel>Query</DaLabel>
