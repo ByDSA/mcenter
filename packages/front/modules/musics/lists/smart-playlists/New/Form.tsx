@@ -1,12 +1,13 @@
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { DaInputText, DaInputTextMultiline } from "#modules/ui-kit/form/input/Text/InputText";
+import { DaForm } from "#modules/ui-kit/form/Form";
+import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { MusicSmartPlaylistsApi } from "../requests";
 import { MusicSmartPlaylistEntity } from "../models";
 import { FormVisibility } from "../../FormVisibility";
@@ -28,7 +29,7 @@ export const NewSmartPlaylistForm = ( { onSuccess }: FormProps) => {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, touchedFields, isValid, isSubmitting } } = useForm( {
+    formState: { errors, touchedFields, isValid } } = useForm( {
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
@@ -52,7 +53,10 @@ export const NewSmartPlaylistForm = ( { onSuccess }: FormProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <DaForm
+        onSubmit={handleSubmit(onSubmit)}
+        isValid={isValid}
+      >
         <DaLabel>Nombre</DaLabel>
         <DaInputText
           {...register("name")}
@@ -74,16 +78,9 @@ export const NewSmartPlaylistForm = ( { onSuccess }: FormProps) => {
           }} />
         <DaErrorView errors={errors} keyName="visibility" touchedFields={touchedFields} />
         <DaFooterButtons>
-          <DaButton
-            type="submit"
-            theme="white"
-            isSubmitting={isSubmitting}
-            disabled={!isValid}
-          >
-          Crear
-          </DaButton>
+          <DaSaveButton>Crear</DaSaveButton>
         </DaFooterButtons>
-      </form>
+      </DaForm>
     </>
   );
 };

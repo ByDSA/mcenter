@@ -21,6 +21,7 @@ import { useMusic } from "#modules/musics/hooks";
 import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { DaDeleteButton } from "#modules/ui-kit/DeleteButton";
 import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
+import { DaForm } from "#modules/ui-kit/form/Form";
 import { DaInputNumber } from "../../../ui-kit/form/input/Number/InputNumber";
 import { DaInputBooleanCheckbox } from "../../../ui-kit/form/input/Boolean/InputBoolean";
 import { DaInputGroup, DaInputGroupItem } from "../../../ui-kit/form/InputGroup";
@@ -60,7 +61,7 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
   const { register,
     handleSubmit,
     control,
-    formState: { errors, isDirty, isSubmitting, dirtyFields, isValid } } = useForm( {
+    formState: { errors, isDirty, dirtyFields, isValid } } = useForm( {
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
@@ -267,7 +268,12 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={styles.container}>
+    <DaForm
+      className={styles.container}
+      onSubmit={handleSubmit(onSubmit)}
+      isDirty={isDirty}
+      isValid={isValid}
+    >
       <DaInputGroup inline>
         <DaLabel>Título</DaLabel>
         <DaInputErrorWrap>
@@ -436,16 +442,12 @@ export const EditMusicForm = ( { initialData, onSuccess, onDelete }: Props) => {
         <aside>
           <DaDeleteButton
             onClick={handleDelete}
-            disabled={isSubmitting}
           />
           <DaCloseModalButton />
-          <DaSaveButton
-            disabled={!isDirty || !isValid || isSubmitting}
-            isSubmitting={isSubmitting}
-          />
+          <DaSaveButton/>
         </aside>
       </DaFooterButtons>
-    </form>
+    </DaForm>
   );
 };
 

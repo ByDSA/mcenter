@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
@@ -10,6 +9,8 @@ import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
+import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
+import { DaForm } from "#modules/ui-kit/form/Form";
 import { ImageCoverEntity } from "../models";
 import { DaLabel } from "../../ui-kit/form/Label/Label";
 import { ImageCoverUpload, ImageCoverUploadRef } from "../Edit/UploadImage";
@@ -33,7 +34,7 @@ export function NewImageCoverForm( { onSuccess }: NewImageCoverProps) {
   const [hasFile, setHasFile] = useState(false);
   const { register,
     handleSubmit,
-    formState: { errors, isValid, isSubmitting, dirtyFields } } = useForm<FormData>( {
+    formState: { errors, isValid, isDirty, dirtyFields } } = useForm<FormData>( {
       resolver: zodResolver(schema),
       mode: "onChange",
       defaultValues: {
@@ -56,7 +57,12 @@ export function NewImageCoverForm( { onSuccess }: NewImageCoverProps) {
   };
 
   return (
-    <form className={styles.content} onSubmit={handleSubmit(onSubmit)}>
+    <DaForm
+      className={styles.content}
+      onSubmit={handleSubmit(onSubmit)}
+      isDirty={isDirty}
+      isValid={isValid && hasFile}
+    >
       <DaInputGroup>
         <DaLabel>Etiqueta</DaLabel>
         <DaInputErrorWrap>
@@ -78,16 +84,11 @@ export function NewImageCoverForm( { onSuccess }: NewImageCoverProps) {
       </DaInputGroup>
 
       <DaFooterButtons>
-        <DaCloseModalButton disabled={isSubmitting} />
-        <DaButton
-          type="submit"
-          theme="blue"
-          disabled={!hasFile || !isValid || isSubmitting}
-          isSubmitting={isSubmitting}
-        >
+        <DaCloseModalButton />
+        <DaSaveButton>
           Subir
-        </DaButton>
+        </DaSaveButton>
       </DaFooterButtons>
-    </form>
+    </DaForm>
   );
 }

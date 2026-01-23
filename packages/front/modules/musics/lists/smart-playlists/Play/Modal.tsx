@@ -2,12 +2,13 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaInputTextMultiline } from "#modules/ui-kit/form/input/Text/InputText";
+import { DaForm } from "#modules/ui-kit/form/Form";
+import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import styles from "./Modal.module.css";
 
 type FormProps = {
@@ -23,7 +24,7 @@ const PlaySmartPlaylistForm = ( { initialValue }: FormProps) => {
   const { register,
     handleSubmit,
     setError,
-    formState: { errors, touchedFields, isValid, isSubmitting } } = useForm( {
+    formState: { errors, touchedFields, isValid } } = useForm( {
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
@@ -44,7 +45,10 @@ const PlaySmartPlaylistForm = ( { initialValue }: FormProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <DaForm
+        onSubmit={handleSubmit(onSubmit)}
+        isValid={isValid}
+      >
         <section>
           <DaLabel>Query</DaLabel>
           <DaInputTextMultiline
@@ -55,16 +59,9 @@ const PlaySmartPlaylistForm = ( { initialValue }: FormProps) => {
         </section>
 
         <DaFooterButtons>
-          <DaButton
-            type="submit"
-            theme="white"
-            isSubmitting={isSubmitting}
-            disabled={!isValid}
-          >
-            Reproducir
-          </DaButton>
+          <DaSaveButton>Reproducir</DaSaveButton>
         </DaFooterButtons>
-      </form>
+      </DaForm>
     </>
   );
 };

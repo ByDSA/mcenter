@@ -2,7 +2,6 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
@@ -10,6 +9,8 @@ import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButto
 import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
 import { DaInputText, DaInputTextMultiline } from "#modules/ui-kit/form/input/Text/InputText";
 import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
+import { DaForm } from "#modules/ui-kit/form/Form";
+import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { MusicSmartPlaylistsApi } from "../requests";
 import { MusicSmartPlaylistEntity } from "../models";
 import { FormVisibility } from "../../FormVisibility";
@@ -37,7 +38,7 @@ export const EditSmartPlaylistForm = ( { initialData, onSuccess, updateLocalData
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, touchedFields, isValid, isSubmitting, isDirty } } = useForm( {
+    formState: { errors, touchedFields, isValid, isDirty } } = useForm( {
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
@@ -99,7 +100,11 @@ export const EditSmartPlaylistForm = ( { initialData, onSuccess, updateLocalData
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <DaForm
+        onSubmit={handleSubmit(onSubmit)}
+        isDirty={isDirty}
+        isValid={isValid}
+      >
         <DaLabel>Nombre</DaLabel>
         <DaInputText
           {...register("name")}
@@ -143,15 +148,9 @@ export const EditSmartPlaylistForm = ( { initialData, onSuccess, updateLocalData
 
         <DaFooterButtons>
           <DaCloseModalButton />
-          <DaButton
-            type="submit"
-            isSubmitting={isSubmitting}
-            disabled={!isValid || !isDirty}
-          >
-            Editar
-          </DaButton>
+          <DaSaveButton>Editar</DaSaveButton>
         </DaFooterButtons>
-      </form>
+      </DaForm>
     </>
   );
 };

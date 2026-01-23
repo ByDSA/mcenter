@@ -7,6 +7,8 @@ import { SearchBarView } from "#modules/ui-kit/SearchBar";
 import { classes } from "#modules/utils/styles";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
+import { DaForm } from "#modules/ui-kit/form/Form";
+import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
 import { DaLabel } from "../../ui-kit/form/Label/Label";
@@ -62,7 +64,11 @@ export function ImageCoverSelector(
   const { data: current } = useImageCover(currentId ?? null);
 
   return (
-    <form className={styles.selector} onSubmit={onSubmit}>
+    <DaForm
+      className={styles.selector}
+      onSubmit={onSubmit}
+      isValid={canSubmit}
+    >
       <header className={styles.header}>
         {current !== null && <aside className={styles.currentCoverSection}>
           <DaLabel>Actual</DaLabel>
@@ -143,14 +149,9 @@ export function ImageCoverSelector(
         </aside>
         <aside>
           <DaCloseModalButton />
-          <DaButton
-            disabled={!canSubmit}
-            theme="blue"
-          >
-          Aceptar
-          </DaButton>
+          <DaSaveButton>Aceptar</DaSaveButton>
         </aside>
       </DaFooterButtons>
-    </form>
+    </DaForm>
   );
 }

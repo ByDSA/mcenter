@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { logger } from "#modules/core/logger";
@@ -14,6 +13,8 @@ import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
+import { DaDeleteButton } from "#modules/ui-kit/DeleteButton";
+import { DaForm } from "#modules/ui-kit/form/Form";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
 import { getMediumCoverUrl } from "../Selector/image-cover-utils";
@@ -42,7 +43,7 @@ export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditor
   const uploadRef = useRef<ImageCoverUploadRef>(null);
   const { register,
     handleSubmit,
-    formState: { errors, isDirty, isSubmitting, dirtyFields, isValid } } = useForm<FormData>( {
+    formState: { errors, isDirty, dirtyFields, isValid } } = useForm<FormData>( {
       resolver: zodResolver(schema),
       mode: "onChange",
       defaultValues: {
@@ -114,11 +115,14 @@ export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditor
       // Aquí podrías poner un toast de error si tienes un sistema de notificaciones
     }
   };
-  // Se habilita si el formulario está 'dirty' (texto cambiado) O si hay un nuevo archivo
-  const canSave = (isDirty && isValid) || hasNewFile;
 
   return (
-    <form className={styles.editor} onSubmit={handleSubmit(onSubmit)}>
+    <DaForm
+      className={styles.editor}
+      onSubmit={handleSubmit(onSubmit)}
+      isDirty={isDirty || hasNewFile}
+      isValid={isValid}
+    >
       <div className={styles.mainSection}>
         <DaInputGroup className={styles.fieldGroup}>
           <DaLabel>Etiqueta</DaLabel>
@@ -152,24 +156,15 @@ export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditor
 
       <DaFooterButtons>
         <aside>
-          <DaButton
+          <DaDeleteButton
             onClick={handleDelete}
-            theme="red"
-            disabled={isSubmitting}
-            type="button" // Importante para no disparar el submit del form
-          >
-            Borrar
-          </DaButton>
-        </aside>
-        <aside>
-          <DaCloseModalButton disabled={isSubmitting} />
-          <DaSaveButton
-            type="submit"
-            disabled={!canSave || isSubmitting}
-            isSubmitting={isSubmitting}
           />
         </aside>
+        <aside>
+          <DaCloseModalButton />
+          <DaSaveButton />
+        </aside>
       </DaFooterButtons>
-    </form>
+    </DaForm>
   );
 }

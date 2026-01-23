@@ -1,6 +1,8 @@
-import { DaButton } from "../form/input/Button/Button";
 import { DaFooterButtons } from "../form/Footer/Buttons/FooterButtons";
+import { DaForm } from "../form/Form";
+import { DaSaveButton } from "../form/SaveButton";
 import { OpenModalProps, useModal } from "./ModalContext";
+import { DaCloseModalButton } from "./CloseButton";
 
 type Action = (obj?: unknown)=> Promise<boolean> | boolean;
 
@@ -17,13 +19,6 @@ export const useConfirmModal = () => {
   let openModal: (
     props?: OpenConfirmModalProps
    )=> Promise<void> = async (props)=> {
-     const footer = <DaFooterButtons>
-       <DaButton type="submit">Sí</DaButton>
-       <DaButton theme={"white"} onClick={async ()=> {
-         await doCancel();
-         usingModal.closeModal();
-       }}>Cancelar</DaButton>
-     </DaFooterButtons>;
      const bypassed = await props?.bypass?.();
      const doAction = async () => {
        const ret = await props?.action?.();
@@ -46,13 +41,21 @@ export const useConfirmModal = () => {
          ...props,
          title: props?.title ?? "Confirmar acción",
          content: props?.content
-           ? <form onSubmit={async ()=> {
+           ? <DaForm onSubmit={async ()=> {
              await doAction();
              usingModal.closeModal();
            }}>
              {props.content}
-             {footer}
-           </form>
+             <DaFooterButtons>
+               <DaSaveButton>Sí</DaSaveButton>
+               <DaCloseModalButton
+                 onClick={async ()=> {
+                   await doCancel();
+                 }}
+                 showOnSmallWidth
+               >Cancelar</DaCloseModalButton>
+             </DaFooterButtons>
+           </DaForm>
            : undefined,
        } );
      }

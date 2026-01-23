@@ -1,5 +1,6 @@
 import { JSX, RefObject, useLayoutEffect, useRef, useState } from "react";
 import { classes } from "#modules/utils/styles";
+import { useDaFormContext } from "../../FormContext";
 import styles from "./styles.module.css";
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -7,11 +8,9 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   right?: JSX.Element;
   children: React.ReactNode;
   theme?: "blue" | "dark-gray" | "red" | "white";
-  isSubmitting?: boolean;
 };
 
 export const DaButton = ( { children, left, right,
-  isSubmitting = false,
   theme: propTheme, disabled, type = "button", onMouseUp, ...buttonProps }: Props) => {
   const ref = useRef<HTMLButtonElement>(null);
   const isTheSubmitter = useButtonIsSubmitter( {
@@ -30,6 +29,8 @@ export const DaButton = ( { children, left, right,
     // Quita el foco visual tras el click
     e.currentTarget.blur();
   };
+  const formCtx = useDaFormContext();
+  const { isSubmitting } = formCtx;
 
   return <button
     ref={ref}

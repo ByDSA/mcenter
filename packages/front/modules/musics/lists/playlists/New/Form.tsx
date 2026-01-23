@@ -1,12 +1,13 @@
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
+import { DaForm } from "#modules/ui-kit/form/Form";
+import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { MusicPlaylistsApi } from "../requests";
 import { FormVisibility } from "../../FormVisibility";
 
@@ -25,7 +26,7 @@ export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, touchedFields, isValid, isSubmitting } } = useForm( {
+    formState: { errors, touchedFields, isValid } } = useForm( {
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
@@ -52,7 +53,10 @@ export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <DaForm
+      onSubmit={handleSubmit(onSubmit)}
+      isValid={isValid}
+    >
       <DaLabel>Nombre</DaLabel>
       <DaInputText
         {...register("name")}
@@ -72,15 +76,10 @@ export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
       <DaErrorView errors={errors} keyName="visibility" touchedFields={touchedFields} />
 
       <DaFooterButtons>
-        <DaButton
-          type="submit"
-          theme="white"
-          isSubmitting={isSubmitting}
-          disabled={!isValid}
-        >
+        <DaSaveButton>
           Crear
-        </DaButton>
+        </DaSaveButton>
       </DaFooterButtons>
-    </form>
+    </DaForm>
   );
 };

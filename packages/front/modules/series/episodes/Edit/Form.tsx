@@ -17,6 +17,7 @@ import { DaInputNumber } from "#modules/ui-kit/form/input/Number/InputNumber";
 import { Separator } from "#modules/resources/Separator/Separator";
 import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
+import { DaForm } from "#modules/ui-kit/form/Form";
 import { DaInputTime } from "../../../ui-kit/form/input/Time/InputTime";
 import styles from "./style.module.css";
 
@@ -44,7 +45,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
   const { register,
     handleSubmit,
     control,
-    formState: { errors, isDirty, isSubmitting, dirtyFields, isValid } } = useForm( {
+    formState: { errors, isDirty, dirtyFields, isValid } } = useForm( {
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
@@ -147,7 +148,12 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={styles.container}>
+    <DaForm
+      className={styles.container}
+      onSubmit={handleSubmit(onSubmit)}
+      isDirty={isDirty}
+      isValid={isValid}
+    >
       <DaInputGroup inline>
         <DaLabel>Episodio</DaLabel>
         <span>
@@ -231,11 +237,8 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
 
       <DaFooterButtons>
         <DaCloseModalButton />
-        <DaSaveButton
-          disabled={!isDirty || !isValid || isSubmitting}
-          isSubmitting={isSubmitting}
-        />
+        <DaSaveButton />
       </DaFooterButtons>
-    </form>
+    </DaForm>
   );
 };
