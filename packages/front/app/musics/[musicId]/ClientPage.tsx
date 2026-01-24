@@ -8,7 +8,7 @@ import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { Music } from "#modules/musics/musics/FullPage/Music";
 import { useMusic } from "#modules/musics/hooks";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { useAutoplay } from "#modules/utils/autoplay/useAutoplay";
+import { useOnAutoplay } from "#modules/utils/autoplay/useOnAutoplay";
 import { useUser } from "#modules/core/auth/useUser";
 
 interface PageProps {
@@ -19,8 +19,9 @@ export function ClientPage( { params }: PageProps) {
   const { musicId } = use(params);
   const { user } = useUser();
 
-  useAutoplay( {
-    play: ()=>useBrowserPlayer.getState().playMusic(musicId),
+  useOnAutoplay( {
+    data: musicId,
+    play: (id)=>useBrowserPlayer.getState().playMusic(id),
   } );
   const ret = <AsyncLoader
     errorElement={<PageItemNotFound />}

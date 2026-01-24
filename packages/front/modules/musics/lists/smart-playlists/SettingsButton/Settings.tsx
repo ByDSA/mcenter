@@ -1,7 +1,10 @@
+import { PATH_ROUTES } from "$shared/routing";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { LocalDataProvider, useLocalData } from "#modules/utils/local-data-context";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
+import { InstallContextMenuItem } from "app/manifest/install/InstallButton";
+import { isMobile } from "#modules/utils/env";
 import { DeleteSmartPlaylistContextMenuItem } from "../Delete/ContextMenuItem";
 import { EditSmartPlaylistContextMenuItem } from "../Edit/ContextMenuItem";
 import { PlaySmartPlaylistContextMenuItem } from "../Play/ContextMenuItem";
@@ -26,6 +29,10 @@ export const MusicSmartPlaylistSettingsButton = (props: Props) => {
           label="Reproducir modificación"
         />
         <CopySmartPlaylistLinkContextMenuItem />
+        {isMobile() && <InstallContextMenuItem
+          name={data.name}
+          path={`${PATH_ROUTES.musics.frontend.smartPlaylists.withParams(data.id)}?autoplay=1`}
+        />}
         {isUserOwner && <>
           <EditSmartPlaylistContextMenuItem />
           <DeleteSmartPlaylistContextMenuItem

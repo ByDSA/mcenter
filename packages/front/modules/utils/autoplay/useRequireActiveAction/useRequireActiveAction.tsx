@@ -1,10 +1,15 @@
+import { ReactNode } from "react";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
-import { useModal } from "#modules/ui-kit/modal/ModalContext";
+import { OpenModalProps, useModal } from "#modules/ui-kit/modal/ModalContext";
 import styles from "./styles.module.css";
 
 type Props = {
   action: ()=> Promise<void> | void;
-  onFinally?: ()=> Promise<void> | void;
+  openModalProps?: OpenModalProps;
+  button?: {
+    content?: ReactNode;
+    props?: Omit<Parameters<typeof DaButton>[0], "children">;
+  };
 };
 export const useRequireActiveAction = (props: Props) => {
   const modal = useModal();
@@ -16,19 +21,21 @@ export const useRequireActiveAction = (props: Props) => {
       else {
         await modal.openModal( {
           showBox: false,
-          onClose: async ()=> {
-            await props.action();
-            await props.onFinally?.();
-          },
           content: <>
             <DaButton
               className={styles.button}
               theme="blue"
-              onClick={()=> {
-                props.action;
+              {...props.button?.props}
+              onClick={async ()=> {
+                await props.action();
                 modal.closeModal();
-              }}><p>Click para</p><p>Reproducir música</p></DaButton>
+              }}>{props.button?.content ?? <><p>Click para</p><p>Reproducir música</p></>}</DaButton>
           </>,
+          ...props.openModalProps,
+          onClose: async ()=> {
+            await props.openModalProps?.onClose?.();
+            await props.action();
+          },
         } );
       }
     },

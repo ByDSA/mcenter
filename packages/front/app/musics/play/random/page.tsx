@@ -14,8 +14,10 @@ export default function PlaySmartPlaylistPage() {
   const q = searchParams.get("q");
   const playSmartPlaylist = useBrowserPlayer((state) => state.playSmartPlaylist);
   const { action } = useRequireActiveAction( {
-    action: ()=> playSmartPlaylist(q!),
-    onFinally: ()=>router.push(redirectPage),
+    action: async ()=> {
+      await playSmartPlaylist(q!);
+      router.push(redirectPage);
+    },
   } );
   const { user } = useUser();
   const redirectPage = getMusicMainUrl(user);

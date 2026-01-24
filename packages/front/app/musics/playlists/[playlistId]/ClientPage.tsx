@@ -14,7 +14,7 @@ import { useUser } from "#modules/core/auth/useUser";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { useMusic } from "#modules/musics/hooks";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { useAutoplay } from "#modules/utils/autoplay/useAutoplay";
+import { useOnAutoplay } from "#modules/utils/autoplay/useOnAutoplay";
 
 interface PageProps {
   params: Promise<Params | SlugPageParams>;
@@ -25,9 +25,10 @@ export function ClientPage( { params }: PageProps) {
   const { user } = useUser();
   const [data, setData] = useState<MusicPlaylistEntity>();
 
-  useAutoplay( {
-    play: ()=>useBrowserPlayer.getState().playPlaylist( {
-      playlist: data!,
+  useOnAutoplay( {
+    data,
+    play: (d)=>useBrowserPlayer.getState().playPlaylist( {
+      playlist: d,
     } ),
   } );
   const ret = <AsyncLoader

@@ -23,6 +23,7 @@ import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
 import { getMusicMainUrl } from "./musics/utils";
+import { ManifestManager } from "./manifest/ManifestManager";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
@@ -81,6 +82,7 @@ export default async function RootLayout( { children, customMain }: {
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <ManifestManager />
       </head>
       <body>
         <NavigationWatcher />

@@ -1,0 +1,14 @@
+.button {
+  font-size: 2rem;
+  padding: 2rem;
+  max-width: 90dvw;
+}
+
+*:has(>.content) {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
