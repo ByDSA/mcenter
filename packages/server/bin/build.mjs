@@ -1,54 +1,53 @@
 #!/usr/bin/env zx
 
-import { swapPackageJsonKeyValue } from "../../lib/package-json/modifier.mjs";
-
 $.verbose = true;
 
-const PACKAGE_PATH = path.resolve(__dirname, "../package.json");
 const PROJECT_ROOT = path.resolve(__dirname, "../");
-const TARGET_KEY = "dependencies.$shared";
-const TEMP_VALUE = "workspace:../shared/build";
+const TS_CONFIG = path.resolve("tsconfig.json");
+const TS_CONFIG_BAK = path.resolve("tsconfig.json.bak");
+
+// Función para restaurar el archivo original
+async function restoreConfig() {
+  if (await fs.pathExists(TS_CONFIG_BAK)) {
+    echo(chalk.yellow("\nRestaurando configuración original..."));
+    await fs.move(TS_CONFIG_BAK, TS_CONFIG, { overwrite: true } );
+  }
+}
+
+process.once("SIGINT", async () => {
+  await restoreConfig();
+  process.exit(1);
+} );
+process.once("SIGTERM", async () => {
+  await restoreConfig();
+  process.exit(1);
+} );
 
 async function run() {
-  let pkgSwap;
+  cd(PROJECT_ROOT);
 
+  await $`cp ${TS_CONFIG} ${TS_CONFIG_BAK}`;
   try {
-    // 1. Intercambio temporal de valores
-    pkgSwap = await swapPackageJsonKeyValue( {
-      filePath: PACKAGE_PATH,
-      keyPath: TARGET_KEY,
-      newValue: TEMP_VALUE,
-    } );
+    // Si no se quita el $shared del tsconfig, no resuelve luego los alias en Dockerfile
+    // (no sé por qué)
+    await $`sed 's|.*../shared/src/.*||' ${TS_CONFIG_BAK} > ${TS_CONFIG}`;
 
-    // 2. Ejecución del proceso de build
-    cd(PROJECT_ROOT);
+    echo(chalk.blue("tsconfig paths modificados temporalmente."));
     await $`rm -rf build`;
 
     echo(chalk.blue("Transpiling with tsc ..."));
-    // Ejecutamos tsc y tsc-alias. Si alguno falla, el script se detendrá.
     await $`tsc -p tsconfig-build.json`;
     await $`tsc-alias -p tsconfig-build.json`;
 
     echo(chalk.blue("Copying assets ..."));
-    // zx incluye funciones de fs-extra como copy()
     await fs.copy(
       "./src/core/mails/templates/styles.css",
       "./build/core/mails/templates/styles.css",
     );
 
     echo(chalk.bold.green("\n✨ Build finalizado con éxito."));
-  } catch (err) {
-    if (err.exitCode !== undefined) {
-      echo(
-        chalk.red(
-          `\n💥 Error en el proceso de build (Exit Code: ${err.exitCode})`,
-        ),
-      );
-    }
-
-    process.exitCode = 1;
   } finally {
-    await pkgSwap?.restore();
+    await restoreConfig();
   }
 }
 

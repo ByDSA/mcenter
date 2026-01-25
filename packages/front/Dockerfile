@@ -87,6 +87,7 @@ COPY ./$APP/.env.docker.$ENV ./.env
 # Learn more here: https://nextjs.org/telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 
+COPY ./$APP/bin/build.sh ./bin/build.sh
 RUN yarn build
 
 # Production image, copy all the files and run next

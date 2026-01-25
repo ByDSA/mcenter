@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { assertIsSerieEntity, Serie, SeriesKey } from "$shared/models/series";
+import { Serie, serieEntitySchema, SeriesKey } from "$shared/models/series";
 import { StreamCrudDtos } from "$shared/models/streams/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
@@ -33,7 +33,7 @@ CanGetAll<StreamEntity> {
   async handleCreateSerieEvent(event: SeriesEvents.Created.Event) {
     const serie = event.payload.entity;
 
-    assertIsSerieEntity(serie);
+    serieEntitySchema.parse(serie);
 
     // TODO: mejor crear el stream al vuelo cuando se vaya a usar,
     // puede haber muchos users que ni la usen

@@ -25,7 +25,8 @@
       "#tests": ["tests"],
       "#tests/*": ["tests/*"],
       "#utils": ["src/utils"],
-      "#utils/*": ["src/utils/*"]
+      "#utils/*": ["src/utils/*"],
+      "$shared/*": ["../shared/src/*"]
     },
     "skipLibCheck": true, // Para que no compruebe 'noImplicitAny' en las librerías de terceros
     "sourceMap": true,

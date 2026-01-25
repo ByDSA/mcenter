@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "bin/build.mjs",
+    "build": "bin/build.sh",
     "dev": "next dev --webpack",
     "lint": "bin/lint.mjs",
     "start": "[ -e .env ] && set -a && . ./.env; next start"
@@ -21,7 +21,7 @@
     "@tanstack/react-query": "5.90.10",
     "@tanstack/react-virtual": "3.13.13",
     "@textea/json-viewer": "4.0.1",
-    "$shared": "workspace:../shared/src",
+    "$shared": "workspace:../shared/build",
     "async-mutex": "0.5.0",
     "just-clone": "6.2.0",
     "just-diff": "6.0.2",

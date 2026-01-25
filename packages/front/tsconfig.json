@@ -15,11 +15,7 @@
       "#musics/*": ["modules/musics/*"],
       "#styles/*": ["styles/*"],
       "#uikit/*": ["modules/ui-kit/*"],
-      "$shared/*": ["../shared/build/*"],
-      "$sharedSrc/*": [
-        // quitar en producción
-        "../shared/src/*"
-      ]
+      "$shared/*": ["../shared/src/*"],
     },
     "plugins": [
       {

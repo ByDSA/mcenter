@@ -6,6 +6,9 @@ ENV APP=server
 FROM base AS base-pnpm
 RUN yarn global add pnpm
 
+# Para usar $`[cmd]` en scripts de zx
+RUN apk add --no-cache bash
+
 FROM base-pnpm AS deps-common
 WORKDIR /packages
 

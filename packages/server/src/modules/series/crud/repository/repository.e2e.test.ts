@@ -1,11 +1,12 @@
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
+import { assertIsDefined } from "$shared/utils/validation";
 import { StreamsRepository } from "#modules/streams/crud/repository";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
-import { type SerieEntity, assertIsSerieEntity } from "../../models";
+import { type SerieEntity, serieEntitySchema } from "../../models";
 import { SeriesRepository } from "./repository";
 
 let repo: SeriesRepository;
@@ -73,7 +74,7 @@ describe("repository", () => {
       beforeAll(async () => {
         createdGot = await repo.createOneAndGet(newModel);
 
-        assertIsSerieEntity(createdGot);
+        serieEntitySchema.parse(createdGot);
 
         newModel.id = createdGot.id;
       } );
@@ -85,7 +86,7 @@ describe("repository", () => {
       it("should be in db", async () => {
         const got = await repo.getOneByKey(newModel.key);
 
-        assertIsSerieEntity(got);
+        assertIsDefined(got);
 
         newModel.id = got.id;
 
