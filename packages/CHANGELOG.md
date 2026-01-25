@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.30.0](https://github.com/ByDSA/mcenter/compare/v4.29.0...v4.30.0) (2026-01-25)
+
+
+### Features
+
+* **front:** multiple PWA installations ([87e7b4f](https://github.com/ByDSA/mcenter/commit/87e7b4f79f87fe9d7c5a0ba1da433990a62a2e52))
+
+
+### Bug Fixes
+
+* add DaForm ([2e6141f](https://github.com/ByDSA/mcenter/commit/2e6141f56351d1366914c6f51d22f92f70faf058))
+* **front:** ask on close modal when form is dirty ([270f49b](https://github.com/ByDSA/mcenter/commit/270f49b965486da99cae6c069f04694aab86d113))
+* **front:** fetch always user info for musics (if logged) ([76f1bb5](https://github.com/ByDSA/mcenter/commit/76f1bb5adcf848ff15f6537eadb9e24b680e9473))
+* **front:** main music url depending logued/logout ([517424a](https://github.com/ByDSA/mcenter/commit/517424a5a64d91ebd533ca4e3a3d1a4995e71f21))
+* **front:** scroll and keyboard on modal and contextmenu, and minor css style fixes ([8195ccf](https://github.com/ByDSA/mcenter/commit/8195ccf96490c0327f03c8d8a210c67e8da94c47))
+* **front:** unique itemid in playqueue ([6a7e01b](https://github.com/ByDSA/mcenter/commit/6a7e01b0ce3b7820dd9efe65abbbcbfc7149537e))
+
 ## [4.29.0](https://github.com/ByDSA/mcenter/compare/v4.28.0...v4.29.0) (2026-01-21)
 
 
