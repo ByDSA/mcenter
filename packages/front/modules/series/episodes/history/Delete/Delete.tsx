@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
+import { useConfirmModal } from "#modules/ui-kit/modal/ConfirmModal/useConfirmModal";
 import { getLongDateStr } from "#modules/utils/dates";
 import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";

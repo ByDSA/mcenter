@@ -7,7 +7,7 @@ import { docOdmToEntity, entityToFullDocOdm,
 export namespace EpisodeDependencyOdm {
   export type Doc = DocOdm;
   export type FullDoc = FullDocOdm;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+
   export const Model = ModelOdm;
   export const schema = schemaOdm;
   export const toEntity = docOdmToEntity;

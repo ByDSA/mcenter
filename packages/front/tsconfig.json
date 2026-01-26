@@ -14,7 +14,7 @@
       "#modules/*": ["modules/*"],
       "#musics/*": ["modules/musics/*"],
       "#styles/*": ["styles/*"],
-      "#uikit/*": ["modules/ui-kit/*"],
+      "#uikit/*": ["modules/ui-kit/*"]
     },
     "plugins": [
       {

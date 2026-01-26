@@ -2,7 +2,7 @@ import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { Fragment } from "react/jsx-runtime";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
+import { useConfirmModal } from "#modules/ui-kit/modal/ConfirmModal/useConfirmModal";
 import { secsToMmss, formatDateDDMMYYYHHmm } from "#modules/utils/dates";
 import { DaDeleteButton } from "#modules/ui-kit/DeleteButton";
 import { bytesToStr } from "#modules/utils/sizes";

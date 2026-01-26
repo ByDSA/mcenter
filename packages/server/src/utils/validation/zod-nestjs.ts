@@ -9,7 +9,6 @@ import { parseZod } from "$shared/utils/validation/zod";
 import { CustomValidationError } from "$shared/utils/validation/zod";
 import { toGenericError } from "$shared/utils/errors";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ValidateResponseWithZodSchema = (
   schema: z.ZodSchema,
 ) => SetMetadata("zodSerializerSchema", schema);

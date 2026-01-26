@@ -18,7 +18,6 @@ async function getDevModules() {
   if (!isDevEnv)
     return [];
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { DevModule } = await import("../dev/module");
 
   return [

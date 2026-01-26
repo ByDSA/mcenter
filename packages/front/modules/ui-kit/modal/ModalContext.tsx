@@ -10,7 +10,7 @@ import { createContext,
   useEffect } from "react";
 import { Modal } from "./Modal";
 import { disableInput, enableInput } from "./utils";
-import { ConfirmModalContent } from "./useConfirmModal";
+import { ConfirmModalContent } from "./ConfirmModal/Content";
 
 export type OpenModalProps = {
   closeOnClickOutside?: boolean;

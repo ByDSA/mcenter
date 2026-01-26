@@ -18,7 +18,6 @@ export class AuthenticatedGuard implements CanActivate {
 
 export const HAS_AUTHENTICATED_DECORATOR_KEY = "isAuthenticated";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Authenticated = () => {
   return applyDecorators(
     SetMetadata(HAS_AUTHENTICATED_DECORATOR_KEY, true),

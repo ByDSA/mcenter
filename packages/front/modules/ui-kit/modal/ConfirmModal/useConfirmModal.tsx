@@ -1,9 +1,5 @@
-import { ReactNode } from "react";
-import { DaFooterButtons } from "../form/Footer/Buttons/FooterButtons";
-import { DaForm } from "../form/Form";
-import { DaSaveButton } from "../form/SaveButton";
-import { OpenModalProps, useModal } from "./ModalContext";
-import { DaCloseModalButton } from "./CloseButton";
+import { OpenModalProps, useModal } from "../ModalContext";
+import { ConfirmModalContent } from "./Content";
 
 type Action = (obj?: unknown)=> Promise<boolean> | boolean;
 
@@ -64,24 +60,4 @@ export const useConfirmModal = () => {
     ...usingModal,
     openModal,
   };
-};
-
-export const ConfirmModalContent = ( { children,
-  onConfirm,
-  onCancel }: {
-  children: ReactNode;
-  onConfirm: ()=> Promise<void> | void;
-  onCancel?: ()=> Promise<void> | void;
-} ) => {
-  return (
-    <DaForm onSubmit={onConfirm}>
-      {children}
-      <DaFooterButtons>
-        <DaSaveButton>Sí</DaSaveButton>
-        <DaCloseModalButton onClick={onCancel} showOnSmallWidth>
-          Cancelar
-        </DaCloseModalButton>
-      </DaFooterButtons>
-    </DaForm>
-  );
 };

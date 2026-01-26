@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { CstElement, CstNode, IToken } from "@chevrotain/types";
 import { AddedNode, BinaryOperationNode, FilterNode, NegationNode, NumberLiteral, PlayedNode, PrivatePlaylistNode, PublicPlaylistNode, QueryObject, RangeDate, RangeNumber, WeightNode, YearNode } from "../query-object";
 import { queryLexer } from "./query-lexer";

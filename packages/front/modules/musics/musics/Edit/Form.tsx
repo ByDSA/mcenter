@@ -12,7 +12,7 @@ import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
-import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
+import { useConfirmModal } from "#modules/ui-kit/modal/ConfirmModal/useConfirmModal";
 import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
 import { useFileInfosModal } from "#modules/musics/file-info/Edit/Modal";
 import { classes } from "#modules/utils/styles";

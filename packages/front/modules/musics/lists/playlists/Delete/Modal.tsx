@@ -2,7 +2,7 @@ import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
-import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
+import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/ConfirmModal/useConfirmModal";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { MusicPlaylistEntity, musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistsApi } from "../requests";

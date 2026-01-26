@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
 /* eslint-disable padding-line-between-statements */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const NodeMediaServer = require("node-media-server");
 
 const config = {

@@ -155,7 +155,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState<YoutubeTaskStatus | null>(null);
   // Validar URL de YouTube
-  const isValidYouTubeURL = (u: string) => {
+  const isValidYouTubeUrl = (u: string) => {
     const patterns = [
       /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/,
       /^https?:\/\/(www\.)?(music\.)?youtube\.com\/watch\?v=.+/,
@@ -174,7 +174,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
     try {
       setDoing(true);
 
-      if (!isValidYouTubeURL(trimmedUrl))
+      if (!isValidYouTubeUrl(trimmedUrl))
         throw new Error("URL de YouTube no válida");
 
       let input: InputData;
@@ -211,7 +211,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
   const getInputClasses = () => {
     const baseClass = styles.input;
 
-    if (url.trim() && !isValidYouTubeURL(url.trim()))
+    if (url.trim() && !isValidYouTubeUrl(url.trim()))
       return `${baseClass} ${styles.inputInvalid}`;
 
     return `${baseClass} ${styles.inputValid}`;
@@ -238,7 +238,7 @@ export function YouTubeUpload( { onSubmit = defaultOnSubmit,
         onClick={handleSubmit}
         className={styles.uploadButton}
         titleAccess={"Subir"}
-        disabled={!url.trim() || !isValidYouTubeURL(url.trim())}
+        disabled={!url.trim() || !isValidYouTubeUrl(url.trim())}
       />)
           || <Spinner />
           }

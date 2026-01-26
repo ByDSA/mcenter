@@ -11,5 +11,4 @@ export class OptionalJwtGuard extends AuthGuard("jwt") {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const OptionalJwt = ()=> UseGuards(OptionalJwtGuard);

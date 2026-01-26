@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { DocOdm, ModelOdm, schemaOdm,
   FullDocOdm, getIdOdmFromCompKey, EpisodeCompKeyOdm,
   COLLECTION } from "./odm";

@@ -178,7 +178,6 @@ const fileFilter: MulterOptions["fileFilter"] = (_req, file, callback) => {
     callback(new BadRequestException("Tipo de archivo no permitido"), false);
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const UploadFileInterceptor: Type<NestInterceptor> = FileInterceptor("file", {
   storage,
   fileFilter,

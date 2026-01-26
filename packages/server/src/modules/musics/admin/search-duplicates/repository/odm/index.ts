@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { COLLECTION, DocOdm,
   ModelOdm,
   schemaOdm } from "./odm";

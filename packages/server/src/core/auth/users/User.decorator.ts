@@ -3,7 +3,6 @@ import { Reflector } from "@nestjs/core";
 import { HAS_AUTHENTICATED_DECORATOR_KEY } from "./Authenticated.guard";
 import { UserPayload } from "./models";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const User = createParamDecorator((_data, ctx: ExecutionContext): UserPayload | null => {
   const req = ctx.switchToHttp().getRequest();
   const user = req?.user as UserPayload | undefined;

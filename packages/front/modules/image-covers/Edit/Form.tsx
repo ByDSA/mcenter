@@ -5,7 +5,7 @@ import z from "zod";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { logger } from "#modules/core/logger";
-import { useConfirmModal } from "#modules/ui-kit/modal/useConfirmModal";
+import { useConfirmModal } from "#modules/ui-kit/modal/ConfirmModal/useConfirmModal";
 import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
 import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";

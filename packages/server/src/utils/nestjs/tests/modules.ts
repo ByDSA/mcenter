@@ -138,7 +138,6 @@ export async function createMockedModule(
   // Combina mocks propios + mocks importados
   const allMocks = [...mocks, ...importedMocks];
   // 8) Crea wrapper dinámico
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const Wrapper = class {};
 
   Object.defineProperty(Wrapper, "name", {

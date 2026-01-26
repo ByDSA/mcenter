@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { COLLECTION, DocOdm, FullDocOdm, ModelOdm, schemaOdm } from "./odm";
 import { docOdmToEntity, docOdmToModel, modelToDocOdm } from "./adapters";
 

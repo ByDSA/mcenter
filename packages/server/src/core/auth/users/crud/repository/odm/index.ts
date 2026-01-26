@@ -8,7 +8,7 @@ import { docOdmToEntity,
   partialToDocOdm } from "./adapters";
 
 export namespace UserOdm {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+
   export const Model = ModelOdm;
   export const schema = schemaOdm;
   export type Doc = DocOdm;

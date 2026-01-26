@@ -5,7 +5,7 @@ import { DocOdm,
 import { docOdmToModel, modelToDocOdm, docOdmToEntity } from "./adapters";
 
 export namespace UserRoleMapOdm {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+
   export const Model = ModelOdm;
   export const schema = schemaOdm;
   export type Doc = DocOdm;
