@@ -26,6 +26,7 @@ export const DaForm = ( { children,
   const [isSubmitting, setIsSubmitting] = useState(false);
   const usingModal = useModal(true);
   const onSubmit: typeof propsOnSubmit = async (e) => {
+    e.preventDefault(); // Para no recargar la página
     setIsSubmitting(true);
     usingModal.setConfirmClose(null);
     try {
