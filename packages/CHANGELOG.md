@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.30.1](https://github.com/ByDSA/mcenter/compare/v4.30.0...v4.30.1) (2026-01-26)
+
+
+### Bug Fixes
+
+* **front:** install app in mobile ([8545c88](https://github.com/ByDSA/mcenter/commit/8545c887d8df932435eef8189029ccc6cd2767be))
+* **front:** play music from history ([1e8b55a](https://github.com/ByDSA/mcenter/commit/1e8b55a1d282feb4ed7379d2022b4fd243e3f134))
+* **front:** prevent reload on form submit ([8588946](https://github.com/ByDSA/mcenter/commit/85889464fe8e44977f7f1d213e82498c815a9dcc))
+* **front:** race condition on confirm close modal ([7a29f1d](https://github.com/ByDSA/mcenter/commit/7a29f1da005c6fdaffe17d1fa64dcc6ca750707a))
+
 ## [4.30.0](https://github.com/ByDSA/mcenter/compare/v4.29.0...v4.30.0) (2026-01-25)
 
 
