@@ -1,6 +1,7 @@
 import React from "react";
 import { useShallow } from "zustand/react/shallow";
 import { PATH_ROUTES } from "$shared/routing";
+import { showError } from "$shared/utils/errors/showError";
 import { useUser } from "#modules/core/auth/useUser";
 import { HistoryTimeView, WeightView } from "#modules/history";
 import { MusicSubtitle } from "#modules/musics/musics/ListItem/MusicEntry";
@@ -29,6 +30,10 @@ export const MusicHistoryListItem = React.memo(() =>{
   const { data: music } = useMusic(data.resourceId, {
     debounce: true,
   } );
+
+  // TODO: se necesita por la duración
+  if (!music?.fileInfos)
+    useMusic.invalidateCache(data.resourceId).catch(showError);
 
   if (!music)
     return <ResourceEntryLoading />;

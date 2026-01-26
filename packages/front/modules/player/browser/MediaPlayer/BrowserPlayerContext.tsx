@@ -5,6 +5,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
+import { assertIsDefined } from "$shared/utils/validation";
 import { backendUrl } from "#modules/requests";
 import { withRetries } from "#modules/utils/retries";
 import { useMusic } from "#modules/musics/hooks";
@@ -179,6 +180,8 @@ export const useBrowserPlayer = create<PlayerState>()(
         if (!music)
           return;
 
+        assertIsDefined(music.fileInfos?.[0]);
+
         const resource = musicToResource(music);
         const { currentResource } = get();
         const isSameAsLatest = currentResource
@@ -189,7 +192,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           ...(isSameAsLatest
             ? {}
             : {
-              duration: music.fileInfos![0]?.mediaInfo.duration ?? undefined,
+              duration: music.fileInfos[0]?.mediaInfo.duration ?? undefined,
             } ),
           currentResource: resource,
           nextResource: null,
