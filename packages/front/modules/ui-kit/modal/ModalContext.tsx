@@ -56,13 +56,16 @@ type ModalElements = {
 export const ModalProvider = ( { children }: { children: ReactNode } ) => {
   const [modals, setModals] = useState<ModalInstance[]>([]);
   const modalRefs = useRef<Record<string, ModalElements>>( {} );
+  const modalsRef = useRef(modals);
+
+  modalsRef.current = modals;
   const _open = useCallback((id: string, options: OpenModalProps) => {
     const active = document.activeElement as HTMLElement | null;
 
     if (active)
       active.blur();
 
-    if (modals.length === 0)
+    if (modalsRef.current.length === 0)
       disableInput();
 
     setModals((prev) => {
@@ -70,7 +73,7 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
       const newInstance: ModalInstance = {
         id,
         isOpen: true,
-        content: options.content || null,
+        content: options.content ?? null,
         options,
         confirmCloseModal: null,
       };
@@ -112,71 +115,51 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
     } );
   }, []);
   const _close = useCallback(async (id: string, returnObj?: unknown, force: boolean = false) => {
-    let modalOptions: OpenModalProps | undefined;
-    let hasConfirmClose = false;
+    const modal = modalsRef.current.find(m => m.id === id);
 
-    await new Promise<void>((resolve) => {
-      setModals((prev) => {
-        const modal = prev.find((m) => m.id === id);
+    if (!modal)
+      return;
 
-        if (!modal) {
-          resolve();
+    if (modal.confirmCloseModal && !force) {
+      const confirmId = `confirm-close-${id}`;
 
-          return prev;
-        }
-
-        // Si hay confirmación configurada y NO es un cierre forzado
-        if (modal.confirmCloseModal && !force) {
-          const confirmId = `confirm-close-${id}`;
-
-          // Reutilizamos _open para mostrar la confirmación
-          _open(confirmId, {
-            ...modal.confirmCloseModal,
-            title: modal.confirmCloseModal.title ?? "Confirmar acción",
-            showCloseButton: false,
-            content: (
-              <ConfirmModalContent
-                // Al confirmar: Cerramos el confirm modal y luego forzamos el cierre del padre
-                onConfirm={async () => {
-                  // 1. Cerrar este modal de confirmación
-                  await _close(confirmId, undefined, true);
-                  // 2. Cerrar el modal original saltando el check (force=true)
-                  await _close(id, returnObj, true);
-                }}
-                onCancel={async () => {
-                  await _close(confirmId, undefined, true);
-                }}
-              >
-                {modal.confirmCloseModal.content}
-              </ConfirmModalContent>
-            ),
-          } );
-
-          resolve();
-
-          return prev;
-        }
-
-        modalOptions = modal.options;
-        hasConfirmClose = !!modal.confirmCloseModal;
-        resolve();
-
-        return prev.filter((m) => m.id !== id);
+      _open(confirmId, {
+        ...modal.confirmCloseModal,
+        title: modal.confirmCloseModal.title ?? "Confirmar acción",
+        showCloseButton: false,
+        content: (
+          <ConfirmModalContent
+            onConfirm={async () => {
+              // Cerrar este modal de confirmación
+              await _close(confirmId, undefined, true);
+              // Cerrar el modal original saltando el check (force=true)
+              await _close(id, returnObj, true);
+            }}
+            onCancel={async () => {
+              await _close(confirmId, undefined, true);
+            }}
+          >
+            {modal.confirmCloseModal.content}
+          </ConfirmModalContent>
+        ),
       } );
-    } );
 
-    // Post-cierre real
-    // Solo limpiamos si realmente cerramos (force=true o no había confirmación)
-    if (force || !hasConfirmClose) {
-      if (modals.length === 0)
-        enableInput();
-
-      if (modalRefs.current[id])
-        delete modalRefs.current[id];
-
-      if (modalOptions?.onClose)
-        await modalOptions.onClose(returnObj);
+      return; // Detener aquí, no cerramos el padre
     }
+
+    // 3. Ejecutar side-effects (onClose) ANTES de quitarlo del estado o DESPUÉS
+    // (Generalmente es mejor después, pero requiere useEffect o lógica extra)
+    if (modal.options.onClose)
+      await modal.options.onClose(returnObj);
+
+    // 4. Actualización Atómica del Estado (Aquí sí usamos setModals)
+    setModals(prev => prev.filter(m => m.id !== id));
+
+    // Limpieza de refs
+    delete modalRefs.current[id];
+
+    if (modalsRef.current.length <= 1)
+      enableInput(); // Check aproximado
   }, [_open]);
   const _setContent = useCallback((id: string, content: ReactNode) => {
     setModals((prev) => prev.map((m) => (m.id === id

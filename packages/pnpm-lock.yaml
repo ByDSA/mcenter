@@ -207,6 +207,9 @@ importers:
       '@types/react':
         specifier: 19.2.7
         version: 19.2.7
+      baseline-browser-mapping:
+        specifier: ^2.9.18
+        version: 2.9.18
 
   server:
     dependencies:
@@ -3766,8 +3769,8 @@ packages:
     resolution: {integrity: sha512-ir1UPr3dkwexU7FdV8qBBbNDRUhMmIekYMFZfi+C/sLNnRESKPl23nB9b2pltqfOQNnGzsDdId90AEtG5tCx4A==}
     engines: {node: '>=6.0.0'}
 
-  baseline-browser-mapping@2.8.20:
-    resolution: {integrity: sha512-JMWsdF+O8Orq3EMukbUN1QfbLK9mX2CkUmQBcW2T0s8OmdAUL5LLM/6wFwSrqXzlXB13yhyK9gTKS1rIizOduQ==}
+  baseline-browser-mapping@2.9.18:
+    resolution: {integrity: sha512-e23vBV1ZLfjb9apvfPk4rHVu2ry6RIr2Wfs+O324okSidrX7pTAnEJPCh/O5BtRlr7QtZI7ktOP3vsqr7Z5XoA==}
     hasBin: true
 
   batch@0.6.1:
@@ -12929,7 +12932,7 @@ snapshots:
 
   base64url@3.0.1: {}
 
-  baseline-browser-mapping@2.8.20: {}
+  baseline-browser-mapping@2.9.18: {}
 
   batch@0.6.1: {}
 
@@ -13004,7 +13007,7 @@ snapshots:
 
   browserslist@4.27.0:
     dependencies:
-      baseline-browser-mapping: 2.8.20
+      baseline-browser-mapping: 2.9.18
       caniuse-lite: 1.0.30001751
       electron-to-chromium: 1.5.243
       node-releases: 2.0.26
@@ -16962,7 +16965,7 @@ snapshots:
     dependencies:
       '@next/env': 16.1.1
       '@swc/helpers': 0.5.15
-      baseline-browser-mapping: 2.8.20
+      baseline-browser-mapping: 2.9.18
       caniuse-lite: 1.0.30001751
       postcss: 8.4.31
       react: 19.2.3
