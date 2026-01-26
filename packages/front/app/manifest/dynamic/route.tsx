@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
 import { MetadataRoute } from "next";
-import { isDesktop } from "#modules/utils/env";
+import { getBrowserEnv } from "#modules/utils/env";
 
 // Definimos los iconos fuera para reutilizarlos
 const icons: MetadataRoute.Manifest["icons"] = [
@@ -39,14 +39,17 @@ const baseManifest: MetadataRoute.Manifest = {
 // eslint-disable-next-line require-await
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const currentPath = (searchParams.get("path") ?? "") + "/";
+  const currentPath = (searchParams.get("path") ?? "");
   const manifestUrl = request.nextUrl.pathname + request.nextUrl.search;
   let dynamicProps = {};
   const nameParam = searchParams.get("name");
   let name = nameParam;
   let start_url = currentPath;
+  const browserEnv = getBrowserEnv( {
+    userAgent: userAgent(request).ua,
+  } );
 
-  if (isDesktop()) {
+  if (browserEnv === "desktop") {
     if (start_url.startsWith("/musics"))
       start_url = "/musics";
     else

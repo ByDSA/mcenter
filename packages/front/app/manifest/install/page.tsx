@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useCallback, useState } from "react";
+import { showError } from "$shared/utils/errors/showError";
 import { logger } from "#modules/core/logger";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { useRequireActiveAction } from "#modules/utils/autoplay/useRequireActiveAction/useRequireActiveAction";
@@ -16,11 +17,9 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
-// Variable global (se mantiene igual)
 let globalDeferredPrompt: BeforeInstallPromptEvent | null = null;
 
 if (typeof window !== "undefined") {
-  // MODIFICADO: TypeScript estricto requiere recibir 'Event' genérico y castear dentro
   window.addEventListener("beforeinstallprompt", (e: Event) => {
     e.preventDefault();
     globalDeferredPrompt = e as BeforeInstallPromptEvent;
@@ -33,6 +32,7 @@ function InstallPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnPath = searchParams.get("returnPath");
+  const [loaded, setLoaded] = useState(false);
   const [activePrompt, setActivePrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const handleBack = useCallback(() => {
     if (returnPath)
@@ -60,8 +60,6 @@ function InstallPageContent() {
 
       const { outcome } = await promptToUse.userChoice;
 
-      logger.info(outcome);
-
       if (outcome === "accepted") {
         logger.info("App instalada con éxito");
         globalDeferredPrompt = null;
@@ -71,7 +69,6 @@ function InstallPageContent() {
       logger.error(e.message);
     }
     handleBack();
-    doing = false;
   }, [activePrompt, handleBack]);
   const { action: triggerRequireActive } = useRequireActiveAction( {
     button: {
@@ -92,13 +89,14 @@ function InstallPageContent() {
       const event = e;
 
       globalDeferredPrompt = event;
-      setActivePrompt(event); // MODIFICADO: Actualizamos el estado
+      setActivePrompt(event);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     triggerRequireActive();
+    setLoaded(true);
 
     if (globalDeferredPrompt)
       setActivePrompt(globalDeferredPrompt);
@@ -110,12 +108,39 @@ function InstallPageContent() {
     // y así se sasegura que sólo se llame el useEfect una vez
   }, []);
 
-  if (activePrompt)
-    return null;
+  const startUrl = useStartUrl();
 
-  return <div className={styles.content}><ContentSpinner /></div>;
+  if (!loaded)
+    return <div className={styles.content}><ContentSpinner /></div>;
+
+  return <div className={styles.url}><p>La dirección de la App será:</p><p>{startUrl}</p></div>;
 }
 
 export default function Page() {
   return <InstallPageContent />;
+}
+
+function useStartUrl() {
+  const [startUrl, setStartUrl] = useState<string>("");
+
+  useEffect(() => {
+    // Obtener la start_url del manifest
+    const fetchManifest = async () => {
+      try {
+        const manifestLink = document.querySelector("link[rel=\"manifest\"]") as HTMLLinkElement;
+        const manifestUrl = manifestLink?.href || "/manifest.json";
+        const response = await fetch(manifestUrl);
+        const manifest = await response.json();
+
+        setStartUrl(manifest.start_url || "/");
+      } catch (error) {
+        logger.error("Error al cargar manifest:", error);
+        setStartUrl("/");
+      }
+    };
+
+    fetchManifest().catch(showError);
+  }, []);
+
+  return startUrl;
 }

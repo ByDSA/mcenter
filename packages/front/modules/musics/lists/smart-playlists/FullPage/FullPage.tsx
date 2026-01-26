@@ -94,5 +94,7 @@ export const MusicSmartPlaylistFullPage = () => {
 
 function makeReadableQuery(query: string) {
   return query.replaceAll("*", " * ")
-    .replaceAll("|", " | ");
+    .replaceAll("|", " | ")
+    .replaceAll("(", "( ")
+    .replaceAll(")", " )");
 }

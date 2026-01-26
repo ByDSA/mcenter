@@ -12,3 +12,7 @@
   align-items: center;
   flex: 1;
 }
+
+.url {
+  padding: 1rem;
+}

@@ -28,29 +28,24 @@ export const isInstalledApp = (): boolean => {
  * Detecta si el usuario está en un dispositivo móvil basándose en el User Agent.
  * Útil para lógica que debe ejecutarse antes de que el layout CSS cargue.
  */
-export const isMobile = (userAgent?: string): boolean => {
-  const ua = userAgent || (isClient() ? window.navigator.userAgent : "");
+type Props = {
+  userAgent?: string;
+};
+export const isMobile = (props?: Props): boolean => {
+  const ua = props?.userAgent ?? (isClient() ? window.navigator.userAgent : "");
+  const hasMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
 
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  return hasMobileUserAgent;
 };
 
 /**
  * Detecta si el usuario está en un dispositivo desktop.
  * Se define simplemente como lo opuesto a un dispositivo móvil.
  */
-export const isDesktop = (userAgent?: string): boolean => {
-  return !isMobile(userAgent);
-};
+type Env = "desktop" | "mobile";
+export const getBrowserEnv = (props?: Props): Env => {
+  if (isMobile(props))
+    return "mobile";
 
-/**
- * Hook de ejemplo o utilidad combinada para obtener el estado del dispositivo.
- * Nota: En Next.js, si usas esto en componentes de servidor, debes pasar el
- * User Agent desde los headers de la petición.
- */
-export const getDeviceType = (userAgent?: string) => {
-  return {
-    isMobile: isMobile(userAgent),
-    isDesktop: isDesktop(userAgent),
-    isInstalled: isInstalledApp(),
-  };
+  return "desktop";
 };
