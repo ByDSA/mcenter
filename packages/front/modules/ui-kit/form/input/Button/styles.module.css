@@ -35,6 +35,7 @@ body:has(.button) {
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
 
   &:focus-visible {
    box-shadow: 0 0 0 3px var(--color-ui-focus);
