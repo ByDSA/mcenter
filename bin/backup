@@ -1,0 +1,307 @@
+#!/usr/bin/env zx
+
+import { fileURLToPath } from 'url';
+import path from 'path';
+import net from 'net';
+
+// --- Configuración Global ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+
+// Capturamos el primer argumento como carpeta de salida personalizada
+// Si no existe, usamos el valor por defecto ".backups"
+const customOutputDir = argv._[0];
+const BACKUP_ROOT = customOutputDir
+    ? path.resolve(process.cwd(), customOutputDir)
+    : path.join(PROJECT_ROOT, '.backups');
+
+const TMP_DIR = path.join(BACKUP_ROOT, 'tmp');
+const LOG_FILE = path.join(TMP_DIR, 'backup.log');
+
+$.verbose = false;
+cd(PROJECT_ROOT);
+
+/**
+ * Registra mensajes en consola y en el archivo de log con timestamp.
+ */
+async function logMessage(msg) {
+    const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
+    const formattedMsg = `[${timestamp}] ${msg}`;
+    console.log(formattedMsg);
+
+    if (await fs.pathExists(TMP_DIR)) {
+        await fs.appendFile(LOG_FILE, formattedMsg + '\n');
+    }
+}
+
+/**
+ * Verifica si mongodump existe.
+ */
+async function checkDependencies() {
+    try {
+        await $`which mongodump`.quiet();
+    } catch (e) {
+        throw new Error("No se encontró 'mongodump'. Por favor, instala 'mongodb-database-tools'.");
+    }
+}
+
+/**
+ * Parsea valores del archivo .env.
+ */
+function parseEnvValue(content, key) {
+    const regex = new RegExp(`^\\s*${key}\\s*=\\s*(.*)$`, 'm');
+    const match = content.match(regex);
+    if (match) {
+        return match[1]
+            .trim()
+            .replace(/^["']|["']$/g, '')
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+    }
+    return null;
+}
+
+/**
+ * Verifica si un puerto TCP está abierto (Solo se llama si el puerto está definido).
+ */
+function checkTcpPort(host, port, timeoutMs = 3000) {
+    return new Promise((resolve, reject) => {
+        const socket = new net.Socket();
+        let status = null;
+
+        socket.setTimeout(timeoutMs);
+
+        socket.on('connect', () => {
+            status = 'open';
+            socket.destroy();
+        });
+
+        socket.on('timeout', () => {
+            status = 'timeout';
+            socket.destroy();
+        });
+
+        socket.on('error', () => {
+            status = 'error';
+            socket.destroy();
+        });
+
+        socket.on('close', () => {
+            if (status === 'open') resolve(true);
+            else reject(new Error(status === 'timeout' ? 'Timeout' : 'Rechazada'));
+        });
+
+        socket.connect(parseInt(port, 10), host);
+    });
+}
+
+/**
+ * Prueba la conexión y construye la URI siguiendo la lógica del backend.
+ */
+async function tryMongoConnection(envPath) {
+    if (!(await fs.pathExists(envPath))) return null;
+
+    const envContent = await fs.readFile(envPath, 'utf-8');
+    const host = parseEnvValue(envContent, 'MONGO_HOSTNAME');
+    const dbNameRaw = parseEnvValue(envContent, 'MONGO_DB');
+    const port = parseEnvValue(envContent, 'MONGO_PORT');
+    const user = parseEnvValue(envContent, 'MONGO_USER');
+    const pass = parseEnvValue(envContent, 'MONGO_PASSWORD');
+
+    if (!host || !dbNameRaw) return null;
+
+    // Lógica para el Schema
+    const isLocal = (port !== undefined || (host === "localhost" || host === "127.0.0.1"))
+                    && !host.includes("mongodb.net");
+    const schema = isLocal ? "mongodb" : "mongodb+srv";
+
+    // Verificación TCP: SOLO si el puerto está explícitamente definido
+    if (port) {
+        try {
+            await checkTcpPort(host, port, 3000);
+        } catch (tcpError) {
+            await logMessage(`[SKIP] ${path.basename(envPath)} inalcanzable en ${host}:${port}.`);
+            return null;
+        }
+    }
+
+    // Construcción de la URI
+    let auth = "";
+    if (user && pass) {
+        auth = `${encodeURIComponent(user)}:${encodeURIComponent(pass)}@`;
+    }
+
+    const dbName = dbNameRaw.split('?')[0];
+    const portString = port ? `:${port}` : '';
+
+    // Si es mongodb+srv, por especificación no se incluye el puerto en la cadena de conexión
+    const finalUri = (schema === "mongodb+srv")
+        ? `${schema}://${auth}${host}/${dbNameRaw}`
+        : `${schema}://${auth}${host}${portString}/${dbNameRaw}`;
+
+    return { uri: finalUri, dbName };
+}
+
+/**
+ * Prepara el directorio de trabajo.
+ */
+async function prepareWorkspace() {
+    // Nos aseguramos de que la carpeta de backup raíz exista
+    await fs.ensureDir(BACKUP_ROOT);
+
+    if (await fs.pathExists(TMP_DIR)) {
+        await fs.remove(TMP_DIR);
+    }
+    await fs.ensureDir(TMP_DIR);
+}
+
+/**
+ * Obtiene la lista de archivos a respaldar.
+ */
+async function getFilesToBackup() {
+    const excludePatterns = [
+        "(^|/)node_modules/",
+        "^\\.git/",
+        "^\\.husky/",
+        "^packages/\\.husky/",
+        "^\\.backups/",
+        "^packages/server/(build|coverage|lib/chevrotain|tests/logs)/",
+        "^packages/front/(\\.next/|next-env.d.ts)",
+        "^packages/shared/(build|bin/\\.debounce.*|playwright-report|test-results|tests/e2e/bin/\\.tmp)/",
+        "^packages/vlc/(build|coverage)/",
+        "^build/",
+        "^bin/backup.mjs"
+    ];
+
+    const excludeRegex = new RegExp(excludePatterns.join('|'));
+    const isGitRepo = await fs.pathExists(path.join(PROJECT_ROOT, '.git'));
+    let fileList = [];
+
+    if (isGitRepo) {
+        const rawFiles = await $`git ls-files -o -m --ignored --exclude-standard`.quiet();
+        fileList = rawFiles.stdout.split('\n');
+    } else {
+        const rawFiles = await $`find . -type f`.quiet();
+        fileList = rawFiles.stdout.split('\n').map(f => f.replace(/^\.\//, ''));
+    }
+
+    return fileList
+        .filter(line => line.trim() !== '')
+        .filter(file => !excludeRegex.test(file));
+}
+
+/**
+ * Realiza el volcado de la base de datos.
+ */
+async function performDatabaseDump() {
+    await logMessage("--- Fase Base de Datos ---");
+
+    const envOptions = [
+        path.join(PROJECT_ROOT, "packages/server/.env"),
+        path.join(PROJECT_ROOT, "packages/server/.env.dev")
+    ];
+
+    let connection = null;
+    for (const envPath of envOptions) {
+        connection = await tryMongoConnection(envPath);
+        if (connection) break;
+    }
+
+    if (!connection) {
+        throw new Error("No se pudo conectar a MongoDB. Revisa los archivos .env.");
+    }
+
+    const { uri, dbName } = connection;
+    const timestamp = new Date().toISOString().replace(/[-:T]/g, '').split('.')[0];
+    const archiveName = `db_dump_${dbName}_${timestamp}.archive`;
+    const archivePath = path.join(TMP_DIR, archiveName);
+
+    await logMessage(`Iniciando mongodump de: ${dbName}`);
+
+    $.verbose = true;
+    try {
+        await $`mongodump --uri=${uri} --archive=${archivePath}`;
+    } catch (e) {
+         throw new Error("Error ejecutando mongodump.");
+    }
+    $.verbose = false;
+
+    await logMessage(`Dump completado: ${archiveName}`);
+}
+
+/**
+ * Genera reporte de archivos multimedia.
+ */
+async function generateMediaReport() {
+    await logMessage("--- Fase Multimedia ---");
+    const rootEnvPath = path.join(PROJECT_ROOT, "packages/.env");
+
+    if (!(await fs.pathExists(rootEnvPath))) {
+        throw new Error(`Falta el archivo: ${rootEnvPath}`);
+    }
+
+    const envContent = await fs.readFile(rootEnvPath, 'utf-8');
+    const mediaRootPath = parseEnvValue(envContent, 'MCENTER_SERVER_MEDIA_PATH');
+
+    if (!mediaRootPath || !(await fs.pathExists(mediaRootPath))) {
+        throw new Error(`Ruta de media no configurada.`);
+    }
+
+    const subfolders = ['docs', 'image-covers', 'music', 'pelis', 'series'];
+    let fullReport = "";
+
+    for (const folder of subfolders) {
+        const fullPath = path.join(mediaRootPath, folder);
+        if (await fs.pathExists(fullPath)) {
+            await logMessage(`Indexando: ${folder}`);
+            const result = await $`find ${fullPath} -type f -printf "${folder}/%P | %s bytes | %TY-%Tm-%Td %TH:%TM:%TS\n"`.quiet();
+            fullReport += result.stdout;
+        }
+    }
+
+    await fs.writeFile(path.join(TMP_DIR, 'media.files.txt'), fullReport);
+}
+
+/**
+ * Función Principal
+ */
+async function runBackup() {
+    try {
+        await prepareWorkspace();
+        await logMessage(`=== INICIANDO BACKUP EN: ${BACKUP_ROOT} ===`);
+
+        await checkDependencies();
+
+        // 1. Archivos
+        const fileList = await getFilesToBackup();
+        if (fileList.length > 0) {
+            await logMessage(`Copiando ${fileList.length} archivos...`);
+            await $`echo ${fileList.join('\n')} | rsync -av --files-from=- ${PROJECT_ROOT} ${TMP_DIR}/`.quiet();
+        }
+
+        // 2. DB
+        await performDatabaseDump();
+
+        // 3. Media
+        await generateMediaReport();
+
+        // 4. Empaquetado
+        const timestamp = new Date().toISOString().replace(/[-:T]/g, '').split('.')[0];
+        const backupFileName = `backup_${timestamp}.tar.gz`;
+        const finalBackupPath = path.join(BACKUP_ROOT, backupFileName);
+
+        await logMessage("Comprimiendo backup...");
+        await $`tar -czf ${finalBackupPath} -C ${TMP_DIR} .`.quiet();
+
+        await fs.remove(TMP_DIR);
+
+        console.log(`\n✅ COMPLETADO: ${finalBackupPath}\n`);
+
+    } catch (err) {
+        console.error(`\n❌ ERROR: ${err.message}`);
+        process.exit(1);
+    }
+}
+
+runBackup();
