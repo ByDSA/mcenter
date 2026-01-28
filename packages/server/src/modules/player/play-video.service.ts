@@ -3,15 +3,15 @@ import { Injectable } from "@nestjs/common";
 import { EpisodeCompKey, EpisodeEntityWithFileInfos } from "$shared/models/episodes";
 import { episodeToMediaElement } from "$shared/models/player";
 import { mediaElementFixPlayerLabels } from "$shared/models/resources";
-import { assertFoundClient, assertIsNotEmptyClient } from "#utils/validation/found";
-import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
-import { EpisodePickerService } from "#modules/streams/picker";
-import { StreamsRepository } from "#modules/streams/crud/repository";
-import { EpisodeEntity } from "#episodes/models";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
-import { SeriesRepository } from "#modules/series/crud/repository";
 import { PlayService } from "./play.service";
 import { RemotePlayersRepository } from "./player-services/repository";
+import { assertFoundClient, assertIsNotEmptyClient } from "#utils/validation/found";
+import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
+import { EpisodePickerService } from "#episodes/streams/picker";
+import { StreamsRepository } from "#episodes/streams/crud/repository";
+import { EpisodeEntity } from "#episodes/models";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
+import { SeriesRepository } from "#episodes/series/crud/repository";
 
 type ProcessAndPlayEpisodesProps = {
   remotePlayerId: string;

@@ -1,7 +1,7 @@
 import type { PipelineStage } from "mongoose";
 import { StreamCrudDtos } from "$shared/models/streams/dto/transport";
 import { EpisodeHistoryEntryOdm } from "#episodes/history/crud/repository/odm";
-import { SeriesOdm } from "#modules/series/crud/repository/odm";
+import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 
 type CriteriaMany = StreamCrudDtos.GetManyByCriteria.Criteria;
 

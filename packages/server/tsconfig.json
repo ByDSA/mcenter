@@ -21,7 +21,7 @@
       "#episodes/*": ["src/modules/episodes/*"],
       "#modules/*": ["src/modules/*"],
       "#musics/*": ["src/modules/musics/*"],
-      "#series/*": ["src/modules/series/*"],
+      "#series/*": ["src/modules/episodes/series/*"],
       "#tests": ["tests"],
       "#tests/*": ["tests/*"],
       "#utils": ["src/utils"],

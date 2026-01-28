@@ -2,17 +2,17 @@ import type { ResourcePicker } from "#modules/picker";
 import type { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined, assertIsNotEmpty, neverCase } from "$shared/utils/validation";
+import { buildEpisodePicker } from "./episode-picker";
+import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { PickMode } from "#modules/picker/resource-picker/pick-mode";
-import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#modules/streams";
-import { StreamsRepository } from "#modules/streams/crud/repository";
+import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#episodes/streams";
+import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
-import { SeriesRepository } from "#modules/series/crud/repository";
+import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfosRepository } from "#episodes/file-info/crud/repository/repository";
-import { buildEpisodePicker } from "./episode-picker";
-import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
 
 @Injectable()
 export class StreamGetRandomEpisodeService {

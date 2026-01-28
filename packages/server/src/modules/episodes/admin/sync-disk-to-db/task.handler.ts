@@ -16,9 +16,9 @@ import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt
 import { RemoteSeriesTreeService } from "./db";
 import { SerieNode, SerieTree, EpisodeNode } from "./disk/models";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
-import { SeriesRepository } from "#modules/series/crud/repository";
+import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfo, EpisodeFileInfoEntity, EpisodeFileInfoOmitEpisodeId, episodeFileInfoSchema } from "#episodes/file-info/models";
-import { Serie } from "#modules/series";
+import { Serie } from "#episodes/series";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { md5FileAsync } from "#utils/crypt";
 import { Episode } from "#episodes/models";

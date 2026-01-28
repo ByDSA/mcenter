@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { Body, Controller } from "@nestjs/common";
 import { StreamCrudDtos } from "$shared/models/streams/dto/transport";
 import { createZodDto } from "nestjs-zod";
-import { Stream, streamEntitySchema } from "#modules/streams/models";
+import { StreamsRepository } from "./repository";
+import { Stream, streamEntitySchema } from "#episodes/streams/models";
 import { CanGetAll } from "#utils/layers/controller";
 import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/crud/get";
-import { StreamsRepository } from "./repository";
 
 const schema = streamEntitySchema;
 

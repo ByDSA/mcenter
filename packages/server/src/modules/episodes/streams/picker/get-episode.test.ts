@@ -1,14 +1,15 @@
 import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
+import { StreamGetRandomEpisodeService } from "./get-episode.service";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { episodeRepositoryMockProvider } from "#episodes/crud/repositories/episodes/tests";
-import { StreamEntity } from "#modules/streams";
-import { StreamsRepository } from "#modules/streams/crud/repository";
-import { streamsRepositoryMockProvider } from "#modules/streams/crud/repository/tests";
+import { StreamEntity } from "#episodes/streams";
+import { StreamsRepository } from "#episodes/streams/crud/repository";
+import { streamsRepositoryMockProvider } from "#episodes/streams/crud/repository/tests";
 import { episodeDependenciesRepositoryMockProvider } from "#episodes/dependencies/crud/repository/tests";
 import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
-import { STREAM_SIMPSONS } from "#modules/streams/tests";
+import { STREAM_SIMPSONS } from "#episodes/streams/tests";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
 import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
@@ -16,10 +17,9 @@ import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app
 import { createMockProvider } from "#utils/nestjs/tests";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
-import { seriesRepositoryMockProvider } from "#modules/series/crud/repository/tests";
-import { SeriesRepository } from "#modules/series/crud/repository";
+import { seriesRepositoryMockProvider } from "#episodes/series/crud/repository/tests";
+import { SeriesRepository } from "#episodes/series/crud/repository";
 import { episodeFileInfoRepositoryMockProvider } from "#episodes/file-info/crud/repository/tests";
-import { StreamGetRandomEpisodeService } from "./get-episode.service";
 
 describe("streamGetRandomEpisode", () => {
   let testingSetup: TestingSetup;

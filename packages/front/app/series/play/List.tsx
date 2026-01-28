@@ -6,7 +6,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { RemotePlayerDtos } from "$shared/models/player/remote-player/dto/domain";
 import { useRouter } from "next/navigation";
 import { backendUrl } from "#modules/requests";
-import { StreamsFetching } from "#modules/streams/requests";
+import { StreamsFetching } from "#modules/episodes/streams/requests";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudData } from "#modules/fetching/index";
 import { logger } from "#modules/core/logger";

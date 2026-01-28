@@ -1,4 +1,4 @@
-import type { SeriesKey } from "#series/models";
+import type { SeriesKey } from "#episodes/series/models";
 import { EpisodeDependency } from "#episodes/dependencies/models";
 
 export type DependenciesList = {[key: SeriesKey]: [string, string][]};

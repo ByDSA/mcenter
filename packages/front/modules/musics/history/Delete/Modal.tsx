@@ -6,7 +6,7 @@ import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/ConfirmModal/useConfirmModal";
 import { getLongDateStr } from "#modules/utils/dates";
 import { useLocalData } from "#modules/utils/local-data-context";
-import { DeleteHistoryEntryModalContentWrapper } from "#modules/series/episodes/history/Delete/Delete";
+import { DeleteHistoryEntryModalContentWrapper } from "#modules/episodes/history/Delete/Delete";
 import { MusicHistoryEntryEntity } from "../models";
 import { MusicHistoryApi } from "../requests";
 

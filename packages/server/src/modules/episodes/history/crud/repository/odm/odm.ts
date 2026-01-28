@@ -3,7 +3,7 @@ import { DateType } from "$shared/utils/time";
 import { DateTypeOdmSchema } from "#utils/time";
 import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
-import { StreamOdm } from "#modules/streams/crud/repository/odm";
+import { StreamOdm } from "#episodes/streams/crud/repository/odm";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 
 type DocOdm = {

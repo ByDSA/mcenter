@@ -3,8 +3,8 @@ import { createManyResultResponseSchema, createOneResultResponseSchema, ResultRe
 import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
-import { EpisodeCompKey, EpisodeEntity, episodeEntitySchema } from "#modules/series/episodes/models";
-import { EpisodesCrudDtos } from "#modules/series/episodes/models/dto";
+import { EpisodeCompKey, EpisodeEntity, episodeEntitySchema } from "#modules/episodes/models";
+import { EpisodesCrudDtos } from "#modules/episodes/models/dto";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";

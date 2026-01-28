@@ -2,16 +2,16 @@ import { Injectable } from "@nestjs/common";
 import { Serie, serieEntitySchema, SeriesKey } from "$shared/models/series";
 import { StreamCrudDtos } from "$shared/models/streams/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
-import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
-import { SeriesEvents } from "#modules/series/crud/repository/events";
-import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
-import { DomainEvent } from "#core/domain-event-emitter";
-import { logDomainEvent } from "#core/logging/log-domain-event";
-import { UsersRepository } from "#core/auth/users/crud/repository";
 import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
 import { StreamEvents } from "./events";
 import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
 import { StreamOdm } from "./odm";
+import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
+import { SeriesEvents } from "#episodes/series/crud/repository/events";
+import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
+import { DomainEvent } from "#core/domain-event-emitter";
+import { logDomainEvent } from "#core/logging/log-domain-event";
+import { UsersRepository } from "#core/auth/users/crud/repository";
 
 type CriteriaMany = StreamCrudDtos.GetManyByCriteria.Criteria;
 @Injectable()

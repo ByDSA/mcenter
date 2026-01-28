@@ -3,9 +3,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { EpisodeEntity } from "$shared/models/episodes";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { EpisodesApi } from "#modules/series/episodes/requests";
-import { EpisodeUserInfosApi } from "#modules/series/episodes/user-info/requests";
-import { EpisodeFileInfosApi } from "#modules/series/episodes/file-info/requests";
+import { EpisodesApi } from "#modules/episodes/requests";
+import { EpisodeUserInfosApi } from "#modules/episodes/user-info/requests";
+import { EpisodeFileInfosApi } from "#modules/episodes/file-info/requests";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaErrorView } from "#modules/ui-kit/form/Error";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
@@ -18,7 +18,7 @@ import { Separator } from "#modules/resources/Separator/Separator";
 import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { DaForm } from "#modules/ui-kit/form/Form";
-import { DaInputTime } from "../../../ui-kit/form/input/Time/InputTime";
+import { DaInputTime } from "#modules/ui-kit/form/input/Time/InputTime";
 import styles from "./style.module.css";
 
 const schema = z.object( {

@@ -12,7 +12,7 @@ import { getCriteriaPipeline } from "./odm/criteria-pipeline";
 import { EpisodeEvents } from "./events";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { assertFoundClient } from "#utils/validation/found";
-import { SeriesKey } from "#modules/series";
+import { SeriesKey } from "#episodes/series";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";

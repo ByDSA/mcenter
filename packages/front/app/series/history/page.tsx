@@ -1,7 +1,7 @@
 "use client";
 
-import { EpisodeHistoryList } from "#modules/series";
+import { EpisodeHistoryList } from "#modules/episodes";
 
-export default function SeriesHistoryPage() {
+export default function EpisodesHistoryPage() {
   return <EpisodeHistoryList />;
 }

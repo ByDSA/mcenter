@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { EpisodeEntity } from "$shared/models/episodes";
 import { assertIsNotEmpty } from "$shared/utils/validation";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { EpisodesApi } from "#modules/series/episodes/requests";
+import { EpisodesApi } from "#modules/episodes/requests";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { EditEpisodeForm } from "./Form";

@@ -1,5 +1,9 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { seriesRepositoryMockProvider } from "#modules/series/crud/repository/tests";
+import { episodeRepositoryMockProvider } from "../crud/repositories/episodes/tests";
+import { EpisodesRepository } from "../crud/repositories/episodes";
+import { EpisodesSlugController } from "./controller";
+import { EpisodeSlugHandlerService } from "./service";
+import { seriesRepositoryMockProvider } from "#episodes/series/crud/repository/tests";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { fixtureEpisodes } from "#episodes/tests";
 import { testRoute } from "#core/routing/test";
@@ -7,10 +11,6 @@ import { ResourceResponseFormatterModule } from "#modules/resources/response-for
 import { ResourceSlugService } from "#modules/resources/slug/service";
 import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
 import { episodeUserInfosRepositoryMockProvider } from "#episodes/crud/repositories/user-infos/tests";
-import { episodeRepositoryMockProvider } from "../crud/repositories/episodes/tests";
-import { EpisodesRepository } from "../crud/repositories/episodes";
-import { EpisodesSlugController } from "./controller";
-import { EpisodeSlugHandlerService } from "./service";
 
 testRoute(PATH_ROUTES.episodes.slug.withParams("seriesKey", "episodeKey"));
 
