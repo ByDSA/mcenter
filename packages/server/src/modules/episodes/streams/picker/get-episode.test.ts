@@ -1,5 +1,4 @@
 import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
-import { StreamGetRandomEpisodeService } from "./get-episode.service";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
@@ -20,6 +19,7 @@ import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { seriesRepositoryMockProvider } from "#episodes/series/crud/repository/tests";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { episodeFileInfoRepositoryMockProvider } from "#episodes/file-info/crud/repository/tests";
+import { StreamGetRandomEpisodeService } from "./get-episode.service";
 
 describe("streamGetRandomEpisode", () => {
   let testingSetup: TestingSetup;

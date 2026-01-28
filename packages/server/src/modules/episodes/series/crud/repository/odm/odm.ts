@@ -1,7 +1,7 @@
 import mongoose, { Schema, Types } from "mongoose";
-import { SeriesKey } from "../../../models";
 import { RequireId } from "#utils/layers/db/mongoose";
 import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { SeriesKey } from "../../../models";
 
 export interface DocOdm {
   _id?: Types.ObjectId;

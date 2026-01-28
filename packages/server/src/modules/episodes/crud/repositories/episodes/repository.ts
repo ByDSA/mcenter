@@ -4,12 +4,6 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
-import { Episode, EpisodeCompKey, EpisodeEntity } from "../../../models";
-import { LastTimePlayedService } from "../../../history/last-time-played.service";
-import { EpisodeHistoryEntryEvents } from "../../../history/crud/repository/events";
-import { EpisodeOdm } from "./odm";
-import { getCriteriaPipeline } from "./odm/criteria-pipeline";
-import { EpisodeEvents } from "./events";
 import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { assertFoundClient } from "#utils/validation/found";
 import { SeriesKey } from "#episodes/series";
@@ -19,6 +13,12 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { fixTxtFields } from "#modules/resources/fix-text";
+import { EpisodeHistoryEntryEvents } from "../../../history/crud/repository/events";
+import { LastTimePlayedService } from "../../../history/last-time-played.service";
+import { Episode, EpisodeCompKey, EpisodeEntity } from "../../../models";
+import { EpisodeEvents } from "./events";
+import { getCriteriaPipeline } from "./odm/criteria-pipeline";
+import { EpisodeOdm } from "./odm";
 
 function fixFields<T extends Partial<{title: string}>>(model: T): T {
   return fixTxtFields(model, ["title"]);

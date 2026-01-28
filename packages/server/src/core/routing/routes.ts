@@ -1,6 +1,5 @@
 import { RouterModule, Routes } from "@nestjs/core";
 import { PATH_ROUTES } from "$shared/routing";
-import { LoggingModule } from "../logging/module";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesAdminModule } from "#episodes/admin/module";
@@ -29,6 +28,7 @@ import { ImageCoversCrudModule } from "#modules/image-covers/module";
 import { ImageCoversAdminModule } from "#modules/image-covers/admin/module";
 import { MusicSmartPlaylistsCrudModule } from "#musics/smart-playlists/crud/module";
 import { MusicUsersListsModule } from "#musics/users-lists/crud/module";
+import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
 // y por los que se importan en AppModule

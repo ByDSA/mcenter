@@ -1,7 +1,7 @@
 /* eslint-disable accessor-pairs */
+import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 import { Episode, EpisodeCompKey, EpisodeEntityWithUserInfo, compareEpisodeCompKey } from "../../../models";
 import { DependenciesList } from "./dependencies";
-import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
 
 class PreventDisabledEpisodeFilter extends PreventDisabledFilter<EpisodeEntityWithUserInfo> {
   isDisabled(resource: EpisodeEntityWithUserInfo): boolean {

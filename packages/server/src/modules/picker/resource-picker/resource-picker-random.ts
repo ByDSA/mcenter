@@ -2,10 +2,10 @@ import type { FilterApplier } from "./filters";
 import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
-import { ResourcePicker } from "./resource-picker";
-import { WeightFixerApplier } from "./weight-fixers";
 import { EpisodeFilterApplier } from "#episodes/streams/picker/appliers/filter-applier";
 import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
+import { ResourcePicker } from "./resource-picker";
+import { WeightFixerApplier } from "./weight-fixers";
 
 type Params<R, L = R> = {
   resources: R[];

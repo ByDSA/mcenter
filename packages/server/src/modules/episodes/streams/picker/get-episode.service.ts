@@ -2,8 +2,6 @@ import type { ResourcePicker } from "#modules/picker";
 import type { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined, assertIsNotEmpty, neverCase } from "$shared/utils/validation";
-import { buildEpisodePicker } from "./episode-picker";
-import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { PickMode } from "#modules/picker/resource-picker/pick-mode";
 import { getSeriesKeyFromStream, StreamEntity, StreamMode } from "#episodes/streams";
@@ -13,6 +11,8 @@ import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repos
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfosRepository } from "#episodes/file-info/crud/repository/repository";
+import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
+import { buildEpisodePicker } from "./episode-picker";
 
 @Injectable()
 export class StreamGetRandomEpisodeService {

@@ -1,13 +1,13 @@
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { assertIsDefined } from "$shared/utils/validation";
-import { type SerieEntity, serieEntitySchema } from "../../models";
-import { SeriesRepository } from "./repository";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
+import { type SerieEntity, serieEntitySchema } from "../../models";
+import { SeriesRepository } from "./repository";
 
 let repo: SeriesRepository;
 let streamsRepo: StreamsRepository;

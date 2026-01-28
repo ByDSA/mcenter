@@ -1,4 +1,3 @@
-import { SERIE_SIMPSONS } from "$sharedSrc/models/series/tests/fixtures";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
@@ -8,6 +7,7 @@ import { StreamOdm } from "#episodes/streams/crud/repository/odm";
 import { STREAM_SIMPSONS } from "#episodes/streams/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
+import { SERIE_SIMPSONS } from "$sharedSrc/models/series/tests/fixtures";
 
 export const loadFixtureSimpsons = async () => {
   await loadFixtureSerieAndEpisodesSimpsons();

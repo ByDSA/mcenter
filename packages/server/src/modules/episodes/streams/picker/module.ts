@@ -1,7 +1,4 @@
 import { Module } from "@nestjs/common";
-import { StreamPickerController } from "./picker.controller";
-import { StreamGetRandomEpisodeService } from "./get-episode.service";
-import { StreamGetEpisodeController } from "./get-episode.controller";
 import { SeriesModule } from "#episodes/series/module";
 import { StreamsModule } from "#episodes/streams/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
@@ -10,6 +7,9 @@ import { EpisodesCrudModule } from "#episodes/crud/module";
 import { EpisodeFileInfosModule } from "#episodes/file-info/module";
 import { EpisodeRendererModule } from "#episodes/renderer/module";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
+import { StreamGetEpisodeController } from "./get-episode.controller";
+import { StreamGetRandomEpisodeService } from "./get-episode.service";
+import { StreamPickerController } from "./picker.controller";
 
 @Module( {
   imports: [

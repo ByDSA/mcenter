@@ -5,8 +5,6 @@ import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { UserPayload } from "$shared/models/auth";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
-import { dependenciesToList } from "./appliers/dependencies";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { Episode, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { LastTimePlayedService } from "#episodes/history";
@@ -19,6 +17,8 @@ import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repos
 import { genRandomPickerWithData } from "#modules/picker/resource-picker/resource-picker-random";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { User } from "#core/auth/users/User.decorator";
+import { dependenciesToList } from "./appliers/dependencies";
+import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
 
 class ShowPickerParamsDto extends createZodDto(z.object( {
   streamKey: z.string(),

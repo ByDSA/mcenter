@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
+import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
 import { Serie, SerieEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
-import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
 
 export function docOdmToEntity(docOdm: FullDocOdm): SerieEntity {
   const ret = {
