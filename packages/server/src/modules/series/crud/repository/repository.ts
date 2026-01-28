@@ -1,16 +1,17 @@
 import assert from "node:assert";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
+import { WithOptional } from "$shared/utils/objects";
+import { Serie, SerieEntity, SeriesKey } from "../../models";
+import { FullDocOdm, ModelOdm } from "./odm/odm";
+import { SeriesOdm } from "./odm";
+import { SeriesEvents } from "./events";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
-import { Serie, SerieEntity, SeriesKey } from "../../models";
-import { FullDocOdm, ModelOdm } from "./odm/odm";
-import { SeriesOdm } from "./odm";
-import { SeriesEvents } from "./events";
 
 @Injectable()
 export class SeriesRepository
@@ -49,7 +50,11 @@ CanGetAll<SerieEntity> {
     return SeriesOdm.toEntity(serieDb);
   }
 
-  async getOneOrCreate(model: Serie): Promise<SerieEntity> {
+  async getOneOrCreate(createDto: WithOptional<Serie, "imageCoverId">): Promise<SerieEntity> {
+    const model: Serie = {
+      ...createDto,
+      imageCoverId: createDto.imageCoverId ?? null,
+    };
     const filter: MongoFilterQuery<FullDocOdm> = {
       key: model.key,
     };

@@ -6,4 +6,5 @@ export const SERIE_SIMPSONS: SerieEntity = deepFreeze( {
   id: new ObjectId().toString(),
   key: "simpsons",
   name: "simpsons",
+  imageCoverId: null,
 } );

@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
-import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
-import { SeriesOdm } from "#modules/series/crud/repository/odm";
-import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { Episode, EpisodeEntity } from "../../../../models";
 import { EpisodesUsersOdm } from "../../user-infos/odm";
 import { DocOdm, FullDocOdm } from "./odm";
+import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
+import { SeriesOdm } from "#modules/series/crud/repository/odm";
+import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {
   const model: Episode = {
@@ -22,6 +22,7 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
     updatedAt: docOdm.updatedAt,
     addedAt: docOdm.addedAt,
     releasedOn: docOdm.releasedOn,
+    imageCoverId: docOdm.imageCoverId === null ? null : docOdm.imageCoverId?.toString(),
   } satisfies AllKeysOf<Episode>;
 
   return removeUndefinedDeep(model);
@@ -55,6 +56,13 @@ export function entityToDocOdm(entity: EpisodeEntity): FullDocOdm {
 }
 
 export function episodeToDocOdm(model: Episode): DocOdm {
+  let imageCoverId: Types.ObjectId | null | undefined;
+
+  if (model.imageCoverId)
+    imageCoverId = new Types.ObjectId(model.imageCoverId);
+  else if (model.imageCoverId === null)
+    imageCoverId = null;
+
   const ret = {
     title: model.title,
     episodeKey: model.compKey.episodeKey,
@@ -66,34 +74,27 @@ export function episodeToDocOdm(model: Episode): DocOdm {
     updatedAt: model.updatedAt,
     addedAt: model.addedAt,
     releasedOn: model.releasedOn,
+    imageCoverId,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(ret);
 }
 
 export function partialModelToDocOdm(model: Partial<EpisodeEntity>): MongoUpdateQuery<DocOdm> {
-  const ret: MongoUpdateQuery<DocOdm> = {};
-
-  if (model.compKey !== undefined) {
-    ret.episodeKey = model.compKey.episodeKey;
-
-    ret.seriesKey = model.compKey.seriesKey;
-  }
-
-  if (model.title !== undefined)
-    ret.title = model.title;
+  const ret: MongoUpdateQuery<DocOdm> = {
+    episodeKey: model.compKey?.episodeKey,
+    seriesKey: model.compKey?.seriesKey,
+    title: model.title,
+    tags: model.tags,
+    imageCoverId: model.imageCoverId,
+  };
 
   if ("disabled" in model) {
-    if (model.disabled !== undefined)
-      ret.disabled = model.disabled;
-    else {
+    if (model.disabled === undefined) {
       ret.$unset = ret.$unset ?? {};
       ret.$unset.disabled = 1;
     }
   }
 
-  if (model.tags !== undefined)
-    ret.tags = model.tags;
-
-  return ret;
+  return removeUndefinedDeep(ret);
 }

@@ -1,10 +1,11 @@
 import { Types } from "mongoose";
-import { SerieEntity, serieEntitySchema, serieSchema } from ".";
+import { SerieEntity, serieEntitySchema, serieSchema } from "../serie";
 
 const VALID_MODEL: SerieEntity = {
   id: new Types.ObjectId().toString(),
   key: "serie",
   name: "Serie Name",
+  imageCoverId: null,
 };
 
 describe("assertIsModel", () => {

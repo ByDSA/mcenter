@@ -2,6 +2,7 @@ import z from "zod";
 import { resourceSchema } from "../resources";
 import { serieEntitySchema, seriesKeySchema } from "../series";
 import { mongoDbId } from "../resources/partial-schemas";
+import { imageCoverEntitySchema } from "../image-covers";
 import { episodeFileInfoEntitySchema } from "./file-info";
 import { episodeUserInfoEntitySchema } from "./user-info/user-info";
 
@@ -17,6 +18,7 @@ const compKeySchema = z.object( {
 type CompKey = z.infer<typeof compKeySchema>;
 const modelSchema = resourceSchema.extend( {
   compKey: compKeySchema,
+  imageCoverId: mongoDbId.nullable().optional(),
 } );
 
 type Model = z.infer<typeof modelSchema>;
@@ -28,6 +30,7 @@ const entitySchema = modelSchema
     serie: serieEntitySchema.optional(),
     fileInfos: z.array(episodeFileInfoEntitySchema).optional(),
     userInfo: episodeUserInfoEntitySchema.optional(),
+    imageCover: imageCoverEntitySchema.optional(),
   } );
 
 type Entity = z.infer<typeof entitySchema>;

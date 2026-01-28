@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
+import { EpisodeCompKey } from "../../../../models";
+import { EpisodesUsersOdm } from "../../user-infos/odm";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { MongoFilterQuery, OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#modules/series/crud/repository/odm";
-import { EpisodeCompKey } from "../../../../models";
-import { EpisodesUsersOdm } from "../../user-infos/odm";
+import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
 
 export type EpisodeCompKeyOdm = {
   episodeKey: string;
@@ -17,12 +18,14 @@ export type DocOdm = EpisodeCompKeyOdm & OptionalId & TimestampsOdm.AutoTimestam
   tags?: string[];
   disabled?: boolean;
   uploaderUserId: mongoose.Types.ObjectId;
+  imageCoverId?: mongoose.Types.ObjectId | null;
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
   serie?: SeriesOdm.FullDoc;
   fileInfos?: EpisodeFileInfoOdm.FullDoc[];
   userInfo?: EpisodesUsersOdm.FullDoc;
+  imageCover?: ImageCoverOdm.FullDoc;
 };
 
 const NAME = "Episode";
@@ -52,6 +55,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
   disabled: {
     type: Boolean,
+  },
+  imageCoverId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
   },
   ...TimestampsOdm.nonAutoTimestampsSchemaDefinition,
 } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
