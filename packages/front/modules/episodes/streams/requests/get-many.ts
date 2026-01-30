@@ -2,8 +2,8 @@ import { createManyResultResponseSchema } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
 import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
-import { StreamCrudDtos } from "$shared/models/streams/dto/transport";
-import { streamEntitySchema } from "$shared/models/streams";
+import { StreamCrudDtos } from "$shared/models/episodes/streams/dto/transport";
+import { streamEntitySchema } from "$shared/models/episodes/streams";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 
@@ -37,7 +37,7 @@ export const fetch = (props: FetchProps) => {
   const fetcher = makeFetcher<Req, Res>( {
     method,
     reqBodyValidator: genAssertZod(reqSchema),
-    parseResponse: genParseZod(resSchema),
+    parseResponse: genParseZod(resSchema) as (m: unknown)=> any,
   } );
 
   return fetcher( {

@@ -105,8 +105,8 @@ importers:
   front:
     dependencies:
       $shared:
-        specifier: workspace:../shared/build
-        version: link:../shared/build
+        specifier: workspace:../shared/src
+        version: link:../shared/src
       '@dnd-kit/core':
         specifier: 6.3.1
         version: 6.3.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -208,14 +208,14 @@ importers:
         specifier: 19.2.7
         version: 19.2.7
       baseline-browser-mapping:
-        specifier: ^2.9.18
+        specifier: 2.9.18
         version: 2.9.18
 
   server:
     dependencies:
       $shared:
-        specifier: workspace:../shared/build
-        version: link:../shared/build
+        specifier: workspace:../shared/src
+        version: link:../shared/src
       '@nestjs-modules/mailer':
         specifier: 2.0.2
         version: 2.0.2(@nestjs/common@11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(nodemailer@7.0.6)

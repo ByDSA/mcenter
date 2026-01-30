@@ -1,30 +1,30 @@
 import z from "zod";
-import { genAssertZod } from "../../utils/validation/zod";
-import { mongoDbId } from "../resources/partial-schemas";
-import { imageCoverEntitySchema } from "../image-covers";
+import { mongoDbId } from "../../resources/partial-schemas";
+import { imageCoverEntitySchema } from "../../image-covers";
+import { timestampsSchema } from "../../utils/schemas/timestamps";
 
 const seriesKeySchema = z.string();
 
 type SeriesKey = z.infer<typeof seriesKeySchema>;
 
-export const serieSchema = z.object( {
+export const seriesSchema = z.object( {
   name: z.string(),
   key: seriesKeySchema,
   imageCoverId: mongoDbId.nullable(),
-} ).strict();
+} )
+  .merge(timestampsSchema)
+  .strict();
 
-export type Serie = z.infer<typeof serieSchema>;
+export type Series = z.infer<typeof seriesSchema>;
 
-export const assertIsSerie = genAssertZod(serieSchema);
-
-export const serieEntitySchema = serieSchema.extend( {
+export const seriesEntitySchema = seriesSchema.extend( {
   id: mongoDbId,
   imageCover: imageCoverEntitySchema.optional(),
+  countEpisodes: z.number().optional(),
+  countSeasons: z.number().optional(),
 } );
 
-export type SerieEntity = z.infer<typeof serieEntitySchema>;
-
-export const assertIsSerieEntity = genAssertZod(serieEntitySchema);
+export type SeriesEntity = z.infer<typeof seriesEntitySchema>;
 
 export {
   type SeriesKey,

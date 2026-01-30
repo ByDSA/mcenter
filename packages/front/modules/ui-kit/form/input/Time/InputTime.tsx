@@ -5,48 +5,54 @@ import { classes } from "#modules/utils/styles";
 import styles from "./styles.module.css";
 
 type Props = {
-  value: number | null | undefined;
+  value: number | null;
   onChange: (val: number | null)=> void;
   nullable?: boolean;
-  isOptional?: boolean;
   disabled?: boolean;
 };
 
 export const DaInputTime = ( { value,
   onChange,
   nullable,
-  isOptional,
   disabled = false }: Props) => {
-  const isNullable = nullable || isOptional;
-  const isNull = value === null || value === undefined;
-  const [localSeconds, setLocalSeconds] = useState(value ?? 0);
+  // Determinamos si el valor externo es nulo
+  const isExternalNull = value === null || value === undefined;
+  // ghostValue mantiene el valor numérico para los inputs.
+  // Inicialmente es null si value es null, así los inputs se ven vacíos.
+  const [ghostValue, setGhostValue] = useState<number | null>(value ?? null);
+  // Ref para acceder al valor más reciente en intervalos/eventos sin dependencias circulares
+  const ghostValueRef = useRef(ghostValue);
 
   useEffect(() => {
-    // Sincronizar estado local si el padre envía un valor válido
+    ghostValueRef.current = ghostValue;
+  }, [ghostValue]);
+
+  // Sincronización: Si el padre envía un número, actualizamos el ghostValue.
+  // Si envía null, NO lo actualizamos para mantener el valor visual (fantasma).
+  useEffect(() => {
     if (value !== null && value !== undefined)
-      setLocalSeconds(value);
+      setGhostValue(value);
   }, [value]);
 
-  const minutes = Math.floor(localSeconds / 60);
-  const seconds = localSeconds % 60;
+  // El valor base para mostrar es el valor real si existe, o el fantasma si el real es null.
+  // Si ambos son null, los minutos/segundos serán null (inputs vacíos).
+  const displayBase = value !== null && value !== undefined ? value : ghostValue;
+  const minutes = displayBase === null ? null : Math.floor(displayBase / 60);
+  const seconds = displayBase === null ? null : displayBase % 60;
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const updateValue = useCallback((newTotal: number) => {
+    setGhostValue(newTotal);
+    onChange(newTotal);
+  }, [onChange]);
   const adjustTime = useCallback((delta: number) => {
-    setLocalSeconds((prev) => {
-      const next = Math.max(0, prev + delta);
+    // Si estaba vacío (null), partimos de 0
+    const current = ghostValueRef.current ?? 0;
+    const next = Math.max(0, current + delta);
 
-      return next;
-    } );
-  }, []);
-
-  // Efecto para propagar cambios locales al padre
-  useEffect(() => {
-    if (localSeconds !== value && value !== undefined)
-      onChange(localSeconds);
-  }, [localSeconds, onChange]);
-
+    updateValue(next);
+  }, [updateValue]);
   const startAdjusting = (delta: number) => {
-    // No permitir ajustar si está deshabilitado
     if (disabled)
       return;
 
@@ -65,23 +71,14 @@ export const DaInputTime = ( { value,
       clearInterval(intervalRef.current);
   };
   const handleManualChange = (newMinutes: number, newSeconds: number) => {
-    let m = isNaN(newMinutes) ? 0 : newMinutes;
-    let s = isNaN(newSeconds) ? 0 : newSeconds;
+    const m = isNaN(newMinutes) ? 0 : newMinutes;
+    const s = isNaN(newSeconds) ? 0 : newSeconds;
+    let totalSeconds = (m * 60) + s;
 
-    if (s >= 60) {
-      m += Math.floor(s / 60);
-      s %= 60;
-    } else if (s < 0 && m > 0) {
-      m -= 1;
-      s = 59;
-    }
+    if (totalSeconds < 0)
+      totalSeconds = 0;
 
-    const total = Math.max(0, (m * 60) + s);
-
-    setLocalSeconds(total);
-    // Aquí llamamos a onChange directo porque es una acción explícita del usuario
-    // y saca al componente del estado "Nulo" si lo tuviera.
-    onChange(total);
+    updateValue(totalSeconds);
   };
   const handleKeyDownSeconds = (e: React.KeyboardEvent) => {
     if (disabled)
@@ -108,23 +105,29 @@ export const DaInputTime = ( { value,
     }
   };
   const handleToggleNullable = (checked: boolean) => {
-    onChange(checked ? null : localSeconds);
+    if (checked)
+      onChange(null);
+    else {
+      // Al quitar el null, usamos el valor fantasma o 0 si nunca hubo nada
+      onChange(ghostValue ?? 0);
+    }
   };
 
   return (
     <div className={styles.container}>
       <div className={classes(
         styles.inputsWrapper,
-        isNull && styles.isNull,
+        isExternalNull && styles.isNull,
         disabled && styles.disabled,
       )}>
         <div className={styles.timeGroup}>
           <DaInputNumber
-            value={minutes}
+            // Usamos undefined si es null para que el input se vea vacío
+            value={minutes ?? undefined}
             onChange={(e) => {
               const val = parseInt(e.target.value, 10);
 
-              handleManualChange(val, seconds);
+              handleManualChange(val, seconds ?? 0);
             }}
             onKeyDown={handleKeyDownMinutes}
             disabled={disabled}
@@ -133,11 +136,11 @@ export const DaInputTime = ( { value,
           />
           <span className={styles.separator}>:</span>
           <DaInputNumber
-            value={seconds}
+            value={seconds ?? undefined}
             onChange={(e) => {
               const val = parseFloat(e.target.value);
 
-              handleManualChange(minutes, val);
+              handleManualChange(minutes ?? 0, val);
             }}
             onKeyDown={handleKeyDownSeconds}
             disabled={disabled}
@@ -170,11 +173,11 @@ export const DaInputTime = ( { value,
         </div>
       </div>
 
-      {isNullable && (
+      {nullable && (
         <div className={styles.toggleWrapper}>
           <DaInputBooleanCheckbox
             className={styles.nullCheckbox}
-            value={isNull}
+            value={isExternalNull}
             onChange={handleToggleNullable}
             label="Nulo"
           />

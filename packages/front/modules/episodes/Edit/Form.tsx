@@ -1,7 +1,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { EpisodeEntity } from "$shared/models/episodes";
+import { EpisodeEntity, episodeSchema, episodeUserInfoSchema } from "$shared/models/episodes";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { EpisodesApi } from "#modules/episodes/requests";
 import { EpisodeUserInfosApi } from "#modules/episodes/user-info/requests";
@@ -19,18 +19,23 @@ import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { DaForm } from "#modules/ui-kit/form/Form";
 import { DaInputTime } from "#modules/ui-kit/form/input/Time/InputTime";
+import { episodeFileInfoSchema } from "../file-info/models";
 import styles from "./style.module.css";
 
 const schema = z.object( {
   title: z.string().trim()
     .min(1, "El título es obligatorio"),
-  tags: z.array(z.string()),
-  weight: z.number().default(0),
-  start: z.number().nullable()
-    .optional(),
-  end: z.number().nullable()
-    .optional(),
-} );
+} )
+  .merge(episodeSchema.pick( {
+    tags: true,
+  } ))
+  .merge(episodeUserInfoSchema.pick( {
+    weight: true,
+  } ))
+  .merge(episodeFileInfoSchema.pick( {
+    start: true,
+    end: true,
+  } ));
 
 type FormData = z.infer<typeof schema>;
 
@@ -52,8 +57,8 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
       title: initialData.title,
       tags: initialData.tags ?? [],
       weight: initialData.userInfo?.weight ?? 0,
-      start: fileInfo?.start ?? null,
-      end: fileInfo?.end ?? null,
+      start: fileInfo?.start,
+      end: fileInfo?.end,
     },
   } );
   const onSubmit = async (formValues: FormData) => {
@@ -192,8 +197,8 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
               name="start"
               render={( { field } ) => (
                 <DaInputTime
-                  value={field.value}
-                  onChange={field.onChange}
+                  value={field.value ?? null}
+                  onChange={e=>field.onChange(e ?? undefined)}
                   nullable
                 />
               )}
@@ -206,8 +211,8 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
               name="end"
               render={( { field } ) => (
                 <DaInputTime
-                  value={field.value}
-                  onChange={field.onChange}
+                  value={field.value ?? null}
+                  onChange={e=>field.onChange(e ?? undefined)}
                   nullable
                 />
               )}

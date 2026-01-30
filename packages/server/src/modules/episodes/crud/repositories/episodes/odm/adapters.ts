@@ -23,6 +23,7 @@ export function docOdmToModel(docOdm: DocOdm): Episode {
     addedAt: docOdm.addedAt,
     releasedOn: docOdm.releasedOn,
     imageCoverId: docOdm.imageCoverId === null ? null : docOdm.imageCoverId?.toString(),
+    count: docOdm.count,
   } satisfies AllKeysOf<Episode>;
 
   return removeUndefinedDeep(model);
@@ -75,6 +76,7 @@ export function episodeToDocOdm(model: Episode): DocOdm {
     addedAt: model.addedAt,
     releasedOn: model.releasedOn,
     imageCoverId,
+    count: model.count,
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 
   return removeUndefinedDeep(ret);

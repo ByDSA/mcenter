@@ -1,0 +1,10 @@
+.header {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 2rem;
+  justify-content: right;
+
+  @media (width < 500px) {
+    gap: 0.5rem;
+  }
+}

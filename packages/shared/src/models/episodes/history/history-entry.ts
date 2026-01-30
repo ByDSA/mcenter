@@ -3,7 +3,7 @@ import { userEntitySchema } from "../../auth";
 import { mongoDbId } from "../../resources/partial-schemas";
 import { genAssertZod } from "../../../utils/validation/zod";
 import { episodeEntitySchema } from "..";
-import { streamEntitySchema } from "../../streams";
+import { streamEntitySchema } from "../streams";
 import { makeHistoryEntrySchema } from "../../history-lists-common";
 
 const schema = makeHistoryEntrySchema(mongoDbId).extend( {

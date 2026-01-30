@@ -140,7 +140,7 @@ export const DaInputNumber = forwardRef<HTMLInputElement, Props>(
           nullable && textStyles.nullable,
           className,
         )}
-        value={props.value !== undefined ? getFormattedValue(props.value.toString()) : props.value}
+        value={props.value !== undefined ? getFormattedValue(props.value.toString()) : ""}
         onChange={handleChange}
         onBlur={handleBlur}
       />

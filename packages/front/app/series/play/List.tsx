@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, MouseEventHandler } from "react";
-import { Stream } from "$shared/models/streams";
+import { Stream } from "$shared/models/episodes/streams";
 import { PATH_ROUTES } from "$shared/routing";
 import { RemotePlayerDtos } from "$shared/models/player/remote-player/dto/domain";
 import { useRouter } from "next/navigation";

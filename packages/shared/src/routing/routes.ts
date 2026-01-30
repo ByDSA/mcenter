@@ -24,6 +24,8 @@ const STREAMS = "/api/streams";
 const AUTH = "/api/auth";
 const AUTH_EMAIL_VERIFICATION = `${AUTH}/local/email-verification`;
 const AUTH_EMAIL_VERIFICATION_FRONT = "/auth/register/verify";
+const SERIES = `${EPISODES}/series`;
+const IMAGE_COVERS = "/api/image-covers";
 
 type MusicSlugQueryParams = {
   format?: ResponseFormat;
@@ -145,9 +147,9 @@ export const PATH_ROUTES = {
   },
   imageCovers: {
     withParams: (id: string) => {
-      return `/api/image-covers/${id}`;
+      return `${IMAGE_COVERS}/${id}`;
     },
-    path: "/api/image-covers",
+    path: IMAGE_COVERS,
     raw: {
       withParams: (filename: string) => {
         const [id] = filename.split(/\.|_/);
@@ -155,6 +157,9 @@ export const PATH_ROUTES = {
 
         return `/raw/image-covers/${subfolder}/${filename}`;
       },
+    },
+    admin: {
+      path: `${IMAGE_COVERS}/admin`,
     },
   },
   musics: {
@@ -319,7 +324,11 @@ token?: string;} ) => {
         return `${MUSICS_RANDOM}?${params.toString()}`;
       },
     },
+    usersLists: {
+      path: `${MUSICS}/users-lists`,
+    },
     admin: {
+      path: `${MUSICS}/admin`,
       fixInfo: {
         path: `${MUSICS_ADMIN}/fix-info`,
       },
@@ -390,6 +399,25 @@ token?: string;} ) => {
       },
       addNewFiles: {
         path: EPISODES_ADMIN + "/add-new-files",
+      },
+    },
+    series: {
+      path: SERIES,
+      getMany: {
+        path: `${SERIES}/get-many`,
+      },
+      withParams: (id: string) => `${SERIES}/${id}`,
+      seasons: {
+        withParams: (id: string) => `${SERIES}/${id}/seasons`,
+      },
+    },
+    frontend: {
+      history: {
+        path: "/series/history",
+      },
+      lists: {
+        path: "/series/lists",
+        withParams: (id: string) => `/series/lists/${id}`,
       },
     },
   },

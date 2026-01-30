@@ -1,0 +1,7 @@
+.subtitle {
+  white-space: nowrap;
+}
+
+.episodeKey {
+  color: var(--color-gray-25);
+}

@@ -23,7 +23,8 @@ function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
     // Orden compuesto
     ret["seriesKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
     ret["episodeKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
-  }
+  } else if (body.sort.episodeKey)
+    ret["episodeKey"] = body.sort.episodeKey === "asc" ? 1 : -1;
 
   if (body.sort.createdAt)
     ret["createdAt"] = body.sort.createdAt === "asc" ? 1 : -1;

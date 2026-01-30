@@ -1,5 +1,5 @@
 import z from "zod";
-import { createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
+import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 
 export namespace StreamCrudDtos {
   export namespace GetManyByCriteria {

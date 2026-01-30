@@ -1,5 +1,7 @@
 .icon {
   color: var(--color-gray-200);
+  display: flex;
+  justify-content: center;
 }
 
 .wrap {

@@ -1,7 +1,7 @@
+import { SeriesEntity } from "../../models";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
-import { SerieEntity } from "../../models";
 
-type Entity = SerieEntity;
+type Entity = SeriesEntity;
 export namespace SeriesEvents {
   const MAIN_TYPE = "series";
   export const WILDCARD = `${MAIN_TYPE}.*`;

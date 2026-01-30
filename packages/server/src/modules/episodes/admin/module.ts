@@ -1,8 +1,4 @@
 import { forwardRef, Module } from "@nestjs/common";
-import { TasksModule } from "#core/tasks";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { SeriesModule } from "#episodes/series/module";
 import { EpisodeHistoryModule } from "../history/module";
 import { EpisodeFileInfosModule } from "../file-info/module";
 import { EpisodeDependenciesModule } from "../dependencies/module";
@@ -13,11 +9,15 @@ import { EpisodesUpdateLastTimePlayedController } from "./update-last-time-playe
 import { EpisodeUpdateRemoteTaskHandler } from "./sync-disk-to-db/task.handler";
 import { EpisodeUpdateLastTimePlayedTaskHandler } from "./update-last-time-played/task.handler";
 import { EpisodeUpdateFileInfoSavedTaskHandler } from "./update-file-info-saved/task.handler";
+import { SeriesCrudModule } from "#episodes/series/module";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
+import { TasksModule } from "#core/tasks";
 
 @Module( {
   imports: [
     DomainEventEmitterModule,
-    SeriesModule,
+    SeriesCrudModule,
     forwardRef(() => EpisodeHistoryModule),
     EpisodeFileInfosModule,
     EpisodeDependenciesModule,

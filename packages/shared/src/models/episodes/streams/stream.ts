@@ -1,6 +1,6 @@
 import z from "zod";
-import { serieEntitySchema } from "../series";
-import { mongoDbId } from "../resources/partial-schemas";
+import { seriesEntitySchema } from "../series";
+import { mongoDbId } from "../../resources/partial-schemas";
 
 enum Mode {
   SEQUENTIAL = "SEQUENTIAL",
@@ -15,7 +15,7 @@ enum OriginType {
 const originSerieSchema = z.object( {
   type: z.literal(OriginType.SERIE),
   id: z.string(), // seriesKey
-  serie: serieEntitySchema.optional(),
+  serie: seriesEntitySchema.optional(),
 } ).strict();
 const originStreamSchema = z.object( {
   type: z.literal(OriginType.STREAM),

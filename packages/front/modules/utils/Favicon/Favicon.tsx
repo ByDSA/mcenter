@@ -1,4 +1,4 @@
-import { svgRawReplaceIds, svgRawToSvgJsx } from "#modules/episodes/series/SeriesIcon";
+import { svgRawReplaceIds, svgRawToSvgJsx } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import svg from "./favicon.svg?raw";
 
 export const Favicon = () => {

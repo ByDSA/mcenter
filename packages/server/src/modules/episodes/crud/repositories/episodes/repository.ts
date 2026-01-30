@@ -4,7 +4,7 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
-import { CanCreateManyAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanCreateManyAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { assertFoundClient } from "#utils/validation/found";
 import { SeriesKey } from "#episodes/series";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
@@ -24,7 +24,7 @@ function fixFields<T extends Partial<{title: string}>>(model: T): T {
   return fixTxtFields(model, ["title"]);
 }
 
-type CreateOneDto = Omit<Episode, "addedAt" | "createdAt" | "updatedAt">;
+type CreateOneDto = EpisodesCrudDtos.CreateOne.Body;
 type EpisodeId = EpisodeEntity["id"];
 
 type Criteria = EpisodesCrudDtos.GetManyByCriteria.Criteria;
@@ -34,7 +34,7 @@ type GetOneProps = {
   criteria: CriteriaOne;
   requestingUserId?: string;
 };
-type GetManyProps = {
+export type GetManyProps = {
   criteria: Criteria;
   requestingUserId?: string;
 };
@@ -45,6 +45,7 @@ implements
 CanCreateManyAndGet<EpisodeEntity>,
 CanGetOneById<EpisodeEntity, EpisodeId>,
 CanPatchOneByIdAndGet<Episode, EpisodeId>,
+CanDeleteOneByIdAndGet<EpisodeEntity, EpisodeId>,
 CanGetAll<EpisodeEntity> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
@@ -112,6 +113,15 @@ CanGetAll<EpisodeEntity> {
     assertFoundClient(ret);
 
     return ret;
+  }
+
+  @EmitEntityEvent(EpisodeEvents.Deleted.TYPE)
+  async deleteOneByIdAndGet(id: EpisodeId): Promise<EpisodeEntity> {
+    const doc = await EpisodeOdm.Model.findByIdAndDelete(id);
+
+    assertFoundClient(doc);
+
+    return EpisodeOdm.toEntity(doc);
   }
 
   async getOneById(

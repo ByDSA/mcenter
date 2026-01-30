@@ -1,1 +1,1 @@
-export * from "$sharedSrc/models/streams/tests";
+export * from "$sharedSrc/models/episodes/streams/tests";

@@ -1,5 +1,5 @@
 import type { PipelineStage } from "mongoose";
-import { StreamCrudDtos } from "$shared/models/streams/dto/transport";
+import { StreamCrudDtos } from "$shared/models/episodes/streams/dto/transport";
 import { EpisodeHistoryEntryOdm } from "#episodes/history/crud/repository/odm";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 

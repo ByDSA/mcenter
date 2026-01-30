@@ -1,11 +1,15 @@
 import { Types } from "mongoose";
-import { SerieEntity, serieEntitySchema, serieSchema } from "../serie";
+import { SeriesEntity, seriesEntitySchema, seriesSchema } from "../serie";
 
-const VALID_MODEL: SerieEntity = {
+const VALID_MODEL: SeriesEntity = {
   id: new Types.ObjectId().toString(),
   key: "serie",
   name: "Serie Name",
   imageCoverId: null,
+  addedAt: new Date(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  releasedOn: "2000",
 };
 
 describe("assertIsModel", () => {
@@ -13,7 +17,7 @@ describe("assertIsModel", () => {
     const obj = VALID_MODEL;
 
     expect(() => {
-      serieEntitySchema.parse(obj);
+      seriesEntitySchema.parse(obj);
     } ).not.toThrow();
   } );
 
@@ -24,7 +28,7 @@ describe("assertIsModel", () => {
     };
 
     expect(() => {
-      serieSchema.parse(obj);
+      seriesSchema.parse(obj);
     } ).toThrow();
   } );
 
@@ -39,7 +43,7 @@ describe("assertIsModel", () => {
       delete obj.name;
 
       expect(() => {
-        serieSchema.parse(obj);
+        seriesSchema.parse(obj);
       } ).toThrow();
     },
   );
@@ -49,7 +53,7 @@ describe("assertIsModel", () => {
       const NOT_AN_OBJECT = "not an object";
 
       expect(() => {
-        serieSchema.parse(NOT_AN_OBJECT);
+        seriesSchema.parse(NOT_AN_OBJECT);
       } ).toThrow();
     } );
 
@@ -60,7 +64,7 @@ describe("assertIsModel", () => {
       };
 
       expect(() => {
-        serieSchema.parse(obj);
+        seriesSchema.parse(obj);
       } ).toThrow();
     } );
   } );

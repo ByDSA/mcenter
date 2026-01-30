@@ -1,5 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { getUniqueString } from "#modules/resources/get-unique-string";
 import { MusicSmartPlaylistRepository } from "./repository";
 
 type Props = {
@@ -15,20 +16,16 @@ export class MusicSmartPlaylistAvailableSlugGeneratorService {
   ) {}
 
   async getAvailable( { slug: base, userId }: Props): Promise<string> {
-    let currentSlug = base;
-    let i = 1;
+    return await getUniqueString(
+      base,
+      async (candidate) => {
+        const query = await this.repo.getOneBySlug( {
+          slug: candidate,
+          ownerUserId: userId,
+        } );
 
-    while (true) {
-      const query = await this.repo.getOneBySlug( {
-        slug: currentSlug,
-        ownerUserId: userId,
-      } );
-
-      if (!query)
-        return currentSlug;
-
-      i++;
-      currentSlug = `${base}-${i}`;
-    }
+        return !query;
+      },
+    );
   }
 }

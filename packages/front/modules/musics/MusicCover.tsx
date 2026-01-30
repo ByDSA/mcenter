@@ -1,4 +1,5 @@
 import { ImageCover, ImageCoverEntity } from "$shared/models/image-covers";
+import { WithOptional } from "$shared/utils/objects/types";
 import { ResourceImageCover, ResourceImageCoverProps } from "#modules/resources/ResourceCover/ResourceCover";
 import { classes } from "#modules/utils/styles";
 import { ImageCoverEditButton } from "#modules/image-covers/Edit/Button";
@@ -10,7 +11,7 @@ import styles from "./MusicCover.module.css";
 type Props =
   Omit<ResourceImageCoverProps, "icon" | "img"> &
     {
-      icon?: Omit<ResourceImageCoverProps["icon"], "element">;
+      icon?: WithOptional<ResourceImageCoverProps["icon"], "element">;
       onClick?: ()=> void;
       editable?: boolean;
       onUpdate?: ImageCoverEditorProps["onUpdate"];
@@ -47,7 +48,7 @@ export const MusicImageCover = (props?: Props) => {
       img={img}
       onClick={props?.onClick}
       icon={{
-        element: <MusicsIcon />,
+        element: props?.icon?.element ?? <MusicsIcon />,
         className: classes(styles.icon, props?.icon?.className),
       }}/>
     {props?.editable && props.cover && "id" in props.cover && <ImageCoverEditButton

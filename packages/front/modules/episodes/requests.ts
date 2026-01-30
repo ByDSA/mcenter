@@ -3,11 +3,11 @@ import { createManyResultResponseSchema, createOneResultResponseSchema, ResultRe
 import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
-import { EpisodeCompKey, EpisodeEntity, episodeEntitySchema } from "#modules/episodes/models";
-import { EpisodesCrudDtos } from "#modules/episodes/models/dto";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { EpisodeCompKey, EpisodeEntity, episodeEntitySchema, EpisodesBySeason, episodesBySeasonSchema } from "./models";
+import { EpisodesCrudDtos } from "./models/dto";
 
 export class EpisodesApi {
   static {
@@ -59,6 +59,40 @@ export class EpisodesApi {
       body,
     } );
   }
+
+  async deleteOne(episodeCompKey: EpisodeCompKey): Promise<EpisodesApi.DeleteOne.Res> {
+    const method = "DELETE";
+    const fetcher = makeFetcher<undefined, EpisodesApi.DeleteOne.Res>( {
+      method,
+      parseResponse: genParseZod(
+        createOneResultResponseSchema(episodeEntitySchema.or(z.null())),
+      ) as (m: unknown)=> any,
+    } );
+    const URL = backendUrl(
+      PATH_ROUTES.episodes.slug.withParams(episodeCompKey.seriesKey, episodeCompKey.episodeKey),
+    );
+
+    return fetcher( {
+      url: URL,
+      body: undefined,
+    } );
+  }
+
+  async getEpisodesBySeason(seriesId: string): Promise<ResultResponse<EpisodesBySeason>> {
+    const fetcher = makeFetcher<undefined, {data: EpisodesBySeason}>( {
+      method: "GET",
+      parseResponse: genParseZod(
+        createOneResultResponseSchema(episodesBySeasonSchema),
+      ) as (m: unknown)=> any,
+    } );
+    const URL = backendUrl(PATH_ROUTES.episodes.series.seasons.withParams(seriesId));
+    const res = await fetcher( {
+      url: URL,
+      body: undefined,
+    } );
+
+    return res;
+  }
 }
 
 // eslint-disable-next-line no-redeclare
@@ -73,6 +107,9 @@ export namespace EpisodesApi {
     export const responseSchema = createManyResultResponseSchema(episodeEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
     export type Res = z.infer<typeof responseSchema>;
+  }
 
+  export namespace DeleteOne {
+    export type Res = ResultResponse<EpisodeEntity | null>;
   }
 }

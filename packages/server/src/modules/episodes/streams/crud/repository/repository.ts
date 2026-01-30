@@ -1,17 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { Serie, serieEntitySchema, SeriesKey } from "$shared/models/series";
-import { StreamCrudDtos } from "$shared/models/streams/dto/transport";
+import { StreamCrudDtos } from "$shared/models/episodes/streams/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
+import { Series, seriesEntitySchema, SeriesKey } from "$shared/models/episodes/series";
+import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
+import { StreamOdm } from "./odm";
+import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
+import { StreamEvents } from "./events";
 import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
 import { SeriesEvents } from "#episodes/series/crud/repository/events";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { UsersRepository } from "#core/auth/users/crud/repository";
-import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
-import { StreamOdm } from "./odm";
-import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
-import { StreamEvents } from "./events";
 
 type CriteriaMany = StreamCrudDtos.GetManyByCriteria.Criteria;
 @Injectable()
@@ -33,7 +33,7 @@ CanGetAll<StreamEntity> {
   async handleCreateSerieEvent(event: SeriesEvents.Created.Event) {
     const serie = event.payload.entity;
 
-    serieEntitySchema.parse(serie);
+    seriesEntitySchema.parse(serie);
 
     // TODO: mejor crear el stream al vuelo cuando se vaya a usar,
     // puede haber muchos users que ni la usen
@@ -128,7 +128,7 @@ CanGetAll<StreamEntity> {
     return StreamOdm.toEntity(docOdm);
   }
 
-  async getOneOrCreateBySeriesKey(userId: string, seriesKey: Serie["key"]): Promise<StreamEntity> {
+  async getOneOrCreateBySeriesKey(userId: string, seriesKey: Series["key"]): Promise<StreamEntity> {
     const docOdm = await StreamOdm.Model.findOne( {
       key: seriesKey,
     } );

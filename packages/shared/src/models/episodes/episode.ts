@@ -1,8 +1,8 @@
 import z from "zod";
 import { resourceSchema } from "../resources";
-import { serieEntitySchema, seriesKeySchema } from "../series";
 import { mongoDbId } from "../resources/partial-schemas";
 import { imageCoverEntitySchema } from "../image-covers";
+import { seriesEntitySchema, seriesKeySchema } from "./series";
 import { episodeFileInfoEntitySchema } from "./file-info";
 import { episodeUserInfoEntitySchema } from "./user-info/user-info";
 
@@ -19,6 +19,7 @@ type CompKey = z.infer<typeof compKeySchema>;
 const modelSchema = resourceSchema.extend( {
   compKey: compKeySchema,
   imageCoverId: mongoDbId.nullable().optional(),
+  count: z.number().optional(),
 } );
 
 type Model = z.infer<typeof modelSchema>;
@@ -27,7 +28,7 @@ type Model = z.infer<typeof modelSchema>;
 const entitySchema = modelSchema
   .extend( {
     id: mongoDbId,
-    serie: serieEntitySchema.optional(),
+    serie: seriesEntitySchema.optional(),
     fileInfos: z.array(episodeFileInfoEntitySchema).optional(),
     userInfo: episodeUserInfoEntitySchema.optional(),
     imageCover: imageCoverEntitySchema.optional(),
@@ -52,6 +53,12 @@ const entityWithUserInfoSchema = entitySchema.required( {
 
 type EntityWithUserInfo = z.infer<typeof entityWithUserInfoSchema>;
 
+const episodesBySeasonSchema = z.record(
+  z.array(entitySchema),
+);
+
+type EpisodesBySeason = z.infer<typeof episodesBySeasonSchema>;
+
 export {
   modelSchema as episodeSchema,
   entitySchema as episodeEntitySchema,
@@ -64,4 +71,6 @@ export {
   type EntityWithFileInfos as EpisodeEntityWithFileInfos,
   entityWithUserInfoSchema as episodeEntityWithUserInfoSchema,
   type EntityWithUserInfo as EpisodeEntityWithUserInfo,
+  episodesBySeasonSchema,
+  type EpisodesBySeason,
 };

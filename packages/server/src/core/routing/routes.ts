@@ -28,6 +28,7 @@ import { ImageCoversCrudModule } from "#modules/image-covers/module";
 import { ImageCoversAdminModule } from "#modules/image-covers/admin/module";
 import { MusicSmartPlaylistsCrudModule } from "#musics/smart-playlists/crud/module";
 import { MusicUsersListsModule } from "#musics/users-lists/crud/module";
+import { SeriesCrudModule } from "#episodes/series/module";
 import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
@@ -52,6 +53,7 @@ const imports = [
   EpisodesAdminModule,
   EpisodeFileInfosModule,
   EpisodesCrudModule, // Al final, para que no interfiera con slugs
+  SeriesCrudModule,
 
   PlayerModule,
 
@@ -75,32 +77,7 @@ export const authRoutes: Routes = [
     module: AuthGoogleModule,
   },
 ];
-const routes: Routes = [
-  {
-    path: "/",
-    module: StaticFilesModule,
-  },
-  {
-    path: "/config",
-    module: ConfigModule,
-  },
-  {
-    path: PATH_ROUTES.logs.path,
-    module: LoggingModule,
-  },
-  ...authRoutes,
-  {
-    path: PATH_ROUTES.imageCovers.path,
-    module: ImageCoversCrudModule,
-  },
-  {
-    path: PATH_ROUTES.imageCovers.path + "/admin",
-    module: ImageCoversAdminModule,
-  },
-  {
-    path: "api/users",
-    module: UsersMusicPlaylistsModule,
-  },
+const episodesRoutes: Routes = [
   {
     path: PATH_ROUTES.episodes.path,
     module: EpisodesCrudModule,
@@ -125,6 +102,20 @@ const routes: Routes = [
     path: PATH_ROUTES.episodes.dependencies.path,
     module: EpisodeDependenciesModule,
   },
+  {
+    path: PATH_ROUTES.episodes.series.path,
+    module: SeriesCrudModule,
+  },
+  {
+    path: PATH_ROUTES.streams.path,
+    module: StreamsModule,
+  },
+  {
+    path: PATH_ROUTES.streams.path,
+    module: StreamPickerModule,
+  },
+];
+const musicsRoutes: Routes = [
   {
     path: PATH_ROUTES.musics.path,
     module: MusicsCrudModule,
@@ -154,21 +145,42 @@ const routes: Routes = [
     module: MusicSmartPlaylistsCrudModule,
   },
   {
-    path: "api/musics/users-lists",
+    path: PATH_ROUTES.musics.usersLists.path,
     module: MusicUsersListsModule,
   },
   {
-    path: PATH_ROUTES.musics.path + "/admin",
+    path: PATH_ROUTES.musics.admin.path,
     module: MusicsAdminModule,
   },
+];
+const routes: Routes = [
   {
-    path: PATH_ROUTES.streams.path,
-    module: StreamsModule,
+    path: "/",
+    module: StaticFilesModule,
   },
   {
-    path: PATH_ROUTES.streams.path,
-    module: StreamPickerModule,
+    path: "/config",
+    module: ConfigModule,
   },
+  {
+    path: PATH_ROUTES.logs.path,
+    module: LoggingModule,
+  },
+  ...authRoutes,
+  {
+    path: PATH_ROUTES.imageCovers.path,
+    module: ImageCoversCrudModule,
+  },
+  {
+    path: PATH_ROUTES.imageCovers.admin.path,
+    module: ImageCoversAdminModule,
+  },
+  {
+    path: "api/users",
+    module: UsersMusicPlaylistsModule,
+  },
+  ...episodesRoutes,
+  ...musicsRoutes,
   {
     path: PATH_ROUTES.player.path,
     module: PlayerModule,

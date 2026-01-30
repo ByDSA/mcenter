@@ -6,6 +6,7 @@ import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonView";
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { anchorOnClick } from "#modules/ui-kit/menus/TabsClient";
+import { PropsOf } from "#modules/utils/react";
 import { Separator } from "../Separator/Separator";
 import styles from "./ListItem.module.css";
 import { ListItemColumn, ListItemRow } from "./ListItem";
@@ -30,11 +31,12 @@ export type ResourceEntryProps = {
     status: PlayerStatus;
   };
   imageCover?: ImageCover | null;
+  imageCoverDefaultIcon?: NonNullable<PropsOf<typeof MusicImageCover>>["icon"];
 };
 
 export function ResourceEntry(
   { mainTitle, subtitle, settings, right, favButton, play, drag, imageCover,
-    mainTitleHref, href }: ResourceEntryProps,
+    mainTitleHref, imageCoverDefaultIcon, href }: ResourceEntryProps,
 ) {
   const shouldHaveLeftDiv = !!play || imageCover !== undefined;
   const isPlaying = play !== undefined && play.status !== "stopped";
@@ -54,6 +56,7 @@ export function ResourceEntry(
         <MusicImageCover
           className={classes(styles.cover)}
           size="small"
+          icon={imageCoverDefaultIcon}
           cover={imageCover}
         />
         {play && <PlayButtonView

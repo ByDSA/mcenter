@@ -1,6 +1,6 @@
 import z from "zod";
 import { mongoDbId } from "../../resources/partial-schemas";
-import { episodeCompKeySchema } from "../episode";
+import { episodeCompKeySchema, episodeSchema } from "../episode";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { episodeEntitySchema } from "../episode";
 import { createCriteriaConfig, createCriteriaOneSchema, createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
@@ -14,7 +14,7 @@ const criteriaConfig = createCriteriaConfig( {
     episodeKeys: z.array(z.string()).optional(),
     seriesKeys: z.array(z.string()).optional(),
   },
-  sortKeys: ["episodeCompKey", "createdAt", "updatedAt"],
+  sortKeys: ["episodeCompKey", "episodeKey", "createdAt", "updatedAt"],
   expandKeys: ["series", "fileInfos", "userInfo"],
 } );
 
@@ -42,5 +42,15 @@ export namespace EpisodesCrudDtos {
     export const bodySchema = generatePatchBodySchema(episodeEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
     export const { paramsSchema } = EpisodesCrudDtos.GetOne.ById;
+  }
+
+  export namespace CreateOne {
+    export const bodySchema = episodeSchema.omit( {
+      addedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    } ).strict();
+
+    export type Body = z.infer<typeof bodySchema>;
   }
 }

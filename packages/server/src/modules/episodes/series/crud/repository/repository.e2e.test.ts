@@ -6,7 +6,7 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
-import { type SerieEntity, serieEntitySchema } from "../../models";
+import { type SeriesEntity, seriesEntitySchema } from "../../models";
 import { SeriesRepository } from "./repository";
 
 let repo: SeriesRepository;
@@ -40,11 +40,15 @@ describe("repository", () => {
   } );
 
   describe("create", () => {
-    const newModel: SerieEntity = {
+    const newModel: SeriesEntity = {
       id: "serieId",
       name: "title",
       key: "key",
       imageCoverId: null,
+      addedAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      releasedOn: "2000-01-01",
     };
 
     describe("before Create", () => {
@@ -70,12 +74,12 @@ describe("repository", () => {
     } );
 
     describe("create", () => {
-      let createdGot: SerieEntity;
+      let createdGot: SeriesEntity;
 
       beforeAll(async () => {
         createdGot = await repo.createOneAndGet(newModel);
 
-        serieEntitySchema.parse(createdGot);
+        seriesEntitySchema.parse(createdGot);
 
         newModel.id = createdGot.id;
       } );

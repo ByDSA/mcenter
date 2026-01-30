@@ -2,7 +2,7 @@ import type { EpisodeHistoryEntryEntity } from "../";
 import { ObjectId } from "mongodb";
 import { fixtureUsers } from "../../../auth/tests/fixtures";
 import { deepFreeze } from "../../../../utils/objects";
-import { STREAM_SIMPSONS } from "../../../streams/tests";
+import { STREAM_SIMPSONS } from "../../streams/tests";
 import { SAMPLE1 as DATE_SAMPLE1 } from "../../../../../tests/other-fixtures/dates";
 import { fixtureEpisodes } from "../../tests";
 

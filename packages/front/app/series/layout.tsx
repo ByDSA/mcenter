@@ -1,12 +1,18 @@
+import { PATH_ROUTES } from "$shared/routing";
 import { PageContainer } from "app/PageContainer";
 import { TabsContainer } from "app/TabsContainer";
+import styles from "./styles.module.css";
 
 export default function SeriesLayout( { children }: {
   children: React.ReactNode;
 } ) {
   const data = [
     {
-      path: "/series/history",
+      path: PATH_ROUTES.episodes.frontend.lists.path,
+      label: "Explorar",
+    },
+    {
+      path: PATH_ROUTES.episodes.frontend.history.path,
       label: "Historial",
     },
     {
@@ -18,7 +24,7 @@ export default function SeriesLayout( { children }: {
   return (
     <>
       <TabsContainer data={data}>
-        <PageContainer>
+        <PageContainer className={styles.page}>
           {children}
         </PageContainer>
       </TabsContainer>

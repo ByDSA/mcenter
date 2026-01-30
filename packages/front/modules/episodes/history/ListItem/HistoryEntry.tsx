@@ -10,6 +10,8 @@ import { SetState } from "#modules/utils/react";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { copyText } from "#modules/musics/lists/playlists/utils";
 import { logger } from "#modules/core/logger";
+import { useImageCover } from "#modules/image-covers/hooks";
+import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import { EpisodeHistoryApi } from "../requests";
 import { EpisodeLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem";
 import { EditEpisodeContextMenuItem } from "../../Edit/ContextMenu";
@@ -28,16 +30,22 @@ export const EpisodeHistoryEntryElement = React.memo((
 ) =>{
   const { resource: episode } = value;
   const { openMenu } = useContextMenuTrigger();
+  const { data: imageCover } = useImageCover(
+    episode.imageCoverId ?? episode.serie?.imageCoverId ?? null,
+  );
 
-  return ResourceEntry( {
-    mainTitle: episode.title,
-    subtitle: <EpisodeSubtitle episode={episode} />,
-    right: <>
+  return <ResourceEntry
+    mainTitle={episode.title}
+    subtitle={<EpisodeSubtitle episode={episode} />}
+    right={<>
       <HistoryTimeView timestamp={value.date.timestamp} />
       <WeightView weight={episode.userInfo.weight} />
-    </>,
-    settings: <SettingsButton
-
+    </>}
+    imageCover={imageCover ?? null}
+    imageCoverDefaultIcon={{
+      element: <SeriesIcon />,
+    }}
+    settings={<SettingsButton
       onClick={(e)=> {
         openMenu( {
           event: e,
@@ -88,8 +96,8 @@ export const EpisodeHistoryEntryElement = React.memo((
           </>,
         } );
       }}
-    />,
-  } );
+    />}
+  />;
 } );
 
 type EpisodeSubtitleProps = {

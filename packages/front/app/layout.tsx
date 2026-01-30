@@ -10,7 +10,7 @@ import { UserAvatarButton } from "#modules/core/auth/Avatar";
 import { SidebarClient } from "#modules/ui-kit/menus/SidebarClient";
 import { classes } from "#modules/utils/styles";
 import { MenuItemData } from "#modules/ui-kit/menus/Sidebar";
-import { SeriesIcon } from "#modules/episodes/series/SeriesIcon";
+import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import { MoviesIcon } from "#modules/movies/MoviesIcon";
 import { MusicsIcon } from "#modules/musics/MusicsIcon";
 import { ModalProvider } from "#modules/ui-kit/modal/ModalContext";

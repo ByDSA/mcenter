@@ -4,6 +4,7 @@ import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { MongoFilterQuery, OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { isTest } from "#utils";
 import { EpisodesUsersOdm } from "../../user-infos/odm";
 import { EpisodeCompKey } from "../../../../models";
 
@@ -19,6 +20,7 @@ export type DocOdm = EpisodeCompKeyOdm & OptionalId & TimestampsOdm.AutoTimestam
   disabled?: boolean;
   uploaderUserId: mongoose.Types.ObjectId;
   imageCoverId?: mongoose.Types.ObjectId | null;
+  count?: number;
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
@@ -60,10 +62,14 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: mongoose.Schema.Types.ObjectId,
     required: false,
   },
+  count: {
+    type: Number,
+    required: false,
+  },
   ...TimestampsOdm.nonAutoTimestampsSchemaDefinition,
 } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
   collection: COLLECTION,
-  autoIndex: false,
+  autoIndex: isTest(),
   versionKey: false,
   timestamps: true,
 } );

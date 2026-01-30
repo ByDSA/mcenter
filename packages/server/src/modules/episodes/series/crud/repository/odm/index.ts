@@ -4,7 +4,8 @@ import { COLLECTION, DocOdm,
   schema as schemaOdm } from "./odm";
 import { docOdmToEntity,
   entityToDocOdm,
-  modelToDocOdm } from "./adapters";
+  modelToDocOdm,
+  partialToDocOdm } from "./adapters";
 
 export namespace SeriesOdm {
   export type Doc = DocOdm;
@@ -15,5 +16,6 @@ export namespace SeriesOdm {
   export const toEntity = docOdmToEntity;
   export const toFullDoc = entityToDocOdm;
   export const toDoc = modelToDocOdm;
+  export const partialToDoc = partialToDocOdm;
   export const COLLECTION_NAME = COLLECTION;
 }

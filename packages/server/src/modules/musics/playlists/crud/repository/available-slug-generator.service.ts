@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { MusicPlaylistEntity } from "../../models";
+import { getUniqueString } from "#modules/resources/get-unique-string";
 import { MusicPlaylistsRepository } from "./repository";
 
 type Props = {
@@ -17,22 +17,18 @@ export class MusicPlaylistAvailableSlugGeneratorService {
 
   async getAvailable( { slug: base,
     userId }: Props): Promise<string> {
-    let currentSlug = base;
-    let playlist: MusicPlaylistEntity | null;
-    let i = 1;
+    return await getUniqueString(
+      base,
+      async (candidate) => {
+        const playlist = await this.repo.getOneBySlug( {
+          playlistSlug: candidate,
+          ownerUserId: userId,
+          requestUserId: userId,
+        } );
 
-    while (true) {
-      playlist = await this.repo.getOneBySlug( {
-        playlistSlug: currentSlug,
-        ownerUserId: userId,
-        requestUserId: userId,
-      } );
-
-      if (!playlist)
-        return currentSlug;
-
-      i++;
-      currentSlug = `${base}-${i}`;
-    }
+        return !playlist;
+      },
+      // No maxLength explícito en el original, pero se puede añadir si es necesario
+    );
   }
 }

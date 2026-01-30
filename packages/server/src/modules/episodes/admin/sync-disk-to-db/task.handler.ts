@@ -14,14 +14,14 @@ import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfo, EpisodeFileInfoEntity, EpisodeFileInfoOmitEpisodeId, episodeFileInfoSchema } from "#episodes/file-info/models";
-import { Serie } from "#episodes/series";
+import { Series } from "#episodes/series";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { md5FileAsync } from "#utils/crypt";
 import { Episode } from "#episodes/models";
 import { EpisodesRepository } from "../../crud/repositories/episodes";
-import { SerieNode, SerieTree, EpisodeNode } from "./disk/models";
-import { RemoteSeriesTreeService } from "./db";
 import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "./disk";
+import { RemoteSeriesTreeService } from "./db";
+import { SerieNode, SerieTree, EpisodeNode } from "./disk/models";
 
 const TASK_NAME = EpisodeTasks.sync.name;
 
@@ -195,6 +195,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
       const seriePromise = this.seriesRepo.getOneOrCreate( {
         name: seriesNode.key,
         key: seriesNode.key,
+        imageCoverId: null,
       } );
 
       // Para cada temporada y episodio, crear las promesas que dependen de la serie
@@ -216,7 +217,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
 
   private async createFileInfoFromLocalEpisode(
     localEpisode: EpisodeNode,
-    serie: Serie,
+    serie: Series,
     userId: string,
   ) {
     const episode: Omit<Episode, "addedAt" | "createdAt" | "releasedOn" | "updatedAt"> = {

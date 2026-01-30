@@ -1,10 +1,13 @@
-import type { SerieEntity } from "..";
+import type { SeriesEntity } from "..";
 import { ObjectId } from "mongodb";
-import { deepFreeze } from "../../../utils/objects";
+import { deepFreeze } from "../../../../utils/objects";
 
-export const SERIE_SIMPSONS: SerieEntity = deepFreeze( {
+export const SERIE_SIMPSONS: SeriesEntity = deepFreeze( {
   id: new ObjectId().toString(),
   key: "simpsons",
   name: "simpsons",
   imageCoverId: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  addedAt: new Date(),
 } );
