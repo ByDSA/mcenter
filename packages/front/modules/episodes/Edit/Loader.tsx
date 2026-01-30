@@ -8,13 +8,7 @@ import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { EditEpisodeForm } from "./Form";
 
 type Props = {
-  initialData: {
-    id: string;
-    compKey: {
-        seriesKey: string;
-        episodeKey: string;
-    };
-  };
+  initialData: EpisodeEntity;
   onSuccess: (data: EpisodeEntity)=> void;
 };
 

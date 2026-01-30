@@ -1,5 +1,7 @@
 export {
-  Taggable, TimeRange, timeRangeSchema,
+  type Taggable,
+  type TimeRange,
+  timeRangeSchema,
 } from "./partial-schemas";
 
 export * from "./resource";

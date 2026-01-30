@@ -2,11 +2,11 @@ import { createOneResultResponseSchema, createPaginatedResultResponseSchema, Res
 import { genParseZod } from "$shared/utils/validation/zod";
 import z from "zod";
 import { PATH_ROUTES } from "$shared/routing";
-import { SeriesEntity, seriesEntitySchema } from "./models";
-import { SeriesCrudDtos } from "./models/dto";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { SeriesCrudDtos } from "./models/dto";
+import { SeriesEntity, seriesEntitySchema } from "./models";
 
 export class SeriesApi {
   static {

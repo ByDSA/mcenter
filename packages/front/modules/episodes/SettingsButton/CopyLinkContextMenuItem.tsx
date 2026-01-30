@@ -11,10 +11,10 @@ export const CopyEpisodeLinkContextMenuItem = () => {
     <CopyLinkContextMenuItem
       txt={() => {
         return frontendUrl(
-          PATH_ROUTES.episodes.slug.withParams(
-            data.compKey.seriesKey,
-            data.compKey.episodeKey,
-          ),
+          PATH_ROUTES.episodes.frontend.lists.withParams( {
+            serieId: data.id,
+            episodeKey: data.compKey.episodeKey,
+          } ),
         );
       }}
     />

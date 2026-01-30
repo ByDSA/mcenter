@@ -85,7 +85,7 @@ export const EpisodeListItem = ( { episode, series, setEpisode, onDelete }: Prop
                 }}>
                   <EditEpisodeContextMenuItem
                     initialData={episode}
-                    setData={setEpisode as any}
+                    setData={setEpisode}
                   />
                   <CopyEpisodeLinkContextMenuItem />
                   <EpisodeLatestViewsContextMenuItem

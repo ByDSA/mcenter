@@ -18,7 +18,11 @@ export const SeriesListItem = (props: Props) => {
   const { data: imageCover } = useImageCover(props.data.imageCoverId);
   const { removeItemByIndex, setItemByIndex } = useArrayData<SeriesEntity>();
   const router = useRouter();
-  const url = frontendUrl(PATH_ROUTES.episodes.frontend.lists.withParams(props.data.id));
+  const url = frontendUrl(
+    PATH_ROUTES.episodes.frontend.lists.withParams( {
+      serieId: props.data.id,
+    } ),
+  );
 
   return (
     <a

@@ -18,7 +18,7 @@ type Response = z.infer<typeof responseSchema>;
 
 export {
   schema as localSignUpBodySchema,
-  LocalSignUpBody,
+  type LocalSignUpBody,
   responseSchema as oauthSignUpResponseSchema,
-  Response as OauthSignUpResponse,
+  type Response as OauthSignUpResponse,
 };

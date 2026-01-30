@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { PATH_ROUTES } from "$shared/routing";
 import { PaginationContainer, PaginationButtonProps } from "#modules/ui-kit/Pagination/Pagination";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
+import { ResourceFullPage } from "#modules/resources/FullPage/FullPage/FullPage";
 import { SeriesEntity } from "../models";
 import { SeriesHeader } from "./Header";
 import { EpisodesList } from "./Seasons/List";
@@ -58,7 +59,7 @@ export const SeriesFullPage = ( { series,
   };
 
   return (
-    <div className={styles.container}>
+    <ResourceFullPage>
       <SeriesHeader
         series={series}
         totalEpisodes={totalEpisodes}
@@ -112,7 +113,7 @@ export const SeriesFullPage = ( { series,
               <p>No se encontraron temporadas.</p>
             )}
       </div>
-    </div>
+    </ResourceFullPage>
   );
 };
 

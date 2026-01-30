@@ -3,23 +3,21 @@ import { useRouter } from "next/navigation";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { ResourcePlayButtonView } from "#modules/resources/PlayButton/PlayButton";
-import { classes } from "#modules/utils/styles";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { useLocalData } from "#modules/utils/local-data-context";
-import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
-import { Separator } from "#modules/resources/Separator/Separator";
-import playlistStyles from "../../playlists/FullPage/Playlist.module.css";
-import playlistHeaderStyles from "../../playlists/FullPage/Header.module.css";
+import { VisibilityTag } from "#modules/resources/FullPage/VisibilityTag";
+import { classes } from "#modules/utils/styles";
+import { DateTag } from "#modules/resources/FullPage/DateTag/DateTag";
+import { HeaderList } from "#modules/resources/FullPage/HeaderList";
+import { ResourceFullPage } from "#modules/resources/FullPage/FullPage/FullPage";
 import { MusicSmartPlaylistEntity } from "../models";
 import { MusicSmartPlaylistSettingsButton } from "../SettingsButton/Settings";
-import { DateTag } from "../../playlists/FullPage/Header";
 import styles from "./styles.module.css";
 
 export const MusicSmartPlaylistFullPage = () => {
   const { data } = useLocalData<MusicSmartPlaylistEntity>();
-  const playerStatus = useBrowserPlayer(s => s.status);
-  const queryPlaying = useBrowserPlayer(s => s.query);
+  const playerStatus = useBrowserPlayer((s) => s.status);
+  const queryPlaying = useBrowserPlayer((s) => s.query);
   const { data: imageCover } = useImageCover(data.imageCoverId ?? null);
   const router = useRouter();
   let status: PlayerStatus = "stopped";
@@ -37,58 +35,35 @@ export const MusicSmartPlaylistFullPage = () => {
     else
       player.pause();
   };
+  const infoItems = [
+    <span key="type" title="Smart Playlist">Smart Playlist</span>,
+    <VisibilityTag key="visibility" isPublic={data.visibility === "public"} />,
+    <DateTag key="date" date={data.createdAt} />,
+  ];
 
   return (
-    <div className={playlistStyles.container}>
-      <div className={playlistHeaderStyles.playlistHeader}>
-        <div className={playlistHeaderStyles.headerContent}>
-          <MusicImageCover
-            title={data.name}
-            className={playlistHeaderStyles.playlistCover}
-            cover={imageCover}
-          />
-
-          <div className={playlistHeaderStyles.playlistInfo}>
-            <span className={playlistHeaderStyles.playlistTitle}>
-              <h1>{data.name}</h1>
-            </span>
-
-            <div className={playlistHeaderStyles.playlistStats}>
-              <div className={playlistHeaderStyles.row}>
-                <div
-                  className={classes(playlistHeaderStyles.statItem)}
-                  title="Smart Playlist"
-                >
-                  Smart Playlist
-                </div>
-                <Separator />
-                <VisibilityTag
-                  isPublic={data.visibility === "public"}
-                  className={playlistHeaderStyles.statItem}
-                />
-                <Separator />
-                <DateTag date={data.createdAt} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className={playlistHeaderStyles.playlistControls}>
-          <ResourcePlayButtonView
-            onClick={handlePlay}
-            status={status}
-          />
+    <ResourceFullPage>
+      <HeaderList
+        title={data.name}
+        cover={<MusicImageCover
+          title={data.name}
+          cover={imageCover}
+        />}
+        onPlay={handlePlay}
+        playStatus={status}
+        settings={
           <MusicSmartPlaylistSettingsButton
             onDelete={() => router.push(PATH_ROUTES.musics.frontend.playlists.path)}
           />
-        </div>
-      </div>
+        }
+        info={infoItems}
+      />
 
       <div className={classes(styles.body)}>
         <h3 className={styles.queryTitle}><Code /> Query</h3>
         <p className={styles.queryText}>{makeReadableQuery(data.query)}</p>
       </div>
-    </div>
+    </ResourceFullPage>
   );
 };
 

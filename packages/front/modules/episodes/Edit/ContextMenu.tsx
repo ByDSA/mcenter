@@ -1,16 +1,14 @@
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { SetState } from "#modules/utils/react";
-import { EpisodeHistoryApi } from "../history/requests";
+import { EpisodeEntity } from "../models";
 import { useEditEpisodeModal } from "./EditModal";
-
-type Data = EpisodeHistoryApi.GetMany.Data["resource"];
 
 // Se necesita como hook-wrapper, porque si se pone dentro del ContextMenu,
 // al cerrarse el menú se destruyen los hooks del modal
 // y no se puede actualizar cuando llegan los datos
 type Props = {
-  initialData: Data;
-  setData: SetState<Data>;
+  initialData: EpisodeEntity;
+  setData: SetState<EpisodeEntity>;
 };
 export const EditEpisodeContextMenuItem = (props: Props) => {
   const { openModal } = useEditEpisodeModal(props);

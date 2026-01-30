@@ -26,7 +26,6 @@ cp "$TSCONFIG" "$BACKUP"
 # Buscamos la línea que contiene "$shared" o "@my-project/shared" y la eliminamos
 # Nota: Adaptamos el patrón según el nombre exacto que uses en tu paths
 sed -i.tmp '/"\$shared\/\*":/d' "$TSCONFIG"
-sed -i.tmp '/"@my-project\/shared":/d' "$TSCONFIG"
 # Eliminar archivo temporal residual de sed en algunos sistemas (como macOS)
 rm -f "$TSCONFIG.tmp"
 

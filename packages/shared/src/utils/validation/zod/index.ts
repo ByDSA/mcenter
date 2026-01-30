@@ -114,7 +114,7 @@ export function assertZodPopStack<T>(
 }
 
 export {
-  PropInfo,
+  type PropInfo,
   schemaToReadableFormat as zodSchemaToReadableFormat,
 } from "./utils";
 

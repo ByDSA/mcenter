@@ -43,9 +43,9 @@ function compareModelOmitEpisodeId(a: ModelOmitEpisodeId, b: ModelOmitEpisodeId)
 export {
   schema as episodeFileInfoSchema,
   entitySchema as episodeFileInfoEntitySchema,
-  Model as EpisodeFileInfo,
-  ModelOmitEpisodeId as EpisodeFileInfoOmitEpisodeId,
-  Entity as EpisodeFileInfoEntity,
+  type Model as EpisodeFileInfo,
+  type ModelOmitEpisodeId as EpisodeFileInfoOmitEpisodeId,
+  type Entity as EpisodeFileInfoEntity,
   assertIsModel as assertIsEpisodeFileInfo,
   assertIsEntity as assertIsEpisodeFileInfoEntity,
   compareModelOmitEpisodeId as compareEpisodeFileInfoOmitEpisodeId,

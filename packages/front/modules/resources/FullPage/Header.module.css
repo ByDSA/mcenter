@@ -1,0 +1,25 @@
+.header {
+  padding: 48px;
+  color: white;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* --- Common Image Styles --- */
+.coverWrapper {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  position: relative; /* Importante para el posicionamiento interno */
+}
+
+/* Forzar que el componente de imagen llene el wrapper */
+.coverWrapper > * {
+  width: 100% !important;
+  height: 100% !important;
+}

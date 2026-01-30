@@ -1,81 +1,56 @@
-import { CalendarToday } from "@mui/icons-material";
 import { usePathname, useRouter } from "next/navigation";
 import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined } from "$shared/utils/validation";
-import { classes } from "#modules/utils/styles";
-import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { ResourcePlayButtonView } from "#modules/resources/PlayButton/PlayButton";
-import { Separator } from "#modules/resources/Separator/Separator";
-import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
+import { VisibilityTag } from "#modules/resources/FullPage/VisibilityTag";
 import { useLocalData } from "#modules/utils/local-data-context";
+import { DateTag } from "#modules/resources/FullPage/DateTag/DateTag";
+import { HeaderList } from "#modules/resources/FullPage/HeaderList";
 import { formatDurationHeader } from "../utils";
 import { MusicPlaylistEntity } from "../models";
 import { MusicPlaylistSettingsButton } from "../SettingsButton/Settings";
-import styles from "./Header.module.css";
 
-interface PlaylistHeaderProps {
+type Props = {
   totalSongs: number;
   totalDuration: number;
   playlistStatus: PlayerStatus;
   onPlay: ()=> void;
-}
+};
 
 export const PlaylistHeader = ( { totalSongs,
   totalDuration,
   playlistStatus,
-  onPlay }: PlaylistHeaderProps) => {
+  onPlay }: Props) => {
   const { data } = useLocalData<MusicPlaylistEntity>();
   const pathname = usePathname();
   const router = useRouter();
+  const infoItems = [
+    <span key="count">
+      {totalSongs} {totalSongs === 1 ? "música" : "músicas"}
+    </span>,
+    <span key="duration">{formatDurationHeader(totalDuration)}</span>,
+    <VisibilityTag key="visibility" isPublic={data.visibility === "public"} />,
+    <DateTag key="date" date={data.createdAt} />,
+  ];
 
   return (
-    <div className={styles.playlistHeader}>
-      <div className={styles.headerContent}>
-        <MusicImageCover
-          title={data.name}
-          className={styles.playlistCover}
-          cover={data.imageCover}
-        />
-
-        <div className={styles.playlistInfo}>
-          <span className={styles.playlistTitle}>
-            <h1>{data.name}</h1>
-          </span>
-
-          <div className={styles.playlistStats}>
-            <div className={styles.row}>
-              <div className={styles.statItem}>
-                <span>{totalSongs} {totalSongs === 1 ? "música" : "músicas"}</span>
-              </div>
-              <Separator />
-              <div className={styles.statItem}>
-                <span>{formatDurationHeader(totalDuration)}</span>
-              </div>
-              <Separator />
-              <VisibilityTag
-                isPublic={data.visibility === "public"}
-                className={styles.statItem}
-              />
-              <Separator />
-              <DateTag date={data.createdAt} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className={styles.playlistControls}>
-        <ResourcePlayButtonView
-          onClick={onPlay}
-          disabled={totalSongs === 0}
-          status={playlistStatus}
-        />
+    <HeaderList
+      title={data.name}
+      cover={<MusicImageCover
+        title={data.name}
+        cover={data.imageCover}
+      />}
+      onPlay={onPlay}
+      playStatus={playlistStatus}
+      playDisabled={totalSongs === 0}
+      settings={
         <MusicPlaylistSettingsButton
-          onEdit={(current, previous)=> {
+          onEdit={(current, previous) => {
             if (
               pathname.startsWith(PATH_ROUTES.musics.frontend.playlists.slug.path)
-                              && previous.slug !== current.slug) {
+              && previous.slug !== current.slug
+            ) {
               const userSlug = current.ownerUserPublic?.slug;
 
               assertIsDefined(userSlug);
@@ -87,23 +62,12 @@ export const PlaylistHeader = ( { totalSongs,
               );
             }
           }}
-          onDelete={()=> {
+          onDelete={() => {
             router.push(PATH_ROUTES.musics.frontend.playlists.path);
           }}
         />
-      </div>
-    </div>
+      }
+      info={infoItems}
+    />
   );
-};
-
-export const DateTag = ( { date }: {date: Date} ) => {
-  return <div
-    className={classes(styles.statItem)}
-    title="Fecha de creación"
-  >
-    <span>
-      <CalendarToday />
-    </span>
-    <span>{formatDateDDMMYYY(date)}</span>
-  </div>;
 };

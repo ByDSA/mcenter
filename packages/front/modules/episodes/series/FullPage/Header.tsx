@@ -2,10 +2,9 @@ import { SeriesEntity } from "$shared/models/episodes/series";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import { useImageCover } from "#modules/image-covers/hooks";
-import { Separator } from "#modules/resources/Separator/Separator";
-import { DateTag } from "#modules/musics/lists/playlists/FullPage/Header";
+import { DateTag } from "#modules/resources/FullPage/DateTag/DateTag";
+import { HeaderList } from "#modules/resources/FullPage/HeaderList";
 import { SeriesSettingsButton } from "../SettingsButton/SettingsButton";
-import styles from "./Header.module.css";
 
 type Props = {
   series: SeriesEntity;
@@ -21,47 +20,36 @@ export const SeriesHeader = ( { series,
   onUpdate,
   onDelete }: Props) => {
   const { data: imageCover } = useImageCover(series.imageCoverId);
+  const infoItems = [
+    <span key="seasons">{totalSeasons} {totalSeasons === 1 ? "temporada" : "temporadas"}</span>,
+    <span key="episodes">{totalEpisodes} episodios</span>,
+    <DateTag key="date" date={series.addedAt} />,
+  ];
 
   return (
-    <div className={styles.header}>
-      <div className={styles.headerContent}>
+    <HeaderList
+      title={series.name}
+      cover={
         <MusicImageCover
           title={series.name}
-          className={styles.cover}
           cover={imageCover}
           icon={{
             element: <SeriesIcon />,
           }}
-          editable
-          onUpdate={(newCover) => {
-            // Lógica para actualizar la cover si es necesario,
-            // aunque el componente padre manejará la actualización de la serie
+          size="medium"
+          onUpdate={() => {
+            // La actualización se maneja en el padre, pero el botón de edición está en la cover
           }}
         />
-
-        <div className={styles.info}>
-          <h1 className={styles.title}>{series.name}</h1>
-        </div>
-      </div>
-
-      <div className={styles.controls}>
+      }
+      settings={
         <SeriesSettingsButton
           series={series}
           onUpdate={onUpdate}
           onDelete={onDelete}
         />
-        <div className={styles.stats}>
-          <div className={styles.statItem}>
-            <span>{totalSeasons} {totalSeasons === 1 ? "temporada" : "temporadas"}</span>
-          </div>
-          <Separator />
-          <div className={styles.statItem}>
-            <span>{totalEpisodes} episodes</span>
-          </div>
-          <Separator />
-          <DateTag date={series.addedAt} />
-        </div>
-      </div>
-    </div>
+      }
+      info={infoItems}
+    />
   );
 };

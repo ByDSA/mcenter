@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import { SetState } from "#modules/utils/react";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { useUser } from "#modules/core/auth/useUser";
+import { ResourceFullPage } from "#modules/resources/FullPage/FullPage/FullPage";
 import { MusicPlaylistEntity } from "../models";
 import { usePlaylistPlayer } from "./hooks/usePlaylistPlayer";
 import { usePlaylistDragAndDrop } from "./hooks/usePlaylistDragAndDrop";
 import { PlaylistHeader } from "./Header";
 import { MusicPlaylistTrackList } from "./Tracks/List";
-import styles from "./Playlist.module.css";
 
 interface PlaylistProps {
   value: MusicPlaylistEntity;
@@ -39,7 +39,7 @@ export const MusicPlaylistFullPage = ( { value, setValue }: PlaylistProps) => {
 
   return <LocalDataProvider data={value} setData={setValue}>
 
-    <div className={styles.container}>
+    <ResourceFullPage>
       <PlaylistHeader
         totalSongs={totalSongs}
         totalDuration={totalDuration}
@@ -58,6 +58,6 @@ export const MusicPlaylistFullPage = ( { value, setValue }: PlaylistProps) => {
         activeId={activeId}
         itemIds={itemIds}
       />
-    </div>
+    </ResourceFullPage>
   </LocalDataProvider>;
 };

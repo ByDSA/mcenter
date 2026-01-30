@@ -1,14 +1,12 @@
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { SetState } from "#modules/utils/react";
-import { EpisodeHistoryApi } from "../history/requests";
+import { EpisodeEntity } from "../models";
 import { EditEpisodeLoader } from "./Loader";
 import styles from "./EditModal.module.css";
 
-type Data = EpisodeHistoryApi.GetMany.Data["resource"];
-
 type Props = {
-  initialData: Data;
-  setData: SetState<Data>;
+  initialData: EpisodeEntity;
+  setData: SetState<EpisodeEntity>;
 };
 
 export function useEditEpisodeModal( { initialData, setData }: Props) {

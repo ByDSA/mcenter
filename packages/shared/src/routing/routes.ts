@@ -417,7 +417,8 @@ token?: string;} ) => {
       },
       lists: {
         path: "/series/lists",
-        withParams: (id: string) => `/series/lists/${id}`,
+        withParams: ( { serieId, episodeKey }: {serieId: string;
+episodeKey?: string;} ) => `/series/lists/${serieId}${episodeKey ? `/${episodeKey}` : ""}`,
       },
     },
   },

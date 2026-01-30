@@ -1,0 +1,84 @@
+.container {
+  background: var(--color-gray-950);
+}
+
+
+.itemMainRow {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  gap: 4rem;
+  width: 100%;
+}
+
+.itemCover {
+  flex: 1;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 200px;
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
+}
+
+.itemDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.itemTitleWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.itemTitle {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--color-gray-25); /* Título en blanco/claro */
+  line-height: 1.2;
+}
+
+.itemInfoColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem; /* Separación solicitada */
+  height: 100%;
+  color: var(--color-gray-300); /* Color gris para la info */
+  font-size: 1rem;
+}
+
+/* Asegurar que los hijos hereden el color gris */
+.itemInfoColumn > * {
+  color: inherit;
+}
+
+.itemFooter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (width < 800px) {
+  .itemMainRow {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .itemDetails {
+    flex: 0;
+  }
+
+  .itemCover {
+    width: 100%;
+    align-self: center;
+  }
+}

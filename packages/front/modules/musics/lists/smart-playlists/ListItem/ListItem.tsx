@@ -4,7 +4,7 @@ import { useArrayData } from "#modules/utils/array-data-context";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { VisibilityTag } from "#modules/ui-kit/VisibilityTag";
+import { VisibilityTag } from "#modules/resources/FullPage/VisibilityTag";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { MusicSmartPlaylistEntity } from "../models";
 import { MusicSmartPlaylistSettingsButton } from "../SettingsButton/Settings";

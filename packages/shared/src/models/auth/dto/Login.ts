@@ -12,8 +12,8 @@ type LocalLoginBody = z.infer<typeof schema>;
 type LocalLoginResponse = z.infer<typeof responseSchema>;
 
 export {
-  LocalLoginBody,
-  LocalLoginResponse,
+  type LocalLoginBody,
+  type LocalLoginResponse,
   schema as localLoginBodySchema,
   responseSchema as localLoginResponseSchema,
 };

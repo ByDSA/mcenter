@@ -1,13 +1,14 @@
 .container {
   width: 100%;
-  margin: 0 auto;
-  margin-top: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  color: var(--color-gray-300);
+  background: var(--color-gray-950);
+  display: flex;
+  flex-flow: column nowrap;
 
-  @media (width <= 768px) {
-    margin-top: 0;
+  @media (width <= 600px) {
     border-radius: 0;
   }
 }
