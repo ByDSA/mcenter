@@ -66,6 +66,7 @@ export function NewImageCoverForm( { onSuccess }: NewImageCoverProps) {
         <DaInputErrorWrap>
           <DaInputText
             {...register("label")}
+            autoFocus
           />
           <DaErrorView errors={errors} keyName="label" touchedFields={dirtyFields} />
         </DaInputErrorWrap>

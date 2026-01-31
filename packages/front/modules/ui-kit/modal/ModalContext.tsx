@@ -8,6 +8,8 @@ import { createContext,
   useRef,
   ReactNode,
   useEffect } from "react";
+import { logger } from "#modules/core/logger";
+import { submitAndWait } from "../form/submit";
 import { Modal } from "./Modal";
 import { disableInput, enableInput } from "./utils";
 import { ConfirmModalContent } from "./ConfirmModal/Content";
@@ -225,9 +227,16 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
       return;
 
     // Disparo de submit estándar (respeta onSubmit, validaciones, etc.)
-    if (typeof form.requestSubmit === "function")
-      form.requestSubmit();
-    else {
+    if (typeof form.requestSubmit === "function") {
+      try {
+        await submitAndWait(form, submitters[0]);
+
+        await _close(id, returnObj, true);
+      } catch (e) {
+        if (e instanceof Error)
+          logger.error(e.message);
+      }
+    } else {
       // Fallback para navegadores antiguos
       form.dispatchEvent(
         new Event("submit", {
@@ -235,9 +244,9 @@ export const ModalProvider = ( { children }: { children: ReactNode } ) => {
           cancelable: true,
         } ),
       );
+      logger.info("Puede que no se hayan guardado los cambios. Revísalo.");
+      await _close(id, returnObj, true);
     }
-
-    await _close(id, returnObj, true);
   }, [modals, _close]);
 
   useEffect(() => {
