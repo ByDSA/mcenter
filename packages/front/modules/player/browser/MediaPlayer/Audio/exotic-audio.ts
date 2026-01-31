@@ -46,10 +46,10 @@ export async function convertAudio(fileUrl: string) {
 }
 
 export async function handleExoticAudio(params: {
-  engine: HTMLAudioElement;
+  audio: HTMLAudioElement;
   sync: ()=> Promise<void>;
 } ) {
-  const { engine, sync } = params;
+  const { audio, sync } = params;
 
   logger.info("Formato no soportado nativamente, intentando Exotic Audio...");
   try {
@@ -67,14 +67,14 @@ export async function handleExoticAudio(params: {
     const { add } = useAudioCache.getState();
 
     add(currentResource.resourceId, converted.audioBlob);
-    engine.src = converted.url;
-    engine.load();
+    audio.src = converted.url;
+    audio.load();
     await sync();
 
     return false;
   } catch (exoticErr) {
     logger.error("Exotic Audio falló", exoticErr);
-    engine.removeAttribute("src");
+    audio.removeAttribute("src");
 
     return true;
   }

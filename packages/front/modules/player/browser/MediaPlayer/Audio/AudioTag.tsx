@@ -16,11 +16,6 @@ import { useMediaSession } from "./useMediaSession";
 
 export type AudioRef = RefObject<HTMLAudioElement | null>;
 
-/**
- * AUDIO ENGINE
- * - Carrier (DOM): Mantiene la sesión viva con silencio.
- * - Engine (Memoria): Procesa el audio real a través del AudioContext.
- */
 export const AudioTag = () => {
   const player = useBrowserPlayer(useShallow((s) => ( {
     isOnline: s.isOnline,
@@ -36,7 +31,7 @@ export const AudioTag = () => {
     hasPrev: s.hasPrev,
     hasNext: s.hasNext,
   } )));
-  const engineRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const syncingRef = useRef(false);
   const mutexRef = useRef(new Mutex());
   const sync = useCallback(async () => {
@@ -48,7 +43,7 @@ export const AudioTag = () => {
     syncingRef.current = true;
 
     try {
-      const audio = engineRef.current;
+      const audio = audioRef.current;
 
       // Evitar play si no hay fuente definida aún
       if (!audio || !audio.src || audio.src === "")
@@ -63,7 +58,7 @@ export const AudioTag = () => {
 
       if (status === "playing") {
         if (audio.paused || audio.error || audio.readyState === 0)
-          await securePlayEngine();
+          await securePlayAudioTag();
       } else
         audio.pause();
     } finally {
@@ -73,10 +68,10 @@ export const AudioTag = () => {
   }, []);
   const setGlobalAudioElement = useBrowserPlayer(s=>s.setAudioElement);
   const onEnded = useCallback(async () => {
-    if (!engineRef.current)
+    if (!audioRef.current)
       return;
 
-    const audio = engineRef.current;
+    const audio = audioRef.current;
     const { repeatMode } = useBrowserPlayer.getState();
 
     if (repeatMode === RepeatMode.One)
@@ -88,16 +83,16 @@ export const AudioTag = () => {
   }, [player]);
 
   useEffect(() => {
-    if (engineRef.current || typeof Audio === "undefined")
+    if (audioRef.current || typeof Audio === "undefined")
       return;
 
     const audio = new Audio();
 
     audio.crossOrigin = "use-credentials";
     audio.preload = "auto";
-    engineRef.current = audio;
+    audioRef.current = audio;
 
-    setGlobalAudioElement(engineRef.current);
+    setGlobalAudioElement(audioRef.current);
 
     const onTimeUpdate = () => player.setCurrentTime(audio.currentTime);
     const onDurationChange = () => {
@@ -110,7 +105,7 @@ export const AudioTag = () => {
       await sync();
     };
     const checkBlobAndFix = async () => {
-      if (!engineRef.current || !engineRef.current.src.startsWith("blob"))
+      if (!audioRef.current || !audioRef.current.src.startsWith("blob"))
         return;
 
       const { currentResource } = useBrowserPlayer.getState();
@@ -188,7 +183,7 @@ export const AudioTag = () => {
       audio.pause();
       audio.removeAttribute("src");
       audio.load();
-      engineRef.current = null;
+      audioRef.current = null;
       audio.removeEventListener("timeupdate", onTimeUpdate);
       audio.removeEventListener("durationchange", onDurationChange);
       audio.removeEventListener("ended", onEndedHandler);
@@ -203,17 +198,17 @@ export const AudioTag = () => {
 
   useEffect(() => {
     const loadResource = async () => {
-      const engine = engineRef.current;
+      const audio = audioRef.current;
 
-      if (!engine)
+      if (!audio)
         return;
 
-      engine.pause();
+      audio.pause();
 
       if (!player.currentResource) {
-        engine.pause();
-        engine.removeAttribute("src");
-        engine.load();
+        audio.pause();
+        audio.removeAttribute("src");
+        audio.load();
 
         return;
       }
@@ -225,9 +220,9 @@ export const AudioTag = () => {
 
       newUrl ??= await getUrlSkipHistory(player.currentResource.resourceId);
 
-      if (engine.src !== newUrl) {
-        engine.src = newUrl;
-        engine.load();
+      if (audio.src !== newUrl) {
+        audio.src = newUrl;
+        audio.load();
       }
     };
 
@@ -240,7 +235,7 @@ export const AudioTag = () => {
 
   useEffect(() => {
     const fn = async () => {
-      if (player.isOnline && engineRef.current?.src)
+      if (player.isOnline && audioRef.current?.src)
         await sync();
     };
 
@@ -258,19 +253,22 @@ export const AudioTag = () => {
   //   const interval = setInterval(() => sync().catch(showError), 1_000);
   //   return () => clearInterval(interval);
   // }, [sync]);
-  async function securePlayEngine() {
-    const engine = engineRef.current;
+  async function securePlayAudioTag() {
+    const audio = audioRef.current;
 
-    if (!engine)
+    if (!audio)
       return;
 
     await withRetries(async ( { attempt } ) => {
       if (attempt > 1)
-        engine.load();
+        audio.load();
 
       try {
         await withTimeout(async ()=> {
-          await engine.play();
+          await audio.play();
+
+          if (useBrowserPlayer.getState().status !== "playing")
+            audio.pause();
         }, 5_000);
       } catch (e) {
         if (!(e instanceof Error && e.name === "AbortError"))
@@ -285,7 +283,7 @@ export const AudioTag = () => {
 
         if (e.name === "NotSupportedError") {
           return await handleExoticAudio( {
-            engine,
+            audio,
             sync,
           } );
         }
@@ -299,13 +297,13 @@ export const AudioTag = () => {
   }
 
   useAudioSilence();
-  useMediaSession(engineRef.current);
+  useMediaSession(audioRef.current);
   useOnline();
-  useAudioEffects(engineRef.current);
+  useAudioEffects(audioRef.current);
   const { user } = useUser();
 
   if (user)
-    useHistoryLogger(engineRef.current);
+    useHistoryLogger(audioRef.current);
 
   const { abort: abortPrefetchingFetch, waitForPrefetching } = usePrefetching();
 
