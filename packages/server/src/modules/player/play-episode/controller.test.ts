@@ -3,12 +3,6 @@ import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { SERIE_SIMPSONS } from "$sharedSrc/models/episodes/series/tests/fixtures";
-import { fixturesRemotePlayers } from "../tests/fixtures";
-import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
-import { AuthPlayerService } from "../AuthPlayer.service";
-import { PlayService } from "../play.service";
-import { PlayVideoService } from "../play-video.service";
-import { PlayEpisodeController } from "./controller";
 import { SeriesCrudModule } from "#episodes/series/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { fixtureEpisodes } from "#episodes/tests";
@@ -22,6 +16,12 @@ import { SeriesRepository } from "#episodes/series/crud/repository";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { STREAM_SIMPSONS } from "#episodes/streams/tests";
 import { UUID_INVALID, UUID_UNUSED } from "#core/db/tests/fixtures/uuid";
+import { PlayVideoService } from "../play-video.service";
+import { PlayService } from "../play.service";
+import { AuthPlayerService } from "../AuthPlayer.service";
+import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
+import { fixturesRemotePlayers } from "../tests/fixtures";
+import { PlayEpisodeController } from "./controller";
 
 describe("playEpisodeController", () => {
   let routerApp: Application;
@@ -31,17 +31,17 @@ describe("playEpisodeController", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
       imports: [
-        createMockedModule(SeriesCrudModule),
-        createMockedModule(StreamsModule),
-        createMockedModule(EpisodesCrudModule),
-        createMockedModule(StreamPickerModule),
-        createMockedModule(EpisodeHistoryModule),
+        createMockedModule(SeriesCrudModule), // SeriesRepository
+        createMockedModule(StreamsModule), // StreamsRepository
+        createMockedModule(EpisodesCrudModule), // EpisodesRepository
+        createMockedModule(StreamPickerModule), // StreamGetRandomEpisodeService
+        createMockedModule(EpisodeHistoryModule), // EpisodeHistoryRepository
       ],
       controllers: [PlayEpisodeController],
       providers: [
-        createMockProvider(PlayService),
-        createMockProvider(AuthPlayerService),
-        mockRemotePlayersRepositoryProvider,
+        createMockProvider(PlayService), // para PlayVideoService
+        createMockProvider(AuthPlayerService), // para PlayEpisodeController
+        mockRemotePlayersRepositoryProvider, // RemotePlayersRepository
         PlayVideoService,
       ],
     }, {

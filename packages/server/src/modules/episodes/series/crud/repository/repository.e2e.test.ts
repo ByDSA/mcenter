@@ -6,8 +6,10 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
+import { EpisodesCrudModule } from "#episodes/crud/module";
 import { type SeriesEntity, seriesEntitySchema } from "../../models";
-import { SeriesRepository } from "./repository";
+import { CreateDto, SeriesRepository } from "./repository";
+import { SeriesAvailableSlugGeneratorService } from "./available-slug-generator.service";
 
 let repo: SeriesRepository;
 let streamsRepo: StreamsRepository;
@@ -16,10 +18,14 @@ let testingSetup: TestingSetup;
 describe("repository", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [DomainEventEmitterModule],
+      imports: [
+        EpisodesCrudModule,
+        DomainEventEmitterModule,
+      ],
       controllers: [],
       providers: [
         SeriesRepository,
+        SeriesAvailableSlugGeneratorService,
         StreamsRepository,
         UsersRepository,
       ],
@@ -40,16 +46,12 @@ describe("repository", () => {
   } );
 
   describe("create", () => {
-    const newModel: SeriesEntity = {
-      id: "serieId",
+    const newModel = {
       name: "title",
       key: "key",
       imageCoverId: null,
-      addedAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
       releasedOn: "2000-01-01",
-    };
+    } satisfies CreateDto;
 
     describe("before Create", () => {
       beforeAll(async () => {
@@ -80,12 +82,10 @@ describe("repository", () => {
         createdGot = await repo.createOneAndGet(newModel);
 
         seriesEntitySchema.parse(createdGot);
-
-        newModel.id = createdGot.id;
       } );
 
       it("ok", () => {
-        expect(createdGot).toStrictEqual(newModel);
+        expect(createdGot).toMatchObject(newModel);
       } );
 
       it("should be in db", async () => {
@@ -93,9 +93,7 @@ describe("repository", () => {
 
         assertIsDefined(got);
 
-        newModel.id = got.id;
-
-        expect(got).toStrictEqual(newModel);
+        expect(got).toMatchObject(newModel);
       } );
 
       it("should not stream created", async () => {

@@ -35,6 +35,7 @@ export namespace SeriesCrudDtos {
       imageCoverId: true,
       key: true,
       name: true,
+      releasedOn: true,
     } )
       .partial( {
         key: true,
