@@ -38,10 +38,10 @@ const assertIsEntity = genAssertZod(entitySchema);
 export {
   idSchema as imageCoverIdSchema,
   entitySchema as imageCoverEntitySchema,
-  Entity as ImageCoverEntity,
-  Id as ImageCoverId,
+  type Entity as ImageCoverEntity,
+  type Id as ImageCoverId,
   modelSchema as imageCoverSchema,
-  Model as ImageCover,
+  type Model as ImageCover,
   assertIsModel as assertIsImageCover,
   assertIsEntity as assertIsImageCoverEntity,
   compareId as compareImageCoverId,

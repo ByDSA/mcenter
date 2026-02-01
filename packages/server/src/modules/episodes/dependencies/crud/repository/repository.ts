@@ -47,7 +47,7 @@ CanDeleteOneByIdAndGet<Model, Id> {
   }
 
   async getManyByCriteria(
-    criteria: EpisodeDependencyCrudDtos.GetManyByCriteria.Criteria,
+    criteria: EpisodeDependencyCrudDtos.GetMany.Criteria,
   ): Promise<Entity[]> {
     const pipeline = getCriteriaPipeline(criteria);
     const docsOdm: EpisodeDependencyOdm.FullDoc[] = await EpisodeDependencyOdm.Model.aggregate(

@@ -12,6 +12,7 @@ import { EpisodesApi } from "#modules/episodes/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { logger } from "#modules/core/logger";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
+import { EpisodesCrudDtos } from "#modules/episodes/models/dto";
 import styles from "./Player.module.css";
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;
@@ -75,7 +76,7 @@ export default function RemotePlayer( { params }: PageProps) {
           if (!path)
             return;
 
-          const body: EpisodesApi.GetManyByCriteria.Body = {
+          const body: EpisodesCrudDtos.GetMany.Criteria = {
             filter: {
               path,
             },
@@ -88,7 +89,7 @@ export default function RemotePlayer( { params }: PageProps) {
           const episodesApi = FetchApi.get(EpisodesApi);
 
           episodesApi.getManyByCriteria(body)
-            .then((res: EpisodesApi.GetManyByCriteria.Res) => {
+            .then((res: EpisodesCrudDtos.GetMany.Response) => {
               const episodes = res.data;
               const [episode] = episodes;
 

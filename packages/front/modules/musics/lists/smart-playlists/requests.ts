@@ -1,12 +1,9 @@
-import { createManyResultResponseSchema, createOneResultResponseSchema, type ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
-import { genParseZod } from "$shared/utils/validation/zod";
-import z from "zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useImageCover } from "#modules/image-covers/hooks";
-import { MusicSmartPlaylistEntity, musicSmartPlaylistEntitySchema } from "./models";
+import { MusicSmartPlaylistEntity } from "./models";
 import { MusicSmartPlaylistCrudDtos } from "./models/dto";
 
 export class MusicSmartPlaylistsApi {
@@ -15,16 +12,12 @@ export class MusicSmartPlaylistsApi {
   }
 
   async getOneByCriteria(
-    criteria: MusicSmartPlaylistsApi.GetOne.Body,
-  ): Promise<MusicSmartPlaylistsApi.GetOne.Response> {
-    const fetcher = makeFetcher<
-      MusicSmartPlaylistsApi.GetOne.Body,
-      MusicSmartPlaylistsApi.GetOne.Response
-    >( {
+    criteria: MusicSmartPlaylistCrudDtos.GetOne.Criteria,
+  ) {
+    const fetcher = makeFetcher( {
       method: "POST",
-      parseResponse: genParseZod(
-        MusicSmartPlaylistsApi.GetOne.responseSchema,
-      ) as (m: unknown)=> any,
+      requestSchema: MusicSmartPlaylistCrudDtos.GetOne.criteriaSchema,
+      responseSchema: MusicSmartPlaylistCrudDtos.GetOne.responseSchema,
     } );
     const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.smartPlaylists.path + "/search-one"),
@@ -38,16 +31,12 @@ export class MusicSmartPlaylistsApi {
   }
 
   async createOne(
-    props: MusicSmartPlaylistsApi.CreateOne.Body,
-  ): Promise<MusicSmartPlaylistsApi.CreateOne.Response> {
-    const fetcher = makeFetcher<
-      MusicSmartPlaylistsApi.CreateOne.Body,
-      MusicSmartPlaylistsApi.CreateOne.Response
-    >( {
+    props: MusicSmartPlaylistCrudDtos.CreateOne.Body,
+  ) {
+    const fetcher = makeFetcher( {
       method: "POST",
-      parseResponse: genParseZod(
-        MusicSmartPlaylistsApi.CreateOne.responseSchema,
-      ) as (m: unknown)=> any,
+      requestSchema: MusicSmartPlaylistCrudDtos.CreateOne.bodySchema,
+      responseSchema: MusicSmartPlaylistCrudDtos.CreateOne.responseSchema,
     } );
     const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.smartPlaylists.path),
@@ -62,16 +51,12 @@ export class MusicSmartPlaylistsApi {
 
   async patchOne(
     id: string,
-    props: MusicSmartPlaylistsApi.PatchOne.Body,
-  ): Promise<MusicSmartPlaylistsApi.PatchOne.Response> {
-    const fetcher = makeFetcher<
-      MusicSmartPlaylistsApi.PatchOne.Body,
-      MusicSmartPlaylistsApi.PatchOne.Response
-    >( {
+    props: MusicSmartPlaylistCrudDtos.Patch.Body,
+  ) {
+    const fetcher = makeFetcher( {
       method: "PATCH",
-      parseResponse: genParseZod(
-        MusicSmartPlaylistsApi.GetOne.responseSchema,
-      ) as (m: unknown)=> any,
+      requestSchema: MusicSmartPlaylistCrudDtos.Patch.bodySchema,
+      responseSchema: MusicSmartPlaylistCrudDtos.GetOne.responseSchema,
     } );
     const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.smartPlaylists.withParams(id)),
@@ -86,9 +71,9 @@ export class MusicSmartPlaylistsApi {
 
   async getManyByUserCriteria(
     userId: string,
-    criteria?: MusicSmartPlaylistsApi.GetManyByCriteria.Body,
-  ): Promise<MusicSmartPlaylistsApi.GetManyByCriteria.Response> {
-    const body: MusicSmartPlaylistsApi.GetManyByCriteria.Body = {
+    criteria?: MusicSmartPlaylistCrudDtos.GetMany.Criteria,
+  ) {
+    const body: MusicSmartPlaylistCrudDtos.GetMany.Criteria = {
       ...criteria,
       sort: {
         updated: "desc",
@@ -97,14 +82,10 @@ export class MusicSmartPlaylistsApi {
       offset: criteria?.offset ?? undefined,
       expand: ["imageCover"],
     };
-    const fetcher = makeFetcher<
-      MusicSmartPlaylistsApi.GetManyByCriteria.Body,
-      MusicSmartPlaylistsApi.GetManyByCriteria.Response
-    >( {
+    const fetcher = makeFetcher( {
       method: "POST",
-      parseResponse: genParseZod(
-        MusicSmartPlaylistsApi.GetManyByCriteria.responseSchema,
-      ) as (m: unknown)=> any,
+      requestSchema: MusicSmartPlaylistCrudDtos.GetMany.criteriaSchema,
+      responseSchema: MusicSmartPlaylistCrudDtos.GetMany.responseSchema,
     } );
     const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.smartPlaylists.path + "/search"),
@@ -127,60 +108,17 @@ export class MusicSmartPlaylistsApi {
 
   async deleteOneById(
     id: MusicSmartPlaylistEntity["id"],
-  ): Promise<MusicSmartPlaylistsApi.DeleteOneById.Response> {
-    const fetcher = makeFetcher<undefined, MusicSmartPlaylistsApi.DeleteOneById.Response>( {
+  ) {
+    const fetcher = makeFetcher( {
       method: "DELETE",
-      parseResponse: genParseZod(createOneResultResponseSchema(
-        musicSmartPlaylistEntitySchema,
-      )) as (m: unknown)=> any,
+      responseSchema: MusicSmartPlaylistCrudDtos.Delete.responseSchema,
     } );
     const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.smartPlaylists.withParams(id)),
-      body: undefined,
     } );
 
     await useImageCover.invalidateCache(id);
 
     return ret;
-  }
-}
-
-// eslint-disable-next-line no-redeclare
-export namespace MusicSmartPlaylistsApi {
-  export namespace GetOne {
-    export const body = MusicSmartPlaylistCrudDtos.GetOne.criteriaSchema;
-    export type Body = z.infer<typeof body>;
-    export const dataSchema = musicSmartPlaylistEntitySchema;
-    export type Data = z.infer<typeof dataSchema>;
-    export const responseSchema = createOneResultResponseSchema(dataSchema);
-    export type Response = z.infer<typeof responseSchema>;
-  }
-
-  export namespace CreateOne {
-    export const responseSchema = createOneResultResponseSchema(musicSmartPlaylistEntitySchema);
-    export type Response = z.infer<typeof responseSchema>;
-    export const { bodySchema } = MusicSmartPlaylistCrudDtos.CreateOne;
-    export type Body = z.infer<typeof bodySchema>;
-  }
-
-  export namespace PatchOne {
-    export const dataSchema = musicSmartPlaylistEntitySchema;
-    export const responseSchema = createOneResultResponseSchema(dataSchema);
-    export type Response = z.infer<typeof responseSchema>;
-    export const { bodySchema } = MusicSmartPlaylistCrudDtos.PatchOneById;
-    export type Body = z.infer<typeof bodySchema>;
-  }
-
-  export namespace GetManyByCriteria {
-    export const body = MusicSmartPlaylistCrudDtos.GetMany.criteriaSchema;
-    export type Body = z.infer<typeof body>;
-    export const dataSchema = musicSmartPlaylistEntitySchema;
-    export type Data = z.infer<typeof dataSchema>;
-    export const responseSchema = createManyResultResponseSchema(dataSchema);
-    export type Response = z.infer<typeof responseSchema>;
-  }
-
-  export namespace DeleteOneById {
-    export type Response = ResultResponse<MusicSmartPlaylistEntity>;
   }
 }

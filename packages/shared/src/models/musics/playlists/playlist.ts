@@ -40,10 +40,10 @@ const entitySchema = modelSchema.extend( {
 type Entity = z.infer<typeof entitySchema>;
 
 export {
-  Model as MusicPlaylist,
-  Entity as MusicPlaylistEntity,
-  EntryEntity as MusicPlaylistEntryEntity,
-  EntryModel as MusicPlaylistEntry,
+  type Model as MusicPlaylist,
+  type Entity as MusicPlaylistEntity,
+  type EntryEntity as MusicPlaylistEntryEntity,
+  type EntryModel as MusicPlaylistEntry,
   modelSchema as musicPlaylistSchema,
   entitySchema as musicPlaylistEntitySchema,
 };

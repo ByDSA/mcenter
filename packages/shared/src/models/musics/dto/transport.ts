@@ -1,7 +1,6 @@
 import z from "zod";
-import { createOneResultResponseSchema } from "../../../utils/http/responses";
+import { createOneResultResponseSchema, createPaginatedResultResponseSchema } from "../../../utils/http/responses";
 import { slugSchema } from "../../utils/schemas/slug";
-import { idParamsSchema } from "../../utils/schemas/requests";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { musicEntitySchema } from "../music";
 import { createCriteriaOneSchema, createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
@@ -23,9 +22,12 @@ const criteriaConfig = {
 };
 
 export namespace MusicCrudDtos {
+  const responseOneSchema = createOneResultResponseSchema(musicEntitySchema);
   export namespace GetMany {
     export const criteriaSchema = createCriteriaManySchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;
+    export const responseSchema = createPaginatedResultResponseSchema(musicEntitySchema);
+    export type Response = z.infer<typeof responseSchema>;
   }
 
   export namespace GetOne {
@@ -34,12 +36,9 @@ export namespace MusicCrudDtos {
     export const responseDataSchema = musicEntitySchema;
     export const responseSchema = createOneResultResponseSchema(responseDataSchema);
     export type Response = z.infer<typeof responseSchema>;
-    export namespace ById {
-      export const paramsSchema = idParamsSchema;
-    }
   }
 
-  export namespace PatchOneById {
+  export namespace Patch {
     export const bodySchema = generatePatchBodySchema(musicEntitySchema.omit( {
       uploaderUserId: true,
       createdAt: true,
@@ -49,9 +48,11 @@ export namespace MusicCrudDtos {
       slug: z.string(),
     } ));
     export type Body = z.infer<typeof bodySchema>;
-    export const paramsSchema = idParamsSchema;
+    export const responseSchema = responseOneSchema;
+    export type Response = z.infer<typeof responseSchema>;
   }
-  export namespace DeleteOneById {
-    export const paramsSchema = idParamsSchema;
+  export namespace Delete {
+    export const responseSchema = responseOneSchema;
+    export type Response = z.infer<typeof responseSchema>;
   }
 }

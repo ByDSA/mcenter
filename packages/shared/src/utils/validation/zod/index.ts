@@ -72,7 +72,7 @@ export function parseZod<T extends ZodTypeAny>(
 export function genParseZod<T>(
   schema: ZodType<T>,
   settings?: AssertZodSettings,
-) {
+): (model: unknown)=> T {
   return (model: unknown): T => parseZodPopStack(schema, model, settings);
 }
 

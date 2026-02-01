@@ -1,7 +1,5 @@
-import { createManyResultResponseSchema } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import z from "zod";
-import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { StreamCrudDtos } from "$shared/models/episodes/streams/dto/transport";
 import { streamEntitySchema } from "$shared/models/episodes/streams";
 import { makeFetcher } from "#modules/fetching";
@@ -11,11 +9,11 @@ export const dataSchema = streamEntitySchema;
 
 export type Data = z.infer<typeof dataSchema>;
 
-const resSchema = createManyResultResponseSchema(dataSchema);
+const resSchema = StreamCrudDtos.GetMany.responseSchema;
 
 export type Res = z.infer<typeof resSchema>;
 
-const reqSchema = StreamCrudDtos.GetManyByCriteria.criteriaSchema;
+const reqSchema = StreamCrudDtos.GetMany.criteriaSchema;
 
 type Req = z.infer<typeof reqSchema>;
 
@@ -34,10 +32,10 @@ export const fetch = (props: FetchProps) => {
       lastTimePlayed: "desc",
     },
   };
-  const fetcher = makeFetcher<Req, Res>( {
+  const fetcher = makeFetcher( {
     method,
-    reqBodyValidator: genAssertZod(reqSchema),
-    parseResponse: genParseZod(resSchema) as (m: unknown)=> any,
+    requestSchema: reqSchema,
+    responseSchema: resSchema,
   } );
 
   return fetcher( {

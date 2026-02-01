@@ -16,6 +16,7 @@ import { DaForm } from "#modules/ui-kit/form/Form";
 import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
 import { newSerieSchema } from "../New/Form";
+import { SeriesCrudDtos } from "../models/dto";
 
 const schema = newSerieSchema.extend( {
   key: z.string().trim()
@@ -44,7 +45,7 @@ export const EditSeriesForm = ( { initialData, onSuccess }: Props) => {
     } );
   const onSubmit = async (formValues: FormData) => {
     const seriesApi = FetchApi.get(SeriesApi);
-    const changes: SeriesApi.Patch.Body = {
+    const changes: SeriesCrudDtos.Patch.Body = {
       entity: {},
     };
 

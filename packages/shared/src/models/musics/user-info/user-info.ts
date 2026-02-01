@@ -23,7 +23,7 @@ type MusicUserInfoEntity = z.infer<typeof musicUserInfoEntitySchema>;
 
 export {
   musicUserInfoSchema,
-  MusicUserInfo,
+  type MusicUserInfo,
   musicUserInfoEntitySchema,
-  MusicUserInfoEntity,
+  type MusicUserInfoEntity,
 };

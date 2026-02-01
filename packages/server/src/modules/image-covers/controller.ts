@@ -6,15 +6,13 @@ import { UserPayload } from "$shared/models/auth";
 import { AdminDeleteOne, AdminPatchOne, GetManyCriteria, GetOneCriteria } from "#utils/nestjs/rest";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
+import { IdParamDto } from "#utils/validation/dtos";
 import { ImageCoversRepository } from "./repositories";
 import { ImageCoversUploadService, UploadFile, UploadFileDto, UploadFileInterceptor } from "./upload.service";
 
-class GetOneByIdParamsDto extends createZodDto(ImageCoverCrudDtos.GetOne.ById.paramsSchema) {}
-class GetManyByCriteriaDto extends createZodDto(ImageCoverCrudDtos.GetMany.criteriaSchema) {}
+class GetManyBodyDto extends createZodDto(ImageCoverCrudDtos.GetMany.criteriaSchema) {}
 class GetManyOneByCriteriaDto extends createZodDto(ImageCoverCrudDtos.GetOne.criteriaSchema) {}
-class PatchParamsDto extends createZodDto(ImageCoverCrudDtos.PatchOneById.paramsSchema) {}
-class DeleteOneParamsDto extends createZodDto(ImageCoverCrudDtos.DeleteOneById.paramsSchema) {}
-class PatchBodyDto extends createZodDto(ImageCoverCrudDtos.PatchOneById.bodySchema) {}
+class PatchBodyDto extends createZodDto(ImageCoverCrudDtos.Patch.bodySchema) {}
 
 @Controller("/")
 export class ImageCoverCrudController {
@@ -40,7 +38,7 @@ export class ImageCoverCrudController {
 
   @GetManyCriteria("/search-many", imageCoverEntitySchema)
   async getManyByCriteria(
-    @Body() criteria: GetManyByCriteriaDto,
+    @Body() criteria: GetManyBodyDto,
   ): Promise<ImageCoverEntity[]> {
     return await this.repo.getMany( {
       criteria,
@@ -49,7 +47,7 @@ export class ImageCoverCrudController {
 
   @AdminPatchOne("/:id", imageCoverEntitySchema)
   async patchOneByIdAndGet(
-    @Param() params: PatchParamsDto,
+    @Param() params: IdParamDto,
     @Body() body: PatchBodyDto,
   ) {
     const { id } = params;
@@ -59,7 +57,7 @@ export class ImageCoverCrudController {
 
   @AdminDeleteOne("/:id", imageCoverEntitySchema)
   async deleteOneByIdAndGet(
-    @Param() params: DeleteOneParamsDto,
+    @Param() params: IdParamDto,
   ) {
     const { id } = params;
 
@@ -68,7 +66,7 @@ export class ImageCoverCrudController {
 
   @Get("/:id")
   async getOneById(
-    @Param() params: GetOneByIdParamsDto,
+    @Param() params: IdParamDto,
   ) {
     const { id } = params;
 

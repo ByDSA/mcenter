@@ -24,7 +24,7 @@ function compareModel(a: Model, b: Model): boolean {
 
 export {
   schema as fileInfoSchema,
-  Model as FileInfo,
+  type Model as FileInfo,
   assertIsModel as assertIsFileInfo,
   compareModel as compareFileInfo,
 };

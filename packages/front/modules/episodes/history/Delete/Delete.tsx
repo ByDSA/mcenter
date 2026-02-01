@@ -8,9 +8,10 @@ import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup"
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { SetState } from "#modules/utils/react";
 import { EpisodeHistoryApi } from "../requests";
+import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
 import styles from "./DeleteEntryModal.module.css";
 
-type Data = EpisodeHistoryApi.GetMany.Data;
+type Data = EpisodeHistoryEntryCrudDtos.GetMany.Data;
 
 type DeleteHistoryEntryModalContentWrapperProps = {
   children: ReactNode;

@@ -1,9 +1,7 @@
 /* eslint-disable import/no-cycle */
 import assert from "assert";
-import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
-import { createOneResultResponseSchema, createPaginatedResultResponseSchema, PaginatedResult, ResultResponse } from "$shared/utils/http/responses";
+import { createPaginatedResultResponseSchema } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
-import z from "zod";
 import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { backendUrl } from "#modules/requests";
@@ -25,19 +23,15 @@ export class ImageCoversApi {
 
   async patch(
     id: string,
-    body: ImageCoversApi.Patch.Body,
-  ): Promise<ImageCoversApi.Patch.Response> {
-    const method = "PATCH";
-    const fetcher = makeFetcher<ImageCoversApi.Patch.Body, ImageCoversApi.Patch.Response>( {
-      method,
-      reqBodyValidator: genAssertZod(ImageCoverCrudDtos.PatchOneById.bodySchema),
-      parseResponse: genParseZod(
-        createOneResultResponseSchema(imageCoverEntitySchema),
-      ) as (m: unknown)=> ImageCoversApi.Patch.Response,
+    body: ImageCoverCrudDtos.Patch.Body,
+  ) {
+    const fetcher = makeFetcher( {
+      method: "PATCH",
+      requestSchema: ImageCoverCrudDtos.Patch.bodySchema,
+      responseSchema: ImageCoverCrudDtos.Patch.responseSchema,
     } );
-    const URL = backendUrl(PATH_ROUTES.imageCovers.withParams(id));
     const ret = await fetcher( {
-      url: URL,
+      url: backendUrl(PATH_ROUTES.imageCovers.withParams(id)),
       body,
     } );
 
@@ -51,20 +45,13 @@ export class ImageCoversApi {
       skipCache?: boolean;
     },
   ): Promise<ImageCoverCrudDtos.GetOne.Response> {
-    const method = "POST";
-    const fetcher = makeFetcher<
-      ImageCoverCrudDtos.GetOne.Criteria,
-      ImageCoverCrudDtos.GetOne.Response
-    >( {
-      method,
-      reqBodyValidator: genAssertZod(ImageCoverCrudDtos.GetOne.criteriaSchema),
-      parseResponse: genParseZod(
-        ImageCoverCrudDtos.GetOne.responseSchema,
-      ) as (m: unknown)=> ImageCoverCrudDtos.GetOne.Response,
+    const fetcher = makeFetcher( {
+      method: "POST",
+      requestSchema: ImageCoverCrudDtos.GetOne.criteriaSchema,
+      responseSchema: ImageCoverCrudDtos.GetOne.responseSchema,
     } );
-    const URL = backendUrl(PATH_ROUTES.imageCovers.path + "/search-one");
     const ret = await fetcher( {
-      url: URL,
+      url: backendUrl(PATH_ROUTES.imageCovers.path + "/search-one"),
       body: criteria,
     } );
 
@@ -75,18 +62,12 @@ export class ImageCoversApi {
   }
 
   async getManyByCriteria(
-    criteria: ImageCoversApi.GetManyByCriteria.Criteria,
-  ): Promise<ImageCoversApi.GetManyByCriteria.Response> {
-    const method = "POST";
-    const fetcher = makeFetcher<
-      ImageCoversApi.GetManyByCriteria.Criteria,
-      ImageCoversApi.GetManyByCriteria.Response
-    >( {
-      method,
-      reqBodyValidator: genAssertZod(ImageCoverCrudDtos.GetMany.criteriaSchema),
-      parseResponse: genParseZod(
-        createPaginatedResultResponseSchema(imageCoverEntitySchema),
-      ) as (m: unknown)=> any,
+    criteria: ImageCoverCrudDtos.GetMany.Criteria,
+  ) {
+    const fetcher = makeFetcher( {
+      method: "POST",
+      requestSchema: ImageCoverCrudDtos.GetMany.criteriaSchema,
+      responseSchema: createPaginatedResultResponseSchema(imageCoverEntitySchema),
     } );
     const URL = backendUrl(PATH_ROUTES.imageCovers.path + "/search-many");
     const ret = await fetcher( {
@@ -102,21 +83,13 @@ export class ImageCoversApi {
     return ret;
   }
 
-  async deleteOneById(id: ImageCoverEntity["id"]): Promise<ImageCoversApi.DeleteOneById.Response> {
-    const method = "DELETE";
-    const fetcher = makeFetcher<
-      undefined,
-      ImageCoversApi.DeleteOneById.Response
-    >( {
-      method,
-      parseResponse: genParseZod(
-        createOneResultResponseSchema(imageCoverEntitySchema.or(z.null())),
-      ) as (m: unknown)=> any,
+  async deleteOneById(id: ImageCoverEntity["id"]) {
+    const fetcher = makeFetcher( {
+      method: "DELETE",
+      responseSchema: ImageCoverCrudDtos.Delete.responseSchema,
     } );
-    const URL = backendUrl(PATH_ROUTES.imageCovers.withParams(id));
     const ret = await fetcher( {
-      url: URL,
-      body: undefined,
+      url: backendUrl(PATH_ROUTES.imageCovers.withParams(id)),
     } );
 
     await useMusic.invalidateCache(id);
@@ -153,21 +126,5 @@ export class ImageCoversApi {
       useImageCover.updateCacheWithMerging(res.data.imageCover.id, res.data.imageCover);
 
     return res;
-  }
-}
-
-// eslint-disable-next-line no-redeclare
-export namespace ImageCoversApi {
-  export namespace Patch {
-    export type Response = ResultResponse<ImageCoverEntity>;
-    export type Body = ImageCoverCrudDtos.PatchOneById.Body;
-  }
-  export namespace DeleteOneById {
-    export type Response = ResultResponse<ImageCoverEntity>;
-  }
-  export namespace GetManyByCriteria {
-    export type Response = PaginatedResult<ImageCoverEntity>;
-    export type Criteria = ImageCoverCrudDtos.GetMany.Criteria;
-    export type Body = Criteria;
   }
 }

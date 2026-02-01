@@ -1,24 +1,34 @@
+import { ZodType } from "zod";
+import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
+import { assertIsDefined } from "$shared/utils/validation";
 import { HttpError, HttpErrorUnauthorized } from "#modules/core/errors/custom-errors";
 import { logger } from "#modules/core/logger";
 
+type OptionalIfUndefined<T, K extends string> = undefined extends T
+  ? { [P in K]?: T }
+  : { [P in K]: T };
+
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
-type FetcherParams<ReqBody> = {
+type FetcherParams<ReqBody> = OptionalIfUndefined<ReqBody, "body"> & {
   url: string;
-  body: ReqBody;
 };
 export type Fetcher<ReqBody, ResBody> = (params: FetcherParams<ReqBody>)=> Promise<ResBody>;
 
 type MakeFetcherParams<ReqBody, ResBody> = {
   method: Method;
   reqBodyValidator?: (data: ReqBody)=> void;
-  parseResponse: (data: unknown)=> ResBody;
+  requestSchema?: ZodType<ReqBody, any, any>;
+  parseResponse?: (data: unknown)=> ResBody;
+  responseSchema?: ZodType<ResBody, any, any>;
   errorMiddleware?: (error: any)=> void;
   silentErrors?: boolean;
 };
-export function makeFetcher<ReqBody, ResBody>(
+export function makeFetcher<ReqBody = undefined, ResBody = unknown>(
   { method,
     parseResponse,
+    responseSchema,
     reqBodyValidator,
+    requestSchema,
     silentErrors = false,
     errorMiddleware = (err)=> {
       if (err instanceof HttpErrorUnauthorized) {
@@ -36,17 +46,26 @@ export function makeFetcher<ReqBody, ResBody>(
     } }: MakeFetcherParams<ReqBody, ResBody>,
 ): Fetcher<ReqBody, ResBody> {
   const ret = async (params: FetcherParams<ReqBody>) => {
-    reqBodyValidator?.(params.body);
+    let innerReqBodyValidator = reqBodyValidator;
+
+    if (!innerReqBodyValidator && requestSchema)
+      innerReqBodyValidator = genAssertZod(requestSchema);
+
+    innerReqBodyValidator?.(params.body!);
 
     const options: RequestInit = {
       method,
       credentials: "include", // Para que devuelva la cookie de auth
-      body: JSON.stringify(params.body),
       headers: {
         accept: "application/json",
-        "Content-Type": "application/json",
       },
     };
+
+    if (params.body) {
+      options.body = JSON.stringify(params.body);
+
+      options.headers!["Content-Type"] = "application/json";
+    }
 
     try {
       const res = await fetch(params.url, options);
@@ -76,8 +95,14 @@ export function makeFetcher<ReqBody, ResBody>(
       }
 
       const value = text ? JSON.parse(text) : undefined;
+      let innerParseResponse = parseResponse;
 
-      return parseResponse(value);
+      if (!innerParseResponse) {
+        assertIsDefined(responseSchema);
+        innerParseResponse = genParseZod(responseSchema);
+      }
+
+      return innerParseResponse(value);
     } catch (error) {
       errorMiddleware(error);
 

@@ -6,13 +6,12 @@ import { AdminDeleteOne, UserPost } from "#utils/nestjs/rest";
 import { GetManyCriteria } from "#utils/nestjs/rest/crud/get";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
+import { IdParamDto } from "#utils/validation/dtos";
 import { musicHistoryEntryEntitySchema } from "../models";
 import { MusicHistoryRepository } from "./repository";
 
-class GetManyByCriteriaBodyDto
-  extends createZodDto(MusicHistoryEntryCrudDtos.GetManyByCriteria.bodySchema) {}
-class DeleteOneByIdParamsDto
-  extends createZodDto(MusicHistoryEntryCrudDtos.DeleteOneById.paramsSchema) {}
+class GetManyBodyDto
+  extends createZodDto(MusicHistoryEntryCrudDtos.GetMany.bodySchema) {}
 
 class CreateOneEntryBodyDto
   extends createZodDto(MusicHistoryEntryCrudDtos.CreateOne.bodySchema) {}
@@ -31,7 +30,7 @@ export class MusicHistoryCrudController {
 
   @AdminDeleteOne("/:id", schema)
   async deleteOneByIdAndGet(
-    @Param() params: DeleteOneByIdParamsDto,
+    @Param() params: IdParamDto,
   ) {
     // TODO: cambiar de admin a que sea del propio usuario que hace la request
     const { id } = params;
@@ -42,7 +41,7 @@ export class MusicHistoryCrudController {
 
   @GetManyCriteria("/search", schema)
   async getManyEntriesBySearch(
-    @Body() body: GetManyByCriteriaBodyDto,
+    @Body() body: GetManyBodyDto,
     @User() user: UserPayload,
   ) {
     return await this.historyRepo.getManyByCriteria( {

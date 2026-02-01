@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Facebook, GitHub, Person, Twitter } from "@mui/icons-material";
-import { LocalLoginBody } from "$shared/models/auth/dto";
+import { AuthCrudDtos } from "$shared/models/auth/dto/transport";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import styles from "../styles.module.css";
@@ -13,7 +13,7 @@ type Props = {
   handleGithubLogin?: ()=> Promise<void>;
   handleTwitterLogin?: ()=> Promise<void>;
   handleFacebookLogin?: ()=> Promise<void>;
-  handleLocalLogin?: (props: LocalLoginBody)=> Promise<void>;
+  handleLocalLogin?: (props: AuthCrudDtos.LocalLogin.Body)=> Promise<void>;
   handleForgotPass?: ()=> Promise<void>;
   handleGotoSignUp?: ()=> Promise<void>;
 };

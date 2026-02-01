@@ -10,8 +10,9 @@ import { EmptyHistory } from "#modules/history/EmptyHistory";
 import { useMusic } from "../hooks";
 import { MusicHistoryApi } from "./requests";
 import { MusicHistoryListItem } from "./ListItem";
+import { MusicHistoryEntryEntity } from "./models";
 
-type Data = MusicHistoryApi.GetManyByCriteria.Data[];
+type ArrayData = MusicHistoryEntryEntity[];
 
 export function MusicHistoryList() {
   const { data, isLoading, error,
@@ -24,7 +25,7 @@ export function MusicHistoryList() {
     }
   }
 
-  return renderFetchedData<Data | null>( {
+  return renderFetchedData<ArrayData | null>( {
     data,
     error,
     loader: {

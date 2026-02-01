@@ -19,8 +19,8 @@ import { EpisodeSlugHandlerService } from "./service";
 
 class GetOneByIdParamsDto extends createZodDto(EpisodesCrudDtos.GetOne.ById.paramsSchema) {}
 class GetAllParamsDto extends createZodDto(EpisodesCrudDtos.GetAll.paramsSchema) {}
-class PatchOneByIdParamsDto extends createZodDto(EpisodesCrudDtos.PatchOneById.paramsSchema) {}
-class PatchOneByIdBodyDto extends createZodDto(EpisodesCrudDtos.PatchOneById.bodySchema) {}
+class PatchOneByIdParamsDto extends createZodDto(EpisodesCrudDtos.Patch.paramsSchema) {}
+class PatchOneByIdBodyDto extends createZodDto(EpisodesCrudDtos.Patch.bodySchema) {}
 
 const schema = episodeEntitySchema;
 

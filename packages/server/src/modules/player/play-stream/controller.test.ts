@@ -3,7 +3,6 @@ import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UserPayload } from "$shared/models/auth";
-import { Types } from "mongoose";
 import { SeriesCrudModule } from "#episodes/series/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { fixtureEpisodes } from "#episodes/tests";
@@ -15,6 +14,7 @@ import { EpisodePickerService } from "#episodes/streams/picker";
 import { StreamsModule } from "#episodes/streams/module";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { STREAM_SIMPSONS } from "#episodes/streams/tests";
+import { mockMongoId } from "#tests/mongo";
 import { PlayVideoService } from "../play-video.service";
 import { PlayService } from "../play.service";
 import { AuthPlayerService } from "../AuthPlayer.service";
@@ -26,7 +26,7 @@ import { PlayStreamController } from "./controller";
 describe("playStreamController", () => {
   let routerApp: Application;
   let testingSetup: TestingSetup;
-  let remotePlayerId = new Types.ObjectId().toString();
+  let remotePlayerId = mockMongoId;
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {

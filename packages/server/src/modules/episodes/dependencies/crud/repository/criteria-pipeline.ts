@@ -4,13 +4,13 @@ import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { DocOdm } from "./odm/odm";
 
 function buildMongooseSort(
-  _body: EpisodeDependencyCrudDtos.GetManyByCriteria.Criteria,
+  _body: EpisodeDependencyCrudDtos.GetMany.Criteria,
 ): MongoSortQuery<DocOdm> | undefined {
   return undefined;
 }
 
 function buildMongooseFilter(
-  criteria: EpisodeDependencyCrudDtos.GetManyByCriteria.Criteria,
+  criteria: EpisodeDependencyCrudDtos.GetMany.Criteria,
 ): MongoFilterQuery<DocOdm> {
   const filter: MongoFilterQuery<DocOdm> = {};
 
@@ -23,7 +23,7 @@ function buildMongooseFilter(
 }
 
 export function getCriteriaPipeline(
-  criteria: EpisodeDependencyCrudDtos.GetManyByCriteria.Criteria,
+  criteria: EpisodeDependencyCrudDtos.GetMany.Criteria,
 ) {
   const filter = buildMongooseFilter(criteria);
   const sort = buildMongooseSort(criteria);

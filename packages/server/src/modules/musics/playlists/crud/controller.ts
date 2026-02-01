@@ -16,6 +16,7 @@ import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { MusicRendererService } from "#musics/renderer/render.service";
 import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
+import { IdParamDto } from "#utils/validation/dtos";
 import { musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistCrudDtos } from "../models/dto";
 import { MusicPlaylistsRepository } from "./repository/repository";
@@ -30,9 +31,6 @@ type GuardVisibilityByIdProps = {
   playlistId: string;
 };
 
-class GetOneParams extends createZodDto(z.object( {
-  id: mongoDbId,
-} )) {}
 class GetOneByCriteriaBody extends createZodDto(MusicPlaylistCrudDtos.GetOne.criteriaSchema) {}
 const numTrackZeroBasedSchema = z
   .string()
@@ -91,7 +89,7 @@ class RemoveManyTrackBody extends createZodDto(z.object( {
   musicIds: z.array(mongoDbId).optional(),
 } )) {}
 
-class PatchBody extends createZodDto(MusicPlaylistCrudDtos.PatchOneById.bodySchema) {}
+class PatchBody extends createZodDto(MusicPlaylistCrudDtos.Patch.bodySchema) {}
 
 class CreateOnePlaylistsBody extends createZodDto(
   MusicPlaylistCrudDtos.CreateOne.bodySchema,
@@ -109,7 +107,7 @@ export class MusicPlaylistsController {
 
   @Get("/:id")
   async getOne(
-    @Param() params: GetOneParams,
+    @Param() params: IdParamDto,
     @Req() req: Request,
     @User() user: UserPayload | null,
     @Query("token") token: string | undefined,
@@ -167,7 +165,7 @@ export class MusicPlaylistsController {
 
   @UserPatchOne("/:id", musicPlaylistEntitySchema)
   async patchPlaylist(
-    @Param() params: GetOneParams,
+    @Param() params: IdParamDto,
     @Body() body: PatchBody,
     @User() user: UserPayload,
   ) {
@@ -189,7 +187,7 @@ export class MusicPlaylistsController {
 
   @UserDeleteOne("/:id", musicPlaylistEntitySchema)
   async deleteOnePlaylist(
-    @Param() params: GetOneParams,
+    @Param() params: IdParamDto,
     @User() user: UserPayload,
   ) {
     await this.guardEditPlaylist(user, params.id);
@@ -200,7 +198,7 @@ export class MusicPlaylistsController {
 
   @UserPost("/:id/track", musicPlaylistEntitySchema)
   async addTracks(
-    @Param() params: GetOneParams,
+    @Param() params: IdParamDto,
     @User() user: UserPayload,
     @Body() body: AddManyTrackBody,
   ) {
@@ -218,7 +216,7 @@ export class MusicPlaylistsController {
 
   @UserDeleteOne("/:id/track", musicPlaylistEntitySchema)
   async removeManyTracks(
-    @Param() params: GetOneParams,
+    @Param() params: IdParamDto,
     @User() user: UserPayload,
     @Body() body: RemoveManyTrackBody,
   ) {
@@ -268,7 +266,9 @@ export class MusicPlaylistsController {
   }
 
   @GetOne("/:id/track/:n", musicEntitySchema)
-  async getOneTrack(@Param() params: GetOneTrackParams) {
+  async getOneTrack(
+    @Param() params: GetOneTrackParams,
+  ) {
     const playlist = await this.playlistsRepo.getOneById(params.id);
 
     assertFoundClient(playlist);

@@ -7,11 +7,11 @@ import { CopyMusicLinkContextMenuItem } from "#modules/musics/musics/SettingsBut
 import { EditMusicContextMenuItem } from "../../musics/Edit/ContextMenuItem";
 import { AddToPlaylistContextMenuItem } from "../../lists/playlists/AddToPlaylistContextMenuItem";
 import { MusicLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem";
-import { MusicHistoryApi } from "../requests";
 import { DeleteHistoryEntryContextMenuItem } from "../Delete/ContextMenuItem";
+import { MusicHistoryEntryEntity } from "../models";
 
 const HistoryEntryContextMenu = () => {
-  const { data } = useLocalData<MusicHistoryApi.GetManyByCriteria.Data>();
+  const { data } = useLocalData<MusicHistoryEntryEntity>();
   const { user } = useUser();
   const { data: music } = useMusic(data.resourceId);
 
@@ -37,7 +37,7 @@ const HistoryEntryContextMenu = () => {
 };
 
 export const MusicHistoryEntrySettingsButton = () => {
-  const { data, setData } = useLocalData<MusicHistoryApi.GetManyByCriteria.Data>();
+  const { data, setData } = useLocalData<MusicHistoryEntryEntity>();
   const { openMenu } = useContextMenuTrigger();
 
   return <SettingsButton

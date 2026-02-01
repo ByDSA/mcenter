@@ -1,7 +1,6 @@
 import z from "zod";
 import { mongoDbId } from "../../../models/resources/partial-schemas";
 import { createOneResultResponseSchema } from "../../../utils/http/responses";
-import { idParamsSchema } from "../../utils/schemas/requests";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { createCriteriaOneSchema, createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
 import { imageCoverEntitySchema } from "../imageCover";
@@ -28,19 +27,18 @@ export namespace ImageCoverCrudDtos {
     export const responseDataSchema = imageCoverEntitySchema;
     export const responseSchema = createOneResultResponseSchema(responseDataSchema);
     export type Response = z.infer<typeof responseSchema>;
-    export namespace ById {
-      export const paramsSchema = idParamsSchema;
-    }
   }
 
-  export namespace PatchOneById {
+  export namespace Patch {
     export const bodySchema = generatePatchBodySchema(imageCoverEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
-    export const paramsSchema = idParamsSchema;
+    export const responseSchema = createOneResultResponseSchema(imageCoverEntitySchema).extend( {
+      data: imageCoverEntitySchema,
+    } );
   }
 
-  export namespace DeleteOneById {
-    export const paramsSchema = idParamsSchema;
+  export namespace Delete {
+    export const responseSchema = createOneResultResponseSchema(imageCoverEntitySchema);
   }
 
   export namespace UploadFile {

@@ -9,7 +9,7 @@ import { assertFoundClient } from "#utils/validation/found";
 import { DocOdm, FullDocOdm } from "./odm/odm";
 
 function buildMongooseSort(
-  body: EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
+  body: EpisodeHistoryEntryCrudDtos.GetMany.Criteria,
 ): MongoSortQuery<DocOdm> | undefined {
   if (!body.sort?.timestamp)
     return undefined;
@@ -20,7 +20,7 @@ function buildMongooseSort(
 }
 
 function buildMongooseFilter(
-  criteria: EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
+  criteria: EpisodeHistoryEntryCrudDtos.GetMany.Criteria,
 ): MongoFilterQuery<DocOdm> {
   const filter: MongoFilterQuery<WithRequired<FullDocOdm, "episode"> & {
     episode: {
@@ -61,7 +61,7 @@ function buildMongooseFilter(
 }
 
 export function getCriteriaPipeline(
-  criteria: EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
+  criteria: EpisodeHistoryEntryCrudDtos.GetMany.Criteria,
 ) {
   const filter = buildMongooseFilter(criteria);
   const sort = buildMongooseSort(criteria);

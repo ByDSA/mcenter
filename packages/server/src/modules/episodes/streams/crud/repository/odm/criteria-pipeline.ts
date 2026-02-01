@@ -3,7 +3,7 @@ import { StreamCrudDtos } from "$shared/models/episodes/streams/dto/transport";
 import { EpisodeHistoryEntryOdm } from "#episodes/history/crud/repository/odm";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 
-type CriteriaMany = StreamCrudDtos.GetManyByCriteria.Criteria;
+type CriteriaMany = StreamCrudDtos.GetMany.Criteria;
 
 export function buildCriteriaPipeline(criteria: CriteriaMany): PipelineStage[] {
   const pipeline: PipelineStage[] = [];

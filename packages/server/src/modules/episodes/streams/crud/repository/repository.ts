@@ -2,18 +2,18 @@ import { Injectable } from "@nestjs/common";
 import { StreamCrudDtos } from "$shared/models/episodes/streams/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Series, seriesEntitySchema, SeriesKey } from "$shared/models/episodes/series";
-import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
-import { StreamOdm } from "./odm";
-import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
-import { StreamEvents } from "./events";
 import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
 import { SeriesEvents } from "#episodes/series/crud/repository/events";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { UsersRepository } from "#core/auth/users/crud/repository";
+import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
+import { StreamEvents } from "./events";
+import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
+import { StreamOdm } from "./odm";
 
-type CriteriaMany = StreamCrudDtos.GetManyByCriteria.Criteria;
+type CriteriaMany = StreamCrudDtos.GetMany.Criteria;
 @Injectable()
 export class StreamsRepository
 implements

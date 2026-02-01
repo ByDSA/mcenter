@@ -22,7 +22,7 @@ type Entity = MusicHistoryEntryEntity;
 type DocOdm = MusicHistoryEntryOdm.Doc;
 const ModelOdm = MusicHistoryEntryOdm.Model;
 
-export type GetManyCriteria = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
+export type GetManyCriteria = MusicHistoryEntryCrudDtos.GetMany.Criteria;
 type EntryId = Entity["id"];
 
 type CreateNewEntryNowForProps = {

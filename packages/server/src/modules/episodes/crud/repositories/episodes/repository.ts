@@ -27,7 +27,7 @@ function fixFields<T extends Partial<{title: string}>>(model: T): T {
 type CreateOneDto = EpisodesCrudDtos.CreateOne.Body;
 type EpisodeId = EpisodeEntity["id"];
 
-type Criteria = EpisodesCrudDtos.GetManyByCriteria.Criteria;
+type Criteria = EpisodesCrudDtos.GetMany.Criteria;
 type CriteriaOne = EpisodesCrudDtos.GetOne.Criteria;
 
 type GetOneProps = {

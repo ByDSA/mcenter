@@ -1,5 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 import { assertFoundClient } from "#utils/validation/found";
+import { mockMongoId } from "#tests/mongo";
 import { TestGroupConfigCtx, PatchTestsProps } from "./patch-one";
 import { defaultResponse, expectedDataNotFound } from "./common";
 import { classifyAuth, generateNotAllowedTest, putUser } from "./auth";
@@ -7,7 +8,7 @@ import { generateHttpCase } from "./generate-http-case";
 
 export function deleteOneTests<R>(props: PatchTestsProps<R>) {
   const { buildDynamicConfig, getExpressApp, getTestingSetup } = props;
-  const validUrl = props.url ?? "/id";
+  const validUrl = props.url ?? "/" + mockMongoId;
 
   describe("delete one", () => {
     const { allowed, notAllowed } = classifyAuth(props.auth);

@@ -3,10 +3,11 @@ import { Application } from "express";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureAuthLocal } from "$sharedSrc/models/auth/tests/auth-local-fixtures";
 import z from "zod";
+import { AuthCrudDtos } from "$shared/models/auth/dto/transport";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { deleteFixtureAuthUsers, loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { AuthModule } from "../../../module";
-import { LoginDto, SignUpDto, localLoginResponseSchema } from "../dto";
+import { LoginDto, SignUpDto } from "../dto";
 import { createLoginRequest, createSignUpRequest, LoginRequestProps } from "./requests";
 
 describe(AuthModule.name + "", () => {
@@ -85,7 +86,7 @@ describe(AuthModule.name + "", () => {
     } );
 
     it("should return valid login response schema for correct login", () => {
-      expect(() => localLoginResponseSchema.parse(res.body)).not.toThrow();
+      expect(() => AuthCrudDtos.LocalLogin.responseSchema.parse(res.body)).not.toThrow();
     } );
 
     it("should set auth cookie for correct login", () => {

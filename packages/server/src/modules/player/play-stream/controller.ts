@@ -11,7 +11,7 @@ import { SecretTokenBodyDto } from "../model";
 
 class ParamsDto extends createZodDto(z.object( {
   remotePlayerId: mongoDbId,
-  id: z.string(),
+  id: z.string(), // Realmente es "stream.key", no el id
 } )) {}
 
 const booleanFromString = z.preprocess((val) => {

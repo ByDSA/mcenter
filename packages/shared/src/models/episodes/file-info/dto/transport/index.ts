@@ -1,12 +1,13 @@
 import z from "zod";
 import { generatePatchBodySchema } from "../../../../utils/schemas/patch";
-import { idParamsSchema } from "../../../../utils/schemas/requests/id-params";
 import { episodeFileInfoEntitySchema } from "../../file-info";
+import { createOneResultResponseSchema } from "../../../../../utils/http/responses";
+import { EpisodeFileInfoDtos } from "../domain";
 
 export namespace EpisodeFileInfoCrudDtos {
-  export namespace PatchOneById {
+  export namespace Patch {
     export const bodySchema = generatePatchBodySchema(episodeFileInfoEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
-    export const paramsSchema = idParamsSchema;
+    export const responseSchema = createOneResultResponseSchema(EpisodeFileInfoDtos.schemaFullDto);
   }
 }

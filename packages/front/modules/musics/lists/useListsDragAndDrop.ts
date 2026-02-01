@@ -4,11 +4,12 @@ import { useSensor,
   PointerSensor,
   KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
+import { MusicUserListsCrudDtos } from "$shared/models/musics/users-lists/dto/transport";
 import { SetState } from "#modules/utils/react";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicUsersListsApi } from "./users-lists/requests";
 
-type Data = NonNullable<MusicUsersListsApi.GetMyList.Response["data"]>;
+type Data = NonNullable<MusicUserListsCrudDtos.GetMyList.Response["data"]>;
 
 export const useListsDragAndDrop = (
   data: Data | null,

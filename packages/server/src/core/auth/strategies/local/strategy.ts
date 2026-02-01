@@ -5,8 +5,8 @@ import { ContextIdFactory, ModuleRef } from "@nestjs/core";
 import { Request } from "express";
 import { UserPayload } from "$shared/models/auth";
 import { assertIsDefined } from "$shared/utils/validation";
+import { AuthCrudDtos } from "$shared/models/auth/dto/transport";
 import { AuthLocalService } from "./service";
-import { localLoginBodySchema } from "./dto";
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -16,8 +16,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     private readonly moduleRef: ModuleRef,
   ) {
     super( {
-      usernameField: localLoginBodySchema.keyof().enum.usernameOrEmail,
-      passwordField: localLoginBodySchema.keyof().enum.password,
+      usernameField: AuthCrudDtos.LocalLogin.bodySchema.keyof().enum.usernameOrEmail,
+      passwordField: AuthCrudDtos.LocalLogin.bodySchema.keyof().enum.password,
       passReqToCallback: true,
     } );
   }

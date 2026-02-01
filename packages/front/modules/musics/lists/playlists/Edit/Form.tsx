@@ -13,6 +13,7 @@ import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { MusicPlaylistsApi } from "../requests";
 import { MusicPlaylistEntity } from "../models";
 import { FormVisibility } from "../../FormVisibility";
+import { MusicPlaylistCrudDtos } from "../models/dto";
 
 type Props = {
   initialValue: MusicPlaylistEntity;
@@ -48,7 +49,7 @@ export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }:
   const currentVisibility = watch("visibility");
   const currentImageCoverId = watch("imageCoverId");
   const onSubmit = async (data: z.infer<typeof schema>) => {
-    const changes: MusicPlaylistsApi.PatchOne.Body = {
+    const changes: MusicPlaylistCrudDtos.Patch.Body = {
       entity: {},
     };
 

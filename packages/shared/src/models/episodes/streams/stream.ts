@@ -62,13 +62,13 @@ function getSeriesKeyFromStream(stream: Model): string | null {
 }
 
 export {
-  Model as Stream,
+  type Model as Stream,
   modelSchema as streamSchema,
   OriginType as StreamOriginType,
-  Group as StreamGroup,
-  Origin as StreamOrigin,
+  type Group as StreamGroup,
+  type Origin as StreamOrigin,
   Mode as StreamMode,
   entitySchema as streamEntitySchema,
-  Entity as StreamEntity,
+  type Entity as StreamEntity,
   getSeriesKeyFromStream,
 };

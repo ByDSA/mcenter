@@ -4,11 +4,10 @@ import { createZodDto } from "nestjs-zod";
 import { EpisodeFileInfoEntity, episodeFileInfoEntitySchema } from "$shared/models/episodes/file-info";
 import { AdminPatchOne } from "#utils/nestjs/rest";
 import { assertFoundClient } from "#utils/validation/found";
+import { IdParamDto } from "#utils/validation/dtos";
 import { EpisodeFileInfoRepository } from "./repository";
 
-class PatchOneByIdParamsDto
-  extends createZodDto(EpisodeFileInfoCrudDtos.PatchOneById.paramsSchema) {}
-class PatchOneByIdBodyDto extends createZodDto(EpisodeFileInfoCrudDtos.PatchOneById.bodySchema) {}
+class PatchOneByIdBodyDto extends createZodDto(EpisodeFileInfoCrudDtos.Patch.bodySchema) {}
 
 const schema = episodeFileInfoEntitySchema;
 
@@ -21,7 +20,7 @@ export class EpisodeFileInfosCrudController {
 
   @AdminPatchOne("/:id", schema)
   async patchOneByIdAndGet(
-    @Param() params: PatchOneByIdParamsDto,
+    @Param() params: IdParamDto,
     @Body() body: PatchOneByIdBodyDto,
   ): Promise<EpisodeFileInfoEntity> {
     const got = await this.fileInfoRepo.patchOneByIdAndGet(params.id, body);

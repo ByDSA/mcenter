@@ -6,6 +6,7 @@ import { DndContext, closestCenter, DragOverlay } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { DragHandle } from "@mui/icons-material";
+import { MusicUserListsCrudDtos } from "$shared/models/musics/users-lists/dto/transport";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceList } from "#modules/resources/List/ResourceList";
@@ -20,7 +21,7 @@ import styles from "./List.module.css";
 import { useListsDragAndDrop } from "./useListsDragAndDrop";
 import { SortableListItem } from "./SortableListItem";
 
-type Data = NonNullable<MusicUsersListsApi.GetMyList.Response["data"]>;
+type Data = NonNullable<MusicUserListsCrudDtos.GetMyList.Response["data"]>;
 type Item = Data["list"][0];
 
 type Props = ReturnType<typeof useMusicPlaylists>;

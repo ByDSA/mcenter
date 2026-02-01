@@ -8,14 +8,16 @@ import { dayTitle } from "#modules/history/utils";
 import { EmptyHistory } from "#modules/history/EmptyHistory";
 import { EpisodeHistoryEntryElement } from "./ListItem/HistoryEntry";
 import { EpisodeHistoryApi } from "./requests";
+import { EpisodeHistoryEntryCrudDtos } from "./models/dto";
 
-type Data = EpisodeHistoryApi.GetMany.Data[];
+type Data = EpisodeHistoryEntryCrudDtos.GetMany.Data;
+type ArrayData = Data[];
 
 export function HistoryList() {
   const { data, isLoading, error,
     setItem, observerTarget } = useHistoryList();
 
-  return renderFetchedData<Data | null>( {
+  return renderFetchedData<ArrayData | null>( {
     data,
     error,
     loader: {
@@ -29,7 +31,7 @@ export function HistoryList() {
         <ResourceList>
           {(!data || data.length === 0) && <EmptyHistory />}
           {
-            data!.map((entry: EpisodeHistoryApi.GetMany.Data, i: number, array) => {
+            data!.map((entry: Data, i: number, array) => {
               return <Fragment
                 key={entry.date.timestamp}>
                 {dayTitle( {

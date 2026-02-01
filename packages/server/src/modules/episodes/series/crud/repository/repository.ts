@@ -27,7 +27,7 @@ type Model = Series;
 
 type Seasons = Record<string, EpisodeEntity[]>;
 
-export type GetManyCriteria = SeriesCrudDtos.GetManyByCriteria.Criteria & { requestUserId: string |
+export type GetManyCriteria = SeriesCrudDtos.GetMany.Criteria & { requestUserId: string |
   null; };
 
 export type CreateDto = SeriesCrudDtos.CreateOne.Body;

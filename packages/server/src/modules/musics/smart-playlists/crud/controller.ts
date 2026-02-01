@@ -19,6 +19,7 @@ import { UserDeleteOne,
   GetOneCriteria } from "#utils/nestjs/rest";
 import { assertFoundClient } from "#utils/validation/found";
 import { UsersRepository } from "#core/auth/users/crud/repository";
+import { IdParamDto } from "#utils/validation/dtos";
 import { musicSmartPlaylistEntitySchema } from "../models";
 import { MusicSmartPlaylistRepository } from "./repository/repository";
 
@@ -26,16 +27,12 @@ class CreateBody extends createZodDto(
   MusicSmartPlaylistCrudDtos.CreateOne.bodySchema,
 ) {}
 class PatchBody extends createZodDto(
-  MusicSmartPlaylistCrudDtos.PatchOneById.bodySchema,
+  MusicSmartPlaylistCrudDtos.Patch.bodySchema,
 ) {}
 class GetManyBody extends createZodDto(
   MusicSmartPlaylistCrudDtos.GetMany.criteriaSchema,
 ) {}
-class IdParam extends createZodDto(
-  z.object( {
-    id: mongoDbId,
-  } ),
-) {}
+
 class GetOneByCriteriaBody extends createZodDto(
   MusicSmartPlaylistCrudDtos.GetOne.criteriaSchema,
 ) {}
@@ -62,7 +59,7 @@ export class SmartPlaylistCrudController {
 
   @Get("/:id")
   async getOne(
-    @Param() params: IdParam,
+    @Param() params: IdParamDto,
     @User() user: UserPayload | null,
     @Query("token") token: string | undefined,
   ) {
@@ -108,14 +105,17 @@ export class SmartPlaylistCrudController {
 
   @Authenticated()
   @UserPost("/", musicSmartPlaylistEntitySchema)
-  async createOne(@Body() body: CreateBody, @User() user: UserPayload) {
+  async createOne(
+    @Body() body: CreateBody,
+    @User() user: UserPayload,
+  ) {
     return await this.repo.createOneAndGet(body, user.id);
   }
 
   @Authenticated()
   @UserPatchOne("/:id", musicSmartPlaylistEntitySchema)
   async patchOne(
-    @Param() params: IdParam,
+    @Param() params: IdParamDto,
     @Body() body: PatchBody,
     @User() user: UserPayload,
   ) {
@@ -126,7 +126,7 @@ export class SmartPlaylistCrudController {
 
   @Authenticated()
   @UserDeleteOne("/:id", musicSmartPlaylistEntitySchema)
-  async deleteOne(@Param() params: IdParam, @User() user: UserPayload) {
+  async deleteOne(@Param() params: IdParamDto, @User() user: UserPayload) {
     await this.repo.guardOwner(user.id, params.id);
 
     return await this.repo.deleteOneByIdAndGet(params.id);

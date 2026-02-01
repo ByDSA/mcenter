@@ -32,7 +32,7 @@ export {
   entitySchema as episodeHistoryEntryEntitySchema,
   assertIsModel as assertIsEpisodeHistoryEntry,
   assertIsEntity as assertIsEpisodeHistoryEntryEntity,
-  Entity as EpisodeHistoryEntryEntity,
-  Model as EpisodeHistoryEntry,
+  type Entity as EpisodeHistoryEntryEntity,
+  type Model as EpisodeHistoryEntry,
   schema as episodeHistoryEntrySchema,
 };

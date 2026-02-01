@@ -1,8 +1,8 @@
 import z from "zod";
 import { generatePatchBodySchema } from "../../../utils/schemas/patch";
 import { mongoDbId } from "../../../resources/partial-schemas";
-import { idParamsSchema } from "../../../utils/schemas/requests";
-import { episodeUserInfoSchema } from "../user-info";
+import { episodeUserInfoEntitySchema, episodeUserInfoSchema } from "../user-info";
+import { createOneResultResponseSchema } from "../../../../utils/http/responses";
 
 export namespace EpisodeInfoCrudDtos {
   export const keySchema = z.object( {
@@ -10,7 +10,9 @@ export namespace EpisodeInfoCrudDtos {
     userId: mongoDbId,
   } );
 
-  export namespace PatchOneById {
+  const responseOneSchema = createOneResultResponseSchema(episodeUserInfoEntitySchema);
+
+  export namespace Patch {
     export const bodySchema = generatePatchBodySchema(episodeUserInfoSchema.omit( {
       createdAt: true,
       updatedAt: true,
@@ -19,8 +21,8 @@ export namespace EpisodeInfoCrudDtos {
       userId: true,
     } ));
     export type Body = z.infer<typeof bodySchema>;
-    export const paramsSchema = idParamsSchema; // episodeId
-    export type Params = z.infer<typeof paramsSchema>;
+    export const responseSchema = responseOneSchema;
+    export type Response = z.infer<typeof responseSchema>;
   }
 
   export namespace CreateOne {
@@ -29,5 +31,7 @@ export namespace EpisodeInfoCrudDtos {
       updatedAt: true,
     } );
     export type Body = z.infer<typeof bodySchema>;
+    export const responseSchema = responseOneSchema;
+    export type Response = z.infer<typeof responseSchema>;
   }
 }

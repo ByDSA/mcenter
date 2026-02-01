@@ -5,13 +5,12 @@ import { createZodDto } from "nestjs-zod";
 import { EpisodeDependencyCrudDtos } from "$shared/models/episodes/dependencies/dto/transport";
 import { episodeCompKeySchema } from "$shared/models/episodes/episode";
 import { AdminDeleteOne, GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest";
+import { IdParamDto } from "#utils/validation/dtos";
 import { type EpisodeDependencyEntity, episodeDependencyEntitySchema } from "../models";
 import { EpisodeDependenciesRepository } from "./repository/repository";
 
-class GetManyByCriteriaBodyDto
-  extends createZodDto(EpisodeDependencyCrudDtos.GetManyByCriteria.criteriaSchema) {}
-class DeleteOneByIdParamsDto
-  extends createZodDto(EpisodeDependencyCrudDtos.DeleteOneById.paramsSchema) {}
+class GetManyBodyDto
+  extends createZodDto(EpisodeDependencyCrudDtos.GetMany.criteriaSchema) {}
 
 class LastCompKeyParamsDto extends createZodDto(episodeCompKeySchema) {}
 
@@ -41,14 +40,14 @@ implements
 
   @GetManyCriteria("/", episodeDependencyEntitySchema)
   async getManyEntriesByCriteria(
-    @Body() body: GetManyByCriteriaBodyDto,
+    @Body() body: GetManyBodyDto,
   ) {
     return await this.repo.getManyByCriteria(body);
   }
 
   @AdminDeleteOne("/:id", episodeDependencyEntitySchema)
   async deleteOneByIdAndGet(
-    @Param() params: DeleteOneByIdParamsDto,
+    @Param() params: IdParamDto,
   ): Promise<EpisodeDependencyEntity> {
     const { id } = params;
     const deleted = await this.repo.deleteOneByIdAndGet(id);

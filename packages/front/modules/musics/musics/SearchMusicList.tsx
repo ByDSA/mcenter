@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
+import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -66,7 +67,7 @@ function useSearchMusicList(props: Props) {
   const fetchingMoreLimitRef = useRef<number>(15);
   const { user } = useUser();
   const api = FetchApi.get(MusicsApi);
-  const expand: NonNullable<MusicsApi.GetManyByCriteria.Criteria["expand"]> = [
+  const expand: NonNullable<MusicCrudDtos.GetMany.Criteria["expand"]> = [
     "fileInfos",
     "imageCover",
   ];
@@ -74,7 +75,7 @@ function useSearchMusicList(props: Props) {
   if (user)
     expand.push("favorite", "userInfo");
 
-  const criteriaCommon: MusicsApi.GetManyByCriteria.Criteria = {
+  const criteriaCommon: MusicCrudDtos.GetMany.Criteria = {
     sort: {
       added: "desc",
     },
@@ -151,8 +152,8 @@ function useSearchMusicList(props: Props) {
 
 function getFilterFromProps(
   props: Props,
-): MusicsApi.GetManyByCriteria.Criteria["filter"] | undefined {
-  const ret: MusicsApi.GetManyByCriteria.Criteria["filter"] = {};
+): MusicCrudDtos.GetMany.Criteria["filter"] | undefined {
+  const ret: MusicCrudDtos.GetMany.Criteria["filter"] = {};
 
   if (props.filters.title)
     ret.title = props.filters.title;

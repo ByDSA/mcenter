@@ -3,6 +3,7 @@ import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createMockProvider } from "#utils/nestjs/tests";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
+import { mockMongoId } from "#tests/mongo";
 import { MusicFlowService } from "../MusicFlow.service";
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicRendererModule } from "../renderer/module";
@@ -51,7 +52,7 @@ crudTestsSuite( {
       repoConfig: ((ctx)=>( {
         getFn: ()=>ctx.beforeExecution().repo.patchOneByIdAndGet,
         expected: {
-          params: ["id", {
+          params: [mockMongoId, {
             entity: {
               title: "new title",
             },

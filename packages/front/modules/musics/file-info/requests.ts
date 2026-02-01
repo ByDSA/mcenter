@@ -1,8 +1,6 @@
 /* eslint-disable require-await */
-import type { ResultResponse } from "$shared/utils/http/responses";
 import type { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import type { MusicId } from "#musics/models";
-import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import z from "zod";
@@ -17,23 +15,16 @@ export class MusicFileInfosApi {
 
   async patch(
     id: MusicFileInfoEntity["id"],
-    body: MusicFileInfosApi.Patch.Body,
-  ): Promise<MusicFileInfosApi.Patch.Response> {
-    const method = "PATCH";
-    const fetcher = makeFetcher<
-      MusicFileInfosApi.Patch.Body,
-      MusicFileInfosApi.Patch.Response
-    >( {
-      method,
-      reqBodyValidator: genAssertZod(MusicFileInfoCrudDtos.PatchOneById.bodySchema),
-      parseResponse: genParseZod(
-        MusicFileInfoCrudDtos.PatchOneById.responseSchema,
-      ) as (m: unknown)=> any,
+    body: MusicFileInfoCrudDtos.Patch.Body,
+  ) {
+    const fetcher = makeFetcher( {
+      method: "PATCH",
+      requestSchema: MusicFileInfoCrudDtos.Patch.bodySchema,
+      responseSchema: MusicFileInfoCrudDtos.Patch.responseSchema,
     } );
-    const URL = backendUrl(PATH_ROUTES.musics.fileInfo.withParams(id));
 
     return fetcher( {
-      url: URL,
+      url: backendUrl(PATH_ROUTES.musics.fileInfo.withParams(id)),
       body,
     } );
   }
@@ -41,59 +32,33 @@ export class MusicFileInfosApi {
   async deleteOneById(
     id: MusicFileInfoEntity["id"],
   ): Promise<void> {
-    const body = undefined;
-    const method = "DELETE";
-    const fetcher = makeFetcher<
-      undefined,
-      undefined
-    >( {
-      method,
-      parseResponse: genParseZod(z.undefined()),
+    const fetcher = makeFetcher( {
+      method: "DELETE",
+      responseSchema: z.undefined(),
     } );
-    const URL = backendUrl(PATH_ROUTES.musics.fileInfo.withParams(id));
 
     return fetcher( {
-      url: URL,
-      body,
+      url: backendUrl(PATH_ROUTES.musics.fileInfo.withParams(id)),
     } );
   }
 
   async getAllByMusicId(
     id: MusicId,
-  ): Promise<MusicFileInfosApi.GetMany.Response> {
-    const method = "POST";
-    const body: MusicFileInfosApi.GetMany.Body = {
+  ) {
+    const body: MusicFileInfoCrudDtos.GetMany.Criteria = {
       filter: {
         musicId: id,
       },
     };
-    const fetcher = makeFetcher<
-      MusicFileInfosApi.GetMany.Body,
-      MusicFileInfosApi.GetMany.Response
-    >( {
-      method,
-      reqBodyValidator: genAssertZod(MusicFileInfoCrudDtos.GetMany.criteriaSchema),
-      parseResponse: genParseZod(
-        MusicFileInfoCrudDtos.GetMany.responseSchema,
-      ) as (m: unknown)=> any,
+    const fetcher = makeFetcher( {
+      method: "POST",
+      requestSchema: MusicFileInfoCrudDtos.GetMany.criteriaSchema,
+      responseSchema: MusicFileInfoCrudDtos.GetMany.responseSchema,
     } );
-    const URL = backendUrl(PATH_ROUTES.musics.fileInfo.path);
 
     return fetcher( {
-      url: URL,
+      url: backendUrl(PATH_ROUTES.musics.fileInfo.path),
       body,
     } );
-  }
-}
-
-// eslint-disable-next-line no-redeclare
-export namespace MusicFileInfosApi {
-  export namespace Patch {
-    export type Response = ResultResponse<MusicFileInfoEntity>;
-    export type Body = MusicFileInfoCrudDtos.PatchOneById.Body;
-  }
-  export namespace GetMany {
-    export type Response = ResultResponse<MusicFileInfoEntity[]>;
-    export type Body = MusicFileInfoCrudDtos.GetMany.Criteria;
   }
 }

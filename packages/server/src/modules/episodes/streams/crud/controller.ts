@@ -2,14 +2,14 @@ import { Request, Response } from "express";
 import { Body, Controller } from "@nestjs/common";
 import { StreamCrudDtos } from "$shared/models/episodes/streams/dto/transport";
 import { createZodDto } from "nestjs-zod";
-import { StreamsRepository } from "./repository";
 import { Stream, streamEntitySchema } from "#episodes/streams/models";
 import { CanGetAll } from "#utils/layers/controller";
 import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/crud/get";
+import { StreamsRepository } from "./repository";
 
 const schema = streamEntitySchema;
 
-class CriteriaBodyDto extends createZodDto(StreamCrudDtos.GetManyByCriteria.criteriaSchema) {}
+class GetManyBodyDto extends createZodDto(StreamCrudDtos.GetMany.criteriaSchema) {}
 
 @Controller()
 export class StreamsCrudController
@@ -27,7 +27,7 @@ implements
 
   @GetManyCriteria("/criteria", schema)
   async getMany(
-    @Body() body: CriteriaBodyDto,
+    @Body() body: GetManyBodyDto,
   ): Promise<Stream[]> {
     return await this.repo.getManyByCriteria(body);
   }

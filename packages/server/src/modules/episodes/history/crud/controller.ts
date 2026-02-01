@@ -13,8 +13,8 @@ import { type EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from 
 import { LastTimePlayedService } from "../last-time-played.service";
 import { EpisodeHistoryRepository } from "./repository";
 
-class GetManyByCriteriaBodyDto
-  extends createZodDto(EpisodeHistoryEntryCrudDtos.GetManyByCriteria.criteriaSchema) {}
+class GetManyBodyDto
+  extends createZodDto(EpisodeHistoryEntryCrudDtos.GetMany.criteriaSchema) {}
 
 class SeriesKeyParamsDto extends createZodDto(
   z.object( {
@@ -69,7 +69,7 @@ implements
 
   @GetManyCriteria("/:seriesKey/entries/search", episodeHistoryEntryEntitySchema)
   async getManyEntriesBySerieAndCriteria(
-    @Body() body: GetManyByCriteriaBodyDto,
+    @Body() body: GetManyBodyDto,
     @Param() params: SeriesKeyParamsDto,
     @User() user: UserPayload,
   ) {
@@ -85,7 +85,7 @@ implements
 
   @GetManyCriteria("/entries/search", episodeHistoryEntryEntitySchema)
   async getManyEntriesByCriteria(
-    @Body() body: GetManyByCriteriaBodyDto,
+    @Body() body: GetManyBodyDto,
     @User() user: UserPayload,
   ) {
     return await this.entriesRepo.getManyByCriteria( {

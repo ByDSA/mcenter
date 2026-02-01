@@ -8,9 +8,6 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { OnEvent } from "@nestjs/event-emitter";
 import { getDateNow } from "$shared/utils/time";
 import { UserEntity } from "$shared/models/auth";
-import { EpisodeHistoryEntryOdm } from "./odm";
-import { EpisodeHistoryEntryEvents } from "./events";
-import { getCriteriaPipeline } from "./criteria-pipeline";
 import { assertFoundClient } from "#utils/validation/found";
 import { SeriesKey } from "#episodes/series";
 import { StreamEntity } from "#episodes/streams";
@@ -18,6 +15,9 @@ import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
+import { getCriteriaPipeline } from "./criteria-pipeline";
+import { EpisodeHistoryEntryEvents } from "./events";
+import { EpisodeHistoryEntryOdm } from "./odm";
 
 type FindLastProps = {
   streamId: StreamEntity["id"];
@@ -78,7 +78,7 @@ CanDeleteOneByIdAndGet<Model, Id> {
   }
 
   async getManyByCriteria(
-    criteria: EpisodeHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
+    criteria: EpisodeHistoryEntryCrudDtos.GetMany.Criteria,
   ): Promise<Entity[]> {
     const pipeline = getCriteriaPipeline(criteria);
     const docsOdm: EpisodeHistoryEntryOdm.FullDoc[] = await EpisodeHistoryEntryOdm.Model.aggregate(

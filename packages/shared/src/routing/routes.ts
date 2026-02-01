@@ -37,6 +37,11 @@ type YoutubeImportMusicOneOptions = {
 };
 
 export const PATH_ROUTES = {
+  users: {
+    favoritePlaylist: {
+      path: "/api/users/musics/favorite-playlist",
+    },
+  },
   tests: {
     createOauthUser: {
       path: "/tests/users/oauth/create",

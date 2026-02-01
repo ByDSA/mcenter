@@ -5,6 +5,7 @@ import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { HISTORY_MUSIC_SAMPLES1 } from "#musics/history/tests";
 import { expectBodyEquals } from "#tests/suites/generate-http-case";
 import { putUser } from "#tests/suites/auth";
+import { mockMongoId } from "#tests/mongo";
 import { MusicHistoryCrudController } from "./controller";
 import { MusicHistoryRepository } from "./repository";
 import { musicHistoryRepoMockProvider } from "./repository/tests";
@@ -107,11 +108,11 @@ crudTestsSuite( {
       repoConfig: (ctx)=>( {
         getFn: ()=>ctx.beforeExecution().repo.deleteOneByIdAndGet,
         expected: {
-          params: ["entryId"],
+          params: [mockMongoId],
         },
         returned: HISTORY_MUSIC_SAMPLES1[0],
       } ),
-      url: "/entryId",
+      url: "/" + mockMongoId,
     },
   },
 } );

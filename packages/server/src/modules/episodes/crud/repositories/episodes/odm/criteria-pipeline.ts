@@ -11,7 +11,7 @@ export interface EpisodeExpansionFlags {
   includeSeries: boolean;
 }
 
-type Criteria = EpisodesCrudDtos.GetManyByCriteria.Criteria;
+type Criteria = EpisodesCrudDtos.GetMany.Criteria;
 
 function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
   if (!body.sort)

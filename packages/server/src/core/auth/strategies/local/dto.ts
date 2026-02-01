@@ -1,8 +1,8 @@
 import { createZodDto } from "nestjs-zod";
-import { localSignUpBodySchema, localLoginBodySchema } from "$shared/models/auth/dto";
+import { AuthCrudDtos } from "$shared/models/auth/dto/transport";
 
-export class SignUpDto extends createZodDto(localSignUpBodySchema) {}
+export class SignUpDto extends createZodDto(AuthCrudDtos.LocalSignUp.bodySchema) {}
 
-export class LoginDto extends createZodDto(localLoginBodySchema) { }
+export class LoginDto extends createZodDto(AuthCrudDtos.LocalLogin.bodySchema) { }
 
-export * from "$shared/models/auth/dto";
+export * from "$shared/models/auth/dto/transport";

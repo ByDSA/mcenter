@@ -3,13 +3,11 @@ import { createCriteriaManySchema } from "../../../utils/schemas/requests/criter
 import { mongoDbId } from "../../../resources/partial-schemas";
 import { createManyResultResponseSchema, createOneResultResponseSchema } from "../../../../utils/http/responses";
 import { generatePatchBodySchema } from "../../../utils/schemas/patch";
-import { idParamsSchema } from "../../../utils/schemas/requests";
 import { musicFileInfoEntitySchema } from "../file-info";
 import { musicEntitySchema } from "../../music";
 
 export namespace MusicFileInfoCrudDtos {
   export namespace GetOneById {
-    export const paramsSchema = idParamsSchema;
   }
   export namespace GetMany {
     export const criteriaSchema = createCriteriaManySchema( {
@@ -25,15 +23,13 @@ export namespace MusicFileInfoCrudDtos {
     export const responseSchema = createManyResultResponseSchema(musicFileInfoEntitySchema);
     export type Response = z.infer<typeof responseSchema>;
   }
-  export namespace PatchOneById {
+  export namespace Patch {
     export const bodySchema = generatePatchBodySchema(musicFileInfoEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
-    export const paramsSchema = idParamsSchema;
     export const responseSchema = createOneResultResponseSchema(musicFileInfoEntitySchema);
     export type Response = z.infer<typeof responseSchema>;
   }
-  export namespace DeleteOneById {
-    export const paramsSchema = idParamsSchema;
+  export namespace Delete {
   }
 
   export namespace UploadFile {

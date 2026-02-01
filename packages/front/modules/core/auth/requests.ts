@@ -1,6 +1,5 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { LocalLoginBody, localLoginBodySchema, localLoginResponseSchema, LocalSignUpBody, localSignUpBodySchema } from "$shared/models/auth/dto";
-import { genAssertZod, genParseZod } from "$shared/utils/validation/zod";
+import { AuthCrudDtos } from "$shared/models/auth/dto/transport";
 import z from "zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
@@ -13,11 +12,11 @@ export class AuthApi {
     FetchApi.register(this, new this());
   }
 
-  async localLogin(dto: LocalLoginBody) {
+  async localLogin(dto: AuthCrudDtos.LocalLogin.Body) {
     const f = makeFetcher( {
       method: "POST",
-      reqBodyValidator: genAssertZod(localLoginBodySchema),
-      parseResponse: genParseZod(localLoginResponseSchema),
+      requestSchema: AuthCrudDtos.LocalLogin.bodySchema,
+      responseSchema: AuthCrudDtos.LocalLogin.responseSchema,
       errorMiddleware: (e)=> {
         if (!(e instanceof HttpErrorUnauthorized))
           logger.error(e);
@@ -31,11 +30,11 @@ export class AuthApi {
     return res;
   }
 
-  async localSignUp(dto: LocalSignUpBody) {
+  async localSignUp(dto: AuthCrudDtos.LocalSignUp.Body) {
     const f = makeFetcher( {
       method: "POST",
-      reqBodyValidator: genAssertZod(localSignUpBodySchema),
-      parseResponse: genParseZod(z.undefined()),
+      requestSchema: AuthCrudDtos.LocalSignUp.bodySchema,
+      responseSchema: z.undefined(),
       errorMiddleware: (e)=> {
         if (e instanceof Error && e.message.toLowerCase().includes("username already exists")) {
           logger.error("El usuario ya está registrado");

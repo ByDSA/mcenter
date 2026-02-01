@@ -1,20 +1,23 @@
 /* eslint-disable require-await */
 import { PATH_ROUTES } from "$shared/routing";
-import { genParseZod } from "$shared/utils/validation/zod";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 import { EpisodeHistoryEntryEntity } from "../models";
-import * as _GetMany from "./get-many";
-import * as _Delete from "./delete";
+import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
+
+type GetManyProps = {
+  limit?: number;
+  offset?: number;
+};
 
 export class EpisodeHistoryApi {
   static {
     FetchApi.register(this, new this());
   }
 
-  async getMany(props: EpisodeHistoryApi.GetMany.FetchProps): Promise<_GetMany.Res> {
-    const body: _GetMany.Req = {
+  async getMany(props: GetManyProps) {
+    const body: EpisodeHistoryEntryCrudDtos.GetMany.Criteria = {
       filter: {},
       sort: {
         timestamp: "desc",
@@ -23,10 +26,10 @@ export class EpisodeHistoryApi {
       offset: props?.offset ?? undefined,
       expand: ["episodes", "episodesSeries", "episodesFileInfos", "episodesUserInfo"],
     };
-    const schema = _GetMany.resSchema;
-    const fetcher = makeFetcher<_GetMany.Req, _GetMany.Res>( {
-      method: EpisodeHistoryApi.GetMany.method,
-      parseResponse: genParseZod(schema) as (m: unknown)=> _GetMany.Res,
+    const fetcher = makeFetcher( {
+      method: "POST",
+      requestSchema: EpisodeHistoryEntryCrudDtos.GetMany.criteriaSchema,
+      responseSchema: EpisodeHistoryEntryCrudDtos.GetMany.responseSchema,
     } );
 
     return fetcher( {
@@ -37,22 +40,40 @@ export class EpisodeHistoryApi {
 
   async delete(
     entryId: EpisodeHistoryEntryEntity["id"],
-  ): Promise<_Delete.Response> {
-    const URL = backendUrl(PATH_ROUTES.episodes.history.entries.withParams(entryId));
-    const fetcher = makeFetcher<typeof undefined, _Delete.Response>( {
-      method: _Delete.method,
-      parseResponse: genParseZod(_Delete.responseSchema) as (m: unknown)=> any,
+  ) {
+    const fetcher = makeFetcher( {
+      method: "DELETE",
+      responseSchema: EpisodeHistoryEntryCrudDtos.DeleteOne.responseSchema,
     } );
 
     return fetcher( {
-      url: URL,
+      url: backendUrl(PATH_ROUTES.episodes.history.entries.withParams(entryId)),
       body: undefined,
     } );
   }
-}
 
-// eslint-disable-next-line no-redeclare
-export namespace EpisodeHistoryApi {
-  export import GetMany = _GetMany;
-  export import Delete = _Delete;
+  async getLatestViews(seriesKey: string, episodeKey: string, maxTimestamp: number) {
+    const body: EpisodeHistoryEntryCrudDtos.GetMany.Criteria = {
+      filter: {
+        seriesKey: seriesKey,
+        episodeKey: episodeKey,
+        timestampMax: maxTimestamp - 1,
+      },
+      sort: {
+        timestamp: "desc",
+      },
+      limit: 4,
+      expand: ["episodes"],
+    };
+    const fetcher = makeFetcher( {
+      method: "POST",
+      requestSchema: EpisodeHistoryEntryCrudDtos.GetMany.criteriaSchema,
+      responseSchema: EpisodeHistoryEntryCrudDtos.GetMany.responseSchema,
+    } );
+
+    return fetcher( {
+      body,
+      url: backendUrl(PATH_ROUTES.episodes.history.entries.search.path),
+    } );
+  }
 }

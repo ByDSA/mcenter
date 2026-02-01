@@ -5,7 +5,7 @@ import { enrichSingleMusic, MusicExpansionFlags } from "#musics/crud/repositorie
 import { DocOdm } from "./odm";
 
 function buildMongooseSort(
-  body: MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
+  body: MusicHistoryEntryCrudDtos.GetMany.Criteria,
 ): Record<string, -1 | 1> | undefined {
   if (!body.sort?.timestamp)
     return undefined;
@@ -16,7 +16,7 @@ function buildMongooseSort(
 }
 
 function buildMongooseFilter(
-  criteria: MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
+  criteria: MusicHistoryEntryCrudDtos.GetMany.Criteria,
 ): FilterQuery<DocOdm> {
   const filter: FilterQuery<DocOdm> = {};
   const userIdStr = criteria.filter?.userId;
@@ -40,7 +40,7 @@ function buildMongooseFilter(
 }
 
 export function getCriteriaPipeline(
-  criteria: MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria,
+  criteria: MusicHistoryEntryCrudDtos.GetMany.Criteria,
 ) {
   const filter = buildMongooseFilter(criteria);
   const sort = buildMongooseSort(criteria);

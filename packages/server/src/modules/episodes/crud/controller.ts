@@ -5,30 +5,23 @@ import { createZodDto } from "nestjs-zod";
 import { Param } from "@nestjs/common";
 import { UserPayload } from "$shared/models/auth";
 import { episodeUserInfoEntitySchema } from "$shared/models/episodes";
-import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import z from "zod";
-import { EpisodesRepository } from "../crud/repositories/episodes";
-import { EpisodesUsersRepository } from "./repositories/user-infos";
 import { GetManyCriteria, UserPost, UserPatchOne, AdminDeleteOne } from "#utils/nestjs/rest";
 import { episodeEntitySchema } from "#episodes/models";
 import { User } from "#core/auth/users/User.decorator";
+import { IdParamDto } from "#utils/validation/dtos";
+import { EpisodesRepository } from "../crud/repositories/episodes";
+import { EpisodesUsersRepository } from "./repositories/user-infos";
 
-class GetManyByCriteriaBodyDto extends createZodDto(
-  EpisodesCrudDtos.GetManyByCriteria.criteriaSchema,
+class GetManyBodyDto extends createZodDto(
+  EpisodesCrudDtos.GetMany.criteriaSchema,
 ) {}
 
 class PatchOneByIdUserInfoBodyDto extends createZodDto(
-  EpisodeInfoCrudDtos.PatchOneById.bodySchema,
-) {}
-class PatchOneByIdUserInfoParamsDto extends createZodDto(
-  EpisodeInfoCrudDtos.PatchOneById.paramsSchema,
+  EpisodeInfoCrudDtos.Patch.bodySchema,
 ) {}
 
 class CreateBody extends createZodDto(EpisodesCrudDtos.CreateOne.bodySchema) {}
-class PatchBody extends createZodDto(EpisodesCrudDtos.PatchOneById.bodySchema) {}
-class IdParam extends createZodDto(z.object( {
-  id: mongoDbId,
-} )) {}
+class PatchBody extends createZodDto(EpisodesCrudDtos.Patch.bodySchema) {}
 
 const schema = episodeEntitySchema;
 
@@ -41,13 +34,13 @@ export class EpisodesCrudController {
   }
 
   @Get("/:id")
-  async getOneById(@Param() params: IdParam) {
+  async getOneById(@Param() params: IdParamDto) {
     return await this.episodesRepo.getOneById(params.id);
   }
 
   @GetManyCriteria("/search", schema)
   async getManyByCriteria(
-    @Body() body: GetManyByCriteriaBodyDto,
+    @Body() body: GetManyBodyDto,
     @User() user: UserPayload | null,
   ) {
     return await this.episodesRepo.getMany( {
@@ -69,20 +62,20 @@ export class EpisodesCrudController {
 
   @UserPatchOne("/:id", schema)
   async patchOne(
-    @Param() params: IdParam,
+    @Param() params: IdParamDto,
     @Body() body: PatchBody,
   ) {
     return await this.episodesRepo.patchOneByIdAndGet(params.id, body);
   }
 
   @AdminDeleteOne("/:id", schema)
-  async deleteOne(@Param() params: IdParam) {
+  async deleteOne(@Param() params: IdParamDto) {
     return await this.episodesRepo.deleteOneByIdAndGet(params.id);
   }
 
   @UserPatchOne("/:id/user-info", episodeUserInfoEntitySchema)
   async patchOneUserInfoByKeyAndGet(
-    @Param() params: PatchOneByIdUserInfoParamsDto,
+    @Param() params: IdParamDto,
     @Body() body: PatchOneByIdUserInfoBodyDto,
     @User() user: UserPayload,
   ) {

@@ -2,6 +2,7 @@ import React from "react";
 import { useShallow } from "zustand/react/shallow";
 import { PATH_ROUTES } from "$shared/routing";
 import { showError } from "$shared/utils/errors/showError";
+import { assertIsDefined } from "$shared/utils/validation";
 import { useUser } from "#modules/core/auth/useUser";
 import { HistoryTimeView, WeightView } from "#modules/history";
 import { MusicSubtitle } from "#modules/musics/musics/ListItem/MusicEntry";
@@ -12,10 +13,10 @@ import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryL
 import { useLocalData } from "#modules/utils/local-data-context";
 import { useMusic } from "../hooks";
 import { MusicHistoryEntrySettingsButton } from "./SettingsButton/SettingsButton";
-import { MusicHistoryApi } from "./requests";
+import { MusicHistoryEntryEntity } from "./models";
 
 export const MusicHistoryListItem = React.memo(() =>{
-  const { data } = useLocalData<MusicHistoryApi.GetManyByCriteria.Data>();
+  const { data } = useLocalData<MusicHistoryEntryEntity>();
   const { user } = useUser();
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
   const { currentResource, playMusic, status, pause, resume } = useBrowserPlayer(
@@ -38,6 +39,8 @@ export const MusicHistoryListItem = React.memo(() =>{
   if (!music)
     return <ResourceEntryLoading />;
 
+  assertIsDefined(data.resource);
+
   return <ResourceEntry
     mainTitle={music.title}
     mainTitleHref={PATH_ROUTES.musics.frontend.path + "/" + music.id}
@@ -52,13 +55,13 @@ export const MusicHistoryListItem = React.memo(() =>{
     favButton={
       <PlaylistFavButton
         favoritesPlaylistId={favoritesPlaylistId}
-        musicId={data.resource.id}
+        musicId={data.resourceId}
       />
     }
     play={{
-      status: currentResource?.resourceId === data.resource.id ? status : "stopped",
+      status: currentResource?.resourceId === data.resourceId ? status : "stopped",
       onClick: async () => {
-        if (currentResource?.resourceId === data.resource.id) {
+        if (currentResource?.resourceId === data.resourceId) {
           if (status === "paused") {
             resume();
 

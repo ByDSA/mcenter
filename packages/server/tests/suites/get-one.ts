@@ -1,11 +1,12 @@
 import { HttpStatus } from "@nestjs/common";
+import { mockMongoId } from "#tests/mongo";
 import { TestGroupConfigCtx, PatchTestsProps } from "./patch-one";
 import { defaultResponse, expectedDataNotFound } from "./common";
 import { generateHttpCase } from "./generate-http-case";
 import { classifyAuth, generateNotAllowedTest, putUser } from "./auth";
 
 const getOneTestsGlobalConfig = {
-  url: "/id",
+  url: "/" + mockMongoId,
 };
 
 export function getOneTests<R>(props: PatchTestsProps<R>) {

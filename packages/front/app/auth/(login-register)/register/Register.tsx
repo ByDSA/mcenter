@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { LocalSignUpBody } from "$shared/models/auth/dto";
+import { AuthCrudDtos } from "$shared/models/auth/dto/transport";
 import { Email, Person } from "@mui/icons-material";
 import { showError } from "$shared/utils/errors/showError";
 import z from "zod";
@@ -11,7 +11,7 @@ import { CallValidationFn, createFormInputText, ValidateFn } from "../FormInputT
 import { createFormInputPassword } from "../FormInputPassword";
 
 type Props = {
-  handleRegister: (props: LocalSignUpBody)=> Promise<void>;
+  handleRegister: (props: AuthCrudDtos.LocalSignUp.Body)=> Promise<void>;
   handleGotoLogin?: ()=> Promise<void>;
   className?: string;
 };

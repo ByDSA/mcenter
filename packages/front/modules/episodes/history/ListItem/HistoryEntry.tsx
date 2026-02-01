@@ -12,13 +12,13 @@ import { copyText } from "#modules/musics/lists/playlists/utils";
 import { logger } from "#modules/core/logger";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
-import { EpisodeHistoryApi } from "../requests";
 import { EpisodeLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem";
 import { EditEpisodeContextMenuItem } from "../../Edit/ContextMenu";
 import { DeleteHistoryEntryContextMenuItem } from "../Delete/Delete";
+import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
 import styles from "./HistoryEntry.module.css";
 
-type Data = EpisodeHistoryApi.GetMany.Data;
+type Data = EpisodeHistoryEntryCrudDtos.GetMany.Data;
 
 type Props<T> = {
   value: T;

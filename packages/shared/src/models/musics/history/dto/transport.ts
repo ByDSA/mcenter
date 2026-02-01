@@ -1,10 +1,13 @@
 import z from "zod";
-import { idParamsSchema } from "../../../utils/schemas/requests";
 import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 import { mongoDbId } from "../../../resources/partial-schemas";
+import { musicHistoryEntryEntitySchema } from "../history-entry";
+import { musicEntitySchema } from "../../music";
+import { createManyResultResponseSchema, createOneResultResponseSchema } from "../../../../utils/http/responses";
 
 export namespace MusicHistoryEntryCrudDtos {
-  export namespace GetManyByCriteria {
+  const responseOneSchema = createOneResultResponseSchema(musicHistoryEntryEntitySchema);
+  export namespace GetMany {
     export const criteriaSchema = createCriteriaManySchema( {
       filterShape: {
         resourceId: z.string().optional(),
@@ -16,12 +19,29 @@ export namespace MusicHistoryEntryCrudDtos {
     } );
     export type Criteria = z.infer<typeof criteriaSchema>;
     export const bodySchema = criteriaSchema.default( {} );
+
+    export const dataSchema = musicHistoryEntryEntitySchema
+      .required( {
+        resource: true,
+      } )
+      .extend( {
+        resource: musicEntitySchema.required( {
+          userInfo: true,
+        } ),
+      } );
+
+    export type Data = z.infer<typeof dataSchema>;
+
+    export const responseSchema = createManyResultResponseSchema(dataSchema);
+    export type Response = z.infer<typeof responseSchema>;
   }
-  export namespace DeleteOneById {
-    export const paramsSchema = idParamsSchema;
+  export namespace Delete {
+    export const responseSchema = responseOneSchema;
+    export type Response = z.infer<typeof responseSchema>;
   }
   export namespace GetOneById {
-    export const paramsSchema = idParamsSchema;
+    export const responseSchema = responseOneSchema;
+    export type Response = z.infer<typeof responseSchema>;
   }
   export namespace CreateOne {
     export const bodySchema = z.object( {
@@ -29,5 +49,7 @@ export namespace MusicHistoryEntryCrudDtos {
       timestamp: z.number().optional(),
     } );
     export type Body = z.infer<typeof bodySchema>;
+    export const responseSchema = responseOneSchema;
+    export type Response = z.infer<typeof responseSchema>;
   }
 };

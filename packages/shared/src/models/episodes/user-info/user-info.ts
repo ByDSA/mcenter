@@ -23,7 +23,7 @@ type Entity = z.infer<typeof entitySchema>;
 
 export {
   schema as episodeUserInfoSchema,
-  Model as EpisodeUserInfo,
+  type Model as EpisodeUserInfo,
   entitySchema as episodeUserInfoEntitySchema,
-  Entity as EpisodeUserInfoEntity,
+  type Entity as EpisodeUserInfoEntity,
 };

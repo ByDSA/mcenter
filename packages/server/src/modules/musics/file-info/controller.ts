@@ -5,12 +5,12 @@ import { UserPayload } from "$shared/models/auth";
 import { AdminDeleteOne, GetManyCriteria } from "#utils/nestjs/rest";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
+import { IdParamDto } from "#utils/validation/dtos";
 import { MusicFileInfoRepository } from "./crud/repository";
 import { MusicFileInfoEntity, musicFileInfoEntitySchema } from "./models";
 import { MusicFileInfoUploadRepository, UploadFile, UploadFileInterceptor, UploadMusicFileInfoDto } from "./upload.service";
 
 class GetManyCriteriaDto extends createZodDto(MusicFileInfoCrudDtos.GetMany.criteriaSchema) { }
-class DeleteParamsDto extends createZodDto(MusicFileInfoCrudDtos.DeleteOneById.paramsSchema) { }
 
 @Controller()
 export class MusicFileInfoController {
@@ -45,7 +45,7 @@ export class MusicFileInfoController {
 
   @AdminDeleteOne("/:id")
   async deleteOne(
-    @Param() params: DeleteParamsDto,
+    @Param() params: IdParamDto,
   ) {
     const { id } = params;
 

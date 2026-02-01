@@ -1,6 +1,7 @@
 import z from "zod";
+import { createManyResultResponseSchema, createOneResultResponseSchema } from "../../../utils/http/responses";
 import { mongoDbId } from "../../resources/partial-schemas";
-import { episodeCompKeySchema, episodeSchema } from "../episode";
+import { episodeCompKeySchema, episodesBySeasonSchema, episodeSchema } from "../episode";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { episodeEntitySchema } from "../episode";
 import { createCriteriaConfig, createCriteriaOneSchema, createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
@@ -19,15 +20,20 @@ const criteriaConfig = createCriteriaConfig( {
 } );
 
 export namespace EpisodesCrudDtos {
+  const responseManySchema = createManyResultResponseSchema(episodeEntitySchema);
   export namespace GetAll {
     export const paramsSchema = z.object( {
       seriesKey: z.string(),
     } ).strict()
       .required();
   }
-  export namespace GetManyByCriteria {
+  export namespace GetMany {
     export const criteriaSchema = createCriteriaManySchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;
+
+    export const responseSchema = responseManySchema;
+
+    export type Response = z.infer<typeof responseSchema>;
   }
 
   export namespace GetOne {
@@ -38,10 +44,11 @@ export namespace EpisodesCrudDtos {
     export const criteriaSchema = createCriteriaOneSchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;
   }
-  export namespace PatchOneById {
+  export namespace Patch {
     export const bodySchema = generatePatchBodySchema(episodeEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
     export const { paramsSchema } = EpisodesCrudDtos.GetOne.ById;
+    export const responseSchema = responseManySchema;
   }
 
   export namespace CreateOne {
@@ -52,5 +59,14 @@ export namespace EpisodesCrudDtos {
     } ).strict();
 
     export type Body = z.infer<typeof bodySchema>;
+  }
+
+  export namespace DeleteOne {
+    export const responseSchema = createOneResultResponseSchema(episodeEntitySchema.or(z.null()));
+    export type Response = z.infer<typeof responseSchema>;
+  }
+
+  export namespace GetManyBySeason {
+    export const responseSchema = createOneResultResponseSchema(episodesBySeasonSchema);
   }
 }

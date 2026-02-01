@@ -4,6 +4,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { UserPayload, UserRoleName } from "$shared/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
 import { TestingSetup } from "#core/app/tests/app";
+import { mockMongoId } from "#tests/mongo";
 import { AfterProps, BeforeProps, GenerateHttpCaseProps } from "./generate-http-case";
 import { defaultResponse, expectedDataNotFound, expectUnprocessableEntity } from "./common";
 import { classifyAuth, generateNotAllowedTest, putUser } from "./auth";
@@ -86,7 +87,7 @@ export function patchOneTests<R>(
   props: PatchTestsProps<R>,
 ) {
   const { buildDynamicConfig, getExpressApp, getTestingSetup } = props;
-  const validUrl = props.url ?? "/id";
+  const validUrl = props.url ?? "/" + mockMongoId;
 
   describe("patch one", () => {
     const { allowed, notAllowed } = classifyAuth(props.auth);

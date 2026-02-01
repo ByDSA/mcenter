@@ -1,7 +1,5 @@
-import { createOneResultResponseSchema } from "$shared/utils/http/responses";
-import { genParseZod } from "$shared/utils/validation/zod";
-import z from "zod";
-import { userEntitySchema } from "$shared/models/auth";
+import { PATH_ROUTES } from "$shared/routing";
+import { UserCrudDtos } from "$shared/models/auth/dto/transport";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -13,40 +11,18 @@ export class UsersApi {
 
   setFavoritePlaylist(
     playlistId: string | null,
-  ): Promise<UsersApi.SetFavoritePlaylist.Response> {
-    const fetcher = makeFetcher<
-      UsersApi.SetFavoritePlaylist.Body,
-      UsersApi.SetFavoritePlaylist.Response
-    >( {
+  ) {
+    const fetcher = makeFetcher( {
       method: "PATCH",
-      parseResponse: genParseZod(
-        UsersApi.SetFavoritePlaylist.responseSchema,
-      ) as (m: unknown)=> any,
+      requestSchema: UserCrudDtos.SetFavoritePlaylist.bodySchema,
+      responseSchema: UserCrudDtos.SetFavoritePlaylist.responseSchema,
     } );
 
     return fetcher( {
-      url: backendUrl("/api/users/musics/favorite-playlist"),
+      url: backendUrl(PATH_ROUTES.users.favoritePlaylist.path),
       body: {
         playlistId,
       },
     } );
-  }
-}
-
-// eslint-disable-next-line no-redeclare
-export namespace UsersApi {
-  export namespace SetFavoritePlaylist {
-    export const dataSchema = userEntitySchema;
-
-    export type Data = z.infer<typeof dataSchema>;
-
-    export const responseSchema = createOneResultResponseSchema(dataSchema);
-    export type Response = z.infer<typeof responseSchema>;
-
-    export const bodySchema = z.object( {
-      playlistId: z.string().nullable(),
-    } );
-
-    export type Body = z.infer<typeof bodySchema>;
   }
 }

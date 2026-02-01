@@ -1,13 +1,14 @@
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
-import { createManyResultResponseSchema, createOneResultResponseSchema, type ResultResponse } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
-import { genParseZod } from "$shared/utils/validation/zod";
-import z from "zod";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { musicEntitySchema } from "../models";
-import { musicHistoryEntryEntitySchema, type MusicHistoryEntryEntity } from "./models";
+import { type MusicHistoryEntryEntity } from "./models";
+
+type GetManyProps = {
+  limit?: number;
+  offset?: number;
+};
 
 export class MusicHistoryApi {
   static {
@@ -15,9 +16,9 @@ export class MusicHistoryApi {
   }
 
   getManyByCriteria(
-    props: MusicHistoryApi.GetManyByCriteria.Props,
-  ): Promise<MusicHistoryApi.GetManyByCriteria.Response> {
-    const body: MusicHistoryApi.GetManyByCriteria.Request = {
+    props: GetManyProps,
+  ) {
+    const body: MusicHistoryEntryCrudDtos.GetMany.Criteria = {
       sort: {
         timestamp: "desc",
       },
@@ -25,14 +26,10 @@ export class MusicHistoryApi {
       offset: props?.offset ?? undefined,
       expand: ["musics", "musicsFavorite", "musicsImageCover"],
     };
-    const fetcher = makeFetcher<
-      MusicHistoryApi.GetManyByCriteria.Request,
-      MusicHistoryApi.GetManyByCriteria.Response
-    >( {
+    const fetcher = makeFetcher( {
       method: "POST",
-      parseResponse: genParseZod(
-        MusicHistoryApi.GetManyByCriteria.responseSchema,
-      ) as (m: unknown)=> any,
+      requestSchema: MusicHistoryEntryCrudDtos.GetMany.criteriaSchema,
+      responseSchema: MusicHistoryEntryCrudDtos.GetMany.responseSchema,
     } );
 
     return fetcher( {
@@ -43,77 +40,53 @@ export class MusicHistoryApi {
 
   deleteOneById(
     id: MusicHistoryEntryEntity["id"],
-  ): Promise<MusicHistoryApi.DeleteOneById.Response> {
-    const fetcher = makeFetcher<undefined, MusicHistoryApi.DeleteOneById.Response>( {
+  ) {
+    const fetcher = makeFetcher( {
       method: "DELETE",
-      parseResponse: genParseZod(createOneResultResponseSchema(
-        musicHistoryEntryEntitySchema,
-      )) as (m: unknown)=> any,
+      responseSchema: MusicHistoryEntryCrudDtos.Delete.responseSchema,
     } );
 
     return fetcher( {
       url: backendUrl(PATH_ROUTES.musics.history.withParams(id)),
-      body: undefined,
     } );
   }
 
   createOne(
-    body: MusicHistoryApi.CreateOne.Body,
-  ): Promise<MusicHistoryApi.CreateOne.Response> {
-    const fetcher = makeFetcher<
-      MusicHistoryApi.CreateOne.Body,
-      MusicHistoryApi.CreateOne.Response
-     >( {
-       method: "POST",
-       parseResponse: genParseZod(MusicHistoryApi.CreateOne.responseSchema) as (m: unknown)=> any,
-     } );
+    body: MusicHistoryEntryCrudDtos.CreateOne.Body,
+  ) {
+    const fetcher = makeFetcher( {
+      method: "POST",
+      requestSchema: MusicHistoryEntryCrudDtos.CreateOne.bodySchema,
+      responseSchema: MusicHistoryEntryCrudDtos.CreateOne.responseSchema,
+    } );
 
     return fetcher( {
       url: backendUrl(PATH_ROUTES.musics.history.path),
       body,
     } );
   }
-}
 
-// eslint-disable-next-line no-redeclare
-export namespace MusicHistoryApi {
-  export namespace GetManyByCriteria {
-    export type Request = MusicHistoryEntryCrudDtos.GetManyByCriteria.Criteria;
-
-    export type Props = {
-      limit?: number;
-      offset?: number;
+  getLatestsViews(musicId: string, maxTimestamp: number) {
+    const body: MusicHistoryEntryCrudDtos.GetMany.Criteria = {
+      filter: {
+        resourceId: musicId,
+        timestampMax: maxTimestamp - 1,
+      },
+      sort: {
+        timestamp: "desc",
+      },
+      limit: 4,
+      expand: [],
     };
+    const fetcher = makeFetcher( {
+      method: "POST",
+      requestSchema: MusicHistoryEntryCrudDtos.GetMany.criteriaSchema,
+      responseSchema: MusicHistoryEntryCrudDtos.GetMany.responseSchema,
+    } );
 
-    export const dataSchema = musicHistoryEntryEntitySchema
-      .required( {
-        resource: true,
-      } )
-      .extend( {
-        resource: musicEntitySchema.required( {
-          userInfo: true,
-        } ),
-      } );
-
-    export type Data = z.infer<typeof dataSchema>;
-
-    export const responseSchema = createManyResultResponseSchema(dataSchema);
-    export type Response = z.infer<typeof responseSchema>;
-  }
-
-  export namespace DeleteOneById {
-    export type Response = ResultResponse<MusicHistoryEntryEntity>;
-  }
-
-  export namespace CreateOne {
-    export type Body = {
-      musicId: string;
-      timestamp?: number;
-    };
-
-    export const responseSchema = createOneResultResponseSchema(
-      musicHistoryEntryEntitySchema,
-    );
-    export type Response = z.infer<typeof responseSchema>;
+    return fetcher( {
+      body,
+      url: backendUrl(PATH_ROUTES.musics.history.search.path),
+    } );
   }
 }
