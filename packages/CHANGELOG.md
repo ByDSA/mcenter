@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.31.0-alpha.0](https://github.com/ByDSA/mcenter/compare/v4.30.1...v4.31.0-alpha.0) (2026-02-02)
+
+
+### Features
+
+* **back:** add imageCover to episodes and series ([fa41b8b](https://github.com/ByDSA/mcenter/commit/fa41b8b2f094b11c208e40f321a7e4fc62b20a50))
+* series and episodes list and edition pages ([2395bcf](https://github.com/ByDSA/mcenter/commit/2395bcf38a2eceba5aa85e0de115e5fcd55bfc97))
+
+
+### Bug Fixes
+
+* fixed all routes and add routing tests ([e68b0fc](https://github.com/ByDSA/mcenter/commit/e68b0fc3efca9e1ca28894a2929bb83f4f829200))
+* **front:** await until submit ends ([9fd72fa](https://github.com/ByDSA/mcenter/commit/9fd72fa2c3d730546a84f08c390ca3888090daf0))
+* **front:** exec action only once ([33e4877](https://github.com/ByDSA/mcenter/commit/33e4877f44bc55613dcb7429bd31907aa3414dbd))
+
 ### [4.30.1](https://github.com/ByDSA/mcenter/compare/v4.30.0...v4.30.1) (2026-01-26)
 
 
