@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.31.0-alpha.1](https://github.com/ByDSA/mcenter/compare/v4.31.0-alpha.0...v4.31.0-alpha.1) (2026-02-02)
+
+
+### Bug Fixes
+
+* **server:** shared/src to build ([a1bcc4a](https://github.com/ByDSA/mcenter/commit/a1bcc4a0109fccdd04b0f393bb16e03b07c9337f))
+
 ## [4.31.0-alpha.0](https://github.com/ByDSA/mcenter/compare/v4.30.1...v4.31.0-alpha.0) (2026-02-02)
 
 
