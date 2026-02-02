@@ -2,16 +2,13 @@ import { Application } from "express";
 import request from "supertest";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
-import { PATH_ROUTES } from "$shared/routing";
 import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
 import { EpisodeCompKey } from "$shared/models/episodes";
-import { testRoute } from "#core/routing/test";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { EpisodeDependenciesRepository } from "./repository";
 import { episodeDependenciesRepositoryMockProvider } from "./repository/tests";
 import { EpisodeDependenciesCrudController } from "./controller";
-
-testRoute(PATH_ROUTES.episodes.dependencies.withParams("serie", "episode"));
 
 describe("crudController", () => {
   let routerApp: Application;
@@ -65,7 +62,7 @@ describe("crudController", () => {
   } );
 
   describe("getManyEntriesByCriteria", () => {
-    const URL = "/";
+    const URL = "/" + GET_MANY_CRITERIA_PATH;
 
     it("should call repository", async () => {
       await request(routerApp)

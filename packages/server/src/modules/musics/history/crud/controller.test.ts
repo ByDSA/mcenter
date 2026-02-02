@@ -1,6 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { HISTORY_MUSIC_SAMPLES1 } from "#musics/history/tests";
 import { expectBodyEquals } from "#tests/suites/generate-http-case";
@@ -63,14 +64,13 @@ crudTestsSuite( {
           guest: false,
         },
       },
-      url: "/search",
       data: {
         validInput: validCriteria,
       },
       customCases: [(props)=>( {
         name: "no criteria (user)",
         request: {
-          url: "/search",
+          url: "/" + GET_MANY_CRITERIA_PATH,
           method: "post",
         },
         before: async (p) => {

@@ -3,6 +3,7 @@ import request from "supertest";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { EpisodeHistoryRepository } from "./repository";
@@ -105,7 +106,7 @@ describe("crudController", () => {
     describe("getManyEntriesBySerieAndCriteria", () => {
       it("should call historyList repository", async () => {
         await request(routerApp)
-          .post("/seriesKey/entries/search")
+          .post("/seriesKey/entries/" + GET_MANY_CRITERIA_PATH)
           .send( {} );
 
         expect(repository.getManyByCriteria).toHaveBeenCalledTimes(1);
@@ -113,7 +114,7 @@ describe("crudController", () => {
 
       it("should throw 422 if provided unexpected property", async () => {
         await request(routerApp)
-          .post("/id/entries/search")
+          .post("/id/entries/" + GET_MANY_CRITERIA_PATH)
           .expect(HttpStatus.UNPROCESSABLE_ENTITY)
           .send( {
             cosarara: "porquesi",
@@ -126,7 +127,7 @@ describe("crudController", () => {
         repository.getManyByCriteria.mockResolvedValueOnce(entries);
 
         const response = await request(routerApp)
-          .post("/seriesKey/entries/search")
+          .post("/seriesKey/entries/" + GET_MANY_CRITERIA_PATH)
           .send( {} );
 
         expect(response.statusCode).toEqual(HttpStatus.OK);
@@ -139,7 +140,7 @@ describe("crudController", () => {
     } );
 
     describe("getManyEntriesByCriteria", () => {
-      const URL = "/entries/search";
+      const URL = "/entries/" + GET_MANY_CRITERIA_PATH;
 
       it("should call historyList repository", async () => {
         await request(routerApp)

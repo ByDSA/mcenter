@@ -3,11 +3,13 @@ import { EpisodeCompKey } from "../models/episodes";
 import { GoogleState, googleStateSchema } from "../models/auth";
 import { PathRoutes } from "./routes.types";
 
+const API = "/api";
 const TASKS = "/api/tasks";
 const YOUTUBE = "/api/youtube";
 const MUSICS = "/api/musics";
 const MUSICS_SLUG = `${MUSICS}/slug`;
 const MUSICS_PLAYLISTS = `${MUSICS}/playlists`;
+const MUSICS_SMART_PLAYLISTS = `${MUSICS}/smart-playlists`;
 const MUSICS_RANDOM = `${MUSICS}/random`;
 const MUSICS_ADMIN = `${MUSICS}/admin`;
 const MUSICS_FILE_INFO = MUSICS + "/file-info";
@@ -22,10 +24,15 @@ const EPISODES_DEPENDENCIES = EPISODES + "/dependencies";
 const EPISODES_ADMIN = EPISODES + "/admin";
 const STREAMS = "/api/streams";
 const AUTH = "/api/auth";
-const AUTH_EMAIL_VERIFICATION = `${AUTH}/local/email-verification`;
+const AUTH_LOCAL = `${AUTH}/local`;
+const AUTH_EMAIL_VERIFICATION = `${AUTH_LOCAL}/email-verification`;
 const AUTH_EMAIL_VERIFICATION_FRONT = "/auth/register/verify";
 const SERIES = `${EPISODES}/series`;
 const IMAGE_COVERS = "/api/image-covers";
+
+export const GET_ONE_CRITERIA_PATH = "get-one";
+
+export const GET_MANY_CRITERIA_PATH = "get-many";
 
 type MusicSlugQueryParams = {
   format?: ResponseFormat;
@@ -37,9 +44,19 @@ type YoutubeImportMusicOneOptions = {
 };
 
 export const PATH_ROUTES = {
+  config: {
+    path: "/config",
+    stop: {
+      path: "/config/stop",
+    },
+    resume: {
+      path: "/config/resume",
+    },
+  },
   users: {
+    path: `${API}/users`,
     favoritePlaylist: {
-      path: "/api/users/musics/favorite-playlist",
+      path: API + "/users/musics/favorite-playlist",
     },
   },
   tests: {
@@ -89,11 +106,12 @@ export const PATH_ROUTES = {
       path: `${AUTH}/logout`,
     },
     local: {
+      path: AUTH_LOCAL,
       login: {
-        path: `${AUTH}/local/login`,
+        path: `${AUTH_LOCAL}/login`,
       },
       signup: {
-        path: `${AUTH}/local/signup`,
+        path: `${AUTH_LOCAL}/signup`,
       },
       emailVerification: {
         verify: {
@@ -123,13 +141,16 @@ export const PATH_ROUTES = {
     withParams: (id: string) => `${TASKS}/${id}`,
     status: {
       withParams: (id: string) => `${TASKS}/${id}/status`,
+      stream: {
+        withParams: (id: string) => `${TASKS}/${id}/status/stream`,
+      },
     },
     queue: {
       status: {
         withParams: (queue: string, n?: number) => `${TASKS}/queue/${queue}/status${n ? `?n=${n}` : ""}`,
       },
       ids: {
-        withParams: (queue: string, n?: number) => `${TASKS}/queue/${queue}/ids/${n ? `?n=${n}` : ""}`,
+        withParams: (queue: string, n?: number) => `${TASKS}/queue/${queue}/ids${n ? `?n=${n}` : ""}`,
       },
     },
     statusStream: {
@@ -155,6 +176,12 @@ export const PATH_ROUTES = {
       return `${IMAGE_COVERS}/${id}`;
     },
     path: IMAGE_COVERS,
+    getOne: {
+      path: `${IMAGE_COVERS}/${GET_ONE_CRITERIA_PATH}`,
+    },
+    getMany: {
+      path: `${IMAGE_COVERS}/${GET_MANY_CRITERIA_PATH}`,
+    },
     raw: {
       withParams: (filename: string) => {
         const [id] = filename.split(/\.|_/);
@@ -163,15 +190,24 @@ export const PATH_ROUTES = {
         return `/raw/image-covers/${subfolder}/${filename}`;
       },
     },
+    upload: {
+      path: `${IMAGE_COVERS}/image`,
+    },
     admin: {
       path: `${IMAGE_COVERS}/admin`,
+      rebuildAll: {
+        path: `${IMAGE_COVERS}/admin/rebuild-all`,
+      },
     },
   },
   musics: {
     path: MUSICS,
     withParams: (id: string)=>`${MUSICS}/${id}`,
-    search: {
-      path: `${MUSICS}/search`,
+    getMany: {
+      path: `${MUSICS}/${GET_MANY_CRITERIA_PATH}`,
+    },
+    getOne: {
+      path: `${MUSICS}/${GET_ONE_CRITERIA_PATH}`,
     },
     userInfo: {
       withParams: (musicId: string)=>`${MUSICS}/${musicId}/user-info`,
@@ -186,8 +222,8 @@ export const PATH_ROUTES = {
     history: {
       path: MUSICS_HISTORY,
       withParams: (id: string) => `${MUSICS_HISTORY}/${id}`,
-      search: {
-        path: MUSICS_HISTORY + "/search",
+      getMany: {
+        path: `${MUSICS_HISTORY}/${GET_MANY_CRITERIA_PATH}`,
       },
     },
     slug: {
@@ -206,16 +242,19 @@ export const PATH_ROUTES = {
       },
     },
     smartPlaylists: {
-      path: `${MUSICS}/smart-playlists`,
-      withParams: (id: string) => `${MUSICS}/smart-playlists/${id}`,
-      searchOne: {
-        path: `${MUSICS}/smart-playlists/search-one`,
+      path: MUSICS_SMART_PLAYLISTS,
+      withParams: (id: string) => `${MUSICS_SMART_PLAYLISTS}/${id}`,
+      getOne: {
+        path: `${MUSICS_SMART_PLAYLISTS}/${GET_ONE_CRITERIA_PATH}`,
+      },
+      getMany: {
+        path: `${MUSICS_SMART_PLAYLISTS}/${GET_MANY_CRITERIA_PATH}`,
       },
       slug: {
         withParams: ( { userSlug, smartPlaylistSlug }: {
             userSlug: string;
             smartPlaylistSlug?: string;
-          } ) => `${MUSICS_PLAYLISTS}/user/${userSlug}${
+          } ) => `${MUSICS_SMART_PLAYLISTS}/user/${userSlug}${
           smartPlaylistSlug ? `/${smartPlaylistSlug}` : ""
         }`,
       },
@@ -279,14 +318,26 @@ token?: string;} ) => {
     },
     playlists: {
       path: MUSICS_PLAYLISTS,
-      search: {
-        path: MUSICS_PLAYLISTS + "/criteria",
+      getOne: {
+        path: `${MUSICS_PLAYLISTS}/${GET_ONE_CRITERIA_PATH}`,
+      },
+      getMany: {
+        path: `${MUSICS_PLAYLISTS}/${GET_MANY_CRITERIA_PATH}`,
+      },
+      getManyByUser: {
+        withParams: (userId: string) => `${MUSICS_PLAYLISTS}/user/${userId}`,
       },
       withParams: (id: string) => `${MUSICS_PLAYLISTS}/${id}`,
       track: {
         withParams: (
           id: string,
         ) => `${MUSICS_PLAYLISTS}/${id}/track`,
+        addTrack: {
+          withParams: (playlistId: string) => `${MUSICS_PLAYLISTS}/${playlistId}/track`,
+        },
+        removeManyTracks: {
+          withParams: (playlistId: string) => `${MUSICS_PLAYLISTS}/${playlistId}/track`,
+        },
         index: {
           withParams: (id: string, trackNumber: number) => `${MUSICS_PLAYLISTS}/${id}/track/${trackNumber}`,
         },
@@ -331,6 +382,12 @@ token?: string;} ) => {
     },
     usersLists: {
       path: `${MUSICS}/users-lists`,
+      move: {
+        path: `${MUSICS}/users-lists/move`,
+      },
+      myLists: {
+        path: `${MUSICS}/users-lists/my-lists`,
+      },
     },
     admin: {
       path: `${MUSICS}/admin`,
@@ -354,8 +411,8 @@ token?: string;} ) => {
   episodes: {
     path: EPISODES,
     withParams: (id: string) => `${EPISODES}/${id}`,
-    search: {
-      path: `${EPISODES}/search`,
+    getMany: {
+      path: `${EPISODES}/${GET_MANY_CRITERIA_PATH}`,
     },
     userInfo: {
       withParams: (episodeId: string)=>`${EPISODES}/${episodeId}/user-info`,
@@ -374,6 +431,11 @@ token?: string;} ) => {
 
         return ret;
       },
+      getAll: {
+        withParams: (seriesKey: string) => {
+          return `${EPISODES_SLUG}/${seriesKey}`;
+        },
+      },
     },
     dependencies: {
       path: EPISODES_DEPENDENCIES,
@@ -390,8 +452,8 @@ token?: string;} ) => {
       path: EPISODES_HISTORY,
       entries: {
         withParams: (entryId: string) => `${EPISODES_HISTORY}/entries/${entryId}`,
-        search: {
-          path: EPISODES_HISTORY + "/entries/search",
+        getMany: {
+          path: `${EPISODES_HISTORY}/entries/${GET_MANY_CRITERIA_PATH}`,
         },
       },
     },
@@ -409,7 +471,7 @@ token?: string;} ) => {
     series: {
       path: SERIES,
       getMany: {
-        path: `${SERIES}/get-many`,
+        path: `${SERIES}/${GET_MANY_CRITERIA_PATH}`,
       },
       withParams: (id: string) => `${SERIES}/${id}`,
       seasons: {
@@ -429,15 +491,21 @@ episodeKey?: string;} ) => `/series/lists/${serieId}${episodeKey ? `/${episodeKe
   },
   streams: {
     path: STREAMS,
-    search: {
-      path: STREAMS + "/criteria",
+    getMany: {
+      path: `${STREAMS}/${GET_MANY_CRITERIA_PATH}`,
     },
     fixer: {
       path: `${STREAMS}/fixer`,
     },
     picker: {
-      path: "/api/streams/picker",
-      withParams: (streamKey: string) => `${STREAMS}/picker/${streamKey}`,
+      showPicker: {
+        path: "/api/streams/picker",
+        withParams: (streamKey: string) => `${STREAMS}/picker/${streamKey}`,
+      },
+      getEpisode: {
+        path: "/api/streams/get-episode",
+        withParams: (streamKey: string) => `${STREAMS}/get-episode/${streamKey}`,
+      },
     },
     pickRandom: {
       path: `${STREAMS}/random`,
@@ -448,7 +516,7 @@ episodeKey?: string;} ) => `/series/lists/${serieId}${episodeKey ? `/${episodeKe
     path: PLAYER,
     play: {
       episode: {
-        withParams: (remotePlayerId: string, seriesKey: string, episodeKey: string) => `${PLAYER_PLAY}/${remotePlayerId}/episode/${seriesKey}/${episodeKey}`,
+        withParams: ( { remotePlayerId, episodeKey, seriesKey }: PlayerEpisodeParams) => `${PLAYER_PLAY}/${remotePlayerId}/episode${seriesKey ? "/" + seriesKey : ""}${episodeKey ? "/" + episodeKey : ""}`,
       },
       music: {
         withParams: (remotePlayerId: string, slug: string) => `${PLAYER_PLAY}/${remotePlayerId}/music/${slug}`,
@@ -457,5 +525,21 @@ episodeKey?: string;} ) => `/series/lists/${serieId}${episodeKey ? `/${episodeKe
         withParams: (remotePlayerId: string, streamId: string) => `${PLAYER_PLAY}/${remotePlayerId}/stream/${streamId}`,
       },
     },
+    remotePlayers: {
+      path: `${PLAYER}/remote-players`,
+      stream: {
+        path: `${PLAYER}/remote-players/stream`,
+      },
+    },
   },
 } satisfies PathRoutes;
+
+type PlayerEpisodeParams = {
+  remotePlayerId: string;
+} & ( {
+  seriesKey: string;
+  episodeKey?: string;
+} | {
+  seriesKey?: never;
+  episodeKey?: never;
+} );

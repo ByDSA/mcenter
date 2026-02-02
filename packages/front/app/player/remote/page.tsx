@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RemotePlayerDtos } from "$shared/models/player/remote-player/dto/domain";
 import { useRouter } from "next/navigation";
+import { PATH_ROUTES } from "$shared/routing";
 import { getPreviousPath } from "app/NavigationWatcher";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
@@ -47,7 +48,7 @@ const useRemotePlayers = (props?: Props) => {
 
   useEffect(()=> {
     return sseRemotePlayers( {
-      url: backendUrl("/api/player/remote-players/stream"),
+      url: backendUrl(PATH_ROUTES.player.remotePlayers.stream.path),
       onInitial: async (data)=> {
         setIsLoading(false);
         const obj: typeof remotePlayers = {};

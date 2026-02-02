@@ -33,7 +33,9 @@ export class MusicUsersListsController {
     return await this.repo.getAllResourcesSorted(user.id, body);
   }
 
-  @UserPatchOne("/", musicUserListEntitySchema)
+  @UserPatchOne(musicUserListEntitySchema, {
+    url: "/",
+  } )
   async patchList(@User() user: UserPayload, @Body() body: PatchBody) {
     return await this.repo.patchOneByUserIdAndGet(user.id, {
       entity: {
@@ -42,7 +44,9 @@ export class MusicUsersListsController {
     } );
   }
 
-  @UserPatchOne("/move", musicUserListEntitySchema)
+  @UserPatchOne(musicUserListEntitySchema, {
+    url: "/move",
+  } )
   async moveOneList(@User() user: UserPayload, @Body() body: MoveListBody) {
     return await this.repo.moveOneList( {
       ownerUserId: user.id,

@@ -33,7 +33,7 @@ import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
 // y por los que se importan en AppModule
-const imports = [
+export const directImports = [
   StaticFilesModule,
   ConfigModule,
   ImageCoversCrudModule,
@@ -65,15 +65,15 @@ const imports = [
   Si hay colisiones en el acceso, cargar el módulo específico primero fuera del Register */
 export const authRoutes: Routes = [
   {
-    path: "api/users",
+    path: PATH_ROUTES.users.path,
     module: UsersModule,
   },
   {
-    path: "api/auth",
+    path: PATH_ROUTES.auth.path,
     module: AuthModule,
   },
   {
-    path: "api/auth",
+    path: PATH_ROUTES.auth.path,
     module: AuthGoogleModule,
   },
 ];
@@ -153,13 +153,14 @@ const musicsRoutes: Routes = [
     module: MusicsAdminModule,
   },
 ];
-const routes: Routes = [
+
+export const routes: Routes = [
   {
     path: "/",
     module: StaticFilesModule,
   },
   {
-    path: "/config",
+    path: PATH_ROUTES.config.path,
     module: ConfigModule,
   },
   {
@@ -195,4 +196,4 @@ const routes: Routes = [
   },
 ];
 
-export const routeModules = [...imports, RouterModule.register(routes)];
+export const routeModules = [...directImports, RouterModule.register(routes)];

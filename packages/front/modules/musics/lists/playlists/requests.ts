@@ -24,7 +24,7 @@ export class MusicPlaylistsApi {
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.playlists.path + "/search-one"),
+      url: backendUrl(PATH_ROUTES.musics.playlists.getOne.path),
       body: criteria,
     } );
   }
@@ -188,7 +188,7 @@ musicId: string;} ) {
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.playlists.search.path),
+      url: backendUrl(PATH_ROUTES.musics.playlists.getMany.path),
       body,
     } );
   }

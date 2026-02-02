@@ -3,7 +3,6 @@ import z from "zod";
 import { UserPayload } from "$shared/models/auth";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { User } from "#core/auth/users/User.decorator";
-import { EpisodeRendererService } from "#episodes/renderer/render.service";
 import { ResponseFormatInterceptor, M3u8FormatUseNext } from "#modules/resources/response-formatter";
 import { StreamGetRandomEpisodeService } from "./get-episode.service";
 
@@ -11,9 +10,7 @@ import { StreamGetRandomEpisodeService } from "./get-episode.service";
 export class StreamGetEpisodeController {
   constructor(
      private readonly service: StreamGetRandomEpisodeService,
-     private readonly renderer: EpisodeRendererService,
-  ) {
-  }
+  ) { }
 
   @UseInterceptors(ResponseFormatInterceptor)
   @M3u8FormatUseNext()

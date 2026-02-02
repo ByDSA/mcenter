@@ -24,3 +24,11 @@ export function UserPost(url: string, dataSchema?: z.ZodSchema) {
 
   return applyDecorators(...decorators);
 }
+
+export function UserCreateOne(dataSchema: z.ZodSchema) {
+  const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
+    UserPost("/", dataSchema),
+  ];
+
+  return applyDecorators(...decorators);
+}

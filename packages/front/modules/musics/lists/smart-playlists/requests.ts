@@ -20,7 +20,7 @@ export class MusicSmartPlaylistsApi {
       responseSchema: MusicSmartPlaylistCrudDtos.GetOne.responseSchema,
     } );
     const ret = await fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.smartPlaylists.path + "/search-one"),
+      url: backendUrl(PATH_ROUTES.musics.smartPlaylists.getOne.path),
       body: criteria,
     } );
 
@@ -88,7 +88,7 @@ export class MusicSmartPlaylistsApi {
       responseSchema: MusicSmartPlaylistCrudDtos.GetMany.responseSchema,
     } );
     const ret = await fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.smartPlaylists.path + "/search"),
+      url: backendUrl(PATH_ROUTES.musics.smartPlaylists.getMany.path),
       body: {
         ...body,
         filter: {

@@ -1,5 +1,7 @@
 import { useCallback, useState } from "react";
 import { EpisodeCompKey, EpisodeEntity } from "$shared/models/episodes";
+import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
+import { EpisodeHistoryApi } from "../requests";
 import { DateFormat } from "#modules/utils/dates";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { LatestViewsView } from "#modules/history/Latest/LatestViewsDisplay";
@@ -7,8 +9,6 @@ import { Separator } from "#modules/resources/Separator/Separator";
 import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { FetchApi } from "#modules/fetching/fetch-api";
-import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
-import { EpisodeHistoryApi } from "../requests";
 
 type Props = {
   episode?: EpisodeEntity;
@@ -53,7 +53,7 @@ export function EpisodeLatestViews(props: Props) {
       </DaInputGroupItem>
       <DaInputGroupItem inline>
         <DaLabel>Episodio</DaLabel>
-        <span><span>{props.episode.serie?.name
+        <span><span>{props.episode.serie?.name ?? data?.[0]?.resource.serie?.name
         ?? props.episode.compKey.seriesKey}</span><Separator /><span>{props.episode.compKey.episodeKey}</span></span>
       </DaInputGroupItem>
     </DaInputGroup>

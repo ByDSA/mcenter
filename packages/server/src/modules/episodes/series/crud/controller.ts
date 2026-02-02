@@ -2,7 +2,7 @@ import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { UserPayload } from "$shared/models/auth";
 import { SeriesCrudDtos } from "$shared/models/episodes/series/dto/transport";
-import { UserPost, UserPatchOne, AdminDeleteOne, GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest";
+import { UserCreateOne, UserPatchOne, AdminDeleteOne, GetAll, GetManyCriteria, GetOneById } from "#utils/nestjs/rest";
 import { User } from "#core/auth/users/User.decorator";
 import { episodesBySeasonSchema } from "#episodes/models";
 import { IdParamDto } from "#utils/validation/dtos";
@@ -20,12 +20,12 @@ export class SeriesCrudController {
     private readonly repo: SeriesRepository,
   ) {}
 
-  @GetMany("/", seriesEntitySchema)
+  @GetAll(seriesEntitySchema)
   async getAll() {
     return await this.repo.getAll();
   }
 
-  @GetManyCriteria("/get-many", seriesEntitySchema)
+  @GetManyCriteria(seriesEntitySchema)
   async getMany(
     @Body() body: GetManyBody,
     @User() user: UserPayload | null,
@@ -36,12 +36,14 @@ export class SeriesCrudController {
     } );
   }
 
-  @GetOne("/:id", seriesEntitySchema)
+  @GetOneById(seriesEntitySchema)
   async getOne(@Param() params: IdParamDto) {
     return await this.repo.getOneById(params.id);
   }
 
-  @GetOne("/:id/seasons", episodesBySeasonSchema)
+  @GetOneById(episodesBySeasonSchema, {
+    url: "/:id/seasons",
+  } )
   async getSeasons(
     @Param() params: IdParamDto,
     @User() user: UserPayload | null,
@@ -58,7 +60,7 @@ export class SeriesCrudController {
     return ret;
   }
 
-  @UserPost("/", seriesEntitySchema)
+  @UserCreateOne(seriesEntitySchema)
   async createOne(
     @Body() body: CreateBody,
     @User() _user: UserPayload,
@@ -69,7 +71,7 @@ export class SeriesCrudController {
     } );
   }
 
-  @UserPatchOne("/:id", seriesEntitySchema)
+  @UserPatchOne(seriesEntitySchema)
   async patchOne(
     @Param() params: IdParamDto,
     @Body() body: PatchBody,
@@ -77,8 +79,10 @@ export class SeriesCrudController {
     return await this.repo.patchOneByIdAndGet(params.id, body);
   }
 
-  @AdminDeleteOne("/:id", seriesEntitySchema)
-  async deleteOne(@Param() params: IdParamDto) {
+  @AdminDeleteOne(seriesEntitySchema)
+  async deleteOne(
+    @Param() params: IdParamDto,
+  ) {
     return await this.repo.deleteOneByIdAndGet(params.id);
   }
 }

@@ -5,7 +5,8 @@ import { createZodDto } from "nestjs-zod";
 import { EpisodeHistoryEntryCrudDtos } from "$shared/models/episodes/history/dto/transport";
 import z from "zod";
 import { UserPayload } from "$shared/models/auth";
-import { AdminDeleteOne, GetMany, GetManyCriteria } from "#utils/nestjs/rest";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
+import { AdminDeleteOne, GetAll, GetManyCriteria } from "#utils/nestjs/rest";
 import { showError } from "#core/logging/show-error";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
@@ -40,12 +41,14 @@ implements
   ) {
   }
 
-  @GetMany("/", episodeHistoryEntryEntitySchema)
+  @GetAll(episodeHistoryEntryEntitySchema)
   async getAll() {
     return await this.entriesRepo.getAll();
   }
 
-  @GetMany("/:seriesKey", episodeHistoryEntryEntitySchema)
+  @GetAll(episodeHistoryEntryEntitySchema, {
+    url: "/:seriesKey",
+  } )
   async getManyBySeriesKey(
     @Param() params: SeriesKeyParamsDto,
     @User() user: UserPayload,
@@ -53,7 +56,9 @@ implements
     return await this.entriesRepo.getManyBySeriesKey(user.id, params.seriesKey);
   }
 
-  @GetMany("/:seriesKey/entries", episodeHistoryEntryEntitySchema)
+  @GetAll(episodeHistoryEntryEntitySchema, {
+    url: "/:seriesKey/entries",
+  } )
   async getAllEntriesByseriesKey(
     @Param() params: SeriesKeyParamsDto,
     @User() user: UserPayload,
@@ -67,7 +72,9 @@ implements
     } );
   }
 
-  @GetManyCriteria("/:seriesKey/entries/search", episodeHistoryEntryEntitySchema)
+  @GetManyCriteria(episodeHistoryEntryEntitySchema, {
+    url: "/:seriesKey/entries/" + GET_MANY_CRITERIA_PATH,
+  } )
   async getManyEntriesBySerieAndCriteria(
     @Body() body: GetManyBodyDto,
     @Param() params: SeriesKeyParamsDto,
@@ -83,7 +90,9 @@ implements
     } );
   }
 
-  @GetManyCriteria("/entries/search", episodeHistoryEntryEntitySchema)
+  @GetManyCriteria(episodeHistoryEntryEntitySchema, {
+    url: "/entries/" + GET_MANY_CRITERIA_PATH,
+  } )
   async getManyEntriesByCriteria(
     @Body() body: GetManyBodyDto,
     @User() user: UserPayload,
@@ -97,7 +106,9 @@ implements
     } );
   }
 
-  @AdminDeleteOne("/entries/:id", episodeHistoryEntryEntitySchema)
+  @AdminDeleteOne(episodeHistoryEntryEntitySchema, {
+    url: "/entries/:id",
+  } )
   async deleteOneEntryByIdAndGet(
     @Param() params: IdParamsDto,
   ): Promise<EpisodeHistoryEntryEntity> {

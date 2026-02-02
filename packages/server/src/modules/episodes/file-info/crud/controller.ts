@@ -18,7 +18,7 @@ export class EpisodeFileInfosCrudController {
   ) {
   }
 
-  @AdminPatchOne("/:id", schema)
+  @AdminPatchOne(schema)
   async patchOneByIdAndGet(
     @Param() params: IdParamDto,
     @Body() body: PatchOneByIdBodyDto,

@@ -39,7 +39,7 @@ export class MusicCrudController {
     private readonly flow: MusicFlowService,
   ) {}
 
-  @GetManyCriteria("/search", musicEntitySchema)
+  @GetManyCriteria(musicEntitySchema)
   async getManyByCriteria(
     @Body() criteria: GetManyBodyDto,
     @User() user: UserPayload | null,
@@ -50,7 +50,7 @@ export class MusicCrudController {
     } );
   }
 
-  @UserPatchOne(":id", musicEntitySchema)
+  @UserPatchOne(musicEntitySchema)
   async patchOneByIdAndGet(
     @Param() params: IdParamDto,
     @Body() body: PatchBodyDto,
@@ -62,7 +62,9 @@ export class MusicCrudController {
     return await this.musicRepo.patchOneByIdAndGet(id, body);
   }
 
-  @UserPatchOne(":id/user-info", musicUserInfoEntitySchema)
+  @UserPatchOne(musicUserInfoEntitySchema, {
+    url: ":id/user-info",
+  } )
   async patchOneUserInfoByKeyAndGet(
     @Param() params: IdParamDto,
     @Body() body: PatchUserInfoBodyDto,
@@ -77,7 +79,7 @@ export class MusicCrudController {
     );
   }
 
-  @AdminDeleteOne(":id", musicEntitySchema)
+  @AdminDeleteOne(musicEntitySchema)
   async deleteOneByIdAndGet(
     @Param() params: IdParamDto,
   ) {

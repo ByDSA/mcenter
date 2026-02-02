@@ -2,7 +2,7 @@ import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { UserPayload } from "$shared/models/auth";
 import { MusicHistoryEntryCrudDtos } from "$shared/models/musics/history/dto/transport";
-import { AdminDeleteOne, UserPost } from "#utils/nestjs/rest";
+import { AdminDeleteOne, UserPost, UserCreateOne } from "#utils/nestjs/rest";
 import { GetManyCriteria } from "#utils/nestjs/rest/crud/get";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
@@ -28,7 +28,7 @@ export class MusicHistoryCrudController {
     private readonly historyRepo: MusicHistoryRepository,
   ) {}
 
-  @AdminDeleteOne("/:id", schema)
+  @AdminDeleteOne(schema)
   async deleteOneByIdAndGet(
     @Param() params: IdParamDto,
   ) {
@@ -39,7 +39,7 @@ export class MusicHistoryCrudController {
     return deleted;
   }
 
-  @GetManyCriteria("/search", schema)
+  @GetManyCriteria(schema)
   async getManyEntriesBySearch(
     @Body() body: GetManyBodyDto,
     @User() user: UserPayload,
@@ -53,7 +53,7 @@ export class MusicHistoryCrudController {
     } );
   }
 
-  @UserPost("/", schema)
+  @UserCreateOne(schema)
   async createOneEntry(
     @Body() body: CreateOneEntryBodyDto,
     @User() user: UserPayload,
@@ -67,7 +67,8 @@ export class MusicHistoryCrudController {
     } );
   }
 
-  @UserPost("/batch", schema)
+  // TODO: no se usa ??
+  @UserPost("/create-many", schema)
   async createManyEntries(
     @Body() body: CreateManyEntriesBodyDto,
     @User() user: UserPayload,

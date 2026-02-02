@@ -33,7 +33,7 @@ export class MusicHistoryApi {
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.history.search.path),
+      url: backendUrl(PATH_ROUTES.musics.history.getMany.path),
       body,
     } );
   }
@@ -86,7 +86,7 @@ export class MusicHistoryApi {
 
     return fetcher( {
       body,
-      url: backendUrl(PATH_ROUTES.musics.history.search.path),
+      url: backendUrl(PATH_ROUTES.musics.history.getMany.path),
     } );
   }
 }

@@ -7,7 +7,7 @@ import { UserPayload } from "$shared/models/auth";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
-import { GetMany } from "#utils/nestjs/rest/crud/get";
+import { GetAll } from "#utils/nestjs/rest/crud/get";
 import { AdminPatchOne } from "#utils/nestjs/rest";
 import { assertFoundClient } from "#utils/validation/found";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
@@ -34,7 +34,9 @@ export class EpisodesSlugController {
   ) {
   }
 
-  @AdminPatchOne("/:seriesKey/:episodeKey", schema)
+  @AdminPatchOne(schema, {
+    url: "/:seriesKey/:episodeKey",
+  } )
   async patchOneByIdAndGet(
     @Param() params: PatchOneByIdParamsDto,
     @Body() body: PatchOneByIdBodyDto,
@@ -48,7 +50,9 @@ export class EpisodesSlugController {
     return got;
   }
 
-  @GetMany("/:seriesKey", schema)
+  @GetAll(schema, {
+    url: "/:seriesKey",
+  } )
   async getAll(
     @Param() params: GetAllParamsDto,
   ) {

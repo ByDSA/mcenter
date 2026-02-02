@@ -8,6 +8,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { createManyResultResponseSchema, createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { createPaginatedResultResponseSchema } from "$shared/utils/http/responses";
+import { GET_MANY_CRITERIA_PATH, GET_ONE_CRITERIA_PATH } from "$shared/routing";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { assertFoundClient } from "#utils/validation/found";
 import { ResponseFormatterInterceptor } from "../responses/response-formatter.interceptor";
@@ -26,11 +27,11 @@ export class DataNotFoundOnNullInterceptor implements NestInterceptor {
 }
 
 type GetOneOptions = {
-  _: 0;
+  url?: string;
 };
-export function GetOne(url: string, schema: z.ZodSchema, _options?: GetOneOptions) {
+export function GetOneById(schema: z.ZodSchema, options?: GetOneOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
-    Get(url),
+    Get(options?.url ?? "/:id"),
     // los interceptors se ejecutan al revés:
     UseInterceptors(ResponseFormatterInterceptor, DataNotFoundOnNullInterceptor),
     ValidateResponseWithZodSchema(createOneResultResponseSchema(schema)),
@@ -41,12 +42,12 @@ export function GetOne(url: string, schema: z.ZodSchema, _options?: GetOneOption
 }
 
 type GetManyOptions = {
-  _: 0;
+  url?: string;
 };
 
-export function GetMany(url: string, schema: z.ZodSchema, _options?: GetManyOptions) {
+export function GetAll(schema: z.ZodSchema, options?: GetManyOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
-    Get(url),
+    Get(options?.url ?? "/"),
     UseInterceptors(ResponseFormatterInterceptor),
     ValidateResponseWithZodSchema(createManyResultResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
@@ -54,17 +55,26 @@ export function GetMany(url: string, schema: z.ZodSchema, _options?: GetManyOpti
 
   return applyDecorators(...decorators);
 }
-type GetManyCriteriaOptions = {
-  _: 0;
-};
 
+export function GetMany(url: string, schema: z.ZodSchema, options?: Omit<GetManyOptions, "url">) {
+  const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
+    GetAll(schema, {
+      url,
+      ...options,
+    } ),
+  ];
+
+  return applyDecorators(...decorators);
+}
+type GetManyCriteriaOptions = {
+  url?: string;
+};
 export function GetManyCriteria(
-  url: string,
   schema: z.ZodSchema,
-  _options?: GetManyCriteriaOptions,
+  options?: GetManyCriteriaOptions,
 ) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
-    Post(url),
+    Post(options?.url ?? GET_MANY_CRITERIA_PATH),
     UseInterceptors(ResponseFormatterInterceptor),
     ValidateResponseWithZodSchema(createPaginatedResultResponseSchema(schema)),
     HttpCode(HttpStatus.OK),
@@ -81,7 +91,7 @@ export function GetOneCriteria(
   options?: GetOneCriteriaOptions,
 ) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
-    Post(options?.url ?? "search-one"),
+    Post(options?.url ?? GET_ONE_CRITERIA_PATH),
     UseInterceptors(ResponseFormatterInterceptor),
     ValidateResponseWithZodSchema(createOneResultResponseSchema(schema)),
     HttpCode(HttpStatus.OK),

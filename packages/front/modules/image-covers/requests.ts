@@ -51,7 +51,7 @@ export class ImageCoversApi {
       responseSchema: ImageCoverCrudDtos.GetOne.responseSchema,
     } );
     const ret = await fetcher( {
-      url: backendUrl(PATH_ROUTES.imageCovers.path + "/search-one"),
+      url: backendUrl(PATH_ROUTES.imageCovers.getOne.path),
       body: criteria,
     } );
 
@@ -69,7 +69,7 @@ export class ImageCoversApi {
       requestSchema: ImageCoverCrudDtos.GetMany.criteriaSchema,
       responseSchema: createPaginatedResultResponseSchema(imageCoverEntitySchema),
     } );
-    const URL = backendUrl(PATH_ROUTES.imageCovers.path + "/search-many");
+    const URL = backendUrl(PATH_ROUTES.imageCovers.getMany.path);
     const ret = await fetcher( {
       url: URL,
       body: criteria,
@@ -101,7 +101,7 @@ export class ImageCoversApi {
     file: File,
     options: UpdateImageProps,
   ): Promise<ImageCoverCrudDtos.UploadFile.Response> {
-    const URL = backendUrl(PATH_ROUTES.imageCovers.path + "/image");
+    const URL = backendUrl(PATH_ROUTES.imageCovers.upload.path);
     const metadata: ImageCoverCrudDtos.UploadFile.RequestBody["metadata"] = {};
 
     if (options.id)

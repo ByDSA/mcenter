@@ -1,9 +1,9 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { ImageCoverEntity, imageCoverEntitySchema } from "$shared/models/image-covers";
 import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { UserPayload } from "$shared/models/auth";
-import { AdminDeleteOne, AdminPatchOne, GetManyCriteria, GetOneCriteria } from "#utils/nestjs/rest";
+import { AdminDeleteOne, AdminPatchOne, GetManyCriteria, GetOneById, GetOneCriteria } from "#utils/nestjs/rest";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
 import { IdParamDto } from "#utils/validation/dtos";
@@ -36,7 +36,7 @@ export class ImageCoverCrudController {
     return await this.uploadService.upload(file, uploadDto, uploaderUserId);
   }
 
-  @GetManyCriteria("/search-many", imageCoverEntitySchema)
+  @GetManyCriteria(imageCoverEntitySchema)
   async getManyByCriteria(
     @Body() criteria: GetManyBodyDto,
   ): Promise<ImageCoverEntity[]> {
@@ -45,7 +45,7 @@ export class ImageCoverCrudController {
     } );
   }
 
-  @AdminPatchOne("/:id", imageCoverEntitySchema)
+  @AdminPatchOne(imageCoverEntitySchema)
   async patchOneByIdAndGet(
     @Param() params: IdParamDto,
     @Body() body: PatchBodyDto,
@@ -55,7 +55,7 @@ export class ImageCoverCrudController {
     return await this.repo.patchOneByIdAndGet(id, body);
   }
 
-  @AdminDeleteOne("/:id", imageCoverEntitySchema)
+  @AdminDeleteOne(imageCoverEntitySchema)
   async deleteOneByIdAndGet(
     @Param() params: IdParamDto,
   ) {
@@ -64,7 +64,7 @@ export class ImageCoverCrudController {
     return await this.repo.deleteOneByIdAndGet(id);
   }
 
-  @Get("/:id")
+  @GetOneById(imageCoverEntitySchema)
   async getOneById(
     @Param() params: IdParamDto,
   ) {

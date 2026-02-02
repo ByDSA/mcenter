@@ -19,7 +19,9 @@ export class UsersMusicController {
     private readonly usersMusicPlaylistsRepo: UsersMusicPlaylistsRepository,
   ) { }
 
-  @UserPatchOne("/musics/favorite-playlist", userEntitySchema)
+  @UserPatchOne(userEntitySchema, {
+    url: "/musics/favorite-playlist",
+  } )
   async musicPlaylistFavorite(
     @User() user: UserPayload,
     @Body() body: MusicPlaylistFavoriteDto,

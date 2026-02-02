@@ -1,5 +1,6 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { HttpStatus } from "@nestjs/common";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { autoProps, TestGroupConfigCtx, PatchTestsProps, TestDynamicConfig } from "./patch-one";
 import { defaultResponse, expectUnprocessableEntity } from "./common";
 import { generateHttpCase } from "./generate-http-case";
@@ -20,7 +21,7 @@ function defaultProps<R>(
 
 export function getManyCriteriaTests<R>(props: PatchTestsProps<R>) {
   const { getExpressApp, getTestingSetup, buildDynamicConfig } = props;
-  const validUrl = props.url ?? "/search";
+  const validUrl = props.url ?? "/" + GET_MANY_CRITERIA_PATH;
 
   describe("get many by search", () => {
     const { allowed, notAllowed } = classifyAuth(props.auth);

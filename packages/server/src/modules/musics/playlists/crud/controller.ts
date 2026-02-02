@@ -9,7 +9,7 @@ import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserPayload } from "$shared/models/auth";
 import { slugSchema } from "$shared/models/utils/schemas/slug";
-import { GetManyCriteria, GetOne, GetOneCriteria, UserDeleteOne, UserPatchOne, UserPost } from "#utils/nestjs/rest";
+import { GetManyCriteria, GetOneCriteria, UserDeleteOne, UserPatchOne, UserPost, UserCreateOne, GetOneById } from "#utils/nestjs/rest";
 import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
 import { assertFoundClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
@@ -105,8 +105,8 @@ export class MusicPlaylistsController {
   ) {
   }
 
-  @Get("/:id")
-  async getOne(
+  @GetOneById(musicPlaylistEntitySchema)
+  async getOneById(
     @Param() params: IdParamDto,
     @Req() req: Request,
     @User() user: UserPayload | null,
@@ -138,7 +138,7 @@ export class MusicPlaylistsController {
       return this.musicRenderer.renderM3u8Many(playlist.list.map(e=>e.music!), req);
     }
 
-    return createSuccessResultResponse(playlist);
+    return playlist;
   }
 
   @GetOneCriteria(musicPlaylistEntitySchema)
@@ -163,7 +163,7 @@ export class MusicPlaylistsController {
     return ret;
   }
 
-  @UserPatchOne("/:id", musicPlaylistEntitySchema)
+  @UserPatchOne(musicPlaylistEntitySchema)
   async patchPlaylist(
     @Param() params: IdParamDto,
     @Body() body: PatchBody,
@@ -175,7 +175,7 @@ export class MusicPlaylistsController {
     return ret;
   }
 
-  @UserPost("/", musicPlaylistEntitySchema)
+  @UserCreateOne(musicPlaylistEntitySchema)
   async createOnePlaylist(
     @Body() body: CreateOnePlaylistsBody,
     @User() user: UserPayload,
@@ -185,7 +185,7 @@ export class MusicPlaylistsController {
     return ret;
   }
 
-  @UserDeleteOne("/:id", musicPlaylistEntitySchema)
+  @UserDeleteOne(musicPlaylistEntitySchema)
   async deleteOnePlaylist(
     @Param() params: IdParamDto,
     @User() user: UserPayload,
@@ -214,7 +214,9 @@ export class MusicPlaylistsController {
     } );
   }
 
-  @UserDeleteOne("/:id/track", musicPlaylistEntitySchema)
+  @UserDeleteOne(musicPlaylistEntitySchema, {
+    url: "/:id/track",
+  } )
   async removeManyTracks(
     @Param() params: IdParamDto,
     @User() user: UserPayload,
@@ -246,7 +248,9 @@ export class MusicPlaylistsController {
   }
 
   @Authenticated()
-  @GetOne("/:id/track/move/:itemId/:newIndex", musicPlaylistEntitySchema)
+  @GetOneById(musicPlaylistEntitySchema, {
+    url: "/:id/track/move/:itemId/:newIndex",
+  } )
   async moveOneTrack(
     @Param() params: MoveOneTrackParams,
     @User() user: UserPayload,
@@ -265,7 +269,9 @@ export class MusicPlaylistsController {
     return playlist;
   }
 
-  @GetOne("/:id/track/:n", musicEntitySchema)
+  @GetOneById(musicEntitySchema, {
+    url: "/:id/track/:n",
+  } )
   async getOneTrack(
     @Param() params: GetOneTrackParams,
   ) {
@@ -276,7 +282,9 @@ export class MusicPlaylistsController {
     return await this.playlistsRepo.findOneTrackByPosition(playlist, params.n);
   }
 
-  @GetManyCriteria("/user/:userId", musicPlaylistEntitySchema)
+  @GetManyCriteria(musicPlaylistEntitySchema, {
+    url: "/user/:userId",
+  } )
   async getUserPlaylists(
     @Param() params: GetManyUserPlaylistsParams,
     @Body() body: GetManyUserPlaylistsBody,
@@ -297,7 +305,7 @@ export class MusicPlaylistsController {
     return ret;
   }
 
-  @GetManyCriteria("/criteria", musicPlaylistEntitySchema)
+  @GetManyCriteria(musicPlaylistEntitySchema)
   async getManyByCriteria(
     @Body() body: GetManyUserPlaylistsBody,
   ) {

@@ -22,7 +22,7 @@ export class EpisodesApi {
 
     return fetcher( {
       url: backendUrl(
-        PATH_ROUTES.episodes.search.path,
+        PATH_ROUTES.episodes.getMany.path,
       ),
       body,
     } );
@@ -66,7 +66,6 @@ export class EpisodesApi {
     } );
     const res = await fetcher( {
       url: backendUrl(PATH_ROUTES.episodes.series.seasons.withParams(seriesId)),
-      body: undefined,
     } );
 
     return res;

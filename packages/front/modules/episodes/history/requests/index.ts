@@ -1,10 +1,10 @@
 /* eslint-disable require-await */
 import { PATH_ROUTES } from "$shared/routing";
+import { EpisodeHistoryEntryEntity } from "../models";
+import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
-import { EpisodeHistoryEntryEntity } from "../models";
-import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
 
 type GetManyProps = {
   limit?: number;
@@ -33,7 +33,7 @@ export class EpisodeHistoryApi {
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.episodes.history.entries.search.path),
+      url: backendUrl(PATH_ROUTES.episodes.history.entries.getMany.path),
       body,
     } );
   };
@@ -63,7 +63,7 @@ export class EpisodeHistoryApi {
         timestamp: "desc",
       },
       limit: 4,
-      expand: ["episodes"],
+      expand: ["episodes", "episodesSeries", "episodesFileInfos", "episodesUserInfo"],
     };
     const fetcher = makeFetcher( {
       method: "POST",
@@ -73,7 +73,7 @@ export class EpisodeHistoryApi {
 
     return fetcher( {
       body,
-      url: backendUrl(PATH_ROUTES.episodes.history.entries.search.path),
+      url: backendUrl(PATH_ROUTES.episodes.history.entries.getMany.path),
     } );
   }
 }

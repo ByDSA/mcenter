@@ -4,7 +4,7 @@ import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { EpisodeDependencyCrudDtos } from "$shared/models/episodes/dependencies/dto/transport";
 import { episodeCompKeySchema } from "$shared/models/episodes/episode";
-import { AdminDeleteOne, GetMany, GetManyCriteria, GetOne } from "#utils/nestjs/rest";
+import { AdminDeleteOne, GetAll, GetManyCriteria, GetOneById } from "#utils/nestjs/rest";
 import { IdParamDto } from "#utils/validation/dtos";
 import { type EpisodeDependencyEntity, episodeDependencyEntitySchema } from "../models";
 import { EpisodeDependenciesRepository } from "./repository/repository";
@@ -23,12 +23,14 @@ implements
   ) {
   }
 
-  @GetMany("/", episodeDependencyEntitySchema)
+  @GetAll(episodeDependencyEntitySchema)
   async getAll() {
     return await this.repo.getAll();
   }
 
-  @GetOne("/:seriesKey/:episodeKey", episodeDependencyEntitySchema)
+  @GetOneById(episodeDependencyEntitySchema, {
+    url: "/:seriesKey/:episodeKey",
+  } )
   async getNext(
     @Param() params: LastCompKeyParamsDto,
   ) {
@@ -38,14 +40,14 @@ implements
     } );
   }
 
-  @GetManyCriteria("/", episodeDependencyEntitySchema)
+  @GetManyCriteria(episodeDependencyEntitySchema)
   async getManyEntriesByCriteria(
     @Body() body: GetManyBodyDto,
   ) {
     return await this.repo.getManyByCriteria(body);
   }
 
-  @AdminDeleteOne("/:id", episodeDependencyEntitySchema)
+  @AdminDeleteOne(episodeDependencyEntitySchema)
   async deleteOneByIdAndGet(
     @Param() params: IdParamDto,
   ): Promise<EpisodeDependencyEntity> {

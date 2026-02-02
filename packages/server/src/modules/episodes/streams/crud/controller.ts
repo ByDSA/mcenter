@@ -4,7 +4,7 @@ import { StreamCrudDtos } from "$shared/models/episodes/streams/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { Stream, streamEntitySchema } from "#episodes/streams/models";
 import { CanGetAll } from "#utils/layers/controller";
-import { GetMany, GetManyCriteria } from "#utils/nestjs/rest/crud/get";
+import { GetAll, GetManyCriteria } from "#utils/nestjs/rest/crud/get";
 import { StreamsRepository } from "./repository";
 
 const schema = streamEntitySchema;
@@ -20,12 +20,12 @@ implements
   ) {
   }
 
-  @GetMany("/", schema)
+  @GetAll(schema)
   async getAll() {
     return await this.repo.getAll();
   }
 
-  @GetManyCriteria("/criteria", schema)
+  @GetManyCriteria(schema)
   async getMany(
     @Body() body: GetManyBodyDto,
   ): Promise<Stream[]> {

@@ -1,11 +1,11 @@
-import { Body, Controller, Get } from "@nestjs/common";
+import { Body, Controller } from "@nestjs/common";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { EpisodeInfoCrudDtos } from "$shared/models/episodes/user-info/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { Param } from "@nestjs/common";
 import { UserPayload } from "$shared/models/auth";
 import { episodeUserInfoEntitySchema } from "$shared/models/episodes";
-import { GetManyCriteria, UserPost, UserPatchOne, AdminDeleteOne } from "#utils/nestjs/rest";
+import { GetManyCriteria, UserCreateOne, UserPatchOne, AdminDeleteOne, GetOneById } from "#utils/nestjs/rest";
 import { episodeEntitySchema } from "#episodes/models";
 import { User } from "#core/auth/users/User.decorator";
 import { IdParamDto } from "#utils/validation/dtos";
@@ -33,12 +33,14 @@ export class EpisodesCrudController {
   ) {
   }
 
-  @Get("/:id")
-  async getOneById(@Param() params: IdParamDto) {
+  @GetOneById(schema)
+  async getOneById(
+    @Param() params: IdParamDto,
+  ) {
     return await this.episodesRepo.getOneById(params.id);
   }
 
-  @GetManyCriteria("/search", schema)
+  @GetManyCriteria(schema)
   async getManyByCriteria(
     @Body() body: GetManyBodyDto,
     @User() user: UserPayload | null,
@@ -49,7 +51,7 @@ export class EpisodesCrudController {
     } );
   }
 
-  @UserPost("/", schema)
+  @UserCreateOne(schema)
   async createOne(
     @Body() body: CreateBody,
     @User() user: UserPayload,
@@ -60,7 +62,7 @@ export class EpisodesCrudController {
     } );
   }
 
-  @UserPatchOne("/:id", schema)
+  @UserPatchOne(schema)
   async patchOne(
     @Param() params: IdParamDto,
     @Body() body: PatchBody,
@@ -68,12 +70,14 @@ export class EpisodesCrudController {
     return await this.episodesRepo.patchOneByIdAndGet(params.id, body);
   }
 
-  @AdminDeleteOne("/:id", schema)
+  @AdminDeleteOne(schema)
   async deleteOne(@Param() params: IdParamDto) {
     return await this.episodesRepo.deleteOneByIdAndGet(params.id);
   }
 
-  @UserPatchOne("/:id/user-info", episodeUserInfoEntitySchema)
+  @UserPatchOne(episodeUserInfoEntitySchema, {
+    url: "/:id/user-info",
+  } )
   async patchOneUserInfoByKeyAndGet(
     @Param() params: IdParamDto,
     @Body() body: PatchOneByIdUserInfoBodyDto,

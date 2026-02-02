@@ -36,7 +36,7 @@ export function List() {
       )=> MouseEventHandler = (stream: string) => async (e) => {
         e.preventDefault();
 
-        const remotePlayersRes = await fetch(backendUrl("/api/player/remote-players"), {
+        const remotePlayersRes = await fetch(backendUrl(PATH_ROUTES.player.remotePlayers.path), {
           credentials: "include",
         } );
         const remotePlayers: RemotePlayerDtos.Front.Dto[] = await remotePlayersRes.json();

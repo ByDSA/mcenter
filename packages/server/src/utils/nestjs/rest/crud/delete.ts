@@ -5,20 +5,24 @@ import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { getCommonCommandDecorators } from "./patch";
 
-export function AdminDeleteOne(url: string, dataSchema?: z.ZodSchema) {
+type DeleteOptions = {
+  url?: string;
+};
+
+export function AdminDeleteOne(dataSchema: z.ZodSchema, deleteOptions?: DeleteOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     IsAdmin(),
-    Delete(url),
+    Delete(deleteOptions?.url ?? "/:id"),
     ...getCommonCommandDecorators(dataSchema),
   ];
 
   return applyDecorators(...decorators);
 }
 
-export function UserDeleteOne(url: string, dataSchema?: z.ZodSchema) {
+export function UserDeleteOne(dataSchema: z.ZodSchema, deleteOptions?: DeleteOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Authenticated(),
-    Delete(url),
+    Delete(deleteOptions?.url ?? "/:id"),
     ...getCommonCommandDecorators(dataSchema),
   ];
 

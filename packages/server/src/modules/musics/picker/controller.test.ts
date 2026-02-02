@@ -3,14 +3,11 @@ import { INestApplication } from "@nestjs/common";
 import { Application } from "express";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { PATH_ROUTES } from "$shared/routing";
-import { testRoute } from "#core/routing/test";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { ResourceResponseFormatterModule, ResponseFormatInterceptor } from "#modules/resources/response-formatter";
 import { musicsRepoMockProvider } from "../crud/repositories/music/tests";
 import { musicHistoryRepoMockProvider } from "../history/crud/repository/tests";
 import { MusicGetRandomController } from "./controller";
-
-testRoute(PATH_ROUTES.musics.pickRandom.path);
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 

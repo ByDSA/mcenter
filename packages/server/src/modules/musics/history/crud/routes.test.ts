@@ -1,12 +1,15 @@
-import { RequestMethod } from "@nestjs/common";
 import { PATH_ROUTES } from "$shared/routing";
-import { testRoute } from "#core/routing/test";
+import { testCrudRoutes, verifyRoutesCoverage } from "#core/routing/test";
+import { MusicHistoryCrudController } from "./controller";
 
-describe("global routes", () => {
-  testRoute(PATH_ROUTES.musics.history.search.path, {
-    httpMethod: RequestMethod.POST,
-  } );
-  testRoute(PATH_ROUTES.musics.history.withParams("id"), {
-    httpMethod: RequestMethod.DELETE,
-  } );
+testCrudRoutes(PATH_ROUTES.musics.history.path, [
+  "delete",
+  "create",
+  "get-many-criteria",
+  "create-many",
+]);
+
+verifyRoutesCoverage( {
+  controller: MusicHistoryCrudController,
+  controllerRoute: PATH_ROUTES.musics.history.path,
 } );

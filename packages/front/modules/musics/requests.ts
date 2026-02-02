@@ -45,7 +45,7 @@ export class MusicsApi {
       responseSchema: MusicCrudDtos.GetOne.responseSchema,
     } );
     const ret = await fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.search.path + "-one"),
+      url: backendUrl(PATH_ROUTES.musics.getOne.path),
       body: criteria,
     } );
 
@@ -69,7 +69,7 @@ export class MusicsApi {
       responseSchema: MusicCrudDtos.GetMany.responseSchema,
     } );
     const ret = await fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.search.path),
+      url: backendUrl(PATH_ROUTES.musics.getMany.path),
       body: criteria,
     } );
 

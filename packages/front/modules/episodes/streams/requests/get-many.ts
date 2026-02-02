@@ -39,7 +39,7 @@ export const fetch = (props: FetchProps) => {
   } );
 
   return fetcher( {
-    url: backendUrl(PATH_ROUTES.streams.search.path),
+    url: backendUrl(PATH_ROUTES.streams.getMany.path),
     body,
   } );
 };

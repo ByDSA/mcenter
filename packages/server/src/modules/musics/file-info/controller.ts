@@ -33,7 +33,7 @@ export class MusicFileInfoController {
     return await this.uploadRepo.upload(file, uploadDto, uploaderUserId);
   }
 
-  @GetManyCriteria("/", musicFileInfoEntitySchema)
+  @GetManyCriteria(musicFileInfoEntitySchema)
   async getMany(
     @Body() body: GetManyCriteriaDto,
   ): Promise<MusicFileInfoEntity[]> {
@@ -43,7 +43,7 @@ export class MusicFileInfoController {
     return [];
   }
 
-  @AdminDeleteOne("/:id")
+  @AdminDeleteOne(musicFileInfoEntitySchema)
   async deleteOne(
     @Param() params: IdParamDto,
   ) {

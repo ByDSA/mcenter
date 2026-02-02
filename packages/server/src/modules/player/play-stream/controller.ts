@@ -1,10 +1,12 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Param, Post, Query } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { UserPayload } from "$shared/models/auth";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
+import { episodeEntityWithFileInfosSchema } from "#episodes/models";
+import { GetMany } from "#utils/nestjs/rest";
 import { PlayVideoService } from "../play-video.service";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { SecretTokenBodyDto } from "../model";
@@ -42,8 +44,8 @@ export class PlayStreamController {
     private readonly auth: AuthPlayerService,
   ) { }
 
-  @Get("/:id")
   @Authenticated()
+  @GetMany("/:id", episodeEntityWithFileInfosSchema)
   async playStreamDefault(
     @Param() params: ParamsDto,
     @Query() query: QueryDto,

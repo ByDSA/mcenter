@@ -8,20 +8,23 @@ import { ResponseFormatterInterceptor } from "../responses/response-formatter.in
 
 const UNDEFINED_SCHEMA = z.undefined();
 
-export function AdminPatchOne(url: string, dataSchema?: z.ZodSchema) {
+type PatchOptions = {
+  url?: string;
+};
+
+export function AdminPatchOne(dataSchema: z.ZodSchema, options?: PatchOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     IsAdmin(),
-    Patch(url),
-    ...getCommonCommandDecorators(dataSchema),
+    UserPatchOne(dataSchema, options),
   ];
 
   return applyDecorators(...decorators);
 }
 
-export function UserPatchOne(url: string, dataSchema?: z.ZodSchema) {
+export function UserPatchOne(dataSchema: z.ZodSchema, options?: PatchOptions) {
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Authenticated(),
-    Patch(url),
+    Patch(options?.url ?? "/:id"),
     ...getCommonCommandDecorators(dataSchema),
   ];
 

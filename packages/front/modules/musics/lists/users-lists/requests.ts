@@ -1,4 +1,5 @@
 import { MusicUserListsCrudDtos } from "$shared/models/musics/users-lists/dto/transport";
+import { PATH_ROUTES } from "$shared/routing";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -7,8 +8,6 @@ export class MusicUsersListsApi {
   static {
     FetchApi.register(MusicUsersListsApi, new MusicUsersListsApi());
   }
-
-  private readonly baseUrl = "/api/musics/users-lists";
 
   getMyList(
     criteria: MusicUserListsCrudDtos.GetMyList.RequestParams,
@@ -20,7 +19,7 @@ export class MusicUsersListsApi {
     } );
 
     return fetcher( {
-      url: backendUrl(this.baseUrl + "/my-lists"),
+      url: backendUrl(PATH_ROUTES.musics.usersLists.myLists.path),
       body: criteria,
     } );
   }
@@ -35,7 +34,7 @@ export class MusicUsersListsApi {
     } );
 
     return fetcher( {
-      url: backendUrl(this.baseUrl),
+      url: backendUrl(PATH_ROUTES.musics.usersLists.myLists.path),
       body,
     } );
   }
@@ -50,9 +49,7 @@ export class MusicUsersListsApi {
     } );
 
     return fetcher( {
-      url: backendUrl(
-        `${this.baseUrl}/move`,
-      ),
+      url: backendUrl(PATH_ROUTES.musics.usersLists.move.path),
       body,
     } );
   }

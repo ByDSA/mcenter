@@ -1,35 +1,14 @@
-import { INestApplication, Logger, RequestMethod } from "@nestjs/common";
+import { INestApplication, Logger } from "@nestjs/common";
 import { Application } from "express";
+
+export type HttpMethod = "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
 
 export type GotRoute = {
   path: string;
   regex: RegExp;
-  httpMethod: RequestMethod;
+  method: HttpMethod;
   params: string[];
 };
-
-function stringToRequestMethod(method: string): RequestMethod {
-  if (!method || typeof method !== "string")
-    throw new Error("Method must be a non-empty string");
-
-  const upperMethod = method.trim().toUpperCase();
-  const methodMap: Record<string, RequestMethod> = {
-    GET: RequestMethod.GET,
-    POST: RequestMethod.POST,
-    PUT: RequestMethod.PUT,
-    DELETE: RequestMethod.DELETE,
-    PATCH: RequestMethod.PATCH,
-    OPTIONS: RequestMethod.OPTIONS,
-    HEAD: RequestMethod.HEAD,
-    ALL: RequestMethod.ALL,
-  };
-  const requestMethod = methodMap[upperMethod];
-
-  if (requestMethod === undefined)
-    throw new Error(`Unsupported HTTP method: ${method}`);
-
-  return requestMethod;
-}
 
 const pathToRegex = (path: string) => {
   const regexPattern = path.replace(/:[^/]+/g, "[^/]+");
@@ -37,7 +16,7 @@ const pathToRegex = (path: string) => {
   return new RegExp(`^${regexPattern}$`);
 };
 
-export function getRoutes(expressApp: Application): GotRoute[] {
+export function getExpressRoutes(expressApp: Application): GotRoute[] {
   const routes: GotRoute[] = [];
   // eslint-disable-next-line no-underscore-dangle
   const { router } = (expressApp as any)._events.request;
@@ -45,12 +24,12 @@ export function getRoutes(expressApp: Application): GotRoute[] {
   router.stack.forEach((middleware: any) => {
     if (middleware.route) {
       // Rutas definidas directamente en `app`
-      const httpMethod = Object.keys(middleware.route.methods)[0].toUpperCase();
+      const httpMethod = Object.keys(middleware.route.methods)[0].toUpperCase() as HttpMethod;
       const { path } = middleware.route;
       const params = extractParamsFromPath(path);
 
       routes.push( {
-        httpMethod: stringToRequestMethod(httpMethod),
+        method: httpMethod,
         path,
         regex: pathToRegex(path),
         params,
@@ -58,12 +37,12 @@ export function getRoutes(expressApp: Application): GotRoute[] {
     } else if (middleware.name === "router" && middleware.handle.stack) {
       // Rutas en routers montados
       middleware.handle.stack.forEach((handler: any) => {
-        const httpMethod = Object.keys(handler.route.methods)[0].toUpperCase();
+        const httpMethod = Object.keys(handler.route.methods)[0].toUpperCase() as HttpMethod;
         const { path } = handler.route;
         const params = extractParamsFromPath(path);
 
         routes.push( {
-          httpMethod: stringToRequestMethod(httpMethod),
+          method: httpMethod,
           regex: pathToRegex(path),
           path,
           params,
@@ -100,7 +79,7 @@ function extractParamsFromPath(path: string): string[] {
 
 export function printRoutes(nestApp: INestApplication) {
   const expressApp = nestApp.getHttpAdapter().getInstance() as Application;
-  const routes = getRoutes(expressApp);
+  const routes = getExpressRoutes(expressApp);
 
   nestApp.get(Logger).log(routes);
 }

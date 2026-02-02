@@ -1,8 +1,6 @@
-import { PATH_ROUTES } from "$shared/routing";
 import { seriesRepositoryMockProvider } from "#episodes/series/crud/repository/tests";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { fixtureEpisodes } from "#episodes/tests";
-import { testRoute } from "#core/routing/test";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { ResourceSlugService } from "#modules/resources/slug/service";
 import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
@@ -11,8 +9,6 @@ import { EpisodesRepository } from "../crud/repositories/episodes";
 import { episodeRepositoryMockProvider } from "../crud/repositories/episodes/tests";
 import { EpisodeSlugHandlerService } from "./service";
 import { EpisodesSlugController } from "./controller";
-
-testRoute(PATH_ROUTES.episodes.slug.withParams("seriesKey", "episodeKey"));
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
