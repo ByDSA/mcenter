@@ -9,6 +9,7 @@ import { AUDIO_EXTENSIONS } from "$shared/models/musics/audio-extensions";
 import * as mime from "mime-types";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
+import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
 import { md5FileAsync } from "#utils/crypt";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { createUploadFileSuccessResponse, diskStorageEnsureDestination, diskStorageUniqueFilename, fileMimeTypeFilter, UploadFileProps } from "#utils/files";
@@ -100,7 +101,7 @@ function getMime(ext: string) {
   }
 }
 
-export const UploadFileInterceptor: Type<NestInterceptor> = FileInterceptor("file", {
+export const uploadFileInterceptorOptions: MulterOptions = {
   storage: diskStorage( {
     destination: diskStorageEnsureDestination(path.join(MUSIC_MEDIA_PATH, "upload")),
     filename: diskStorageUniqueFilename(),
@@ -109,4 +110,9 @@ export const UploadFileInterceptor: Type<NestInterceptor> = FileInterceptor("fil
   limits: {
     fileSize: 100 * 1024 * 1024, // 100MB por archivo
   },
-} );
+};
+
+export const UploadFileInterceptor: Type<NestInterceptor> = FileInterceptor(
+  "file",
+  uploadFileInterceptorOptions,
+);
