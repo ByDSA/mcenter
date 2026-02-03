@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TasksModule } from "#core/tasks";
 import { MusicsCrudModule } from "#musics/crud/module";
-import { MusicFileInfoModule } from "#musics/file-info/module";
+import { MusicFileInfoCrudModule } from "#musics/file-info/crud/module";
 import { YoutubeImportMusicController } from "./controller";
 import { YoutubeImportMusicOneTaskHandler } from "./import-one.handler";
 import { YoutubeDownloadMusicService } from "./youtube-download-music.service";
@@ -12,7 +12,7 @@ import { YoutubeImportMusicPlaylistTaskHandler } from "./import-playlist.handler
   imports: [
     TasksModule,
     MusicsCrudModule,
-    MusicFileInfoModule,
+    MusicFileInfoCrudModule,
   ],
   controllers: [YoutubeImportMusicController],
   providers: [

@@ -16,7 +16,7 @@ import { MusicsSlugModule } from "#musics/slug/module";
 import { MusicsCrudModule } from "#musics/crud/module";
 import { EpisodesSlugModule } from "#episodes/slug/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
-import { MusicFileInfoModule } from "#musics/file-info/module";
+import { MusicFileInfoCrudModule } from "#musics/file-info/crud/module";
 import { MusicsAdminModule } from "#musics/admin/module";
 import { TasksModule } from "#core/tasks";
 import { YoutubeImportMusicModule } from "#modules/youtube/import-music/module";
@@ -24,12 +24,14 @@ import { UsersModule } from "#core/auth/users";
 import { AuthModule } from "#core/auth/module";
 import { AuthGoogleModule } from "#core/auth/strategies/google";
 import { UsersMusicPlaylistsModule } from "#musics/users-playlists/module";
-import { ImageCoversCrudModule } from "#modules/image-covers/module";
+import { ImageCoversCrudModule } from "#modules/image-covers/crud/module";
 import { ImageCoversAdminModule } from "#modules/image-covers/admin/module";
 import { MusicSmartPlaylistsCrudModule } from "#musics/smart-playlists/crud/module";
 import { MusicUsersListsModule } from "#musics/users-lists/crud/module";
 import { SeriesCrudModule } from "#episodes/series/module";
+import { ImageCoversUploadModule } from "#modules/image-covers/upload/module";
 import { LoggingModule } from "../logging/module";
+import { MusicFileInfoUploadModule } from "#musics/file-info/upload/module";
 
 // No hace falta poner todos los modules porque hay imports internos
 // y por los que se importan en AppModule
@@ -43,7 +45,8 @@ export const directImports = [
   MusicsSlugModule,
   MusicsAdminModule,
   MusicHistoryModule,
-  MusicFileInfoModule,
+  MusicFileInfoCrudModule,
+  MusicFileInfoUploadModule,
   MusicPlaylistsModule,
   UsersMusicPlaylistsModule,
   MusicSmartPlaylistsCrudModule,
@@ -122,7 +125,11 @@ const musicsRoutes: Routes = [
   },
   {
     path: PATH_ROUTES.musics.fileInfo.path,
-    module: MusicFileInfoModule,
+    module: MusicFileInfoCrudModule,
+  },
+  {
+    path: PATH_ROUTES.musics.fileInfo.upload.path,
+    module: MusicFileInfoUploadModule,
   },
   {
     path: PATH_ROUTES.musics.slug.path,
@@ -171,6 +178,10 @@ export const routes: Routes = [
   {
     path: PATH_ROUTES.imageCovers.path,
     module: ImageCoversCrudModule,
+  },
+  {
+    path: PATH_ROUTES.imageCovers.upload.path,
+    module: ImageCoversUploadModule,
   },
   {
     path: PATH_ROUTES.imageCovers.admin.path,

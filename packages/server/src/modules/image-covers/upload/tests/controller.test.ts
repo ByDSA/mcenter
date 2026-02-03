@@ -4,11 +4,11 @@ import { HttpStatus } from "@nestjs/common";
 import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { createMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { ImageCoverCrudController } from "../controller";
-import { ImageCoversUploadService, UploadFileInterceptor } from "../upload.service";
-import { ImageCoversRepository } from "../repositories";
+import { ImageCoversUploadService, UploadFileInterceptor } from "../service";
 import { fileBuffer, mockFileInMemory, uploadImage } from "./utils";
 import { MemoryUploadFileInterceptor } from "./MemoryUploadFile.interceptor";
+import { ImageCoverUploadController } from "../controller";
+import { ImageCoversRepository } from "#modules/image-covers/crud/repositories";
 
 describe("imageCoverCrudController (upload)", () => {
   let testingSetup: TestingSetup;
@@ -18,7 +18,7 @@ describe("imageCoverCrudController (upload)", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      controllers: [ImageCoverCrudController],
+      controllers: [ImageCoverUploadController],
       providers: [
         createMockProvider(ImageCoversUploadService),
         createMockProvider(ImageCoversRepository),

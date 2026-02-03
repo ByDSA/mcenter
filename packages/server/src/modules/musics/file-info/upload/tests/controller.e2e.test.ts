@@ -7,9 +7,8 @@ import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/trans
 import supertest from "supertest";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { MUSIC_MEDIA_PATH } from "#musics/utils";
-import { MusicsCrudModule } from "#musics/crud/module";
 import { MUSIC_DATA_FOLDER } from "#tests/MusicData";
-import { MusicFileInfoModule } from "../module";
+import { MusicFileInfoUploadModule } from "../module";
 import { uploadMusic } from "./utils";
 
 const tempFilePath = path.join(process.cwd(), MUSIC_DATA_FOLDER, "..", "sample.mp3");
@@ -19,14 +18,14 @@ if (!fs.existsSync(tempFilePath))
 
 const sampleFile = fs.readFileSync(tempFilePath);
 
-describe("musicFileInfoController E2E", () => {
+describe("controller E2E", () => {
   let testingSetup: TestingSetup;
   let routerApp: Application;
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit(
       {
-        imports: [MusicFileInfoModule, MusicsCrudModule],
+        imports: [MusicFileInfoUploadModule],
       },
       {
         db: {

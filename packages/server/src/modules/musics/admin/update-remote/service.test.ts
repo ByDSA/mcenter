@@ -9,9 +9,9 @@ import { MusicsRepository } from "../../crud/repositories/music";
 import { MusicFileInfoRepository } from "../../file-info/crud/repository";
 import { musicFileInfoEntitySchema } from "../../file-info/models";
 import { musicEntitySchema } from "../../models";
-import { MusicFileInfoModule } from "../../file-info/module";
 import { MusicsCrudModule } from "../../crud/module";
 import { UpdateRemoteTreeService, UpdateResult } from "./service";
+import { MusicFileInfoCrudModule } from "#modules/musics/file-info/crud/module";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 
@@ -24,7 +24,7 @@ describe("updateRemoteService", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
       imports: [
-        createMockedModule(MusicFileInfoModule),
+        createMockedModule(MusicFileInfoCrudModule),
         createMockedModule(MusicsCrudModule),
       ],
       controllers: [],

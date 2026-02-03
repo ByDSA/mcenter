@@ -12,7 +12,7 @@ routerApp: Application;
 };
 export function uploadImage( { fileBuffer, metadata, options, routerApp }: Props) {
   return request(routerApp)
-    .post("/image")
+    .post("/")
     .attach("file", fileBuffer, {
       filename: options?.filename ?? "test-image.png",
       contentType: options?.contentType ?? "image/png",

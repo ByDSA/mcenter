@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TasksModule } from "#core/tasks/module";
 import { MusicsCrudModule } from "../crud/module";
-import { MusicFileInfoModule } from "../file-info/module";
+import { MusicFileInfoCrudModule } from "../file-info/crud/module";
 import { MusicFixInfoController } from "./fix-info/fix-info.controller";
 import { SearchDuplicatesController } from "./search-duplicates/controller";
 import { MusicUpdateRemoteController } from "./update-remote/controller";
@@ -13,7 +13,7 @@ import { MusicUpdateFileInfoTaskHandler } from "./update-file-info/task.handler"
 @Module( {
   imports: [
     MusicsCrudModule,
-    MusicFileInfoModule,
+    MusicFileInfoCrudModule,
     TasksModule,
   ],
   controllers: [

@@ -16,7 +16,7 @@ import { MongoFilterQuery,
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEventEmitter, DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
-import { enrichImageCover } from "#modules/image-covers/repositories/odm/utils";
+import { enrichImageCover } from "#modules/image-covers/crud/repositories/odm/utils";
 import { enrichOwnerUserPublic } from "#musics/playlists/crud/repository/odm/pipeline-utils";
 import { MusicSmartPlaylistModel,
   MusicSmartPlaylistEntity } from "../../models";

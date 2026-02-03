@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
-import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { MusicSmartPlaylistModel,
   MusicSmartPlaylistEntity } from "../../../models";

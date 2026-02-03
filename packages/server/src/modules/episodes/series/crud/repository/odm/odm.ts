@@ -1,6 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
 import { OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
-import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { SeriesKey } from "../../../models";
 

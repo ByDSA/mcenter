@@ -1,5 +1,15 @@
 import { Global, Module } from "@nestjs/common";
 import { StreamPickerModule } from "#episodes/streams/picker/module";
+import { SeriesCrudModule } from "#episodes/series/module";
+import { StreamsModule } from "#episodes/streams/module";
+import { EpisodeHistoryModule } from "#episodes/history/module";
+import { EpisodeFileInfosModule } from "#episodes/file-info/module";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { EpisodesCrudModule } from "#episodes/crud/module";
+import { MusicHistoryModule } from "#musics/history/module";
+import { MusicsCrudModule } from "#musics/crud/module";
+import { AuthModule } from "#core/auth/module";
+import { MusicFileInfoCrudModule } from "#musics/file-info/crud/module";
 import { PlayVideoService } from "./play-video.service";
 import { FrontWSServerService } from "./player-services/front/front-player-web-sockets-server.service";
 import { VlcBackWSService } from "./player-services/vlc-back/vlc-back-ws-server.service";
@@ -13,16 +23,6 @@ import { OnlineRemotePlayersService } from "./online-remote-players.service";
 import { RemotePlayersRepository } from "./player-services/repository";
 import { RemotePlayerSubscriptionsService } from "./player-services/front/subs.service";
 import { AuthPlayerService } from "./AuthPlayer.service";
-import { SeriesCrudModule } from "#episodes/series/module";
-import { StreamsModule } from "#episodes/streams/module";
-import { EpisodeHistoryModule } from "#episodes/history/module";
-import { EpisodeFileInfosModule } from "#episodes/file-info/module";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { EpisodesCrudModule } from "#episodes/crud/module";
-import { MusicHistoryModule } from "#musics/history/module";
-import { MusicsCrudModule } from "#musics/crud/module";
-import { MusicFileInfoModule } from "#musics/file-info/module";
-import { AuthModule } from "#core/auth/module";
 
 @Global() // Para que use sólo una instancia de servicio backend de web sockets
 @Module( {
@@ -36,7 +36,7 @@ import { AuthModule } from "#core/auth/module";
     EpisodeFileInfosModule,
     MusicsCrudModule,
     MusicHistoryModule,
-    MusicFileInfoModule,
+    MusicFileInfoCrudModule,
     AuthModule,
   ],
   controllers: [

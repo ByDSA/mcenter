@@ -4,7 +4,7 @@ import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues
 import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
-import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
 import { MusicPlaylist, MusicPlaylistEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 

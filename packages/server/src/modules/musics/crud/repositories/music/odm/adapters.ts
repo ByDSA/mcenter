@@ -4,7 +4,7 @@ import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues
 import { PaginatedResult } from "$shared/utils/http/responses";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
-import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
 import { Music, MusicEntity } from "../../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 

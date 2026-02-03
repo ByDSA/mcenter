@@ -3,7 +3,7 @@ import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
-import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
 
 export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimestamps & {
   _id?: mongoose.Types.ObjectId;

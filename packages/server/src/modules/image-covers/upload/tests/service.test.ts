@@ -4,10 +4,10 @@ import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { ImageCoverEntity } from "$shared/models/image-covers";
 import { createMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { ImageCoversUploadService } from "../upload.service";
-import { ImageCoversRepository } from "../repositories";
 import { ImageCoverVersions, ImageVersionsGenerator } from "../generate-versions";
 import { mockFile } from "./utils";
+import { ImageCoversUploadService } from "../service";
+import { ImageCoversRepository } from "#modules/image-covers/crud/repositories";
 
 const uploadDtoWithLabel: ImageCoverCrudDtos.UploadFile.RequestBody = {
   metadata: {

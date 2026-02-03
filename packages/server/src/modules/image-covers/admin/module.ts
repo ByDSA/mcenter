@@ -1,12 +1,14 @@
 import { Module } from "@nestjs/common";
 import { TasksModule } from "#core/tasks";
-import { ImageCoversCrudModule } from "../module";
+import { ImageCoversUploadModule } from "../upload/module";
+import { ImageCoversCrudModule } from "../crud/module";
 import { ImageCoversRebuildAllController } from "./task-rebuild/controller";
 import { ImageCoversRebuildAllTaskHandler } from "./task-rebuild/task.handler";
 
 @Module( {
   imports: [
     ImageCoversCrudModule,
+    ImageCoversUploadModule,
     TasksModule,
   ],
   controllers: [

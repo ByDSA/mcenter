@@ -15,7 +15,7 @@ type Props = {
 
 export function uploadMusic( { fileBuffer, metadata, options, routerApp }: Props) {
   return request(routerApp)
-    .post("/upload") // La ruta definida en MusicFileInfoController para @UserUploadFile("upload", ...)
+    .post("/")
     .attach("file", fileBuffer, {
       filename: options?.filename ?? "test-audio.mp3",
       contentType: options?.contentType ?? "audio/mpeg",

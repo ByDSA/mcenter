@@ -13,10 +13,10 @@ import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer
 import { md5FileAsync } from "#utils/crypt";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { createUploadFileSuccessResponse, diskStorageEnsureDestination, diskStorageUniqueFilename, fileMimeTypeFilter, UploadFileProps } from "#utils/files";
-import { MusicsRepository } from "../crud/repositories/music";
-import { MusicEntity } from "../models";
-import { MUSIC_MEDIA_PATH } from "../utils";
-import { MusicFileInfoEntity } from "./models";
+import { MusicsRepository } from "../../crud/repositories/music";
+import { MusicEntity } from "../../models";
+import { MUSIC_MEDIA_PATH } from "../../utils";
+import { MusicFileInfoEntity } from "../models";
 
 @Injectable()
 export class MusicFileInfoUploadRepository {

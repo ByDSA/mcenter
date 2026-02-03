@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
-import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
 import { OwnerUserPublic } from "#musics/playlists/crud/repository/odm/odm";
 
 export type DocOdm = TimestampsOdm.AutoTimestamps & {

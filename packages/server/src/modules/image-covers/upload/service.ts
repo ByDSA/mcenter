@@ -10,8 +10,8 @@ import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
 import { createUploadFileSuccessResponse, diskStorageEnsureDestination, diskStorageUniqueFilename, fileMimeTypeFilter, getImageMime, UploadFileProps } from "#utils/files";
 import { assertFoundClient } from "#utils/validation/found";
-import { ImageCoversRepository } from "./repositories";
-import { IMAGE_COVERS_FOLDER_PATH } from "./utils";
+import { IMAGE_COVERS_FOLDER_PATH } from "../utils";
+import { ImageCoversRepository } from "../crud/repositories";
 import { ImageVersionsGenerator } from "./generate-versions";
 
 const IMAGE_COVERS_TMP_FOLDER_PATH = path.join(IMAGE_COVERS_FOLDER_PATH, "tmp");

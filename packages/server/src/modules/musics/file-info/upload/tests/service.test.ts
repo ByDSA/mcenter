@@ -7,8 +7,8 @@ import { createMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import * as cryptUtils from "#utils/crypt";
 import { MusicsRepository } from "#musics/crud/repositories/music";
-import { MusicFileInfoUploadRepository } from "../upload.service";
-import { MusicFileInfoRepository } from "../crud/repository";
+import { MusicFileInfoUploadRepository } from "../service";
+import { MusicFileInfoRepository } from "../../crud/repository";
 import { mockFile } from "./utils";
 
 // Mock Data

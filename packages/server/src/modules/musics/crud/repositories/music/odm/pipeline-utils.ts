@@ -3,7 +3,7 @@
 // music-pipeline-utils.ts
 import { PipelineStage, Types } from "mongoose";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
-import { enrichImageCover } from "#modules/image-covers/repositories/odm/utils";
+import { enrichImageCover } from "#modules/image-covers/crud/repositories/odm/utils";
 import { MusicsUsersOdm } from "../../user-info/odm";
 
 // Ajusta el path según tu estructura

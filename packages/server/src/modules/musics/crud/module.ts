@@ -4,9 +4,9 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MeilisearchModule } from "#modules/search/module";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { MusicHistoryModule } from "../history/module";
-import { MusicFileInfoModule } from "../file-info/module";
 import { MusicFlowService } from "../MusicFlow.service";
 import { MusicRendererModule } from "../renderer/module";
+import { MusicFileInfoCrudModule } from "../file-info/crud/module";
 import { MusicsUsersRepository } from "./repositories/user-info/repository";
 import { MusicBuilderService } from "./builder/music-builder.service";
 import { MusicCrudController } from "./controller";
@@ -17,7 +17,7 @@ import { GetManyByCriteriaMusicRepoService } from "./repositories/music/get-many
 @Module( {
   imports: [
     DomainEventEmitterModule,
-    forwardRef(()=>MusicFileInfoModule),
+    MusicFileInfoCrudModule,
     forwardRef(()=>MusicHistoryModule),
     MeilisearchModule,
     MusicRendererModule,

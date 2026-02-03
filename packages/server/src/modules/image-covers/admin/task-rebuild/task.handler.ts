@@ -6,8 +6,8 @@ import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
 import { ImageCoverTasks } from "$shared/models/image-covers/admin";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
-import { ImageCoversRepository } from "../../repositories";
-import { ImageVersionsGenerator } from "../../generate-versions";
+import { ImageCoversRepository } from "#modules/image-covers/crud/repositories";
+import { ImageVersionsGenerator } from "../../upload/generate-versions";
 import { IMAGE_COVERS_FOLDER_PATH } from "../../utils";
 
 const TASK_NAME = ImageCoverTasks.rebuildAll.name;

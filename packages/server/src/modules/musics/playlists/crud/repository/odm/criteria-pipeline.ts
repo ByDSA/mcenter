@@ -2,7 +2,7 @@ import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MongoFilterQuery } from "#utils/layers/db/mongoose";
 import { MusicPlaylistCrudDtos } from "#musics/playlists/models/dto";
 import { MusicExpansionFlags, enrichMusicList } from "#musics/crud/repositories/music/odm/pipeline-utils";
-import { enrichImageCover } from "#modules/image-covers/repositories/odm/utils";
+import { enrichImageCover } from "#modules/image-covers/crud/repositories/odm/utils";
 import { DocOdm, FullDocOdm } from "./odm";
 import { enrichOwnerUserPublic } from "./pipeline-utils";
 

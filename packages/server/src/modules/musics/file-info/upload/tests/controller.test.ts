@@ -4,13 +4,13 @@ import { HttpStatus } from "@nestjs/common";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { createMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { MusicFileInfoController } from "../controller";
-import { MusicFileInfoUploadRepository, UploadFileInterceptor } from "../upload.service";
-import { MusicFileInfoRepository } from "../crud/repository";
+import { MusicFileInfoUploadController } from "../controller";
+import { MusicFileInfoUploadRepository, UploadFileInterceptor } from "../service";
+import { MusicFileInfoRepository } from "../../crud/repository";
 import { fileBuffer, mockFileInMemory, uploadMusic } from "./utils";
 import { MemoryUploadFileInterceptor } from "./MemoryUploadFile.interceptor";
 
-describe("musicFileInfoController (upload)", () => {
+describe("controller", () => {
   let testingSetup: TestingSetup;
   let routerApp: Application;
   let uploadServiceMock: jest.Mocked<MusicFileInfoUploadRepository>;
@@ -18,7 +18,7 @@ describe("musicFileInfoController (upload)", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit(
       {
-        controllers: [MusicFileInfoController],
+        controllers: [MusicFileInfoUploadController],
         providers: [
           createMockProvider(MusicFileInfoUploadRepository),
           createMockProvider(MusicFileInfoRepository),

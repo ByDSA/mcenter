@@ -115,7 +115,9 @@ describe("findFilesByExtensionRecursive", () => {
       `${MUSIC_DATA_FOLDER}/${DK.path}`,
       `${MUSIC_DATA_FOLDER}/${AOT4_COPY.path}`,
       `${MUSIC_DATA_FOLDER}/${A_AOT4.path}`,
-      `${MUSIC_DATA_FOLDER}/${DRIFTVEIL.path}`];
+      `${MUSIC_DATA_FOLDER}/${DRIFTVEIL.path}`,
+      join(MUSIC_DATA_FOLDER, "..", "sample.mp3"),
+    ];
     const path = "tests/files";
     const actual = await findFiles( {
       folder: path,

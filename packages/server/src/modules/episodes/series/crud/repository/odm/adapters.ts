@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { AllKeysOf } from "$shared/utils/types";
-import { ImageCoverOdm } from "#modules/image-covers/repositories/odm";
+import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { Series, SeriesEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
