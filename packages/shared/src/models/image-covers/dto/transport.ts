@@ -1,4 +1,5 @@
 import z from "zod";
+import { createUploadFileResponseSchema } from "../../utils/schemas/files";
 import { mongoDbId } from "../../../models/resources/partial-schemas";
 import { createOneResultResponseSchema } from "../../../utils/http/responses";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
@@ -50,24 +51,9 @@ export namespace ImageCoverCrudDtos {
     } );
 
     export type RequestBody = z.infer<typeof requestBodySchema>;
-    const uploadedFileSchema = z.object( {
-      originalName: z.string(),
-      filename: z.string(),
-      path: z.string(),
-      size: z.number(),
-      mimetype: z.string(),
-      uploadDate: z.string(), // ISO string format
-    } );
 
-    export const responseSchema = z.object( {
-      message: z.string(),
-      meta: z.object( {
-        body: requestBodySchema,
-        file: uploadedFileSchema,
-      } ),
-      data: z.object( {
-        imageCover: imageCoverEntitySchema,
-      } ),
+    export const responseSchema = createUploadFileResponseSchema( {
+      imageCover: imageCoverEntitySchema,
     } );
 
     export type Response = z.infer<typeof responseSchema>;

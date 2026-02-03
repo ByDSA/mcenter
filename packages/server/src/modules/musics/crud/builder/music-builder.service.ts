@@ -1,7 +1,7 @@
 import path from "node:path";
 import { Injectable } from "@nestjs/common";
 import NodeID3 from "node-id3";
-import { AUDIO_EXTENSIONS } from "$shared/models/musics/audio-extensions";
+import { removeFilenameEndUuid, removeFilenameExtension } from "#utils/files";
 import { ARTIST_EMPTY, Music, musicSchema } from "../../models";
 import { getAbsolutePath } from "../../utils";
 import { fixTxtFields } from "../../../resources/fix-text";
@@ -67,20 +67,4 @@ function getTitleFromFilenamePath(relativePath: string): string {
   } while (oldTitle !== title);
 
   return title;
-}
-
-function removeFilenameEndUuid(str: string): string {
-  const uuidRegex = /\[[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\]$/;
-
-  return str.replace(uuidRegex, "");
-}
-export function removeFilenameExtension(str: string): string {
-  for (const ext of AUDIO_EXTENSIONS) {
-    const index = str.lastIndexOf(`.${ext}`);
-
-    if (index >= 0)
-      return str.substring(0, index);
-  }
-
-  return str;
 }

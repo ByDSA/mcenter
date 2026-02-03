@@ -9,9 +9,18 @@ import { parseZod } from "$shared/utils/validation/zod";
 import { CustomValidationError } from "$shared/utils/validation/zod";
 import { toGenericError } from "$shared/utils/errors";
 
+type Options = {
+  failMsg?: string;
+};
+
 export const ValidateResponseWithZodSchema = (
   schema: z.ZodSchema,
-) => SetMetadata("zodSerializerSchema", schema);
+  options?: Options,
+) => {
+  SetMetadata("zodSerializerSchemaOptions", options);
+
+  return SetMetadata("zodSerializerSchema", schema);
+};
 
 @Injectable()
 export class ZodSerializerSchemaInterceptor implements NestInterceptor {
@@ -23,17 +32,23 @@ export class ZodSerializerSchemaInterceptor implements NestInterceptor {
     if (!schema)
       return next.handle();
 
+    const options = this.reflector.get<Options>("zodSerializerSchemaOptions", context.getHandler());
     const req = context.getArgs()?.[0];
 
     return next.handle().pipe(
       map(data => {
-        return validateResponseWithZodSchema(data, schema, req);
+        return validateResponseWithZodSchema(data, schema, req, options);
       } ),
     );
   }
 }
 
-export function validateResponseWithZodSchema<D>(data: D, schema: z.ZodSchema, req?: Request): D {
+export function validateResponseWithZodSchema<D>(
+  data: D,
+  schema: z.ZodSchema,
+  req?: Request,
+  options?: Options,
+): D {
   try {
     return parseZod(schema, data);
   } catch (e) {
@@ -46,6 +61,7 @@ export function validateResponseWithZodSchema<D>(data: D, schema: z.ZodSchema, r
 
     const msgObj = {
       message: e.message,
+      failMsg: options?.failMsg,
       issues: e instanceof ZodError ? e.issues : undefined,
       ctx: {
         request: {

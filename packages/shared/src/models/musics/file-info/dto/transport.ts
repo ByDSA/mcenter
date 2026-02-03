@@ -5,6 +5,7 @@ import { createManyResultResponseSchema, createOneResultResponseSchema } from ".
 import { generatePatchBodySchema } from "../../../utils/schemas/patch";
 import { musicFileInfoEntitySchema } from "../file-info";
 import { musicEntitySchema } from "../../music";
+import { createUploadFileResponseSchema } from "../../../utils/schemas/files";
 
 export namespace MusicFileInfoCrudDtos {
   export namespace GetOneById {
@@ -41,25 +42,10 @@ export namespace MusicFileInfoCrudDtos {
     } );
 
     export type RequestBody = z.infer<typeof requestBodySchema>;
-    const uploadedFileSchema = z.object( {
-      originalName: z.string(),
-      filename: z.string(),
-      path: z.string(),
-      size: z.number(),
-      mimetype: z.string(),
-      uploadDate: z.string(), // ISO string format
-    } );
 
-    export const responseSchema = z.object( {
-      message: z.string(),
-      meta: z.object( {
-        body: requestBodySchema,
-        file: uploadedFileSchema,
-      } ),
-      data: z.object( {
-        music: musicEntitySchema.or(z.undefined()),
-        fileInfo: musicFileInfoEntitySchema,
-      } ),
+    export const responseSchema = createUploadFileResponseSchema( {
+      music: musicEntitySchema.or(z.undefined()),
+      fileInfo: musicFileInfoEntitySchema,
     } );
 
     export type Response = z.infer<typeof responseSchema>;

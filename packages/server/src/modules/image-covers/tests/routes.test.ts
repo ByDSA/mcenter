@@ -1,6 +1,6 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { testCrudRoutes, testRoute, verifyRoutesCoverage } from "#core/routing/test/routing";
-import { ImageCoverCrudController } from "./controller";
+import { ImageCoverCrudController } from "../controller";
 
 testCrudRoutes(PATH_ROUTES.imageCovers.path, [
   "get",

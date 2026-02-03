@@ -1,16 +1,19 @@
-import { Controller, Post, UseInterceptors, HttpStatus, HttpCode, Body, UploadedFile, Param } from "@nestjs/common";
+import { Controller, Body, UploadedFile, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { UserPayload } from "$shared/models/auth";
 import { AdminDeleteOne, GetManyCriteria } from "#utils/nestjs/rest";
-import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
 import { IdParamDto } from "#utils/validation/dtos";
+import { createMulterDto, UploadFile, UserUploadFile } from "#utils/files";
 import { MusicFileInfoRepository } from "./crud/repository";
 import { MusicFileInfoEntity, musicFileInfoEntitySchema } from "./models";
-import { MusicFileInfoUploadRepository, UploadFile, UploadFileInterceptor, UploadMusicFileInfoDto } from "./upload.service";
+import { MusicFileInfoUploadRepository, UploadFileInterceptor } from "./upload.service";
 
 class GetManyCriteriaDto extends createZodDto(MusicFileInfoCrudDtos.GetMany.criteriaSchema) { }
+export class UploadMusicFileInfoDto extends createMulterDto(
+  MusicFileInfoCrudDtos.UploadFile.requestBodySchema,
+) {};
 
 @Controller()
 export class MusicFileInfoController {
@@ -19,18 +22,20 @@ export class MusicFileInfoController {
     private readonly uploadRepo: MusicFileInfoUploadRepository,
   ) {}
 
-  @Post("upload")
-  @HttpCode(HttpStatus.OK)
-  @UseInterceptors(UploadFileInterceptor)
-  @Authenticated() // TODO: filtro role uploader
+  @UserUploadFile("upload", {
+    fileInterceptor: UploadFileInterceptor,
+    responseSchema: MusicFileInfoCrudDtos.UploadFile.responseSchema,
+  } )
   async uploadFile(
     @UploadedFile() file: UploadFile,
     @Body() uploadDto: UploadMusicFileInfoDto,
     @User() user: UserPayload,
-  ): Promise<MusicFileInfoCrudDtos.UploadFile.Response> {
-    const uploaderUserId = user.id;
-
-    return await this.uploadRepo.upload(file, uploadDto, uploaderUserId);
+  ) {
+    return await this.uploadRepo.upload( {
+      file,
+      uploadDto,
+      uploaderUserId: user.id,
+    } );
   }
 
   @GetManyCriteria(musicFileInfoEntitySchema)

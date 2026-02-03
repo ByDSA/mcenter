@@ -7,7 +7,7 @@ import z from "zod";
 import { ImageCoverTasks } from "$shared/models/image-covers/admin";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { ImageCoversRepository } from "../../repositories";
-import { generateImageVersions } from "../../generate-versions";
+import { ImageVersionsGenerator } from "../../generate-versions";
 import { IMAGE_COVERS_FOLDER_PATH } from "../../utils";
 
 const TASK_NAME = ImageCoverTasks.rebuildAll.name;
@@ -27,6 +27,7 @@ export class ImageCoversRebuildAllTaskHandler implements TaskHandler<undefined, 
   constructor(
     private readonly repo: ImageCoversRepository,
     private readonly taskService: TaskService,
+    private readonly imageVersionsGenerator: ImageVersionsGenerator,
   ) {
   }
 
@@ -70,7 +71,7 @@ export class ImageCoversRebuildAllTaskHandler implements TaskHandler<undefined, 
 
     for (const imageCover of allImageCovers) {
       i++;
-      const updatedVersions = await generateImageVersions( {
+      const updatedVersions = await this.imageVersionsGenerator.generate( {
         filePath: path.join(
           IMAGE_COVERS_FOLDER_PATH,
           imageCover.id.slice(-2),

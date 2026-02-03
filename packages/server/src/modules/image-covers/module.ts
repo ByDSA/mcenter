@@ -3,6 +3,7 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { ImageCoverCrudController } from "./controller";
 import { ImageCoversRepository } from "./repositories";
 import { ImageCoversUploadService } from "./upload.service";
+import { ImageVersionsGenerator } from "./generate-versions";
 
 @Module( {
   imports: [
@@ -14,7 +15,8 @@ import { ImageCoversUploadService } from "./upload.service";
   providers: [
     ImageCoversRepository,
     ImageCoversUploadService,
+    ImageVersionsGenerator,
   ],
-  exports: [ImageCoversRepository],
+  exports: [ImageCoversRepository, ImageVersionsGenerator],
 } )
 export class ImageCoversCrudModule {}

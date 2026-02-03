@@ -16,6 +16,7 @@ const config: JestConfigWithTsJest = {
     "^#series($|/.*)$": "<rootDir>/src/modules/series/$1",
     "^#core($|/.*)$": "<rootDir>/src/core/$1",
     "^#utils($|/.*)$": "<rootDir>/src/utils/$1",
+    "^\\$shared($|/.*)$": "<rootDir>/../shared/src/$1",
   },
   setupFiles: ["./jest.setup.ts"],
   globalSetup: "./jest.global.setup.ts",
