@@ -10,7 +10,6 @@ testCrudRoutes(PATH_ROUTES.imageCovers.path, [
   "get-many-criteria",
 ]);
 
-
 verifyRoutesCoverage( {
   controller: ImageCoverCrudController,
   controllerRoute: PATH_ROUTES.imageCovers.path,

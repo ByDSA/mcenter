@@ -4,7 +4,7 @@ import { StreamsModule } from "#episodes/streams/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
-import { EpisodeFileInfosModule } from "#episodes/file-info/module";
+import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { EpisodeRendererModule } from "#episodes/renderer/module";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { StreamPickerController } from "./show-picker.controller";
@@ -18,7 +18,7 @@ import { StreamGetEpisodeController } from "./get-episode.controller";
     EpisodeHistoryModule,
     SeriesCrudModule,
     EpisodeDependenciesModule,
-    EpisodeFileInfosModule,
+    EpisodeFileInfosCrudModule,
     EpisodeRendererModule,
     ResourceResponseFormatterModule,
   ],

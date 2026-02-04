@@ -2,7 +2,7 @@ import type { EpisodeHistoryEntryEntity } from "../";
 import { ObjectId } from "mongodb";
 import { fixtureUsers } from "../../../auth/tests/fixtures";
 import { deepFreeze } from "../../../../utils/objects";
-import { STREAM_SIMPSONS } from "../../streams/tests";
+import { STREAM_SAMPLE, STREAM_SIMPSONS } from "../../streams/tests";
 import { SAMPLE1 as DATE_SAMPLE1 } from "../../../../../tests/other-fixtures/dates";
 import { fixtureEpisodes } from "../../tests";
 
@@ -24,8 +24,23 @@ const HISTORY_ENTRIES_SIMPSONS: EpisodeHistoryEntryEntity[] = deepFreeze([
   HISTORY_ENTRY_SIMPSONS1,
   HISTORY_ENTRY_SIMPSONS_6_25,
 ] satisfies EpisodeHistoryEntryEntity[]);
+const HISTORY_ENTRY_SAMPLE1: EpisodeHistoryEntryEntity = {
+  id: new ObjectId().toString(),
+  resourceId: fixtureEpisodes.SerieSample.Samples.EP1x01.id,
+  date: DATE_SAMPLE1,
+  streamId: STREAM_SAMPLE.id,
+  userId: fixtureUsers.Normal.User.id,
+};
 
 export const fixtureEpisodeHistoryEntries = {
+  SampleSerie: {
+    Samples: {
+      EP1x01: HISTORY_ENTRY_SAMPLE1,
+    },
+    List: [
+      HISTORY_ENTRY_SAMPLE1,
+    ],
+  },
   Simpsons: {
     Samples: {
       EP1x01: HISTORY_ENTRY_SIMPSONS1,

@@ -3,7 +3,7 @@ import { StreamPickerModule } from "#episodes/streams/picker/module";
 import { SeriesCrudModule } from "#episodes/series/module";
 import { StreamsModule } from "#episodes/streams/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
-import { EpisodeFileInfosModule } from "#episodes/file-info/module";
+import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
 import { MusicHistoryModule } from "#musics/history/module";
@@ -33,7 +33,7 @@ import { AuthPlayerService } from "./AuthPlayer.service";
     EpisodesCrudModule,
     EpisodeHistoryModule,
     StreamPickerModule,
-    EpisodeFileInfosModule,
+    EpisodeFileInfosCrudModule,
     MusicsCrudModule,
     MusicHistoryModule,
     MusicFileInfoCrudModule,

@@ -65,6 +65,26 @@ CanGetAll<Entity> {
     return modelsOdm.map(EpisodeFileInfoOdm.toEntity);
   }
 
+  async getOneByHash(hash: EpisodeFileInfoEntity["hash"]): Promise<Entity | null> {
+    const doc = await EpisodeFileInfoOdm.Model.findOne( {
+      hash,
+    } );
+
+    if (!doc)
+      return null;
+
+    return EpisodeFileInfoOdm.toEntity(doc);
+  }
+
+  // Lo normal es que haya uno solo por hash, pero por si acaso
+  async getManyByHash(hash: EpisodeFileInfoEntity["hash"]): Promise<Entity[]> {
+    const docs = await EpisodeFileInfoOdm.Model.find( {
+      hash,
+    } );
+
+    return docs.map(EpisodeFileInfoOdm.toEntity);
+  }
+
   async getOneByPath(path: EpisodeFileInfoEntity["path"]): Promise<Entity | null> {
     const doc = await EpisodeFileInfoOdm.Model.findOne( {
       path,

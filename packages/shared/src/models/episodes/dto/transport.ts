@@ -8,6 +8,7 @@ import { createCriteriaConfig, createCriteriaOneSchema, createCriteriaManySchema
 
 const criteriaConfig = createCriteriaConfig( {
   filterShape: {
+    ids: z.array(mongoDbId).optional(),
     id: mongoDbId.optional(),
     path: z.string().optional(),
     seriesKey: z.string().optional(),
@@ -15,8 +16,8 @@ const criteriaConfig = createCriteriaConfig( {
     episodeKeys: z.array(z.string()).optional(),
     seriesKeys: z.array(z.string()).optional(),
   },
-  sortKeys: ["episodeCompKey", "episodeKey", "createdAt", "updatedAt"],
-  expandKeys: ["series", "fileInfos", "userInfo"],
+  sortKeys: ["episodeCompKey", "episodeKey", "createdAt", "updatedAt"] as const,
+  expandKeys: ["series", "fileInfos", "userInfo"] as const,
 } );
 
 export namespace EpisodesCrudDtos {

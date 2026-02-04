@@ -1,6 +1,6 @@
 import { RouterModule, Routes } from "@nestjs/core";
 import { PATH_ROUTES } from "$shared/routing";
-import { EpisodeFileInfosModule } from "#episodes/file-info/module";
+import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesAdminModule } from "#episodes/admin/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
@@ -30,6 +30,7 @@ import { MusicSmartPlaylistsCrudModule } from "#musics/smart-playlists/crud/modu
 import { MusicUsersListsModule } from "#musics/users-lists/crud/module";
 import { SeriesCrudModule } from "#episodes/series/module";
 import { ImageCoversUploadModule } from "#modules/image-covers/upload/module";
+import { EpisodeFileInfosUploadModule } from "#episodes/file-info/upload/module";
 import { LoggingModule } from "../logging/module";
 import { MusicFileInfoUploadModule } from "#musics/file-info/upload/module";
 
@@ -54,7 +55,7 @@ export const directImports = [
 
   EpisodesSlugModule,
   EpisodesAdminModule,
-  EpisodeFileInfosModule,
+  EpisodeFileInfosCrudModule,
   EpisodesCrudModule, // Al final, para que no interfiera con slugs
   SeriesCrudModule,
 
@@ -99,7 +100,11 @@ const episodesRoutes: Routes = [
   },
   {
     path: PATH_ROUTES.episodes.fileInfo.path,
-    module: EpisodeFileInfosModule,
+    module: EpisodeFileInfosCrudModule,
+  },
+  {
+    path: PATH_ROUTES.episodes.fileInfo.upload.path,
+    module: EpisodeFileInfosUploadModule,
   },
   {
     path: PATH_ROUTES.episodes.dependencies.path,

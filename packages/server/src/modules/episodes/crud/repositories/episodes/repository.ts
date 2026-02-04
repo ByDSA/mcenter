@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -49,7 +49,6 @@ CanDeleteOneByIdAndGet<EpisodeEntity, EpisodeId>,
 CanGetAll<EpisodeEntity> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
-    @Inject(forwardRef(() => LastTimePlayedService))
     private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
   }
@@ -137,14 +136,12 @@ CanGetAll<EpisodeEntity> {
       return episodeOdm ? EpisodeOdm.toEntity(episodeOdm) : null;
     }
 
-    // Si hay expand, usar aggregate para poder aplicar las transformaciones
-    const [episode] = await this.getMany( {
+    const episode = await this.getOne( {
       criteria: {
         ...criteria,
         filter: {
           id,
         },
-        limit: 1,
       },
     } );
 

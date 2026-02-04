@@ -1,7 +1,6 @@
 import { existsSync } from "fs";
-import fs from "node:fs";
 import path from "node:path";
-import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { safeOneConcurrent, safeSequential } from "$shared/utils/errors";
 import { createOneResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
 import { Job } from "bullmq";
@@ -9,15 +8,14 @@ import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
 import { EpisodeTasks } from "$shared/models/episodes/admin";
 import { assertIsDefined } from "$shared/utils/validation";
-import ffmpeg from "fluent-ffmpeg";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfo, EpisodeFileInfoEntity, EpisodeFileInfoOmitEpisodeId, episodeFileInfoSchema } from "#episodes/file-info/models";
 import { Series } from "#episodes/series";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
-import { md5FileAsync } from "#utils/crypt";
 import { Episode } from "#episodes/models";
+import { VideoMetadataService } from "#modules/resources/video/video-metadata/VideoMetadataService.service";
 import { EpisodesRepository } from "../../crud/repositories/episodes";
 import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "./disk";
 import { RemoteSeriesTreeService } from "./db";
@@ -53,6 +51,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
     private readonly savedSerieTreeService: RemoteSeriesTreeService,
     private readonly fileInfoRepo: EpisodeFileInfoRepository,
     private readonly taskService: TaskService,
+    private readonly videoMetadata: VideoMetadataService,
   ) {
   }
 
@@ -251,54 +250,10 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
     if (!existsSync(fullFilePath))
       throw new Error("UpdateMetadataProcess: file '" + fullFilePath + "' not exists");
 
-    const episodeFileInfo: ModelOmitEpisodeId = await new Promise((resolve, reject) =>{
-      ffmpeg.ffprobe(fullFilePath, async (err, metadata) => {
-        if (err) {
-          if (err instanceof Error && err.message === "Cannot find ffprobe") {
-            const newError = new InternalServerErrorException();
-
-            newError.message = err.message;
-            newError.stack = err.stack;
-
-            return reject(newError);
-          }
-
-          return reject(err);
-        }
-
-        if (!metadata)
-          return;
-
-        const duration = metadata.format?.duration ?? null;
-        const resolution = {
-          width: metadata.streams[0].width ?? null,
-          height: metadata.streams[0].height ?? null,
-        };
-        const fps = metadata.streams[0].r_frame_rate ?? null;
-        const { mtime, ctime, size } = fs.statSync(fullFilePath);
-        const createdAt = new Date(ctime);
-        const updatedAt = new Date(mtime);
-
-        this.logger.log(`got metadata of ${filePath}`);
-
-        const ret: ModelOmitEpisodeId = {
-          path: filePath,
-          hash: await md5FileAsync(fullFilePath),
-          size,
-          timestamps: {
-            createdAt,
-            updatedAt,
-          },
-          mediaInfo: {
-            duration,
-            resolution,
-            fps,
-          },
-        };
-
-        return resolve(ret);
-      } );
-    } );
+    const episodeFileInfo: ModelOmitEpisodeId = {
+      path: filePath,
+      ...await this.videoMetadata.getVideoInfo(fullFilePath),
+    };
 
     return episodeFileInfo;
   }

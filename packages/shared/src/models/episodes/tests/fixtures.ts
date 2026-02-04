@@ -5,7 +5,7 @@ import { deepFreeze } from "../../../utils/objects";
 import { DATEJS_SAMPLE1 } from "../../../../tests/other-fixtures/dates";
 import { fixtureEpisodeFileInfos } from "../file-info/tests";
 import { fixtureUsers } from "../../auth/tests/fixtures";
-import { simpsonIds } from "./fixture-ids";
+import { simpsonIds, serieSampleIds } from "./fixture-ids";
 
 const uploaderUserId = fixtureUsers.Admin.User.id;
 const timestamps = {
@@ -175,8 +175,28 @@ const EPISODES_SIMPSONS: EpisodeEntity[] = deepFreeze([
   EP6x25,
   EP7x01,
 ]);
+const SerieSampleEP1x01 = {
+  ...ep1x01,
+  id: serieSampleIds.ep1x01,
+  compKey: {
+    episodeKey: "1x01",
+    seriesKey: "sample-serie",
+  },
+  title: "Sample Title",
+  fileInfos: [
+    fixtureEpisodeFileInfos.SampleSerie.Samples.EP1x01,
+  ],
+} satisfies EpisodeEntity;
 
 export const fixtureEpisodes = {
+  SerieSample: {
+    Samples: {
+      EP1x01: SerieSampleEP1x01,
+    },
+    List: [
+      SerieSampleEP1x01,
+    ],
+  },
   Simpsons: {
     Samples: {
       EP1x01: ep1x01,

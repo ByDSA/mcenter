@@ -239,6 +239,12 @@ function buildMongooseFilterWithFileInfos(
     if (criteria.filter.id)
       filter["_id"] = new Types.ObjectId(criteria.filter.id);
 
+    if (criteria.filter.ids) {
+      filter["_id"] = {
+        $in: criteria.filter.ids.map(id => new Types.ObjectId(id)),
+      };
+    }
+
     if (criteria.filter.seriesKey)
       filter["seriesKey"] = criteria.filter.seriesKey;
 

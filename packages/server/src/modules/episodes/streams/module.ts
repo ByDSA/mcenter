@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { forwardRef, Module } from "@nestjs/common";
 import { SeriesCrudModule } from "#episodes/series/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";

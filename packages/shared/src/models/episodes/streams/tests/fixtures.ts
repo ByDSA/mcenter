@@ -18,3 +18,18 @@ export const STREAM_SIMPSONS: StreamEntity = deepFreeze( {
   },
   mode: StreamMode.RANDOM,
 } satisfies StreamEntity);
+
+export const STREAM_SAMPLE: StreamEntity = deepFreeze( {
+  id: new ObjectId().toString(),
+  key: "sample",
+  userId: fixtureUsers.Normal.User.id,
+  group: {
+    origins: [
+      {
+        type: StreamOriginType.SERIE,
+        id: "simpsons",
+      },
+    ],
+  },
+  mode: StreamMode.RANDOM,
+} satisfies StreamEntity);

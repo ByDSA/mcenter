@@ -45,7 +45,7 @@ export namespace ImageCoverCrudDtos {
   export namespace UploadFile {
     export const requestBodySchema = z.object( {
       metadata: z.object( {
-        imageCoverId: z.string().optional(),
+        imageCoverId: mongoDbId.optional(),
         label: z.string().optional(),
       } ),
     } );

@@ -17,3 +17,7 @@ export const simpsonIds = {
   ep6x25: new ObjectId().toString(),
   ep7x01: new ObjectId().toString(),
 };
+
+export const serieSampleIds = {
+  ep1x01: new ObjectId().toString(),
+};

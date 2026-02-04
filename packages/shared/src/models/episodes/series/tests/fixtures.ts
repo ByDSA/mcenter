@@ -11,3 +11,13 @@ export const SERIE_SIMPSONS: SeriesEntity = deepFreeze( {
   updatedAt: new Date(),
   addedAt: new Date(),
 } );
+
+export const SAMPLE_SERIE: SeriesEntity = deepFreeze( {
+  id: new ObjectId().toString(),
+  key: "sample-serie",
+  name: "Sample Serie",
+  imageCoverId: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  addedAt: new Date(),
+} );

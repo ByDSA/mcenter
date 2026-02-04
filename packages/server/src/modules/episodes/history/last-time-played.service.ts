@@ -1,7 +1,6 @@
 import type { EpisodeEntity, EpisodeUserInfoEntity } from "#episodes/models";
 import { DateTime } from "luxon";
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
+import { Injectable } from "@nestjs/common";
 import { showError } from "#core/logging/show-error";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { EpisodeHistoryRepository } from "./crud/repository";
@@ -9,8 +8,6 @@ import { EpisodeHistoryRepository } from "./crud/repository";
 @Injectable()
 export class LastTimePlayedService {
   constructor(
-    @Inject(forwardRef(() => EpisodesRepository))
-    private readonly episodesRepo: EpisodesRepository,
     private readonly episodesUsersRepo: EpisodesUsersRepository,
     private readonly historyRepo: EpisodeHistoryRepository,
   ) {

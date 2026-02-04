@@ -7,9 +7,9 @@ import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { imageCoverEntitySchema } from "$shared/models/image-covers";
 import supertest from "supertest";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { uploadImage } from "./utils";
-import { ImageCoversUploadModule } from "../module";
 import { IMAGE_COVERS_FOLDER_PATH } from "#modules/image-covers/utils";
+import { ImageCoversUploadModule } from "../module";
+import { uploadImage } from "./utils";
 
 const sampleFile = Buffer.from(fs.readFileSync(IMAGE_COVERS_FOLDER_PATH + "/sample-nodejs.png"));
 

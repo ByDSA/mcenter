@@ -2,7 +2,7 @@ import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
-import { SERIE_SIMPSONS } from "$sharedSrc/models/episodes/series/tests/fixtures";
+import { SAMPLE_SERIE } from "$sharedSrc/models/episodes/series/tests/fixtures";
 import { SeriesCrudModule } from "#episodes/series/module";
 import { EpisodeHistoryModule } from "#episodes/history/module";
 import { fixtureEpisodes } from "#episodes/tests";
@@ -14,7 +14,7 @@ import { StreamsModule } from "#episodes/streams/module";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
-import { STREAM_SIMPSONS } from "#episodes/streams/tests";
+import { STREAM_SAMPLE } from "#episodes/streams/tests";
 import { UUID_INVALID, UUID_UNUSED } from "#core/db/tests/fixtures/uuid";
 import { PlayVideoService } from "../play-video.service";
 import { PlayService } from "../play.service";
@@ -54,11 +54,11 @@ describe("playEpisodeController", () => {
     routerApp = testingSetup.routerApp;
 
     testingSetup.getMock(EpisodesRepository).getOneByCompKey
-      .mockResolvedValue(fixtureEpisodes.Simpsons.Samples.EP1x01);
+      .mockResolvedValue(fixtureEpisodes.SerieSample.Samples.EP1x01);
     testingSetup.getMock(SeriesRepository).getOneByKey
-      .mockResolvedValue(SERIE_SIMPSONS);
+      .mockResolvedValue(SAMPLE_SERIE);
     testingSetup.getMock(StreamsRepository).getOneOrCreateBySeriesKey
-      .mockResolvedValue(STREAM_SIMPSONS);
+      .mockResolvedValue(STREAM_SAMPLE);
 
     await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
   } );
@@ -76,7 +76,7 @@ describe("playEpisodeController", () => {
     it("should return 422 if episode id is not UUID", async () => {
       testingSetup.getMock(EpisodesRepository).getOneByCompKey
         .mockResolvedValueOnce(null);
-      const response = await request(routerApp).get(`/play/${remotePlayerId}/episode/simpsons/${UUID_INVALID}`)
+      const response = await request(routerApp).get(`/play/${remotePlayerId}/episode/sample-serie/${UUID_INVALID}`)
         .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
       expect(response).toBeDefined();
@@ -85,7 +85,16 @@ describe("playEpisodeController", () => {
     it("should return 422 if episode id not exists", async () => {
       testingSetup.getMock(EpisodesRepository).getOneByCompKey
         .mockResolvedValueOnce(null);
-      const response = await request(routerApp).get(`/play/${remotePlayerId}/episode/simpsons/${UUID_UNUSED}`)
+      const response = await request(routerApp).get(`/play/${remotePlayerId}/episode/sample-serie/${UUID_UNUSED}`)
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
+
+      expect(response).toBeDefined();
+    } );
+
+    it("should return 422 if episode key not exists", async () => {
+      testingSetup.getMock(EpisodesRepository).getOneByCompKey
+        .mockResolvedValueOnce(null);
+      const response = await request(routerApp).get(`/play/${remotePlayerId}/episode/sample-serie/23x24`)
         .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
       expect(response).toBeDefined();
@@ -93,7 +102,7 @@ describe("playEpisodeController", () => {
 
     it("should return 200 if episode found", async () => {
       const spy = jest.spyOn(testingSetup.module.get(PlayService), "play");
-      const response = await request(routerApp).get(`/play/${remotePlayerId}/episode/simpsons/1x01`)
+      const response = await request(routerApp).get(`/play/${remotePlayerId}/episode/sample-serie/1x01`)
         .expect(HttpStatus.OK);
 
       expect(response).toBeDefined();

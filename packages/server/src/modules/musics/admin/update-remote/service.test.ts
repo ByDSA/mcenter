@@ -5,13 +5,13 @@ import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { createMockedModule } from "#utils/nestjs/tests";
 import { MockJob } from "#core/tasks/tests";
+import { MusicFileInfoCrudModule } from "#musics/file-info/crud/module";
 import { MusicsRepository } from "../../crud/repositories/music";
 import { MusicFileInfoRepository } from "../../file-info/crud/repository";
 import { musicFileInfoEntitySchema } from "../../file-info/models";
 import { musicEntitySchema } from "../../models";
 import { MusicsCrudModule } from "../../crud/module";
 import { UpdateRemoteTreeService, UpdateResult } from "./service";
-import { MusicFileInfoCrudModule } from "#modules/musics/file-info/crud/module";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 

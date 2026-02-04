@@ -447,6 +447,9 @@ token?: string;} ) => {
     fileInfo: {
       path: EPISODES_FILE_INFO,
       withParams: (id: string) => `${EPISODES_FILE_INFO}/${id}`,
+      upload: {
+        path: `${EPISODES_FILE_INFO}/upload`,
+      },
     },
     history: {
       path: EPISODES_HISTORY,

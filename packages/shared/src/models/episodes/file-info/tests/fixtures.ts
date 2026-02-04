@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { deepFreeze } from "../../../../utils/objects";
 import { DATEJS_SAMPLE1 } from "../../../../../tests/other-fixtures/dates";
 import { generateRandomMD5 } from "../../../../../tests/other-fixtures/hash";
-import { simpsonIds } from "../../tests/fixture-ids";
+import { serieSampleIds, simpsonIds } from "../../tests/fixture-ids";
 
 const fileInfoTimestamps = {
   createdAt: DATEJS_SAMPLE1,
@@ -151,8 +151,32 @@ const EPISODE_FILE_INFO_SIMPSONS: EpisodeFileInfoEntity[] = deepFreeze([
   ep1x12FileInfo,
   ep1x13FileInfo,
 ]);
+const sampleSerieEp1x01FileInfo: EpisodeFileInfoEntity = {
+  id: new ObjectId().toString(),
+  path: "series/sample-serie/1/sample-1x01.mp4",
+  episodeId: serieSampleIds.ep1x01,
+  timestamps: fileInfoTimestamps,
+  hash: "8f247ad75542bba9609f7e03be016cb1",
+  size: 5217,
+  mediaInfo: {
+    duration: 0.5,
+    fps: "25",
+    resolution: {
+      width: 640,
+      height: 480,
+    },
+  },
+} satisfies EpisodeFileInfoEntity;
 
 export const fixtureEpisodeFileInfos = {
+  SampleSerie: {
+    Samples: {
+      EP1x01: sampleSerieEp1x01FileInfo,
+    },
+    List: [
+      sampleSerieEp1x01FileInfo,
+    ],
+  },
   Simpsons: {
     Samples: {
       EP1x01: EPISODE_FILE_INFO_SIMPSONS[0],

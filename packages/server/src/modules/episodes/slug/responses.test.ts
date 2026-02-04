@@ -38,7 +38,7 @@ describe("responses", () => {
 
     router = testingSetup.routerApp;
     repo = testingSetup.module.get(EpisodesRepository);
-    repo.getOneByCompKey.mockResolvedValue(fixtureEpisodes.Simpsons.Samples.EP1x01);
+    repo.getOneByCompKey.mockResolvedValue(fixtureEpisodes.SerieSample.Samples.EP1x01);
   } );
 
   it("default response json", async () => {
@@ -46,7 +46,7 @@ describe("responses", () => {
       .get(URL)
       .expect(HttpStatus.OK);
 
-    expectWithEpisode(res, fixtureEpisodes.Simpsons.Samples.EP1x01);
+    expectWithEpisode(res, fixtureEpisodes.SerieSample.Samples.EP1x01);
   } );
 
   it("response json", async () => {
@@ -54,14 +54,14 @@ describe("responses", () => {
       .get(URL + "?format=json")
       .expect(HttpStatus.OK);
 
-    expectWithEpisode(res, fixtureEpisodes.Simpsons.Samples.EP1x01);
+    expectWithEpisode(res, fixtureEpisodes.SerieSample.Samples.EP1x01);
   } );
 
   it("response m3u8", async () => {
     const res = await request(router)
       .get(URL + "?format=m3u8")
       .expect(HttpStatus.OK);
-    const ep = fixtureEpisodes.Simpsons.Samples.EP1x01;
+    const ep = fixtureEpisodes.SerieSample.Samples.EP1x01;
     const host = getHostFromSuperTestRequest(res.request);
     const path = PATH_ROUTES.episodes.slug.withParams(ep.compKey.seriesKey, ep.compKey.episodeKey);
 
@@ -71,9 +71,9 @@ describe("responses", () => {
   it("response raw", async () => {
     repo.getOneByCompKey.mockResolvedValueOnce(
       {
-        ...fixtureEpisodes.Simpsons.Samples.EP1x01,
+        ...fixtureEpisodes.SerieSample.Samples.EP1x01,
         fileInfos: [
-          fixtureEpisodeFileInfos.Simpsons.Samples.EP1x01,
+          fixtureEpisodeFileInfos.SampleSerie.Samples.EP1x01,
         ],
       },
     );

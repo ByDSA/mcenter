@@ -1,6 +1,11 @@
 import { forwardRef, Module } from "@nestjs/common";
+import { SeriesCrudModule } from "#episodes/series/module";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
+import { TasksModule } from "#core/tasks";
+import { VideoMetadataModule } from "#modules/resources/video/video-metadata/module";
 import { EpisodeHistoryModule } from "../history/module";
-import { EpisodeFileInfosModule } from "../file-info/module";
+import { EpisodeFileInfosCrudModule } from "../file-info/crud/module";
 import { EpisodeDependenciesModule } from "../dependencies/module";
 import { EpisodesCrudModule } from "../crud/module";
 import { EpisodesUpdateController } from "./update-file-info-saved/controller";
@@ -9,21 +14,18 @@ import { EpisodesUpdateLastTimePlayedController } from "./update-last-time-playe
 import { EpisodeUpdateRemoteTaskHandler } from "./sync-disk-to-db/task.handler";
 import { EpisodeUpdateLastTimePlayedTaskHandler } from "./update-last-time-played/task.handler";
 import { EpisodeUpdateFileInfoSavedTaskHandler } from "./update-file-info-saved/task.handler";
-import { SeriesCrudModule } from "#episodes/series/module";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
-import { TasksModule } from "#core/tasks";
 
 @Module( {
   imports: [
     DomainEventEmitterModule,
     SeriesCrudModule,
     forwardRef(() => EpisodeHistoryModule),
-    EpisodeFileInfosModule,
+    EpisodeFileInfosCrudModule,
     EpisodeDependenciesModule,
     ResourceResponseFormatterModule,
     EpisodesCrudModule,
     TasksModule,
+    VideoMetadataModule,
   ],
   controllers: [
     EpisodesUpdateLastTimePlayedController,
