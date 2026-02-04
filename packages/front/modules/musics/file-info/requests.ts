@@ -57,7 +57,7 @@ export class MusicFileInfosApi {
     } );
 
     return fetcher( {
-      url: backendUrl(PATH_ROUTES.musics.fileInfo.path),
+      url: backendUrl(PATH_ROUTES.musics.fileInfo.getMany.path),
       body,
     } );
   }

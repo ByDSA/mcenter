@@ -215,6 +215,9 @@ export const PATH_ROUTES = {
     fileInfo: {
       path: `${MUSICS_FILE_INFO}`,
       withParams: (id: string)=>`${MUSICS_FILE_INFO}/${id}`,
+      getMany: {
+        path: `${MUSICS_FILE_INFO}/${GET_MANY_CRITERIA_PATH}`,
+      },
       upload: {
         path: `${MUSICS_FILE_INFO}/upload`,
       },

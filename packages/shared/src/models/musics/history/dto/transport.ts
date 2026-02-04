@@ -2,7 +2,6 @@ import z from "zod";
 import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
 import { mongoDbId } from "../../../resources/partial-schemas";
 import { musicHistoryEntryEntitySchema } from "../history-entry";
-import { musicEntitySchema } from "../../music";
 import { createManyResultResponseSchema, createOneResultResponseSchema } from "../../../../utils/http/responses";
 
 export namespace MusicHistoryEntryCrudDtos {
@@ -20,15 +19,7 @@ export namespace MusicHistoryEntryCrudDtos {
     export type Criteria = z.infer<typeof criteriaSchema>;
     export const bodySchema = criteriaSchema.default( {} );
 
-    export const dataSchema = musicHistoryEntryEntitySchema
-      .required( {
-        resource: true,
-      } )
-      .extend( {
-        resource: musicEntitySchema.required( {
-          userInfo: true,
-        } ),
-      } );
+    export const dataSchema = musicHistoryEntryEntitySchema;
 
     export type Data = z.infer<typeof dataSchema>;
 
