@@ -66,7 +66,7 @@ export const DaInputNumber = forwardRef<HTMLInputElement, Props>(
       const dMax = decimals === "integer" ? 0 : maxDecimals;
       // Obtener decimales actuales para no recortar mientras el usuario escribe si no hay max
       const currentDecimals = (val.split(".")[1] || "").length;
-      let targetDecimals = Math.max(dMin, currentDecimals);
+      let targetDecimals = Math.max(dMin, 0, currentDecimals);
 
       if (typeof dMax === "number")
         targetDecimals = Math.min(targetDecimals, dMax);
@@ -83,13 +83,14 @@ export const DaInputNumber = forwardRef<HTMLInputElement, Props>(
 
       return formatted;
     }, [decimals, maxDecimals, minDecimals, paddingZeroDigits]);
-    const updateToFormated = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const formatted = getFormattedValue(e.target.value);
+    const updateToFormated = (e: React.ChangeEvent<HTMLInputElement> |
+      React.FocusEvent<HTMLInputElement>) => {
+      const currentVal = e.target.value;
+      const formatted = getFormattedValue(currentVal);
 
-      if (formatted !== e.target.value) {
+      if (formatted !== currentVal && formatted !== "") {
         e.target.value = formatted;
 
-        // Notificar del cambio tras el formateo
         if (onChange) {
           const event = {
             ...e,
@@ -98,7 +99,6 @@ export const DaInputNumber = forwardRef<HTMLInputElement, Props>(
           } as unknown as React.ChangeEvent<HTMLInputElement>;
 
           onChange(event);
-          updateToFormated(event);
         }
 
         return true;
@@ -108,25 +108,43 @@ export const DaInputNumber = forwardRef<HTMLInputElement, Props>(
     };
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       updateNull(e.target, nullable);
-      const updated = updateToFormated(e);
 
-      if (!updated && onChange)
-        onChange(e);
+      onChange?.(e);
     };
+    const restoreToInitialValue = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+      const restored = initialValue?.toString() ?? "";
+
+      if (restored !== "") {
+        e.target.value = restored;
+
+        // Disparamos onChange manualmente para que
+        // el estado interno (ej. RHF) no se quede con NaN o ""
+        if (onChange) {
+          const event = {
+            ...e,
+            type: "change",
+          } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+          onChange(event);
+        }
+      }
+    }, [initialValue, onChange]);
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
       if (e.target.value === "")
-        e.target.value = initialValue?.toString() ?? "";
+        restoreToInitialValue(e);
 
       updateToFormated(e);
 
-      if (onBlur)
-        onBlur(e);
+      onBlur?.(e);
     };
     const targets = {
       max: decimals === "integer" ? 0 : maxDecimals,
     };
     const derivedStep = step
       ?? (targets.max !== undefined ? (10 ** -targets.max).toFixed(targets.max) : "any");
+    const inputValue = props.value !== undefined
+      ? getFormattedValue(props.value.toString())
+      : undefined;
 
     return (
       <input
@@ -140,7 +158,7 @@ export const DaInputNumber = forwardRef<HTMLInputElement, Props>(
           nullable && textStyles.nullable,
           className,
         )}
-        value={props.value !== undefined ? getFormattedValue(props.value.toString()) : ""}
+        value={inputValue}
         onChange={handleChange}
         onBlur={handleBlur}
       />

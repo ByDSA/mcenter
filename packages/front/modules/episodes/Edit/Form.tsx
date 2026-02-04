@@ -50,6 +50,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
   const { register,
     handleSubmit,
     control,
+    getValues,
     formState: { errors, isDirty, dirtyFields, isValid } } = useForm( {
     resolver: zodResolver(schema),
     mode: "onChange",
@@ -197,8 +198,8 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
               name="start"
               render={( { field } ) => (
                 <DaInputTime
-                  value={field.value ?? null}
-                  onChange={e=>field.onChange(e ?? undefined)}
+                  value={getValues(field.name) ?? null}
+                  onChange={newValue=>field.onChange(newValue ?? undefined)}
                   nullable
                 />
               )}
@@ -211,7 +212,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
               name="end"
               render={( { field } ) => (
                 <DaInputTime
-                  value={field.value ?? null}
+                  value={getValues(field.name) ?? null}
                   onChange={e=>field.onChange(e ?? undefined)}
                   nullable
                 />
