@@ -9,7 +9,7 @@ import { EditEpisodeForm } from "./Form";
 
 type Props = {
   initialData: EpisodeEntity;
-  onSuccess: (data: EpisodeEntity)=> void;
+  onSuccess?: (data: EpisodeEntity)=> void;
 };
 
 export function EditEpisodeLoader( { initialData, onSuccess }: Props) {
@@ -39,7 +39,7 @@ export function EditEpisodeLoader( { initialData, onSuccess }: Props) {
       <EditEpisodeForm
         initialData={loadedData!}
         onSuccess={(d) => {
-          onSuccess(d);
+          onSuccess?.(d);
           closeModal();
         }}
       />

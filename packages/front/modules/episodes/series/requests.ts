@@ -1,8 +1,12 @@
+/* eslint-disable import/no-cycle */
 import { PATH_ROUTES } from "$shared/routing";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { useImageCover } from "#modules/image-covers/hooks";
 import { SeriesCrudDtos } from "./models/dto";
+import { useSeries } from "./hooks";
+import { SeriesEntity } from "./models";
 
 export class SeriesApi {
   static {
@@ -20,22 +24,29 @@ export class SeriesApi {
     } );
   }
 
-  getManyByCriteria(
-    criteria: SeriesCrudDtos.GetMany.Criteria,
+  async getManyByCriteria(
+    criteria: SeriesCrudDtos.GetMany.Criteria & {skipCache?: boolean},
   ) {
     const fetcher = makeFetcher( {
       method: "POST",
       requestSchema: SeriesCrudDtos.GetMany.criteriaSchema,
       responseSchema: SeriesCrudDtos.GetMany.responseSchema,
     } );
-
-    return fetcher( {
+    const { skipCache, ...actualCriteria } = criteria;
+    const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.episodes.series.getMany.path),
-      body: criteria,
+      body: actualCriteria,
     } );
+
+    if (!skipCache) {
+      for (const item of ret.data)
+        updateCache(item);
+    }
+
+    return ret;
   }
 
-  createOne(
+  async createOne(
     body: SeriesCrudDtos.CreateOne.Body,
   ) {
     const fetcher = makeFetcher( {
@@ -43,14 +54,19 @@ export class SeriesApi {
       requestSchema: SeriesCrudDtos.CreateOne.bodySchema,
       responseSchema: SeriesCrudDtos.CreateOne.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.episodes.series.path),
       body,
     } );
+    const newItem = ret.data;
+
+    if (newItem)
+      updateCache(newItem);
+
+    return ret;
   }
 
-  patch(
+  async patch(
     id: string,
     body: SeriesCrudDtos.Patch.Body,
   ) {
@@ -59,21 +75,36 @@ export class SeriesApi {
       requestSchema: SeriesCrudDtos.Patch.bodySchema,
       responseSchema: SeriesCrudDtos.Patch.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.episodes.series.withParams(id)),
       body,
     } );
+    const updatedItem = ret.data;
+
+    if (updatedItem)
+      updateCache(updatedItem);
+
+    return ret;
   }
 
-  deleteOneById(id: string) {
+  async deleteOneById(id: string) {
     const fetcher = makeFetcher( {
       method: "DELETE",
       responseSchema: SeriesCrudDtos.Delete.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.episodes.series.withParams(id)),
     } );
+
+    await useSeries.invalidateCache(id);
+
+    return ret;
   }
+}
+
+function updateCache(item: SeriesEntity) {
+  useSeries.updateCache(item.id, ()=> item);
+
+  if (item.imageCoverId && item.imageCover)
+    useImageCover.updateCache(item.imageCoverId, ()=> item.imageCover!);
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SeriesEntity } from "$shared/models/episodes/series";
 import { useRouter, useSearchParams } from "next/navigation";
 import { logger } from "#modules/core/logger";
 import { ArrayDataProvider } from "#modules/utils/array-data-context";
@@ -14,7 +13,7 @@ import { NewSeriesButton } from "../../../modules/episodes/series/New/Button";
 import styles from "./styles.module.css";
 
 export default function SeriesPage() {
-  const [data, setData] = useState<SeriesEntity[]>([]);
+  const [data, setData] = useState<string[]>([]);
   const [totalCount, setTotalCount] = useState<number>();
   const limit = 8;
   const router = useRouter();
@@ -26,12 +25,12 @@ export default function SeriesPage() {
     const res = await api.getManyByCriteria( {
       limit,
       offset: (nPage - 1) * limit,
-      expand: ["countEpisodes", "countSeasons"],
+      expand: ["countEpisodes", "countSeasons", "imageCover"],
     } );
 
     return res;
   };
-  const addItem = (item: SeriesEntity | ((oldData: SeriesEntity[])=> SeriesEntity[])) => {
+  const addItem = (item: string | ((oldData: string[])=> string[])) => {
     setData((oldData) => {
       const newData = typeof item === "function"
         ? item(oldData)
@@ -52,11 +51,11 @@ export default function SeriesPage() {
       return newData;
     } );
   };
-  const setItemByIndex = (index: number, item: SeriesEntity |
-    ((oldData: SeriesEntity)=> SeriesEntity)) => {
+  const setItemByIndex = (index: number, item: string |
+    ((oldData: string)=> string)) => {
     setData((oldData) => {
-      const oldItem: SeriesEntity = oldData[index];
-      const newItem: SeriesEntity = typeof item === "function" ? item(oldItem) : item;
+      const oldItem: string = oldData[index];
+      const newItem: string = typeof item === "function" ? item(oldItem) : item;
 
       return oldData.map((current, i) => (i === index ? newItem : current));
     } );
@@ -67,7 +66,7 @@ export default function SeriesPage() {
       <NewSeriesButton onSuccess={async (newValue) => {
         const res = await fetch(page);
 
-        setData(res.data);
+        setData(res.data.map(s=>s.id));
         setTotalCount(res.metadata?.totalCount);
 
         logger.debug(
@@ -88,14 +87,14 @@ export default function SeriesPage() {
           page: String(n),
         } ).toString()}`);
 
-        setData(res.data);
+        setData(res.data.map(r=>r.id));
         setTotalCount(res.metadata?.totalCount);
       }}
     >
       <AsyncLoader
         action={()=>fetch(page)}
         onSuccess={(res)=>{
-          setData(res.data);
+          setData(res.data.map(r=>r.id));
           setTotalCount(res.metadata?.totalCount);
         }
         }
@@ -108,7 +107,7 @@ export default function SeriesPage() {
         >
           <SeriesList
             className={styles.list}
-            data={data}
+            seriesIds={data}
           />
         </ArrayDataProvider>
       </AsyncLoader>

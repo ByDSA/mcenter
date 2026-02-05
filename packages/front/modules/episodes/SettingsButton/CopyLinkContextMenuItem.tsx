@@ -4,7 +4,7 @@ import { CopyLinkContextMenuItem } from "#modules/musics/lists/CopyLinkContextMe
 import { frontendUrl } from "#modules/requests";
 import { useLocalData } from "#modules/utils/local-data-context";
 
-export const CopyEpisodeLinkContextMenuItem = () => {
+export const CopyEpisodeLinkContextMenuItemCurrentCtx = () => {
   const { data } = useLocalData<EpisodeEntity>();
 
   return (

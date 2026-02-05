@@ -39,31 +39,9 @@ export function HistoryList() {
                   previousDateTimestamp: i > 0 ? array[i - 1].date.timestamp : undefined,
                 } )}
                 <EpisodeHistoryEntryElement
-                  value={entry}
-                  setValue={(fnOrData) => {
-                    setItem(i, (oldEntry)=> {
-                      let newEntry: (typeof entry) | undefined;
-
-                      if (typeof fnOrData === "function")
-                        newEntry = fnOrData(oldEntry);
-                      else
-                        newEntry = fnOrData;
-
-                      if (!newEntry)
-                        return oldEntry;
-
-                      const newData = {
-                        ...oldEntry,
-                        resource: {
-                          ...oldEntry?.resource,
-                          ...newEntry.resource,
-                          serie: newEntry.resource.serie ?? oldEntry?.resource.serie,
-                        },
-                      };
-
-                      return newData;
-                    } );
-                  }}/>
+                  episodeId={entry.resourceId}
+                  historyEntry={entry}
+                  onDelete={async (_)=>await setItem(i, undefined!)}/>
               </Fragment>;
             } )
           }

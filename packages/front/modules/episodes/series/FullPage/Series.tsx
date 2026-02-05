@@ -1,73 +1,57 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Episode, EpisodeEntity, EpisodesBySeason } from "$shared/models/episodes";
 import { useRouter, useSearchParams } from "next/navigation";
-import { PATH_ROUTES } from "$shared/routing";
-import { PaginationContainer, PaginationButtonProps } from "#modules/ui-kit/Pagination/Pagination";
+import { PaginationContainer } from "#modules/ui-kit/Pagination/Pagination";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { ResourceFullPage } from "#modules/resources/FullPage/FullPage/FullPage";
-import { SeriesEntity } from "../models";
+import { useLocalData } from "#modules/utils/local-data-context";
+import { useSeries } from "../hooks";
 import { SeriesHeader } from "./Header";
 import { EpisodesList } from "./Seasons/List";
 import styles from "./Series.module.css";
+import { SeasonButton } from "./SeasonButton";
 
 export type SeriesFullPageProps = {
   initialSeason?: string;
-  series: SeriesEntity;
-  episodesBySeason: EpisodesBySeason;
+  seriesId: string;
+  updateEpisodesBySeason: ()=> Promise<unknown>;
 };
 
-export const SeriesFullPage = ( { series,
-  initialSeason,
-  episodesBySeason: seasons }: SeriesFullPageProps) => {
-  const seasonsEntries = Object.entries(seasons);
-  const seasonNames = Object.keys(seasons);
+export const SeriesFullPageCurrentCtx = ( { seriesId,
+  initialSeason, updateEpisodesBySeason }: SeriesFullPageProps) => {
+  const { data: episodesBySeason } = useLocalData<EpisodesBySeason>();
+  const seasonsEntries = Object.entries(episodesBySeason);
+  const seasonNames = Object.keys(episodesBySeason);
   const searchParams = useSearchParams();
-  const totalEpisodes = useMemo(()=>countAllEpisodes(seasons), [seasons]);
-  const maxSeason = +(seasonsEntries.at(-1)?.[0] ?? 0);
-  const [currentSeason, setCurrentSeason] = useState<string>(() => {
+  const [currentSeason, setCurrentSeason] = useState<string | null>(() => {
+    if (seasonsEntries.length === 0)
+      return null;
+
     if (initialSeason && seasonNames.includes(initialSeason))
       return initialSeason;
 
-    if (seasons["1"])
+    if (episodesBySeason["1"])
       return "1";
 
     return seasonsEntries[0][0];
   } );
   const [episodes, setEpisodes] = useState<EpisodeEntity[]>([]);
-  const router = useRouter();
-  // Componente personalizado para los botones de temporada
-  const SeasonButton = (props: PaginationButtonProps) => {
-    return (
-      <button
-        type="button"
-        onClick={props.onClick}
-        disabled={props.isDisabled}
-        className={`${props.isActive ? "ui-kit-pagination-active" : ""} ${styles.seasonButton}`}
-        style={{
-          padding: "0.5rem 1rem",
-          margin: "0 0.25rem",
-          borderRadius: "0.25rem",
-          border: "1px solid var(--color-gray-600)",
-          background: props.isActive ? "var(--color-blue-600)" : "var(--color-gray-800)",
-          color: "white",
-          cursor: props.isDisabled ? "default" : "pointer",
-        }}
-      >
-        {props.pageValue}
-      </button>
-    );
-  };
 
+  useEffect(()=> {
+    if (episodesBySeason && currentSeason !== null) {
+      const updated = episodesBySeason[currentSeason];
+
+      setEpisodes(updated ?? []);
+    }
+  }, [episodesBySeason]);
+  const router = useRouter();
+
+  // Componente personalizado para los botones de temporada
   return (
     <ResourceFullPage>
       <SeriesHeader
-        series={series}
-        totalEpisodes={totalEpisodes}
-        totalSeasons={maxSeason}
-        onUpdate={()=>{ /* empty */ }}
-        onDelete={() => {
-          router.push(PATH_ROUTES.episodes.series.path);
-        }}
+        seriesId={seriesId}
+        updateEpisodesBySeason={updateEpisodesBySeason}
       />
 
       <div className={styles.content}>
@@ -79,7 +63,7 @@ export const SeriesFullPage = ( { series,
             ? (
               <PaginationContainer
                 customValues={seasonNames}
-                initialPageIndex={seasonNames.indexOf(currentSeason)}
+                initialPageIndex={currentSeason ? seasonNames.indexOf(currentSeason) : null}
                 position="top"
                 renderButton={SeasonButton}
                 showPageInfo={false}
@@ -93,20 +77,29 @@ export const SeriesFullPage = ( { series,
                   setCurrentSeason(seasonName);
                 }}
               >
-                <AsyncLoader
+                {currentSeason !== null && <AsyncLoader
                   // Usamos key para forzar recarga cuando cambia la temporada
                   key={currentSeason}
                   // eslint-disable-next-line require-await
-                  action={async () => seasons[currentSeason]}
+                  action={async () => episodesBySeason[currentSeason]}
                   onSuccess={(data) => setEpisodes(data)}
                 >
                   <p>{countGroupEpisodes(episodes)} episodios</p>
                   <EpisodesList
                     episodes={episodes}
-                    series={series}
-                    onEpisodesChange={setEpisodes}
+                    seriesId={seriesId}
+                    onDelete={async (episode)=> {
+                      setEpisodes(old => {
+                        if (!old)
+                          return old;
+
+                        return old.filter(e=>e.id !== episode.id);
+                      } );
+
+                      await useSeries.fetch(seriesId);
+                    }}
                   />
-                </AsyncLoader>
+                </AsyncLoader>}
 
               </PaginationContainer>
             ) : (
@@ -116,17 +109,6 @@ export const SeriesFullPage = ( { series,
     </ResourceFullPage>
   );
 };
-
-function countAllEpisodes(seasons: EpisodesBySeason): number {
-  let total = 0;
-
-  for (const [key, seasonEpisodes] of Object.entries(seasons)) {
-    if (key !== "0")
-      total += countGroupEpisodes(seasonEpisodes);
-  }
-
-  return total;
-}
 
 function countGroupEpisodes(episodes: Episode[]): number {
   let total = 0;

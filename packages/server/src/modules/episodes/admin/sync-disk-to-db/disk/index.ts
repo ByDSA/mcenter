@@ -12,7 +12,3 @@ export {
 export {
   diff as diffSerieTree, OldNew as OldNewSerieTree,
 } from "./diff";
-
-export {
-  splitSeasonEpisodeFromEpisodeKey as getSeasonEpisodeFromEpisodeId,
-} from "./idGetter";

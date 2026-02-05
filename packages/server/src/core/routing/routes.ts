@@ -31,8 +31,8 @@ import { MusicUsersListsModule } from "#musics/users-lists/crud/module";
 import { SeriesCrudModule } from "#episodes/series/module";
 import { ImageCoversUploadModule } from "#modules/image-covers/upload/module";
 import { EpisodeFileInfosUploadModule } from "#episodes/file-info/upload/module";
-import { LoggingModule } from "../logging/module";
 import { MusicFileInfoUploadModule } from "#musics/file-info/upload/module";
+import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
 // y por los que se importan en AppModule
@@ -56,6 +56,7 @@ export const directImports = [
   EpisodesSlugModule,
   EpisodesAdminModule,
   EpisodeFileInfosCrudModule,
+  EpisodeFileInfosUploadModule,
   EpisodesCrudModule, // Al final, para que no interfiera con slugs
   SeriesCrudModule,
 

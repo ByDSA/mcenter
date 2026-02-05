@@ -1,5 +1,4 @@
-import { EpisodeEntity } from "$shared/models/episodes";
-import { SeriesEntity } from "$shared/models/episodes/series";
+import type { EpisodesList } from "./List";
 import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined } from "$shared/utils/validation";
 import { useImageCover } from "#modules/image-covers/hooks";
@@ -10,36 +9,40 @@ import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { EditEpisodeContextMenuItem } from "#modules/episodes/Edit/ContextMenu";
 import { EpisodeLatestViewsContextMenuItem } from "#modules/episodes/history/LatestViews/ContextMenuItem";
 import { DeleteEpisodeContextMenuItem } from "#modules/episodes/Delete/ContextMenuItem";
-import { CopyEpisodeLinkContextMenuItem } from "#modules/episodes/SettingsButton/CopyLinkContextMenuItem";
-import { PropsOf, SetState } from "#modules/utils/react";
+import { CopyEpisodeLinkContextMenuItemCurrentCtx } from "#modules/episodes/SettingsButton/CopyLinkContextMenuItem";
+import { PropsOf } from "#modules/utils/react";
 import { DurationView, WeightView } from "#modules/history";
 import { useUser } from "#modules/core/auth/useUser";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
+import { useEpisode } from "#modules/episodes/hooks";
+import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryLoading";
 import { SeriesIcon } from "../../SeriesIcon/SeriesIcon";
+import { useSeries } from "../../hooks";
 import styles from "./ListItem.module.css";
 
-type Props = {
-  episode: EpisodeEntity;
-  series: SeriesEntity;
-  setEpisode: SetState<EpisodeEntity>;
-  onDelete: ()=> void;
+type Props = Pick<PropsOf<typeof EpisodesList>, "onDelete"> & {
+  episodeId: string;
+  seriesId: string;
 };
 
-export const EpisodeListItem = ( { episode, series, setEpisode, onDelete }: Props) => {
+export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
   const { openMenu } = useContextMenuTrigger();
-  const coverId = episode.imageCoverId ?? series.imageCoverId;
-  const { data: imageCover } = useImageCover(coverId);
+  const { data: series } = useSeries(seriesId);
+  const { data: episode } = useEpisode(episodeId);
+  const coverId = episode?.imageCoverId ?? series?.imageCoverId;
+  const { data: imageCover } = useImageCover(coverId ?? null);
   const user = useUser();
   const hasUser = !!user;
   let subtitleSeen: PropsOf<typeof ResourceSubtitle>["items"][0];
 
+  if (!episode)
+    return <ResourceEntryLoading />;
+
   assertIsDefined(episode.fileInfos);
 
   if (hasUser) {
-    assertIsDefined(episode.userInfo);
-
     subtitleSeen = {
-      text: episode.userInfo.lastTimePlayed === 0
+      text: episode.userInfo?.lastTimePlayed === 0 || !episode.userInfo
         ? "Nunca visto"
         : `Visto el ${formatDateDDMMYYY(new Date(episode.userInfo.lastTimePlayed * 1_000))}`,
     };
@@ -77,23 +80,12 @@ export const EpisodeListItem = ( { episode, series, setEpisode, onDelete }: Prop
             openMenu( {
               event: e,
               content: (
-                <LocalDataProvider data={episode} setData={(newVal) => {
-                  if (typeof newVal === "function")
-                    setEpisode(prev => newVal(prev));
-                  else
-                    setEpisode(newVal);
-                }}>
-                  <EditEpisodeContextMenuItem
-                    initialData={episode}
-                    setData={setEpisode}
-                  />
-                  <CopyEpisodeLinkContextMenuItem />
-                  <EpisodeLatestViewsContextMenuItem
-                    episode={episode}
-                    episodeCompKey={episode.compKey}
-                  />
+                <LocalDataProvider data={episode}>
+                  <EditEpisodeContextMenuItem initialData={episode} />
+                  <CopyEpisodeLinkContextMenuItemCurrentCtx />
+                  <EpisodeLatestViewsContextMenuItem episodeId={episodeId} />
                   <DeleteEpisodeContextMenuItem
-                    onActionSuccess={onDelete}
+                    onActionSuccess={onDelete ? ()=>onDelete(episode) : undefined}
                   />
                 </LocalDataProvider>
               ),

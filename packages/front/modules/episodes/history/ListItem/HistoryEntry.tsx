@@ -6,40 +6,43 @@ import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/Res
 import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { classes } from "#modules/utils/styles";
 import { backendUrl } from "#modules/requests";
-import { SetState } from "#modules/utils/react";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { copyText } from "#modules/musics/lists/playlists/utils";
 import { logger } from "#modules/core/logger";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
+import { useEpisode } from "#modules/episodes/hooks";
+import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryLoading";
 import { EpisodeLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem";
 import { EditEpisodeContextMenuItem } from "../../Edit/ContextMenu";
 import { DeleteHistoryEntryContextMenuItem } from "../Delete/Delete";
-import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
+import { EpisodeHistoryEntryEntity } from "../models";
 import styles from "./HistoryEntry.module.css";
 
-type Data = EpisodeHistoryEntryCrudDtos.GetMany.Data;
-
-type Props<T> = {
-  value: T;
-  setValue: SetState<T>;
+type Props = {
+  historyEntry: EpisodeHistoryEntryEntity;
+  episodeId: string;
   showDate?: boolean;
+  onDelete: (entry: EpisodeHistoryEntryEntity)=> Promise<void>;
 };
 export const EpisodeHistoryEntryElement = React.memo((
-  { value, setValue }: Props<Data>,
+  { episodeId, historyEntry, onDelete }: Props,
 ) =>{
-  const { resource: episode } = value;
+  const { data: episode } = useEpisode(episodeId);
   const { openMenu } = useContextMenuTrigger();
   const { data: imageCover } = useImageCover(
-    episode.imageCoverId ?? episode.serie?.imageCoverId ?? null,
+    episode?.imageCoverId ?? episode?.serie?.imageCoverId ?? null,
   );
+
+  if (!episode)
+    return <ResourceEntryLoading />;
 
   return <ResourceEntry
     mainTitle={episode.title}
     subtitle={<EpisodeSubtitle episode={episode} />}
     right={<>
-      <HistoryTimeView timestamp={value.date.timestamp} />
-      <WeightView weight={episode.userInfo.weight} />
+      <HistoryTimeView timestamp={historyEntry.date.timestamp} />
+      {episode.userInfo && <WeightView weight={episode.userInfo.weight} />}
     </>}
     imageCover={imageCover ?? null}
     imageCoverDefaultIcon={{
@@ -50,32 +53,12 @@ export const EpisodeHistoryEntryElement = React.memo((
         openMenu( {
           event: e,
           content: <>
-            <EditEpisodeContextMenuItem initialData={value.resource} setData={(fnOrEntity)=>{
-              setValue(oldData => {
-                if (!oldData)
-                  return;
-
-                let entity: Data["resource"];
-
-                if (typeof fnOrEntity === "function")
-                  entity = fnOrEntity(oldData.resource) as Data["resource"];
-                else
-                  entity = fnOrEntity as Data["resource"];
-
-                return ( {
-                  ...oldData,
-                  resource: {
-                    ...oldData.resource,
-                    ...entity,
-                  },
-                } );
-              } );
-            }}/>
+            <EditEpisodeContextMenuItem initialData={episode}/>
             <ContextMenuItem
               label="Copiar backend URL"
               onClick={async (event) => {
                 event.stopPropagation();
-                const { episodeKey, seriesKey } = value.resource!.compKey;
+                const { episodeKey, seriesKey } = episode.compKey;
 
                 await copyText(
                   backendUrl(
@@ -86,13 +69,10 @@ export const EpisodeHistoryEntryElement = React.memo((
               }}
             />
             <EpisodeLatestViewsContextMenuItem
-              episode={value.resource}
-              episodeCompKey={value.resource.compKey}
-              maxTimestamp={value.date.timestamp}
+              episodeId={episode.id}
+              maxTimestamp={historyEntry.date.timestamp}
             />
-            <DeleteHistoryEntryContextMenuItem
-              value={value} setValue={setValue}
-            />
+            <DeleteHistoryEntryContextMenuItem value={historyEntry} onActionSuccess={onDelete}/>
           </>,
         } );
       }}

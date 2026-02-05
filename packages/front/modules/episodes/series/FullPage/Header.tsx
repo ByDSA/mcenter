@@ -1,28 +1,37 @@
-import { SeriesEntity } from "$shared/models/episodes/series";
+import type { SeriesFullPageProps } from "./Series";
+import { useRouter } from "next/navigation";
+import { PATH_ROUTES } from "$shared/routing";
+import { assertIsDefined } from "$shared/utils/validation";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { DateTag } from "#modules/resources/FullPage/DateTag/DateTag";
 import { HeaderList } from "#modules/resources/FullPage/HeaderList";
+import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { SeriesSettingsButton } from "../SettingsButton/SettingsButton";
+import { useSeries } from "../hooks";
 
-type Props = {
-  series: SeriesEntity;
-  totalSeasons: number;
-  totalEpisodes: number;
-  onUpdate: (newData: SeriesEntity)=> void;
-  onDelete: ()=> void;
+type Props = Pick<SeriesFullPageProps, "updateEpisodesBySeason"> & {
+  seriesId: string;
 };
 
-export const SeriesHeader = ( { series,
-  totalSeasons,
-  totalEpisodes,
-  onUpdate,
-  onDelete }: Props) => {
-  const { data: imageCover } = useImageCover(series.imageCoverId);
+export const SeriesHeader = ( { seriesId,
+  updateEpisodesBySeason }: Props) => {
+  const { data: series } = useSeries(seriesId);
+  const { data: imageCover } = useImageCover(series?.imageCoverId ?? null);
+  const router = useRouter();
+
+  if (!series)
+    return <ContentSpinner />;
+
+  assertIsDefined(series.countSeasons);
+  assertIsDefined(series.countEpisodes);
+
   const infoItems = [
-    <span key="seasons">{totalSeasons} {totalSeasons === 1 ? "temporada" : "temporadas"}</span>,
-    <span key="episodes">{totalEpisodes} episodios</span>,
+    <span key="seasons">{series.countSeasons} {series.countSeasons === 1
+      ? "temporada"
+      : "temporadas"}</span>,
+    <span key="episodes">{series.countEpisodes} episodios</span>,
     <DateTag key="date" date={series.addedAt} />,
   ];
 
@@ -37,16 +46,16 @@ export const SeriesHeader = ( { series,
             element: <SeriesIcon />,
           }}
           size="medium"
-          onUpdate={() => {
-            // La actualización se maneja en el padre, pero el botón de edición está en la cover
-          }}
         />
       }
       settings={
         <SeriesSettingsButton
-          series={series}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
+          seriesId={seriesId}
+          onDelete={() => router.push(PATH_ROUTES.episodes.frontend.lists.path)}
+          onUploadEachEpisode={async ()=>{
+            await updateEpisodesBySeason();
+            await useSeries.fetch(seriesId);
+          }}
         />
       }
       info={infoItems}

@@ -22,6 +22,7 @@ const criteriaConfig = createCriteriaConfig( {
 
 export namespace EpisodesCrudDtos {
   const responseManySchema = createManyResultResponseSchema(episodeEntitySchema);
+  const responseOneSchema = createOneResultResponseSchema(episodeEntitySchema);
   export namespace GetAll {
     export const paramsSchema = z.object( {
       seriesKey: z.string(),
@@ -44,12 +45,13 @@ export namespace EpisodesCrudDtos {
 
     export const criteriaSchema = createCriteriaOneSchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;
+    export const responseSchema = responseOneSchema;
   }
   export namespace Patch {
     export const bodySchema = generatePatchBodySchema(episodeEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
     export const { paramsSchema } = EpisodesCrudDtos.GetOne.ById;
-    export const responseSchema = responseManySchema;
+    export const responseSchema = responseOneSchema;
   }
 
   export namespace CreateOne {

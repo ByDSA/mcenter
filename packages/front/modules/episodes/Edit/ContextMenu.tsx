@@ -1,5 +1,4 @@
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
-import { SetState } from "#modules/utils/react";
 import { EpisodeEntity } from "../models";
 import { useEditEpisodeModal } from "./EditModal";
 
@@ -8,7 +7,6 @@ import { useEditEpisodeModal } from "./EditModal";
 // y no se puede actualizar cuando llegan los datos
 type Props = {
   initialData: EpisodeEntity;
-  setData: SetState<EpisodeEntity>;
 };
 export const EditEpisodeContextMenuItem = (props: Props) => {
   const { openModal } = useEditEpisodeModal(props);

@@ -33,7 +33,7 @@ export namespace EpisodeFileInfoCrudDtos {
 
     export const responseSchema = createUploadFileResponseSchema( {
       fileInfo: episodeFileInfoEntitySchema,
-      episode: episodeEntitySchema.optional(),
+      episode: episodeEntitySchema,
     } );
 
     export type Response = z.infer<typeof responseSchema>;

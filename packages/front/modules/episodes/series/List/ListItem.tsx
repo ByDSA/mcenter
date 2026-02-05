@@ -4,25 +4,31 @@ import { useImageCover } from "#modules/image-covers/hooks";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { useArrayData } from "#modules/utils/array-data-context";
 import { frontendUrl } from "#modules/requests";
+import { LocalDataProvider } from "#modules/utils/local-data-context";
+import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { SeriesSettingsButton } from "../SettingsButton/SettingsButton";
 import { SeriesEntity } from "../models";
 import { SeriesIcon } from "../SeriesIcon/SeriesIcon";
+import { useSeries } from "../hooks";
 import styles from "./ListItem.module.css";
 
-type Entity = SeriesEntity;
 type Props = {
-  data: Entity;
+  seriesId: string;
   index: number;
 };
 export const SeriesListItem = (props: Props) => {
-  const { data: imageCover } = useImageCover(props.data.imageCoverId);
-  const { removeItemByIndex, setItemByIndex } = useArrayData<SeriesEntity>();
+  const { data: series } = useSeries(props.seriesId);
+  const { data: imageCover } = useImageCover(series?.imageCoverId ?? null);
+  const { removeItemByIndex } = useArrayData<SeriesEntity>();
   const router = useRouter();
   const url = frontendUrl(
     PATH_ROUTES.episodes.frontend.lists.withParams( {
-      serieId: props.data.id,
+      serieId: props.seriesId,
     } ),
   );
+
+  if (!series)
+    return <ContentSpinner />;
 
   return (
     <a
@@ -40,22 +46,28 @@ export const SeriesListItem = (props: Props) => {
         cover={imageCover}
         size="medium"
       />
-      <span className={styles.title}>{props.data.name}</span>
+      <span className={styles.title}>{series.name}</span>
       <footer className={styles.footer}>
         <aside className={styles.info}>
-          {props.data.countSeasons !== undefined && (
-            <span className={styles.subInfo}>{props.data.countSeasons} temporadas</span>
+          {series.countSeasons !== undefined && (
+            <span className={styles.subInfo}>{series.countSeasons} temporadas</span>
           )}
-          {props.data.countEpisodes !== undefined && (
-            <span className={styles.subInfo}>{props.data.countEpisodes} episodes</span>
+          {series.countEpisodes !== undefined && (
+            <span className={styles.subInfo}>{series.countEpisodes} episodes</span>
           )}
         </aside>
         <aside>
-          <SeriesSettingsButton
-            series={props.data}
-            onDelete={() => removeItemByIndex(props.index)}
-            onUpdate={(newData) => setItemByIndex(props.index, newData)}
-          />
+          <LocalDataProvider data={series}>
+            <SeriesSettingsButton
+              seriesId={props.seriesId}
+              onDelete={() => {
+                removeItemByIndex(props.index);
+              }}
+              onUploadEachEpisode={async ()=> {
+                await useSeries.fetch(props.seriesId);
+              }}
+            />
+          </LocalDataProvider>
         </aside>
       </footer>
     </a>

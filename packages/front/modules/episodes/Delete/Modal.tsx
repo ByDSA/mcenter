@@ -45,7 +45,7 @@ export function useDeleteEpisodeModal(
         onActionSuccess,
         action: async () => {
           const api = FetchApi.get(EpisodesApi);
-          const response = await api.deleteOne(data.compKey);
+          const response = await api.deleteOne(data.id);
 
           if (response.data) {
             logger.debug(`Deleted episode: ${data.compKey.episodeKey}`);

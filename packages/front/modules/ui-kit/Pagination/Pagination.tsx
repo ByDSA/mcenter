@@ -34,7 +34,7 @@ export type PaginationButtonProps = {
  * Props base comunes para cualquier modo de paginación.
  */
 type BasePaginationProps = {
-  initialPageIndex?: number; // Índice inicial
+  initialPageIndex?: number | null; // Índice inicial
   position?: "both" | "bottom" | "top";
   allowClickActive?: boolean;
   neighbors?: number;
@@ -121,7 +121,7 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
     ? props.customValues!.length - 1
     : (props.maxValue as number);
   // Estado del índice actual
-  const [currentIndex, setCurrentIndex] = useState<number>(() => {
+  const [currentIndex, setCurrentIndex] = useState<number | null>(() => {
     if (initialPageIndex !== undefined)
       return initialPageIndex;
 
@@ -130,6 +130,9 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
 
   // Asegurar que si cambian las props y el índice queda fuera, se resetee
   useEffect(() => {
+    if (currentIndex === null)
+      return;
+
     if (currentIndex < minIndex)
       setCurrentIndex(minIndex);
 
@@ -157,8 +160,8 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
       }, (_, i) => minIndex + i);
     }
 
-    const leftSiblingIndex = Math.max(currentIndex - neighbors, minIndex);
-    const rightSiblingIndex = Math.min(currentIndex + neighbors, maxIndex);
+    const leftSiblingIndex = Math.max((currentIndex ?? 0) - neighbors, minIndex);
+    const rightSiblingIndex = Math.min((currentIndex ?? 0) + neighbors, maxIndex);
     const shouldShowLeftDots = leftSiblingIndex > minIndex + 1;
     const shouldShowRightDots = rightSiblingIndex < maxIndex - 1;
 
@@ -224,11 +227,11 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
       {/* Botón Previous */}
       <DefaultPageButton
         label="&laquo;"
-        pageIndex={currentIndex - 1}
+        pageIndex={currentIndex! - 1}
         pageValue="prev" // Valor dummy
         isActive={false}
-        isDisabled={currentIndex === minIndex}
-        onClick={() => handlePageChange(currentIndex - 1)}
+        isDisabled={currentIndex === minIndex || currentIndex === null}
+        onClick={() => handlePageChange(currentIndex! - 1)}
       />
 
       {paginationRange.map((item, index) => {
@@ -264,15 +267,15 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
       {/* Botón Next */}
       <DefaultPageButton
         label="&raquo;"
-        pageIndex={currentIndex + 1}
+        pageIndex={currentIndex! + 1}
         pageValue="next" // Valor dummy
         isActive={false}
-        isDisabled={currentIndex === maxIndex}
-        onClick={() => handlePageChange(currentIndex + 1)}
+        isDisabled={currentIndex === maxIndex || currentIndex === null}
+        onClick={() => handlePageChange(currentIndex! + 1)}
       />
     </nav>
   );
-  const currentValue = getValueForIndex(currentIndex);
+  const currentValue = currentIndex === null ? null : getValueForIndex(currentIndex);
   const totalCount = maxIndex - minIndex + 1;
 
   return (
@@ -296,7 +299,7 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
               {isCustomMode
                 ? (
                   <span>
-                    {currentValue} <span className={styles.muted}>({currentIndex + 1}/{totalCount})</span>
+                    {currentValue} <span className={styles.muted}>({currentIndex! + 1}/{totalCount})</span>
                   </span>
                 )
                 : (

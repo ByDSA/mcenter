@@ -2,29 +2,30 @@
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { getQueryClient } from "#modules/fetching/QueryClientProvider";
-import { useUser } from "#modules/core/auth/useUser";
-import { MusicsApi } from "./requests";
-import { MusicEntity, musicEntitySchema } from "./models";
+import { EpisodesApi } from "./requests";
+import { EpisodeEntity, episodeEntitySchema } from "./models";
 
 type GenQueryOptions = {
   debounce?: boolean;
   hasUser?: boolean;
 };
 
+const KEY = "episode";
+
 function genQueryFn(id: string, options?: GenQueryOptions) {
   return async ()=> {
-    const api = FetchApi.get(MusicsApi);
+    const api = FetchApi.get(EpisodesApi);
 
     if (options?.debounce)
-      return fetchMusicDebounced(id, options);
+      return fetchEpisodesDebounced(id, options);
 
-    const res = await api.getOneByCriteria( {
-      filter: {
-        id,
+    const res = await api.getOneById(
+      id,
+      {
+        expand: getExpand(options?.hasUser ?? false),
+        skipCache: true,
       },
-      expand: getExpand(options?.hasUser ?? false),
-      skipCache: true,
-    } );
+    );
 
     return res.data;
   };
@@ -32,63 +33,34 @@ function genQueryFn(id: string, options?: GenQueryOptions) {
 
 function genQuery(id: string, options?: GenQueryOptions) {
   return {
-    queryKey: ["music", id],
+    queryKey: [KEY, id],
     queryFn: genQueryFn(id, options),
     staleTime: 1_000 * 60 * 5,
-    refetchOnMount: (query) => {
-      const data = query.state.data as MusicEntity | undefined;
-
-      // Si no hay datos, refetch normal
-      if (!data)
-        return true;
-
-      const missingFields = data.userInfo === undefined;
-
-      // Si faltan campos, retornamos 'always' para forzar el refetch AHORA MISMO
-      // Si no faltan, retornamos false (o undefined) para respetar el staleTime global
-      return missingFields ? "always" : false;
-    },
-    structuralSharing: (oldData: MusicEntity | undefined, newData: Partial<MusicEntity>) => {
-      if (!oldData)
-        return newData as MusicEntity;
-
-      return merge(oldData, newData);
-    },
   };
 }
 
-export const useMusic = (id: string | null, options?: Omit<GenQueryOptions, "hasUser">) => {
-  const { user } = useUser();
-
+export const useEpisode = (id: string | null, options?: GenQueryOptions) => {
   return useQuery(
     id
       ? genQuery(id, {
         ...options,
-        hasUser: !!user,
       } )
       : {
-        queryKey: ["music", null],
+        queryKey: [KEY, null],
         queryFn: () => null,
       },
   );
 };
 
-useMusic.get = (id: string, options?: GenQueryOptions) => {
-  if (options?.hasUser) {
-    const isMissingUserFields = !!useMusic.getCache(id)?.userInfo;
-
-    if (isMissingUserFields)
-      return useMusic.fetch(id, options);
-  }
-
+useEpisode.get = (id: string, options?: GenQueryOptions) => {
   return getQueryClient().ensureQueryData(genQuery(id, options));
 };
 
-useMusic.getCache = (id: string) => {
-  return getQueryClient().getQueryData<MusicEntity>(["music", id]);
+useEpisode.getCache = (id: string) => {
+  return getQueryClient().getQueryData<EpisodeEntity>([KEY, id]);
 };
 
-useMusic.fetch = (id: string, options?: GenQueryOptions) => {
+useEpisode.fetch = (id: string, options?: GenQueryOptions) => {
   const queryOptions = genQuery(id, options);
 
   // Forzamos staleTime a 0 para asegurar que se ejecute la petición de red
@@ -98,27 +70,27 @@ useMusic.fetch = (id: string, options?: GenQueryOptions) => {
   } );
 };
 
-useMusic.updateCacheWithMerging = (id: string, entity: Partial<MusicEntity>) => {
-  useMusic.updateCache(id, (oldData: MusicEntity | undefined) => {
+useEpisode.updateCacheWithMerging = (id: string, entity: Partial<EpisodeEntity>) => {
+  useEpisode.updateCache(id, (oldData: EpisodeEntity | undefined) => {
     if (!oldData)
-      return musicEntitySchema.parse(entity);
+      return episodeEntitySchema.parse(entity);
 
     return merge(oldData, entity);
   } );
 };
 
-type CustomFn = (oldData: MusicEntity | undefined)=> MusicEntity;
-useMusic.updateCache = (id: string, fn: CustomFn) => {
-  getQueryClient().setQueryData(["music", id], fn);
+type CustomFn = (oldData: EpisodeEntity | undefined)=> EpisodeEntity;
+useEpisode.updateCache = (id: string, fn: CustomFn) => {
+  getQueryClient().setQueryData([KEY, id], fn);
 };
 
-useMusic.invalidateCache = (id: string) => {
+useEpisode.invalidateCache = (id: string) => {
   return getQueryClient().invalidateQueries( {
-    queryKey: ["music", id],
+    queryKey: [KEY, id],
   } );
 };
 
-export const useMusics = (ids: string[]) => {
+export const useManyEpisods = (ids: string[]) => {
   return useQueries( {
     queries: ids.map(id => {
       return genQuery(id);
@@ -133,26 +105,14 @@ export const useMusics = (ids: string[]) => {
   } );
 };
 
-const OPTIONAL_KEYS = ["disabled", "album", "country",
-  "game", "tags", "spotifyId", "year"] as (keyof MusicEntity)[];
-
-function merge(oldData: MusicEntity | undefined, newData: Partial<MusicEntity>): MusicEntity {
+function merge(oldData: EpisodeEntity | undefined, newData: Partial<EpisodeEntity>): EpisodeEntity {
   const ret = {
     ...oldData,
     ...newData,
-    userInfo: newData.userInfo ?? oldData?.userInfo,
-    fileInfos: newData.fileInfos ?? oldData?.fileInfos,
-  } as MusicEntity;
+  } as EpisodeEntity;
 
-  if (newData.imageCoverId === null) {
-    delete ret.imageCoverId;
+  if (newData.imageCoverId === null)
     delete ret.imageCover;
-  }
-
-  for (const op of OPTIONAL_KEYS) {
-    if (newData[op] === undefined)
-      delete ret[op];
-  }
 
   return ret;
 }
@@ -162,10 +122,10 @@ let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Cola de promesas esperando resolución:
 type BatchPromise = {
-  resolve: (data: MusicEntity)=> void;
+  resolve: (data: EpisodeEntity)=> void;
   reject: (err: any)=> void;
 };
-const batchQueue = new Map<MusicEntity["id"], Array<BatchPromise>>();
+const batchQueue = new Map<EpisodeEntity["id"], Array<BatchPromise>>();
 const flushBatch = async (options?: GenQueryOptions) => {
   const currentBatch = new Map(batchQueue);
 
@@ -177,7 +137,7 @@ const flushBatch = async (options?: GenQueryOptions) => {
     return;
 
   try {
-    const api = FetchApi.get(MusicsApi);
+    const api = FetchApi.get(EpisodesApi);
     const res = await api.getManyByCriteria( {
       filter: {
         ids,
@@ -192,7 +152,7 @@ const flushBatch = async (options?: GenQueryOptions) => {
         // Resolvemos con el mismo dato TODAS las promesas que esperaban este ID
         subscribers.forEach(sub => sub.resolve(found));
       } else {
-        const err = new Error(`Music entity ${id} not found`);
+        const err = new Error(`Episode entity ${id} not found`);
 
         subscribers.forEach(sub => sub.reject(err));
       }
@@ -204,7 +164,7 @@ const flushBatch = async (options?: GenQueryOptions) => {
     } );
   }
 };
-const fetchMusicDebounced = (id: string, options?: GenQueryOptions): Promise<MusicEntity> => {
+const fetchEpisodesDebounced = (id: string, options?: GenQueryOptions): Promise<EpisodeEntity> => {
   return new Promise((resolve, reject) => {
     const existingSubscribers = batchQueue.get(id) || [];
 
@@ -223,7 +183,7 @@ const fetchMusicDebounced = (id: string, options?: GenQueryOptions): Promise<Mus
 
 function getExpand(hasUser: boolean) {
   return [
-    ...(hasUser ? ["favorite", "userInfo"] as any[] : []), "fileInfos",
+    ...(hasUser ? ["userInfo"] as any[] : []), "fileInfos",
     "imageCover",
   ];
 }

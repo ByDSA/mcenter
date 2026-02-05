@@ -1,3 +1,4 @@
+import type { UploadEpisodeFileInfoDto } from "./controller";
 import path from "node:path";
 import { existsSync } from "node:fs";
 import fs from "node:fs";
@@ -9,6 +10,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
 import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
 import { v4 as uuidv4 } from "uuid";
+import { VIDEO_EXTENSIONS } from "$shared/models/episodes/video-extensions";
 import { md5FileAsync } from "#utils/crypt";
 import { createUploadFileSuccessResponse, diskStorageEnsureDestination, diskStorageUniqueFilename, fileMimeTypeFilter, UploadFile, UploadFileProps } from "#utils/files";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
@@ -17,7 +19,6 @@ import { EpisodeEntity } from "#episodes/models";
 import { getSeasonNumberByEpisodeKey } from "#episodes/series/crud/repository/repository";
 import { VideoMetadataService } from "#modules/resources/video/video-metadata/VideoMetadataService.service";
 import { EpisodeFileInfoRepository } from "../crud/repository";
-import { UploadEpisodeFileInfoDto } from "./controller";
 import { EPISODES_MEDIA_PATH, EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "./utils";
 
 @Injectable()
@@ -155,14 +156,12 @@ export function getVideoMime(ext: string) {
   }
 }
 
-const ALLOWED_VIDEO_EXTENSIONS = ["mp4", "mkv", "avi", "mov", "wmv", "flv", "webm"];
-
 export const uploadFileInterceptorOptions: MulterOptions = {
   storage: diskStorage( {
     destination: diskStorageEnsureDestination(EPISODES_MEDIA_UPLOAD_FOLDER_PATH),
     filename: diskStorageUniqueFilename(),
   } ),
-  fileFilter: fileMimeTypeFilter(ALLOWED_VIDEO_EXTENSIONS.map(getVideoMime)),
+  fileFilter: fileMimeTypeFilter(VIDEO_EXTENSIONS.map(getVideoMime)),
   limits: {
     fileSize: 10 * 1024 * 1024 * 1024, // 10GB por archivo
   },

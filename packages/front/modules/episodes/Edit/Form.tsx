@@ -20,6 +20,7 @@ import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { DaForm } from "#modules/ui-kit/form/Form";
 import { DaInputTime } from "#modules/ui-kit/form/input/Time/InputTime";
 import { episodeFileInfoSchema } from "../file-info/models";
+import { useEpisode } from "../hooks";
 import styles from "./style.module.css";
 
 const schema = z.object( {
@@ -150,6 +151,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
       fileInfos: updatedFileInfos,
     };
 
+    useEpisode.updateCache(initialData.id, ()=>newEpisodeData);
     onSuccess?.(newEpisodeData);
   };
 

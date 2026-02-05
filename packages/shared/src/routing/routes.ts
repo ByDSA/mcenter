@@ -414,6 +414,9 @@ token?: string;} ) => {
   episodes: {
     path: EPISODES,
     withParams: (id: string) => `${EPISODES}/${id}`,
+    getOne: {
+      path: `${EPISODES}/${GET_ONE_CRITERIA_PATH}`,
+    },
     getMany: {
       path: `${EPISODES}/${GET_MANY_CRITERIA_PATH}`,
     },

@@ -8,6 +8,7 @@ import { createOneResultResponseSchema, createPaginatedResultResponseSchema } fr
 const criteriaConfig = createCriteriaConfig( {
   filterShape: {
     id: mongoDbId.optional(),
+    ids: z.array(mongoDbId).optional(),
     title: z.string().optional(),
     key: z.string().optional(),
     search: z.string().optional(),

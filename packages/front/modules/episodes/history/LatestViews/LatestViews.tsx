@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { EpisodeCompKey, EpisodeEntity } from "$shared/models/episodes";
+import { assertIsDefined } from "$shared/utils/validation";
 import { DateFormat } from "#modules/utils/dates";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { LatestViewsView } from "#modules/history/Latest/LatestViewsDisplay";
@@ -7,29 +7,32 @@ import { Separator } from "#modules/resources/Separator/Separator";
 import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { useEpisode } from "#modules/episodes/hooks";
 import { EpisodeHistoryApi } from "../requests";
 import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
 
 type Props = {
-  episode?: EpisodeEntity;
-  episodeCompKey: EpisodeCompKey;
+  episodeId: string;
   maxTimestamp?: number;
   dateFormat?: DateFormat;
   autoStart?: boolean;
 };
 
 export function EpisodeLatestViews(props: Props) {
-  const { episodeCompKey, maxTimestamp = new Date().getTime(), dateFormat } = props;
+  const { maxTimestamp = new Date().getTime(), dateFormat, episodeId } = props;
+  const { data: episode } = useEpisode(episodeId);
   const fetchData = useCallback(async () => {
     const api = FetchApi.get(EpisodeHistoryApi);
+
+    assertIsDefined(episode);
     const result = await api.getLatestViews(
-      episodeCompKey.seriesKey,
-      episodeCompKey.episodeKey,
+      episode.compKey.seriesKey,
+      episode.compKey.episodeKey,
       maxTimestamp,
     );
 
     return result.data;
-  }, [episodeCompKey, maxTimestamp]);
+  }, [episodeId, maxTimestamp]);
   const [data, setData] = useState<EpisodeHistoryEntryCrudDtos.GetMany.Response["data"]>();
   const element = <AsyncLoader
     errorElement={<div>Error al cargar el historial</div>}
@@ -42,19 +45,19 @@ export function EpisodeLatestViews(props: Props) {
     />}
   </AsyncLoader>;
 
-  if (!props.episode)
+  if (!episode)
     return element;
 
   return <>
     <DaInputGroup>
       <DaInputGroupItem inline>
         <DaLabel>Título</DaLabel>
-        <span>{props.episode.title}</span>
+        <span>{episode.title}</span>
       </DaInputGroupItem>
       <DaInputGroupItem inline>
         <DaLabel>Episodio</DaLabel>
-        <span><span>{props.episode.serie?.name ?? data?.[0]?.resource.serie?.name
-        ?? props.episode.compKey.seriesKey}</span><Separator /><span>{props.episode.compKey.episodeKey}</span></span>
+        <span><span>{episode.serie?.name ?? data?.[0]?.resource.serie?.name
+        ?? episode.compKey.seriesKey}</span><Separator /><span>{episode.compKey.episodeKey}</span></span>
       </DaInputGroupItem>
     </DaInputGroup>
     {element}

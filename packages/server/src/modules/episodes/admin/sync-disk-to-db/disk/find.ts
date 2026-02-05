@@ -1,6 +1,6 @@
 import fs, { Dirent } from "node:fs";
 import path from "node:path";
-import { GetEpisodeIdOptions, getEpisodeSeasonAndEpisodeNumberFromFilePath, splitSeasonEpisodeFromEpisodeKey } from "./idGetter";
+import { GetEpisodeIdOptions, getEpisodeKeyFromFilePath, splitSeasonEpisodeFromEpisodeKey } from "$shared/models/episodes/episode-code";
 import { EpisodeNode, SeasonNode, SerieNode, SerieTree } from "./models";
 
 type Options = {
@@ -119,7 +119,7 @@ function getSeasonEpisodeCompKey(
   filePath: string,
   options: GetEpisodeIdOptions,
 ): EpisodeIdRet | null {
-  const seasonEpisode = getEpisodeSeasonAndEpisodeNumberFromFilePath(filePath, options);
+  const seasonEpisode = getEpisodeKeyFromFilePath(filePath, options);
 
   if (seasonEpisode === null)
     return null;

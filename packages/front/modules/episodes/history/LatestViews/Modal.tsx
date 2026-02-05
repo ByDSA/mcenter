@@ -1,12 +1,10 @@
 // LatestModal.tsx
-import { EpisodeCompKey, EpisodeEntity } from "$shared/models/episodes";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import styles from "#modules/history/Latest/Latest.module.css";
 import { EpisodeLatestViews } from "./LatestViews";
 
 type Props = {
-  episode?: EpisodeEntity;
-  episodeCompKey: EpisodeCompKey;
+  episodeId: string;
   maxTimestamp?: number;
 };
 

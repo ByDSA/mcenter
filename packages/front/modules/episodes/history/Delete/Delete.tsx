@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { assertIsDefined } from "$shared/utils/validation";
 import { ContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -6,12 +7,10 @@ import { useConfirmModal } from "#modules/ui-kit/modal/ConfirmModal/useConfirmMo
 import { getLongDateStr } from "#modules/utils/dates";
 import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
-import { SetState } from "#modules/utils/react";
+import { useEpisode } from "#modules/episodes/hooks";
 import { EpisodeHistoryApi } from "../requests";
-import { EpisodeHistoryEntryCrudDtos } from "../models/dto";
+import { EpisodeHistoryEntryEntity } from "../models";
 import styles from "./DeleteEntryModal.module.css";
-
-type Data = EpisodeHistoryEntryCrudDtos.GetMany.Data;
 
 type DeleteHistoryEntryModalContentWrapperProps = {
   children: ReactNode;
@@ -27,13 +26,16 @@ export function DeleteHistoryEntryModalContentWrapper(
   </span>;
 }
 
-type Props<T> = {
-  value: T;
-  setValue: SetState<T>;
+type Props = {
+  value: EpisodeHistoryEntryEntity;
+  onActionSuccess?: (entry: EpisodeHistoryEntryEntity)=> Promise<void>;
 };
 
-export function DeleteHistoryEntryContextMenuItem( { setValue, value }: Props<Data>) {
+export function DeleteHistoryEntryContextMenuItem( { value, onActionSuccess }: Props) {
   const { openModal } = useConfirmModal();
+  const { data: episode } = useEpisode(value.resourceId);
+
+  assertIsDefined(episode);
 
   return <ContextMenuItem
     label="Quitar del historial"
@@ -49,26 +51,30 @@ export function DeleteHistoryEntryContextMenuItem( { setValue, value }: Props<Da
             </DaInputGroupItem>
             <DaInputGroupItem inline>
               <DaLabel>Serie</DaLabel>
-              <span>{value.resource.serie?.name ?? value.resource.compKey.seriesKey}</span>
+              <span>{episode.serie?.name ?? episode.compKey.seriesKey}</span>
             </DaInputGroupItem>
             <DaInputGroupItem inline>
               <DaLabel>Episodio</DaLabel>
-              <span>{value.resource.compKey.episodeKey}</span>
+              <span>{episode.compKey.episodeKey}</span>
             </DaInputGroupItem>
             <DaInputGroupItem inline>
               <DaLabel>Título</DaLabel>
-              <span>{value.resource.title}</span>
+              <span>{episode.title}</span>
             </DaInputGroupItem>
           </DaInputGroup>
         </DeleteHistoryEntryModalContentWrapper>,
         action: async ()=> {
           const api = FetchApi.get(EpisodeHistoryApi);
+          const res = await api.delete(value.id);
 
-          await api.delete(value.id);
-          logger.info("Quitada entrada de historial");
-          setValue(undefined);
+          if (res.data) {
+            await onActionSuccess?.(res.data);
+            logger.info("Quitada entrada de historial");
 
-          return true;
+            return true;
+          }
+
+          return false;
         },
       } );
     }}

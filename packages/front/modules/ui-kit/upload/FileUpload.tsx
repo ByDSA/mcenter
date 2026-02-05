@@ -9,7 +9,7 @@ import { UploadButton } from "./UploadButton";
 
 export type FileDataMetadata = Record<string, any>;
 
-type FileDataWithoutMetadata = {
+export type FileDataWithoutMetadata = {
   file: File;
   id: string;
   name: string;
@@ -18,11 +18,13 @@ type FileDataWithoutMetadata = {
   uploadProgress?: number;
   uploadStatus?: "completed" | "error" | "pending" | "uploading";
 };
+
 export type FileData = FileDataWithoutMetadata & {
   metadata: FileDataMetadata;
 };
 
-type ProvideMetadataFn = (fileDatas: FileDataWithoutMetadata)=> FileDataMetadata;
+type ProvideMetadataFn =
+  (fileDatas: FileDataWithoutMetadata)=> FileDataMetadata | Promise<FileDataMetadata>;
 
 export type OnUploadOptions = {
   setSelectedFiles?: React.Dispatch<React.SetStateAction<FileData[]>>;
@@ -107,19 +109,20 @@ ${acceptedTypesDisplay}`,
     else if (e.type === "dragleave")
       setDragActive(false);
   };
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>): Promise<void> => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0])
-      handleFileSelection(e.dataTransfer.files);
+      await handleFileSelection(e.dataTransfer.files);
   };
-  const handleFileSelection = (fileList: FileList): void => {
+  const handleFileSelection = async (fileList: FileList): Promise<void> => {
     const newValidationErrors: string[] = [];
     const validFiles: FileData[] = [];
+    const files = Array.from(fileList);
 
-    Array.from(fileList).forEach(fileItem => {
+    for (const fileItem of files) {
       const fileErrors = isFileValid(fileItem);
 
       if (fileErrors.length > 0)
@@ -135,14 +138,16 @@ ${acceptedTypesDisplay}`,
           uploadProgress: 0,
           uploadStatus: "pending",
         };
-        const metadata = provideMetadata?.(fileDataWithoutMetadata) ?? {} as M;
+        const metadata = await provideMetadata?.(fileDataWithoutMetadata) ?? {} as M;
 
         validFiles.push( {
           ...fileDataWithoutMetadata,
           metadata,
         } );
       }
-    } );
+    }
+
+    ;
 
     setValidationErrors(newValidationErrors);
 
@@ -154,9 +159,9 @@ ${acceptedTypesDisplay}`,
   const onButtonClick = (): void => {
     inputRef.current?.click();
   };
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const onInputChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     if (e.target.files && e.target.files[0])
-      handleFileSelection(e.target.files);
+      await handleFileSelection(e.target.files);
   };
   const removeFile = (fileId: string): void => {
     setSelectedFiles(prev => prev.filter(fileData => fileData.id !== fileId));

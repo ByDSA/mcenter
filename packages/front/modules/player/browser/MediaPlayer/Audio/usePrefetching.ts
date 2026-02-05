@@ -69,10 +69,8 @@ export function usePrefetching() {
         const url = await getUrlSkipHistory(resourceId);
         let music = await useMusic.get(resourceId);
 
-        if (!music?.fileInfos) {
-          await useMusic.invalidateCache(resourceId);
+        if (!music?.fileInfos)
           music = await useMusic.fetch(resourceId);
-        }
 
         const ext = music?.fileInfos?.[0].path.split(".").pop();
         let blob: Blob;
