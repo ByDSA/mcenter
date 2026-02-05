@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.31.0-alpha.2](https://github.com/ByDSA/mcenter/compare/v4.31.0-alpha.1...v4.31.0-alpha.2) (2026-02-05)
+
+
+### Features
+
+* **back:** upload episodes ([6b21340](https://github.com/ByDSA/mcenter/commit/6b21340ee751ac5010e7cd176b8558b0007e7976))
+* **front:** upload episodes ([0ec6492](https://github.com/ByDSA/mcenter/commit/0ec64921b1f4ab7e70cb00bda8fe5e6c5bf26613))
+
+
+### Bug Fixes
+
+* **front:** fix input time and input number ([48a2fb4](https://github.com/ByDSA/mcenter/commit/48a2fb4e5718828bb48e9fa8dda6ecf029a9296f))
+* **front:** fix requests toedit music file info and latest views ([66da461](https://github.com/ByDSA/mcenter/commit/66da461a709e79abd16c4d11a2172ca92582e67b))
+
 ## [4.31.0-alpha.1](https://github.com/ByDSA/mcenter/compare/v4.31.0-alpha.0...v4.31.0-alpha.1) (2026-02-02)
 
 
