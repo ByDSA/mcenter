@@ -1,6 +1,6 @@
 import { Type, DynamicModule, Provider, ForwardReference } from "@nestjs/common";
 import "reflect-metadata";
-import { createMockProvider } from "./providers";
+import { getOrCreateMockProvider } from "./providers";
 
 type NestModuleType =
   DynamicModule | ForwardReference | Promise<DynamicModule> | Type;
@@ -104,14 +104,14 @@ export async function createMockedModule(
     for (const exportedProvider of importExports) {
       // Solo procesa exports que sean clases o providers con token de clase
       if (isClass(exportedProvider))
-        importedMocks.push(createMockProvider(exportedProvider));
+        importedMocks.push(getOrCreateMockProvider(exportedProvider));
       else if (
         exportedProvider
         && typeof exportedProvider === "object"
         && "provide" in exportedProvider
         && isClass((exportedProvider as any).provide)
       )
-        importedMocks.push(createMockProvider((exportedProvider as any).provide));
+        importedMocks.push(getOrCreateMockProvider((exportedProvider as any).provide));
 
       // Ignora strings, símbolos, y otros tipos que no podemos mockear directamente
     }
@@ -121,7 +121,7 @@ export async function createMockedModule(
   const mocks: Provider[] = provList.map((prov) => {
     // class provider directo
     if (isClass(prov))
-      return createMockProvider(prov);
+      return getOrCreateMockProvider(prov);
 
     // { provide: X, useClass/useFactory/useValue... }
     if (
@@ -130,7 +130,7 @@ export async function createMockedModule(
       && "provide" in prov
       && isClass((prov as any).provide)
     )
-      return createMockProvider((prov as any).provide);
+      return getOrCreateMockProvider((prov as any).provide);
 
     // deja pasar otros (InjectionToken, ValueProvider, etc.)
     return prov;

@@ -1,33 +1,25 @@
-import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { assertIsDefined } from "$shared/utils/validation";
-import { StreamsRepository } from "#episodes/streams/crud/repository";
+import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { UsersRepository } from "#core/auth/users/crud/repository";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
-import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
-import { EpisodesCrudModule } from "#episodes/crud/module";
+import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
+import { fixtureEpisodes } from "#episodes/tests";
 import { type SeriesEntity, seriesEntitySchema } from "../../models";
 import { CreateDto, SeriesRepository } from "./repository";
-import { SeriesAvailableSlugGeneratorService } from "./available-slug-generator.service";
-
-let repo: SeriesRepository;
-let streamsRepo: StreamsRepository;
-let testingSetup: TestingSetup;
 
 describe("repository", () => {
+  let repo: SeriesRepository;
+  let testingSetup: TestingSetup;
+
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
       imports: [
-        EpisodesCrudModule,
         DomainEventEmitterModule,
       ],
       controllers: [],
       providers: [
         SeriesRepository,
-        SeriesAvailableSlugGeneratorService,
-        StreamsRepository,
-        UsersRepository,
       ],
     }, {
       db: {
@@ -37,12 +29,9 @@ describe("repository", () => {
 
     await loadFixtureAuthUsers();
 
-    await loadFixtureSimpsons();
+    await loadFixtureSampleSeries();
 
-    repo = testingSetup.module
-      .get<SeriesRepository>(SeriesRepository);
-    streamsRepo = testingSetup.module
-      .get<StreamsRepository>(StreamsRepository);
+    repo = testingSetup.app.get(SeriesRepository);
   } );
 
   describe("create", () => {
@@ -54,22 +43,8 @@ describe("repository", () => {
     } satisfies CreateDto;
 
     describe("before Create", () => {
-      beforeAll(async () => {
-        await testingSetup.db!.dropAll();
-      } );
-
       it("should not be in db", async () => {
         const got = await repo.getOneByKey(newModel.key);
-
-        expect(got).toBeNull();
-      } );
-
-      it("should not be stream in db", async () => {
-        const streamId = newModel.key;
-        const got = await streamsRepo.getOneByKey(
-          fixtureUsers.Normal.User.id,
-          streamId,
-        );
 
         expect(got).toBeNull();
       } );
@@ -95,13 +70,31 @@ describe("repository", () => {
 
         expect(got).toMatchObject(newModel);
       } );
+    } );
+  } );
 
-      it("should not stream created", async () => {
-        const userId = fixtureUsers.Normal.User.id;
-        const got = await streamsRepo.getOneByKey(userId, newModel.key);
+  describe("getMany", ()=> {
+    it("get all", async () => {
+      const criteria = {
+        requestUserId: null,
+      } satisfies Parameters<typeof repo.getMany>[0];
+      const ret = await repo.getMany(criteria);
 
-        expect(got).toBeNull();
-      } );
+      expect(ret.data.length).toBeGreaterThan(0);
+    } );
+
+    it("count episodes and seasons", async () => {
+      const criteria = {
+        requestUserId: null,
+        filter: {
+          id: SERIES_SAMPLE_SERIES.id,
+        },
+        expand: ["countEpisodes", "countSeasons"],
+      } satisfies Parameters<typeof repo.getMany>[0];
+      const ret = await repo.getMany(criteria);
+
+      expect(ret.data[0].metadata?.countEpisodes).toBe(fixtureEpisodes.SampleSeries.List.length);
+      expect(ret.data[0].metadata?.countSeasons).toBe(2);
     } );
   } );
 } );

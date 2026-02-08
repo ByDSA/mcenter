@@ -7,10 +7,9 @@ import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/
 import { createTestingAppModuleAndInit } from "#core/app/tests/app";
 import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { MusicDtos } from "#musics/models/dto";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureMusics } from "../tests";
 import { MusicsRepository } from "../crud/repositories/music";
-import { musicsRepoMockProvider } from "../crud/repositories/music/tests";
-import { musicHistoryRepoMockProvider } from "../history/crud/repository/tests";
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicsSlugModule } from "./module";
 
@@ -21,7 +20,10 @@ describe("responses", () => {
 
   beforeAll(async () => {
     const testingSetup = await createTestingAppModuleAndInit( {
-      imports: [ResourceResponseFormatterModule, MusicsSlugModule],
+      imports: [
+        ResourceResponseFormatterModule,
+        MusicsSlugModule,
+      ],
       controllers: [],
       providers: [
       ],
@@ -29,11 +31,11 @@ describe("responses", () => {
       beforeCompile: (builder)=> {
         builder
           .overrideProvider(MusicsRepository)
-          .useClass(musicsRepoMockProvider.useClass);
+          .useValue(getOrCreateMockProvider(MusicsRepository).useValue);
 
         builder
           .overrideProvider(MusicHistoryRepository)
-          .useClass(musicHistoryRepoMockProvider.useClass);
+          .useValue(getOrCreateMockProvider(MusicHistoryRepository).useValue);
       },
     } );
 

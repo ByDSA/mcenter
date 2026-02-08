@@ -1,6 +1,6 @@
 /* eslint-disable accessor-pairs */
 import { DependencyFilter, FilterApplier, PreventDisabledFilter, PreventRepeatInDaysFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { Episode, EpisodeCompKey, EpisodeEntityWithUserInfo, compareEpisodeCompKey } from "../../../models";
+import { EpisodeEntity, EpisodeEntityWithUserInfo } from "../../../models";
 import { DependenciesList } from "./dependencies";
 
 class PreventDisabledEpisodeFilter extends PreventDisabledFilter<EpisodeEntityWithUserInfo> {
@@ -18,8 +18,8 @@ class RemoveWeightLowerOrEqualThanEpisodeFilter
 
 class PreventRepeatInDaysEpisodeFilter
   extends PreventRepeatInDaysFilter<EpisodeEntityWithUserInfo> {
-  getLastTimePlayed(resource: EpisodeEntityWithUserInfo): number {
-    return resource.userInfo.lastTimePlayed ?? 0;
+  getLastTimePlayed(resource: EpisodeEntityWithUserInfo): Date | null {
+    return resource.userInfo.lastTimePlayed;
   }
 }
 
@@ -30,9 +30,9 @@ type Params<R, ID = string> = {
   dependencies: DependenciesList;
 };
 export class EpisodeFilterApplier extends FilterApplier<EpisodeEntityWithUserInfo> {
-  #params: Params<EpisodeEntityWithUserInfo, EpisodeCompKey>;
+  #params: Params<EpisodeEntityWithUserInfo, string>;
 
-  constructor(params: Params<EpisodeEntityWithUserInfo, EpisodeCompKey>) {
+  constructor(params: Params<EpisodeEntityWithUserInfo, string>) {
     super();
     this.#params = params;
 
@@ -49,29 +49,19 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntityWithUserInf
 
   #addDependencyFilter(): boolean {
     const { dependencies, lastId } = this.#params;
-    const seriesKey = lastId?.seriesKey;
+    const plainDependencies = Object.values(dependencies).flat();
+    const dependency = plainDependencies.find((d) => d.lastEpisodeId === lastId);
 
-    if (lastId && seriesKey && seriesKey in dependencies) {
-      const serieDependencies = dependencies[seriesKey];
-      const dependency = serieDependencies.find(([a]) => a === lastId.episodeKey);
+    if (dependency) {
+      this.add(new DependencyFilter<string, EpisodeEntityWithUserInfo>( {
+        lastId: lastId ?? null,
+        firstId: dependency.lastEpisodeId,
+        secondId: dependency.nextEpisodeId,
+        compareId: (a, b)=>a === b,
+        getId: (e)=>e.id,
+      } ));
 
-      if (dependency) {
-        const dependencyFullId: [EpisodeCompKey, EpisodeCompKey] = dependency
-          .map((episodeKey) => ( {
-            episodeKey: episodeKey,
-            seriesKey: seriesKey,
-          } )) as [EpisodeCompKey, EpisodeCompKey];
-
-        this.add(new DependencyFilter<EpisodeCompKey, EpisodeEntityWithUserInfo>( {
-          lastId,
-          firstId: dependencyFullId[0],
-          secondId: dependencyFullId[1],
-          compareId: compareEpisodeCompKey,
-          getId: (e)=>e.compKey,
-        } ));
-
-        return true;
-      }
+      return true;
     }
 
     return false;
@@ -88,11 +78,11 @@ export class EpisodeFilterApplier extends FilterApplier<EpisodeEntityWithUserInf
     this.add(new PreventDisabledEpisodeFilter());
 
     if (lastEp) {
-      this.add(new PreventRepeatLastFilter<EpisodeCompKey, Episode>(
+      this.add(new PreventRepeatLastFilter<string, EpisodeEntity>(
         {
           lastId,
-          compareId: compareEpisodeCompKey,
-          getResourceId: e=>e.compKey,
+          compareId: (a, b)=>a === b,
+          getResourceId: e=>e.id,
         },
       ));
     }
@@ -113,7 +103,7 @@ export function genEpisodeFilterApplier(
   return new EpisodeFilterApplier( {
     resources,
     lastEp: lastEp ?? null,
-    lastId: lastEp?.compKey,
+    lastId: lastEp?.id,
     dependencies: deps,
   } );
 }

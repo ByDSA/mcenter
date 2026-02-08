@@ -16,12 +16,14 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
     name: docOdm.name,
     imageCoverId: docOdm.imageCoverId?.toString() ?? null,
     imageCover: docOdm.imageCover ? ImageCoverOdm.toEntity(docOdm.imageCover) : undefined,
-    countEpisodes: docOdm.countEpisodes,
-    countSeasons: docOdm.countSeasons,
     addedAt: docOdm.addedAt,
     createdAt: docOdm.createdAt,
     updatedAt: docOdm.updatedAt,
     releasedOn: docOdm.releasedOn,
+    metadata: {
+      countEpisodes: docOdm.countEpisodes,
+      countSeasons: docOdm.countSeasons,
+    },
   } satisfies AllKeysOf<Entity>;
 
   return removeUndefinedDeep(ret);

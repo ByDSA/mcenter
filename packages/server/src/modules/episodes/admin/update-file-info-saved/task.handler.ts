@@ -11,12 +11,13 @@ import ffmpeg from "fluent-ffmpeg";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
-import { EpisodeCompKey } from "#episodes/models";
 import { md5FileAsync } from "#utils/crypt";
 import { EpisodeFileInfoEntity, EpisodeFileInfoOmitEpisodeId, compareEpisodeFileInfoOmitEpisodeId, episodeFileInfoEntitySchema } from "#episodes/file-info/models";
-import { RemoteSeriesTreeService } from "../sync-disk-to-db/db";
+import { assertFoundServer } from "#utils/validation/found";
+import { SeriesOdm } from "#episodes/series/crud/repository/odm";
+import { SeriesNode } from "../sync-disk-to-db/disk/models";
 import { EpisodeFile, SerieFolderTree } from "../sync-disk-to-db/disk";
-import { SerieNode } from "../sync-disk-to-db/disk/models";
+import { RemoteSeriesTreeService } from "../sync-disk-to-db/db";
 
 type Entity = EpisodeFileInfoEntity;
 type ModelOmitEpisodeId = EpisodeFileInfoOmitEpisodeId;
@@ -89,20 +90,20 @@ export class EpisodeUpdateFileInfoSavedTaskHandler implements TaskHandler<Payloa
     const fileInfos: Entity[] = [];
     const errors: ErrorElementResponse[] = [];
     const n = seriesTree.children
-      .flatMap(serie => serie.children)
+      .flatMap(series => series.children)
       .flatMap(season => season.children)
       .length;
     let i = 0;
 
-    for (const serie of seriesTree.children) {
-      for (const season of serie.children) {
+    for (const series of seriesTree.children) {
+      for (const season of series.children) {
         for (const episode of season.children) {
           i++;
           await updateProgress( {
-            message: "Updating: " + serie.key + " " + season.key + "x" + episode.key,
+            message: "Updating: " + series.key + " " + season.key + "x" + episode.key,
             percentage: 5 + ((99 - 5) * (i / n)),
           } );
-          await this.genEpisodeFileInfoAndUpdateOrCreate(serie.key, episode, {
+          await this.genEpisodeFileInfoAndUpdateOrCreate(series.key, episode, {
             forceHash: payload?.forceHash ?? false,
           } )
             .then((episodeFileWithId) => {
@@ -134,7 +135,7 @@ export class EpisodeUpdateFileInfoSavedTaskHandler implements TaskHandler<Payloa
   }
 
   private async genEpisodeFileInfoFromEpisodeOrFail(
-    seriesKey: SerieNode["key"],
+    seriesKey: SeriesNode["key"],
     episode: EpisodeFile,
     options: Options,
   ): Promise<Entity | null> {
@@ -206,15 +207,23 @@ export class EpisodeUpdateFileInfoSavedTaskHandler implements TaskHandler<Payloa
     if (episodeFileInfo === null)
       return null;
 
-    const episodeCompKey: EpisodeCompKey = {
-      seriesKey: seriesKey,
-      episodeKey: episodeKey,
-    };
-    const episodeId = await EpisodeOdm.getIdFromCompKey(episodeCompKey);
+    const seriesDoc = await SeriesOdm.Model.findOne( {
+      key: seriesKey,
+    } );
+
+    assertFoundServer(seriesDoc);
+    const seriesId = seriesDoc._id.toString();
+    const episodeDoc = await EpisodeOdm.Model.findOne( {
+      episodeKey,
+      seriesId,
+    } );
+
+    assertFoundServer(episodeDoc);
+    const episodeId = episodeDoc._id;
 
     assertIsDefined(
       episodeId,
-      `episode with id ${episodeCompKey.episodeKey} in ${episodeCompKey.seriesKey} not found`,
+      `episode with key ${episodeKey} in ${seriesKey} not found`,
     );
 
     const episodeFileWithId = {

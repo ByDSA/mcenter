@@ -18,7 +18,9 @@ type Props = {
 };
 export const SeriesListItem = (props: Props) => {
   const { data: series } = useSeries(props.seriesId);
-  const { data: imageCover } = useImageCover(series?.imageCoverId ?? null);
+  const { data: imageCover } = useImageCover(series?.imageCoverId ?? null, {
+    debounce: true,
+  } );
   const { removeItemByIndex } = useArrayData<SeriesEntity>();
   const router = useRouter();
   const url = frontendUrl(
@@ -49,12 +51,10 @@ export const SeriesListItem = (props: Props) => {
       <span className={styles.title}>{series.name}</span>
       <footer className={styles.footer}>
         <aside className={styles.info}>
-          {series.countSeasons !== undefined && (
-            <span className={styles.subInfo}>{series.countSeasons} temporadas</span>
-          )}
-          {series.countEpisodes !== undefined && (
-            <span className={styles.subInfo}>{series.countEpisodes} episodes</span>
-          )}
+          <span className={styles.subInfo}>
+            {series.metadata?.countSeasons ?? "-"} temporadas
+          </span>
+          <span className={styles.subInfo}>{series.metadata?.countEpisodes ?? "-"} episodios</span>
         </aside>
         <aside>
           <LocalDataProvider data={series}>

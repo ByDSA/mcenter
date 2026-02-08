@@ -1,6 +1,4 @@
 import mongoose, { Schema, Types } from "mongoose";
-import { DateType } from "$shared/utils/time";
-import { DateTypeOdmSchema } from "#utils/time";
 import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { StreamOdm } from "#episodes/streams/crud/repository/odm";
@@ -8,10 +6,10 @@ import { UserOdm } from "#core/auth/users/crud/repository/odm";
 
 type DocOdm = {
   _id?: Types.ObjectId;
-  date: DateType;
+  date: Date;
   episodeId: Types.ObjectId;
   streamId: Types.ObjectId;
-  userId: UserOdm.FullDoc["_id"];
+  userId: Types.ObjectId;
 };
 
 type FullDocOdm = RequireId<DocOdm> & {
@@ -24,7 +22,7 @@ export const COLLECTION = "episode_history_entries";
 
 const schemaOdm = new mongoose.Schema<DocOdm>( {
   date: {
-    type: DateTypeOdmSchema,
+    type: Schema.Types.Date,
     required: true,
   },
   episodeId: {

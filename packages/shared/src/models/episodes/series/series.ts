@@ -20,8 +20,10 @@ export type Series = z.infer<typeof seriesSchema>;
 export const seriesEntitySchema = seriesSchema.extend( {
   id: mongoDbId,
   imageCover: imageCoverEntitySchema.optional(),
-  countEpisodes: z.number().optional(),
-  countSeasons: z.number().optional(),
+  metadata: z.object( {
+    countEpisodes: z.number().optional(),
+    countSeasons: z.number().optional(),
+  } ).optional(),
 } );
 
 export type SeriesEntity = z.infer<typeof seriesEntitySchema>;

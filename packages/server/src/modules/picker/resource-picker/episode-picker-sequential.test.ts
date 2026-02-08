@@ -1,6 +1,6 @@
-import { Episode, EpisodeEntity, compareEpisodeCompKey } from "#episodes/models";
-import { fixtureEpisodes } from "#episodes/tests";
 import { ResourcePickerSequential } from "./resource-picker-sequential";
+import { Episode, EpisodeEntity } from "#episodes/models";
+import { fixtureEpisodes } from "#episodes/tests";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
@@ -12,9 +12,9 @@ it("should pick 1x02 when lastEp is 1x01", async () => {
   const expected = EPISODES_SIMPSONS[1];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp.compKey,
-    compareId: compareEpisodeCompKey,
-    getId: e=>e.compKey,
+    lastId: lastEp.id,
+    compareId: (a, b)=>a === b,
+    getId: e=>e.id,
   } );
   const actualEpisodes: Model[] = await seq.pick();
 
@@ -29,9 +29,9 @@ it("should pick 1x01 (first one) when lastEp is undfined", async () => {
   const expected = EPISODES_SIMPSONS[0];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp?.compKey,
-    compareId: compareEpisodeCompKey,
-    getId: e=>e.compKey,
+    lastId: lastEp?.id,
+    compareId: (a, b)=>a === b,
+    getId: e=>e.id,
   } );
   const actualEpisodes: Model[] = await seq.pick();
 
@@ -46,9 +46,9 @@ it("should pick 1x01 (first one) when lastEp is last", async () => {
   const expected = EPISODES_SIMPSONS[0];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp?.compKey,
-    compareId: compareEpisodeCompKey,
-    getId: e=>e.compKey,
+    lastId: lastEp?.id,
+    compareId: (a, b)=>a === b,
+    getId: e=>e.id,
   } );
   const actualEpisodes: Model[] = await seq.pick();
 
@@ -64,9 +64,9 @@ is previous to last and pick 2 episodes", async () => {
   const expected = [EPISODES_SIMPSONS.at(-1), EPISODES_SIMPSONS[0]];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp?.compKey,
-    compareId: compareEpisodeCompKey,
-    getId: e=>e.compKey,
+    lastId: lastEp?.id,
+    compareId: (a, b)=>a === b,
+    getId: e=>e.id,
   } );
   const actualEpisodes: Model[] = await seq.pick(2);
 

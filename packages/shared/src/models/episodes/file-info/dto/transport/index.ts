@@ -22,7 +22,7 @@ export namespace EpisodeFileInfoCrudDtos {
     const metadataWithKey = z.object( {
       title: z.string().optional(),
       episodeKey: z.string(),
-      seriesKey: z.string(),
+      seriesId: mongoDbId,
     } ).strict();
 
     export const requestBodySchema = z.object( {

@@ -5,8 +5,8 @@ import { EpisodeFile } from "../disk";
 export function episodeToEpisodeFiles(
   episode: EpisodeEntityWithFileInfos,
 ): EpisodeFile[] {
-  const key = splitSeasonEpisodeFromEpisodeKey(episode.compKey.episodeKey).episode;
-  const { episodeKey } = episode.compKey;
+  const key = splitSeasonEpisodeFromEpisodeKey(episode.episodeKey).episode;
+  const { episodeKey } = episode;
   const episodeFiles: EpisodeFile[] = episode.fileInfos.map(f =>( {
     key,
     content: {

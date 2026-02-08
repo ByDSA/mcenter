@@ -4,8 +4,9 @@ import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
 import { EpisodeTasks } from "$shared/models/episodes/admin";
+import { dateSchema } from "$shared/models/utils/schemas/timestamps/date";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
-import { LastTimePlayedService } from "#episodes/history/last-time-played.service";
+import { EpisodeLastTimePlayedService } from "#episodes/history/last-time-played/service";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 
 const TASK_NAME = EpisodeTasks.cache.updateLastTimePlayed.name;
@@ -18,8 +19,8 @@ const resultSchema = createOneResultResponseSchema(z.object( {
   changes: z.array(z.object( {
     id: z.string(),
     description: z.string(),
-    old: z.number().optional(),
-    new: z.number().nullable(),
+    old: dateSchema.nullable(),
+    new: dateSchema.nullable(),
   } )),
 } ));
 
@@ -31,7 +32,7 @@ type Result = z.infer<typeof resultSchema>;
 @TaskHandlerClass()
 export class EpisodeUpdateLastTimePlayedTaskHandler implements TaskHandler<Payload, Result> {
   constructor(
-    private readonly lastTimePlayedService: LastTimePlayedService,
+    private readonly lastTimePlayedService: EpisodeLastTimePlayedService,
     private readonly episodesUsersRepo: EpisodesUsersRepository,
     private readonly taskService: TaskService,
   ) { }
@@ -72,9 +73,13 @@ export class EpisodeUpdateLastTimePlayedTaskHandler implements TaskHandler<Paylo
 
     for (const userInfo of allUserInfos) {
       const updatePromise = this.lastTimePlayedService
-        .updateEpisodeLastTimePlayedById(userInfo.userId, userInfo.episodeId)
+        .updateEpisodeLastTimePlayedById(userInfo.episodeId, {
+          requestingUserId: userInfo.userId,
+        } )
         .then(n=> {
-          if (n !== (userInfo.lastTimePlayed ?? null)) {
+          if (
+            (n?.getMilliseconds() ?? null) !== (userInfo.lastTimePlayed?.getMilliseconds() ?? null)
+          ) {
             data.changes.push( {
               id: userInfo.id,
               description:

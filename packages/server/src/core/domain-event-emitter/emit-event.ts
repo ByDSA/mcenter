@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-import { isDefined } from "$shared/utils/validation";
+import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { Logger } from "@nestjs/common";
 import { Entity, EntityEvent } from "./events";
 import { getEventEmitter } from "./get-event-emitter";
@@ -48,11 +48,13 @@ export function EmitEntityEvent<T>(
 
     descriptor.value = async function (...args: readonly any[]) {
       const result = await originalMethod.apply(this, args) as Entity<T> | Entity<T>[];
+
+      assertIsDefined(result);
       const eventEmitter = getEventEmitter(this);
 
       if (eventEmitter) {
         // Determinar qué datos usar (resultado o primer argumento)
-        const dataToProcess = result ?? args[0] as object[] | object;
+        const dataToProcess = result as object[] | object;
 
         if (!isDefined(dataToProcess) || typeof dataToProcess !== "object") {
           throw new Error(

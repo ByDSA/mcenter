@@ -1,37 +1,26 @@
 import { AllKeysOf } from "$shared/utils/types";
 import { Types } from "mongoose";
-import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
+import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { EpisodeDependency as Model, EpisodeDependencyEntity as Entity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
+import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
 
 function docOdmToEntity(docOdm: FullDocOdm): Entity {
   const ret: Entity = {
     id: docOdm._id.toString(),
-    lastCompKey: {
-      episodeKey: docOdm.lastCompKey.episodeKey,
-      seriesKey: docOdm.lastCompKey.seriesKey,
-    },
-    nextCompKey: {
-      episodeKey: docOdm.nextCompKey.episodeKey,
-      seriesKey: docOdm.nextCompKey.seriesKey,
-    },
+    lastEpisodeId: docOdm.lastEpisodeId.toString(),
+    nextEpisodeId: docOdm.nextEpisodeId.toString(),
     last: docOdm.last ? EpisodeOdm.toEntity(docOdm.last) : undefined,
     next: docOdm.next ? EpisodeOdm.toEntity(docOdm.next) : undefined,
   } satisfies AllKeysOf<Entity>;
 
-  return ret;
+  return removeUndefinedDeep(ret);
 }
 
 function modelToDocOdm(model: Model): DocOdm {
   return {
-    lastCompKey: {
-      episodeKey: model.lastCompKey.episodeKey,
-      seriesKey: model.lastCompKey.seriesKey,
-    },
-    nextCompKey: {
-      episodeKey: model.nextCompKey.episodeKey,
-      seriesKey: model.nextCompKey.seriesKey,
-    },
+    lastEpisodeId: new Types.ObjectId(model.lastEpisodeId),
+    nextEpisodeId: new Types.ObjectId(model.nextEpisodeId),
   } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
 }
 

@@ -3,9 +3,11 @@ import path from "path";
 import { Application } from "express";
 import supertest from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { loadFixtureSampleSeriesWithoutEpisodes } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { EpisodeFileInfosUploadModule } from "../module";
 import { EPISODES_MEDIA_PATH, EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "../utils";
 import { uploadEpisodeFile } from "./utils";
@@ -33,6 +35,8 @@ describe("episodeFileInfoUploadController E2E", () => {
       },
     );
 
+    await loadFixtureSampleSeriesWithoutEpisodes();
+
     await testingSetup.useMockedUser(fixtureUsers.Admin.UserWithRoles);
     routerApp = testingSetup.routerApp;
   } );
@@ -53,10 +57,10 @@ describe("episodeFileInfoUploadController E2E", () => {
   describe("uploadFile (Crear nuevo episodio)", () => {
     let res: supertest.Response;
     let body: EpisodeFileInfoCrudDtos.UploadFile.Response;
-    const seriesKey = "e2e-test-series";
+    const seriesId = SERIES_SAMPLE_SERIES.id;
     const episodeKey = "1x01";
     const metadata: EpisodeFileInfoCrudDtos.UploadFile.RequestBody["metadata"] = {
-      seriesKey,
+      seriesId,
       episodeKey,
       title: "Pilot Episode E2E",
     };
@@ -88,8 +92,8 @@ describe("episodeFileInfoUploadController E2E", () => {
       expect(body.data.episode).toBeDefined();
       expect(body.data.fileInfo).toBeDefined();
 
-      expect(body.data.episode?.compKey.seriesKey).toBe(seriesKey);
-      expect(body.data.episode?.compKey.episodeKey).toBe(episodeKey);
+      expect(body.data.episode?.seriesId).toBe(seriesId);
+      expect(body.data.episode?.episodeKey).toBe(episodeKey);
       expect(body.data.fileInfo.episodeId).toBe(body.data.episode?.id);
     } );
 
@@ -100,7 +104,7 @@ describe("episodeFileInfoUploadController E2E", () => {
       const relativePath = body.data.fileInfo.path;
 
       // Verificamos que el path relativo devuelto tenga sentido
-      expect(relativePath).toContain(seriesKey);
+      expect(relativePath).toContain(SERIES_SAMPLE_SERIES.key);
       expect(relativePath).toContain(season);
 
       const absolutePathCheck = path.join(EPISODES_MEDIA_PATH, relativePath);

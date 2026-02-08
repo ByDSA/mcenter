@@ -4,11 +4,11 @@ import { UserPayload } from "$shared/models/auth";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
 import { ResponseFormat } from "$shared/models/resources";
-import { assertFoundClient } from "#utils/validation/found";
-import { ResponseFormatterService } from "#modules/resources/response-formatter";
 import { MusicHistoryRepository } from "./history/crud/repository";
 import { MusicEntity } from "./models";
 import { MusicRendererService } from "./renderer/render.service";
+import { assertFoundClient } from "#utils/validation/found";
+import { MusicResponseFormatterService } from "#modules/resources/response-formatter/music-response-formatter.service";
 
 interface ProcessOptions {
   req: Request;
@@ -23,7 +23,7 @@ export class MusicFlowService {
   constructor(
     private readonly historyRepo: MusicHistoryRepository,
     private readonly renderer: MusicRendererService,
-    private readonly responseFormatter: ResponseFormatterService,
+    private readonly responseFormatter: MusicResponseFormatterService,
   ) {}
 
   /**

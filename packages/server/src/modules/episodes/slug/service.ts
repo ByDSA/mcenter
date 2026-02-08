@@ -1,14 +1,17 @@
 import { Injectable, StreamableFile } from "@nestjs/common";
 import { Request, Response } from "express";
-import { assertFoundClient } from "#utils/validation/found";
+import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
 import { ResourceSlugService } from "#modules/resources/slug/service";
 import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { getAbsolutePath } from "#episodes/utils";
-import { EpisodeHistoryRepository } from "../history/crud/repository";
-import { EpisodeEntity } from "../models";
 import { EpisodesRepository } from "../crud/repositories/episodes";
+import { EpisodeEntity } from "../models";
+import { EpisodeHistoryRepository } from "../history/crud/repository";
 
-type Slug = EpisodeEntity["compKey"];
+type Slug = {
+  seriesKey: string;
+  episodeKey: string;
+};
 type HandleProps = {
   slug: Slug;
   userId?: string;
@@ -24,14 +27,20 @@ export class EpisodeSlugHandlerService {
   ) {}
 
   async handle( { req, res, slug, userId }: HandleProps): Promise<StreamableFile | void> {
-    const episode = await this.repo.getOneByCompKey(slug, {
-      requestingUserId: userId,
-      criteria: {
+    const episode = await this.repo.getOneBySeriesKeyAndEpisodeKey(
+      slug.seriesKey,
+      slug.episodeKey,
+      {
         expand: ["fileInfos", "series"],
       },
-    } );
+      {
+        requestingUserId: userId,
+      },
+    );
 
     assertFoundClient(episode);
+    assertFoundServer(episode.fileInfos);
+    assertFoundServer(episode.series);
 
     if (userId)
       await this.updateHistory(episode, userId);
@@ -43,22 +52,27 @@ export class EpisodeSlugHandlerService {
       getAbsolutePath,
       generateFilename: (entity: EpisodeEntity, fileInfo: EpisodeFileInfoEntity) => {
         const ext = fileInfo.path.slice(fileInfo.path.lastIndexOf("."));
-        const serie = entity.serie?.name ?? entity.compKey.seriesKey;
-        const { episodeKey } = entity.compKey;
 
-        return `${serie} - ${episodeKey} - ${entity.title}${ext}`;
+        assertFoundServer(entity.series);
+        const series = entity.series.name;
+        const { episodeKey } = entity;
+
+        return `${series} - ${episodeKey} - ${entity.title}${ext}`;
       },
     } );
   }
 
   private async updateHistory(episode: EpisodeEntity, userId: string) {
-    const isLast = await this.historyRepo.isLast(episode.id, userId);
+    const options = {
+      requestingUserId: userId,
+    };
+    const isLast = await this.historyRepo.isLast(episode.id, options);
 
     if (!isLast) {
       await this.historyRepo.createNewEntryNowFor( {
-        episode,
-        userId,
-      } );
+        episodeId: episode.id,
+        seriesId: episode.seriesId,
+      }, options);
     }
   }
 }

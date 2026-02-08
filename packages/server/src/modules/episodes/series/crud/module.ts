@@ -1,21 +1,19 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
-import { SeriesRepository } from "./crud/repository";
-import { SeriesCrudController } from "./crud/controller";
-import { SeriesAvailableSlugGeneratorService } from "./crud/repository/available-slug-generator.service";
+import { SeriesRepository } from "./repository";
+import { SeriesCrudController } from "./controller";
 
 @Module( {
   imports: [
     DomainEventEmitterModule,
-    forwardRef(() => EpisodesCrudModule),
+    EpisodesCrudModule,
   ],
   controllers: [
     SeriesCrudController,
   ],
   providers: [
     SeriesRepository,
-    SeriesAvailableSlugGeneratorService,
   ],
   exports: [SeriesRepository],
 } )

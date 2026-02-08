@@ -3,16 +3,19 @@ import { Request, Response } from "express";
 import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { EpisodeDependencyCrudDtos } from "$shared/models/episodes/dependencies/dto/transport";
-import { episodeCompKeySchema } from "$shared/models/episodes/episode";
-import { AdminDeleteOne, GetAll, GetManyCriteria, GetOneById } from "#utils/nestjs/rest";
-import { IdParamDto } from "#utils/validation/dtos";
+import { mongoDbId } from "$shared/models/resources/partial-schemas";
+import z from "zod";
 import { type EpisodeDependencyEntity, episodeDependencyEntitySchema } from "../models";
 import { EpisodeDependenciesRepository } from "./repository/repository";
+import { AdminDeleteOne, GetAll, GetManyCriteria, GetOneById } from "#utils/nestjs/rest";
+import { IdParamDto } from "#utils/validation/dtos";
 
 class GetManyBodyDto
   extends createZodDto(EpisodeDependencyCrudDtos.GetMany.criteriaSchema) {}
 
-class LastCompKeyParamsDto extends createZodDto(episodeCompKeySchema) {}
+class LastCompKeyParamsDto extends createZodDto(z.object( {
+  episodeId: mongoDbId,
+} )) {}
 
 @Controller()
 export class EpisodeDependenciesCrudController
@@ -29,15 +32,12 @@ implements
   }
 
   @GetOneById(episodeDependencyEntitySchema, {
-    url: "/:seriesKey/:episodeKey",
+    url: "/:episodeId",
   } )
   async getNext(
     @Param() params: LastCompKeyParamsDto,
   ) {
-    return await this.repo.getNextByLast( {
-      episodeKey: params.episodeKey,
-      seriesKey: params.seriesKey,
-    } );
+    return await this.repo.getNextByEpisodeId(params.episodeId);
   }
 
   @GetManyCriteria(episodeDependencyEntitySchema)

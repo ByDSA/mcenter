@@ -86,7 +86,7 @@ export function buildCriteriaPipeline(criteria: CriteriaMany): PipelineStage[] {
                       $filter: {
                         input: "$$origins",
                         cond: {
-                          $eq: ["$this.type", "serie"],
+                          $eq: ["$this.type", "series"],
                         },
                       },
                     },
@@ -113,10 +113,10 @@ export function buildCriteriaPipeline(criteria: CriteriaMany): PipelineStage[] {
               $mergeObjects: [
                 "$$origin",
                 {
-                  serie: {
+                  series: {
                     $cond: {
                       if: {
-                        $eq: ["$origin.type", "serie"],
+                        $eq: ["$origin.type", "series"],
                       },
                       then: {
                         $arrayElemAt: [

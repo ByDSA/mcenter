@@ -2,7 +2,7 @@ import z from "zod";
 import { mongoDbId } from "../../../resources/partial-schemas";
 import { generatePatchBodySchema } from "../../../utils/schemas/patch";
 import { createCriteriaConfig, createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
-import { seriesEntitySchema, seriesSchema } from "../serie";
+import { seriesEntitySchema, seriesSchema } from "../series";
 import { createOneResultResponseSchema, createPaginatedResultResponseSchema } from "../../../../utils/http/responses";
 
 const criteriaConfig = createCriteriaConfig( {
@@ -19,7 +19,9 @@ const criteriaConfig = createCriteriaConfig( {
 
 export namespace SeriesCrudDtos {
   const responseOneSchema = createOneResultResponseSchema(seriesEntitySchema);
-  const responseManySchema = createPaginatedResultResponseSchema(seriesEntitySchema);
+  const responseManySchema = createPaginatedResultResponseSchema(
+    seriesEntitySchema,
+  );
 
   export namespace GetMany {
     export const criteriaSchema = createCriteriaManySchema(criteriaConfig);

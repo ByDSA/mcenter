@@ -4,6 +4,7 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
+import { PaginatedResult } from "$shared/utils/http/responses";
 import { CanCreateManyAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { assertFoundClient } from "#utils/validation/found";
 import { SeriesKey } from "#episodes/series";
@@ -13,12 +14,12 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { fixTxtFields } from "#modules/resources/fix-text";
-import { EpisodeHistoryEntryEvents } from "../../../history/crud/repository/events";
-import { LastTimePlayedService } from "../../../history/last-time-played.service";
-import { Episode, EpisodeCompKey, EpisodeEntity } from "../../../models";
-import { EpisodeEvents } from "./events";
-import { getCriteriaPipeline } from "./odm/criteria-pipeline";
+import { SeriesOdm } from "#episodes/series/crud/repository/odm";
+import { getSeasonNumberByEpisodeKey } from "#episodes/series/crud/repository/repository";
+import { Episode, EpisodeEntity } from "../../../models";
 import { EpisodeOdm } from "./odm";
+import { getCriteriaPipeline } from "./odm/criteria-pipeline";
+import { EpisodeEvents } from "./events";
 
 function fixFields<T extends Partial<{title: string}>>(model: T): T {
   return fixTxtFields(model, ["title"]);
@@ -30,14 +31,11 @@ type EpisodeId = EpisodeEntity["id"];
 type Criteria = EpisodesCrudDtos.GetMany.Criteria;
 type CriteriaOne = EpisodesCrudDtos.GetOne.Criteria;
 
-type GetOneProps = {
-  criteria: CriteriaOne;
+type Options = {
   requestingUserId?: string;
 };
-export type GetManyProps = {
-  criteria: Criteria;
-  requestingUserId?: string;
-};
+
+type Seasons = Record<string, EpisodeEntity[]>;
 
 @Injectable()
 export class EpisodesRepository
@@ -49,7 +47,6 @@ CanDeleteOneByIdAndGet<EpisodeEntity, EpisodeId>,
 CanGetAll<EpisodeEntity> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
-    private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
   }
 
@@ -58,18 +55,56 @@ CanGetAll<EpisodeEntity> {
     logDomainEvent(ev);
   }
 
-  @OnEvent(EpisodeHistoryEntryEvents.Deleted.TYPE)
-  async handleDeleteHistoryEntryEvents(event: EpisodeHistoryEntryEvents.Deleted.Event) {
-    const { entity } = event.payload;
+  async getSeasonsById(
+    seriesId: string,
+    criteria?: Criteria,
+    options?: Options,
+  ): Promise<Seasons> {
+    const { data: episodes } = await this.getMany(
+      {
+        ...criteria,
+        filter: {
+          ...criteria?.filter,
+          seriesId,
+        },
+        sort: {
+          ...criteria?.sort,
+          episodeKey: "asc",
+        },
+      },
+      {
+        requestingUserId: options?.requestingUserId,
+      },
+    );
+    const seasons: Seasons = {};
 
-    await this.lastTimePlayedService
-      .updateEpisodeLastTimePlayedById(entity.userId, entity.resourceId);
-    ;
+    for (const e of episodes) {
+      const seasonNumberStr = getSeasonNumberByEpisodeKey(e.episodeKey).toString();
+      const episodeEntity = e;
+      let season = seasons[seasonNumberStr];
+
+      if (!season) {
+        season = [];
+        seasons[seasonNumberStr] = season;
+      }
+
+      season.push(episodeEntity);
+    }
+
+    if (Object.entries(seasons).length === 1 && seasons["0"] !== undefined) {
+      return {
+        1: seasons["0"],
+      };
+    }
+
+    return seasons;
   }
 
-  async getMany(props: GetManyProps): Promise<EpisodeEntity[]> {
-    const { requestingUserId } = props;
-    const { criteria } = props;
+  async getMany(
+    criteria: Criteria,
+    options?: Options,
+  ): Promise<PaginatedResult<EpisodeEntity>> {
+    const requestingUserId = options?.requestingUserId;
     const pipeline = getCriteriaPipeline(requestingUserId, criteria);
     const res = await EpisodeOdm.Model.aggregate(pipeline, {
       ...(criteria.sort?.episodeCompKey && {
@@ -79,8 +114,38 @@ CanGetAll<EpisodeEntity> {
         },
       } ),
     } );
+    const data = res[0].data.map(EpisodeOdm.toEntity);
 
-    return res[0].data.map(EpisodeOdm.toEntity);
+    return {
+      data,
+    };
+  }
+
+  /**
+   *
+   * @deprecated
+   */
+  async getOneBySeriesKeyAndEpisodeKey(
+    seriesKey: string,
+    episodeKey: string,
+    criteria?: CriteriaOne,
+    options?: Options,
+  ): Promise<EpisodeEntity | null> {
+    try {
+      const seriesId = await this.getSeriesIdStr(seriesKey);
+
+      return this.getOne( {
+        ...criteria,
+        filter: {
+          ...criteria?.filter,
+          seriesId,
+          episodeKey,
+        },
+
+      }, options);
+    } catch {
+      return null;
+    }
   }
 
   async patchOneByIdAndGet(
@@ -94,13 +159,13 @@ CanGetAll<EpisodeEntity> {
       throw new Error("Empty partialDocOdm, nothing to patch");
 
     const updateResult = await EpisodeOdm.Model.updateOne( {
-      _id: id,
+      _id: new Types.ObjectId(id),
     }, partialDocOdm);
 
     if (updateResult.matchedCount === 0 || updateResult.acknowledged === false)
       assertFoundClient(null);
 
-    const episodeId = updateResult.upsertedId!.toString();
+    const episodeId = updateResult.upsertedId?.toString() ?? id;
 
     this.domainEventEmitter.emitPatch(EpisodeEvents.Patched.TYPE, {
       partialEntity: episode,
@@ -125,10 +190,9 @@ CanGetAll<EpisodeEntity> {
 
   async getOneById(
     id: EpisodeId,
-    props?: Omit<GetOneProps, "criteria"> & {criteria: Pick<GetOneProps["criteria"], "expand">},
+    criteria?: Pick<Criteria, "expand">,
+    options?: Options,
   ): Promise<EpisodeEntity | null> {
-    const criteria = props?.criteria;
-
     // Si no hay criteria, usar findById (más eficiente)
     if (!criteria?.expand || Object.keys(criteria.expand).length === 0) {
       const episodeOdm = await EpisodeOdm.Model.findById(id);
@@ -136,14 +200,15 @@ CanGetAll<EpisodeEntity> {
       return episodeOdm ? EpisodeOdm.toEntity(episodeOdm) : null;
     }
 
-    const episode = await this.getOne( {
-      criteria: {
+    const episode = await this.getOne(
+      {
         ...criteria,
         filter: {
           id,
         },
       },
-    } );
+      options,
+    );
 
     return episode;
   }
@@ -157,9 +222,27 @@ CanGetAll<EpisodeEntity> {
     return episodesOdm.map(EpisodeOdm.toEntity);
   }
 
+  /**
+   * @deprecated
+   */
+  private async getSeriesIdStr(seriesKey: string) {
+    const seriesDoc = await SeriesOdm.Model.findOne( {
+      key: seriesKey,
+    } );
+
+    assertFoundClient(seriesDoc);
+
+    return seriesDoc._id.toString();
+  }
+
+  /**
+   *
+   * @deprecated
+   */
   async getAllBySeriesKey(seriesKey: SeriesKey): Promise<EpisodeEntity[]> {
+    const seriesId = await this.getSeriesIdStr(seriesKey);
     const filter = {
-      seriesKey,
+      seriesId: new Types.ObjectId(seriesId),
     } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
     const episodesOdm = await EpisodeOdm.Model.find(filter);
 
@@ -169,49 +252,88 @@ CanGetAll<EpisodeEntity> {
     return episodesOdm.map(EpisodeOdm.toEntity);
   }
 
-  async getOne(props: GetOneProps): Promise<EpisodeEntity | null> {
-    const [episode] = await this.getMany( {
-      criteria: {
-        ...props.criteria,
+  async getAllBySeriesId(seriesId: string): Promise<EpisodeEntity[]> {
+    const filter = {
+      seriesId: new Types.ObjectId(seriesId),
+    } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
+    const episodesOdm = await EpisodeOdm.Model.find(filter);
+
+    if (episodesOdm.length === 0)
+      return [];
+
+    return episodesOdm.map(EpisodeOdm.toEntity);
+  }
+
+  async getOne(criteria: CriteriaOne, options?: Options): Promise<EpisodeEntity | null> {
+    const { data } = await this.getMany(
+      {
+        ...criteria,
         limit: 1,
       },
-      requestingUserId: props.requestingUserId,
-    } );
+      {
+        requestingUserId: options?.requestingUserId,
+      },
+    );
 
-    return episode;
+    return data[0] ?? null;
   }
 
-  async getOneByCompKey(
-    compKey: EpisodeCompKey,
-    props?: Omit<GetOneProps, "criteria"> & {criteria: Omit<GetOneProps["criteria"], "filter"> },
+  /**
+   *
+   * @deprecated
+   */
+  async getOneByEpisodeKeyAndSerieId(
+    episodeKey: string,
+    seriesId: string,
+    criteria: CriteriaOne,
+    options?: Options,
   ): Promise<EpisodeEntity | null> {
     return await this.getOne( {
-      criteria: {
-        ...props?.criteria,
-        filter: {
-          episodeKey: compKey.episodeKey,
-          seriesKey: compKey.seriesKey,
-        },
+      ...criteria,
+      filter: {
+        ...criteria.filter,
+        episodeKey,
+        seriesId,
       },
-      requestingUserId: props?.requestingUserId,
-    } );
+    }, options);
   }
 
+  /**
+   *
+   * @deprecated
+   */
   async getManyBySerieKey(
     seriesKey: SeriesKey,
-    props?: Omit<GetManyProps, "criteria"> & {criteria: Omit<GetManyProps["criteria"], "filter">},
+    criteria?: Omit<Criteria, "filter">,
+    options?: Options,
   ): Promise<EpisodeEntity[]> {
-    return await this.getMany( {
-      requestingUserId: props?.requestingUserId,
-      criteria: {
-        ...props?.criteria,
+    const seriesDoc = await SeriesOdm.Model.findOne( {
+      key: seriesKey,
+    } );
+
+    if (!seriesDoc)
+      return [];
+
+    const seriesId = seriesDoc._id.toString();
+    const { data } = await this.getMany(
+      {
+        ...criteria,
         filter: {
-          seriesKey,
+          seriesId,
         },
       },
-    } );
+      {
+        requestingUserId: options?.requestingUserId,
+      },
+    );
+
+    return data;
   }
 
+  /**
+   *
+   * @deprecated
+   */
   async patchOneByCompKeyAndGet(
     compKey: EpisodeCompKey,
     patchParams: PatchOneParams<Episode>,
@@ -222,9 +344,10 @@ CanGetAll<EpisodeEntity> {
     if (Object.keys(partialDocOdm).length === 0)
       throw new Error("Empty partialDocOdm, nothing to patch");
 
+    const seriesId = await this.getSeriesIdStr(compKey.seriesKey);
     const filter = {
       episodeKey: compKey.episodeKey,
-      seriesKey: compKey.seriesKey,
+      seriesId: new Types.ObjectId(seriesId),
     } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
     const updateResult = await EpisodeOdm.Model.findOneAndUpdate(filter, partialDocOdm);
 
@@ -237,7 +360,7 @@ CanGetAll<EpisodeEntity> {
       id: episodeId,
     } );
 
-    const ret = await this.getOneByCompKey(compKey);
+    const ret = await this.getOneById(episodeId);
 
     assertFoundClient(ret);
 
@@ -245,13 +368,13 @@ CanGetAll<EpisodeEntity> {
   }
 
   async getOneOrCreate(createDto: CreateOneDto): Promise<EpisodeEntity> {
-    const model = fixFields(this.createDtoToCreateDoc(createDto));
+    const createDoc = fixFields(this.createDtoToCreateDoc(createDto));
     const filter = {
-      seriesKey: model.seriesKey,
-      episodeKey: model.episodeKey,
+      seriesId: createDoc.seriesId,
+      episodeKey: createDoc.episodeKey,
     } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
     const update = {
-      $setOnInsert: model, // Solo se aplica en la creación
+      $setOnInsert: createDoc, // Solo se aplica en la creación
     } satisfies MongoUpdateQuery<EpisodeOdm.Doc>;
     const result = await EpisodeOdm.Model.findOneAndUpdate(
       filter,
@@ -277,8 +400,8 @@ CanGetAll<EpisodeEntity> {
     createDto: CreateOneDto,
   ): Omit<EpisodeOdm.Doc, "createdAt" | "updatedAt"> {
     const createDoc = {
-      episodeKey: createDto.compKey.episodeKey,
-      seriesKey: createDto.compKey.seriesKey,
+      episodeKey: createDto.episodeKey,
+      seriesId: new Types.ObjectId(createDto.seriesId),
       title: createDto.title,
       uploaderUserId: new Types.ObjectId(createDto.uploaderUserId),
       tags: createDto.tags,
@@ -309,3 +432,8 @@ CanGetAll<EpisodeEntity> {
     return ret;
   }
 }
+
+type EpisodeCompKey = {
+  seriesKey: string;
+  episodeKey: string;
+};

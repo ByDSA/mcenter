@@ -1,7 +1,7 @@
 /* eslint-disable require-await */
 import { createMockClass } from "$sharedTests/jest/mocking";
-import { Provider } from "@nestjs/common";
 import { fixtureEpisodes } from "#episodes/tests";
+import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { EpisodesUsersRepository } from "../repository";
 
 class MockEpisodeUserInfosRepository extends createMockClass(EpisodesUsersRepository) {
@@ -15,7 +15,6 @@ class MockEpisodeUserInfosRepository extends createMockClass(EpisodesUsersReposi
   }
 }
 
-export const episodeUserInfosRepositoryMockProvider = {
-  provide: EpisodesUsersRepository,
-  useClass: MockEpisodeUserInfosRepository,
-} satisfies Provider;
+export function createAndRegisterEpisodeUserInfosRepositoryMockClass() {
+  registerMockProviderInstance(EpisodesUsersRepository, new MockEpisodeUserInfosRepository());
+}

@@ -5,7 +5,7 @@ export {
 export {
   EpisodeNode as EpisodeFile,
   SeasonNode as SeasonFolder,
-  SerieNode as SerieFolder,
+  SeriesNode as SerieFolder,
   SerieTree as SerieFolderTree,
 } from "./models";
 

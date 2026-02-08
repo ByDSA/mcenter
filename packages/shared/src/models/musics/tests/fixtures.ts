@@ -59,12 +59,12 @@ const userInfo: MusicUserInfoEntity = {
   updatedAt: new Date(),
   tags: ["userTag"],
 };
-const samples: Record<string, MusicEntity> = {
+const samples = {
   A_AOT4,
   AOT4_COPY,
   DK,
   DRIFTVEIL,
-};
+} satisfies Record<string, MusicEntity>;
 const samplesWithUserInfo = Object.values(samples).map(s=> ( {
   ...s,
   userInfo: {

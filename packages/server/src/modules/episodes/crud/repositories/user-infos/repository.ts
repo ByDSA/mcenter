@@ -7,28 +7,21 @@ import { WithRequired } from "$shared/utils/objects";
 import { assertFoundClient } from "#utils/validation/found";
 import { CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
-import { showError } from "#core/logging/show-error";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { EpisodeUserInfoEntity } from "#episodes/models";
-import { EpisodeHistoryEntryEvents } from "../../../history/crud/repository/events";
-import { EpisodeOdm } from "../episodes/odm";
 import { EpisodesRepository } from "../episodes";
-import { EpisodesUsersEvents } from "./events";
+import { EpisodeOdm } from "../episodes/odm";
 import { EpisodesUsersOdm } from "./odm";
+import { EpisodesUsersEvents } from "./events";
 
 type Entity = EpisodeUserInfoEntity;
 
 type UserInfoKey = {
   episodeId: EpisodeEntity["id"];
   userId: string;
-};
-
-type GetFullSerieForUserProps = {
-  userId: string;
-  seriesKey: string;
 };
 
 @Injectable()
@@ -45,29 +38,15 @@ CanGetOneById<Entity, UserInfoKey> {
     logDomainEvent(ev);
   }
 
-  @OnEvent(EpisodeHistoryEntryEvents.Created.TYPE)
-  async handleCreateHistoryEntryEvents(event: EpisodeHistoryEntryEvents.Created.Event) {
-    const { entity } = event.payload;
-
-    await this.patchOneByIdAndGet( {
-      episodeId: entity.resourceId,
-      userId: event.payload.entity.userId,
-    }, {
-      entity: {
-        lastTimePlayed: entity.date.timestamp,
-      },
-    } ).catch(showError);
-  }
-
   async getFullSerieForUser(
-    { seriesKey: serieKey,
-      userId }: GetFullSerieForUserProps,
-    props?: Parameters<EpisodesRepository["getManyBySerieKey"]>[1],
+    seriesId: string,
+    options: NonNullable<Parameters<EpisodesRepository["getManyBySerieKey"]>[2]>,
+    criteria?: Parameters<EpisodesRepository["getManyBySerieKey"]>[1],
   ): Promise<EpisodeEntityWithUserInfo[]> {
     const docs: WithRequired<EpisodeOdm.FullDoc, "userInfo">[] = await EpisodeOdm.Model.aggregate([
       {
         $match: {
-          seriesKey: serieKey,
+          seriesId: new Types.ObjectId(seriesId),
         },
       },
       {
@@ -85,7 +64,7 @@ CanGetOneById<Entity, UserInfoKey> {
                       $eq: ["$episodeId", "$$episodeId"],
                     },
                     {
-                      $eq: ["$userId", new Types.ObjectId(userId)],
+                      $eq: ["$userId", new Types.ObjectId(options.requestingUserId)],
                     },
                   ],
                 },
@@ -107,8 +86,8 @@ CanGetOneById<Entity, UserInfoKey> {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 episodeId: "$_id" as any,
-                lastTimePlayed: 0,
-                userId: new Types.ObjectId(userId),
+                lastTimePlayed: null,
+                userId: new Types.ObjectId(options.requestingUserId),
                 weight: 0,
               } satisfies EpisodesUsersOdm.FullDoc,
             ],
@@ -123,8 +102,8 @@ CanGetOneById<Entity, UserInfoKey> {
     ]);
 
     // TODO: hacer sort en aggregate
-    if (props?.criteria?.sort) {
-      if (props?.criteria.sort.episodeCompKey)
+    if (criteria?.sort) {
+      if (criteria.sort.episodeCompKey)
         docs.sort((a, b)=>a.episodeKey.localeCompare(b.episodeKey));
     }
 

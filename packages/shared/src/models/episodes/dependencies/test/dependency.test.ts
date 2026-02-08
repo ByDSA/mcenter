@@ -33,7 +33,7 @@ describe("assertIsEntity", () => {
       };
 
       // @ts-ignore
-      delete obj.lastCompKey;
+      delete obj.lastEpisodeId;
 
       expect(() => {
         assertIsEntity(obj);

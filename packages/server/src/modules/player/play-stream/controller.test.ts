@@ -3,46 +3,55 @@ import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UserPayload } from "$shared/models/auth";
-import { SeriesCrudModule } from "#episodes/series/module";
-import { EpisodeHistoryModule } from "#episodes/history/module";
-import { fixtureEpisodes } from "#episodes/tests";
+import z from "zod";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { EpisodesCrudModule } from "#episodes/crud/module";
-import { createMockedModule, createMockProvider } from "#utils/nestjs/tests";
-import { StreamPickerModule } from "#episodes/streams/picker/module";
-import { EpisodePickerService } from "#episodes/streams/picker";
-import { StreamsModule } from "#episodes/streams/module";
-import { StreamsRepository } from "#episodes/streams/crud/repository";
-import { STREAM_SIMPSONS } from "#episodes/streams/tests";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";
-import { PlayVideoService } from "../play-video.service";
-import { PlayService } from "../play.service";
+import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
+import { fixtureEpisodes } from "#episodes/tests";
+import { EpisodeEntityWithFileInfos, episodeEntityWithFileInfosSchema } from "#episodes/models";
 import { AuthPlayerService } from "../AuthPlayer.service";
-import { SecretTokenBody } from "../model";
-import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
+import { PlayVideoService } from "../play-video.service";
 import { fixturesRemotePlayers } from "../tests/fixtures";
 import { PlayStreamController } from "./controller";
 
+const EPISODE_WITH_FILE_INFO: EpisodeEntityWithFileInfos = {
+  ...fixtureEpisodes.SampleSeries.Samples.EP1x01,
+  fileInfos: [fixtureEpisodeFileInfos.SampleSeries.Samples.EP1x01],
+};
+
 describe("playStreamController", () => {
-  let routerApp: Application;
   let testingSetup: TestingSetup;
-  let remotePlayerId = mockMongoId;
+  let routerApp: Application;
+  let mocks: Awaited<ReturnType<typeof initMocks>>;
+  const validRemotePlayerId = mockMongoId;
+  const invalidRemotePlayerId = "invalidId";
+  const validControllerUrl = `/play/${validRemotePlayerId}/stream`;
+  const invalidControllerUrl = `/play/${invalidRemotePlayerId}/stream`;
+
+  async function initMocks(setup: TestingSetup) {
+    const ret = {
+      playVideoService: setup.getMock(PlayVideoService),
+      authPlayerService: setup.getMock(AuthPlayerService),
+    };
+
+    ret.playVideoService.playEpisodeStream.mockResolvedValue([EPISODE_WITH_FILE_INFO]);
+    ret.authPlayerService.guardToken.mockResolvedValue(fixturesRemotePlayers.valid);
+
+    // User
+    await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles as UserPayload);
+
+    return ret;
+  }
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
       imports: [
-        createMockedModule(SeriesCrudModule),
-        createMockedModule(StreamsModule),
-        createMockedModule(EpisodesCrudModule),
-        createMockedModule(StreamPickerModule),
-        createMockedModule(EpisodeHistoryModule),
       ],
       controllers: [PlayStreamController],
       providers: [
-        createMockProvider(PlayService),
-        createMockProvider(AuthPlayerService),
-        PlayVideoService,
-        mockRemotePlayersRepositoryProvider,
+        getOrCreateMockProvider(PlayVideoService),
+        getOrCreateMockProvider(AuthPlayerService),
       ],
     }, {
       auth: {
@@ -53,93 +62,61 @@ describe("playStreamController", () => {
 
     routerApp = testingSetup.routerApp;
 
-    testingSetup.getMock(StreamsRepository).getOneByKey
-      .mockResolvedValue(STREAM_SIMPSONS);
-    testingSetup.getMock(StreamsRepository).getOneById
-      // eslint-disable-next-line require-await
-      .mockImplementation(async id=> id === STREAM_SIMPSONS.id ? STREAM_SIMPSONS : null);
-    testingSetup.getMock(EpisodePickerService).getByStream
-      .mockResolvedValue([fixtureEpisodes.Simpsons.Samples.EP1x01]);
-
-    // User
-    await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles as UserPayload);
+    mocks = await initMocks(testingSetup);
   } );
 
-  describe("requests GET", () => {
-    it("should return 422 if stream not found", async () => {
-      testingSetup.getMock(StreamsRepository).getOneByKey
-        .mockResolvedValueOnce(null);
-      const response = await request(routerApp).get(`/play/${remotePlayerId}/stream/not-found?n=1`)
-        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
+  beforeEach(()=> {
+    jest.clearAllMocks();
+  } );
 
-      expect(response).toBeDefined();
+  describe("playStreamDefault", () => {
+    it("should go ok", async () => {
+      const res = await request(routerApp)
+        .get(`${validControllerUrl}/streamKey`);
+      const data = z.array(episodeEntityWithFileInfosSchema).parse(res.body.data);
+
+      expect(data).toEqual([EPISODE_WITH_FILE_INFO]);
+      expect(res.statusCode).toBe(HttpStatus.OK);
     } );
 
-    it("should return 422 if no episodes found", async () => {
-      testingSetup.getMock(EpisodePickerService).getByStream
-        .mockResolvedValueOnce([]);
-      const response = await request(routerApp).get(`/play/${remotePlayerId}/stream/simpsons?n=1`)
-        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
+    describe("params", ()=> {
+      it("invalid remotePlayerId", async () => {
+        const res = await request(routerApp)
+          .get(`${invalidControllerUrl}/streamKey`);
 
-      expect(response).toBeDefined();
-    } );
+        expect(mocks.authPlayerService.guardUser).not.toHaveBeenCalled();
 
-    it("should return 422 if episodes are null/undefined", async () => {
-      testingSetup.getMock(EpisodePickerService).getByStream
-        .mockResolvedValueOnce([null, undefined] as any[]);
-      const response = await request(routerApp).get(`/play/${remotePlayerId}/stream/simpsons?n=1`)
-        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
+        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+      } );
 
-      expect(response).toBeDefined();
-    } );
+      it("should fail without user", async () => {
+        await testingSetup.useMockedUser(null);
+        const res = await request(routerApp)
+          .get(`${validControllerUrl}/streamKey`);
 
-    it("should return 200 if stream and episodes found", async () => {
-      const spy = jest.spyOn(testingSetup.module.get(PlayService), "play");
-      const response = await request(routerApp).get(`/play/${remotePlayerId}/stream/simpsons?n=1`)
-        .expect(HttpStatus.OK);
-
-      expect(response).toBeDefined();
-      expect(spy).toHaveBeenCalledTimes(1);
-    } );
-
-    it("should handle force parameter correctly", async () => {
-      const spy = jest.spyOn(testingSetup.module.get(PlayService), "play");
-      const response = await request(routerApp)
-        .get(`/play/${remotePlayerId}/stream/simpsons?n=1`)
-        .query( {
-          force: true,
-        } )
-        .expect(HttpStatus.OK);
-
-      expect(response).toBeDefined();
-      expect(spy).toHaveBeenCalledWith( {
-        mediaElements: expect.any(Array),
-        force: true,
-        remotePlayerId,
+        expect(res.statusCode).toBe(HttpStatus.UNAUTHORIZED);
       } );
     } );
-
-    it("should call EpisodePickerService with correct parameters", async () => {
-      const episodePickerSpy = testingSetup.getMock(EpisodePickerService).getByStream;
-
-      await request(routerApp).get(`/play/${remotePlayerId}/stream/simpsons-stream?n=5`)
-        .expect(HttpStatus.OK);
-
-      expect(episodePickerSpy).toHaveBeenCalledTimes(5);
-    } );
   } );
 
-  describe("requests POST", () => {
-    it("should call EpisodePickerService with correct parameters", async () => {
-      const episodePickerSpy = testingSetup.getMock(EpisodePickerService).getByStream;
+  describe("playStreamWithToken", () => {
+    it("should fail without user nor token", async () => {
+      await testingSetup.useMockedUser(null);
+      const res = await request(routerApp)
+        .post(`${validControllerUrl}/streamKey`);
 
-      await request(routerApp).post(`/play/${remotePlayerId}/stream/simpsons-stream?n=5`)
+      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+    } );
+
+    it("should not fail without user but with token", async () => {
+      await testingSetup.useMockedUser(null);
+      const res = await request(routerApp)
+        .post(`${validControllerUrl}/streamKey`)
         .send( {
-          secretToken: fixturesRemotePlayers.valid.secretToken,
-        } satisfies SecretTokenBody)
-        .expect(HttpStatus.ACCEPTED);
+          secretToken: "123456",
+        } );
 
-      expect(episodePickerSpy).toHaveBeenCalledTimes(5);
+      expect(res.statusCode).toBe(HttpStatus.ACCEPTED);
     } );
   } );
 } );

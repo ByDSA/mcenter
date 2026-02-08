@@ -13,7 +13,7 @@ import { SecretTokenBodyDto } from "../model";
 
 class ParamsDto extends createZodDto(z.object( {
   remotePlayerId: mongoDbId,
-  id: z.string(), // Realmente es "stream.key", no el id
+  streamKey: z.string(),
 } )) {}
 
 const booleanFromString = z.preprocess((val) => {
@@ -45,7 +45,7 @@ export class PlayStreamController {
   ) { }
 
   @Authenticated()
-  @GetMany("/:id", episodeEntityWithFileInfosSchema)
+  @GetMany("/:streamKey", episodeEntityWithFileInfosSchema)
   async playStreamDefault(
     @Param() params: ParamsDto,
     @Query() query: QueryDto,
@@ -59,30 +59,28 @@ export class PlayStreamController {
     return await this.playService.playEpisodeStream( {
       userId: user.id,
       remotePlayerId: params.remotePlayerId,
-      streamId: params.id,
+      streamKey: params.streamKey,
       query,
     } );
   }
 
-  @Post("/:id")
+  @Post("/:streamKey")
   @HttpCode(HttpStatus.ACCEPTED)
   async playStreamWithToken(
     @Param() params: ParamsDto,
     @Query() query: QueryDto,
     @Body() body: SecretTokenBodyDto,
   ) {
-    try {
-      const remotePlayer = await this.auth.guardToken( {
-        remotePlayerId: params.remotePlayerId,
-        secretToken: body.secretToken,
-      } );
+    const remotePlayer = await this.auth.guardToken( {
+      remotePlayerId: params.remotePlayerId,
+      secretToken: body.secretToken,
+    } );
 
-      return await this.playService.playEpisodeStream( {
-        userId: remotePlayer.ownerId,
-        remotePlayerId: params.remotePlayerId,
-        streamId: params.id,
-        query,
-      } );
-    } catch { /* empty */ }
+    return await this.playService.playEpisodeStream( {
+      userId: remotePlayer.ownerId,
+      remotePlayerId: params.remotePlayerId,
+      streamKey: params.streamKey,
+      query,
+    } );
   }
 }

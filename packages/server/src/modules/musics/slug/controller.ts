@@ -3,10 +3,10 @@ import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { Response, Request } from "express";
 import { UserPayload } from "$shared/models/auth";
-import { User } from "#core/auth/users/User.decorator";
 import { MusicsRepository } from "../crud/repositories/music";
 import { ResponseFormat } from "../../resources/response-formatter";
 import { MusicFlowService } from "../MusicFlow.service";
+import { User } from "#core/auth/users/User.decorator";
 
 class GetDto extends createZodDto(z.object( {
   slug: z.string(),

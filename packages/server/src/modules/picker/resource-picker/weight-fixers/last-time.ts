@@ -1,3 +1,4 @@
+import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
 import { secondsElapsedFrom } from "../utils";
 import { WeightFixer, WeightFixerParams } from "./weight-fixer";
 
@@ -17,8 +18,8 @@ export abstract class LastTimeWeightFixer<R> implements WeightFixer<R> {
     let secondsElapsed;
     const lastTimePlayed = this.getLastTimePlayed(resource);
 
-    if (lastTimePlayed) {
-      secondsElapsed = secondsElapsedFrom(lastTimePlayed);
+    if ((lastTimePlayed?.getTime() ?? 0) > 0) {
+      secondsElapsed = secondsElapsedFrom(dateToTimestampInSeconds(lastTimePlayed!));
 
       if (secondsElapsed < 0)
         secondsElapsed = 0;
@@ -28,5 +29,5 @@ export abstract class LastTimeWeightFixer<R> implements WeightFixer<R> {
     return this.#params.fx(resource, secondsElapsed);
   }
 
-  abstract getLastTimePlayed(r: R): number;
+  abstract getLastTimePlayed(r: R): Date | null;
 }

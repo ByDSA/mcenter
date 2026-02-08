@@ -9,17 +9,19 @@ import z from "zod";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
 import { GetAll } from "#utils/nestjs/rest/crud/get";
 import { AdminPatchOne } from "#utils/nestjs/rest";
-import { assertFoundClient } from "#utils/validation/found";
-import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
+import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
+import { ResponseFormat, EpisodeResponseFormatterService } from "#modules/resources/response-formatter";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { User } from "#core/auth/users/User.decorator";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { EpisodesRepository } from "../crud/repositories/episodes";
 import { EpisodeSlugHandlerService } from "./service";
 
-class GetOneByIdParamsDto extends createZodDto(EpisodesCrudDtos.GetOne.ById.paramsSchema) {}
+class GetOneByCompKeyParamsDto extends createZodDto(
+  EpisodesCrudDtos.GetOne.ByCompKey.paramsSchema,
+) {}
 class GetAllParamsDto extends createZodDto(EpisodesCrudDtos.GetAll.paramsSchema) {}
-class PatchOneByIdParamsDto extends createZodDto(EpisodesCrudDtos.Patch.paramsSchema) {}
+class PatchOneByCompKeyParamsDto extends createZodDto(EpisodesCrudDtos.Patch.compKeyParamsSchema) {}
 class PatchOneByIdBodyDto extends createZodDto(EpisodesCrudDtos.Patch.bodySchema) {}
 
 const schema = episodeEntitySchema;
@@ -29,7 +31,7 @@ export class EpisodesSlugController {
   constructor(
     private readonly slugHandler: EpisodeSlugHandlerService,
     private readonly episodesRepo: EpisodesRepository,
-    private readonly responseFormatter: ResponseFormatterService,
+    private readonly responseFormatter: EpisodeResponseFormatterService,
     private readonly episodeUserInfosRepo: EpisodesUsersRepository,
   ) {
   }
@@ -37,8 +39,8 @@ export class EpisodesSlugController {
   @AdminPatchOne(schema, {
     url: "/:seriesKey/:episodeKey",
   } )
-  async patchOneByIdAndGet(
-    @Param() params: PatchOneByIdParamsDto,
+  async patchOneByCompKeyAndGet(
+    @Param() params: PatchOneByCompKeyParamsDto,
     @Body() body: PatchOneByIdBodyDto,
   ): Promise<EpisodeEntity> {
     const episodePartial = body;
@@ -63,7 +65,7 @@ export class EpisodesSlugController {
 
   @Get("/:seriesKey/:episodeKey")
   async getOneBySlug(
-    @Param() params: GetOneByIdParamsDto,
+    @Param() params: GetOneByCompKeyParamsDto,
     @Res( {
       passthrough: true,
     } ) res: Response,
@@ -77,35 +79,40 @@ export class EpisodesSlugController {
     let got: EpisodeEntity | null;
 
     if (format === ResponseFormat.M3U8 || format === ResponseFormat.JSON) {
-      const props: Parameters<
-        typeof this.episodesRepo.getOneByCompKey
+      const criteria: Parameters<
+        typeof this.episodesRepo.getOneById
       >[1] = format === ResponseFormat.M3U8
         ? {
-          criteria: {
-            expand: ["fileInfos"],
-          },
+          expand: ["fileInfos"],
         }
         : {
-          criteria: {
-            expand: [],
-          },
+          expand: [],
         };
 
-      props.requestingUserId = userId ?? undefined;
+      criteria.expand?.push("series");
 
-      props.criteria.expand?.push("series");
-
-      got = await this.episodesRepo.getOneByCompKey(params, props);
+      got = await this.episodesRepo.getOneByEpisodeKeyAndSerieId(
+        params.seriesKey,
+        params.episodeKey,
+        criteria,
+        {
+          requestingUserId: userId ?? undefined,
+        },
+      );
 
       assertFoundClient(got);
     }
 
     switch (format) {
-      case ResponseFormat.M3U8:
+      case ResponseFormat.M3U8: {
+        assertFoundServer(got!.series);
+
         return this.responseFormatter.formatOneRemoteM3u8Response(
           got!,
+          got!.series.key,
           getHostFromRequest(req),
         );
+      }
       case ResponseFormat.RAW: {
         return await this.slugHandler.handle( {
           slug: params,

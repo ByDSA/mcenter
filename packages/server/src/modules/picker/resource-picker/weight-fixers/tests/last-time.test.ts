@@ -7,8 +7,8 @@ import { secondsElapsedFrom } from "../../utils";
 import { ResourceWithUserInfo } from "../../filters/tests/types";
 
 class LastTimeResourceWeightFixer extends LastTimeWeightFixer<ResourceWithUserInfo> {
-  getLastTimePlayed(r: ResourceWithUserInfo): number {
-    return r.userInfo.lastTimePlayed ?? 0;
+  getLastTimePlayed(r: ResourceWithUserInfo): Date | null {
+    return new Date(r.userInfo.lastTimePlayed * 1_000);
   }
 }
 

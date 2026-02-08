@@ -9,25 +9,25 @@ export type SeasonNode = TreeBranchModel<string, EpisodeNode> & {
   children: EpisodeNode[];
 };
 
-export type SerieNode = TreeBranchModel<string, EpisodeNode> & {
+export type SeriesNode = TreeBranchModel<string, EpisodeNode> & {
   children: SeasonNode[];
 };
 
 export type SerieTree = {
-  children: SerieNode[];
+  children: SeriesNode[];
 };
 
 type EpisodeParam = {
   episode: EpisodeNode;
   seasonKey: SeasonNode["key"];
-  seriesKey: SerieNode["key"];
+  seriesKey: SeriesNode["key"];
 };
 
 export function putEpisodeInSerie(
   { episode, seasonKey }: EpisodeParam,
-  serie: SerieNode,
-): SerieNode {
-  treePut(serie, [seasonKey], episode.key, episode);
+  series: SeriesNode,
+): SeriesNode {
+  treePut(series, [seasonKey], episode.key, episode);
 
-  return serie;
+  return series;
 }

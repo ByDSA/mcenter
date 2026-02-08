@@ -5,8 +5,9 @@ import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { ResourceSlugService } from "#modules/resources/slug/service";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
 import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
-import { ResponseFormat, ResponseFormatterService } from "../../resources/response-formatter";
+import { assertFoundServer } from "#utils/validation/found";
 import { getAbsolutePath } from "../utils";
+import { ResponseFormat, EpisodeResponseFormatterService } from "../../resources/response-formatter";
 
 type Entity = EpisodeEntity;
 
@@ -20,20 +21,22 @@ type RenderProps = {
 @Injectable()
 export class EpisodeRendererService {
   constructor(
-    private readonly responseFormatter: ResponseFormatterService,
+    private readonly responseFormatter: EpisodeResponseFormatterService,
     private readonly resourceSlugService: ResourceSlugService,
   ) { }
 
-  renderM3u8One(episode: Entity, req: Request) {
+  renderM3u8One(episode: Entity, seriesName: string, req: Request) {
     return this.responseFormatter.formatOneRemoteM3u8Response(
       episode,
+      seriesName,
       getHostFromRequest(req),
     );
   }
 
-  renderM3u8Many(episodes: Entity[], req: Request) {
+  renderM3u8Many(data: {episode: Entity;
+seriesName: string;}[], req: Request) {
     return this.responseFormatter.formatManyRemoteM3u8Response(
-      episodes,
+      data,
       getHostFromRequest(req),
     );
   }
@@ -52,7 +55,9 @@ export class EpisodeRendererService {
     response: res }: RenderProps) {
     switch (format) {
       case ResponseFormat.M3U8:
-        return this.renderM3u8One(episode, req);
+        assertFoundServer(episode.series);
+
+        return this.renderM3u8One(episode, episode.series.name, req);
       case ResponseFormat.RAW:
       {
         return this.resourceSlugService.handle( {
@@ -62,10 +67,12 @@ export class EpisodeRendererService {
           getAbsolutePath,
           generateFilename: (entity: Entity, fileInfo: EpisodeFileInfoEntity) => {
             const ext = fileInfo.path.slice(fileInfo.path.lastIndexOf("."));
-            const serie = entity.serie?.name ?? entity.compKey.seriesKey;
-            const { episodeKey } = entity.compKey;
 
-            return `${serie} - ${episodeKey} - ${entity.title}${ext}`;
+            assertFoundServer(entity.series);
+            const series = entity.series?.name;
+            const { episodeKey } = entity;
+
+            return `${series} - ${episodeKey} - ${entity.title}${ext}`;
           },
         } );
       }

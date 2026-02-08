@@ -1,7 +1,7 @@
 import type { EpisodeDependencyCrudDtos } from "$shared/models/episodes/dependencies/dto/transport";
 import type { PipelineStage } from "mongoose";
-import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { DocOdm } from "./odm/odm";
+import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 
 function buildMongooseSort(
   _body: EpisodeDependencyCrudDtos.GetMany.Criteria,
@@ -15,8 +15,8 @@ function buildMongooseFilter(
   const filter: MongoFilterQuery<DocOdm> = {};
 
   if (criteria.filter) {
-    if (criteria.filter.lastCompKey)
-      filter["lastCompKey"] = criteria.filter.lastCompKey;
+    if (criteria.filter.lastEpisodeId)
+      filter["lastEpisodeId"] = criteria.filter.lastEpisodeId;
   }
 
   return filter;

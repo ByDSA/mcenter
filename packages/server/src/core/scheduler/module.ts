@@ -19,10 +19,9 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit() {
     schedule.scheduleJob("* * * * * *", async (dateArg: Date) => {
-      const date = DateTime.fromJSDate(dateArg);
-      const { second } = date;
+      const seconds = dateArg.getSeconds();
 
-      if (second !== 0)
+      if (seconds !== 0)
         return;
 
       const calendarFunc = await dynamicLoadScriptFromEnvVar("CALENDAR_FILE");
@@ -30,6 +29,8 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
       const scheduleFunc = await dynamicLoadScriptFromEnvVar("SCHEDULE_FILE");
 
       this.logger.log("Checking schedule...");
+      const date = DateTime.fromJSDate(dateArg);
+
       scheduleFunc(date, calendar);
     } );
 

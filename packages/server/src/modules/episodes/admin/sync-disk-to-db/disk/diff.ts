@@ -1,5 +1,5 @@
 import { treePut } from "$shared/utils/trees";
-import { EpisodeNode, SeasonNode, SerieNode, SerieTree } from "./models";
+import { EpisodeNode, SeasonNode, SeriesNode, SerieTree } from "./models";
 
 export type OldNew = {
   old: EpisodeNode;
@@ -85,16 +85,16 @@ export function diff(tree1: SerieTree, tree2: SerieTree): Return {
 }
 
 type Hash = string;
-type Branches = [SerieNode["key"], SeasonNode["key"], EpisodeNode["key"]];
+type Branches = [SeriesNode["key"], SeasonNode["key"], EpisodeNode["key"]];
 type TreeNode = EpisodeNode;
 function plainTreeMaps(serieTree: SerieTree) {
   const branchesMap: {[key: string]: TreeNode} = {};
   const contentMap: {[key: Hash]: TreeNode} = {};
 
-  for (const serie of serieTree.children) {
-    for (const season of serie.children) {
+  for (const series of serieTree.children) {
+    for (const season of series.children) {
       for (const episode of season.children) {
-        const branches: Branches = [serie.key, season.key, episode.key];
+        const branches: Branches = [series.key, season.key, episode.key];
         const key = branches.join("/");
 
         branchesMap[key] = episode;

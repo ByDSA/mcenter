@@ -2,12 +2,12 @@ import fs from "node:fs";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { ImageCoverEntity } from "$shared/models/image-covers";
-import { createMockProvider } from "#utils/nestjs/tests";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { ImageCoverVersions, ImageVersionsGenerator } from "../generate-versions";
-import { mockFile } from "./utils";
-import { ImageCoversUploadService } from "../service";
 import { ImageCoversRepository } from "#modules/image-covers/crud/repositories";
+import { ImageCoverVersions, ImageVersionsGenerator } from "../generate-versions";
+import { ImageCoversUploadService } from "../service";
+import { mockFile } from "./utils";
 
 const uploadDtoWithLabel: ImageCoverCrudDtos.UploadFile.RequestBody = {
   metadata: {
@@ -48,8 +48,8 @@ describe("imageCoverCrudController (upload)", () => {
       controllers: [],
       providers: [
         ImageCoversUploadService,
-        createMockProvider(ImageCoversRepository),
-        createMockProvider(ImageVersionsGenerator),
+        getOrCreateMockProvider(ImageCoversRepository),
+        getOrCreateMockProvider(ImageVersionsGenerator),
       ],
     } );
 

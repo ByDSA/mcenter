@@ -4,7 +4,7 @@ import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useImageCover } from "#modules/image-covers/hooks";
-import { EpisodeCompKey, EpisodeEntity } from "./models";
+import { EpisodeEntity } from "./models";
 import { EpisodesCrudDtos } from "./models/dto";
 import { useEpisode } from "./hooks";
 
@@ -68,7 +68,8 @@ export class EpisodesApi {
   }
 
   async patch(
-    episodeCompKey: EpisodeCompKey,
+    episodeCompKey: {seriesKey: string;
+episodeKey: string;},
     body: EpisodesCrudDtos.Patch.Body,
   ) {
     const fetcher = makeFetcher( {

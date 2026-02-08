@@ -16,10 +16,12 @@ import { Series } from "#episodes/series";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { Episode } from "#episodes/models";
 import { VideoMetadataService } from "#modules/resources/video/video-metadata/VideoMetadataService.service";
+import { assertFoundServer } from "#utils/validation/found";
+import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EpisodesRepository } from "../../crud/repositories/episodes";
-import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "./disk";
+import { SeriesNode, SerieTree, EpisodeNode } from "./disk/models";
 import { RemoteSeriesTreeService } from "./db";
-import { SerieNode, SerieTree, EpisodeNode } from "./disk/models";
+import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "./disk";
 
 const TASK_NAME = EpisodeTasks.sync.name;
 
@@ -183,7 +185,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
   }
 
   private async saveNewFileInfosAndEpisode(
-    seriesNodes: SerieNode[],
+    seriesNodes: SeriesNode[],
     userId: string,
   ): Promise<EpisodeFileInfoEntity[]> {
     const allFileInfos: EpisodeFileInfoEntity[] = [];
@@ -191,7 +193,7 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
     // Recopilar todas las promesas para procesarlas en paralelo
     for (const seriesNode of seriesNodes) {
     // Crear la promesa de la serie una vez
-      const seriePromise = this.seriesRepo.getOneOrCreate( {
+      const seriesPromise = this.seriesRepo.getOneOrCreate( {
         name: seriesNode.key,
         key: seriesNode.key,
         imageCoverId: null,
@@ -201,8 +203,8 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
       for (const seasonInTree of seriesNode.children) {
         for (const episodeInTree of seasonInTree.children) {
           // se hace await para no leer varios capítulos en disco en paralelo
-          const episodeFileInfo = await seriePromise.then(
-            serie => this.createFileInfoFromLocalEpisode(episodeInTree, serie, userId),
+          const episodeFileInfo = await seriesPromise.then(
+            series => this.createFileInfoFromLocalEpisode(episodeInTree, series, userId),
           );
 
           allFileInfos.push(episodeFileInfo);
@@ -216,15 +218,19 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
 
   private async createFileInfoFromLocalEpisode(
     localEpisode: EpisodeNode,
-    serie: Series,
+    series: Series,
     userId: string,
   ) {
+    const seriesDoc = await SeriesOdm.Model.findOne( {
+      key: series.key,
+    } );
+
+    assertFoundServer(seriesDoc);
+    const seriesId = seriesDoc._id.toString();
     const episode: Omit<Episode, "addedAt" | "createdAt" | "releasedOn" | "updatedAt"> = {
-      compKey: {
-        episodeKey: localEpisode.content.episodeKey,
-        seriesKey: serie.key,
-      },
-      title: `${serie.name} ${localEpisode.content.episodeKey}`,
+      episodeKey: localEpisode.content.episodeKey,
+      seriesId,
+      title: `${series.name} ${localEpisode.content.episodeKey}`,
       uploaderUserId: userId,
     };
     const gotEpisode = await this.episodesRepo.getOneOrCreate(episode);

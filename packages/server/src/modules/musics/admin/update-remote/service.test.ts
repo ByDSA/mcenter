@@ -39,25 +39,6 @@ describe("updateRemoteService", () => {
 
     musicRepoMock = testingSetup.getMock(MusicsRepository);
     musicFileInfoRepoMock = testingSetup.getMock(MusicFileInfoRepository);
-    musicRepoMock.createOneFromPath.mockImplementation((path: string) => {
-      const musicFileInfo = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
-      const music = MUSICS_SAMPLES_IN_DISK.find(m=>m.id === musicFileInfo.musicId);
-
-      assertIsDefined(music);
-
-      return Promise.resolve( {
-        music: {
-          ...music,
-          id: "id",
-        },
-        fileInfo: musicFileInfo,
-      } );
-    } );
-    musicFileInfoRepoMock.upsertOneByPathAndGet.mockImplementation((path: string)=> {
-      const musicFileInfo = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
-
-      return Promise.resolve(musicFileInfo);
-    } );
     service = testingSetup.app.get<UpdateRemoteTreeService>(UpdateRemoteTreeService);
   } );
 

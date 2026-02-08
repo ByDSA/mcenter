@@ -17,8 +17,10 @@ export class RemoveWeightLowerOrEqualThanMusicFilter
 }
 
 export class PreventRepeatInTimeMusicFilter extends PreventRepeatInTimeFilter<Entity> {
-  getLastTimePlayed(self: Entity): number {
-    return self.userInfo?.lastTimePlayed ?? 0;
+  getLastTimePlayed(self: Entity): Date | null {
+    return self.userInfo?.lastTimePlayed === undefined
+      ? null
+      : new Date(self.userInfo?.lastTimePlayed * 1_000);
   }
 }
 

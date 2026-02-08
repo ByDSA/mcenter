@@ -1,25 +1,22 @@
-import type { CanGetAll } from "#utils/layers/controller";
-import { Request, Response } from "express";
-import { Body, Controller, Inject, Param } from "@nestjs/common";
+import { Body, Controller, Param } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { EpisodeHistoryEntryCrudDtos } from "$shared/models/episodes/history/dto/transport";
 import z from "zod";
 import { UserPayload } from "$shared/models/auth";
 import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
-import { AdminDeleteOne, GetAll, GetManyCriteria } from "#utils/nestjs/rest";
-import { showError } from "#core/logging/show-error";
+import { mongoDbId } from "$shared/models/resources/partial-schemas";
+import { GetAll, GetManyCriteria, UserDeleteOne } from "#utils/nestjs/rest";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
 import { type EpisodeHistoryEntryEntity, episodeHistoryEntryEntitySchema } from "../models";
-import { LastTimePlayedService } from "../last-time-played.service";
 import { EpisodeHistoryRepository } from "./repository";
 
 class GetManyBodyDto
   extends createZodDto(EpisodeHistoryEntryCrudDtos.GetMany.criteriaSchema) {}
 
-class SeriesKeyParamsDto extends createZodDto(
+class SeriesIdParamsDto extends createZodDto(
   z.object( {
-    seriesKey: z.string(),
+    seriesId: mongoDbId,
   } ),
 ) {}
 
@@ -31,62 +28,66 @@ class IdParamsDto extends createZodDto(
 
 @Authenticated()
 @Controller()
-export class EpisodeHistoryCrudController
-implements
-    CanGetAll<Request, Response> {
+export class EpisodeHistoryCrudController {
   constructor(
     private readonly entriesRepo: EpisodeHistoryRepository,
-    @Inject(LastTimePlayedService)
-    private readonly lastTimePlayedService: LastTimePlayedService,
   ) {
   }
 
   @GetAll(episodeHistoryEntryEntitySchema)
-  async getAll() {
-    return await this.entriesRepo.getAll();
-  }
-
-  @GetAll(episodeHistoryEntryEntitySchema, {
-    url: "/:seriesKey",
-  } )
-  async getManyBySeriesKey(
-    @Param() params: SeriesKeyParamsDto,
+  async getAll(
     @User() user: UserPayload,
   ) {
-    return await this.entriesRepo.getManyBySeriesKey(user.id, params.seriesKey);
+    return await this.entriesRepo.getAll( {
+      requestingUserId: user.id,
+    } );
   }
 
   @GetAll(episodeHistoryEntryEntitySchema, {
-    url: "/:seriesKey/entries",
+    url: "/:seriesId",
   } )
-  async getAllEntriesByseriesKey(
-    @Param() params: SeriesKeyParamsDto,
+  async getManyBySeriesId(
+    @Param() params: SeriesIdParamsDto,
+    @User() user: UserPayload,
+  ) {
+    return await this.entriesRepo.getManyBySeriesId(params.seriesId, {
+      requestingUserId: user.id,
+    } );
+  }
+
+  @GetAll(episodeHistoryEntryEntitySchema, {
+    url: "/:seriesId/entries",
+  } )
+  async getAllEntriesBySeriesId(
+    @Param() params: SeriesIdParamsDto,
     @User() user: UserPayload,
   ) {
     return await this.entriesRepo.getManyByCriteria( {
       filter: {
-        seriesKey: params.seriesKey,
-        userId: user.id,
+        seriesId: params.seriesId,
       },
       expand: ["episodesSeries"],
+    }, {
+      requestingUserId: user.id,
     } );
   }
 
   @GetManyCriteria(episodeHistoryEntryEntitySchema, {
-    url: "/:seriesKey/entries/" + GET_MANY_CRITERIA_PATH,
+    url: "/:seriesId/entries/" + GET_MANY_CRITERIA_PATH,
   } )
   async getManyEntriesBySerieAndCriteria(
     @Body() body: GetManyBodyDto,
-    @Param() params: SeriesKeyParamsDto,
+    @Param() params: SeriesIdParamsDto,
     @User() user: UserPayload,
   ) {
     return await this.entriesRepo.getManyByCriteria( {
       ...body,
       filter: {
         ...body.filter,
-        userId: user.id,
-        seriesKey: params.seriesKey,
+        seriesId: params.seriesId,
       },
+    }, {
+      requestingUserId: user.id,
     } );
   }
 
@@ -101,22 +102,23 @@ implements
       ...body,
       filter: {
         ...body.filter,
-        userId: user.id,
       },
+    }, {
+      requestingUserId: user.id,
     } );
   }
 
-  @AdminDeleteOne(episodeHistoryEntryEntitySchema, {
+  @UserDeleteOne(episodeHistoryEntryEntitySchema, {
     url: "/entries/:id",
   } )
   async deleteOneEntryByIdAndGet(
     @Param() params: IdParamsDto,
+    @User() user: UserPayload,
   ): Promise<EpisodeHistoryEntryEntity> {
     const { id } = params;
-    const deleted = await this.entriesRepo.deleteOneByIdAndGet(id);
-
-    this.lastTimePlayedService.updateEpisodeLastTimePlayedById(deleted.userId, deleted.resourceId)
-      .catch(showError);
+    const deleted = await this.entriesRepo.deleteOneByIdAndGet(id, {
+      requestingUserId: user.id,
+    } );
 
     return deleted;
   }

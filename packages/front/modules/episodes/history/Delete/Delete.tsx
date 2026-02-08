@@ -8,6 +8,7 @@ import { getLongDateStr } from "#modules/utils/dates";
 import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { useEpisode } from "#modules/episodes/hooks";
+import { useSeries } from "#modules/episodes/series/hooks";
 import { EpisodeHistoryApi } from "../requests";
 import { EpisodeHistoryEntryEntity } from "../models";
 import styles from "./DeleteEntryModal.module.css";
@@ -34,28 +35,29 @@ type Props = {
 export function DeleteHistoryEntryContextMenuItem( { value, onActionSuccess }: Props) {
   const { openModal } = useConfirmModal();
   const { data: episode } = useEpisode(value.resourceId);
-
-  assertIsDefined(episode);
+  const { data: series } = useSeries(episode?.seriesId ?? null);
 
   return <ContextMenuItem
     label="Quitar del historial"
     theme="danger"
     onClick={async () => {
+      assertIsDefined(episode);
+      assertIsDefined(series);
       await openModal( {
         title: "Confirmar borrado",
         content: <DeleteHistoryEntryModalContentWrapper>
           <DaInputGroup>
             <DaInputGroupItem inline>
               <DaLabel>Fecha</DaLabel>
-              <span>{getLongDateStr(new Date(value.date.timestamp * 1_000), "datetime")}</span>
+              <span>{getLongDateStr(value.date, "datetime")}</span>
             </DaInputGroupItem>
             <DaInputGroupItem inline>
               <DaLabel>Serie</DaLabel>
-              <span>{episode.serie?.name ?? episode.compKey.seriesKey}</span>
+              <span>{series.name}</span>
             </DaInputGroupItem>
             <DaInputGroupItem inline>
               <DaLabel>Episodio</DaLabel>
-              <span>{episode.compKey.episodeKey}</span>
+              <span>{episode.episodeKey}</span>
             </DaInputGroupItem>
             <DaInputGroupItem inline>
               <DaLabel>Título</DaLabel>

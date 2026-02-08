@@ -1,3 +1,1 @@
-export {
-  musicsRepoMockProvider,
-} from "./music.mock";
+export * from "./music.mock";

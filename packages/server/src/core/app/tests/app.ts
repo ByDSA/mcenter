@@ -20,6 +20,12 @@ import { MockUsersRepository } from "#core/auth/users/tests/repository";
 import { authRoutes } from "#core/routing";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { AuthGoogleModule } from "#core/auth/strategies/google";
+import { createAndRegisterMusicRepositoryMockClass } from "#musics/crud/repositories/music/tests";
+import { createAndRegisterMusicHistoryRepositoryMockClass } from "#musics/history/crud/repository/tests";
+import { createAndRegisterEpisodesRepositoryMockClass } from "#episodes/crud/repositories/episodes/tests";
+import { createAndRegisterEpisodeUserInfosRepositoryMockClass } from "#episodes/crud/repositories/user-infos/tests";
+import { registerMusicFileInfoRepositoryMockClass } from "#musics/file-info/crud/repository/tests";
+import { createAndRegisterSeriesRepositoryMockClass } from "#episodes/series/crud/repository/tests";
 
 export type TestingSetup = {
   options?: Options;
@@ -41,6 +47,16 @@ type Options = {
   };
   beforeCompile?: (moduleBuilder: TestingModuleBuilder)=> void;
 };
+
+(function registerMocks() {
+  createAndRegisterMusicRepositoryMockClass();
+  registerMusicFileInfoRepositoryMockClass();
+  createAndRegisterMusicHistoryRepositoryMockClass();
+  createAndRegisterEpisodesRepositoryMockClass();
+  createAndRegisterEpisodeUserInfosRepositoryMockClass();
+  createAndRegisterSeriesRepositoryMockClass();
+} )();
+
 export async function createTestingAppModule(
   metadata: ModuleMetadata,
   options?: Options,

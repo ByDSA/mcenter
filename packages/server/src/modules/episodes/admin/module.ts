@@ -1,12 +1,12 @@
-import { forwardRef, Module } from "@nestjs/common";
-import { SeriesCrudModule } from "#episodes/series/module";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
-import { TasksModule } from "#core/tasks";
+import { Module } from "@nestjs/common";
 import { VideoMetadataModule } from "#modules/resources/video/video-metadata/module";
-import { EpisodeHistoryModule } from "../history/module";
+import { TasksModule } from "#core/tasks";
+import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { SeriesCrudModule } from "#episodes/series/crud/module";
+import { EpisodeLastTimePlayedModule } from "#episodes/history/last-time-played/module";
 import { EpisodeFileInfosCrudModule } from "../file-info/crud/module";
-import { EpisodeDependenciesModule } from "../dependencies/module";
+import { EpisodeDependenciesModule } from "../dependencies/crud/module";
 import { EpisodesCrudModule } from "../crud/module";
 import { EpisodesUpdateController } from "./update-file-info-saved/controller";
 import { EpisodesSyncDiskToDatabaseController } from "./sync-disk-to-db/controller";
@@ -19,7 +19,7 @@ import { EpisodeUpdateFileInfoSavedTaskHandler } from "./update-file-info-saved/
   imports: [
     DomainEventEmitterModule,
     SeriesCrudModule,
-    forwardRef(() => EpisodeHistoryModule),
+    EpisodeLastTimePlayedModule,
     EpisodeFileInfosCrudModule,
     EpisodeDependenciesModule,
     ResourceResponseFormatterModule,

@@ -1,26 +1,29 @@
 import type { EpisodeEntity } from "#episodes/models";
-import type { DomainEvent } from "#core/domain-event-emitter";
-import type { CanCreateOne, CanDeleteOneByIdAndGet } from "#utils/layers/repository";
-import type { EpisodeHistoryEntry as Model, EpisodeHistoryEntryEntity as Entity, EpisodeHistoryEntryEntity } from "../../models";
+import type { EpisodeHistoryEntryEntity as Entity, EpisodeHistoryEntryEntity } from "../../models";
 import type { EpisodeHistoryEntryCrudDtos } from "$shared/models/episodes/history/dto/transport";
 import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { OnEvent } from "@nestjs/event-emitter";
-import { getDateNow } from "$shared/utils/time";
-import { UserEntity } from "$shared/models/auth";
-import { assertFoundClient } from "#utils/validation/found";
+import { Types } from "mongoose";
+import { type DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
+import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
 import { SeriesKey } from "#episodes/series";
 import { StreamEntity } from "#episodes/streams";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
-import { getCriteriaPipeline } from "./criteria-pipeline";
-import { EpisodeHistoryEntryEvents } from "./events";
+import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EpisodeHistoryEntryOdm } from "./odm";
+import { EpisodeHistoryEntryEvents } from "./events";
+import { getCriteriaPipeline } from "./criteria-pipeline";
 
 type FindLastProps = {
   streamId: StreamEntity["id"];
+};
+
+type Options = {
+  requestingUserId: string;
 };
 
 type Id = EpisodeHistoryEntryEntity["id"];
@@ -29,18 +32,16 @@ type EpisodeId = EpisodeEntity["id"];
 type AddEpisodesToHistoryProps = {
   episodes: EpisodeEntity[];
   streamId: StreamEntity["id"];
-  userId: UserEntity["id"];
 };
 type CreateNewEntryNowForProps = {
-  episode: EpisodeEntity;
+  episodeId: EpisodeEntity["id"];
+  seriesId: string;
   streamId?: StreamEntity["id"];
-  userId: UserEntity["id"];
 };
 @Injectable()
-export class EpisodeHistoryRepository implements
-CanCreateOne<Model>,
-CanDeleteOneByIdAndGet<Model, Id> {
+export class EpisodeHistoryRepository {
   constructor(
+    private readonly domainEventEmitter: DomainEventEmitter,
     private readonly streamsRepo: StreamsRepository,
   ) {}
 
@@ -50,15 +51,22 @@ CanDeleteOneByIdAndGet<Model, Id> {
   }
 
   @EmitEntityEvent(EpisodeHistoryEntryEvents.Created.TYPE)
-  async createOne(entry: Model): Promise<void> {
-    const entryDocOdm = EpisodeHistoryEntryOdm.toDoc(entry);
+  async createOneAndGet(
+    entry: EpisodeHistoryEntryCrudDtos.CreateOne.Body,
+    options: Options,
+  ): Promise<EpisodeHistoryEntryEntity> {
+    const entryDocOdm = EpisodeHistoryEntryOdm.toDoc( {
+      ...entry,
+      userId: options.requestingUserId,
+    } );
+    const created = await EpisodeHistoryEntryOdm.Model.create(entryDocOdm);
 
-    await EpisodeHistoryEntryOdm.Model.create(entryDocOdm);
+    return EpisodeHistoryEntryOdm.toEntity(created);
   }
 
-  async getAll(): Promise<Entity[]> {
-    const docsOdm = await EpisodeHistoryEntryOdm.Model.find( {}, {
-      _id: 0,
+  async getAll(options: Options): Promise<Entity[]> {
+    const docsOdm = await EpisodeHistoryEntryOdm.Model.find( {
+      userId: options.requestingUserId,
     } );
 
     if (docsOdm.length === 0)
@@ -67,19 +75,23 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return docsOdm.map(EpisodeHistoryEntryOdm.toEntity);
   }
 
-  async getManyBySeriesKey(userId: string, seriesKey: SeriesKey): Promise<Entity[]> {
+  async getManyBySeriesId(seriesId: SeriesKey, options: Options): Promise<Entity[]> {
     return await this.getManyByCriteria( {
       filter: {
-        userId,
-        seriesKey,
+        seriesId,
       },
       expand: ["episodes"],
-    } );
+    }, options);
   }
 
   async getManyByCriteria(
     criteria: EpisodeHistoryEntryCrudDtos.GetMany.Criteria,
+    options: Options,
   ): Promise<Entity[]> {
+    criteria.filter = {
+      ...criteria.filter,
+      userId: options.requestingUserId,
+    };
     const pipeline = getCriteriaPipeline(criteria);
     const docsOdm: EpisodeHistoryEntryOdm.FullDoc[] = await EpisodeHistoryEntryOdm.Model.aggregate(
       pipeline,
@@ -89,10 +101,10 @@ CanDeleteOneByIdAndGet<Model, Id> {
       return [];
 
     if (criteria.expand?.includes("episodesSeries"))
-      assertIsDefined(docsOdm[0].episode?.serie, "Lookup serie failed");
+      assertIsDefined(docsOdm[0].episode?.series, "Lookup series failed");
 
     if (criteria.expand?.includes("episodesUserInfo"))
-      assertIsDefined(docsOdm[0].episode?.userInfo, "Lookup serie failed");
+      assertIsDefined(docsOdm[0].episode?.userInfo, "Lookup series failed");
 
     if (criteria.expand?.includes("episodes"))
       assertIsDefined(docsOdm[0].episode, "Lookup episode failed");
@@ -104,21 +116,46 @@ CanDeleteOneByIdAndGet<Model, Id> {
   }
 
   @EmitEntityEvent(EpisodeHistoryEntryEvents.Deleted.TYPE)
-  async deleteOneByIdAndGet(id: Id): Promise<Entity> {
-    const docOdm = await EpisodeHistoryEntryOdm.Model.findByIdAndDelete(id);
+  async deleteOneByIdAndGet(id: Id, options: Options): Promise<Entity> {
+    const docOdm = await EpisodeHistoryEntryOdm.Model.findByIdAndDelete(id, {
+      userId: new Types.ObjectId(options.requestingUserId),
+    } );
 
     assertFoundClient(docOdm);
 
     return EpisodeHistoryEntryOdm.toEntity(docOdm);
   }
 
-  async findLastByEpisodeId(episodeId: EpisodeId): Promise<Entity | null> {
+  async deleteAllAndGet(options: Options): Promise<Entity[]> {
+    const filter = {
+      userId: new Types.ObjectId(options.requestingUserId),
+    };
+    const docs = await EpisodeHistoryEntryOdm.Model.find(filter);
+
+    await EpisodeHistoryEntryOdm.Model.deleteMany(filter);
+
+    const ret = docs.map(EpisodeHistoryEntryOdm.toEntity);
+
+    for (const e of ret) {
+      this.domainEventEmitter.emitEntity(EpisodeHistoryEntryEvents.Deleted.TYPE, {
+        ...e,
+        id: e.id,
+      } );
+    }
+
+    return ret;
+  }
+
+  async findLastByEpisodeId(episodeId: EpisodeId, options: Options): Promise<Entity | null> {
     const sort = {
-      "date.timestamp": -1,
+      date: -1,
     } satisfies MongoSortQuery<EpisodeHistoryEntryOdm.Doc>;
-    const last = await EpisodeHistoryEntryOdm.Model.findById(episodeId, {}, {
-      sort,
-    } );
+    const last = await EpisodeHistoryEntryOdm.Model
+      .findOne( {
+        episodeId: new Types.ObjectId(episodeId),
+        userId: new Types.ObjectId(options.requestingUserId),
+      } )
+      .sort(sort);
 
     if (!last)
       return null;
@@ -126,16 +163,17 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return EpisodeHistoryEntryOdm.toEntity(last);
   }
 
-  async findLast( { streamId }: FindLastProps): Promise<Entity | null> {
+  async findLast( { streamId }: FindLastProps, options: Options): Promise<Entity | null> {
     const filter = {
       streamId,
+      userId: new Types.ObjectId(options.requestingUserId),
     } satisfies MongoFilterQuery<EpisodeHistoryEntryOdm.Doc>;
     const sort = {
-      "date.timestamp": -1,
+      date: -1,
     } satisfies MongoSortQuery<EpisodeHistoryEntryOdm.Doc>;
-    const last = await EpisodeHistoryEntryOdm.Model.findOne(filter, {}, {
-      sort,
-    } );
+    const last = await EpisodeHistoryEntryOdm.Model
+      .findOne(filter)
+      .sort(sort);
 
     if (!last)
       return null;
@@ -143,74 +181,49 @@ CanDeleteOneByIdAndGet<Model, Id> {
     return EpisodeHistoryEntryOdm.toEntity(last);
   }
 
-  async isLast(episodeId: EpisodeEntity["id"], userId: string): Promise<boolean> {
+  async isLast(episodeId: EpisodeEntity["id"], options: Options): Promise<boolean> {
     const lastOdm = await EpisodeHistoryEntryOdm.Model.findOne( {
-      userId,
+      userId: new Types.ObjectId(options.requestingUserId),
     } ).sort( {
-      "date.timestamp": -1,
+      date: -1,
     } );
 
     return lastOdm?.episodeId.toString() === episodeId;
   }
 
-  async createNewEntryNowFor( { episode, streamId, userId }: CreateNewEntryNowForProps) {
-    assertIsDefined(userId);
-
+  async createNewEntryNowFor(
+    { episodeId, seriesId, streamId }: CreateNewEntryNowForProps,
+    options: Options,
+  ) {
     if (streamId === undefined) {
-      const defaultStream = this.streamsRepo.getOneOrCreateBySeriesKey(
-        userId,
-        episode.compKey.seriesKey,
+      const series = await SeriesOdm.Model.findById(seriesId);
+
+      assertFoundServer(series);
+      const defaultStream = this.streamsRepo.getOneOrCreateBySeriesId(
+        options.requestingUserId,
+        series.id,
       );
 
       streamId = (await defaultStream).id;
     }
 
-    const newEntry: Model = {
-      date: getDateNow(),
-      resourceId: episode.id,
+    const newEntry: EpisodeHistoryEntryCrudDtos.CreateOne.Body = {
+      date: new Date(),
+      resourceId: episodeId,
       streamId,
-      userId,
     };
 
-    await this.createOne(newEntry);
+    return await this.createOneAndGet(newEntry, options);
   }
 
-  async addEpisodesToHistory( { episodes, streamId, userId }: AddEpisodesToHistoryProps) {
+  async addEpisodesToHistory( { episodes, streamId }: AddEpisodesToHistoryProps, options: Options) {
     // TODO: usar bulk insert (quitar await en for)
     for (const episode of episodes) {
       await this.createNewEntryNowFor( {
-        episode,
+        episodeId: episode.id,
+        seriesId: episode.seriesId,
         streamId,
-        userId,
-      } );
+      }, options);
     }
-  }
-
-  async calcEpisodeLastTimePlayedById(episodeId: EpisodeEntity["id"]): Promise<number | null> {
-    const last = await this.findLastByEpisodeId(episodeId);
-
-    if (last === null)
-      return null;
-
-    let lastTimePlayed = last.date.timestamp;
-
-    if (lastTimePlayed <= 0)
-      return null;
-
-    return lastTimePlayed;
-  }
-
-  async calcEpisodeLastTimePlayedByEpisodeId(episodeId: EpisodeId): Promise<number | null> {
-    const last = await this.findLastByEpisodeId(episodeId);
-
-    if (last === null)
-      return null;
-
-    let lastTimePlayed = last.date.timestamp;
-
-    if (lastTimePlayed <= 0)
-      return null;
-
-    return lastTimePlayed;
   }
 }

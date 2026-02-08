@@ -2,13 +2,17 @@ import type { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
+import { SeriesOdm } from "#episodes/series/crud/repository/odm";
+import { enrichImageCover } from "#modules/image-covers/crud/repositories/odm/utils";
+import { EpisodesUsersOdm } from "../../user-infos/odm";
 import { DocOdm } from "./odm";
 
 // Definimos flags similares a MusicExpansionFlags
 export interface EpisodeExpansionFlags {
   includeFileInfos: boolean;
-  includeUserInfo: boolean; // Ahora busca en episodes_users
+  includeUserInfo: boolean;
   includeSeries: boolean;
+  includeSeriesImageCover: boolean;
 }
 
 type Criteria = EpisodesCrudDtos.GetMany.Criteria;
@@ -21,7 +25,7 @@ function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
 
   if (body.sort.episodeCompKey) {
     // Orden compuesto
-    ret["seriesKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
+    ret["seriesId"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
     ret["episodeKey"] = body.sort.episodeCompKey === "asc" ? 1 : -1;
   } else if (body.sort.episodeKey)
     ret["episodeKey"] = body.sort.episodeKey === "asc" ? 1 : -1;
@@ -43,7 +47,7 @@ function buildMongooseSort(body: Criteria): Record<string, -1 | 1> | undefined {
  * Función helper equivalente a enrichSingleMusic pero para Episodes.
  * Maneja los Lookups complejos.
  */
-function enrichSingleEpisode(
+export function enrichSingleEpisode(
   _localField: string,
   targetField: string | null,
   userId: string | null | undefined,
@@ -64,11 +68,11 @@ function enrichSingleEpisode(
     } );
   }
 
-  // 2. User Info (CORREGIDO: Busca en episodes_users)
+  // 2. User Info
   if (flags.includeUserInfo && userId) {
     pipeline.push( {
       $lookup: {
-        from: "episodes_users", // Colección pivote
+        from: EpisodesUsersOdm.COLLECTION_NAME,
         let: {
           episodeId: targetField ? `$${targetField}._id` : "$_id",
         },
@@ -105,45 +109,50 @@ function enrichSingleEpisode(
     } );
   }
 
-  // 3. Series (y sus fileInfos si aplica)
-  if (flags.includeSeries) {
+  // 3. Series
+  if (flags.includeSeries || flags.includeSeriesImageCover) {
     pipeline.push( {
       $lookup: {
-        from: "series",
-        localField: `${rootPrefix}seriesKey`,
-        foreignField: "key", // Asumiendo que 'key' es el identificador en Series
-        as: `${rootPrefix}serie`,
+        from: SeriesOdm.COLLECTION_NAME,
+        localField: `${rootPrefix}seriesId`,
+        foreignField: "_id",
+        as: `${rootPrefix}series`,
       },
     } );
 
     pipeline.push( {
       $addFields: {
-        [`${rootPrefix}serie`]: {
-          $arrayElemAt: [`$${rootPrefix}serie`, 0],
+        [`${rootPrefix}series`]: {
+          $arrayElemAt: [`$${rootPrefix}series`, 0],
         },
       },
     } );
 
-    // Si también pedimos fileInfos, solemos querer los fileInfos de la serie también
-    // según tu código original
+    if (flags.includeSeriesImageCover) {
+      pipeline.push(...enrichImageCover( {
+        imageCoverField: `${rootPrefix}series.imageCover`,
+        imageCoverIdField: `${rootPrefix}series.imageCoverId`,
+      } ));
+    }
+
     if (flags.includeFileInfos) {
       pipeline.push( {
         $lookup: {
           from: EpisodeFileInfoOdm.COLLECTION_NAME,
-          localField: `${rootPrefix}serie._id`, // ID de la serie recién poblada
-          foreignField: "seriesKey", // Asumiendo relación en FileInfos
-          as: "serieFileInfosTemp",
+          localField: `${rootPrefix}series._id`, // ID de la serie recién poblada
+          foreignField: "seriesId", // Asumiendo relación en FileInfos
+          as: "seriesFileInfosTemp",
         },
       } );
 
       pipeline.push( {
         $addFields: {
-          [`${rootPrefix}serie.fileInfos`]: "$serieFileInfosTemp",
+          [`${rootPrefix}series.fileInfos`]: "$seriesFileInfosTemp",
         },
       } );
 
       pipeline.push( {
-        $unset: "serieFileInfosTemp",
+        $unset: "seriesFileInfosTemp",
       } );
     }
   }
@@ -163,6 +172,7 @@ export function getCriteriaPipeline(
                       || !!criteria.filter?.path, // Necesario si filtramos por path
     includeUserInfo: criteria.expand?.includes("userInfo") ?? false,
     includeSeries: criteria.expand?.includes("series") ?? false,
+    includeSeriesImageCover: criteria.expand?.includes("seriesImageCover") ?? false,
   };
   // Pre-filter: Si filtramos por 'path', necesitamos 'fileInfos' ANTES del match
   const preFilterEnrichment = !!criteria.filter?.path;
@@ -172,6 +182,7 @@ export function getCriteriaPipeline(
       includeFileInfos: true, // Forzamos carga
       includeUserInfo: false,
       includeSeries: false,
+      includeSeriesImageCover: false,
     } ));
   }
 
@@ -219,6 +230,7 @@ export function getCriteriaPipeline(
     includeFileInfos: expansionFlags.includeFileInfos && !preFilterEnrichment,
     includeUserInfo: expansionFlags.includeUserInfo,
     includeSeries: expansionFlags.includeSeries,
+    includeSeriesImageCover: expansionFlags.includeSeriesImageCover,
   };
 
   dataPipeline.push(...enrichSingleEpisode("_id", null, userId, postPaginationFlags));
@@ -245,8 +257,8 @@ function buildMongooseFilterWithFileInfos(
       };
     }
 
-    if (criteria.filter.seriesKey)
-      filter["seriesKey"] = criteria.filter.seriesKey;
+    if (criteria.filter.seriesId)
+      filter["seriesId"] = new Types.ObjectId(criteria.filter.seriesId);
 
     if (criteria.filter.episodeKey)
       filter["episodeKey"] = criteria.filter.episodeKey;
@@ -257,9 +269,9 @@ function buildMongooseFilterWithFileInfos(
       };
     }
 
-    if (criteria.filter.seriesKeys && criteria.filter.seriesKeys.length > 0) {
-      filter["seriesKey"] = {
-        $in: criteria.filter.seriesKeys,
+    if (criteria.filter.seriesIds && criteria.filter.seriesIds.length > 0) {
+      filter["seriesId"] = {
+        $in: criteria.filter.seriesIds.map(id => new Types.ObjectId(id)),
       };
     }
 

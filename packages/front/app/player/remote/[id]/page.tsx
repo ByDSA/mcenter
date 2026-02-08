@@ -200,7 +200,7 @@ function statusRepresentaton(
   let artist = "-";
 
   if (resource)
-    artist = `${resource.compKey.episodeKey}, ${ resource?.serie?.name}`;
+    artist = `${resource.episodeKey}, ${ resource?.series?.name}`;
   else
     artist = uri?.slice(uri.lastIndexOf("/") + 1) ?? "-";
 

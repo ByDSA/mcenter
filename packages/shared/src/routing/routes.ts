@@ -1,5 +1,4 @@
 import { ResponseFormat } from "../models/resources";
-import { EpisodeCompKey } from "../models/episodes";
 import { GoogleState, googleStateSchema } from "../models/auth";
 import { PathRoutes } from "./routes.types";
 
@@ -446,9 +445,8 @@ token?: string;} ) => {
     dependencies: {
       path: EPISODES_DEPENDENCIES,
       withParams: (
-        seriesKey: EpisodeCompKey["seriesKey"],
-        episodeKey: EpisodeCompKey["episodeKey"],
-      ) => `${EPISODES_DEPENDENCIES}/${seriesKey}/${episodeKey}`,
+        lastEpisodeId: string,
+      ) => `${EPISODES_DEPENDENCIES}/${lastEpisodeId}`,
     },
     fileInfo: {
       path: EPISODES_FILE_INFO,

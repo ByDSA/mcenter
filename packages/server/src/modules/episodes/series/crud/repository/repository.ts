@@ -1,6 +1,5 @@
-/* eslint-disable import/no-cycle */
 import assert from "node:assert";
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { SeriesCrudDtos } from "$shared/models/episodes/series/dto/transport";
@@ -12,20 +11,15 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
-import { EpisodeEntity } from "#episodes/models";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
-import { GetManyProps } from "#episodes/crud/repositories/episodes/repository";
+import { getUniqueString } from "#modules/resources/get-unique-string";
 import { Series, SeriesEntity, SeriesKey } from "../../models";
-import { getSeriesCriteriaPipeline } from "./odm/criteria-pipeline";
-import { SeriesEvents } from "./events";
-import { SeriesOdm } from "./odm";
 import { FullDocOdm, ModelOdm } from "./odm/odm";
-import { SeriesAvailableSlugGeneratorService } from "./available-slug-generator.service";
+import { SeriesOdm } from "./odm";
+import { SeriesEvents } from "./events";
+import { getSeriesCriteriaPipeline } from "./odm/criteria-pipeline";
 
 type Entity = SeriesEntity;
 type Model = Series;
-
-type Seasons = Record<string, EpisodeEntity[]>;
 
 export type GetManyCriteria = SeriesCrudDtos.GetMany.Criteria & { requestUserId: string |
   null; };
@@ -42,9 +36,6 @@ CanPatchOneByIdAndGet<Entity, string, Model>,
 CanDeleteOneByIdAndGet<Entity, string> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
-    @Inject(forwardRef(() => SeriesAvailableSlugGeneratorService))
-    private readonly slugGenerator: SeriesAvailableSlugGeneratorService,
-    private readonly episodesRepo: EpisodesRepository,
   ) { }
 
   @OnEvent(SeriesEvents.WILDCARD)
@@ -58,7 +49,18 @@ CanDeleteOneByIdAndGet<Entity, string> {
     return seriesDocOdm.map(SeriesOdm.toEntity);
   }
 
-  async getMany(criteria: GetManyCriteria): Promise<PaginatedResult<Entity[]>> {
+  async getAvailableKey(baseKey: string): Promise<string> {
+    return await getUniqueString(
+      baseKey,
+      async (candidate) => {
+        const series = await this.getOneByKey(candidate);
+
+        return !series;
+      },
+    );
+  }
+
+  async getMany(criteria: GetManyCriteria): Promise<PaginatedResult<Entity>> {
     const pipeline = getSeriesCriteriaPipeline(criteria);
     const [result] = await ModelOdm.aggregate(pipeline);
     const seriesDocs = result?.data || [];
@@ -82,47 +84,6 @@ CanDeleteOneByIdAndGet<Entity, string> {
     return SeriesOdm.toEntity(doc);
   }
 
-  async getSeasonsById(
-    id: string,
-    episodeGetManyProps: GetManyProps,
-  ): Promise<Seasons> {
-    const serie = await ModelOdm.findById(id);
-
-    assertFoundClient(serie);
-    const episodes = await this.episodesRepo.getManyBySerieKey(serie.key, {
-      requestingUserId: episodeGetManyProps.requestingUserId,
-      criteria: {
-        ...episodeGetManyProps.criteria,
-        sort: {
-          ...episodeGetManyProps.criteria.sort,
-          episodeKey: "asc",
-        },
-      },
-    } );
-    const seasons: Seasons = {};
-
-    for (const e of episodes) {
-      const seasonNumberStr = getSeasonNumberByEpisodeKey(e.compKey.episodeKey).toString();
-      const episodeEntity = e;
-      let season = seasons[seasonNumberStr];
-
-      if (!season) {
-        season = [];
-        seasons[seasonNumberStr] = season;
-      }
-
-      season.push(episodeEntity);
-    }
-
-    if (Object.entries(seasons).length === 1 && seasons["0"] !== undefined) {
-      return {
-        1: seasons["0"],
-      };
-    }
-
-    return seasons;
-  }
-
   @EmitEntityEvent(SeriesEvents.Created.TYPE)
   async createOneAndGet(dto: CreateDto): Promise<Entity> {
     const model = await this.createDtoToUpdateQuery(dto);
@@ -132,7 +93,7 @@ CanDeleteOneByIdAndGet<Entity, string> {
   }
 
   private async createDtoToUpdateQuery(dto: CreateDto) {
-    const uniqueKey = await this.slugGenerator.getAvailableKey(dto.key ?? dto.name);
+    const uniqueKey = await this.getAvailableKey(dto.key ?? dto.name);
 
     return SeriesOdm.partialToDoc( {
       ...dto,
@@ -147,7 +108,7 @@ CanDeleteOneByIdAndGet<Entity, string> {
 
     // Si se está actualizando la key, asegurarse de que es única
     if (paramEntity.key)
-      paramEntity.key = await this.slugGenerator.getAvailableKey(paramEntity.key);
+      paramEntity.key = await this.getAvailableKey(paramEntity.key);
 
     const updateQuery = patchParamsToUpdateQuery( {
       ...params,
@@ -216,12 +177,12 @@ CanDeleteOneByIdAndGet<Entity, string> {
     const gotOdm = result.value;
 
     assert(gotOdm !== null);
-    const serie = SeriesOdm.toEntity(gotOdm);
+    const series = SeriesOdm.toEntity(gotOdm);
 
     if (result.lastErrorObject?.upserted)
-      this.domainEventEmitter.emitEntity(SeriesEvents.Created.TYPE, serie);
+      this.domainEventEmitter.emitEntity(SeriesEvents.Created.TYPE, series);
 
-    return serie;
+    return series;
   }
 }
 

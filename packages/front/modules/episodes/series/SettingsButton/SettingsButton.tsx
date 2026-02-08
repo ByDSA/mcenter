@@ -16,8 +16,8 @@ type Props = PropsOf<typeof UploadEpisodesContextMenuItemCurrentCtx> & {
   seriesId: string;
 };
 
-export const SeriesSettingsButton =
-  ( { onUpdate, onDelete, onUploadEachEpisode: onUpload, seriesId }: Props) => {
+export const SeriesSettingsButton = ( { onUpdate, onDelete,
+  onUploadEachEpisode: onUpload, seriesId }: Props) => {
   const { openMenu } = useContextMenuTrigger();
   const { data } = useSeries(seriesId);
 

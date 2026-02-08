@@ -1,7 +1,7 @@
 import fs, { Dirent } from "node:fs";
 import path from "node:path";
 import { GetEpisodeIdOptions, getEpisodeKeyFromFilePath, splitSeasonEpisodeFromEpisodeKey } from "$shared/models/episodes/episode-code";
-import { EpisodeNode, SeasonNode, SerieNode, SerieTree } from "./models";
+import { EpisodeNode, SeasonNode, SeriesNode, SerieTree } from "./models";
 
 type Options = {
   baseFolder?: string;
@@ -13,7 +13,7 @@ export function findAllSerieFolderTreesAt(
 ): SerieTree {
   const baseFolder = options?.baseFolder ?? "";
   const seriesNames = readFolderNamesIn(folderFullPath);
-  const series: SerieNode[] = [];
+  const manySeries: SeriesNode[] = [];
 
   seriesNames.forEach(serieFolderName => {
     const serieFolderFullPath = path.join(folderFullPath, serieFolderName);
@@ -65,16 +65,16 @@ export function findAllSerieFolderTreesAt(
 
     checkDuplicatedEpisodeId(episodesInSerie);
 
-    const serie: SerieNode = {
+    const series: SeriesNode = {
       key: serieFolderName,
       children: seasonsInSerie,
     };
 
-    series.push(serie);
+    manySeries.push(series);
   } );
 
   return {
-    children: series,
+    children: manySeries,
   };
 }
 
@@ -100,7 +100,7 @@ function readFolderNamesIn(folderFullPath: string): string[] {
   const folders = folderContent.filter(
     folder => folder.isDirectory() && !folder.name.startsWith("."),
   );
-  const foldersPaths = folders.map(serie => serie.name);
+  const foldersPaths = folders.map(series => series.name);
 
   return foldersPaths;
 }

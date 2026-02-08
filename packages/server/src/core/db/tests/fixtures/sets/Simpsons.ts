@@ -1,4 +1,4 @@
-import { SERIE_SIMPSONS } from "$sharedSrc/models/episodes/series/tests/fixtures";
+import { SERIES_SIMPSONS } from "$sharedSrc/models/episodes/series/tests/fixtures";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
@@ -18,7 +18,7 @@ const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 const EPISODE_FILE_INFO_SIMPSONS = fixtureEpisodeFileInfos.Simpsons.List;
 const loadFixtureSerieAndEpisodesSimpsons = async () => {
   // Series
-  const seriesDocOdm: SeriesOdm.FullDoc[] = [SERIE_SIMPSONS].map(SeriesOdm.toFullDoc);
+  const seriesDocOdm: SeriesOdm.FullDoc[] = [SERIES_SIMPSONS].map(SeriesOdm.toFullDoc);
 
   await SeriesOdm.Model.insertMany(seriesDocOdm);
 

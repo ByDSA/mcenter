@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import assert from "assert";
-import { createPaginatedResultResponseSchema } from "$shared/utils/http/responses";
+import { createPaginatedResultResponseSchema, PaginatedResult } from "$shared/utils/http/responses";
 import { PATH_ROUTES } from "$shared/routing";
 import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { makeFetcher } from "#modules/fetching/fetcher";
@@ -73,7 +73,7 @@ export class ImageCoversApi {
     const ret = await fetcher( {
       url: URL,
       body: criteria,
-    } );
+    } ) as any as PaginatedResult<ImageCoverEntity>;
 
     if (ret.data) {
       for (const im of ret.data)

@@ -3,13 +3,13 @@ import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesAdminModule } from "#episodes/admin/module";
-import { EpisodeHistoryModule } from "#episodes/history/module";
+import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { StreamPickerModule } from "#episodes/streams/picker/module";
-import { StreamsModule } from "#episodes/streams/module";
+import { StreamsCrudModule } from "#episodes/streams/crud/module";
 import { PlayerModule } from "#modules/player/module";
 import { ConfigModule } from "#modules/config/config.module";
 import { StaticFilesModule } from "#modules/config/static-files.module";
-import { EpisodeDependenciesModule } from "#episodes/dependencies/module";
+import { EpisodeDependenciesModule } from "#episodes/dependencies/crud/module";
 import { MusicsGetRandomModule } from "#musics/picker/module";
 import { MusicPlaylistsModule } from "#musics/playlists/module";
 import { MusicsSlugModule } from "#musics/slug/module";
@@ -28,10 +28,12 @@ import { ImageCoversCrudModule } from "#modules/image-covers/crud/module";
 import { ImageCoversAdminModule } from "#modules/image-covers/admin/module";
 import { MusicSmartPlaylistsCrudModule } from "#musics/smart-playlists/crud/module";
 import { MusicUsersListsModule } from "#musics/users-lists/crud/module";
-import { SeriesCrudModule } from "#episodes/series/module";
+import { SeriesCrudModule } from "#episodes/series/crud/module";
 import { ImageCoversUploadModule } from "#modules/image-covers/upload/module";
 import { EpisodeFileInfosUploadModule } from "#episodes/file-info/upload/module";
 import { MusicFileInfoUploadModule } from "#musics/file-info/upload/module";
+import { EpisodeLastTimePlayedModule } from "#episodes/history/last-time-played/module";
+import { StreamsFixerModule } from "#episodes/streams/fixer/module";
 import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
@@ -55,10 +57,11 @@ export const directImports = [
 
   EpisodesSlugModule,
   EpisodesAdminModule,
+  EpisodeLastTimePlayedModule,
   EpisodeFileInfosCrudModule,
-  EpisodeFileInfosUploadModule,
   EpisodesCrudModule, // Al final, para que no interfiera con slugs
   SeriesCrudModule,
+  EpisodeFileInfosUploadModule,
 
   PlayerModule,
 
@@ -97,7 +100,7 @@ const episodesRoutes: Routes = [
   },
   {
     path: PATH_ROUTES.episodes.history.path,
-    module: EpisodeHistoryModule,
+    module: EpisodeHistoryCrudModule,
   },
   {
     path: PATH_ROUTES.episodes.fileInfo.path,
@@ -117,7 +120,11 @@ const episodesRoutes: Routes = [
   },
   {
     path: PATH_ROUTES.streams.path,
-    module: StreamsModule,
+    module: StreamsCrudModule,
+  },
+  {
+    path: PATH_ROUTES.streams.fixer.path,
+    module: StreamsFixerModule,
   },
   {
     path: PATH_ROUTES.streams.path,

@@ -9,17 +9,18 @@ import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserPayload } from "$shared/models/auth";
 import { slugSchema } from "$shared/models/utils/schemas/slug";
+import { musicPlaylistEntitySchema } from "../models";
+import { MusicPlaylistCrudDtos } from "../models/dto";
+import { MusicPlaylistsRepository } from "./repository/repository";
 import { GetManyCriteria, GetOneCriteria, UserDeleteOne, UserPatchOne, UserPost, UserCreateOne, GetOneById } from "#utils/nestjs/rest";
-import { ResponseFormat, ResponseFormatterService } from "#modules/resources/response-formatter";
+import { ResponseFormat } from "#modules/resources/response-formatter";
 import { assertFoundClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { MusicRendererService } from "#musics/renderer/render.service";
 import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { IdParamDto } from "#utils/validation/dtos";
-import { musicPlaylistEntitySchema } from "../models";
-import { MusicPlaylistCrudDtos } from "../models/dto";
-import { MusicPlaylistsRepository } from "./repository/repository";
+import { MusicResponseFormatterService } from "#modules/resources/response-formatter/music-response-formatter.service";
 
 type GuardVisibilityBySlugProps = {
   requestUserId: string | undefined;
@@ -99,7 +100,7 @@ class CreateOnePlaylistsBody extends createZodDto(
 export class MusicPlaylistsController {
   constructor(
     private readonly playlistsRepo: MusicPlaylistsRepository,
-    private readonly responseFormatter: ResponseFormatterService,
+    private readonly responseFormatter: MusicResponseFormatterService,
     private readonly musicHistoryRepo: MusicHistoryRepository,
     private readonly musicRenderer: MusicRendererService,
   ) {

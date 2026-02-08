@@ -7,13 +7,13 @@ import { map } from "rxjs/operators";
 import { Request, Response } from "express";
 import { Reflector } from "@nestjs/core";
 import { M3U8_FORMAT_USE_NEXT } from "./use-next.decorator";
-import { ResponseFormatterService, FormatResponseOptions } from "./response-formatter.service";
+import { EpisodeResponseFormatterService, FormatResponseOptions } from "./episode-response-formatter.service";
 
 @Injectable()
-export class ResponseFormatInterceptor implements NestInterceptor {
+export class EpisodeResponseFormatInterceptor implements NestInterceptor {
   constructor(
     private readonly reflector: Reflector,
-    private readonly responseFormatter: ResponseFormatterService,
+    private readonly responseFormatter: EpisodeResponseFormatterService,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -34,7 +34,8 @@ export class ResponseFormatInterceptor implements NestInterceptor {
         switch (format) {
           case "m3u8":
             return this.responseFormatter.formatM3u8Response( {
-              data,
+              episode: data,
+              serieName: "Series Name", // TODO
               request,
               response,
               options,

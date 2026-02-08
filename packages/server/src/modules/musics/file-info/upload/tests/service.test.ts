@@ -3,7 +3,7 @@ import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { MusicEntity } from "$shared/models/musics";
 import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
-import { createMockProvider } from "#utils/nestjs/tests";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import * as cryptUtils from "#utils/crypt";
 import { MusicsRepository } from "#musics/crud/repositories/music";
@@ -57,8 +57,8 @@ describe("musicFileInfoUploadRepository", () => {
       controllers: [],
       providers: [
         MusicFileInfoUploadRepository,
-        createMockProvider(MusicFileInfoRepository),
-        createMockProvider(MusicsRepository),
+        getOrCreateMockProvider(MusicFileInfoRepository),
+        getOrCreateMockProvider(MusicsRepository),
       ],
     } );
 

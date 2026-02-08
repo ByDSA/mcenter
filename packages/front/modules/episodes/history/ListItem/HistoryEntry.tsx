@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import { EpisodeEntity } from "$shared/models/episodes";
 import { PATH_ROUTES } from "$shared/routing";
+import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
 import { HistoryTimeView, WeightView } from "#modules/history";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
@@ -13,6 +14,8 @@ import { useImageCover } from "#modules/image-covers/hooks";
 import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import { useEpisode } from "#modules/episodes/hooks";
 import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryLoading";
+import { useSeries } from "#modules/episodes/series/hooks";
+import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { EpisodeLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem";
 import { EditEpisodeContextMenuItem } from "../../Edit/ContextMenu";
 import { DeleteHistoryEntryContextMenuItem } from "../Delete/Delete";
@@ -29,22 +32,29 @@ export const EpisodeHistoryEntryElement = React.memo((
   { episodeId, historyEntry, onDelete }: Props,
 ) =>{
   const { data: episode } = useEpisode(episodeId);
+  const { data: series } = useSeries(episode?.seriesId ?? null, {
+    debounce: true,
+    notExpandCountEpisodes: true,
+    notExpandCountSeasons: true,
+    notExpandImageCover: true,
+  } );
+  const imageCoverId = episode?.imageCoverId ?? series?.imageCoverId;
+  const { data: imageCover } = useImageCover(imageCoverId ?? null, {
+    debounce: true,
+  } );
   const { openMenu } = useContextMenuTrigger();
-  const { data: imageCover } = useImageCover(
-    episode?.imageCoverId ?? episode?.serie?.imageCoverId ?? null,
-  );
 
-  if (!episode)
+  if (!episode || !series || (imageCoverId && !imageCover))
     return <ResourceEntryLoading />;
 
   return <ResourceEntry
     mainTitle={episode.title}
     subtitle={<EpisodeSubtitle episode={episode} />}
     right={<>
-      <HistoryTimeView timestamp={historyEntry.date.timestamp} />
+      <HistoryTimeView timestamp={dateToTimestampInSeconds(historyEntry.date)} />
       {episode.userInfo && <WeightView weight={episode.userInfo.weight} />}
     </>}
-    imageCover={imageCover ?? null}
+    imageCover={imageCover}
     imageCoverDefaultIcon={{
       element: <SeriesIcon />,
     }}
@@ -58,7 +68,8 @@ export const EpisodeHistoryEntryElement = React.memo((
               label="Copiar backend URL"
               onClick={async (event) => {
                 event.stopPropagation();
-                const { episodeKey, seriesKey } = episode.compKey;
+                const { episodeKey } = episode;
+                const { key: seriesKey } = series;
 
                 await copyText(
                   backendUrl(
@@ -70,7 +81,7 @@ export const EpisodeHistoryEntryElement = React.memo((
             />
             <EpisodeLatestViewsContextMenuItem
               episodeId={episode.id}
-              maxTimestamp={historyEntry.date.timestamp}
+              maxTimestamp={dateToTimestampInSeconds(historyEntry.date)}
             />
             <DeleteHistoryEntryContextMenuItem value={historyEntry} onActionSuccess={onDelete}/>
           </>,
@@ -84,11 +95,21 @@ type EpisodeSubtitleProps = {
   episode: EpisodeEntity;
 };
 export const EpisodeSubtitle = memo(( { episode }: EpisodeSubtitleProps) => {
+  const { data: series } = useSeries(episode.seriesId, {
+    debounce: true,
+    notExpandCountEpisodes: true,
+    notExpandCountSeasons: true,
+    notExpandImageCover: true,
+  } );
+
+  if (!series)
+    return <ContentSpinner />;
+
   return <ResourceSubtitle items={[{
-    text: episode.serie?.name!,
+    text: series.name,
     className: classes(styles.subtitle, "ellipsis"),
   }, {
-    text: episode.compKey.episodeKey,
+    text: episode.episodeKey,
     className: classes(styles.subtitle),
   }]} />;
 } );

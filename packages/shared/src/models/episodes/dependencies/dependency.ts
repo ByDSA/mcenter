@@ -1,11 +1,11 @@
 import z from "zod";
 import { mongoDbId } from "../../resources/partial-schemas";
 import { genAssertZod } from "../../../utils/validation/zod";
-import { episodeEntitySchema, episodeCompKeySchema } from "..";
+import { episodeEntitySchema } from "..";
 
 const schema = z.object( {
-  lastCompKey: episodeCompKeySchema,
-  nextCompKey: episodeCompKeySchema,
+  lastEpisodeId: mongoDbId,
+  nextEpisodeId: mongoDbId,
 } ).strict();
 
 type Model = z.infer<typeof schema>;

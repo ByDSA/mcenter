@@ -8,7 +8,7 @@ const schema = z.object( {
   userId: mongoDbId,
   weight: z.number(),
   tags: z.array(z.string()).optional(),
-  lastTimePlayed: z.number(),
+  lastTimePlayed: dateSchema.nullable(),
   createdAt: dateSchema,
   updatedAt: dateSchema,
 } );

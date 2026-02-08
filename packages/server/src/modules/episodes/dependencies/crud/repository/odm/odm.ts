@@ -3,8 +3,8 @@ import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
 import { OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 
 type DocOdm = OptionalId & {
-  lastCompKey: EpisodeOdm.EpisodeCompKey;
-  nextCompKey: EpisodeOdm.EpisodeCompKey;
+ lastEpisodeId: mongoose.Types.ObjectId;
+  nextEpisodeId: mongoose.Types.ObjectId;
 };
 
 type FullDocOdm = RequireId<DocOdm> & {
@@ -16,25 +16,13 @@ const NAME = "EpisodeDependency";
 
 export const COLLECTION = "episode_dependencies";
 const schemaOdm = new mongoose.Schema<DocOdm>( {
-  lastCompKey: {
-    episodeKey: {
-      type: String,
-      required: true,
-    },
-    seriesKey: {
-      type: String,
-      required: true,
-    },
+  lastEpisodeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
   },
-  nextCompKey: {
-    episodeKey: {
-      type: String,
-      required: true,
-    },
-    seriesKey: {
-      type: String,
-      required: true,
-    },
+  nextEpisodeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
   },
 } satisfies SchemaDef<DocOdm>, {
   collection: COLLECTION,
@@ -43,8 +31,7 @@ const schemaOdm = new mongoose.Schema<DocOdm>( {
 
 schemaOdm.index(
   {
-    "lastCompKey.seriesKey": 1,
-    "lastCompKey.episodeKey": 1,
+    lastEpisodeId: 1,
   },
   {
     unique: true,

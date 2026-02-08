@@ -1,13 +1,13 @@
-import { Series, SeriesEntity } from "../serie";
+import { Series, SeriesEntity } from "../series";
 
-export function expectSerie(actual: Series, expeted: Series) {
+export function expectSeries(actual: Series, expeted: Series) {
   if (actual.name !== expeted.name && actual.key !== expeted.key)
-    throw new Error(`Serie name mismatch: ${actual.name} !== ${expeted.name}`);
+    throw new Error(`Series name mismatch: ${actual.name} !== ${expeted.name}`);
 }
 
-export function expectSerieEntity(actual: SeriesEntity, expeted: SeriesEntity) {
+export function expectSeriesEntity(actual: SeriesEntity, expeted: SeriesEntity) {
   if (actual.id !== expeted.id)
-    throw new Error(`Serie id mismatch: ${actual.id} !== ${expeted.id}`);
+    throw new Error(`Series id mismatch: ${actual.id} !== ${expeted.id}`);
 
-  expectSerie(actual, expeted);
+  expectSeries(actual, expeted);
 }

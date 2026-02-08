@@ -14,10 +14,11 @@ type Options = {
 
 export function episodeToMediaElement(
   episode: EpisodeEntity,
+  seriesKey: string,
   options?: Options,
 ): MediaElement {
-  const artist = episode.serie?.name ?? episode.compKey.seriesKey;
-  const title = `${episode.compKey.episodeKey} - ${episode.title}`;
+  const artist = episode.series?.name ?? seriesKey;
+  const title = `${episode.episodeKey} - ${episode.title}`;
   const fileInfo = episode.fileInfos?.[0];
   const length = calculateEpisodeFileInfoLength(fileInfo);
   const isLocal = options?.local ?? false;
@@ -28,8 +29,8 @@ export function episodeToMediaElement(
     path = fileInfo.path;
   } else {
     path = PATH_ROUTES.episodes.slug.withParams(
-      episode.compKey.seriesKey,
-      episode.compKey.episodeKey,
+      seriesKey,
+      episode.episodeKey,
       {
         format: ResponseFormat.RAW,
         token: options?.token,

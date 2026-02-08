@@ -1,17 +1,17 @@
 import type { QueryDto } from "./play-stream/controller";
 import { Injectable } from "@nestjs/common";
-import { EpisodeCompKey, EpisodeEntityWithFileInfos } from "$shared/models/episodes";
+import { EpisodeEntityWithFileInfos } from "$shared/models/episodes";
 import { episodeToMediaElement } from "$shared/models/player";
 import { mediaElementFixPlayerLabels } from "$shared/models/resources";
-import { assertFoundClient, assertIsNotEmptyClient } from "#utils/validation/found";
+import { assertFoundClient, assertFoundServer, assertIsNotEmptyClient } from "#utils/validation/found";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { EpisodePickerService } from "#episodes/streams/picker";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { EpisodeEntity } from "#episodes/models";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { SeriesRepository } from "#episodes/series/crud/repository";
-import { RemotePlayersRepository } from "./player-services/repository";
 import { PlayService } from "./play.service";
+import { RemotePlayersRepository } from "./player-services/repository";
 
 type ProcessAndPlayEpisodesProps = {
   remotePlayerId: string;
@@ -21,13 +21,13 @@ type ProcessAndPlayEpisodesProps = {
 };
 type PlayEpisodeProps = {
   remotePlayerId: string;
-  episodeCompKey: EpisodeCompKey;
+  episodeId: string;
   query: QueryDto;
 };
 type PlayEpisodeStreamProps = {
   userId: string;
   remotePlayerId: string;
-  streamId: string;
+  streamKey: string;
   query: QueryDto;
 };
 @Injectable()
@@ -46,16 +46,21 @@ export class PlayVideoService {
     remotePlayerId,
     streamId,
     force }: ProcessAndPlayEpisodesProps): Promise<EpisodeEntityWithFileInfos[]> {
-    const mediaElements = episodes.map((e) => {
-      const mediaElement = episodeToMediaElement(e, {
+    const mediaElements = [];
+
+    for (const e of episodes) {
+      const series = await this.seriesRepo.getOneById(e.seriesId);
+
+      assertFoundServer(series);
+      const mediaElement = episodeToMediaElement(e, series.name, {
         local: true,
       } );
 
       // TODO: quitar de db "series" del path y ponerlo aquí
       mediaElement.path = `${mediaElement.path}`;
 
-      return mediaElementFixPlayerLabels(mediaElement);
-    } );
+      mediaElements.push(mediaElementFixPlayerLabels(mediaElement));
+    }
 
     assertIsNotEmptyClient(mediaElements);
     await this.playService.play( {
@@ -67,7 +72,10 @@ export class PlayVideoService {
     const userIds = await this.remotePlayersRepo.getAllViewersOf(remotePlayerId);
 
     for (const userId of userIds) {
-      const isLast = await this.historyRepo.isLast(episodes[0].id, userId);
+      const options = {
+        requestingUserId: userId,
+      };
+      const isLast = await this.historyRepo.isLast(episodes[0].id, options);
       const episodesToAddInHistory: EpisodeEntity[] = isLast
         ? episodes.slice(1)
         : episodes;
@@ -75,14 +83,15 @@ export class PlayVideoService {
       await this.historyRepo.addEpisodesToHistory( {
         episodes: episodesToAddInHistory,
         streamId,
-        userId,
-      } );
+      }, options);
     }
 
     return episodes;
   }
 
-  async playEpisodeStream( { query, remotePlayerId, streamId, userId }: PlayEpisodeStreamProps) {
+  async playEpisodeStream(
+    { query, remotePlayerId, streamKey: streamId, userId }: PlayEpisodeStreamProps,
+  ) {
     const { force } = query;
     const stream = await this.streamsRepo.getOneByKey(userId, streamId);
 
@@ -96,10 +105,7 @@ export class PlayVideoService {
       number = query.n;
 
     const episodes = (await this.episodePickerService.getByStream(stream, number ?? 1, {
-      requestingUserId: userId,
-      criteria: {
-        expand: ["series", "fileInfos"],
-      },
+      expand: ["series", "fileInfos"],
     } ))
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
 
@@ -115,32 +121,29 @@ export class PlayVideoService {
     );
   }
 
-  async playEpisode( { episodeCompKey, query, remotePlayerId }: PlayEpisodeProps) {
+  async playEpisode( { episodeId, query, remotePlayerId }: PlayEpisodeProps) {
     const { force } = query;
-    const { episodeKey, seriesKey } = episodeCompKey;
-    const serie = await this.seriesRepo.getOneByKey(seriesKey);
-
-    assertFoundClient(serie);
     const remotePlayer = await this.remotePlayersRepo.getOneById(remotePlayerId);
 
     assertFoundClient(remotePlayer);
     const requestingUserId = remotePlayer.ownerId.toString();
     const episodes = [await this.episodesRepo
-      .getOneByCompKey( {
-        seriesKey,
-        episodeKey,
+      .getOneById(episodeId, {
+        expand: ["series", "fileInfos"],
       }, {
-        criteria: {
-          expand: ["series", "fileInfos"],
-        },
         requestingUserId,
       } )]
       .filter(Boolean) as EpisodeEntityWithFileInfos[];
 
     assertFoundClient(episodes[0]);
-    const stream = await this.streamsRepo.getOneOrCreateBySeriesKey(
+    assertFoundClient(episodes[0].series);
+    assertFoundClient(episodes[0].fileInfos);
+    const { series } = episodes[0];
+
+    assertFoundClient(series);
+    const stream = await this.streamsRepo.getOneOrCreateBySeriesId(
       requestingUserId,
-      seriesKey,
+      series.id,
     );
 
     return this.processAndPlayEpisodes( {

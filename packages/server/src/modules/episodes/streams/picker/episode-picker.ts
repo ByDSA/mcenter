@@ -22,7 +22,7 @@ class EpisodePickerRandom extends ResourcePickerRandom<EpisodeEntityWithUserInfo
     } );
   }
 
-  setLastTimePlayed(resource: EpisodeEntityWithUserInfo, time: number): void {
+  setLastTimePlayed(resource: EpisodeEntityWithUserInfo, time: Date): void {
     resource.userInfo.lastTimePlayed = time;
   }
 }

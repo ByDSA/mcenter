@@ -6,6 +6,7 @@ import { UserCreateOne, UserPatchOne, AdminDeleteOne, GetAll, GetManyCriteria, G
 import { User } from "#core/auth/users/User.decorator";
 import { episodesBySeasonSchema } from "#episodes/models";
 import { IdParamDto } from "#utils/validation/dtos";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { seriesEntitySchema } from "../models";
 import { SeriesRepository } from "./repository";
 
@@ -18,6 +19,7 @@ class GetManyBody extends createZodDto(SeriesCrudDtos.GetMany.criteriaSchema) {}
 export class SeriesCrudController {
   constructor(
     private readonly repo: SeriesRepository,
+    private readonly episodesRepo: EpisodesRepository,
   ) {}
 
   @GetAll(seriesEntitySchema)
@@ -48,12 +50,15 @@ export class SeriesCrudController {
     @Param() params: IdParamDto,
     @User() user: UserPayload | null,
   ) {
-    const ret = await this.repo.getSeasonsById(params.id, {
-      requestingUserId: user?.id,
-      criteria: {
+    const ret = await this.episodesRepo.getSeasonsById(
+      params.id,
+      {
         expand: ["fileInfos", ...(user ? ["userInfo" as any] : [])],
       },
-    } );
+      {
+        requestingUserId: user?.id,
+      },
+    );
 
     episodesBySeasonSchema.parse(ret);
 

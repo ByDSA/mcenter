@@ -4,8 +4,8 @@ import { EpisodeEntityWithUserInfo } from "#episodes/models";
 const SECONDS_IN_DAY = 24 * 60 * 60;
 
 class LastTimeEpisodeWeightFixer extends LastTimeWeightFixer<EpisodeEntityWithUserInfo> {
-  getLastTimePlayed(r: EpisodeEntityWithUserInfo): number {
-    return r.userInfo.lastTimePlayed ?? 0;
+  getLastTimePlayed(r: EpisodeEntityWithUserInfo): Date | null {
+    return r.userInfo.lastTimePlayed;
   }
 }
 

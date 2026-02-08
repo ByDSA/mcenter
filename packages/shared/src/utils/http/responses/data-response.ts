@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import z from "zod";
 import { errorElementResponseSchema } from "./error-element";
 
@@ -25,19 +26,25 @@ export function createManyResultResponseSchema<T extends z.ZodSchema>(schema: T)
     } );
 }
 
-export function createPaginatedResultResponseSchema<T extends z.ZodSchema>(schema: T) {
-  return createManyResultResponseSchema(schema)
-    .extend( {
-      metadata: z.object( {
-        totalCount: z.number().optional(),
-      } ).optional(),
-    } );
+export function createPaginatedResultResponseSchema<
+  T extends z.ZodSchema,
+  U extends z.ZodRawShape = {}
+>(schema: T, metadataSchema?: z.ZodObject<U>) {
+  const baseMetadata = z.object( {
+    totalCount: z.number().optional(),
+  } );
+  const metadata = metadataSchema
+    ? baseMetadata.merge(metadataSchema)
+    : baseMetadata;
+
+  return createManyResultResponseSchema(schema).extend( {
+    metadata: metadata.optional(),
+  } );
 }
 
-export type PaginatedResult<T = any> = Omit<z.infer<
-ReturnType<typeof createPaginatedResultResponseSchema<any>>
->, "data"> & {
+export type PaginatedResult<T, M = {}> = {
   data: T[];
+  metadata?: M & { totalCount?: number };
 };
 
 export function createSuccessResultResponse<T>(data: T): ResultResponse<T> {

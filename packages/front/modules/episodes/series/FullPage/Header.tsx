@@ -1,7 +1,6 @@
 import type { SeriesFullPageProps } from "./Series";
 import { useRouter } from "next/navigation";
 import { PATH_ROUTES } from "$shared/routing";
-import { assertIsDefined } from "$shared/utils/validation";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import { useImageCover } from "#modules/image-covers/hooks";
@@ -24,14 +23,11 @@ export const SeriesHeader = ( { seriesId,
   if (!series)
     return <ContentSpinner />;
 
-  assertIsDefined(series.countSeasons);
-  assertIsDefined(series.countEpisodes);
-
   const infoItems = [
-    <span key="seasons">{series.countSeasons} {series.countSeasons === 1
+    <span key="seasons">{series.metadata?.countSeasons ?? "-"} {series.metadata?.countSeasons === 1
       ? "temporada"
       : "temporadas"}</span>,
-    <span key="episodes">{series.countEpisodes} episodios</span>,
+    <span key="episodes">{series.metadata?.countEpisodes ?? "-"} episodios</span>,
     <DateTag key="date" date={series.addedAt} />,
   ];
 

@@ -45,9 +45,8 @@ export class EpisodesCrudController {
     @Body() body: GetManyBodyDto,
     @User() user: UserPayload | null,
   ) {
-    return await this.episodesRepo.getMany( {
+    return await this.episodesRepo.getMany(body, {
       requestingUserId: user?.id,
-      criteria: body,
     } );
   }
 

@@ -11,8 +11,9 @@ import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repos
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfosRepository } from "#episodes/file-info/crud/repository/repository";
-import { DependenciesList, dependenciesToList } from "./appliers/dependencies";
+import { assertFoundServer } from "#utils/validation/found";
 import { buildEpisodePicker } from "./episode-picker";
+import { DependenciesList } from "./appliers/dependencies";
 
 @Injectable()
 export class StreamGetRandomEpisodeService {
@@ -41,9 +42,7 @@ export class StreamGetRandomEpisodeService {
       stream,
       n,
       {
-        criteria: {
-          expand: ["series", "fileInfos"],
-        },
+        expand: ["series", "fileInfos"],
       },
     );
 
@@ -53,29 +52,32 @@ export class StreamGetRandomEpisodeService {
   async getByStream(
     stream: StreamEntity,
     n = 1,
-    props?: Parameters<typeof this.episodesRepo
+    criteria?: Parameters<typeof this.episodesRepo
       .getManyBySerieKey>[1],
   ): Promise<EpisodeEntity[]> {
     const seriesKey = getSeriesKeyFromStream(stream);
 
     assertIsDefined(seriesKey);
-    props ??= {
-      criteria: {},
-    };
+
+    criteria ??= {};
 
     if (stream.mode === StreamMode.SEQUENTIAL) {
-      props.criteria.sort = {
+      criteria.sort = {
         episodeCompKey: "asc",
       };
     }
 
+    const series = await this.seriesRepo.getOneByKey(seriesKey);
+
+    assertFoundServer(series);
     const allEpisodesInSerie: EpisodeEntityWithUserInfo[] = await this.episodesUsersRepo
-      .getFullSerieForUser( {
-        userId: stream.userId,
-        seriesKey,
-      }, props);
+      .getFullSerieForUser(series.id, {
+        requestingUserId: stream.userId,
+      }, criteria);
     const lastEntry = await this.historyRepo.findLast( {
       streamId: stream.id,
+    }, {
+      requestingUserId: stream.userId,
     } );
     const lastPlayedEpInSerieId = lastEntry?.resourceId;
     const lastPlayedEpInSerie: EpisodeEntityWithUserInfo | null = lastPlayedEpInSerieId
@@ -87,7 +89,7 @@ export class StreamGetRandomEpisodeService {
     let dependencies: DependenciesList | undefined;
 
     if (mode === PickMode.RANDOM)
-      dependencies = dependenciesToList(await this.dependenciesRepo.getAll());
+      dependencies = await this.dependenciesRepo.getAll();
 
     const picker: ResourcePicker<EpisodeEntityWithUserInfo> = buildEpisodePicker( {
       mode,
@@ -97,17 +99,17 @@ export class StreamGetRandomEpisodeService {
     } );
     const episodes = await picker.pick(n);
 
-    if (props.criteria.expand) {
+    if (criteria.expand) {
       for (const e of episodes) {
-        if (props.criteria.expand.includes("series")) {
-          const gotSerie = await this.seriesRepo.getOneByKey(e.compKey.seriesKey);
+        if (criteria.expand.includes("series")) {
+          const gotSeries = await this.seriesRepo.getOneById(e.seriesId);
 
-          assertIsDefined(gotSerie);
+          assertIsDefined(gotSeries);
 
-          e.serie = gotSerie;
+          e.series = gotSeries;
         }
 
-        if (props.criteria.expand.includes("fileInfos")) {
+        if (criteria.expand.includes("fileInfos")) {
           const gotFileInfos = await this.fileInfosRepo.getAllByEpisodeId(e.id);
 
           assertIsNotEmpty(gotFileInfos);

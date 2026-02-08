@@ -1,5 +1,4 @@
 import type { FilterApplier } from "./filters";
-import { DateTime } from "luxon";
 import { Picker, newPicker } from "rand-picker";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
 import { EpisodeFilterApplier } from "#episodes/streams/picker/appliers/filter-applier";
@@ -34,7 +33,7 @@ export abstract class ResourcePickerRandom<R extends L, L = R> implements Resour
       assertIsDefined(resource, "Picker has no data");
 
       if (i < n - 1) {
-        this.setLastTimePlayed(resource, Math.floor(DateTime.now().toSeconds()));
+        this.setLastTimePlayed(resource, new Date());
 
         lastOne = resource;
       }
@@ -45,7 +44,7 @@ export abstract class ResourcePickerRandom<R extends L, L = R> implements Resour
     return ret;
   }
 
-  abstract setLastTimePlayed(resource: R, time: number): void;
+  abstract setLastTimePlayed(resource: R, time: Date): void;
 }
 
 export async function genRandomPickerWithData<R, L>(
@@ -60,7 +59,7 @@ export async function genRandomPickerWithData<R, L>(
     newFilterApplier = new EpisodeFilterApplier( {
       dependencies: filterApplier.dependencies,
       lastEp: lastOne as EpisodeEntityWithUserInfo | undefined ?? null,
-      lastId: (lastOne as unknown as EpisodeEntity).compKey,
+      lastId: (lastOne as unknown as EpisodeEntity).id,
       resources: resources as unknown as EpisodeEntityWithUserInfo[],
     } ) as unknown as FilterApplier<R>;
   }

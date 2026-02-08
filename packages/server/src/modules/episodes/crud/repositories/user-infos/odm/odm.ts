@@ -7,7 +7,7 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & {
   _id?: mongoose.Types.ObjectId;
   weight: number;
   tags?: string[];
-  lastTimePlayed: number;
+  lastTimePlayed: Date | null;
   userId: mongoose.Types.ObjectId;
   episodeId: mongoose.Types.ObjectId;
 };
@@ -38,8 +38,8 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     default: undefined,
   },
   lastTimePlayed: {
-    type: Number,
-    default: 0,
+    type: Date,
+    default: null,
   },
 } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {
   collection: COLLECTION,

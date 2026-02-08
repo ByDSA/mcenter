@@ -2,15 +2,19 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from 
 import { createZodDto } from "nestjs-zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { UserPayload } from "$shared/models/auth";
-import { EpisodeCompKey, episodeCompKeySchema } from "#episodes/models";
-import { Authenticated } from "#core/auth/users/Authenticated.guard";
+import z from "zod";
 import { User } from "#core/auth/users/User.decorator";
+import { Authenticated } from "#core/auth/users/Authenticated.guard";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
+import { assertFoundClient } from "#utils/validation/found";
 import { PlayVideoService } from "../play-video.service";
 import { QueryDto } from "../play-stream/controller";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { SecretTokenBodyDto } from "../model";
 
-class ParamsDto extends createZodDto(episodeCompKeySchema.extend( {
+class ParamsDto extends createZodDto(z.object( {
+  seriesKey: z.string(),
+  episodeKey: z.string(),
   remotePlayerId: mongoDbId,
 } )) {}
 
@@ -18,6 +22,7 @@ class ParamsDto extends createZodDto(episodeCompKeySchema.extend( {
 export class PlayEpisodeController {
   constructor(
     private readonly playService: PlayVideoService,
+    private readonly episodesRepo: EpisodesRepository,
     private readonly auth: AuthPlayerService,
   ) {
   }
@@ -33,14 +38,17 @@ export class PlayEpisodeController {
       userId: user.id,
       remotePlayerId: params.remotePlayerId,
     } );
-    const compKey: EpisodeCompKey = {
-      episodeKey: params.episodeKey,
-      seriesKey: params.seriesKey,
-    };
+
+    const episode = await this.episodesRepo.getOneBySeriesKeyAndEpisodeKey(
+      params.seriesKey,
+      params.episodeKey,
+    );
+
+    assertFoundClient(episode);
 
     return await this.playService.playEpisode( {
       remotePlayerId: params.remotePlayerId,
-      episodeCompKey: compKey,
+      episodeId: episode.id,
       query,
     } );
   }
@@ -57,14 +65,16 @@ export class PlayEpisodeController {
         remotePlayerId: params.remotePlayerId,
         secretToken: body.secretToken,
       } );
-      const compKey: EpisodeCompKey = {
-        episodeKey: params.episodeKey,
-        seriesKey: params.seriesKey,
-      };
+      const episode = await this.episodesRepo.getOneBySeriesKeyAndEpisodeKey(
+        params.seriesKey,
+        params.episodeKey,
+      );
+
+      assertFoundClient(episode);
 
       return await this.playService.playEpisode( {
         remotePlayerId: params.remotePlayerId,
-        episodeCompKey: compKey,
+        episodeId: episode.id,
         query,
       } );
     } catch { /* empty */ }

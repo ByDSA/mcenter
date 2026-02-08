@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { getHostFromRequest } from "$shared/models/resources";
 import { Request, Response } from "express";
-import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
-import { ResourceSlugService } from "#modules/resources/slug/service";
-import { M3u8ViewOptions } from "#modules/resources/response-formatter/retource-to-media-element";
-import { ResponseFormat, ResponseFormatterService } from "../../resources/response-formatter";
+import { ResponseFormat } from "../../resources/response-formatter";
 import { MusicEntity, musicEntitySchema } from "../models";
 import { MusicFileInfoEntity } from "../file-info/models";
 import { getAbsolutePath } from "../utils";
+import { M3u8ViewOptions } from "#modules/resources/response-formatter/retource-to-media-element";
+import { ResourceSlugService } from "#modules/resources/slug/service";
+import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
+import { MusicResponseFormatterService } from "#modules/resources/response-formatter/music-response-formatter.service";
 
 type Entity = MusicEntity;
 
@@ -30,7 +31,7 @@ function getM3u8OptionsFromRequest(req: Request): M3u8ViewOptions {
 @Injectable()
 export class MusicRendererService {
   constructor(
-    private readonly responseFormatter: ResponseFormatterService,
+    private readonly responseFormatter: MusicResponseFormatterService,
     private readonly resourceSlugService: ResourceSlugService,
   ) { }
 

@@ -1,38 +1,25 @@
 import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
-import { StreamGetRandomEpisodeService } from "./get-episode.service";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
-import { episodeHistoryRepositoryMockProvider } from "#episodes/history/crud/repository/tests";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
-import { episodeRepositoryMockProvider } from "#episodes/crud/repositories/episodes/tests";
 import { StreamEntity } from "#episodes/streams";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
-import { streamsRepositoryMockProvider } from "#episodes/streams/crud/repository/tests";
-import { episodeDependenciesRepositoryMockProvider } from "#episodes/dependencies/crud/repository/tests";
 import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
 import { STREAM_SIMPSONS } from "#episodes/streams/tests";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
 import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { createMockProvider } from "#utils/nestjs/tests";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
-import { seriesRepositoryMockProvider } from "#episodes/series/crud/repository/tests";
 import { SeriesRepository } from "#episodes/series/crud/repository";
-import { episodeFileInfoRepositoryMockProvider } from "#episodes/file-info/crud/repository/tests";
+import { EpisodeFileInfoRepository } from "#episodes/file-info";
+import { StreamGetRandomEpisodeService } from "./get-episode.service";
 
 describe("streamGetRandomEpisode", () => {
   let testingSetup: TestingSetup;
   let service: StreamGetRandomEpisodeService;
-  let repos: {
-    dependencies: jest.Mocked<EpisodeDependenciesRepository>;
-    episodes: jest.Mocked<EpisodesRepository>;
-    historyEntries: jest.Mocked<EpisodeHistoryRepository>;
-    streams: jest.Mocked<StreamsRepository>;
-    episodesUsers: jest.Mocked<EpisodesUsersRepository>;
-    series: jest.Mocked<SeriesRepository>;
-    fileInfos: jest.Mocked<EpisodeDependenciesRepository>;
-  };
+  let mocks: Awaited<ReturnType<typeof initMocks>>;
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
@@ -40,41 +27,53 @@ describe("streamGetRandomEpisode", () => {
       ],
       controllers: [],
       providers: [
-        streamsRepositoryMockProvider,
-        episodeRepositoryMockProvider,
-        episodeHistoryRepositoryMockProvider,
-        episodeDependenciesRepositoryMockProvider,
-        createMockProvider(EpisodesUsersRepository),
+        getOrCreateMockProvider(StreamsRepository),
+        getOrCreateMockProvider(EpisodesRepository),
+        getOrCreateMockProvider(EpisodeHistoryRepository),
+        getOrCreateMockProvider(EpisodeDependenciesRepository),
+        getOrCreateMockProvider(EpisodesUsersRepository),
+        getOrCreateMockProvider(EpisodeFileInfoRepository),
+        getOrCreateMockProvider(SeriesRepository),
         StreamGetRandomEpisodeService,
-        seriesRepositoryMockProvider,
-        episodeFileInfoRepositoryMockProvider,
       ],
     } );
-    repos = {
-      dependencies: testingSetup.module.get(EpisodeDependenciesRepository),
-      episodes: testingSetup.module.get<jest.Mocked<EpisodesRepository>>(EpisodesRepository),
-      historyEntries: testingSetup.module.get(EpisodeHistoryRepository),
-      streams: testingSetup.module.get(StreamsRepository),
-      episodesUsers: testingSetup.module.get(EpisodesUsersRepository),
-      series: testingSetup.module.get(SeriesRepository),
-      fileInfos: testingSetup.module.get(EpisodeDependenciesRepository),
-    };
+
+    mocks = await initMocks(testingSetup);
     service = testingSetup.module.get(StreamGetRandomEpisodeService);
-    repos.episodesUsers.getFullSerieForUser.mockResolvedValue(
+    mocks.episodesUsersRepo.getFullSerieForUser.mockResolvedValue(
       fixtureEpisodes.Simpsons.ListForUser.NormalUser,
     );
+  } );
+
+  // eslint-disable-next-line require-await
+  async function initMocks(setup: TestingSetup) {
+    const ret = {
+      dependenciesRepo: setup.getMock(EpisodeDependenciesRepository),
+      episodesRepo: setup.getMock(EpisodesRepository),
+      historyEntriesRepo: setup.getMock(EpisodeHistoryRepository),
+      streamsRepo: setup.getMock(StreamsRepository),
+      episodesUsersRepo: setup.getMock(EpisodesUsersRepository),
+      seriesRepo: setup.getMock(SeriesRepository),
+      fileInfosRepo: setup.getMock(EpisodeDependenciesRepository),
+    };
+
+    return ret;
+  }
+
+  beforeEach(()=> {
+    jest.clearAllMocks();
   } );
 
   it("one dependency test", async ()=> {
     const stream: StreamEntity = STREAM_SIMPSONS;
 
-    repos.historyEntries.findLast.mockResolvedValueOnce(
+    mocks.historyEntriesRepo.findLast.mockResolvedValueOnce(
       fixtureEpisodeHistoryEntries.Simpsons.Samples.EP6x25,
     );
-    repos.episodes.getOneByCompKey.mockResolvedValueOnce(
+    mocks.episodesRepo.getOneById.mockResolvedValueOnce(
       fixtureEpisodes.Simpsons.Samples.Dependency.last,
     );
-    repos.dependencies.getAll.mockResolvedValueOnce([DEPENDENCY_SIMPSONS]);
+    mocks.dependenciesRepo.getAll.mockResolvedValueOnce([DEPENDENCY_SIMPSONS]);
 
     const ret = await service.getByStream(stream);
     const expectedNext = addUserInfo(fixtureEpisodes.Simpsons.Samples.Dependency.next);
@@ -85,10 +84,10 @@ describe("streamGetRandomEpisode", () => {
   it("two dependency test", async ()=> {
     const stream: StreamEntity = STREAM_SIMPSONS;
 
-    repos.historyEntries.findLast.mockResolvedValueOnce(
+    mocks.historyEntriesRepo.findLast.mockResolvedValueOnce(
       fixtureEpisodeHistoryEntries.Simpsons.Samples.EP6x25,
     );
-    repos.episodes.getOneByCompKey.mockResolvedValueOnce(
+    mocks.episodesRepo.getOneById.mockResolvedValueOnce(
       fixtureEpisodes.Simpsons.Samples.Dependency.last,
     );
 
@@ -96,11 +95,11 @@ describe("streamGetRandomEpisode", () => {
     const nextTwo = fixtureEpisodes.Simpsons.Samples.EP1x02;
     const nextTwoDependency: EpisodeDependencyEntity = {
       id: "1",
-      lastCompKey: nextOne.compKey,
-      nextCompKey: nextTwo.compKey,
+      lastEpisodeId: nextOne.id,
+      nextEpisodeId: nextTwo.id,
     };
 
-    repos.dependencies.getAll.mockResolvedValueOnce([DEPENDENCY_SIMPSONS, nextTwoDependency]);
+    mocks.dependenciesRepo.getAll.mockResolvedValueOnce([DEPENDENCY_SIMPSONS, nextTwoDependency]);
 
     const ret = await service.getByStream(stream, 2);
     const actualFirstWithoutLastTimePlayed = ret[0];

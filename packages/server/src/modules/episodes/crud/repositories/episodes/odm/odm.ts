@@ -1,20 +1,16 @@
 import mongoose from "mongoose";
 import { TimestampsOdm } from "#modules/resources/odm/timestamps";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
-import { MongoFilterQuery, OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
+import { OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { isTest } from "#utils";
 import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
 import { EpisodesUsersOdm } from "../../user-infos/odm";
-import { EpisodeCompKey } from "../../../../models";
 
-export type EpisodeCompKeyOdm = {
-  episodeKey: string;
-  seriesKey: string;
-};
-
-export type DocOdm = EpisodeCompKeyOdm & OptionalId & TimestampsOdm.AutoTimestamps &
+export type DocOdm = OptionalId & TimestampsOdm.AutoTimestamps &
   TimestampsOdm.NonAutoTimestamps & {
+  episodeKey: string;
+  seriesId: mongoose.Types.ObjectId;
   title: string;
   tags?: string[];
   disabled?: boolean;
@@ -24,7 +20,7 @@ export type DocOdm = EpisodeCompKeyOdm & OptionalId & TimestampsOdm.AutoTimestam
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
-  serie?: SeriesOdm.FullDoc;
+  series?: SeriesOdm.FullDoc;
   fileInfos?: EpisodeFileInfoOdm.FullDoc[];
   userInfo?: EpisodesUsersOdm.FullDoc;
   imageCover?: ImageCoverOdm.FullDoc;
@@ -39,8 +35,8 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
     type: String,
     required: true,
   },
-  seriesKey: {
-    type: String,
+  seriesId: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   uploaderUserId: {
@@ -75,25 +71,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
 } );
 
 schemaOdm.index( {
+  seriesId: 1,
   episodeKey: 1,
-  seriesKey: 1,
 }, {
   unique: true,
 } );
 
 export const ModelOdm = mongoose.model<DocOdm>(NAME, schemaOdm);
-
-export async function getIdOdmFromCompKey(compKey: EpisodeCompKey) {
-  const filter = {
-    seriesKey: compKey.seriesKey,
-    episodeKey: compKey.episodeKey,
-  } satisfies MongoFilterQuery<DocOdm>;
-  const episodeOdm = await ModelOdm.findOne(filter);
-
-  if (!episodeOdm)
-    return null;
-
-  const id = episodeOdm.toObject()._id as mongoose.Types.ObjectId;
-
-  return id;
-}

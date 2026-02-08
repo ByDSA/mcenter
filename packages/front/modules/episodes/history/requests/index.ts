@@ -28,7 +28,13 @@ export class EpisodeHistoryApi {
       },
       limit: props?.limit ?? 10,
       offset: props?.offset ?? undefined,
-      expand: ["episodes", "episodesSeries", "episodesFileInfos", "episodesUserInfo"],
+      expand: [
+        "episodes",
+        "episodesSeries",
+        "episodesSeriesImageCover",
+        "episodesFileInfos",
+        "episodesUserInfo",
+      ],
     };
     const fetcher = makeFetcher( {
       method: "POST",
@@ -60,10 +66,10 @@ export class EpisodeHistoryApi {
     } );
   }
 
-  async getLatestViews(seriesKey: string, episodeKey: string, maxTimestamp: number) {
+  async getLatestViews(seriesId: string, episodeKey: string, maxTimestamp: number) {
     const body: EpisodeHistoryEntryCrudDtos.GetMany.Criteria = {
       filter: {
-        seriesKey: seriesKey,
+        seriesId: seriesId,
         episodeKey: episodeKey,
         timestampMax: maxTimestamp - 1,
       },
@@ -99,7 +105,15 @@ function updateCache(entry: EpisodeHistoryEntryEntity) {
     if (e.imageCoverId && e.imageCover)
       useImageCover.updateCacheWithMerging(e.imageCoverId, e.imageCover);
 
-    if (entry.resource?.serie)
-      useSeries.updateCacheWithMerging(entry.resource.serie.id, entry.resource.serie);
+    if (entry.resource?.series) {
+      useSeries.updateCacheWithMerging(entry.resource.series.id, entry.resource.series);
+
+      if (entry.resource.series.imageCover) {
+        useImageCover.updateCacheWithMerging(
+          entry.resource.series.imageCover.id,
+          entry.resource.series.imageCover,
+        );
+      }
+    }
   }
 }

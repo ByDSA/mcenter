@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
+import { EpisodeDependenciesCrudController } from "./controller";
+import { EpisodeDependenciesRepository } from "./repository/repository";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { EpisodeDependenciesCrudController } from "./crud/controller";
-import { EpisodeDependenciesRepository } from "./crud/repository/repository";
 
 @Module( {
   imports: [

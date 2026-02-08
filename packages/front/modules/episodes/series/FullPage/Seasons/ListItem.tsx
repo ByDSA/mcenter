@@ -35,16 +35,16 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
   const hasUser = !!user;
   let subtitleSeen: PropsOf<typeof ResourceSubtitle>["items"][0];
 
-  if (!episode)
+  if (!episode || !series)
     return <ResourceEntryLoading />;
 
   assertIsDefined(episode.fileInfos);
 
   if (hasUser) {
     subtitleSeen = {
-      text: episode.userInfo?.lastTimePlayed === 0 || !episode.userInfo
+      text: episode.userInfo?.lastTimePlayed === null || !episode.userInfo
         ? "Nunca visto"
-        : `Visto el ${formatDateDDMMYYY(new Date(episode.userInfo.lastTimePlayed * 1_000))}`,
+        : `Visto el ${formatDateDDMMYYY(episode.userInfo.lastTimePlayed)}`,
     };
   }
 
@@ -58,12 +58,12 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
     <ResourceEntry
       mainTitle={episode.title}
       mainTitleHref={PATH_ROUTES.episodes.slug.withParams(
-        episode.compKey.seriesKey,
-        episode.compKey.episodeKey,
+        series.key,
+        episode.episodeKey,
       )}
       subtitle={<ResourceSubtitle items={[{
         className: styles.episodeKey,
-        text: episode.compKey.episodeKey,
+        text: episode.episodeKey,
       }, subtitleSeen]} />}
       imageCover={imageCover}
       imageCoverDefaultIcon={{

@@ -1,5 +1,8 @@
 import { createMockClass } from "$sharedTests/jest/mocking";
+import { fixtureMusicFileInfos } from "$shared/models/musics/file-info/tests/fixtures";
+import { assertIsDefined } from "$shared/utils/validation";
 import { fixtureMusics } from "#musics/tests";
+import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { MusicsRepository } from "../repository";
 
 class MusicsRepositoryMock extends createMockClass(MusicsRepository) {
@@ -20,10 +23,24 @@ class MusicsRepositoryMock extends createMockClass(MusicsRepository) {
 
       return fixtureMusics.Disk.List;
     } );
+
+    this.createOneFromPath.mockImplementation((path: string) => {
+      const musicFileInfo = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
+      const music = fixtureMusics.Disk.List.find(m => m.id === musicFileInfo.musicId);
+
+      assertIsDefined(music);
+
+      return Promise.resolve( {
+        music: {
+          ...music,
+          id: "id",
+        },
+        fileInfo: musicFileInfo,
+      } );
+    } );
   }
 }
 
-export const musicsRepoMockProvider = {
-  provide: MusicsRepository,
-  useClass: MusicsRepositoryMock,
-};
+export function createAndRegisterMusicRepositoryMockClass() {
+  registerMockProviderInstance(MusicsRepository, new MusicsRepositoryMock());
+}

@@ -8,10 +8,12 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { UsersRepository } from "#core/auth/users/crud/repository";
+import { SeriesOdm } from "#episodes/series/crud/repository/odm";
+import { assertFoundClient } from "#utils/validation/found";
 import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
-import { StreamEvents } from "./events";
-import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
 import { StreamOdm } from "./odm";
+import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
+import { StreamEvents } from "./events";
 
 type CriteriaMany = StreamCrudDtos.GetMany.Criteria;
 @Injectable()
@@ -31,14 +33,14 @@ CanGetAll<StreamEntity> {
 
   @OnEvent(SeriesEvents.Created.TYPE)
   async handleCreateSerieEvent(event: SeriesEvents.Created.Event) {
-    const serie = event.payload.entity;
+    const series = event.payload.entity;
 
-    seriesEntitySchema.parse(serie);
+    seriesEntitySchema.parse(series);
 
     // TODO: mejor crear el stream al vuelo cuando se vaya a usar,
     // puede haber muchos users que ni la usen
     for (const user of await this.usersRepo.getAll())
-      await this.createDefaultForSerie(user.id, serie.key);
+      await this.createDefaultForSerie(user.id, series.key);
   }
 
   async getManyByCriteria(criteria: CriteriaMany) {
@@ -128,13 +130,16 @@ CanGetAll<StreamEntity> {
     return StreamOdm.toEntity(docOdm);
   }
 
-  async getOneOrCreateBySeriesKey(userId: string, seriesKey: Series["key"]): Promise<StreamEntity> {
+  async getOneOrCreateBySeriesId(userId: string, seriesId: Series["key"]): Promise<StreamEntity> {
+    const series = await SeriesOdm.Model.findById(seriesId);
+
+    assertFoundClient(series);
     const docOdm = await StreamOdm.Model.findOne( {
-      key: seriesKey,
+      key: series.key,
     } );
 
     if (!docOdm)
-      return this.createDefaultForSerie(userId, seriesKey);
+      return this.createDefaultForSerie(userId, series.key);
 
     return StreamOdm.toEntity(docOdm);
   }

@@ -1,7 +1,7 @@
 import z from "zod";
 import { createManyResultResponseSchema, createOneResultResponseSchema } from "../../../utils/http/responses";
 import { mongoDbId } from "../../resources/partial-schemas";
-import { episodeCompKeySchema, episodesBySeasonSchema, episodeSchema } from "../episode";
+import { episodesBySeasonSchema, episodeSchema } from "../episode";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { episodeEntitySchema } from "../episode";
 import { createCriteriaConfig, createCriteriaOneSchema, createCriteriaManySchema } from "../../utils/schemas/requests/criteria";
@@ -11,13 +11,13 @@ const criteriaConfig = createCriteriaConfig( {
     ids: z.array(mongoDbId).optional(),
     id: mongoDbId.optional(),
     path: z.string().optional(),
-    seriesKey: z.string().optional(),
+    seriesId: mongoDbId.optional(),
     episodeKey: z.string().optional(),
     episodeKeys: z.array(z.string()).optional(),
-    seriesKeys: z.array(z.string()).optional(),
+    seriesIds: z.array(mongoDbId).optional(),
   },
   sortKeys: ["episodeCompKey", "episodeKey", "createdAt", "updatedAt"] as const,
-  expandKeys: ["series", "fileInfos", "userInfo"] as const,
+  expandKeys: ["series", "seriesImageCover", "fileInfos", "userInfo"] as const,
 } );
 
 export namespace EpisodesCrudDtos {
@@ -39,8 +39,11 @@ export namespace EpisodesCrudDtos {
   }
 
   export namespace GetOne {
-    export namespace ById {
-      export const paramsSchema = episodeCompKeySchema.required();
+    export namespace ByCompKey {
+      export const paramsSchema = z.object( {
+        episodeKey: z.string(),
+        seriesKey: z.string(),
+      } );
     }
 
     export const criteriaSchema = createCriteriaOneSchema(criteriaConfig);
@@ -50,7 +53,7 @@ export namespace EpisodesCrudDtos {
   export namespace Patch {
     export const bodySchema = generatePatchBodySchema(episodeEntitySchema);
     export type Body = z.infer<typeof bodySchema>;
-    export const { paramsSchema } = EpisodesCrudDtos.GetOne.ById;
+    export const compKeyParamsSchema = EpisodesCrudDtos.GetOne.ByCompKey.paramsSchema;
     export const responseSchema = responseOneSchema;
   }
 

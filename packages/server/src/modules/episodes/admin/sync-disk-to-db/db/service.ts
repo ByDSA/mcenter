@@ -2,7 +2,10 @@ import type { EpisodeEntity } from "#episodes/models";
 import { Injectable } from "@nestjs/common";
 import { treePut } from "$shared/utils/trees";
 import { WithRequired } from "$shared/utils/objects";
+import { Types } from "mongoose";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
+import { SeriesOdm } from "#episodes/series/crud/repository/odm";
+import { assertFoundServer } from "#utils/validation/found";
 import { EpisodeFile, SerieFolderTree as SerieTree } from "../disk";
 import { episodeToEpisodeFiles } from "./adapters";
 
@@ -19,15 +22,30 @@ export class RemoteSeriesTreeService {
     const serieFolderTree: SerieTree = {
       children: [],
     };
-    const allEpisodesWithFileInfos: EpisodeEntityWithFileInfos[] = await this.episodesRepo
+    const ret = await this.episodesRepo
       .getMany( {
-        criteria: {
-          expand: ["fileInfos"],
-        },
-      } ) as EpisodeEntityWithFileInfos[];
+        expand: ["fileInfos"],
+      } );
+    const allEpisodesWithFileInfos = ret.data as EpisodeEntityWithFileInfos[];
+    const seriesIdToSeriesKey: Record<string, string> = {};
 
-    for (const episodeWithFileInfos of allEpisodesWithFileInfos)
-      putModelInSerieFolderTree(episodeWithFileInfos, serieFolderTree);
+    for (const episodeWithFileInfos of allEpisodesWithFileInfos) {
+      if (!seriesIdToSeriesKey[episodeWithFileInfos.seriesId]) {
+        const seriesDoc = await SeriesOdm.Model.findOne( {
+          seriesId: new Types.ObjectId(),
+        } );
+
+        assertFoundServer(seriesDoc);
+
+        seriesIdToSeriesKey[episodeWithFileInfos.seriesId] = seriesDoc.key;
+      }
+
+      putModelInSerieFolderTree(
+        episodeWithFileInfos,
+        seriesIdToSeriesKey[episodeWithFileInfos.seriesId],
+        serieFolderTree,
+      );
+    }
 
     return serieFolderTree;
   }
@@ -35,9 +53,10 @@ export class RemoteSeriesTreeService {
 
 export function putModelInSerieFolderTree(
   episodeEntity: EpisodeEntityWithFileInfos,
+  seriesKey: string,
   serieFolderTree: SerieTree,
 ): SerieTree {
-  const { compKey: { seriesKey, episodeKey } } = episodeEntity;
+  const { episodeKey } = episodeEntity;
   const seasonId = getSeasonFromCode(episodeKey) ?? "";
   const episodeFiles: EpisodeFile[] = episodeToEpisodeFiles(episodeEntity);
 

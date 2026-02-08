@@ -5,8 +5,10 @@ import { MusicEntity } from "#musics/models";
 type Entity = MusicEntity;
 
 export class LastTimeMusicWeightFixer extends LastTimeWeightFixer<Entity> {
-  getLastTimePlayed(r: Entity): number {
-    return r.userInfo?.lastTimePlayed ?? 0;
+  getLastTimePlayed(r: Entity): Date | null {
+    return r.userInfo?.lastTimePlayed === undefined
+      ? null
+      : new Date(r.userInfo?.lastTimePlayed * 1_000);
   }
 }
 

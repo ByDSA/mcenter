@@ -1,12 +1,12 @@
 import z from "zod";
+import { mongoDbId } from "../../../resources/partial-schemas";
 import { createCriteriaManySchema } from "../../../utils/schemas/requests/criteria";
-import { episodeCompKeySchema } from "../../episode";
 
 export namespace EpisodeDependencyCrudDtos {
   export namespace GetMany {
     export const criteriaSchema = createCriteriaManySchema( {
       filterShape: {
-        lastCompKey: episodeCompKeySchema.optional(),
+        lastEpisodeId: mongoDbId.optional(),
       },
       sortKeys: [],
       expandKeys: ["episodes"],

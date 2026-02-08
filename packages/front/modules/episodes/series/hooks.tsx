@@ -9,6 +9,9 @@ const KEY = "series";
 
 type GenQueryOptions = {
   debounce?: boolean;
+  notExpandCountEpisodes?: boolean;
+  notExpandCountSeasons?: boolean;
+  notExpandImageCover?: boolean;
 };
 
 function genQueryFn(id: string, options?: GenQueryOptions) {
@@ -22,7 +25,11 @@ function genQueryFn(id: string, options?: GenQueryOptions) {
       filter: {
         id,
       },
-      expand: ["countEpisodes", "countSeasons", "imageCover"],
+      expand: [
+        !options?.notExpandCountEpisodes && "countEpisodes",
+        !options?.notExpandCountSeasons && "countSeasons",
+        !options?.notExpandImageCover && "imageCover",
+      ].filter(Boolean) as any[],
       limit: 1,
       skipCache: true,
     } );

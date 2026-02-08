@@ -18,8 +18,8 @@ export function EditEpisodeLoader( { initialData, onSuccess }: Props) {
     const api = FetchApi.get(EpisodesApi);
     const result = await api.getManyByCriteria( {
       filter: {
-        seriesKey: initialData.compKey.seriesKey,
-        episodeKey: initialData.compKey.episodeKey,
+        seriesId: initialData.seriesId,
+        episodeKey: initialData.episodeKey,
       },
       expand: ["userInfo", "fileInfos", "series"],
     } );
@@ -27,7 +27,7 @@ export function EditEpisodeLoader( { initialData, onSuccess }: Props) {
     assertIsNotEmpty(result.data);
 
     return result.data[0] as EpisodeEntity;
-  }, [initialData.compKey.seriesKey, initialData.compKey.episodeKey]);
+  }, [initialData.seriesId, initialData.episodeKey]);
   const [loadedData, setLoadedData] = useState<EpisodeEntity | null>(null);
 
   return (

@@ -1,6 +1,6 @@
-import { createMockProvider } from "#utils/nestjs/tests";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { VlcBackWebSocketsServerService } from "..";
 
-export const playerBackWebSocketsServiceMockProvider = createMockProvider(
+export const playerBackWebSocketsServiceMockProvider = getOrCreateMockProvider(
   VlcBackWebSocketsServerService,
 );

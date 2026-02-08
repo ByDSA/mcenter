@@ -3,6 +3,7 @@ import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { ImageCover, ImageCoverEntity } from "$shared/models/image-covers";
+import { Types } from "mongoose";
 import { assertFoundClient } from "#utils/validation/found";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
@@ -41,6 +42,11 @@ export class ImageCoversRepository {
     const res = await ImageCoverOdm.Model.find( {
       ...(filter?.id && {
         _id: filter.id,
+      } ),
+      ...(filter?.ids && {
+        _id: {
+          $in: filter.ids.map(s=>new Types.ObjectId(s)),
+        },
       } ),
       ...(filter?.searchLabel
         && {

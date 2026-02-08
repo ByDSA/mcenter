@@ -7,9 +7,9 @@ import { HISTORY_MUSIC_SAMPLES1 } from "#musics/history/tests";
 import { expectBodyEquals } from "#tests/suites/generate-http-case";
 import { putUser } from "#tests/suites/auth";
 import { mockMongoId } from "#tests/mongo";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { MusicHistoryCrudController } from "./controller";
 import { MusicHistoryRepository } from "./repository";
-import { musicHistoryRepoMockProvider } from "./repository/tests";
 import { GetManyCriteria } from "./repository/repository";
 
 const validCriteria = {
@@ -31,7 +31,7 @@ crudTestsSuite( {
     {
       controllers: [MusicHistoryCrudController],
       providers: [
-        musicHistoryRepoMockProvider,
+        getOrCreateMockProvider(MusicHistoryRepository),
       ],
     },
     {

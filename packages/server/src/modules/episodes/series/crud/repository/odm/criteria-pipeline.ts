@@ -2,6 +2,7 @@
 import type { GetManyCriteria } from "../repository";
 import { Types, type FilterQuery, type PipelineStage } from "mongoose";
 import { MongoFilterQuery } from "#utils/layers/db/mongoose";
+import { enrichImageCover } from "#modules/image-covers/crud/repositories/odm/utils";
 
 type Criteria = GetManyCriteria;
 
@@ -65,8 +66,8 @@ export function getSeriesCriteriaPipeline(criteria: Criteria): PipelineStage[] {
     dataPipeline.push( {
       $lookup: {
         from: "episodes",
-        localField: "key",
-        foreignField: "seriesKey",
+        localField: "_id",
+        foreignField: "seriesId",
         as: "rawEpisodes",
       },
     } );
@@ -153,6 +154,9 @@ export function getSeriesCriteriaPipeline(criteria: Criteria): PipelineStage[] {
     } );
   }
 
+  if (criteria.expand?.includes("imageCover"))
+    dataPipeline.push(...enrichImageCover());
+
   // 4. Facet Stage
   const facetStage: PipelineStage.Facet = {
     $facet: {
@@ -211,7 +215,7 @@ function buildSeriesFilter(criteria: Criteria): FilterQuery<any> {
 
 /**
  * Agrega al pipeline la lógica de ordenamiento por defecto:
- * Max( Serie.updatedAt, Max(History.date.timestamp) ) DESC
+ * Max( Series.updatedAt, Max(History.date.timestamp) ) DESC
  */
 function addDefaultSortStage(pipeline: PipelineStage[], userId: string | null): void {
   // 1. Si hay usuario, necesitamos buscar su historial para esta serie
@@ -220,8 +224,8 @@ function addDefaultSortStage(pipeline: PipelineStage[], userId: string | null): 
     pipeline.push( {
       $lookup: {
         from: "episodes",
-        localField: "key",
-        foreignField: "seriesKey",
+        localField: "_id",
+        foreignField: "seriesId",
         pipeline: [{
           $project: {
             _id: 1,

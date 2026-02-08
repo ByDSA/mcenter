@@ -16,7 +16,7 @@ import { createUploadFileSuccessResponse, diskStorageEnsureDestination, diskStor
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { assertFoundClient } from "#utils/validation/found";
 import { EpisodeEntity } from "#episodes/models";
-import { getSeasonNumberByEpisodeKey } from "#episodes/series/crud/repository/repository";
+import { getSeasonNumberByEpisodeKey, SeriesRepository } from "#episodes/series/crud/repository/repository";
 import { VideoMetadataService } from "#modules/resources/video/video-metadata/VideoMetadataService.service";
 import { EpisodeFileInfoRepository } from "../crud/repository";
 import { EPISODES_MEDIA_PATH, EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "./utils";
@@ -26,6 +26,7 @@ export class EpisodeFileInfoUploadService {
   constructor(
     private readonly fileInfosRepo: EpisodeFileInfoRepository,
     private readonly episodesRepo: EpisodesRepository,
+    private readonly seriesRepo: SeriesRepository,
     private readonly videoMetadata: VideoMetadataService,
   ) { }
 
@@ -35,7 +36,7 @@ export class EpisodeFileInfoUploadService {
       uploaderUserId }: UploadFileProps<UploadEpisodeFileInfoDto>,
   ) {
     let episode: EpisodeEntity | null = null;
-    let seriesKey: string | undefined;
+    let seriesId: string | undefined;
     let episodeKey: string | undefined;
     let hash: string | undefined;
 
@@ -47,32 +48,33 @@ export class EpisodeFileInfoUploadService {
       assertFoundClient(episode);
     } else {
       episode = await this.episodesRepo.getOne( {
-        criteria: {
-          filter: {
-            episodeKey: uploadDto.metadata.episodeKey,
-            seriesKey: uploadDto.metadata.seriesKey,
-          },
+        filter: {
+          episodeKey: uploadDto.metadata.episodeKey,
+          seriesId: uploadDto.metadata.seriesId,
         },
       } );
-      seriesKey = uploadDto.metadata.seriesKey;
+      seriesId = uploadDto.metadata.seriesId;
       episodeKey = uploadDto.metadata.episodeKey;
     }
 
     if (episode) {
       await this.checkDuplicated(file, episode.id);
 
-      if (!seriesKey)
-        seriesKey = episode.compKey.seriesKey;
+      if (!seriesId)
+        seriesId = episode.seriesId;
 
       if (!episodeKey)
-        episodeKey = episode.compKey.episodeKey;
+        episodeKey = episode.episodeKey;
     }
 
     assertFoundClient(episodeKey);
-    assertFoundClient(seriesKey);
+    assertFoundClient(seriesId);
 
     const season = getSeasonNumberByEpisodeKey(episodeKey);
-    const targetDir = path.join(EPISODES_MEDIA_PATH, seriesKey, season.toString());
+    let series = await this.seriesRepo.getOneById(seriesId);
+
+    assertFoundClient(series);
+    const targetDir = path.join(EPISODES_MEDIA_PATH, series.key, season.toString());
 
     if (!existsSync(targetDir)) {
       await fs.promises.mkdir(targetDir, {
@@ -93,10 +95,8 @@ export class EpisodeFileInfoUploadService {
         title = episodeKey;
 
       episode = await this.episodesRepo.createOneAndGet( {
-        compKey: {
-          episodeKey,
-          seriesKey,
-        },
+        episodeKey,
+        seriesId,
         title,
         uploaderUserId,
       } );

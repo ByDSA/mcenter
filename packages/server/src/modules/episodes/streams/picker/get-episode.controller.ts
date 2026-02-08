@@ -2,9 +2,10 @@ import { Controller, Get, Param, Query, UnauthorizedException, UnprocessableEnti
 import z from "zod";
 import { UserPayload } from "$shared/models/auth";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import { User } from "#core/auth/users/User.decorator";
-import { ResponseFormatInterceptor, M3u8FormatUseNext } from "#modules/resources/response-formatter";
 import { StreamGetRandomEpisodeService } from "./get-episode.service";
+import { User } from "#core/auth/users/User.decorator";
+import { M3u8FormatUseNext } from "#modules/resources/response-formatter";
+import { EpisodeResponseFormatInterceptor } from "#modules/resources/response-formatter/episode-response-format.interceptor";
 
 @Controller("/get-episode")
 export class StreamGetEpisodeController {
@@ -12,7 +13,7 @@ export class StreamGetEpisodeController {
      private readonly service: StreamGetRandomEpisodeService,
   ) { }
 
-  @UseInterceptors(ResponseFormatInterceptor)
+  @UseInterceptors(EpisodeResponseFormatInterceptor)
   @M3u8FormatUseNext()
   @Get("/:streamKey")
   async getEpisode(

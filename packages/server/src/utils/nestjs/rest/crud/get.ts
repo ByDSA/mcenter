@@ -68,6 +68,7 @@ export function GetMany(url: string, schema: z.ZodSchema, options?: Omit<GetMany
 }
 type GetManyCriteriaOptions = {
   url?: string;
+  metadataSchema?: z.ZodObject<any>;
 };
 export function GetManyCriteria(
   schema: z.ZodSchema,
@@ -76,7 +77,9 @@ export function GetManyCriteria(
   const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [
     Post(options?.url ?? GET_MANY_CRITERIA_PATH),
     UseInterceptors(ResponseFormatterInterceptor),
-    ValidateResponseWithZodSchema(createPaginatedResultResponseSchema(schema)),
+    ValidateResponseWithZodSchema(
+      createPaginatedResultResponseSchema(schema, options?.metadataSchema),
+    ),
     HttpCode(HttpStatus.OK),
   ];
 

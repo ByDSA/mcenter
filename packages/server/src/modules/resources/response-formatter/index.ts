@@ -1,8 +1,8 @@
 export * from "./module";
 
-export * from "./response-formatter.service";
+export * from "./episode-response-formatter.service";
 
-export * from "./response-format.interceptor";
+export * from "./music-response-format.interceptor";
 
 export * from "./use-next.decorator";
 

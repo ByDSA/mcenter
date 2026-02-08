@@ -1,4 +1,5 @@
 import { EpisodeEntity } from "$shared/models/episodes";
+import { assertIsDefined } from "$shared/utils/validation";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
@@ -6,6 +7,7 @@ import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/ConfirmModal/useConfirmModal";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { EpisodesApi } from "../requests";
+import { useSeries } from "../series/hooks";
 
 type Props = Pick<OpenConfirmModalProps, "onFinish"> & {
   onActionSuccess?: ()=> void;
@@ -16,10 +18,17 @@ export function useDeleteEpisodeModal(
 ): ReturnType<typeof useConfirmModal> {
   const { openModal, ...modal } = useConfirmModal();
   const { data } = useLocalData<EpisodeEntity>();
+  const { data: series } = useSeries(data.seriesId, {
+    notExpandCountEpisodes: true,
+    notExpandCountSeasons: true,
+    notExpandImageCover: true,
+  } );
 
   return {
     ...modal,
     openModal: (props) => {
+      assertIsDefined(series);
+
       return openModal( {
         title: "Confirmar borrado de episodio",
         content: (
@@ -28,11 +37,11 @@ export function useDeleteEpisodeModal(
             <DaInputGroup>
               <DaInputGroupItem inline>
                 <DaLabel>Serie</DaLabel>
-                <span>{data.serie?.name ?? data.compKey.seriesKey}</span>
+                <span>{series.name}</span>
               </DaInputGroupItem>
               <DaInputGroupItem inline>
                 <DaLabel>Episodio</DaLabel>
-                <span>{data.compKey.episodeKey}</span>
+                <span>{data.episodeKey}</span>
               </DaInputGroupItem>
               <DaInputGroupItem inline>
                 <DaLabel>Título</DaLabel>
@@ -48,7 +57,7 @@ export function useDeleteEpisodeModal(
           const response = await api.deleteOne(data.id);
 
           if (response.data) {
-            logger.debug(`Deleted episode: ${data.compKey.episodeKey}`);
+            logger.debug(`Deleted episode: ${data.episodeKey}`);
 
             return true;
           }

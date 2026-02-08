@@ -2,10 +2,10 @@ import request from "supertest";
 import { Application } from "express";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { HttpStatus } from "@nestjs/common";
+import { StreamPickerModule } from "./module";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
-import { StreamPickerModule } from "./module";
 
 async function loadFixtures() {
   await loadFixtureSimpsons();
@@ -14,6 +14,7 @@ async function loadFixtures() {
 
 let testingSetup: TestingSetup;
 let routerApp: Application;
+const validStreamKey = "simpsons";
 
 describe("showPicker", () => {
   beforeAll(async () => {
@@ -38,7 +39,7 @@ describe("showPicker", () => {
   it("should return valid data with user provided", async () => {
     await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
     const response = await request(routerApp)
-      .get("/picker/simpsons")
+      .get("/picker/" + validStreamKey)
       .expect(HttpStatus.OK)
       .send();
 
@@ -48,7 +49,7 @@ describe("showPicker", () => {
   it("should throw and error because no token provided", async () => {
     await testingSetup.useMockedUser(null);
     const response = await request(routerApp)
-      .get("/picker/simpsons")
+      .get("/picker/" + validStreamKey)
       .expect(HttpStatus.UNAUTHORIZED)
       .send();
 
@@ -59,7 +60,7 @@ describe("showPicker", () => {
     await testingSetup.useMockedUser(null);
     const token = fixtureUsers.Normal.UserWithRoles.id;
     const response = await request(routerApp)
-      .get("/picker/simpsons?token=" + token)
+      .get("/picker/" + validStreamKey + "?token=" + token)
       .expect(200)
       .send();
 
@@ -69,7 +70,7 @@ describe("showPicker", () => {
   it("should return 422 on invalid stream", async () => {
     await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
     const response = await request(routerApp)
-      .get("/picker/invalid-stream")
+      .get("/picker/invalid-stream-key")
       .expect(HttpStatus.UNPROCESSABLE_ENTITY)
       .send();
 

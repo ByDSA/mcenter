@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { deepFreeze } from "../../../../utils/objects";
 import { DATEJS_SAMPLE1 } from "../../../../../tests/other-fixtures/dates";
 import { generateRandomMD5 } from "../../../../../tests/other-fixtures/hash";
-import { serieSampleIds, simpsonIds } from "../../tests/fixture-ids";
+import { sampleSeriesIds, simpsonIds } from "../../tests/fixture-ids";
 
 const fileInfoTimestamps = {
   createdAt: DATEJS_SAMPLE1,
@@ -154,7 +154,7 @@ const EPISODE_FILE_INFO_SIMPSONS: EpisodeFileInfoEntity[] = deepFreeze([
 const sampleSerieEp1x01FileInfo: EpisodeFileInfoEntity = {
   id: new ObjectId().toString(),
   path: "series/sample-serie/1/sample-1x01.mp4",
-  episodeId: serieSampleIds.ep1x01,
+  episodeId: sampleSeriesIds.ep1x01,
   timestamps: fileInfoTimestamps,
   hash: "8f247ad75542bba9609f7e03be016cb1",
   size: 5217,
@@ -167,14 +167,49 @@ const sampleSerieEp1x01FileInfo: EpisodeFileInfoEntity = {
     },
   },
 } satisfies EpisodeFileInfoEntity;
+const sampleSerieEp1x02FileInfo: EpisodeFileInfoEntity = {
+  id: new ObjectId().toString(),
+  path: "series/sample-serie/1/sample-1x02.mp4",
+  episodeId: sampleSeriesIds.ep1x02,
+  timestamps: fileInfoTimestamps,
+  hash: "dc3ea225ae44cb1f87d315ce3bf1ae28",
+  size: 5217,
+  mediaInfo: {
+    duration: 0.501,
+    fps: "25",
+    resolution: {
+      width: 640,
+      height: 480,
+    },
+  },
+} satisfies EpisodeFileInfoEntity;
+const sampleSerieEp2x01FileInfo: EpisodeFileInfoEntity = {
+  id: new ObjectId().toString(),
+  path: "series/sample-serie/2/sample-2x01.mp4",
+  episodeId: sampleSeriesIds.ep1x02,
+  timestamps: fileInfoTimestamps,
+  hash: "91887ed09d8f79d476199a8df47b7294",
+  size: 5217,
+  mediaInfo: {
+    duration: 0.502,
+    fps: "25",
+    resolution: {
+      width: 640,
+      height: 480,
+    },
+  },
+} satisfies EpisodeFileInfoEntity;
 
 export const fixtureEpisodeFileInfos = {
-  SampleSerie: {
+  SampleSeries: {
     Samples: {
       EP1x01: sampleSerieEp1x01FileInfo,
+      EP1x02: sampleSerieEp1x02FileInfo,
+      EP2x01: sampleSerieEp2x01FileInfo,
     },
     List: [
       sampleSerieEp1x01FileInfo,
+      sampleSerieEp1x02FileInfo,
     ],
   },
   Simpsons: {

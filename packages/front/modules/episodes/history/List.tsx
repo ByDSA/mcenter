@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -33,10 +34,12 @@ export function HistoryList() {
           {
             data!.map((entry: Data, i: number, array) => {
               return <Fragment
-                key={entry.date.timestamp}>
+                key={dateToTimestampInSeconds(entry.date)}>
                 {dayTitle( {
-                  currentDateTimestamp: entry.date.timestamp,
-                  previousDateTimestamp: i > 0 ? array[i - 1].date.timestamp : undefined,
+                  currentDateTimestamp: dateToTimestampInSeconds(entry.date),
+                  previousDateTimestamp: i > 0
+                    ? dateToTimestampInSeconds(array[i - 1].date)
+                    : undefined,
                 } )}
                 <EpisodeHistoryEntryElement
                   episodeId={entry.resourceId}

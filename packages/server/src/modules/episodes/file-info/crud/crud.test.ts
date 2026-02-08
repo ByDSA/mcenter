@@ -1,7 +1,7 @@
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { mockMongoId } from "#tests/mongo";
-import { episodeFileInfoRepositoryMockProvider } from "./repository/tests";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { EpisodeFileInfoRepository } from "./repository";
 import { EpisodeFileInfosCrudController } from "./controller";
 
@@ -12,7 +12,7 @@ crudTestsSuite( {
       imports: [],
       controllers: [EpisodeFileInfosCrudController],
       providers: [
-        episodeFileInfoRepositoryMockProvider,
+        getOrCreateMockProvider(EpisodeFileInfoRepository),
       ],
     }, {
       auth: {

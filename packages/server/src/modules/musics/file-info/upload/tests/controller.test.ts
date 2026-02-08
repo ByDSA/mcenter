@@ -2,7 +2,7 @@ import { Application } from "express";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { HttpStatus } from "@nestjs/common";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
-import { createMockProvider } from "#utils/nestjs/tests";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { MusicFileInfoUploadController } from "../controller";
 import { MusicFileInfoUploadRepository, UploadFileInterceptor } from "../service";
@@ -20,8 +20,8 @@ describe("controller", () => {
       {
         controllers: [MusicFileInfoUploadController],
         providers: [
-          createMockProvider(MusicFileInfoUploadRepository),
-          createMockProvider(MusicFileInfoRepository),
+          getOrCreateMockProvider(MusicFileInfoUploadRepository),
+          getOrCreateMockProvider(MusicFileInfoRepository),
         ],
       },
       {

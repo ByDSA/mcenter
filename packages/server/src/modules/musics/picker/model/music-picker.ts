@@ -1,4 +1,5 @@
 import { neverCase } from "$shared/utils/validation";
+import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
 import { PickMode, ResourcePicker, ResourcePickerSequential } from "#modules/picker";
 import { MusicEntity } from "#musics/models";
 import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
@@ -23,7 +24,9 @@ export class MusicPickerRandom extends ResourcePickerRandom<Entity, MusicEntity>
     } );
   }
 
-  setLastTimePlayed(resource: Entity, time: number): void {
+  setLastTimePlayed(resource: Entity, date: Date): void {
+    const time = dateToTimestampInSeconds(date);
+
     if (resource.userInfo)
       resource.userInfo.lastTimePlayed = time;
     else {

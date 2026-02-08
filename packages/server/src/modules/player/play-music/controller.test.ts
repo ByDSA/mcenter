@@ -1,38 +1,51 @@
 import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
-import { Types } from "mongoose";
+import { UserPayload } from "$shared/models/auth";
+import { fixtureMusicFileInfos } from "$shared/models/musics/file-info/tests/fixtures";
+import { MusicEntityWithFileInfos } from "$shared/models/musics";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { createMockedModule, createMockProvider } from "#utils/nestjs/tests";
-import { MusicHistoryModule } from "#musics/history/module";
-import { MusicsCrudModule } from "#musics/crud/module";
-import { MusicsRepository } from "#musics/crud/repositories/music";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureMusics } from "#musics/tests";
 import { AuthPlayerService } from "../AuthPlayer.service";
-import { PlayService } from "../play.service";
-import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
-import { PlayMusicService } from "./service";
+import { fixturesRemotePlayers } from "../tests/fixtures";
 import { PlayMusicController } from "./controller";
+import { PlayMusicService } from "./service";
+
+const MUSIC_WITH_FILE_INFO: MusicEntityWithFileInfos = {
+  ...fixtureMusics.Disk.Samples.DK,
+  fileInfos: [fixtureMusicFileInfos.Disk.Samples.DK],
+};
 
 describe("playMusicController", () => {
-  let routerApp: Application;
   let testingSetup: TestingSetup;
-  let remotePlayerId = new Types.ObjectId().toString();
+  let routerApp: Application;
+  let mocks: Awaited<ReturnType<typeof initMocks>>;
+  let remotePlayerId = fixturesRemotePlayers.valid.id;
+
+  async function initMocks(setup: TestingSetup) {
+    const ret = {
+      playMusicService: setup.getMock(PlayMusicService),
+      authPlayerService: setup.getMock(AuthPlayerService),
+    };
+
+    ret.playMusicService.playMusic.mockResolvedValue([MUSIC_WITH_FILE_INFO]);
+
+    // User
+    await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles as UserPayload);
+
+    return ret;
+  }
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
       imports: [
-        createMockedModule(MusicsCrudModule),
-        createMockedModule(MusicHistoryModule),
       ],
       controllers: [PlayMusicController],
       providers: [
-        createMockProvider(PlayService),
-        createMockProvider(AuthPlayerService),
-        PlayMusicService,
-        mockRemotePlayersRepositoryProvider,
+        getOrCreateMockProvider(PlayMusicService),
+        getOrCreateMockProvider(AuthPlayerService),
       ],
     }, {
       auth: {
@@ -43,34 +56,32 @@ describe("playMusicController", () => {
 
     routerApp = testingSetup.routerApp;
 
-    testingSetup.getMock(MusicsRepository).getOneBySlug
-      .mockResolvedValue( {
-        ...fixtureMusics.Disk.Samples.DK,
-        fileInfos: [
-          fixtureMusicFileInfos.Disk.Samples.DK,
-        ],
-      } );
-
-    await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
+    mocks = await initMocks(testingSetup);
   } );
 
-  describe("requests", () => {
-    it("should return 422 if music not found", async () => {
-      testingSetup.getMock(MusicsRepository).getOneBySlug
-        .mockResolvedValueOnce(null);
-      const response = await request(routerApp).get(`/play/${remotePlayerId}/music/not-found`)
-        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
+  beforeEach(()=> {
+    jest.clearAllMocks();
+  } );
 
-      expect(response).toBeDefined();
-    } );
+  const validControllerUrl = `/play/${remotePlayerId}/music`;
+  const invalidControllerUrl = "/play/invalidRemotePlayerId/music";
+
+  it("invalid controller params", async () => {
+    const response = await request(routerApp)
+      .get(invalidControllerUrl + "/music-slug");
+
+    expect(response.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+  } );
+
+  describe("playMusic", () => {
+    const validUrl = validControllerUrl + "/music-slug";
 
     it("should return 200 if episode found", async () => {
-      const spy = jest.spyOn(testingSetup.module.get(PlayService), "play");
-      const response = await request(routerApp).get(`/play/${remotePlayerId}/music/dk`)
-        .expect(HttpStatus.OK);
+      const res = await request(routerApp).get(validUrl);
 
-      expect(response).toBeDefined();
-      expect(spy).toHaveBeenCalledTimes(1);
+      expect(res.statusCode).toBe(HttpStatus.OK);
+
+      expect(mocks.playMusicService.playMusic).toHaveBeenCalled();
     } );
   } );
 } );

@@ -1,13 +1,14 @@
-import { Episode, EpisodeCompKey, EpisodeEntity } from "#episodes/models";
+import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
+import { Episode, EpisodeEntity } from "#episodes/models";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { EpisodeEvents } from "#episodes/crud/repositories/episodes/events";
 import { fixtureEpisodes } from "#episodes/tests";
-import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 import { EntityEvent } from "#core/domain-event-emitter";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { EpisodesCrudModule } from "#episodes/crud/module";
+import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
 
 let episodesRepo: EpisodesRepository;
 let domainEventEmitter: DomainEventEmitter;
@@ -24,20 +25,15 @@ beforeAll(async () => {
       using: "default",
     },
   } );
-  await loadFixtureSimpsons();
+  await loadFixtureSampleSeries();
 
-  domainEventEmitter = testingSetup.module
-    .get<DomainEventEmitter>(DomainEventEmitter);
+  domainEventEmitter = testingSetup.module.get(DomainEventEmitter);
 
-  episodesRepo = testingSetup.module
-    .get<EpisodesRepository>(EpisodesRepository);
+  episodesRepo = testingSetup.module.get(EpisodesRepository);
 } );
 
 it("should emit Patch Event", async () => {
-  const episodeCompKey: EpisodeCompKey = {
-    seriesKey: "simpsons",
-    episodeKey: "1x01",
-  };
+  const episodeId = fixtureEpisodes.SampleSeries.Samples.EP1x01.id;
   const fn = jest.fn();
 
   domainEventEmitter.subscribe(EpisodeEvents.Patched.TYPE, fn);
@@ -46,7 +42,7 @@ it("should emit Patch Event", async () => {
     title: "new title",
   };
 
-  await episodesRepo.patchOneByCompKeyAndGet(episodeCompKey, {
+  await episodesRepo.patchOneByIdAndGet(episodeId, {
     entity: partialModel,
   } );
 
@@ -55,7 +51,7 @@ it("should emit Patch Event", async () => {
     type: EpisodeEvents.Patched.TYPE,
     payload: {
       hasOld: false,
-      entityId: fixtureEpisodes.Simpsons.Samples.EP1x01.id,
+      entityId: fixtureEpisodes.SampleSeries.Samples.EP1x01.id,
       key: "title",
       value: partialModel.title,
       partialEntity: partialModel,
@@ -66,20 +62,18 @@ it("should emit Patch Event", async () => {
 it("should emit Create Event", async () => {
   const fn = jest.fn((event: EntityEvent<EpisodeEntity>) => {
     expect(event.type).toBe(EpisodeEvents.Created.TYPE);
-    expect(event.payload.entity.compKey?.seriesKey).toBe("simpsons");
-    expect(event.payload.entity.compKey?.episodeKey.startsWith("X")).toBeTruthy();
+    expect(event.payload.entity.seriesId).toBe(SERIES_SAMPLE_SERIES.id);
+    expect(event.payload.entity.episodeKey.startsWith("X")).toBeTruthy();
 
     return Promise.resolve();
   } );
 
   domainEventEmitter.subscribe(EpisodeEvents.Created.TYPE, fn);
 
-  const models = fixtureEpisodes.Simpsons.List.slice(0, 10).map(episode => ( {
+  const models = fixtureEpisodes.SampleSeries.List.slice(0, 10).map(episode => ( {
     ...episode,
-    compKey: {
-      episodeKey: `X${episode.compKey?.episodeKey}`,
-      seriesKey: episode.compKey?.seriesKey,
-    } as EpisodeCompKey,
+    episodeKey: `X${episode.episodeKey}`,
+    seriesId: SERIES_SAMPLE_SERIES.id,
   } ) as EpisodeEntity);
 
   await testingSetup.db?.dropAll();

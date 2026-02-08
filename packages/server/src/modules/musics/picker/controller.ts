@@ -3,13 +3,13 @@ import { Controller, Get, Query, Req, UseInterceptors } from "@nestjs/common";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
 import { UserPayload } from "$shared/models/auth";
-import { Music, MusicEntity, MusicEntityWithUserInfo } from "#musics/models";
-import { assertIsNotEmptyClient } from "#utils/validation/found";
 import { User } from "#core/auth/users/User.decorator";
+import { assertIsNotEmptyClient } from "#utils/validation/found";
+import { Music, MusicEntity, MusicEntityWithUserInfo } from "#musics/models";
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicsRepository } from "../crud/repositories/music";
 import { requestToFindMusicParams } from "../crud/repositories/music/queries/queries";
-import { ResponseFormatInterceptor } from "../../resources/response-formatter/response-format.interceptor";
+import { MusicResponseFormatInterceptor } from "../../resources/response-formatter/music-response-format.interceptor";
 import { M3u8FormatUseNext } from "../../resources/response-formatter/use-next.decorator";
 import { genMusicFilterApplier, genMusicWeightFixerApplier } from "./model";
 import { MusicPickerRandom } from "./model/music-picker";
@@ -25,7 +25,7 @@ export class MusicGetRandomController {
   }
 
   @Get("/")
-  @UseInterceptors(ResponseFormatInterceptor)
+  @UseInterceptors(MusicResponseFormatInterceptor)
   @M3u8FormatUseNext()
   async getRandom(
     @Req() req: Request,

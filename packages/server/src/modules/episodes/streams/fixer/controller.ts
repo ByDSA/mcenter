@@ -4,7 +4,7 @@ import { SeriesRepository } from "#episodes/series/crud/repository";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 
-@Controller("/fixer")
+@Controller("/")
 export class FixerController {
   constructor(
     private readonly seriesRepo: SeriesRepository,
@@ -24,18 +24,18 @@ export class FixerController {
       data: [],
       errors: [],
     };
-    const series = await this.seriesRepo.getAll();
+    const manySeries = await this.seriesRepo.getAll();
     const users = await this.usersRepo.getAll();
     const promises: Promise<string | null | void>[] = [];
 
     for (const user of users) {
-      for (const serie of series) {
-        const promise = this.streamsRepo.createDefaultForSerieIfNeeded(user.id, serie.key)
+      for (const series of manySeries) {
+        const promise = this.streamsRepo.createDefaultForSerieIfNeeded(user.id, series.key)
           .then(stream => {
             if (!stream)
               return null;
 
-            return `Created default stream for serie ${stream.key}`;
+            return `Created default stream for series ${stream.key}`;
           } )
           .catch(e=> {
             response.errors?.push(errorToErrorElementResponse(e));

@@ -1,8 +1,9 @@
 import fs from "node:fs";
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
 import { EpisodeFileInfoEntity } from "$shared/models/episodes/file-info";
-import { createMockProvider } from "#utils/nestjs/tests";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import * as cryptUtils from "#utils/crypt";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
@@ -11,6 +12,7 @@ import { EpisodeEntity } from "#episodes/models";
 import { EpisodeFileInfoRepository } from "#episodes/file-info/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
+import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfoUploadService } from "../service";
 import { mockFile } from "./utils";
 
@@ -25,8 +27,8 @@ const mockEpisodeEntity = fixtureEpisodes.Simpsons.Samples.EP1x01 as EpisodeEnti
 const mockFileInfoEntity: EpisodeFileInfoEntity = fixtureEpisodeFileInfos.Simpsons.Samples.EP1x01;
 const uploadDtoWithKeys: EpisodeFileInfoCrudDtos.UploadFile.RequestBody = {
   metadata: {
-    seriesKey: mockEpisodeEntity.compKey.seriesKey,
-    episodeKey: mockEpisodeEntity.compKey.episodeKey,
+    seriesId: mockEpisodeEntity.seriesId,
+    episodeKey: mockEpisodeEntity.episodeKey,
   },
 };
 const mockVideoInfo = {
@@ -41,6 +43,7 @@ describe("episodeFileInfoUploadService", () => {
   let service: EpisodeFileInfoUploadService;
   let fileInfoRepoMock: jest.Mocked<EpisodeFileInfoRepository>;
   let episodesRepoMock: jest.Mocked<EpisodesRepository>;
+  let seriesRepoMock: jest.Mocked<SeriesRepository>;
   let videoMetadataMock: jest.Mocked<VideoMetadataService>;
 
   beforeAll(async () => {
@@ -48,15 +51,17 @@ describe("episodeFileInfoUploadService", () => {
       controllers: [],
       providers: [
         EpisodeFileInfoUploadService,
-        createMockProvider(EpisodeFileInfoRepository),
-        createMockProvider(EpisodesRepository),
-        createMockProvider(VideoMetadataService),
+        getOrCreateMockProvider(EpisodeFileInfoRepository),
+        getOrCreateMockProvider(SeriesRepository),
+        getOrCreateMockProvider(EpisodesRepository),
+        getOrCreateMockProvider(VideoMetadataService),
       ],
     } );
 
     fileInfoRepoMock = testingSetup.getMock(EpisodeFileInfoRepository);
     episodesRepoMock = testingSetup.getMock(EpisodesRepository);
     videoMetadataMock = testingSetup.getMock(VideoMetadataService);
+    seriesRepoMock = testingSetup.getMock(SeriesRepository);
     service = testingSetup.module.get(EpisodeFileInfoUploadService);
 
     // Mocks de sistema
@@ -79,6 +84,7 @@ describe("episodeFileInfoUploadService", () => {
   describe("subida usando episodeId", () => {
     it("debería adjuntar el archivo a un episodio existente", async () => {
       episodesRepoMock.getOneById.mockResolvedValue(mockEpisodeEntity);
+      seriesRepoMock.getOneById.mockResolvedValue(SERIES_SAMPLE_SERIES);
 
       const ret = await service.upload( {
         file: mockFile,
@@ -96,6 +102,7 @@ describe("episodeFileInfoUploadService", () => {
 
     it("debería fallar si el archivo es duplicado para el mismo episodio", async () => {
       episodesRepoMock.getOneById.mockResolvedValue(mockEpisodeEntity);
+      seriesRepoMock.getOneById.mockResolvedValue(SERIES_SAMPLE_SERIES);
       fileInfoRepoMock.getManyByHash.mockResolvedValue([mockFileInfoEntity]);
 
       await expect(service.upload( {
@@ -106,9 +113,10 @@ describe("episodeFileInfoUploadService", () => {
     } );
   } );
 
-  describe("subida usando seriesKey y episodeKey", () => {
+  describe("subida usando seriesId y episodeKey", () => {
     it("debería encontrar episodio existente y subir archivo", async () => {
       episodesRepoMock.getOne.mockResolvedValue(mockEpisodeEntity);
+      seriesRepoMock.getOneById.mockResolvedValue(SERIES_SAMPLE_SERIES);
 
       const ret = await service.upload( {
         file: mockFile,
@@ -122,8 +130,24 @@ describe("episodeFileInfoUploadService", () => {
       expect(ret.data.episode).toEqual(mockEpisodeEntity);
     } );
 
+    it("debería fallar si no existe la serie con seriesId", async () => {
+      episodesRepoMock.getOne.mockResolvedValue(mockEpisodeEntity);
+      seriesRepoMock.getOneById.mockResolvedValue(null);
+
+      await expect(service.upload( {
+        file: mockFile,
+        uploadDto: uploadDtoWithKeys,
+        uploaderUserId: fixtureUsers.Admin.User.id,
+      } )).rejects.toThrow();
+
+      expect(episodesRepoMock.getOne).toHaveBeenCalled();
+      expect(episodesRepoMock.createOneAndGet).not.toHaveBeenCalled();
+      expect(fileInfoRepoMock.createOneAndGet).not.toHaveBeenCalled();
+    } );
+
     it("debería crear el episodio si no existe y luego subir archivo", async () => {
       episodesRepoMock.getOne.mockResolvedValue(null);
+      seriesRepoMock.getOneById.mockResolvedValue(SERIES_SAMPLE_SERIES);
       episodesRepoMock.createOneAndGet.mockResolvedValue(mockEpisodeEntity);
 
       const ret = await service.upload( {
@@ -134,7 +158,8 @@ describe("episodeFileInfoUploadService", () => {
 
       expect(episodesRepoMock.getOne).toHaveBeenCalled();
       expect(episodesRepoMock.createOneAndGet).toHaveBeenCalledWith(expect.objectContaining( {
-        compKey: mockEpisodeEntity.compKey,
+        seriesId: mockEpisodeEntity.seriesId,
+        episodeKey: mockEpisodeEntity.episodeKey,
         uploaderUserId: fixtureUsers.Admin.User.id,
       } ));
       expect(fileInfoRepoMock.createOneAndGet).toHaveBeenCalled();
@@ -143,6 +168,7 @@ describe("episodeFileInfoUploadService", () => {
 
     it("debería usar el título proporcionado en metadatos al crear episodio", async () => {
       episodesRepoMock.getOne.mockResolvedValue(null);
+      seriesRepoMock.getOneById.mockResolvedValue(SERIES_SAMPLE_SERIES);
       episodesRepoMock.createOneAndGet.mockResolvedValue(mockEpisodeEntity);
 
       const customTitle = "Mi Titulo Personalizado";

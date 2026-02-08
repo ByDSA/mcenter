@@ -1,8 +1,9 @@
 import type { SeriesEntity } from "..";
 import { ObjectId } from "mongodb";
+import { fixtureImageCovers } from "../../../image-covers/tests";
 import { deepFreeze } from "../../../../utils/objects";
 
-export const SERIE_SIMPSONS: SeriesEntity = deepFreeze( {
+export const SERIES_SIMPSONS: SeriesEntity = deepFreeze( {
   id: new ObjectId().toString(),
   key: "simpsons",
   name: "simpsons",
@@ -12,11 +13,11 @@ export const SERIE_SIMPSONS: SeriesEntity = deepFreeze( {
   addedAt: new Date(),
 } );
 
-export const SAMPLE_SERIE: SeriesEntity = deepFreeze( {
+export const SERIES_SAMPLE_SERIES: SeriesEntity = deepFreeze( {
   id: new ObjectId().toString(),
   key: "sample-serie",
-  name: "Sample Serie",
-  imageCoverId: null,
+  name: "Sample Series",
+  imageCoverId: fixtureImageCovers.Disk.Samples.NodeJs.id,
   createdAt: new Date(),
   updatedAt: new Date(),
   addedAt: new Date(),

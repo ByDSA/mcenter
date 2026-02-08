@@ -1,6 +1,6 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { compareEpisodeCompKey, Episode, EpisodeCompKey, EpisodeEntity } from "$shared/models/episodes/episode";
-import { stringifyEpisodeCompKey, fixtureEpisodes } from "$sharedSrc/models/episodes/tests";
+import { EpisodeEntity } from "$shared/models/episodes/episode";
+import { fixtureEpisodes } from "$sharedSrc/models/episodes/tests";
 import { PreventRepeatLastFilter } from "../prevent-repeat-last-filter";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
@@ -16,7 +16,7 @@ type Case<ID> = {
   expected: boolean;
 };
 
-type CaseEpisode = Case<EpisodeCompKey>;
+type CaseEpisode = Case<string>;
 
 describe.each([
   {
@@ -25,25 +25,23 @@ describe.each([
     expected: true,
   },
   {
-    lastId: DEFAULT_EPISODE.compKey,
+    lastId: DEFAULT_EPISODE.id,
     resource: OTHER_EPISODE,
     expected: true,
   },
   {
-    lastId: DEFAULT_EPISODE.compKey,
+    lastId: DEFAULT_EPISODE.id,
     resource: DEFAULT_EPISODE,
     expected: false,
   },
 ] as CaseEpisode[])("preventRepeatLastFilter", ( { lastId, resource, expected }: CaseEpisode) => {
   it(`should return ${expected} when lastId = ${
     lastId
-      ? stringifyEpisodeCompKey(lastId)
-      : undefined
-  } and current episode is ${stringifyEpisodeCompKey(resource.compKey)}`, async () => {
-    const filter = new PreventRepeatLastFilter<EpisodeCompKey, Episode>( {
+  } and current episode is ${resource.id}`, async () => {
+    const filter = new PreventRepeatLastFilter<string, EpisodeEntity>( {
       lastId,
-      compareId: compareEpisodeCompKey,
-      getResourceId: e=>e.compKey,
+      compareId: (a, b)=>a === b,
+      getResourceId: e=>e.id,
     } );
     const result = await filter.filter(resource);
 

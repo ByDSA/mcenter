@@ -1,29 +1,61 @@
 import { Application } from "express";
 import request from "supertest";
-import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { HttpStatus } from "@nestjs/common";
+import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
-import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
+import { EpisodeHistoryEntryCrudDtos } from "$shared/models/episodes/history/dto/transport";
+import z from "zod";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
+import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
+import { mockMongoId } from "#tests/mongo";
+import { fixtureEpisodes } from "#episodes/tests";
+import { episodeUserInfoEntitySchema } from "#episodes/models";
 import { EpisodeHistoryRepository } from "./repository";
-import { episodeHistoryRepositoryMockProvider, lastTimePlayedServiceMockProvider } from "./repository/tests";
 import { EpisodeHistoryCrudController } from "./controller";
 
 const SAMPLE = fixtureEpisodeHistoryEntries.Simpsons.Samples.EP1x01;
+const SAMPLE_WITH_RESOURCE_AND_USERINFO = {
+  ...SAMPLE,
+  resource: {
+    ...fixtureEpisodes.Simpsons.Samples.EP1x01,
+    userInfo: {
+      episodeId: fixtureEpisodes.Simpsons.Samples.EP1x01.id,
+      id: mockMongoId,
+      lastTimePlayed: new Date(0),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      weight: 0,
+      userId: fixtureUsers.Normal.User.id,
+    }satisfies z.infer<typeof episodeUserInfoEntitySchema>,
+  },
+};
 
-describe("crudController", () => {
+describe("episodeHistoryCrudController", () => {
   let routerApp: Application;
-  let repository: jest.Mocked<EpisodeHistoryRepository>;
   let testingSetup: TestingSetup;
+  let mocks: Awaited<ReturnType<typeof initMocks>>;
+  const validSeriesId = mockMongoId;
+
+  // eslint-disable-next-line require-await
+  async function initMocks(setup: TestingSetup) {
+    const ret = {
+      repo: setup.getMock(EpisodeHistoryRepository),
+    };
+
+    ret.repo.getManyBySeriesId.mockResolvedValue([SAMPLE_WITH_RESOURCE_AND_USERINFO]);
+    ret.repo.getManyByCriteria.mockResolvedValue([SAMPLE_WITH_RESOURCE_AND_USERINFO]);
+
+    return ret;
+  }
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
       imports: [],
       controllers: [EpisodeHistoryCrudController],
       providers: [
-        episodeHistoryRepositoryMockProvider,
-        lastTimePlayedServiceMockProvider,
+        getOrCreateMockProvider(EpisodeHistoryRepository),
       ],
     }, {
       auth: {
@@ -31,11 +63,9 @@ describe("crudController", () => {
         cookies: "mock",
       },
     } );
-    repository = testingSetup.module
-      .get<jest.Mocked<EpisodeHistoryRepository>>(EpisodeHistoryRepository);
 
     routerApp = testingSetup.routerApp;
-
+    mocks = await initMocks(testingSetup);
     await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
   } );
 
@@ -43,136 +73,141 @@ describe("crudController", () => {
     jest.clearAllMocks();
   } );
 
-  it("should be defined", () => {
-    expect(repository).toBeDefined();
-    expect(routerApp).toBeDefined();
+  describe("getManyBySeriesId", () => {
+    const validUrl = `/${validSeriesId}`;
+    const invalidUrl = "/notObjectId";
+
+    it("should return 422 if seriesId is not ObjectId", async () => {
+      const res = await request(routerApp)
+        .get(invalidUrl);
+
+      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+    } );
+
+    it("should call repository with correct params", async () => {
+      await request(routerApp)
+        .get(validUrl);
+
+      expect(mocks.repo.getManyBySeriesId).toHaveBeenCalledTimes(1);
+    } );
+
+    it("should return 200 and empty array when no entries found", async () => {
+      mocks.repo.getManyBySeriesId.mockResolvedValueOnce([]);
+
+      const res = await request(routerApp)
+        .get(validUrl);
+
+      expect(res.statusCode).toBe(HttpStatus.OK);
+      expect(res.body).toEqual(createSuccessResultResponse([]));
+    } );
+
+    it("should return 200 and entries when found", async () => {
+      const entries = [SAMPLE_WITH_RESOURCE_AND_USERINFO];
+
+      mocks.repo.getManyBySeriesId.mockResolvedValueOnce(entries);
+
+      const res = await request(routerApp)
+        .get(validUrl);
+      const parsedRes = EpisodeHistoryEntryCrudDtos.GetMany.responseSchema.parse(res.body);
+
+      expect(res.statusCode).toBe(HttpStatus.OK);
+      expect(parsedRes).toEqual(createSuccessResultResponse(entries));
+    } );
   } );
 
-  describe("getOneBySeriesKey", () => {
-    it("should call historyList repository", async () => {
-      await request(routerApp)
-        .get("/seriesKey")
-        .send();
+  describe("getAllEntriesByseriesKey", () => {
+    const validUrl = `/${validSeriesId}/entries`;
 
-      expect(repository.getManyBySeriesKey).toHaveBeenCalledTimes(1);
+    it("should call repository with correct criteria", async () => {
+      await request(routerApp)
+        .get(validUrl);
+
+      expect(mocks.repo.getManyByCriteria).toHaveBeenCalledTimes(1);
     } );
 
-    it("should return empty array and 200 if 'id' is not found in repository", async () => {
-      repository.getManyBySeriesKey.mockResolvedValueOnce([]);
-      await request(routerApp)
-        .get("/seriesKey")
-        .expect(HttpStatus.OK)
-        .send();
-    } );
+    it("should return 200 and entries when found", async () => {
+      const entries = [SAMPLE_WITH_RESOURCE_AND_USERINFO];
 
-    it("should return same as repository returns", async () => {
-      const entries = [SAMPLE];
+      mocks.repo.getManyByCriteria.mockResolvedValueOnce(entries);
 
-      repository.getManyBySeriesKey.mockResolvedValueOnce(entries);
+      const res = await request(routerApp)
+        .get(validUrl);
+      const parsedRes = EpisodeHistoryEntryCrudDtos.GetMany.responseSchema.parse(res.body);
 
-      const response = await request(routerApp)
-        .get("/seriesKey")
-        .expect(HttpStatus.OK)
-        .send();
-
-      expect(response.body).toEqual(createSuccessResultResponse(entries));
+      expect(res.statusCode).toBe(HttpStatus.OK);
+      expect(parsedRes).toEqual(createSuccessResultResponse(entries));
     } );
   } );
 
-  describe("entries", () => {
-    describe("getAllEntriesBySeriesKey", () => {
-      it("should call historyList repository", async () => {
-        await request(routerApp)
-          .get("/seriesKey/entries")
-          .send();
+  describe("getManyEntriesBySerieAndCriteria", () => {
+    const URL = `/${validSeriesId}/entries/${GET_MANY_CRITERIA_PATH}`;
 
-        expect(repository.getManyByCriteria).toHaveBeenCalledTimes(1);
-      } );
+    it("should return 422 if provided unexpected property", async () => {
+      const res = await request(routerApp)
+        .post(URL)
+        .send( {
+          cosarara: "porquesi",
+        } );
 
-      it("should return the same entries that repository returns inside", async () => {
-        const entries = [SAMPLE];
-
-        repository.getManyByCriteria.mockResolvedValueOnce(entries);
-
-        const response = await request(routerApp)
-          .get("/seriesKey/entries")
-          .expect(HttpStatus.OK)
-          .send();
-
-        expect(response.body).toEqual(createSuccessResultResponse(entries));
-      } );
+      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     } );
 
-    describe("getManyEntriesBySerieAndCriteria", () => {
-      it("should call historyList repository", async () => {
-        await request(routerApp)
-          .post("/seriesKey/entries/" + GET_MANY_CRITERIA_PATH)
-          .send( {} );
+    it("should call repository with merged criteria", async () => {
+      await request(routerApp)
+        .post(URL)
+        .send( {} );
 
-        expect(repository.getManyByCriteria).toHaveBeenCalledTimes(1);
-      } );
-
-      it("should throw 422 if provided unexpected property", async () => {
-        await request(routerApp)
-          .post("/id/entries/" + GET_MANY_CRITERIA_PATH)
-          .expect(HttpStatus.UNPROCESSABLE_ENTITY)
-          .send( {
-            cosarara: "porquesi",
-          } );
-      } );
-
-      it("should return all entries if empty criteria provided", async () => {
-        const entries = [SAMPLE];
-
-        repository.getManyByCriteria.mockResolvedValueOnce(entries);
-
-        const response = await request(routerApp)
-          .post("/seriesKey/entries/" + GET_MANY_CRITERIA_PATH)
-          .send( {} );
-
-        expect(response.statusCode).toEqual(HttpStatus.OK);
-        expect(response.body).toEqual(
-          createSuccessResultResponse(
-            entries,
-          ),
-        );
-      } );
+      expect(mocks.repo.getManyByCriteria).toHaveBeenCalledTimes(1);
     } );
 
-    describe("getManyEntriesByCriteria", () => {
-      const URL = "/entries/" + GET_MANY_CRITERIA_PATH;
+    it("should return 200 and entries with valid criteria", async () => {
+      const entries = [SAMPLE_WITH_RESOURCE_AND_USERINFO];
 
-      it("should call historyList repository", async () => {
-        await request(routerApp)
-          .post(URL)
-          .send( {} );
+      mocks.repo.getManyByCriteria.mockResolvedValueOnce(entries);
 
-        expect(repository.getManyByCriteria).toHaveBeenCalledTimes(1);
-      } );
+      const res = await request(routerApp)
+        .post(URL)
+        .send( {} );
+      const parsedRes = EpisodeHistoryEntryCrudDtos.GetMany.responseSchema.parse(res.body);
 
-      it("should throw 422 if provided unexpected property", async () => {
-        await request(routerApp)
-          .post(URL)
-          .expect(HttpStatus.UNPROCESSABLE_ENTITY)
-          .send( {
-            cosarara: "porquesi",
-          } );
-      } );
+      expect(res.statusCode).toBe(HttpStatus.OK);
+      expect(parsedRes).toEqual(createSuccessResultResponse(entries));
+    } );
+  } );
 
-      it("should return all entries if empty criteria provided", async () => {
-        const entries = [SAMPLE];
+  describe("getManyEntriesByCriteria", () => {
+    const URL = `/entries/${GET_MANY_CRITERIA_PATH}`;
 
-        repository.getManyByCriteria.mockResolvedValueOnce(entries);
+    it("should return 422 if provided unexpected property", async () => {
+      const res = await request(routerApp)
+        .post(URL)
+        .send( {
+          cosarara: "porquesi",
+        } );
 
-        const response = await request(routerApp)
-          .post(URL)
-          .send( {} );
+      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+    } );
 
-        expect(response.statusCode).toEqual(HttpStatus.OK);
-        expect(response.body).toEqual(
-          createSuccessResultResponse(entries),
-        );
-      } );
+    it("should call repository with user-scoped criteria", async () => {
+      await request(routerApp)
+        .post(URL)
+        .send( {} );
+
+      expect(mocks.repo.getManyByCriteria).toHaveBeenCalledTimes(1);
+    } );
+
+    it("should return 200 and entries with valid criteria", async () => {
+      const entries = [SAMPLE_WITH_RESOURCE_AND_USERINFO];
+
+      mocks.repo.getManyByCriteria.mockResolvedValueOnce(entries);
+
+      const res = await request(routerApp)
+        .post(URL)
+        .send( {} );
+      const parsedRes = EpisodeHistoryEntryCrudDtos.GetMany.responseSchema.parse(res.body);
+
+      expect(res.statusCode).toBe(HttpStatus.OK);
+      expect(parsedRes).toEqual(createSuccessResultResponse(entries));
     } );
   } );
 } );

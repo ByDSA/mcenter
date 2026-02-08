@@ -60,14 +60,14 @@ async function addToSeries(seriesWithEpisodesCollection: SerieWithEpisodesDocODM
   await createCollectionIfNotExists(SERIES_COLLECTION);
 
   const seriesWithEpisodes: SerieWithEpisodes[] = seriesWithEpisodesCollection.map(serieWithEpisodesDocOdmToModel);
-  const series = seriesWithEpisodes.map(serieWithEpisodesToSerie);
+  const manySeries = seriesWithEpisodes.map(serieWithEpisodesToSerie);
 
-  for (const serie of series) {
+  for (const series of manySeries) {
     // eslint-disable-next-line no-await-in-loop
     await mongoose.connection.db.collection(SERIES_COLLECTION).updateOne( {
-      id: serie.id,
+      id: series.id,
     }, {
-      $setOnInsert: serie,
+      $setOnInsert: series,
     }, {
       upsert: true,
     } );

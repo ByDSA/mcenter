@@ -19,8 +19,10 @@ import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { DaForm } from "#modules/ui-kit/form/Form";
 import { DaInputTime } from "#modules/ui-kit/form/input/Time/InputTime";
+import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { episodeFileInfoSchema } from "../file-info/models";
 import { useEpisode } from "../hooks";
+import { useSeries } from "../series/hooks";
 import styles from "./style.module.css";
 
 const schema = z.object( {
@@ -46,6 +48,11 @@ type Props = {
 };
 
 export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
+  const { data: series } = useSeries(initialData.seriesId, {
+    notExpandCountEpisodes: true,
+    notExpandCountSeasons: true,
+    notExpandImageCover: true,
+  } );
   // Asumimos que editamos el primer archivo si existe, igual que en la versión anterior
   const fileInfo = initialData.fileInfos?.[0];
   const { register,
@@ -63,6 +70,10 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
       end: fileInfo?.end,
     },
   } );
+
+  if (!series)
+    return <ContentSpinner />;
+
   const onSubmit = async (formValues: FormData) => {
     const episodesApi = FetchApi.get(EpisodesApi);
     const userInfoApi = FetchApi.get(EpisodeUserInfosApi);
@@ -82,7 +93,10 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
     }
 
     const episodePromise = hasEpisodeChanges
-      ? episodesApi.patch(initialData.compKey, {
+      ? episodesApi.patch( {
+        episodeKey: initialData.episodeKey,
+        seriesKey: series.key,
+      }, {
         entity: episodePatch,
       } )
       : Promise.resolve( {
@@ -165,9 +179,9 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
       <DaInputGroup inline>
         <DaLabel>Episodio</DaLabel>
         <span>
-          <span>{initialData.serie?.name ?? initialData.compKey.seriesKey}</span>
+          <span>{series.name}</span>
           <Separator />
-          <span>{initialData.compKey.episodeKey}</span>
+          <span>{initialData.episodeKey}</span>
         </span>
       </DaInputGroup>
       <DaInputGroup inline>

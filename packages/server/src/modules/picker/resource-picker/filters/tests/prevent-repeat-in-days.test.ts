@@ -9,7 +9,7 @@ const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 
 class PreventRepeatInDaysResourceFilter extends PreventRepeatInDaysFilter<ResourceWithUserInfo> {
   getLastTimePlayed(r: ResourceWithUserInfo) {
-    return r.userInfo.lastTimePlayed ?? 0;
+    return new Date(r.userInfo.lastTimePlayed * 1_000);
   }
 }
 
@@ -77,17 +77,17 @@ type CaseLastTimePlayed = {
 const casesLastTimePlayed = [
   {
     lastTimePlayed: 0,
-    minDays: Infinity,
+    minDays: 9999,
     expected: true,
   },
   {
     lastTimePlayed: -1,
-    minDays: Infinity,
+    minDays: 9999,
     expected: true,
   },
   {
     lastTimePlayed: undefined,
-    minDays: Infinity,
+    minDays: 9999,
     expected: true,
   },
   {

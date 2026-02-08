@@ -3,20 +3,20 @@ import { ObjectId } from "mongodb";
 import { fixtureUsers } from "../../../auth/tests/fixtures";
 import { deepFreeze } from "../../../../utils/objects";
 import { STREAM_SAMPLE, STREAM_SIMPSONS } from "../../streams/tests";
-import { SAMPLE1 as DATE_SAMPLE1 } from "../../../../../tests/other-fixtures/dates";
+import { DATEJS_SAMPLE1 } from "../../../../../tests/other-fixtures/dates";
 import { fixtureEpisodes } from "../../tests";
 
 const HISTORY_ENTRY_SIMPSONS1: EpisodeHistoryEntryEntity = {
   id: new ObjectId().toString(),
   resourceId: fixtureEpisodes.Simpsons.Samples.EP1x01.id,
-  date: DATE_SAMPLE1,
+  date: DATEJS_SAMPLE1,
   streamId: STREAM_SIMPSONS.id,
   userId: fixtureUsers.Normal.User.id,
 };
 const HISTORY_ENTRY_SIMPSONS_6_25: EpisodeHistoryEntryEntity = {
   id: new ObjectId().toString(),
   resourceId: fixtureEpisodes.Simpsons.Samples.Dependency.last.id,
-  date: DATE_SAMPLE1,
+  date: DATEJS_SAMPLE1,
   streamId: STREAM_SIMPSONS.id,
   userId: fixtureUsers.Normal.User.id,
 };
@@ -26,14 +26,14 @@ const HISTORY_ENTRIES_SIMPSONS: EpisodeHistoryEntryEntity[] = deepFreeze([
 ] satisfies EpisodeHistoryEntryEntity[]);
 const HISTORY_ENTRY_SAMPLE1: EpisodeHistoryEntryEntity = {
   id: new ObjectId().toString(),
-  resourceId: fixtureEpisodes.SerieSample.Samples.EP1x01.id,
-  date: DATE_SAMPLE1,
+  resourceId: fixtureEpisodes.SampleSeries.Samples.EP1x01.id,
+  date: DATEJS_SAMPLE1,
   streamId: STREAM_SAMPLE.id,
   userId: fixtureUsers.Normal.User.id,
 };
 
 export const fixtureEpisodeHistoryEntries = {
-  SampleSerie: {
+  SampleSeries: {
     Samples: {
       EP1x01: HISTORY_ENTRY_SAMPLE1,
     },

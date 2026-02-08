@@ -1,3 +1,3 @@
 export {
-  LastTimePlayedService,
-} from "./last-time-played.service";
+  EpisodeLastTimePlayedService,
+} from "./last-time-played/service";

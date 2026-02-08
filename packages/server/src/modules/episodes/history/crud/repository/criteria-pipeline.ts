@@ -3,9 +3,9 @@ import { Types, type PipelineStage } from "mongoose";
 import { WithRequired } from "$shared/utils/objects";
 import { assertIsDefined } from "$shared/utils/validation";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
-import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
-import { EpisodesUsersOdm } from "#episodes/crud/repositories/user-infos/odm";
 import { assertFoundClient } from "#utils/validation/found";
+import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
+import { enrichSingleEpisode } from "#episodes/crud/repositories/episodes/odm/criteria-pipeline";
 import { DocOdm, FullDocOdm } from "./odm/odm";
 
 function buildMongooseSort(
@@ -15,7 +15,7 @@ function buildMongooseSort(
     return undefined;
 
   return {
-    "date.timestamp": body.sort.timestamp === "asc" ? 1 : -1,
+    date: body.sort.timestamp === "asc" ? 1 : -1,
   };
 }
 
@@ -24,7 +24,7 @@ function buildMongooseFilter(
 ): MongoFilterQuery<DocOdm> {
   const filter: MongoFilterQuery<WithRequired<FullDocOdm, "episode"> & {
     episode: {
-      serie: NonNullable<Required<FullDocOdm>["episode"]["serie"]>;
+      series: NonNullable<Required<FullDocOdm>["episode"]["series"]>;
     };
   }> = {};
   const userIdStr = criteria.filter?.userId;
@@ -34,12 +34,12 @@ function buildMongooseFilter(
   filter.userId = new Types.ObjectId(userIdStr);
 
   if (criteria.filter) {
-    if (criteria.filter.seriesKey) {
+    if (criteria.filter.seriesId) {
       assertFoundClient(
         criteria.expand?.includes("episodes"),
-        "Lookup episodes is required to filter by seriesKey",
+        "Lookup episodes is required to filter by seriesId",
       );
-      filter["episode.seriesKey"] = criteria.filter.seriesKey;
+      filter["episode.seriesId"] = new Types.ObjectId(criteria.filter.seriesId);
     }
 
     if (criteria.filter.episodeKey) {
@@ -50,9 +50,12 @@ function buildMongooseFilter(
       filter["episode.episodeKey"] = criteria.filter.episodeKey;
     }
 
+    if (criteria.filter.episodeId)
+      filter["episodeId"] = new Types.ObjectId(criteria.filter.episodeId);
+
     if (criteria.filter.timestampMax !== undefined) {
-      filter["date.timestamp"] = {
-        $lte: criteria.filter.timestampMax,
+      filter["date"] = {
+        $lte: new Date(criteria.filter.timestampMax * 1000),
       };
     }
   }
@@ -63,14 +66,50 @@ function buildMongooseFilter(
 export function getCriteriaPipeline(
   criteria: EpisodeHistoryEntryCrudDtos.GetMany.Criteria,
 ) {
+  if (criteria.limit !== undefined && criteria.limit < 1) {
+    return [{
+      $match: {
+        _id: null,
+      },
+    }];
+  }
+
   const filter = buildMongooseFilter(criteria);
   const sort = buildMongooseSort(criteria);
-  const pipeline: PipelineStage[] = [
-    {
-      $match: filter,
-    },
-  ];
+  const pipeline: PipelineStage[] = [];
+  const needsEpisodeLookupEarly = criteria.filter?.episodeKey || criteria.filter?.seriesId;
+  const needsEpisodeLookup = criteria.expand?.includes("episodes")
+  || criteria.expand?.includes("episodesFileInfos")
+  || criteria.expand?.includes("episodesUserInfo")
+  || criteria.expand?.includes("episodesSeries")
+  || criteria.expand?.includes("episodesSeriesImageCover");
 
+  // 1. Lookup de episode ANTES del match si necesitamos filtrar por sus campos
+  if (needsEpisodeLookupEarly && needsEpisodeLookup) {
+    pipeline.push( {
+      $lookup: {
+        from: EpisodeOdm.COLLECTION_NAME,
+        localField: "episodeId",
+        foreignField: "_id",
+        as: "episode",
+      },
+    } );
+
+    pipeline.push( {
+      $addFields: {
+        episode: {
+          $arrayElemAt: ["$episode", 0],
+        },
+      },
+    } );
+  }
+
+  // 2. Match (ahora puede filtrar por episode.episodeKey o episode.seriesId si aplica)
+  pipeline.push( {
+    $match: filter,
+  } );
+
+  // 3. Sort, skip, limit
   if (sort) {
     pipeline.push( {
       $sort: sort,
@@ -89,107 +128,38 @@ export function getCriteriaPipeline(
     } );
   }
 
-  // Agregar lookups para expand
-  if (criteria.expand) {
-    if (criteria.expand.includes("episodes")) {
-      const episodesLookUp = {
-        $lookup: {
-          from: "episodes",
-          localField: "episodeId",
-          foreignField: "_id",
-          as: "episode",
+  // 4. Lookup de episode DESPUÉS de paginación si no se hizo antes
+  if (needsEpisodeLookup && !needsEpisodeLookupEarly) {
+    pipeline.push( {
+      $lookup: {
+        from: EpisodeOdm.COLLECTION_NAME,
+        localField: "episodeId",
+        foreignField: "_id",
+        as: "episode",
+      },
+    } );
+
+    pipeline.push( {
+      $addFields: {
+        episode: {
+          $arrayElemAt: ["$episode", 0],
         },
-      };
+      },
+    } );
+  }
 
-      if (criteria.filter?.episodeKey || criteria.filter?.seriesKey)
-        pipeline.unshift(episodesLookUp);
-      else
-        pipeline.push(episodesLookUp);
+  if (needsEpisodeLookup) {
+    const episodeEnrichFlags = {
+      includeFileInfos: criteria.expand!.includes("episodesFileInfos"),
+      includeUserInfo: criteria.expand!.includes("episodesUserInfo"),
+      includeSeries: criteria.expand!.includes("episodesSeries"),
+      includeSeriesImageCover: criteria.expand!.includes("episodesSeriesImageCover"),
+    };
 
-      // Convertir el array a objeto único
-      pipeline.push( {
-        $addFields: {
-          episode: {
-            $arrayElemAt: ["$episode", 0],
-          },
-        },
-      } );
-
-      // Si también se solicita series, agregarlo al episode
-      if (criteria.expand.includes("episodesSeries")) {
-        pipeline.push( {
-          $lookup: {
-            from: "series",
-            localField: "episode.seriesKey",
-            foreignField: "key",
-            as: "serieTemp",
-          },
-        } );
-
-        // Añadir la serie al episode
-        pipeline.push( {
-          $addFields: {
-            "episode.serie": {
-              $arrayElemAt: ["$serieTemp", 0],
-            },
-          },
-        } );
-
-        // Limpiar el campo temporal
-        pipeline.push( {
-          $unset: "serieTemp",
-        } );
-      }
-
-      if (criteria.expand.includes("episodesFileInfos")) {
-        pipeline.push( {
-          $lookup: {
-            from: EpisodeFileInfoOdm.COLLECTION_NAME,
-            localField: "episode._id",
-            foreignField: "episodeId",
-            as: "episodeFileInfos",
-          },
-        } );
-
-        // Añadir los fileInfos al episode
-        pipeline.push( {
-          $addFields: {
-            "episode.fileInfos": "$episodeFileInfos",
-          },
-        } );
-
-        // Limpiar el campo temporal
-        pipeline.push( {
-          $unset: "episodeFileInfos",
-        } );
-      }
-
-      if (criteria.expand.includes("episodesUserInfo")) {
-        pipeline.push( {
-          $lookup: {
-            from: EpisodesUsersOdm.COLLECTION_NAME,
-            localField: "episode._id",
-            foreignField: "episodeId",
-            as: "tmp",
-          },
-        } );
-
-        // Añadir al episode
-        pipeline.push( {
-          $addFields: {
-            "episode.userInfo": {
-              $arrayElemAt: ["$tmp", 0],
-            },
-
-          },
-        } );
-
-        // Limpiar el campo temporal
-        pipeline.push( {
-          $unset: "tmp",
-        } );
-      }
-    }
+    // Usar enrichSingleEpisode apuntando al campo "episode"
+    pipeline.push(
+      ...enrichSingleEpisode("episodeId", "episode", criteria.filter?.userId, episodeEnrichFlags),
+    );
   }
 
   return pipeline;

@@ -16,7 +16,7 @@ export type FullDocOdm = RequireId<DocOdm> & {
   countSeasons?: number;
 };
 
-const NAME = "Serie";
+const NAME = "Series";
 
 export const COLLECTION = "series";
 

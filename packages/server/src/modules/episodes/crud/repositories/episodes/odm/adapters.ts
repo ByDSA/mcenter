@@ -10,10 +10,8 @@ import { DocOdm, FullDocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {
   const model: Episode = {
-    compKey: {
-      episodeKey: docOdm.episodeKey,
-      seriesKey: docOdm.seriesKey,
-    },
+    episodeKey: docOdm.episodeKey,
+    seriesId: docOdm.seriesId.toString(),
     title: docOdm.title,
     disabled: docOdm.disabled,
     tags: docOdm.tags,
@@ -41,8 +39,8 @@ export function docOdmToEntity(docOdm: FullDocOdm): EpisodeEntity {
   if (docOdm.userInfo)
     ret.userInfo = EpisodesUsersOdm.toEntity(docOdm.userInfo);
 
-  if (docOdm.serie)
-    ret.serie = SeriesOdm.toEntity(docOdm.serie);
+  if (docOdm.series)
+    ret.series = SeriesOdm.toEntity(docOdm.series);
 
   return ret;
 }
@@ -66,8 +64,8 @@ export function episodeToDocOdm(model: Episode): DocOdm {
 
   const ret = {
     title: model.title,
-    episodeKey: model.compKey.episodeKey,
-    seriesKey: model.compKey.seriesKey,
+    episodeKey: model.episodeKey,
+    seriesId: new Types.ObjectId(model.seriesId),
     disabled: model.disabled,
     tags: model.tags,
     uploaderUserId: new Types.ObjectId(model.uploaderUserId),
@@ -84,12 +82,18 @@ export function episodeToDocOdm(model: Episode): DocOdm {
 
 export function partialModelToDocOdm(model: Partial<EpisodeEntity>): MongoUpdateQuery<DocOdm> {
   const ret: MongoUpdateQuery<DocOdm> = {
-    episodeKey: model.compKey?.episodeKey,
-    seriesKey: model.compKey?.seriesKey,
-    title: model.title,
     tags: model.tags,
     imageCoverId: model.imageCoverId,
   };
+
+  if (model.title !== undefined)
+    ret.title = model.title;
+
+  if (model.episodeKey !== undefined)
+    ret.episodeKey = model.episodeKey;
+
+  if (model.seriesId !== undefined)
+    ret.seriesId = new Types.ObjectId(model.seriesId);
 
   if ("disabled" in model) {
     if (model.disabled === undefined) {
