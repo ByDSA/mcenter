@@ -13,7 +13,6 @@ import { MemoryUploadFileInterceptor } from "./MemoryUploadFile.interceptor";
 describe("imageCoverCrudController (upload)", () => {
   let testingSetup: TestingSetup;
   let routerApp: Application;
-  let repoMock: jest.Mocked<ImageCoversRepository>;
   let uploadServiceMock: jest.Mocked<ImageCoversUploadService>;
 
   beforeAll(async () => {
@@ -38,7 +37,6 @@ describe("imageCoverCrudController (upload)", () => {
     routerApp = testingSetup.routerApp;
 
     uploadServiceMock = testingSetup.getMock(ImageCoversUploadService);
-    repoMock = testingSetup.getMock(ImageCoversRepository);
   } );
 
   beforeEach(() => {

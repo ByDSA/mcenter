@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { Module } from "@nestjs/common";
 import { EpisodesCrudModule } from "#episodes/crud/module";
 import { EpisodeHistoryCrudModule } from "../crud/module";

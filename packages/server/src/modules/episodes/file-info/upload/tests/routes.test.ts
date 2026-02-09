@@ -1,6 +1,6 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { EpisodeFileInfosUploadController } from "../controller";
 import { testRoute, verifyRoutesCoverage } from "#core/routing/test";
+import { EpisodeFileInfosUploadController } from "../controller";
 
 testRoute(PATH_ROUTES.episodes.fileInfo.upload.path, {
   method: "POST",

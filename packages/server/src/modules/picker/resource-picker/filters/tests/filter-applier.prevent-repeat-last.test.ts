@@ -1,7 +1,7 @@
-import { FilterApplier } from "../filter-applier";
-import { PreventRepeatLastFilter } from "../prevent-repeat-last-filter";
 import { EpisodeEntity } from "#episodes/models";
 import { fixtureEpisodes } from "#episodes/tests";
+import { FilterApplier } from "../filter-applier";
+import { PreventRepeatLastFilter } from "../prevent-repeat-last-filter";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 const TWO_EPS = [

@@ -1,6 +1,6 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { EpisodeDependenciesCrudController } from "./controller";
 import { testCrudRoutes, testRoute, verifyRoutesCoverage } from "#core/routing/test";
+import { EpisodeDependenciesCrudController } from "./controller";
 
 testCrudRoutes(PATH_ROUTES.episodes.dependencies.path, [
   "get-all",

@@ -2,10 +2,10 @@ import request from "supertest";
 import { Application } from "express";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { HttpStatus } from "@nestjs/common";
-import { StreamPickerModule } from "./module";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
+import { StreamPickerModule } from "./module";
 
 async function loadFixtures() {
   await loadFixtureSimpsons();

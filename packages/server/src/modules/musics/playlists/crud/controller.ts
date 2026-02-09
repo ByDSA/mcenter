@@ -13,11 +13,11 @@ import { GetManyCriteria, GetOneCriteria, UserDeleteOne, UserPatchOne, UserPost,
 import { ResponseFormat } from "#modules/resources/response-formatter";
 import { assertFoundClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
-import { MusicRendererService } from "#modules/musics/renderer/renderer.service";
+import { MusicRendererService } from "#musics/renderer/renderer.service";
 import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { IdParamDto } from "#utils/validation/dtos";
-import { MusicResponseFormatterService } from "#modules/musics/renderer/formatter.service";
+import { MusicResponseFormatterService } from "#musics/renderer/formatter.service";
 import { MusicPlaylistCrudDtos } from "../models/dto";
 import { musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistsRepository } from "./repository/repository";

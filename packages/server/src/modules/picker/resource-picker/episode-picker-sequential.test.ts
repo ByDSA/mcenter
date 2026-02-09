@@ -1,6 +1,6 @@
-import { ResourcePickerSequential } from "./resource-picker-sequential";
 import { Episode, EpisodeEntity } from "#episodes/models";
 import { fixtureEpisodes } from "#episodes/tests";
+import { ResourcePickerSequential } from "./resource-picker-sequential";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 

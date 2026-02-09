@@ -1,6 +1,6 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { FixerController } from "./controller";
 import { testRoute, verifyRoutesCoverage } from "#core/routing/test";
+import { FixerController } from "./controller";
 
 testRoute(PATH_ROUTES.streams.fixer.path);
 
