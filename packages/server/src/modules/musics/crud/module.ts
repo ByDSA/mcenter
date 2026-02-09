@@ -2,7 +2,6 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { MeilisearchModule } from "#modules/search/module";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { MusicHistoryModule } from "../history/module";
 import { MusicFlowService } from "../MusicFlow.service";
 import { MusicRendererModule } from "../renderer/module";
@@ -21,7 +20,6 @@ import { GetManyByCriteriaMusicRepoService } from "./repositories/music/get-many
     forwardRef(()=>MusicHistoryModule),
     MeilisearchModule,
     MusicRendererModule,
-    ResourceResponseFormatterModule,
   ],
   controllers: [
     MusicCrudController,

@@ -39,7 +39,7 @@ export class PlayEpisodeController {
       remotePlayerId: params.remotePlayerId,
     } );
 
-    const episode = await this.episodesRepo.getOneBySeriesKeyAndEpisodeKey(
+    const episode = await this.episodesRepo.getOneBySlug(
       params.seriesKey,
       params.episodeKey,
     );
@@ -65,7 +65,7 @@ export class PlayEpisodeController {
         remotePlayerId: params.remotePlayerId,
         secretToken: body.secretToken,
       } );
-      const episode = await this.episodesRepo.getOneBySeriesKeyAndEpisodeKey(
+      const episode = await this.episodesRepo.getOneBySlug(
         params.seriesKey,
         params.episodeKey,
       );

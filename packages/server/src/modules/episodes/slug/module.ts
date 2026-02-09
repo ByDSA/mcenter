@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
-import { ResourcesSlugModule } from "#modules/resources/slug/module";
+import { StreamFileModule } from "#modules/resources/stream-file/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
+import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { EpisodeSlugHandlerService } from "./service";
 import { EpisodesSlugController } from "./controller";
 
@@ -12,8 +12,8 @@ import { EpisodesSlugController } from "./controller";
     EpisodeHistoryCrudModule,
     EpisodeFileInfosCrudModule,
     EpisodesCrudModule,
-    ResourceResponseFormatterModule,
-    ResourcesSlugModule,
+    EpisodeResponseFormatterModule,
+    StreamFileModule,
   ],
   controllers: [
     EpisodesSlugController,

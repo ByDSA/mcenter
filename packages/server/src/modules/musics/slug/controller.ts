@@ -1,12 +1,13 @@
-import { Controller, Get, Param, Query, Req, Res } from "@nestjs/common";
+import { Controller, Get, Param, Query, Req } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
-import { Response, Request } from "express";
+import { Request } from "express";
 import { UserPayload } from "$shared/models/auth";
+import { User } from "#core/auth/users/User.decorator";
 import { MusicsRepository } from "../crud/repositories/music";
 import { ResponseFormat } from "../../resources/response-formatter";
 import { MusicFlowService } from "../MusicFlow.service";
-import { User } from "#core/auth/users/User.decorator";
+import { RenderMusic } from "../renderer/renderer.interceptor";
 
 class GetDto extends createZodDto(z.object( {
   slug: z.string(),
@@ -20,18 +21,20 @@ export class MusicsSlugController {
   ) {
   }
 
+  @RenderMusic( {
+    json: true,
+    m3u8: true,
+    raw: true,
+  } )
   @Get("/:slug")
   async getRaw(
     @Param() params: GetDto,
-    @Res( {
-      passthrough: true,
-    } ) res: Response,
     @Req() req: Request,
     @User() user: UserPayload | null,
     @Query("token") token: string | undefined,
     @Query("skip-history") shouldNotAddToHistory: string | undefined,
   ) {
-    return await this.flow.fetchAndRender((format)=> {
+    return await this.flow.validateParamsAndFetchMusicAndUpdateHistory((format)=> {
       return this.musicRepo.getOneBySlug(
         params.slug,
         {
@@ -45,7 +48,6 @@ export class MusicsSlugController {
       );
     }, {
       req,
-      res,
       user,
       shouldNotAddToHistory: !!shouldNotAddToHistory,
       token,

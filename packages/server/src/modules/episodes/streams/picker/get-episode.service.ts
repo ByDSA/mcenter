@@ -53,7 +53,7 @@ export class StreamGetRandomEpisodeService {
     stream: StreamEntity,
     n = 1,
     criteria?: Parameters<typeof this.episodesRepo
-      .getManyBySerieKey>[1],
+      .getMany>[0],
   ): Promise<EpisodeEntity[]> {
     const seriesKey = getSeriesKeyFromStream(stream);
 

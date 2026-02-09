@@ -7,7 +7,6 @@ import { Types } from "mongoose";
 import { PaginatedResult } from "$shared/utils/http/responses";
 import { CanCreateManyAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { assertFoundClient } from "#utils/validation/found";
-import { SeriesKey } from "#episodes/series";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
@@ -121,18 +120,20 @@ CanGetAll<EpisodeEntity> {
     };
   }
 
-  /**
-   *
-   * @deprecated
-   */
-  async getOneBySeriesKeyAndEpisodeKey(
+  async getOneBySlug(
     seriesKey: string,
     episodeKey: string,
     criteria?: CriteriaOne,
     options?: Options,
   ): Promise<EpisodeEntity | null> {
     try {
-      const seriesId = await this.getSeriesIdStr(seriesKey);
+      const seriesDoc = await SeriesOdm.Model.findOne( {
+        key: seriesKey,
+      } );
+
+      assertFoundClient(seriesDoc);
+
+      const seriesId = seriesDoc._id.toString();
 
       return this.getOne( {
         ...criteria,
@@ -222,36 +223,6 @@ CanGetAll<EpisodeEntity> {
     return episodesOdm.map(EpisodeOdm.toEntity);
   }
 
-  /**
-   * @deprecated
-   */
-  private async getSeriesIdStr(seriesKey: string) {
-    const seriesDoc = await SeriesOdm.Model.findOne( {
-      key: seriesKey,
-    } );
-
-    assertFoundClient(seriesDoc);
-
-    return seriesDoc._id.toString();
-  }
-
-  /**
-   *
-   * @deprecated
-   */
-  async getAllBySeriesKey(seriesKey: SeriesKey): Promise<EpisodeEntity[]> {
-    const seriesId = await this.getSeriesIdStr(seriesKey);
-    const filter = {
-      seriesId: new Types.ObjectId(seriesId),
-    } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
-    const episodesOdm = await EpisodeOdm.Model.find(filter);
-
-    if (episodesOdm.length === 0)
-      return [];
-
-    return episodesOdm.map(EpisodeOdm.toEntity);
-  }
-
   async getAllBySeriesId(seriesId: string): Promise<EpisodeEntity[]> {
     const filter = {
       seriesId: new Types.ObjectId(seriesId),
@@ -276,95 +247,6 @@ CanGetAll<EpisodeEntity> {
     );
 
     return data[0] ?? null;
-  }
-
-  /**
-   *
-   * @deprecated
-   */
-  async getOneByEpisodeKeyAndSerieId(
-    episodeKey: string,
-    seriesId: string,
-    criteria: CriteriaOne,
-    options?: Options,
-  ): Promise<EpisodeEntity | null> {
-    return await this.getOne( {
-      ...criteria,
-      filter: {
-        ...criteria.filter,
-        episodeKey,
-        seriesId,
-      },
-    }, options);
-  }
-
-  /**
-   *
-   * @deprecated
-   */
-  async getManyBySerieKey(
-    seriesKey: SeriesKey,
-    criteria?: Omit<Criteria, "filter">,
-    options?: Options,
-  ): Promise<EpisodeEntity[]> {
-    const seriesDoc = await SeriesOdm.Model.findOne( {
-      key: seriesKey,
-    } );
-
-    if (!seriesDoc)
-      return [];
-
-    const seriesId = seriesDoc._id.toString();
-    const { data } = await this.getMany(
-      {
-        ...criteria,
-        filter: {
-          seriesId,
-        },
-      },
-      {
-        requestingUserId: options?.requestingUserId,
-      },
-    );
-
-    return data;
-  }
-
-  /**
-   *
-   * @deprecated
-   */
-  async patchOneByCompKeyAndGet(
-    compKey: EpisodeCompKey,
-    patchParams: PatchOneParams<Episode>,
-  ): Promise<EpisodeEntity> {
-    const episode = fixFields(patchParams.entity);
-    const partialDocOdm = EpisodeOdm.partialToDoc(episode);
-
-    if (Object.keys(partialDocOdm).length === 0)
-      throw new Error("Empty partialDocOdm, nothing to patch");
-
-    const seriesId = await this.getSeriesIdStr(compKey.seriesKey);
-    const filter = {
-      episodeKey: compKey.episodeKey,
-      seriesId: new Types.ObjectId(seriesId),
-    } satisfies MongoFilterQuery<EpisodeOdm.Doc>;
-    const updateResult = await EpisodeOdm.Model.findOneAndUpdate(filter, partialDocOdm);
-
-    assertFoundClient(updateResult);
-
-    const episodeId = updateResult._id.toString();
-
-    this.domainEventEmitter.emitPatch(EpisodeEvents.Patched.TYPE, {
-      partialEntity: episode,
-      id: episodeId,
-    } );
-
-    const ret = await this.getOneById(episodeId);
-
-    assertFoundClient(ret);
-
-    return ret;
   }
 
   async getOneOrCreate(createDto: CreateOneDto): Promise<EpisodeEntity> {
@@ -432,8 +314,3 @@ CanGetAll<EpisodeEntity> {
     return ret;
   }
 }
-
-type EpisodeCompKey = {
-  seriesKey: string;
-  episodeKey: string;
-};

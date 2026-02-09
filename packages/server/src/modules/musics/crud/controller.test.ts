@@ -2,7 +2,6 @@ import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { mockMongoId } from "#tests/mongo";
 import { MusicFlowService } from "../MusicFlow.service";
 import { MusicHistoryRepository } from "../history/crud/repository";
@@ -18,7 +17,6 @@ crudTestsSuite( {
       imports: [
         DomainEventEmitterModule,
         MusicRendererModule,
-        ResourceResponseFormatterModule,
       ],
       controllers: [MusicCrudController],
       providers: [

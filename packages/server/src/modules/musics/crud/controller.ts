@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, Query, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, Param, Query, Req } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { UserPayload } from "$shared/models/auth";
 import { MusicInfoCrudDtos } from "$shared/models/musics/user-info/dto/transport";
-import { Response, Request } from "express";
+import { Request } from "express";
 import { MusicEntity,
   musicEntitySchema,
   musicUserInfoEntitySchema } from "#musics/models";
@@ -14,6 +14,7 @@ import { AdminDeleteOne,
 import { User } from "#core/auth/users/User.decorator";
 import { IdParamDto } from "#utils/validation/dtos";
 import { MusicFlowService } from "../MusicFlow.service";
+import { RenderMusic } from "../renderer/renderer.interceptor";
 import { MusicsUsersRepository } from "./repositories/user-info/repository";
 import { MusicsRepository } from "./repositories/music";
 
@@ -90,12 +91,13 @@ export class MusicCrudController {
   }
 
   @Get("/:id")
+  @RenderMusic( {
+    json: true,
+    raw: true,
+    m3u8: true,
+  } )
   async getOneById(
     @Param() params: IdParamDto,
-    @Res( {
-      passthrough: true,
-    } )
-      res: Response,
     @Req() req: Request,
     @User() user: UserPayload | null,
     @Query("token") token: string | undefined,
@@ -103,13 +105,12 @@ export class MusicCrudController {
   ) {
     const { id } = params;
 
-    return await this.flow.fetchAndRender(
+    return await this.flow.validateParamsAndFetchMusicAndUpdateHistory(
       (_format) => {
         return this.musicRepo.getOneById(id);
       },
       {
         req,
-        res,
         user,
         shouldNotAddToHistory: !!shouldNotAddToHistory,
         token,

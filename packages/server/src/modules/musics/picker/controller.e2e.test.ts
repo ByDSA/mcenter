@@ -9,7 +9,6 @@ import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit,
   TestingSetup } from "#core/app/tests/app";
 import { loadFixtureMusicsInDisk } from "#core/db/tests/fixtures/sets";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { MusicsIndexService } from "#modules/search/indexes/musics.service";
 import { loadFixtureMusicsUsersInDisk } from "#core/db/tests/fixtures/sets/MusicsUsers";
 import { MusicsSearchService,
@@ -17,6 +16,7 @@ import { MusicsSearchService,
 import { MusicsCrudModule } from "../crud/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicHistoryEntryOdm } from "../history/crud/repository/odm";
+import { MusicRendererModule } from "../renderer/module";
 import { MusicGetRandomController } from "./controller";
 
 let routerApp: Application;
@@ -57,7 +57,7 @@ describe("controller", () => {
           DomainEventEmitterModule,
           MusicHistoryModule,
           MusicsCrudModule,
-          ResourceResponseFormatterModule,
+          MusicRendererModule,
         ],
         controllers: [MusicGetRandomController],
         providers: [],

@@ -5,9 +5,8 @@ import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { EpisodeDependenciesModule } from "#episodes/dependencies/crud/module";
 import { EpisodesCrudModule } from "#episodes/crud/module";
 import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
-import { EpisodeRendererModule } from "#episodes/renderer/module";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { EpisodeLastTimePlayedModule } from "#episodes/history/last-time-played/module";
+import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { StreamGetEpisodeController } from "./get-episode.controller";
 import { StreamGetRandomEpisodeService } from "./get-episode.service";
 import { StreamPickerController } from "./show-picker.controller";
@@ -21,8 +20,7 @@ import { StreamPickerController } from "./show-picker.controller";
     SeriesCrudModule,
     EpisodeDependenciesModule,
     EpisodeFileInfosCrudModule,
-    EpisodeRendererModule,
-    ResourceResponseFormatterModule,
+    EpisodeResponseFormatterModule,
   ],
   controllers: [
     StreamPickerController,

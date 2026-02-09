@@ -1,18 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { Response, Request } from "express";
+import { Request } from "express";
 import { UserPayload } from "$shared/models/auth";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
 import { ResponseFormat } from "$shared/models/resources";
+import { assertFoundClient } from "#utils/validation/found";
+import { MusicResponseFormatterService } from "#musics/renderer/formatter.service";
 import { MusicHistoryRepository } from "./history/crud/repository";
 import { MusicEntity } from "./models";
-import { MusicRendererService } from "./renderer/render.service";
-import { assertFoundClient } from "#utils/validation/found";
-import { MusicResponseFormatterService } from "#modules/resources/response-formatter/music-response-formatter.service";
 
 interface ProcessOptions {
   req: Request;
-  res: Response;
   user: UserPayload | null;
   token?: string;
   shouldNotAddToHistory?: boolean;
@@ -20,49 +18,81 @@ interface ProcessOptions {
 
 @Injectable()
 export class MusicFlowService {
+  private currentOptions!: ProcessOptions;
+
+  private currentFormat!: ResponseFormat;
+
+  private currentMusic!: MusicEntity;
+
   constructor(
     private readonly historyRepo: MusicHistoryRepository,
-    private readonly renderer: MusicRendererService,
     private readonly responseFormatter: MusicResponseFormatterService,
   ) {}
 
-  /**
-   * Ejecuta el flujo común: Validar -> Buscar -> Historial -> Renderizar
-   */
-  async fetchAndRender(
+  async validateParamsAndFetchMusicAndUpdateHistory(
     fetcher: (format: ResponseFormat)=> Promise<MusicEntity | null>,
     options: ProcessOptions,
   ) {
-    const { req, res, user, token, shouldNotAddToHistory } = options;
+    this.currentOptions = options;
 
-    // 1. Validación de seguridad del token
+    this.validateToken(options.token);
+    this.determineResponseFormat();
+    await this.fetchMusic(fetcher);
+    await this.updateHistoryIfNeeded();
+
+    return this.currentMusic;
+  }
+
+  /**
+   * Fase 1: Validación de seguridad del token
+   */
+  private validateToken(token: string | undefined): void {
     mongoDbId.or(z.undefined()).parse(token);
+  }
 
-    // 2. Determinar formato
-    const format = this.responseFormatter.getResponseFormatByRequest(req);
-    // 3. Obtener la música usando el callback inyectado
-    const got = await fetcher(format);
+  /**
+   * Fase 2: Determinar formato de respuesta
+   */
+  private determineResponseFormat(): void {
+    this.currentFormat = this.responseFormatter.getResponseFormatByRequest(
+      this.currentOptions.req,
+    );
+  }
 
-    assertFoundClient(got);
+  /**
+   * Fase 3: Obtener la música usando el callback inyectado
+   */
+  private async fetchMusic(
+    fetcher: (format: ResponseFormat)=> Promise<MusicEntity | null>,
+  ): Promise<void> {
+    const music = await fetcher(this.currentFormat);
 
-    // 4. Lógica de historial (solo si es RAW)
-    if (format === ResponseFormat.RAW) {
-      const userId = user?.id ?? token;
+    assertFoundClient(music);
+    this.currentMusic = music;
+  }
 
-      if (userId && !shouldNotAddToHistory) {
-        await this.historyRepo.createNewEntryNowIfShouldFor( {
-          musicId: got.id,
-          userId,
-        } );
-      }
-    }
+  /**
+   * Fase 4: Actualizar historial si corresponde
+   */
+  private async updateHistoryIfNeeded(): Promise<void> {
+    if (this.currentFormat !== ResponseFormat.RAW)
+      return;
 
-    // 5. Renderizado final
-    return this.renderer.render( {
-      music: got,
-      format,
-      request: req,
-      response: res,
+    const userId = this.getUserIdForHistory();
+
+    if (!userId || this.currentOptions.shouldNotAddToHistory)
+      return;
+
+    await this.historyRepo.createNewEntryNowIfShouldFor( {
+      musicId: this.currentMusic.id,
+      userId,
     } );
+  }
+
+  /**
+   * Obtiene el ID de usuario para el historial (user.id o token)
+   */
+  private getUserIdForHistory(): string | undefined {
+    return this.currentOptions.user?.id ?? this.currentOptions.token;
   }
 }

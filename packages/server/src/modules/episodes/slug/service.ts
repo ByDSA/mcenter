@@ -1,78 +1,58 @@
-import { Injectable, StreamableFile } from "@nestjs/common";
-import { Request, Response } from "express";
-import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
-import { ResourceSlugService } from "#modules/resources/slug/service";
-import { EpisodeFileInfoEntity } from "#episodes/file-info/models";
-import { getAbsolutePath } from "#episodes/utils";
-import { EpisodesRepository } from "../crud/repositories/episodes";
+import { Injectable } from "@nestjs/common";
+import { Request } from "express";
+import { ResponseFormat } from "$shared/models/resources";
+import { assertFoundClient } from "#utils/validation/found";
+import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
+import { EpisodesCrudDtos } from "#episodes/models/dto";
+import { } from "#modules/resources/response-formatter";
+import { EpisodeResponseFormatterService } from "#episodes/renderer/formatter.service";
 import { EpisodeEntity } from "../models";
-import { EpisodeHistoryRepository } from "../history/crud/repository";
 
-type Slug = {
-  seriesKey: string;
-  episodeKey: string;
-};
-type HandleProps = {
-  slug: Slug;
-  userId?: string;
-  req: Request;
-  res: Response;
-};
 @Injectable()
 export class EpisodeSlugHandlerService {
   constructor(
-    private readonly repo: EpisodesRepository,
-    private readonly historyRepo: EpisodeHistoryRepository,
-    private readonly resourceSlugService: ResourceSlugService,
+    private readonly episodesRepo: EpisodesRepository,
+    private readonly responseFormatter: EpisodeResponseFormatterService,
   ) {}
 
-  async handle( { req, res, slug, userId }: HandleProps): Promise<StreamableFile | void> {
-    const episode = await this.repo.getOneBySeriesKeyAndEpisodeKey(
-      slug.seriesKey,
-      slug.episodeKey,
+  getFormat(req: Request) {
+    return this.responseFormatter.getResponseFormatByRequest(req);
+  }
+
+  async fetchEpisodeByFormat(params: {
+    seriesKey: string;
+    episodeKey: string;
+    format: ResponseFormat;
+    userId: string | null;
+  } ): Promise<EpisodeEntity> {
+    const expandCriteria = this.buildExpandCriteria(params.format, params.userId);
+    const episode = await this.episodesRepo.getOneBySlug(
+      params.seriesKey,
+      params.episodeKey,
+      expandCriteria,
       {
-        expand: ["fileInfos", "series"],
-      },
-      {
-        requestingUserId: userId,
+        requestingUserId: params.userId ?? undefined,
       },
     );
 
     assertFoundClient(episode);
-    assertFoundServer(episode.fileInfos);
-    assertFoundServer(episode.series);
 
-    if (userId)
-      await this.updateHistory(episode, userId);
-
-    return this.resourceSlugService.handle( {
-      entity: episode,
-      req,
-      res,
-      getAbsolutePath,
-      generateFilename: (entity: EpisodeEntity, fileInfo: EpisodeFileInfoEntity) => {
-        const ext = fileInfo.path.slice(fileInfo.path.lastIndexOf("."));
-
-        assertFoundServer(entity.series);
-        const series = entity.series.name;
-        const { episodeKey } = entity;
-
-        return `${series} - ${episodeKey} - ${entity.title}${ext}`;
-      },
-    } );
+    return episode;
   }
 
-  private async updateHistory(episode: EpisodeEntity, userId: string) {
-    const options = {
-      requestingUserId: userId,
-    };
-    const isLast = await this.historyRepo.isLast(episode.id, options);
+  private buildExpandCriteria(format: ResponseFormat, userId: string | null) {
+    const expand: NonNullable<EpisodesCrudDtos.GetOne.Criteria["expand"]> = [];
 
-    if (!isLast) {
-      await this.historyRepo.createNewEntryNowFor( {
-        episodeId: episode.id,
-        seriesId: episode.seriesId,
-      }, options);
-    }
+    if (format === ResponseFormat.M3U8 || format === ResponseFormat.RAW)
+      expand.push("fileInfos");
+
+    expand.push("series");
+
+    if (userId)
+      expand.push("userInfo");
+
+    return {
+      expand,
+    };
   }
 }

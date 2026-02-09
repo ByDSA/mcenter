@@ -412,7 +412,18 @@ token?: string;} ) => {
   },
   episodes: {
     path: EPISODES,
-    withParams: (id: string) => `${EPISODES}/${id}`,
+    withParams: (id: string, query?: MusicSlugQueryParams) => {
+      let ret = `${EPISODES}/${id}`;
+
+      if (query) {
+        const nonEmptyQuery = Object.entries(query).filter(([_, v])=> !!v);
+
+        if (nonEmptyQuery.length > 0)
+          ret += `?${new URLSearchParams(query).toString()}`;
+      }
+
+      return ret;
+    },
     getOne: {
       path: `${EPISODES}/${GET_ONE_CRITERIA_PATH}`,
     },
@@ -435,11 +446,6 @@ token?: string;} ) => {
         }
 
         return ret;
-      },
-      getAll: {
-        withParams: (seriesKey: string) => {
-          return `${EPISODES_SLUG}/${seriesKey}`;
-        },
       },
     },
     dependencies: {

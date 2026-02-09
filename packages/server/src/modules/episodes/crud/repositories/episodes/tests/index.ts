@@ -11,10 +11,6 @@ class MockEpisodesRepository extends createMockClass(EpisodesRepository) {
     this.getOneById.mockImplementation(async id => {
       return fixtureEpisodes.Simpsons.List.find(e=>e.id === id) ?? null;
     } );
-
-    this.getManyBySerieKey.mockImplementation(
-      async key=>key === "simpsons" ? fixtureEpisodes.Simpsons.List : [],
-    );
   }
 }
 

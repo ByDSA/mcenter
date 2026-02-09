@@ -35,7 +35,7 @@ describe("playEpisodeController", () => {
 
     ret.playVideoService.playEpisodeStream.mockResolvedValue([EPISODE_WITH_FILE_INFO]);
 
-    ret.episodesRepo.getOneBySeriesKeyAndEpisodeKey
+    ret.episodesRepo.getOneBySlug
       .mockResolvedValue(fixtureEpisodes.SampleSeries.Samples.EP1x01);
     ret.episodesRepo.getOneById
       .mockResolvedValue( {
@@ -97,7 +97,7 @@ describe("playEpisodeController", () => {
     } );
 
     it("should return 422 if episode not found", async () => {
-      mocks.episodesRepo.getOneBySeriesKeyAndEpisodeKey
+      mocks.episodesRepo.getOneBySlug
         .mockResolvedValueOnce(null);
       const res = await request(routerApp)
         .get(validUrl);

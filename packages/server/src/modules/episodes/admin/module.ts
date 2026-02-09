@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
 import { VideoMetadataModule } from "#modules/resources/video/video-metadata/module";
 import { TasksModule } from "#core/tasks";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { SeriesCrudModule } from "#episodes/series/crud/module";
 import { EpisodeLastTimePlayedModule } from "#episodes/history/last-time-played/module";
+import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { EpisodeFileInfosCrudModule } from "../file-info/crud/module";
 import { EpisodeDependenciesModule } from "../dependencies/crud/module";
 import { EpisodesCrudModule } from "../crud/module";
@@ -22,7 +22,7 @@ import { EpisodeUpdateFileInfoSavedTaskHandler } from "./update-file-info-saved/
     EpisodeLastTimePlayedModule,
     EpisodeFileInfosCrudModule,
     EpisodeDependenciesModule,
-    ResourceResponseFormatterModule,
+    EpisodeResponseFormatterModule,
     EpisodesCrudModule,
     TasksModule,
     VideoMetadataModule,

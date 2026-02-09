@@ -5,9 +5,9 @@ import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { PATH_ROUTES } from "$shared/routing";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
-import { ResourceResponseFormatterModule, MusicResponseFormatInterceptor } from "#modules/resources/response-formatter";
 import { MusicsRepository } from "../crud/repositories/music";
 import { MusicHistoryRepository } from "../history/crud/repository";
+import { MusicRendererModule } from "../renderer/module";
 import { MusicGetRandomController } from "./controller";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
@@ -34,12 +34,11 @@ describe("musicGetRandomController", () => {
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
-      imports: [ResourceResponseFormatterModule],
+      imports: [MusicRendererModule],
       controllers: [MusicGetRandomController],
       providers: [
         getOrCreateMockProvider(MusicsRepository),
         getOrCreateMockProvider(MusicHistoryRepository),
-        MusicResponseFormatInterceptor,
       ],
     } );
 

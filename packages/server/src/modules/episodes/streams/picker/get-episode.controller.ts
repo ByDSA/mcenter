@@ -1,11 +1,11 @@
-import { Controller, Get, Param, Query, UnauthorizedException, UnprocessableEntityException, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Param, Query, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import z from "zod";
 import { UserPayload } from "$shared/models/auth";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import { StreamGetRandomEpisodeService } from "./get-episode.service";
 import { User } from "#core/auth/users/User.decorator";
 import { M3u8FormatUseNext } from "#modules/resources/response-formatter";
-import { EpisodeResponseFormatInterceptor } from "#modules/resources/response-formatter/episode-response-format.interceptor";
+import { RenderEpisode } from "#episodes/renderer/renderer.interceptor";
+import { StreamGetRandomEpisodeService } from "./get-episode.service";
 
 @Controller("/get-episode")
 export class StreamGetEpisodeController {
@@ -13,7 +13,10 @@ export class StreamGetEpisodeController {
      private readonly service: StreamGetRandomEpisodeService,
   ) { }
 
-  @UseInterceptors(EpisodeResponseFormatInterceptor)
+  @RenderEpisode( {
+    json: true,
+    m3u8: true,
+  } )
   @M3u8FormatUseNext()
   @Get("/:streamKey")
   async getEpisode(

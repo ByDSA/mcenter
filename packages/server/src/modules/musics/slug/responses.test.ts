@@ -5,23 +5,23 @@ import { PATH_ROUTES } from "$shared/routing";
 import { MusicEntity } from "$sharedSrc/models/musics/music";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { createTestingAppModuleAndInit } from "#core/app/tests/app";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { MusicDtos } from "#musics/models/dto";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureMusics } from "../tests";
 import { MusicsRepository } from "../crud/repositories/music";
 import { MusicHistoryRepository } from "../history/crud/repository";
+import { MusicRendererModule } from "../renderer/module";
 import { MusicsSlugModule } from "./module";
 
 describe("responses", () => {
   let router: Application;
-  let repo: jest.Mocked<MusicsRepository>;
+  let musicRepoMock: jest.Mocked<MusicsRepository>;
   const URL = "/slug";
 
   beforeAll(async () => {
     const testingSetup = await createTestingAppModuleAndInit( {
       imports: [
-        ResourceResponseFormatterModule,
+        MusicRendererModule,
         MusicsSlugModule,
       ],
       controllers: [],
@@ -40,8 +40,8 @@ describe("responses", () => {
     } );
 
     router = testingSetup.routerApp;
-    repo = testingSetup.module.get(MusicsRepository);
-    repo.getOneBySlug.mockResolvedValue(fixtureMusics.Disk.Samples.DK);
+    musicRepoMock = testingSetup.module.get(MusicsRepository);
+    musicRepoMock.getOneBySlug.mockResolvedValue(fixtureMusics.Disk.Samples.DK);
   } );
 
   it("default response json", async () => {
@@ -72,7 +72,7 @@ describe("responses", () => {
   } );
 
   it("response raw", async () => {
-    repo.getOneBySlug.mockResolvedValueOnce(
+    musicRepoMock.getOneBySlug.mockResolvedValueOnce(
       {
         ...fixtureMusics.Disk.Samples.DK,
         fileInfos: [

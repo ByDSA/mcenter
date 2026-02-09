@@ -40,8 +40,8 @@ CanGetOneById<Entity, UserInfoKey> {
 
   async getFullSerieForUser(
     seriesId: string,
-    options: NonNullable<Parameters<EpisodesRepository["getManyBySerieKey"]>[2]>,
-    criteria?: Parameters<EpisodesRepository["getManyBySerieKey"]>[1],
+    options: NonNullable<Parameters<EpisodesRepository["getMany"]>[1]>,
+    criteria?: Parameters<EpisodesRepository["getMany"]>[0],
   ): Promise<EpisodeEntityWithUserInfo[]> {
     const docs: WithRequired<EpisodeOdm.FullDoc, "userInfo">[] = await EpisodeOdm.Model.aggregate([
       {

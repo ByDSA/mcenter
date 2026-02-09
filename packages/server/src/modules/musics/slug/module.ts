@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
-import { ResourcesSlugModule } from "#modules/resources/slug/module";
+import { StreamFileModule } from "#modules/resources/stream-file/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicRendererModule } from "../renderer/module";
@@ -10,9 +9,8 @@ import { MusicsSlugController } from "./controller";
   imports: [
     MusicHistoryModule,
     MusicsCrudModule,
-    ResourceResponseFormatterModule,
     MusicRendererModule,
-    ResourcesSlugModule,
+    StreamFileModule,
   ],
   controllers: [
     MusicsSlugController,

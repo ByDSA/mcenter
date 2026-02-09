@@ -1,18 +1,25 @@
 import { Module } from "@nestjs/common";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
-import { ResourcesSlugModule } from "#modules/resources/slug/module";
-import { EpisodeRendererService } from "./render.service";
+import { StreamFileModule } from "#modules/resources/stream-file/module";
+import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
+import { EpisodeResponseFormatterService } from "./formatter.service";
+import { EpisodeRendererInterceptor } from "./renderer.interceptor";
+import { EpisodeRendererService } from "./renderer.service";
 
 @Module( {
   imports: [
-    ResourceResponseFormatterModule,
-    ResourcesSlugModule,
-  ],
-  controllers: [
+    StreamFileModule,
+    EpisodeHistoryCrudModule, // TODO: quitar
   ],
   providers: [
+    EpisodeResponseFormatterService,
+    EpisodeRendererInterceptor,
     EpisodeRendererService,
   ],
-  exports: [EpisodeRendererService],
+  controllers: [],
+  exports: [
+    EpisodeRendererInterceptor,
+    EpisodeResponseFormatterService,
+    EpisodeRendererService,
+  ],
 } )
-export class EpisodeRendererModule {}
+export class EpisodeResponseFormatterModule {}

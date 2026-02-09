@@ -6,11 +6,16 @@ import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtu
 import { fixtureEpisodes } from "#episodes/tests";
 import { createTestingAppModuleAndInit } from "#core/app/tests/app";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
-import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
-import { getOrCreateMockProvider } from "#utils/nestjs/tests";
+import { createMockedModule } from "#utils/nestjs/tests";
+import { EpisodesCrudModule } from "#episodes/crud/module";
+import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
+import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
+import { StreamFileModule } from "#modules/resources/stream-file/module";
+import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { EpisodesRepository } from "../crud/repositories/episodes";
-import { EpisodesSlugModule } from "./module";
+import { EpisodesSlugController } from "./controller";
+import { EpisodeSlugHandlerService } from "./service";
 
 const EPISODE_WITH_SERIE = {
   ...fixtureEpisodes.SampleSeries.Samples.EP1x01,
@@ -26,25 +31,20 @@ describe("responses", () => {
 
   beforeAll(async () => {
     const testingSetup = await createTestingAppModuleAndInit( {
-      imports: [EpisodesSlugModule],
-      controllers: [],
+      imports: [EpisodeResponseFormatterModule,
+        createMockedModule(EpisodeHistoryCrudModule),
+        createMockedModule(EpisodeFileInfosCrudModule),
+        createMockedModule(EpisodesCrudModule),
+        createMockedModule(StreamFileModule)],
+      controllers: [EpisodesSlugController],
       providers: [
+        EpisodeSlugHandlerService,
       ],
-    }, {
-      beforeCompile: (builder) => {
-        builder
-          .overrideProvider(EpisodesRepository)
-          .useValue(getOrCreateMockProvider(EpisodesRepository).useValue);
-
-        builder
-          .overrideProvider(EpisodeHistoryRepository)
-          .useValue(getOrCreateMockProvider(EpisodeHistoryRepository).useValue);
-      },
     } );
 
     router = testingSetup.routerApp;
-    repo = testingSetup.module.get(EpisodesRepository);
-    repo.getOneByEpisodeKeyAndSerieId.mockResolvedValue(EPISODE_WITH_SERIE);
+    repo = testingSetup.getMock(EpisodesRepository);
+    repo.getOneBySlug.mockResolvedValue(EPISODE_WITH_SERIE);
   } );
 
   it("default response json", async () => {
@@ -69,13 +69,13 @@ describe("responses", () => {
       .expect(HttpStatus.OK);
     const ep = fixtureEpisodes.SampleSeries.Samples.EP1x01;
     const host = getHostFromSuperTestRequest(res.request);
-    const path = PATH_ROUTES.episodes.slug.withParams(SERIES_SAMPLE_SERIES.key, ep.episodeKey);
+    const path = PATH_ROUTES.episodes.withParams(ep.id);
 
     expect(res.text).toContain(`${host}${path}`);
   } );
 
   it("response raw", async () => {
-    repo.getOneBySeriesKeyAndEpisodeKey.mockResolvedValueOnce(
+    repo.getOneBySlug.mockResolvedValueOnce(
       {
         ...fixtureEpisodes.SampleSeries.Samples.EP1x01,
         fileInfos: [

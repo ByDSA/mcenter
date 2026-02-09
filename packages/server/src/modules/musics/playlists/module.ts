@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
 import { MusicsCrudModule } from "../crud/module";
 import { MusicHistoryModule } from "../history/module";
 import { MusicRendererModule } from "../renderer/module";
@@ -11,7 +10,6 @@ import { MusicPlaylistAvailableSlugGeneratorService } from "./crud/repository/av
   imports: [
     MusicsCrudModule,
     MusicHistoryModule,
-    ResourceResponseFormatterModule,
     MusicRendererModule,
   ],
   controllers: [

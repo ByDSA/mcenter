@@ -1,39 +1,28 @@
-import { createReadStream, existsSync, statSync } from "fs";
+import { createReadStream, existsSync, statSync } from "node:fs";
 import { HttpStatus, Injectable, NotFoundException, StreamableFile } from "@nestjs/common";
 import { Request, Response } from "express";
 import * as mime from "mime-types";
-import { assertIsDefined, isDefined } from "$shared/utils/validation";
-import { assertFoundClient } from "#utils/validation/found";
 
-type FileInfo = {
-  path: string;
-  size: number;
-};
-
-type Entity<F extends FileInfo> = {
-  updatedAt: Date;
-  fileInfos?: Array<F>;
-};
-
-interface StreamingOptions<T, F> {
-  entity: T;
+type StreamingOptions = {
+  lastModified: Date;
+  size?: number;
   req: Request;
   res: Response;
-  getAbsolutePath: (relativePath: string)=> string;
-  generateFilename: (entity: T, fileInfo: F)=> string;
-}
+  fullpath: string;
+  customFilename: string;
+};
 
 @Injectable()
-export class ResourceSlugService {
+export class StreamFileService {
   // eslint-disable-next-line require-await
-  async handle<T extends Entity<F>, F extends FileInfo>(
-    options: StreamingOptions<T, F>,
+  async handle(
+    options: StreamingOptions,
   ): Promise<StreamableFile | void> {
-    const { entity, req, res, generateFilename } = options;
+    const { lastModified, fullpath, size, req, res, customFilename } = options;
     const ifNoneMatch = req.headers["if-none-match"] as string;
     const range = req.headers.range as string;
     // 1. Client cache check
-    const etag = `"${entity.updatedAt.getTime()}"`;
+    const etag = `"${lastModified.getTime()}"`;
 
     if (ifNoneMatch === etag) {
       res.status(HttpStatus.NOT_MODIFIED);
@@ -42,22 +31,16 @@ export class ResourceSlugService {
     }
 
     // 2. File existence
-    assertFoundClient(entity.fileInfos);
-    const fileInfo = entity.fileInfos![0];
-
-    assertIsDefined(fileInfo);
-    const fullpath = options.getAbsolutePath(fileInfo.path);
-
     if (!existsSync(fullpath))
       throw new NotFoundException("File not found");
 
     // 3. Headers
-    this.setCommonHeaders<T, F>(res, entity, fileInfo, etag, generateFilename);
+    this.setCommonHeaders(res, lastModified, fullpath, etag, customFilename);
 
     // 4. File streaming
-    let fileSize: number = fileInfo.size;
+    let fileSize: number = size ?? 0;
 
-    if (!isDefined(fileInfo.size) || fileInfo.size <= 0)
+    if (fileSize <= 0)
       fileSize = statSync(fullpath).size;
 
     if (range) {
@@ -78,20 +61,18 @@ export class ResourceSlugService {
     return this.streamFull(fullpath, fileSize);
   }
 
-  private setCommonHeaders<T extends Entity<F>, F extends FileInfo>(
+  private setCommonHeaders(
     res: Response,
-    entity: T,
-    fileInfo: F,
+    lastModified: Date,
+    path: string,
     etag: string,
-    generateFilename: (entity: T, fileInfo: F)=> string,
+    filename: string,
   ) {
-    const filename = generateFilename(entity, fileInfo);
-
     res.set( {
-      "Content-Type": mime.lookup(fileInfo.path) || "application/octet-stream",
+      "Content-Type": mime.lookup(path) || "application/octet-stream",
       "Accept-Ranges": "bytes",
       ETag: etag,
-      "Last-Modified": entity.updatedAt.toUTCString(),
+      "Last-Modified": lastModified.toUTCString(),
       "Cache-Control": "public, max-age=31536000, must-revalidate",
       "Content-Disposition": `inline; filename*=UTF-8''${encodeURIComponent(filename)}`,
     } );

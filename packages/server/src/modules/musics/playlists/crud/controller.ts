@@ -9,18 +9,18 @@ import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserPayload } from "$shared/models/auth";
 import { slugSchema } from "$shared/models/utils/schemas/slug";
-import { musicPlaylistEntitySchema } from "../models";
-import { MusicPlaylistCrudDtos } from "../models/dto";
-import { MusicPlaylistsRepository } from "./repository/repository";
 import { GetManyCriteria, GetOneCriteria, UserDeleteOne, UserPatchOne, UserPost, UserCreateOne, GetOneById } from "#utils/nestjs/rest";
 import { ResponseFormat } from "#modules/resources/response-formatter";
 import { assertFoundClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
-import { MusicRendererService } from "#musics/renderer/render.service";
+import { MusicRendererService } from "#modules/musics/renderer/renderer.service";
 import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { IdParamDto } from "#utils/validation/dtos";
-import { MusicResponseFormatterService } from "#modules/resources/response-formatter/music-response-formatter.service";
+import { MusicResponseFormatterService } from "#modules/musics/renderer/formatter.service";
+import { MusicPlaylistCrudDtos } from "../models/dto";
+import { musicPlaylistEntitySchema } from "../models";
+import { MusicPlaylistsRepository } from "./repository/repository";
 
 type GuardVisibilityBySlugProps = {
   requestUserId: string | undefined;

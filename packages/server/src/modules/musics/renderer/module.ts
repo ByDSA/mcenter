@@ -1,18 +1,23 @@
 import { Module } from "@nestjs/common";
-import { ResourceResponseFormatterModule } from "#modules/resources/response-formatter";
-import { ResourcesSlugModule } from "#modules/resources/slug/module";
-import { MusicRendererService } from "./render.service";
+import { StreamFileModule } from "#modules/resources/stream-file/module";
+import { MusicRendererService } from "./renderer.service";
+import { MusicRendererInterceptor } from "./renderer.interceptor";
+import { MusicResponseFormatterService } from "./formatter.service";
 
 @Module( {
   imports: [
-    ResourceResponseFormatterModule,
-    ResourcesSlugModule,
+    StreamFileModule,
   ],
   controllers: [
   ],
   providers: [
     MusicRendererService,
+    MusicResponseFormatterService,
+    MusicRendererInterceptor,
   ],
-  exports: [MusicRendererService],
+  exports: [MusicRendererService,
+    MusicResponseFormatterService,
+    MusicRendererInterceptor,
+  ],
 } )
 export class MusicRendererModule {}

@@ -28,9 +28,8 @@ export function episodeToMediaElement(
     assertIsDefined(fileInfo);
     path = fileInfo.path;
   } else {
-    path = PATH_ROUTES.episodes.slug.withParams(
-      seriesKey,
-      episode.episodeKey,
+    path = PATH_ROUTES.episodes.withParams(
+      episode.id,
       {
         format: ResponseFormat.RAW,
         token: options?.token,

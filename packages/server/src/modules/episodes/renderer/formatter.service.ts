@@ -2,25 +2,26 @@ import { Injectable } from "@nestjs/common";
 import { Request, Response } from "express";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { ResponseFormat } from "$shared/models/resources/response-format.enum";
-import { mediaElementWithAbsolutePath, musicToMediaElement } from "$shared/models/player/media-element";
+import { episodeToMediaElement, mediaElementWithAbsolutePath } from "$shared/models/player/media-element";
 import { genM3u8Item, getHostFromRequest, genM3u8Playlist, genM3u8PlaylistWithNext } from "$shared/models/resources/m3u8.view";
 import { isMediaPlayerUserAgent } from "$shared/utils/http/user-agent";
-import { MusicEntity } from "$shared/models/musics";
-import { type M3u8ViewOptions } from "./retource-to-media-element";
+import { EpisodeEntity } from "#episodes/models";
+import { type M3u8ViewOptions } from "../../resources/response-formatter/resource-to-media-element";
 
 export type FormatResponseOptions = M3u8ViewOptions & {
   m3u8UseNext?: boolean;
 };
 
 export type M3u8Props = {
-  music: MusicEntity;
+  episode: EpisodeEntity;
+  serieName: string;
   request: Request;
   response: Response;
   options: FormatResponseOptions;
 };
 
 @Injectable()
-export class MusicResponseFormatterService {
+export class EpisodeResponseFormatterService {
   getResponseFormatByRequest(req: Request): ResponseFormat {
     const queryFormat = req.query.format as string | undefined;
 
@@ -54,14 +55,15 @@ export class MusicResponseFormatterService {
     return ResponseFormat.JSON;
   }
 
-  formatM3u8Response( { music: data,
+  formatM3u8Response( { episode,
+    serieName,
     request,
     response,
     options }: M3u8Props) {
     response.setHeader("Content-Type", "application/x-mpegURL");
 
     const useNext = options?.m3u8UseNext ?? false;
-    let mediaElement = musicToMediaElement(data, options);
+    let mediaElement = episodeToMediaElement(episode, serieName, options);
     const host = getHostFromRequest(request);
 
     if (!options.local) {
@@ -101,11 +103,12 @@ export class MusicResponseFormatterService {
   }
 
   formatOneRemoteM3u8Response(
-    data: MusicEntity,
+    episode: EpisodeEntity,
+    serieName: string,
     host: string,
     options?: Omit<M3u8ViewOptions, "local" | "prefix">,
   ) {
-    const mediaElement = musicToMediaElement(data, {
+    const mediaElement = episodeToMediaElement(episode, serieName, {
       ...options,
       prefix: host,
     } );
@@ -116,11 +119,12 @@ export class MusicResponseFormatterService {
   }
 
   formatManyRemoteM3u8Response(
-    data: MusicEntity[],
+    data: {episode: EpisodeEntity;
+seriesName: string;}[],
     host: string,
     options?: Omit<M3u8ViewOptions, "local" | "prefix">,
   ) {
-    const items = data.map(d=>genM3u8Item(musicToMediaElement(d, {
+    const items = data.map(d=>genM3u8Item(episodeToMediaElement(d.episode, d.seriesName, {
       ...options,
       prefix: host,
     } )));
@@ -128,9 +132,7 @@ export class MusicResponseFormatterService {
     return genM3u8Playlist(items);
   }
 
-  formatOneJsonResponse(data: object, response: Response) {
-    response.setHeader("Content-Type", "application/json");
-
+  formatOneJsonResponse(data: EpisodeEntity) {
     return createSuccessResultResponse(data);
   }
 }
