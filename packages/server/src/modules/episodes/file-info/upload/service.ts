@@ -18,8 +18,9 @@ import { assertFoundClient } from "#utils/validation/found";
 import { EpisodeEntity } from "#episodes/models";
 import { getSeasonNumberByEpisodeKey, SeriesRepository } from "#episodes/series/crud/repository/repository";
 import { VideoMetadataService } from "#modules/resources/video/video-metadata/VideoMetadataService.service";
+import { EPISODES_MEDIA_PATH } from "#episodes/utils";
 import { EpisodeFileInfoRepository } from "../crud/repository";
-import { EPISODES_MEDIA_PATH, EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "./utils";
+import { EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "./utils";
 
 @Injectable()
 export class EpisodeFileInfoUploadService {

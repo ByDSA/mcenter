@@ -1,5 +1,4 @@
 import { existsSync } from "fs";
-import path from "node:path";
 import { Injectable, Logger } from "@nestjs/common";
 import { safeOneConcurrent, safeSequential } from "$shared/utils/errors";
 import { createOneResultResponseSchema, ResultResponse } from "$shared/utils/http/responses";
@@ -18,6 +17,7 @@ import { Episode } from "#episodes/models";
 import { VideoMetadataService } from "#modules/resources/video/video-metadata/VideoMetadataService.service";
 import { assertFoundServer } from "#utils/validation/found";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
+import { EPISODES_MEDIA_PATH } from "#episodes/utils";
 import { EpisodesRepository } from "../../crud/repositories/episodes";
 import { SeriesNode, SerieTree, EpisodeNode } from "./disk/models";
 import { RemoteSeriesTreeService } from "./db";
@@ -266,13 +266,10 @@ export class EpisodeUpdateRemoteTaskHandler implements TaskHandler<Payload, Resu
 
   // eslint-disable-next-line require-await
   async getLocalSeriesTree() {
-    const { MEDIA_FOLDER_PATH } = process.env;
+    assertIsDefined(EPISODES_MEDIA_PATH);
 
-    assertIsDefined(MEDIA_FOLDER_PATH);
-
-    const seriesPath = path.join(MEDIA_FOLDER_PATH, "series");
-    const filesSerieTreeResult = findAllSerieFolderTreesAt(seriesPath, {
-      baseFolder: "series/",
+    const filesSerieTreeResult = findAllSerieFolderTreesAt(EPISODES_MEDIA_PATH, {
+      baseFolder: "/",
     } );
 
     return filesSerieTreeResult;

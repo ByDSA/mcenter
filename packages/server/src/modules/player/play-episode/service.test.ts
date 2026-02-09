@@ -16,14 +16,14 @@ import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { STREAM_SAMPLE } from "#episodes/streams/tests";
 import { fixtureEpisodes } from "#episodes/tests";
-import { mockRemotePlayersRepositoryProvider } from "./player-services/repository/tests/repository";
-import { PlayService } from "./play.service";
-import { PlayVideoService } from "./play-video.service";
-import { RemotePlayersRepository } from "./player-services/repository";
+import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
+import { PlayService } from "../play.service";
+import { RemotePlayersRepository } from "../player-services/repository";
+import { PlayEpisodeService } from "./service";
 
-describe("playVideoService", () => {
+describe("playEpisodeService", () => {
   let testingSetup: TestingSetup;
-  let service: PlayVideoService;
+  let service: PlayEpisodeService;
   let mocks: Awaited<ReturnType<typeof initMocks>>;
   let validRemotePlayerId = mockMongoId;
 
@@ -74,7 +74,7 @@ describe("playVideoService", () => {
       providers: [
         getOrCreateMockProvider(PlayService),
         mockRemotePlayersRepositoryProvider,
-        PlayVideoService,
+        PlayEpisodeService,
       ],
     }, {
       auth: {
@@ -84,7 +84,7 @@ describe("playVideoService", () => {
     } );
 
     mocks = await initMocks(testingSetup);
-    service = await testingSetup.app.get(PlayVideoService);
+    service = await testingSetup.app.get(PlayEpisodeService);
   } );
 
   beforeEach(()=> {

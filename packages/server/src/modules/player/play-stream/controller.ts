@@ -7,7 +7,7 @@ import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { User } from "#core/auth/users/User.decorator";
 import { episodeEntityWithFileInfosSchema } from "#episodes/models";
 import { GetMany } from "#utils/nestjs/rest";
-import { PlayVideoService } from "../play-video.service";
+import { PlayEpisodeService } from "../play-episode/service";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { SecretTokenBodyDto } from "../model";
 
@@ -40,7 +40,7 @@ export class QueryDto extends createZodDto(z.object( {
 @Controller("play/:remotePlayerId/stream")
 export class PlayStreamController {
   constructor(
-    private readonly playService: PlayVideoService,
+    private readonly playService: PlayEpisodeService,
     private readonly auth: AuthPlayerService,
   ) { }
 

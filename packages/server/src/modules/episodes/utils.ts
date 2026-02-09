@@ -1,13 +1,13 @@
-import path from "path";
+import path from "node:path";
 import { ENVS } from "#musics/utils";
+import { isTest } from "#utils";
+
+export const EPISODES_MEDIA_PATH = path.join(
+  isTest() ? process.cwd() : "",
+  ENVS.mediaPath,
+  "series",
+);
 
 export function getAbsolutePath(relativePath: string = ""): string {
-  // TODO: quitar "series/" del path en DB
-  relativePath = relativePath.replace(/^series\//, "");
-  let mediaPath = path.join(ENVS.mediaPath, "series");
-
-  if (!mediaPath.startsWith("/"))
-    mediaPath = path.join(process.cwd(), mediaPath);
-
-  return path.join(mediaPath, relativePath);
+  return path.join(EPISODES_MEDIA_PATH, relativePath);
 }

@@ -1,4 +1,4 @@
-import type { QueryDto } from "./play-stream/controller";
+import type { QueryDto } from "../play-stream/controller";
 import { Injectable } from "@nestjs/common";
 import { EpisodeEntityWithFileInfos } from "$shared/models/episodes";
 import { episodeToMediaElement } from "$shared/models/player";
@@ -10,8 +10,8 @@ import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { EpisodeEntity } from "#episodes/models";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { SeriesRepository } from "#episodes/series/crud/repository";
-import { PlayService } from "./play.service";
-import { RemotePlayersRepository } from "./player-services/repository";
+import { PlayService } from "../play.service";
+import { RemotePlayersRepository } from "../player-services/repository";
 
 type ProcessAndPlayEpisodesProps = {
   remotePlayerId: string;
@@ -31,7 +31,7 @@ type PlayEpisodeStreamProps = {
   query: QueryDto;
 };
 @Injectable()
-export class PlayVideoService {
+export class PlayEpisodeService {
   constructor(
     private readonly episodePickerService: EpisodePickerService,
     private readonly streamsRepo: StreamsRepository,
@@ -56,8 +56,7 @@ export class PlayVideoService {
         local: true,
       } );
 
-      // TODO: quitar de db "series" del path y ponerlo aquí
-      mediaElement.path = `${mediaElement.path}`;
+      mediaElement.path = `series/${mediaElement.path}`;
 
       mediaElements.push(mediaElementFixPlayerLabels(mediaElement));
     }

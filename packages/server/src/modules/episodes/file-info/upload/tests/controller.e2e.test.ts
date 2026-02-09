@@ -8,8 +8,9 @@ import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureSampleSeriesWithoutEpisodes } from "#core/db/tests/fixtures/sets/SampleSeries";
+import { EPISODES_MEDIA_PATH } from "#episodes/utils";
 import { EpisodeFileInfosUploadModule } from "../module";
-import { EPISODES_MEDIA_PATH, EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "../utils";
+import { EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "../utils";
 import { uploadEpisodeFile } from "./utils";
 
 const sampleFileName = "sample.mp4";

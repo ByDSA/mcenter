@@ -7,10 +7,10 @@ import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { assertFoundClient } from "#utils/validation/found";
-import { PlayVideoService } from "../play-video.service";
 import { QueryDto } from "../play-stream/controller";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { SecretTokenBodyDto } from "../model";
+import { PlayEpisodeService } from "./service";
 
 class ParamsDto extends createZodDto(z.object( {
   seriesKey: z.string(),
@@ -21,7 +21,7 @@ class ParamsDto extends createZodDto(z.object( {
 @Controller("play/:remotePlayerId/episode")
 export class PlayEpisodeController {
   constructor(
-    private readonly playService: PlayVideoService,
+    private readonly playService: PlayEpisodeService,
     private readonly episodesRepo: EpisodesRepository,
     private readonly auth: AuthPlayerService,
   ) {

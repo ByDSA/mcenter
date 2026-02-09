@@ -12,7 +12,7 @@ import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { EpisodeEntityWithFileInfos } from "#episodes/models";
 import { fixturesRemotePlayers } from "../tests/fixtures";
 import { AuthPlayerService } from "../AuthPlayer.service";
-import { PlayVideoService } from "../play-video.service";
+import { PlayEpisodeService } from "./service";
 import { PlayEpisodeController } from "./controller";
 
 const EPISODE_WITH_FILE_INFO: EpisodeEntityWithFileInfos = {
@@ -28,7 +28,7 @@ describe("playEpisodeController", () => {
 
   async function initMocks(setup: TestingSetup) {
     const ret = {
-      playVideoService: setup.getMock(PlayVideoService),
+      playVideoService: setup.getMock(PlayEpisodeService),
       authPlayerService: setup.getMock(AuthPlayerService),
       episodesRepo: setup.getMock(EpisodesRepository),
     };
@@ -56,7 +56,7 @@ describe("playEpisodeController", () => {
       ],
       controllers: [PlayEpisodeController],
       providers: [
-        getOrCreateMockProvider(PlayVideoService), // para PlayVideoService
+        getOrCreateMockProvider(PlayEpisodeService), // para PlayVideoService
         getOrCreateMockProvider(AuthPlayerService), // para PlayEpisodeController
         getOrCreateMockProvider(EpisodesRepository),
       ],
