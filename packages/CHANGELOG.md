@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.31.0-alpha.4](https://github.com/ByDSA/mcenter/compare/v4.31.0-alpha.3...v4.31.0-alpha.4) (2026-02-09)
+
+
+### Bug Fixes
+
+* **front:** upload files metadata payload ([d749693](https://github.com/ByDSA/mcenter/commit/d74969364025973ee414a0f74c53a6af42742baa))
+* **server:** remove "series" prefix in episode paths ([daab368](https://github.com/ByDSA/mcenter/commit/daab3689abb336cd8b98be237c43380276dc4716))
+
 ## [4.31.0-alpha.3](https://github.com/ByDSA/mcenter/compare/v4.31.0-alpha.2...v4.31.0-alpha.3) (2026-02-09)
 
 
