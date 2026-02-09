@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.31.0-alpha.3](https://github.com/ByDSA/mcenter/compare/v4.31.0-alpha.2...v4.31.0-alpha.3) (2026-02-09)
+
+
+### Features
+
+* partial migration seriesKey to seriesId ([1e021ee](https://github.com/ByDSA/mcenter/commit/1e021eeee77f5b2a9e34098858f430e2608916de))
+
 ## [4.31.0-alpha.2](https://github.com/ByDSA/mcenter/compare/v4.31.0-alpha.1...v4.31.0-alpha.2) (2026-02-05)
 
 
