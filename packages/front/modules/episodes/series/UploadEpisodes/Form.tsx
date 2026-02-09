@@ -19,11 +19,11 @@ import { UploadEpisodesContextMenuItemCurrentCtx } from "./ContextMenuItem";
 type Props = PropsOf<typeof UploadEpisodesContextMenuItemCurrentCtx>;
 
 export const UploadEpisodesForm = ( { onUploadEachEpisode }: Props) => {
-  const { data } = useLocalData<SeriesEntity>();
+  const { data: series } = useLocalData<SeriesEntity>();
   const [lastEpisodeKey, setLastEpisodeKey] = useState<string | undefined>();
   const usingModal = useModal();
 
-  assertIsDefined(data);
+  assertIsDefined(series);
 
   return (
     <>
@@ -36,9 +36,7 @@ export const UploadEpisodesForm = ( { onUploadEachEpisode }: Props) => {
             provideMetadata={async (fileDatas) => {
               const episodeKeyParts = getEpisodeKeyPartsFrom(fileDatas, lastEpisodeKey);
 
-              if (
-                episodeKeyParts.episode === null || episodeKeyParts.season === null
-              ) {
+              if (episodeKeyParts.episode === null || episodeKeyParts.season === null) {
                 await usingModal.openModal( {
                   content: <>
                     <div>{episodeKeyParts.season}</div>
@@ -58,9 +56,9 @@ export const UploadEpisodesForm = ( { onUploadEachEpisode }: Props) => {
               setLastEpisodeKey(episodeKey);
 
               return {
-                seriesKey: data.key,
                 episodeKey,
-              };
+                seriesId: series.id,
+              } satisfies EpisodeFileInfoCrudDtos.UploadFile.RequestBody["metadata"];
             }}
             onUpload={genOnUpload( {
               url: backendUrl(PATH_ROUTES.episodes.fileInfo.upload.path),

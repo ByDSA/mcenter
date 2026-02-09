@@ -93,10 +93,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
     }
 
     const episodePromise = hasEpisodeChanges
-      ? episodesApi.patch( {
-        episodeKey: initialData.episodeKey,
-        seriesKey: series.key,
-      }, {
+      ? episodesApi.patch(initialData.id, {
         entity: episodePatch,
       } )
       : Promise.resolve( {

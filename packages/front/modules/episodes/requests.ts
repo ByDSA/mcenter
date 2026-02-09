@@ -68,8 +68,7 @@ export class EpisodesApi {
   }
 
   async patch(
-    episodeCompKey: {seriesKey: string;
-episodeKey: string;},
+    episodeId: string,
     body: EpisodesCrudDtos.Patch.Body,
   ) {
     const fetcher = makeFetcher( {
@@ -79,7 +78,7 @@ episodeKey: string;},
     } );
     const ret = await fetcher( {
       url: backendUrl(
-        PATH_ROUTES.episodes.slug.withParams(episodeCompKey.seriesKey, episodeCompKey.episodeKey),
+        PATH_ROUTES.episodes.withParams(episodeId),
       ),
       body,
     } );
