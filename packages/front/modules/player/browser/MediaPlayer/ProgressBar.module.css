@@ -38,7 +38,7 @@
 .timeTooltip {
   position: absolute;
   transform: translateX(-50%) translateY(-20px);
-  color: var(--color-gray-25);
+  color: var(--color-title);
   background-color: var(--color-gray-950);
   padding: 4px 8px;
   border-radius: 4px;

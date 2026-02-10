@@ -11,7 +11,7 @@
   width: var(--size);
   height: var(--size);
   border-radius: 50%;
-  background: var(--color-gray-400);
+  background: var(--color-gray-300);
   border: none;
   cursor: pointer;
 

@@ -13,7 +13,7 @@
   left: var(--content-margin-left);
   text-align: center;
   width: calc(100dvw - var(--content-margin-left));
-  color: var(--color-gray-300);
+  color: var(--color-text);
 }
 
 .title {

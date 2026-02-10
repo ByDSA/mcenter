@@ -9,9 +9,9 @@
   }
 }
 
-.container a {
-  text-decoration: unset;
-  color: unset;
+.container a:has(*) {
+  text-decoration: unset !important;
+  color: unset !important;
 }
 
 * + .leftDiv,
@@ -59,11 +59,11 @@
 
   &:hover,
   &.dragging {
-    background-color: var(--color-gray-800);
+    background-color: var(--color-item);
   }
 
   &.playing {
-    background-color: var(--color-gray-900);
+    background-color: var(--color-item-playing);
     box-shadow: inset 4px 0 0 0 var(--color-playing);
   }
 
@@ -108,7 +108,7 @@
 
     .title {
       font-weight: 500;
-      color: var(--color-gray-25);
+      color: var(--color-item-text-title);
 
       width: fit-content;
       max-width: 100%; /* Evita que se salga del padre y activa el ellipsis */
@@ -160,7 +160,7 @@
   }
 }
 
-.container {
+.container.isPlayable {
   --is-active: 0;
 
   @media (width < 600px) {
@@ -168,9 +168,11 @@
   }
 }
 
-.container:hover,
-.container.playing {
-  --is-active: 1;
+.container.isPlayable {
+  &:hover,
+  &.playing {
+    --is-active: 1;
+  }
 }
 
 .playButton {
@@ -190,6 +192,9 @@
 .cover {
   background-color: var(--color-gray-900);
   transition: all 0.2s;
+}
+
+.isPlayable .cover {
   filter: brightness(calc(1 - (var(--is-active) * 0.5)));
 }
 

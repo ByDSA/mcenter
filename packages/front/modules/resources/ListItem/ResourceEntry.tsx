@@ -1,6 +1,7 @@
 import { AnchorHTMLAttributes, Fragment, JSX, memo, ReactNode, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ImageCover } from "$shared/models/image-covers";
+import { PropsXOR } from "$shared/utils/types";
 import { classes } from "#modules/utils/styles";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonView";
@@ -48,6 +49,7 @@ export function ResourceEntry(
       styles.container,
       isPlaying && styles.playing,
       drag?.isDragging && styles.dragging,
+      play && styles.playable,
     )}
   >
     {drag?.element}
@@ -94,14 +96,17 @@ export function ResourceEntry(
   </span>;
 }
 
+type Item = PropsXOR<{
+  text: string;
+}, {
+  customContent: ReactNode;
+}> & {
+  className?: string;
+  separatorClassName?: string;
+};
 type ResourceSubtitleProps = {
   className?: string;
-  items: ( {
-    text: string;
-    customContent?: ReactNode;
-    className?: string;
-    separatorClassName?: string;
-  } | undefined)[];
+  items: (Item | undefined)[];
 };
 export const ResourceSubtitle = memo(( { items, className }: ResourceSubtitleProps) => {
   const title = useMemo(()=>items.reduce((acc, item) => {

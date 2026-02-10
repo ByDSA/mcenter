@@ -2,6 +2,18 @@
   white-space: nowrap;
 }
 
+.seen {
+  font-size: 0.8rem;
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
 .episodeKey {
-  color: var(--color-gray-25);
+  color: var(--color-item-text-title);
 }

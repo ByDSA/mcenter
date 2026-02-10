@@ -25,9 +25,8 @@
   align-self: stretch;
   min-width: 2.5rem;
   opacity: 0.5;
-  color: var(--color-gray-400);
+  color: var(--color-gray-300);
   cursor: grab;
-  margin-right: 0.5rem;
 
   &:active {
     cursor: grabbing;
@@ -36,7 +35,7 @@
 
 .dragHandle:hover {
   opacity: 1;
-  color: var(--color-gray-100);
+  color: var(--color-gray-25);
 }
 
 .isDraggingGlobal :not(:has(.isDragging)) {

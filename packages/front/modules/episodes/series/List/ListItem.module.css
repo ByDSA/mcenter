@@ -3,17 +3,18 @@
   --width: 180px;
   --size: calc(var(--width) - 2* 1rem);
   width: var(--width);
+  max-width: 250px;
   flex-flow: column nowrap;
   align-items: center;
   border-radius: 0.5rem;
-  background-color: var(--color-gray-975);
+  background-color: var(--color-item);
   gap: 0;
   cursor: pointer;
   padding: 1rem;
   text-decoration: none !important;
 
   &:hover {
-    background-color: var(--color-gray-950);
+    background-color: var(--color-item-hover);
   }
 
   .footer {
@@ -21,6 +22,7 @@
     flex-flow: row nowrap;
     gap: 0.5rem;
     align-items: center;
+    justify-content: center;
     width: 100%;
 
     aside:first-child {
@@ -33,6 +35,7 @@
     flex-flow: column nowrap;
     align-items: center;
     gap: 0.25rem;
+    max-width: 150px;
 
     >* {
       text-align: center;
@@ -40,13 +43,13 @@
 
     .subInfo {
       font-size: 0.8em;
-      color: var(--color-gray-300);
+      color: var(--color-item-text);
     }
   }
 
   .title {
     font-size: 1em;
-    color: var(--color-gray-50);
+    color: var(--color-item-text-title);
     margin-top: 0.5rem;
     margin-bottom: 0.125rem;
     text-align: center;
@@ -57,6 +60,16 @@
   background-color: var(--color-gray-925) !important;
 
   svg {
-    color: var(--color-gray-100) !important;
+    color: var(--color-item-text-title) !important;
+  }
+}
+
+.item {
+  @container (width < 400px) {
+    --width: 100%;
+    --size: 100%;
+    *:has(>.cover) {
+      width: min(100%, 200px);
+    }
   }
 }

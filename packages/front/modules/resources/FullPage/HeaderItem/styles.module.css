@@ -1,5 +1,5 @@
 .container {
-  background: var(--color-gray-950);
+  background: var(--color-item);
 }
 
 
@@ -41,7 +41,7 @@
   margin: 0;
   font-weight: 700;
   font-size: 1.5rem;
-  color: var(--color-gray-25); /* Título en blanco/claro */
+  color: var(--color-item-text-title);
   line-height: 1.2;
 }
 
@@ -51,7 +51,7 @@
   justify-content: center;
   gap: 0.5rem; /* Separación solicitada */
   height: 100%;
-  color: var(--color-gray-300); /* Color gris para la info */
+  color: var(--color-item-text);
   font-size: 1rem;
 }
 

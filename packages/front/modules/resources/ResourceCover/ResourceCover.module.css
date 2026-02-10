@@ -8,6 +8,7 @@
   position: relative;
 
   border-radius: 8px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   background: rgba(0, 0, 0, 0.2);
   display: flex;
@@ -23,7 +24,7 @@
 }
 
 .icon {
-  color: var(--color-gray-200);
+  color: var(--color-gray-25);
 
   --size: 50%;
   width: var(--size) !important;

@@ -14,7 +14,7 @@
   &:hover {
     opacity: 0.75;
     cursor: pointer;
-    color: var(--color-gray-100) !important;
+    color: var(--color-text-hover) !important;
   }
 
   &.active {

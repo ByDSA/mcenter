@@ -8,11 +8,11 @@
 }
 
 .label {
-  color: var(--color-gray-600);
+  color: var(--color-text);
   font-size: 1rem;
 }
 
 .topIconWrap, .topIconWrap svg {
-  color: var(--color-gray-300);
+  color: var(--color-gray-25);
   font-size: 3rem;
 }

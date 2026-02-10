@@ -1,5 +1,5 @@
 .text {
-  color: var(--color-gray-200);
+  color: var(--color-text);
   text-align: left;
   display: block;
   flex: 1;

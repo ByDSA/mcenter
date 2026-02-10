@@ -9,6 +9,8 @@ import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { SeriesApi } from "#modules/episodes/series/requests";
 import { SeriesList } from "#modules/episodes/series/List/List";
 import { PaginationContainer } from "#modules/ui-kit/Pagination/Pagination";
+import { SMALL_BREAKPOINT } from "#modules/player/browser/MediaPlayer/Bottom/breakpoints";
+import { useWindowWidth } from "#modules/player/browser/MediaPlayer/Bottom/useWindowWidth";
 import { NewSeriesButton } from "../../../modules/episodes/series/New/Button";
 import styles from "./styles.module.css";
 
@@ -20,6 +22,7 @@ export default function SeriesPage() {
   const searchParams = useSearchParams();
   const pageParam = searchParams.get("page");
   const page = pageParam ? parseInt(pageParam, 10) : 1;
+  const width = useWindowWidth();
   const fetch = async (nPage: number) => {
     const api = FetchApi.get(SeriesApi);
     const res = await api.getManyByCriteria( {
@@ -77,7 +80,7 @@ export default function SeriesPage() {
     <PaginationContainer
       maxValue={Math.ceil((totalCount ?? 0) / limit)}
       initialPageIndex={page}
-      position="top"
+      position={width < SMALL_BREAKPOINT ? "both" : "top"}
       onChange={async (details)=> {
         const n = details.pageIndex;
         const res = await fetch(n);

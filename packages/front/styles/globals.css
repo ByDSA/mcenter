@@ -1,5 +1,4 @@
 @import "./globals-colors.css";
-@import "./globals-resolution.css";
 @import "./globals-ui-kit.css";
 @import "./globals-animation.css";
 @import "./scrollbar.css";
@@ -22,7 +21,17 @@
     var(--color-blue-500) 0%,
     var(--color-purple-600) 100%
   );
+  --color-text: var(--color-gray-300);
+  --color-text-hover: var(--color-gray-100);
+  --color-title: var(--color-gray-25);
   --color-ui-focus: var(--color-blue-300);
+
+  --color-item: var(--color-gray-975);
+  --color-item-text: var(--color-text);
+  --color-item-text-title: var(--color-title);
+  --color-item-hover: var(--color-gray-950);
+  --color-item-playing: var(--color-gray-950);
+  --color-label: var(--color-gray-200);
 }
 
 html,
@@ -58,18 +67,16 @@ body {
 a {
   color: var(--color-link);
   text-decoration: none;
-}
-
-a:hover,
-a:focus,
-a:active {
-  text-decoration: underline;
-  color: var(--color-link-hover);
-}
-
-a:hover {
   cursor: pointer;
+
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: underline;
+    color: var(--color-link-hover);
+  }
 }
+
 
 /** Layout **/
 

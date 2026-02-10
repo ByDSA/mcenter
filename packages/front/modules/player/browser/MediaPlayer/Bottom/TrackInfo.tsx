@@ -10,7 +10,7 @@ import { useBrowserPlayer } from "../BrowserPlayerContext";
 import commonStyles from "../MediaPlayerCommon.module.css";
 import { CurrentTimeLabel } from "./CurrentTimeLabel";
 import styles from "./MediaPlayer.module.css";
-import { BIG_BREAKPOINT } from "./breakpoints";
+import { BIG_BREAKPOINT, SMALL_BREAKPOINT } from "./breakpoints";
 import { useWindowWidth } from "./useWindowWidth";
 
 export const TrackInfo = memo(
@@ -34,14 +34,21 @@ export const TrackInfo = memo(
           cover={music.imageCover}
         />
         <div className={styles.trackDetails}>
-          <a
-            className={styles.trackTitle}
-            title={music.title}
-            onClick={(e)=> {
-              e.stopPropagation();
-              router.push(PATH_ROUTES.musics.frontend.path + "/" + music.id);
-            }}
-          >{music.title}</a>
+          {width < SMALL_BREAKPOINT
+            ? <span
+              className={styles.trackTitle}
+              title={music.title}
+
+            >{music.title}</span>
+            : <a
+              className={styles.trackTitle}
+              title={music.title}
+              onClick={(e)=> {
+                e.stopPropagation();
+                router.push(PATH_ROUTES.musics.frontend.path + "/" + music.id);
+              }}
+            >{music.title}</a>
+          }
           <ResourceSubtitle
             className={styles.trackSubtitle}
             items={[

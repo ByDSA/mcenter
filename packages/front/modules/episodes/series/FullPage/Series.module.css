@@ -1,5 +1,9 @@
 .content {
   padding: 1rem;
+
+  @media (width < 500px) {
+    padding: 0;
+  }
 }
 
 .seasonTitle {
@@ -7,4 +11,8 @@
   margin-bottom: 1rem;
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.seasonEpisodesCount {
+  margin-left: 0.5rem;
 }

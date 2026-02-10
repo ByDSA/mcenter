@@ -246,10 +246,10 @@
     margin: 0rem;
     background: none;
     border: none;
-    color: var(--color-gray-200);
+    color: var(--color-text);
 
     h1 {
-      color: var(--color-gray-0) !important;
+      color: var(--color-title) !important;
     }
   }
 

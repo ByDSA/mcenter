@@ -1,5 +1,5 @@
 :root {
-  --spinner-color: var(--color-gray-200);
+  --spinner-color: var(--color-label);
   --spinner-size: 1rem;
   --spinner-width: 2px;
 }

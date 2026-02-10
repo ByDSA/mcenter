@@ -113,10 +113,17 @@ export const useManySeries = (ids: string[]) => {
 };
 
 function merge(oldData: SeriesEntity | undefined, newData: Partial<SeriesEntity>): SeriesEntity {
+  if (!oldData)
+    return seriesEntitySchema.parse(newData);
+
   const ret = {
     ...oldData,
     ...newData,
-  } as SeriesEntity;
+    metadata: {
+      ...oldData.metadata,
+      ...newData.metadata,
+    },
+  } satisfies SeriesEntity;
 
   if (newData.imageCoverId === null)
     delete ret.imageCover;

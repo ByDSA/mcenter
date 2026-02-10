@@ -1,10 +1,9 @@
-import React, { useState, useMemo, ReactNode, useEffect } from "react";
+import { useState, useMemo, useEffect, ReactNode, useRef, useCallback } from "react";
 import { classes } from "#modules/utils/styles";
 import styles from "./Pagination.module.css";
+import { PaginationButtonProps,
+  DefaultPageButton } from "./PaginationComponents";
 
-// ----------------------------------------------------------------------
-// TYPES
-// ----------------------------------------------------------------------
 /**
  * Información enviada cuando la página cambia.
  * Se separa el índice interno del valor mostrado.
@@ -17,31 +16,18 @@ export type PaginationChangeDetails = {
   isLast: boolean;
 };
 
-/**
- * Props para el componente de botón.
- * Ahora recibe index y value por separado.
- */
-export type PaginationButtonProps = {
-  pageIndex: number;
-  pageValue: number | string;
-  isActive: boolean;
-  isDisabled: boolean;
-  onClick: ()=> void;
-  label?: ReactNode | string;
-};
-
-/**
- * Props base comunes para cualquier modo de paginación.
- */
 type BasePaginationProps = {
   initialPageIndex?: number | null; // Índice inicial
   position?: "both" | "bottom" | "top";
   allowClickActive?: boolean;
-  neighbors?: number;
+  maxVisibleButtons?: number; // Número total de botones visibles (incluyendo primero y último)
+  // si es undefined, se auto-calcula
   renderButton?: React.FC<PaginationButtonProps>;
   className?: string;
+  isDisabled?: boolean;
   showPageInfo?: boolean;
-  onChange?: (details: PaginationChangeDetails)=> void;
+  showNavigationButtons?: boolean; // Nueva prop
+  onChange?: (details: PaginationChangeDetails)=> Promise<void> | void; // Ahora puede ser async
   children: ReactNode | ((props: {
     currentPageIndex: number;
     currentValue: number | string;
@@ -73,44 +59,23 @@ type CustomPaginationProps = BasePaginationProps & {
 // Unión de tipos para hacerlos excluyentes
 export type PaginationContainerProps = CustomPaginationProps | RangePaginationProps;
 
-// ----------------------------------------------------------------------
-// COMPONENTES INTERNOS
-// ----------------------------------------------------------------------
-const DefaultPageButton = ( { pageValue,
-  isActive,
-  isDisabled,
-  onClick,
-  label }: PaginationButtonProps) => {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={isDisabled}
-      className={classes(
-        styles.button,
-        isActive && styles.active,
-        isDisabled && styles.disabled,
-      )}
-      aria-current={isActive ? "page" : undefined}
-    >
-      {label || pageValue}
-    </button>
-  );
-};
-
-// ----------------------------------------------------------------------
-// COMPONENTE PRINCIPAL
-// ----------------------------------------------------------------------
 export const PaginationContainer = (props: PaginationContainerProps) => {
   const { children,
     initialPageIndex,
     position = "bottom",
     allowClickActive = false,
-    neighbors = 2,
+    maxVisibleButtons, // Ya no tiene default, puede ser undefined
     renderButton: CustomButton,
     className,
+    isDisabled = false,
     showPageInfo = true,
+    showNavigationButtons = true, // Por defecto se muestran
     onChange } = props;
+  // Refs para ResizeObserver
+  const navRef = useRef<HTMLElement>(null);
+  // Estado para el número calculado de botones visibles
+  // Default mientras se calcula
+  const [calculatedMaxButtons, setCalculatedMaxButtons] = useState<number>(7);
   // Detectar modo
   const isCustomMode = Array.isArray(props.customValues);
   // Normalizar límites lógicos (Indices internos)
@@ -127,6 +92,78 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
 
     return minIndex;
   } );
+  // Estado para controlar si está cambiando (para async)
+  const [isChanging, setIsChanging] = useState(false);
+  // Valor efectivo de maxVisibleButtons (manual o calculado)
+  const effectiveMaxButtons = maxVisibleButtons ?? calculatedMaxButtons;
+  // Función para calcular cuántos botones caben
+  const calculateMaxButtons = useCallback(() => {
+    if (maxVisibleButtons !== undefined)
+      return;
+
+    if (!navRef.current || currentIndex === null)
+      return;
+
+    const navWidth = navRef.current.offsetWidth;
+    const buttonWidth = 32;
+    const ellipsisWidth = 16;
+    const gap = 8;
+    const totalPages = maxIndex - minIndex + 1;
+    const navigationButtonsWidth = showNavigationButtons
+      ? ((buttonWidth * 2) + (gap * 2))
+      : 0;
+    let availableWidth = navWidth - navigationButtonsWidth;
+    // Si caben todas las páginas sin ellipsis
+    const maxButtonsNoEllipsis = Math.ceil((availableWidth + gap) / (buttonWidth + gap));
+
+    if (maxButtonsNoEllipsis >= totalPages) {
+      setCalculatedMaxButtons(totalPages);
+
+      return;
+    }
+
+    // Si no caben todas, calcular cuántos ellipsis habrá con la página actual
+    // Probamos con un número tentativo de botones para determinar los ellipsis
+    const tentativeMaxButtons = maxButtonsNoEllipsis;
+    const buttonsForMiddle = tentativeMaxButtons - 2;
+    const leftButtons = Math.floor(buttonsForMiddle / 2);
+    const rightButtons = buttonsForMiddle - leftButtons - 1;
+    let leftSiblingIndex = Math.max(currentIndex - leftButtons, minIndex);
+    let rightSiblingIndex = Math.min(currentIndex + rightButtons, maxIndex);
+    const shouldShowLeftDots = leftSiblingIndex > minIndex + 1;
+    const shouldShowRightDots = rightSiblingIndex < maxIndex - 1;
+    // Contar ellipsis que aparecerán
+    const ellipsisCount = (shouldShowLeftDots ? 1 : 0) + (shouldShowRightDots ? 1 : 0);
+    // Restar espacio de los ellipsis que realmente aparecerán
+    const ellipsisSpace = (ellipsisWidth + gap) * ellipsisCount;
+    const availableWidthWithEllipsis = availableWidth - ellipsisSpace;
+    const maxButtons = Math.ceil((availableWidthWithEllipsis + gap) / (buttonWidth + gap));
+    const finalMaxButtons = Math.max(3, maxButtons);
+
+    setCalculatedMaxButtons(finalMaxButtons);
+  }, [maxVisibleButtons, showNavigationButtons, maxIndex, minIndex, currentIndex]);
+
+  // ResizeObserver para detectar cambios de tamaño
+  useEffect(() => {
+    if (maxVisibleButtons !== undefined)
+      return; // Solo si es auto-adaptable
+
+    if (!navRef.current)
+      return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      calculateMaxButtons();
+    } );
+
+    resizeObserver.observe(navRef.current);
+
+    // Calcular inmediatamente al montar
+    calculateMaxButtons();
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [calculateMaxButtons, maxVisibleButtons]);
 
   // Asegurar que si cambian las props y el índice queda fuera, se resetee
   useEffect(() => {
@@ -138,7 +175,7 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
 
     if (currentIndex > maxIndex)
       setCurrentIndex(maxIndex);
-  }, [maxIndex, minIndex]);
+  }, [maxIndex, minIndex, currentIndex]);
 
   // Helper para obtener el valor a mostrar basado en un índice
   const getValueForIndex = (idx: number): number | string => {
@@ -149,90 +186,127 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
   };
   // Generar la lista de números de página (Indices) para renderizar
   const paginationRange = useMemo(() => {
-    const totalNumbers = (neighbors * 2) + 3; // neighbors + current + neighbors + first + last
-    const totalButtons = totalNumbers + 2; // + dots
-    const rangeLength = maxIndex - minIndex + 1;
+    const totalPages = maxIndex - minIndex + 1;
 
-    // Caso 1: Todo cabe sin puntos suspensivos
-    if (rangeLength <= totalButtons) {
+    // Si no hay página actual, no mostramos nada
+    if (currentIndex === null)
+      return [];
+
+    // Si el total de páginas cabe en effectiveMaxButtons, mostrar todas
+    if (totalPages <= effectiveMaxButtons) {
       return Array.from( {
-        length: rangeLength,
+        length: totalPages,
       }, (_, i) => minIndex + i);
     }
 
-    const leftSiblingIndex = Math.max((currentIndex ?? 0) - neighbors, minIndex);
-    const rightSiblingIndex = Math.min((currentIndex ?? 0) + neighbors, maxIndex);
+    // Calcular cuántos botones mostrar alrededor de la página actual
+    // Reservamos 2 espacios para el primero y el último
+    const buttonsForMiddle = effectiveMaxButtons - 2;
+    // Calcular cuántos botones a cada lado del actual
+    const leftButtons = Math.floor(buttonsForMiddle / 2);
+    const rightButtons = buttonsForMiddle - leftButtons - 1; // -1 porque incluye el botón actual
+    // Calcular el rango ideal
+    let leftSiblingIndex = Math.max(currentIndex - leftButtons, minIndex);
+    let rightSiblingIndex = Math.min(currentIndex + rightButtons, maxIndex);
+    // Ajustar si nos acercamos a los extremos
+    const totalButtonsInMiddle = rightSiblingIndex - leftSiblingIndex + 1;
+
+    if (totalButtonsInMiddle < buttonsForMiddle) {
+      if (leftSiblingIndex === minIndex) {
+        // Estamos cerca del inicio, extender a la derecha
+        rightSiblingIndex = Math.min(minIndex + buttonsForMiddle - 1, maxIndex);
+      } else if (rightSiblingIndex === maxIndex) {
+        // Estamos cerca del final, extender a la izquierda
+        leftSiblingIndex = Math.max(maxIndex - buttonsForMiddle + 1, minIndex);
+      }
+    }
+
     const shouldShowLeftDots = leftSiblingIndex > minIndex + 1;
     const shouldShowRightDots = rightSiblingIndex < maxIndex - 1;
 
-    // Caso 2: Puntos solo a la derecha
-    if (!shouldShowLeftDots && shouldShowRightDots) {
-      const leftItemCount = 3 + (2 * neighbors);
-      const leftRange = Array.from( {
-        length: leftItemCount,
-      }, (_, i) => minIndex + i);
+    // Caso 1: Sin puntos a la izquierda (inicio)
+    if (!shouldShowLeftDots) {
+      const leftRange = Array.from(
+        {
+          length: rightSiblingIndex - minIndex + 1,
+        },
+        (_, i) => minIndex + i,
+      );
 
-      return [...leftRange, "...", maxIndex];
+      if (shouldShowRightDots)
+        return [...leftRange, "...", maxIndex];
+
+      return leftRange;
     }
 
-    // Caso 3: Puntos solo a la izquierda
-    if (shouldShowLeftDots && !shouldShowRightDots) {
-      const rightItemCount = 3 + (2 * neighbors);
+    // Caso 2: Sin puntos a la derecha (final)
+    if (!shouldShowRightDots) {
       const rightRange = Array.from(
         {
-          length: rightItemCount,
+          length: maxIndex - leftSiblingIndex + 1,
         },
-        (_, i) => maxIndex - rightItemCount + 1 + i,
+        (_, i) => leftSiblingIndex + i,
       );
 
       return [minIndex, "...", ...rightRange];
     }
 
-    // Caso 4: Puntos a ambos lados
-    if (shouldShowLeftDots && shouldShowRightDots) {
-      const middleRange = Array.from(
-        {
-          length: rightSiblingIndex - leftSiblingIndex + 1,
-        },
-        (_, i) => leftSiblingIndex + i,
-      );
+    // Caso 3: Puntos a ambos lados (medio)
+    const middleRange = Array.from(
+      {
+        length: rightSiblingIndex - leftSiblingIndex + 1,
+      },
+      (_, i) => leftSiblingIndex + i,
+    );
 
-      return [minIndex, "...", ...middleRange, "...", maxIndex];
-    }
-
-    return [];
-  }, [minIndex, maxIndex, neighbors, currentIndex]);
-  // Manejador de cambio
-  const handlePageChange = (newIndex: number) => {
+    return [minIndex, "...", ...middleRange, "...", maxIndex];
+  }, [minIndex, maxIndex, effectiveMaxButtons, currentIndex]);
+  // Manejador de cambio (ahora async)
+  const handlePageChange = async (newIndex: number) => {
     if (newIndex < minIndex || newIndex > maxIndex)
       return;
 
     if (newIndex === currentIndex && !allowClickActive)
       return;
 
-    setCurrentIndex(newIndex);
+    if (isChanging)
+      return; // Prevenir clicks mientras está cambiando
 
-    if (onChange) {
-      onChange( {
-        pageIndex: newIndex,
-        pageValue: getValueForIndex(newIndex),
-        totalPages: maxIndex - minIndex + 1, // Cantidad total de páginas
-        isFirst: newIndex === minIndex,
-        isLast: newIndex === maxIndex,
-      } );
+    setIsChanging(true);
+
+    try {
+      if (onChange) {
+        await onChange( {
+          pageIndex: newIndex,
+          pageValue: getValueForIndex(newIndex),
+          totalPages: maxIndex - minIndex + 1,
+          isFirst: newIndex === minIndex,
+          isLast: newIndex === maxIndex,
+        } );
+      }
+
+      // Solo cambiar visualmente después de que termine el onChange
+      setCurrentIndex(newIndex);
+    } catch (error) {
+      console.error("Error changing page:", error);
+      // No cambiar la página si hubo error
+    } finally {
+      setIsChanging(false);
     }
   };
   const renderPaginationNav = () => (
-    <nav className={styles.nav} aria-label="Page navigation">
-      {/* Botón Previous */}
-      <DefaultPageButton
-        label="&laquo;"
-        pageIndex={currentIndex! - 1}
-        pageValue="prev" // Valor dummy
-        isActive={false}
-        isDisabled={currentIndex === minIndex || currentIndex === null}
-        onClick={() => handlePageChange(currentIndex! - 1)}
-      />
+    <nav ref={navRef} className={styles.nav} aria-label="Page navigation">
+      {/* Botón Previous - solo si showNavigationButtons es true */}
+      {showNavigationButtons && (
+        <DefaultPageButton
+          label="&laquo;"
+          pageIndex={currentIndex! - 1}
+          pageValue="prev"
+          isActive={false}
+          isDisabled={currentIndex === minIndex || currentIndex === null || isChanging}
+          onClick={() => handlePageChange(currentIndex! - 1)}
+        />
+      )}
 
       {paginationRange.map((item, index) => {
         if (item === "...") {
@@ -249,9 +323,8 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
           pageIndex: pageIdx,
           pageValue: pageVal,
           isActive: pageIdx === currentIndex,
-          isDisabled: pageIdx === currentIndex && !allowClickActive,
+          isDisabled: isDisabled || isChanging,
           onClick: () => handlePageChange(pageIdx),
-          // Si es custom, el label es el valor (string), si es numérico, es el numero
           label: String(pageVal),
         };
 
@@ -264,15 +337,17 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
           );
       } )}
 
-      {/* Botón Next */}
-      <DefaultPageButton
-        label="&raquo;"
-        pageIndex={currentIndex! + 1}
-        pageValue="next" // Valor dummy
-        isActive={false}
-        isDisabled={currentIndex === maxIndex || currentIndex === null}
-        onClick={() => handlePageChange(currentIndex! + 1)}
-      />
+      {/* Botón Next - solo si showNavigationButtons es true */}
+      {showNavigationButtons && (
+        <DefaultPageButton
+          label="&raquo;"
+          pageIndex={currentIndex! + 1}
+          pageValue="next"
+          isActive={false}
+          isDisabled={currentIndex === maxIndex || currentIndex === null || isChanging}
+          onClick={() => handlePageChange(currentIndex! + 1)}
+        />
+      )}
     </nav>
   );
   const currentValue = currentIndex === null ? null : getValueForIndex(currentIndex);
@@ -304,7 +379,7 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
                 )
                 : (
                   <span>
-                   Página {currentValue} de {maxIndex}
+                    Página {currentValue} de {maxIndex}
                   </span>
                 )}
             </div>

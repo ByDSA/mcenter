@@ -13,7 +13,7 @@
   overflow: hidden;
   background-color: var(--color-gray-800);
   transition: background-color 0.2s ease;
-  color: white;
+  color: var(--color-item-text-title);
 
   &:hover {
     cursor: not-allowed;
@@ -34,7 +34,7 @@
   }
 
   &.idle {
-    color: var(--color-gray-100);
+    color: var(--color-item-text);
 
     .statusIndicator {
       background-color: var(--color-yellow-600);
@@ -42,7 +42,7 @@
   }
 
   &.offline {
-    color: var(--color-gray-300);
+    color: var(--color-item-text);
 
     .statusIndicator {
       background-color: var(--color-red-700);

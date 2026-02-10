@@ -53,7 +53,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: var(--color-gray-25);
+      color: var(--color-title);
 
       width: fit-content;
       max-width: 100%; /* Evita que se salga del padre y activa el ellipsis */

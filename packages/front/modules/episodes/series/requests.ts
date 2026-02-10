@@ -103,7 +103,7 @@ export class SeriesApi {
 }
 
 function updateCache(item: SeriesEntity) {
-  useSeries.updateCache(item.id, ()=> item);
+  useSeries.updateCacheWithMerging(item.id, item);
 
   if (item.imageCoverId && item.imageCover)
     useImageCover.updateCache(item.imageCoverId, ()=> item.imageCover!);

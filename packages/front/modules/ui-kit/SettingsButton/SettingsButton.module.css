@@ -8,10 +8,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-gray-200);
+  color: var(--color-item-text);
 
   &:hover {
-    color: var(--color-gray-25);
+    color: var(--color-text-hover);
     cursor: pointer;
   }
 

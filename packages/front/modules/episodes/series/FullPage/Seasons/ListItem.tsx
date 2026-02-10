@@ -1,6 +1,7 @@
 import type { EpisodesList } from "./List";
 import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined } from "$shared/utils/validation";
+import { Visibility } from "@mui/icons-material";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
@@ -41,10 +42,16 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
   assertIsDefined(episode.fileInfos);
 
   if (hasUser) {
+    const neverSeen = episode.userInfo?.lastTimePlayed === null || !episode.userInfo;
+    const txt = neverSeen
+      ? "Nunca visto"
+      : `${formatDateDDMMYYY(episode.userInfo!.lastTimePlayed!)}`;
+
     subtitleSeen = {
-      text: episode.userInfo?.lastTimePlayed === null || !episode.userInfo
-        ? "Nunca visto"
-        : `Visto el ${formatDateDDMMYYY(episode.userInfo.lastTimePlayed)}`,
+      customContent: <span className={styles.seen} title={`Visto por última vez: ${txt}`}>
+        <Visibility/>
+        <span>{txt}</span>
+      </span>,
     };
   }
 

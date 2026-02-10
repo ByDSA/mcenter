@@ -1,5 +1,5 @@
 .label {
-  color: var(--color-gray-200);
+  color: var(--color-label);
   font-weight: 600;
   text-align: left;
   margin-bottom: 0.5rem;

@@ -9,7 +9,6 @@ import { useSeries } from "../hooks";
 import { SeriesHeader } from "./Header";
 import { EpisodesList } from "./Seasons/List";
 import styles from "./Series.module.css";
-import { SeasonButton } from "./SeasonButton";
 
 export type SeriesFullPageProps = {
   initialSeason?: string;
@@ -65,8 +64,8 @@ export const SeriesFullPageCurrentCtx = ( { seriesId,
                 customValues={seasonNames}
                 initialPageIndex={currentSeason ? seasonNames.indexOf(currentSeason) : null}
                 position="top"
-                renderButton={SeasonButton}
                 showPageInfo={false}
+                showNavigationButtons={false}
                 onChange={(details) => {
                   const seasonName = details.pageValue.toString();
 
@@ -84,7 +83,9 @@ export const SeriesFullPageCurrentCtx = ( { seriesId,
                   action={async () => episodesBySeason[currentSeason]}
                   onSuccess={(data) => setEpisodes(data)}
                 >
-                  <p>{countGroupEpisodes(episodes)} episodios</p>
+                  <p className={styles.seasonEpisodesCount}>
+                    {countGroupEpisodes(episodes)} episodios
+                  </p>
                   <EpisodesList
                     episodes={episodes}
                     seriesId={seriesId}

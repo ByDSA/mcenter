@@ -2,7 +2,7 @@
   position: fixed;
   bottom: var(--media-player-height);
   background-color: var(--color-gray-925);
-  color: var(--color-gray-25);
+  color: var(--color-title);
   max-height: max(30rem, calc(90vh - var(--media-player-height)));
   width: 100%;
   z-index: 200;
