@@ -3,8 +3,10 @@ import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { PATH_ROUTES } from "$shared/routing";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
+import { createTokenTests } from "#core/auth/strategies/token/tests";
 import { MusicsRepository } from "../crud/repositories/music";
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicRendererModule } from "../renderer/module";
@@ -14,7 +16,7 @@ const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 const MUSIC_WITH_USER_INFO = fixtureMusics.Disk.WithUserInfo.List[0];
 
 describe("musicGetRandomController", () => {
-  let routerApp: Application;
+  let router: Application;
   let testingSetup: TestingSetup;
   let mocks: Awaited<ReturnType<typeof initMocks>>;
 
@@ -40,9 +42,13 @@ describe("musicGetRandomController", () => {
         getOrCreateMockProvider(MusicsRepository),
         getOrCreateMockProvider(MusicHistoryRepository),
       ],
+    }, {
+      auth: {
+        repositories: "mock",
+      },
     } );
 
-    routerApp = testingSetup.routerApp;
+    router = testingSetup.routerApp;
     mocks = await initMocks(testingSetup);
   } );
 
@@ -54,22 +60,29 @@ describe("musicGetRandomController", () => {
     describe("format=m3u8", () => {
       const validUrl = "/?format=m3u8";
 
+      createTokenTests( {
+        getTestingSetup: ()=>testingSetup,
+        expectedUser: fixtureUsers.Normal.UserWithRoles,
+        getRouter: ()=>router,
+        url: validUrl,
+      } );
+
       it("should return 200 with m3u8 format", async () => {
-        const res = await request(routerApp)
+        const res = await request(router)
           .get(validUrl);
 
         expect(res.statusCode).toBe(HttpStatus.OK);
       } );
 
       it("should call repositories", async () => {
-        await request(routerApp)
+        await request(router)
           .get(validUrl);
 
         expect(mocks.musicRepo.getAll).toHaveBeenCalled();
       } );
 
       it("should include music titles in response", async () => {
-        const res = await request(routerApp)
+        const res = await request(router)
           .get(validUrl);
         const responseText = res.text;
         const musics = MUSICS_SAMPLES_IN_DISK;
@@ -78,7 +91,7 @@ describe("musicGetRandomController", () => {
       } );
 
       it("should include music slugs in response", async () => {
-        const res = await request(routerApp)
+        const res = await request(router)
           .get(validUrl);
         const responseText = res.text;
         const musics = MUSICS_SAMPLES_IN_DISK;
@@ -94,7 +107,7 @@ describe("musicGetRandomController", () => {
       const validUrl = "/?format=json";
 
       it("should return 200 with json format", async () => {
-        const res = await request(routerApp)
+        const res = await request(router)
           .get(validUrl);
 
         expect(res.statusCode).toBe(HttpStatus.OK);
@@ -102,7 +115,7 @@ describe("musicGetRandomController", () => {
       } );
 
       it("should not return userInfo when no user provided", async () => {
-        const res = await request(routerApp)
+        const res = await request(router)
           .get(validUrl);
         const { data } = res.body;
 
@@ -110,8 +123,8 @@ describe("musicGetRandomController", () => {
       } );
 
       it("should return userInfo when token provided", async () => {
-        const token = MUSIC_WITH_USER_INFO.userInfo.id;
-        const res = await request(routerApp)
+        const token = MUSIC_WITH_USER_INFO.userInfo.userId;
+        const res = await request(router)
           .get(`${validUrl}&token=${token}`);
         const { data } = res.body;
 
@@ -120,11 +133,11 @@ describe("musicGetRandomController", () => {
     } );
 
     describe("invalid params", () => {
-      it("should return 422 if token is not ObjectId", async () => {
-        const res = await request(routerApp)
+      it("should ignore token if is not ObjectId", async () => {
+        const res = await request(router)
           .get("/?format=json&token=invalidToken");
 
-        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+        expect(res.statusCode).toBe(HttpStatus.OK);
       } );
     } );
   } );

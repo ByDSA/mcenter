@@ -6,14 +6,17 @@ import { MusicEntity } from "$sharedSrc/models/musics/music";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { createTestingAppModuleAndInit } from "#core/app/tests/app";
 import { MusicDtos } from "#musics/models/dto";
-import { getOrCreateMockProvider } from "#utils/nestjs/tests";
+import { createMockedModule, getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureMusics } from "../tests";
 import { MusicsRepository } from "../crud/repositories/music";
-import { MusicHistoryRepository } from "../history/crud/repository";
+import { MusicsCrudModule } from "../crud/module";
 import { MusicRendererModule } from "../renderer/module";
-import { MusicsSlugModule } from "./module";
+import { MusicFlowService } from "../MusicFlow.service";
+import { MusicHistoryRepository } from "../history/crud/repository";
+import { MusicResponseFormatterService } from "../renderer/formatter.service";
+import { MusicsSlugController } from "./controller";
 
-describe("responses", () => {
+describe("musicsSlugController", () => {
   let router: Application;
   let musicRepoMock: jest.Mocked<MusicsRepository>;
   const URL = "/slug";
@@ -21,26 +24,27 @@ describe("responses", () => {
   beforeAll(async () => {
     const testingSetup = await createTestingAppModuleAndInit( {
       imports: [
+        createMockedModule(MusicsCrudModule),
         MusicRendererModule,
-        MusicsSlugModule,
       ],
-      controllers: [],
-      providers: [
-      ],
+      controllers: [MusicsSlugController],
+      providers: [],
     }, {
+      auth: {
+        repositories: "mock",
+      },
       beforeCompile: (builder)=> {
         builder
-          .overrideProvider(MusicsRepository)
-          .useValue(getOrCreateMockProvider(MusicsRepository).useValue);
-
-        builder
-          .overrideProvider(MusicHistoryRepository)
-          .useValue(getOrCreateMockProvider(MusicHistoryRepository).useValue);
+          .overrideProvider(MusicFlowService)
+          .useValue(new MusicFlowService(
+            getOrCreateMockProvider(MusicHistoryRepository).useValue,
+            getOrCreateMockProvider(MusicResponseFormatterService).useValue,
+          ));
       },
     } );
 
     router = testingSetup.routerApp;
-    musicRepoMock = testingSetup.module.get(MusicsRepository);
+    musicRepoMock = testingSetup.getMock(MusicsRepository);
     musicRepoMock.getOneBySlug.mockResolvedValue(fixtureMusics.Disk.Samples.DK);
   } );
 

@@ -4,10 +4,16 @@ import { throwErrorPopStack } from "../../errors";
 export type AssertZodSettings = {
   msg?: string;
   useZodError?: boolean;
+  metadata: ArgumentMetadata;
 };
 
 export class CustomValidationError extends Error {
-  static fromZodError(error: z.ZodError, model: unknown, msg?: string): CustomValidationError {
+  static fromZodError(
+    error: z.ZodError,
+    model: unknown,
+    metadata: ArgumentMetadata,
+    msg?: string,
+  ): CustomValidationError {
     const plainErrors = error.issues.map((issue) => {
       let ret = issue.message;
 
@@ -19,7 +25,10 @@ export class CustomValidationError extends Error {
     const finalMsg = msg ?? plainErrors.join("\n");
     const ret = new CustomValidationError(model, finalMsg);
 
-    ret.cause = error;
+    ret.cause = {
+      metadata,
+      error,
+    };
 
     return ret;
   }
@@ -52,7 +61,9 @@ export function parseZod<T extends ZodTypeAny>(
     const result = schema.safeParse(model);
 
     if (!result.success) {
-      const error = CustomValidationError.fromZodError(result.error, model, settings?.msg);
+      const error = CustomValidationError.fromZodError(result.error, model, {
+        type: "custom",
+      }, settings?.msg);
 
       throwErrorPopStack(error);
     }
@@ -119,3 +130,31 @@ export {
 } from "./utils";
 
 export * from "./refinements";
+
+/* nestjs */
+ interface ArgumentMetadata {
+
+    /**
+     * Indicates whether argument is a body, query, param, or custom parameter
+     */
+    readonly type: Paramtype;
+
+    /**
+     * Underlying base type (e.g., `String`) of the parameter, based on the type
+     * definition in the route handler.
+     */
+    readonly metatype?: Type<any> | undefined;
+
+    /**
+     * String passed as an argument to the decorator.
+     * Example: `@Body('userId')` would yield `userId`
+     */
+    readonly data?: string | undefined;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+interface Type<T = any> extends Function {
+    new (...args: any[]): T;
+}
+
+type Paramtype = "body" | "custom" | "param" | "query";

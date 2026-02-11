@@ -7,9 +7,9 @@ import { EpisodesCrudModule } from "#episodes/crud/module";
 import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { EpisodeLastTimePlayedModule } from "#episodes/history/last-time-played/module";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
-import { StreamGetEpisodeController } from "./get-episode.controller";
-import { StreamGetRandomEpisodeService } from "./get-episode.service";
-import { StreamPickerController } from "./show-picker.controller";
+import { StreamGetEpisodeController } from "./get-episode/controller";
+import { StreamGetRandomEpisodeService } from "./get-episode/service";
+import { StreamPickerController } from "./show-picker/show-picker.controller";
 
 @Module( {
   imports: [

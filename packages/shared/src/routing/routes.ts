@@ -368,9 +368,10 @@ token?: string;} ) => {
     },
     pickRandom: {
       path: MUSICS_RANDOM,
-      withParams: ( { q, token }: {
+      withParams: ( { q, token, format }: {
         q: string;
         token?: string;
+        format?: "json" | "m3u8" | "raw";
       } ) => {
         const params = new URLSearchParams( {
           q,
@@ -378,6 +379,9 @@ token?: string;} ) => {
 
         if (token)
           params.append("token", token);
+
+        if (format)
+          params.append("format", format);
 
         return `${MUSICS_RANDOM}?${params.toString()}`;
       },

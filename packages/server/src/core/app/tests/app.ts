@@ -1,7 +1,7 @@
 import { Test, TestingModule, TestingModuleBuilder } from "@nestjs/testing";
 import { INestApplication, Logger, ModuleMetadata, Type } from "@nestjs/common";
 import { Application } from "express";
-import { APP_GUARD, RouterModule } from "@nestjs/core";
+import { APP_GUARD, APP_PIPE, RouterModule } from "@nestjs/core";
 import { isDebugging } from "$shared/utils/vscode";
 import { AppPayload, UserPayload } from "$shared/models/auth";
 import { createMockInstance } from "$sharedTests/jest/mocking";
@@ -26,6 +26,8 @@ import { createAndRegisterEpisodesRepositoryMockClass } from "#episodes/crud/rep
 import { createAndRegisterEpisodeUserInfosRepositoryMockClass } from "#episodes/crud/repositories/user-infos/tests";
 import { registerMusicFileInfoRepositoryMockClass } from "#musics/file-info/crud/repository/tests";
 import { createAndRegisterSeriesRepositoryMockClass } from "#episodes/series/crud/repository/tests";
+import { CaptureAfterValidationPipe, CaptureArgsExceptionFilter, CaptureArgsInterceptor, CaptureArgsMiddleware } from "#core/app/tests/controllers/capture-args.interceptor";
+import { GlobalExceptionFilter } from "#core/error-handlers/http-error-handler";
 
 export type TestingSetup = {
   options?: Options;
@@ -36,6 +38,9 @@ export type TestingSetup = {
   getMock: <T>(clazz: Type<T>)=> jest.Mocked<T>;
   resolveMock: <T>(clazz: Type<T>)=> Promise<jest.Mocked<T>>;
   useMockedUser: (user: UserPayload | null)=> Promise<void>;
+  controllers: {
+      getCapturedData: ()=> CaptureArgsMiddleware["capturedData"];
+  };
 };
 type Options = {
   db?: {
@@ -64,6 +69,7 @@ export async function createTestingAppModule(
   const mockAuthGuard = {
     canActivate: jest.fn(),
   };
+  const captureMiddleware = new CaptureArgsMiddleware();
   const moduleBuilder = Test.createTestingModule( {
     ...metadata,
     imports: [
@@ -82,6 +88,10 @@ export async function createTestingAppModule(
     ],
     providers: [
       ...globalValidationProviders,
+      {
+        provide: APP_PIPE,
+        useFactory: () => new CaptureAfterValidationPipe(captureMiddleware),
+      },
       ...(options?.auth && options.auth.cookies !== "mock"
         ? globalAuthProviders
         : []),
@@ -147,8 +157,19 @@ export async function createTestingAppModule(
 
   module.useLogger(false);
   const app = module.createNestApplication();
+  const captureInterceptor = new CaptureArgsInterceptor(captureMiddleware);
+
+  app.use(captureMiddleware.use.bind(captureMiddleware));
+  app.useGlobalInterceptors(captureInterceptor);
 
   addGlobalConfigToApp(app);
+  // Después de la global config reemplazarlo
+  const captureFilter = new CaptureArgsExceptionFilter(
+    captureMiddleware,
+    new GlobalExceptionFilter(),
+  );
+
+  app.useGlobalFilters(captureFilter);
   const routerApp = app.getHttpServer();
   const resolveMock = async <T>(clazz: Type<T>) => {
     return await module.resolve<jest.Mocked<T>>(clazz);
@@ -159,6 +180,9 @@ export async function createTestingAppModule(
     options,
     app,
     module,
+    controllers: {
+      getCapturedData: ()=>captureMiddleware.capturedData,
+    },
     db: options?.db?.using ? app.get<TestRealDatabase>(Database) : undefined,
     getMock: <T>(clazz: Type<T>) => {
       return module.get<jest.Mocked<T>>(clazz);

@@ -1,8 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Request } from "express";
 import { UserPayload } from "$shared/models/auth";
-import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import z from "zod";
 import { ResponseFormat } from "$shared/models/resources";
 import { assertFoundClient } from "#utils/validation/found";
 import { MusicResponseFormatterService } from "#musics/renderer/formatter.service";
@@ -12,7 +10,6 @@ import { MusicEntity } from "./models";
 interface ProcessOptions {
   req: Request;
   user: UserPayload | null;
-  token?: string;
   shouldNotAddToHistory?: boolean;
 }
 
@@ -35,19 +32,11 @@ export class MusicFlowService {
   ) {
     this.currentOptions = options;
 
-    this.validateToken(options.token);
     this.determineResponseFormat();
     await this.fetchMusic(fetcher);
     await this.updateHistoryIfNeeded();
 
     return this.currentMusic;
-  }
-
-  /**
-   * Fase 1: Validación de seguridad del token
-   */
-  private validateToken(token: string | undefined): void {
-    mongoDbId.or(z.undefined()).parse(token);
   }
 
   /**
@@ -78,7 +67,7 @@ export class MusicFlowService {
     if (this.currentFormat !== ResponseFormat.RAW)
       return;
 
-    const userId = this.getUserIdForHistory();
+    const userId = this.currentOptions.user?.id;
 
     if (!userId || this.currentOptions.shouldNotAddToHistory)
       return;
@@ -87,12 +76,5 @@ export class MusicFlowService {
       musicId: this.currentMusic.id,
       userId,
     } );
-  }
-
-  /**
-   * Obtiene el ID de usuario para el historial (user.id o token)
-   */
-  private getUserIdForHistory(): string | undefined {
-    return this.currentOptions.user?.id ?? this.currentOptions.token;
   }
 }

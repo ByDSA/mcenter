@@ -98,7 +98,7 @@ export class CustomZodValidationPipe extends ZodValidationPipe implements PipeTr
       return result;
     } catch (error: unknown) {
       if (error instanceof ZodValidationException)
-        resendZodErrorWith422(error, value);
+        resendZodErrorWith422(error, value, metadata);
 
       throw error;
     }
@@ -127,8 +127,12 @@ export const globalAuthProviders: Provider[] = [{
   useClass: OptionalJwtGuard,
 }];
 
-export function resendZodErrorWith422(error: ZodValidationException, model: unknown) {
+export function resendZodErrorWith422(
+  error: ZodValidationException,
+  model: unknown,
+  metadata: ArgumentMetadata,
+) {
   const zodError = error.getZodError();
 
-  throw CustomValidationError.fromZodError(zodError, model);
+  throw CustomValidationError.fromZodError(zodError, model, metadata);
 }

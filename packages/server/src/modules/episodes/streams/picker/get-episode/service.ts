@@ -12,8 +12,8 @@ import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos"
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfosRepository } from "#episodes/file-info/crud/repository/repository";
 import { assertFoundServer } from "#utils/validation/found";
+import { DependenciesList } from "../appliers/dependencies";
 import { buildEpisodePicker } from "./episode-picker";
-import { DependenciesList } from "./appliers/dependencies";
 
 @Injectable()
 export class StreamGetRandomEpisodeService {

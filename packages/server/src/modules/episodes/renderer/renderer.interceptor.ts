@@ -1,9 +1,7 @@
 import { Injectable,
   NestInterceptor,
   ExecutionContext,
-  CallHandler,
-  applyDecorators,
-  SetMetadata, UseInterceptors } from "@nestjs/common";
+  CallHandler } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { Request, Response } from "express";
@@ -12,6 +10,14 @@ import { episodeEntitySchema } from "#episodes/models";
 import { M3U8_FORMAT_USE_NEXT } from "../../resources/response-formatter/use-next.decorator";
 import { EpisodeResponseFormatterService, FormatResponseOptions } from "./formatter.service";
 import { EpisodeRendererService } from "./renderer.service";
+
+export const EPISODE_RENDERER_KEY = "EPISODE_RENDERER";
+
+export type RenderEpisodeDecoratorProps = {
+  m3u8?: boolean;
+  json?: boolean;
+  raw?: boolean;
+};
 
 @Injectable()
 export class EpisodeRendererInterceptor implements NestInterceptor {
@@ -83,18 +89,3 @@ export class EpisodeRendererInterceptor implements NestInterceptor {
     );
   }
 }
-
-const EPISODE_RENDERER_KEY = "EPISODE_RENDERER";
-
-export type RenderEpisodeDecoratorProps = {
-  m3u8?: boolean;
-  json?: boolean;
-  raw?: boolean;
-};
-
-export const RenderEpisode = (props?: RenderEpisodeDecoratorProps) => {
-  return applyDecorators(
-    SetMetadata(EPISODE_RENDERER_KEY, props),
-    UseInterceptors(EpisodeRendererInterceptor),
-  );
-};

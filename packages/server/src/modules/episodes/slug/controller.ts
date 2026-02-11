@@ -1,12 +1,11 @@
-import { Controller, Get, Param, Query, Req } from "@nestjs/common";
+import { Controller, Get, Param, Req } from "@nestjs/common";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { Request } from "express";
 import { UserPayload } from "$shared/models/auth";
-import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import z from "zod";
 import { User } from "#core/auth/users/User.decorator";
-import { RenderEpisode } from "#episodes/renderer/renderer.interceptor";
+import { RenderEpisode } from "#episodes/renderer/renderer.decorator";
+import { TokenAuth } from "#core/auth/strategies/token/decorator";
 import { EpisodeSlugHandlerService } from "./service";
 
 class GetOneByCompKeyParamsDto extends createZodDto(
@@ -25,15 +24,14 @@ export class EpisodesSlugController {
     m3u8: true,
     raw: true,
   } )
+  @TokenAuth()
   @Get("/:seriesKey/:episodeKey")
   async getOneBySlug(
     @Param() params: GetOneByCompKeyParamsDto,
     @Req() req: Request,
     @User() user: UserPayload | null,
-    @Query("token") token: string | undefined,
   ) {
-    const parsedToken = mongoDbId.or(z.undefined()).parse(token);
-    const userId = user?.id ?? parsedToken ?? null;
+    const userId = user?.id ?? null;
     const format = this.handler.getFormat(req);
     const episode = await this.handler.fetchEpisodeByFormat( {
       seriesKey: params.seriesKey,

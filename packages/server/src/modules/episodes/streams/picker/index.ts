@@ -1,7 +1,7 @@
 export {
   StreamGetRandomEpisodeService as EpisodePickerService,
-} from "./get-episode.service";
+} from "./get-episode/service";
 
 export {
   StreamPickerController as EpisodePickerController,
-} from "./show-picker.controller";
+} from "./show-picker/show-picker.controller";

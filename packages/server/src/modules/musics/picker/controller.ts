@@ -1,11 +1,10 @@
 import { Request } from "express";
-import { Controller, Get, Query, Req } from "@nestjs/common";
-import { mongoDbId } from "$shared/models/resources/partial-schemas";
-import z from "zod";
+import { Controller, Get, Req } from "@nestjs/common";
 import { UserPayload } from "$shared/models/auth";
 import { User } from "#core/auth/users/User.decorator";
 import { assertIsNotEmptyClient } from "#utils/validation/found";
 import { Music, MusicEntity, MusicEntityWithUserInfo } from "#musics/models";
+import { TokenAuth } from "#core/auth/strategies/token/decorator";
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicsRepository } from "../crud/repositories/music";
 import { requestToFindMusicParams } from "../crud/repositories/music/queries/queries";
@@ -16,7 +15,7 @@ import { MusicPickerRandom } from "./model/music-picker";
 
 type Entity = MusicEntity;
 
-@Controller("/")
+@Controller()
 export class MusicGetRandomController {
   constructor(
     private readonly musicHistoryRepo: MusicHistoryRepository,
@@ -24,23 +23,22 @@ export class MusicGetRandomController {
   ) {
   }
 
-  @Get("/")
   @RenderMusic( {
     json: true,
     m3u8: true,
   } )
   @M3u8FormatUseNext()
+  @TokenAuth()
+  @Get("/")
   async getRandom(
     @Req() req: Request,
-    @Query("token") token: string | undefined,
     @User() user: UserPayload | null,
   ): Promise<Music> {
-    mongoDbId.or(z.undefined()).parse(token);
-    const userId = user?.id ?? token;
+    const userId = user?.id;
     const musics = await this.#findMusics(userId, req);
 
     assertIsNotEmptyClient(musics);
-    const picked = await this.#randomPick(token, musics);
+    const picked = await this.#randomPick(userId, musics);
 
     if (!userId && picked.userInfo) {
       const { userInfo, ...pickedWithoutUserInfo } = picked;

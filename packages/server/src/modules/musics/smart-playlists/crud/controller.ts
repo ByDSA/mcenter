@@ -1,12 +1,9 @@
 import { Body,
   Controller,
   Get,
-  Param,
-  Query,
-  UnauthorizedException } from "@nestjs/common";
+  Param, UnauthorizedException } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
-import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { UserPayload } from "$shared/models/auth";
 import { slugSchema } from "$shared/models/utils/schemas/slug";
 import { MusicSmartPlaylistCrudDtos } from "$shared/models/musics/smart-playlists/dto/transport";
@@ -19,6 +16,7 @@ import { UserDeleteOne,
   GetOneById } from "#utils/nestjs/rest";
 import { assertFoundClient } from "#utils/validation/found";
 import { IdParamDto } from "#utils/validation/dtos";
+import { TokenAuth } from "#core/auth/strategies/token/decorator";
 import { musicSmartPlaylistEntitySchema } from "../models";
 import { MusicSmartPlaylistRepository } from "./repository/repository";
 
@@ -55,14 +53,13 @@ export class SmartPlaylistCrudController {
     private readonly repo: MusicSmartPlaylistRepository,
   ) {}
 
+  @TokenAuth()
   @GetOneById(musicSmartPlaylistEntitySchema)
   async getOne(
     @Param() params: IdParamDto,
     @User() user: UserPayload | null,
-    @Query("token") token: string | undefined,
   ) {
-    mongoDbId.or(z.undefined()).parse(token);
-    const userId = user?.id ?? token;
+    const userId = user?.id;
     const smartPlaylist = await this.repo.getOneById(params.id);
 
     assertFoundClient(smartPlaylist);
@@ -74,14 +71,13 @@ export class SmartPlaylistCrudController {
     return smartPlaylist;
   }
 
+  @TokenAuth()
   @Get("/user/:userSlug/:querySlug")
   async getOneUserQuery(
     @Param() params: GetOneUserQueryParams,
     @User() user: UserPayload | null,
-    @Query("token") token: string | undefined,
   ) {
-    mongoDbId.or(z.undefined()).parse(token);
-    const userId = user?.id ?? token;
+    const userId = user?.id;
 
     await this.guardVisibilityBySlugs( {
       requestUserId: userId,

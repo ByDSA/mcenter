@@ -3,8 +3,9 @@ import { Application } from "express";
 import { HttpStatus } from "@nestjs/common";
 import { PATH_ROUTES } from "$shared/routing";
 import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { fixtureEpisodes } from "#episodes/tests";
-import { createTestingAppModuleAndInit } from "#core/app/tests/app";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { createMockedModule } from "#utils/nestjs/tests";
@@ -13,6 +14,7 @@ import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { StreamFileModule } from "#modules/resources/stream-file/module";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
+import { createTokenTests } from "#core/auth/strategies/token/tests";
 import { EpisodesRepository } from "../crud/repositories/episodes";
 import { EpisodesSlugController } from "./controller";
 import { EpisodeSlugHandlerService } from "./service";
@@ -23,6 +25,7 @@ const EPISODE_WITH_SERIE = {
 };
 
 describe("responses", () => {
+  let testingSetup: TestingSetup;
   const validSerieKey = "seriesKey";
   const validEpisodeKey = "episodeKey";
   let router: Application;
@@ -30,8 +33,9 @@ describe("responses", () => {
   const URL = "/" + validSerieKey + "/" + validEpisodeKey;
 
   beforeAll(async () => {
-    const testingSetup = await createTestingAppModuleAndInit( {
-      imports: [EpisodeResponseFormatterModule,
+    testingSetup = await createTestingAppModuleAndInit( {
+      imports: [
+        EpisodeResponseFormatterModule,
         createMockedModule(EpisodeHistoryCrudModule),
         createMockedModule(EpisodeFileInfosCrudModule),
         createMockedModule(EpisodesCrudModule),
@@ -40,6 +44,10 @@ describe("responses", () => {
       providers: [
         EpisodeSlugHandlerService,
       ],
+    }, {
+      auth: {
+        repositories: "mock",
+      },
     } );
 
     router = testingSetup.routerApp;
@@ -53,6 +61,13 @@ describe("responses", () => {
       .expect(HttpStatus.OK);
 
     expectWithEpisode(res, EPISODE_WITH_SERIE);
+  } );
+
+  createTokenTests( {
+    getTestingSetup: ()=>testingSetup,
+    expectedUser: fixtureUsers.Normal.UserWithRoles,
+    getRouter: ()=>router,
+    url: URL,
   } );
 
   it("response json", async () => {

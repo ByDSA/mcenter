@@ -13,6 +13,7 @@ import { AdminDeleteOne,
   UserPatchOne } from "#utils/nestjs/rest";
 import { User } from "#core/auth/users/User.decorator";
 import { IdParamDto } from "#utils/validation/dtos";
+import { TokenAuth } from "#core/auth/strategies/token/decorator";
 import { MusicFlowService } from "../MusicFlow.service";
 import { RenderMusic } from "../renderer/renderer.interceptor";
 import { MusicsUsersRepository } from "./repositories/user-info/repository";
@@ -90,17 +91,17 @@ export class MusicCrudController {
     return await this.musicRepo.deleteOneByIdAndGet(id);
   }
 
-  @Get("/:id")
   @RenderMusic( {
     json: true,
     raw: true,
     m3u8: true,
   } )
+  @TokenAuth()
+  @Get("/:id")
   async getOneById(
     @Param() params: IdParamDto,
     @Req() req: Request,
     @User() user: UserPayload | null,
-    @Query("token") token: string | undefined,
     @Query("skip-history") shouldNotAddToHistory: string | undefined,
   ) {
     const { id } = params;
@@ -113,7 +114,6 @@ export class MusicCrudController {
         req,
         user,
         shouldNotAddToHistory: !!shouldNotAddToHistory,
-        token,
       },
     );
   }

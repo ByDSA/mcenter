@@ -48,11 +48,13 @@ describe("episodeDependenciesCrudController", () => {
     const validUrl = `/${mockMongoId}`;
     const invalidUrl = "/notObjectId";
 
-    it("should return 422 if episodeId is not ObjectId", async () => {
-      const res = await request(routerApp)
-        .get(invalidUrl);
+    describe("params", ()=> {
+      it("should return 422 if episodeId is not ObjectId", async () => {
+        const res = await request(routerApp)
+          .get(invalidUrl);
 
-      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+      } );
     } );
 
     it("should call repository with correct params", async () => {

@@ -26,7 +26,7 @@ const booleanFromString = z.preprocess((val) => {
     if (normalized === "false" || normalized === "0")
       return false;
 
-    throw new Error(`Invalid boolean string: ${val}. Expected 'true', 'false', '1', or '0'`);
+    return val;
   }
 
   return val;
@@ -64,8 +64,8 @@ export class PlayStreamController {
     } );
   }
 
-  @Post("/:streamKey")
   @HttpCode(HttpStatus.ACCEPTED)
+  @Post("/:streamKey")
   async playStreamWithToken(
     @Param() params: ParamsDto,
     @Query() query: QueryDto,

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Query, Req, Res, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
+import { Body, Controller, Get, Param, Req, Res, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
@@ -18,6 +18,7 @@ import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { IdParamDto } from "#utils/validation/dtos";
 import { MusicResponseFormatterService } from "#musics/renderer/formatter.service";
+import { TokenAuth } from "#core/auth/strategies/token/decorator";
 import { MusicPlaylistCrudDtos } from "../models/dto";
 import { musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistsRepository } from "./repository/repository";
@@ -106,16 +107,15 @@ export class MusicPlaylistsController {
   ) {
   }
 
+  @TokenAuth()
   @GetOneById(musicPlaylistEntitySchema)
   async getOneById(
     @Param() params: IdParamDto,
     @Req() req: Request,
     @User() user: UserPayload | null,
-    @Query("token") token: string | undefined,
   ) {
-    mongoDbId.or(z.undefined()).parse(token);
     await this.guardVisibilityById( {
-      requestUserId: token ?? user?.id,
+      requestUserId: user?.id,
       playlistId: params.id,
     } );
     const format = this.responseFormatter.getResponseFormatByRequest(req);
@@ -313,16 +313,15 @@ export class MusicPlaylistsController {
     return await this.playlistsRepo.getManyByCriteria(body);
   }
 
+  @TokenAuth()
   @Get("/user/:userSlug/:playlistSlug")
   async getOneUserPlaylist(
     @Param() params: GetOneUserPlaylistParams,
     @Req() req: Request,
     @User() user: UserPayload | null,
-    @Query("token") token: string | undefined,
   ) {
-    mongoDbId.or(z.undefined()).parse(token);
     await this.guardVisibilityBySlugs( {
-      requestUserId: token ?? user?.id,
+      requestUserId: user?.id,
       userSlug: params.userSlug,
       playlistSlug: params.playlistSlug,
     } );
@@ -359,6 +358,7 @@ export class MusicPlaylistsController {
     return createSuccessResultResponse(playlist);
   }
 
+  @TokenAuth()
   @Get("/user/:userSlug/:playlistSlug/track/:n")
   async getOneUserPlaylistTrack(
     @Param() params: GetOneUserPlaylistTrackParams,
@@ -367,12 +367,9 @@ export class MusicPlaylistsController {
     } ) res: Response,
     @Req() req: Request,
     @User() user: UserPayload | null,
-    @Query("token") token: string | undefined,
   ) {
-    mongoDbId.or(z.undefined()).parse(token);
-
     await this.guardVisibilityBySlugs( {
-      requestUserId: token ?? user?.id,
+      requestUserId: user?.id,
       userSlug: params.userSlug,
       playlistSlug: params.playlistSlug,
     } );
@@ -398,7 +395,7 @@ export class MusicPlaylistsController {
     assertFoundClient(got);
 
     if (format === ResponseFormat.RAW) {
-      const userId = user?.id ?? token;
+      const userId = user?.id;
 
       if (userId) {
         await this.musicHistoryRepo.createNewEntryNowIfShouldFor( {

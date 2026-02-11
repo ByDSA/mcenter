@@ -28,9 +28,13 @@ export class LoggingInterceptor implements NestInterceptor {
             .startsWith("5"))
         ) {
           const h = `Failed ${method} ${url} in ${duration}ms.\n${error.name}: ${error.message}`;
-          const output = error.stack
-            ? `${h}\n${genOutputStackError(error.stack)}`
-            : h;
+          let output = h;
+
+          if (error.cause)
+            output += `\n${JSON.stringify(error.cause, null, 2)}`;
+
+          if (error.stack)
+            output += `\n${genOutputStackError(error.stack)}`;
 
           this.logger.error(output, LoggingInterceptor.name);
         } else {

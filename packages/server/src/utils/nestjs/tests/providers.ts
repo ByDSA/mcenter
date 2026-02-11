@@ -10,15 +10,8 @@ export function createMockProvider<T>(clazz: Type<T>): ValueProvider<T> {
 
 const regisretedMocks = new Map<Type<any>, any>();
 
-function getMockInstance<T>(clazz: Type<T>): T {
-  if (!regisretedMocks.has(clazz))
-    regisretedMocks.set(clazz, createMockInstance(clazz));
-
-  return regisretedMocks.get(clazz);
-}
-
 export function getOrCreateMockProvider<T>(clazz: Type<T>): ValueProvider<T> {
-  let ret = getMockInstance(clazz);
+  let ret = regisretedMocks.get(clazz);
 
   if (!ret) {
     ret = createMockInstance(clazz);

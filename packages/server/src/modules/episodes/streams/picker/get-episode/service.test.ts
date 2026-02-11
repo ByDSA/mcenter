@@ -14,7 +14,7 @@ import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos"
 import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
-import { StreamGetRandomEpisodeService } from "./get-episode.service";
+import { StreamGetRandomEpisodeService } from "./service";
 
 describe("streamGetRandomEpisode", () => {
   let testingSetup: TestingSetup;

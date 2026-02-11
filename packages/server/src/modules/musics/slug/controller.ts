@@ -4,6 +4,7 @@ import z from "zod";
 import { Request } from "express";
 import { UserPayload } from "$shared/models/auth";
 import { User } from "#core/auth/users/User.decorator";
+import { TokenAuth } from "#core/auth/strategies/token/decorator";
 import { MusicsRepository } from "../crud/repositories/music";
 import { ResponseFormat } from "../../resources/response-formatter";
 import { MusicFlowService } from "../MusicFlow.service";
@@ -26,12 +27,12 @@ export class MusicsSlugController {
     m3u8: true,
     raw: true,
   } )
+  @TokenAuth()
   @Get("/:slug")
   async getRaw(
     @Param() params: GetDto,
     @Req() req: Request,
     @User() user: UserPayload | null,
-    @Query("token") token: string | undefined,
     @Query("skip-history") shouldNotAddToHistory: string | undefined,
   ) {
     return await this.flow.validateParamsAndFetchMusicAndUpdateHistory((format)=> {
@@ -43,14 +44,13 @@ export class MusicsSlugController {
               expand: ["fileInfos"],
             }
             : {},
-          requestingUserId: token ?? user?.id,
+          requestingUserId: user?.id,
         },
       );
     }, {
       req,
       user,
       shouldNotAddToHistory: !!shouldNotAddToHistory,
-      token,
     } );
   }
 }

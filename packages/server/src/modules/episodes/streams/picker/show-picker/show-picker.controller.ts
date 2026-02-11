@@ -1,10 +1,9 @@
-import { Controller, Get, Param, Query, UnauthorizedException } from "@nestjs/common";
+import { Controller, Get, Param, UnauthorizedException } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { asyncMap } from "$shared/utils/arrays";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { UserPayload } from "$shared/models/auth";
-import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { Episode, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { EpisodeLastTimePlayedService } from "#episodes/history";
@@ -17,7 +16,8 @@ import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repos
 import { genRandomPickerWithData } from "#modules/picker/resource-picker/resource-picker-random";
 import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { User } from "#core/auth/users/User.decorator";
-import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "./appliers";
+import { TokenAuth } from "#core/auth/strategies/token/decorator";
+import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "../appliers";
 
 class ShowPickerParamsDto extends createZodDto(z.object( {
   streamKey: z.string(),
@@ -41,15 +41,14 @@ export class StreamPickerController {
   ) {
   }
 
+  @TokenAuth()
   @Get("/:streamKey")
   async showPicker(
     @Param() params: ShowPickerParamsDto,
-    @Query("token") token: string | undefined,
     @User() user: UserPayload | null,
   ) {
-    mongoDbId.or(z.undefined()).parse(token);
     const { streamKey } = params;
-    const userId = user?.id ?? token;
+    const userId = user?.id;
 
     if (!userId)
       throw new UnauthorizedException("User not authorized");

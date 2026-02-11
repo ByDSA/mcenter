@@ -13,6 +13,7 @@ import { AuthController } from "./controller";
 import { LocalUserVerificationService } from "./strategies/local/verification.service";
 import { AppPayloadEncoderService } from "./strategies/jwt/payload/AppPayloadEncoderService";
 import { JwtStrategy } from "./strategies/jwt/strategy";
+import { TokenStrategy } from "./strategies/token/strategy";
 
 const { AUTH_JWT_SECRET } = process.env;
 
@@ -38,6 +39,7 @@ assertIsDefined(AUTH_JWT_SECRET);
     AppPayloadEncoderService,
     AppPayloadService,
     JwtStrategy,
+    TokenStrategy,
     // Local
     UserPassesRepository,
     LocalUserVerificationService,
