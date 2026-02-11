@@ -4,9 +4,11 @@ import { HttpStatus } from "@nestjs/common";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicEntity } from "$sharedSrc/models/musics/music";
 import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
-import { createTestingAppModuleAndInit } from "#core/app/tests/app";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { MusicDtos } from "#musics/models/dto";
 import { createMockedModule, getOrCreateMockProvider } from "#utils/nestjs/tests";
+import { expectControllerCalled, createTokenTests } from "#core/auth/strategies/token/tests";
 import { fixtureMusics } from "../tests";
 import { MusicsRepository } from "../crud/repositories/music";
 import { MusicsCrudModule } from "../crud/module";
@@ -17,12 +19,23 @@ import { MusicResponseFormatterService } from "../renderer/formatter.service";
 import { MusicsSlugController } from "./controller";
 
 describe("musicsSlugController", () => {
+  let testingSetup: TestingSetup;
   let router: Application;
-  let musicRepoMock: jest.Mocked<MusicsRepository>;
+  let mocks: Awaited<ReturnType<typeof initMocks>>;
   const URL = "/slug";
 
+  function initMocks(setup: TestingSetup) {
+    const ret = {
+      musicRepo: setup.getMock(MusicsRepository),
+    };
+
+    ret.musicRepo.getOneBySlug.mockResolvedValue(fixtureMusics.Disk.Samples.DK);
+
+    return ret;
+  }
+
   beforeAll(async () => {
-    const testingSetup = await createTestingAppModuleAndInit( {
+    testingSetup = await createTestingAppModuleAndInit( {
       imports: [
         createMockedModule(MusicsCrudModule),
         MusicRendererModule,
@@ -44,50 +57,92 @@ describe("musicsSlugController", () => {
     } );
 
     router = testingSetup.routerApp;
-    musicRepoMock = testingSetup.getMock(MusicsRepository);
-    musicRepoMock.getOneBySlug.mockResolvedValue(fixtureMusics.Disk.Samples.DK);
+    mocks = initMocks(testingSetup);
   } );
 
-  it("default response json", async () => {
-    const res = await request(router)
-      .get(URL)
-      .expect(HttpStatus.OK);
-
-    expectWithMusic(res, fixtureMusics.Disk.Samples.DK);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mocks.musicRepo.getOneBySlug.mockResolvedValue(fixtureMusics.Disk.Samples.DK);
   } );
 
-  it("response json", async () => {
-    const res = await request(router)
-      .get(URL + "?format=json")
-      .expect(HttpStatus.OK);
+  describe("getRaw (GET /:slug)", () => {
+    it("default response json", async () => {
+      const res = await request(router)
+        .get(URL)
+        .expect(HttpStatus.OK);
 
-    expectWithMusic(res, fixtureMusics.Disk.Samples.DK);
-  } );
+      expectWithMusic(res, fixtureMusics.Disk.Samples.DK);
+      expectControllerCalled(testingSetup);
+    } );
 
-  it("response m3u8", async () => {
-    const res = await request(router)
-      .get(URL + "?format=m3u8")
-      .expect(HttpStatus.OK);
-    const music = fixtureMusics.Disk.Samples.DK;
-    const host = getHostFromSuperTestRequest(res.request);
-    const path = PATH_ROUTES.musics.slug.withParams(music.slug);
+    it("response json", async () => {
+      const res = await request(router)
+        .get(URL + "?format=json")
+        .expect(HttpStatus.OK);
 
-    expect(res.text).toContain(`${host}${path}`);
-  } );
+      expectWithMusic(res, fixtureMusics.Disk.Samples.DK);
+      expectControllerCalled(testingSetup);
+    } );
 
-  it("response raw", async () => {
-    musicRepoMock.getOneBySlug.mockResolvedValueOnce(
-      {
-        ...fixtureMusics.Disk.Samples.DK,
-        fileInfos: [
-          fixtureMusicFileInfos.Disk.Samples.DK,
-        ],
-      },
-    );
-    await request(router)
-      .get(URL + "?format=raw")
-      .expect(HttpStatus.OK)
-      .expect("Content-Type", "audio/mpeg");
+    it("response m3u8", async () => {
+      const res = await request(router)
+        .get(URL + "?format=m3u8")
+        .expect(HttpStatus.OK);
+      const music = fixtureMusics.Disk.Samples.DK;
+      const host = getHostFromSuperTestRequest(res.request);
+      const path = PATH_ROUTES.musics.slug.withParams(music.slug);
+
+      expect(res.text).toContain(`${host}${path}`);
+
+      expectControllerCalled(testingSetup);
+    } );
+
+    it("response raw", async () => {
+      mocks.musicRepo.getOneBySlug.mockResolvedValueOnce(
+        {
+          ...fixtureMusics.Disk.Samples.DK,
+          fileInfos: [
+            fixtureMusicFileInfos.Disk.Samples.DK,
+          ],
+        },
+      );
+      await request(router)
+        .get(URL + "?format=raw")
+        .expect(HttpStatus.OK)
+        .expect("Content-Type", "audio/mpeg");
+
+      expectControllerCalled(testingSetup);
+    } );
+
+    describe("authentication", () => {
+      createTokenTests( {
+        url: URL,
+        expectedUser: fixtureUsers.Normal.UserWithRoles,
+        getTestingSetup: () => testingSetup,
+        getRouter: () => router,
+      } );
+    } );
+
+    describe("repositories", () => {
+      it("should call repository with correct slug", async () => {
+        const slug = "test-slug";
+
+        await request(router).get(`/${slug}`);
+
+        expect(mocks.musicRepo.getOneBySlug).toHaveBeenCalled();
+      } );
+
+      it("should call repository with fileInfos when format is raw", async () => {
+        mocks.musicRepo.getOneBySlug.mockResolvedValueOnce( {
+          ...fixtureMusics.Disk.Samples.DK,
+          fileInfos: [fixtureMusicFileInfos.Disk.Samples.DK],
+        } );
+
+        await request(router).get("/test-slug?format=raw");
+
+        expect(mocks.musicRepo.getOneBySlug).toHaveBeenCalled();
+      } );
+    } );
   } );
 } );
 

@@ -1,8 +1,8 @@
 import { Application } from "express";
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { createTokenTests, expectControllerCalled } from "#core/auth/strategies/token/tests";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
@@ -13,6 +13,19 @@ import { StreamGetRandomEpisodeService } from "./service";
 describe("get-episode", () => {
   let testingSetup: TestingSetup;
   let router: Application;
+  let mocks: Awaited<ReturnType<typeof initMocks>>;
+
+  async function initMocks(setup: TestingSetup) {
+    const ret = {
+      streamGetRandomEpisodeService: setup.getMock(StreamGetRandomEpisodeService),
+    };
+
+    ret.streamGetRandomEpisodeService.getByStreamKey.mockResolvedValue(
+      fixtureEpisodes.SampleSeries.List,
+    );
+
+    return ret;
+  }
 
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit( {
@@ -30,11 +43,12 @@ describe("get-episode", () => {
       },
     } );
 
-    const mock = testingSetup.getMock(StreamGetRandomEpisodeService);
-
-    mock.getByStreamKey.mockResolvedValue(fixtureEpisodes.SampleSeries.List);
-
     router = testingSetup.routerApp;
+    mocks = await initMocks(testingSetup);
+  } );
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   } );
 
   describe("getEpisode", ()=> {
@@ -64,6 +78,17 @@ describe("get-episode", () => {
           .get(URL);
 
         expect(res.statusCode).toBe(HttpStatus.UNAUTHORIZED);
+      } );
+    } );
+
+    describe("repositories", () => {
+      it("should call service", async () => {
+        const user = fixtureUsers.Normal.UserWithRoles;
+
+        await testingSetup.useMockedUser(user);
+        await request(router).get(URL);
+
+        expect(mocks.streamGetRandomEpisodeService.getByStreamKey).toHaveBeenCalled();
       } );
     } );
   } );

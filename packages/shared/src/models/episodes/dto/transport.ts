@@ -51,10 +51,15 @@ export namespace EpisodesCrudDtos {
   }
 
   export namespace CreateOne {
-    export const bodySchema = episodeSchema.omit( {
+    export const repoDto = episodeSchema.omit( {
       addedAt: true,
       createdAt: true,
       updatedAt: true,
+      count: true,
+    } ).strict();
+    export type RepoDto = z.infer<typeof repoDto>;
+    export const bodySchema = repoDto.omit( {
+      uploaderUserId: true,
     } ).strict();
 
     export type Body = z.infer<typeof bodySchema>;

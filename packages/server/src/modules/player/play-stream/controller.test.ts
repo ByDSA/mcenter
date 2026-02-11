@@ -4,7 +4,7 @@ import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UserPayload } from "$shared/models/auth";
 import z from "zod";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
@@ -86,7 +86,7 @@ describe("playStreamController", () => {
       expect(res.statusCode).toBe(HttpStatus.OK);
     } );
 
-    describe("params", () => {
+    describe("path parameters validation", () => {
       it("invalid remotePlayerId", async () => {
         const res = await request(router)
           .get(invalidIdUrl);
@@ -105,7 +105,7 @@ describe("playStreamController", () => {
       } );
     } );
 
-    describe("query params", () => {
+    describe("query parameters validation", () => {
       it("valid force parameter (true)", async () => {
         const res = await request(router)
           .get(validUrl)
@@ -204,8 +204,8 @@ describe("playStreamController", () => {
       } );
     } );
 
-    describe("auth", () => {
-      it("should fail without user", async () => {
+    describe("authentication", () => {
+      it("request without user should fail", async () => {
         await testingSetup.useMockedUser(null);
 
         const res = await request(router)
@@ -220,7 +220,7 @@ describe("playStreamController", () => {
       } );
     } );
 
-    describe("services", () => {
+    describe("repositories", () => {
       it("should call authPlayerService.guardUser", async () => {
         await request(router)
           .get(validUrl);
@@ -292,7 +292,7 @@ describe("playStreamController", () => {
       expect(res.statusCode).toBe(HttpStatus.ACCEPTED);
     } );
 
-    describe("params", () => {
+    describe("path parameters validation", () => {
       it("invalid remotePlayerId", async () => {
         const res = await request(router)
           .post(invalidIdUrl)
@@ -312,7 +312,7 @@ describe("playStreamController", () => {
       } );
     } );
 
-    describe("query params", () => {
+    describe("query parameters validation", () => {
       it("valid force parameter", async () => {
         const res = await request(router)
           .post(validUrl)
@@ -353,7 +353,7 @@ describe("playStreamController", () => {
       } );
     } );
 
-    describe("invalid payload", () => {
+    describe("payload validation", () => {
       it("should fail without secretToken", async () => {
         const res = await request(router)
           .post(validUrl)
@@ -377,7 +377,7 @@ describe("playStreamController", () => {
       } );
     } );
 
-    describe("services", () => {
+    describe("repositories", () => {
       it("should call authPlayerService.guardToken", async () => {
         await request(router)
           .post(validUrl)

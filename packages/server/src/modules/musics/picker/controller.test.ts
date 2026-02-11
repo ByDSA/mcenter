@@ -4,7 +4,7 @@ import { HttpStatus } from "@nestjs/common";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { PATH_ROUTES } from "$shared/routing";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { createTokenTests } from "#core/auth/strategies/token/tests";
 import { MusicsRepository } from "../crud/repositories/music";
@@ -16,8 +16,8 @@ const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 const MUSIC_WITH_USER_INFO = fixtureMusics.Disk.WithUserInfo.List[0];
 
 describe("musicGetRandomController", () => {
-  let router: Application;
   let testingSetup: TestingSetup;
+  let router: Application;
   let mocks: Awaited<ReturnType<typeof initMocks>>;
 
   // eslint-disable-next-line require-await
@@ -35,18 +35,21 @@ describe("musicGetRandomController", () => {
   }
 
   beforeAll(async () => {
-    testingSetup = await createTestingAppModuleAndInit( {
-      imports: [MusicRendererModule],
-      controllers: [MusicGetRandomController],
-      providers: [
-        getOrCreateMockProvider(MusicsRepository),
-        getOrCreateMockProvider(MusicHistoryRepository),
-      ],
-    }, {
-      auth: {
-        repositories: "mock",
+    testingSetup = await createTestingAppModuleAndInit(
+      {
+        imports: [MusicRendererModule],
+        controllers: [MusicGetRandomController],
+        providers: [
+          getOrCreateMockProvider(MusicsRepository),
+          getOrCreateMockProvider(MusicHistoryRepository),
+        ],
       },
-    } );
+      {
+        auth: {
+          repositories: "mock",
+        },
+      },
+    );
 
     router = testingSetup.routerApp;
     mocks = await initMocks(testingSetup);
@@ -138,6 +141,17 @@ describe("musicGetRandomController", () => {
           .get("/?format=json&token=invalidToken");
 
         expect(res.statusCode).toBe(HttpStatus.OK);
+      } );
+    } );
+
+    describe("repositories", () => {
+      it("should call musicRepo", async () => {
+        const user = fixtureUsers.Normal.UserWithRoles;
+
+        await testingSetup.useMockedUser(user);
+        await request(router).get("/?format=json");
+
+        expect(mocks.musicRepo.getAll).toHaveBeenCalled();
       } );
     } );
   } );
