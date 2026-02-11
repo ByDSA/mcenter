@@ -7,7 +7,7 @@ import { UserPayload } from "$shared/models/auth";
 import { fixtureEpisodes } from "#episodes/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { EpisodeEntityWithFileInfos } from "#episodes/models";
 import { fixturesRemotePlayers } from "../tests/fixtures";

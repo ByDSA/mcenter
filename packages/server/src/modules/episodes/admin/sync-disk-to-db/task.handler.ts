@@ -18,10 +18,10 @@ import { VideoMetadataService } from "#modules/resources/video/video-metadata/Vi
 import { assertFoundServer } from "#utils/validation/found";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EPISODES_MEDIA_PATH } from "#episodes/utils";
-import { EpisodesRepository } from "../../crud/repositories/episodes";
 import { SeriesNode, SerieTree, EpisodeNode } from "./disk/models";
 import { RemoteSeriesTreeService } from "./db";
 import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "./disk";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 const TASK_NAME = EpisodeTasks.sync.name;
 

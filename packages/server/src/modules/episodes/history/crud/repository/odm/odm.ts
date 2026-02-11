@@ -1,5 +1,5 @@
 import mongoose, { Schema, Types } from "mongoose";
-import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
+import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 import { RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { StreamOdm } from "#episodes/streams/crud/repository/odm";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";

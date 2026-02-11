@@ -1,8 +1,9 @@
 import { Module } from "@nestjs/common";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { EpisodesCrudController } from "./controller";
-import { EpisodesRepository } from "./repositories/episodes";
-import { EpisodesUsersRepository } from "./repositories/user-infos";
+import { EpisodesCrudController } from "./episodes/controller";
+import { EpisodesUserInfoCrudController } from "./user-infos/controller";
+import { EpisodesRepository } from "./episodes/repository";
+import { EpisodesUsersRepository } from "./user-infos/repository";
 
 @Module( {
   imports: [
@@ -10,6 +11,7 @@ import { EpisodesUsersRepository } from "./repositories/user-infos";
   ],
   controllers: [
     EpisodesCrudController,
+    EpisodesUserInfoCrudController,
   ],
   providers: [
     EpisodesRepository,

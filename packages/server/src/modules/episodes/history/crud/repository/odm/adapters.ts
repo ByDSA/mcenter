@@ -1,6 +1,6 @@
 import { AllKeysOf } from "$shared/utils/types";
 import { Types } from "mongoose";
-import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
+import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 import { StreamOdm } from "#episodes/streams/crud/repository/odm";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { EpisodeHistoryEntry as Entry, EpisodeHistoryEntryEntity as Entity } from "../../../models";

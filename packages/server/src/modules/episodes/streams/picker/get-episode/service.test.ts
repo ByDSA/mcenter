@@ -1,6 +1,6 @@
 import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { StreamEntity } from "#episodes/streams";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
@@ -10,7 +10,7 @@ import { fixtureEpisodes } from "#episodes/tests";
 import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
-import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
+import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";

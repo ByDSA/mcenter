@@ -2,7 +2,7 @@ import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { Types } from "mongoose";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { fixtureEpisodes } from "#episodes/tests";
-import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
+import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 import { createMockedModule } from "#utils/nestjs/tests";
 import { StreamsCrudModule } from "#episodes/streams/crud/module";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";

@@ -3,14 +3,14 @@ import { Types } from "mongoose";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
-import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
+import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { EpisodeHistoryEntryOdm } from "#episodes/history/crud/repository/odm";
 import { StreamOdm } from "#episodes/streams/crud/repository/odm";
 import { STREAM_SAMPLE } from "#episodes/streams/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { EpisodeHistoryEntryEntity } from "#episodes/history/models";
-import { EpisodesUsersOdm } from "#episodes/crud/repositories/user-infos/odm";
+import { EpisodesUsersOdm } from "#episodes/crud/user-infos/repository/odm";
 import { EpisodeUserInfoEntity } from "#episodes/models";
 
 export const loadFixtureSampleSeries = async () => {

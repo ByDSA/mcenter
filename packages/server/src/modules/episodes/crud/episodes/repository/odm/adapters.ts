@@ -5,7 +5,7 @@ import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { Episode, EpisodeEntity } from "../../../../models";
-import { EpisodesUsersOdm } from "../../user-infos/odm";
+import { EpisodesUsersOdm } from "../../../user-infos/repository/odm";
 import { DocOdm, FullDocOdm } from "./odm";
 
 export function docOdmToModel(docOdm: DocOdm): Episode {

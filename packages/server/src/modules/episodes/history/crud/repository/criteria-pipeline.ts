@@ -4,8 +4,8 @@ import { WithRequired } from "$shared/utils/objects";
 import { assertIsDefined } from "$shared/utils/validation";
 import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { assertFoundClient } from "#utils/validation/found";
-import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
-import { enrichSingleEpisode } from "#episodes/crud/repositories/episodes/odm/criteria-pipeline";
+import { enrichSingleEpisode } from "#episodes/crud/episodes/repository/odm/criteria-pipeline";
+import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 import { DocOdm, FullDocOdm } from "./odm/odm";
 
 function buildMongooseSort(

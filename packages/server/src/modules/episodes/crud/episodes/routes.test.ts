@@ -1,5 +1,5 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { testCrudRoutes, testRoute, verifyRoutesCoverage } from "#core/routing/test";
+import { testCrudRoutes, verifyRoutesCoverage } from "#core/routing/test";
 import { EpisodesCrudController } from "./controller";
 
 testCrudRoutes(PATH_ROUTES.episodes.path, [
@@ -9,10 +9,6 @@ testCrudRoutes(PATH_ROUTES.episodes.path, [
   "delete",
   "get-many-criteria",
 ]);
-
-testRoute(PATH_ROUTES.episodes.userInfo.withParams("id"), {
-  method: "PATCH",
-} );
 
 verifyRoutesCoverage( {
   controller: EpisodesCrudController,

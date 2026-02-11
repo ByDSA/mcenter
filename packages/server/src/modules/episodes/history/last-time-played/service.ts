@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { assertIsDefined } from "$shared/utils/validation";
 import { showError } from "#core/logging/show-error";
-import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
+import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 import { EpisodeHistoryRepository } from "../crud/repository";
 import { EpisodeHistoryEntryEvents } from "../crud/repository/events";
 

@@ -2,7 +2,7 @@ import { fixtureEpisodes } from "$sharedSrc/models/episodes/tests/fixtures";
 import { expectEpisodes } from "$sharedSrc/models/episodes/tests";
 import { SERIES_SAMPLE_SERIES, SERIES_SIMPSONS } from "$sharedSrc/models/episodes/series/tests/fixtures";
 import { expectSeries } from "$sharedSrc/models/episodes/series/tests";
-import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
+import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureSampleSeries } from "./sets/SampleSeries";

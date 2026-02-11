@@ -6,7 +6,6 @@ import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtu
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import * as cryptUtils from "#utils/crypt";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { VideoMetadataService } from "#modules/resources/video/video-metadata/VideoMetadataService.service";
 import { EpisodeEntity } from "#episodes/models";
 import { EpisodeFileInfoRepository } from "#episodes/file-info/crud/repository";
@@ -15,6 +14,7 @@ import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfoUploadService } from "../service";
 import { mockFile } from "./utils";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 // Mock Data
 const existingEpisodeId = "episode_123";

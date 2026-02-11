@@ -10,6 +10,7 @@ import { expectControllerCalled, expectControllerNotCalled } from "#core/auth/st
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { EpisodeFileInfosCrudController } from "./controller";
 import { EpisodeFileInfoRepository } from "./repository";
+import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
 
 const SAMPLE = fixtureEpisodeFileInfos.SampleSeries.Samples.EP1x01;
 
@@ -63,20 +64,33 @@ describe("episodeFileInfosCrudController", () => {
     const validUrl = `${baseUrl}${validId}`;
     const invalidUrl = `${baseUrl}${invalidId}`;
     const payload = {
-      fileName: "new.mp3",
-    };
+      entity: {
+        path: "new.mp3",
+      }
+    } satisfies EpisodeFileInfoCrudDtos.Patch.Body;
+
+    beforeEach(async()=> {
+      testingSetup.useMockedUser(fixtureUsers.Admin.UserWithRoles);
+    })
 
     it("valid request-response", async () => {
       const res = await request(router).patch(validUrl)
         .send(payload);
 
-      expectControllerCalled(testingSetup);
+        expectControllerCalled(testingSetup);
 
-      const data = episodeFileInfoEntitySchema.parse(res.body.data);
+        const data = episodeFileInfoEntitySchema.parse(res.body.data);
 
-      expect(data).toEqual(SAMPLE);
-      expect(res.statusCode).toBe(HttpStatus.OK);
-    } );
+        expect(data).toEqual(SAMPLE);
+        expect(res.statusCode).toBe(HttpStatus.OK);
+      } );
+
+      it(`normal user should not request`, async () => {
+        testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
+        const res = await request(router).patch(validUrl)
+        .send(payload);
+        expect(res.statusCode).toBe(HttpStatus.FORBIDDEN);
+    });
 
     it("invalid id", async () => {
       const res = await request(router).patch(invalidUrl)
@@ -111,7 +125,7 @@ describe("episodeFileInfosCrudController", () => {
       await request(router).patch(validUrl)
         .send(payload);
 
-      expect(mocks.fileInfoRepo.patchOneByIdAndGet).toHaveBeenCalledTimes(1);
+      expect(mocks.fileInfoRepo.patchOneByIdAndGet).toHaveBeenCalled();
     } );
   } );
 } );

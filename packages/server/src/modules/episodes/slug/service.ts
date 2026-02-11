@@ -2,11 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { Request } from "express";
 import { ResponseFormat } from "$shared/models/resources";
 import { assertFoundClient } from "#utils/validation/found";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { EpisodesCrudDtos } from "#episodes/models/dto";
 import { } from "#modules/resources/response-formatter";
 import { EpisodeResponseFormatterService } from "#episodes/renderer/formatter.service";
 import { EpisodeEntity } from "../models";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 @Injectable()
 export class EpisodeSlugHandlerService {

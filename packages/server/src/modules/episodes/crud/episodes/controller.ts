@@ -1,23 +1,16 @@
 import { Body, Controller } from "@nestjs/common";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
-import { EpisodeInfoCrudDtos } from "$shared/models/episodes/user-info/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { Param } from "@nestjs/common";
 import { UserPayload } from "$shared/models/auth";
-import { episodeUserInfoEntitySchema } from "$shared/models/episodes";
 import { GetManyCriteria, UserCreateOne, UserPatchOne, AdminDeleteOne, GetOneById } from "#utils/nestjs/rest";
 import { episodeEntitySchema } from "#episodes/models";
 import { User } from "#core/auth/users/User.decorator";
 import { IdParamDto } from "#utils/validation/dtos";
-import { EpisodesRepository } from "../crud/repositories/episodes";
-import { EpisodesUsersRepository } from "./repositories/user-infos";
+import { EpisodesRepository } from "./repository";
 
 class GetManyBodyDto extends createZodDto(
   EpisodesCrudDtos.GetMany.criteriaSchema,
-) {}
-
-class PatchOneByIdUserInfoBodyDto extends createZodDto(
-  EpisodeInfoCrudDtos.Patch.bodySchema,
 ) {}
 
 class CreateBody extends createZodDto(EpisodesCrudDtos.CreateOne.bodySchema) {}
@@ -29,7 +22,6 @@ const schema = episodeEntitySchema;
 export class EpisodesCrudController {
   constructor(
     private readonly episodesRepo: EpisodesRepository,
-    private readonly episodesUserInfoRepo: EpisodesUsersRepository,
   ) {
   }
 
@@ -72,19 +64,5 @@ export class EpisodesCrudController {
   @AdminDeleteOne(schema)
   async deleteOne(@Param() params: IdParamDto) {
     return await this.episodesRepo.deleteOneByIdAndGet(params.id);
-  }
-
-  @UserPatchOne(episodeUserInfoEntitySchema, {
-    url: "/:id/user-info",
-  } )
-  async patchOneUserInfoByKeyAndGet(
-    @Param() params: IdParamDto,
-    @Body() body: PatchOneByIdUserInfoBodyDto,
-    @User() user: UserPayload,
-  ) {
-    return await this.episodesUserInfoRepo.patchOneByIdAndGet( {
-      episodeId: params.id,
-      userId: user.id,
-    }, body);
   }
 }

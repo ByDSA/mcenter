@@ -10,7 +10,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import ffmpeg from "fluent-ffmpeg";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
-import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
+import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 import { md5FileAsync } from "#utils/crypt";
 import { EpisodeFileInfoEntity, EpisodeFileInfoOmitEpisodeId, compareEpisodeFileInfoOmitEpisodeId, episodeFileInfoEntitySchema } from "#episodes/file-info/models";
 import { assertFoundServer } from "#utils/validation/found";

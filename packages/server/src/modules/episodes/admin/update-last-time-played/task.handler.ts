@@ -7,7 +7,7 @@ import { EpisodeTasks } from "$shared/models/episodes/admin";
 import { dateSchema } from "$shared/models/utils/schemas/timestamps/date";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { EpisodeLastTimePlayedService } from "#episodes/history/last-time-played/service";
-import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
+import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 
 const TASK_NAME = EpisodeTasks.cache.updateLastTimePlayed.name;
 

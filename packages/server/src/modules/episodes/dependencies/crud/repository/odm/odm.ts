@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
 import { OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
+import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 
 type DocOdm = OptionalId & {
  lastEpisodeId: mongoose.Types.ObjectId;

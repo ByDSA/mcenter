@@ -13,7 +13,6 @@ import { v4 as uuidv4 } from "uuid";
 import { VIDEO_EXTENSIONS } from "$shared/models/episodes/video-extensions";
 import { md5FileAsync } from "#utils/crypt";
 import { createUploadFileSuccessResponse, diskStorageEnsureDestination, diskStorageUniqueFilename, fileMimeTypeFilter, UploadFile, UploadFileProps } from "#utils/files";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
 import { assertFoundClient } from "#utils/validation/found";
 import { EpisodeEntity } from "#episodes/models";
 import { getSeasonNumberByEpisodeKey, SeriesRepository } from "#episodes/series/crud/repository/repository";
@@ -21,6 +20,7 @@ import { VideoMetadataService } from "#modules/resources/video/video-metadata/Vi
 import { EPISODES_MEDIA_PATH } from "#episodes/utils";
 import { EpisodeFileInfoRepository } from "../crud/repository";
 import { EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "./utils";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 @Injectable()
 export class EpisodeFileInfoUploadService {

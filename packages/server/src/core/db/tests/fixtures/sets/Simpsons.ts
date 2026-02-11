@@ -1,7 +1,7 @@
 import { SERIES_SIMPSONS } from "$sharedSrc/models/episodes/series/tests/fixtures";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
-import { EpisodeOdm } from "#episodes/crud/repositories/episodes/odm";
+import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { EpisodeHistoryEntryOdm } from "#episodes/history/crud/repository/odm";
 import { StreamOdm } from "#episodes/streams/crud/repository/odm";

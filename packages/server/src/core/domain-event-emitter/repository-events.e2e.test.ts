@@ -1,7 +1,7 @@
 import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
 import { Episode, EpisodeEntity } from "#episodes/models";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
-import { EpisodeEvents } from "#episodes/crud/repositories/episodes/events";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
+import { EpisodeEvents } from "#episodes/crud/episodes/repository/events";
 import { fixtureEpisodes } from "#episodes/tests";
 import { EntityEvent } from "#core/domain-event-emitter";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";

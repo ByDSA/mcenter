@@ -5,7 +5,7 @@ import { OptionalId, RequireId, SchemaDef } from "#utils/layers/db/mongoose";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { isTest } from "#utils";
 import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
-import { EpisodesUsersOdm } from "../../user-infos/odm";
+import { EpisodesUsersOdm } from "../../../user-infos/repository/odm";
 
 export type DocOdm = OptionalId & TimestampsOdm.AutoTimestamps &
   TimestampsOdm.NonAutoTimestamps & {

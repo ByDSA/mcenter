@@ -4,7 +4,7 @@ import { MongoFilterQuery, MongoSortQuery } from "#utils/layers/db/mongoose";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { enrichImageCover } from "#modules/image-covers/crud/repositories/odm/utils";
-import { EpisodesUsersOdm } from "../../user-infos/odm";
+import { EpisodesUsersOdm } from "../../../user-infos/repository/odm";
 import { DocOdm } from "./odm";
 
 // Definimos flags similares a MusicExpansionFlags

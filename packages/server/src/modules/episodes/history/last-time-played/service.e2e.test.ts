@@ -3,10 +3,10 @@ import { Types } from "mongoose";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
-import { EpisodesUsersRepository } from "#episodes/crud/repositories/user-infos";
 import { EpisodeHistoryRepository } from "../crud/repository";
 import { EpisodeHistoryEntryEntity } from "../models";
 import { EpisodeLastTimePlayedService } from "./service";
+import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 
 describe("episodeLastTimePlayedService", () => {
   let testingSetup: TestingSetup;

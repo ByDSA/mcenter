@@ -12,8 +12,8 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { EpisodeUserInfoEntity } from "#episodes/models";
-import { EpisodesRepository } from "../episodes";
-import { EpisodeOdm } from "../episodes/odm";
+import { EpisodesRepository } from "../../episodes/repository";
+import { EpisodeOdm } from "../../episodes/repository/odm";
 import { EpisodesUsersOdm } from "./odm";
 import { EpisodesUsersEvents } from "./events";
 

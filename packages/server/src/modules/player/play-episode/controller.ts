@@ -5,7 +5,7 @@ import { UserPayload } from "$shared/models/auth";
 import z from "zod";
 import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
-import { EpisodesRepository } from "#episodes/crud/repositories/episodes";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { assertFoundClient } from "#utils/validation/found";
 import { QueryDto } from "../play-stream/controller";
 import { AuthPlayerService } from "../AuthPlayer.service";
