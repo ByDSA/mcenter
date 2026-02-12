@@ -15,6 +15,7 @@ import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { fixTxtFields } from "#modules/resources/fix-text";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { getSeasonNumberByEpisodeKey } from "#episodes/series/crud/repository/repository";
+import { SeriesSeasons } from "#episodes/series";
 import { Episode, EpisodeEntity } from "../../../models";
 import { EpisodeOdm } from "./odm";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
@@ -33,8 +34,6 @@ type CriteriaOne = EpisodesCrudDtos.GetOne.Criteria;
 type Options = {
   requestingUserId?: string;
 };
-
-type Seasons = Record<string, EpisodeEntity[]>;
 
 @Injectable()
 export class EpisodesRepository
@@ -58,7 +57,7 @@ CanGetAll<EpisodeEntity> {
     seriesId: string,
     criteria?: Criteria,
     options?: Options,
-  ): Promise<Seasons> {
+  ): Promise<SeriesSeasons> {
     const { data: episodes } = await this.getMany(
       {
         ...criteria,
@@ -75,7 +74,7 @@ CanGetAll<EpisodeEntity> {
         requestingUserId: options?.requestingUserId,
       },
     );
-    const seasons: Seasons = {};
+    const seasons: SeriesSeasons = {};
 
     for (const e of episodes) {
       const seasonNumberStr = getSeasonNumberByEpisodeKey(e.episodeKey).toString();

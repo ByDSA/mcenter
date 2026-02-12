@@ -2,6 +2,7 @@ import z from "zod";
 import { mongoDbId } from "../../resources/partial-schemas";
 import { imageCoverEntitySchema } from "../../image-covers";
 import { timestampsSchema } from "../../utils/schemas/timestamps";
+import { EpisodeEntity } from "../episode";
 
 const seriesKeySchema = z.string();
 
@@ -27,6 +28,8 @@ export const seriesEntitySchema = seriesSchema.extend( {
 } );
 
 export type SeriesEntity = z.infer<typeof seriesEntitySchema>;
+
+export type SeriesSeasons = Record<string, EpisodeEntity[]>;
 
 export {
   type SeriesKey,

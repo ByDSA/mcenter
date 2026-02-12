@@ -6,9 +6,9 @@ import { UserCreateOne, UserPatchOne, AdminDeleteOne, GetAll, GetManyCriteria, G
 import { User } from "#core/auth/users/User.decorator";
 import { episodesBySeasonSchema } from "#episodes/models";
 import { IdParamDto } from "#utils/validation/dtos";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { seriesEntitySchema } from "../models";
 import { SeriesRepository } from "./repository";
-import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 class CreateBody extends createZodDto(SeriesCrudDtos.CreateOne.bodySchema) {}
 class PatchBody extends createZodDto(SeriesCrudDtos.Patch.bodySchema) {}
@@ -68,7 +68,7 @@ export class SeriesCrudController {
   @UserCreateOne(seriesEntitySchema)
   async createOne(
     @Body() body: CreateBody,
-    @User() _user: UserPayload,
+    @User() _user: UserPayload, // TODO: uploader
   ) {
     return await this.repo.createOneAndGet( {
       ...body,
