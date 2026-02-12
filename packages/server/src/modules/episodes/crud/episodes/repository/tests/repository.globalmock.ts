@@ -2,7 +2,7 @@
 import { createMockClass } from "$sharedTests/jest/mocking";
 import { fixtureEpisodes } from "#episodes/tests";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
-import { EpisodesRepository } from "../../repository";
+import { EpisodesRepository } from "..";
 
 class MockEpisodesRepository extends createMockClass(EpisodesRepository) {
   constructor() {
@@ -14,6 +14,4 @@ class MockEpisodesRepository extends createMockClass(EpisodesRepository) {
   }
 }
 
-export function createAndRegisterEpisodesRepositoryMockClass() {
-  registerMockProviderInstance(EpisodesRepository, new MockEpisodesRepository());
-}
+registerMockProviderInstance(EpisodesRepository, new MockEpisodesRepository());

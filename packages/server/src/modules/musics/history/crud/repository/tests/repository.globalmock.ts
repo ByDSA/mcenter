@@ -10,6 +10,4 @@ class MusicHistoryRepositoryMock extends createMockClass(MusicHistoryRepository)
   }
 }
 
-export function createAndRegisterMusicHistoryRepositoryMockClass() {
-  registerMockProviderInstance(MusicHistoryRepository, new MusicHistoryRepositoryMock());
-}
+registerMockProviderInstance(MusicHistoryRepository, new MusicHistoryRepositoryMock());

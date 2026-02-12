@@ -246,7 +246,6 @@ export function testManyAuth(options: TestManyAuthOptions) {
 type TestValidationOptions = ExpectControllerFailInPhaseOptions & {
   request: ()=> Promise<request.Response>;
   shouldPass: boolean;
-  name?: string;
   user?: UserPayload | null;
 };
 

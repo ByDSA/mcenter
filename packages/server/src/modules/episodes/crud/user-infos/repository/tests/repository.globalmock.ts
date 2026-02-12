@@ -15,6 +15,4 @@ class MockEpisodeUserInfosRepository extends createMockClass(EpisodesUsersReposi
   }
 }
 
-export function createAndRegisterEpisodeUserInfosRepositoryMockClass() {
-  registerMockProviderInstance(EpisodesUsersRepository, new MockEpisodeUserInfosRepository());
-}
+registerMockProviderInstance(EpisodesUsersRepository, new MockEpisodeUserInfosRepository());

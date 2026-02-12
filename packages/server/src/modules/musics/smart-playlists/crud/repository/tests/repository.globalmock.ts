@@ -31,9 +31,7 @@ class MusicSmartPlaylistsRepositoryMock extends createMockClass(MusicSmartPlayli
   }
 }
 
-export function createAndRegisterMusicSmartPlaylistsRepositoryMockClass() {
-  registerMockProviderInstance(
-    MusicSmartPlaylistsRepository,
-    new MusicSmartPlaylistsRepositoryMock(),
-  );
-}
+registerMockProviderInstance(
+  MusicSmartPlaylistsRepository,
+  new MusicSmartPlaylistsRepositoryMock(),
+);

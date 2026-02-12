@@ -11,7 +11,7 @@ import { expectControllerFailInValidationPhase, createTokenTests, expectControll
 import { SmartPlaylistCrudController } from "./controller";
 import { MusicSmartPlaylistRepository } from "./repository/repository";
 import { GuardOwnerService } from "./guard-owner.service";
-import { MUSIC_SMART_PLAYLIST_SAMPLE } from "./repository/tests";
+import { MUSIC_SMART_PLAYLIST_SAMPLE } from "./repository/tests/repository.globalmock";
 
 const otherUser = fixtureUsers.Admin.UserWithRoles;
 const ownerUser = fixtureUsers.Normal.UserWithRoles;

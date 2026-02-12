@@ -13,6 +13,4 @@ class SeriesRepositoryMock extends createMockClass(SeriesRepository) {
   }
 }
 
-export function createAndRegisterSeriesRepositoryMockClass() {
-  registerMockProviderInstance(SeriesRepository, new SeriesRepositoryMock());
-}
+registerMockProviderInstance(SeriesRepository, new SeriesRepositoryMock());

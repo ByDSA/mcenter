@@ -41,6 +41,4 @@ class MusicsRepositoryMock extends createMockClass(MusicsRepository) {
   }
 }
 
-export function createAndRegisterMusicRepositoryMockClass() {
-  registerMockProviderInstance(MusicsRepository, new MusicsRepositoryMock());
-}
+registerMockProviderInstance(MusicsRepository, new MusicsRepositoryMock());

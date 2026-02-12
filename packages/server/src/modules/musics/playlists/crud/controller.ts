@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, Req, Res, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
+import { Body, Controller, Get, Param, Req, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
 import { musicEntitySchema } from "$shared/models/musics";
-import { Request, Response } from "express";
+import { Request } from "express";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { assertIsDefined } from "$shared/utils/validation";
@@ -19,6 +19,7 @@ import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { IdParamDto } from "#utils/validation/dtos";
 import { MusicResponseFormatterService } from "#musics/renderer/formatter.service";
 import { TokenAuth } from "#core/auth/strategies/token/decorator";
+import { RenderMusic } from "#musics/renderer/renderer.interceptor";
 import { MusicPlaylistCrudDtos } from "../models/dto";
 import { musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistsRepository } from "./repository/repository";
@@ -36,24 +37,12 @@ type GuardVisibilityByIdProps = {
 class GetOneByCriteriaBody extends createZodDto(MusicPlaylistCrudDtos.GetOne.criteriaSchema) {}
 const numTrackZeroBasedSchema = z
   .string()
-  .transform((val) => {
-    const num = Number(val);
-
-    if (!Number.isInteger(num) || num < 0)
-      throw new Error("n must be an integer greater or equal than 0");
-
-    return num;
-  } );
+  .pipe(z.coerce.number().int()
+    .min(0));
 const numTrackOneBasedSchema = z
   .string()
-  .transform((val) => {
-    const num = Number(val);
-
-    if (!Number.isInteger(num) || num <= 0)
-      throw new Error("n must be an integer greater than 0");
-
-    return num;
-  } );
+  .pipe(z.coerce.number().int()
+    .min(1));
 const trackPosParamsSchema = z.object( {
   n: numTrackOneBasedSchema,
 } );
@@ -114,10 +103,14 @@ export class MusicPlaylistsController {
     @Req() req: Request,
     @User() user: UserPayload | null,
   ) {
-    await this.guardVisibilityById( {
-      requestUserId: user?.id,
-      playlistId: params.id,
-    } );
+    try {
+      await this.guardVisibilityById( {
+        requestUserId: user?.id,
+        playlistId: params.id,
+      } );
+    } catch {
+      return null;
+    }
     const format = this.responseFormatter.getResponseFormatByRequest(req);
 
     if (format === ResponseFormat.RAW)
@@ -155,10 +148,14 @@ export class MusicPlaylistsController {
     const ret = await this.playlistsRepo.getOneByCriteria(body);
 
     if (ret) {
-      await this.guardVisibilityById( {
-        requestUserId: user?.id,
-        playlistId: ret.id,
-      } );
+      try {
+        await this.guardVisibilityById( {
+          requestUserId: user?.id,
+          playlistId: ret.id,
+        } );
+      } catch {
+        return null;
+      }
     }
 
     return ret;
@@ -278,7 +275,8 @@ export class MusicPlaylistsController {
   ) {
     const playlist = await this.playlistsRepo.getOneById(params.id);
 
-    assertFoundClient(playlist);
+    if (!playlist)
+      return null;
 
     return await this.playlistsRepo.findOneTrackByPosition(playlist, params.n);
   }
@@ -358,13 +356,15 @@ export class MusicPlaylistsController {
     return createSuccessResultResponse(playlist);
   }
 
+  @RenderMusic( {
+    json: true,
+    m3u8: true,
+    raw: true,
+  } )
   @TokenAuth()
   @Get("/user/:userSlug/:playlistSlug/track/:n")
   async getOneUserPlaylistTrack(
     @Param() params: GetOneUserPlaylistTrackParams,
-    @Res( {
-      passthrough: true,
-    } ) res: Response,
     @Req() req: Request,
     @User() user: UserPayload | null,
   ) {
@@ -392,25 +392,7 @@ export class MusicPlaylistsController {
       musicCriteria,
     );
 
-    assertFoundClient(got);
-
-    if (format === ResponseFormat.RAW) {
-      const userId = user?.id;
-
-      if (userId) {
-        await this.musicHistoryRepo.createNewEntryNowIfShouldFor( {
-          musicId: got.id,
-          userId,
-        } );
-      }
-    }
-
-    return this.musicRenderer.render( {
-      music: got,
-      format,
-      request: req,
-      response: res,
-    } );
+    return got;
   }
 
   private async guardEditPlaylist(user: UserPayload, playlistId: string) {

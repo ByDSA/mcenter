@@ -28,6 +28,4 @@ class MusicFileInfoRepositoryMock extends createMockClass(MusicFileInfoRepositor
   }
 }
 
-export function createAndRegisterMusicFileInfoRepositoryMockClass() {
-  registerMockProviderInstance(MusicFileInfoRepository, new MusicFileInfoRepositoryMock());
-}
+registerMockProviderInstance(MusicFileInfoRepository, new MusicFileInfoRepositoryMock());

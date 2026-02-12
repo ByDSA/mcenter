@@ -20,16 +20,8 @@ import { MockUsersRepository } from "#core/auth/users/tests/repository";
 import { authRoutes } from "#core/routing";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { AuthGoogleModule } from "#core/auth/strategies/google";
-import { createAndRegisterMusicRepositoryMockClass } from "#musics/crud/repositories/music/tests";
-import { createAndRegisterMusicHistoryRepositoryMockClass } from "#musics/history/crud/repository/tests";
-import { createAndRegisterEpisodesRepositoryMockClass } from "#episodes/crud/episodes/repository/tests";
-import { createAndRegisterEpisodeUserInfosRepositoryMockClass } from "#episodes/crud/user-infos/repository/tests";
-import { createAndRegisterMusicFileInfoRepositoryMockClass } from "#musics/file-info/crud/repository/tests";
-import { createAndRegisterSeriesRepositoryMockClass } from "#episodes/series/crud/repository/tests";
 import { CaptureAfterValidationPipe, CaptureArgsExceptionFilter, CaptureArgsInterceptor, CaptureArgsMiddleware, CaptureBeforeValidationPipe } from "#core/app/tests/controllers/capture-args.interceptor";
 import { GlobalExceptionFilter } from "#core/error-handlers/http-error-handler";
-import { createAndRegisterMusicSmartPlaylistsRepositoryMockClass } from "#musics/smart-playlists/crud/repository/tests";
-import { createAndRegisterMusicUsersListsRepositoryMockClass } from "#musics/users-lists/crud/repository/tests";
 
 let currentTestingSetup: TestingSetup;
 
@@ -60,18 +52,6 @@ type Options = {
   };
   beforeCompile?: (moduleBuilder: TestingModuleBuilder)=> void;
 };
-
-(function registerMocks() {
-  createAndRegisterMusicRepositoryMockClass();
-  createAndRegisterMusicFileInfoRepositoryMockClass();
-  createAndRegisterMusicHistoryRepositoryMockClass();
-  createAndRegisterMusicSmartPlaylistsRepositoryMockClass();
-  createAndRegisterMusicUsersListsRepositoryMockClass();
-
-  createAndRegisterEpisodesRepositoryMockClass();
-  createAndRegisterEpisodeUserInfosRepositoryMockClass();
-  createAndRegisterSeriesRepositoryMockClass();
-} )();
 
 export async function createTestingAppModule(
   metadata: ModuleMetadata,

@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { MusicUserListEntity } from "$shared/models/musics/users-lists";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
-import { MUSIC_SMART_PLAYLIST_SAMPLE } from "#musics/smart-playlists/crud/repository/tests";
+import { MUSIC_SMART_PLAYLIST_SAMPLE } from "#modules/musics/smart-playlists/crud/repository/tests/repository.globalmock";
 import { MusicUsersListsRepository } from "../repository";
 
 export const MUSIC_USER_LIST_SAMPLE: MusicUserListEntity = {
@@ -29,9 +29,7 @@ class MusicUsersListsRepositoryMock extends createMockClass(
   }
 }
 
-export function createAndRegisterMusicUsersListsRepositoryMockClass() {
-  registerMockProviderInstance(
-    MusicUsersListsRepository,
-    new MusicUsersListsRepositoryMock(),
-  );
-}
+registerMockProviderInstance(
+  MusicUsersListsRepository,
+  new MusicUsersListsRepositoryMock(),
+);
