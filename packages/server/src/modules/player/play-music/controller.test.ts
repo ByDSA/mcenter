@@ -8,6 +8,7 @@ import { MusicEntityWithFileInfos } from "$shared/models/musics";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureMusics } from "#musics/tests";
+import { testFailValidation } from "#core/auth/strategies/token/tests";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { fixturesRemotePlayers } from "../tests/fixtures";
 import { PlayMusicController } from "./controller";
@@ -66,11 +67,8 @@ describe("playMusicController", () => {
   const validControllerUrl = `/play/${remotePlayerId}/music`;
   const invalidControllerUrl = "/play/invalidRemotePlayerId/music";
 
-  it("invalid controller params", async () => {
-    const response = await request(routerApp)
-      .get(invalidControllerUrl + "/music-slug");
-
-    expect(response.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+  testFailValidation("invalid controller params", {
+    request: () => request(routerApp).get(invalidControllerUrl + "/music-slug"),
   } );
 
   describe("playMusic", () => {

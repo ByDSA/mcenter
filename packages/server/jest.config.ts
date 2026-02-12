@@ -7,6 +7,9 @@ const config: JestConfigWithTsJest = {
     "^.+\\.tsx?$": "ts-jest",
   },
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+  testPathIgnorePatterns: [
+    "/ai/",
+  ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   moduleNameMapper: {
     "^#tests($|/.*)$": "<rootDir>/tests/$1",

@@ -47,7 +47,10 @@ export class MusicUsersListsController {
   @UserPatchOne(musicUserListEntitySchema, {
     url: "/move",
   } )
-  async moveOneList(@User() user: UserPayload, @Body() body: MoveListBody) {
+  async moveOneList(
+    @Body() body: MoveListBody,
+    @User() user: UserPayload,
+  ) {
     return await this.repo.moveOneList( {
       ownerUserId: user.id,
       entryId: body.entryId,

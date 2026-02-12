@@ -13,7 +13,18 @@ import { Observable, tap } from "rxjs";
 import { Request, Response } from "express";
 import { GlobalExceptionFilter } from "#core/error-handlers/http-error-handler";
 
+export enum Phase {
+  middleware = 0,
+  guard = 1,
+  dtoValidation = 2,
+  controller = 3,
+  afterController = 4,
+  finished = 5,
+}
+
 type CapturedData = {
+  currentPhase: Phase;
+
   // Fase 1: Middleware (siempre se ejecuta)
   initialRequest?: {
     method: string;
@@ -31,26 +42,30 @@ type CapturedData = {
 
   // Fase 4: Si hay error
   error?: {
-    phase: "controller" | "dto-validation" | "guard" | "interceptor" | "middleware";
+    phase: Phase;
     stack?: string;
     message: string;
     statusCode: number;
   };
 
   pipeValidations?: {
-    params: Set<string>; // IDs de parámetros que pasaron validación
-    completed: boolean; // Marca si todos terminaron
+    startedCount: number; // Cuántos parámetros empezaron a validarse
+    completedCount: number; // Cuántos parámetros completaron validación
   };
-  afterController?: boolean;
 };
 
 @Injectable()
 export class CaptureArgsMiddleware implements NestMiddleware {
-  public capturedData: CapturedData = {};
+  public capturedData: CapturedData = {
+    currentPhase: Phase.middleware,
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  use(req: Request, _res: Response, next: Function) {
-    this.capturedData = {};
+  use(req: Request, res: Response, next: Function) {
+    this.capturedData = {
+      currentPhase: Phase.middleware,
+    };
+
     // Captura SIEMPRE, antes de guards
     this.capturedData.initialRequest = {
       method: req.method,
@@ -60,7 +75,26 @@ export class CaptureArgsMiddleware implements NestMiddleware {
       headers: req.headers as any,
     };
 
+    // Avanzar a la siguiente fase
+    this.capturedData.currentPhase = Phase.guard;
+
+    res.on("finish", () => {
+      // Esto se ejecuta DESPUÉS de todo (interceptors + filters)
+      // Solo cambiar a finished si no hubo error
+      if (!this.capturedData.error
+          && this.capturedData.currentPhase === Phase.afterController)
+        this.capturedData.currentPhase = Phase.finished;
+    } );
+
     next();
+  }
+
+  /**
+   * Obtiene la fase actual del request
+   * Puede ser llamado externamente o desde el filter
+   */
+  getPhase(): Phase {
+    return this.capturedData.currentPhase;
   }
 }
 
@@ -78,16 +112,17 @@ export class CaptureArgsInterceptor implements NestInterceptor {
       params: req.params,
     };
 
-    // Inicializar tracking de pipes
     this.middleware.capturedData.pipeValidations = {
-      params: new Set(),
-      completed: false,
+      startedCount: 0,
+      completedCount: 0,
     };
+
+    this.middleware.capturedData.currentPhase = Phase.dtoValidation;
 
     return next.handle().pipe(
       tap(() => {
-        // Si llegamos aquí, controller terminó OK
-        this.middleware.capturedData.afterController = true;
+        // Controller terminó, antes de otros interceptors
+        this.middleware.capturedData.currentPhase = Phase.afterController;
       } ),
     );
   }
@@ -102,24 +137,11 @@ export class CaptureArgsExceptionFilter implements ExceptionFilter {
   ) {}
 
   catch(exception: any, host: ArgumentsHost) {
-    const { afterGuards, pipeValidations, afterController } = this.middleware.capturedData;
-    let phase: NonNullable<CapturedData["error"]>["phase"];
-
-    if (!afterGuards)
-      phase = "guard";
-    else if (pipeValidations && !pipeValidations.completed) {
-    // Pipes empezaron pero no todos completaron = error en DTO validation
-      phase = "dto-validation";
-    } else if (pipeValidations?.completed && !afterController) {
-    // Todos los pipes pasaron pero controller no terminó = error en controller
-      phase = "controller";
-    } else {
-    // Controller terminó = error en response/interceptor
-      phase = "interceptor";
-    }
+    // Obtener la fase actual directamente
+    const currentPhase = this.middleware.getPhase();
 
     this.middleware.capturedData.error = {
-      phase,
+      phase: currentPhase,
       stack: exception.stack,
       message: exception.message ?? "Unknown error",
       statusCode: exception.status ?? 500,
@@ -129,28 +151,35 @@ export class CaptureArgsExceptionFilter implements ExceptionFilter {
   }
 }
 
+// Este pipe se ejecuta ANTES de ZodValidationPipe
+@Injectable()
+export class CaptureBeforeValidationPipe implements PipeTransform {
+  constructor(private readonly middleware: CaptureArgsMiddleware) {}
+
+  transform(value: any, _metadata: ArgumentMetadata) {
+    const validations = this.middleware.capturedData.pipeValidations;
+
+    if (validations)
+      validations.startedCount++;
+
+    return value;
+  }
+}
+
+// Este pipe se ejecuta DESPUÉS de ZodValidationPipe
 @Injectable()
 export class CaptureAfterValidationPipe implements PipeTransform {
   constructor(private readonly middleware: CaptureArgsMiddleware) {}
 
-  transform(value: any, metadata: ArgumentMetadata) {
+  transform(value: any, _metadata: ArgumentMetadata) {
     const validations = this.middleware.capturedData.pipeValidations;
 
-    if (validations && !validations.completed) {
-      // Crear ID único para este parámetro
-      const paramId = `${metadata.type}:${metadata.data ?? "unknown"}:${metadata.metatype?.name
-        ?? "any"}`;
+    if (validations) {
+      validations.completedCount++;
 
-      validations.params.add(paramId);
-
-      // Programar verificación asíncrona de que todos terminaron
-      // setImmediate se ejecuta después de que TODOS los pipes síncronos terminen
-      setImmediate(() => {
-        if (validations && !validations.completed && !this.middleware.capturedData.error) {
-          // Si llegamos aquí sin error, todos los pipes pasaron
-          validations.completed = true;
-        }
-      } );
+      // Si todos los pipes completaron, avanzar a la fase del controller
+      if (validations.completedCount === validations.startedCount)
+        this.middleware.capturedData.currentPhase = Phase.controller;
     }
 
     return value;

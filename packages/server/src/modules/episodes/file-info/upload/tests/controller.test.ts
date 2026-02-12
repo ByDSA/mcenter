@@ -5,6 +5,7 @@ import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { mockMongoId } from "#tests/mongo";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
+import { expectControllerFailInValidationPhase } from "#core/auth/strategies/token/tests";
 import { EpisodeFileInfosUploadController } from "../controller";
 import { EpisodeFileInfoUploadService, UploadFileInterceptor } from "../service";
 import { EpisodeFileInfoRepository } from "../../crud/repository";
@@ -125,8 +126,9 @@ describe("controller", () => {
             metadata,
           } );
 
+          expectControllerFailInValidationPhase();
+
           expect(res.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
-          expect(uploadServiceMock.upload).not.toHaveBeenCalled();
         } );
       } );
     } );

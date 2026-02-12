@@ -5,6 +5,7 @@ import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { ImageCoversRepository } from "#modules/image-covers/crud/repositories";
+import { testFailValidation, testManyAuth } from "#core/auth/strategies/token/tests";
 import { ImageCoversUploadService, UploadFileInterceptor } from "../service";
 import { ImageCoverUploadController } from "../controller";
 import { fileBuffer, mockFileInMemory, uploadImage } from "./utils";
@@ -89,19 +90,16 @@ describe("imageCoverCrudController (upload)", () => {
       expect(uploadServiceMock.upload).not.toHaveBeenCalled();
     } );
 
-    it("falla si faltan datos requeridos en el DTO (label)", async () => {
-      const invalidMetadata = null;
-      const res = await uploadImage( {
+    testFailValidation("missing required metadata field (label)", {
+      request: () => uploadImage( {
         routerApp,
         options: {
           filename: "valid.png",
           contentType: "image/png",
         },
         fileBuffer,
-        metadata: invalidMetadata!,
-      } );
-
-      expect(res.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+        metadata: null!,
+      } ),
     } );
 
     it("falla si no se adjunta ningún archivo", async () => {
@@ -117,38 +115,34 @@ describe("imageCoverCrudController (upload)", () => {
       expect(res.status).toBe(HttpStatus.BAD_REQUEST);
     } );
 
-    it("should not upload a normal user", async () => {
-      const metadata = {
-        label: "Normal User",
-      } satisfies ImageCoverCrudDtos.UploadFile.RequestBody["metadata"];
+    describe("auth", ()=> {
+      testManyAuth( {
+        request: ()=>{
+          const metadata = {
+            label: "User",
+          } satisfies ImageCoverCrudDtos.UploadFile.RequestBody["metadata"];
 
-      await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
-      const res = await uploadImage( {
-        fileBuffer,
-        metadata,
-        routerApp,
+          return uploadImage( {
+            fileBuffer,
+            metadata,
+            routerApp,
+          } );
+        },
+        list: [
+          {
+            user: null,
+            shouldPass: false,
+          },
+          {
+            user: fixtureUsers.Normal.UserWithRoles,
+            shouldPass: false,
+          },
+          {
+            user: fixtureUsers.Admin.UserWithRoles,
+            shouldPass: true,
+          },
+        ],
       } );
-
-      expect(res.statusCode).toBe(HttpStatus.FORBIDDEN);
-
-      expect(uploadServiceMock.upload).not.toHaveBeenCalled();
-    } );
-
-    it("should not upload by guest user", async () => {
-      const metadata = {
-        label: "Guest User",
-      } satisfies ImageCoverCrudDtos.UploadFile.RequestBody["metadata"];
-
-      await testingSetup.useMockedUser(null);
-      const res = await uploadImage( {
-        fileBuffer,
-        metadata,
-        routerApp,
-      } );
-
-      expect(res.statusCode).toBe(HttpStatus.UNAUTHORIZED);
-
-      expect(uploadServiceMock.upload).not.toHaveBeenCalled();
     } );
   } );
 } );

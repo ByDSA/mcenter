@@ -4,7 +4,7 @@ import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
-import { createTokenTests, expectControllerCalled } from "#core/auth/strategies/token/tests";
+import { createTokenTests, expectControllerFinishRequest, testAuth } from "#core/auth/strategies/token/tests";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { fixtureEpisodes } from "#episodes/tests";
 import { StreamGetEpisodeController } from "./controller";
@@ -15,6 +15,7 @@ describe("get-episode", () => {
   let router: Application;
   let mocks: Awaited<ReturnType<typeof initMocks>>;
 
+  // eslint-disable-next-line require-await
   async function initMocks(setup: TestingSetup) {
     const ret = {
       streamGetRandomEpisodeService: setup.getMock(StreamGetRandomEpisodeService),
@@ -47,8 +48,9 @@ describe("get-episode", () => {
     mocks = await initMocks(testingSetup);
   } );
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
+    await testingSetup.useMockedUser(null);
   } );
 
   describe("getEpisode", ()=> {
@@ -60,7 +62,7 @@ describe("get-episode", () => {
         .get(URL);
 
       await testingSetup.useMockedUser(null);
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
 
       expect(res.statusCode).toBe(HttpStatus.OK);
     } );
@@ -69,15 +71,12 @@ describe("get-episode", () => {
       createTokenTests( {
         url: URL,
         expectedUser: fixtureUsers.Normal.UserWithRoles,
-        getTestingSetup: ()=>testingSetup,
-        getRouter: ()=>router,
       } );
 
-      it("request without user should fail", async () => {
-        const res = await request(router)
-          .get(URL);
-
-        expect(res.statusCode).toBe(HttpStatus.UNAUTHORIZED);
+      testAuth( {
+        request: () =>request(router)
+          .get(URL),
+        shouldPass: false,
       } );
     } );
 

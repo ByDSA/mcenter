@@ -24,10 +24,18 @@ import { createAndRegisterMusicRepositoryMockClass } from "#musics/crud/reposito
 import { createAndRegisterMusicHistoryRepositoryMockClass } from "#musics/history/crud/repository/tests";
 import { createAndRegisterEpisodesRepositoryMockClass } from "#episodes/crud/episodes/repository/tests";
 import { createAndRegisterEpisodeUserInfosRepositoryMockClass } from "#episodes/crud/user-infos/repository/tests";
-import { registerMusicFileInfoRepositoryMockClass } from "#musics/file-info/crud/repository/tests";
+import { createAndRegisterMusicFileInfoRepositoryMockClass } from "#musics/file-info/crud/repository/tests";
 import { createAndRegisterSeriesRepositoryMockClass } from "#episodes/series/crud/repository/tests";
-import { CaptureAfterValidationPipe, CaptureArgsExceptionFilter, CaptureArgsInterceptor, CaptureArgsMiddleware } from "#core/app/tests/controllers/capture-args.interceptor";
+import { CaptureAfterValidationPipe, CaptureArgsExceptionFilter, CaptureArgsInterceptor, CaptureArgsMiddleware, CaptureBeforeValidationPipe } from "#core/app/tests/controllers/capture-args.interceptor";
 import { GlobalExceptionFilter } from "#core/error-handlers/http-error-handler";
+import { createAndRegisterMusicSmartPlaylistsRepositoryMockClass } from "#musics/smart-playlists/crud/repository/tests";
+import { createAndRegisterMusicUsersListsRepositoryMockClass } from "#musics/users-lists/crud/repository/tests";
+
+let currentTestingSetup: TestingSetup;
+
+export function getCurrentTestingSetup() {
+  return currentTestingSetup;
+}
 
 export type TestingSetup = {
   options?: Options;
@@ -55,8 +63,11 @@ type Options = {
 
 (function registerMocks() {
   createAndRegisterMusicRepositoryMockClass();
-  registerMusicFileInfoRepositoryMockClass();
+  createAndRegisterMusicFileInfoRepositoryMockClass();
   createAndRegisterMusicHistoryRepositoryMockClass();
+  createAndRegisterMusicSmartPlaylistsRepositoryMockClass();
+  createAndRegisterMusicUsersListsRepositoryMockClass();
+
   createAndRegisterEpisodesRepositoryMockClass();
   createAndRegisterEpisodeUserInfosRepositoryMockClass();
   createAndRegisterSeriesRepositoryMockClass();
@@ -66,6 +77,13 @@ export async function createTestingAppModule(
   metadata: ModuleMetadata,
   options?: Options,
 ): Promise<TestingSetup> {
+  if (currentTestingSetup) {
+    throw new Error(
+      "Testing setup already exists. Make sure to call createTestingAppModule \
+only once at the beginning of the tests.",
+    );
+  }
+
   const mockAuthGuard = {
     canActivate: jest.fn(),
   };
@@ -87,6 +105,10 @@ export async function createTestingAppModule(
         : []),
     ],
     providers: [
+      {
+        provide: APP_PIPE,
+        useFactory: () => new CaptureBeforeValidationPipe(captureMiddleware),
+      },
       ...globalValidationProviders,
       {
         provide: APP_PIPE,
@@ -160,9 +182,10 @@ export async function createTestingAppModule(
   const captureInterceptor = new CaptureArgsInterceptor(captureMiddleware);
 
   app.use(captureMiddleware.use.bind(captureMiddleware));
-  app.useGlobalInterceptors(captureInterceptor);
 
   addGlobalConfigToApp(app);
+  // Después de la global config, para que sea el último interceptor
+  app.useGlobalInterceptors(captureInterceptor);
   // Después de la global config reemplazarlo
   const captureFilter = new CaptureArgsExceptionFilter(
     captureMiddleware,
@@ -174,8 +197,7 @@ export async function createTestingAppModule(
   const resolveMock = async <T>(clazz: Type<T>) => {
     return await module.resolve<jest.Mocked<T>>(clazz);
   };
-
-  return {
+  const ret = {
     routerApp,
     options,
     app,
@@ -214,6 +236,10 @@ export async function createTestingAppModule(
       } );
     },
   };
+
+  currentTestingSetup = ret;
+
+  return ret;
 }
 
 export const createTestingAppModuleAndInit: typeof createTestingAppModule = async (

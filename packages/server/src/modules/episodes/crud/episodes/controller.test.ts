@@ -5,7 +5,7 @@ import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";
-import { expectControllerCalled, expectControllerNotCalled } from "#core/auth/strategies/token/tests";
+import { expectControllerFailInValidationPhase, expectControllerFinishRequest, testFailValidation } from "#core/auth/strategies/token/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { episodeEntitySchema } from "#episodes/models";
 import { EpisodesCrudDtos } from "#episodes/models/dto";
@@ -22,9 +22,9 @@ describe("episodesCrudController", () => {
   const invalidId = "invalidId";
   const baseUrl = "/";
 
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      episodesRepo: setup.getMock(EpisodesRepository),
+      episodesRepo: testingSetup.getMock(EpisodesRepository),
     };
 
     ret.episodesRepo.getOneById.mockResolvedValue(SAMPLE);
@@ -56,7 +56,7 @@ describe("episodesCrudController", () => {
 
     router = testingSetup.routerApp;
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
   } );
 
   beforeEach(() => {
@@ -70,7 +70,7 @@ describe("episodesCrudController", () => {
     it("valid request-response", async () => {
       const res = await request(router).get(validUrl);
 
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
 
       const data = episodeEntitySchema.parse(res.body.data);
 
@@ -78,12 +78,8 @@ describe("episodesCrudController", () => {
       expect(res.statusCode).toBe(HttpStatus.OK);
     } );
 
-    it("invalid id", async () => {
-      const res = await request(router).get(invalidUrl);
-
-      expectControllerNotCalled(testingSetup);
-
-      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+    testFailValidation("id param", {
+      request: () => request(router).get(invalidUrl),
     } );
 
     it("should call repository", async () => {
@@ -105,7 +101,7 @@ describe("episodesCrudController", () => {
       const res = await request(router).post(url)
         .send(validPayload);
 
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
 
       const data = episodeEntitySchema.parse(res.body.data);
 
@@ -113,15 +109,11 @@ describe("episodesCrudController", () => {
       expect(res.statusCode).toBe(HttpStatus.OK);
     } );
 
-    it("invalid payload", async () => {
-      const res = await request(router).post(url)
+    testFailValidation("payload", {
+      request: () => request(router).post(url)
         .send( {
           invalid: "field",
-        } );
-
-      expectControllerNotCalled(testingSetup);
-
-      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+        } ),
     } );
 
     it("should call repository", async () => {
@@ -144,7 +136,7 @@ describe("episodesCrudController", () => {
       const res = await request(router).patch(validUrl)
         .send(payload);
 
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
 
       const data = episodeEntitySchema.parse(res.body.data);
 
@@ -170,7 +162,7 @@ describe("episodesCrudController", () => {
     it("valid request-response", async () => {
       const res = await request(router).delete(validUrl);
 
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
 
       const data = episodeEntitySchema.parse(res.body.data);
 
@@ -182,7 +174,7 @@ describe("episodesCrudController", () => {
       await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
       const res = await request(router).delete(validUrl);
 
-      expectControllerNotCalled(testingSetup);
+      expectControllerFailInValidationPhase();
 
       expect(res.statusCode).toBe(HttpStatus.FORBIDDEN);
     } );

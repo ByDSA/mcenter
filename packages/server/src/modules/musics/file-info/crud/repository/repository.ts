@@ -5,7 +5,7 @@ import { MusicEntity, MusicId } from "$shared/models/musics";
 import { assertIsDefined } from "$shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
-import { CanCreateOneAndGet, CanDeleteOneById, CanGetAll, CanGetOneById } from "#utils/layers/repository";
+import { CanCreateOneAndGet, CanGetAll, CanGetOneById } from "#utils/layers/repository";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 import { MusicEvents } from "#musics/crud/repositories/music/events";
@@ -29,13 +29,12 @@ export class MusicFileInfoRepository
 implements
 CanCreateOneAndGet<Model>,
 CanGetAll<Entity>,
-CanDeleteOneById<Entity["id"]>,
 CanGetOneById<Entity, Entity["id"]> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
   ) {}
 
-  async deleteOneById(id: string): Promise<void> {
+  async deleteOneById(id: string): Promise<Entity> {
     const fileInfo = await MusicFileInfoOdm.Model.findById(id);
 
     assertFoundClient(fileInfo);
@@ -66,6 +65,8 @@ música si desea borrar el archivo.",
     await MusicFileInfoOdm.Model.deleteOne( {
       _id: id,
     } );
+
+    return MusicFileInfoOdm.toEntity(fileInfo);
   }
 
   @OnEvent(MusicFileInfoEvents.WILDCARD)

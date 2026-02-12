@@ -15,9 +15,9 @@ import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { StreamFileModule } from "#modules/resources/stream-file/module";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { createTokenTests } from "#core/auth/strategies/token/tests";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { EpisodesSlugController } from "./controller";
 import { EpisodeSlugHandlerService } from "./service";
-import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 const EPISODE_WITH_SERIE = {
   ...fixtureEpisodes.SampleSeries.Samples.EP1x01,
@@ -64,9 +64,7 @@ describe("responses", () => {
   } );
 
   createTokenTests( {
-    getTestingSetup: ()=>testingSetup,
     expectedUser: fixtureUsers.Normal.UserWithRoles,
-    getRouter: ()=>router,
     url: URL,
   } );
 

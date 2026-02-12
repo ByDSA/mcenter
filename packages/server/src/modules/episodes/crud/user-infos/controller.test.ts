@@ -7,7 +7,7 @@ import { Types } from "mongoose";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";
-import { expectControllerCalled, expectControllerNotCalled } from "#core/auth/strategies/token/tests";
+import { expectControllerFinishRequest, testFailValidation } from "#core/auth/strategies/token/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { episodeUserInfoEntitySchema } from "#episodes/models";
 import { EpisodesUserInfoCrudController } from "./controller";
@@ -24,7 +24,7 @@ const SAMPLE_USER_INFO = {
 
 };
 
-describe("EpisodesUserInfoCrudController", () => {
+describe("episodesUserInfoCrudController", () => {
   let testingSetup: TestingSetup;
   let router: Application;
   let mocks: Awaited<ReturnType<typeof initMocks>>;
@@ -86,7 +86,7 @@ describe("EpisodesUserInfoCrudController", () => {
         .patch(validUrl)
         .send(payload);
 
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
 
       const data = episodeUserInfoEntitySchema.parse(res.body.data);
 
@@ -94,13 +94,9 @@ describe("EpisodesUserInfoCrudController", () => {
       expect(res.statusCode).toBe(HttpStatus.OK);
     } );
 
-    it("invalid id", async () => {
-      const res = await request(router).patch(`${baseUrl}invalidId/user-info`)
-        .send(payload);
-
-      expectControllerNotCalled(testingSetup);
-
-      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+    testFailValidation("id param", {
+      request: () => request(router).patch(`${baseUrl}invalidId/user-info`)
+        .send(payload),
     } );
 
     it("should call episodesUserInfoRepo", async () => {

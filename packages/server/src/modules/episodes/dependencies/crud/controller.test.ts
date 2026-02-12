@@ -7,6 +7,7 @@ import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";
+import { testFailValidation } from "#core/auth/strategies/token/tests";
 import { EpisodeDependenciesRepository } from "./repository/repository";
 import { EpisodeDependenciesCrudController } from "./controller";
 
@@ -49,11 +50,8 @@ describe("episodeDependenciesCrudController", () => {
     const invalidUrl = "/notObjectId";
 
     describe("params", ()=> {
-      it("should return 422 if episodeId is not ObjectId", async () => {
-        const res = await request(routerApp)
-          .get(invalidUrl);
-
-        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+      testFailValidation("not ObjectId param", {
+        request: () => request(routerApp).get(invalidUrl),
       } );
     } );
 
@@ -72,27 +70,25 @@ describe("episodeDependenciesCrudController", () => {
       expect(res.statusCode).toBe(HttpStatus.OK);
     } );
 
-    it("should return 422 when dependency not found", async () => {
+    it("should return OK + data null when dependency not found", async () => {
       mocks.repo.getNextByEpisodeId.mockResolvedValueOnce(null);
 
       const res = await request(routerApp)
         .get(validUrl);
 
-      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+      expect(res.statusCode).toBe(HttpStatus.OK);
+      expect(res.body.data).toBeNull();
     } );
   } );
 
   describe("getManyEntriesByCriteria", () => {
     const URL = `/${GET_MANY_CRITERIA_PATH}`;
 
-    it("should return 422 if provided unexpected property", async () => {
-      const res = await request(routerApp)
-        .post(URL)
+    testFailValidation("invalid payload field", {
+      request: () => request(routerApp).post(URL)
         .send( {
-          cosarara: "porquesi",
-        } );
-
-      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+          invalid: "field",
+        } ),
     } );
 
     it("should call repository with empty criteria", async () => {

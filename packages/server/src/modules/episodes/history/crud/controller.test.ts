@@ -12,6 +12,7 @@ import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 import { mockMongoId } from "#tests/mongo";
 import { fixtureEpisodes } from "#episodes/tests";
 import { episodeUserInfoEntitySchema } from "#episodes/models";
+import { testFailValidation } from "#core/auth/strategies/token/tests";
 import { EpisodeHistoryRepository } from "./repository";
 import { EpisodeHistoryCrudController } from "./controller";
 
@@ -77,14 +78,11 @@ describe("episodeHistoryCrudController", () => {
     const validUrl = `/${validSeriesId}`;
     const invalidUrl = "/notObjectId";
 
-    it("should return 422 if seriesId is not ObjectId", async () => {
-      const res = await request(routerApp)
-        .get(invalidUrl);
-
-      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+    testFailValidation("not ObjectId param", {
+      request: () => request(routerApp).get(invalidUrl),
     } );
 
-    it("should call repository with correct params", async () => {
+    it("should call repository", async () => {
       await request(routerApp)
         .get(validUrl);
 
@@ -142,14 +140,11 @@ describe("episodeHistoryCrudController", () => {
   describe("getManyEntriesBySerieAndCriteria", () => {
     const URL = `/${validSeriesId}/entries/${GET_MANY_CRITERIA_PATH}`;
 
-    it("should return 422 if provided unexpected property", async () => {
-      const res = await request(routerApp)
-        .post(URL)
+    testFailValidation("unexpected payload field", {
+      request: () => request(routerApp).post(URL)
         .send( {
           cosarara: "porquesi",
-        } );
-
-      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+        } ),
     } );
 
     it("should call repository with merged criteria", async () => {
@@ -178,14 +173,11 @@ describe("episodeHistoryCrudController", () => {
   describe("getManyEntriesByCriteria", () => {
     const URL = `/entries/${GET_MANY_CRITERIA_PATH}`;
 
-    it("should return 422 if provided unexpected property", async () => {
-      const res = await request(routerApp)
-        .post(URL)
+    testFailValidation("unexpected payload field", {
+      request: () => request(routerApp).post(URL)
         .send( {
           cosarara: "porquesi",
-        } );
-
-      expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+        } ),
     } );
 
     it("should call repository with user-scoped criteria", async () => {

@@ -1,6 +1,5 @@
 /* eslint-disable import/no-cycle */
-import { Injectable,
-  UnauthorizedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { PipelineStage, Types } from "mongoose";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
@@ -272,15 +271,5 @@ implements
     assertFoundClient(doc);
 
     return MusicSmartPlaylistOdm.toEntity(doc);
-  }
-
-  // Guardias de seguridad
-  async guardOwner(userId: string, queryId: string): Promise<void> {
-    const query = await this.getOneById(queryId);
-
-    assertFoundClient(query);
-
-    if (query.ownerUserId !== userId)
-      throw new UnauthorizedException("User is not the owner of the query");
   }
 }

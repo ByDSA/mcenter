@@ -4,6 +4,7 @@ import { UsersModule } from "#core/auth/users";
 import { SmartPlaylistCrudController } from "./controller";
 import { MusicSmartPlaylistRepository } from "./repository/repository";
 import { MusicSmartPlaylistAvailableSlugGeneratorService } from "./repository/available-slug-generator.service";
+import { GuardOwnerService } from "./guard-owner.service";
 
 @Module( {
   imports: [DomainEventEmitterModule, UsersModule],
@@ -11,6 +12,7 @@ import { MusicSmartPlaylistAvailableSlugGeneratorService } from "./repository/av
   providers: [
     MusicSmartPlaylistRepository,
     MusicSmartPlaylistAvailableSlugGeneratorService,
+    GuardOwnerService,
   ],
   exports: [MusicSmartPlaylistRepository],
 } )

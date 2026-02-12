@@ -8,7 +8,7 @@ import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { MusicDtos } from "#musics/models/dto";
 import { createMockedModule, getOrCreateMockProvider } from "#utils/nestjs/tests";
-import { expectControllerCalled, createTokenTests } from "#core/auth/strategies/token/tests";
+import { expectControllerFinishRequest, createTokenTests } from "#core/auth/strategies/token/tests";
 import { fixtureMusics } from "../tests";
 import { MusicsRepository } from "../crud/repositories/music";
 import { MusicsCrudModule } from "../crud/module";
@@ -24,9 +24,9 @@ describe("musicsSlugController", () => {
   let mocks: Awaited<ReturnType<typeof initMocks>>;
   const URL = "/slug";
 
-  function initMocks(setup: TestingSetup) {
+  function initMocks() {
     const ret = {
-      musicRepo: setup.getMock(MusicsRepository),
+      musicRepo: testingSetup.getMock(MusicsRepository),
     };
 
     ret.musicRepo.getOneBySlug.mockResolvedValue(fixtureMusics.Disk.Samples.DK);
@@ -57,7 +57,7 @@ describe("musicsSlugController", () => {
     } );
 
     router = testingSetup.routerApp;
-    mocks = initMocks(testingSetup);
+    mocks = initMocks();
   } );
 
   beforeEach(() => {
@@ -72,7 +72,7 @@ describe("musicsSlugController", () => {
         .expect(HttpStatus.OK);
 
       expectWithMusic(res, fixtureMusics.Disk.Samples.DK);
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
     } );
 
     it("response json", async () => {
@@ -81,7 +81,7 @@ describe("musicsSlugController", () => {
         .expect(HttpStatus.OK);
 
       expectWithMusic(res, fixtureMusics.Disk.Samples.DK);
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
     } );
 
     it("response m3u8", async () => {
@@ -94,7 +94,7 @@ describe("musicsSlugController", () => {
 
       expect(res.text).toContain(`${host}${path}`);
 
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
     } );
 
     it("response raw", async () => {
@@ -111,15 +111,13 @@ describe("musicsSlugController", () => {
         .expect(HttpStatus.OK)
         .expect("Content-Type", "audio/mpeg");
 
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
     } );
 
     describe("authentication", () => {
       createTokenTests( {
         url: URL,
         expectedUser: fixtureUsers.Normal.UserWithRoles,
-        getTestingSetup: () => testingSetup,
-        getRouter: () => router,
       } );
     } );
 

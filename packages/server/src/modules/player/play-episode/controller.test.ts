@@ -10,6 +10,7 @@ import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { EpisodeEntityWithFileInfos } from "#episodes/models";
+import { testFailValidation } from "#core/auth/strategies/token/tests";
 import { fixturesRemotePlayers } from "../tests/fixtures";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { PlayEpisodeService } from "./service";
@@ -79,21 +80,19 @@ describe("playEpisodeController", () => {
   const validControllerUrl = `/play/${remotePlayerId}/episode`;
   const invalidControllerUrl = "/play/invalidRemotePlayerId/episode";
 
-  it("invalid controller params", async () => {
-    const response = await request(routerApp)
-      .get(invalidControllerUrl + "/sample-series/1x01");
-
-    expect(response.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+  testFailValidation("invalid remote player id", {
+    request: () => request(routerApp).get(invalidControllerUrl + "/sample-series/1x01"),
   } );
 
   describe("playEpisode", () => {
     const validUrl = `${validControllerUrl}/sample-series/1x01`;
 
-    it("should not return 422 if params are valid", async () => {
+    it("should return 200 if episode found", async () => {
       const res = await request(routerApp)
         .get(validUrl);
 
-      expect(res.statusCode).not.toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+      expect(mocks.playVideoService.playEpisode).toHaveBeenCalled();
+      expect(res.statusCode).toBe(HttpStatus.OK);
     } );
 
     it("should return 422 if episode not found", async () => {
@@ -104,14 +103,6 @@ describe("playEpisodeController", () => {
 
       expect(res).toBeDefined();
       expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
-    } );
-
-    it("should return 200 if episode found", async () => {
-      const res = await request(routerApp)
-        .get(validUrl);
-
-      expect(mocks.playVideoService.playEpisode).toHaveBeenCalled();
-      expect(res.statusCode).toBe(HttpStatus.OK);
     } );
   } );
 } );

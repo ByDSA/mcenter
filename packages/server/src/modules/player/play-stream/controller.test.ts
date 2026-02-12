@@ -10,7 +10,7 @@ import { mockMongoId } from "#tests/mongo";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { EpisodeEntityWithFileInfos, episodeEntityWithFileInfosSchema } from "#episodes/models";
-import { expectControllerNotCalled, expectControllerCalled } from "#core/auth/strategies/token/tests";
+import { expectControllerFinishRequest, testFailValidation, testManyAuth, testValidation } from "#core/auth/strategies/token/tests";
 import { AuthPlayerService } from "../AuthPlayer.service";
 import { PlayEpisodeService } from "../play-episode/service";
 import { fixturesRemotePlayers } from "../tests/fixtures";
@@ -31,10 +31,10 @@ describe("playStreamController", () => {
   const validControllerUrl = `/play/${validRemotePlayerId}/stream`;
   const invalidControllerUrl = `/play/${invalidRemotePlayerId}/stream`;
 
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      playVideoService: setup.getMock(PlayEpisodeService),
-      authPlayerService: setup.getMock(AuthPlayerService),
+      playVideoService: testingSetup.getMock(PlayEpisodeService),
+      authPlayerService: testingSetup.getMock(AuthPlayerService),
     };
 
     ret.playVideoService.playEpisodeStream.mockResolvedValue([EPISODE_WITH_FILE_INFO]);
@@ -63,11 +63,12 @@ describe("playStreamController", () => {
 
     router = testingSetup.routerApp;
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
   } );
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
+    await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
   } );
 
   describe("playStreamDefault (GET)", () => {
@@ -78,7 +79,7 @@ describe("playStreamController", () => {
       const res = await request(router)
         .get(validUrl);
 
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
 
       const data = z.array(episodeEntityWithFileInfosSchema).parse(res.body.data);
 
@@ -87,14 +88,9 @@ describe("playStreamController", () => {
     } );
 
     describe("path parameters validation", () => {
-      it("invalid remotePlayerId", async () => {
-        const res = await request(router)
-          .get(invalidIdUrl);
-
-        expectControllerNotCalled(testingSetup);
-
-        expect(mocks.authPlayerService.guardUser).not.toHaveBeenCalled();
-        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+      testFailValidation("invalid remotePlayerId", {
+        request: () => request(router)
+          .get(invalidIdUrl),
       } );
 
       it("missing streamKey", async () => {
@@ -106,117 +102,92 @@ describe("playStreamController", () => {
     } );
 
     describe("query parameters validation", () => {
-      it("valid force parameter (true)", async () => {
-        const res = await request(router)
+      testValidation("force parameter (true)", {
+        request: ()=>request(router)
           .get(validUrl)
           .query( {
             force: "true",
-          } );
-
-        expectControllerCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.OK);
+          } ),
+        shouldPass: true,
       } );
 
-      it("valid force parameter (false)", async () => {
-        const res = await request(router)
-          .get(validUrl)
+      testValidation("force parameter (false)", {
+        request: () => request(router).get(validUrl)
           .query( {
             force: "false",
-          } );
-
-        expectControllerCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.OK);
+          } ),
+        shouldPass: true,
       } );
 
-      it("valid force parameter (1)", async () => {
-        const res = await request(router)
-          .get(validUrl)
-          .query( {
-            force: "1",
-          } );
-
-        expectControllerCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.OK);
-      } );
-
-      it("valid force parameter (0)", async () => {
-        const res = await request(router)
-          .get(validUrl)
-          .query( {
-            force: "0",
-          } );
-
-        expectControllerCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.OK);
-      } );
-
-      it("invalid force parameter", async () => {
-        const res = await request(router)
+      testValidation("force parameter (1)", {
+        request: () => request(router)
           .get(validUrl)
           .query( {
             force: "invalid",
-          } );
-
-        expectControllerNotCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+          } ),
+        shouldPass: false,
       } );
 
-      it("valid n parameter", async () => {
-        const res = await request(router)
+      testValidation("force parameter (0)", {
+        request: () => request(router).get(validUrl)
+          .query( {
+            force: "0",
+          } ),
+        shouldPass: true,
+      } );
+
+      testFailValidation("invalid force parameter", {
+        request: () => request(router)
+          .get(validUrl)
+          .query( {
+            force: "invalid",
+          } ),
+      } );
+
+      testValidation("n parameter", {
+        request: () => request(router)
           .get(validUrl)
           .query( {
             n: "5",
-          } );
-
-        expectControllerCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.OK);
+          } ),
+        shouldPass: true,
       } );
 
-      it("invalid n parameter (not a number)", async () => {
-        const res = await request(router)
+      testFailValidation("n parameter (not a number)", {
+        request: () => request(router)
           .get(validUrl)
           .query( {
             n: "notANumber",
-          } );
-
-        expectControllerNotCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+          } ),
       } );
 
-      it("multiple valid query params", async () => {
-        const res = await request(router)
-          .get(validUrl)
+      testValidation("multiple query params", {
+        request: () => request(router).get(validUrl)
           .query( {
             force: "true",
             n: "10",
-          } );
-
-        expectControllerCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.OK);
+          } ),
+        shouldPass: true,
       } );
     } );
 
     describe("authentication", () => {
-      it("request without user should fail", async () => {
-        await testingSetup.useMockedUser(null);
-
-        const res = await request(router)
-          .get(validUrl);
-
-        expectControllerNotCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.UNAUTHORIZED);
-
-        // Restore user for other tests
-        await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles as UserPayload);
+      testManyAuth( {
+        request: ()=>request(router).get(validUrl),
+        list: [
+          {
+            user: null,
+            shouldPass: false,
+          },
+          {
+            user: fixtureUsers.Normal.UserWithRoles,
+            shouldPass: true,
+          },
+          {
+            user: fixtureUsers.Admin.UserWithRoles,
+            shouldPass: true,
+          },
+        ],
       } );
     } );
 
@@ -287,20 +258,16 @@ describe("playStreamController", () => {
         .post(validUrl)
         .send(validPayload);
 
-      expectControllerCalled(testingSetup);
+      expectControllerFinishRequest();
 
       expect(res.statusCode).toBe(HttpStatus.ACCEPTED);
     } );
 
     describe("path parameters validation", () => {
-      it("invalid remotePlayerId", async () => {
-        const res = await request(router)
+      testFailValidation("invalid remotePlayerId", {
+        request: () => request(router)
           .post(invalidIdUrl)
-          .send(validPayload);
-
-        expectControllerNotCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+          .send(validPayload),
       } );
 
       it("missing streamKey", async () => {
@@ -313,67 +280,49 @@ describe("playStreamController", () => {
     } );
 
     describe("query parameters validation", () => {
-      it("valid force parameter", async () => {
-        const res = await request(router)
+      testValidation("force parameter (true)", {
+        request: () => request(router)
           .post(validUrl)
+          .send(validPayload)
           .query( {
             force: "true",
-          } )
-          .send(validPayload);
-
-        expectControllerCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.ACCEPTED);
+          } ),
+        shouldPass: true,
       } );
 
-      it("valid n parameter", async () => {
-        const res = await request(router)
+      testValidation("n parameter", {
+        request: () => request(router)
           .post(validUrl)
+          .send(validPayload)
           .query( {
             n: "10",
-          } )
-          .send(validPayload);
-
-        expectControllerCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.ACCEPTED);
+          } ),
+        shouldPass: true,
       } );
 
-      it("invalid force parameter", async () => {
-        const res = await request(router)
+      testFailValidation("invalid force parameter", {
+        request: () => request(router)
           .post(validUrl)
+          .send(validPayload)
           .query( {
             force: "invalid",
-          } )
-          .send(validPayload);
-
-        expectControllerNotCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+          } ),
       } );
     } );
 
     describe("payload validation", () => {
-      it("should fail without secretToken", async () => {
-        const res = await request(router)
+      testFailValidation("missing secretToken", {
+        request: () => request(router)
           .post(validUrl)
-          .send( {} );
-
-        expectControllerNotCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+          .send( {} ),
       } );
 
-      it("should fail with invalid secretToken type", async () => {
-        const res = await request(router)
+      testFailValidation("invalid secretToken type", {
+        request: () => request(router)
           .post(validUrl)
           .send( {
             secretToken: 123456, // number instead of string
-          } );
-
-        expectControllerNotCalled(testingSetup);
-
-        expect(res.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+          } ),
       } );
     } );
 

@@ -64,9 +64,7 @@ describe("musicGetRandomController", () => {
       const validUrl = "/?format=m3u8";
 
       createTokenTests( {
-        getTestingSetup: ()=>testingSetup,
         expectedUser: fixtureUsers.Normal.UserWithRoles,
-        getRouter: ()=>router,
         url: validUrl,
       } );
 

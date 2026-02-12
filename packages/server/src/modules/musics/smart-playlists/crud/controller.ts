@@ -17,8 +17,9 @@ import { UserDeleteOne,
 import { assertFoundClient } from "#utils/validation/found";
 import { IdParamDto } from "#utils/validation/dtos";
 import { TokenAuth } from "#core/auth/strategies/token/decorator";
-import { musicSmartPlaylistEntitySchema } from "../models";
+import { MusicSmartPlaylistEntity, musicSmartPlaylistEntitySchema } from "../models";
 import { MusicSmartPlaylistRepository } from "./repository/repository";
+import { GuardOwnerService } from "./guard-owner.service";
 
 class CreateBody extends createZodDto(
   MusicSmartPlaylistCrudDtos.CreateOne.bodySchema,
@@ -51,18 +52,20 @@ type GuardVisibilityBySlugProps = {
 export class SmartPlaylistCrudController {
   constructor(
     private readonly repo: MusicSmartPlaylistRepository,
+    private readonly guardService: GuardOwnerService,
   ) {}
 
   @TokenAuth()
   @GetOneById(musicSmartPlaylistEntitySchema)
-  async getOne(
+  async getOneById(
     @Param() params: IdParamDto,
     @User() user: UserPayload | null,
   ) {
     const userId = user?.id;
     const smartPlaylist = await this.repo.getOneById(params.id);
 
-    assertFoundClient(smartPlaylist);
+    if (!smartPlaylist)
+      return null;
 
     // Validar visibilidad
     if (smartPlaylist.visibility === "private" && smartPlaylist.ownerUserId !== userId)
@@ -78,19 +81,25 @@ export class SmartPlaylistCrudController {
     @User() user: UserPayload | null,
   ) {
     const userId = user?.id;
+    let smartPlaylist: MusicSmartPlaylistEntity | null;
 
-    await this.guardVisibilityBySlugs( {
-      requestUserId: userId,
-      userSlug: params.userSlug,
-      smartPlaylistSlug: params.querySlug,
-    } );
+    try {
+      await this.guardVisibilityBySlugs( {
+        requestUserId: userId,
+        userSlug: params.userSlug,
+        smartPlaylistSlug: params.querySlug,
+      } );
 
-    const smartPlaylist = await this.repo.getOneByCriteria( {
-      filter: {
-        ownerUserSlug: params.userSlug,
-        slug: params.querySlug,
-      },
-    } );
+      smartPlaylist = await this.repo.getOneByCriteria( {
+        filter: {
+          ownerUserSlug: params.userSlug,
+          slug: params.querySlug,
+        },
+      } );
+      assertFoundClient(smartPlaylist);
+    } catch {
+      return null;
+    }
 
     return musicSmartPlaylistEntitySchema.parse(smartPlaylist);
   }
@@ -104,26 +113,36 @@ export class SmartPlaylistCrudController {
   }
 
   @UserPatchOne(musicSmartPlaylistEntitySchema)
-  async patchOne(
+  async patchOneById(
     @Param() params: IdParamDto,
     @Body() body: PatchBody,
     @User() user: UserPayload,
   ) {
-    await this.repo.guardOwner(user.id, params.id);
+    await this.guardService.guardOwner(user.id, params.id);
 
     return await this.repo.patchOneByIdAndGet(params.id, body);
   }
 
   @UserDeleteOne(musicSmartPlaylistEntitySchema)
   async deleteOne(@Param() params: IdParamDto, @User() user: UserPayload) {
-    await this.repo.guardOwner(user.id, params.id);
+    await this.guardService.guardOwner(user.id, params.id);
 
     return await this.repo.deleteOneByIdAndGet(params.id);
   }
 
   @GetOneCriteria(musicSmartPlaylistEntitySchema)
-  async getOneByCriteria(@Body() body: GetOneByCriteriaBody) {
-    return await this.repo.getOneByCriteria(body);
+  async getOneByCriteria(
+    @Body() body: GetOneByCriteriaBody,
+    @User() user: UserPayload | null,
+  ) {
+    const ret = await this.repo.getOneByCriteria(body);
+
+    if (!ret)
+      return null;
+
+    this.guardVisibility(ret, user?.id);
+
+    return ret;
   }
 
   @GetManyCriteria(musicSmartPlaylistEntitySchema)
@@ -143,6 +162,13 @@ export class SmartPlaylistCrudController {
 
     assertFoundClient(smartPlaylist);
 
+    this.guardVisibility(smartPlaylist, requestUserId);
+  }
+
+  private guardVisibility(
+    smartPlaylist: MusicSmartPlaylistEntity,
+    requestUserId: string | undefined,
+  ) {
     if (smartPlaylist.visibility === "private" && smartPlaylist.ownerUserId !== requestUserId)
       throw new UnauthorizedException();
   }
