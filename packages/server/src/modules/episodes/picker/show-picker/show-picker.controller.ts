@@ -17,7 +17,7 @@ import { genRandomPickerWithData } from "#modules/picker/resource-picker/resourc
 import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 import { User } from "#core/auth/users/User.decorator";
 import { TokenAuth } from "#core/auth/strategies/token/decorator";
-import { genEpisodeFilterApplier, genEpisodeWeightFixerApplier } from "../appliers";
+import { EpisodeFilterApplier, EpisodeWeightFixerApplier } from "../appliers";
 
 class ShowPickerParamsDto extends createZodDto(z.object( {
   streamKey: z.string(),
@@ -78,7 +78,6 @@ export class StreamPickerController {
 
     await Promise.all([seriePromise, lastEpPromise]);
     const series = await seriePromise;
-    const lastEp: EpisodeEntityWithUserInfo = await lastEpPromise as any;
 
     assertFoundClient(series);
 
@@ -87,15 +86,16 @@ export class StreamPickerController {
       .getFullSerieForUser(series.id, {
         requestingUserId: userId,
       } );
-    const picker = await genRandomPickerWithData<
-        EpisodeEntityWithUserInfo,
-        EpisodeEntityWithUserInfo
-      >( {
+    const picker = await genRandomPickerWithData<EpisodeEntityWithUserInfo>( {
+      resources: episodes,
+      lastId: lastEpId,
+      filterApplier: new EpisodeFilterApplier( {
         resources: episodes,
-        lastOne: lastEp ?? undefined,
-        filterApplier: genEpisodeFilterApplier(episodes, dependencies, lastEp ?? undefined),
-        weightFixerApplier: genEpisodeWeightFixerApplier(),
-      } );
+        dependencies,
+        lastId: lastEpId,
+      } ),
+      weightFixerApplier: new EpisodeWeightFixerApplier(),
+    } );
     const pickerWeight = picker.weight;
     const ret = (await asyncMap(
       picker.data,

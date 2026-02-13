@@ -11,6 +11,7 @@ import { MusicsRepository } from "../crud/repositories/music";
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicRendererModule } from "../renderer/module";
 import { MusicGetRandomController } from "./controller";
+import { MusicGetRandomService } from "./service";
 
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 const MUSIC_WITH_USER_INFO = fixtureMusics.Disk.WithUserInfo.List[0];
@@ -42,6 +43,7 @@ describe("musicGetRandomController", () => {
         providers: [
           getOrCreateMockProvider(MusicsRepository),
           getOrCreateMockProvider(MusicHistoryRepository),
+          MusicGetRandomService,
         ],
       },
       {

@@ -1,76 +1,44 @@
-import { neverCase } from "$shared/utils/validation";
 import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
-import { PickMode, ResourcePicker, ResourcePickerSequential } from "#modules/picker";
 import { MusicEntity } from "#musics/models";
 import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
-import { genMusicFilterApplier, genMusicWeightFixerApplier, MusicFilterApplier, MusicWeightFixerApplier } from "./appliers";
+import { MusicFilterApplier, MusicWeightFixerApplier } from "./appliers";
 
-type Entity = MusicEntity;
-type ModelId = string;
+type R = MusicEntity;
 
 type ParamsPicker = {
-  resources: Entity[];
-  lastOne?: MusicEntity;
+  resources: R[];
+  lastId: string | null;
   filterApplier: MusicFilterApplier;
   weightFixerApplier: MusicWeightFixerApplier;
 };
-export class MusicPickerRandom extends ResourcePickerRandom<Entity, MusicEntity> {
-  constructor( { filterApplier, resources, weightFixerApplier, lastOne }: ParamsPicker) {
+export class MusicPickerRandom extends ResourcePickerRandom<R> {
+  constructor( { filterApplier, resources, weightFixerApplier, lastId }: ParamsPicker) {
     super( {
       filterApplier,
       resources,
       weightFixerApplier,
-      lastOne,
+      lastId,
     } );
   }
 
-  setLastTimePlayed(resource: Entity, date: Date): void {
+  getId(r: R) {
+    return r.id;
+  }
+
+  setLastTimePlayed(resource: R, date: Date): void {
     const time = dateToTimestampInSeconds(date);
 
     if (resource.userInfo)
       resource.userInfo.lastTimePlayed = time;
     else {
       resource.userInfo = {
-        lastTimePlayed: time,
-        weight: 0,
-        createdAt: new Date(),
-        musicId: resource.id,
-        updatedAt: new Date(),
         userId: null!,
+        musicId: resource.id,
+        weight: 0,
+        lastTimePlayed: time,
+        createdAt: null!,
+        updatedAt: null!,
       };
     }
   }
-}
-type Params = {
-  episodes: Entity[];
-  lastOne?: MusicEntity;
-  mode: PickMode;
-};
-export function buildMusicPicker(
-  { mode, episodes, lastOne }: Params,
-): ResourcePicker<Entity> {
-  let picker: ResourcePicker<Entity>;
-
-  switch (mode) {
-    case PickMode.SEQUENTIAL:
-      picker = new ResourcePickerSequential<ModelId, Entity>( {
-        resources: episodes,
-        lastId: lastOne ? lastOne.slug : undefined,
-        compareId: (a, b) => a === b,
-        getId: e=>e.id,
-      } );
-      break;
-    case PickMode.RANDOM:
-      picker = new MusicPickerRandom( {
-        resources: episodes,
-        lastOne,
-        filterApplier: genMusicFilterApplier(episodes, lastOne),
-        weightFixerApplier: genMusicWeightFixerApplier(),
-      } );
-      break;
-    default:
-      neverCase(mode);
-  }
-
-  return picker;
 }

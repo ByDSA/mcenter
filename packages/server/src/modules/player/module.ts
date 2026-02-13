@@ -9,7 +9,7 @@ import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { StreamsCrudModule } from "#episodes/streams/crud/module";
 import { SeriesCrudModule } from "#episodes/series/crud/module";
-import { StreamPickerModule } from "#episodes/streams/picker/module";
+import { StreamPickerModule } from "#episodes/picker/module";
 import { PlayEpisodeService } from "./play-episode/service";
 import { FrontWSServerService } from "./player-services/front/front-player-web-sockets-server.service";
 import { VlcBackWSService } from "./player-services/vlc-back/vlc-back-ws-server.service";

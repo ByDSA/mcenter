@@ -4,9 +4,6 @@ import { WeightFixer } from "./weight-fixer";
 export class WeightFixerApplier<R> {
   #weightFixers: WeightFixer<R>[] = [];
 
-  constructor() {
-  }
-
   add(...fixers: WeightFixer<R>[]): void {
     this.#weightFixers.push(...fixers);
   }

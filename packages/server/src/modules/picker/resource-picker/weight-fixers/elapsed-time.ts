@@ -2,11 +2,15 @@ import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
 import { secondsElapsedFrom } from "../utils";
 import { WeightFixer, WeightFixerParams } from "./weight-fixer";
 
-export type Fx<R> = (pickable: R, x: number)=> number;
+type FxParams<R> = {
+  resource: R;
+  elapsedSeconds: number;
+};
+export type Fx<R> = (params: FxParams<R>)=> number;
 type Params<R> = {
   fx: Fx<R>;
 };
-export abstract class LastTimeWeightFixer<R> implements WeightFixer<R> {
+export abstract class ElapsedTimeWeightFixer<R> implements WeightFixer<R> {
   #params: Params<R>;
 
   constructor(params: Params<R>) {
@@ -15,18 +19,21 @@ export abstract class LastTimeWeightFixer<R> implements WeightFixer<R> {
 
   // eslint-disable-next-line require-await
   async fixWeight( { resource }: WeightFixerParams<R>): Promise<number> {
-    let secondsElapsed;
+    let elapsedSeconds;
     const lastTimePlayed = this.getLastTimePlayed(resource);
 
     if ((lastTimePlayed?.getTime() ?? 0) > 0) {
-      secondsElapsed = secondsElapsedFrom(dateToTimestampInSeconds(lastTimePlayed!));
+      elapsedSeconds = secondsElapsedFrom(dateToTimestampInSeconds(lastTimePlayed!));
 
-      if (secondsElapsed < 0)
-        secondsElapsed = 0;
+      if (elapsedSeconds < 0)
+        elapsedSeconds = 0;
     } else
-      secondsElapsed = Infinity;
+      elapsedSeconds = Infinity;
 
-    return this.#params.fx(resource, secondsElapsed);
+    return this.#params.fx( {
+      resource,
+      elapsedSeconds,
+    } );
   }
 
   abstract getLastTimePlayed(r: R): Date | null;

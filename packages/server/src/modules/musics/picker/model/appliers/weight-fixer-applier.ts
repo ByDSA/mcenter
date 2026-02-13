@@ -1,29 +1,30 @@
-import { LastTimeWeightFilterFx, LastTimeWeightFixer, LimiterSafeIntegerPerItems, WeightFixerApplier } from "#modules/picker";
+import { LastTimeWeightFilterFx, ElapsedTimeWeightFixer, LimiterSafeIntegerPerItems, WeightFixerApplier } from "#modules/picker";
 import { SECONDS_IN_HOUR, SECONDS_IN_MONTH, SECONDS_IN_WEEK } from "#modules/resources";
 import { MusicEntity } from "#musics/models";
 
 type Entity = MusicEntity;
 
-export class LastTimeMusicWeightFixer extends LastTimeWeightFixer<Entity> {
+export class ElapsedTimeMusicWeightFixer extends ElapsedTimeWeightFixer<Entity> {
   getLastTimePlayed(r: Entity): Date | null {
-    return r.userInfo?.lastTimePlayed === undefined
-      ? null
-      : new Date(r.userInfo?.lastTimePlayed * 1_000);
+    if (r.userInfo?.lastTimePlayed === undefined)
+      return null;
+
+    return new Date(r.userInfo?.lastTimePlayed * 1_000);
   }
 }
 
 export class MusicWeightFixerApplier extends WeightFixerApplier<Entity> {
   constructor() {
     super();
-    this.add(new LastTimeMusicWeightFixer( {
+    this.add(new ElapsedTimeMusicWeightFixer( {
       fx,
     } ));
-    // this.add(new TagWeightFixer());
     this.add(new LimiterSafeIntegerPerItems());
   }
 }
 
-const fx: LastTimeWeightFilterFx<Entity> = (r: Entity, secondsFromLastTime: number): number => {
+const fx: LastTimeWeightFilterFx<Entity> = ( { resource: r,
+  elapsedSeconds: secondsFromLastTime } ): number => {
   const weightFactor = weightFactorFx(r.userInfo?.weight ?? 0);
   const timeFactor = timeFactorFx(secondsFromLastTime);
 
@@ -51,8 +52,4 @@ function timeFactorFx(secondsFromLastTime: number): number {
     return 1.0 + ((secondsFromLastTime - minSecondsRise) / SECONDS_IN_WEEK);
 
   return 1;
-}
-
-export function genWeightFixerApplier() {
-  return new MusicWeightFixerApplier();
 }

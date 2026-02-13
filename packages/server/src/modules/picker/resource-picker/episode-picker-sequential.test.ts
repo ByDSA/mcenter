@@ -1,19 +1,18 @@
-import { Episode, EpisodeEntity } from "#episodes/models";
+import { Episode } from "#episodes/models";
 import { fixtureEpisodes } from "#episodes/tests";
 import { ResourcePickerSequential } from "./resource-picker-sequential";
 
-const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
+const EPISODES = fixtureEpisodes.SampleSeries.List;
 
 type Model = Episode;
 
 it("should pick 1x02 when lastEp is 1x01", async () => {
-  const episodes = EPISODES_SIMPSONS;
-  const lastEp = EPISODES_SIMPSONS[0];
-  const expected = EPISODES_SIMPSONS[1];
+  const episodes = EPISODES;
+  const lastEp = EPISODES[0];
+  const expected = EPISODES[1];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
     lastId: lastEp.id,
-    compareId: (a, b)=>a === b,
     getId: e=>e.id,
   } );
   const actualEpisodes: Model[] = await seq.pick();
@@ -24,13 +23,12 @@ it("should pick 1x02 when lastEp is 1x01", async () => {
 } );
 
 it("should pick 1x01 (first one) when lastEp is undfined", async () => {
-  const episodes = EPISODES_SIMPSONS;
-  const lastEp: EpisodeEntity | undefined = undefined as EpisodeEntity | undefined;
-  const expected = EPISODES_SIMPSONS[0];
+  const episodes = EPISODES;
+  const lastId = null;
+  const expected = EPISODES[0];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp?.id,
-    compareId: (a, b)=>a === b,
+    lastId,
     getId: e=>e.id,
   } );
   const actualEpisodes: Model[] = await seq.pick();
@@ -41,13 +39,12 @@ it("should pick 1x01 (first one) when lastEp is undfined", async () => {
 } );
 
 it("should pick 1x01 (first one) when lastEp is last", async () => {
-  const episodes = EPISODES_SIMPSONS;
-  const lastEp = EPISODES_SIMPSONS.at(-1);
-  const expected = EPISODES_SIMPSONS[0];
+  const episodes = EPISODES;
+  const lastEp = EPISODES.at(-1);
+  const expected = EPISODES[0];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp?.id,
-    compareId: (a, b)=>a === b,
+    lastId: lastEp?.id ?? null,
     getId: e=>e.id,
   } );
   const actualEpisodes: Model[] = await seq.pick();
@@ -59,13 +56,12 @@ it("should pick 1x01 (first one) when lastEp is last", async () => {
 
 it("should pick last and 1x01 (first one) when lastEp\
 is previous to last and pick 2 episodes", async () => {
-  const episodes = EPISODES_SIMPSONS;
-  const lastEp = EPISODES_SIMPSONS.at(-2);
-  const expected = [EPISODES_SIMPSONS.at(-1), EPISODES_SIMPSONS[0]];
+  const episodes = EPISODES;
+  const lastEp = EPISODES.at(-2);
+  const expected = [EPISODES.at(-1), EPISODES[0]];
   const seq = new ResourcePickerSequential( {
     resources: episodes,
-    lastId: lastEp?.id,
-    compareId: (a, b)=>a === b,
+    lastId: lastEp?.id ?? null,
     getId: e=>e.id,
   } );
   const actualEpisodes: Model[] = await seq.pick(2);

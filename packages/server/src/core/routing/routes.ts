@@ -4,7 +4,7 @@ import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { MusicHistoryModule } from "#musics/history/module";
 import { EpisodesAdminModule } from "#episodes/admin/module";
 import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
-import { StreamPickerModule } from "#episodes/streams/picker/module";
+import { StreamPickerModule } from "#episodes/picker/module";
 import { StreamsCrudModule } from "#episodes/streams/crud/module";
 import { PlayerModule } from "#modules/player/module";
 import { ConfigModule } from "#modules/config/config.module";

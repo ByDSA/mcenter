@@ -2,11 +2,11 @@ import { SECONDS_IN_DAY } from "#modules/resources";
 import { genLastTimePlayedAgo, genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { useFakeTime } from "#tests/time";
 import { fixtureEpisodes } from "#episodes/tests";
-import { Fx, LastTimeWeightFixer } from "../last-time";
+import { Fx, ElapsedTimeWeightFixer } from "../elapsed-time";
 import { secondsElapsedFrom } from "../../utils";
 import { ResourceWithUserInfo } from "../../filters/tests/types";
 
-class LastTimeResourceWeightFixer extends LastTimeWeightFixer<ResourceWithUserInfo> {
+class LastTimeResourceWeightFixer extends ElapsedTimeWeightFixer<ResourceWithUserInfo> {
   getLastTimePlayed(r: ResourceWithUserInfo): Date | null {
     return new Date(r.userInfo.lastTimePlayed * 1_000);
   }
@@ -15,16 +15,14 @@ class LastTimeResourceWeightFixer extends LastTimeWeightFixer<ResourceWithUserIn
 useFakeTime(); // Por la diferencia de Date.now durante la ejecución
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
-const fx: Fx<ResourceWithUserInfo> = (r: ResourceWithUserInfo, x: number) => {
+const fx: Fx<ResourceWithUserInfo> = ( { resource: r, elapsedSeconds: x } ) => {
   if (r.userInfo.lastTimePlayed === undefined)
     return Infinity;
 
   return x;
 };
-const fxDays: Fx<ResourceWithUserInfo> = (
-  _: ResourceWithUserInfo,
-  x: number,
-) => Math.round(x / SECONDS_IN_DAY);
+const fxDays: Fx<ResourceWithUserInfo> = ( { elapsedSeconds: x } ) => Math.round(x
+  / SECONDS_IN_DAY);
 
 type Case = {
   resource: ResourceWithUserInfo;

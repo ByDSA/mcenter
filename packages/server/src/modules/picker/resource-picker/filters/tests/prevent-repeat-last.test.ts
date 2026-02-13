@@ -10,17 +10,15 @@ const OTHER_EPISODE = EPISODES_SIMPSONS[1];
 assertIsDefined(DEFAULT_EPISODE);
 assertIsDefined(OTHER_EPISODE);
 
-type Case<ID> = {
-  lastId: ID | undefined;
+type Case = {
+  lastId: string | null;
   resource: EpisodeEntity;
   expected: boolean;
 };
 
-type CaseEpisode = Case<string>;
-
 describe.each([
   {
-    lastId: undefined,
+    lastId: null,
     resource: DEFAULT_EPISODE,
     expected: true,
   },
@@ -34,14 +32,13 @@ describe.each([
     resource: DEFAULT_EPISODE,
     expected: false,
   },
-] as CaseEpisode[])("preventRepeatLastFilter", ( { lastId, resource, expected }: CaseEpisode) => {
+] as Case[])("preventRepeatLastFilter", ( { lastId, resource, expected }: Case) => {
   it(`should return ${expected} when lastId = ${
     lastId
   } and current episode is ${resource.id}`, async () => {
-    const filter = new PreventRepeatLastFilter<string, EpisodeEntity>( {
+    const filter = new PreventRepeatLastFilter<EpisodeEntity>( {
       lastId,
-      compareId: (a, b)=>a === b,
-      getResourceId: e=>e.id,
+      getId: e=>e.id,
     } );
     const result = await filter.filter(resource);
 

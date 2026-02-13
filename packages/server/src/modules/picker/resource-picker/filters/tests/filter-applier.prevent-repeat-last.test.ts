@@ -16,10 +16,9 @@ describe("preventRepeatLastFilter", () => {
   describe("with lastEp = 0", () => {
     const filterApplierWithLastEp0 = new FilterApplier();
 
-    filterApplierWithLastEp0.add(new PreventRepeatLastFilter<string, EpisodeEntity>( {
-      compareId: (a, b)=>a === b,
+    filterApplierWithLastEp0.add(new PreventRepeatLastFilter<EpisodeEntity>( {
       lastId: EPISODES_SIMPSONS[0].id,
-      getResourceId: e=>e.id,
+      getId: e=>e.id,
     } ));
 
     it("with empty list", async () => {

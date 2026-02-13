@@ -14,12 +14,12 @@ import { MusicsUsersRepository } from "#musics/crud/repositories/user-info/repos
 import { MusicHistoryEntryEvents } from "./events";
 import { MusicHistoryEntryOdm } from "./odm";
 import { getCriteriaPipeline } from "./odm/criteria-pipeline";
-import { docOdmToEntity, docOdmToModel } from "./odm/adapters";
+import { docOdmToEntity } from "./odm/adapters";
 
 type Model = MusicHistoryEntry;
 type Entity = MusicHistoryEntryEntity;
 
-type DocOdm = MusicHistoryEntryOdm.Doc;
+type FullDocOdm = MusicHistoryEntryOdm.FullDoc;
 const ModelOdm = MusicHistoryEntryOdm.Model;
 
 export type GetManyCriteria = MusicHistoryEntryCrudDtos.GetMany.Criteria;
@@ -149,7 +149,7 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
     return docsOdm.map(MusicHistoryEntryOdm.toEntity);
   }
 
-  async #getLastOdm(userId: string): Promise<DocOdm | null> {
+  async #getLastOdm(userId: string): Promise<FullDocOdm | null> {
     const docsOdm = await ModelOdm.find( {
       userId,
     }, {
@@ -165,13 +165,13 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
     return docsOdm[0];
   }
 
-  async getLast(userId: string): Promise<Model | null> {
+  async getLast(userId: string): Promise<Entity | null> {
     const docOdm = await this.#getLastOdm(userId);
 
     if (!docOdm)
       return null;
 
-    return docOdmToModel(docOdm);
+    return docOdmToEntity(docOdm);
   }
 
   @EmitEntityEvent(MusicHistoryEntryEvents.Created.TYPE)

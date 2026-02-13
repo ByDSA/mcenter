@@ -5,7 +5,7 @@ import { episodeToMediaElement } from "$shared/models/player";
 import { mediaElementFixPlayerLabels } from "$shared/models/resources";
 import { assertFoundClient, assertFoundServer, assertIsNotEmptyClient } from "#utils/validation/found";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
-import { EpisodePickerService } from "#episodes/streams/picker";
+import { EpisodePickerService } from "#episodes/picker";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { EpisodeEntity } from "#episodes/models";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";

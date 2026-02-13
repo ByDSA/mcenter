@@ -1,32 +1,34 @@
 import type { FilterApplier } from "./filters";
 import { Picker, newPicker } from "rand-picker";
 import { assertIsDefined, assertIsNotEmpty } from "$shared/utils/validation";
-import { EpisodeFilterApplier } from "#episodes/streams/picker/appliers/filter-applier";
-import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
+import { EpisodeFilterApplier } from "#episodes/picker/appliers/filter-applier";
+import { EpisodeEntityWithUserInfo } from "#episodes/models";
 import { ResourcePicker } from "./resource-picker";
 import { WeightFixerApplier } from "./weight-fixers";
 
-type Params<R, L = R> = {
+type Params<R> = {
   resources: R[];
-  lastOne?: L;
+  lastId: string | null;
   filterApplier: FilterApplier<R>;
   weightFixerApplier: WeightFixerApplier<R>;
 };
-export abstract class ResourcePickerRandom<R extends L, L = R> implements ResourcePicker<R> {
-  #params: Params<R, L>;
+export abstract class ResourcePickerRandom<R> implements ResourcePicker<R> {
+  #params: Params<R>;
 
-  constructor(params: Params<R, L>) {
+  constructor(params: Params<R>) {
     this.#params = params;
   }
 
+  abstract getId(r: R): string;
+
   async pick(n: number): Promise<R[]> {
     const ret: R[] = [];
-    let { lastOne } = this.#params;
+    let { lastId } = this.#params;
 
     for (let i = 0; i < n; i++) {
       const picker = await genRandomPickerWithData( {
         ...this.#params,
-        lastOne,
+        lastId,
       } );
       const resource: R | undefined = picker.pickOne();
 
@@ -35,7 +37,7 @@ export abstract class ResourcePickerRandom<R extends L, L = R> implements Resour
       if (i < n - 1) {
         this.setLastTimePlayed(resource, new Date());
 
-        lastOne = resource;
+        lastId = this.getId(resource);
       }
 
       ret.push(resource);
@@ -47,8 +49,8 @@ export abstract class ResourcePickerRandom<R extends L, L = R> implements Resour
   abstract setLastTimePlayed(resource: R, time: Date): void;
 }
 
-export async function genRandomPickerWithData<R, L>(
-  { resources, lastOne, filterApplier, weightFixerApplier }: Params<R, L>,
+export async function genRandomPickerWithData<R>(
+  { resources, lastId, filterApplier, weightFixerApplier }: Params<R>,
 ): Promise<Picker<R>> {
   assertIsDefined(resources, "Undefined resources");
   assertIsNotEmpty(resources, "Empty resources");
@@ -58,8 +60,7 @@ export async function genRandomPickerWithData<R, L>(
   if (filterApplier instanceof EpisodeFilterApplier) {
     newFilterApplier = new EpisodeFilterApplier( {
       dependencies: filterApplier.dependencies,
-      lastEp: lastOne as EpisodeEntityWithUserInfo | undefined ?? null,
-      lastId: (lastOne as unknown as EpisodeEntity).id,
+      lastId,
       resources: resources as unknown as EpisodeEntityWithUserInfo[],
     } ) as unknown as FilterApplier<R>;
   }

@@ -18,6 +18,7 @@ import { MusicHistoryModule } from "../history/module";
 import { MusicHistoryEntryOdm } from "../history/crud/repository/odm";
 import { MusicRendererModule } from "../renderer/module";
 import { MusicGetRandomController } from "./controller";
+import { MusicGetRandomService } from "./service";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;
@@ -60,7 +61,7 @@ describe("controller", () => {
           MusicRendererModule,
         ],
         controllers: [MusicGetRandomController],
-        providers: [],
+        providers: [MusicGetRandomService],
       },
       {
         beforeCompile: (module) => {

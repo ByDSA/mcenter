@@ -1,6 +1,6 @@
 export {
-  Fx as LastTimeWeightFilterFx, LastTimeWeightFixer,
-} from "./last-time";
+  Fx as LastTimeWeightFilterFx, ElapsedTimeWeightFixer,
+} from "./elapsed-time";
 
 export {
   LimiterWeightFixer,

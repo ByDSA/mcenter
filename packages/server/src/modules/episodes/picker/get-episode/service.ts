@@ -94,7 +94,7 @@ export class StreamGetRandomEpisodeService {
     const picker: ResourcePicker<EpisodeEntityWithUserInfo> = buildEpisodePicker( {
       mode,
       episodes: allEpisodesInSerie,
-      lastEp: lastPlayedEpInSerie ?? undefined,
+      lastId: lastPlayedEpInSerie?.id ?? null,
       dependencies,
     } );
     const episodes = await picker.pick(n);

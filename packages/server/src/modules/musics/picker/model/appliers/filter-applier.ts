@@ -1,8 +1,7 @@
 import { FilterApplier, PreventDisabledFilter, PreventRepeatInTimeFilter, PreventRepeatLastFilter, RemoveWeightLowerOrEqualThanFilter } from "#modules/picker";
-import { MusicEntity, compareMusicId } from "#musics/models";
+import { MusicEntity } from "#musics/models";
 
 type Entity = MusicEntity;
-type ModelId = string;
 export class PreventDisabledMusicFilter extends PreventDisabledFilter<Entity> {
   isDisabled(self: Entity): boolean {
     return !!self.disabled;
@@ -18,16 +17,16 @@ export class RemoveWeightLowerOrEqualThanMusicFilter
 
 export class PreventRepeatInTimeMusicFilter extends PreventRepeatInTimeFilter<Entity> {
   getLastTimePlayed(self: Entity): Date | null {
-    return self.userInfo?.lastTimePlayed === undefined
-      ? null
-      : new Date(self.userInfo?.lastTimePlayed * 1_000);
+    if (self.userInfo?.lastTimePlayed === undefined)
+      return null;
+
+    return new Date(self.userInfo.lastTimePlayed * 1_000);
   }
 }
 
 type Params = {
   resources: Entity[];
-  lastEp: MusicEntity | null;
-  lastId: ModelId | undefined;
+  lastId: string | null;
 };
 export class MusicFilterApplier extends FilterApplier<Entity> {
   #params: Params;
@@ -41,16 +40,15 @@ export class MusicFilterApplier extends FilterApplier<Entity> {
 
   #createFilters(): void {
     const { PICKER_MIN_WEIGHT = -99 } = process.env;
-    const { lastEp, lastId } = this.#params;
+    const { lastId } = this.#params;
 
     this.add(new PreventDisabledMusicFilter());
 
-    if (lastEp) {
-      this.addReversible(new PreventRepeatLastFilter<ModelId, Entity>(
+    if (lastId) {
+      this.addReversible(new PreventRepeatLastFilter<Entity>(
         {
           lastId,
-          compareId: compareMusicId,
-          getResourceId: (m)=>m.id,
+          getId: (m)=>m.id,
         },
       ));
     }
@@ -63,12 +61,4 @@ export class MusicFilterApplier extends FilterApplier<Entity> {
       minSecondsElapsed,
     } ));
   }
-}
-
-export function genFilterApplier(resources: Entity[], lastOne?: MusicEntity) {
-  return new MusicFilterApplier( {
-    resources,
-    lastEp: lastOne ?? null,
-    lastId: lastOne?.id,
-  } );
 }

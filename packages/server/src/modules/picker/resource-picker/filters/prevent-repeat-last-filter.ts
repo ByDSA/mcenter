@@ -1,26 +1,23 @@
-import { isDefined } from "$shared/utils/validation";
 import { Filter } from "./filter";
-import { CompareIdFunc } from "./utils";
 
-type Params<ID, R> = {
-  lastId: ID | undefined;
-  compareId: CompareIdFunc<ID>;
-  getResourceId: (r: R)=> ID;
+type Params<R> = {
+  lastId: string | null;
+  getId: (r: R)=> string;
 };
-export class PreventRepeatLastFilter<ID = string, R = unknown>
+export class PreventRepeatLastFilter<R = unknown>
 implements Filter<R> {
-  #params: Params<ID, R>;
+  #params: Params<R>;
 
-  constructor(params: Params<ID, R>) {
+  constructor(params: Params<R>) {
     this.#params = params;
   }
 
   // eslint-disable-next-line require-await
   async filter(resource: R): Promise<boolean> {
-    if (!isDefined(this.#params.lastId))
+    if (this.#params.lastId === null)
       return true;
 
-    if (!this.#params.compareId(this.#params.getResourceId(resource), this.#params.lastId))
+    if (this.#params.getId(resource) !== this.#params.lastId)
       return true;
 
     return false;

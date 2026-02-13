@@ -8,8 +8,8 @@ export abstract class RemoveWeightLowerOrEqualThanFilter<R> implements Filter<R>
   }
 
   // eslint-disable-next-line require-await
-  async filter(self: R): Promise<boolean> {
-    return this.getWeight(self) >= this.#num;
+  async filter(resource: R): Promise<boolean> {
+    return this.getWeight(resource) >= this.#num;
   }
 
   abstract getWeight(self: R): number;
