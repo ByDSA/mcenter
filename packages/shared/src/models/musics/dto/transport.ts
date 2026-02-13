@@ -55,4 +55,9 @@ export namespace MusicCrudDtos {
     export const responseSchema = responseOneSchema;
     export type Response = z.infer<typeof responseSchema>;
   }
+
+  export namespace PickRandom {
+    export const responseSchema = responseOneSchema;
+    export type Response = z.infer<typeof responseSchema>;
+  }
 }

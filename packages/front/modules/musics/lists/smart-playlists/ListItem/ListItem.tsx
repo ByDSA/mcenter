@@ -42,7 +42,6 @@ export const MusicSmartPlaylistListItem = ( { index, drag }: Props) => {
     subtitle={<ResourceSubtitle items={[{
       text: "Smart Playlist",
     }, {
-      text: data.visibility === "public" ? "Pública" : "Privada",
       customContent: <VisibilityTag
         isPublic={data.visibility === "public"}
         iconClassName={styles.visibility}

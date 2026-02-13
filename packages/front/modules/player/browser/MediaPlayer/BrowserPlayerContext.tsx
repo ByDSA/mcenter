@@ -3,13 +3,13 @@ import type { MusicEntity } from "$shared/models/musics";
 import assert from "assert";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { PATH_ROUTES } from "$shared/routing";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { assertIsDefined } from "$shared/utils/validation";
-import { backendUrl } from "#modules/requests";
 import { withRetries } from "#modules/utils/retries";
 import { useMusic } from "#modules/musics/hooks";
 import { logger } from "#modules/core/logger";
+import { FetchApi } from "#modules/fetching/fetch-api";
+import { MusicsApi } from "#modules/musics/requests";
 import { useAudioCache } from "./Audio/AudioCacheContext";
 
 export type PlayerStatus = "paused" | "playing" | "stopped";
@@ -253,7 +253,9 @@ export const useBrowserPlayer = create<PlayerState>()(
         let music: MusicEntity | null = null;
 
         try {
-          music = await withRetries(() => fetchMusicByQuery(q), {
+          const api = FetchApi.get(MusicsApi);
+
+          music = await withRetries(async () => (await api.pickRandomByQuery(q)).data, {
             retries: 3,
           } );
         } catch { /* empty */ }
@@ -518,26 +520,6 @@ function getRandomExcludePrevious(max: number, previousValue?: number): number {
   return newValue;
 }
 
-async function fetchMusicByQuery(q: string) {
-  const url = backendUrl(PATH_ROUTES.musics.pickRandom.withParams( {
-    q,
-  } ));
-  const res = await fetch(url, {
-    cache: "no-cache",
-    credentials: "include",
-  } );
-  const json = await res.json();
-  const data = json.data as MusicEntity | null;
-
-  if (data === null)
-    return null;
-
-  // Para que tenga todos los campos (favorites, imageCover...) que no trae el pickRandom:
-  await useMusic.fetch(data.id);
-
-  return data;
-}
-
 const getOfflineRandomIndex = ( { queueLength, queueIndex }: {queueLength: number;
 queueIndex: number;} ) => {
   const normalRandomIndex = getRandomExcludePrevious(queueLength - 1, queueIndex);
@@ -581,7 +563,8 @@ export async function getNextByParams(props: GetNextProps): Promise<NextAction |
   // 2. LÓGICA DE SHUFFLE / DISCOVERY (CON API)
   if (playingType === "playlist" || playingType === "smart-playlist") {
     assert(!!query);
-    const music = await withRetries(() => fetchMusicByQuery(query), {
+    const api = FetchApi.get(MusicsApi);
+    const music = await withRetries(async () => (await api.pickRandomByQuery(query)).data, {
       retries: 3,
     } );
 

@@ -98,4 +98,26 @@ export class MusicsApi {
 
     return ret;
   }
+
+  async pickRandomByQuery(q: string) {
+    const fetcher = makeFetcher( {
+      method: "GET",
+      responseSchema: MusicCrudDtos.PickRandom.responseSchema,
+      options: {
+        cache: "no-cache",
+      },
+    } );
+    const ret = await fetcher( {
+      url: backendUrl(PATH_ROUTES.musics.pickRandom.withParams( {
+        q,
+      } )),
+    } );
+
+    if (ret.data) {
+    // Para que tenga todos los campos (favorites, imageCover...) que no trae el pickRandom:
+      await useMusic.fetch(ret.data.id);
+    }
+
+    return ret;
+  }
 }

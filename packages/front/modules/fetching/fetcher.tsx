@@ -16,6 +16,7 @@ export type Fetcher<ReqBody, ResBody> = (params: FetcherParams<ReqBody>)=> Promi
 
 type MakeFetcherParams<ReqBody, ResBody> = {
   method: Method;
+  options?: Omit<RequestInit, "body" | "credentials" | "method">;
   reqBodyValidator?: (data: ReqBody)=> void;
   requestSchema?: ZodType<ReqBody, any, any>;
   parseResponse?: (data: unknown)=> ResBody;
@@ -25,6 +26,7 @@ type MakeFetcherParams<ReqBody, ResBody> = {
 };
 export function makeFetcher<ReqBody = undefined, ResBody = unknown>(
   { method,
+    options: optionsParam,
     parseResponse,
     responseSchema,
     reqBodyValidator,
@@ -54,10 +56,12 @@ export function makeFetcher<ReqBody = undefined, ResBody = unknown>(
     innerReqBodyValidator?.(params.body!);
 
     const options: RequestInit = {
+      ...optionsParam,
       method,
       credentials: "include", // Para que devuelva la cookie de auth
       headers: {
         accept: "application/json",
+        ...optionsParam?.headers,
       },
     };
 
