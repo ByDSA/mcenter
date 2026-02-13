@@ -19,7 +19,6 @@ const musicWithoutUserInfo = {
   ...baseMusicA,
 };
 const VALID_QUERY = "weight:>10";
-// Adjust to whatever queryToExpressionNode considers syntactically invalid
 const INVALID_QUERY = ":::";
 const makeHistoryEntry = (resourceId: string): MusicHistoryEntryEntity => ( {
   id: mockMongoId,
@@ -85,8 +84,8 @@ describe("musicGetRandomService", () => {
           userId,
         } );
 
-        expect(result).toBeDefined();
-        expect(result.id).toBe(musicWithUserInfo.id);
+        expect(result).not.toBeNull();
+        expect(result!.id).toBe(musicWithUserInfo.id);
       } );
 
       it("returns music without userInfo when userId is null and music has userInfo", async () => {
@@ -152,24 +151,28 @@ describe("musicGetRandomService", () => {
     } );
 
     describe("failure cases", () => {
-      it("should fail when findMusics (getAll) returns an empty array", async () => {
+      it("should return null when findMusics (getAll) returns an empty array", async () => {
         mocks.musicRepo.getAll.mockResolvedValue([]);
 
-        await expect(service.getRandom( {
+        const ret = await service.getRandom( {
           query: null,
           userId,
-        } )).rejects.toThrow();
+        } );
+
+        expect(ret).toBeNull();
       } );
 
       it(
-        "should fail when findMusics (getManyByQuery) returns an empty array",
+        "should return null when findMusics (getManyByQuery) returns an empty array",
         async () => {
           mocks.musicRepo.getManyByQuery.mockResolvedValue([]);
 
-          await expect(service.getRandom( {
+          const ret = await service.getRandom( {
             query: VALID_QUERY,
             userId,
-          } )).rejects.toThrow();
+          } );
+
+          expect(ret).toBeNull();
         },
       );
 
@@ -196,13 +199,15 @@ describe("musicGetRandomService", () => {
       randomPickSpy.mockRestore();
     } );
 
-    it("throws when findMusics returns empty array", async () => {
+    it("return null when findMusics returns empty array", async () => {
       findMusicsSpy.mockResolvedValue([]);
 
-      await expect(service.getRandom( {
+      const ret = await service.getRandom( {
         query: VALID_QUERY,
         userId,
-      } )).rejects.toThrow();
+      } );
+
+      expect(ret).toBeNull();
       expect(randomPickSpy).not.toHaveBeenCalled();
     } );
 

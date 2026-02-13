@@ -23,7 +23,7 @@ export class MusicGetRandomController {
   async getRandom(
     @User() user: UserPayload | null,
     @Query("q") query: string | null = null,
-  ): Promise<MusicEntity> {
+  ): Promise<MusicEntity | null> {
     return await this.musicGetRandomService.getRandom( {
       query,
       userId: user?.id ?? null,

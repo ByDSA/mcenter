@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { MusicEntity, MusicEntityWithUserInfo } from "#musics/models";
-import { assertIsNotEmptyClient } from "#utils/validation/found";
 import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicsRepository } from "../crud/repositories/music";
 import { queryToExpressionNode } from "../crud/repositories/music/queries/queries";
@@ -20,11 +19,16 @@ export class MusicGetRandomService {
     private readonly musicRepo: MusicsRepository,
   ) { }
 
-  async getRandom( { query, userId }: Params): Promise<MusicEntity> {
+  async getRandom( { query, userId }: Params): Promise<MusicEntity | null> {
     const musics = await this.findMusics(userId, query);
 
-    assertIsNotEmptyClient(musics);
+    if (musics.length === 0)
+      return null;
+
     const picked = await this.randomPick(userId, musics);
+
+    if (!picked)
+      return null;
 
     if (!userId && picked.userInfo) {
       const { userInfo, ...pickedWithoutUserInfo } = picked;
@@ -51,7 +55,7 @@ export class MusicGetRandomService {
     userId: string | null,
     musics: Entity[],
     n: number = 1,
-  ): Promise<Entity> {
+  ): Promise<Entity | null> {
     const lastId = await this.getLastMusicIdInHistory(userId);
     const picker = new MusicPickerRandom( {
       resources: musics,
@@ -64,9 +68,8 @@ export class MusicGetRandomService {
     } );
     let [picked] = await picker.pick(n);
 
-    // default case
     if (!picked)
-      [picked] = musics;
+      return null;
 
     return picked;
   }
