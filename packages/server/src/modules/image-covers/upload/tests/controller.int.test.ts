@@ -13,7 +13,7 @@ import { uploadImage } from "./utils";
 
 const sampleFile = Buffer.from(fs.readFileSync(IMAGE_COVERS_FOLDER_PATH + "/sample-nodejs.png"));
 
-describe("imageCoverCrudController e2e", () => {
+describe("imageCoverCrudController integration (db, disk)", () => {
   let testingSetup: TestingSetup;
   let routerApp: Application;
 

@@ -27,11 +27,6 @@ describe("episodesCrudController", () => {
       episodesRepo: testingSetup.getMock(EpisodesRepository),
     };
 
-    ret.episodesRepo.getOneById.mockResolvedValue(SAMPLE);
-    ret.episodesRepo.createOneAndGet.mockResolvedValue(SAMPLE);
-    ret.episodesRepo.patchOneByIdAndGet.mockResolvedValue(SAMPLE);
-    ret.episodesRepo.deleteOneByIdAndGet.mockResolvedValue(SAMPLE);
-
     await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
 
     return ret;

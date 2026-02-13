@@ -18,7 +18,7 @@ import { MusicHistoryRepository } from "../history/crud/repository";
 import { MusicResponseFormatterService } from "../renderer/formatter.service";
 import { MusicsSlugController } from "./controller";
 
-describe("musicsSlugController", () => {
+describe("musicsSlugController integration (controller + render + MusicFlowService)", () => {
   let testingSetup: TestingSetup;
   let router: Application;
   let mocks: Awaited<ReturnType<typeof initMocks>>;
@@ -28,8 +28,6 @@ describe("musicsSlugController", () => {
     const ret = {
       musicRepo: testingSetup.getMock(MusicsRepository),
     };
-
-    ret.musicRepo.getOneBySlug.mockResolvedValue(fixtureMusics.Disk.Samples.DK);
 
     return ret;
   }

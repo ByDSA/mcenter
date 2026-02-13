@@ -4,4 +4,4 @@ export {
 
 export {
   StreamPickerController as EpisodePickerController,
-} from "./show-picker/show-picker.controller";
+} from "./show-picker/controller";

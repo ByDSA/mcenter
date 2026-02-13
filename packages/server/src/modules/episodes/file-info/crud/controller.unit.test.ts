@@ -22,9 +22,9 @@ describe("episodeFileInfosCrudController", () => {
   const invalidId = "invalidId";
   const baseUrl = "/";
 
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      fileInfoRepo: setup.getMock(EpisodeFileInfoRepository),
+      fileInfoRepo: testingSetup.getMock(EpisodeFileInfoRepository),
     };
 
     ret.fileInfoRepo.patchOneByIdAndGet.mockResolvedValue(SAMPLE);
@@ -53,7 +53,7 @@ describe("episodeFileInfosCrudController", () => {
 
     router = testingSetup.routerApp;
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
   } );
 
   beforeEach(() => {

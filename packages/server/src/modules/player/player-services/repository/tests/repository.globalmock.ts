@@ -1,6 +1,6 @@
 import { createMockClass } from "$sharedTests/jest/mocking";
-import { Provider } from "@nestjs/common";
 import { fixturesRemotePlayers } from "#modules/player/tests/fixtures";
+import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { RemotePlayersRepository } from "../repository";
 
 export class MockRemotePlayersRepository extends createMockClass(RemotePlayersRepository) {
@@ -16,7 +16,4 @@ export class MockRemotePlayersRepository extends createMockClass(RemotePlayersRe
   }
 }
 
-export const mockRemotePlayersRepositoryProvider: Provider = {
-  provide: RemotePlayersRepository,
-  useClass: MockRemotePlayersRepository,
-};
+registerMockProviderInstance(RemotePlayersRepository, new MockRemotePlayersRepository());

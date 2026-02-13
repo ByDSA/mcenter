@@ -31,10 +31,6 @@ describe("updateRemoteService", () => {
       providers: [
         UpdateRemoteTreeService,
       ],
-    }, {
-      db: {
-        using: "default",
-      },
     } );
 
     musicRepoMock = testingSetup.getMock(MusicsRepository);

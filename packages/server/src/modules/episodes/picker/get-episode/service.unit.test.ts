@@ -38,7 +38,7 @@ describe("streamGetRandomEpisode", () => {
       ],
     } );
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
     service = testingSetup.module.get(StreamGetRandomEpisodeService);
     mocks.episodesUsersRepo.getFullSerieForUser.mockResolvedValue(
       fixtureEpisodes.Simpsons.ListForUser.NormalUser,
@@ -46,15 +46,15 @@ describe("streamGetRandomEpisode", () => {
   } );
 
   // eslint-disable-next-line require-await
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      dependenciesRepo: setup.getMock(EpisodeDependenciesRepository),
-      episodesRepo: setup.getMock(EpisodesRepository),
-      historyEntriesRepo: setup.getMock(EpisodeHistoryRepository),
-      streamsRepo: setup.getMock(StreamsRepository),
-      episodesUsersRepo: setup.getMock(EpisodesUsersRepository),
-      seriesRepo: setup.getMock(SeriesRepository),
-      fileInfosRepo: setup.getMock(EpisodeDependenciesRepository),
+      dependenciesRepo: testingSetup.getMock(EpisodeDependenciesRepository),
+      episodesRepo: testingSetup.getMock(EpisodesRepository),
+      historyEntriesRepo: testingSetup.getMock(EpisodeHistoryRepository),
+      streamsRepo: testingSetup.getMock(StreamsRepository),
+      episodesUsersRepo: testingSetup.getMock(EpisodesUsersRepository),
+      seriesRepo: testingSetup.getMock(SeriesRepository),
+      fileInfosRepo: testingSetup.getMock(EpisodeDependenciesRepository),
     };
 
     return ret;

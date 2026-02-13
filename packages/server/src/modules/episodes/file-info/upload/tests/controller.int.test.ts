@@ -16,7 +16,7 @@ import { uploadEpisodeFile } from "./utils";
 const sampleFileName = "sample.mp4";
 const sampleFile = Buffer.from(fs.readFileSync(EPISODES_MEDIA_PATH + "/" + sampleFileName));
 
-describe("episodeFileInfoUploadController E2E", () => {
+describe("episodeFileInfoUploadController integration (db, disk)", () => {
   let testingSetup: TestingSetup;
   let routerApp: Application;
 

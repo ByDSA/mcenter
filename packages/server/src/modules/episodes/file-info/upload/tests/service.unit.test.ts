@@ -12,9 +12,9 @@ import { EpisodeFileInfoRepository } from "#episodes/file-info/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
 import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { SeriesRepository } from "#episodes/series/crud/repository";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { EpisodeFileInfoUploadService } from "../service";
 import { mockFile } from "./utils";
-import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 // Mock Data
 const existingEpisodeId = "episode_123";

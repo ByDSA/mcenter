@@ -21,9 +21,9 @@ describe("musicFileInfoController", () => {
   let mocks: Awaited<ReturnType<typeof initMocks>>;
 
   // eslint-disable-next-line require-await
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      fileInfosRepo: setup.getMock(MusicFileInfoRepository),
+      fileInfosRepo: testingSetup.getMock(MusicFileInfoRepository),
     };
 
     return ret;
@@ -47,7 +47,7 @@ describe("musicFileInfoController", () => {
     );
 
     router = testingSetup.routerApp;
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
   } );
 
   beforeEach(async () => {

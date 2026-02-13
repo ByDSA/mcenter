@@ -3,26 +3,14 @@ import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { EpisodeInfoCrudDtos } from "$shared/models/episodes/user-info/dto/transport";
-import { Types } from "mongoose";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";
 import { expectControllerFinishRequest, testFailValidation } from "#core/auth/strategies/token/tests";
-import { fixtureEpisodes } from "#episodes/tests";
 import { episodeUserInfoEntitySchema } from "#episodes/models";
 import { EpisodesUserInfoCrudController } from "./controller";
 import { EpisodesUsersRepository } from "./repository";
-
-const SAMPLE_USER_INFO = {
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  episodeId: fixtureEpisodes.SampleSeries.Samples.EP1x01.id,
-  id: new Types.ObjectId().toString(),
-  lastTimePlayed: new Date(0),
-  userId: fixtureUsers.Normal.User.id,
-  weight: 5,
-
-};
+import { SAMPLE_USER_INFO } from "./repository/tests/repository.globalmock";
 
 describe("episodesUserInfoCrudController", () => {
   let testingSetup: TestingSetup;
@@ -31,12 +19,10 @@ describe("episodesUserInfoCrudController", () => {
   const validId = mockMongoId;
   const baseUrl = "/";
 
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      episodesUserInfoRepo: setup.getMock(EpisodesUsersRepository),
+      episodesUserInfoRepo: testingSetup.getMock(EpisodesUsersRepository),
     };
-
-    ret.episodesUserInfoRepo.patchOneByIdAndGet.mockResolvedValue(SAMPLE_USER_INFO);
 
     await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
 
@@ -62,7 +48,7 @@ describe("episodesUserInfoCrudController", () => {
 
     router = testingSetup.routerApp;
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
   } );
 
   beforeEach(() => {

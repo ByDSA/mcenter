@@ -21,9 +21,9 @@ describe("episodeHistoryRepository", () => {
   };
 
   // eslint-disable-next-line require-await
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      streamsRepo: setup.getMock(StreamsRepository),
+      streamsRepo: testingSetup.getMock(StreamsRepository),
     };
 
     ret.streamsRepo.getOneOrCreateBySeriesId
@@ -62,7 +62,7 @@ describe("episodeHistoryRepository", () => {
       },
     } );
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
     repo = await testingSetup.app.get(EpisodeHistoryRepository);
 
     await loadFixtureSampleSeries();

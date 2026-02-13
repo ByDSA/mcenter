@@ -10,6 +10,7 @@ import { MusicsRepository } from "./repositories/music";
 import { MusicCrudController } from "./controller";
 import { MusicsUsersRepository } from "./repositories/user-info/repository";
 
+// Integration controller + service + render
 crudTestsSuite( {
   name: MusicCrudController.name,
   appModule: [

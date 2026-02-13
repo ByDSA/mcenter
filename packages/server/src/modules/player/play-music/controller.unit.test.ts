@@ -25,10 +25,10 @@ describe("playMusicController", () => {
   let mocks: Awaited<ReturnType<typeof initMocks>>;
   let remotePlayerId = fixturesRemotePlayers.valid.id;
 
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      playMusicService: setup.getMock(PlayMusicService),
-      authPlayerService: setup.getMock(AuthPlayerService),
+      playMusicService: testingSetup.getMock(PlayMusicService),
+      authPlayerService: testingSetup.getMock(AuthPlayerService),
     };
 
     ret.playMusicService.playMusic.mockResolvedValue([MUSIC_WITH_FILE_INFO]);
@@ -57,7 +57,7 @@ describe("playMusicController", () => {
 
     routerApp = testingSetup.routerApp;
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
   } );
 
   beforeEach(()=> {

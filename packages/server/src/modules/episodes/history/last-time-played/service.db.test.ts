@@ -3,10 +3,10 @@ import { Types } from "mongoose";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
+import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 import { EpisodeHistoryRepository } from "../crud/repository";
 import { EpisodeHistoryEntryEntity } from "../models";
 import { EpisodeLastTimePlayedService } from "./service";
-import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 
 describe("episodeLastTimePlayedService", () => {
   let testingSetup: TestingSetup;
@@ -17,10 +17,10 @@ describe("episodeLastTimePlayedService", () => {
   };
 
   // eslint-disable-next-line require-await
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      historyRepo: setup.getMock(EpisodeHistoryRepository),
-      usersInfo: setup.getMock(EpisodesUsersRepository),
+      historyRepo: testingSetup.getMock(EpisodeHistoryRepository),
+      usersInfo: testingSetup.getMock(EpisodesUsersRepository),
     };
     const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
     const entry: EpisodeHistoryEntryEntity = {
@@ -47,7 +47,7 @@ describe("episodeLastTimePlayedService", () => {
       ],
     } );
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
     service = await testingSetup.app.get(EpisodeLastTimePlayedService);
   } );
 

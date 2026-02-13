@@ -40,9 +40,9 @@ describe("episodeHistoryCrudController", () => {
   const validSeriesId = mockMongoId;
 
   // eslint-disable-next-line require-await
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      repo: setup.getMock(EpisodeHistoryRepository),
+      repo: testingSetup.getMock(EpisodeHistoryRepository),
     };
 
     ret.repo.getManyBySeriesId.mockResolvedValue([SAMPLE_WITH_RESOURCE_AND_USERINFO]);
@@ -66,7 +66,7 @@ describe("episodeHistoryCrudController", () => {
     } );
 
     routerApp = testingSetup.routerApp;
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
     await testingSetup.useMockedUser(fixtureUsers.Normal.UserWithRoles);
   } );
 

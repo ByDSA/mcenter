@@ -9,7 +9,7 @@ import { EpisodeLastTimePlayedModule } from "#episodes/history/last-time-played/
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { StreamGetEpisodeController } from "./get-episode/controller";
 import { StreamGetRandomEpisodeService } from "./get-episode/service";
-import { StreamPickerController } from "./show-picker/show-picker.controller";
+import { StreamPickerController } from "./show-picker/controller";
 
 @Module( {
   imports: [

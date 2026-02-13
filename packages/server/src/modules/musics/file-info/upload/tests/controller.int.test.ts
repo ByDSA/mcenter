@@ -18,7 +18,7 @@ if (!fs.existsSync(tempFilePath))
 
 const sampleFile = fs.readFileSync(tempFilePath);
 
-describe("controller E2E", () => {
+describe("controller integration (db, disk)", () => {
   let testingSetup: TestingSetup;
   let routerApp: Application;
 

@@ -16,7 +16,6 @@ import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { STREAM_SAMPLE } from "#episodes/streams/tests";
 import { fixtureEpisodes } from "#episodes/tests";
-import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
 import { PlayService } from "../play.service";
 import { RemotePlayersRepository } from "../player-services/repository";
 import { PlayEpisodeService } from "./service";
@@ -27,14 +26,14 @@ describe("playEpisodeService", () => {
   let mocks: Awaited<ReturnType<typeof initMocks>>;
   let validRemotePlayerId = mockMongoId;
 
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      streamRepo: setup.getMock(StreamsRepository),
-      episodePickerService: setup.getMock(EpisodePickerService),
-      seriesRepo: setup.getMock(SeriesRepository),
-      historyRepo: setup.getMock(EpisodeHistoryRepository),
-      remotePlayersRepo: setup.getMock(RemotePlayersRepository),
-      playService: setup.getMock(PlayService),
+      streamRepo: testingSetup.getMock(StreamsRepository),
+      episodePickerService: testingSetup.getMock(EpisodePickerService),
+      seriesRepo: testingSetup.getMock(SeriesRepository),
+      historyRepo: testingSetup.getMock(EpisodeHistoryRepository),
+      remotePlayersRepo: testingSetup.getMock(RemotePlayersRepository),
+      playService: testingSetup.getMock(PlayService),
     };
 
     ret.streamRepo.getOneByKey.mockResolvedValue(STREAM_SAMPLE);
@@ -73,7 +72,7 @@ describe("playEpisodeService", () => {
       controllers: [],
       providers: [
         getOrCreateMockProvider(PlayService),
-        mockRemotePlayersRepositoryProvider,
+        getOrCreateMockProvider(RemotePlayersRepository),
         PlayEpisodeService,
       ],
     }, {
@@ -83,7 +82,7 @@ describe("playEpisodeService", () => {
       },
     } );
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
     service = await testingSetup.app.get(PlayEpisodeService);
   } );
 

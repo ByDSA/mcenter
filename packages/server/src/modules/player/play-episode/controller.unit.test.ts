@@ -27,17 +27,15 @@ describe("playEpisodeController", () => {
   let mocks: Awaited<ReturnType<typeof initMocks>>;
   let remotePlayerId = fixturesRemotePlayers.valid.id;
 
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      playVideoService: setup.getMock(PlayEpisodeService),
-      authPlayerService: setup.getMock(AuthPlayerService),
-      episodesRepo: setup.getMock(EpisodesRepository),
+      playVideoService: testingSetup.getMock(PlayEpisodeService),
+      authPlayerService: testingSetup.getMock(AuthPlayerService),
+      episodesRepo: testingSetup.getMock(EpisodesRepository),
     };
 
     ret.playVideoService.playEpisodeStream.mockResolvedValue([EPISODE_WITH_FILE_INFO]);
 
-    ret.episodesRepo.getOneBySlug
-      .mockResolvedValue(fixtureEpisodes.SampleSeries.Samples.EP1x01);
     ret.episodesRepo.getOneById
       .mockResolvedValue( {
         ...fixtureEpisodes.SampleSeries.Samples.EP1x01,
@@ -57,9 +55,9 @@ describe("playEpisodeController", () => {
       ],
       controllers: [PlayEpisodeController],
       providers: [
-        getOrCreateMockProvider(PlayEpisodeService), // para PlayVideoService
-        getOrCreateMockProvider(AuthPlayerService), // para PlayEpisodeController
+        getOrCreateMockProvider(PlayEpisodeService),
         getOrCreateMockProvider(EpisodesRepository),
+        getOrCreateMockProvider(AuthPlayerService),
       ],
     }, {
       auth: {
@@ -70,7 +68,7 @@ describe("playEpisodeController", () => {
 
     routerApp = testingSetup.routerApp;
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
   } );
 
   beforeEach(()=> {

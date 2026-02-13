@@ -10,7 +10,6 @@ import { fixtureMusics } from "#musics/tests";
 import { mockMongoId } from "#tests/mongo";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { PlayService } from "../play.service";
-import { mockRemotePlayersRepositoryProvider } from "../player-services/repository/tests/repository";
 import { RemotePlayersRepository } from "../player-services/repository";
 import { PlayMusicService } from "./service";
 
@@ -21,12 +20,12 @@ describe("playMusicService", () => {
   let validRemotePlayerId = mockMongoId;
 
   // eslint-disable-next-line require-await
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      musicRepo: setup.getMock(MusicsRepository),
-      playService: setup.getMock(PlayService),
-      historyRepo: setup.getMock(MusicHistoryRepository),
-      remotePlayersRepo: setup.getMock(RemotePlayersRepository),
+      musicRepo: testingSetup.getMock(MusicsRepository),
+      playService: testingSetup.getMock(PlayService),
+      historyRepo: testingSetup.getMock(MusicHistoryRepository),
+      remotePlayersRepo: testingSetup.getMock(RemotePlayersRepository),
     };
 
     ret.musicRepo.getOneBySlug
@@ -57,8 +56,8 @@ describe("playMusicService", () => {
       controllers: [],
       providers: [
         getOrCreateMockProvider(PlayService),
+        getOrCreateMockProvider(RemotePlayersRepository),
         PlayMusicService,
-        mockRemotePlayersRepositoryProvider,
       ],
     }, {
       auth: {
@@ -67,7 +66,7 @@ describe("playMusicService", () => {
       },
     } );
 
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
     service = await testingSetup.app.get(PlayMusicService);
   } );
 

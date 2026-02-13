@@ -16,9 +16,9 @@ describe("get-episode", () => {
   let mocks: Awaited<ReturnType<typeof initMocks>>;
 
   // eslint-disable-next-line require-await
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      streamGetRandomEpisodeService: setup.getMock(StreamGetRandomEpisodeService),
+      streamGetRandomEpisodeService: testingSetup.getMock(StreamGetRandomEpisodeService),
     };
 
     ret.streamGetRandomEpisodeService.getByStreamKey.mockResolvedValue(
@@ -45,7 +45,7 @@ describe("get-episode", () => {
     } );
 
     router = testingSetup.routerApp;
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
   } );
 
   beforeEach(async () => {

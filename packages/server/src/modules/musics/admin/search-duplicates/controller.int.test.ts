@@ -50,7 +50,7 @@ const SAMPLE_RESPONSE = {
   titleArtist: [] as MusicEntity[][],
 };
 
-describe("searchDuplicatesController", () => {
+describe("searchDuplicatesController integration (controller + service)", () => {
   let testingSetup: TestingSetup;
   let router: Application;
   let mocks: Awaited<ReturnType<typeof initMocks>>;

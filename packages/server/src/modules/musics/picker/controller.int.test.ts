@@ -16,21 +16,17 @@ import { MusicGetRandomService } from "./service";
 const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
 const MUSIC_WITH_USER_INFO = fixtureMusics.Disk.WithUserInfo.List[0];
 
-describe("musicGetRandomController", () => {
+describe("musicGetRandomController integration (controller + service + render)", () => {
   let testingSetup: TestingSetup;
   let router: Application;
   let mocks: Awaited<ReturnType<typeof initMocks>>;
 
   // eslint-disable-next-line require-await
-  async function initMocks(setup: TestingSetup) {
+  async function initMocks() {
     const ret = {
-      musicRepo: setup.getMock(MusicsRepository),
-      historyRepo: setup.getMock(MusicHistoryRepository),
+      musicRepo: testingSetup.getMock(MusicsRepository),
+      historyRepo: testingSetup.getMock(MusicHistoryRepository),
     };
-
-    ret.musicRepo.getMany.mockResolvedValue(MUSICS_SAMPLES_IN_DISK);
-    ret.musicRepo.getOneById.mockResolvedValue(MUSICS_SAMPLES_IN_DISK[0]);
-    ret.historyRepo.getLast.mockResolvedValue(null);
 
     return ret;
   }
@@ -54,7 +50,7 @@ describe("musicGetRandomController", () => {
     );
 
     router = testingSetup.routerApp;
-    mocks = await initMocks(testingSetup);
+    mocks = await initMocks();
   } );
 
   beforeEach(() => {

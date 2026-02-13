@@ -74,11 +74,7 @@ describe("musicGetRandomService", () => {
     jest.clearAllMocks();
   } );
 
-  // ─── getRandom e2e ───────────────────────────────────────────────────────────
-  // Full flow. Only repos/external services are mocked.
-  // Internal methods (findMusics, randomPick) run for real.
-  // ─────────────────────────────────────────────────────────────────────────────
-  describe("getRandom e2e", () => {
+  describe("getRandom", () => {
     describe("normal flow", () => {
       it("normal valid flow", async () => {
         mocks.musicRepo.getManyByQuery.mockResolvedValue([musicWithUserInfo]);
@@ -186,10 +182,6 @@ describe("musicGetRandomService", () => {
     } );
   } );
 
-  // ─── getRandom (unit) ────────────────────────────────────────────────────────
-  // findMusics and randomPick are mocked. Tests every combination of their
-  // return values and how getRandom reacts.
-  // ─────────────────────────────────────────────────────────────────────────────
   describe("getRandom (unit — findMusics and randomPick mocked)", () => {
     let findMusicsSpy: jest.SpyInstance;
     let randomPickSpy: jest.SpyInstance;

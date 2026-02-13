@@ -64,6 +64,11 @@ describe("googleController", () => {
     expect(responseBody).toContain("https://accounts.google.com/");
   } );
 
+  it("should have envs", () => {
+    expect(process.env.AUTH_GOOGLE_CLIENT_ID).toBeDefined();
+    expect(process.env.AUTH_GOOGLE_CALLBACK_URL).toBeDefined();
+  } );
+
   it("should show current OAuth config", async () => {
     const response = await global.apiRequest.get(
       `${baseURL}${PATH_ROUTES.auth.google.login.path}`,

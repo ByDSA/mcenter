@@ -50,7 +50,7 @@ function expectNotEmpty(array: unknown[]) {
   expect(array.length).toBeGreaterThan(0);
 }
 
-describe("controller", () => {
+describe("controller integration (db, render)", () => {
   beforeAll(async () => {
     testingSetup = await createTestingAppModuleAndInit(
       {

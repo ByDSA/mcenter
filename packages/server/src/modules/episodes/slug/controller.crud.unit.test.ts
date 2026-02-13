@@ -6,9 +6,9 @@ import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { StreamFileModule } from "#modules/resources/stream-file/module";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { EpisodeSlugHandlerService } from "./service";
 import { EpisodesSlugController } from "./controller";
-import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
 

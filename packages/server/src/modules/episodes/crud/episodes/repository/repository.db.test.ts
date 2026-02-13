@@ -6,7 +6,7 @@ import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { createMockedModule } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
-import { EpisodesRepository } from "../repository";
+import { EpisodesRepository } from ".";
 
 describe("episodesRepository", () => {
   let repo: EpisodesRepository;
