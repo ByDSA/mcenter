@@ -1,0 +1,37 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "*": "deny",
+    "read": {
+      "*": "deny",
+      "*packages/front/app/*": "allow",
+      "*packages/front/modules/*": "allow",
+      "*packages/front/styles/*": "allow",
+      "*packages/server/src/*": "allow",
+      "*packages/server/tests/*": "allow",
+      "*packages/shared/src/*": "allow",
+      "*packages/shared/tests/*": "allow"
+    },
+    "edit": {
+      "*": "deny",
+      "*packages/front/app/*": "allow",
+      "*packages/front/modules/*": "allow",
+      "*packages/front/styles/*": "allow",
+      "*packages/server/src/*": "allow",
+      "*packages/server/tests/*": "allow",
+      "*packages/shared/src/*": "allow",
+      "*packages/shared/tests/*": "allow"
+    },
+    "glob": "allow",
+    "list": "allow",
+    "bash": {
+      "*": "deny",
+      "ls *": "allow",
+      "find *": "allow"
+    },
+    "external_directory": "deny"
+  },
+  "watcher": {
+    "ignore": [".env", ".env.*"]
+  }
+}
