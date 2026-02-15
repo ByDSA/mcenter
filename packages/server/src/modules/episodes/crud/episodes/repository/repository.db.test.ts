@@ -1,11 +1,11 @@
-import { EpisodesRepository } from ".";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { TestingSetup, createTestingAppModuleAndInit } from "#core/app/tests/app";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { fixtureEpisodes } from "#episodes/tests";
 import { createMockedModule } from "#utils/nestjs/tests";
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { EpisodesRepository } from ".";
 
 describe("episodesRepository", () => {
   let repo: EpisodesRepository;

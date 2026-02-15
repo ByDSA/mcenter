@@ -1,14 +1,14 @@
 import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { StreamGetEpisodeController } from "./controller";
-import { StreamGetRandomEpisodeService } from "./service";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { createTokenTests, expectControllerFinishRequest, testAuth } from "#core/auth/strategies/token/tests";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { fixtureEpisodes } from "#episodes/tests";
+import { StreamGetRandomEpisodeService } from "./service";
+import { StreamGetEpisodeController } from "./controller";
 
 describe("get-episode", () => {
   let testingSetup: TestingSetup;

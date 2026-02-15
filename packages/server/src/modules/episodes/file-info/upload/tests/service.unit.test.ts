@@ -1,8 +1,6 @@
 import fs from "node:fs";
 import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
 import { EpisodeFileInfoEntity } from "$shared/models/episodes/file-info";
-import { EpisodeFileInfoUploadService } from "../service";
-import { mockFile } from "./utils";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { fixtureEpisodes } from "#episodes/tests";
 import { SeriesRepository } from "#episodes/series/crud/repository";
@@ -13,6 +11,8 @@ import { EpisodeEntity } from "#episodes/models";
 import { VideoMetadataService } from "#modules/resources/video/video-metadata/VideoMetadataService.service";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import * as cryptUtils from "#utils/crypt";
+import { EpisodeFileInfoUploadService } from "../service";
+import { mockFile } from "./utils";
 
 // Mock Data
 const existingEpisodeId = "episode_123";

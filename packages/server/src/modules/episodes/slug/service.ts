@@ -5,8 +5,8 @@ import { assertFoundClient } from "#utils/validation/found";
 import { EpisodesCrudDtos } from "#episodes/models/dto";
 import { } from "#modules/resources/response-formatter";
 import { EpisodeResponseFormatterService } from "#episodes/renderer/formatter.service";
-import { EpisodeEntity } from "../models";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
+import { EpisodeEntity } from "../models";
 
 @Injectable()
 export class EpisodeSlugHandlerService {

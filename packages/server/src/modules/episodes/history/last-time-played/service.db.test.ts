@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
-import { EpisodeHistoryRepository } from "../crud/repository";
-import { EpisodeHistoryEntryEntity } from "../models";
-import { EpisodeLastTimePlayedService } from "./service";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
+import { EpisodeHistoryEntryEntity } from "../models";
+import { EpisodeHistoryRepository } from "../crud/repository";
+import { EpisodeLastTimePlayedService } from "./service";
 
 describe("episodeLastTimePlayedService", () => {
   let testingSetup: TestingSetup;

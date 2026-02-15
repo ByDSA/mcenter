@@ -1,9 +1,9 @@
-import { EpisodeFileInfoRepository } from "./repository";
-import { EpisodeFileInfosCrudController } from "./controller";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { mockMongoId } from "#tests/mongo";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
+import { EpisodeFileInfosCrudController } from "./controller";
+import { EpisodeFileInfoRepository } from "./repository";
 
 crudTestsSuite( {
   name: EpisodeFileInfosCrudController.name,

@@ -3,13 +3,13 @@ import { createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
-import { EpisodeTasks } from "$shared/models/episodes/admin";
+import { tasksEpisodes } from "$shared/models/episodes/admin";
 import { dateSchema } from "$shared/models/utils/schemas/timestamps/date";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { EpisodeLastTimePlayedService } from "#episodes/history/last-time-played/service";
 import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 
-const TASK_NAME = EpisodeTasks.cache.updateLastTimePlayed.name;
+const TASK_NAME = tasksEpisodes.cache.updateLastTimePlayed.name;
 
 export const payloadSchema = z.undefined();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

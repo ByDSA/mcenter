@@ -4,12 +4,6 @@ import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { PATH_ROUTES } from "$shared/routing";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { createMockClass } from "$sharedTests/jest/mocking";
-import { MusicsCrudModule } from "../crud/module";
-import { MusicHistoryModule } from "../history/module";
-import { MusicHistoryEntryOdm } from "../history/crud/repository/odm";
-import { MusicRendererModule } from "../renderer/module";
-import { MusicGetRandomController } from "./controller";
-import { MusicGetRandomService } from "./service";
 import { Music, MusicEntityWithUserInfo } from "#musics/models";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { createTestingAppModuleAndInit,
@@ -19,6 +13,12 @@ import { MusicsIndexService } from "#modules/search/indexes/musics.service";
 import { loadFixtureMusicsUsersInDisk } from "#core/db/tests/fixtures/sets/MusicsUsers";
 import { MusicsSearchService,
   SearchRet } from "#modules/search/search-services/musics.search.service";
+import { MusicRendererModule } from "../renderer/module";
+import { MusicHistoryEntryOdm } from "../history/crud/repository/odm";
+import { MusicHistoryModule } from "../history/module";
+import { MusicsCrudModule } from "../crud/module";
+import { MusicGetRandomService } from "./service";
+import { MusicGetRandomController } from "./controller";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;

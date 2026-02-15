@@ -3,16 +3,16 @@ import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UserPayload } from "$shared/models/auth";
-import { AuthPlayerService } from "../AuthPlayer.service";
-import { fixturesRemotePlayers } from "../tests/fixtures";
-import { PlayEpisodeController } from "./controller";
-import { PlayEpisodeService } from "./service";
 import { fixtureEpisodes } from "#episodes/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { EpisodeEntityWithFileInfos } from "#episodes/models";
 import { testFailValidation } from "#core/auth/strategies/token/tests";
+import { fixturesRemotePlayers } from "../tests/fixtures";
+import { AuthPlayerService } from "../AuthPlayer.service";
+import { PlayEpisodeService } from "./service";
+import { PlayEpisodeController } from "./controller";
 
 const EPISODE_WITH_FILE_INFO: EpisodeEntityWithFileInfos = fixtureEpisodes.SampleSeries
   .Episodes.FullSamples.EP1x01;

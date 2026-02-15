@@ -1,10 +1,10 @@
 /* eslint-disable require-await */
 import { createMockClass } from "$sharedTests/jest/mocking";
 import { Types } from "mongoose";
-import { EpisodeHistoryRepository } from "../repository";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { EpisodeEntity } from "#episodes/models";
+import { EpisodeHistoryRepository } from "../repository";
 
 const SAMPLE_HISTORY_ENTRY = fixtureEpisodes.HistoryEntries.List[0];
 

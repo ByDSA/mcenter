@@ -1,4 +1,4 @@
-export const EpisodeTasks = Object.freeze( {
+export const tasksEpisodes = Object.freeze( {
   sync: {
     name: "episodes-sync-disk-to-db",
   },

@@ -1,8 +1,8 @@
 /* eslint-disable require-await */
 import { createMockClass } from "$sharedTests/jest/mocking";
-import { SeriesRepository } from "../repository";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
+import { SeriesRepository } from "../repository";
 
 const SERIES_SAMPLE_SERIES = fixtureEpisodes.Series.Samples.SampleSeries;
 const ALL_SERIES = fixtureEpisodes.Series.List;

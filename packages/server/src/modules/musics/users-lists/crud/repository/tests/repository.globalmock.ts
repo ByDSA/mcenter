@@ -3,8 +3,8 @@ import { Types } from "mongoose";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { MusicUserListEntity } from "$shared/models/musics/users-lists";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
-import { MUSIC_SMART_PLAYLIST_SAMPLE } from "#modules/musics/smart-playlists/crud/repository/tests/repository.globalmock";
 import { MusicUsersListsRepository } from "../repository";
+import { MUSIC_SMART_PLAYLIST_SAMPLE } from "$shared/models/musics/smart-playlists/tests/fixtures";
 
 export const MUSIC_USER_LIST_SAMPLE: MusicUserListEntity = {
   id: new Types.ObjectId().toString(),

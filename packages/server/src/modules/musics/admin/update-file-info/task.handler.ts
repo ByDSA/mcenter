@@ -3,13 +3,13 @@ import { Injectable, Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
-import { MusicTasks } from "$shared/models/musics/admin";
+import { tasksMusics } from "$shared/models/musics/admin";
 import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { TaskHandlerClass, TaskHandler, TaskService } from "#core/tasks";
 import { MusicFileInfoOmitMusicIdBuilder } from "#musics/file-info/builder";
 
-const TASK_NAME = MusicTasks.updateFileInfos.name;
+const TASK_NAME = tasksMusics.updateFileInfos.name;
 
 export const payloadSchema = z.undefined();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

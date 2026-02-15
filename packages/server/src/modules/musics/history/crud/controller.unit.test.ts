@@ -2,15 +2,15 @@ import { HttpStatus } from "@nestjs/common";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
-import { MusicHistoryCrudController } from "./controller";
-import { MusicHistoryRepository } from "./repository";
-import { GetManyCriteria } from "./repository/repository";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { expectBodyEquals } from "#tests/suites/generate-http-case";
 import { putUser } from "#tests/suites/auth";
 import { mockMongoId } from "#tests/mongo";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureMusics } from "#musics/tests";
+import { GetManyCriteria } from "./repository/repository";
+import { MusicHistoryRepository } from "./repository";
+import { MusicHistoryCrudController } from "./controller";
 
 const SAMPLE_HISTORY = [fixtureMusics.HistoryEntries.List[0]];
 const validCriteria = {

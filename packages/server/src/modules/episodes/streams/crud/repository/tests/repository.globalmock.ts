@@ -1,8 +1,8 @@
 import { createMockClass } from "$sharedTests/jest/mocking";
 import { Types } from "mongoose";
 import { StreamEntity, StreamMode, StreamOriginType } from "$shared/models/episodes/streams/stream";
-import { StreamsRepository } from "../repository";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
+import { StreamsRepository } from "../repository";
 
 const SAMPLE_STREAM = {
   id: new Types.ObjectId().toString(),

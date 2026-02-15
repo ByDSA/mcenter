@@ -4,13 +4,13 @@ import { createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
-import { ImageCoverTasks } from "$shared/models/image-covers/admin";
+import { tasksImageCovers } from "$shared/models/image-covers/admin";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { ImageCoversRepository } from "#modules/image-covers/crud/repositories";
 import { ImageVersionsGenerator } from "../../upload/generate-versions";
 import { IMAGE_COVERS_FOLDER_PATH } from "../../utils";
 
-const TASK_NAME = ImageCoverTasks.rebuildAll.name;
+const TASK_NAME = tasksImageCovers.rebuildAll.name;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const progressSchema = TasksCrudDtos.TaskStatus.progressSchemaBase;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

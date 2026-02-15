@@ -1,11 +1,11 @@
 /* eslint-disable require-await */
 import { createMockClass } from "$sharedTests/jest/mocking";
 import { Types } from "mongoose";
-import { EpisodesUsersRepository } from "../repository";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { fixtureEpisodes } from "#episodes/tests";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { episodeEntityWithUserInfoSchema, EpisodeUserInfoEntity } from "#episodes/models";
+import { EpisodesUsersRepository } from "../repository";
 
 export const SAMPLE_USER_INFO = {
   createdAt: new Date(),

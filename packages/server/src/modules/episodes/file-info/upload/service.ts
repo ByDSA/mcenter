@@ -18,9 +18,9 @@ import { EpisodeEntity } from "#episodes/models";
 import { getSeasonNumberByEpisodeKey, SeriesRepository } from "#episodes/series/crud/repository/repository";
 import { VideoMetadataService } from "#modules/resources/video/video-metadata/VideoMetadataService.service";
 import { EPISODES_MEDIA_PATH } from "#episodes/utils";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { EpisodeFileInfoRepository } from "../crud/repository";
 import { EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "./utils";
-import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 @Injectable()
 export class EpisodeFileInfoUploadService {

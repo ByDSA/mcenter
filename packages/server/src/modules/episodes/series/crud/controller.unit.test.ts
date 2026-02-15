@@ -4,9 +4,6 @@ import { HttpStatus } from "@nestjs/common";
 import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { SeriesCrudDtos } from "$shared/models/episodes/series/dto/transport";
 import { PaginatedResult } from "$shared/utils/http/responses";
-import { seriesEntitySchema, SeriesSeasons } from "../models";
-import { SeriesCrudController } from "./controller";
-import { SeriesRepository } from "./repository";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
@@ -15,6 +12,9 @@ import { testFailValidation, expectControllerFinishRequest,
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { fixtureImageCovers } from "#modules/image-covers/tests";
 import { fixtureEpisodes } from "#episodes/tests";
+import { seriesEntitySchema, SeriesSeasons } from "../models";
+import { SeriesRepository } from "./repository";
+import { SeriesCrudController } from "./controller";
 
 const SAMPLE = fixtureEpisodes.Series.Samples.SampleSeries;
 const SAMPLE_SEASONS: SeriesSeasons = {

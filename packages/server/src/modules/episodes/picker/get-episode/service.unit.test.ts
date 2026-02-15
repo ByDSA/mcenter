@@ -1,4 +1,3 @@
-import { StreamGetRandomEpisodeService } from "./service";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { StreamEntity } from "#episodes/streams";
@@ -11,6 +10,7 @@ import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
+import { StreamGetRandomEpisodeService } from "./service";
 
 describe("streamGetRandomEpisode", () => {
   let testingSetup: TestingSetup;

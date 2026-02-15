@@ -1,8 +1,8 @@
 /* eslint-disable require-await */
 import { createMockClass } from "$sharedTests/jest/mocking";
-import { EpisodeDependenciesRepository } from "../repository";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
+import { EpisodeDependenciesRepository } from "../repository";
 
 class EpisodeDependenciesRepositoryMock extends createMockClass(EpisodeDependenciesRepository) {
   constructor() {

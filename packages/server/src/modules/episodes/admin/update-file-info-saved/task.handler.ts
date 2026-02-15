@@ -5,7 +5,7 @@ import { createOneResultResponseSchema, ErrorElementResponse, errorToErrorElemen
 import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
-import { EpisodeTasks } from "$shared/models/episodes/admin";
+import { tasksEpisodes } from "$shared/models/episodes/admin";
 import { assertIsDefined } from "$shared/utils/validation";
 import ffmpeg from "fluent-ffmpeg";
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
@@ -28,7 +28,7 @@ type Options = {
   forceHash?: boolean;
 };
 
-const TASK_NAME = EpisodeTasks.updateFileInfoSaved.name;
+const TASK_NAME = tasksEpisodes.updateFileInfoSaved.name;
 
 export const payloadSchema = z.object( {
   forceHash: z.boolean().optional(),

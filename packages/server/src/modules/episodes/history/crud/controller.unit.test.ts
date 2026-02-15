@@ -4,12 +4,12 @@ import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { EpisodeHistoryEntryCrudDtos } from "$shared/models/episodes/history/dto/transport";
-import { EpisodeHistoryRepository } from "./repository";
-import { EpisodeHistoryCrudController } from "./controller";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { testFailValidation } from "#core/auth/strategies/token/tests";
+import { EpisodeHistoryCrudController } from "./controller";
+import { EpisodeHistoryRepository } from "./repository";
 
 describe("episodeHistoryCrudController", () => {
   let routerApp: Application;

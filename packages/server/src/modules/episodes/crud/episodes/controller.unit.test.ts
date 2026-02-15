@@ -1,8 +1,6 @@
 import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { EpisodesRepository } from "./repository";
-import { EpisodesCrudController } from "./controller";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
@@ -10,6 +8,8 @@ import { expectControllerFailInValidationPhase, expectControllerFinishRequest, t
 import { fixtureEpisodes } from "#episodes/tests";
 import { episodeEntitySchema } from "#episodes/models";
 import { EpisodesCrudDtos } from "#episodes/models/dto";
+import { EpisodesCrudController } from "./controller";
+import { EpisodesRepository } from "./repository";
 
 const SAMPLE = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
 

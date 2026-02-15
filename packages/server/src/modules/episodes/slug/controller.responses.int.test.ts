@@ -2,10 +2,8 @@ import request, { Response } from "supertest";
 import { Application } from "express";
 import { HttpStatus } from "@nestjs/common";
 import { PATH_ROUTES } from "$shared/routing";
-import { EpisodesSlugController } from "./controller";
-import { EpisodeSlugHandlerService } from "./service";
-import { fixtureEpisodes } from "#episodes/tests";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { fixtureEpisodes } from "#episodes/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
 import { createMockedModule } from "#utils/nestjs/tests";
@@ -16,6 +14,8 @@ import { StreamFileModule } from "#modules/resources/stream-file/module";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { createTokenTests } from "#core/auth/strategies/token/tests";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
+import { EpisodeSlugHandlerService } from "./service";
+import { EpisodesSlugController } from "./controller";
 
 const EPISODE_WITH_SERIE = {
   ...fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01,

@@ -1,4 +1,4 @@
-export const MusicTasks = Object.freeze( {
+export const tasksMusics = Object.freeze( {
   sync: {
     name: "music-sync-disk-and-db",
   },

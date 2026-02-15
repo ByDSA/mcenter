@@ -1,9 +1,9 @@
-import { PreventRepeatInDaysFilter } from "../prevent-repeat-in-days-filter";
-import { ResourceWithUserInfo } from "./types";
 import { SECONDS_IN_DAY } from "#modules/resources";
 import { genLastTimePlayedDaysAgo } from "#modules/resources/tests";
 import { useFakeTime } from "#tests/time";
 import { fixtureEpisodes } from "#episodes/tests";
+import { PreventRepeatInDaysFilter } from "../prevent-repeat-in-days-filter";
+import { ResourceWithUserInfo } from "./types";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.Episodes.List;
 

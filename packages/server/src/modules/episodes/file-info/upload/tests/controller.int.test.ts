@@ -4,14 +4,14 @@ import { Application } from "express";
 import supertest from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
-import { EpisodeFileInfosUploadModule } from "../module";
-import { EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "../utils";
-import { uploadEpisodeFile } from "./utils";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { fixtureEpisodes } from "#episodes/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureSampleSeriesWithoutEpisodes } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { EPISODES_MEDIA_PATH } from "#episodes/utils";
+import { EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "../utils";
+import { EpisodeFileInfosUploadModule } from "../module";
+import { uploadEpisodeFile } from "./utils";
 
 const sampleFileName = "sample.mp4";
 const sampleFile = Buffer.from(fs.readFileSync(EPISODES_MEDIA_PATH + "/" + sampleFileName));

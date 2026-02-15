@@ -5,7 +5,7 @@ import { createOneResultResponseSchema, ResultResponse } from "$shared/utils/htt
 import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
-import { EpisodeTasks } from "$shared/models/episodes/admin";
+import { tasksEpisodes } from "$shared/models/episodes/admin";
 import { assertIsDefined } from "$shared/utils/validation";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
@@ -18,12 +18,12 @@ import { VideoMetadataService } from "#modules/resources/video/video-metadata/Vi
 import { assertFoundServer } from "#utils/validation/found";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EPISODES_MEDIA_PATH } from "#episodes/utils";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { SeriesNode, SerieTree, EpisodeNode } from "./disk/models";
 import { RemoteSeriesTreeService } from "./db";
 import { diffSerieTree as diffSeriesTree, EpisodeFile, findAllSerieFolderTreesAt, OldNewSerieTree as OldNew } from "./disk";
-import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
-const TASK_NAME = EpisodeTasks.sync.name;
+const TASK_NAME = tasksEpisodes.sync.name;
 
 export const payloadSchema = z.object( {
   uploaderUserId: mongoDbId,

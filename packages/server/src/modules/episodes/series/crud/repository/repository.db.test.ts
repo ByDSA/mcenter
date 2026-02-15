@@ -1,11 +1,11 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { type SeriesEntity, seriesEntitySchema } from "../../models";
-import { CreateDto, SeriesRepository } from "./repository";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { fixtureEpisodes } from "#episodes/tests";
+import { type SeriesEntity, seriesEntitySchema } from "../../models";
+import { CreateDto, SeriesRepository } from "./repository";
 
 const SERIES_SAMPLE_SERIES = fixtureEpisodes.Series.Samples.SampleSeries;
 

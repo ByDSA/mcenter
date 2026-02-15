@@ -7,11 +7,12 @@ import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/test
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";
 import { testFailValidation } from "#core/auth/strategies/token/tests";
+import { fixtureEpisodes } from "#episodes/tests";
 import { EpisodeDependenciesRepository } from "./repository/repository";
 import { EpisodeDependenciesCrudController } from "./controller";
-import { fixtureEpisodes } from "#episodes/tests";
 
 const DEPENDENCY_SIMPSONS = fixtureEpisodes.Simpsons.Episodes.Dependencies.Sample;
+
 describe("episodeDependenciesCrudController", () => {
   let routerApp: Application;
   let testingSetup: TestingSetup;

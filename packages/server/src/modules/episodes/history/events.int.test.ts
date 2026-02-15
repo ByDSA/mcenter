@@ -1,6 +1,4 @@
 import { Types } from "mongoose";
-import { EpisodeHistoryRepository } from "./crud/repository";
-import { EpisodeLastTimePlayedService } from "./last-time-played/service";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { fixtureEpisodes } from "#episodes/tests";
@@ -10,6 +8,8 @@ import { StreamsCrudModule } from "#episodes/streams/crud/module";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { sleep } from "#utils";
+import { EpisodeLastTimePlayedService } from "./last-time-played/service";
+import { EpisodeHistoryRepository } from "./crud/repository";
 
 describe("integration: EpisodeHistoryRepository <-> EpisodesUsersRepository", () => {
   let testingSetup: TestingSetup;

@@ -3,10 +3,6 @@ import { StreamCrudDtos } from "$shared/models/episodes/streams/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Series, seriesEntitySchema, SeriesKey } from "$shared/models/episodes/series";
 import { Types } from "mongoose";
-import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
-import { StreamOdm } from "./odm";
-import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
-import { StreamEvents } from "./events";
 import { CanCreateOneAndGet, CanGetAll, CanGetManyByCriteria } from "#utils/layers/repository";
 import { SeriesEvents } from "#episodes/series/crud/repository/events";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
@@ -15,6 +11,10 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { UsersRepository } from "#core/auth/users/crud/repository";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { assertFoundClient } from "#utils/validation/found";
+import { Stream, StreamEntity, StreamMode, StreamOriginType } from "../../models";
+import { StreamEvents } from "./events";
+import { buildCriteriaPipeline } from "./odm/criteria-pipeline";
+import { StreamOdm } from "./odm";
 
 type CriteriaMany = StreamCrudDtos.GetMany.Criteria;
 @Injectable()

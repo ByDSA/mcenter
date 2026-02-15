@@ -1,10 +1,10 @@
 import { fixtureEpisodes } from "$sharedSrc/models/episodes/tests/fixtures";
 import { expectEpisodes } from "$sharedSrc/models/episodes/tests";
-import { loadFixtureSampleSeries } from "./sets/SampleSeries";
-import { loadFixtureSimpsons } from "./sets";
 import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { loadFixtureSimpsons } from "./sets";
+import { loadFixtureSampleSeries } from "./sets/SampleSeries";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.Episodes.List;
 let testingSetup: TestingSetup;

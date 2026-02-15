@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { fixtureEpisodes } from "#episodes/tests";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { fixtureEpisodes } from "#episodes/tests";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";

@@ -5,9 +5,9 @@ import { WithRequired } from "$shared/utils/objects";
 import { Types } from "mongoose";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { assertFoundServer } from "#utils/validation/found";
+import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { EpisodeFile, SerieFolderTree as SerieTree } from "../disk";
 import { episodeToEpisodeFiles } from "./adapters";
-import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 
 export type EpisodeEntityWithFileInfos = WithRequired<EpisodeEntity, "fileInfos">;
 

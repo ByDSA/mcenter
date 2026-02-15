@@ -1,9 +1,6 @@
 import { UnprocessableEntityException } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UserPayload } from "$shared/models/auth";
-import { PlayService } from "../play.service";
-import { RemotePlayersRepository } from "../player-services/repository";
-import { PlayEpisodeService } from "./service";
 import { SeriesCrudModule } from "#episodes/series/crud/module";
 import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
@@ -17,6 +14,9 @@ import { mockMongoId } from "#tests/mongo";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
+import { RemotePlayersRepository } from "../player-services/repository";
+import { PlayService } from "../play.service";
+import { PlayEpisodeService } from "./service";
 
 describe("playEpisodeService", () => {
   let testingSetup: TestingSetup;

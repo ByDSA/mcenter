@@ -2,11 +2,11 @@ import { Injectable, Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
-import { MusicTasks } from "$shared/models/musics/admin";
+import { tasksMusics } from "$shared/models/musics/admin";
 import { TaskHandlerClass, TaskHandler, TaskService } from "#core/tasks";
 import { UpdateRemoteTreeService, type UpdateResult } from "./service";
 
-const TASK_NAME = MusicTasks.sync.name;
+const TASK_NAME = tasksMusics.sync.name;
 
 export const payloadSchema = z.object( {
   userId: z.string(),

@@ -1,5 +1,3 @@
-import { EpisodeSlugHandlerService } from "./service";
-import { EpisodesSlugController } from "./controller";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { fixtureEpisodes } from "#episodes/tests";
 import { createMockedModule } from "#utils/nestjs/tests";
@@ -9,6 +7,8 @@ import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { StreamFileModule } from "#modules/resources/stream-file/module";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
+import { EpisodesSlugController } from "./controller";
+import { EpisodeSlugHandlerService } from "./service";
 
 const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.Episodes.List;
 

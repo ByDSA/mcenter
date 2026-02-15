@@ -4,8 +4,7 @@ import { EpisodesUserInfoCrudController } from "./controller";
 
 testRoute(PATH_ROUTES.episodes.userInfo.withParams("episodeId"), {
   method: "PATCH",
-})
-
+} );
 
 verifyRoutesCoverage( {
   controller: EpisodesUserInfoCrudController,

@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import { EpisodeHistoryRepository } from "./repository";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
@@ -9,6 +8,7 @@ import { fixtureEpisodes } from "#episodes/tests";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { loadFixtureImageCoversInDisk } from "#core/db/tests/fixtures/sets/image-covers";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { EpisodeHistoryRepository } from "./repository";
 
 const SERIES_SAMPLE_SERIES = fixtureEpisodes.Series.Samples.SampleSeries;
 
