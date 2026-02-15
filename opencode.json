@@ -28,6 +28,7 @@
       "*": "deny",
       "pnpm build": "allow",
       "pnpm test": "allow",
+      "pnpm lint": "allow",
       "ls *": "allow",
       "find *": "allow",
       "git *": "ask",

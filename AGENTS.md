@@ -255,7 +255,7 @@ Entidades principales: `musics`, `episodes` (con `file-info`, `history`, `depend
 - `layout.tsx` — Layout de sección
 
 ### Commits
-El proyecto usa **Conventional Commits** (commitlint configurado). Formato: `type(scope): message`. Tipos: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `style`. El scope es opcional, pero de tenerlo puede ser back o front.
+El proyecto usa **Conventional Commits** (commitlint configurado). Formato: `type(scope): message`. Tipos: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `style`. El scope es opcional, pero de tenerlo puede ser back, front o shared. Los mensajes de commit son en inglés. No poner scope si afecta a múltiples packages o a fuera de ellos.
 
 ---
 
