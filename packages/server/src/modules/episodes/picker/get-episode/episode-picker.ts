@@ -1,11 +1,11 @@
 import { assertIsDefined, neverCase } from "$shared/utils/validation";
 import { EpisodeEntityWithUserInfo } from "$shared/models/episodes";
+import { EpisodeFilterApplier, EpisodeWeightFixerApplier } from "../appliers";
+import { DependenciesList } from "../appliers/dependencies";
 import { PickMode } from "#modules/picker/resource-picker/pick-mode";
 import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
 import { ResourcePickerSequential } from "#modules/picker/resource-picker/resource-picker-sequential";
 import { ResourcePicker } from "#modules/picker/resource-picker/resource-picker";
-import { EpisodeFilterApplier, EpisodeWeightFixerApplier } from "../appliers";
-import { DependenciesList } from "../appliers/dependencies";
 
 type R = EpisodeEntityWithUserInfo;
 

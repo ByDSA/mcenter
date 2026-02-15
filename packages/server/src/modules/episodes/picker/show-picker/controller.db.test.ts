@@ -2,10 +2,11 @@ import request from "supertest";
 import { Application } from "express";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { HttpStatus } from "@nestjs/common";
+import { StreamPickerModule } from "../module";
 import { loadFixtureSimpsons } from "#core/db/tests/fixtures/sets";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
-import { StreamPickerModule } from "../module";
+import { fixtureEpisodes } from "#episodes/tests";
 
 async function loadFixtures() {
   await loadFixtureSimpsons();
@@ -14,7 +15,7 @@ async function loadFixtures() {
 
 let testingSetup: TestingSetup;
 let routerApp: Application;
-const validStreamKey = "simpsons";
+const validStreamKey = fixtureEpisodes.Streams.Samples.Simpsons.key;
 
 describe("showPicker", () => {
   beforeAll(async () => {

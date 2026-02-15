@@ -1,24 +1,22 @@
-import { SERIES_SIMPSONS } from "$sharedSrc/models/episodes/series/tests/fixtures";
+import { fixtureEpisodes } from "#episodes/tests";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
-import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { EpisodeHistoryEntryOdm } from "#episodes/history/crud/repository/odm";
 import { StreamOdm } from "#episodes/streams/crud/repository/odm";
-import { STREAM_SIMPSONS } from "#episodes/streams/tests";
-import { fixtureEpisodes } from "#episodes/tests";
-import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 
 export const loadFixtureSimpsons = async () => {
   await loadFixtureSerieAndEpisodesSimpsons();
   await loadFixtureStreamAndHistoryListSimpsons();
 };
 
-const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
-const EPISODE_FILE_INFO_SIMPSONS = fixtureEpisodeFileInfos.Simpsons.List;
+const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.Episodes.List;
+const EPISODE_FILE_INFO_SIMPSONS = fixtureEpisodes.Simpsons.FileInfos;
 const loadFixtureSerieAndEpisodesSimpsons = async () => {
   // Series
-  const seriesDocOdm: SeriesOdm.FullDoc[] = [SERIES_SIMPSONS].map(SeriesOdm.toFullDoc);
+  const seriesDocOdm: SeriesOdm.FullDoc[] = [
+    fixtureEpisodes.Series.Samples.Simpsons,
+  ].map(SeriesOdm.toFullDoc);
 
   await SeriesOdm.Model.insertMany(seriesDocOdm);
 
@@ -35,12 +33,14 @@ const loadFixtureSerieAndEpisodesSimpsons = async () => {
 };
 const loadFixtureStreamAndHistoryListSimpsons = async () => {
   // Streams
-  const streamsDocOdm: StreamOdm.FullDoc[] = [STREAM_SIMPSONS].map(StreamOdm.toFullDoc);
+  const streamsDocOdm: StreamOdm.FullDoc[] = [
+    fixtureEpisodes.Streams.Samples.Simpsons,
+  ].map(StreamOdm.toFullDoc);
 
   await StreamOdm.Model.insertMany(streamsDocOdm);
 
   // Episode History Entries
-  const entriesOdm: EpisodeHistoryEntryOdm.FullDoc[] = fixtureEpisodeHistoryEntries.Simpsons.List
+  const entriesOdm: EpisodeHistoryEntryOdm.FullDoc[] = fixtureEpisodes.Simpsons.HistoryEntries.List
     .map(EpisodeHistoryEntryOdm.toFullDoc);
 
   await EpisodeHistoryEntryOdm.Model.insertMany(entriesOdm);

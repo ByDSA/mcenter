@@ -1,9 +1,9 @@
-import { crudTestsSuite } from "#tests/suites/crud-suite";
-import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
-import { mockMongoId } from "#tests/mongo";
-import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { EpisodeFileInfoRepository } from "./repository";
 import { EpisodeFileInfosCrudController } from "./controller";
+import { crudTestsSuite } from "#tests/suites/crud-suite";
+import { mockMongoId } from "#tests/mongo";
+import { getOrCreateMockProvider } from "#utils/nestjs/tests";
+import { fixtureEpisodes } from "#episodes/tests";
 
 crudTestsSuite( {
   name: EpisodeFileInfosCrudController.name,
@@ -38,7 +38,7 @@ crudTestsSuite( {
             },
           }],
         },
-        returned: fixtureEpisodeFileInfos.Simpsons.Samples.EP1x01,
+        returned: fixtureEpisodes.Episodes.FullSamples.SampleSeries.EP1x01.fileInfos[0],
       } ),
       url: "/" + mockMongoId,
     },

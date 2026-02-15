@@ -1,18 +1,18 @@
 import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { episodeFileInfoEntitySchema } from "$shared/models/episodes/file-info";
 import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
+import { EpisodeFileInfosCrudController } from "./controller";
+import { EpisodeFileInfoRepository } from "./repository";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";
 import { expectControllerFinishRequest, testFailValidation, testManyAuth } from "#core/auth/strategies/token/tests";
-import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
-import { EpisodeFileInfosCrudController } from "./controller";
-import { EpisodeFileInfoRepository } from "./repository";
+import { fixtureEpisodes } from "#episodes/tests";
 
-const SAMPLE = fixtureEpisodeFileInfos.SampleSeries.Samples.EP1x01;
+const SAMPLE = fixtureEpisodes.SampleSeries.Episodes.FullSamples.EP1x01.fileInfos[0];
 
 describe("episodeFileInfosCrudController", () => {
   let testingSetup: TestingSetup;

@@ -1,11 +1,13 @@
 import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { SeriesCrudDtos } from "$shared/models/episodes/series/dto/transport";
 import { PaginatedResult } from "$shared/utils/http/responses";
-import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
+import { seriesEntitySchema, SeriesSeasons } from "../models";
+import { SeriesCrudController } from "./controller";
+import { SeriesRepository } from "./repository";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { testFailValidation, expectControllerFinishRequest,
@@ -13,18 +15,15 @@ import { testFailValidation, expectControllerFinishRequest,
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { fixtureImageCovers } from "#modules/image-covers/tests";
 import { fixtureEpisodes } from "#episodes/tests";
-import { seriesEntitySchema, SeriesSeasons } from "../models";
-import { SeriesCrudController } from "./controller";
-import { SeriesRepository } from "./repository";
 
-const SAMPLE = SERIES_SAMPLE_SERIES;
+const SAMPLE = fixtureEpisodes.Series.Samples.SampleSeries;
 const SAMPLE_SEASONS: SeriesSeasons = {
   1: [
-    fixtureEpisodes.SampleSeries.Samples.EP1x01,
-    fixtureEpisodes.SampleSeries.Samples.EP1x02,
+    fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01,
+    fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x02,
   ],
   2: [
-    fixtureEpisodes.SampleSeries.Samples.EP2x01,
+    fixtureEpisodes.SampleSeries.Episodes.Samples.EP2x01,
   ],
 };
 const uploaderUser = fixtureUsers.Normal.UserWithRoles;
@@ -114,7 +113,7 @@ describe("seriesCrudController", () => {
     const URL = `/${GET_MANY_CRITERIA_PATH}`;
     const validPayload = {
       filter: {
-        id: SERIES_SAMPLE_SERIES.id,
+        id: SAMPLE.id,
       },
     } satisfies SeriesCrudDtos.GetMany.Criteria;
 
@@ -210,7 +209,7 @@ describe("seriesCrudController", () => {
   } );
 
   describe("getOne (GET)", () => {
-    const VALID_URL = `/${SERIES_SAMPLE_SERIES.id}`;
+    const VALID_URL = `/${SAMPLE.id}`;
     const INVALID_URL = "/notObjectId";
 
     it("valid request-response", async () => {
@@ -223,7 +222,7 @@ describe("seriesCrudController", () => {
 
       const data = seriesEntitySchema.parse(res.body.data);
 
-      expect(data).toEqual(SERIES_SAMPLE_SERIES);
+      expect(data).toEqual(SAMPLE);
     } );
 
     it("should return OK + data null when series not found", async () => {

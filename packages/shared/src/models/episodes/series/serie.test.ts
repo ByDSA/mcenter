@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { SeriesEntity, seriesEntitySchema, seriesSchema } from "../series";
+import { SeriesEntity, seriesEntitySchema, seriesSchema } from "./series";
 
 const VALID_MODEL: SeriesEntity = {
   id: new Types.ObjectId().toString(),

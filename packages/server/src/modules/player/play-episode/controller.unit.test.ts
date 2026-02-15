@@ -2,24 +2,20 @@ import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
-import { SERIES_SAMPLE_SERIES } from "$sharedSrc/models/episodes/series/tests/fixtures";
 import { UserPayload } from "$shared/models/auth";
+import { AuthPlayerService } from "../AuthPlayer.service";
+import { fixturesRemotePlayers } from "../tests/fixtures";
+import { PlayEpisodeController } from "./controller";
+import { PlayEpisodeService } from "./service";
 import { fixtureEpisodes } from "#episodes/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
-import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { EpisodeEntityWithFileInfos } from "#episodes/models";
 import { testFailValidation } from "#core/auth/strategies/token/tests";
-import { fixturesRemotePlayers } from "../tests/fixtures";
-import { AuthPlayerService } from "../AuthPlayer.service";
-import { PlayEpisodeService } from "./service";
-import { PlayEpisodeController } from "./controller";
 
-const EPISODE_WITH_FILE_INFO: EpisodeEntityWithFileInfos = {
-  ...fixtureEpisodes.SampleSeries.Samples.EP1x01,
-  fileInfos: [fixtureEpisodeFileInfos.SampleSeries.Samples.EP1x01],
-};
+const EPISODE_WITH_FILE_INFO: EpisodeEntityWithFileInfos = fixtureEpisodes.SampleSeries
+  .Episodes.FullSamples.EP1x01;
 
 describe("playEpisodeController", () => {
   let testingSetup: TestingSetup;
@@ -38,9 +34,9 @@ describe("playEpisodeController", () => {
 
     ret.episodesRepo.getOneById
       .mockResolvedValue( {
-        ...fixtureEpisodes.SampleSeries.Samples.EP1x01,
-        series: SERIES_SAMPLE_SERIES,
-        fileInfos: [fixtureEpisodeFileInfos.SampleSeries.Samples.EP1x01],
+        ...fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01,
+        series: fixtureEpisodes.Series.Samples.SampleSeries,
+        fileInfos: [fixtureEpisodes.FileInfos.Samples.SampleSeries.EP1x01],
       } );
 
     // User

@@ -1,12 +1,12 @@
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { Types } from "mongoose";
+import { EpisodeHistoryRepository } from "../crud/repository";
+import { EpisodeHistoryEntryEntity } from "../models";
+import { EpisodeLastTimePlayedService } from "./service";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
-import { EpisodeHistoryRepository } from "../crud/repository";
-import { EpisodeHistoryEntryEntity } from "../models";
-import { EpisodeLastTimePlayedService } from "./service";
 
 describe("episodeLastTimePlayedService", () => {
   let testingSetup: TestingSetup;
@@ -22,7 +22,7 @@ describe("episodeLastTimePlayedService", () => {
       historyRepo: testingSetup.getMock(EpisodeHistoryRepository),
       usersInfo: testingSetup.getMock(EpisodesUsersRepository),
     };
-    const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+    const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
     const entry: EpisodeHistoryEntryEntity = {
       id: new Types.ObjectId().toString(),
       resourceId: episode.id,
@@ -56,7 +56,7 @@ describe("episodeLastTimePlayedService", () => {
   } );
 
   describe("calcEpisodeLastTimePlayedByEpisodeId", () => {
-    const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+    const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
     const episodeId = episode.id;
 
     it("should return timestamp of last time episode was played", async () => {

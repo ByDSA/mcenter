@@ -2,12 +2,12 @@ import request, { Response } from "supertest";
 import { Application } from "express";
 import { HttpStatus } from "@nestjs/common";
 import { PATH_ROUTES } from "$shared/routing";
-import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { EpisodesSlugController } from "./controller";
+import { EpisodeSlugHandlerService } from "./service";
 import { fixtureEpisodes } from "#episodes/tests";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { EpisodeEntity, episodeEntitySchema } from "#episodes/models";
-import { fixtureEpisodeFileInfos } from "#episodes/file-info/tests";
 import { createMockedModule } from "#utils/nestjs/tests";
 import { EpisodesCrudModule } from "#episodes/crud/module";
 import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
@@ -16,12 +16,10 @@ import { StreamFileModule } from "#modules/resources/stream-file/module";
 import { EpisodeResponseFormatterModule } from "#episodes/renderer/module";
 import { createTokenTests } from "#core/auth/strategies/token/tests";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
-import { EpisodesSlugController } from "./controller";
-import { EpisodeSlugHandlerService } from "./service";
 
 const EPISODE_WITH_SERIE = {
-  ...fixtureEpisodes.SampleSeries.Samples.EP1x01,
-  series: SERIES_SAMPLE_SERIES,
+  ...fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01,
+  series: fixtureEpisodes.Series.Samples.SampleSeries,
 };
 
 describe("responses", () => {
@@ -80,7 +78,7 @@ describe("responses", () => {
     const res = await request(router)
       .get(URL + "?format=m3u8")
       .expect(HttpStatus.OK);
-    const ep = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+    const ep = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
     const host = getHostFromSuperTestRequest(res.request);
     const path = PATH_ROUTES.episodes.withParams(ep.id);
 
@@ -90,11 +88,11 @@ describe("responses", () => {
   it("response raw", async () => {
     repo.getOneBySlug.mockResolvedValueOnce(
       {
-        ...fixtureEpisodes.SampleSeries.Samples.EP1x01,
+        ...fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01,
         fileInfos: [
-          fixtureEpisodeFileInfos.SampleSeries.Samples.EP1x01,
+          fixtureEpisodes.SampleSeries.FileInfos[0],
         ],
-        series: SERIES_SAMPLE_SERIES,
+        series: fixtureEpisodes.Series.Samples.SampleSeries,
       },
     );
     await request(router)

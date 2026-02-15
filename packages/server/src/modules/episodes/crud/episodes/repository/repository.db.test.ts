@@ -1,12 +1,11 @@
-import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
-import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
-import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
+import { EpisodesRepository } from ".";
+import { TestingSetup, createTestingAppModuleAndInit } from "#core/app/tests/app";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
-import { createMockedModule } from "#utils/nestjs/tests";
+import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { fixtureEpisodes } from "#episodes/tests";
-import { EpisodesRepository } from ".";
+import { createMockedModule } from "#utils/nestjs/tests";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 
 describe("episodesRepository", () => {
   let repo: EpisodesRepository;
@@ -39,14 +38,14 @@ describe("episodesRepository", () => {
       const props = [{}] satisfies Parameters<typeof repo.getMany>;
       const ret = await repo.getMany(...props);
 
-      expect(ret.data).toHaveLength(fixtureEpisodes.SampleSeries.List.length);
+      expect(ret.data).toHaveLength(fixtureEpisodes.SampleSeries.Episodes.List.length);
     } );
 
     it("filter: serieId + episodeKey", async () => {
       const props = [{
         filter: {
-          episodeKey: fixtureEpisodes.SampleSeries.Samples.EP1x01.episodeKey,
-          seriesId: SERIES_SAMPLE_SERIES.id,
+          episodeKey: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.episodeKey,
+          seriesId: fixtureEpisodes.Series.Samples.SampleSeries.id,
         },
       }] satisfies Parameters<typeof repo.getMany>;
       const ret = await repo.getMany(...props);
@@ -57,8 +56,8 @@ describe("episodesRepository", () => {
     it("cannot expand user info without authentication", async () => {
       const props = [{
         filter: {
-          episodeKey: fixtureEpisodes.SampleSeries.Samples.EP1x01.episodeKey,
-          seriesId: SERIES_SAMPLE_SERIES.id,
+          episodeKey: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.episodeKey,
+          seriesId: fixtureEpisodes.Series.Samples.SampleSeries.id,
         },
         expand: ["userInfo"],
       }] satisfies Parameters<typeof repo.getMany>;
@@ -70,8 +69,8 @@ describe("episodesRepository", () => {
     it("expands", async () => {
       const props = [{
         filter: {
-          episodeKey: fixtureEpisodes.SampleSeries.Samples.EP1x01.episodeKey,
-          seriesId: SERIES_SAMPLE_SERIES.id,
+          episodeKey: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.episodeKey,
+          seriesId: fixtureEpisodes.Series.Samples.SampleSeries.id,
         },
         expand: ["fileInfos", "series", "userInfo"],
       }, {

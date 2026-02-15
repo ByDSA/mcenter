@@ -1,5 +1,7 @@
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { Types } from "mongoose";
+import { EpisodeHistoryRepository } from "./crud/repository";
+import { EpisodeLastTimePlayedService } from "./last-time-played/service";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { fixtureEpisodes } from "#episodes/tests";
 import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
@@ -8,15 +10,13 @@ import { StreamsCrudModule } from "#episodes/streams/crud/module";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { sleep } from "#utils";
-import { EpisodeHistoryRepository } from "./crud/repository";
-import { EpisodeLastTimePlayedService } from "./last-time-played/service";
 
 describe("integration: EpisodeHistoryRepository <-> EpisodesUsersRepository", () => {
   let testingSetup: TestingSetup;
   let historyRepo: EpisodeHistoryRepository;
   let usersInfoRepo: EpisodesUsersRepository;
   const user = fixtureUsers.Normal.User;
-  const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+  const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
   const options = {
     requestingUserId: user.id,
   };
@@ -404,7 +404,7 @@ describe("integration: EpisodeHistoryRepository <-> EpisodesUsersRepository", ()
   } );
 
   describe("escenarios de múltiples episodios", () => {
-    const episode2 = fixtureEpisodes.SampleSeries.Samples.EP1x02;
+    const episode2 = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x02;
 
     it("debería mantener lastTimePlayed independiente para cada episodio", async () => {
       // Arrange

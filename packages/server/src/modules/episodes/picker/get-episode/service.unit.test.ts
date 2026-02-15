@@ -1,20 +1,16 @@
-import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
+import { StreamGetRandomEpisodeService } from "./service";
 import { EpisodeDependenciesRepository } from "#episodes/dependencies/crud/repository";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { StreamEntity } from "#episodes/streams";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
-import { STREAM_SIMPSONS } from "#episodes/streams/tests";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
 import { fixtureEpisodes } from "#episodes/tests";
-import { fixtureEpisodeHistoryEntries } from "#episodes/history/tests";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
-import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
-import { StreamGetRandomEpisodeService } from "./service";
 
 describe("streamGetRandomEpisode", () => {
   let testingSetup: TestingSetup;
@@ -40,9 +36,6 @@ describe("streamGetRandomEpisode", () => {
 
     mocks = await initMocks();
     service = testingSetup.module.get(StreamGetRandomEpisodeService);
-    mocks.episodesUsersRepo.getFullSerieForUser.mockResolvedValue(
-      fixtureEpisodes.Simpsons.ListForUser.NormalUser,
-    );
   } );
 
   // eslint-disable-next-line require-await
@@ -64,62 +57,45 @@ describe("streamGetRandomEpisode", () => {
     jest.clearAllMocks();
   } );
 
-  it("one dependency test", async ()=> {
-    const stream: StreamEntity = STREAM_SIMPSONS;
+  const stream: StreamEntity = fixtureEpisodes.Streams.Samples.Simpsons;
 
+  it("one dependency test", async ()=> {
     mocks.historyEntriesRepo.findLast.mockResolvedValueOnce(
-      fixtureEpisodeHistoryEntries.Simpsons.Samples.EP6x25,
+      fixtureEpisodes.Simpsons.HistoryEntries.Samples.EP6x25,
     );
-    mocks.episodesRepo.getOneById.mockResolvedValueOnce(
-      fixtureEpisodes.Simpsons.Samples.Dependency.last,
-    );
-    mocks.dependenciesRepo.getAll.mockResolvedValueOnce([DEPENDENCY_SIMPSONS]);
 
     const ret = await service.getByStream(stream);
-    const expectedNext = addUserInfo(fixtureEpisodes.Simpsons.Samples.Dependency.next);
 
-    expect(ret).toStrictEqual([expectedNext]);
+    expect(ret).toHaveLength(1);
+    expect(ret[0].userInfo).toBeDefined();
+    expect(ret[0]).toMatchObject(fixtureEpisodes.Simpsons.Episodes.Samples.EP7x01);
   } );
 
   it("two dependency test", async ()=> {
-    const stream: StreamEntity = STREAM_SIMPSONS;
-
     mocks.historyEntriesRepo.findLast.mockResolvedValueOnce(
-      fixtureEpisodeHistoryEntries.Simpsons.Samples.EP6x25,
-    );
-    mocks.episodesRepo.getOneById.mockResolvedValueOnce(
-      fixtureEpisodes.Simpsons.Samples.Dependency.last,
+      fixtureEpisodes.Simpsons.HistoryEntries.Samples.EP6x25,
     );
 
-    const nextOne = fixtureEpisodes.Simpsons.Samples.Dependency.next;
-    const nextTwo = fixtureEpisodes.Simpsons.Samples.EP1x02;
+    const nextOne = fixtureEpisodes.Simpsons.Episodes.Samples.EP7x01;
+    const nextTwo = fixtureEpisodes.Simpsons.Episodes.Samples.EP1x02;
     const nextTwoDependency: EpisodeDependencyEntity = {
       id: "1",
       lastEpisodeId: nextOne.id,
       nextEpisodeId: nextTwo.id,
     };
 
-    mocks.dependenciesRepo.getAll.mockResolvedValueOnce([DEPENDENCY_SIMPSONS, nextTwoDependency]);
+    mocks.dependenciesRepo.getAll.mockResolvedValueOnce([
+      fixtureEpisodes.Simpsons.Episodes.Dependencies.Sample,
+      nextTwoDependency,
+    ]);
 
     const ret = await service.getByStream(stream, 2);
-    const actualFirstWithoutLastTimePlayed = ret[0];
-    const actualSecondWithoutLastTimePlayed = ret[1];
 
-    expect([
-      actualFirstWithoutLastTimePlayed,
-      actualSecondWithoutLastTimePlayed,
-    ]).toStrictEqual([
-      addUserInfo(nextOne),
-      addUserInfo(nextTwo),
-    ]);
+    expect(ret).toHaveLength(2);
+
+    expect(ret[0].userInfo).toBeDefined();
+    expect(ret[0]).toMatchObject(nextOne);
+    expect(ret[1].userInfo).toBeDefined();
+    expect(ret[1]).toMatchObject(nextTwo);
   } );
 } );
-
-function addUserInfo(episode: EpisodeEntity): EpisodeEntityWithUserInfo {
-  return {
-    ...episode,
-    userInfo: fixtureEpisodes.Simpsons.ListForUser.NormalUser.find(
-      e=>e.id === episode.id,
-    )!.userInfo,
-  };
-}

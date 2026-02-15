@@ -1,9 +1,9 @@
-import { genAssertZod } from "../../../../utils/validation/zod";
-import { EpisodeDependency, episodeDependencyEntitySchema } from "../dependency";
-import { DEPENDENCY_SIMPSONS } from "./fixtures";
+import { genAssertZod } from "../../../utils/validation/zod";
+import { fixtureEpisodes } from "../tests";
+import { EpisodeDependency, episodeDependencyEntitySchema } from "./dependency";
 
 const assertIsEntity: ReturnType<typeof genAssertZod> = genAssertZod(episodeDependencyEntitySchema);
-const VALID_MODEL = DEPENDENCY_SIMPSONS;
+const VALID_MODEL = fixtureEpisodes.Simpsons.Episodes.Dependencies.Sample;
 
 describe("assertIsEntity", () => {
   it("should not throw an error when asserting a valid object", () => {

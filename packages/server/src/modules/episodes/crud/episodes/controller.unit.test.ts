@@ -1,25 +1,24 @@
 import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
+import { EpisodesRepository } from "./repository";
+import { EpisodesCrudController } from "./controller";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
-import { mockMongoId } from "#tests/mongo";
 import { expectControllerFailInValidationPhase, expectControllerFinishRequest, testFailValidation } from "#core/auth/strategies/token/tests";
 import { fixtureEpisodes } from "#episodes/tests";
 import { episodeEntitySchema } from "#episodes/models";
 import { EpisodesCrudDtos } from "#episodes/models/dto";
-import { EpisodesRepository } from "./repository";
-import { EpisodesCrudController } from "./controller";
 
-const SAMPLE = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+const SAMPLE = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
 
 describe("episodesCrudController", () => {
   let testingSetup: TestingSetup;
   let router: Application;
   let mocks: Awaited<ReturnType<typeof initMocks>>;
-  const validId = mockMongoId;
-  const invalidId = "invalidId";
+  const VALID_ID = SAMPLE.id;
+  const INVALID_ID = "invalidId";
   const baseUrl = "/";
 
   async function initMocks() {
@@ -59,8 +58,8 @@ describe("episodesCrudController", () => {
   } );
 
   describe("getOneById (GET)", () => {
-    const validUrl = `${baseUrl}${validId}`;
-    const invalidUrl = `${baseUrl}${invalidId}`;
+    const validUrl = `${baseUrl}${VALID_ID}`;
+    const invalidUrl = `${baseUrl}${INVALID_ID}`;
 
     it("valid request-response", async () => {
       const res = await request(router).get(validUrl);
@@ -120,7 +119,7 @@ describe("episodesCrudController", () => {
   } );
 
   describe("patchOne (PATCH)", () => {
-    const validUrl = `${baseUrl}${validId}`;
+    const validUrl = `${baseUrl}${VALID_ID}`;
     const payload = {
       entity: {
         title: "updated",
@@ -148,7 +147,7 @@ describe("episodesCrudController", () => {
   } );
 
   describe("deleteOne (DELETE)", () => {
-    const validUrl = `${baseUrl}${validId}`;
+    const validUrl = `${baseUrl}${VALID_ID}`;
 
     beforeEach(async ()=> {
       await testingSetup.useMockedUser(fixtureUsers.Admin.UserWithRoles);

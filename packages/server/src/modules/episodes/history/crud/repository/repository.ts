@@ -5,6 +5,9 @@ import { Injectable } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
+import { EpisodeHistoryEntryOdm } from "./odm";
+import { EpisodeHistoryEntryEvents } from "./events";
+import { getCriteriaPipeline } from "./criteria-pipeline";
 import { type DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
 import { SeriesKey } from "#episodes/series";
@@ -14,9 +17,6 @@ import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
-import { EpisodeHistoryEntryOdm } from "./odm";
-import { EpisodeHistoryEntryEvents } from "./events";
-import { getCriteriaPipeline } from "./criteria-pipeline";
 
 type FindLastProps = {
   streamId: StreamEntity["id"];
@@ -165,7 +165,7 @@ export class EpisodeHistoryRepository {
 
   async findLast( { streamId }: FindLastProps, options: Options): Promise<Entity | null> {
     const filter = {
-      streamId,
+      streamId: new Types.ObjectId(streamId),
       userId: new Types.ObjectId(options.requestingUserId),
     } satisfies MongoFilterQuery<EpisodeHistoryEntryOdm.Doc>;
     const sort = {

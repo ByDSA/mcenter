@@ -4,6 +4,7 @@ import { asyncMap } from "$shared/utils/arrays";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
 import { UserPayload } from "$shared/models/auth";
+import { EpisodeFilterApplier, EpisodeWeightFixerApplier } from "../appliers";
 import { EpisodesRepository } from "#episodes/crud/episodes/repository";
 import { Episode, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { EpisodeLastTimePlayedService } from "#episodes/history";
@@ -17,7 +18,6 @@ import { genRandomPickerWithData } from "#modules/picker/resource-picker/resourc
 import { EpisodesUsersRepository } from "#episodes/crud/user-infos/repository";
 import { User } from "#core/auth/users/User.decorator";
 import { TokenAuth } from "#core/auth/strategies/token/decorator";
-import { EpisodeFilterApplier, EpisodeWeightFixerApplier } from "../appliers";
 
 class ShowPickerParamsDto extends createZodDto(z.object( {
   streamKey: z.string(),

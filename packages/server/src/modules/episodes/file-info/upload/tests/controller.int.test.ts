@@ -4,14 +4,14 @@ import { Application } from "express";
 import supertest from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
-import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
-import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { loadFixtureSampleSeriesWithoutEpisodes } from "#core/db/tests/fixtures/sets/SampleSeries";
-import { EPISODES_MEDIA_PATH } from "#episodes/utils";
 import { EpisodeFileInfosUploadModule } from "../module";
 import { EPISODES_MEDIA_UPLOAD_FOLDER_PATH } from "../utils";
 import { uploadEpisodeFile } from "./utils";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { fixtureEpisodes } from "#episodes/tests";
+import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
+import { loadFixtureSampleSeriesWithoutEpisodes } from "#core/db/tests/fixtures/sets/SampleSeries";
+import { EPISODES_MEDIA_PATH } from "#episodes/utils";
 
 const sampleFileName = "sample.mp4";
 const sampleFile = Buffer.from(fs.readFileSync(EPISODES_MEDIA_PATH + "/" + sampleFileName));
@@ -58,7 +58,7 @@ describe("episodeFileInfoUploadController integration (db, disk)", () => {
   describe("uploadFile (Crear nuevo episodio)", () => {
     let res: supertest.Response;
     let body: EpisodeFileInfoCrudDtos.UploadFile.Response;
-    const seriesId = SERIES_SAMPLE_SERIES.id;
+    const seriesId = fixtureEpisodes.Series.Samples.SampleSeries.id;
     const episodeKey = "1x01";
     const metadata: EpisodeFileInfoCrudDtos.UploadFile.RequestBody["metadata"] = {
       seriesId,
@@ -105,7 +105,7 @@ describe("episodeFileInfoUploadController integration (db, disk)", () => {
       const relativePath = body.data.fileInfo.path;
 
       // Verificamos que el path relativo devuelto tenga sentido
-      expect(relativePath).toContain(SERIES_SAMPLE_SERIES.key);
+      expect(relativePath).toContain(fixtureEpisodes.Series.Samples.SampleSeries.key);
       expect(relativePath).toContain(season);
 
       const absolutePathCheck = path.join(EPISODES_MEDIA_PATH, relativePath);

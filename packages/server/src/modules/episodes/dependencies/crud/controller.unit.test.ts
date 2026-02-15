@@ -2,7 +2,6 @@ import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
-import { DEPENDENCY_SIMPSONS } from "$sharedSrc/models/episodes/dependencies/test";
 import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
@@ -10,7 +9,9 @@ import { mockMongoId } from "#tests/mongo";
 import { testFailValidation } from "#core/auth/strategies/token/tests";
 import { EpisodeDependenciesRepository } from "./repository/repository";
 import { EpisodeDependenciesCrudController } from "./controller";
+import { fixtureEpisodes } from "#episodes/tests";
 
+const DEPENDENCY_SIMPSONS = fixtureEpisodes.Simpsons.Episodes.Dependencies.Sample;
 describe("episodeDependenciesCrudController", () => {
   let routerApp: Application;
   let testingSetup: TestingSetup;

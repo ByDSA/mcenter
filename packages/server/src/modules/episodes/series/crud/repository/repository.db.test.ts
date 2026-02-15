@@ -1,12 +1,13 @@
 import { assertIsDefined } from "$shared/utils/validation";
-import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
+import { type SeriesEntity, seriesEntitySchema } from "../../models";
+import { CreateDto, SeriesRepository } from "./repository";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { loadFixtureAuthUsers } from "#core/db/tests/fixtures/sets/auth-users";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { fixtureEpisodes } from "#episodes/tests";
-import { type SeriesEntity, seriesEntitySchema } from "../../models";
-import { CreateDto, SeriesRepository } from "./repository";
+
+const SERIES_SAMPLE_SERIES = fixtureEpisodes.Series.Samples.SampleSeries;
 
 describe("repository", () => {
   let repo: SeriesRepository;
@@ -93,7 +94,8 @@ describe("repository", () => {
       } satisfies Parameters<typeof repo.getMany>[0];
       const ret = await repo.getMany(criteria);
 
-      expect(ret.data[0].metadata?.countEpisodes).toBe(fixtureEpisodes.SampleSeries.List.length);
+      expect(ret.data[0].metadata?.countEpisodes)
+        .toBe(fixtureEpisodes.SampleSeries.Episodes.List.length);
       expect(ret.data[0].metadata?.countSeasons).toBe(2);
     } );
   } );

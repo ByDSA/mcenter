@@ -25,20 +25,34 @@ export namespace EpisodeHistoryEntryCrudDtos {
       ],
     } );
     export type Criteria = z.infer<typeof criteriaSchema>;
-    export const dataSchema = episodeHistoryEntryEntitySchema
-      .omit( {
-        resource: true,
-      } )
-      .extend( {
-        resource: episodeEntitySchema.required( {
-          fileInfos: true,
-          userInfo: true,
-        } ),
-      } );
+    export const dataSchema = episodeHistoryEntryEntitySchema;
 
     export type Data = z.infer<typeof dataSchema>;
     export const responseSchema = createManyResultResponseSchema(dataSchema);
     export type Response = z.infer<typeof responseSchema>;
+    }
+
+  export namespace GetManyBySeriesId {
+    export const dataSchema = episodeHistoryEntryEntitySchema
+      .required( {
+        resource: true,
+      } );
+    export const responseSchema = createManyResultResponseSchema(dataSchema);
+    export type Response = z.infer<typeof responseSchema>;
+
+  }
+  export namespace GetAllEntriesBySeriesId {
+    export const dataSchema = episodeHistoryEntryEntitySchema
+      .omit( {
+        resource: true,
+      } ).extend( {
+        resource: episodeEntitySchema.required( {
+          series: true,
+        } ),
+      } );
+    export const responseSchema = createManyResultResponseSchema(dataSchema);
+    export type Response = z.infer<typeof responseSchema>;
+
   }
 
   export namespace CreateOne {

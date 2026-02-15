@@ -1,14 +1,12 @@
 import { fixtureEpisodes } from "$sharedSrc/models/episodes/tests/fixtures";
 import { expectEpisodes } from "$sharedSrc/models/episodes/tests";
-import { SERIES_SAMPLE_SERIES, SERIES_SIMPSONS } from "$sharedSrc/models/episodes/series/tests/fixtures";
-import { expectSeries } from "$sharedSrc/models/episodes/series/tests";
+import { loadFixtureSampleSeries } from "./sets/SampleSeries";
+import { loadFixtureSimpsons } from "./sets";
 import { EpisodeOdm } from "#episodes/crud/episodes/repository/odm";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
-import { loadFixtureSampleSeries } from "./sets/SampleSeries";
-import { loadFixtureSimpsons } from "./sets";
 
-const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
+const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.Episodes.List;
 let testingSetup: TestingSetup;
 
 beforeAll(async () => {
@@ -30,7 +28,7 @@ it("should load fixture simpsons", async () => {
   const seriesDocOdm: SeriesOdm.FullDoc[] = await SeriesOdm.Model.find();
   const series = SeriesOdm.toEntity(seriesDocOdm[0]);
 
-  expectSeries(series, SERIES_SIMPSONS);
+  expect(series).toMatchObject(fixtureEpisodes.Series.Samples.Simpsons);
 
   const episodesDocOdm = await EpisodeOdm.Model.find();
   const episodes = episodesDocOdm.map(EpisodeOdm.toEntity);
@@ -49,12 +47,12 @@ it("should load fixture sample series", async () => {
   const seriesDocOdm: SeriesOdm.FullDoc[] = await SeriesOdm.Model.find();
   const series = SeriesOdm.toEntity(seriesDocOdm[0]);
 
-  expectSeries(series, SERIES_SAMPLE_SERIES);
+  expect(series).toMatchObject(fixtureEpisodes.Series.Samples.SampleSeries);
 
   const episodesDocOdm = await EpisodeOdm.Model.find();
   const episodes = episodesDocOdm.map(EpisodeOdm.toEntity);
 
-  expectEpisodes(episodes, fixtureEpisodes.SampleSeries.List.map(e=>{
+  expectEpisodes(episodes, fixtureEpisodes.SampleSeries.Episodes.List.map(e=>{
     const { fileInfos, ...ret } = e;
 
     return ret;

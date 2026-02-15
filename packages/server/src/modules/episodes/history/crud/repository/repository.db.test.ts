@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
+import { EpisodeHistoryRepository } from "./repository";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
@@ -9,7 +9,8 @@ import { fixtureEpisodes } from "#episodes/tests";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
 import { loadFixtureImageCoversInDisk } from "#core/db/tests/fixtures/sets/image-covers";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
-import { EpisodeHistoryRepository } from "./repository";
+
+const SERIES_SAMPLE_SERIES = fixtureEpisodes.Series.Samples.SampleSeries;
 
 describe("episodeHistoryRepository", () => {
   let testingSetup: TestingSetup;
@@ -88,14 +89,14 @@ describe("episodeHistoryRepository", () => {
         const criteria: Parameters<typeof repo.getManyByCriteria>[0] = {
           filter: {
             seriesId: SERIES_SAMPLE_SERIES.id,
-            episodeKey: fixtureEpisodes.SampleSeries.Samples.EP1x01.episodeKey,
+            episodeKey: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.episodeKey,
           },
           expand: ["episodes"],
         };
         const ret = await repo.getManyByCriteria(criteria, options);
 
         expect(ret).toHaveLength(1);
-        expect(ret[0].resourceId).toBe(fixtureEpisodes.SampleSeries.Samples.EP1x01.id);
+        expect(ret[0].resourceId).toBe(fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.id);
       } );
 
       it("filter by seriesId only", async () => {
@@ -114,7 +115,7 @@ describe("episodeHistoryRepository", () => {
       } );
 
       it("filter by episodeId only", async () => {
-        const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+        const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
         const criteriaPast: Parameters<typeof repo.getManyByCriteria>[0] = {
           filter: {
             episodeId: episode.id,
@@ -154,7 +155,7 @@ describe("episodeHistoryRepository", () => {
         const criteria: Parameters<typeof repo.getManyByCriteria>[0] = {
           filter: {
             seriesId: SERIES_SAMPLE_SERIES.id,
-            episodeKey: fixtureEpisodes.SampleSeries.Samples.EP1x01.episodeKey,
+            episodeKey: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.episodeKey,
             timestampMax: futureTimestamp,
           },
           expand: ["episodes"],
@@ -162,15 +163,15 @@ describe("episodeHistoryRepository", () => {
         const ret = await repo.getManyByCriteria(criteria, options);
 
         expect(ret).toHaveLength(1);
-        expect(ret[0].resourceId).toBe(fixtureEpisodes.SampleSeries.Samples.EP1x01.id);
+        expect(ret[0].resourceId).toBe(fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.id);
       } );
     } );
 
     describe("sorting", () => {
       beforeEach(async () => {
         // Crear múltiples entradas con diferentes timestamps
-        const episode1 = fixtureEpisodes.SampleSeries.Samples.EP1x01;
-        const episode2 = fixtureEpisodes.SampleSeries.Samples.EP1x02;
+        const episode1 = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
+        const episode2 = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x02;
 
         await repo.createNewEntryNowFor( {
           episodeId: episode1.id,
@@ -361,7 +362,7 @@ describe("episodeHistoryRepository", () => {
         const criteria: Parameters<typeof repo.getManyByCriteria>[0] = {
           filter: {
             seriesId: SERIES_SAMPLE_SERIES.id,
-            episodeKey: fixtureEpisodes.SampleSeries.Samples.EP1x01.episodeKey,
+            episodeKey: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.episodeKey,
           },
           expand: ["episodes", "episodesFileInfos", "episodesSeries",
             "episodesUserInfo", "episodesSeriesImageCover"],
@@ -414,7 +415,7 @@ describe("episodeHistoryRepository", () => {
     it("should create a new entry", async () => {
       const newEntry = {
         date: new Date(),
-        resourceId: fixtureEpisodes.SampleSeries.Samples.EP1x01.id,
+        resourceId: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.id,
         streamId: new Types.ObjectId().toString(),
       };
 
@@ -433,12 +434,12 @@ describe("episodeHistoryRepository", () => {
     it("should create multiple entries", async () => {
       const entry1 = {
         date: new Date(),
-        resourceId: fixtureEpisodes.SampleSeries.Samples.EP1x01.id,
+        resourceId: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.id,
         streamId: new Types.ObjectId().toString(),
       };
       const entry2 = {
         date: new Date(),
-        resourceId: fixtureEpisodes.SampleSeries.Samples.EP1x02.id,
+        resourceId: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x02.id,
         streamId: new Types.ObjectId().toString(),
       };
 
@@ -505,7 +506,7 @@ describe("episodeHistoryRepository", () => {
     it("should delete and return the entry", async () => {
       const newEntry = {
         date: new Date(),
-        resourceId: fixtureEpisodes.SampleSeries.Samples.EP1x01.id,
+        resourceId: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.id,
         streamId: new Types.ObjectId().toString(),
       };
 
@@ -536,7 +537,7 @@ describe("episodeHistoryRepository", () => {
   } );
 
   describe("findLastByEpisodeId", () => {
-    const episodeId = fixtureEpisodes.SampleSeries.Samples.EP1x01.id;
+    const episodeId = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.id;
 
     it("should return the last entry for an episode", async () => {
       const last = await repo.findLastByEpisodeId(episodeId, options);
@@ -552,7 +553,7 @@ describe("episodeHistoryRepository", () => {
     } );
 
     it("should return most recent entry when multiple exist", async () => {
-      const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+      const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
 
       await repo.createNewEntryNowFor( {
         episodeId: episode.id,
@@ -579,7 +580,7 @@ describe("episodeHistoryRepository", () => {
   } );
 
   describe("findLast", () => {
-    const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+    const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
 
     it("should return the last entry for a stream", async () => {
       const newEntry = {
@@ -626,7 +627,7 @@ describe("episodeHistoryRepository", () => {
 
       const entry2 = {
         date: new Date(),
-        resourceId: fixtureEpisodes.SampleSeries.Samples.EP1x02.id,
+        resourceId: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x02.id,
         streamId,
       };
 
@@ -643,7 +644,7 @@ describe("episodeHistoryRepository", () => {
 
   describe("isLast", () => {
     it("should return true if episode is the last one played by user", async () => {
-      const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+      const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
 
       await repo.createNewEntryNowFor( {
         episodeId: episode.id,
@@ -656,8 +657,8 @@ describe("episodeHistoryRepository", () => {
     } );
 
     it("should return false if episode is not the last one played by user", async () => {
-      const episode1 = fixtureEpisodes.SampleSeries.Samples.EP1x01;
-      const episode2 = fixtureEpisodes.SampleSeries.Samples.EP1x02;
+      const episode1 = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
+      const episode2 = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x02;
 
       await repo.createNewEntryNowFor( {
         episodeId: episode1.id,
@@ -690,7 +691,7 @@ describe("episodeHistoryRepository", () => {
     } );
 
     it("should create a new entry with provided streamId", async () => {
-      const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+      const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
       const streamId = new Types.ObjectId().toString();
 
       await repo.createNewEntryNowFor( {
@@ -708,7 +709,7 @@ describe("episodeHistoryRepository", () => {
     } );
 
     it("should create a new entry with default stream when streamId not provided", async () => {
-      const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+      const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
 
       await repo.createNewEntryNowFor( {
         episodeId: episode.id,
@@ -725,7 +726,7 @@ describe("episodeHistoryRepository", () => {
     } );
 
     it("should set current date on entry", async () => {
-      const episode = fixtureEpisodes.SampleSeries.Samples.EP1x01;
+      const episode = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01;
       const beforeCreate = new Date();
 
       await repo.createNewEntryNowFor( {
@@ -752,8 +753,8 @@ describe("episodeHistoryRepository", () => {
 
     it("should add multiple episodes to history", async () => {
       const episodes = [
-        fixtureEpisodes.SampleSeries.Samples.EP1x01,
-        fixtureEpisodes.SampleSeries.Samples.EP1x02,
+        fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01,
+        fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x02,
       ];
       const streamId = new Types.ObjectId().toString();
 
@@ -771,7 +772,7 @@ describe("episodeHistoryRepository", () => {
 
     it("should add episodes with correct streamId and userId", async () => {
       const episodes = [
-        fixtureEpisodes.SampleSeries.Samples.EP1x01,
+        fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01,
       ];
       const streamId = new Types.ObjectId().toString();
 

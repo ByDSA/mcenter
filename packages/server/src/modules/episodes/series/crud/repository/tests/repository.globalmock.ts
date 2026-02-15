@@ -1,16 +1,26 @@
 /* eslint-disable require-await */
-import { SERIES_SAMPLE_SERIES, SERIES_SIMPSONS } from "$shared/models/episodes/series/tests/fixtures";
 import { createMockClass } from "$sharedTests/jest/mocking";
-import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { SeriesRepository } from "../repository";
+import { registerMockProviderInstance } from "#utils/nestjs/tests";
+import { fixtureEpisodes } from "#episodes/tests";
 
-const ALL_SERIES = [SERIES_SAMPLE_SERIES, SERIES_SIMPSONS];
+const SERIES_SAMPLE_SERIES = fixtureEpisodes.Series.Samples.SampleSeries;
+const ALL_SERIES = fixtureEpisodes.Series.List;
 
 class SeriesRepositoryMock extends createMockClass(SeriesRepository) {
   constructor() {
     super();
 
-    this.getOneByKey.mockResolvedValue(SERIES_SAMPLE_SERIES);
+    this.getOneByKey.mockImplementation(
+      async key=>{
+        const res = ALL_SERIES.find(s=>s.key === key);
+
+        if (!res)
+          return null;
+
+        return res;
+      },
+    );
     this.getOneById.mockImplementation(
       async id=>{
         const res = ALL_SERIES.find(s=>s.id === id);
@@ -25,7 +35,7 @@ class SeriesRepositoryMock extends createMockClass(SeriesRepository) {
     this.deleteOneByIdAndGet.mockResolvedValue(SERIES_SAMPLE_SERIES);
     this.getOneOrCreate.mockResolvedValue(SERIES_SAMPLE_SERIES);
     this.createOneAndGet.mockResolvedValue(SERIES_SAMPLE_SERIES);
-    this.getAll.mockResolvedValue([SERIES_SAMPLE_SERIES, SERIES_SIMPSONS]);
+    this.getAll.mockResolvedValue(ALL_SERIES);
     this.getMany.mockResolvedValue( {
       data: [SERIES_SAMPLE_SERIES],
       metadata: {

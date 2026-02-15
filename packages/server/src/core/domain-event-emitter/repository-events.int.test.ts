@@ -1,14 +1,12 @@
-import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
-import { Episode, EpisodeEntity } from "#episodes/models";
-import { EpisodesRepository } from "#episodes/crud/episodes/repository";
-import { EpisodeEvents } from "#episodes/crud/episodes/repository/events";
 import { fixtureEpisodes } from "#episodes/tests";
+import { Episode, EpisodeEntity } from "#episodes/models";
 import { EntityEvent } from "#core/domain-event-emitter";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { EpisodesCrudModule } from "#episodes/crud/module";
 import { loadFixtureSampleSeries } from "#core/db/tests/fixtures/sets/SampleSeries";
+import { EpisodesRepository, EpisodeEvents } from "#episodes/crud/episodes/repository";
 
 let episodesRepo: EpisodesRepository;
 let domainEventEmitter: DomainEventEmitter;
@@ -33,7 +31,7 @@ beforeAll(async () => {
 } );
 
 it("should emit Patch Event", async () => {
-  const episodeId = fixtureEpisodes.SampleSeries.Samples.EP1x01.id;
+  const episodeId = fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.id;
   const fn = jest.fn();
 
   domainEventEmitter.subscribe(EpisodeEvents.Patched.TYPE, fn);
@@ -51,7 +49,7 @@ it("should emit Patch Event", async () => {
     type: EpisodeEvents.Patched.TYPE,
     payload: {
       hasOld: false,
-      entityId: fixtureEpisodes.SampleSeries.Samples.EP1x01.id,
+      entityId: fixtureEpisodes.SampleSeries.Episodes.Samples.EP1x01.id,
       key: "title",
       value: partialModel.title,
       partialEntity: partialModel,
@@ -62,7 +60,7 @@ it("should emit Patch Event", async () => {
 it("should emit Create Event", async () => {
   const fn = jest.fn((event: EntityEvent<EpisodeEntity>) => {
     expect(event.type).toBe(EpisodeEvents.Created.TYPE);
-    expect(event.payload.entity.seriesId).toBe(SERIES_SAMPLE_SERIES.id);
+    expect(event.payload.entity.seriesId).toBe(fixtureEpisodes.Series.Samples.SampleSeries.id);
     expect(event.payload.entity.episodeKey.startsWith("X")).toBeTruthy();
 
     return Promise.resolve();
@@ -70,10 +68,10 @@ it("should emit Create Event", async () => {
 
   domainEventEmitter.subscribe(EpisodeEvents.Created.TYPE, fn);
 
-  const models = fixtureEpisodes.SampleSeries.List.slice(0, 10).map(episode => ( {
+  const models = fixtureEpisodes.SampleSeries.Episodes.List.slice(0, 10).map(episode => ( {
     ...episode,
     episodeKey: `X${episode.episodeKey}`,
-    seriesId: SERIES_SAMPLE_SERIES.id,
+    seriesId: fixtureEpisodes.Series.Samples.SampleSeries.id,
   } ) as EpisodeEntity);
 
   await testingSetup.db?.dropAll();

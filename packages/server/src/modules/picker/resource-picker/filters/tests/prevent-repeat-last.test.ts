@@ -3,7 +3,7 @@ import { EpisodeEntity } from "$shared/models/episodes/episode";
 import { fixtureEpisodes } from "$sharedSrc/models/episodes/tests";
 import { PreventRepeatLastFilter } from "../prevent-repeat-last-filter";
 
-const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.List;
+const EPISODES_SIMPSONS = fixtureEpisodes.Simpsons.Episodes.List;
 const DEFAULT_EPISODE = EPISODES_SIMPSONS[0];
 const OTHER_EPISODE = EPISODES_SIMPSONS[1];
 

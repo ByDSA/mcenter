@@ -1,14 +1,14 @@
 import { Types } from "mongoose";
 import { fixtureUsers } from "../../auth/tests/fixtures";
 import { genAssertZod } from "../../../utils/validation/zod";
+import { fixtureEpisodes } from "../tests";
 import { EpisodeHistoryEntry, episodeHistoryEntrySchema } from "./history-entry";
-import { fixtureEpisodeHistoryEntries } from "./tests";
 
 const assertIsModel: ReturnType<typeof genAssertZod> = genAssertZod(episodeHistoryEntrySchema);
 const VALID_MODEL: EpisodeHistoryEntry = {
   resourceId: new Types.ObjectId().toString(),
   date: new Date(1234567890),
-  streamId: fixtureEpisodeHistoryEntries.Simpsons.Samples.EP1x01.streamId,
+  streamId: fixtureEpisodes.Simpsons.HistoryEntries.Samples.EP1x01.streamId,
   userId: fixtureUsers.Normal.User.id,
 };
 

@@ -1,7 +1,9 @@
 import { UnprocessableEntityException } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UserPayload } from "$shared/models/auth";
-import { SERIES_SAMPLE_SERIES } from "$shared/models/episodes/series/tests/fixtures";
+import { PlayService } from "../play.service";
+import { RemotePlayersRepository } from "../player-services/repository";
+import { PlayEpisodeService } from "./service";
 import { SeriesCrudModule } from "#episodes/series/crud/module";
 import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
@@ -14,11 +16,7 @@ import { StreamsRepository } from "#episodes/streams/crud/repository";
 import { mockMongoId } from "#tests/mongo";
 import { SeriesRepository } from "#episodes/series/crud/repository";
 import { EpisodeHistoryRepository } from "#episodes/history/crud/repository";
-import { STREAM_SAMPLE } from "#episodes/streams/tests";
 import { fixtureEpisodes } from "#episodes/tests";
-import { PlayService } from "../play.service";
-import { RemotePlayersRepository } from "../player-services/repository";
-import { PlayEpisodeService } from "./service";
 
 describe("playEpisodeService", () => {
   let testingSetup: TestingSetup;
@@ -36,14 +34,9 @@ describe("playEpisodeService", () => {
       playService: testingSetup.getMock(PlayService),
     };
 
-    ret.streamRepo.getOneByKey.mockResolvedValue(STREAM_SAMPLE);
-    // eslint-disable-next-line require-await
-    ret.streamRepo.getOneById.mockImplementation(async id=> id === STREAM_SAMPLE.id
-      ? STREAM_SAMPLE
-      : null);
     ret.episodePickerService.getByStream
-      .mockResolvedValue([fixtureEpisodes.SampleSeries.Samples.EP1x01]);
-    ret.seriesRepo.getOneById.mockResolvedValue(SERIES_SAMPLE_SERIES);
+      .mockResolvedValue([fixtureEpisodes.SampleSeries.Episodes.FullSamples.EP1x01]);
+    ret.seriesRepo.getOneById.mockResolvedValue(fixtureEpisodes.Series.Samples.SampleSeries);
 
     ret.remotePlayersRepo.getAllViewersOf.mockResolvedValue([fixtureUsers.Normal.User.id]);
 

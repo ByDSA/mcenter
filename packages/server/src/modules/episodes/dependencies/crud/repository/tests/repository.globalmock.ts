@@ -1,14 +1,8 @@
+/* eslint-disable require-await */
 import { createMockClass } from "$sharedTests/jest/mocking";
-import { Types } from "mongoose";
-import { registerMockProviderInstance } from "#utils/nestjs/tests";
-import { EpisodeDependencyEntity } from "#episodes/dependencies/models";
 import { EpisodeDependenciesRepository } from "../repository";
-
-const SAMPLE_EPISODE_DEPENDENCY = {
-  id: new Types.ObjectId().toString(),
-  lastEpisodeId: new Types.ObjectId().toString(),
-  nextEpisodeId: new Types.ObjectId().toString(),
-} satisfies EpisodeDependencyEntity;
+import { registerMockProviderInstance } from "#utils/nestjs/tests";
+import { fixtureEpisodes } from "#episodes/tests";
 
 class EpisodeDependenciesRepositoryMock extends createMockClass(EpisodeDependenciesRepository) {
   constructor() {
@@ -16,13 +10,17 @@ class EpisodeDependenciesRepositoryMock extends createMockClass(EpisodeDependenc
 
     this.createOne.mockResolvedValue(undefined);
 
-    this.getAll.mockResolvedValue([SAMPLE_EPISODE_DEPENDENCY]);
+    this.getAll.mockResolvedValue(fixtureEpisodes.Dependencies.List);
 
-    this.getNextByEpisodeId.mockResolvedValue(SAMPLE_EPISODE_DEPENDENCY);
+    this.getNextByEpisodeId.mockImplementation(async (lastId) => {
+      const dep = fixtureEpisodes.Dependencies.List.find(d=>d.lastEpisodeId === lastId);
 
-    this.getManyByCriteria.mockResolvedValue([SAMPLE_EPISODE_DEPENDENCY]);
+      return dep ?? null;
+    } );
 
-    this.deleteOneByIdAndGet.mockResolvedValue(SAMPLE_EPISODE_DEPENDENCY);
+    this.getManyByCriteria.mockResolvedValue(fixtureEpisodes.Dependencies.List);
+
+    this.deleteOneByIdAndGet.mockResolvedValue(fixtureEpisodes.Dependencies.List[0]);
   }
 }
 

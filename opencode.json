@@ -26,8 +26,12 @@
     "list": "allow",
     "bash": {
       "*": "deny",
+      "pnpm build": "allow",
+      "pnpm test": "allow",
       "ls *": "allow",
-      "find *": "allow"
+      "find *": "allow",
+      "git *": "ask",
+      "git diff": "allow"
     },
     "external_directory": "deny"
   },
