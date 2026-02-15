@@ -3,7 +3,6 @@ import { Application } from "express";
 import { HttpStatus } from "@nestjs/common";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicEntity } from "$sharedSrc/models/musics/music";
-import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { MusicDtos } from "#musics/models/dto";
@@ -60,7 +59,7 @@ describe("musicsSlugController integration (controller + render + MusicFlowServi
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mocks.musicRepo.getOneBySlug.mockResolvedValue(fixtureMusics.Disk.Samples.DK);
+    mocks.musicRepo.getOneBySlug.mockResolvedValue(fixtureMusics.Musics.Samples.DK);
   } );
 
   describe("getRaw (GET /:slug)", () => {
@@ -69,7 +68,7 @@ describe("musicsSlugController integration (controller + render + MusicFlowServi
         .get(URL)
         .expect(HttpStatus.OK);
 
-      expectWithMusic(res, fixtureMusics.Disk.Samples.DK);
+      expectWithMusic(res, fixtureMusics.Musics.Samples.DK);
       expectControllerFinishRequest();
     } );
 
@@ -78,7 +77,7 @@ describe("musicsSlugController integration (controller + render + MusicFlowServi
         .get(URL + "?format=json")
         .expect(HttpStatus.OK);
 
-      expectWithMusic(res, fixtureMusics.Disk.Samples.DK);
+      expectWithMusic(res, fixtureMusics.Musics.Samples.DK);
       expectControllerFinishRequest();
     } );
 
@@ -86,7 +85,7 @@ describe("musicsSlugController integration (controller + render + MusicFlowServi
       const res = await request(router)
         .get(URL + "?format=m3u8")
         .expect(HttpStatus.OK);
-      const music = fixtureMusics.Disk.Samples.DK;
+      const music = fixtureMusics.Musics.Samples.DK;
       const host = getHostFromSuperTestRequest(res.request);
       const path = PATH_ROUTES.musics.slug.withParams(music.slug);
 
@@ -98,9 +97,9 @@ describe("musicsSlugController integration (controller + render + MusicFlowServi
     it("response raw", async () => {
       mocks.musicRepo.getOneBySlug.mockResolvedValueOnce(
         {
-          ...fixtureMusics.Disk.Samples.DK,
+          ...fixtureMusics.Musics.Samples.DK,
           fileInfos: [
-            fixtureMusicFileInfos.Disk.Samples.DK,
+            fixtureMusics.FileInfos.Samples.DK,
           ],
         },
       );
@@ -130,8 +129,8 @@ describe("musicsSlugController integration (controller + render + MusicFlowServi
 
       it("should call repository with fileInfos when format is raw", async () => {
         mocks.musicRepo.getOneBySlug.mockResolvedValueOnce( {
-          ...fixtureMusics.Disk.Samples.DK,
-          fileInfos: [fixtureMusicFileInfos.Disk.Samples.DK],
+          ...fixtureMusics.Musics.Samples.DK,
+          fileInfos: [fixtureMusics.FileInfos.Samples.DK],
         } );
 
         await request(router).get("/test-slug?format=raw");

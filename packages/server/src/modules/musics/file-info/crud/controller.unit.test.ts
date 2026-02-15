@@ -4,7 +4,7 @@ import { HttpStatus, UnprocessableEntityException } from "@nestjs/common";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
-import { fixtureMusicFileInfos } from "$shared/models/musics/file-info/tests/fixtures";
+import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";
@@ -13,7 +13,7 @@ import { musicFileInfoEntitySchema } from "../models";
 import { MusicFileInfoController } from "./controller";
 import { MusicFileInfoRepository } from "./repository";
 
-const SAMPLE = fixtureMusicFileInfos.Disk.Samples.DK;
+const SAMPLE = fixtureMusics.FileInfos.Samples.DK;
 
 describe("musicFileInfoController", () => {
   let testingSetup: TestingSetup;
@@ -63,7 +63,7 @@ describe("musicFileInfoController", () => {
         .post(URL)
         .send( {
           filter: {
-            musicId: fixtureMusicFileInfos.Disk.Samples.DK.musicId,
+            musicId: fixtureMusics.FileInfos.Samples.DK.musicId,
           },
         } satisfies MusicFileInfoCrudDtos.GetMany.Criteria);
 
@@ -71,7 +71,7 @@ describe("musicFileInfoController", () => {
 
       expect(res.statusCode).toBe(HttpStatus.OK);
       expect(musicFileInfoEntitySchema.array().parse(res.body.data))
-        .toEqual([fixtureMusicFileInfos.Disk.Samples.DK]);
+        .toEqual([fixtureMusics.FileInfos.Samples.DK]);
     } );
 
     it("should return empty array when filter is not provided", async () => {

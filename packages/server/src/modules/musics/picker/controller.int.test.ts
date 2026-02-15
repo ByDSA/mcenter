@@ -13,8 +13,8 @@ import { MusicRendererModule } from "../renderer/module";
 import { MusicGetRandomController } from "./controller";
 import { MusicGetRandomService } from "./service";
 
-const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
-const MUSIC_WITH_USER_INFO = fixtureMusics.Disk.WithUserInfo.List[0];
+const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Musics.List;
+const MUSIC_WITH_USER_INFO = fixtureMusics.Musics.FullList[0];
 
 describe("musicGetRandomController integration (controller + service + render)", () => {
   let testingSetup: TestingSetup;

@@ -3,7 +3,7 @@ import { MusicEntity } from "#musics/models";
 import { fixtureMusics } from "#musics/tests";
 
 export const loadFixtureMusicsInDisk = async () => {
-  const musicsOdm: MusicOdm.Doc[] = fixtureMusics.Disk.List
+  const musicsOdm: MusicOdm.Doc[] = fixtureMusics.Musics.List
     .map((music: MusicEntity) => MusicOdm.toFullDoc(music));
 
   await MusicOdm.Model.insertMany(musicsOdm);

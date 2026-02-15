@@ -3,7 +3,6 @@ import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { UserPayload } from "$shared/models/auth";
-import { fixtureMusicFileInfos } from "$shared/models/musics/file-info/tests/fixtures";
 import { MusicEntityWithFileInfos } from "$shared/models/musics";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
@@ -14,10 +13,7 @@ import { fixturesRemotePlayers } from "../tests/fixtures";
 import { PlayMusicController } from "./controller";
 import { PlayMusicService } from "./service";
 
-const MUSIC_WITH_FILE_INFO: MusicEntityWithFileInfos = {
-  ...fixtureMusics.Disk.Samples.DK,
-  fileInfos: [fixtureMusicFileInfos.Disk.Samples.DK],
-};
+const MUSIC_WITH_FILE_INFO: MusicEntityWithFileInfos = fixtureMusics.Musics.FullSamples.DK;
 
 describe("playMusicController", () => {
   let testingSetup: TestingSetup;

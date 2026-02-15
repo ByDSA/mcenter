@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { join } from "path";
-import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
+import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { MUSIC_DATA_FOLDER } from "#tests/MusicData";
 import { md5FileAsync } from "#utils/crypt";
 import { FindOptions, findFiles } from ".";
 
-const { DK, AOT4_COPY, A_AOT4, DRIFTVEIL } = fixtureMusicFileInfos.Disk.Samples;
+const { DK, AOT4_COPY, A_AOT4, DRIFTVEIL } = fixtureMusics.FileInfos.Samples;
 
 describe("getHashFromFile", () => {
   it("existing path", async () => {

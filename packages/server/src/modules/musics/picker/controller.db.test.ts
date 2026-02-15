@@ -22,7 +22,7 @@ import { MusicGetRandomService } from "./service";
 
 let routerApp: Application;
 let testingSetup: TestingSetup;
-const MUSICS_WITH_TAGS_SAMPLES = fixtureMusics.Disk.List;
+const MUSICS_WITH_TAGS_SAMPLES = fixtureMusics.Musics.List;
 
 async function loadFixtures() {
   await loadFixtureMusicsInDisk();
@@ -93,7 +93,7 @@ describe("controller integration (db, render)", () => {
     testingSetup.getMock(MusicsSearchService).filter.mockImplementation(
       // eslint-disable-next-line require-await
       async (_userId, queryFilter) => ( {
-        data: fixtureMusics.Disk.WithUserInfo.List.map((music) => {
+        data: fixtureMusics.Musics.FullList.map((music) => {
           const ret: SearchRet["data"][0] = {
             addedAt: music.addedAt.getTime(),
             artist: music.artist,
@@ -123,7 +123,7 @@ describe("controller integration (db, render)", () => {
           } else
             return false;
         } ),
-        total: fixtureMusics.Disk.WithUserInfo.List.length,
+        total: fixtureMusics.Musics.FullList.length,
       } ) as SearchRet,
     );
 
@@ -157,7 +157,7 @@ describe("controller integration (db, render)", () => {
     } );
 
     it("should get a music if query weight is put", async () => {
-      const list = fixtureMusics.Disk.WithUserInfo.List;
+      const list = fixtureMusics.Musics.FullList;
       const possibleMusics: MusicEntityWithUserInfo[] = list.filter(
         (music) => music.userInfo.weight > 10,
       );

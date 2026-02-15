@@ -1,5 +1,4 @@
 import { createMockClass } from "$sharedTests/jest/mocking";
-import { fixtureMusicFileInfos } from "$shared/models/musics/file-info/tests/fixtures";
 import { assertIsDefined } from "$shared/utils/validation";
 import { fixtureMusics } from "#musics/tests";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
@@ -11,22 +10,22 @@ class MusicsRepositoryMock extends createMockClass(MusicsRepository) {
     // eslint-disable-next-line require-await
     this.getAll.mockImplementation(async (props)=> {
       if (props?.criteria?.expand?.includes("userInfo"))
-        return fixtureMusics.Disk.WithUserInfo.List;
+        return fixtureMusics.Musics.FullList;
 
-      return fixtureMusics.Disk.List;
+      return fixtureMusics.Musics.List;
     } );
 
     // eslint-disable-next-line require-await
     this.getManyByQuery.mockImplementation(async (_params, props) => {
       if (props?.criteria?.expand?.includes("userInfo"))
-        return fixtureMusics.Disk.WithUserInfo.List;
+        return fixtureMusics.Musics.FullList;
 
-      return fixtureMusics.Disk.List;
+      return fixtureMusics.Musics.List;
     } );
 
     this.createOneFromPath.mockImplementation((path: string) => {
-      const musicFileInfo = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
-      const music = fixtureMusics.Disk.List.find(m => m.id === musicFileInfo.musicId);
+      const musicFileInfo = fixtureMusics.FileInfos.List.find((m) => m.path === path)!;
+      const music = fixtureMusics.Musics.List.find(m => m.id === musicFileInfo.musicId);
 
       assertIsDefined(music);
 

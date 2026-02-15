@@ -6,7 +6,7 @@ import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { fixtureMusics } from "#musics/tests";
 import { MusicPlaylistsRepository } from "../repository";
 
-const SAMPLE_MUSIC = fixtureMusics.Disk.Samples.DK;
+const SAMPLE_MUSIC = fixtureMusics.Musics.Samples.DK;
 
 export const SAMPLE_PLAYLIST = {
   id: new Types.ObjectId().toString(),

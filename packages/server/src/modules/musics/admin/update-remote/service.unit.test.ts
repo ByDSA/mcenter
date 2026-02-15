@@ -1,6 +1,5 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
-import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { createMockedModule } from "#utils/nestjs/tests";
@@ -13,7 +12,7 @@ import { musicEntitySchema } from "../../models";
 import { MusicsCrudModule } from "../../crud/module";
 import { UpdateRemoteTreeService, UpdateResult } from "./service";
 
-const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Disk.List;
+const MUSICS_SAMPLES_IN_DISK = fixtureMusics.Musics.List;
 
 describe("updateRemoteService", () => {
   let testingSetup: TestingSetup;
@@ -75,7 +74,7 @@ describe("updateRemoteService", () => {
   } );
 
   it("fixAll no changes", async () => {
-    musicFileInfoRepoMock.getAll.mockResolvedValue(fixtureMusicFileInfos.Disk.List);
+    musicFileInfoRepoMock.getAll.mockResolvedValue(fixtureMusics.FileInfos.List);
     const result = await service.update( {
       job: new MockJob(),
       userId: fixtureUsers.Admin.User.id,
@@ -92,7 +91,7 @@ describe("updateRemoteService", () => {
     // Remove one music in remote
     const musics = [...MUSICS_SAMPLES_IN_DISK];
     const deletedMusic = musics.splice(2, 1)[0];
-    const musicFileInfos = [...fixtureMusicFileInfos.Disk.List];
+    const musicFileInfos = [...fixtureMusics.FileInfos.List];
     const deletedMusicFileInfo = musicFileInfos.splice(
       musicFileInfos.findIndex(mf=>mf.musicId === deletedMusic.id),
       1,
@@ -102,7 +101,7 @@ describe("updateRemoteService", () => {
     musicFileInfoRepoMock.getAll.mockResolvedValue(musicFileInfos);
     musicFileInfoRepoMock.upsertOneByPathAndGet.mockResolvedValue(deletedMusicFileInfo);
     musicRepoMock.createOneFromPath = jest.fn((path: string, _userId: string) => {
-      const musicFileInfo = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
+      const musicFileInfo = fixtureMusics.FileInfos.List.find((m) => m.path === path)!;
       const music = MUSICS_SAMPLES_IN_DISK.find(m=>m.id === musicFileInfo.musicId);
 
       assertIsDefined(music);

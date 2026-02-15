@@ -5,7 +5,7 @@ import { mongoDbId, taggableSchema } from "../resources/partial-schemas";
 import { slugSchema } from "../utils/schemas/slug";
 import { imageCoverEntitySchema } from "../image-covers";
 import { musicFileInfoEntitySchema } from "./file-info";
-import { musicUserInfoSchema } from "./user-info/user-info";
+import { musicUserInfoEntitySchema } from "./user-info/user-info";
 
 const optionalPropsSchema = z.object( {
   album: z.string().optional(),
@@ -32,7 +32,7 @@ type Model = z.infer<typeof modelSchema>;
 const entitySchema = modelSchema.extend( {
   id: idSchema,
   fileInfos: z.array(musicFileInfoEntitySchema).optional(),
-  userInfo: musicUserInfoSchema.optional(),
+  userInfo: musicUserInfoEntitySchema.optional(),
   imageCover: imageCoverEntitySchema.optional(),
   isFav: z.boolean().optional(),
 } );

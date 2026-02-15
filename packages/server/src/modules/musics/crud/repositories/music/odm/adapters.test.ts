@@ -11,7 +11,7 @@ function removeUndefinedProps(obj: Record<string, any>) {
 
 describe("musicModelToDocOdm", () => {
   it("should convert Music model to DocOdm correctly", () => {
-    const music = fixtureMusics.Disk.Samples.A_AOT4;
+    const music = fixtureMusics.Musics.Samples.A_AOT4;
     const expectedDocOdm: DocOdm = {
       _id: new mongoose.Types.ObjectId(music.id),
       title: music.title,
@@ -131,7 +131,7 @@ describe("musicDocOdmToModel", () => {
 
 describe("reversibility", () => {
   it("should be reversible: model->odm->model", () => {
-    const music: MusicEntity = fixtureMusics.Disk.Samples.A_AOT4;
+    const music: MusicEntity = fixtureMusics.Musics.Samples.A_AOT4;
     const docOdm = musicEntityToDocOdm(music);
     const result = docOdmToEntity(docOdm);
 
@@ -141,14 +141,14 @@ describe("reversibility", () => {
   it("should be reversible: odm->model->odm", () => {
     const docOdm: FullDocOdm = {
       _id: new mongoose.Types.ObjectId(),
-      title: fixtureMusics.Disk.Samples.A_AOT4.title,
-      url: fixtureMusics.Disk.Samples.A_AOT4.slug,
-      artist: fixtureMusics.Disk.Samples.A_AOT4.artist,
+      title: fixtureMusics.Musics.Samples.A_AOT4.title,
+      url: fixtureMusics.Musics.Samples.A_AOT4.slug,
+      artist: fixtureMusics.Musics.Samples.A_AOT4.artist,
       tags: ["t1", "t3"],
       uploaderUserId: new mongoose.Types.ObjectId(fixtureUsers.Admin.User.id),
-      createdAt: fixtureMusics.Disk.Samples.A_AOT4.createdAt,
-      updatedAt: fixtureMusics.Disk.Samples.A_AOT4.updatedAt,
-      addedAt: fixtureMusics.Disk.Samples.A_AOT4.addedAt,
+      createdAt: fixtureMusics.Musics.Samples.A_AOT4.createdAt,
+      updatedAt: fixtureMusics.Musics.Samples.A_AOT4.updatedAt,
+      addedAt: fixtureMusics.Musics.Samples.A_AOT4.addedAt,
     };
     const music = docOdmToEntity(docOdm);
     const result = musicEntityToDocOdm(music);

@@ -1,5 +1,5 @@
 import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
-import { MusicEntity } from "#musics/models";
+import { MusicEntity, MusicUserInfoEntity } from "#musics/models";
 import { ResourcePickerRandom } from "#modules/picker/resource-picker/resource-picker-random";
 import { MusicFilterApplier, MusicWeightFixerApplier } from "./appliers";
 
@@ -32,13 +32,14 @@ export class MusicPickerRandom extends ResourcePickerRandom<R> {
       resource.userInfo.lastTimePlayed = time;
     else {
       resource.userInfo = {
+        id: null!,
         userId: null!,
         musicId: resource.id,
         weight: 0,
         lastTimePlayed: time,
         createdAt: null!,
         updatedAt: null!,
-      };
+      } satisfies MusicUserInfoEntity;
     }
   }
 }

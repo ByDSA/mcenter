@@ -15,8 +15,8 @@ const musicUserInfoSchema = z.object( {
 
 type MusicUserInfo = z.infer<typeof musicUserInfoSchema>;
 
-const musicUserInfoEntitySchema = musicUserInfoSchema.extend( {
-  id: mongoDbId,
+const musicUserInfoEntitySchema = musicUserInfoSchema.required( {
+  id: true,
 } );
 
 type MusicUserInfoEntity = z.infer<typeof musicUserInfoEntitySchema>;

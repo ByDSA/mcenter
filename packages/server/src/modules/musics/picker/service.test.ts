@@ -1,5 +1,7 @@
-import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
+import { MusicHistoryEntryEntity } from "../history/models";
+import { MusicGetRandomService } from "./service";
+import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { createMockedModule } from "#utils/nestjs/tests";
 import { MusicHistoryModule } from "#musics/history/module";
@@ -8,13 +10,11 @@ import { MusicsRepository } from "#musics/crud/repositories/music";
 import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { fixtureMusics } from "#musics/tests";
 import { mockMongoId } from "#tests/mongo";
-import { MusicHistoryEntryEntity } from "../history/models";
-import { MusicGetRandomService } from "./service";
 
 const fixtureUser = fixtureUsers.Normal.User;
 const userId = fixtureUser.id;
-const baseMusicA = fixtureMusics.Disk.Samples.DK;
-const musicWithUserInfo = fixtureMusics.Disk.WithUserInfo.List.find(m => m.id === baseMusicA.id)!;
+const baseMusicA = fixtureMusics.Musics.Samples.DK;
+const musicWithUserInfo = fixtureMusics.Musics.FullList.find(m => m.id === baseMusicA.id)!;
 const musicWithoutUserInfo = {
   ...baseMusicA,
 };
@@ -107,7 +107,8 @@ describe("musicGetRandomService", () => {
           userId: null,
         } );
 
-        expect(result).toEqual(musicWithoutUserInfo);
+        expect(result?.userInfo).toBeUndefined();
+        expect(result).toMatchObject(musicWithoutUserInfo);
       } );
 
       it("keeps userInfo when userId is present", async () => {

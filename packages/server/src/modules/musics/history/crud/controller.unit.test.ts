@@ -2,16 +2,17 @@ import { HttpStatus } from "@nestjs/common";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
 import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
+import { MusicHistoryCrudController } from "./controller";
+import { MusicHistoryRepository } from "./repository";
+import { GetManyCriteria } from "./repository/repository";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
-import { HISTORY_MUSIC_SAMPLES1 } from "#musics/history/tests";
 import { expectBodyEquals } from "#tests/suites/generate-http-case";
 import { putUser } from "#tests/suites/auth";
 import { mockMongoId } from "#tests/mongo";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
-import { MusicHistoryCrudController } from "./controller";
-import { MusicHistoryRepository } from "./repository";
-import { GetManyCriteria } from "./repository/repository";
+import { fixtureMusics } from "#musics/tests";
 
+const SAMPLE_HISTORY = [fixtureMusics.HistoryEntries.List[0]];
 const validCriteria = {
   limit: 10,
   sort: {
@@ -55,7 +56,7 @@ crudTestsSuite( {
             },
           }],
         },
-        returned: HISTORY_MUSIC_SAMPLES1,
+        returned: SAMPLE_HISTORY,
       } ),
       auth: {
         roles: {
@@ -83,13 +84,13 @@ crudTestsSuite( {
         repoConfig: ((ctx: any)=>( {
           getFn: props.buildDynamicConfig(ctx).mockConfig.getFn,
           params: [{}],
-          returned: HISTORY_MUSIC_SAMPLES1,
+          returned: SAMPLE_HISTORY,
         } )),
         getExpressApp: props.getExpressApp,
         response: {
           body: expectBodyEquals(
             createSuccessResultResponse(
-              HISTORY_MUSIC_SAMPLES1.map(h=>JSON.parse(JSON.stringify(h))),
+              SAMPLE_HISTORY.map(h=>JSON.parse(JSON.stringify(h))),
             ),
           ),
           statusCode: HttpStatus.OK,
@@ -110,7 +111,7 @@ crudTestsSuite( {
         expected: {
           params: [mockMongoId],
         },
-        returned: HISTORY_MUSIC_SAMPLES1[0],
+        returned: SAMPLE_HISTORY[0],
       } ),
       url: "/" + mockMongoId,
     },

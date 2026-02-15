@@ -36,7 +36,7 @@ crudTestsSuite( {
     getOne: {
       repoConfig: ((ctx)=>( {
         getFn: ()=>ctx.beforeExecution().repo.getOneById,
-        returned: fixtureMusics.Disk.List[0],
+        returned: fixtureMusics.Musics.List[0],
       } )),
     },
     patchOne: {
@@ -57,7 +57,7 @@ crudTestsSuite( {
           }],
         },
         returned: {
-          ...fixtureMusics.Disk.List[0],
+          ...fixtureMusics.Musics.List[0],
           title: "new title",
         },
       } )),

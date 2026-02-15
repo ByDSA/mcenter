@@ -1,5 +1,4 @@
 import { UnprocessableEntityException } from "@nestjs/common";
-import { fixtureMusicFileInfos } from "$sharedSrc/models/musics/file-info/tests/fixtures";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { createMockedModule, getOrCreateMockProvider } from "#utils/nestjs/tests";
@@ -29,12 +28,7 @@ describe("playMusicService", () => {
     };
 
     ret.musicRepo.getOneBySlug
-      .mockResolvedValue( {
-        ...fixtureMusics.Disk.Samples.DK,
-        fileInfos: [
-          fixtureMusicFileInfos.Disk.Samples.DK,
-        ],
-      } );
+      .mockResolvedValue(fixtureMusics.Musics.FullSamples.DK);
 
     ret.remotePlayersRepo.getAllViewersOf.mockResolvedValue([fixtureUsers.Normal.User.id]);
 

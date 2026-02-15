@@ -1,4 +1,4 @@
-import { fixtureMusicFileInfos } from "$shared/models/musics/file-info/tests/fixtures";
+import { fixtureMusics } from "$sharedSrc/models/musics/tests/fixtures";
 import { createMockClass } from "$sharedTests/jest/mocking";
 import { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
@@ -9,22 +9,22 @@ class MusicFileInfoRepositoryMock extends createMockClass(MusicFileInfoRepositor
     super();
 
     this.upsertOneByPathAndGet.mockImplementation((path: string) => {
-      const musicFileInfos = fixtureMusicFileInfos.Disk.List.find((m) => m.path === path)!;
+      const musicFileInfos = fixtureMusics.FileInfos.List.find((m) => m.path === path)!;
 
       return Promise.resolve(musicFileInfos);
     } );
 
     this.getAllByMusicId.mockImplementation((musicId)=> {
-      const musicFileInfos: MusicFileInfoEntity[] = fixtureMusicFileInfos.Disk.List
+      const musicFileInfos: MusicFileInfoEntity[] = fixtureMusics.FileInfos.List
         .filter((m) => m.musicId === musicId);
 
       return Promise.resolve(musicFileInfos);
     } );
-    this.getOneByHash.mockResolvedValue(fixtureMusicFileInfos.Disk.Samples.DK);
-    this.getOneById.mockResolvedValue(fixtureMusicFileInfos.Disk.Samples.DK);
-    this.getOneByMusicId.mockResolvedValue(fixtureMusicFileInfos.Disk.Samples.DK);
-    this.getOneByPath.mockResolvedValue(fixtureMusicFileInfos.Disk.Samples.DK);
-    this.deleteOneById.mockResolvedValue(fixtureMusicFileInfos.Disk.Samples.DK);
+    this.getOneByHash.mockResolvedValue(fixtureMusics.FileInfos.Samples.DK);
+    this.getOneById.mockResolvedValue(fixtureMusics.FileInfos.Samples.DK);
+    this.getOneByMusicId.mockResolvedValue(fixtureMusics.FileInfos.Samples.DK);
+    this.getOneByPath.mockResolvedValue(fixtureMusics.FileInfos.Samples.DK);
+    this.deleteOneById.mockResolvedValue(fixtureMusics.FileInfos.Samples.DK);
   }
 }
 

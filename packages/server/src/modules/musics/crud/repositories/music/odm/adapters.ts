@@ -37,7 +37,7 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
     addedAt: docOdm.addedAt,
     releasedOn: docOdm.releasedOn,
     fileInfos: docOdm.fileInfos?.map(MusicFileInfoOdm.toEntity),
-    userInfo: docOdm.userInfo ? MusicsUsersOdm.toModel(docOdm.userInfo) : undefined,
+    userInfo: docOdm.userInfo ? MusicsUsersOdm.toEntity(docOdm.userInfo) : undefined,
     isFav: docOdm.isFav,
     imageCoverId: docOdm.imageCoverId?.toString(),
     imageCover: docOdm.imageCover ? ImageCoverOdm.toEntity(docOdm.imageCover) : undefined,
