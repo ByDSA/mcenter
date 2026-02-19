@@ -8,7 +8,7 @@ import { isMobile } from "#modules/utils/env";
 import { EditPlaylistContextMenuItem } from "../Edit/ContextMenuItem";
 import { MusicPlaylistEntity } from "../models";
 import { DeletePlaylistContextMenuItem } from "../Delete/ContextMenuItem";
-import { CopyPlaylistLinkContextMenuItem } from "./CopyPlaylistLinkContextMenuItem";
+import { SharePlaylistLinkContextMenuItem } from "./SharePlaylistLinkContextMenuItem";
 
 type Props = {
   onEdit?: (current: MusicPlaylistEntity, previous: MusicPlaylistEntity)=> void;
@@ -25,25 +25,24 @@ export const MusicPlaylistSettingsButton = (props: Props) => {
       event: e,
       content: (
         <LocalDataProvider data={data!} setData={setData}>
-          <CopyPlaylistLinkContextMenuItem />
+          {isUserOwner && <EditPlaylistContextMenuItem
+            onSuccess={( { previous, current } ) => {
+              props.onEdit?.(current, previous);
+            }}
+          />}
+          <SharePlaylistLinkContextMenuItem />
           {isMobile() && <InstallContextMenuItem
             name={data.name}
             path={`${PATH_ROUTES.musics.frontend.playlists.withParams( {
               playlistId: data.id,
             } )}?autoplay=1`}
           />}
-          {isUserOwner && <>
-            <EditPlaylistContextMenuItem
-              onSuccess={( { previous, current } ) => {
-                props.onEdit?.(current, previous);
-              }}
-            />
-            <DeletePlaylistContextMenuItem
+          {isUserOwner
+            && <DeletePlaylistContextMenuItem
               onActionSuccess={()=> {
                 props.onDelete?.();
               }}
             />
-          </>
           }
         </LocalDataProvider>
       ),

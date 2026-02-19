@@ -3,7 +3,7 @@ import { useUser } from "#modules/core/auth/useUser";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useMusic } from "#modules/musics/hooks";
-import { CopyMusicLinkContextMenuItem } from "#modules/musics/musics/SettingsButton/CopyMusicLinkContextMenuItem";
+import { ShareMusicContextMenuItem } from "#modules/musics/musics/SettingsButton/ShareContextMenuItem";
 import { EditMusicContextMenuItem } from "../../musics/Edit/ContextMenuItem";
 import { AddToPlaylistContextMenuItem } from "../../lists/playlists/AddToPlaylistContextMenuItem";
 import { MusicLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem";
@@ -21,16 +21,16 @@ const HistoryEntryContextMenu = () => {
         <AddToPlaylistContextMenuItem
           musicId={data.resourceId}
         />
-        <CopyMusicLinkContextMenuItem
+        <EditMusicContextMenuItem />
+        <MusicLatestViewsContextMenuItem
+          music={data.resource}
+          musicId={data.resourceId}
+          maxTimestamp={data.date.timestamp}
+        />
+        <ShareMusicContextMenuItem
           token={user?.id}
         />
-        <EditMusicContextMenuItem />
       </LocalDataProvider>
-      <MusicLatestViewsContextMenuItem
-        music={data.resource}
-        musicId={data.resourceId}
-        maxTimestamp={data.date.timestamp}
-      />
       <DeleteHistoryEntryContextMenuItem />
     </>
   );

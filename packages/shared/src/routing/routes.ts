@@ -264,14 +264,23 @@ export const PATH_ROUTES = {
     frontend: {
       path: "/musics",
       slug: {
-        withParams: ( { slug, token }: {slug: string;
-token?: string;} ) => {
+        withParams: ( { slug, token, autoplay }: {
+          slug: string;
+          token?: string;
+          autoplay?: boolean;
+} ) => {
           const url = `/musics/slug/${slug}`;
+          const params = new URLSearchParams();
 
           if (token)
-            return `${url}?token=${token}`;
+            params.append("token", token);
 
-          return url;
+          if (autoplay)
+            params.append("autoplay", "1");
+
+          const query = params.toString();
+
+          return query ? `${url}?${query}` : url;
         },
       },
       playlists: {
@@ -288,17 +297,24 @@ token?: string;} ) => {
           return url;
         },
         slug: {
-          withParams: ( { playlistSlug, userSlug, token }: {
+          withParams: ( { playlistSlug, userSlug, token, autoplay }: {
           playlistSlug: string;
           userSlug: string;
           token?: string;
+          autoplay?: boolean;
 } ) => {
             const url = `/musics/playlists/slug/${userSlug}/${playlistSlug}`;
+            const params = new URLSearchParams();
 
             if (token)
-              return `${url}?token=${token}`;
+              params.append("token", token);
 
-            return url;
+            if (autoplay)
+              params.append("autoplay", "1");
+
+            const query = params.toString();
+
+            return query ? `${url}?${query}` : url;
           },
           path: "/musics/playlists/slug",
         },
@@ -501,8 +517,30 @@ token?: string;} ) => {
       },
       lists: {
         path: "/series/lists",
-        withParams: ( { serieId, episodeKey }: {serieId: string;
-episodeKey?: string;} ) => `/series/lists/${serieId}${episodeKey ? `/${episodeKey}` : ""}`,
+        withParams: ( { serieId }: {
+          serieId: string;
+} ) => `/series/lists/${serieId}`,
+        episode: {
+          withParams: ( { episodeId, autoplay, token }: {
+          episodeId: string;
+          autoplay?: boolean;
+          token?: string;
+} ) => {
+            const url = `/series/episodes/${episodeId}`;
+            const params = new URLSearchParams();
+
+            if (autoplay)
+              params.append("autoplay", "1");
+
+            if (token)
+              params.append("token", token);
+
+            const query = params.toString();
+
+            return query ? `${url}?${query}` : url;
+          },
+
+        },
       },
     },
   },

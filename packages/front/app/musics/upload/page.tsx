@@ -22,6 +22,7 @@ import styles from "./page.module.css";
 
 function injectDefaultUserInfo(music: MusicEntity, userId: string): MusicEntityWithUserInfo {
   music.userInfo = {
+    id: null!,
     createdAt: music.createdAt,
     lastTimePlayed: 0,
     musicId: music.id,

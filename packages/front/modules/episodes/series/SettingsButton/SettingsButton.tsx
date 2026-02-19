@@ -1,14 +1,16 @@
 import { SeriesEntity } from "$shared/models/episodes/series";
 import { assertIsDefined } from "$shared/utils/validation";
+import { UserRoleName } from "$shared/models/auth";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { PropsOf } from "#modules/utils/react";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
+import { useUser } from "#modules/core/auth/useUser";
 import { EditSeriesContextMenuItemCurrentCtx } from "../Edit/ContextMenuItem";
 import { DeleteSeriesContextMenuItemCurrentCtx } from "../Delete/ContextMenuItem";
 import { UploadEpisodesContextMenuItemCurrentCtx } from "../UploadEpisodes/ContextMenuItem";
 import { useSeries } from "../hooks";
-import { CopySeriesLinkContextMenuItemCurrentCtx } from "./CopyLinkContextMenuItem";
+import { ShareSeriesContextMenuItemCurrentCtx } from "./ShareContextMenuItem";
 
 type Props = PropsOf<typeof UploadEpisodesContextMenuItemCurrentCtx> & {
   onUpdate?: (newData: SeriesEntity)=> void;
@@ -20,6 +22,8 @@ export const SeriesSettingsButton = ( { onUpdate, onDelete,
   onUploadEachEpisode: onUpload, seriesId }: Props) => {
   const { openMenu } = useContextMenuTrigger();
   const { data } = useSeries(seriesId);
+  const { user } = useUser();
+  const isAdmin = !!user?.roles.find(r=>r.name === UserRoleName.ADMIN);
 
   return (
     <SettingsButton
@@ -30,10 +34,11 @@ export const SeriesSettingsButton = ( { onUpdate, onDelete,
           event: e,
           content: (
             <LocalDataProvider data={data}>
-              <CopySeriesLinkContextMenuItemCurrentCtx />
-              <EditSeriesContextMenuItemCurrentCtx onSuccess={onUpdate} />
-              <UploadEpisodesContextMenuItemCurrentCtx onUploadEachEpisode={onUpload} />
-              <DeleteSeriesContextMenuItemCurrentCtx onActionSuccess={onDelete} />
+              {isAdmin && <EditSeriesContextMenuItemCurrentCtx onSuccess={onUpdate} />}
+              {isAdmin
+                && <UploadEpisodesContextMenuItemCurrentCtx onUploadEachEpisode={onUpload} />}
+              <ShareSeriesContextMenuItemCurrentCtx />
+              {isAdmin && <DeleteSeriesContextMenuItemCurrentCtx onActionSuccess={onDelete} />}
             </LocalDataProvider>
           ),
         } );

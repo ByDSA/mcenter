@@ -9,7 +9,7 @@ import { DeleteSmartPlaylistContextMenuItem } from "../Delete/ContextMenuItem";
 import { EditSmartPlaylistContextMenuItem } from "../Edit/ContextMenuItem";
 import { PlaySmartPlaylistContextMenuItem } from "../Play/ContextMenuItem";
 import { MusicSmartPlaylistEntity } from "../models";
-import { CopySmartPlaylistLinkContextMenuItem } from "./CopySmartPlaylistLinkContextMenuItem";
+import { ShareSmartPlaylistContextMenuItem } from "./ShareContextMenuItem";
 
 type Props = {
   onDelete: ()=> void;
@@ -28,17 +28,16 @@ export const MusicSmartPlaylistSettingsButton = (props: Props) => {
           initialValue={data.query}
           label="Reproducir modificación"
         />
-        <CopySmartPlaylistLinkContextMenuItem />
+        {isUserOwner && <EditSmartPlaylistContextMenuItem />}
+        <ShareSmartPlaylistContextMenuItem />
         {isMobile() && <InstallContextMenuItem
           name={data.name}
           path={`${PATH_ROUTES.musics.frontend.smartPlaylists.withParams(data.id)}?autoplay=1`}
         />}
-        {isUserOwner && <>
-          <EditSmartPlaylistContextMenuItem />
-          <DeleteSmartPlaylistContextMenuItem
+        {isUserOwner
+          && <DeleteSmartPlaylistContextMenuItem
             onActionSuccess={props.onDelete}
-          />
-        </>}
+          />}
       </LocalDataProvider>,
     } );
   }} />;

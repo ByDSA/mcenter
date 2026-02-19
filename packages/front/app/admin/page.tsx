@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { PATH_ROUTES } from "$shared/routing";
-import { EpisodeTasks } from "$shared/models/episodes/admin";
-import { ImageCoverTasks } from "$shared/models/image-covers/admin";
-import { MusicTasks } from "$shared/models/musics/admin";
+import { tasksEpisodes } from "$shared/models/episodes/admin";
+import { tasksImageCovers } from "$shared/models/image-covers/admin";
+import { tasksMusics } from "$shared/models/musics/admin";
 import { assertIsDefined } from "$shared/utils/validation";
 import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
@@ -28,25 +28,25 @@ const ACTIONS: Action[] = [
     path: PATH_ROUTES.imageCovers.path + "/admin/rebuild-all",
     name: "Image Covers: rebuild all",
     type: "task",
-    taskName: ImageCoverTasks.rebuildAll.name,
+    taskName: tasksImageCovers.rebuildAll.name,
   },
   {
     path: PATH_ROUTES.episodes.admin.updateLastTimePlayed.path,
     name: "Episodes: updateLastTimePlayed",
     type: "task",
-    taskName: EpisodeTasks.cache.updateLastTimePlayed.name,
+    taskName: tasksEpisodes.cache.updateLastTimePlayed.name,
   },
   {
     path: PATH_ROUTES.episodes.admin.fileInfoUpdateSaved.path,
     name: "Episodes: update file-info saved",
     type: "task",
-    taskName: EpisodeTasks.updateFileInfoSaved.name,
+    taskName: tasksEpisodes.updateFileInfoSaved.name,
   },
   {
     path: PATH_ROUTES.episodes.admin.addNewFiles.path,
     name: "Episodes: add new files",
     type: "task",
-    taskName: EpisodeTasks.sync.name,
+    taskName: tasksEpisodes.sync.name,
   },
   {
     path: PATH_ROUTES.streams.fixer.path,
@@ -67,13 +67,13 @@ const ACTIONS: Action[] = [
     path: PATH_ROUTES.musics.admin.updateRemote.path,
     name: "Musics: update remote tree (FileInfo DB + Local files)",
     type: "task",
-    taskName: MusicTasks.sync.name,
+    taskName: tasksMusics.sync.name,
   },
   {
     path: PATH_ROUTES.musics.admin.updateFileInfos.path,
     name: "Musics: update file infos",
     type: "task",
-    taskName: MusicTasks.updateFileInfos.name,
+    taskName: tasksMusics.updateFileInfos.name,
   },
   {
     path: PATH_ROUTES.logs.path,

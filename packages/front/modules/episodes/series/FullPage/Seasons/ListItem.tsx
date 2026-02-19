@@ -2,6 +2,7 @@ import type { EpisodesList } from "./List";
 import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined } from "$shared/utils/validation";
 import { Visibility } from "@mui/icons-material";
+import { UserRoleName } from "$shared/models/auth";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
@@ -10,7 +11,7 @@ import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { EditEpisodeContextMenuItem } from "#modules/episodes/Edit/ContextMenu";
 import { EpisodeLatestViewsContextMenuItem } from "#modules/episodes/history/LatestViews/ContextMenuItem";
 import { DeleteEpisodeContextMenuItem } from "#modules/episodes/Delete/ContextMenuItem";
-import { CopyEpisodeLinkContextMenuItemCurrentCtx } from "#modules/episodes/SettingsButton/CopyLinkContextMenuItem";
+import { ShareEpisodeLinkContextMenuItemCurrentCtx } from "#modules/episodes/SettingsButton/ShareContextMenuItem";
 import { PropsOf } from "#modules/utils/react";
 import { DurationView, WeightView } from "#modules/history";
 import { useUser } from "#modules/core/auth/useUser";
@@ -32,7 +33,7 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
   const { data: episode } = useEpisode(episodeId);
   const coverId = episode?.imageCoverId ?? series?.imageCoverId;
   const { data: imageCover } = useImageCover(coverId ?? null);
-  const user = useUser();
+  const { user } = useUser();
   const hasUser = !!user;
   let subtitleSeen: PropsOf<typeof ResourceSubtitle>["items"][0];
 
@@ -60,6 +61,7 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
   assertIsDefined(fileInfo.mediaInfo.duration);
   const duration = Math.min(fileInfo.mediaInfo.duration, fileInfo.end ?? Infinity)
     - Math.max(fileInfo.start ?? 0);
+  const isAdmin = !!user?.roles.find(r=>r.name === UserRoleName.ADMIN);
 
   return (
     <ResourceEntry
@@ -88,12 +90,12 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
               event: e,
               content: (
                 <LocalDataProvider data={episode}>
-                  <EditEpisodeContextMenuItem initialData={episode} />
-                  <CopyEpisodeLinkContextMenuItemCurrentCtx />
-                  <EpisodeLatestViewsContextMenuItem episodeId={episodeId} />
-                  <DeleteEpisodeContextMenuItem
+                  {isAdmin && <EditEpisodeContextMenuItem initialData={episode} />}
+                  {hasUser && <EpisodeLatestViewsContextMenuItem episodeId={episodeId} />}
+                  <ShareEpisodeLinkContextMenuItemCurrentCtx />
+                  {isAdmin && <DeleteEpisodeContextMenuItem
                     onActionSuccess={onDelete ? ()=>onDelete(episode) : undefined}
-                  />
+                  />}
                 </LocalDataProvider>
               ),
             } );

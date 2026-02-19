@@ -24,7 +24,7 @@ export function EpisodeLatestViews(props: Props) {
   const { maxTimestamp = new Date().getTime(), dateFormat, episodeId } = props;
   const { data: episode } = useEpisode(episodeId);
   const [data, setData] = useState<EpisodeHistoryEntryCrudDtos.GetMany.Response["data"]>();
-  const { data: series } = useSeries(data?.[0]?.resource.seriesId ?? null, {
+  const { data: series } = useSeries(data?.[0]?.resource?.seriesId ?? episode?.seriesId ?? null, {
     notExpandCountEpisodes: true,
     notExpandCountSeasons: true,
     notExpandImageCover: true,

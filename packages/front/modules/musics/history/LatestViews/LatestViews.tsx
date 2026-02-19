@@ -3,10 +3,8 @@ import { MusicHistoryEntry } from "$shared/models/musics/history";
 import { DateFormat } from "#modules/utils/dates";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { useMusic } from "#modules/musics/hooks";
-import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup";
-import { DaLabel } from "#modules/ui-kit/form/Label/Label";
-import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { musicIdInfoElement } from "#modules/musics/utils";
 import { LatestViewsView } from "../../../history/Latest/LatestViewsDisplay";
 import { MusicHistoryApi } from "../requests";
 
@@ -41,20 +39,7 @@ export function MusicLatestViews(props: Props) {
     return element;
 
   return <>
-    <DaInputGroup>
-      <DaInputGroupItem inline>
-        <DaLabel>Título</DaLabel>
-        <DaInputErrorWrap>
-          <span>{music.title}</span>
-        </DaInputErrorWrap>
-      </DaInputGroupItem>
-      <DaInputGroupItem inline>
-        <DaLabel>Artista</DaLabel>
-        <DaInputErrorWrap>
-          <span>{music.artist}</span>
-        </DaInputErrorWrap>
-      </DaInputGroupItem>
-    </DaInputGroup>
+    {musicIdInfoElement(music)}
     {element}
   </>;
 }

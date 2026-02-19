@@ -7,7 +7,7 @@ import { AddToPlaylistContextMenuItem } from "#modules/musics/lists/playlists/Ad
 import { useUser } from "#modules/core/auth/useUser";
 import { LocalDataProvider, useLocalData } from "#modules/utils/local-data-context";
 import { EditMusicContextMenuItem } from "../Edit/ContextMenuItem";
-import { CopyMusicLinkContextMenuItem } from "./CopyMusicLinkContextMenuItem";
+import { ShareMusicContextMenuItem } from "./ShareContextMenuItem";
 
 type Props = {
   musicId: string;
@@ -48,7 +48,7 @@ export function MusicContextMenu() {
       />
       </>
     }
-    <CopyMusicLinkContextMenuItem
+    <ShareMusicContextMenuItem
       token={user?.id}
     />
   </>;
