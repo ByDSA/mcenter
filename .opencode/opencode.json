@@ -1,18 +1,48 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "build": {
+      "permission": {
+        "task": {
+          "*": "deny",
+          "server": "allow"
+        }
+      }
+    }
+  },
   "permission": {
     "*": "deny",
+    "skill": {
+      "*": "allow",
+      "test-": "ask"
+    },
     "read": {
       "*": "deny",
+      "*AGENTS.md": "allow",
+      "*.opencode/*": "allow",
       "*packages/front/app/*": "allow",
       "*packages/front/modules/*": "allow",
       "*packages/front/styles/*": "allow",
       "*packages/server/src/*": "allow",
+      "*packages/server/tsconfig.json": "allow",
+      "*packages/server/package.json": "allow",
       "*packages/server/tests/*": "allow",
       "*packages/shared/src/*": "allow",
       "*packages/shared/tests/*": "allow"
     },
     "edit": {
+      "*": "deny",
+      "*packages/front/app/*": "allow",
+      "*packages/front/modules/*": "allow",
+      "*packages/front/styles/*": "allow",
+      "*packages/server/src/*": "allow",
+      "*packages/server/tsconfig.json": "allow",
+      "*packages/server/package.json": "allow",
+      "*packages/server/tests/*": "allow",
+      "*packages/shared/src/*": "allow",
+      "*packages/shared/tests/*": "allow"
+    },
+    "write": {
       "*": "deny",
       "*packages/front/app/*": "allow",
       "*packages/front/modules/*": "allow",
@@ -29,8 +59,15 @@
       "pnpm build": "allow",
       "pnpm test": "allow",
       "pnpm lint": "allow",
+      "jest *": "allow",
+      "eslint *": "allow",
       "ls *": "allow",
+      "grep *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
+      "pnpm exec *": "allow",
       "find *": "allow",
+      "mkdir *": "allow",
       "git *": "ask",
       "git diff": "allow"
     },

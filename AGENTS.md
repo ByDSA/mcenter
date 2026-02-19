@@ -23,6 +23,8 @@ packages/
 
 Cosas comunes: TypeScript 5.8, ESLint 9, Jest.
 
+**IMPORTANTE**: para todo lo relacionado con "server", delgarás en el subagente "server". Para el resto, como no existe subagente especializado, lo realizarás tú.
+
 ## Packages: información general
 
 ### `packages/shared`
@@ -79,87 +81,10 @@ $shared    → ../shared/build   (producción)
 $sharedSrc → ../shared/src     (dev, tipos)
 ```
 
-### `packages/server`
-Stack:
-- **NestJS 11** sobre Express 5
-- **MongoDB** via Mongoose 7 (ODM principal)
-- **BullMQ** (colas de tareas asíncronas) con Redis
-- **Meilisearch** (búsqueda full-text, especialmente para músicas)
-- **Socket.io** (comunicación realtime con front y con el agente VLC)
-- **Passport** (autenticación: JWT cookie, local email/password, Google OAuth, token)
-- **nestjs-zod** (validación de DTOs en requests y serialización de responses con Zod)
-- **Winston** (logging)
-- **fluent-ffmpeg**, **node-id3** (metadata de audio)
-- **React/React-DOM** (renderizado de emails con TSX en el server)
-- **Chevrotain** (parser de queries de búsqueda de músicas — custom DSL)
-
-Path Alias:
-```
-#core      → src/core
-#core/*    → src/core/*
-#modules/* → src/modules/*
-#musics/*  → src/modules/musics/*
-#episodes/* → src/modules/episodes/*
-#series/*  → src/modules/episodes/series/*
-#utils     → src/utils
-#utils/*   → src/utils/*
-$shared/*  → ../shared/src/*   (solo en dev/tests, en producción usa el build)
-```
-
-
 ### `packages/vlc`
 - App Node.js independiente (no NestJS, arquitectura más simple)
 - Controla VLC via su HTTP interface local
 - Se conecta al server via WebSockets para recibir comandos y enviar estado
-
-
-## Arquitectura del servidor
-
-### Patrón de capas (por módulo)
-
-Cada módulo del servidor sigue esta estructura de capas consistente:
-
-```
-modules/musics/crud/
-├── controller.ts         # Endpoints HTTP (@Get, @Post, etc.)
-├── module.ts             # NestJS Module
-└── repositories/
-    └── music/
-        ├── repository.ts       # Implementación del repositorio (lógica de negocio)
-        ├── events.ts           # Eventos de dominio que emite
-        ├── index.ts            # Re-exports del repositorio
-        └── odm/
-            ├── odm.ts          # Mongoose Model + Schema
-            ├── adapters.ts     # Conversión DB ↔ dominio
-            ├── criteria-pipeline.ts  # Pipelines de agregación MongoDB
-            └── index.ts
-```
-
-**No hay una capa `Service` intermediaria en todos los casos** — algunos controladores llaman directamente a los repositorios. En los módulos más complejos (admin, picker, file-info/upload) sí existe un `service.ts`.
-
-### Domain Event Emitter
-
-Los módulos se comunican entre sí mediante eventos de dominio (no llamadas directas entre servicios). Cada repositorio tiene un `events.ts` que declara los eventos que emite. Se configura en `core/domain-event-emitter/`.
-
-### Sistema de tareas (BullMQ)
-
-Las operaciones costosas (sync disk→DB, update file-info, importar de YouTube, etc.) son tareas asíncronas:
-- Se registran handlers con el decorador `@TaskHandler()`
-- El controlador `core/tasks/controller.ts` expone endpoints para lanzar tareas y consultar su estado
-- El estado se puede recibir como SSE stream (`/api/tasks/:id/status/stream`)
-
-### App Module
-
-El `AppModule` (en `core/app/app.module.ts`) carga dinámicamente el `DevModule` solo en desarrollo. Los módulos de features se cargan via `routeModules` definidos en `core/routing/routes.ts`.
-
-### Autenticación
-
-- **Global**: `OptionalJwtGuard` aplicado a todos los endpoints. Lee el JWT de la cookie.
-- **Rutas protegidas**: usar `@UseGuards(AuthenticatedGuard)`.
-- **Rutas solo admin**: usar `@UseGuards(RolesGuard)` con `@Roles(Role.Admin)`.
-- **Rutas públicas** (accesibles sin JWT): usar `@Public()` + `@PublicCors()` para los endpoints de slug/stream.
-
----
 
 ## Estructura del Frontend
 
@@ -231,23 +156,6 @@ Entidades principales: `musics`, `episodes` (con `file-info`, `history`, `depend
 
 ## Convenciones de naming y estructura
 
-### Archivos de servidor
-- `*.module.ts` — NestJS Module
-- `*.controller.ts` — NestJS Controller (HTTP)
-- `*.service.ts` — NestJS Service (lógica de negocio)
-- `*.repository.ts` / `repository.ts` — Repositorio
-- `odm.ts` — Mongoose Schema + Model
-- `adapters.ts` — Conversión entre capa ODM y dominio
-- `events.ts` — Declaración de eventos de dominio del módulo
-- `*.guard.ts` — NestJS Guards (autenticación/autorización)
-- `*.decorator.ts` — Decoradores personalizados
-- `*.interceptor.ts` — Interceptores NestJS
-- `*.test.ts` — Tests (Jest)
-- `*.unit.test.ts` — Tests unitario donde se prueba un controller/service/repository y se mockea todo lo demás
-- `*.db.test.ts` — Tests de integración con base de datos
-- `*.int.test.ts` — Tests de integración
-- `*.e2e.spec.ts` — Tests E2E
-
 ### Archivos de front
 - `page.tsx` — Página de ruta Next.js (Server Component por defecto)
 - `ClientPage.tsx` — Parte cliente de una página
@@ -265,10 +173,8 @@ El proyecto usa **Conventional Commits** (commitlint configurado). Formato: `typ
 
 - **Zod en todas partes**: los DTOs HTTP (tanto request como response) se validan con Zod via `nestjs-zod`. Los schemas de transport están en `packages/shared/src/models/*/dto/transport.ts`.
 
-- **El server ya tiene un guard JWT global** (`OptionalJwtGuard`): no añadas guards JWT a nivel de módulo salvo que quieras comportamiento específico. Para proteger un endpoint, usa `@UseGuards(AuthenticatedGuard)`.
-
-- **Parser de queries de músicas**: la búsqueda de músicas usa un DSL propio parseado con Chevrotain (`modules/musics/crud/repositories/music/queries/`). Es distinto de Meilisearch — Meilisearch se usa para la búsqueda full-text general, el DSL para filtros estructurados.
-
 - **VLC es un proceso separado**: el package `vlc` no es un módulo del server. Se despliega independientemente en el dispositivo con VLC instalado.
 
-- **Emails con React/TSX**: los templates de email (`VerificationEmail.tsx`, `WelcomeEmail.tsx`) son componentes React renderizados a HTML en el server. Están en `core/auth/strategies/local/`.
+- Si tienes problemas de permisos, lee tu parchivo `.opencode/opencode.json` para no volver intentar comandos que no podrás ejecutar.
+
+- Trata de evitar `as any` siempre que sea posible, especialmente en nuevo código que escribas tú.
