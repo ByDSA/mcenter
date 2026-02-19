@@ -2,16 +2,16 @@ import { createMockClass } from "$sharedTests/jest/mocking";
 import { Types } from "mongoose";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
 import { MusicUserListEntity } from "$shared/models/musics/users-lists";
+import { fixtureMusics } from "$shared/models/musics/tests";
 import { registerMockProviderInstance } from "#utils/nestjs/tests";
 import { MusicUsersListsRepository } from "../repository";
-import { MUSIC_SMART_PLAYLIST_SAMPLE } from "$shared/models/musics/smart-playlists/tests/fixtures";
 
 export const MUSIC_USER_LIST_SAMPLE: MusicUserListEntity = {
   id: new Types.ObjectId().toString(),
   list: [{
     id: new Types.ObjectId().toString(),
     type: "smart-playlist",
-    resourceId: MUSIC_SMART_PLAYLIST_SAMPLE.id,
+    resourceId: fixtureMusics.Playlists.Samples.Normal.id,
   }],
   ownerUserId: fixtureUsers.Normal.User.id,
 };
