@@ -13,14 +13,14 @@ export const DaInputBooleanCheckbox = ( { value, onChange, label, className }: P
   const id = useId();
 
   return (
-    <span className={classes(styles.checkboxWrap, className)}>
+    <label htmlFor={id} className={classes(styles.label, className)}>
       <input
         id={id}
         type="checkbox"
         checked={value}
         onChange={(e) => onChange(e.target.checked)}
       />
-      {label && <label htmlFor={id}>{label}</label>}
-    </span>
+      {label}
+    </label>
   );
 };

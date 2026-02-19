@@ -49,7 +49,7 @@ export function ResourceEntry(
       styles.container,
       isPlaying && styles.playing,
       drag?.isDragging && styles.dragging,
-      play && styles.playable,
+      play && styles.isPlayable,
     )}
   >
     {drag?.element}
