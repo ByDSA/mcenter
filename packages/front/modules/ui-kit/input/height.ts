@@ -1,6 +1,4 @@
-import { useEffect } from "react";
-
-export function measureTextAreaWidth(textarea: HTMLTextAreaElement): number {
+function measureTextAreaWidth(textarea: HTMLTextAreaElement): number {
   // Obtener estilos computados del textarea
   const style = window.getComputedStyle(textarea);
   const paddingLeft = parseFloat(style.paddingLeft || "0");
@@ -99,7 +97,7 @@ function getTextWidth(
   return width;
 }
 
-export function getVisualLines(
+function getVisualLines(
   textarea: HTMLTextAreaElement,
   sentence: string,
 ): number {
@@ -175,45 +173,6 @@ lastLine: string; } {
     lines,
     lastLine: currentPart,
   };
-}
-
-/**
- * Hook que dispara callback la primera vez que el elemento entra en viewport,
- * y re-calcula al redimensionar.
- */
-export function useFirstTimeVisible<E extends Element | null>(
-  ref: React.RefObject<E>,
-  callback: (current: E)=> void,
-) {
-  useEffect(() => {
-    const onResize = () => {
-      if (ref.current)
-        callback(ref.current);
-    };
-    const observer = new IntersectionObserver(
-      entries => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && ref.current) {
-            callback(ref.current);
-            window.addEventListener("resize", onResize);
-            observer.disconnect();
-            break;
-          }
-        }
-      },
-      {
-        threshold: 0.1,
-      },
-    );
-
-    if (ref.current)
-      observer.observe(ref.current);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", onResize);
-    };
-  }, []);
 }
 
 export const updateHeight = (

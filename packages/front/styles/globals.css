@@ -64,20 +64,6 @@ body {
   text-overflow: ellipsis;
 }
 
-a {
-  color: var(--color-link);
-  text-decoration: none;
-  cursor: pointer;
-
-  &:hover,
-  &:focus,
-  &:active {
-    text-decoration: underline;
-    color: var(--color-link-hover);
-  }
-}
-
-
 /** Layout **/
 
 .extra-margin {

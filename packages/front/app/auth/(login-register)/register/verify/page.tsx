@@ -5,6 +5,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined } from "$shared/utils/validation";
 import { backendUrl } from "#modules/requests";
 import { usePageAsyncAction } from "#modules/utils/usePageAsyncAction";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 
 export default function RegisterVerifyPage() {
   const searchParams = useSearchParams();
@@ -16,7 +17,7 @@ export default function RegisterVerifyPage() {
     loadingElement: <p>Verificando token ...</p>,
     errorElement: <><p>Error: Token caducado o incorrecto.</p>
       {email && <p>
-        <a href={email}>Volver a solicitar token</a>
+        <DaAnchor href={email}>Volver a solicitar token</DaAnchor>
       </p>
       }</>,
     action: async () => {

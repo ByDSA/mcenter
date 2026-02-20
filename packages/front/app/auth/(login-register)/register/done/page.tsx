@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { PATH_ROUTES } from "$shared/routing";
 import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { classes } from "#modules/utils/styles";
 import styles from "./styles.module.css";
 
 export default function RegisterDonePage() {
@@ -45,14 +47,14 @@ export default function RegisterDonePage() {
         Te hemos enviado un correo a {" "}
         <span className={styles.strong}>{email}</span>{" "}
         para verificar tu cuenta. Si en unos minutos no lo recibes, haz clic{" "}
-        <a
+        <DaAnchor
           href={resendUrl}
           onClick={!isDisabled ? handleResend : undefined}
           title={isDisabled ? "Desactivado temporalmente" : undefined}
-          className={isDisabled ? styles.disabled : ""}
+          className={classes(isDisabled && styles.disabled)}
         >
           aquí
-        </a>{" "}
+        </DaAnchor>{" "}
         para reenviarlo.
       </p>
       <p>Puedes cerrar esta página cuando quieras.</p>

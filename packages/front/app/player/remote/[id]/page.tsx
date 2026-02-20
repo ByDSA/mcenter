@@ -13,6 +13,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { logger } from "#modules/core/logger";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { EpisodesCrudDtos } from "#modules/episodes/models/dto";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import styles from "./Player.module.css";
 
 let webSockets: RemotePlayerWebSocketsClient | undefined;
@@ -251,7 +252,7 @@ function mapElements(array: PlayerPlaylistElement[]): React.JSX.Element {
       array.filter(
         (_, i)=>i < 10,
       ).map(
-        (item, index) => <li key={index}><a onClick={()=>playId(item.id)}>{item.name}</a></li>,
+        (item, index) => <li key={index}><DaAnchor onClick={()=>playId(item.id)}>{item.name}</DaAnchor></li>,
       )
     }
   </ol>;

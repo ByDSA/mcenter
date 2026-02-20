@@ -19,6 +19,7 @@ import { MediaPlayerPageLayout } from "#modules/player/browser/MediaPlayer/Media
 import { TopbarMainClient } from "#modules/ui-kit/menus/TopbarClient";
 import { GlobalQueryClientProvider } from "#modules/fetching/QueryClientProvider";
 import { Favicon } from "#modules/utils/Favicon/Favicon";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
@@ -146,8 +147,8 @@ async function Menu(customMainSlot: React.ReactNode) {
     className={classes(styles.topbar, styles.fixed)}
     leftAside={
       <>
-        <a className={classes(styles.topbarLeftAsideChild, styles.normal)} href="/"><Favicon/><span className={styles.logoCenter}>Center</span></a>
-        <a className={classes(styles.topbarLeftAsideChild, styles.mini)} href="/"><Favicon/></a>
+        <DaAnchor theme="text" className={classes(styles.topbarLeftAsideChild, styles.normal)} href="/"><Favicon/><span className={styles.logoCenter}>Center</span></DaAnchor>
+        <DaAnchor theme="text" className={classes(styles.topbarLeftAsideChild, styles.mini)} href="/"><Favicon/></DaAnchor>
       </>
     }
     rightAside={

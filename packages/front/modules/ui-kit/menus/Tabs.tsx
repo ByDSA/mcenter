@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { classes } from "#modules/utils/styles";
+import { DaAnchor } from "../Anchor/Anchor";
 import styles from "./Tabs.module.css";
 import { MenuItemData } from "./Sidebar";
 
@@ -16,7 +17,8 @@ export const Tabs = ( { data, className, before }: Props) =>{
       </header>
       <main>
         {data.map((item) => (
-          <a
+          <DaAnchor
+            theme="white"
             key={item.path}
             className={classes(styles.item, item.active && styles.active)}
             href={item.path}
@@ -24,7 +26,7 @@ export const Tabs = ( { data, className, before }: Props) =>{
           >
             {item.icon && <span className={styles.icon}>{item.icon}</span>}
             {item.label}
-          </a>
+          </DaAnchor>
         ))}
       </main>
     </nav>

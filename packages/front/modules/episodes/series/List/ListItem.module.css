@@ -9,9 +9,7 @@
   border-radius: 0.5rem;
   background-color: var(--color-item);
   gap: 0;
-  cursor: pointer;
   padding: 1rem;
-  text-decoration: none !important;
 
   &:hover {
     background-color: var(--color-item-hover);

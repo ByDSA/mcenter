@@ -6,6 +6,7 @@ import { useArrayData } from "#modules/utils/array-data-context";
 import { frontendUrl } from "#modules/requests";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import { SeriesSettingsButton } from "../SettingsButton/SettingsButton";
 import { SeriesEntity } from "../models";
 import { SeriesIcon } from "../SeriesIcon/SeriesIcon";
@@ -33,7 +34,8 @@ export const SeriesListItem = (props: Props) => {
     return <ContentSpinner />;
 
   return (
-    <a
+    <DaAnchor
+      theme="text"
       className={styles.item}
       href={url}
       onClick={(e)=> {
@@ -70,6 +72,6 @@ export const SeriesListItem = (props: Props) => {
           </LocalDataProvider>
         </aside>
       </footer>
-    </a>
+    </DaAnchor>
   );
 };

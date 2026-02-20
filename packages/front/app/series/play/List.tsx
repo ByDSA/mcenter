@@ -10,6 +10,7 @@ import { StreamsFetching } from "#modules/episodes/streams/requests";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudData } from "#modules/fetching/index";
 import { logger } from "#modules/core/logger";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 
 export function List() {
   const router = useRouter();
@@ -71,7 +72,10 @@ export function List() {
 
             return (
               <Fragment key={stream.key}>
-                <a onClick={playStream(stream.key)}>Play {name} ({stream.key}, {stream.mode})</a>
+                <DaAnchor
+                  onClick={playStream(stream.key)}>
+                  Play {name} ({stream.key}, {stream.mode})
+                </DaAnchor>
                 <br/>
                 <br/>
               </Fragment>

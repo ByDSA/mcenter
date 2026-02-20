@@ -1,9 +1,11 @@
 import { classes } from "#modules/utils/styles";
+import { DaAnchor } from "../Anchor/Anchor";
 import { MenuItemData } from "./Sidebar";
 import styles from "./Topbar.module.css";
 
 export const TopbarItem = ( { path, label, title, active, icon, onClick }: MenuItemData) => {
-  return <a
+  return <DaAnchor
+    theme="white"
     key={path}
     className={classes(styles.item, active && styles.active)}
     href={path}
@@ -12,5 +14,5 @@ export const TopbarItem = ( { path, label, title, active, icon, onClick }: MenuI
   >
     {icon && <span className={styles.icon}>{icon}</span>}
     {label}
-  </a>;
+  </DaAnchor>;
 };

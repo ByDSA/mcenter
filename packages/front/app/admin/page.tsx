@@ -10,6 +10,7 @@ import { backendUrl } from "#modules/requests";
 import { streamTaskStatus } from "#modules/tasks";
 import { TaskJsonViewer, useResponsiveCollapseLength } from "#modules/tasks/TaskJsonViewer";
 import { logger } from "#modules/core/logger";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 
 type Action = {
   path: string;
@@ -90,47 +91,48 @@ export default function Page() {
     <>
       <ul>
         {ACTIONS.map((action: Action) => (
-          <li key={action.path}><a onClick={async ()=>{
-            if (action.type === "action") {
-              await callAction( {
-                name: action.name,
-                setText,
-                path: action.path,
-              } );
-            } else if (action.type === "task") {
-              const response = await fetch(
-                backendUrl(action.path),
-                {
-                  credentials: "include",
-                },
-              ).then(r=> r.json());
-              const taskId = response.data?.job?.id;
+          <li key={action.path}><DaAnchor
+            onClick={async ()=>{
+              if (action.type === "action") {
+                await callAction( {
+                  name: action.name,
+                  setText,
+                  path: action.path,
+                } );
+              } else if (action.type === "task") {
+                const response = await fetch(
+                  backendUrl(action.path),
+                  {
+                    credentials: "include",
+                  },
+                ).then(r=> r.json());
+                const taskId = response.data?.job?.id;
 
-              if (response.errors) {
-                logger.error(response.errors[0]);
+                if (response.errors) {
+                  logger.error(response.errors[0]);
 
-                return;
+                  return;
+                }
+
+                assertIsDefined(taskId);
+
+                await streamTaskStatus( {
+                  url: backendUrl(PATH_ROUTES.tasks.statusStream.withParams(taskId)),
+                  taskName: action.taskName,
+                  // eslint-disable-next-line require-await
+                  onListenStatus: async (status) => {
+                    if (status.status === "active")
+                      setText(status.progress);
+                    else if (status.status === "completed")
+                      setText(status.returnValue);
+                    else
+                      setText(status);
+
+                    return status;
+                  },
+                } );
               }
-
-              assertIsDefined(taskId);
-
-              await streamTaskStatus( {
-                url: backendUrl(PATH_ROUTES.tasks.statusStream.withParams(taskId)),
-                taskName: action.taskName,
-                // eslint-disable-next-line require-await
-                onListenStatus: async (status) => {
-                  if (status.status === "active")
-                    setText(status.progress);
-                  else if (status.status === "completed")
-                    setText(status.returnValue);
-                  else
-                    setText(status);
-
-                  return status;
-                },
-              } );
-            }
-          }}>{action.name}</a></li>
+            }}>{action.name}</DaAnchor></li>
         ))}
       </ul>
 

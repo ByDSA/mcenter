@@ -6,6 +6,7 @@ import { ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { classes } from "#modules/utils/styles";
 import { useMusic } from "#modules/musics/hooks";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import commonStyles from "../MediaPlayerCommon.module.css";
 import { CurrentTimeLabel } from "./CurrentTimeLabel";
@@ -40,14 +41,14 @@ export const TrackInfo = memo(
               title={music.title}
 
             >{music.title}</span>
-            : <a
+            : <DaAnchor
               className={styles.trackTitle}
               title={music.title}
               onClick={(e)=> {
                 e.stopPropagation();
                 router.push(PATH_ROUTES.musics.frontend.path + "/" + music.id);
               }}
-            >{music.title}</a>
+            >{music.title}</DaAnchor>
           }
           <ResourceSubtitle
             className={styles.trackSubtitle}

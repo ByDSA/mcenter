@@ -3,6 +3,7 @@ import { Facebook, GitHub, Person, Twitter } from "@mui/icons-material";
 import { AuthCrudDtos } from "$shared/models/auth/dto/transport";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import styles from "../styles.module.css";
 import { LoginRegisterForm } from "../Form";
 import { createFormInputText } from "../FormInputText";
@@ -145,12 +146,12 @@ export const LoginComponent = ( { handleForgotPass,
         </DaButton>
         {handleForgotPass
         && <div className={styles.forgotPassword}>
-          <a onClick={()=>handleForgotPass()}>¿Olvidaste tu contraseña?</a>
+          <DaAnchor onClick={()=>handleForgotPass()}>¿Olvidaste tu contraseña?</DaAnchor>
         </div>
         }
         {handleGotoSignUp && <div className={styles.signupPrompt}>
-          ¿No tienes cuenta? <a onClick={()=>handleGotoSignUp()}
-            className={styles.signupLink}>Regístrate</a>.
+          ¿No tienes cuenta? <DaAnchor onClick={()=>handleGotoSignUp()}
+            className={styles.signupLink}>Regístrate</DaAnchor>.
         </div>
         }
         {/* Para que si el botón de local login está disabled, no se llame a otro botón

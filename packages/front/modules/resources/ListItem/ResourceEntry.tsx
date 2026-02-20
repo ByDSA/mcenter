@@ -8,6 +8,7 @@ import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonVi
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { anchorOnClick } from "#modules/ui-kit/menus/TabsClient";
 import { PropsOf } from "#modules/utils/react";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import { Separator } from "../Separator/Separator";
 import styles from "./ListItem.module.css";
 import { ListItemColumn, ListItemRow } from "./ListItem";
@@ -42,7 +43,6 @@ export function ResourceEntry(
   const shouldHaveLeftDiv = !!play || imageCover !== undefined;
   const isPlaying = play !== undefined && play.status !== "stopped";
   const router = useRouter();
-  const Tag = href ? "a" : "span";
 
   return <span
     className={classes(
@@ -70,7 +70,8 @@ export function ResourceEntry(
         }
       </div>
     )}
-    <Tag
+    <DaAnchor
+      theme="text"
       className={classes(styles.main, !shouldHaveLeftDiv && styles.noLeftDiv)}
       href={href}
       onClick={href
@@ -84,7 +85,7 @@ export function ResourceEntry(
     >
       <ResourceTitle title={mainTitle} href={mainTitleHref} />
       {subtitle}
-    </Tag>
+    </DaAnchor>
     <ListItemRow className={styles.right}>
       {favButton}
       {right && <ListItemColumn className={classes(styles.small, styles.info)}>
@@ -103,17 +104,22 @@ type Item = PropsXOR<{
 }> & {
   className?: string;
   separatorClassName?: string;
-};
+} & {title?: string};
 type ResourceSubtitleProps = {
   className?: string;
+  title?: string;
   items: (Item | undefined)[];
 };
-export const ResourceSubtitle = memo(( { items, className }: ResourceSubtitleProps) => {
-  const title = useMemo(()=>items.reduce((acc, item) => {
-    if (!item?.text)
+export const ResourceSubtitle = memo(( { title: paramTitle,
+  items,
+  className }: ResourceSubtitleProps) => {
+  const title = paramTitle ?? useMemo(()=>items.reduce((acc, item) => {
+    const titlePart = item?.title ?? item?.text;
+
+    if (!titlePart)
       return acc;
 
-    return acc + (acc !== "" ? " • " : "") + item?.text;
+    return acc + (acc !== "" ? " • " : "") + titlePart;
   }, ""), [items]);
 
   return <ListItemRow className={classes(styles.subtitle, "ellipsis", className)}>
@@ -140,7 +146,6 @@ type ResourceTitleProps = AnchorHTMLAttributes<HTMLAnchorElement>;
 export const ResourceTitle = (props: ResourceTitleProps) => {
   const router = useRouter();
   const { onClick: onClickProp, href, children, ...otherProps } = props;
-  const TitleTag = href ? "a" : "span";
   let onClick: ResourceTitleProps["onClick"];
 
   if (onClickProp)
@@ -152,10 +157,10 @@ export const ResourceTitle = (props: ResourceTitleProps) => {
     } );
   }
 
-  return <TitleTag className={classes(styles.title, "ellipsis")}
+  return <DaAnchor className={classes(styles.title, "ellipsis")}
     {...otherProps}
     href={href}
     onClick={onClick}
   >{children ?? props.title ?? "Title"}
-  </TitleTag>;
+  </DaAnchor>;
 };

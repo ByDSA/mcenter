@@ -5,6 +5,7 @@ import { showError } from "$shared/utils/errors/showError";
 import z from "zod";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
+import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import styles from "../styles.module.css";
 import { LoginRegisterForm } from "../Form";
 import { CallValidationFn, createFormInputText, ValidateFn } from "../FormInputText";
@@ -154,8 +155,8 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
     </div>
     {handleGotoLogin
     && <div className={styles.signupPrompt}>
-          ¿Ya tienes cuenta? <a onClick={()=>handleGotoLogin()}
-        className={styles.signupLink}>Accede</a>.
+          ¿Ya tienes cuenta? <DaAnchor onClick={()=>handleGotoLogin()}
+        className={styles.signupLink}>Accede</DaAnchor>.
     </div>
     }
   </LoginRegisterForm>;

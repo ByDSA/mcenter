@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { classes } from "#modules/utils/styles";
+import { DaAnchor } from "../Anchor/Anchor";
 import styles from "./Sidebar.module.css";
 
 import "../../../styles/globals.css";
@@ -25,7 +26,8 @@ export const Sidebar = ( { data, className }: SidebarProps) => {
   return (
     <nav className={classes(styles.sidebar, styles.nav, className)}>
       {data.map((item) => (
-        <a
+        <DaAnchor
+          theme="text"
           key={item.path}
           className={classes(styles.item, item.active && styles.active)}
           href={item.path}
@@ -33,7 +35,7 @@ export const Sidebar = ( { data, className }: SidebarProps) => {
         >
           {item.icon && <span className={styles.icon}>{item.icon}</span>}
           {item.label}
-        </a>
+        </DaAnchor>
       ))}
     </nav>
   );

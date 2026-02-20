@@ -1,0 +1,33 @@
+a.anchor {
+  color: var(--color-link);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: underline;
+    color: var(--color-link-hover);
+  }
+}
+
+.white {
+  --color-link: white;
+  --color-link-hover: white;
+}
+
+.black {
+  --color-link: black;
+  --color-link-hover: black;
+}
+
+.text {
+  color: inherit !important;
+
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+}
