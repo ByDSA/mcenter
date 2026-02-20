@@ -3,7 +3,7 @@ import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { createZodDto } from "nestjs-zod";
 import { Param } from "@nestjs/common";
 import { UserPayload } from "$shared/models/auth";
-import { GetManyCriteria, UserCreateOne, UserPatchOne, AdminDeleteOne, GetOneById } from "#utils/nestjs/rest";
+import { GetManyCriteria, UserCreateOne, UserPatchOne, AdminDeleteOne, GetOneById, GetOneCriteria } from "#utils/nestjs/rest";
 import { episodeEntitySchema } from "#episodes/models";
 import { User } from "#core/auth/users/User.decorator";
 import { IdParamDto } from "#utils/validation/dtos";
@@ -11,6 +11,9 @@ import { EpisodesRepository } from "./repository";
 
 class GetManyBodyDto extends createZodDto(
   EpisodesCrudDtos.GetMany.criteriaSchema,
+) {}
+class GetOneBodyDto extends createZodDto(
+  EpisodesCrudDtos.GetOne.criteriaSchema,
 ) {}
 
 class CreateBody extends createZodDto(EpisodesCrudDtos.CreateOne.bodySchema) {}
@@ -30,6 +33,16 @@ export class EpisodesCrudController {
     @Param() params: IdParamDto,
   ) {
     return await this.episodesRepo.getOneById(params.id);
+  }
+
+  @GetOneCriteria(schema)
+  async getOneByCriteria(
+    @Body() body: GetOneBodyDto,
+    @User() user: UserPayload | null,
+  ) {
+    return await this.episodesRepo.getOne(body, {
+      requestingUserId: user?.id,
+    } );
   }
 
   @GetManyCriteria(schema)

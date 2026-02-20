@@ -1,0 +1,33 @@
+.synopsis {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  background-color: var(--color-gray-850);
+  margin: 1rem;
+  border-radius: 1rem;
+
+  .synopsisTitle {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--color-item-text-title);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .synopsisText {
+    color: var(--color-item-text);
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+.seriesName {
+  color: var(--color-item-text-title);
+  font-weight: 600;
+  font-size: 1.2rem !important;
+}
+
+.lastSeen {
+  svg {
+    width: 0.75em;
+    height: 0.75em;
+  }
+}

@@ -17,7 +17,7 @@ const criteriaConfig = createCriteriaConfig( {
     seriesIds: z.array(mongoDbId).optional(),
   },
   sortKeys: ["episodeCompKey", "episodeKey", "createdAt", "updatedAt"] as const,
-  expandKeys: ["series", "seriesImageCover", "fileInfos", "userInfo"] as const,
+  expandKeys: ["series", "seriesImageCover", "fileInfos", "userInfo", "imageCover"] as const,
 } );
 
 export namespace EpisodesCrudDtos {

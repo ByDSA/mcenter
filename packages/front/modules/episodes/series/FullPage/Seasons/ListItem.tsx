@@ -3,6 +3,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { assertIsDefined } from "$shared/utils/validation";
 import { Visibility } from "@mui/icons-material";
 import { UserRoleName } from "$shared/models/auth";
+import { EpisodeUserInfo } from "$shared/models/episodes";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
@@ -13,7 +14,7 @@ import { EpisodeLatestViewsContextMenuItem } from "#modules/episodes/history/Lat
 import { DeleteEpisodeContextMenuItem } from "#modules/episodes/Delete/ContextMenuItem";
 import { ShareEpisodeLinkContextMenuItemCurrentCtx } from "#modules/episodes/SettingsButton/ShareContextMenuItem";
 import { PropsOf } from "#modules/utils/react";
-import { DurationView, WeightView } from "#modules/history";
+import { DurationView, MetadataView, WeightView } from "#modules/history";
 import { useUser } from "#modules/core/auth/useUser";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
 import { useEpisode } from "#modules/episodes/hooks";
@@ -43,16 +44,11 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
   assertIsDefined(episode.fileInfos);
 
   if (hasUser) {
-    const neverSeen = episode.userInfo?.lastTimePlayed === null || !episode.userInfo;
-    const txt = neverSeen
-      ? "Nunca visto"
-      : `${formatDateDDMMYYY(episode.userInfo!.lastTimePlayed!)}`;
-
     subtitleSeen = {
-      customContent: <span className={styles.seen} title={`Visto por última vez: ${txt}`}>
-        <Visibility/>
-        <span>{txt}</span>
-      </span>,
+      customContent: <LastSeenElement
+        userInfo={episode.userInfo}
+        className={styles.seen}
+      />,
     };
   }
 
@@ -66,9 +62,10 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
   return (
     <ResourceEntry
       mainTitle={episode.title}
-      mainTitleHref={PATH_ROUTES.episodes.slug.withParams(
-        series.key,
-        episode.episodeKey,
+      mainTitleHref={PATH_ROUTES.episodes.frontend.lists.episode.withParams(
+        {
+          episodeId: episode.id,
+        },
       )}
       subtitle={<ResourceSubtitle items={[{
         className: styles.episodeKey,
@@ -105,3 +102,20 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
     />
   );
 };
+
+type LastSeenProps = {
+  userInfo: EpisodeUserInfo | undefined;
+  className?: string;
+};
+export function LastSeenElement( { userInfo, className }: LastSeenProps) {
+  const neverSeen = userInfo?.lastTimePlayed === null || !userInfo;
+  const txt = neverSeen
+    ? "Nunca visto"
+    : `${formatDateDDMMYYY(userInfo!.lastTimePlayed!)}`;
+
+  return <MetadataView
+    icon={<Visibility/>}
+    className={className}
+    title={`Visto por última vez: ${txt}`}
+    txt={txt} />;
+}
