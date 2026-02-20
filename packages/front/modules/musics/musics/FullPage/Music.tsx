@@ -1,10 +1,10 @@
-import { Album, Person } from "@mui/icons-material";
+import { Album, CalendarToday, Person } from "@mui/icons-material";
 import { assertIsDefined } from "$shared/utils/validation";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { useUser } from "#modules/core/auth/useUser";
 import { formatDate } from "#modules/utils/dates";
 import { PlaylistFavButton } from "#modules/musics/lists/playlists/PlaylistFavButton";
-import { DurationView, MetadataView } from "#modules/history";
+import { DurationView, MetadataView, WeightView } from "#modules/history";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { useMusic } from "#modules/musics/hooks";
 import { HeaderItem } from "#modules/resources/FullPage/HeaderItem";
@@ -31,11 +31,13 @@ export const Music = ( { musicId }: Props) => {
     updatedAt,
     addedAt,
     slug,
+    releasedOn,
     tags,
     isFav,
     userInfo,
     fileInfos,
-    imageCover: _,
+    imageCover: _1,
+    imageCoverId: _2,
     ...rest } = value;
   const { user } = useUser();
   const durationSecs = fileInfos?.[0].mediaInfo.duration;
@@ -70,7 +72,20 @@ export const Music = ( { musicId }: Props) => {
                 duration={durationSecs}
               />
             )}
-            {year && <span>Año: {year}</span>}
+            {user && <WeightView
+              weight={userInfo?.weight ?? 0} />}
+            {releasedOn && <MetadataView
+              className={styles.subtitle}
+              icon={<CalendarToday />}
+              title={"Fecha"}
+              txt={releasedOn}
+            />}
+            {(!releasedOn && year) && <MetadataView
+              className={styles.subtitle}
+              icon={<CalendarToday />}
+              title={"Año"}
+              txt={(year!).toString()}
+            />}
           </>
         }
         controls={
@@ -88,35 +103,19 @@ export const Music = ( { musicId }: Props) => {
       />
 
       <main className={styles.metadata}>
-        <div className={styles.metadataItem}>
-          <span>id</span>
-          <span>{id}</span>
-        </div>
-        <div className={styles.metadataItem}>
-          <span>Slug</span>
-          <span>{slug}</span>
-        </div>
         {tags && (
           <div className={styles.metadataItem}>
             <span>Tags</span>
             <span>{tags.join(", ")}</span>
           </div>
         )}
-        <hr className={styles.hr} />
         {userInfo && (
-          <>
-            <p className={styles.metadataSectionTitle}>User Info</p>
-            <div className={styles.metadataItem}>
-              <span>Weight</span>
-              <span>{userInfo.weight}</span>
-            </div>
-            <div className={styles.metadataItem}>
-              <span>Tags</span>
-              <span>{userInfo.tags?.join(", ")}</span>
-            </div>
-            <hr className={styles.hr} />
-          </>
+          <div className={styles.metadataItem}>
+            <span>User Tags</span>
+            <span>{userInfo.tags?.join(", ")}</span>
+          </div>
         )}
+        <hr className={styles.hr} />
         <p className={styles.metadataSectionTitle}>Tiempos</p>
         <div className={styles.metadataItem}>
           <span>Creado</span>
