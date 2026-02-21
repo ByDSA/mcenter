@@ -1,21 +1,19 @@
 import React, { memo } from "react";
 import { EpisodeEntity } from "$shared/models/episodes";
-import { PATH_ROUTES } from "$shared/routing";
 import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
 import { HistoryTimeView, WeightView } from "#modules/history";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
-import { ContextMenuItem, useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
+import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { classes } from "#modules/utils/styles";
-import { backendUrl } from "#modules/requests";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
-import { copyText } from "#modules/musics/lists/playlists/utils";
-import { logger } from "#modules/core/logger";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import { useEpisode } from "#modules/episodes/hooks";
 import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryLoading";
 import { useSeries } from "#modules/episodes/series/hooks";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
+import { ShareEpisodeLinkContextMenuItemCurrentCtx } from "#modules/episodes/SettingsButton/ShareContextMenuItem";
+import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { EpisodeLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem";
 import { EditEpisodeContextMenuItem } from "../../Edit/ContextMenu";
 import { DeleteHistoryEntryContextMenuItem } from "../Delete/Delete";
@@ -54,6 +52,7 @@ export const EpisodeHistoryEntryElement = React.memo((
       <HistoryTimeView timestamp={dateToTimestampInSeconds(historyEntry.date)} />
       {episode.userInfo && <WeightView weight={episode.userInfo.weight} />}
     </>}
+    disabled={episode.disabled}
     imageCover={imageCover}
     imageCoverDefaultIcon={{
       element: <SeriesIcon />,
@@ -64,25 +63,13 @@ export const EpisodeHistoryEntryElement = React.memo((
           event: e,
           content: <>
             <EditEpisodeContextMenuItem initialData={episode}/>
-            <ContextMenuItem
-              label="Copiar backend URL"
-              onClick={async (event) => {
-                event.stopPropagation();
-                const { episodeKey } = episode;
-                const { key: seriesKey } = series;
-
-                await copyText(
-                  backendUrl(
-                    PATH_ROUTES.episodes.slug.withParams(seriesKey, episodeKey),
-                  ),
-                );
-                logger.info("Texto copiado.");
-              }}
-            />
             <EpisodeLatestViewsContextMenuItem
               episodeId={episode.id}
               maxTimestamp={dateToTimestampInSeconds(historyEntry.date)}
             />
+            <LocalDataProvider data={episode}>
+              {!episode.disabled && <ShareEpisodeLinkContextMenuItemCurrentCtx />}
+            </LocalDataProvider>
             <DeleteHistoryEntryContextMenuItem value={historyEntry} onActionSuccess={onDelete}/>
           </>,
         } );

@@ -1,10 +1,10 @@
 /* eslint-disable import/no-cycle */
-import type { MusicEntity } from "$shared/models/musics";
 import assert from "assert";
+import { isMusicAvailable, type MusicEntity } from "$shared/models/musics";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
-import { assertIsDefined } from "$shared/utils/validation";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { withRetries } from "#modules/utils/retries";
 import { useMusic } from "#modules/musics/hooks";
 import { logger } from "#modules/core/logger";
@@ -180,7 +180,12 @@ export const useBrowserPlayer = create<PlayerState>()(
         if (!music)
           return;
 
-        assertIsDefined(music.fileInfos?.[0]);
+        const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
+
+        if (isMusicAvailable(music, {
+          precalcFileInfo: fileInfo,
+        } ))
+          return;
 
         const resource = musicToResource(music);
         const { currentResource } = get();
@@ -192,7 +197,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           ...(isSameAsLatest
             ? {}
             : {
-              duration: music.fileInfos[0]?.mediaInfo.duration ?? undefined,
+              duration: fileInfo?.mediaInfo.duration ?? undefined,
             } ),
           currentResource: resource,
           nextResource: null,
@@ -270,6 +275,12 @@ export const useBrowserPlayer = create<PlayerState>()(
         const isSameAsLatest = currentResource
         && currentResource.resourceId === music.id;
         const queueItem: PlaylistQueueItem = musicToResource(music);
+        const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
+
+        if (isMusicAvailable(music, {
+          precalcFileInfo: fileInfo,
+        } ))
+          return;
 
         set( {
           query: q,
@@ -277,7 +288,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           ...(isSameAsLatest
             ? {}
             : {
-              duration: music.fileInfos?.[0]?.mediaInfo.duration ?? undefined,
+              duration: fileInfo!.mediaInfo.duration ?? undefined,
             } ),
           currentResource: queueItem,
           nextResource: null,
@@ -300,6 +311,13 @@ export const useBrowserPlayer = create<PlayerState>()(
         if (!music)
           return;
 
+        const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
+
+        if (isMusicAvailable(music, {
+          precalcFileInfo: fileInfo,
+        } ))
+          return;
+
         if (isSameAsLatest) {
           setCurrentTime(0, {
             shouldUpdateAudioElement: true,
@@ -310,7 +328,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           ...(isSameAsLatest
             ? {}
             : {
-              duration: music.fileInfos?.[0]?.mediaInfo.duration ?? undefined,
+              duration: fileInfo!.mediaInfo.duration ?? undefined,
             } ),
           currentResource: queue[index],
           status: "playing",

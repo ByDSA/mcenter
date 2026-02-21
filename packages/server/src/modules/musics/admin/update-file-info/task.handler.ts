@@ -69,7 +69,9 @@ export class MusicUpdateFileInfoTaskHandler implements TaskHandler<Payload, Resu
       } )
         .build();
 
-      await this.fileInfosRepo.patchOneByPath(relativePath, file);
+      await this.fileInfosRepo.patchOneByPath(relativePath, {
+        entity: file,
+      } );
 
       await this.updateInternal(job, (old)=>( {
         ...old,

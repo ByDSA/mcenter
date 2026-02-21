@@ -4,10 +4,14 @@ import styles from "./Anchor.module.css";
 
 type Props = AnchorHTMLAttributes<HTMLAnchorElement> & {
   theme?: "black" | "default" | "text" | "white";
+  disabled?: boolean;
 };
 export const DaAnchor = ( { theme = "default", className = "",
-  children, ...props }: Props) => {
-  const Tag = props.href!! ? "a" : "span";
+  children, disabled, href, onClick, ...props }: Props) => {
+  const Tag = href!! && !disabled ? "a" : "span";
+  const isAnchor = Tag === "a";
+  const finalHref = isAnchor ? href : undefined;
+  const finalOnClick = isAnchor ? onClick : undefined;
 
   return (
     <Tag
@@ -16,9 +20,12 @@ export const DaAnchor = ( { theme = "default", className = "",
         theme === "black" && styles.black,
         theme === "text" && styles.text,
         styles.anchor,
+        disabled && styles.disabled,
         className,
       )}
       {...props}
+      href={finalHref}
+      onClick={finalOnClick}
     >
       {children}
     </Tag>

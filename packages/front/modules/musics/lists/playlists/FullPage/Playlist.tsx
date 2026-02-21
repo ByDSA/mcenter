@@ -28,7 +28,9 @@ export const MusicPlaylistFullPage = ( { value, setValue }: PlaylistProps) => {
   // const usingMusics = useMusics(musicIds);
   // const totalDuration = useMemo(
   //   () => usingMusics.data.reduce(
-  //     (acc, e) => acc + (e?.fileInfos?.[0].mediaInfo.duration ?? 0),
+  //     (acc, e) => acc + (
+  // getFirstAvailableFileInfoOrFirst(e?.fileInfos)?.mediaInfo.duration ?? 0
+  // ),
   //     0,
   //   ) ?? 0,
   //   [usingMusics.data],

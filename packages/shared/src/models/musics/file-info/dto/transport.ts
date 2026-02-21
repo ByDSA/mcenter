@@ -24,13 +24,19 @@ export namespace MusicFileInfoCrudDtos {
     export const responseSchema = createManyResultResponseSchema(musicFileInfoEntitySchema);
     export type Response = z.infer<typeof responseSchema>;
   }
-  export namespace Patch {
-    export const bodySchema = generatePatchBodySchema(musicFileInfoEntitySchema);
+  export namespace CreateOne {
+    export const bodySchema = musicFileInfoEntitySchema.omit( {
+      id: true,
+    } );
     export type Body = z.infer<typeof bodySchema>;
     export const responseSchema = createOneResultResponseSchema(musicFileInfoEntitySchema);
     export type Response = z.infer<typeof responseSchema>;
   }
-  export namespace Delete {
+  export namespace PatchOne {
+    export const bodySchema = generatePatchBodySchema(CreateOne.bodySchema);
+    export type Body = z.infer<typeof bodySchema>;
+    export const responseSchema = createOneResultResponseSchema(musicFileInfoEntitySchema);
+    export type Response = z.infer<typeof responseSchema>;
   }
 
   export namespace UploadFile {

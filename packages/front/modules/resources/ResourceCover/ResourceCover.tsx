@@ -5,6 +5,7 @@ import styles from "./ResourceCover.module.css";
 
 export type ResourceImageCoverProps = {
   className?: string;
+  disabled?: boolean;
   img?: {
     url?: string;
     alt?: string;
@@ -19,7 +20,11 @@ export type ResourceImageCoverProps = {
 };
 
 export const ResourceImageCover = (props: ResourceImageCoverProps) => {
-  return <div className={classes(styles.cover, props.className)}>
+  return <div className={classes(
+    styles.cover,
+    props.disabled && styles.disabled,
+    props.className,
+  )}>
     {props.img?.url
       ? (
         <Image

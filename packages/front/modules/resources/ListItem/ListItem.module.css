@@ -160,7 +160,7 @@
   }
 }
 
-.container.isPlayable {
+.container.isPlayable.isAvailable {
   --is-active: 0;
 
   @media (width < 600px) {
@@ -168,7 +168,11 @@
   }
 }
 
-.container.isPlayable {
+.container:not(.isAvailable) {
+  --is-active: 0;
+}
+
+.container.isPlayable.isAvailable {
   &:hover,
   &.playing {
     --is-active: 1;
@@ -194,11 +198,11 @@
   transition: all 0.2s;
 }
 
-.isPlayable .cover {
+.isPlayable.isAvailable .cover {
   filter: brightness(calc(1 - (var(--is-active) * 0.5)));
 }
 
-*:has(> .playButton):hover .cover {
+*:has(> .playButton):hover .isAvailable .cover {
   filter: brightness(0.25) !important;
 }
 

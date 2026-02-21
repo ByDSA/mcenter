@@ -3,15 +3,17 @@ import { useShallow } from "zustand/react/shallow";
 import { PATH_ROUTES } from "$shared/routing";
 import { showError } from "$shared/utils/errors/showError";
 import { assertIsDefined } from "$shared/utils/validation";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { useUser } from "#modules/core/auth/useUser";
 import { HistoryTimeView, WeightView } from "#modules/history";
 import { MusicSubtitle } from "#modules/musics/musics/ListItem/MusicEntry";
 import { PlaylistFavButton } from "#modules/musics/lists/playlists/PlaylistFavButton";
 import { ResourceEntry } from "#modules/resources/ListItem/ResourceEntry";
-import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
+import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryLoading";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { useMusic } from "../hooks";
+import { isMusicAvailable } from "../models";
 import { MusicHistoryEntrySettingsButton } from "./SettingsButton/SettingsButton";
 import { MusicHistoryEntryEntity } from "./models";
 
@@ -41,7 +43,19 @@ export const MusicHistoryListItem = React.memo(() =>{
 
   assertIsDefined(data.resource);
 
+  const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
+  const isDisabled = !isMusicAvailable(music, {
+    precalcFileInfo: fileInfo,
+  } );
+  let playStatus: PlayerStatus | "disabled";
+
+  if (isDisabled)
+    playStatus = "disabled";
+  else
+    playStatus = currentResource?.resourceId === data.resourceId ? status : "stopped";
+
   return <ResourceEntry
+    disabled={music.disabled}
     mainTitle={music.title}
     mainTitleHref={PATH_ROUTES.musics.frontend.path + "/" + music.id}
     subtitle={<MusicSubtitle music={music} />}
@@ -59,7 +73,7 @@ export const MusicHistoryListItem = React.memo(() =>{
       />
     }
     play={{
-      status: currentResource?.resourceId === data.resourceId ? status : "stopped",
+      status: playStatus,
       onClick: async () => {
         if (currentResource?.resourceId === data.resourceId) {
           if (status === "paused") {

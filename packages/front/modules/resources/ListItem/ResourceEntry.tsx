@@ -23,6 +23,7 @@ export type ResourceEntryProps = {
   right?: ReactNode;
   settings?: ReactNode;
   favButton?: JSX.Element;
+  disabled?: boolean;
   drag?: {
     isDragging: boolean;
     isDraggingGlobal: boolean;
@@ -30,7 +31,7 @@ export type ResourceEntryProps = {
   };
   play?: {
     onClick: (e: React.MouseEvent<HTMLElement>)=> Promise<void> | void;
-    status: PlayerStatus;
+    status: PlayerStatus | "disabled";
   };
   imageCover?: ImageCover | null;
   imageCoverDefaultIcon?: NonNullable<PropsOf<typeof MusicImageCover>>["icon"];
@@ -38,11 +39,12 @@ export type ResourceEntryProps = {
 
 export function ResourceEntry(
   { mainTitle, subtitle, settings, right, favButton, play, drag, imageCover,
-    mainTitleHref, imageCoverDefaultIcon, href }: ResourceEntryProps,
+    mainTitleHref, imageCoverDefaultIcon, href, disabled }: ResourceEntryProps,
 ) {
   const shouldHaveLeftDiv = !!play || imageCover !== undefined;
-  const isPlaying = play !== undefined && play.status !== "stopped";
+  const isPlaying = play !== undefined && play.status !== "stopped" && play.status !== "disabled";
   const router = useRouter();
+  const isAvailable = !(disabled || play?.status === "disabled");
 
   return <span
     className={classes(
@@ -50,6 +52,7 @@ export function ResourceEntry(
       isPlaying && styles.playing,
       drag?.isDragging && styles.dragging,
       play && styles.isPlayable,
+      isAvailable && styles.isAvailable,
     )}
   >
     {drag?.element}
@@ -60,19 +63,26 @@ export function ResourceEntry(
           size="small"
           icon={imageCoverDefaultIcon}
           cover={imageCover}
+          disabled={!isAvailable}
         />
         {play && <PlayButtonView
           theme="triangle-white"
           className={classes(styles.playButton)}
           onClick={play.onClick}
-          status={play.status}
+          disabled={play.status === "disabled"}
+          status={play.status === "disabled" ? "stopped" : play.status}
         />
         }
       </div>
     )}
     <DaAnchor
       theme="text"
-      className={classes(styles.main, !shouldHaveLeftDiv && styles.noLeftDiv)}
+      disabled={disabled}
+      className={
+        classes(
+          styles.main,
+          !shouldHaveLeftDiv && styles.noLeftDiv,
+        )}
       href={href}
       onClick={href
         ? (e)=> {
@@ -83,7 +93,7 @@ export function ResourceEntry(
         }
         : undefined}
     >
-      <ResourceTitle title={mainTitle} href={mainTitleHref} />
+      <ResourceTitle title={mainTitle} href={mainTitleHref} disabled={disabled} />
       {subtitle}
     </DaAnchor>
     <ListItemRow className={styles.right}>
@@ -142,10 +152,12 @@ export const ResourceSubtitle = memo(( { title: paramTitle,
   </ListItemRow>;
 } );
 
-type ResourceTitleProps = AnchorHTMLAttributes<HTMLAnchorElement>;
+type ResourceTitleProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  disabled?: boolean;
+};
 export const ResourceTitle = (props: ResourceTitleProps) => {
   const router = useRouter();
-  const { onClick: onClickProp, href, children, ...otherProps } = props;
+  const { onClick: onClickProp, href, children, disabled, ...otherProps } = props;
   let onClick: ResourceTitleProps["onClick"];
 
   if (onClickProp)
@@ -159,6 +171,7 @@ export const ResourceTitle = (props: ResourceTitleProps) => {
 
   return <DaAnchor className={classes(styles.title, "ellipsis")}
     {...otherProps}
+    disabled={disabled}
     href={href}
     onClick={onClick}
   >{children ?? props.title ?? "Title"}

@@ -4,6 +4,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { Visibility } from "@mui/icons-material";
 import { UserRoleName } from "$shared/models/auth";
 import { EpisodeUserInfo } from "$shared/models/episodes";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
@@ -52,9 +53,9 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
     };
   }
 
-  const fileInfo = episode.fileInfos[0];
+  const fileInfo = getFirstAvailableFileInfoOrFirst(episode.fileInfos);
 
-  assertIsDefined(fileInfo.mediaInfo.duration);
+  assertIsDefined(fileInfo?.mediaInfo.duration);
   const duration = Math.min(fileInfo.mediaInfo.duration, fileInfo.end ?? Infinity)
     - Math.max(fileInfo.start ?? 0);
   const isAdmin = !!user?.roles.find(r=>r.name === UserRoleName.ADMIN);
@@ -71,6 +72,7 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
         className: styles.episodeKey,
         text: episode.episodeKey,
       }, subtitleSeen]} />}
+      disabled={episode.disabled}
       imageCover={imageCover}
       imageCoverDefaultIcon={{
         element: <SeriesIcon />,
@@ -89,7 +91,7 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
                 <LocalDataProvider data={episode}>
                   {isAdmin && <EditEpisodeContextMenuItem initialData={episode} />}
                   {hasUser && <EpisodeLatestViewsContextMenuItem episodeId={episodeId} />}
-                  <ShareEpisodeLinkContextMenuItemCurrentCtx />
+                  {!episode.disabled && <ShareEpisodeLinkContextMenuItemCurrentCtx />}
                   {isAdmin && <DeleteEpisodeContextMenuItem
                     onActionSuccess={onDelete ? ()=>onDelete(episode) : undefined}
                   />}

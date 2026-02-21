@@ -9,6 +9,7 @@ export interface DocOdm {
   size: number;
   start?: number;
   end?: number;
+  offloaded?: boolean;
   timestamps: {
     createdAt: Date;
     updatedAt: Date;
@@ -53,6 +54,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
   hash: {
     type: String,
+    required: false,
+  },
+  offloaded: {
+    type: Boolean,
     required: false,
   },
   mediaInfo: {

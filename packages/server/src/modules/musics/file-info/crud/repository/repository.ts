@@ -5,6 +5,7 @@ import { MusicEntity, MusicId } from "$shared/models/musics";
 import { assertIsDefined } from "$shared/utils/validation";
 import { FilterQuery } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
+import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById } from "#utils/layers/repository";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
@@ -15,19 +16,17 @@ import { assertFoundClient } from "#utils/validation/found";
 import { MusicFileInfoOmitMusicIdBuilder } from "../../builder";
 import { MusicFileInfo, MusicFileInfoEntity } from "../../models";
 import { DocOdm } from "./odm/odm";
-import { partialModelToDocOdm } from "./odm/adapters";
 import { MusicFileInfoEvents } from "./events";
 import { MusicFileInfoOdm } from "./odm";
 
 type Entity = MusicFileInfoEntity;
-type Model = MusicFileInfo;
-
-type UpdateOneParams = Model;
+type CreateOneDto = MusicFileInfoCrudDtos.CreateOne.Body;
+type PatchOneDto = MusicFileInfoCrudDtos.PatchOne.Body;
 
 @Injectable()
 export class MusicFileInfoRepository
 implements
-CanCreateOneAndGet<Model>,
+CanCreateOneAndGet<CreateOneDto>,
 CanGetAll<Entity>,
 CanGetOneById<Entity, Entity["id"]> {
   constructor(
@@ -101,20 +100,22 @@ música si desea borrar el archivo.",
     } )
       .build();
 
-    await this.patchOneByPath(path, updated);
+    await this.patchOneByPath(path, {
+      entity: updated,
+    } );
 
     return updated;
   }
 
-  async createOneAndGet(model: Model): Promise<Entity> {
-    const docOdm = MusicFileInfoOdm.toDoc(model);
+  async createOneAndGet(model: CreateOneDto): Promise<Entity> {
+    const docOdm = MusicFileInfoOdm.partialToDoc(model);
     const got = await MusicFileInfoOdm.Model.create(docOdm);
 
     return MusicFileInfoOdm.toEntity(got);
   }
 
-  async patchOneByPath(path: string, model: Partial<Model>): Promise<void> {
-    const docOdm = partialModelToDocOdm(model);
+  async patchOneByPath(path: string, model: PatchOneDto): Promise<void> {
+    const docOdm = MusicFileInfoOdm.partialToDoc(model.entity);
 
     await MusicFileInfoOdm.Model.updateOne( {
       path,
@@ -179,7 +180,7 @@ música si desea borrar el archivo.",
       ...fileInfoWithoutMusicId,
       musicId: partial.musicId,
     };
-    const updateQuery: Required<Omit<DocOdm, "_id">> = MusicFileInfoOdm.toDoc(fileInfo);
+    const updateQuery = MusicFileInfoOdm.partialToDoc(fileInfo);
 
     try {
       const result = await MusicFileInfoOdm.Model.findOneAndUpdate(filterQuery, updateQuery, {
@@ -229,9 +230,9 @@ música si desea borrar el archivo.",
 
   async patchOneByPathAndGet(
     path: Entity["path"],
-    fileInfo: Partial<UpdateOneParams>,
+    fileInfo: PatchOneDto,
   ): Promise<Entity | null> {
-    const partialDocOdm = MusicFileInfoOdm.partialToDoc(fileInfo);
+    const partialDocOdm = MusicFileInfoOdm.partialToDoc(fileInfo.entity);
     const result = await MusicFileInfoOdm.Model.updateOne( {
       path,
     }, partialDocOdm);
@@ -239,7 +240,7 @@ música si desea borrar el archivo.",
     if (result.matchedCount === 0 || result.acknowledged === false)
       return null;
 
-    const newPath = fileInfo.path ?? path;
+    const newPath = fileInfo.entity.path ?? path;
     const ret = await this.getOneByPath(newPath);
 
     if (ret) {

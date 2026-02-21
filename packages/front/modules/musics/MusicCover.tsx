@@ -18,6 +18,7 @@ type Props =
       cover?: ImageCover | null;
       size?: "large" | "medium" | "small";
       title?: string;
+      disabled?: boolean;
     };
 
 export const MusicImageCover = (props?: Props) => {
@@ -46,6 +47,7 @@ export const MusicImageCover = (props?: Props) => {
     <ResourceImageCover
       className={props?.className}
       img={img}
+      disabled={props?.disabled}
       onClick={props?.onClick}
       icon={{
         element: props?.icon?.element ?? <MusicsIcon />,

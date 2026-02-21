@@ -32,7 +32,8 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
       },
       fps: docOdm.mediaInfo?.fps ?? null,
     },
-  } satisfies Entity;
+    offloaded: docOdm.offloaded,
+  } satisfies AllKeysOf<Entity>;
 
   assertIsEntity(ret);
 
@@ -79,6 +80,7 @@ export function partialModelToDocOdm(model: Partial<Model>): Partial<DocOdm> {
     episodeId: model.episodeId ? new Types.ObjectId(model.episodeId) : undefined,
     path: model.path,
     size: model.size,
+    offloaded: model.offloaded,
     mediaInfo: model.mediaInfo !== undefined
       ? {
         duration: model.mediaInfo.duration,

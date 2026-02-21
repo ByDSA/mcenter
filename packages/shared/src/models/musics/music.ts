@@ -4,7 +4,8 @@ import { resourceSchema } from "../resources";
 import { mongoDbId, taggableSchema } from "../resources/partial-schemas";
 import { slugSchema } from "../utils/schemas/slug";
 import { imageCoverEntitySchema } from "../image-covers";
-import { musicFileInfoEntitySchema } from "./file-info";
+import { getFirstAvailableFileInfoOrFirst } from "../file-info-common/file-info";
+import { MusicFileInfoEntity, musicFileInfoEntitySchema } from "./file-info";
 import { musicUserInfoEntitySchema } from "./user-info/user-info";
 
 const optionalPropsSchema = z.object( {
@@ -55,6 +56,12 @@ const entityWithUserInfoSchema = entitySchema.required( {
 } );
 
 type EntityWithUserInfo = z.infer<typeof entityWithUserInfoSchema>;
+
+function isAvailable(music: Entity, options?: {precalcFileInfo: MusicFileInfoEntity | null} ) {
+  const fileInfo = options?.precalcFileInfo ?? getFirstAvailableFileInfoOrFirst(music.fileInfos);
+
+  return !(music.disabled || !fileInfo || fileInfo.offloaded);
+}
 export {
   idSchema as musicIdSchema,
   entitySchema as musicEntitySchema,
@@ -69,4 +76,5 @@ export {
   assertIsModel as assertIsMusic,
   assertIsEntity as assertIsMusicEntity,
   compareId as compareMusicId,
+  isAvailable as isMusicAvailable,
 };

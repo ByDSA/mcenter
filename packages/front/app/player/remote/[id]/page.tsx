@@ -4,6 +4,7 @@ import React, { use, useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
 import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { useRouter } from "next/navigation";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { EpisodeEntity } from "#modules/episodes/models";
 import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
 import { Episode } from "#modules/episodes/models";
@@ -172,7 +173,9 @@ function getPathFromUri(uri: string) {
 function calcStartLength(statusLength: number, resource: EpisodeEntity | null = null) {
   let resourceEnd: number;
   let resourceStart: number;
-  const fileInfo = resource?.fileInfos?.[0];
+  const fileInfo = resource?.fileInfos
+    ? getFirstAvailableFileInfoOrFirst(resource.fileInfos)
+    : undefined;
 
   resourceEnd = fileInfo?.end ?? statusLength;
 

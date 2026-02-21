@@ -3,6 +3,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { MusicEntity } from "$shared/models/musics";
 import { useShallow } from "zustand/react/shallow";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { useUser } from "#modules/core/auth/useUser";
 import { PlaylistFavButton } from "#modules/musics/lists/playlists/PlaylistFavButton";
 import { DurationView, WeightView } from "#modules/history";
@@ -55,7 +56,8 @@ export function MusicEntryElement(
   if (!music)
     return <ResourceEntryLoading />;
 
-  const duration = music.fileInfos?.[0]?.mediaInfo.duration;
+  const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
+  const duration = fileInfo?.mediaInfo.duration;
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
   const right = <>
     {duration && <DurationView duration={duration} />}
@@ -64,6 +66,9 @@ export function MusicEntryElement(
 
   if (props.playable) {
     const playingThisMusicStatus = (()=>{
+      if (fileInfo?.offloaded)
+        return "disabled";
+
       if (props.playlistInfo) {
         let itemId: string | null;
         const { index } = props.playlistInfo;
@@ -137,6 +142,7 @@ export function MusicEntryElement(
       } )
       }
     />}
+    disabled={music.disabled}
     play={play}
     drag={props.drag}
   />;

@@ -11,6 +11,7 @@ const schema = z.object( {
   hash: md5HashSchema,
   size: z.number(),
   timestamps: timestampsFileSchema,
+  offloaded: z.boolean().optional(),
 } )
   .strict();
 
@@ -22,9 +23,22 @@ function compareModel(a: Model, b: Model): boolean {
   return a.path === b.path && a.hash === b.hash && a.size === b.size;
 }
 
+function getFirstAvailableFileInfoOrFirst<T extends Model>(fileInfos: T[] | undefined): T | null {
+  if (!fileInfos)
+    return null;
+
+  for (const fileInfo of fileInfos) {
+    if (fileInfo.offloaded !== true)
+      return fileInfo;
+  }
+
+  return fileInfos[0] ?? null;
+}
+
 export {
   schema as fileInfoSchema,
   type Model as FileInfo,
   assertIsModel as assertIsFileInfo,
   compareModel as compareFileInfo,
+  getFirstAvailableFileInfoOrFirst,
 };

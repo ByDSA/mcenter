@@ -2,6 +2,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { UserRoleName } from "$shared/models/auth";
 import { useRouter } from "next/navigation";
 import { PATH_ROUTES } from "$shared/routing";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import { useImageCover } from "#modules/image-covers/hooks";
@@ -49,7 +50,7 @@ export const EpisodeFullPage = ( { episodeId }: Props) => {
 
   const hasUser = !!user;
   const isAdmin = !!user?.roles.find(r => r.name === UserRoleName.ADMIN);
-  const fileInfo = episode.fileInfos[0];
+  const fileInfo = getFirstAvailableFileInfoOrFirst(episode.fileInfos);
   const duration = fileInfo
     ? Math.min(fileInfo.mediaInfo.duration ?? Infinity, fileInfo.end ?? Infinity)
       - Math.max(fileInfo.start ?? 0)
@@ -108,6 +109,7 @@ export const EpisodeFullPage = ( { episodeId }: Props) => {
         controls={
           <>
             <ResourcePlayButtonView
+              disabled={fileInfo?.offloaded}
               status="stopped"
               onClick={undefined}
             />

@@ -1,4 +1,5 @@
 import mongoose, { Types, UpdateQuery } from "mongoose";
+import { AllKeysOf } from "$shared/utils/types";
 import { MusicFileInfo, MusicFileInfoEntity } from "../../../models";
 import { DocOdm, FullDocOdm } from "./odm";
 
@@ -7,12 +8,13 @@ type Entity = MusicFileInfoEntity;
 type Model = MusicFileInfo;
 
 export function docOdmToEntity(docOdm: FullDocOdm): Entity {
-  const ret: Entity = {
+  const ret = {
     id: docOdm._id.toString(),
     musicId: docOdm.musicId.toString(),
     path: docOdm.path ?? null,
     hash: docOdm.hash,
     size: docOdm.size,
+    offloaded: docOdm.offloaded,
     timestamps: {
       createdAt: docOdm.timestamps?.createdAt,
       updatedAt: docOdm.timestamps?.updatedAt,
@@ -20,31 +22,27 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
     mediaInfo: {
       duration: docOdm.mediaInfo?.duration ?? null,
     },
-  };
+  } satisfies AllKeysOf<Entity>;
 
   return ret;
 }
 
-export function modelToDocOdm(model: Model): DocOdm {
-  return {
-    musicId: new mongoose.Types.ObjectId(model.musicId),
-    path: model.path,
-    hash: model.hash,
-    size: model.size,
+export function entityToDocOdm(entity: Entity): DocOdm {
+  const ret = {
+    _id: new Types.ObjectId(entity.id),
+    musicId: new mongoose.Types.ObjectId(entity.musicId),
+    path: entity.path,
+    hash: entity.hash,
+    size: entity.size,
+    offloaded: entity.offloaded,
     timestamps: {
-      createdAt: model.timestamps.createdAt,
-      updatedAt: model.timestamps.updatedAt,
+      createdAt: entity.timestamps.createdAt,
+      updatedAt: entity.timestamps.updatedAt,
     },
     mediaInfo: {
-      duration: model.mediaInfo.duration,
+      duration: entity.mediaInfo.duration,
     },
-  };
-}
-
-export function entityToDocOdm(entity: Entity): DocOdm {
-  const ret = modelToDocOdm(entity);
-
-  ret._id = new Types.ObjectId(entity.id);
+  } satisfies AllKeysOf<DocOdm>;
 
   return ret;
 }

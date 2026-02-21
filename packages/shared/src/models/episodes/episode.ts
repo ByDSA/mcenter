@@ -2,8 +2,9 @@ import z from "zod";
 import { resourceSchema } from "../resources";
 import { mongoDbId } from "../resources/partial-schemas";
 import { imageCoverEntitySchema } from "../image-covers";
+import { getFirstAvailableFileInfoOrFirst } from "../file-info-common/file-info";
 import { seriesEntitySchema } from "./series";
-import { episodeFileInfoEntitySchema } from "./file-info";
+import { EpisodeFileInfoEntity, episodeFileInfoEntitySchema } from "./file-info";
 import { episodeUserInfoEntitySchema } from "./user-info/user-info";
 
 /* Model */
@@ -55,6 +56,12 @@ const episodesBySeasonSchema = z.record(
 
 type EpisodesBySeason = z.infer<typeof episodesBySeasonSchema>;
 
+function isAvailable(music: Entity, options?: {precalcFileInfo: EpisodeFileInfoEntity | null} ) {
+  const fileInfo = options?.precalcFileInfo ?? getFirstAvailableFileInfoOrFirst(music.fileInfos);
+
+  return !(music.disabled || !fileInfo || fileInfo.offloaded);
+}
+
 export {
   modelSchema as episodeSchema,
   entitySchema as episodeEntitySchema,
@@ -67,4 +74,5 @@ export {
   type EntityWithUserInfo as EpisodeEntityWithUserInfo,
   episodesBySeasonSchema,
   type EpisodesBySeason,
+  isAvailable as isEpisodeAvailable,
 };

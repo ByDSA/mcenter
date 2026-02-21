@@ -2,6 +2,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { EpisodeEntity, episodeSchema, episodeUserInfoSchema } from "$shared/models/episodes";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { EpisodesApi } from "#modules/episodes/requests";
 import { EpisodeUserInfosApi } from "#modules/episodes/user-info/requests";
@@ -54,7 +55,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
     notExpandImageCover: true,
   } );
   // Asumimos que editamos el primer archivo si existe, igual que en la versión anterior
-  const fileInfo = initialData.fileInfos?.[0];
+  const fileInfo = getFirstAvailableFileInfoOrFirst(initialData.fileInfos);
   const { register,
     handleSubmit,
     control,
@@ -149,7 +150,9 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
     const updatedFileInfos = [...(initialData.fileInfos ?? [])];
 
     if (fileInfo && fileInfoRes?.data) {
-      updatedFileInfos[0] = {
+      const index = updatedFileInfos.indexOf(fileInfo);
+
+      updatedFileInfos[index] = {
         ...fileInfo,
         ...fileInfoRes.data,
       };
@@ -251,7 +254,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
       </DaInputGroup>
       <DaInputGroup inline>
         <DaLabel>Path</DaLabel>
-        <span>{initialData.fileInfos?.[0].path}</span>
+        <span>{fileInfo?.path}</span>
       </DaInputGroup>
 
       <DaFooterButtons>

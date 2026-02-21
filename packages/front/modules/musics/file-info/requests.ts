@@ -15,12 +15,12 @@ export class MusicFileInfosApi {
 
   async patch(
     id: MusicFileInfoEntity["id"],
-    body: MusicFileInfoCrudDtos.Patch.Body,
+    body: MusicFileInfoCrudDtos.PatchOne.Body,
   ) {
     const fetcher = makeFetcher( {
       method: "PATCH",
-      requestSchema: MusicFileInfoCrudDtos.Patch.bodySchema,
-      responseSchema: MusicFileInfoCrudDtos.Patch.responseSchema,
+      requestSchema: MusicFileInfoCrudDtos.PatchOne.bodySchema,
+      responseSchema: MusicFileInfoCrudDtos.PatchOne.responseSchema,
     } );
 
     return fetcher( {

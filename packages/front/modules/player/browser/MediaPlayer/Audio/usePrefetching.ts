@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { showError } from "$shared/utils/errors/showError";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { useMusic } from "#musics/hooks";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import { getUrlSkipHistory } from "./audioUtils";
@@ -72,7 +73,8 @@ export function usePrefetching() {
         if (!music?.fileInfos)
           music = await useMusic.fetch(resourceId);
 
-        const ext = music?.fileInfos?.[0].path.split(".").pop();
+        const fileInfo = getFirstAvailableFileInfoOrFirst(music?.fileInfos);
+        const ext = fileInfo?.path.split(".").pop();
         let blob: Blob;
         let ttl: number;
 

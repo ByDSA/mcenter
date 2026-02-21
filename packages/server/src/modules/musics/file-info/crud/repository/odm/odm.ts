@@ -6,6 +6,7 @@ export type DocOdm = OptionalId & {
   path: string;
   hash: string;
   size: number;
+  offloaded?: boolean;
   mediaInfo: {
     duration: number | null;
   };
@@ -35,6 +36,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   size: {
     type: Number,
     required: true,
+  },
+  offloaded: {
+    type: Boolean,
+    required: false,
   },
   mediaInfo: {
     duration: {

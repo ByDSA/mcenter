@@ -1,5 +1,7 @@
 import { Album, CalendarToday, Person } from "@mui/icons-material";
 import { assertIsDefined } from "$shared/utils/validation";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
+import { isMusicAvailable } from "$shared/models/musics";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { useUser } from "#modules/core/auth/useUser";
 import { formatDate } from "#modules/utils/dates";
@@ -25,7 +27,7 @@ export const Music = ( { musicId }: Props) => {
     title,
     album,
     artist,
-    disabled,
+    disabled: _3,
     year,
     createdAt,
     updatedAt,
@@ -40,8 +42,12 @@ export const Music = ( { musicId }: Props) => {
     imageCoverId: _2,
     ...rest } = value;
   const { user } = useUser();
-  const durationSecs = fileInfos?.[0].mediaInfo.duration;
+  const fileInfo = getFirstAvailableFileInfoOrFirst(fileInfos);
+  const durationSecs = fileInfo?.mediaInfo.duration;
   const { data: imageCover } = useImageCover(value.imageCoverId ?? null);
+  const isDisabled = !isMusicAvailable(value, {
+    precalcFileInfo: fileInfo,
+  } );
 
   return (
     <ResourceFullPage>
@@ -90,7 +96,7 @@ export const Music = ( { musicId }: Props) => {
         }
         controls={
           <>
-            <PlayMusicButton music={value} disabled={disabled} />
+            <PlayMusicButton music={value} disabled={isDisabled} />
             <MusicSettingsButton musicId={value.id} />
             {user && (
               <PlaylistFavButton

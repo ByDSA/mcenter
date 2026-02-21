@@ -22,8 +22,15 @@ export const PlayButtonView = ( { status,
   else
     symbol = <PlayArrow />;
 
+  let title: string;
+
+  if (disabled)
+    title = "No disponible";
+  else
+    title = status === "playing" ? "Pausar" : "Reproducir";
+
   return <button
-    title={status === "playing" ? "Pausar" : "Reproducir"}
+    title={title}
     className={classes(
       styles.playButton,
       !theme.startsWith("triangle-") && styles.circle,

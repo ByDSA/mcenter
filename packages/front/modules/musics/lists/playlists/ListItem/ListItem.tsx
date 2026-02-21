@@ -1,6 +1,7 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicUserListResourceItem } from "$shared/models/musics/users-lists";
+import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { useArrayData } from "#modules/utils/array-data-context";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
@@ -21,7 +22,9 @@ export const MusicPlaylistListItem = ( { index, drag }: PlaylistProps) => {
   const { removeItemByIndex } = useArrayData<MusicUserListResourceItem>();
   const { data } = useLocalData<MusicPlaylistEntity>();
   const totalDuration = data.list?.reduce(
-    (acc, item) => acc + (item.music?.fileInfos?.[0].mediaInfo.duration ?? 0),
+    (acc, item) => acc + (
+      getFirstAvailableFileInfoOrFirst(item.music?.fileInfos)?.mediaInfo.duration ?? 0
+    ),
     0,
   ) || 0;
   const totalSongs = data.list?.length || 0;
