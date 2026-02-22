@@ -8,12 +8,17 @@ import styles from "./OtherButtons.module.css";
 export const ControlButton = ( { active = true,
   className,
   children,
+  onMouseDown,
   ...props }: ComponentProps<"button"> & {
   active?: boolean;
 } ) => {
   return (
     <button
       {...props}
+      onMouseDown={(e)=> {
+        e.preventDefault(); // Para evitar que se quede el foco tras hacer click
+        onMouseDown?.(e);
+      }}
       className={classes(styles.controlButton, active ? styles.active : styles.inactive, className)}
     >
       {children}
@@ -130,6 +135,9 @@ export const VolumeController = () => {
           max="1"
           step="0.01"
           value={volume}
+          onMouseDown={e=> {
+            e.preventDefault();
+          }}
           onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
           className={styles.volumeRange}
         />
