@@ -152,8 +152,6 @@ CanDeleteOneByIdAndGet<Entity, EntryId> {
   async #getLastOdm(userId: string): Promise<FullDocOdm | null> {
     const docsOdm = await ModelOdm.find( {
       userId,
-    }, {
-      _id: 0,
     } ).sort( {
       "date.timestamp": -1,
     } )

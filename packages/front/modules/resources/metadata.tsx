@@ -11,11 +11,16 @@ type MetadataViewProps = {
   title: string;
   className?: string;
   classNameTxt?: string;
+  disabled?: boolean;
 };
 export const MetadataView = memo(
-  ( { txt, icon, title, className, classNameTxt }: MetadataViewProps) => {
+  ( { txt, icon, title, disabled, className, classNameTxt }: MetadataViewProps) => {
     return (
-      <span title={title} className={classes(styles.element, className)}>
+      <span title={title} className={classes(
+        styles.element,
+        disabled && styles.disabled,
+        className,
+      )}>
         {icon}
         <span className={classNameTxt}>{txt}</span>
       </span>
@@ -25,11 +30,13 @@ export const MetadataView = memo(
 type DurationProps = {
   duration: number;
   className?: string;
+  disabled?: boolean;
 };
-export const DurationView = memo(( { duration, className }: DurationProps) => {
+export const DurationView = memo(( { disabled, duration, className }: DurationProps) => {
   return <MetadataView
     icon={<AccessTime />}
     title="Duración"
+    disabled={disabled}
     className={className}
     txt={formatDurationItem(duration)}
   />;
@@ -37,9 +44,11 @@ export const DurationView = memo(( { duration, className }: DurationProps) => {
 
 type HistoryTimeProps = {
   timestamp: number | null;
+  disabled?: boolean;
 };
-export const HistoryTimeView = memo(( { timestamp }: HistoryTimeProps) => {
+export const HistoryTimeView = memo(( { disabled, timestamp }: HistoryTimeProps) => {
   return <MetadataView
+    disabled={disabled}
     title={"Hora de reproducción"}
     icon={<CalendarToday />}
     txt={timestamp !== null
@@ -50,8 +59,9 @@ export const HistoryTimeView = memo(( { timestamp }: HistoryTimeProps) => {
 
 type WeightProps = {
   weight: number | null;
+  disabled?: boolean;
 };
-export const WeightView = memo(( { weight }: WeightProps) => {
+export const WeightView = memo(( { disabled, weight }: WeightProps) => {
   const txt = weight !== null
     ? formatWeight(weight)
     : "";
@@ -63,6 +73,7 @@ export const WeightView = memo(( { weight }: WeightProps) => {
 
   return <MetadataView
     title={title}
+    disabled={disabled}
     icon={<Balance />}
     classNameTxt={classes(styles.txt, change && styles.change)}
     txt={txt}

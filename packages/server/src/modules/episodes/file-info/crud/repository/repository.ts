@@ -1,7 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
-import { FilterQuery } from "mongoose";
+import { FilterQuery, Types } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
+import { EpisodeFileInfoOdm } from "./odm";
+import { EpisodeFileInfoEvents } from "./events";
 import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { EpisodeEntity } from "#episodes/models";
@@ -9,8 +11,6 @@ import { assertFoundClient } from "#utils/validation/found";
 import { MongoFilterQuery, patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
-import { EpisodeFileInfoOdm } from "./odm";
-import { EpisodeFileInfoEvents } from "./events";
 
 type Entity = EpisodeFileInfoEntity;
 type Model = EpisodeFileInfo;
@@ -52,6 +52,51 @@ CanGetAll<Entity> {
 
   async getAll(): Promise<Entity[]> {
     const modelsOdm = await EpisodeFileInfoOdm.Model.find();
+
+    return modelsOdm.map(EpisodeFileInfoOdm.toEntity);
+  }
+
+  async patchOffloaded(id: string, newValue: boolean) {
+    if (newValue) {
+      // No existe y no estaba como offloaded → marcar como offloaded
+      await EpisodeFileInfoOdm.Model.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            offloaded: true,
+          },
+        },
+      );
+    } else {
+      await EpisodeFileInfoOdm.Model.findByIdAndUpdate(
+        id,
+        {
+          $unset: {
+            offloaded: 1,
+          },
+        },
+      );
+    }
+  }
+
+  async getManyByEpisodeIds(ids: EpisodeId[]): Promise<Entity[]> {
+    const filter = {
+      episodeId: {
+        $in: ids.map(id => new Types.ObjectId(id)),
+      },
+    } satisfies MongoFilterQuery<EpisodeFileInfoOdm.Doc>;
+    const modelsOdm = await EpisodeFileInfoOdm.Model.find(filter);
+
+    return modelsOdm.map(EpisodeFileInfoOdm.toEntity);
+  }
+
+  async getManyByIds(ids: string[]): Promise<Entity[]> {
+    const filter = {
+      _id: {
+        $in: ids.map(id => new Types.ObjectId(id)),
+      },
+    } satisfies MongoFilterQuery<EpisodeFileInfoOdm.Doc>;
+    const modelsOdm = await EpisodeFileInfoOdm.Model.find(filter);
 
     return modelsOdm.map(EpisodeFileInfoOdm.toEntity);
   }

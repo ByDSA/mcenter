@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { M3u8ViewOptions } from "#modules/resources/response-formatter/resource-to-media-element";
 import { StreamFileService } from "#modules/resources/stream-file/service";
 import { validateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
-import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
+import { assertFoundServer } from "#utils/validation/found";
 import { ResponseFormat } from "../../resources/response-formatter";
 import { MusicEntity, musicEntitySchema } from "../models";
 import { MusicFileInfoEntity } from "../file-info/models";
@@ -14,7 +14,7 @@ import { MusicResponseFormatterService } from "./formatter.service";
 type Entity = MusicEntity;
 
 type RenderRawProps = {
-  music: Entity;
+  music: Entity | null;
   request: Request;
   response: Response;
 };
@@ -40,7 +40,7 @@ export class MusicRendererService {
   ) { }
 
   renderM3u8One(
-    music: MusicEntity,
+    music: Entity | null,
     req: Request,
     options?: Parameters<typeof this.responseFormatter.formatOneRemoteM3u8Response>[2],
   ) {
@@ -50,8 +50,7 @@ export class MusicRendererService {
       {
         ...getM3u8OptionsFromRequest(req),
         ...options,
-      }
-      ,
+      },
     );
   }
 
@@ -63,8 +62,14 @@ export class MusicRendererService {
     );
   }
 
-  renderJson(music: MusicEntity, req: Request, res: Response) {
-    const json = this.responseFormatter.formatOneJsonResponse(music!, res);
+  renderJson(music: Entity | null, req: Request, res: Response) {
+    if (!music) {
+      return {
+        data: null,
+      };
+    }
+
+    const json = this.responseFormatter.formatOneJsonResponse(music, res);
 
     validateResponseWithZodSchema(json.data, musicEntitySchema, req);
 
@@ -92,11 +97,16 @@ export class MusicRendererService {
   }
 
   async renderRaw( { music, request, response }: RenderRawProps) {
-    assertFoundClient(music);
-    assertFoundServer(music.fileInfos);
-    assertFoundServer(music.fileInfos[0]);
+    if (!music) {
+      response.status(204).send();
 
-    const fileInfo = music.fileInfos?.[0];
+      return;
+    }
+
+    assertFoundServer(music.fileInfos);
+    const fileInfo = music.fileInfos.find(f=>!f.offloaded);
+
+    assertFoundServer(fileInfo);
 
     assertFoundServer(fileInfo);
     const fullpath = getAbsolutePath(fileInfo.path);

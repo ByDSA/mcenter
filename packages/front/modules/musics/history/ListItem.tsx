@@ -13,7 +13,7 @@ import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPla
 import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryLoading";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { useMusic } from "../hooks";
-import { isMusicAvailable } from "../models";
+import { isMusicUnavailable } from "../models";
 import { MusicHistoryEntrySettingsButton } from "./SettingsButton/SettingsButton";
 import { MusicHistoryEntryEntity } from "./models";
 
@@ -44,12 +44,12 @@ export const MusicHistoryListItem = React.memo(() =>{
   assertIsDefined(data.resource);
 
   const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
-  const isDisabled = !isMusicAvailable(music, {
+  const isUnavailable = isMusicUnavailable(music, {
     precalcFileInfo: fileInfo,
   } );
   let playStatus: PlayerStatus | "disabled";
 
-  if (isDisabled)
+  if (isUnavailable)
     playStatus = "disabled";
   else
     playStatus = currentResource?.resourceId === data.resourceId ? status : "stopped";

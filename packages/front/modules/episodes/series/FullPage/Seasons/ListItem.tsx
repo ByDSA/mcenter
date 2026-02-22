@@ -1,9 +1,9 @@
 import type { EpisodesList } from "./List";
 import { PATH_ROUTES } from "$shared/routing";
-import { assertIsDefined } from "$shared/utils/validation";
+import { assertIsDefined, isDefined } from "$shared/utils/validation";
 import { Visibility } from "@mui/icons-material";
 import { UserRoleName } from "$shared/models/auth";
-import { EpisodeUserInfo } from "$shared/models/episodes";
+import { EpisodeUserInfo, isEpisodeUnavailable } from "$shared/models/episodes";
 import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
@@ -54,10 +54,13 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
   }
 
   const fileInfo = getFirstAvailableFileInfoOrFirst(episode.fileInfos);
-
-  assertIsDefined(fileInfo?.mediaInfo.duration);
-  const duration = Math.min(fileInfo.mediaInfo.duration, fileInfo.end ?? Infinity)
-    - Math.max(fileInfo.start ?? 0);
+  const isUnavailable = isEpisodeUnavailable(episode, {
+    precalcFileInfo: fileInfo,
+  } );
+  const duration = isDefined(fileInfo?.mediaInfo.duration)
+    ? Math.min(fileInfo.mediaInfo.duration, fileInfo.end ?? Infinity)
+    - Math.max(fileInfo.start ?? 0)
+    : NaN;
   const isAdmin = !!user?.roles.find(r=>r.name === UserRoleName.ADMIN);
 
   return (
@@ -72,7 +75,7 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
         className: styles.episodeKey,
         text: episode.episodeKey,
       }, subtitleSeen]} />}
-      disabled={episode.disabled}
+      disabled={isUnavailable}
       imageCover={imageCover}
       imageCoverDefaultIcon={{
         element: <SeriesIcon />,
@@ -91,7 +94,7 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
                 <LocalDataProvider data={episode}>
                   {isAdmin && <EditEpisodeContextMenuItem initialData={episode} />}
                   {hasUser && <EpisodeLatestViewsContextMenuItem episodeId={episodeId} />}
-                  {!episode.disabled && <ShareEpisodeLinkContextMenuItemCurrentCtx />}
+                  {!isUnavailable && <ShareEpisodeLinkContextMenuItemCurrentCtx />}
                   {isAdmin && <DeleteEpisodeContextMenuItem
                     onActionSuccess={onDelete ? ()=>onDelete(episode) : undefined}
                   />}

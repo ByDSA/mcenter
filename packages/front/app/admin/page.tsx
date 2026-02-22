@@ -77,6 +77,18 @@ const ACTIONS: Action[] = [
     taskName: tasksMusics.updateFileInfos.name,
   },
   {
+    path: PATH_ROUTES.musics.admin.fileInfoUpdateOffloaded.path,
+    name: "Musics: update file infos offloaded",
+    type: "task",
+    taskName: tasksMusics.fileInfosUpdateOffloaded.name,
+  },
+  {
+    path: PATH_ROUTES.episodes.admin.fileInfoUpdateOffloaded.path,
+    name: "Episodes: update file infos offloaded",
+    type: "task",
+    taskName: tasksEpisodes.fileInfoUpdateOffloaded.name,
+  },
+  {
     path: PATH_ROUTES.logs.path,
     name: ACTION_LOG_NAME,
     type: "action",

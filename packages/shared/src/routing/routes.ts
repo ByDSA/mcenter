@@ -425,6 +425,9 @@ export const PATH_ROUTES = {
       updateFileInfos: {
         path: `${MUSICS_ADMIN}/update-file-infos`,
       },
+      fileInfoUpdateOffloaded: {
+        path: MUSICS_ADMIN + "/update-file-info-offloaded",
+      },
     },
   },
   logs: {
@@ -496,6 +499,9 @@ export const PATH_ROUTES = {
       },
       fileInfoUpdateSaved: {
         path: EPISODES_ADMIN + "/file-info/update/saved",
+      },
+      fileInfoUpdateOffloaded: {
+        path: EPISODES_ADMIN + "/file-info/update/offloaded",
       },
       addNewFiles: {
         path: EPISODES_ADMIN + "/add-new-files",

@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import { EpisodeEntity } from "$shared/models/episodes";
 import { dateToTimestampInSeconds } from "$shared/utils/time/timestamp";
+import { getFirstAvailableFileInfoOrFirst, isFileInfoUnavailable } from "$shared/models/file-info-common/file-info";
 import { HistoryTimeView, WeightView } from "#modules/history";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
@@ -29,7 +30,7 @@ type Props = {
 export const EpisodeHistoryEntryElement = React.memo((
   { episodeId, historyEntry, onDelete }: Props,
 ) =>{
-  const { data: episode } = useEpisode(episodeId);
+  let { data: episode } = useEpisode(episodeId);
   const { data: series } = useSeries(episode?.seriesId ?? null, {
     debounce: true,
     notExpandCountEpisodes: true,
@@ -42,8 +43,11 @@ export const EpisodeHistoryEntryElement = React.memo((
   } );
   const { openMenu } = useContextMenuTrigger();
 
-  if (!episode || !series || (imageCoverId && !imageCover))
+  if (!episode || !episode.fileInfos || !series || (imageCoverId && !imageCover))
     return <ResourceEntryLoading />;
+
+  const fileInfo = getFirstAvailableFileInfoOrFirst(episode.fileInfos);
+  const isUnavailable = isFileInfoUnavailable(fileInfo);
 
   return <ResourceEntry
     mainTitle={episode.title}
@@ -52,7 +56,7 @@ export const EpisodeHistoryEntryElement = React.memo((
       <HistoryTimeView timestamp={dateToTimestampInSeconds(historyEntry.date)} />
       {episode.userInfo && <WeightView weight={episode.userInfo.weight} />}
     </>}
-    disabled={episode.disabled}
+    disabled={isUnavailable}
     imageCover={imageCover}
     imageCoverDefaultIcon={{
       element: <SeriesIcon />,
@@ -68,7 +72,7 @@ export const EpisodeHistoryEntryElement = React.memo((
               maxTimestamp={dateToTimestampInSeconds(historyEntry.date)}
             />
             <LocalDataProvider data={episode}>
-              {!episode.disabled && <ShareEpisodeLinkContextMenuItemCurrentCtx />}
+              {!isUnavailable && <ShareEpisodeLinkContextMenuItemCurrentCtx />}
             </LocalDataProvider>
             <DeleteHistoryEntryContextMenuItem value={historyEntry} onActionSuccess={onDelete}/>
           </>,

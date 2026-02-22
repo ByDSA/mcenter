@@ -35,10 +35,15 @@ function getFirstAvailableFileInfoOrFirst<T extends Model>(fileInfos: T[] | unde
   return fileInfos[0] ?? null;
 }
 
+function isFileInfoUnavailable<T extends Model>(fileInfo: T | null | undefined): boolean {
+  return !fileInfo || !!fileInfo.offloaded;
+}
+
 export {
   schema as fileInfoSchema,
   type Model as FileInfo,
   assertIsModel as assertIsFileInfo,
   compareModel as compareFileInfo,
   getFirstAvailableFileInfoOrFirst,
+  isFileInfoUnavailable,
 };

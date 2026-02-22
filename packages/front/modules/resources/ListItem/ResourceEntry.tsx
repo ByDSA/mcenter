@@ -93,7 +93,7 @@ export function ResourceEntry(
         }
         : undefined}
     >
-      <ResourceTitle title={mainTitle} href={mainTitleHref} disabled={disabled} />
+      <ResourceTitle title={mainTitle} href={mainTitleHref} />
       {subtitle}
     </DaAnchor>
     <ListItemRow className={styles.right}>

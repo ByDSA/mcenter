@@ -4,14 +4,14 @@ import { Injectable,
   CallHandler,
   applyDecorators,
   SetMetadata,
-  UseInterceptors,
-  BadRequestException } from "@nestjs/common";
+  UseInterceptors } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { Request, Response } from "express";
 import { Reflector } from "@nestjs/core";
 import { FormatResponseOptions } from "../../episodes/renderer/formatter.service";
 import { M3U8_FORMAT_USE_NEXT } from "../../resources/response-formatter/use-next.decorator";
+import { MusicEntity } from "../models";
 import { MusicResponseFormatterService } from "./formatter.service";
 import { MusicRendererService } from "./renderer.service";
 
@@ -41,10 +41,7 @@ export class MusicRendererInterceptor implements NestInterceptor {
     const format = this.responseFormatter.getResponseFormatByRequest(request);
 
     return next.handle().pipe(
-      map((data) => {
-        if (!data)
-          throw new BadRequestException();
-
+      map((data: MusicEntity | null) => {
         switch (format) {
           case "m3u8":
             if (!props?.m3u8)

@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import assert from "assert";
-import { isMusicAvailable, type MusicEntity } from "$shared/models/musics";
+import { isMusicUnavailable, type MusicEntity } from "$shared/models/musics";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
@@ -182,7 +182,7 @@ export const useBrowserPlayer = create<PlayerState>()(
 
         const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
 
-        if (isMusicAvailable(music, {
+        if (isMusicUnavailable(music, {
           precalcFileInfo: fileInfo,
         } ))
           return;
@@ -224,19 +224,29 @@ export const useBrowserPlayer = create<PlayerState>()(
         const query = ownerSlug
           ? `playlist:@${ownerSlug}/${playlist.slug}`
           : `playlist:${playlist.slug}`;
+        const queue = playlistToQueue(playlist);
+        const { repeatMode, isShuffle } = get();
 
         set( {
-          queue: playlistToQueue(playlist),
+          queue,
           query,
           queueIndex: Infinity,
         } );
-        const isShufle = get().isShuffle;
+
         let index = propsIndex;
 
         if (index === undefined) {
-          if (!isShufle)
-            index = 0;
-          else {
+          if (!isShuffle) {
+            const firstAvailable = await getNextAvailableIndex(queue, -1, repeatMode);
+
+            if (firstAvailable === null) {
+              get().stop();
+
+              return;
+            }
+
+            index = firstAvailable;
+          } else {
             const nextAction = await get().getNext();
 
             if (!nextAction) {
@@ -248,7 +258,7 @@ export const useBrowserPlayer = create<PlayerState>()(
             if (nextAction.type === "INDEX")
               index = nextAction.payload;
             else
-              index = playlist.list.findIndex(e=>e.musicId === nextAction.payload.id);
+              index = playlist.list.findIndex(e => e.musicId === nextAction.payload.id);
           }
         }
 
@@ -277,7 +287,7 @@ export const useBrowserPlayer = create<PlayerState>()(
         const queueItem: PlaylistQueueItem = musicToResource(music);
         const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
 
-        if (isMusicAvailable(music, {
+        if (isMusicUnavailable(music, {
           precalcFileInfo: fileInfo,
         } ))
           return;
@@ -313,7 +323,7 @@ export const useBrowserPlayer = create<PlayerState>()(
 
         const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
 
-        if (isMusicAvailable(music, {
+        if (isMusicUnavailable(music, {
           precalcFileInfo: fileInfo,
         } ))
           return;
@@ -350,6 +360,8 @@ export const useBrowserPlayer = create<PlayerState>()(
         get().stop();
         set( {
           currentResource: null,
+          query: undefined,
+          queue: [],
         } );
       },
       stop: () => {
@@ -360,9 +372,7 @@ export const useBrowserPlayer = create<PlayerState>()(
         } );
         set( {
           status: "stopped",
-          query: undefined,
           nextResource: null,
-          queue: [],
         } );
       },
       addToQueue: (resource) => set((state) => ( {
@@ -428,16 +438,12 @@ export const useBrowserPlayer = create<PlayerState>()(
       },
       prev: async () => {
         const { queueIndex, queue, repeatMode } = get();
-        let newIndex = queueIndex - 1;
+        const prevIndex = await getPrevAvailableIndex(queue, queueIndex, repeatMode);
 
-        if (newIndex < 0) {
-          if (repeatMode === RepeatMode.All)
-            newIndex = queue.length - 1;
-          else
-            return;
-        }
+        if (prevIndex === null)
+          return;
 
-        await get().playQueueIndex(newIndex);
+        await get().playQueueIndex(prevIndex);
       },
       setQueue: (queue) => set( {
         queue,
@@ -559,22 +565,14 @@ export async function getNextByParams(props: GetNextProps): Promise<NextAction |
   // 1.async  LÓGICA DE ORDEN SECUENCIAL
   if ((!isShuffle && (playingType === "playlist" || playingType === "one"))
       || (playingType === "smart-playlist" && queueIndex < queue.length - 1)) {
-    let newIndex = queueIndex + 1;
+    const nextIndex = await getNextAvailableIndex(queue, queueIndex, repeatMode);
 
-    if (newIndex >= queue.length) {
-      if (repeatMode === RepeatMode.All) {
-        return {
-          type: "INDEX",
-          payload: 0,
-        };
-      }
-
-      return null; // No hay más músicas
-    }
+    if (nextIndex === null)
+      return null;
 
     return {
       type: "INDEX",
-      payload: newIndex,
+      payload: nextIndex,
     };
   }
 
@@ -623,4 +621,66 @@ export async function getNextByParams(props: GetNextProps): Promise<NextAction |
 
 function logNoMusic() {
   logger.error("No hay ninguna música para reproducir.");
+}
+
+export async function getNextAvailableIndex(
+  queue: PlaylistQueueItem[],
+  fromIndex: number, // exclusivo — pasa -1 para empezar desde el principio
+  repeatMode: RepeatMode,
+): Promise<number | null> {
+  if (queue.length === 0)
+    return null;
+
+  let newIndex = fromIndex;
+  let checked = 0;
+
+  while (checked < queue.length) {
+    newIndex++;
+    checked++;
+
+    if (newIndex >= queue.length) {
+      if (repeatMode === RepeatMode.All)
+        newIndex = 0;
+      else
+        return null;
+    }
+
+    const music = await useMusic.get(queue[newIndex].resourceId);
+
+    if (music && !isMusicUnavailable(music))
+      return newIndex;
+  }
+
+  return null; // todas las canciones no disponibles
+}
+
+export async function getPrevAvailableIndex(
+  queue: PlaylistQueueItem[],
+  fromIndex: number, // exclusivo — pasa queue.length para empezar desde el final
+  repeatMode: RepeatMode,
+): Promise<number | null> {
+  if (queue.length === 0)
+    return null;
+
+  let newIndex = fromIndex;
+  let checked = 0;
+
+  while (checked < queue.length) {
+    newIndex--;
+    checked++;
+
+    if (newIndex < 0) {
+      if (repeatMode === RepeatMode.All)
+        newIndex = queue.length - 1;
+      else
+        return null;
+    }
+
+    const music = await useMusic.get(queue[newIndex].resourceId);
+
+    if (music && !isMusicUnavailable(music))
+      return newIndex;
+  }
+
+  return null;
 }

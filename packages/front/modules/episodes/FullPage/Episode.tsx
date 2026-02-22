@@ -2,7 +2,7 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { UserRoleName } from "$shared/models/auth";
 import { useRouter } from "next/navigation";
 import { PATH_ROUTES } from "$shared/routing";
-import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
+import { getFirstAvailableFileInfoOrFirst, isFileInfoUnavailable } from "$shared/models/file-info-common/file-info";
 import { MusicImageCover } from "#modules/musics/MusicCover";
 import { SeriesIcon } from "#modules/episodes/series/SeriesIcon/SeriesIcon";
 import { useImageCover } from "#modules/image-covers/hooks";
@@ -54,7 +54,8 @@ export const EpisodeFullPage = ( { episodeId }: Props) => {
   const duration = fileInfo
     ? Math.min(fileInfo.mediaInfo.duration ?? Infinity, fileInfo.end ?? Infinity)
       - Math.max(fileInfo.start ?? 0)
-    : null;
+    : NaN;
+  const isUnavailable = isFileInfoUnavailable(fileInfo);
   const seriesOnClick = () => {
     router.push(PATH_ROUTES.episodes.frontend.lists.withParams( {
       serieId: series.id,
@@ -91,9 +92,7 @@ export const EpisodeFullPage = ( { episodeId }: Props) => {
         info={
           <>
             <DateTag date={episode.createdAt} />
-            {duration !== null && duration > 0 && (
-              <DurationView duration={duration} />
-            )}
+            <DurationView duration={duration} />
 
             {hasUser && (<LastSeenElement
               userInfo={episode.userInfo}
@@ -109,7 +108,7 @@ export const EpisodeFullPage = ( { episodeId }: Props) => {
         controls={
           <>
             <ResourcePlayButtonView
-              disabled={fileInfo?.offloaded}
+              disabled={isUnavailable}
               status="stopped"
               onClick={undefined}
             />

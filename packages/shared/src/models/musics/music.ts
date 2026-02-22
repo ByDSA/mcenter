@@ -4,7 +4,7 @@ import { resourceSchema } from "../resources";
 import { mongoDbId, taggableSchema } from "../resources/partial-schemas";
 import { slugSchema } from "../utils/schemas/slug";
 import { imageCoverEntitySchema } from "../image-covers";
-import { getFirstAvailableFileInfoOrFirst } from "../file-info-common/file-info";
+import { getFirstAvailableFileInfoOrFirst, isFileInfoUnavailable } from "../file-info-common/file-info";
 import { MusicFileInfoEntity, musicFileInfoEntitySchema } from "./file-info";
 import { musicUserInfoEntitySchema } from "./user-info/user-info";
 
@@ -36,6 +36,9 @@ const entitySchema = modelSchema.extend( {
   userInfo: musicUserInfoEntitySchema.optional(),
   imageCover: imageCoverEntitySchema.optional(),
   isFav: z.boolean().optional(),
+
+  // Cache de los fileinfo
+  offloaded: z.boolean().optional(),
 } );
 
 type Entity = z.infer<typeof entitySchema>;
@@ -57,10 +60,10 @@ const entityWithUserInfoSchema = entitySchema.required( {
 
 type EntityWithUserInfo = z.infer<typeof entityWithUserInfoSchema>;
 
-function isAvailable(music: Entity, options?: {precalcFileInfo: MusicFileInfoEntity | null} ) {
+function isUnavailable(music: Entity, options?: {precalcFileInfo: MusicFileInfoEntity | null} ) {
   const fileInfo = options?.precalcFileInfo ?? getFirstAvailableFileInfoOrFirst(music.fileInfos);
 
-  return !(music.disabled || !fileInfo || fileInfo.offloaded);
+  return isFileInfoUnavailable(fileInfo);
 }
 export {
   idSchema as musicIdSchema,
@@ -76,5 +79,5 @@ export {
   assertIsModel as assertIsMusic,
   assertIsEntity as assertIsMusicEntity,
   compareId as compareMusicId,
-  isAvailable as isMusicAvailable,
+  isUnavailable as isMusicUnavailable,
 };

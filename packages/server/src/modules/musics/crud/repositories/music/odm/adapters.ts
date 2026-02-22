@@ -41,6 +41,7 @@ export function docOdmToEntity(docOdm: FullDocOdm): Entity {
     isFav: docOdm.isFav,
     imageCoverId: docOdm.imageCoverId?.toString(),
     imageCover: docOdm.imageCover ? ImageCoverOdm.toEntity(docOdm.imageCover) : undefined,
+    offloaded: docOdm.offloaded,
   } satisfies AllKeysOf<Entity>;
 
   return removeUndefinedDeep(entity);
@@ -64,7 +65,7 @@ export function modelToDocOdm(model: Model): DocOdm {
     releasedOn: model.releasedOn,
     updatedAt: model.updatedAt,
     imageCoverId: model.imageCoverId ? new Types.ObjectId(model.imageCoverId) : undefined,
-  } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
+  } satisfies AllKeysOf<Omit<DocOdm, "_id" | "offloaded">>;
 
   return removeUndefinedDeep(docOdm);
 }
@@ -94,7 +95,7 @@ export function partialToDocOdm(partial: Partial<Model>): Partial<DocOdm> {
     addedAt: partial.addedAt,
     releasedOn: partial.releasedOn,
     imageCoverId: partial.imageCoverId ? new Types.ObjectId(partial.imageCoverId) : undefined,
-  } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
+  } satisfies AllKeysOf<Omit<DocOdm, "_id" | "offloaded">>;
 
   return ret;
 }

@@ -1,6 +1,6 @@
 import { memo, ReactNode } from "react";
 import { PATH_ROUTES } from "$shared/routing";
-import { MusicEntity } from "$shared/models/musics";
+import { isMusicUnavailable, MusicEntity } from "$shared/models/musics";
 import { useShallow } from "zustand/react/shallow";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
@@ -57,11 +57,14 @@ export function MusicEntryElement(
     return <ResourceEntryLoading />;
 
   const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
+  const isUnavailable = isMusicUnavailable(music, {
+    precalcFileInfo: fileInfo,
+  } );
   const duration = fileInfo?.mediaInfo.duration;
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
   const right = <>
-    {duration && <DurationView duration={duration} />}
-    {music.userInfo && <WeightView weight={music.userInfo.weight} />}
+    {duration && <DurationView duration={duration} disabled={isUnavailable} />}
+    {music.userInfo && <WeightView weight={music.userInfo.weight} disabled={isUnavailable} />}
   </>;
 
   if (props.playable) {
@@ -142,7 +145,7 @@ export function MusicEntryElement(
       } )
       }
     />}
-    disabled={music.disabled}
+    disabled={isUnavailable}
     play={play}
     drag={props.drag}
   />;

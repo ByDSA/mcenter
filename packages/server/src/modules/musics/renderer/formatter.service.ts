@@ -101,10 +101,13 @@ export class MusicResponseFormatterService {
   }
 
   formatOneRemoteM3u8Response(
-    data: MusicEntity,
+    data: MusicEntity | null,
     host: string,
     options?: Omit<M3u8ViewOptions, "local" | "prefix">,
   ) {
+    if (!data)
+      return "#EXTM3U\n";
+
     const mediaElement = musicToMediaElement(data, {
       ...options,
       prefix: host,

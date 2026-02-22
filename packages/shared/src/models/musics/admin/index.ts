@@ -5,4 +5,7 @@ export const tasksMusics = Object.freeze( {
   updateFileInfos: {
     name: "music-update-file-infos",
   },
+  fileInfosUpdateOffloaded: {
+    name: "musics-file-infos-update-offloaded",
+  },
 } );

@@ -11,6 +11,7 @@ import { DeleteSeriesContextMenuItemCurrentCtx } from "../Delete/ContextMenuItem
 import { UploadEpisodesContextMenuItemCurrentCtx } from "../UploadEpisodes/ContextMenuItem";
 import { useSeries } from "../hooks";
 import { ShareSeriesContextMenuItemCurrentCtx } from "./ShareContextMenuItem";
+import { SyncFileAvailabilityContextMenuItem } from "./SyncFileAvailabilityContextMenuItem";
 
 type Props = PropsOf<typeof UploadEpisodesContextMenuItemCurrentCtx> & {
   onUpdate?: (newData: SeriesEntity)=> void;
@@ -37,6 +38,7 @@ export const SeriesSettingsButton = ( { onUpdate, onDelete,
               {isAdmin && <EditSeriesContextMenuItemCurrentCtx onSuccess={onUpdate} />}
               {isAdmin
                 && <UploadEpisodesContextMenuItemCurrentCtx onUploadEachEpisode={onUpload} />}
+              {isAdmin && <SyncFileAvailabilityContextMenuItem />}
               <ShareSeriesContextMenuItemCurrentCtx />
               {isAdmin && <DeleteSeriesContextMenuItemCurrentCtx onActionSuccess={onDelete} />}
             </LocalDataProvider>

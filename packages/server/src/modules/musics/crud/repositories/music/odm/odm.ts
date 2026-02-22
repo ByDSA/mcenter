@@ -19,6 +19,9 @@ export type DocOdm = TimestampsOdm.AutoTimestamps & TimestampsOdm.NonAutoTimesta
   country?: string;
   imageCoverId?: mongoose.Types.ObjectId | null;
   uploaderUserId: mongoose.Types.ObjectId;
+
+  // Cache:
+  offloaded?: boolean;
 };
 
 export type FullDocOdm = RequireId<DocOdm> & {
@@ -78,6 +81,10 @@ export const schemaOdm = new mongoose.Schema<DocOdm>( {
   },
   year: {
     type: Number,
+  },
+  offloaded: {
+    type: Boolean,
+    required: false,
   },
   ...TimestampsOdm.nonAutoTimestampsSchemaDefinition,
 } satisfies SchemaDef<TimestampsOdm.OmitAutoTimestamps<DocOdm>>, {

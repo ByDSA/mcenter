@@ -5,8 +5,8 @@ export const tasksEpisodes = Object.freeze( {
   updateFileInfoSaved: {
     name: "episodes-update-file-info-saved",
   },
-  fileInfoUpdateOffloaded: {
-    name: "episodes-file-info-update-offloaded",
+  updateFileInfoOffloaded: {
+    name: "episodes-update-file-info-offloaded",
   },
   cache: {
     updateLastTimePlayed: {

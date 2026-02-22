@@ -19,6 +19,9 @@ export const formatDurationHeader = (seconds: number): string => {
 };
 
 export const formatDurationItem = (seconds: number): string => {
+  if (Number.isNaN(seconds))
+    return "--:--";
+
   return secsToMmss(seconds);
 };
 

@@ -16,8 +16,10 @@ import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
+import { MusicFileInfoEvents } from "#musics/file-info/crud/repository/events";
 import { MusicsSearchService } from "#modules/search/search-services/musics.search.service";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
+import { showError } from "#core/logging/show-error";
 import { MusicBuilderService } from "../../builder/music-builder.service";
 import { MusicAvailableSlugGeneratorService } from "../../builder/available-slug-generator.service";
 import { ExpressionNode } from "./queries/query-object";
@@ -54,6 +56,27 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
   @OnEvent(MusicEvents.WILDCARD)
   handleEvents(ev: DomainEvent<unknown>) {
     logDomainEvent(ev);
+  }
+
+  @OnEvent(MusicFileInfoEvents.Patched.TYPE)
+  async handleFileInfoOffloadedChanged(
+    event: MusicFileInfoEvents.Patched.Event,
+  ): Promise<void> {
+    const { entityId } = event.payload;
+
+    // Recalcula con cualquier cambio, no sólo con cambio en offloaded
+    await this.recalcAndUpdateHasAvailableFileInfo(entityId).catch(showError);
+  }
+
+  private async recalcAndUpdateHasAvailableFileInfo(musicId: string): Promise<void> {
+    const fileInfos = await this.fileInfoRepo.getAllByMusicId(musicId);
+    const hasAvailable = fileInfos.some((fi) => !fi.offloaded);
+
+    await MusicOdm.Model.findByIdAndUpdate(musicId, {
+      $set: {
+        offloaded: !hasAvailable,
+      },
+    } );
   }
 
   async deleteOneByIdAndGet(id: string): Promise<MusicEntity> {

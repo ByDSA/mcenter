@@ -78,8 +78,19 @@ export class MusicGetRandomService {
     userId: string | null,
     query: string | null,
   ): Promise<MusicEntityWithUserInfo[]> {
+    let musics: MusicEntityWithUserInfo[];
+
     if (!query) {
-      return await this.musicRepo.getAll( {
+      musics = await this.musicRepo.getAll( {
+        criteria: {
+          expand: ["userInfo"],
+        },
+        requestingUserId: userId ?? undefined,
+      } ) as MusicEntityWithUserInfo[];
+    } else {
+      const params = queryToExpressionNode(query);
+
+      musics = await this.musicRepo.getManyByQuery(params, {
         criteria: {
           expand: ["userInfo"],
         },
@@ -87,13 +98,6 @@ export class MusicGetRandomService {
       } ) as MusicEntityWithUserInfo[];
     }
 
-    const params = queryToExpressionNode(query);
-
-    return await this.musicRepo.getManyByQuery(params, {
-      criteria: {
-        expand: ["userInfo"],
-      },
-      requestingUserId: userId ?? undefined,
-    } ) as MusicEntityWithUserInfo[];
+    return musics.filter((m) => !m.offloaded);
   }
 }

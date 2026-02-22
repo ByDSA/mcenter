@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { MusicEntity, MusicId } from "$shared/models/musics";
 import { assertIsDefined } from "$shared/utils/validation";
-import { FilterQuery } from "mongoose";
+import { FilterQuery, Types, UpdateQuery } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
 import { CanCreateOneAndGet, CanGetAll, CanGetOneById } from "#utils/layers/repository";
@@ -13,11 +13,12 @@ import { MusicEvents } from "#musics/crud/repositories/music/events";
 import { showError } from "#core/logging/show-error";
 import { MUSIC_MEDIA_PATH } from "#musics/utils";
 import { assertFoundClient } from "#utils/validation/found";
-import { MusicFileInfoOmitMusicIdBuilder } from "../../builder";
+import { MongoFilterQuery } from "#utils/layers/db/mongoose";
 import { MusicFileInfo, MusicFileInfoEntity } from "../../models";
-import { DocOdm } from "./odm/odm";
-import { MusicFileInfoEvents } from "./events";
+import { MusicFileInfoOmitMusicIdBuilder } from "../../builder";
 import { MusicFileInfoOdm } from "./odm";
+import { MusicFileInfoEvents } from "./events";
+import { DocOdm } from "./odm/odm";
 
 type Entity = MusicFileInfoEntity;
 type CreateOneDto = MusicFileInfoCrudDtos.CreateOne.Body;
@@ -114,12 +115,47 @@ música si desea borrar el archivo.",
     return MusicFileInfoOdm.toEntity(got);
   }
 
-  async patchOneByPath(path: string, model: PatchOneDto): Promise<void> {
-    const docOdm = MusicFileInfoOdm.partialToDoc(model.entity);
-
-    await MusicFileInfoOdm.Model.updateOne( {
+  async patchOneByPath(path: string, dto: PatchOneDto): Promise<Entity> {
+    const docOdm = MusicFileInfoOdm.partialToDoc(dto.entity);
+    const ret = await MusicFileInfoOdm.Model.findByIdAndUpdate( {
       path,
-    }, docOdm);
+    }, docOdm, {
+      new: true,
+    } );
+
+    assertFoundClient(ret);
+
+    this.domainEventEmitter.emitPatch(MusicFileInfoEvents.Patched.TYPE, {
+      partialEntity: dto.entity,
+      id: ret.id,
+      unset: dto.unset,
+    } );
+
+    return MusicFileInfoOdm.toEntity(ret);
+  }
+
+  async patchOneById(id: string, dto: PatchOneDto): Promise<Entity> {
+    const docOdm = MusicFileInfoOdm.partialToDoc(dto.entity);
+    const update: UpdateQuery<Entity> = {
+      $set: docOdm,
+    };
+
+    if (dto.unset?.length)
+      update.$unset = Object.fromEntries(dto.unset.map((field) => [field, ""]));
+
+    const ret = await MusicFileInfoOdm.Model.findByIdAndUpdate(id, update, {
+      new: true,
+    } );
+
+    assertFoundClient(ret);
+
+    this.domainEventEmitter.emitPatch(MusicFileInfoEvents.Patched.TYPE, {
+      partialEntity: dto.entity,
+      id,
+      unset: dto.unset,
+    } );
+
+    return MusicFileInfoOdm.toEntity(ret);
   }
 
   async deleteOneByPath(path: string): Promise<void> {
@@ -144,6 +180,17 @@ música si desea borrar el archivo.",
     const modelsOdm = await MusicFileInfoOdm.Model.find( {
       musicId,
     } );
+
+    return modelsOdm.map(MusicFileInfoOdm.toEntity);
+  }
+
+  async getManyByIds(ids: string[]): Promise<Entity[]> {
+    const filter = {
+      _id: {
+        $in: ids.map(id => new Types.ObjectId(id)),
+      },
+    } satisfies MongoFilterQuery<DocOdm>;
+    const modelsOdm = await MusicFileInfoOdm.Model.find(filter);
 
     return modelsOdm.map(MusicFileInfoOdm.toEntity);
   }
