@@ -2,8 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { FilterQuery, Types } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
-import { EpisodeFileInfoOdm } from "./odm";
-import { EpisodeFileInfoEvents } from "./events";
 import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { EpisodeEntity } from "#episodes/models";
@@ -11,6 +9,10 @@ import { assertFoundClient } from "#utils/validation/found";
 import { MongoFilterQuery, patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { DomainEvent, DomainEventEmitter } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
+import { EpisodeEvents } from "#episodes/crud/episodes/repository";
+import { showError } from "#core/logging/show-error";
+import { EpisodeFileInfoEvents } from "./events";
+import { EpisodeFileInfoOdm } from "./odm";
 
 type Entity = EpisodeFileInfoEntity;
 type Model = EpisodeFileInfo;
@@ -30,6 +32,14 @@ CanGetAll<Entity> {
   @OnEvent(EpisodeFileInfoEvents.WILDCARD)
   handleLog(event: DomainEvent<unknown>): void {
     logDomainEvent(event);
+  }
+
+  @OnEvent(EpisodeEvents.Deleted.TYPE)
+  async handleDeleteEpisode(event: EpisodeEvents.Deleted.Event) {
+    const { entity } = event.payload;
+
+    await this.deleteManyByEpisodeId(entity.id)
+      .catch(showError);
   }
 
   async createOneAndGet(model: Model): Promise<Entity> {
@@ -182,5 +192,11 @@ CanGetAll<Entity> {
     );
 
     return EpisodeFileInfoOdm.toEntity(updateResult);
+  }
+
+  async deleteManyByEpisodeId(id: string): Promise<void> {
+    await EpisodeFileInfoOdm.Model.deleteMany( {
+      episodeId: new Types.ObjectId(id),
+    } );
   }
 }

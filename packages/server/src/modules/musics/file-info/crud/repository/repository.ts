@@ -75,7 +75,7 @@ música si desea borrar el archivo.",
   }
 
   @OnEvent(MusicEvents.Deleted.TYPE)
-  async handleCreateHistoryEntryEvents(event: MusicEvents.Deleted.Event) {
+  async handleDeleteMusic(event: MusicEvents.Deleted.Event) {
     const { entity } = event.payload;
 
     await this.deleteManyByMusicId(entity.id)
@@ -166,7 +166,7 @@ música si desea borrar el archivo.",
 
   async deleteManyByMusicId(id: MusicEntity["id"]): Promise<void> {
     await MusicFileInfoOdm.Model.deleteMany( {
-      musicId: id,
+      musicId: new Types.ObjectId(id),
     } );
   }
 
