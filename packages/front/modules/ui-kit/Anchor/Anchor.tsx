@@ -8,7 +8,7 @@ type Props = AnchorHTMLAttributes<HTMLAnchorElement> & {
 };
 export const DaAnchor = ( { theme = "default", className = "",
   children, disabled, href, onClick, ...props }: Props) => {
-  const Tag = href!! && !disabled ? "a" : "span";
+  const Tag = (!!href || onClick) && !disabled ? "a" : "span";
   const isAnchor = Tag === "a";
   const finalHref = isAnchor ? href : undefined;
   const finalOnClick = isAnchor ? onClick : undefined;
