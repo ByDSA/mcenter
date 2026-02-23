@@ -1,13 +1,12 @@
-import { AnchorHTMLAttributes, Fragment, JSX, memo, ReactNode, useMemo } from "react";
+import { AnchorHTMLAttributes, ComponentProps, Fragment, JSX, memo, ReactNode, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ImageCover } from "$shared/models/image-covers";
 import { PropsXOR } from "$shared/utils/types";
 import { classes } from "#modules/utils/styles";
 import { MusicImageCover } from "#modules/musics/MusicCover";
-import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonView";
+import { PlayButtonView } from "#modules/player/common/PlayButtonView";
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { anchorOnClick } from "#modules/ui-kit/menus/TabsClient";
-import { PropsOf } from "#modules/utils/react";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import { Separator } from "../Separator/Separator";
 import styles from "./ListItem.module.css";
@@ -34,7 +33,7 @@ export type ResourceEntryProps = {
     status: PlayerStatus | "disabled";
   };
   imageCover?: ImageCover | null;
-  imageCoverDefaultIcon?: NonNullable<PropsOf<typeof MusicImageCover>>["icon"];
+  imageCoverDefaultIcon?: NonNullable<ComponentProps<typeof MusicImageCover>>["icon"];
 };
 
 export function ResourceEntry(

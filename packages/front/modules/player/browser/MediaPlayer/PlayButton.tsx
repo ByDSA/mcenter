@@ -1,5 +1,5 @@
+import { PlayButtonView } from "../../common/PlayButtonView";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
-import { PlayButtonView } from "./PlayButtonView";
 import styles from "./PlayButton.module.css";
 
 export const PlayButton = () => {
@@ -9,8 +9,7 @@ export const PlayButton = () => {
     status={status}
     theme="white"
     className={styles.playButton}
-    onClick={(e) => {
-      e.stopPropagation();
+    onClick={() => {
       const player = useBrowserPlayer.getState();
 
       if (player.status === "playing")

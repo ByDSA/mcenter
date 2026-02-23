@@ -5,6 +5,7 @@ import { Visibility } from "@mui/icons-material";
 import { UserRoleName } from "$shared/models/auth";
 import { EpisodeUserInfo, isEpisodeUnavailable } from "$shared/models/episodes";
 import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
+import { ComponentProps } from "react";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { ResourceEntry, ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
@@ -14,7 +15,6 @@ import { EditEpisodeContextMenuItem } from "#modules/episodes/Edit/ContextMenu";
 import { EpisodeLatestViewsContextMenuItem } from "#modules/episodes/history/LatestViews/ContextMenuItem";
 import { DeleteEpisodeContextMenuItem } from "#modules/episodes/Delete/ContextMenuItem";
 import { ShareEpisodeLinkContextMenuItemCurrentCtx } from "#modules/episodes/SettingsButton/ShareContextMenuItem";
-import { PropsOf } from "#modules/utils/react";
 import { DurationView, MetadataView, WeightView } from "#modules/history";
 import { useUser } from "#modules/core/auth/useUser";
 import { formatDateDDMMYYY } from "#modules/utils/dates";
@@ -24,7 +24,7 @@ import { SeriesIcon } from "../../SeriesIcon/SeriesIcon";
 import { useSeries } from "../../hooks";
 import styles from "./ListItem.module.css";
 
-type Props = Pick<PropsOf<typeof EpisodesList>, "onDelete"> & {
+type Props = Pick<ComponentProps<typeof EpisodesList>, "onDelete"> & {
   episodeId: string;
   seriesId: string;
 };
@@ -37,7 +37,7 @@ export const EpisodeListItem = ( { episodeId, seriesId, onDelete }: Props) => {
   const { data: imageCover } = useImageCover(coverId ?? null);
   const { user } = useUser();
   const hasUser = !!user;
-  let subtitleSeen: PropsOf<typeof ResourceSubtitle>["items"][0];
+  let subtitleSeen: ComponentProps<typeof ResourceSubtitle>["items"][0];
 
   if (!episode || !series)
     return <ResourceEntryLoading />;

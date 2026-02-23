@@ -1,11 +1,10 @@
-import { useMemo } from "react";
+import { ComponentProps, useMemo } from "react";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { FavButton } from "#modules/ui-kit/FavButton";
-import { PropsOf } from "#modules/utils/react";
 import { useMusic } from "../../hooks";
 import { MusicPlaylistsApi } from "./requests";
 
-type Props = Omit<PropsOf<typeof FavButton>, "disabled" | "onFavorite" |
+type Props = Omit<ComponentProps<typeof FavButton>, "disabled" | "onFavorite" |
   "onUnfavorite" | "value"> & {
   favoritesPlaylistId: string | null;
   musicId: string;

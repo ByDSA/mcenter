@@ -1,0 +1,12 @@
+.closeButton {
+  --padding: 0rem;
+}
+
+.playQueueWrapper {
+  height: 100%;
+  overflow-y: auto;
+
+  .playQueue {
+    font-size: 0.9em;
+  }
+}

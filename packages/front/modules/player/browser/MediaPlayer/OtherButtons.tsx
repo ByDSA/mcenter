@@ -1,30 +1,10 @@
-import { RepeatOne, Repeat, Shuffle, VolumeOff, VolumeDown, VolumeUp, SkipPrevious, SkipNext, Replay10, Forward10, HighlightOff } from "@mui/icons-material";
-import { useEffect, useState, useCallback, ComponentProps } from "react";
+import { VolumeOff, VolumeDown, VolumeUp, SkipPrevious, SkipNext } from "@mui/icons-material";
+import { useEffect, useState, useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { classes } from "#modules/utils/styles";
-import { useBrowserPlayer, RepeatMode } from "./BrowserPlayerContext";
+import { BackwardButtonView, CloseButtonView, ControlButtonView, ForwardButtonView, RepeatButtonView, ShuffleButtonView } from "#modules/player/common/ControlButtonsView";
+import { useBrowserPlayer } from "./BrowserPlayerContext";
 import styles from "./OtherButtons.module.css";
-
-export const ControlButton = ( { active = true,
-  className,
-  children,
-  onMouseDown,
-  ...props }: ComponentProps<"button"> & {
-  active?: boolean;
-} ) => {
-  return (
-    <button
-      {...props}
-      onMouseDown={(e)=> {
-        e.preventDefault(); // Para evitar que se quede el foco tras hacer click
-        onMouseDown?.(e);
-      }}
-      className={classes(styles.controlButton, active ? styles.active : styles.inactive, className)}
-    >
-      {children}
-    </button>
-  );
-};
 
 export const RepeatButton = () => {
   const { cycleRepeatMode, repeatMode } = useBrowserPlayer(useShallow(s => ( {
@@ -33,16 +13,12 @@ export const RepeatButton = () => {
   } )));
 
   return (
-    <ControlButton
-      active={repeatMode !== RepeatMode.Off}
-      title="Repetición"
-      onClick={(e)=>{
-        e.stopPropagation();
+    <RepeatButtonView
+      repeatMode={repeatMode}
+      onClick={()=>{
         cycleRepeatMode();
       }}
-    >
-      {repeatMode === RepeatMode.One ? <RepeatOne fontSize="small" /> : <Repeat fontSize="small" />}
-    </ControlButton>
+    />
   );
 };
 
@@ -57,18 +33,14 @@ export const ShuffleButton = () => {
   const currentResource = useBrowserPlayer(s=>s.currentResource);
 
   return (
-    <ControlButton
-      active={isShuffle}
-      title="Aleatoriedad"
+    <ShuffleButtonView
+      isShuffle={isShuffle}
       disabled={!!query && currentResource?.playlistId === null}
-      onClick={(e) => {
-        e.stopPropagation();
+      onClick={() => {
         setIsShuffle(!isShuffle);
         setNextResource(null);
       }}
-    >
-      <Shuffle fontSize="small" />
-    </ControlButton>
+    />
   );
 };
 
@@ -142,10 +114,10 @@ export const VolumeController = () => {
           className={styles.volumeRange}
         />
       </div>
-      <ControlButton onClick={toggleMute} className={classes(volume === 0
+      <ControlButtonView onClick={toggleMute} className={classes(volume === 0
         && styles.inactive)}>
         {volumeIcon}
-      </ControlButton>
+      </ControlButtonView>
     </div>
   );
 };
@@ -153,60 +125,47 @@ export const VolumeController = () => {
 export const BackwardButton = ( { className }: {className?: string} ) => {
   const audioElement = useBrowserPlayer(s=>s.audioElement);
 
-  return <ControlButton
-    className={classes(className)}
-    title="Ir atrás 10 segundos"
+  return <BackwardButtonView
+    className={className}
     disabled={!audioElement}
-    onClick={(e) => {
-      e.stopPropagation();
+    onClick={() => {
       const { backward } = useBrowserPlayer.getState();
 
       backward(10);
     }}
-  >
-    <Replay10 />
-  </ControlButton>;
+  />;
 };
 
 export const ForwardButton = ( { className }: {className?: string} ) => {
   const audioElement = useBrowserPlayer(s=>s.audioElement);
 
-  return <ControlButton
-    className={classes(className)}
+  return <ForwardButtonView
+    className={className}
     disabled={!audioElement}
-    title="Ir adelante 10 segundos"
-    onClick={(e) => {
-      e.stopPropagation();
+    onClick={() => {
       const { forward } = useBrowserPlayer.getState();
 
       forward(10);
     }}
-  >
-    <Forward10 />
-  </ControlButton>;
+  />;
 };
 
 export const CloseButton = ( { className }: {className?: string} ) => {
-  return <ControlButton
-    className={classes(styles.closeButton, className)}
-    title="Cerrar"
-    onClick={(e) => {
-      e.stopPropagation();
+  return <CloseButtonView
+    className={className}
+    onClick={() => {
       const { close } = useBrowserPlayer.getState();
 
       close();
     }}
-  >
-    <HighlightOff />
-  </ControlButton>;
+  />;
 };
 
 export const PrevButton = ( { className }: {className?: string} ) => {
-  return <ControlButton
+  return <ControlButtonView
     className={classes(styles.prevNextButton, className)}
     title="Anterior"
-    onClick={async (e) => {
-      e.stopPropagation();
+    onClick={async () => {
       const { currentTime, hasPrev, setCurrentTime, prev } = useBrowserPlayer.getState();
 
       if (currentTime < 1 && hasPrev())
@@ -219,7 +178,7 @@ export const PrevButton = ( { className }: {className?: string} ) => {
     }}
   >
     <SkipPrevious />
-  </ControlButton>;
+  </ControlButtonView>;
 };
 type NextButtonProps = {
 className?: string;
@@ -232,15 +191,12 @@ export const NextButton = ( { className }: NextButtonProps) => {
   // eslint-disable-next-line no-underscore-dangle
   const _2 = useBrowserPlayer(s=>s.repeatMode);
 
-  return <ControlButton
+  return <ControlButtonView
     className={classes(styles.prevNextButton, className)}
     title="Siguiente"
     disabled={!hasNext()}
-    onClick={async (e) => {
-      e.stopPropagation();
-      await next();
-    }}
+    onClick={() => next()}
   >
     <SkipNext />
-  </ControlButton>;
+  </ControlButtonView>;
 };

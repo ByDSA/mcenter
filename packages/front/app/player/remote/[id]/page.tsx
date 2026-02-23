@@ -1,267 +1,199 @@
 "use client";
 
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { ReactNode, use, useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
-import { assertIsDefined, isDefined } from "$shared/utils/validation";
+import { isDefined } from "$shared/utils/validation";
 import { useRouter } from "next/navigation";
-import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { EpisodeEntity } from "#modules/episodes/models";
-import { PlayerPlaylistElement, PlayerStatusResponse } from "#modules/remote-player/models";
+import { PlayerStatusResponse } from "#modules/player/remote-player/models";
 import { Episode } from "#modules/episodes/models";
-import { MediaPlayer, RemotePlayerWebSocketsClient } from "#modules/remote-player";
+import { RemotePlayerWebSocketsClient } from "#modules/player/remote-player";
 import { EpisodesApi } from "#modules/episodes/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { logger } from "#modules/core/logger";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { EpisodesCrudDtos } from "#modules/episodes/models/dto";
-import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
-import styles from "./Player.module.css";
+import { RemotePlayerProvider } from "#modules/player/remote-player/RemotePlayerContext";
+import { RemoteLayout } from "#modules/player/remote-player/Layout";
+import { PageContainer } from "app/PageContainer";
+import { Breadcrumbs } from "#modules/ui-kit/Breadcrumbs/Breadcrumbs";
 
+// ---------------------------------------------------------------------------
+// Estado de caché de recursos por URI (fuera del componente para persistir
+// entre renders, igual que en la versión original)
+// ---------------------------------------------------------------------------
 let webSockets: RemotePlayerWebSocketsClient | undefined;
-const RESOURCES = [
-  "series",
-];
-const uriToResource: {[key: string]: Episode | null} = {};
+const RESOURCES = ["series"];
+const uriToResource: { [key: string]: Episode | null } = {};
 let fetchingResource = false;
 
+// ---------------------------------------------------------------------------
+// Página
+// ---------------------------------------------------------------------------
 type PageProps = {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 };
+
 export default function RemotePlayer( { params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
   const routerRef = useRef(router);
+
+  routerRef.current = router;
+
   // eslint-disable-next-line no-empty-function
-  const gotoRemotePlayers = useRef(()=>{} );
+  const gotoRemotePlayers = useRef(() => {} );
 
   gotoRemotePlayers.current = () => {
     router.push("/player/remote");
   };
 
-  routerRef.current = router;
   const [resource, setResource] = useState<EpisodeEntity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = React.useState<PlayerStatusResponse | undefined>(undefined);
   const setResourceRef = useRef(setResource);
   const previousUriRef = useRef("");
+  const intentionalDisconnectOrErrorRef = useRef(false);
 
   setResourceRef.current = setResource;
-  const intentionalDisconnectOrErrorRef = useRef(false);
-  const socketInitializer = () => {
-    webSockets = new (class A extends RemotePlayerWebSocketsClient {
-      onBackendConnect(): void {
-        logger.debug("connected to backend");
-        setIsLoading(false);
-      }
 
-      onConnectError(): void {
-        gotoRemotePlayers.current();
-      }
+  useEffect(() => {
+    const socketInitializer = () => {
+      webSockets = new (class A extends RemotePlayerWebSocketsClient {
+        onBackendConnect(): void {
+          logger.debug("connected to backend");
+          setIsLoading(false);
+        }
 
-      onDisonnect(): void {
-        if (!intentionalDisconnectOrErrorRef.current)
+        onConnectError(): void {
           gotoRemotePlayers.current();
-      }
+        }
 
-      onStatus(status: PlayerStatusResponse) {
-        setStatus(status);
+        onDisonnect(): void {
+          if (!intentionalDisconnectOrErrorRef.current)
+            gotoRemotePlayers.current();
+        }
 
-        const uri = status.status?.playlist?.current?.uri;
+        onStatus(newStatus: PlayerStatusResponse) {
+          setStatus(newStatus);
 
-        if (!uri || uri === previousUriRef.current)
-          return;
+          const uri = newStatus.status?.playlist?.current?.uri;
 
-        if (!fetchingResource) {
-          const path = getPathFromUri(uri);
-
-          if (!path)
+          if (!uri || uri === previousUriRef.current)
             return;
 
-          const body: EpisodesCrudDtos.GetMany.Criteria = {
-            filter: {
-              path,
-            },
-            expand: [
-              "series", "fileInfos",
-            ],
-          };
+          if (!fetchingResource) {
+            const path = getPathFromUri(uri);
 
-          fetchingResource = true;
-          const episodesApi = FetchApi.get(EpisodesApi);
+            if (!path)
+              return;
 
-          episodesApi.getManyByCriteria(body)
-            .then((res: EpisodesCrudDtos.GetMany.Response) => {
-              const episodes = res.data;
-              const [episode] = episodes;
+            const body: EpisodesCrudDtos.GetMany.Criteria = {
+              filter: {
+                path,
+              },
+              expand: ["series", "fileInfos", "imageCover"],
+            };
 
-              try {
-                uriToResource[uri] = episode ?? null;
-                setResourceRef.current(episode);
-              } catch {
-                uriToResource[uri] = null;
-              }
+            fetchingResource = true;
+            const episodesApi = FetchApi.get(EpisodesApi);
 
-              fetchingResource = false;
-            } )
-            .catch(showError)
-            .finally(()=>{
-              previousUriRef.current = uri;
-            } );
+            episodesApi
+              .getManyByCriteria(body)
+              .then((res: EpisodesCrudDtos.GetMany.Response) => {
+                const episodes = res.data;
+                const [episode] = episodes;
+
+                try {
+                  uriToResource[uri] = episode ?? null;
+                  setResourceRef.current(episode ?? null);
+                } catch {
+                  uriToResource[uri] = null;
+                }
+
+                fetchingResource = false;
+              } )
+              .catch(showError)
+              .finally(() => {
+                previousUriRef.current = uri;
+              } );
+          }
         }
-      }
-    } )();
+      } )();
 
-    webSockets.init( {
-      remotePlayerId: id,
-    } );
+      webSockets.init( {
+        remotePlayerId: id,
+      } );
 
-    return () => {
-      intentionalDisconnectOrErrorRef.current = true;
-      webSockets?.close();
+      return () => {
+        intentionalDisconnectOrErrorRef.current = true;
+        webSockets?.close();
+      };
     };
-  };
 
-  useEffect(() => socketInitializer(), []);
-  const [status, setStatus] = React.useState<PlayerStatusResponse | undefined>(undefined);
-  const statusStateRef = useRef( {
-    status,
-    setStatus,
-  } );
+    return socketInitializer();
+  }, []);
 
-  useEffect(()=> {
-    statusStateRef.current.setStatus = setStatus;
-    statusStateRef.current.status = status;
-  }, [status, setStatus]);
-
-  useEffect(()=> {
+  useEffect(() => {
     if (status && !status.open)
       gotoRemotePlayers.current();
   }, [status]);
 
+  let content: ReactNode | null = null;
+
+  if (isLoading || !isDefined(status?.status))
+    content = <ContentSpinner />;
+
+  if (webSockets) {
+    content = <RemotePlayerProvider
+      value={{
+        statusResponse: status,
+        resource,
+        player: webSockets,
+      }}
+    >
+      <RemoteLayout />
+    </RemotePlayerProvider>;
+  }
+
   return (
-    <>
-      <h1>Player</h1>
-      { isLoading && <ContentSpinner /> }
-      {(isDefined(status?.status) && statusRepresentaton(status.status, resource))}
-    </>
+    <PageContainer>
+      <Breadcrumbs
+        items={[{
+          label: "Remote players",
+          href: "/player/remote",
+        },
+        {
+          label: "Player",
+        },
+        ]} />
+      {content}
+    </PageContainer>
   );
 }
 
-function getPathFromUri(uri: string) {
-  const url = new URL(uri);
-  const { pathname } = url;
-  const pathNameSplitted = pathname.split("/");
-  let indexResourceType = -1;
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+function getPathFromUri(uri: string): string | null {
+  try {
+    const url = new URL(uri);
+    const { pathname } = url;
+    const pathNameSplitted = pathname.split("/");
+    let indexResourceType = -1;
 
-  for (let i = 0; i < pathNameSplitted.length; i++) {
-    if (RESOURCES.includes(pathNameSplitted[i])) {
-      indexResourceType = i;
-      break;
+    for (let i = 0; i < pathNameSplitted.length; i++) {
+      if (RESOURCES.includes(pathNameSplitted[i])) {
+        indexResourceType = i;
+        break;
+      }
     }
-  }
 
-  if (indexResourceType !== -1) {
-    const path = pathNameSplitted.slice(indexResourceType + 1).join("/");
-
-    return path;
+    if (indexResourceType !== -1)
+      return pathNameSplitted.slice(indexResourceType + 1).join("/");
+  } catch {
+    // URL inválida
   }
 
   return null;
-}
-
-function calcStartLength(statusLength: number, resource: EpisodeEntity | null = null) {
-  let resourceEnd: number;
-  let resourceStart: number;
-  const fileInfo = resource?.fileInfos
-    ? getFirstAvailableFileInfoOrFirst(resource.fileInfos)
-    : undefined;
-
-  resourceEnd = fileInfo?.end ?? statusLength;
-
-  resourceStart = fileInfo?.start ?? 0;
-
-  const length = resourceEnd - resourceStart;
-
-  return {
-    start: resourceStart,
-    length,
-  };
-}
-
-function statusRepresentaton(
-  status: NonNullable<PlayerStatusResponse["status"]>,
-  resource: EpisodeEntity | null = null,
-) {
-  const uri = status.playlist?.current?.uri;
-  let title = "-";
-
-  if (resource)
-    title = resource.title;
-  else if (status.meta?.title)
-    title = status.meta?.title;
-
-  let artist = "-";
-
-  if (resource)
-    artist = `${resource.episodeKey}, ${ resource?.series?.name}`;
-  else
-    artist = uri?.slice(uri.lastIndexOf("/") + 1) ?? "-";
-
-  const statusLength = status.length;
-
-  assertIsDefined(statusLength);
-  const { start: resourceStart, length } = calcStartLength(statusLength, resource);
-  const time = status.time ?? 0 - (resourceStart ?? 0);
-
-  return <>
-    {
-      webSockets
-      && <>
-        <MediaPlayer meta={{
-          title,
-          artist,
-        }} time={{
-          current: time,
-          start: resourceStart,
-          length,
-        }}
-        volume={status.volume}
-        state={status.state}
-        player={webSockets}/>
-      </>
-    }
-    <div className="extra-margin">
-      {
-        status.playlist && <>
-          <h2>Playlist</h2>
-          <h3>Next</h3>
-          {
-            mapElements(status.playlist.next)
-          }
-          <h3>Previous</h3>
-          {
-            mapElements(status.playlist.previous.toReversed())
-          }
-        </>
-      }
-    </div>
-  </>;
-}
-
-function mapElements(array: PlayerPlaylistElement[]): React.JSX.Element {
-  return <ol className={styles.list} >
-    {
-      array.filter(
-        (_, i)=>i < 10,
-      ).map(
-        (item, index) => <li key={index}><DaAnchor onClick={()=>playId(item.id)}>{item.name}</DaAnchor></li>,
-      )
-    }
-  </ol>;
-}
-
-function playId(id: number) {
-  webSockets?.play(id)
-    .catch(showError);
 }

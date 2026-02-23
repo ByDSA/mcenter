@@ -1,13 +1,14 @@
 import { QueueMusic } from "@mui/icons-material";
-import { ControlButton } from "../../OtherButtons";
+import { ComponentProps } from "react";
+import { ControlButtonView } from "#modules/player/common/ControlButtonsView";
 
-type Props = Omit<Parameters<typeof ControlButton>[0], "children" | "title">;
+type Props = Omit<ComponentProps<typeof ControlButtonView>, "children" | "title">;
 
 export const PlayQueueButtonView = (props: Props) => {
-  return <ControlButton
+  return <ControlButtonView
     title="Lista de reproducción"
     {...props}
   >
     <QueueMusic />
-  </ControlButton>;
+  </ControlButtonView>;
 };

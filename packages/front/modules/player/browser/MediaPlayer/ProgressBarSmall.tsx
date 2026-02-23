@@ -1,12 +1,12 @@
 import { classes } from "#modules/utils/styles";
+import styles from "../../common/ProgressBar.module.css";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
-import styles from "./ProgressBar.module.css";
 
 type Props = {
   className?: string;
 };
 
-export const ProgressBarOnlyView = ( { className }: Props) => {
+export const ProgressBarSmall = ( { className }: Props) => {
   const currentTime = useBrowserPlayer(s=>s.currentTime);
   const duration = useBrowserPlayer(s=>s.duration);
   const percentage = duration ? currentTime / duration * 100 : 0;

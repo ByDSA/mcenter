@@ -5,12 +5,17 @@ export type DateFormat = {
   ago: "no" | "yes";
 };
 
-export function secsToMmss(secs: number) {
-  const secsInt = Math.round(secs);
-  const minutes = Math.floor(secsInt / 60);
-  const seconds = secsInt - (minutes * 60);
+export function secsToMmss(secs: number | null) {
+  if (secs === null)
+    return "--:--";
 
-  return `${pad2(minutes)}:${pad2(seconds)}`;
+  const intSecs = Math.round(secs);
+  const minus = intSecs < 0;
+  const absIntSecs = Math.abs(intSecs);
+  const minutes = Math.floor(absIntSecs / 60);
+  const seconds = absIntSecs - (minutes * 60);
+
+  return `${minus ? "-" : ""}${pad2(minutes)}:${pad2(seconds)}`;
 }
 
 export function getLongDateStr(date: Date, format: DateFormat["dateTime"]) {

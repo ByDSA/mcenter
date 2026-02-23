@@ -1,6 +1,6 @@
 import { Pause, PlayArrow } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
-import { PlayerStatus } from "./BrowserPlayerContext";
+import { PlayerStatus } from "../browser/MediaPlayer/BrowserPlayerContext";
 import styles from "./PlayButtonView.module.css";
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
   theme?: "blue" | "transparent-white" | "triangle-white" | "white";
 };
 export const PlayButtonView = ( { status,
-  onClick,
+  onClick: paramOnClick,
   className,
   theme = "white",
   disabled }: Props) => {
@@ -28,6 +28,15 @@ export const PlayButtonView = ( { status,
     title = "No disponible";
   else
     title = status === "playing" ? "Pausar" : "Reproducir";
+
+  let onClick: typeof paramOnClick;
+
+  if (!disabled && paramOnClick) {
+    onClick = async (e) => {
+      e.stopPropagation();
+      await paramOnClick(e);
+    };
+  }
 
   return <button
     title={title}

@@ -4,12 +4,13 @@ import { useEffect, useMemo } from "react";
 import { Equalizer, KeyboardArrowUp } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { RevealArrow } from "#modules/ui-kit/RevealArrow/RevealArrow";
+import { ControlButtonView } from "#modules/player/common/ControlButtonsView";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import { PlayButton } from "../PlayButton";
-import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, ControlButton, CloseButton, BackwardButton, ForwardButton } from "../OtherButtons";
+import { PrevButton, NextButton, VolumeController, ShuffleButton, RepeatButton, CloseButton, BackwardButton, ForwardButton } from "../OtherButtons";
 import { ProgressBar } from "../ProgressBar";
-import { ProgressBarOnlyView } from "../ProgressBarOnlyView";
-import { FullscreenMediaPlayer } from "../Fullscreen/FullscreenMediaPlayer";
+import { ProgressBarSmall } from "../ProgressBarSmall";
+import { FullscreenLayout } from "../Fullscreen/Layout";
 import { Effects } from "../Fullscreen/Effects";
 import styles from "./MediaPlayer.module.css";
 import { TrackInfo } from "./TrackInfo";
@@ -30,11 +31,9 @@ export function BottomMediaPlayer() {
     <ShuffleButton />
     <RepeatButton />
     <QueueMusicButton/>
-    <ControlButton
+    <ControlButtonView
       active={isOpen && currentWindowName === "effects"}
-      onClick={async (e)=> {
-        e.stopPropagation();
-
+      onClick={async ()=> {
         if (isOpen && currentWindowName === "effects")
           await close();
         else {
@@ -46,7 +45,7 @@ export function BottomMediaPlayer() {
         }
       }}>
       <Equalizer />
-    </ControlButton>
+    </ControlButtonView>
     { width >= BIG_BREAKPOINT && <CloseButton className={styles.closeButton}/>}
   </div>, [open, close, currentWindowName, width]);
 
@@ -75,7 +74,7 @@ export function BottomMediaPlayer() {
              className={styles.progressBar}
            />
          </>)
-           || <ProgressBarOnlyView
+           || <ProgressBarSmall
              className={styles.progressBar}
            />
         }
@@ -84,12 +83,10 @@ export function BottomMediaPlayer() {
           className={styles.playerContent}
           onClick={
             width < SMALL_BREAKPOINT
-              ? (async (e)=> {
-                e.stopPropagation();
-
+              ? (async ()=> {
                 await open( {
                   fullscreen: true,
-                  content: <FullscreenMediaPlayer />,
+                  content: <FullscreenLayout />,
                 } );
               } )
               : undefined}
@@ -165,18 +162,17 @@ const FullscreenButton = () => {
   const { open } = useWindowContext();
 
   return <>
-    <ControlButton
+    <ControlButtonView
       className={classes(styles.fullscreenButton)}
       title="Reproductor completo"
-      onClick={async (e) => {
-        e.stopPropagation();
+      onClick={async () => {
         await open( {
           fullscreen: true,
-          content: <FullscreenMediaPlayer />,
+          content: <FullscreenLayout />,
         } );
       }}
     >
       <KeyboardArrowUp />
-    </ControlButton>
+    </ControlButtonView>
   </>;
 };

@@ -1,135 +1,23 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { secsToMmss } from "#modules/utils/dates";
-import { classes } from "#modules/utils/styles";
-import { TIME_UNDEFINED } from "#modules/remote-player/MediaPlayer";
+import { ProgressBarView } from "#modules/player/common/ProgressBarView";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
-import styles from "./ProgressBar.module.css";
 
 type Props = {
   className?: string;
-  includeTimes?: boolean;
 };
 
-export const ProgressBar = ( { className, includeTimes }: Props) => {
+export const ProgressBar = ( { className }: Props) => {
   const currentTime = useBrowserPlayer(s=>s.currentTime);
   const duration = useBrowserPlayer(s=>s.duration);
   const setCurrentTime = useBrowserPlayer(s=>s.setCurrentTime);
-  const [hover, setHover] = useState<{ pos: number;
-time: string; } | null>(null);
-  const isClick = useRef(false);
-  const progressBarRef = useRef<HTMLDivElement>(null);
-  const handleInteraction = useCallback((e: PointerEvent | React.PointerEvent<HTMLDivElement>) => {
-    if (!progressBarRef.current)
-      return;
 
-    const rect = progressBarRef.current.getBoundingClientRect();
-    // 'clientX' existe en PointerEvents de forma nativa, igual que en MouseEvents
-    const x = (e as PointerEvent).clientX - rect.left;
-    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    const hoverTime = duration ? (duration / 100) * percentage : undefined;
-
-    if (isClick.current && hoverTime !== undefined) {
-      setCurrentTime(hoverTime, {
+  return <ProgressBarView
+    currentTime={currentTime}
+    duration={duration ?? null}
+    className={className}
+    onSeek={(time)=>{
+      setCurrentTime(time, {
         shouldUpdateAudioElement: true,
       } );
-    }
-
-    setHover( {
-      pos: percentage,
-      time: hoverTime !== undefined ? secsToMmss(hoverTime) : TIME_UNDEFINED,
-    } );
-  }, [duration, setCurrentTime]);
-
-  useEffect(() => {
-    const handleGlobalPointerMove = (e: PointerEvent) => {
-      if (!isClick.current)
-        return;
-
-      handleInteraction(e);
-    };
-    const handleGlobalPointerUp = () => {
-      if (!isClick.current)
-        return;
-
-      isClick.current = false;
-      setHover(null);
-    };
-
-    window.addEventListener("pointermove", handleGlobalPointerMove);
-    window.addEventListener("pointerup", handleGlobalPointerUp);
-
-    return () => {
-      window.removeEventListener("pointermove", handleGlobalPointerMove);
-      window.removeEventListener("pointerup", handleGlobalPointerUp);
-    };
-  }, [handleInteraction]);
-
-  const percentage = duration ? currentTime / duration * 100 : 0;
-
-  return (<>
-    <div
-      ref={progressBarRef}
-      className={classes(styles.container, className)}
-      onPointerDown={(e) => {
-        isClick.current = true;
-        handleInteraction(e);
-      }}
-      onPointerEnter={(e)=>{
-        if (isClick.current)
-          return;
-
-        handleInteraction(e);
-      }}
-      onPointerOut={()=>{
-        if (isClick.current)
-          return;
-
-        setHover(null);
-      }}
-      onPointerMove={(e)=>{
-        if (isClick.current)
-          return;
-
-        handleInteraction(e);
-      }}
-    >
-      {hover && (
-        <div className={styles.timeTooltip} style={{
-          left: `clamp(20px, ${hover.pos}%, calc(100% - 20px))`,
-        }}>
-          {hover.time}
-        </div>
-      )}
-      <div className={styles.progressBackground}>
-        <div className={styles.progressFill} style={{
-          width: `${percentage}%`,
-        }} />
-      </div>
-      <div
-        className={classes(styles.thumb, isClick.current && styles.thumbActive)}
-        style={{
-          left: `calc(${percentage}% - var(--thumb-size)/2)`,
-        }}
-      />
-    </div>
-    {
-      includeTimes && <footer className={styles.timeLabelsRow}>
-        <CurrentTime />
-        <Duration />
-      </footer>
-    }
-  </>
-  );
-};
-
-export const CurrentTime = () => {
-  const currentTime = useBrowserPlayer(s=>s.currentTime);
-
-  return <span>{secsToMmss(currentTime)}</span>;
-};
-
-export const Duration = () => {
-  const duration = useBrowserPlayer(s=>s.duration);
-
-  return <span>{duration !== undefined ? secsToMmss(duration) : TIME_UNDEFINED}</span>;
+    }}
+  />;
 };

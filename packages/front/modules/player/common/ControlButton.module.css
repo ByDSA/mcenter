@@ -1,0 +1,51 @@
+.controlButton {
+  color: var(--color-gray-100);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  transition: color 0.2s;
+  transition: all 0.2s;
+  border-radius: 50%;
+  padding: var(--padding, 0.5rem);
+
+  width: calc(var(--button-size, 1em) + 2 * var(--padding, 0.5rem));
+  height: calc(var(--button-size, 1em) + 2 * var(--padding, 0.5rem));
+
+  &:disabled {
+    opacity: 0.1;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: var(--button-size, 1em);
+    height: var(--button-size, 1em);
+  }
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: var(--color-gray-950);
+    }
+  }
+
+  &.inactive {
+    color: var(--color-gray-700);
+  }
+
+  &.active {
+    color: var(--color-gray-25);
+  }
+}
+
+.closeButton {
+  --button-size: 1em;
+  svg {
+    color: var(--color-red-300);
+  }
+
+  &:disabled svg {
+    color: var(--color-gray-300);
+  }
+}

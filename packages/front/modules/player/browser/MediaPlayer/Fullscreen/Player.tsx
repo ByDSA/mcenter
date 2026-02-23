@@ -1,12 +1,10 @@
-import { MusicImageCover } from "#modules/musics/MusicCover";
-import { classes } from "#modules/utils/styles";
 import { useMusic } from "#modules/musics/hooks";
+import { PlayerView } from "#modules/player/common/PlayerView";
+import { secsToMmss } from "#modules/utils/dates";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, ShuffleButton, RepeatButton, BackwardButton, ForwardButton, CloseButton } from "../OtherButtons";
-import { CurrentTime, Duration, ProgressBar } from "../ProgressBar";
-import commonStyles from "../MediaPlayerCommon.module.css";
+import { ProgressBar } from "../ProgressBar";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
-import styles from "./Player.module.css";
 
 export const Player = () => {
   const currentResource = useBrowserPlayer(s=>s.currentResource);
@@ -17,54 +15,33 @@ export const Player = () => {
 
   const { title, artist } = music;
 
-  return <section className={styles.content}>
-    <section className={styles.coverSection}>
-      <div className={styles.coverWrapper}>
-        <MusicImageCover
-          className={classes(commonStyles.imageCover, styles.imageCover)}
-          size="large"
-          cover={music.imageCover}
-          icon={{
-            className: commonStyles.icon,
-          }}
-        />
-      </div>
-    </section>
-    <section className={styles.bottomSection}>
-      <article className={styles.trackInfo}>
-        <p
-          className={classes(styles.title, "ellipsis")}
-          title={title}
-        >{title}</p>
-        <p
-          className={classes(styles.artist, "ellipsis")}
-          title={artist}
-        >{artist}</p>
-      </article>
-      <article className={styles.progressBarWrapper}>
-        <ProgressBar />
-        <footer className={styles.timeLabelsRow}>
-          <CurrentTime />
-          <Duration />
-        </footer>
-      </article>
-      <div className={styles.controlsRow}>
-        <BackwardButton />
-        <section className={styles.controls}>
+  return <PlayerView
+    artist={artist}
+    title={title}
+    cover={music.imageCover}
+    progressBar={<ProgressBar />}
+    currentTime={<CurrentTime />}
+    duration={<Duration />}
+    controls={{
+      backward: <BackwardButton />,
+      prev: <PrevButton />,
+      play: <PlayButton />,
+      next: <NextButton />,
+      forward: <ForwardButton />,
+      shuffle: <ShuffleButton />,
+      repeat: <RepeatButton />,
+      close: <CloseButton />,
+    }}
+  />;
+};
 
-          <PrevButton/>
+const CurrentTime = () => {
+  const currentTime = useBrowserPlayer(s=>s.currentTime);
 
-          <PlayButton />
+  return <span>{secsToMmss(currentTime)}</span>;
+};
+const Duration = () => {
+  const duration = useBrowserPlayer(s=>s.duration);
 
-          <NextButton />
-        </section>
-        <ForwardButton />
-      </div>
-      <div className={styles.controlsRow}>
-        <ShuffleButton />
-        <CloseButton />
-        <RepeatButton />
-      </div>
-    </section>
-  </section>;
+  return <span>{secsToMmss(duration ?? null)}</span>;
 };

@@ -2,7 +2,7 @@ import { SeriesEntity } from "$shared/models/episodes/series";
 import { getEpisodeKeyFromBasename } from "$shared/models/episodes/episode-code";
 import { VIDEO_EXTENSIONS } from "$shared/models/episodes/video-extensions";
 import { PATH_ROUTES } from "$shared/routing";
-import { useState } from "react";
+import { ComponentProps, useState } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
@@ -12,11 +12,10 @@ import { backendUrl } from "#modules/requests";
 import { FileData, FileDataWithoutMetadata, FileUpload, genOnUpload, OnUploadOptions } from "#modules/ui-kit/upload/FileUpload";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { EpisodeFileInfoCrudDtos } from "#modules/episodes/file-info/models/dto";
-import { PropsOf } from "#modules/utils/react";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { UploadEpisodesContextMenuItemCurrentCtx } from "./ContextMenuItem";
 
-type Props = PropsOf<typeof UploadEpisodesContextMenuItemCurrentCtx>;
+type Props = ComponentProps<typeof UploadEpisodesContextMenuItemCurrentCtx>;
 
 export const UploadEpisodesForm = ( { onUploadEachEpisode }: Props) => {
   const { data: series } = useLocalData<SeriesEntity>();

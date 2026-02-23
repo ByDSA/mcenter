@@ -1,12 +1,12 @@
 import type { UploadEpisodesContextMenuItemCurrentCtx } from "./ContextMenuItem";
 import { SeriesEntity } from "$shared/models/episodes/series";
+import { ComponentProps } from "react";
 import { OpenModalProps, useModal } from "#modules/ui-kit/modal/ModalContext";
 import { LocalDataProvider, useLocalData } from "#modules/utils/local-data-context";
-import { PropsOf } from "#modules/utils/react";
 import styles from "../NewEditModal.module.css";
 import { UploadEpisodesForm } from "./Form";
 
-type Props = PropsOf<typeof UploadEpisodesContextMenuItemCurrentCtx>;
+type Props = ComponentProps<typeof UploadEpisodesContextMenuItemCurrentCtx>;
 
 export function useUploadEpisodesModal(props: Props) {
   const { openModal: _openModal, ...usingModal } = useModal();

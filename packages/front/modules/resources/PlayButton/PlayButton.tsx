@@ -1,4 +1,4 @@
-import { PlayButtonView } from "#modules/player/browser/MediaPlayer/PlayButtonView";
+import { PlayButtonView } from "#modules/player/common/PlayButtonView";
 import { classes } from "#modules/utils/styles";
 import styles from "./PlayButton.module.css";
 

@@ -1,9 +1,9 @@
 import { SeriesEntity } from "$shared/models/episodes/series";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserRoleName } from "$shared/models/auth";
+import { ComponentProps } from "react";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
-import { PropsOf } from "#modules/utils/react";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { useUser } from "#modules/core/auth/useUser";
 import { EditSeriesContextMenuItemCurrentCtx } from "../Edit/ContextMenuItem";
@@ -13,7 +13,7 @@ import { useSeries } from "../hooks";
 import { ShareSeriesContextMenuItemCurrentCtx } from "./ShareContextMenuItem";
 import { SyncFileAvailabilityContextMenuItem } from "./SyncFileAvailabilityContextMenuItem";
 
-type Props = PropsOf<typeof UploadEpisodesContextMenuItemCurrentCtx> & {
+type Props = ComponentProps<typeof UploadEpisodesContextMenuItemCurrentCtx> & {
   onUpdate?: (newData: SeriesEntity)=> void;
   onDelete: ()=> void;
   seriesId: string;

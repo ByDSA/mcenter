@@ -8,7 +8,7 @@ import { useMusic } from "#modules/musics/hooks";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
-import commonStyles from "../MediaPlayerCommon.module.css";
+import commonStyles from "../../../common/MediaPlayerCommon.module.css";
 import { CurrentTimeLabel } from "./CurrentTimeLabel";
 import styles from "./MediaPlayer.module.css";
 import { BIG_BREAKPOINT, SMALL_BREAKPOINT } from "./breakpoints";
