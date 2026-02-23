@@ -162,7 +162,7 @@ function getPathFromUri(uri: string) {
   }
 
   if (indexResourceType !== -1) {
-    const path = pathNameSplitted.slice(indexResourceType).join("/");
+    const path = pathNameSplitted.slice(indexResourceType + 1).join("/");
 
     return path;
   }
