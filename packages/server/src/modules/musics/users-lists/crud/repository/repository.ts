@@ -150,7 +150,7 @@ index: number; }>();
           ownerUserId: userId,
         },
         expand: criteria.expand ? ["ownerUserPublic", "imageCover"] : [],
-      } ),
+      }, userId),
       this.queriesRepo.getManyByCriteria( {
         filter: {
           ownerUserId: userId,

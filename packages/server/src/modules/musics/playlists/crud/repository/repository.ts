@@ -9,7 +9,7 @@ import { Types } from "mongoose";
 import { UserPayload } from "$shared/models/auth";
 import { WithRequired } from "$shared/utils/objects";
 import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
-import { CanDeleteOneByIdAndGet, CanGetOneByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanDeleteOneByIdAndGet, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
@@ -31,7 +31,7 @@ type Id = Entity["id"];
 
 type SlugProps = {
   playlistSlug: string;
-  requestUserId: string | undefined;
+  requestUserId: string | null;
 } & (
   {
   ownerUserId: string;
@@ -70,7 +70,6 @@ export class MusicPlaylistsRepository
 implements
 CanPatchOneByIdAndGet<Entity, Id, Model>,
 CanGetOneById<Entity, Id>,
-CanGetOneByCriteria<Entity, CriteriaOne>,
 CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
@@ -390,8 +389,11 @@ addedAt: Date; }>;
     return MusicPlaylistOdm.toEntity(doc);
   }
 
-  async getOneByCriteria(criteria: CriteriaOne): Promise<Entity | null> {
-    const pipeline = MusicPlaylistOdm.getCriteriaPipeline(criteria);
+  async getOneByCriteria(
+    criteria: CriteriaOne,
+    requestUserId: string | null,
+  ): Promise<Entity | null> {
+    const pipeline = MusicPlaylistOdm.getCriteriaPipeline(criteria, requestUserId);
 
     if (pipeline.length === 0)
       throw new UnprocessableEntityException(criteria);
@@ -421,11 +423,10 @@ addedAt: Date; }>;
         slug,
         ownerUserId,
         ownerUserSlug,
-        requestUserId, // Para cuando se expande con favorites
       },
     };
 
-    return await this.getOneByCriteria(criteria);
+    return await this.getOneByCriteria(criteria, requestUserId);
   }
 
   async findOneTrackByPosition(
@@ -532,8 +533,8 @@ addedAt: Date; }>;
     return MusicPlaylistOdm.toEntity(gotDoc);
   }
 
-  async getManyByCriteria(criteria: CriteriaMany): Promise<Entity[]> {
-    const pipeline = MusicPlaylistOdm.getCriteriaPipeline(criteria);
+  async getManyByCriteria(criteria: CriteriaMany, requestUserId: string | null): Promise<Entity[]> {
+    const pipeline = MusicPlaylistOdm.getCriteriaPipeline(criteria, requestUserId);
 
     if (pipeline.length === 0)
       throw new UnprocessableEntityException(criteria);

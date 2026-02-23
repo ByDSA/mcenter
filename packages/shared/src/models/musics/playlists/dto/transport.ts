@@ -12,9 +12,8 @@ const criteriaConfig = {
     slug: slugSchema.optional(),
     ownerUserId: mongoDbId.optional(),
     ownerUserSlug: slugSchema.optional(),
-    requestUserId: mongoDbId.optional(),
   },
-  sortKeys: ["added", "updated"] as const,
+  sortKeys: ["added", "updated", "user"] as const,
   expandKeys: ["musics", "musicsFavorite", "ownerUserPublic", "imageCover"] as const,
 };
 

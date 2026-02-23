@@ -25,12 +25,12 @@ import { musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistsRepository } from "./repository/repository";
 
 type GuardVisibilityBySlugProps = {
-  requestUserId: string | undefined;
+  requestUserId: string | null;
   userSlug: string;
   playlistSlug: string;
 };
 type GuardVisibilityByIdProps = {
-  requestUserId: string | undefined;
+  requestUserId: string | null;
   playlistId: string;
 };
 
@@ -105,7 +105,7 @@ export class MusicPlaylistsController {
   ) {
     try {
       await this.guardVisibilityById( {
-        requestUserId: user?.id,
+        requestUserId: user?.id ?? null,
         playlistId: params.id,
       } );
     } catch {
@@ -122,7 +122,7 @@ export class MusicPlaylistsController {
       },
       expand: ["ownerUserPublic"],
     };
-    const playlist = await this.playlistsRepo.getOneByCriteria(playlistCriteria);
+    const playlist = await this.playlistsRepo.getOneByCriteria(playlistCriteria, user?.id ?? null);
 
     assertFoundClient(playlist);
 
@@ -140,17 +140,12 @@ export class MusicPlaylistsController {
     @Body() body: GetOneByCriteriaBody,
     @User() user: UserPayload | null,
   ) {
-    if (body.expand?.includes("musicsFavorite")) {
-      body.filter ??= {};
-      body.filter.requestUserId = user?.id;
-    }
-
-    const ret = await this.playlistsRepo.getOneByCriteria(body);
+    const ret = await this.playlistsRepo.getOneByCriteria(body, user?.id ?? null);
 
     if (ret) {
       try {
         await this.guardVisibilityById( {
-          requestUserId: user?.id,
+          requestUserId: user?.id ?? null,
           playlistId: ret.id,
         } );
       } catch {
@@ -296,7 +291,7 @@ export class MusicPlaylistsController {
         ...body.filter,
         ownerUserId: params.userId,
       },
-    } );
+    }, user?.id ?? null);
 
     if (!isSameUserAsRequested)
       return ret.filter(p=>p.visibility === "public");
@@ -307,8 +302,9 @@ export class MusicPlaylistsController {
   @GetManyCriteria(musicPlaylistEntitySchema)
   async getManyByCriteria(
     @Body() body: GetManyUserPlaylistsBody,
+    @User() user: UserPayload | null,
   ) {
-    return await this.playlistsRepo.getManyByCriteria(body);
+    return await this.playlistsRepo.getManyByCriteria(body, user?.id ?? null);
   }
 
   @TokenAuth()
@@ -319,7 +315,7 @@ export class MusicPlaylistsController {
     @User() user: UserPayload | null,
   ) {
     await this.guardVisibilityBySlugs( {
-      requestUserId: user?.id,
+      requestUserId: user?.id ?? null,
       userSlug: params.userSlug,
       playlistSlug: params.playlistSlug,
     } );
@@ -342,7 +338,7 @@ export class MusicPlaylistsController {
     const playlist = await this.playlistsRepo.getOneBySlug( {
       playlistSlug: params.playlistSlug,
       ownerUserSlug: params.userSlug,
-      requestUserId: user?.id,
+      requestUserId: user?.id ?? null,
     }, playlistCriteria);
 
     assertFoundClient(playlist);
@@ -369,7 +365,7 @@ export class MusicPlaylistsController {
     @User() user: UserPayload | null,
   ) {
     await this.guardVisibilityBySlugs( {
-      requestUserId: user?.id,
+      requestUserId: user?.id ?? null,
       userSlug: params.userSlug,
       playlistSlug: params.playlistSlug,
     } );
@@ -382,7 +378,7 @@ export class MusicPlaylistsController {
     const playlist = await this.playlistsRepo.getOneBySlug( {
       playlistSlug: params.playlistSlug,
       ownerUserSlug: params.userSlug,
-      requestUserId: user?.id,
+      requestUserId: user?.id ?? null,
     } );
 
     assertFoundClient(playlist);

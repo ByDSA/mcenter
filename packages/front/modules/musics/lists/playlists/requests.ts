@@ -157,7 +157,7 @@ musicId: string;} ) {
     const body: MusicPlaylistCrudDtos.GetMany.Criteria = {
       ...criteria,
       sort: {
-        updated: "desc",
+        user: "asc",
       },
       limit: criteria?.limit ?? 10,
       offset: criteria?.offset ?? undefined,
