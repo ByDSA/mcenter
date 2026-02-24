@@ -5,6 +5,7 @@ import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useUser } from "#modules/core/auth/useUser";
 import { InstallContextMenuItem } from "app/manifest/install/InstallButton";
 import { isMobile } from "#modules/utils/env";
+import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { EditPlaylistContextMenuItem } from "../Edit/ContextMenuItem";
 import { MusicPlaylistEntity } from "../models";
 import { DeletePlaylistContextMenuItem } from "../Delete/ContextMenuItem";
@@ -40,6 +41,12 @@ export const MusicPlaylistSettingsButton = (props: Props) => {
           {isUserOwner
             && <DeletePlaylistContextMenuItem
               onActionSuccess={()=> {
+                // Si esta es la playlist que estaba sonando, cerrar el player
+                const player = useBrowserPlayer.getState();
+
+                if (player.currentResource?.playlistId === data.id)
+                  player.close();
+
                 props.onDelete?.();
               }}
             />
