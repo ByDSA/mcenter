@@ -2,9 +2,9 @@ import { Body, Controller, Get, Post } from "@nestjs/common";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { createZodDto } from "nestjs-zod";
 import z from "zod";
-import { MusicUpdateFileInfoOffloadedTaskHandler, payloadSchema } from "./task.handler";
 import { TaskCreatedResponseValidation } from "#core/tasks";
 import { IsAdmin } from "#core/auth/users/roles/Roles.guard";
+import { MusicUpdateFileInfoOffloadedTaskHandler, payloadSchema } from "./task.handler";
 
 class PostBodyDto extends createZodDto(z.object( {
   ids: mongoDbId.array().nonempty(),
@@ -16,7 +16,7 @@ export class MusicUpdateFileInfoOffloadedController {
   constructor(private readonly taskHandler: MusicUpdateFileInfoOffloadedTaskHandler) {}
 
   @Get()
-   @TaskCreatedResponseValidation(payloadSchema)
+  @TaskCreatedResponseValidation(payloadSchema)
   async task() {
     return {
       job: await this.taskHandler.addTask( {

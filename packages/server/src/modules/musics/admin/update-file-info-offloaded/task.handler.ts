@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
@@ -51,8 +51,6 @@ type JobWithInternal = Job & {
 @Injectable()
 @TaskHandlerClass()
 export class MusicUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Payload, Result> {
-  private readonly logger = new Logger(MusicUpdateFileInfoOffloadedTaskHandler.name);
-
   readonly taskName = TASK_NAME;
 
   constructor(
