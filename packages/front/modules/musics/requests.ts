@@ -107,15 +107,15 @@ export class MusicsApi {
         cache: "no-cache",
       },
     } );
-    const ret = await fetcher( {
+    let ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.pickRandom.withParams( {
         q,
       } )),
     } );
 
     if (ret.data) {
-    // Para que tenga todos los campos (favorites, imageCover...) que no trae el pickRandom:
-      await useMusic.fetch(ret.data.id);
+      // Para que tenga todos los campos (favorites, imageCover...) que no trae el pickRandom:
+      ret.data = await useMusic.fetch(ret.data.id);
     }
 
     return ret;
