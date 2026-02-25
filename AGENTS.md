@@ -1,3 +1,13 @@
+# Uso de Skills
+Cuando uses workflows, ejecuta todos los steps secuencialmente. Nunca omitas un step. Asegúrate antes de pasar al step siguiente que has realizado íntegramente lo que se pide en el step. Y al finalizar el workflow, asegúrate de haber hecho todos los steps como se pedía. ABORTA si no puedes seguir alguna de las instrucciones.
+
+Cuando cargues una skill, sus referencias son la fuente de verdad e ignorarás las convenciones del proyecto.
+
+Las skills a veces tienen instrucciones personalizadas o condicionales. Síguelas.
+
+# Delegación a subagentes
+Para todo lo vaya a modificar el package server (`packages/server`), delgarás en el subagente "server". Para el resto, como no existe subagente especializado, lo realizarás tú.
+
 # Project
 mcenter (Multimedia Center) es una aplicación de gestión y reproducción de medios (músicas, episodios, series) con un player remoto que controla VLC.
 
@@ -6,8 +16,6 @@ Tiene tres packages principales:
 - packages/shared
 - packages/front
 - packages/server
-
-Cosas comunes a todos los packages: pnpm, jest, eslint.
 
 ## Estructura general del monorepo
 
@@ -21,9 +29,7 @@ packages/
 └── vlc/        # Agente independiente que controla VLC localmente
 ```
 
-Cosas comunes: TypeScript 5.8, ESLint 9, Jest.
-
-**IMPORTANTE**: para todo lo relacionado con "server", delgarás en el subagente "server". Para el resto, como no existe subagente especializado, lo realizarás tú.
+Cosas comunes: TypeScript 5.8, ESLint 9, Jest, pnpm, zod.
 
 ## Packages: información general
 
