@@ -192,18 +192,6 @@ export class SingleTasksService extends EventEmitter2 {
     this.emit("task-change", jobId);
   }
 
-  // ─── Helper de checkpoint para handlers ─────────────────────────────────────
-  /**
-   * Debe llamarse en cada checkpoint del handler (inicio de cada iteración,
-   * entre pasos pesados, etc.).
-   *
-   * - Si hay señal "kill": lanza TaskCancelledError (UnrecoverableError, no reintenta).
-   * - Si hay señal "pause": llama a onPause() para guardar el checkpoint,
-   *   luego lanza TaskPausedError → processJob mueve el job a delayed.
-   * - Si no hay señal: no hace nada y retorna.
-   *
-   * El handler NO necesita comprobar el valor de retorno ni hacer nada más.
-   */
   async stopJobChecker(job: Job, options?: StopJobCheckerOptions): Promise<void> {
     assertIsDefined(job.id);
     const signal = await this.checkSignal(job.id!);
