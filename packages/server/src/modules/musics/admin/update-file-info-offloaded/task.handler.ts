@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { Injectable } from "@nestjs/common";
 import { createOneResultResponseSchema } from "$shared/utils/http/responses";
-import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
 import { tasksMusics } from "$shared/models/musics/admin";
@@ -11,6 +10,7 @@ import { MusicFileInfoEntity, musicFileInfoEntitySchema } from "$shared/models/m
 import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { MusicFileInfoRepository } from "#musics/file-info/crud/repository";
 import { MusicFileInfoSyncService } from "#musics/file-info/sync/service";
+import { JobWithInternal } from "#core/tasks/task.service";
 
 const TASK_NAME = tasksMusics.fileInfosUpdateOffloaded.name;
 
@@ -42,12 +42,6 @@ type Internal = Partial<{
   i: number;
 }>;
 
-type JobWithInternal = Job & {
-  data: {
-    _internal: Internal;
-  };
-};
-
 @Injectable()
 @TaskHandlerClass()
 export class MusicUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Payload, Result> {
@@ -59,7 +53,7 @@ export class MusicUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Payl
     private readonly fileInfosSyncService: MusicFileInfoSyncService,
   ) {}
 
-  async execute(payload: Payload, job: JobWithInternal): Promise<Result> {
+  async execute(payload: Payload, job: JobWithInternal<Internal>): Promise<Result> {
     let all = job.data._internal?.all;
 
     if (!all) {
@@ -71,7 +65,7 @@ export class MusicUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Payl
 
     assertIsDefined(all);
 
-    await this.updateInternal(job, (old) => ( {
+    await this.taskService.updateInternal(job, (old) => ( {
       ...old,
       all,
     } ));
@@ -89,6 +83,21 @@ export class MusicUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Payl
       const fileInfo = all[i];
       const relativePath = fileInfo.path;
 
+      await this.taskService.stopJobChecker(job, {
+        onPause: async () => {
+          // Guardamos i (índice aún no procesado) para que al reanudar se
+          // empiece exactamente desde aquí, sin reprocesar ni saltar ninguno.
+          await this.taskService.updateInternal(job, (old) => ( {
+            ...old,
+            i,
+          } ));
+
+          await job.updateProgress( {
+            percentage: 1 + ((99 - 1) * (i / all!.length)),
+            message: `Paused at ${i} / ${all!.length}`,
+          } as Progress);
+        },
+      } );
       await job.updateProgress( {
         percentage: 1 + ((99 - 1) * (i / all.length)),
         message: `${i + 1} / ${all.length}: ${relativePath}`,
@@ -103,9 +112,9 @@ export class MusicUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Payl
       else if (ret === "unmarked")
         unmarkedOffloaded.push(fileInfo);
 
-      await this.updateInternal(job, (old) => ( {
+      await this.taskService.updateInternal(job, (old) => ( {
         ...old,
-        i,
+        i: i + 1,
       } ));
     }
 
@@ -121,15 +130,6 @@ export class MusicUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Payl
         skipped,
       },
     } as Result;
-  }
-
-  private updateInternal(job: JobWithInternal, fn: (old: Internal)=> Internal) {
-    const _internal: Internal = job.data._internal ? fn(job.data._internal) : fn( {} );
-
-    return job.updateData( {
-      ...job.data,
-      _internal,
-    } );
   }
 
   async addTask(

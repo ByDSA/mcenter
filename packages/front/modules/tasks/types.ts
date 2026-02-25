@@ -7,6 +7,4 @@ export const taskStatusAnySchema = TasksCrudDtos.TaskStatus.createSchema( {
   returnValueSchema: z.any().nullable(),
 } );
 
-export type TaskStatusAny = TasksCrudDtos.TaskStatus.TaskStatus<
-  TasksCrudDtos.TaskStatus.ProgressBase
->;
+export type TaskStatusAny = z.infer<typeof taskStatusAnySchema>;

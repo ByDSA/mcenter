@@ -10,6 +10,8 @@ import { streamTaskStatus } from "#modules/tasks";
 import { logger } from "#modules/core/logger";
 import { useCrudData } from "#modules/fetching";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
+import { FetchApi } from "#modules/fetching/fetch-api";
+import { TasksApi } from "#modules/tasks/requests";
 
 const QUEUE_NAME = "mcenter-tasks-main";
 const N = 10;
@@ -17,17 +19,15 @@ const N = 10;
 export default function Page() {
   const [taskStatuses, setTaskStatuses] = useState<Record<string, TaskStatusAny> | null>(null);
   const [sortedTaskStatuses, setSortedTaskStatuses] = useState<TaskStatusAny[] | null>(null);
+  const api = FetchApi.get(TasksApi);
   const { data, isLoading } = useCrudData(
     {
       refetching: {
         everyMs: 1000,
         fn: async () => {
-          const res = await fetch(
-            backendUrl(PATH_ROUTES.tasks.queue.ids.withParams(QUEUE_NAME, N)),
-          );
-          const ret = (await res.json()).data as string[];
+          const res = await api.getQueueIds(QUEUE_NAME, N);
 
-          return ret;
+          return res.data;
         },
       },
     },
@@ -66,13 +66,7 @@ export default function Page() {
     if (taskStatuses !== null) {
       for (const dataId of (data ?? [])) {
         if (taskStatuses[dataId] === undefined) {
-          fetch(
-            backendUrl(PATH_ROUTES.tasks.status.withParams(dataId)),
-          )
-            .then(r=>r.json())
-            .then(r=> {
-              return r as TaskStatusAny;
-            } )
+          api.getTaskStatus(dataId)
             .then(d=> {
               setTaskStatuses(old=> ( {
                 ...old,
@@ -90,11 +84,7 @@ export default function Page() {
 
   useEffect(() => {
     const fetchStatuses = async () => {
-      const response = await fetch(
-        backendUrl(PATH_ROUTES.tasks.queue.status.withParams(QUEUE_NAME, N)),
-      );
-      const obj = await response.json() as {data: TaskStatusAny[];
-errors?: any[];};
+      const obj = await api.getQueueStatus(QUEUE_NAME, N);
 
       if (obj.errors && obj.errors.length > 0)
         logger.error(obj.errors[0]);

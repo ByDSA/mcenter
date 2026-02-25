@@ -99,6 +99,10 @@
 .menuItem.success {
   color: #16a34a;
 }
+.menuItem.disabled {
+  color: var(--color-gray-200);
+  cursor: not-allowed;
+}
 
 .menuItem.success:hover {
   background-color: #f0fdf4;

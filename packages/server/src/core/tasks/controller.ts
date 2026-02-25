@@ -1,8 +1,10 @@
 import { Controller,
   Get,
+  Post,
   Param,
   MessageEvent,
   HttpStatus,
+  HttpCode,
   HttpException,
   Sse,
   Query,
@@ -68,6 +70,59 @@ export class TaskController {
     }
   }
 
+  // ─── Control de tareas ────────────────────────────────────────────────────
+  /**
+   * PAUSA una tarea activa.
+   * Envía señal "pause" → el handler la detecta en el siguiente checkpoint,
+   * guarda el estado en _internal y re-encola el job en estado `delayed`.
+   * El nuevo jobId se obtiene del returnValue del job original (campo `pausedJobId`).
+   */
+  @Post(":id/pause")
+  @HttpCode(HttpStatus.OK)
+  async pauseTask(@Param("id") id: string) {
+    await this.singleTaskService.pauseJob(id);
+
+    return {
+      data: {
+        message: "Pause signal sent. The task will pause at the next checkpoint.",
+      },
+    };
+  }
+
+  /**
+   * REANUDA una tarea previamente pausada (estado `delayed`).
+   * Llama a job.promote() para moverla a `waiting` inmediatamente.
+   */
+  @Post(":id/resume")
+  @HttpCode(HttpStatus.OK)
+  async resumeTask(@Param("id") id: string) {
+    await this.singleTaskService.resumeJob(id);
+
+    return {
+      data: {
+        message: "Task resumed successfully.",
+      },
+    };
+  }
+
+  /**
+   * KILL SEGURO de una tarea activa.
+   * Envía señal "kill" → el handler la detecta en el siguiente checkpoint
+   * y lanza TaskCancelledError → el job queda como `failed`.
+   */
+  @Post(":id/kill")
+  @HttpCode(HttpStatus.OK)
+  async killTask(@Param("id") id: string) {
+    await this.singleTaskService.killJob(id);
+
+    return {
+      data: {
+        message: "Kill signal sent. The task will stop at the next checkpoint.",
+      },
+    };
+  }
+
+  // ─── SSE ──────────────────────────────────────────────────────────────────
   private async getSecureTaskStatusResponse(id: string) {
     try {
       const status = await this.singleTaskService.getTaskStatus(id);
@@ -148,11 +203,7 @@ export class TaskController {
         } );
     } );
 
-    return merge(
-      initialState$,
-      taskChanges$,
-      heartbeat$,
-    ).pipe(
+    return merge(initialState$, taskChanges$, heartbeat$).pipe(
       catchError((error: unknown) => {
         // Retornar un Observable con un solo TaskMessageEvent, no un array
         return of(createTaskErrorMessageEvent(error));

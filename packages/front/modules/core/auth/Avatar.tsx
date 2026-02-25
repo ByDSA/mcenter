@@ -1,7 +1,7 @@
 "use client";
 
 import { PATH_ROUTES } from "$shared/routing";
-import { useContextMenuTrigger, contextMenuStyles } from "#modules/ui-kit/ContextMenu";
+import { useContextMenuTrigger, contextMenuStyles, AnchorContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { classes } from "#modules/utils/styles";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import styles from "./Avatar.module.css";
@@ -14,14 +14,19 @@ type Props = {
 export function UserAvatarButton( { user }: Props) {
   const { openMenu } = useContextMenuTrigger();
   const content = (<>
-    <DaAnchor
-      theme="text"
-      href={PATH_ROUTES.auth.frontend.userPage.path}>
-        Mi perfil
-    </DaAnchor>
-    <DaAnchor
-      theme="text">Ajustes</DaAnchor>
-    {isAdmin(user) && <DaAnchor theme="text" href={"/admin"}>Admin</DaAnchor>}
+    <AnchorContextMenuItem
+      label="Mi perfil"
+      href={PATH_ROUTES.auth.frontend.userPage.path}
+    />
+    <AnchorContextMenuItem
+      label="Ajustes"
+      href={""}
+      disabled
+    />
+    {isAdmin(user) && <AnchorContextMenuItem
+      label="Admin"
+      href={"/admin"}
+    />}
     <div className={contextMenuStyles.divider} />
     <DaAnchor theme="text" href={PATH_ROUTES.auth.frontend.logout.path}>
         Cerrar sesión

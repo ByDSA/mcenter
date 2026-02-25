@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, ReactNode, MouseEvent, useCallback, createContext, useContext, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { classes } from "#modules/utils/styles";
 import { disableInput, enableInput } from "../modal/utils";
 import styles from "./ContextMenu.module.css";
@@ -235,12 +236,14 @@ type CreateContextMenuItemProps = {
   label: string;
   onClick?: (e: MouseEvent<HTMLParagraphElement>)=> void;
   className?: string;
+  disabled?: boolean;
   theme?: "danger" | "default" | "primary" | "success";
 };
 
 export const ContextMenuItem = ( { label,
-  onClick,
+  onClick: paramOnClick,
   className,
+  disabled,
   theme = "default" }: CreateContextMenuItemProps) => {
   const { closeMenu } = useContextMenuTrigger();
 
@@ -248,18 +251,19 @@ export const ContextMenuItem = ( { label,
     <p
       className={classes(
         styles.menuItem,
-        onClick && styles.pointer,
-        theme === "danger" && styles.danger,
-        theme === "primary" && styles.primary,
-        theme === "success" && styles.success,
+        paramOnClick && styles.pointer,
+        theme === "danger" && !disabled && styles.danger,
+        theme === "primary" && !disabled && styles.primary,
+        theme === "success" && !disabled && styles.success,
+        disabled && styles.disabled,
         className,
       )}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (onClick) {
-          onClick(e);
+        if (paramOnClick && !disabled) {
+          paramOnClick(e);
           closeMenu();
         }
       }}
@@ -267,4 +271,18 @@ export const ContextMenuItem = ( { label,
       {label}
     </p>
   );
+};
+
+type AnchorContextMenuItemProps = Omit<CreateContextMenuItemProps, "onClick"> &
+  {href: string};
+export const AnchorContextMenuItem = ( { href, ...props }: AnchorContextMenuItemProps) => {
+  const router = useRouter();
+  const onClick = useCallback(() => {
+    router.push(href);
+  }, [href]);
+
+  return <ContextMenuItem
+    {...props}
+    onClick={onClick}
+  />;
 };

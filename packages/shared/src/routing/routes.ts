@@ -155,6 +155,15 @@ export const PATH_ROUTES = {
     statusStream: {
       withParams: (id: string, heartbeatEveryMs?: number) => `${TASKS}/${id}/status/stream${heartbeatEveryMs ? `?heartbeat=${heartbeatEveryMs}` : ""}`,
     },
+    pause: {
+      withParams: (id: string) => `${TASKS}/${id}/pause`,
+    },
+    resume: {
+      withParams: (id: string) => `${TASKS}/${id}/resume`,
+    },
+    kill: {
+      withParams: (id: string) => `${TASKS}/${id}/kill`,
+    },
   },
   youtube: {
     path: YOUTUBE,
@@ -268,7 +277,7 @@ export const PATH_ROUTES = {
           slug: string;
           token?: string;
           autoplay?: boolean;
-} ) => {
+        } ) => {
           const url = `/musics/slug/${slug}`;
           const params = new URLSearchParams();
 
@@ -525,13 +534,13 @@ export const PATH_ROUTES = {
         path: "/series/lists",
         withParams: ( { serieId }: {
           serieId: string;
-} ) => `/series/lists/${serieId}`,
+        } ) => `/series/lists/${serieId}`,
         episode: {
           withParams: ( { episodeId, autoplay, token }: {
-          episodeId: string;
-          autoplay?: boolean;
-          token?: string;
-} ) => {
+            episodeId: string;
+            autoplay?: boolean;
+            token?: string;
+          } ) => {
             const url = `/series/episodes/${episodeId}`;
             const params = new URLSearchParams();
 
@@ -545,7 +554,6 @@ export const PATH_ROUTES = {
 
             return query ? `${url}?${query}` : url;
           },
-
         },
       },
     },

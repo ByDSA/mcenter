@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { Injectable, Logger } from "@nestjs/common";
 import { createOneResultResponseSchema } from "$shared/utils/http/responses";
-import { Job } from "bullmq";
 import { TasksCrudDtos } from "$shared/models/tasks";
 import z from "zod";
 import { tasksEpisodes } from "$shared/models/episodes/admin";
@@ -11,6 +10,7 @@ import { TaskHandler, TaskHandlerClass, TaskService } from "#core/tasks";
 import { EpisodeFileInfoRepository } from "#episodes/file-info";
 import { EpisodeFileInfoEntity, episodeFileInfoEntitySchema } from "#episodes/file-info/models";
 import { EpisodeFileInfoSyncService } from "#episodes/file-info/sync/service";
+import { JobWithInternal } from "#core/tasks/task.service";
 
 const TASK_NAME = tasksEpisodes.fileInfoUpdateOffloaded.name;
 
@@ -42,12 +42,6 @@ type Internal = Partial<{
   i: number;
 }>;
 
-type JobWithInternal = Job & {
-  data: {
-    _internal: Internal;
-  };
-};
-
 @Injectable()
 @TaskHandlerClass()
 export class EpisodeUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Payload, Result> {
@@ -61,7 +55,7 @@ export class EpisodeUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Pa
     private readonly fileInfosSyncService: EpisodeFileInfoSyncService,
   ) {}
 
-  async execute(payload: Payload, job: JobWithInternal): Promise<Result> {
+  async execute(payload: Payload, job: JobWithInternal<Internal>): Promise<Result> {
     let all = job.data._internal?.all;
 
     if (!all) {
@@ -73,7 +67,7 @@ export class EpisodeUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Pa
 
     assertIsDefined(all); // guard por si el payload fuera inválido pese al zod
 
-    await this.updateInternal(job, (old) => ( {
+    await this.taskService.updateInternal(job, (old) => ( {
       ...old,
       all,
     } ));
@@ -91,6 +85,22 @@ export class EpisodeUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Pa
       const fileInfo = all[i];
       const relativePath = fileInfo.path;
 
+      await this.taskService.stopJobChecker(job, {
+        onPause: async () => {
+          // Guardamos i (índice aún no procesado) para que al reanudar se
+          // empiece exactamente desde aquí, sin reprocesar ni saltar ninguno.
+          await this.taskService.updateInternal(job, (old) => ( {
+            ...old,
+            i,
+          } ));
+
+          await job.updateProgress( {
+            percentage: 1 + ((99 - 1) * (i / all!.length)),
+            message: `Paused at ${i} / ${all!.length}`,
+          } as Progress);
+        },
+      } );
+
       await job.updateProgress( {
         percentage: 1 + ((99 - 1) * (i / all.length)),
         message: `${i + 1} / ${all.length}: ${relativePath}`,
@@ -105,9 +115,9 @@ export class EpisodeUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Pa
       else if (ret === "unmarked")
         unmarkedOffloaded.push(fileInfo);
 
-      await this.updateInternal(job, (old) => ( {
+      await this.taskService.updateInternal(job, (old) => ( {
         ...old,
-        i,
+        i: i + 1,
       } ));
     }
 
@@ -123,15 +133,6 @@ export class EpisodeUpdateFileInfoOffloadedTaskHandler implements TaskHandler<Pa
         skipped,
       },
     } as Result;
-  }
-
-  private updateInternal(job: JobWithInternal, fn: (old: Internal)=> Internal) {
-    const _internal: Internal = job.data._internal ? fn(job.data._internal) : fn( {} );
-
-    return job.updateData( {
-      ...job.data,
-      _internal,
-    } );
   }
 
   async addTask(

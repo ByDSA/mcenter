@@ -8,6 +8,7 @@ export interface ContextMenuStyles {
   danger: string;
   primary: string;
   success: string;
+  disabled: string;
   backdrop: string;
   pointer: string;
 }

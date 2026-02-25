@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { isDefined } from "$shared/utils/validation";
 import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
+import { classes } from "#modules/utils/styles";
 import { TaskStatusAny } from "./types";
 import styles from "./styles.module.css";
 import { TaskJsonViewer } from "./TaskJsonViewer";
+import { TaskControlsButton } from "./TaskControlsButton";
 
 type Props = {
   value: TaskStatusAny;
@@ -65,13 +67,21 @@ export const Task = ( { value, onClick }: Props) => {
   };
 
   return (
-    <div className={`${styles.taskCard} ${getCardClass(value.status)}`}>
+    <div className={classes(styles.taskCard, getCardClass(value.status))}>
       <div className={styles.header}>
         <div>
           <h3 className={styles.taskName} title={value.name}>{value.name}</h3>
-          <span className={`${styles.status} ${getStatusClass(value.status)}`}>
-            {value.status.replace("-", " ")}
-          </span>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}>
+            <span className={classes(styles.status, getStatusClass(value.status))}>
+              {getStatusName(value)}
+            </span>
+            <TaskControlsButton task={value} />
+          </div>
+
         </div>
         <div className={styles.id}>
             ID: {value.id}
@@ -174,3 +184,11 @@ export const Task = ( { value, onClick }: Props) => {
     </div>
   );
 };
+
+function getStatusName(value: TaskStatusAny) {
+  // eslint-disable-next-line no-underscore-dangle
+  if (value.payload._paused)
+    return "paused";
+
+  return value.status.replace("-", " ");
+}
