@@ -20,6 +20,7 @@
       "#core/*": ["src/core/*"],
       "#episodes/*": ["src/modules/episodes/*"],
       "#modules/*": ["src/modules/*"],
+      "#movies/*": ["src/modules/movies/*"],
       "#musics/*": ["src/modules/musics/*"],
       "#series/*": ["src/modules/episodes/series/*"],
       "#tests": ["tests"],

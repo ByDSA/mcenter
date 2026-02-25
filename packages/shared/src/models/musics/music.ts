@@ -1,7 +1,7 @@
 import z from "zod";
 import { genAssertZod } from "../../utils/validation/zod";
 import { resourceSchema } from "../resources";
-import { mongoDbId, taggableSchema } from "../resources/partial-schemas";
+import { mongoDbId } from "../resources/partial-schemas";
 import { slugSchema } from "../utils/schemas/slug";
 import { imageCoverEntitySchema } from "../image-covers";
 import { getFirstAvailableFileInfoOrFirst, isFileInfoUnavailable } from "../file-info-common/file-info";
@@ -25,8 +25,7 @@ const modelSchema = optionalPropsSchema.extend( {
   slug: slugSchema,
   imageCoverId: mongoDbId.nullable().optional(),
 } )
-  .merge(resourceSchema)
-  .merge(taggableSchema);
+  .merge(resourceSchema);
 
 type Model = z.infer<typeof modelSchema>;
 

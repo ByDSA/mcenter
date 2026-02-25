@@ -28,6 +28,8 @@ const AUTH_EMAIL_VERIFICATION = `${AUTH_LOCAL}/email-verification`;
 const AUTH_EMAIL_VERIFICATION_FRONT = "/auth/register/verify";
 const SERIES = `${EPISODES}/series`;
 const IMAGE_COVERS = "/api/image-covers";
+const MOVIES = "/api/movies";
+const MOVIES_FILE_INFO = MOVIES + "/file-info";
 
 export const GET_ONE_CRITERIA_PATH = "get-one";
 
@@ -436,6 +438,23 @@ export const PATH_ROUTES = {
       },
       fileInfoUpdateOffloaded: {
         path: MUSICS_ADMIN + "/update-file-info-offloaded",
+      },
+    },
+  },
+  movies: {
+    path: MOVIES,
+    withParams: (id: string)=>`${MOVIES}/${id}`,
+    getMany: {
+      path: `${MOVIES}/${GET_MANY_CRITERIA_PATH}`,
+    },
+    getOne: {
+      path: `${MOVIES}/${GET_ONE_CRITERIA_PATH}`,
+    },
+    fileInfo: {
+      path: MOVIES_FILE_INFO,
+      withParams: (id: string) => `${MOVIES_FILE_INFO}/${id}`,
+      upload: {
+        path: `${MOVIES_FILE_INFO}/upload`,
       },
     },
   },

@@ -2,6 +2,7 @@ import { RouterModule, Routes } from "@nestjs/core";
 import { PATH_ROUTES } from "$shared/routing";
 import { EpisodeFileInfosCrudModule } from "#episodes/file-info/crud/module";
 import { MusicHistoryModule } from "#musics/history/module";
+import { MovieCrudModule } from "#modules/movies/crud/module";
 import { EpisodesAdminModule } from "#episodes/admin/module";
 import { EpisodeHistoryCrudModule } from "#episodes/history/crud/module";
 import { StreamPickerModule } from "#episodes/picker/module";
@@ -34,6 +35,7 @@ import { EpisodeFileInfosUploadModule } from "#episodes/file-info/upload/module"
 import { MusicFileInfoUploadModule } from "#musics/file-info/upload/module";
 import { EpisodeLastTimePlayedModule } from "#episodes/history/last-time-played/module";
 import { StreamsFixerModule } from "#episodes/streams/fixer/module";
+import { MovieFileInfoCrudModule } from "#modules/movies/file-info/crud/module";
 import { LoggingModule } from "../logging/module";
 
 // No hace falta poner todos los modules porque hay imports internos
@@ -43,6 +45,8 @@ export const directImports = [
   ConfigModule,
   ImageCoversCrudModule,
   ImageCoversAdminModule,
+
+  MovieCrudModule,
 
   MusicsGetRandomModule, // El primero para que "random" no se considere una UUID
   MusicsSlugModule,
@@ -62,6 +66,8 @@ export const directImports = [
   EpisodesCrudModule, // Al final, para que no interfiera con slugs
   SeriesCrudModule,
   EpisodeFileInfosUploadModule,
+
+  MovieFileInfoCrudModule,
 
   PlayerModule,
 
@@ -173,6 +179,16 @@ const musicsRoutes: Routes = [
     module: MusicsAdminModule,
   },
 ];
+const moviesRoutes: Routes = [
+  {
+    path: PATH_ROUTES.movies.path,
+    module: MovieCrudModule,
+  },
+  {
+    path: PATH_ROUTES.movies.fileInfo.path,
+    module: MovieFileInfoCrudModule,
+  },
+];
 
 export const routes: Routes = [
   {
@@ -206,6 +222,7 @@ export const routes: Routes = [
   },
   ...episodesRoutes,
   ...musicsRoutes,
+  ...moviesRoutes,
   {
     path: PATH_ROUTES.player.path,
     module: PlayerModule,
