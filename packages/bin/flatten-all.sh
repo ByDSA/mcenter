@@ -19,5 +19,5 @@ fi
 while IFS= read -r FLATTEN_BIN <&3; do
   MIDDLE_DIR=$(echo "$FLATTEN_BIN" | sed "s|$PARENT_DIR/||" | cut -d'/' -f1)
   echo "Ejecutando flatten de $MIDDLE_DIR ..."
-  bash "$FLATTEN_BIN" "$@"
+  bash "$FLATTEN_BIN" "$SCRIPT_DIR"
 done 3<<< "$FLATTEN_BINS"
