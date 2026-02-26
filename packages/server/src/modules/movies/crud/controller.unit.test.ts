@@ -2,10 +2,10 @@
 import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { MovieEntity, movieEntitySchema } from "$shared/models/movies/movie";
 import { fixtureMovies } from "$shared/models/movies/tests/fixtures";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing/routes-utils";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";

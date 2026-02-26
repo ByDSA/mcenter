@@ -1,7 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { fixtureUsers } from "$sharedSrc/models/auth/tests/fixtures";
-import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing/routes-utils";
 import { crudTestsSuite } from "#tests/suites/crud-suite";
 import { expectBodyEquals } from "#tests/suites/generate-http-case";
 import { putUser } from "#tests/suites/auth";

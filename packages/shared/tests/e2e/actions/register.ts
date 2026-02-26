@@ -1,7 +1,7 @@
 import { expect, Response } from "@playwright/test";
-import { User, UserEntityWithRoles } from "src/models/auth";
-import { PATH_ROUTES } from "src/routing";
-import { WithRequired } from "src/utils/objects";
+import { PATH_ROUTES } from "../../../src/routing";
+import { WithRequired } from "../../../src/utils/objects";
+import { User, UserEntityWithRoles } from "../../../src/models/auth";
 import { backendUrl, expectPageUrl, frontEndUrl, safeFillInput, safeGoto } from "../utils";
 import { Action } from "./Action";
 

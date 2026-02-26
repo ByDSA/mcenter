@@ -8,7 +8,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { createManyResultResponseSchema, createOneResultResponseSchema } from "$shared/utils/http/responses";
 import { createPaginatedResultResponseSchema } from "$shared/utils/http/responses";
-import { GET_MANY_CRITERIA_PATH, GET_ONE_CRITERIA_PATH } from "$shared/routing";
+import { GET_MANY_CRITERIA_PATH, GET_ONE_CRITERIA_PATH } from "$shared/routing/routes-utils";
 import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { ResponseFormatterInterceptor } from "../responses/response-formatter.interceptor";
 

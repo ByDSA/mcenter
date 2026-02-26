@@ -1,5 +1,5 @@
 import { Response, expect } from "@playwright/test";
-import { PATH_ROUTES } from "src/routing";
+import { PATH_ROUTES } from "../../../src/routing";
 import { frontEndUrl } from "../utils";
 import { Action } from "./Action";
 

@@ -2,7 +2,7 @@ import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
 import { createSuccessResultResponse } from "$shared/utils/http/responses";
-import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing/routes-utils";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { mockMongoId } from "#tests/mongo";

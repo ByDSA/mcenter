@@ -3,7 +3,7 @@ import path from "node:path";
 import { Logger, RequestMethod, Type } from "@nestjs/common";
 import { Routes } from "@nestjs/core";
 import { neverCase } from "$shared/utils/validation";
-import { GET_MANY_CRITERIA_PATH, GET_ONE_CRITERIA_PATH } from "$shared/routing";
+import { GET_MANY_CRITERIA_PATH, GET_ONE_CRITERIA_PATH } from "$shared/routing/routes-utils";
 import { directImports, routeModules, routes } from "#core/routing/routes";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { mockMongoId } from "#tests/mongo";

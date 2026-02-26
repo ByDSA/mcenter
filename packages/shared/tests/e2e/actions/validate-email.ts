@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
-import { PATH_ROUTES } from "src/routing";
-import { assertIsDefined } from "src/utils/validation";
+import { PATH_ROUTES } from "../../../src/routing";
+import { assertIsDefined } from "../../../src/utils/validation";
 import { backendUrl, frontEndUrl } from "../utils";
 import { Action } from "./Action";
 

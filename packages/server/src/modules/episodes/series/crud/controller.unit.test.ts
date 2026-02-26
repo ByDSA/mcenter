@@ -1,10 +1,10 @@
 import { Application } from "express";
 import request from "supertest";
 import { HttpStatus } from "@nestjs/common";
-import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
 import { SeriesCrudDtos } from "$shared/models/episodes/series/dto/transport";
 import { PaginatedResult } from "$shared/utils/http/responses";
 import { fixtureUsers } from "$shared/models/auth/tests/fixtures";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing/routes-utils";
 import { createTestingAppModuleAndInit, type TestingSetup } from "#core/app/tests/app";
 import { getOrCreateMockProvider } from "#utils/nestjs/tests";
 import { testFailValidation, expectControllerFinishRequest,

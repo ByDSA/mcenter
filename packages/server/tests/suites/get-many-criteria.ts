@@ -1,6 +1,6 @@
 import { assertIsDefined } from "$shared/utils/validation";
 import { HttpStatus } from "@nestjs/common";
-import { GET_MANY_CRITERIA_PATH } from "$shared/routing";
+import { GET_MANY_CRITERIA_PATH } from "$shared/routing/routes-utils";
 import { autoProps, TestGroupConfigCtx, PatchTestsProps, TestDynamicConfig } from "./patch-one";
 import { defaultResponse, expectUnprocessableEntity } from "./common";
 import { generateHttpCase } from "./generate-http-case";
