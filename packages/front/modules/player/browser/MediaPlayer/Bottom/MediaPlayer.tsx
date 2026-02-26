@@ -12,6 +12,7 @@ import { ProgressBar } from "../ProgressBar";
 import { ProgressBarSmall } from "../ProgressBarSmall";
 import { FullscreenLayout } from "../Fullscreen/Layout";
 import { Effects } from "../Fullscreen/Effects";
+import { PlayerSettingsButton } from "../PlayerSettingsButton";
 import styles from "./MediaPlayer.module.css";
 import { TrackInfo } from "./TrackInfo";
 import { PlayQueueButtonView } from "./PlayQueue/PlayQueueButtonView";
@@ -108,6 +109,11 @@ export function BottomMediaPlayer() {
               width >= SMALL_BREAKPOINT && <>
                 <ForwardButton className={styles.backwardButton}/>
               </>
+            }
+            {
+              width >= SMALL_BREAKPOINT && (
+                <PlayerSettingsButton />
+              )
             }
             {
               width < SMALL_BREAKPOINT && <FullscreenButton />

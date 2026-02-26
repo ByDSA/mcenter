@@ -2,14 +2,13 @@
 
 import { Equalizer, KeyboardArrowDown, LiveTv, QueueMusic } from "@mui/icons-material";
 import { useRef } from "react";
-import { useMusic } from "#modules/musics/hooks";
-import { MusicSettingsButton } from "#modules/musics/musics/SettingsButton/Button";
 import { FullscreenLayoutHandle, FullscreenPlayerLayout } from "#modules/player/common/FullscreenLayout";
 import { ControlButtonView } from "#modules/player/common/ControlButtonsView";
 import { PlayQueue } from "../Bottom/PlayQueue/PlayQueue";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import { useWindowContext } from "../Bottom/PlayQueue/WindowProvider";
 import { Title } from "../../../common/Title";
+import { PlayerSettingsButton } from "../PlayerSettingsButton";
 import styles from "./Layout.module.css";
 import { Player } from "./Player";
 import { Effects } from "./Effects";
@@ -20,12 +19,11 @@ type Props = {
 export function FullscreenLayout( { onClose }: Props) {
   const { close } = useWindowContext();
   const currentResource = useBrowserPlayer(s=>s.currentResource);
-  const { data: music } = useMusic(currentResource?.resourceId ?? null);
   const layoutRef = useRef<FullscreenLayoutHandle>(null);
 
   return <FullscreenPlayerLayout
     ref={layoutRef}
-    headerActions={music && <MusicSettingsButton musicId={music.id}/>}
+    headerActions={currentResource && <PlayerSettingsButton />}
     elements={[{
       iconTitle: "Reproductor",
       icon: <LiveTv />,
