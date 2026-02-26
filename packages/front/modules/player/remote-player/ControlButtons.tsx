@@ -4,13 +4,20 @@ import { BackwardButtonView, ForwardButtonView, NextButtonView, PrevButtonView, 
 import { useRemotePlayer, useRemoteStatus } from "./RemotePlayerContext";
 
 export const RemotePrevButton = () => {
-  const { player } = useRemotePlayer();
+  const { player, resource } = useRemotePlayer();
   const status = useRemoteStatus();
-  const hasPrev = (status?.playlist?.previous?.length ?? 0) > 0;
 
   return <PrevButtonView
-    disabled={!hasPrev}
-    onClick={()=>player.previous()}
+    onClick={async ()=>{
+      const hasPrev = (status?.playlist?.previous?.length ?? 0) > 0;
+      const startTime = resource?.fileInfos?.[0].start ?? 0;
+      const currentTime = (status?.time ?? 0) - startTime;
+
+      if (currentTime < 1 && hasPrev)
+        await player.previous();
+      else
+        await player.seek(startTime);
+    }}
   />;
 };
 

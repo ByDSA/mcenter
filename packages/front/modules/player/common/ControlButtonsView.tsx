@@ -53,7 +53,7 @@ export const PrevButtonView = ( { ...props }: ControlButtonProps) => {
   );
 };
 
-export const NextButtonView = ( { onClick, ...props }: ControlButtonProps) => {
+export const NextButtonView = ( { ...props }: ControlButtonProps) => {
   return (
     <ControlButtonView
       title="Siguiente"

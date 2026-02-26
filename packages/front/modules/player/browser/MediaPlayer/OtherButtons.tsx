@@ -1,8 +1,8 @@
-import { VolumeOff, VolumeDown, VolumeUp, SkipPrevious, SkipNext } from "@mui/icons-material";
+import { VolumeOff, VolumeDown, VolumeUp } from "@mui/icons-material";
 import { useEffect, useState, useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { classes } from "#modules/utils/styles";
-import { BackwardButtonView, CloseButtonView, ControlButtonView, ForwardButtonView, RepeatButtonView, ShuffleButtonView } from "#modules/player/common/ControlButtonsView";
+import { BackwardButtonView, CloseButtonView, ControlButtonView, ForwardButtonView, NextButtonView, PrevButtonView, RepeatButtonView, ShuffleButtonView } from "#modules/player/common/ControlButtonsView";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
 import styles from "./OtherButtons.module.css";
 
@@ -162,9 +162,8 @@ export const CloseButton = ( { className }: {className?: string} ) => {
 };
 
 export const PrevButton = ( { className }: {className?: string} ) => {
-  return <ControlButtonView
-    className={classes(styles.prevNextButton, className)}
-    title="Anterior"
+  return <PrevButtonView
+    className={className}
     onClick={async () => {
       const { currentTime, hasPrev, setCurrentTime, prev } = useBrowserPlayer.getState();
 
@@ -176,9 +175,8 @@ export const PrevButton = ( { className }: {className?: string} ) => {
         } );
       }
     }}
-  >
-    <SkipPrevious />
-  </ControlButtonView>;
+
+  />;
 };
 type NextButtonProps = {
 className?: string;
@@ -186,17 +184,16 @@ className?: string;
 export const NextButton = ( { className }: NextButtonProps) => {
   const next = useBrowserPlayer(s=>s.next);
   const hasNext = useBrowserPlayer(s=>s.hasNext);
+  // Porque hasNext depende de isShuffle y repeatMode
   // eslint-disable-next-line no-underscore-dangle
   const _1 = useBrowserPlayer(s=>s.isShuffle);
   // eslint-disable-next-line no-underscore-dangle
   const _2 = useBrowserPlayer(s=>s.repeatMode);
 
-  return <ControlButtonView
-    className={classes(styles.prevNextButton, className)}
-    title="Siguiente"
+  return <NextButtonView
+    className={className}
     disabled={!hasNext()}
     onClick={() => next()}
-  >
-    <SkipNext />
-  </ControlButtonView>;
+
+  />;
 };

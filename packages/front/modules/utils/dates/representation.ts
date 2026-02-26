@@ -5,11 +5,28 @@ export type DateFormat = {
   ago: "no" | "yes";
 };
 
-export function secsToMmss(secs: number | null) {
+export enum TimeRoundType {
+  Round = "round",
+  Floor = "floor",
+  Ceil = "ceil",
+}
+type Options = {
+  roundType?: TimeRoundType;
+};
+export function secsToMmss(secs: number | null, options?: Options) {
   if (secs === null)
     return "--:--";
 
-  const intSecs = Math.round(secs);
+  const roundType = options?.roundType ?? "round";
+  let intSecs!: number;
+
+  if (roundType === TimeRoundType.Round)
+    intSecs = Math.round(secs);
+  else if (roundType === TimeRoundType.Floor)
+    intSecs = Math.floor(secs);
+  else if (roundType === TimeRoundType.Ceil)
+    intSecs = Math.ceil(secs);
+
   const minus = intSecs < 0;
   const absIntSecs = Math.abs(intSecs);
   const minutes = Math.floor(absIntSecs / 60);

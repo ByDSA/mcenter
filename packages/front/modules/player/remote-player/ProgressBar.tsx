@@ -3,6 +3,7 @@
 import type { EpisodeEntity } from "#modules/episodes/models";
 import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { showError } from "$shared/utils/errors/showError";
+import { TimeRoundType } from "#modules/utils/dates";
 import { ProgressBarView, TimeView } from "../common/ProgressBarView";
 import { useRemotePlayer, useRemoteStatus } from "./RemotePlayerContext";
 
@@ -59,7 +60,7 @@ export const RemoteCurrentTime = () => {
   const rawTime = status?.time ?? 0;
   const { start } = calcStartLength(rawLength, resource);
 
-  return <TimeView time={rawTime - start}/>;
+  return <TimeView time={rawTime - start} roundType={TimeRoundType.Floor} />;
 };
 
 export const RemoteDuration = () => {

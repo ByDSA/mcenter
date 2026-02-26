@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { secsToMmss } from "#modules/utils/dates";
+import { secsToMmss, TimeRoundType } from "#modules/utils/dates";
 import { classes } from "#modules/utils/styles";
 import styles from "./ProgressBar.module.css";
 
@@ -109,9 +109,12 @@ time: string; } | null>(null);
 
 type TimeProps = {
   time: number | null;
+  roundType?: TimeRoundType;
 };
-export const TimeView = ( { time }: TimeProps) => {
+export const TimeView = ( { time, roundType }: TimeProps) => {
   const fixedValue = time !== null ? time : null;
 
-  return <span>{secsToMmss(fixedValue)}</span>;
+  return <span>{secsToMmss(fixedValue, {
+    roundType,
+  } )}</span>;
 };
