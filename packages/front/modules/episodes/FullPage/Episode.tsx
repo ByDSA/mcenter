@@ -24,6 +24,7 @@ import { ShareEpisodeLinkContextMenuItemCurrentCtx } from "#modules/episodes/Set
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { ResourceSubtitle } from "#modules/resources/ListItem/ResourceEntry";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
 import { LastSeenElement } from "../series/FullPage/Seasons/ListItem";
 import styles from "./Episode.module.css";
 
@@ -63,90 +64,92 @@ export const EpisodeFullPage = ( { episodeId }: Props) => {
   };
 
   return (
-    <ResourceFullPage>
-      <HeaderItem
-        title={<>{episode.title}<br/><ResourceSubtitle
-          className={styles.seriesName}
-          items={[
-            {
-              text: episode.episodeKey,
-            }, {
-              title: series.name,
-              customContent: <DaAnchor
-                theme="white"
-                onClick={seriesOnClick}
-              >{series.name}</DaAnchor>,
-            },
-          ]}
-        /></>}
-        cover={
-          <MusicImageCover
-            title={episode.title}
-            cover={imageCover}
-            icon={{
-              element: <SeriesIcon />,
-            }}
-            size="medium"
-          />
-        }
-        info={
-          <>
-            <DateTag date={episode.createdAt} />
-            <DurationView duration={duration} />
-
-            {hasUser && (<LastSeenElement
-              userInfo={episode.userInfo}
-              className={styles.lastSeen}
-            />
-            )}
-
-            {episode.userInfo && (
-              <WeightView weight={episode.userInfo.weight} />
-            )}
-          </>
-        }
-        controls={
-          <>
-            <ResourcePlayButtonView
-              disabled={isUnavailable}
-              status="stopped"
-              onClick={undefined}
-            />
-
-            <SettingsButton
-              theme="dark"
-              onClick={(e) => {
-                openMenu( {
-                  event: e,
-                  content: (
-                    <LocalDataProvider data={episode}>
-                      {isAdmin && (
-                        <EditEpisodeContextMenuItem initialData={episode} />
-                      )}
-                      {hasUser && (
-                        <EpisodeLatestViewsContextMenuItem episodeId={episodeId} />
-                      )}
-                      <ShareEpisodeLinkContextMenuItemCurrentCtx />
-                      {isAdmin && (
-                        <DeleteEpisodeContextMenuItem
-                          onActionSuccess={
-                            () => router.push(PATH_ROUTES.episodes.frontend.lists.path)
-                          }
-                        />
-                      )}
-                    </LocalDataProvider>
-                  ),
-                } );
+    <PageContent>
+      <ResourceFullPage>
+        <HeaderItem
+          title={<>{episode.title}<br/><ResourceSubtitle
+            className={styles.seriesName}
+            items={[
+              {
+                text: episode.episodeKey,
+              }, {
+                title: series.name,
+                customContent: <DaAnchor
+                  theme="white"
+                  onClick={seriesOnClick}
+                >{series.name}</DaAnchor>,
+              },
+            ]}
+          /></>}
+          cover={
+            <MusicImageCover
+              title={episode.title}
+              cover={imageCover}
+              icon={{
+                element: <SeriesIcon />,
               }}
+              size="medium"
             />
-          </>
-        }
-      />
+          }
+          info={
+            <>
+              <DateTag date={episode.createdAt} />
+              <DurationView duration={duration} />
 
-      <section className={styles.synopsis}>
-        <p className={styles.synopsisTitle}>Sinopsis</p>
-        <p className={styles.synopsisText}>{LOREM_SYNOPSIS}</p>
-      </section>
-    </ResourceFullPage>
+              {hasUser && (<LastSeenElement
+                userInfo={episode.userInfo}
+                className={styles.lastSeen}
+              />
+              )}
+
+              {episode.userInfo && (
+                <WeightView weight={episode.userInfo.weight} />
+              )}
+            </>
+          }
+          controls={
+            <>
+              <ResourcePlayButtonView
+                disabled={isUnavailable}
+                status="stopped"
+                onClick={undefined}
+              />
+
+              <SettingsButton
+                theme="dark"
+                onClick={(e) => {
+                  openMenu( {
+                    event: e,
+                    content: (
+                      <LocalDataProvider data={episode}>
+                        {isAdmin && (
+                          <EditEpisodeContextMenuItem initialData={episode} />
+                        )}
+                        {hasUser && (
+                          <EpisodeLatestViewsContextMenuItem episodeId={episodeId} />
+                        )}
+                        <ShareEpisodeLinkContextMenuItemCurrentCtx />
+                        {isAdmin && (
+                          <DeleteEpisodeContextMenuItem
+                            onActionSuccess={
+                              () => router.push(PATH_ROUTES.episodes.frontend.lists.path)
+                            }
+                          />
+                        )}
+                      </LocalDataProvider>
+                    ),
+                  } );
+                }}
+              />
+            </>
+          }
+        />
+
+        <section className={styles.synopsis}>
+          <p className={styles.synopsisTitle}>Sinopsis</p>
+          <p className={styles.synopsisText}>{LOREM_SYNOPSIS}</p>
+        </section>
+      </ResourceFullPage>
+    </PageContent>
   );
 };

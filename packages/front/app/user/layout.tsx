@@ -1,5 +1,5 @@
 import LoggedLayout from "#modules/core/auth/Logged.layout";
-import { PageContainer } from "app/PageContainer";
+import { PageContainer } from "#modules/ui-kit/layouts/PageContainer/PageContainer";
 
 export default async function UserPageLayout( { children }: {
   children: React.ReactNode;

@@ -1,4 +1,8 @@
 .container {
+  display: flex;
+  flex-flow: column nowrap;
+  flex-grow: 1; /* height 100% */
+  align-items: center;
   padding-top: var(--tabs-height, 2rem);
 
   .tabs {

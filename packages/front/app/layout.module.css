@@ -90,6 +90,8 @@ body:has(.content) {
   --content-margin-top: var(--topbar-height);
   margin-left: var(--content-margin-left);
   margin-top: var(--content-margin-top);
+  display: flex;
+  flex-flow: column nowrap;
 
   background: var(--color-gray-1000);
   color: white;

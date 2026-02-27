@@ -78,6 +78,7 @@ export const musicsRoutes = {
   },
   frontend: {
     path: "/musics",
+    withParams: (params: {id: string} ) => `/musics/${params.id}`,
     slug: {
       withParams: ( { slug, token, autoplay }: {
         slug: string;
@@ -133,7 +134,8 @@ export const musicsRoutes = {
     },
     smartPlaylists: {
       path: "/musics/smart-playlists",
-      withParams: (id: string) => `/musics/smart-playlists/${id}`,
+      withParams: (params: {id: string;
+autoplay?: boolean;} ) => `/musics/smart-playlists/${params.id}${params.autoplay ? "?autoplay=1" : ""}`,
       slug: {
         withParams: (userSlug: string, smartPlaylistSlug: string) => `/musics/smart-playlists/slug/${userSlug}/${smartPlaylistSlug}`,
       },

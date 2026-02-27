@@ -11,6 +11,8 @@
 
 .contentSpinner {
   flex: 1;
+  align-self: center;
+  justify-self: center;
 }
 .inlineSpinner {
   display: inline-flex;

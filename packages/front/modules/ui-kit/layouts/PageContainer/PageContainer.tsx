@@ -9,10 +9,11 @@ type Props = {
 
 export function PageContainer( { children, className }: Props) {
   return (
-    <div className={classes(styles.container, className)}>
-      <main>
-        {children}
-      </main>
+    <div className={classes(
+      styles.container,
+      className,
+    )}>
+      {children}
     </div>
   );
 }

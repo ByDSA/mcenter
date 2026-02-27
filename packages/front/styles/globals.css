@@ -64,14 +64,6 @@ body {
   text-overflow: ellipsis;
 }
 
-/** Layout **/
-
-.extra-margin {
-  margin: 0 4dvw;
-  width: 100vw;
-  max-width: 100%;
-}
-
 /** Buttons */
 .btnClickable:hover {
   box-shadow:

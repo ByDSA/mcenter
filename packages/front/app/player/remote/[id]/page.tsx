@@ -15,8 +15,8 @@ import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { EpisodesCrudDtos } from "#modules/episodes/models/dto";
 import { RemotePlayerProvider } from "#modules/player/remote-player/RemotePlayerContext";
 import { RemoteLayout } from "#modules/player/remote-player/Layout";
-import { PageContainer } from "app/PageContainer";
-import { Breadcrumbs } from "#modules/ui-kit/Breadcrumbs/Breadcrumbs";
+import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
+import { PageContainer } from "#modules/ui-kit/layouts/PageContainer/PageContainer";
 
 // ---------------------------------------------------------------------------
 // Estado de caché de recursos por URI (fuera del componente para persistir
@@ -158,16 +158,9 @@ export default function RemotePlayer( { params }: PageProps) {
 
   return (
     <PageContainer>
-      <Breadcrumbs
-        items={[{
-          label: "Remote players",
-          href: "/player/remote",
-        },
-        {
-          label: "Player",
-        },
-        ]} />
-      {content}
+      <PageContent>
+        {content}
+      </PageContent>
     </PageContainer>
   );
 }

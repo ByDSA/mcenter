@@ -1,5 +1,6 @@
 import NotLoggedLayout from "#modules/core/auth/NotLogged.layout";
-import { PageContainer } from "app/PageContainer";
+import { PageContainer } from "#modules/ui-kit/layouts/PageContainer/PageContainer";
+import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
 import styles from "./styles.module.css";
 
 export default async function LoginLayout( { children }: {
@@ -10,7 +11,9 @@ export default async function LoginLayout( { children }: {
       {await NotLoggedLayout( {
         children: (
           <PageContainer className={styles.container}>
-            {children}
+            <PageContent>
+              {children}
+            </PageContent>
           </PageContainer>
         ),
       } )}

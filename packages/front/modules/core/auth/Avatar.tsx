@@ -25,7 +25,7 @@ export function UserAvatarButton( { user }: Props) {
     />
     {isAdmin(user) && <AnchorContextMenuItem
       label="Admin"
-      href={"/admin"}
+      href={PATH_ROUTES.tasks.frontend.doTasks.path}
     />}
     <div className={contextMenuStyles.divider} />
     <DaAnchor theme="text" href={PATH_ROUTES.auth.frontend.logout.path}>

@@ -1,11 +1,12 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { PageContainer } from "app/PageContainer";
-import { TabsContainer } from "app/TabsContainer";
+import { ComponentProps } from "react";
+import { PageContainer } from "#modules/ui-kit/layouts/PageContainer/PageContainer";
+import { TabsContainer } from "#modules/ui-kit/layouts/TabsContainer/TabsContainer";
 import styles from "./styles.module.css";
 
-export default function SeriesLayout( { children }: {
-  children: React.ReactNode;
-} ) {
+export default function SeriesLayout(
+  { children }: Pick<ComponentProps<typeof PageContainer>, "children">,
+) {
   const data = [
     {
       path: PATH_ROUTES.episodes.frontend.lists.path,
@@ -24,7 +25,9 @@ export default function SeriesLayout( { children }: {
   return (
     <>
       <TabsContainer data={data}>
-        <PageContainer className={styles.page}>
+        <PageContainer
+          className={styles.page}
+        >
           {children}
         </PageContainer>
       </TabsContainer>

@@ -35,7 +35,9 @@ export const MusicSmartPlaylistListItem = ( { index, drag }: Props) => {
 
   return <ResourceEntry
     mainTitle={data.name}
-    href={PATH_ROUTES.musics.frontend.smartPlaylists.withParams(data.id)}
+    href={PATH_ROUTES.musics.frontend.smartPlaylists.withParams( {
+      id: data.id,
+    } )}
     settings={ <MusicSmartPlaylistSettingsButton
       onDelete={() => removeItemByIndex(index)}
     />}

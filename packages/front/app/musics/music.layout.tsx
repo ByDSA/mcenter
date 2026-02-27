@@ -1,9 +1,10 @@
 /* eslint-disable import/no-default-export */
 import { PATH_ROUTES } from "$shared/routing";
-import { PageContainer } from "app/PageContainer";
-import { TabsContainer } from "app/TabsContainer";
+import { PageContainer } from "#modules/ui-kit/layouts/PageContainer/PageContainer";
+import { TabsContainer } from "#modules/ui-kit/layouts/TabsContainer/TabsContainer";
 import { useUser } from "#modules/core/auth/useUser";
 import { MenuItemData } from "#modules/ui-kit/menus/Sidebar";
+import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
 import styles from "./Page.module.css";
 import { SearchBar } from "./search/SearchBar";
 
@@ -46,7 +47,9 @@ export default function MusicLayout( { children }: Props) {
 
   return <TabsContainer data={data} before={before} className={styles.tabs}>
     <PageContainer>
-      {children}
+      <PageContent>
+        {children}
+      </PageContent>
     </PageContainer>
   </TabsContainer>;
 }

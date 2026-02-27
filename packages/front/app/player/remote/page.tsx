@@ -10,8 +10,9 @@ import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 import { useUser } from "#modules/core/auth/useUser";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
-import { PageContainer } from "app/PageContainer";
+import { PageContainer } from "#modules/ui-kit/layouts/PageContainer/PageContainer";
 import { EmptyList } from "#modules/history/EmptyList/EmptyList";
+import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
 import { RemotePlayerEntry } from "./RemotePlayerEntry";
 import { sseRemotePlayers } from "./sse";
 import styles from "./styles.module.css";
@@ -143,14 +144,16 @@ export default function RemotePlayerSelector() {
 
   return (
     <PageContainer>
-      <h1>Reproductores</h1>
+      <PageContent>
+        <h1>Reproductores</h1>
 
-      <section className={styles.list}>
-        {isLoading && <ContentSpinner />}
-        {!isLoading && remotePlayers.length === 0
+        <section className={styles.list}>
+          {isLoading && <ContentSpinner />}
+          {!isLoading && remotePlayers.length === 0
         && <EmptyList label="No se ha detectado ningún reproductor remoto."/>}
-        {remotePlayers.map(r=>(<RemotePlayerEntry key={r.id} value={r}/>))}
-      </section>
+          {remotePlayers.map(r=>(<RemotePlayerEntry key={r.id} value={r}/>))}
+        </section>
+      </PageContent>
     </PageContainer>
   );
 }

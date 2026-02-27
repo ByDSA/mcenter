@@ -29,4 +29,12 @@ export const tasksRoutes = {
   kill: {
     withParams: (id: string) => `${TASKS}/${id}/kill`,
   },
+  frontend: {
+    taskManager: {
+      path: "/admin/tasks/task-manager",
+    },
+    doTasks: {
+      path: "/admin/tasks/do-tasks",
+    },
+  },
 };

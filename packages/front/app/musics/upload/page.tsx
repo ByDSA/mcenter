@@ -81,7 +81,6 @@ export default function Upload() {
 
   return (
     <MusicLayout>
-      <h2>Subir músicas</h2>
       <div className={styles.uploaders}>
         <DaInputGroup className={styles.group}>
           <DaLabel>Desde YouTube</DaLabel>

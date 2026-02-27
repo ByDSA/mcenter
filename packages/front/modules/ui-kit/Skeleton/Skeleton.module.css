@@ -1,0 +1,15 @@
+@keyframes pulse {
+  0%, 100% { opacity: 0.33; }
+  50%       { opacity: 0.15; }
+}
+
+.skeleton {
+  display: inline-block;
+  background-color: var(--color-text);
+  opacity: 0.33;
+  border-radius: var(--sk-radius, 0.5rem);
+  height: 1rem;
+  min-width: 40px;
+
+  animation: pulse 1.6s ease-in-out infinite;
+}

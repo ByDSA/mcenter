@@ -105,6 +105,7 @@ export const episodesRoutes = {
       path: "/series/lists",
       withParams: ( { serieId }: { serieId: string } ) => `/series/lists/${serieId}`,
       episode: {
+        path: "/series/episodes",
         withParams: ( { episodeId, autoplay, token }: {
           episodeId: string;
           autoplay?: boolean;

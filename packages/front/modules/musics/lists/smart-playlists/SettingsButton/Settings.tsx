@@ -32,7 +32,12 @@ export const MusicSmartPlaylistSettingsButton = (props: Props) => {
         <ShareSmartPlaylistContextMenuItem />
         {isMobile() && <InstallContextMenuItem
           name={data.name}
-          path={`${PATH_ROUTES.musics.frontend.smartPlaylists.withParams(data.id)}?autoplay=1`}
+          path={`${PATH_ROUTES.musics.frontend.smartPlaylists.withParams(
+            {
+              id: data.id,
+              autoplay: true,
+            },
+          )}`}
         />}
         {isUserOwner
           && <DeleteSmartPlaylistContextMenuItem

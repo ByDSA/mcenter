@@ -5,6 +5,7 @@ import { PaginationContainer } from "#modules/ui-kit/Pagination/Pagination";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { ResourceFullPage } from "#modules/resources/FullPage/FullPage/FullPage";
 import { useLocalData } from "#modules/utils/local-data-context";
+import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
 import { useSeries } from "../hooks";
 import { SeriesHeader } from "./Header";
 import { EpisodesList } from "./Seasons/List";
@@ -47,67 +48,69 @@ export const SeriesFullPageCurrentCtx = ( { seriesId,
 
   // Componente personalizado para los botones de temporada
   return (
-    <ResourceFullPage>
-      <SeriesHeader
-        seriesId={seriesId}
-        updateEpisodesBySeason={updateEpisodesBySeason}
-      />
+    <PageContent>
+      <ResourceFullPage>
+        <SeriesHeader
+          seriesId={seriesId}
+          updateEpisodesBySeason={updateEpisodesBySeason}
+        />
 
-      <div className={styles.content}>
-        <h2 className={styles.seasonTitle}>Temporada {currentSeason}</h2>
+        <div className={styles.content}>
+          <h2 className={styles.seasonTitle}>Temporada {currentSeason}</h2>
 
-        {
-          seasonsEntries.length > 0
+          {
+            seasonsEntries.length > 0
             // eslint-disable-next-line multiline-ternary
-            ? (
-              <PaginationContainer
-                customValues={seasonNames}
-                initialPageIndex={currentSeason ? seasonNames.indexOf(currentSeason) : null}
-                position="top"
-                showPageInfo={false}
-                showNavigationButtons={false}
-                onChange={(details) => {
-                  const seasonName = details.pageValue.toString();
+              ? (
+                <PaginationContainer
+                  customValues={seasonNames}
+                  initialPageIndex={currentSeason ? seasonNames.indexOf(currentSeason) : null}
+                  position="top"
+                  showPageInfo={false}
+                  showNavigationButtons={false}
+                  onChange={(details) => {
+                    const seasonName = details.pageValue.toString();
 
-                  router.push(`?${new URLSearchParams( {
-                    ...Object.fromEntries(searchParams),
-                    season: seasonName,
-                  } ).toString()}`);
-                  setCurrentSeason(seasonName);
-                }}
-              >
-                {currentSeason !== null && <AsyncLoader
-                  // Usamos key para forzar recarga cuando cambia la temporada
-                  key={currentSeason}
-                  // eslint-disable-next-line require-await
-                  action={async () => episodesBySeason[currentSeason]}
-                  onSuccess={(data) => setEpisodes(data)}
+                    router.push(`?${new URLSearchParams( {
+                      ...Object.fromEntries(searchParams),
+                      season: seasonName,
+                    } ).toString()}`);
+                    setCurrentSeason(seasonName);
+                  }}
                 >
-                  <p className={styles.seasonEpisodesCount}>
-                    {countGroupEpisodes(episodes)} episodios
-                  </p>
-                  <EpisodesList
-                    episodes={episodes}
-                    seriesId={seriesId}
-                    onDelete={async (episode)=> {
-                      setEpisodes(old => {
-                        if (!old)
-                          return old;
+                  {currentSeason !== null && <AsyncLoader
+                  // Usamos key para forzar recarga cuando cambia la temporada
+                    key={currentSeason}
+                    // eslint-disable-next-line require-await
+                    action={async () => episodesBySeason[currentSeason]}
+                    onSuccess={(data) => setEpisodes(data)}
+                  >
+                    <p className={styles.seasonEpisodesCount}>
+                      {countGroupEpisodes(episodes)} episodios
+                    </p>
+                    <EpisodesList
+                      episodes={episodes}
+                      seriesId={seriesId}
+                      onDelete={async (episode)=> {
+                        setEpisodes(old => {
+                          if (!old)
+                            return old;
 
-                        return old.filter(e=>e.id !== episode.id);
-                      } );
+                          return old.filter(e=>e.id !== episode.id);
+                        } );
 
-                      await useSeries.fetch(seriesId);
-                    }}
-                  />
-                </AsyncLoader>}
+                        await useSeries.fetch(seriesId);
+                      }}
+                    />
+                  </AsyncLoader>}
 
-              </PaginationContainer>
-            ) : (
-              <p>No se encontraron temporadas.</p>
-            )}
-      </div>
-    </ResourceFullPage>
+                </PaginationContainer>
+              ) : (
+                <p>No se encontraron temporadas.</p>
+              )}
+        </div>
+      </ResourceFullPage>
+    </PageContent>
   );
 };
 

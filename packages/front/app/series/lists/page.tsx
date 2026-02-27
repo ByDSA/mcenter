@@ -11,6 +11,7 @@ import { SeriesList } from "#modules/episodes/series/List/List";
 import { PaginationContainer } from "#modules/ui-kit/Pagination/Pagination";
 import { SMALL_BREAKPOINT } from "#modules/player/browser/MediaPlayer/Bottom/breakpoints";
 import { useWindowWidth } from "#modules/player/browser/MediaPlayer/Bottom/useWindowWidth";
+import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
 import { NewSeriesButton } from "../../../modules/episodes/series/New/Button";
 import styles from "./styles.module.css";
 
@@ -64,7 +65,7 @@ export default function SeriesPage() {
     } );
   };
 
-  return (<>
+  return (<PageContent>
     <header className={styles.header}>
       <NewSeriesButton onSuccess={async (newValue) => {
         const res = await fetch(page);
@@ -115,6 +116,6 @@ export default function SeriesPage() {
         </ArrayDataProvider>
       </AsyncLoader>
     </PaginationContainer>
-  </>
+  </PageContent>
   );
 }

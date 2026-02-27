@@ -14,10 +14,10 @@
   }
 }
 
-main:has(> .page) {
+.page {
   display: flex;
-  flex-flow: column nowrap;
+  flex-grow: 1;
+  height: 100%;
   align-items: center;
   justify-content: center;
-  min-height: inherit;
 }

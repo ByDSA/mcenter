@@ -12,6 +12,7 @@ import { useCrudData } from "#modules/fetching";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { TasksApi } from "#modules/tasks/requests";
+import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
 
 const QUEUE_NAME = "mcenter-tasks-main";
 const N = 10;
@@ -104,8 +105,7 @@ export default function Page() {
   }, []);
 
   return (
-    <>
-      <h2>Task Manager</h2>
+    <PageContent>
       {isLoading && <ContentSpinner />}
       {sortedTaskStatuses && sortedTaskStatuses.map(t=> {
         return <Task key={t.id} value={t} />;
@@ -113,6 +113,6 @@ export default function Page() {
       {
         sortedTaskStatuses && sortedTaskStatuses.length === 0 && <p>No tasks found.</p>
       }
-    </>
+    </PageContent>
   );
 }

@@ -7,7 +7,7 @@ type AsyncElementProps<T> = Omit<Props<T>, "autoStart" | "initialStatus"> & {
 };
 export const AsyncLoader = <T, >( { children, loadingElement, ...props }: AsyncElementProps<T>) => {
   const { statusElement, status } = useAsyncAction( {
-    loadingElement: loadingElement ?? <ContentSpinner size={4}/>,
+    loadingElement: loadingElement ?? <ContentSpinner size={6}/>,
     ...props,
     autoStart: true,
   } );

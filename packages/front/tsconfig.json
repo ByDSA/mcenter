@@ -13,6 +13,7 @@
     "paths": {
       "#modules/*": ["modules/*"],
       "#musics/*": ["modules/musics/*"],
+      "#episodes/*": ["modules/episodes/*"],
       "#styles/*": ["styles/*"],
       "#uikit/*": ["modules/ui-kit/*"],
       "$shared/*": ["../shared/src/*"]

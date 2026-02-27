@@ -1,0 +1,42 @@
+.content {
+  padding: 1rem;
+  width: 100%;
+  flex-grow: 1; /* height 100% */
+
+  display: flex;
+  flex-flow: column nowrap;
+
+  @media (width < 500px) {
+    padding: 1rem 0.25rem;
+  }
+
+  &.hasBreadcrumbs {
+    padding-top: 0;
+  }
+}
+
+:global(.mcenter-media-player-open) .content {
+  padding-bottom: var(--media-player-height);
+}
+
+.content h1,
+.content h2,
+.content h3 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.content h1 {
+  font-size: 2rem;
+}
+
+.content h2 {
+  font-size: 1.75rem;
+}
+
+.content h3 {
+  font-size: 1.5rem;
+}

@@ -11,6 +11,7 @@ import { streamTaskStatus } from "#modules/tasks";
 import { TaskJsonViewer, useResponsiveCollapseLength } from "#modules/tasks/TaskJsonViewer";
 import { logger } from "#modules/core/logger";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
 
 type Action = {
   path: string;
@@ -100,7 +101,7 @@ export default function Page() {
   const collapseStringsAfterLength = useResponsiveCollapseLength();
 
   return (
-    <>
+    <PageContent>
       <ul>
         {ACTIONS.map((action: Action) => (
           <li key={action.path}><DaAnchor
@@ -154,7 +155,7 @@ export default function Page() {
         collapseStringsAfterLength={collapseStringsAfterLength}
         value={text}
       />
-    </>
+    </PageContent>
   );
 }
 
