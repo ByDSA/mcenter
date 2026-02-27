@@ -1,20 +1,26 @@
-import { execSync } from "node:child_process";
 import { Logger, Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { DateTime } from "luxon";
 import schedule from "node-schedule";
-import { IndexSyncService } from "#modules/search/indexes/sync-all.service";
-import { MeilisearchModule } from "#modules/search/module";
+import { IndexSyncService } from "#modules/search/admin/sync-indexes/sync-all.service";
 import { showError } from "#core/logging/show-error";
+import { TasksModule } from "#core/tasks";
+import { UpdateYtDlpTaskHandler } from "#modules/youtube/admin/update-yt-dlp/task.handler";
+import { SyncMeilisearchIndexesTaskHandler } from "#modules/search/admin/sync-indexes/task.handler";
+import { SyncMeilisearchIndexesModule } from "#modules/search/admin/sync-indexes/module";
+import { UpdateYtDlpModule } from "#modules/youtube/admin/update-yt-dlp/module";
 import { dynamicLoadScriptFromEnvVar } from "../../dynamic-load";
 
 @Module( {
-  imports: [MeilisearchModule],
+  imports: [TasksModule, SyncMeilisearchIndexesModule, UpdateYtDlpModule],
+  providers: [],
 } )
 export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SchedulerModule.name);
 
   constructor(
     private readonly indexSyncService: IndexSyncService,
+    private readonly updateYtDlpHandler: UpdateYtDlpTaskHandler,
+    private readonly syncMeilisearchIndexesHandler: SyncMeilisearchIndexesTaskHandler,
   ) { }
 
   onModuleInit() {
@@ -36,9 +42,9 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
 
     // 5 AM
     schedule.scheduleJob("0 5 * * *", async () => {
-      await this.syncAllMeiliseachIndexes();
+      await this.syncMeilisearchIndexesHandler.addTask(undefined);
 
-      await this.updateYtDlp();
+      await this.updateYtDlpHandler.addTask(undefined);
     } );
 
     this.onInit()
@@ -57,13 +63,6 @@ export class SchedulerModule implements OnModuleInit, OnModuleDestroy {
     this.logger.log("Sync Meilisearch data ...");
 
     await this.indexSyncService.syncAll();
-  }
-
-  // eslint-disable-next-line require-await
-  private async updateYtDlp() {
-    this.logger.log("Updating yt-dlp ...");
-
-    execSync("sudo yt-dlp -U");
   }
 
   onModuleDestroy() {

@@ -3,14 +3,12 @@ import { MeiliSearch } from "meilisearch";
 import { MeilisearchService } from "./meilisearch.service";
 import { MusicsIndexService } from "./indexes/musics.service";
 import { MusicsSearchService } from "./search-services/musics.search.service";
-import { IndexSyncService } from "./indexes/sync-all.service";
 
 @Module( {
   providers: [
     MeilisearchService,
     MusicsIndexService,
     MusicsSearchService,
-    IndexSyncService,
     {
       provide: MeiliSearch,
       useFactory: (): MeiliSearch => {
@@ -21,6 +19,6 @@ import { IndexSyncService } from "./indexes/sync-all.service";
       },
     },
   ],
-  exports: [MeilisearchService, MusicsSearchService, IndexSyncService],
+  exports: [MeilisearchService, MusicsSearchService, MusicsIndexService],
 } )
 export class MeilisearchModule {}

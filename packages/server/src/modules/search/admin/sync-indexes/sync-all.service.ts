@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { MusicsIndexService } from "./musics.service";
+import { MusicsIndexService } from "../../indexes/musics.service";
 
 @Injectable()
 export class IndexSyncService {
@@ -10,6 +10,8 @@ export class IndexSyncService {
   }
 
   async syncAll() {
-    await this.musics.syncAll();
+    return {
+      musics: await this.musics.syncAll(),
+    };
   }
 }

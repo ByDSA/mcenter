@@ -300,6 +300,10 @@ export class MusicsIndexService {
     } );
 
     this.logger.log(`Sincronizados ${total} documentos`);
+
+    return {
+      total,
+    };
   }
 
   async addOne(doc: Doc): Promise<void> {
