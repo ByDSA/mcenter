@@ -11,7 +11,7 @@ export default async function LoginLayout( { children }: {
       {await NotLoggedLayout( {
         children: (
           <PageContainer className={styles.container}>
-            <PageContent>
+            <PageContent noBreadcrumbs>
               {children}
             </PageContent>
           </PageContainer>

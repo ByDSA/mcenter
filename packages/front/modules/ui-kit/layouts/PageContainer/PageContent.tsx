@@ -1,8 +1,7 @@
 import { ReactNode } from "react";
-import { usePathname } from "next/navigation";
 import { classes } from "#modules/utils/styles";
-import { Breadcrumbs } from "#modules/ui-kit/Breadcrumbs/Breadcrumbs";
 import styles from "./PageContent.module.css";
+import { PageContentBreadcrumbs } from "./PageContentBreadcrumbs";
 
 type Props = {
   children: ReactNode;
@@ -10,11 +9,9 @@ type Props = {
 };
 
 export function PageContent( { children, noBreadcrumbs = false }: Props) {
-  const pathname = usePathname();
-
   return (
     <main className={classes(styles.content, !noBreadcrumbs && styles.hasBreadcrumbs)}>
-      {!noBreadcrumbs && <Breadcrumbs pathname={pathname} />}
+      {!noBreadcrumbs && <PageContentBreadcrumbs />}
       {children}
     </main>
   );
