@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, ReactNode, useRef, useCallback } from "react";
 import { classes } from "#modules/utils/styles";
+import { Skeleton } from "../Skeleton/Skeleton";
 import styles from "./Pagination.module.css";
 import { PaginationButtonProps,
   DefaultPageButton } from "./PaginationComponents";
@@ -32,6 +33,7 @@ type BasePaginationProps = {
     currentPageIndex: number;
     currentValue: number | string;
   } )=> ReactNode);
+  isLoading?: boolean;
 };
 
 /**
@@ -69,6 +71,7 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
     className,
     isDisabled = false,
     showPageInfo = true,
+    isLoading = false,
     showNavigationButtons = true, // Por defecto se muestran
     onChange } = props;
   // Refs para ResizeObserver
@@ -167,15 +170,19 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
 
   // Asegurar que si cambian las props y el índice queda fuera, se resetee
   useEffect(() => {
-    if (currentIndex === null)
-      return;
+    setCurrentIndex(prev => {
+      if (prev === null)
+        return prev;
 
-    if (currentIndex < minIndex)
-      setCurrentIndex(minIndex);
+      if (prev < minIndex)
+        return minIndex;
 
-    if (currentIndex > maxIndex)
-      setCurrentIndex(maxIndex);
-  }, [maxIndex, minIndex, currentIndex]);
+      if (prev > maxIndex)
+        return maxIndex;
+
+      return prev;
+    } );
+  }, [maxIndex, minIndex]);
 
   // Helper para obtener el valor a mostrar basado en un índice
   const getValueForIndex = (idx: number): number | string => {
@@ -294,8 +301,8 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
       setIsChanging(false);
     }
   };
-  const renderPaginationNav = () => (
-    <nav ref={navRef} className={styles.nav} aria-label="Page navigation">
+  const renderPaginationNav = () => {
+    return <nav ref={navRef} className={styles.nav} aria-label="Page navigation">
       {/* Botón Previous - solo si showNavigationButtons es true */}
       {showNavigationButtons && (
         <DefaultPageButton
@@ -308,7 +315,9 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
         />
       )}
 
-      {paginationRange.map((item, index) => {
+      {isLoading && <Skeleton width={"60%"} height={32}/>}
+
+      {!isLoading && paginationRange.map((item, index) => {
         if (item === "...") {
           return (
             <span key={`dots-${index}`} className={styles.ellipsis}>
@@ -348,8 +357,8 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
           onClick={() => handlePageChange(currentIndex! + 1)}
         />
       )}
-    </nav>
-  );
+    </nav>;
+  };
   const currentValue = currentIndex === null ? null : getValueForIndex(currentIndex);
   const totalCount = maxIndex - minIndex + 1;
 
@@ -367,9 +376,9 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
       </div>
 
       {(position === "bottom" || position === "both") && (
-        <div className={styles.footerContainer}>
+        <>
           {renderPaginationNav()}
-          {showPageInfo && (
+          {showPageInfo && !isLoading && (
             <div className={styles.pageInfo}>
               {isCustomMode
                 ? (
@@ -384,7 +393,7 @@ export const PaginationContainer = (props: PaginationContainerProps) => {
                 )}
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );
