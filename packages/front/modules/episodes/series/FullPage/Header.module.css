@@ -1,0 +1,5 @@
+.seasonsEpisodes {
+  gap: 0.25rem;
+  display: flex;
+  flex-flow: column nowrap;
+}

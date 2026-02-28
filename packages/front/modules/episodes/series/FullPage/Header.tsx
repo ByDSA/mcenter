@@ -9,6 +9,7 @@ import { HeaderList } from "#modules/resources/FullPage/HeaderList";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { SeriesSettingsButton } from "../SettingsButton/SettingsButton";
 import { useSeries } from "../hooks";
+import styles from "./Header.module.css";
 
 type Props = Pick<SeriesFullPageProps, "updateEpisodesBySeason"> & {
   seriesId: string;
@@ -24,10 +25,12 @@ export const SeriesHeader = ( { seriesId,
     return <ContentSpinner />;
 
   const infoItems = [
-    <span key="seasons">{series.metadata?.countSeasons ?? "-"} {series.metadata?.countSeasons === 1
-      ? "temporada"
-      : "temporadas"}</span>,
-    <span key="episodes">{series.metadata?.countEpisodes ?? "-"} episodios</span>,
+    <span key="seasons-episodes" className={styles.seasonsEpisodes}>
+      <span>{series.metadata?.countSeasons
+        ?? "-"} {series.metadata?.countSeasons === 1
+        ? "temporada"
+        : "temporadas"}</span>
+      <span>{series.metadata?.countEpisodes ?? "-"} episodios</span></span>,
     <DateTag key="date" date={series.addedAt} />,
   ];
 

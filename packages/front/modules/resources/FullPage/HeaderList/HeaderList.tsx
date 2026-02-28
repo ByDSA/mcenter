@@ -44,19 +44,16 @@ export const HeaderList = ( { title,
             disabled={playDisabled}
           />
         )}
-        {settings}
 
-        {/* Info next to controls */}
-        {info && info.length > 0 && (
-          <div className={styles.listInfo}>
-            {info.map((item, index) => (
-              <Fragment key={index}>
-                {index > 0 && <Separator />}
-                {item}
-              </Fragment>
-            ))}
-          </div>
-        )}
+        <div className={styles.listInfo}>
+          {settings}
+          {info?.map((item, index) => (
+            <Fragment key={index}>
+              {index > 0 && <Separator />}
+              {item}
+            </Fragment>
+          ))}
+        </div>
       </div>
     </header>
   );

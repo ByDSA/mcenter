@@ -43,12 +43,16 @@
 }
 
 .listInfo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.8);
   flex-wrap: wrap;
+
+  & >*:first-child {
+    margin-right: 2rem;
+  }
 }
 
 @media (width <= 768px) {

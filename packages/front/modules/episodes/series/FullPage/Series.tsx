@@ -56,13 +56,14 @@ export const SeriesFullPageCurrentCtx = ( { seriesId,
         />
 
         <div className={styles.content}>
-          <h2 className={styles.seasonTitle}>Temporada {currentSeason}</h2>
+          <h2 className={styles.seasonTitle}>Temporadas</h2>
 
           {
             seasonsEntries.length > 0
             // eslint-disable-next-line multiline-ternary
               ? (
                 <PaginationContainer
+                  isLoading={!episodesBySeason}
                   customValues={seasonNames}
                   initialPageIndex={currentSeason ? seasonNames.indexOf(currentSeason) : null}
                   position="top"
@@ -70,12 +71,18 @@ export const SeriesFullPageCurrentCtx = ( { seriesId,
                   showNavigationButtons={false}
                   onChange={(details) => {
                     const seasonName = details.pageValue.toString();
+                    const savedScroll = window.scrollY; // Para evitar que haga scroll en mobile
 
                     router.push(`?${new URLSearchParams( {
                       ...Object.fromEntries(searchParams),
                       season: seasonName,
-                    } ).toString()}`);
+                    } ).toString()}`, {
+                      scroll: false,
+                    } );
                     setCurrentSeason(seasonName);
+                    requestAnimationFrame(() => {
+                      window.scrollTo(0, savedScroll);
+                    } );
                   }}
                 >
                   {currentSeason !== null && <AsyncLoader

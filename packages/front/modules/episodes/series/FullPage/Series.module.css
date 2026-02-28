@@ -7,10 +7,11 @@
 }
 
 .seasonTitle {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
+  margin-top: 1rem !important;
+  margin-bottom: 0rem !important;
+  font-size: 1.3rem !important;
   font-weight: bold;
+  color: var(--color-title)
 }
 
 .seasonEpisodesCount {
