@@ -19,8 +19,6 @@
       background: inherit;
     }
 
-    user-select: none;
-
     svg {
       width: var(--height);
       height: var(--height);

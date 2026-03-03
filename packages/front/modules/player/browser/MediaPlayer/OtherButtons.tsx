@@ -1,10 +1,6 @@
-import { VolumeOff, VolumeDown, VolumeUp } from "@mui/icons-material";
-import { useEffect, useState, useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { classes } from "#modules/utils/styles";
-import { BackwardButtonView, CloseButtonView, ControlButtonView, ForwardButtonView, NextButtonView, PrevButtonView, RepeatButtonView, ShuffleButtonView } from "#modules/player/common/ControlButtonsView";
+import { BackwardButtonView, CloseButtonView, ForwardButtonView, NextButtonView, PrevButtonView, RepeatButtonView, ShuffleButtonView } from "#modules/player/common/ControlButtonsView";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
-import styles from "./OtherButtons.module.css";
 
 export const RepeatButton = () => {
   const { cycleRepeatMode, repeatMode } = useBrowserPlayer(useShallow(s => ( {
@@ -41,84 +37,6 @@ export const ShuffleButton = () => {
         setNextResource(null);
       }}
     />
-  );
-};
-
-export const VolumeController = () => {
-  const { volume, setVolume, audioElement } = useBrowserPlayer(
-    useShallow(s => ( {
-      volume: s.volume,
-      setVolume: s.setVolume,
-      audioElement: s.audioElement,
-    }
-    )),
-  );
-
-  useEffect(()=> {
-    updateAudioTagVolume(volume);
-  }, [audioElement]);
-  const [prevVolume, setPrevVolume] = useState(1);
-  const updateAudioTagVolume = useCallback((val: number) => {
-    if (audioElement) {
-      audioElement.volume = val;
-      audioElement.muted = val === 0;
-    }
-  }, [audioElement]);
-  const handleVolumeChange = (newVol: number) => {
-    setVolume(newVol);
-    updateAudioTagVolume(newVol);
-  };
-  const toggleMute = (e) => {
-    e.stopPropagation();
-
-    if (volume === 0)
-      handleVolumeChange(prevVolume || 1);
-    else {
-      setPrevVolume(volume);
-      handleVolumeChange(0);
-    }
-  };
-
-  useEffect(()=> {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target !== document.body)
-        return;
-
-      if (e.code === "KeyM")
-        toggleMute(e);
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return ()=> {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [toggleMute]);
-
-  // eslint-disable-next-line no-nested-ternary
-  const volumeIcon = volume === 0 ? <VolumeOff /> : volume < 0.5 ? <VolumeDown /> : <VolumeUp />;
-
-  return (
-    <div className={styles.volumeContainer}>
-      <div className={styles.volumeSliderContainer}>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={volume}
-          onMouseDown={e=> {
-            e.preventDefault();
-          }}
-          onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-          className={styles.volumeRange}
-        />
-      </div>
-      <ControlButtonView onClick={toggleMute} className={classes(volume === 0
-        && styles.inactive)}>
-        {volumeIcon}
-      </ControlButtonView>
-    </div>
   );
 };
 

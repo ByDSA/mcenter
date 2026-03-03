@@ -1,7 +1,6 @@
 import { KeyboardArrowDown } from "@mui/icons-material";
 import { ReactNode } from "react";
 import { classes } from "#modules/utils/styles";
-import buttonStyles from "../../OtherButtons.module.css";
 import styles from "./Window.module.css";
 
 type Props = {
@@ -32,7 +31,7 @@ export const PlayerWindowView = ( { close, className, state, children }: Props) 
         <footer>
           <button
             onClick={close}
-            className={classes(buttonStyles.controlButton, styles.closeButton)}
+            className={classes(styles.closeButton)}
           >
             <KeyboardArrowDown />
           </button>
