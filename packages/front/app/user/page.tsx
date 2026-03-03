@@ -11,9 +11,11 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicPlaylistsApi } from "#modules/musics/lists/playlists/requests";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { InlineSpinner } from "#modules/ui-kit/Spinner/Spinner";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 
 export default function UserPage() {
   const { user } = useUser();
+  const { LL } = useI18nContext();
 
   assertIsDefined(user);
 
@@ -40,20 +42,20 @@ export default function UserPage() {
       return res.data ?? null;
     }}
   >
-    {favPlaylist?.name ?? "<Ninguna>"}
+    {favPlaylist?.name ?? LL.core.user.profile.favoritePlaylist.none()}
   </AsyncLoader>;
 
   return (
     <div>
-      <h1>Profile</h1>
-      <p>Public Name: {user.publicName}</p>
-      <p>Email: {user.email}</p>
-      <p>First name: {user.firstName}</p>
-      <p>Last name: {user.lastName}</p>
-      <p>Roles: {user.roles.map(r=>r.name).join(", ")}</p>
+      <h1>{LL.core.user.profile.title()}</h1>
+      <p>{LL.core.user.profile.publicName()}: {user.publicName}</p>
+      <p>{LL.uikit.forms.labels.email()}: {user.email}</p>
+      <p>{LL.core.user.profile.firstName()}: {user.firstName}</p>
+      <p>{LL.core.user.profile.lastName()}: {user.lastName}</p>
+      <p>{LL.core.user.profile.roles()}: {user.roles.map(r=>r.name).join(", ")}</p>
 
-      <h3>Música</h3>
-      <p>Playlist favorita: {element}</p>
+      <h3>{LL.main.menu.music()}</h3>
+      <p>{LL.core.user.profile.favoritePlaylist.favoritePlaylist()}: {element}</p>
       <div>
         <DaButton onClick={async ()=>await openModal( {
           onSelect: async (playlist) => {
@@ -63,7 +65,7 @@ export default function UserPage() {
 
             setFavPlaylist(playlist);
           },
-        } )}>Cambiar</DaButton>
+        } )}>{LL.uikit.actions.change()}</DaButton>
       </div>
     </div>);
 }

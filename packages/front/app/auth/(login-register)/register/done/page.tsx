@@ -7,6 +7,8 @@ import { backendUrl } from "#modules/requests";
 import { logger } from "#modules/core/logger";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import { classes } from "#modules/utils/styles";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
+import { interpolateJSX } from "#modules/core/i18n/utils";
 import styles from "./styles.module.css";
 
 export default function RegisterDonePage() {
@@ -14,6 +16,7 @@ export default function RegisterDonePage() {
   const email = searchParams.get("email") ?? "";
   const resendUrl = backendUrl(PATH_ROUTES.auth.local.emailVerification.resend.path);
   const [isDisabled, setIsDisabled] = useState(false);
+  const { LL } = useI18nContext();
   const handleResend = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
@@ -30,10 +33,10 @@ export default function RegisterDonePage() {
     } );
 
     if (!res.ok) {
-      logger.error("Error en el reenvío");
+      logger.error(LL.core.auth.register.emailVerification.errorResending());
       setIsDisabled(false);
     } else {
-      logger.info("Enviado email de verificación");
+      logger.info(LL.core.auth.register.emailVerification.resent());
       setTimeout(() => {
         setIsDisabled(false);
       }, 30000);
@@ -44,20 +47,26 @@ export default function RegisterDonePage() {
     <div className={styles.container}>
       <p className={styles.title}>¡Registro completado con éxito!</p>
       <p>
-        Te hemos enviado un correo a {" "}
-        <span className={styles.strong}>{email}</span>{" "}
-        para verificar tu cuenta. Si en unos minutos no lo recibes, haz clic{" "}
-        <DaAnchor
-          href={resendUrl}
-          onClick={!isDisabled ? handleResend : undefined}
-          title={isDisabled ? "Desactivado temporalmente" : undefined}
-          className={classes(isDisabled && styles.disabled)}
-        >
-          aquí
-        </DaAnchor>{" "}
-        para reenviarlo.
+        {
+          interpolateJSX(
+            LL.core.auth.register.emailVerification.sentEmail(),
+            {
+              email: <span className={styles.strong}>{email}</span>,
+              link: <DaAnchor
+                href={resendUrl}
+                onClick={!isDisabled ? handleResend : undefined}
+                title={isDisabled
+                  ? LL.core.auth.register.emailVerification.disabledTitle()
+                  : undefined}
+                className={classes(isDisabled && styles.disabled)}
+              >
+                {LL.core.auth.register.emailVerification.linkText()}
+              </DaAnchor>,
+            },
+          )
+        }
       </p>
-      <p>Puedes cerrar esta página cuando quieras.</p>
+      <p>{LL.core.auth.register.emailVerification.subMessage()}</p>
     </div>
   );
 }

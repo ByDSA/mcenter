@@ -12,6 +12,7 @@ import { TaskJsonViewer, useResponsiveCollapseLength } from "#modules/tasks/Task
 import { logger } from "#modules/core/logger";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
 import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 
 type Action = {
   path: string;
@@ -25,80 +26,81 @@ type Action = {
   }
 );
 const ACTION_LOG_NAME = "Get logs";
-const ACTIONS: Action[] = [
-  {
-    path: PATH_ROUTES.imageCovers.path + "/admin/rebuild-all",
-    name: "Image Covers: rebuild all",
-    type: "task",
-    taskName: tasksImageCovers.rebuildAll.name,
-  },
-  {
-    path: PATH_ROUTES.episodes.admin.updateLastTimePlayed.path,
-    name: "Episodes: updateLastTimePlayed",
-    type: "task",
-    taskName: tasksEpisodes.cache.updateLastTimePlayed.name,
-  },
-  {
-    path: PATH_ROUTES.episodes.admin.fileInfoUpdateSaved.path,
-    name: "Episodes: update file-info saved",
-    type: "task",
-    taskName: tasksEpisodes.updateFileInfoSaved.name,
-  },
-  {
-    path: PATH_ROUTES.episodes.admin.addNewFiles.path,
-    name: "Episodes: add new files",
-    type: "task",
-    taskName: tasksEpisodes.sync.name,
-  },
-  {
-    path: PATH_ROUTES.streams.fixer.path,
-    name: "Streams: fixer (ensure all series have default stream)",
-    type: "action",
-  },
-  {
-    path: PATH_ROUTES.musics.admin.fixInfo.path,
-    name: "Musics: fix info (title, artist...)",
-    type: "action",
-  },
-  {
-    path: PATH_ROUTES.musics.admin.searchDuplicates.path,
-    name: "Musics: search duplicates",
-    type: "action",
-  },
-  {
-    path: PATH_ROUTES.musics.admin.updateRemote.path,
-    name: "Musics: update remote tree (FileInfo DB + Local files)",
-    type: "task",
-    taskName: tasksMusics.sync.name,
-  },
-  {
-    path: PATH_ROUTES.musics.admin.updateFileInfos.path,
-    name: "Musics: update file infos",
-    type: "task",
-    taskName: tasksMusics.updateFileInfos.name,
-  },
-  {
-    path: PATH_ROUTES.musics.admin.fileInfoUpdateOffloaded.path,
-    name: "Musics: update file infos offloaded",
-    type: "task",
-    taskName: tasksMusics.fileInfosUpdateOffloaded.name,
-  },
-  {
-    path: PATH_ROUTES.episodes.admin.fileInfoUpdateOffloaded.path,
-    name: "Episodes: update file infos offloaded",
-    type: "task",
-    taskName: tasksEpisodes.fileInfoUpdateOffloaded.name,
-  },
-  {
-    path: PATH_ROUTES.logs.path,
-    name: ACTION_LOG_NAME,
-    type: "action",
-  },
-];
 
 export default function Page() {
   const [text, setText] = useState<object>( {} );
   const collapseStringsAfterLength = useResponsiveCollapseLength();
+  const { LL } = useI18nContext();
+  const ACTIONS: Action[] = [
+    {
+      path: PATH_ROUTES.imageCovers.path + "/admin/rebuild-all",
+      name: LL.admin.tasks.imageCoversRebuildAll(),
+      type: "task",
+      taskName: tasksImageCovers.rebuildAll.name,
+    },
+    {
+      path: PATH_ROUTES.episodes.admin.updateLastTimePlayed.path,
+      name: LL.admin.tasks.episodes.updateLastTimePlayed(),
+      type: "task",
+      taskName: tasksEpisodes.cache.updateLastTimePlayed.name,
+    },
+    {
+      path: PATH_ROUTES.episodes.admin.fileInfoUpdateSaved.path,
+      name: LL.admin.tasks.episodes.fileInfoUpdateSaved(),
+      type: "task",
+      taskName: tasksEpisodes.updateFileInfoSaved.name,
+    },
+    {
+      path: PATH_ROUTES.episodes.admin.addNewFiles.path,
+      name: "Episodes: add new files",
+      type: "task",
+      taskName: tasksEpisodes.sync.name,
+    },
+    {
+      path: PATH_ROUTES.streams.fixer.path,
+      name: "Streams: fixer (ensure all series have default stream)",
+      type: "action",
+    },
+    {
+      path: PATH_ROUTES.musics.admin.fixInfo.path,
+      name: "Musics: fix info (title, artist...)",
+      type: "action",
+    },
+    {
+      path: PATH_ROUTES.musics.admin.searchDuplicates.path,
+      name: LL.admin.tasks.musics.searchDuplicates(),
+      type: "action",
+    },
+    {
+      path: PATH_ROUTES.musics.admin.updateRemote.path,
+      name: "Musics: update remote tree (FileInfo DB + Local files)",
+      type: "task",
+      taskName: tasksMusics.sync.name,
+    },
+    {
+      path: PATH_ROUTES.musics.admin.updateFileInfos.path,
+      name: LL.admin.tasks.musics.updateFileInfos(),
+      type: "task",
+      taskName: tasksMusics.updateFileInfos.name,
+    },
+    {
+      path: PATH_ROUTES.musics.admin.fileInfoUpdateOffloaded.path,
+      name: LL.admin.tasks.musics.updateFileInfosOffloaded(),
+      type: "task",
+      taskName: tasksMusics.fileInfosUpdateOffloaded.name,
+    },
+    {
+      path: PATH_ROUTES.episodes.admin.fileInfoUpdateOffloaded.path,
+      name: LL.admin.tasks.musics.updateFileInfosOffloaded(),
+      type: "task",
+      taskName: tasksEpisodes.fileInfoUpdateOffloaded.name,
+    },
+    {
+      path: PATH_ROUTES.logs.path,
+      name: ACTION_LOG_NAME,
+      type: "action",
+    },
+  ];
 
   return (
     <PageContent>

@@ -6,18 +6,20 @@ import { assertIsDefined } from "$shared/utils/validation";
 import { backendUrl } from "#modules/requests";
 import { usePageAsyncAction } from "#modules/utils/usePageAsyncAction";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 
 export default function RegisterVerifyPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
+  const { LL } = useI18nContext();
   const { statusElement: element } = usePageAsyncAction( {
     autoStart: !!token,
-    loadingElement: <p>Verificando token ...</p>,
-    errorElement: <><p>Error: Token caducado o incorrecto.</p>
+    loadingElement: <p>{LL.core.auth.register.token.verifying()}</p>,
+    errorElement: <><p>{LL.core.auth.register.token.error()}</p>
       {email && <p>
-        <DaAnchor href={email}>Volver a solicitar token</DaAnchor>
+        <DaAnchor href={email}>{LL.core.auth.register.token.requestAgain()}</DaAnchor>
       </p>
       }</>,
     action: async () => {

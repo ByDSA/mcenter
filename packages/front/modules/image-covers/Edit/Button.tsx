@@ -1,5 +1,6 @@
 import { Edit } from "@mui/icons-material";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { classes } from "#modules/utils/styles";
 import { ImageCoverEntity } from "../models";
 import styles from "./Button.module.css";
@@ -12,6 +13,7 @@ type EditProps = Pick<ImageCoverEditorProps, "onUpdate"> & {
 };
 
 export function ImageCoverEditButton(props: EditProps) {
+  const { LL } = useI18nContext();
   const { openModal } = useImageCoverEditorModal(props);
 
   return (
@@ -21,7 +23,7 @@ export function ImageCoverEditButton(props: EditProps) {
         e.stopPropagation(); // Evitar triggers padres si los hay
         await openModal();
       }}
-      title="Editar Cover"
+      title={LL.modules.imageCover.edit()}
     >
       <Edit />
     </DaButton>

@@ -5,6 +5,7 @@ import { DaInputGroup, DaInputGroupItem } from "#modules/ui-kit/form/InputGroup"
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { OpenConfirmModalProps, useConfirmModal } from "#modules/ui-kit/modal/ConfirmModal/useConfirmModal";
 import { useLocalData } from "#modules/utils/local-data-context";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { SeriesApi } from "../requests";
 import { SeriesEntity } from "../models";
 
@@ -15,6 +16,7 @@ type Props = Pick<OpenConfirmModalProps, "onFinish"> & {
 export function useDeleteSeriesModal(
   { onFinish, onActionSuccess }: Props,
 ): ReturnType<typeof useConfirmModal> {
+  const { LL } = useI18nContext();
   const { openModal, ...modal } = useConfirmModal();
   const { data } = useLocalData<SeriesEntity>();
 
@@ -24,17 +26,17 @@ export function useDeleteSeriesModal(
       assertIsDefined(data);
 
       return openModal( {
-        title: "Confirmar borrado",
+        title: LL.uikit.modals.confirmDelete(),
         content: (
           <>
-            <p>¿Estás seguro de que deseas eliminar esta serie?</p>
+            <p>{LL.modules.episodes.series.edit.confirmDelete()}</p>
             <DaInputGroup >
               <DaInputGroupItem inline>
-                <DaLabel>Nombre</DaLabel>
+                <DaLabel>{LL.modules.episodes.series.labels.name()}</DaLabel>
                 <span>{data.name}</span>
               </DaInputGroupItem>
               <DaInputGroupItem inline>
-                <DaLabel>Key</DaLabel>
+                <DaLabel>{LL.modules.resources.labels.slug()}</DaLabel>
                 <span>{data.key}</span>
               </DaInputGroupItem>
             </DaInputGroup>

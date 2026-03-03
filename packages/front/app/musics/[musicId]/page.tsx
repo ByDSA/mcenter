@@ -5,6 +5,7 @@ import { backendUrl } from "#modules/requests";
 import { redirectIfMediaPlayer } from "#modules/utils/redirect-media-player";
 import { fetchMusicForMetadata } from "#modules/utils/server-metadata-fetch";
 import { getMediumCoverUrl } from "#modules/image-covers/Selector/image-cover-utils";
+import { i18nServerContext } from "#modules/core/i18n/server-locale";
 import { ClientPage } from "./ClientPage";
 
 export type Params = {
@@ -21,7 +22,16 @@ const DEFAULT_OG_IMAGE = "/og/music.png";
 export async function generateMetadata( { params }: PageProps): Promise<Metadata> {
   const { musicId } = await params;
   const music = await fetchMusicForMetadata(musicId);
-  const title: string = music?.title ?? "Música no encontrada";
+  let title: string;
+
+  if (music)
+    title = music.title;
+  else {
+    const { LL } = await i18nServerContext();
+
+    title = LL.modules.musics.search.oneNotFound();
+  }
+
   const description: string = music
     ? `${music.artist}${music.album ? " · " + music.album : ""}${music.year
       ? " · "

@@ -6,6 +6,8 @@ import z from "zod";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
+import { phraseCase } from "#modules/core/i18n/utils";
 import styles from "../styles.module.css";
 import { LoginRegisterForm } from "../Form";
 import { CallValidationFn, createFormInputText, ValidateFn } from "../FormInputText";
@@ -19,12 +21,13 @@ type Props = {
 
 export const RegisterComponent = ( { handleRegister, handleGotoLogin, className }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { LL } = useI18nContext();
   const { element: usernameElement,
     value: username,
     isValid: usernameIsValid } = createFormInputText( {
     elementProps: {
       icon: <Person />,
-      placeholder: "Nombre de usuario",
+      placeholder: LL.core.auth.register.username(),
       required: true,
     },
   } );
@@ -34,7 +37,7 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
     elementProps: {
       icon: <Email />,
       type: "email",
-      placeholder: "Email",
+      placeholder: phraseCase(LL.core.auth.register.email()),
       required: true,
     },
     validation: {
@@ -44,7 +47,7 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
         const errors: string[] = [];
 
         if (!success)
-          errors.push("Invalid email format.");
+          errors.push(LL.uikit.forms.errors.invalidEmail());
 
         return await {
           success,
@@ -61,7 +64,7 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
     elementProps: {
       icon: <Email />,
       type: "email",
-      placeholder: "Repetir Email",
+      placeholder: LL.core.auth.register.repeatEmail(),
       required: true,
     },
     validation: {
@@ -81,7 +84,7 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
   const { element: passwordRepeatElement,
     isValid: passwordRepeatIsValid } = createFormInputPassword( {
     elementProps: {
-      placeholder: "Repetir contraseña",
+      placeholder: LL.core.auth.register.repeatPassword(),
       required: true,
     },
     validation: {
@@ -92,7 +95,7 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
     value: firstName,
     isValid: firstNameIsValid } = createFormInputText( {
     elementProps: {
-      placeholder: "Nombre",
+      placeholder: LL.core.auth.register.name(),
       required: false,
     },
   } );
@@ -100,7 +103,7 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
     value: lastName,
     isValid: lastNameIsValid } = createFormInputText( {
     elementProps: {
-      placeholder: "Apellidos",
+      placeholder: LL.core.auth.register.lastname(),
       required: false,
     },
   } );
@@ -123,8 +126,8 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
     && passwordIsValid && passwordRepeatIsValid;
 
   return <LoginRegisterForm
-    title="Regístrate"
-    subtitle="Crea una nueva cuenta"
+    title={LL.core.auth.register.youDoRegister()}
+    subtitle={LL.core.auth.register.subtitle()}
     className={className}
   >
     <div className={classes(styles.inputGroup)}>
@@ -143,20 +146,20 @@ export const RegisterComponent = ( { handleRegister, handleGotoLogin, className 
         {isLoading
           ? (
             <>
-                Creando cuenta...
+              {LL.core.auth.register.doingRegister()}
             </>
           )
           : (
             <>
-                Crear cuenta
+              {LL.core.auth.register.doRegister()}
             </>
           )}
       </DaButton>
     </div>
     {handleGotoLogin
     && <div className={styles.signupPrompt}>
-          ¿Ya tienes cuenta? <DaAnchor onClick={()=>handleGotoLogin()}
-        className={styles.signupLink}>Accede</DaAnchor>.
+      {LL.core.auth.register.doLoginAside()} <DaAnchor onClick={()=>handleGotoLogin()}
+        className={styles.signupLink}>{LL.core.auth.login.youDoLogin()}</DaAnchor>.
     </div>
     }
   </LoginRegisterForm>;
@@ -194,14 +197,14 @@ function useRepeatValidation<T>( { updatedValue }: UseRepeatValidationProps<T>) 
     } )
       .catch(showError);
   }, [updatedValue]);
-
+  const { LL } = useI18nContext();
   const validate = (async (txt: string, ctx: any) => {
     const p = ctx?.updatedValue ?? updatedValue;
     const success = txt === p;
     const errors: string[] = [];
 
     if (!success)
-      errors.push("Fields should match.");
+      errors.push(LL.uikit.forms.errors.matchFields());
 
     return await {
       success,

@@ -7,7 +7,7 @@ import { MusicNote, DragHandle } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { SetState } from "#modules/utils/react";
 import listItemStyles from "#modules/resources/ListItem/ListItem.module.css";
-import { EmptyList, EmptyListTopIconWrap } from "#modules/history/EmptyList/EmptyList";
+import { EmptyList, EmptyListTopIconWrap } from "#modules/resources/EmptyList/EmptyList";
 import { MusicPlaylistEntity } from "../../models";
 import styles from "./List.module.css";
 import { SortablePlaylistItem } from "./SortableListItem";

@@ -179,6 +179,9 @@ importers:
       socket.io-client:
         specifier: 4.7.2
         version: 4.7.2
+      typesafe-i18n:
+        specifier: ^5.27.1
+        version: 5.27.1(typescript@5.8.3)
       winston:
         specifier: 3.18.3
         version: 3.18.3
@@ -328,7 +331,7 @@ importers:
         specifier: 7.0.6
         version: 7.0.6
       passport-custom:
-        specifier: ^1.1.1
+        specifier: 1.1.1
         version: 1.1.1
       passport-google-oauth20:
         specifier: 2.0.0
@@ -8410,6 +8413,12 @@ packages:
 
   typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
+
+  typesafe-i18n@5.27.1:
+    resolution: {integrity: sha512-749uWo2ZXETT//kWjVYPm8QPYR8xLh8G0wLfoAyCAtAmysX67uCaAyLjAjAWojL6fuJpE5B6yIjwvO9orXzUPg==}
+    hasBin: true
+    peerDependencies:
+      typescript: '>=3.5.1'
 
   typescript-eslint@8.37.0:
     resolution: {integrity: sha512-TnbEjzkE9EmcO0Q2zM+GE8NQLItNAJpMmED1BdgoBMYNdqMhzlbqfdSwiRlAzEK2pA9UzVW0gzaaIzXWg2BjfA==}
@@ -18966,6 +18975,10 @@ snapshots:
       reflect.getprototypeof: 1.0.10
 
   typedarray@0.0.6: {}
+
+  typesafe-i18n@5.27.1(typescript@5.8.3):
+    dependencies:
+      typescript: 5.8.3
 
   typescript-eslint@8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3):
     dependencies:

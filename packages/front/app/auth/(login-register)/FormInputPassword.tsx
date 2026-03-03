@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Visibility, VisibilityOff, Lock } from "@mui/icons-material";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { createFormInputText, FormInputText, useFormInputText } from "./FormInputText";
 
 const useFormInputPassword = (props: Parameters<typeof useFormInputText>[0]) => {
@@ -19,6 +20,7 @@ export const createFormInputPassword = (props: CreateProps): CreateRet => {
   const { value, showPassword, setShowPassword,
     isValid, handleInputChange,
     callValidation, errors } = useFormInputPassword(props);
+  const { LL } = useI18nContext();
 
   return {
     element: FormInputText( {
@@ -28,7 +30,7 @@ export const createFormInputPassword = (props: CreateProps): CreateRet => {
       >
         {showPassword ? <VisibilityOff /> : <Visibility />}
       </span>,
-      placeholder: "Contraseña",
+      placeholder: LL.core.auth.register.password(),
       ...props.elementProps,
       onChange: async (e)=>{
         await handleInputChange(e);

@@ -3,12 +3,14 @@
 import { PATH_ROUTES } from "$shared/routing";
 import { TabsContainer } from "#modules/ui-kit/layouts/TabsContainer/TabsContainer";
 import { MenuItemData } from "#modules/ui-kit/menus/Sidebar";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 
 export function AdminSectionTabs( { children }: { children: React.ReactNode } ) {
+  const { LL } = useI18nContext();
   const data = [
     {
       path: PATH_ROUTES.tasks.frontend.doTasks.path,
-      label: "Do tasks",
+      label: LL.admin.tasks.tabs.doTasks(),
       matchPath: {
         customMatch: (p) => {
           return p === PATH_ROUTES.tasks.frontend.doTasks.path;
@@ -17,7 +19,7 @@ export function AdminSectionTabs( { children }: { children: React.ReactNode } ) 
     },
     {
       path: PATH_ROUTES.tasks.frontend.taskManager.path,
-      label: "Task Manager",
+      label: LL.admin.tasks.tabs.taskManager(),
     },
   ] satisfies MenuItemData[];
 

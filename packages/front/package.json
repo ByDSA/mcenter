@@ -4,9 +4,11 @@
     "build": "bin/build.sh",
     "dev": "next dev --webpack",
     "lint": "bin/lint.mjs",
-    "start": "[ -e .env ] && set -a && . ./.env; next start"
+    "start": "[ -e .env ] && set -a && . ./.env; next start",
+    "typesafe-i18n": "typesafe-i18n"
   },
   "dependencies": {
+    "$shared": "workspace:../shared/build",
     "@dnd-kit/core": "6.3.1",
     "@dnd-kit/modifiers": "9.0.0",
     "@dnd-kit/sortable": "10.0.0",
@@ -21,7 +23,6 @@
     "@tanstack/react-query": "5.90.10",
     "@tanstack/react-virtual": "3.13.13",
     "@textea/json-viewer": "4.0.1",
-    "$shared": "workspace:../shared/build",
     "async-mutex": "0.5.0",
     "just-clone": "6.2.0",
     "just-diff": "6.0.2",
@@ -32,17 +33,18 @@
     "react-hook-form": "7.71.1",
     "react-toastify": "11.0.5",
     "socket.io-client": "4.7.2",
+    "typesafe-i18n": "5.27.1",
     "winston": "3.18.3",
     "winston-transport": "4.9.0",
     "zod": "3.25.74",
     "zustand": "5.0.9"
   },
   "devDependencies": {
+    "$sharedSrc": "workspace:../shared/src",
     "@next/eslint-plugin-next": "13.5.4",
     "@svgr/webpack": "8.1.0",
     "@types/node": "24.10.1",
     "@types/react": "19.2.7",
-    "$sharedSrc": "workspace:../shared/src",
     "baseline-browser-mapping": "2.9.18"
   },
   "engines": {

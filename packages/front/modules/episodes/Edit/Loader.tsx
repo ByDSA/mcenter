@@ -5,6 +5,7 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { EpisodesApi } from "#modules/episodes/requests";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { EditEpisodeForm } from "./Form";
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export function EditEpisodeLoader( { initialData, onSuccess }: Props) {
+  const { LL } = useI18nContext();
   const { closeModal } = useModal(true);
   const fetchData = useCallback(async () => {
     const api = FetchApi.get(EpisodesApi);
@@ -32,7 +34,7 @@ export function EditEpisodeLoader( { initialData, onSuccess }: Props) {
 
   return (
     <AsyncLoader
-      errorElement={<div>Error al cargar el episodio</div>}
+      errorElement={<div>{LL.modules.episodes.edit.loadError()}</div>}
       action={fetchData}
       onSuccess={d=>setLoadedData(d)}
     >

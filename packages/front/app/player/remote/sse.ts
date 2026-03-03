@@ -1,5 +1,6 @@
 import { DisconnectionResponse, disconnectionResponseSchema, FromRemotePlayerEvent, InitialConnectionsResponse, initialConnectionsResponseSchema, NewConnectionResponse, newConnectionResponseSchema, OpenClosedResponse, openClosedResponseSchema } from "$shared/models/player";
 import { logger } from "#modules/core/logger";
+import { i18nObject } from "#modules/core/i18n/i18n-util";
 
 type Props = {
   url: string;
@@ -9,6 +10,7 @@ type Props = {
   onOpenClosed: (openClosedResponse: OpenClosedResponse)=> Promise<void>;
   onErrorConnecting: ()=> Promise<void>;
   onUnauthorized: ()=> Promise<void>;
+  LL: ReturnType<typeof i18nObject>;
 };
 
 export function sseRemotePlayers( { url,
@@ -17,7 +19,7 @@ export function sseRemotePlayers( { url,
   onErrorConnecting,
   onOpenClosed,
   onUnauthorized,
-  onInitial }: Props) {
+  onInitial, LL }: Props) {
   const eventSource = new EventSource(url, {
     withCredentials: true,
   } );
@@ -38,7 +40,7 @@ export function sseRemotePlayers( { url,
       else if (parsedData.type === FromRemotePlayerEvent.OPEN_CLOSED)
         await onOpenClosed(openClosedResponseSchema.parse(parsedData.data));
     } catch (error) {
-      logger.error("Error parsing SSE data:", error);
+      logger.error(LL.modules.player.remote.errorSse() + ":", error);
     }
   };
 

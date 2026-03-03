@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { Skeleton } from "../Skeleton/Skeleton";
 import { BreadcrumbItem, BreadcrumbsView } from "./BreadcrumbsView/Breadcrumbs";
 import { resolveBreadcrumbs } from "./orchestator";
@@ -16,10 +17,14 @@ interface BreadcrumbsProps {
 
 export function Breadcrumbs( { pathname, className }: BreadcrumbsProps) {
   const [items, setItems] = useState<BreadcrumbItem[] | null>(null);
+  const { LL } = useI18nContext();
 
   useEffect(()=> {
     const fn = async () => {
-      const got = await resolveBreadcrumbs(pathname);
+      const got = await resolveBreadcrumbs( {
+        pathname,
+        LL,
+      } );
 
       setItems(got);
     };

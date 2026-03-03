@@ -1,7 +1,9 @@
 import { WithOptional } from "$shared/utils/objects/types";
 import { formatDate } from "#modules/utils/dates";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
+import { phraseCase } from "#modules/core/i18n/utils";
 
-function dayTitleInner(date: Date) {
+function dayTitleInner(date: Date, LL: ReturnType<typeof useI18nContext>["LL"]) {
   const today = new Date();
   const yesterday = new Date(today);
 
@@ -10,9 +12,9 @@ function dayTitleInner(date: Date) {
   let text: string;
 
   if (datesAreSameDay(date, today))
-    text = "Hoy";
+    text = phraseCase(LL.common.dates.today());
   else if (datesAreSameDay(date, yesterday))
-    text = "Ayer";
+    text = phraseCase(LL.common.dates.yesterday());
   else {
     text = formatDate(date, {
       ago: "no",
@@ -47,7 +49,9 @@ function shouldShowDate(
 
 export function dayTitle(
   { currentDateTimestamp,
-    previousDateTimestamp }: WithOptional<ShouldShowDateProps, "previousDateTimestamp">,
+    previousDateTimestamp, LL }: WithOptional<ShouldShowDateProps, "previousDateTimestamp"> & {
+      LL: ReturnType<typeof useI18nContext>["LL"];
+    },
 ) {
   const entryDate = previousDateTimestamp === undefined
     ? new Date(currentDateTimestamp * 1_000)
@@ -59,5 +63,5 @@ export function dayTitle(
   if (!entryDate)
     return null;
 
-  return dayTitleInner(entryDate);
+  return dayTitleInner(entryDate, LL);
 }

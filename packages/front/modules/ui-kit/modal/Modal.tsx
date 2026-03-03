@@ -3,6 +3,7 @@
 import { useEffect, useRef, ReactNode, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { classes } from "#modules/utils/styles";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import styles from "./Modal.module.css";
 
 type Refs = {
@@ -38,6 +39,7 @@ export function Modal( { isOpen,
   const backdropRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const targetStartClick = useRef<HTMLDivElement>(null);
+  const { LL } = useI18nContext();
 
   useEffect(() => {
     if (onRefs) {
@@ -156,8 +158,8 @@ export function Modal( { isOpen,
               <button
                 className={styles.closeButton}
                 onClick={()=>onClose()}
-                title="Cerrar"
-                aria-label="Cerrar"
+                title={LL.uikit.actions.close()}
+                aria-label={LL.uikit.actions.close()}
               >
             ×
               </button>

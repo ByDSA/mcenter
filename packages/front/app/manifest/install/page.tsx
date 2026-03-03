@@ -6,6 +6,7 @@ import { showError } from "$shared/utils/errors/showError";
 import { logger } from "#modules/core/logger";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { useRequireActiveAction } from "#modules/utils/autoplay/useRequireActiveAction/useRequireActiveAction";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import styles from "./styles.module.css";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -34,6 +35,7 @@ function InstallPageContent() {
   const returnPath = searchParams.get("returnPath");
   const [loaded, setLoaded] = useState(false);
   const [activePrompt, setActivePrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const { LL } = useI18nContext();
   const handleBack = useCallback(() => {
     if (returnPath)
       router.back();
@@ -49,7 +51,7 @@ function InstallPageContent() {
     const promptToUse = activePrompt || globalDeferredPrompt;
 
     if (!promptToUse) {
-      logger.error("Intento de instalación sin evento capturado");
+      logger.error(LL.main.pwa.errorNoEvent());
       handleBack();
 
       return;
@@ -61,7 +63,7 @@ function InstallPageContent() {
       const { outcome } = await promptToUse.userChoice;
 
       if (outcome === "accepted") {
-        logger.info("App instalada con éxito");
+        logger.info(LL.main.pwa.installed());
         globalDeferredPrompt = null;
         setActivePrompt(null);
       }
@@ -72,7 +74,7 @@ function InstallPageContent() {
   }, [activePrompt, handleBack]);
   const { action: triggerRequireActive } = useRequireActiveAction( {
     button: {
-      content: "Instalar App",
+      content: LL.main.pwa.installApp(),
       props: {
         className: styles.button,
       },
@@ -113,7 +115,7 @@ function InstallPageContent() {
   if (!loaded)
     return <div className={styles.content}><ContentSpinner /></div>;
 
-  return <div className={styles.url}><p>La dirección de la App será:</p><p>{startUrl}</p></div>;
+  return <div className={styles.url}><p>{LL.main.pwa.appAddressWillBe()}:</p><p>{startUrl}</p></div>;
 }
 
 export default function Page() {
@@ -134,7 +136,7 @@ function useStartUrl() {
 
         setStartUrl(manifest.start_url || "/");
       } catch (error) {
-        logger.error("Error al cargar manifest:", error);
+        logger.error("Error loading manifest:", error);
         setStartUrl("/");
       }
     };

@@ -1,32 +1,38 @@
 import { RemotePlayerDtos } from "$shared/models/player/remote-player/dto/domain";
 import { useRouter } from "next/navigation";
 import { classes } from "#modules/utils/styles";
+import { i18nObject } from "#modules/core/i18n/i18n-util";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import styles from "./RemotePlayerEntry.module.css";
 
 type Props = {
   value: RemotePlayerDtos.Front.Dto;
 };
 
-const getStatusInfo = (status: RemotePlayerDtos.Front.Dto["status"]) => {
+type GetStatusInfoProps = {
+  LL: ReturnType<typeof i18nObject>;
+  status: RemotePlayerDtos.Front.Dto["status"];
+};
+const getStatusInfo = ( { LL, status }: GetStatusInfoProps) => {
   switch (status) {
     case "offline":
       return {
-        label: "Offline",
+        label: LL.modules.player.remote.status.offline(),
         className: styles.offline,
       };
     case "closed":
       return {
-        label: "Closed",
+        label: LL.modules.player.remote.status.closed(),
         className: styles.idle,
       };
     case "open":
       return {
-        label: "Open",
+        label: LL.modules.player.remote.status.open(),
         className: styles.playing,
       };
     default:
       return {
-        label: "Desconocido",
+        label: LL.modules.player.remote.status.unknown(),
         className: styles.unknown,
       };
   }
@@ -34,7 +40,11 @@ const getStatusInfo = (status: RemotePlayerDtos.Front.Dto["status"]) => {
 
 export const RemotePlayerEntry = ( { value }: Props) => {
   const router = useRouter();
-  const statusInfo = getStatusInfo(value.status);
+  const { LL } = useI18nContext();
+  const statusInfo = getStatusInfo( {
+    status: value.status,
+    LL,
+  } );
 
   return (
     <button

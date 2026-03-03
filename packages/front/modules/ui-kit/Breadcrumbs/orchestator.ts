@@ -1,3 +1,4 @@
+import { i18nObject } from "#modules/core/i18n/i18n-util";
 import { BreadcrumbItem } from "./BreadcrumbsView/Breadcrumbs";
 import { registry } from "./registry";
 
@@ -46,23 +47,27 @@ function buildSegments(pathname: string): string[] {
  * the page's error boundary.
  */
 export async function resolveBreadcrumbs(
-  pathname: string,
+  { LL, pathname }: {pathname: string;
+LL: ReturnType<typeof i18nObject>;},
 ): Promise<BreadcrumbItem[]> {
   const segments = buildSegments(pathname);
   const result: BreadcrumbItem[] = [];
-
-  console.log(registry);
 
   for (const segment of [...segments].reverse()) {
     const entry = registry.find((e) => e.matcher( {
       pathname,
       segment,
+      LL,
     } ));
 
     if (!entry)
       continue;
 
-    const { items, stopChain } = await entry.handler({pathname, segment});
+    const { items, stopChain } = await entry.handler( {
+      pathname,
+      segment,
+      LL,
+    } );
 
     result.unshift(...items);
 

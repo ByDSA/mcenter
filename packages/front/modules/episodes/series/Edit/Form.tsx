@@ -1,6 +1,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
+import { useMemo } from "react";
 import { SeriesEntity } from "$shared/models/episodes/series";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { SeriesApi } from "#modules/episodes/series/requests";
@@ -15,15 +16,9 @@ import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { DaForm } from "#modules/ui-kit/form/Form";
 import { DaInputErrorWrap } from "#modules/ui-kit/form/InputErrorWrap";
 import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
-import { newSerieSchema } from "../New/Form";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
+import { genNewSeriesSchema } from "../New/Form";
 import { SeriesCrudDtos } from "../models/dto";
-
-const schema = newSerieSchema.extend( {
-  key: z.string().trim()
-    .min(1, "El slug es obligatorio"),
-} );
-
-type FormData = z.infer<typeof schema>;
 
 type Props = {
   initialData: SeriesEntity;
@@ -31,6 +26,14 @@ type Props = {
 };
 
 export const EditSeriesForm = ( { initialData, onSuccess }: Props) => {
+  const { LL } = useI18nContext();
+  const schema = useMemo(() => genNewSeriesSchema(LL).extend( {
+    key: z.string().trim()
+      .min(1, LL.uikit.forms.errors.requiredField()),
+  } ), [LL]);
+
+  type FormData = z.infer<typeof schema>;
+
   const { register,
     handleSubmit,
     control,
@@ -90,14 +93,14 @@ export const EditSeriesForm = ( { initialData, onSuccess }: Props) => {
   return (
     <DaForm onSubmit={handleSubmit(onSubmit)} isDirty={isDirty} isValid={isValid}>
       <DaInputGroup>
-        <DaLabel>Nombre</DaLabel>
+        <DaLabel>{LL.uikit.forms.labels.name()}</DaLabel>
         <DaInputErrorWrap>
           <DaInputText {...register("name")} autoFocus />
           <DaErrorView errors={errors} keyName="name" touchedFields={dirtyFields} />
         </DaInputErrorWrap>
       </DaInputGroup>
       <DaInputGroup>
-        <DaLabel>Slug (Key)</DaLabel>
+        <DaLabel>{LL.modules.episodes.labels.key()}</DaLabel>
         <DaInputErrorWrap>
           <DaInputText {...register("key")} />
           <DaErrorView errors={errors} keyName="key" touchedFields={dirtyFields} />
@@ -105,7 +108,7 @@ export const EditSeriesForm = ( { initialData, onSuccess }: Props) => {
       </DaInputGroup>
 
       <DaInputGroup>
-        <DaLabel>Imagen</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.image()}</DaLabel>
         <Controller
           control={control}
           name="imageCoverId"
@@ -121,7 +124,7 @@ export const EditSeriesForm = ( { initialData, onSuccess }: Props) => {
 
       <DaFooterButtons>
         <DaCloseModalButton />
-        <DaSaveButton>Guardar</DaSaveButton>
+        <DaSaveButton>{LL.uikit.actions.save()}</DaSaveButton>
       </DaFooterButtons>
     </DaForm>
   );

@@ -5,6 +5,7 @@ import { backendUrl } from "#modules/requests";
 import { redirectIfMediaPlayer } from "#modules/utils/redirect-media-player";
 import { fetchPlaylistForMetadata } from "#modules/utils/server-metadata-fetch";
 import { getMediumCoverUrl } from "#modules/image-covers/Selector/image-cover-utils";
+import { i18nServerContext } from "#modules/core/i18n/server-locale";
 import { ClientPage } from "./ClientPage";
 
 export type Params = {
@@ -20,13 +21,16 @@ interface PageProps {
 const DEFAULT_OG_IMAGE = "/og/music.png";
 
 export async function generateMetadata( { params }: PageProps): Promise<Metadata> {
+  const { LL } = await i18nServerContext();
   const { playlistId } = await params;
   const playlist = await fetchPlaylistForMetadata( {
     id: playlistId,
   } );
-  const title: string = playlist?.name ?? "Playlist no encontrada";
+  const title: string = playlist?.name ?? LL.modules.musics.lists.playlists.oneNotFound();
   const songCount: number = playlist?.list?.length ?? 0;
-  const description = `${songCount} ${songCount === 1 ? "canción" : "canciones"}`;
+  const description = LL.modules.musics.count( {
+    count: songCount,
+  } );
   const imageUrl: string = playlist?.imageCover
     ? getMediumCoverUrl(playlist.imageCover)
     : DEFAULT_OG_IMAGE;

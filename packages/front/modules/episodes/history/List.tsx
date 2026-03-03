@@ -7,6 +7,7 @@ import { INITIAL_FETCHING_LENGTH } from "#modules/history/lists";
 import { ResourceList } from "#modules/resources/List/ResourceList";
 import { dayTitle } from "#modules/history/utils";
 import { EmptyHistory } from "#modules/history/EmptyHistory";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { EpisodeHistoryEntryElement } from "./ListItem/HistoryEntry";
 import { EpisodeHistoryApi } from "./requests";
 import { EpisodeHistoryEntryCrudDtos } from "./models/dto";
@@ -17,6 +18,7 @@ type ArrayData = Data[];
 export function HistoryList() {
   const { data, isLoading, error,
     setItem, observerTarget } = useHistoryList();
+  const { LL } = useI18nContext();
 
   return renderFetchedData<ArrayData | null>( {
     data,
@@ -40,6 +42,7 @@ export function HistoryList() {
                   previousDateTimestamp: i > 0
                     ? dateToTimestampInSeconds(array[i - 1].date)
                     : undefined,
+                  LL,
                 } )}
                 <EpisodeHistoryEntryElement
                   episodeId={entry.resourceId}

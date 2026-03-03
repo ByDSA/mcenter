@@ -4,6 +4,7 @@ import { PATH_ROUTES } from "$shared/routing";
 import { useContextMenuTrigger, contextMenuStyles, AnchorContextMenuItem } from "#modules/ui-kit/ContextMenu";
 import { classes } from "#modules/utils/styles";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import styles from "./Avatar.module.css";
 import { UserPayload } from "./models";
 import { isAdmin } from "./utils";
@@ -13,23 +14,24 @@ type Props = {
 };
 export function UserAvatarButton( { user }: Props) {
   const { openMenu } = useContextMenuTrigger();
+  const { LL } = useI18nContext();
   const content = (<>
     <AnchorContextMenuItem
-      label="Mi perfil"
+      label={LL.core.user.profile.menuLabel()}
       href={PATH_ROUTES.auth.frontend.userPage.path}
     />
     <AnchorContextMenuItem
-      label="Ajustes"
+      label={LL.core.user.settings.menuLabel()}
       href={""}
       disabled
     />
     {isAdmin(user) && <AnchorContextMenuItem
-      label="Admin"
+      label={LL.admin.menuLabel()}
       href={PATH_ROUTES.tasks.frontend.doTasks.path}
     />}
     <div className={contextMenuStyles.divider} />
     <DaAnchor theme="text" href={PATH_ROUTES.auth.frontend.logout.path}>
-        Cerrar sesión
+      {LL.core.auth.logout.tab()}
     </DaAnchor>
   </>
   );
@@ -47,7 +49,7 @@ export function UserAvatarButton( { user }: Props) {
       <button
         onClick={handleClick}
         className={classes(styles.userAvatarButton, isOpen && styles.open)}
-        aria-label="Menú de usuario"
+        aria-label={LL.core.user.menuAriaLabel()}
         aria-expanded={isOpen}
       >
         <svg

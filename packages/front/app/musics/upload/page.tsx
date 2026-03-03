@@ -16,7 +16,8 @@ import { ResourceList } from "#modules/resources/List/ResourceList";
 import { useMusic } from "#modules/musics/hooks";
 import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
-import { EmptyList, EmptyListTopIconWrap } from "#modules/history/EmptyList/EmptyList";
+import { EmptyList, EmptyListTopIconWrap } from "#modules/resources/EmptyList/EmptyList";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 
@@ -78,16 +79,17 @@ export default function Upload() {
       injectDefaultUserInfo(music, user.id)]));
     useMusic.updateCacheWithMerging(music.id, music);
   };
+  const { LL } = useI18nContext();
 
   return (
     <MusicLayout>
       <div className={styles.uploaders}>
         <DaInputGroup className={styles.group}>
-          <DaLabel>Desde YouTube</DaLabel>
+          <DaLabel>{LL.modules.musics.upload.fromYoutube()}</DaLabel>
           <YouTubeUpload
             withCredentials
             onCreateMusic={onCreateMusic}/>
-          <DaLabel>Desde local</DaLabel>
+          <DaLabel>{LL.modules.musics.upload.fromLocal()}</DaLabel>
           <FileUpload
             acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
             multiple={true}
@@ -95,11 +97,11 @@ export default function Upload() {
           />
         </DaInputGroup>
         <hr/>
-        <DaLabel>Músicas subidas</DaLabel>
+        <DaLabel>{LL.modules.musics.upload.sectionTitle()}</DaLabel>
         <ResourceList>
           {uploaded.length === 0 && <EmptyList
             top={<EmptyListTopIconWrap><MusicNote /></EmptyListTopIconWrap>}
-            label="No has subido músicas todavía."/>
+            label={LL.modules.musics.upload.noneUploaded()} />
           }
           {
           uploaded!.map(

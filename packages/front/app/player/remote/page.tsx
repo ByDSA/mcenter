@@ -11,8 +11,10 @@ import { logger } from "#modules/core/logger";
 import { useUser } from "#modules/core/auth/useUser";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { PageContainer } from "#modules/ui-kit/layouts/PageContainer/PageContainer";
-import { EmptyList } from "#modules/history/EmptyList/EmptyList";
+import { EmptyList } from "#modules/resources/EmptyList/EmptyList";
 import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
+import { phraseCase } from "#modules/core/i18n/utils";
 import { RemotePlayerEntry } from "./RemotePlayerEntry";
 import { sseRemotePlayers } from "./sse";
 import styles from "./styles.module.css";
@@ -46,10 +48,12 @@ const useRemotePlayers = (props?: Props) => {
       return newObj;
     } );
   }, []);
+  const { LL } = useI18nContext();
 
   useEffect(()=> {
     return sseRemotePlayers( {
       url: backendUrl(PATH_ROUTES.player.remotePlayers.stream.path),
+      LL,
       onInitial: async (data)=> {
         setIsLoading(false);
         const obj: typeof remotePlayers = {};
@@ -98,10 +102,11 @@ const useRemotePlayers = (props?: Props) => {
 export default function RemotePlayerSelector() {
   const router = useRouter();
   const { user } = useUser();
+  const { LL } = useI18nContext();
   const { remotePlayers, isLoading } = useRemotePlayers( {
     onUnauthorized: async ()=> {
       if (user) {
-        logger.error("Unauthorized");
+        logger.error(LL.core.errors.unauthorized.unauthorized());
         router.push("/");
       } else
         router.push("/auth/login");
@@ -145,12 +150,12 @@ export default function RemotePlayerSelector() {
   return (
     <PageContainer>
       <PageContent>
-        <h1>Reproductores</h1>
+        <h1>{phraseCase(LL.modules.player.remote.title())}</h1>
 
         <section className={styles.list}>
           {isLoading && <ContentSpinner />}
           {!isLoading && remotePlayers.length === 0
-        && <EmptyList label="No se ha detectado ningún reproductor remoto."/>}
+        && <EmptyList label={LL.modules.player.remote.noPlayers()} />}
           {remotePlayers.map(r=>(<RemotePlayerEntry key={r.id} value={r}/>))}
         </section>
       </PageContent>

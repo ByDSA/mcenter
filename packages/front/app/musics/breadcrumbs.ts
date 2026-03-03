@@ -4,11 +4,11 @@ import { BreadcrumbRegistryEntry, GetBreadcrumb } from "#modules/ui-kit/Breadcru
 export const musicRootBreadcrumbsEntry: BreadcrumbRegistryEntry = {
   matcher: ( { segment } )=> segment === PATH_ROUTES.musics.frontend.path,
   // eslint-disable-next-line require-await
-  handler: async () => {
+  handler: async ( { LL } ) => {
     return {
       items: [
         {
-          label: "Música",
+          label: LL.main.menu.music(),
           href: PATH_ROUTES.musics.frontend.path,
         },
       ],

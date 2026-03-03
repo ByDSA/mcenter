@@ -20,6 +20,10 @@ import { TopbarMainClient } from "#modules/ui-kit/menus/TopbarClient";
 import { GlobalQueryClientProvider } from "#modules/fetching/QueryClientProvider";
 import { Favicon } from "#modules/utils/Favicon/Favicon";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { Locales, TranslationFunctions } from "#modules/core/i18n/i18n-types";
+import { I18nProvider } from "#modules/core/i18n/I18nProvider";
+import { loadAllLocales } from "#modules/core/i18n/i18n-util.sync";
+import { i18nServerContext } from "#modules/core/i18n/server-locale";
 import styles from "./layout.module.css";
 import { LoginButton } from "./LoginButton";
 import { NavigationWatcher } from "./NavigationWatcher";
@@ -29,10 +33,17 @@ import { ManifestManager } from "./manifest/ManifestManager";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 
-const sideData: (user: UserPayload | null)=> MenuItemData[] = (user)=>[
+// Carga los locales al inicializar el módulo (servidor)
+loadAllLocales();
+
+type Params = {
+  LL: TranslationFunctions;
+  user: UserPayload | null;
+};
+const sideData: (params: Params)=> MenuItemData[] = ( { user, LL } )=>[
   {
     icon: <Home />,
-    label: "Inicio",
+    label: LL.main.menu.home(),
     path: "/",
     matchPath: {
       startsWith: "-",
@@ -40,7 +51,7 @@ const sideData: (user: UserPayload | null)=> MenuItemData[] = (user)=>[
   },
   {
     icon: <MusicsIcon />,
-    label: "Música",
+    label: LL.main.menu.music(),
     path: getMusicMainUrl(user),
     matchPath: {
       startsWith: PATH_ROUTES.musics.frontend.path,
@@ -48,7 +59,7 @@ const sideData: (user: UserPayload | null)=> MenuItemData[] = (user)=>[
   },
   {
     icon: <SeriesIcon />,
-    label: "Series",
+    label: LL.main.menu.series(),
     path: "/series/history",
     matchPath: {
       startsWith: "/series",
@@ -56,12 +67,12 @@ const sideData: (user: UserPayload | null)=> MenuItemData[] = (user)=>[
   },
   {
     icon: <MoviesIcon />,
-    label: "Películas",
+    label: LL.main.menu.movies(),
     path: "/movies",
   },
   {
     icon: <SettingsRemote />,
-    label: "Remoto",
+    label: LL.main.menu.remote(),
     path: "/player/remote",
     matchPath: {
       startsWith: "/player",
@@ -74,9 +85,10 @@ export default async function RootLayout( { children, customMain }: {
   customMain: ReactNode;
 } ) {
   const user = await getUser();
+  const { locale } = await i18nServerContext();
 
   return (
-    <html lang="es">
+    <html lang={locale}>
       <head>
         <title>MCenter</title>
         <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
@@ -87,7 +99,7 @@ export default async function RootLayout( { children, customMain }: {
       </head>
       <body>
         <NavigationWatcher />
-        <GlobalProviders user={user}>
+        <GlobalProviders user={user} locale={locale}>
           <MediaPlayerPageLayout>
             {await Menu(customMain)}
             {await SideBar()}
@@ -115,23 +127,30 @@ export default async function RootLayout( { children, customMain }: {
 type GlobalProvidersProps = {
   children: ReactNode;
   user: UserPayload | null;
+  locale: Locales;
 };
-function GlobalProviders( { children, user }: GlobalProvidersProps) {
+function GlobalProviders( { children, user, locale }: GlobalProvidersProps) {
   return <UserProvider initialUser={user}>
     <GlobalQueryClientProvider>
-      <ModalProvider>
-        <ContextMenuProvider>
-          {children}
-        </ContextMenuProvider>
-      </ModalProvider>
+      <I18nProvider locale={locale}>
+        <ModalProvider>
+          <ContextMenuProvider>
+            {children}
+          </ContextMenuProvider>
+        </ModalProvider>
+      </I18nProvider>
     </GlobalQueryClientProvider>
   </UserProvider>;
 }
 
 async function Menu(customMainSlot: React.ReactNode) {
+  const { LL } = await i18nServerContext();
   const user = await getUser();
   const topbarData: MenuItemData[] = [
-    ...sideData(user).map(e=>( {
+    ...sideData( {
+      user,
+      LL,
+    } ).map(e=>( {
       ...e,
       title: e.label?.toString(),
       label: undefined,
@@ -165,9 +184,13 @@ async function Menu(customMainSlot: React.ReactNode) {
 
 async function SideBar() {
   const user = await getUser();
+  const { LL } = await i18nServerContext();
   const sideBar = <SidebarClient
     className={classes(styles.fixed, styles.sidebar)}
-    data={sideData(user)}/>;
+    data={sideData( {
+      user,
+      LL,
+    } )}/>;
 
   return sideBar;
 }

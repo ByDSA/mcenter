@@ -2,6 +2,7 @@ import { ReactNode, JSX, useState, useCallback, useEffect, useRef } from "react"
 import { Title } from "@mui/icons-material";
 import { showError } from "$shared/utils/errors/showError";
 import { classes } from "#modules/utils/styles";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import styles from "./styles.module.css";
 
 type CallValidationFnProps = {
@@ -46,13 +47,14 @@ export const useFormInputText = (props?: CreateProps) => {
   const [value, setValue] = useState("");
   const [errors, setErrors] = useState<string[] | null>([]);
   const [isValid, setIsValid] = useState(false);
+  const { LL } = useI18nContext();
   const validate: ValidateFn = async (txt, ctx)=> {
     const required = props?.elementProps?.required ?? false;
 
     if (required && txt.length === 0) {
       return {
         success: false,
-        errors: ["Required field."],
+        errors: [LL.uikit.forms.errors.requiredField()],
       };
     }
 
@@ -146,13 +148,16 @@ type CreateRet = {
 };
 export const createFormInputText = (props?: CreateProps): CreateRet => {
   const { value, errors, handleInputChange, isValid, callValidation } = useFormInputText(props);
+  const { LL } = useI18nContext();
   const placeholder = props?.elementProps?.placeholder ?? "Texto";
 
   return {
     element: FormInputText( {
       icon: <Title />,
       ...props?.elementProps,
-      placeholder: `${placeholder}${!props?.elementProps?.required ? " (opcional)" : ""}`,
+      placeholder: `${placeholder}${!props?.elementProps?.required
+        ? ` (${LL.uikit.forms.optionalField()})`
+        : ""}`,
       onChange: async (e)=>{
         await handleInputChange(e);
         props?.elementProps?.onChange?.(e);

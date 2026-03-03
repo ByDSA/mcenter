@@ -5,11 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { SearchBarView } from "#modules/ui-kit/SearchBar";
 import { useMusicSearch } from "#modules/musics/MusicSearchContext";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import styles from "./SearchBar.module.css";
 
 export function SearchBar() {
   const searchParams = useSearchParams();
   const { filters, setQueryFilter } = useMusicSearch();
+  const { LL } = useI18nContext();
 
   useEffect(()=> {
     const query = searchParams.get("q");
@@ -30,7 +32,7 @@ export function SearchBar() {
       action={search}
       value={filters.query}
       onChange={(e) => setQueryFilter(e.target.value)}
-      placeholder="Buscar música..."
+      placeholder={LL.modules.musics.search.placeholder()}
     />
   </section>;
 }

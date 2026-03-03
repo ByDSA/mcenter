@@ -1,5 +1,6 @@
 import { FormHTMLAttributes, useEffect, useState } from "react";
 import { logger } from "#modules/core/logger";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { useModal } from "../modal/ModalContext";
 import { DaFormProvider } from "./FormContext";
 
@@ -8,21 +9,21 @@ type Props = FormHTMLAttributes<HTMLFormElement> & {
   isValid?: boolean;
 };
 
-const confirmModalOptions = {
-  title: "Datos sin guardar",
-  content: (
-    <>
-      <p>Hay datos sin guardar.</p>
-      <p>¿Seguro que quieres cerrar?</p>
-    </>
-  ),
-};
-
 export const DaForm = ( { children,
   onSubmit: propsOnSubmit,
   isDirty,
   isValid,
   ...props }: Props) => {
+  const { LL } = useI18nContext();
+  const confirmModalOptions = {
+    title: LL.uikit.forms.unsavedDataModalTitle(),
+    content: (
+      <>
+        <p>{LL.uikit.forms.unsavedData()}</p>
+        <p>{LL.uikit.modals.confirmClose()}</p>
+      </>
+    ),
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const usingModal = useModal(true);
   const onSubmit: typeof propsOnSubmit = async (e) => {

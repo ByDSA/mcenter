@@ -5,11 +5,11 @@ export const musicListsBreadcrumbsEntry: BreadcrumbRegistryEntry = {
   matcher: ( { segment } )=> segment === PATH_ROUTES.musics.frontend.playlists.path
     || segment === PATH_ROUTES.musics.frontend.smartPlaylists.path,
   // eslint-disable-next-line require-await
-  handler: async () => {
+  handler: async ( { LL } ) => {
     return {
       items: [
         {
-          label: "Listas",
+          label: LL.modules.musics.lists.tab(),
           href: PATH_ROUTES.musics.frontend.playlists.path,
         },
       ],

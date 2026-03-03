@@ -10,6 +10,7 @@ import { SkipPrevious,
   HighlightOff } from "@mui/icons-material";
 import { ComponentProps } from "react";
 import { classes } from "#modules/utils/styles";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { RepeatMode } from "../browser/MediaPlayer/BrowserPlayerContext";
 import styles from "./ControlButton.module.css";
 
@@ -43,10 +44,12 @@ export const ControlButtonView = ( { active = true,
 
 type ControlButtonProps = Omit<ComponentProps<typeof ControlButtonView>, "children" | "title">;
 export const PrevButtonView = ( { ...props }: ControlButtonProps) => {
+  const { LL } = useI18nContext();
+
   return (
     <ControlButtonView
       {...props}
-      title="Anterior"
+      title={LL.modules.player.controls.prev()}
     >
       <SkipPrevious />
     </ControlButtonView>
@@ -54,9 +57,11 @@ export const PrevButtonView = ( { ...props }: ControlButtonProps) => {
 };
 
 export const NextButtonView = ( { ...props }: ControlButtonProps) => {
+  const { LL } = useI18nContext();
+
   return (
     <ControlButtonView
-      title="Siguiente"
+      title={LL.modules.player.controls.next()}
       {...props}
     >
       <SkipNext />
@@ -65,10 +70,12 @@ export const NextButtonView = ( { ...props }: ControlButtonProps) => {
 };
 
 export const BackwardButtonView = ( { ...props }: Omit<ControlButtonProps, "title">) => {
+  const { LL } = useI18nContext();
+
   return (
     <ControlButtonView
       {...props}
-      title="Ir atrás 10 segundos"
+      title={LL.modules.player.controls.rewind10()}
     >
       <Replay10 />
     </ControlButtonView>
@@ -76,10 +83,12 @@ export const BackwardButtonView = ( { ...props }: Omit<ControlButtonProps, "titl
 };
 
 export const ForwardButtonView = ( { ...props }: Omit<ControlButtonProps, "title">) => {
+  const { LL } = useI18nContext();
+
   return (
     <ControlButtonView
       {...props}
-      title="Ir adelante 10 segundos"
+      title={LL.modules.player.controls.forward10()}
     >
       <Forward10 />
     </ControlButtonView>
@@ -87,10 +96,12 @@ export const ForwardButtonView = ( { ...props }: Omit<ControlButtonProps, "title
 };
 
 export const StopButtonView = ( { onClick, ...props }: Omit<ControlButtonProps, "title">) => {
+  const { LL } = useI18nContext();
+
   return (
     <ControlButtonView
       {...props}
-      title="Detener"
+      title={LL.modules.player.controls.stop()}
     >
       <Stop />
     </ControlButtonView>
@@ -102,11 +113,13 @@ type RepeatProps = Omit<ControlButtonProps, "active" | "onClick" | "title"> & {
   onClick?: (currentRepeatMode: RepeatMode)=> Promise<void> | void;
 };
 export const RepeatButtonView = ( { repeatMode, onClick, ...props }: RepeatProps) => {
+  const { LL } = useI18nContext();
+
   return (
     <ControlButtonView
       {...props}
       active={repeatMode !== RepeatMode.Off}
-      title="Repetición"
+      title={LL.modules.player.controls.repeat()}
       onClick={()=>onClick?.(repeatMode)}
     >
       {repeatMode === RepeatMode.One ? <RepeatOne fontSize="small" /> : <Repeat fontSize="small" />}
@@ -119,11 +132,13 @@ type ShuffleProps = Omit<ControlButtonProps, "active" | "onClick" | "title"> & {
   onClick?: (currentIsShuffle: boolean)=> Promise<void> | void;
 };
 export const ShuffleButtonView = ( { isShuffle, onClick, ...props }: ShuffleProps) => {
+  const { LL } = useI18nContext();
+
   return (
     <ControlButtonView
       {...props}
       active={isShuffle}
-      title="Aleatoriedad"
+      title={LL.modules.player.controls.shuffle()}
       onClick={()=>onClick?.(isShuffle)}
     >
       <Shuffle fontSize="small" />
@@ -132,13 +147,15 @@ export const ShuffleButtonView = ( { isShuffle, onClick, ...props }: ShuffleProp
 };
 
 export const CloseButtonView = ( { className, ...props }: Omit<ControlButtonProps, "title">) => {
+  const { LL } = useI18nContext();
+
   return <ControlButtonView
     {...props}
     className={classes(
       styles.closeButton,
       className,
     )}
-    title="Cerrar"
+    title={LL.uikit.actions.close()}
   >
     <HighlightOff />
   </ControlButtonView>;

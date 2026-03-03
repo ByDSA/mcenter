@@ -9,6 +9,7 @@ import { PlaylistFavButton } from "#modules/musics/lists/playlists/PlaylistFavBu
 import { DurationView, MetadataView, WeightView } from "#modules/history";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { useMusic } from "#modules/musics/hooks";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { HeaderItem } from "#modules/resources/FullPage/HeaderItem";
 import { ResourceFullPage } from "#modules/resources/FullPage/FullPage/FullPage";
 import { MusicSettingsButton } from "../SettingsButton/Button";
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export const Music = ( { musicId }: Props) => {
+  const { LL } = useI18nContext();
   const value = useMusic.getCache(musicId);
 
   assertIsDefined(value);
@@ -61,14 +63,14 @@ export const Music = ( { musicId }: Props) => {
             <MetadataView
               className={styles.subtitle}
               icon={<Person />}
-              title="Artista"
+              title={LL.modules.musics.labels.artist()}
               txt={artist}
             />
             {album && (
               <MetadataView
                 className={styles.subtitle}
                 icon={<Album />}
-                title="Álbum"
+                title={LL.modules.musics.labels.album()}
                 txt={album}
               />
             )}
@@ -83,13 +85,13 @@ export const Music = ( { musicId }: Props) => {
             {releasedOn && <MetadataView
               className={styles.subtitle}
               icon={<CalendarToday />}
-              title={"Fecha"}
+              title={LL.common.dates.date()}
               txt={releasedOn}
             />}
             {(!releasedOn && year) && <MetadataView
               className={styles.subtitle}
               icon={<CalendarToday />}
-              title={"Año"}
+              title={LL.modules.musics.labels.year()}
               txt={(year!).toString()}
             />}
           </>
@@ -111,34 +113,34 @@ export const Music = ( { musicId }: Props) => {
       <main className={styles.metadata}>
         {tags && (
           <div className={styles.metadataItem}>
-            <span>Tags</span>
+            <span>{LL.modules.resources.labels.tags()}</span>
             <span>{tags.join(", ")}</span>
           </div>
         )}
         {userInfo && (
           <div className={styles.metadataItem}>
-            <span>User Tags</span>
+            <span>{LL.modules.musics.info.userTags()}</span>
             <span>{userInfo.tags?.join(", ")}</span>
           </div>
         )}
         <hr className={styles.hr} />
-        <p className={styles.metadataSectionTitle}>Tiempos</p>
+        <p className={styles.metadataSectionTitle}>{LL.modules.resources.labels.timestamps()}</p>
         <div className={styles.metadataItem}>
-          <span>Creado</span>
+          <span>{LL.modules.resources.labels.createdAt()}</span>
           <span>{formatDate(createdAt, {
             dateTime: "datetime",
             ago: "no",
           } )}</span>
         </div>
         <div className={styles.metadataItem}>
-          <span>Añadido</span>
+          <span>{LL.modules.resources.labels.addedAt()}</span>
           <span>{formatDate(addedAt, {
             dateTime: "datetime",
             ago: "no",
           } )}</span>
         </div>
         <div className={styles.metadataItem}>
-          <span>Actualizado</span>
+          <span>{LL.modules.resources.labels.updatedAt()}</span>
           <span>{formatDate(updatedAt, {
             dateTime: "datetime",
             ago: "no",

@@ -1,5 +1,6 @@
 import { Add } from "@mui/icons-material";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import styles from "../../playlists/New/NewPlaylistButton.module.css";
 import { NewSmartPlaylistModalProps, useNewSmartPlaylistModal } from "./Modal";
 
@@ -8,6 +9,7 @@ type ButtonProps = NewSmartPlaylistModalProps & {
 };
 
 export const NewSmartPlaylistButton = ( { onSuccess, theme }: ButtonProps) => {
+  const { LL } = useI18nContext();
   const { openModal } = useNewSmartPlaylistModal( {
     onSuccess,
   } );
@@ -18,7 +20,7 @@ export const NewSmartPlaylistButton = ( { onSuccess, theme }: ButtonProps) => {
       onClick={openModal}
       left={<span className={styles.left}><Add /></span>}
     >
-      Nueva Smart Playlist
+      {LL.modules.musics.lists.smartPlaylists.new()}
     </DaButton>
   );
 };

@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
+import { useMemo } from "react";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { logger } from "#modules/core/logger";
@@ -15,6 +16,7 @@ import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { DaDeleteButton } from "#modules/ui-kit/DeleteButton";
 import { DaForm } from "#modules/ui-kit/form/Form";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { ImageCoverEntity } from "../models";
 import { ImageCoversApi } from "../requests";
 import { getMediumCoverUrl } from "../Selector/image-cover-utils";
@@ -22,19 +24,20 @@ import { DaLabel } from "../../ui-kit/form/Label/Label";
 import styles from "./Editor.module.css";
 import { ImageCoverUpload, PreviewImage, ImageCoverUploadRef } from "./UploadImage";
 
-const schema = z.object( {
-  label: z.string().trim()
-    .min(1, "La etiqueta es obligatoria"),
-} );
-
-type FormData = z.infer<typeof schema>;
-
 export type ImageCoverEditorProps = {
   imageCover: ImageCoverEntity;
   onUpdate?: (updated: ImageCoverEntity | null)=> void;
 };
 
 export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditorProps) {
+  const { LL } = useI18nContext();
+  const schema = useMemo(() => z.object( {
+    label: z.string().trim()
+      .min(1, LL.uikit.forms.errors.requiredField()),
+  } ), [LL]);
+
+  type FormData = z.infer<typeof schema>;
+
   const modal = useModal(true);
   const confirmModal = useConfirmModal();
   // Estado local para visualizar cambios inmediatos (opcional, pero útil para la imagen actual)
@@ -58,7 +61,7 @@ export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditor
     await confirmModal.openModal( {
       content: (
         <>
-          <p>¿Borrar cover?</p>
+          <p>{LL.modules.imageCover.deleteConfirm()}</p>
           <p>{currentEntity.metadata.label}</p>
         </>
       ),
@@ -125,7 +128,7 @@ export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditor
     >
       <div className={styles.mainSection}>
         <DaInputGroup className={styles.fieldGroup}>
-          <DaLabel>Etiqueta</DaLabel>
+          <DaLabel>{LL.modules.imageCover.label()}</DaLabel>
           <DaInputErrorWrap>
             <DaInputText
               {...register("label")}
@@ -136,14 +139,14 @@ export function ImageCoverEditorForm( { imageCover, onUpdate }: ImageCoverEditor
 
         <DaInputGroup className={styles.imagesSection}>
           <DaInputGroupItem>
-            <DaLabel>Actual</DaLabel>
+            <DaLabel>{LL.modules.imageCover.current()}</DaLabel>
             <div className={styles.currentCoverWrap}>
               <PreviewImage src={getMediumCoverUrl(currentEntity)} />
             </div>
           </DaInputGroupItem>
 
           <DaInputGroupItem>
-            <DaLabel>Reemplazar Imagen</DaLabel>
+            <DaLabel>{LL.modules.imageCover.replaceImage()}</DaLabel>
             <ImageCoverUpload
               ref={uploadRef}
               entityId={currentEntity.id}

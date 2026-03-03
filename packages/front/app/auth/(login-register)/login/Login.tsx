@@ -4,6 +4,7 @@ import { AuthCrudDtos } from "$shared/models/auth/dto/transport";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import styles from "../styles.module.css";
 import { LoginRegisterForm } from "../Form";
 import { createFormInputText } from "../FormInputText";
@@ -26,6 +27,7 @@ export const LoginComponent = ( { handleForgotPass,
   handleFacebookLogin,
   handleTwitterLogin,
   handleGithubLogin }: Props) => {
+  const { LL } = useI18nContext();
   const hasSocialLogin = !!(handleFacebookLogin || handleGithubLogin || handleGithubLogin
     || handleGoogleLogin);
   const { element: usernameOrEmailElement, value: usernameOrEmail } = createFormInputText( {
@@ -33,7 +35,7 @@ export const LoginComponent = ( { handleForgotPass,
       icon: <Person />,
       type: "email",
       name: "email",
-      placeholder: "Email o usuario",
+      placeholder: LL.core.auth.login.emailPlaceholder(),
       className: styles.input,
       required: true,
     },
@@ -59,7 +61,7 @@ export const LoginComponent = ( { handleForgotPass,
 
   return <LoginRegisterForm
     title="Login"
-    subtitle="Inicia sesión en tu cuenta"
+    subtitle={LL.core.auth.login.subtitle()}
     onSubmit={async (e)=>{
       e.preventDefault();
       await handleSubmit();
@@ -135,23 +137,23 @@ export const LoginComponent = ( { handleForgotPass,
           {isLoading
             ? (
               <>
-                Iniciando sesión...
+                {LL.core.auth.login.doingLogin()}
               </>
             )
             : (
               <>
-                Iniciar Sesión
+                {LL.core.auth.login.doLogin()}
               </>
             )}
         </DaButton>
         {handleForgotPass
         && <div className={styles.forgotPassword}>
-          <DaAnchor onClick={()=>handleForgotPass()}>¿Olvidaste tu contraseña?</DaAnchor>
+          <DaAnchor onClick={()=>handleForgotPass()}>{LL.core.auth.login.forgotPassword()}</DaAnchor>
         </div>
         }
         {handleGotoSignUp && <div className={styles.signupPrompt}>
-          ¿No tienes cuenta? <DaAnchor onClick={()=>handleGotoSignUp()}
-            className={styles.signupLink}>Regístrate</DaAnchor>.
+          {LL.core.auth.login.doRegisterAside()} <DaAnchor onClick={()=>handleGotoSignUp()}
+            className={styles.signupLink}>{LL.core.auth.register.youDoRegister()}</DaAnchor>.
         </div>
         }
         {/* Para que si el botón de local login está disabled, no se llame a otro botón

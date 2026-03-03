@@ -1,5 +1,6 @@
 import type { BreadcrumbRegistryEntry } from "./types";
 import { Home } from "@mui/icons-material";
+import { phraseCase } from "#modules/core/i18n/utils";
 import { musicSingleBreadcrumbsEntry } from "app/musics/[musicId]/breadcrumbs";
 import { musicRootBreadcrumbsEntry } from "app/musics/breadcrumbs";
 import { musicHistoryBreadcrumbsEntry } from "app/musics/history/breadcrumbs";
@@ -64,10 +65,3 @@ export const registry: ReadonlyArray<BreadcrumbRegistryEntry> = [
     },
   },
 ] as const;
-
-function phraseCase(str: string) {
-  if (!str)
-    return str;
-
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}

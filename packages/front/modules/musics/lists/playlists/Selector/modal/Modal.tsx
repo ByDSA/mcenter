@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { useUser } from "#modules/core/auth/useUser";
 import { logger } from "#modules/core/logger";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { DaButton } from "#modules/ui-kit/form/input/Button/Button";
 import { classes } from "#modules/utils/styles";
 import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButtons";
@@ -23,6 +24,7 @@ type Props = {
 };
 export function usePlaylistSelectorModal(props?: Props) {
   const { closeOnSelect = true, nullable = false } = props ?? {};
+  const { LL } = useI18nContext();
   const { openModal: _openModal, closeModal, id, isOpen } = useModal();
   const { user } = useUser();
 
@@ -32,7 +34,7 @@ export function usePlaylistSelectorModal(props?: Props) {
     await _openModal( {
       ...openModalProps,
       className: classes(styles.playlistSelectorModal, openModalProps.className),
-      title: openModalProps.title ?? "Seleccionar playlist",
+      title: openModalProps.title ?? LL.modules.musics.lists.playlists.select(),
       content: (
         <AddToPlaylistForm
           userId={user.id}
@@ -46,7 +48,7 @@ export function usePlaylistSelectorModal(props?: Props) {
         />
       ),
     } );
-  }, [user, nullable, closeModal]);
+  }, [user, nullable, closeModal, LL]);
 
   return {
     id,
@@ -62,6 +64,7 @@ type AddToPlaylistContentProps = {
   nullable?: boolean;
 };
 function AddToPlaylistForm( { userId, onSelect, nullable }: AddToPlaylistContentProps) {
+  const { LL } = useI18nContext();
   const { element, setData, fetchData, isSuccess } = useMusicPlaylistsForUser( {
     userId,
     onSelect,
@@ -88,7 +91,7 @@ function AddToPlaylistForm( { userId, onSelect, nullable }: AddToPlaylistContent
       {isSuccess && <DaFooterButtons>
         {nullable && <DaButton theme="white" onClick={()=> {
           onSelect(null);
-        }}>Ninguna</DaButton>}
+        }}>{LL.modules.musics.lists.playlists.none()}</DaButton>}
         {newPlaylistButton}
       </DaFooterButtons>
       }

@@ -1,6 +1,7 @@
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMemo } from "react";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import { DaInputText } from "#modules/ui-kit/form/input/Text/InputText";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -10,6 +11,7 @@ import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButto
 import { ImageCoverSelectorButton } from "#modules/image-covers/Selector/Button";
 import { DaForm } from "#modules/ui-kit/form/Form";
 import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { MusicPlaylistsApi } from "../requests";
 import { MusicPlaylistEntity } from "../models";
 import { FormVisibility } from "../../FormVisibility";
@@ -22,16 +24,16 @@ current: MusicPlaylistEntity; } )=> void;
   updateLocalValue: (value: MusicPlaylistEntity)=> void;
 };
 
-const schema = z.object( {
-  name: z.string().trim()
-    .min(1, "El nombre es obligatorio"),
-  slug: z.string().trim()
-    .min(1, "El slug es obligatorio"),
-  visibility: z.enum(["public", "private"]),
-  imageCoverId: mongoDbId.nullable(),
-} );
-
 export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }: Props) => {
+  const { LL } = useI18nContext();
+  const schema = useMemo(() => z.object( {
+    name: z.string().trim()
+      .min(1, LL.uikit.forms.errors.requiredField()),
+    slug: z.string().trim()
+      .min(1, LL.uikit.forms.errors.requiredField()),
+    visibility: z.enum(["public", "private"]),
+    imageCoverId: mongoDbId.nullable(),
+  } ), [LL]);
   const { register,
     handleSubmit,
     watch,
@@ -94,20 +96,20 @@ export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }:
         isValid={isValid}
         isDirty={isDirty}
       >
-        <DaLabel>Nombre</DaLabel>
+        <DaLabel>{LL.uikit.forms.labels.name()}</DaLabel>
         <DaInputText
           {...register("name")}
           autoFocus
         />
         <DaErrorView errors={errors} keyName="name" touchedFields={touchedFields} />
 
-        <DaLabel>Url slug</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.slug()}</DaLabel>
         <DaInputText
           {...register("slug")}
         />
         <DaErrorView errors={errors} keyName="slug" touchedFields={touchedFields} />
 
-        <DaLabel>Visibilidad</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.visibility()}</DaLabel>
         <FormVisibility
           value={currentVisibility}
           setValue= {(newVal) => {
@@ -118,7 +120,7 @@ export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }:
           }} />
         <DaErrorView errors={errors} keyName="visibility" touchedFields={touchedFields} />
 
-        <DaLabel>Imagen</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.image()}</DaLabel>
         <ImageCoverSelectorButton
           onSelect={(imageCover) => {
             setValue("imageCoverId", imageCover?.id ?? null, {
@@ -132,7 +134,7 @@ export const EditPlaylistForm = ( { initialValue, onSuccess, updateLocalValue }:
 
         <DaFooterButtons>
           <DaSaveButton>
-            Editar
+            {LL.uikit.actions.edit()}
           </DaSaveButton>
         </DaFooterButtons>
       </DaForm>

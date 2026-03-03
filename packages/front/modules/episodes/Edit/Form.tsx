@@ -1,6 +1,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
+import { useMemo } from "react";
 import { EpisodeEntity, episodeSchema, episodeUserInfoSchema } from "$shared/models/episodes";
 import { getFirstAvailableFileInfoOrFirst } from "$shared/models/file-info-common/file-info";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -21,27 +22,11 @@ import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { DaForm } from "#modules/ui-kit/form/Form";
 import { DaInputTime } from "#modules/ui-kit/form/input/Time/InputTime";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { episodeFileInfoSchema } from "../file-info/models";
 import { useEpisode } from "../hooks";
 import { useSeries } from "../series/hooks";
 import styles from "./style.module.css";
-
-const schema = z.object( {
-  title: z.string().trim()
-    .min(1, "El título es obligatorio"),
-} )
-  .merge(episodeSchema.pick( {
-    tags: true,
-  } ))
-  .merge(episodeUserInfoSchema.pick( {
-    weight: true,
-  } ))
-  .merge(episodeFileInfoSchema.pick( {
-    start: true,
-    end: true,
-  } ));
-
-type FormData = z.infer<typeof schema>;
 
 type Props = {
   initialData: EpisodeEntity;
@@ -49,6 +34,24 @@ type Props = {
 };
 
 export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
+  const { LL } = useI18nContext();
+  const schema = useMemo(() => z.object( {
+    title: z.string().trim()
+      .min(1, LL.uikit.forms.errors.requiredField()),
+  } )
+    .merge(episodeSchema.pick( {
+      tags: true,
+    } ))
+    .merge(episodeUserInfoSchema.pick( {
+      weight: true,
+    } ))
+    .merge(episodeFileInfoSchema.pick( {
+      start: true,
+      end: true,
+    } )), [LL]);
+
+  type FormData = z.infer<typeof schema>;
+
   const { data: series } = useSeries(initialData.seriesId, {
     notExpandCountEpisodes: true,
     notExpandCountSeasons: true,
@@ -177,7 +180,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
       isValid={isValid}
     >
       <DaInputGroup inline>
-        <DaLabel>Episodio</DaLabel>
+        <DaLabel>{LL.modules.episodes.edit.episode()}</DaLabel>
         <span>
           <span>{series.name}</span>
           <Separator />
@@ -185,7 +188,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
         </span>
       </DaInputGroup>
       <DaInputGroup inline>
-        <DaLabel>Título</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.title()}</DaLabel>
         <DaInputErrorWrap>
           <DaInputTextMultiline
             {...register("title")}
@@ -196,7 +199,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
 
       <DaInputGroup inline>
         <DaInputGroupItem inline className={styles.weight}>
-          <DaLabel>Peso</DaLabel>
+          <DaLabel>{LL.modules.resources.labels.weight()}</DaLabel>
           <DaInputNumber
             {...register("weight", {
               valueAsNumber: true,
@@ -208,7 +211,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
       {fileInfo && (
         <DaInputGroup inline>
           <DaInputGroupItem inline>
-            <DaLabel>Inicio</DaLabel>
+            <DaLabel>{LL.modules.episodes.labels.start()}</DaLabel>
             <Controller
               control={control}
               name="start"
@@ -222,7 +225,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
             />
           </DaInputGroupItem>
           <DaInputGroupItem inline>
-            <DaLabel>Fin</DaLabel>
+            <DaLabel>{LL.modules.episodes.labels.end()}</DaLabel>
             <Controller
               control={control}
               name="end"
@@ -239,7 +242,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
       )}
 
       <DaInputGroup inline>
-        <DaLabel>Tags</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.tags()}</DaLabel>
         <Controller
           control={control}
           name="tags"
@@ -253,7 +256,7 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
         />
       </DaInputGroup>
       <DaInputGroup inline>
-        <DaLabel>Path</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.path()}</DaLabel>
         <span>{fileInfo?.path}</span>
       </DaInputGroup>
 

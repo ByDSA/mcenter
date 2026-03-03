@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
@@ -22,33 +22,13 @@ import { DaSaveButton } from "#modules/ui-kit/form/SaveButton";
 import { DaDeleteButton } from "#modules/ui-kit/DeleteButton";
 import { DaCloseModalButton } from "#modules/ui-kit/modal/CloseButton";
 import { DaForm } from "#modules/ui-kit/form/Form";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { DaInputNumber } from "../../../ui-kit/form/input/Number/InputNumber";
 import { DaInputBooleanCheckbox } from "../../../ui-kit/form/input/Boolean/InputBoolean";
 import { DaInputGroup, DaInputGroupItem } from "../../../ui-kit/form/InputGroup";
 import { DaInputErrorWrap } from "../../../ui-kit/form/InputErrorWrap";
 import { FormInputTags } from "../../../resources/FormInputTags/FormInputTags";
 import styles from "./styles.module.css";
-
-const schema = musicSchema.pick( {
-  album: true,
-  country: true,
-  game: true,
-  spotifyId: true,
-  year: true,
-  imageCoverId: true,
-} ).extend( {
-  title: z.string().trim()
-    .min(1, "El título es obligatorio"),
-  artist: z.string().trim()
-    .min(1, "El artista es obligatorio"),
-  slug: z.string().trim()
-    .min(1, "El slug es obligatorio"),
-  weight: z.number().default(0),
-  tags: z.array(z.string()),
-  disabled: z.boolean().default(false),
-} );
-
-type FormData = z.infer<typeof schema>;
 
 type Props = {
   initialData: MusicEntity | (()=> MusicEntity);
@@ -57,10 +37,32 @@ type Props = {
 };
 
 export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDelete }: Props) => {
+  const { LL } = useI18nContext();
   const [showOptional, setShowOptional] = useState(false);
   const initialData = typeof propInitialData === "function"
     ? propInitialData()
     : propInitialData;
+  const schema = useMemo(() => musicSchema.pick( {
+    album: true,
+    country: true,
+    game: true,
+    spotifyId: true,
+    year: true,
+    imageCoverId: true,
+  } ).extend( {
+    title: z.string().trim()
+      .min(1, LL.uikit.forms.errors.requiredField()),
+    artist: z.string().trim()
+      .min(1, LL.uikit.forms.errors.requiredField()),
+    slug: z.string().trim()
+      .min(1, LL.uikit.forms.errors.requiredField()),
+    weight: z.number().default(0),
+    tags: z.array(z.string()),
+    disabled: z.boolean().default(false),
+  } ), [LL]);
+
+  type FormData = z.infer<typeof schema>;
+
   const { register,
     handleSubmit,
     control,
@@ -251,11 +253,11 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
   };
   const handleDelete = async () => {
     await confirmModal.openModal( {
-      title: "Confirmar borrado",
+      title: LL.uikit.modals.confirmDelete(),
       content: <>
-        <p>¿Estás seguro de borrar esta música?</p>
+        <p>{LL.modules.musics.edit.confirmDelete()}</p>
         <DaInputGroup inline>
-          <DaLabel>Título</DaLabel>
+          <DaLabel>{LL.modules.resources.labels.title()}</DaLabel>
           <span>{initialData.title}</span>
         </DaInputGroup>
       </>,
@@ -278,7 +280,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
       isValid={isValid}
     >
       <DaInputGroup inline>
-        <DaLabel>Título</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.title()}</DaLabel>
         <DaInputErrorWrap>
           <DaInputTextMultiline
             {...register("title")}
@@ -287,7 +289,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
         </DaInputErrorWrap>
       </DaInputGroup>
       <DaInputGroup inline>
-        <DaLabel>Artista</DaLabel>
+        <DaLabel>{LL.modules.musics.labels.artist()}</DaLabel>
         <DaInputErrorWrap>
           <DaInputTextMultiline
             {...register("artist")}
@@ -298,7 +300,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
 
       <DaInputGroup inline>
         <article>
-          <DaLabel>Peso</DaLabel>
+          <DaLabel>{LL.modules.resources.labels.weight()}</DaLabel>
           <DaInputErrorWrap>
             <DaInputNumber
               {...register("weight", {
@@ -310,7 +312,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
           </DaInputErrorWrap>
         </article>
         <DaInputGroupItem>
-          <DaLabel>Álbum</DaLabel>
+          <DaLabel>{LL.modules.musics.labels.album()}</DaLabel>
           <DaInputTextMultiline
             {...register("album")}
             nullable
@@ -319,7 +321,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
       </DaInputGroup>
 
       <DaInputGroup>
-        <DaLabel>Tags (usa # para tags globales)</DaLabel>
+        <DaLabel>{LL.modules.musics.edit.tagsHint()}</DaLabel>
         <Controller
           control={control}
           name="tags"
@@ -336,7 +338,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
       </DaInputGroup>
 
       <DaInputGroup inline>
-        <DaLabel>Slug</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.slug()}</DaLabel>
         <DaInputErrorWrap>
           <DaInputTextMultiline
             {...register("slug")}
@@ -346,7 +348,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
       </DaInputGroup>
 
       <DaInputGroup inline>
-        <DaLabel>Imagen</DaLabel>
+        <DaLabel>{LL.modules.resources.labels.image()}</DaLabel>
         <Controller
           control={control}
           name="imageCoverId"
@@ -368,7 +370,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
         <DaInputGroup inline>
           {(showOptional || initialData.year !== undefined || dirtyFields.year !== undefined)
           && <DaInputGroupItem className={styles.flex0}>
-            <DaLabel>Año</DaLabel>
+            <DaLabel>{LL.modules.musics.labels.year()}</DaLabel>
             <DaInputErrorWrap>
               <DaInputNumber
                 {...register("year", {
@@ -383,7 +385,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
           {(showOptional || initialData.disabled !== undefined
             || dirtyFields.disabled !== undefined)
         && <DaInputGroupItem className={styles.flex0}>
-          <DaLabel>Desactivado</DaLabel>
+          <DaLabel>{LL.modules.musics.edit.disabled()}</DaLabel>
           <DaInputErrorWrap>
             <Controller
               control={control}
@@ -400,7 +402,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
           }
           {(showOptional || initialData.country !== undefined || dirtyFields.country !== undefined)
         && <DaInputGroupItem>
-          <DaLabel>País</DaLabel>
+          <DaLabel>{LL.modules.musics.labels.country()}</DaLabel>
           <DaInputErrorWrap>
             <DaInputTextMultiline
               {...register("country")}
@@ -413,7 +415,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
 
         {(showOptional || initialData.game !== undefined || dirtyFields.game !== undefined)
         && <DaInputGroup inline>
-          <DaLabel>Juego</DaLabel>
+          <DaLabel>{LL.modules.musics.labels.game()}</DaLabel>
           <DaInputErrorWrap>
             <DaInputTextMultiline
               {...register("game")}
@@ -425,7 +427,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
         {(showOptional || initialData.spotifyId !== undefined
           || dirtyFields.spotifyId !== undefined)
         && <DaInputGroup inline>
-          <DaLabel>Spotify ID</DaLabel>
+          <DaLabel>{LL.modules.musics.edit.spotifyId()}</DaLabel>
           <DaInputErrorWrap>
             <DaInputTextMultiline
               {...register("spotifyId")}
@@ -455,11 +457,12 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
 };
 
 export function EditFileInfosButton(props: Parameters<typeof useFileInfosModal>[0]) {
+  const { LL } = useI18nContext();
   const { openModal } = useFileInfosModal(props);
 
   return (
     <DaButton theme="white" onClick={async () => await openModal()}>
-      Editar archivos
+      {LL.modules.musics.edit.editFiles()}
     </DaButton>
   );
 }
@@ -468,7 +471,11 @@ type OptionalPropsButtonProps = {
   onClick: ()=> void;
   isVisible: boolean;
 };
-export const OptionalPropsButton = ( { isVisible, onClick }: OptionalPropsButtonProps)=><span
-  onClick={onClick}
-  className={classes(styles.optionalButton)}>
-  {!isVisible ? <ArrowRight /> : <ArrowDropDown />} Propiedades opcionales</span>;
+export const OptionalPropsButton = ( { isVisible, onClick }: OptionalPropsButtonProps) => {
+  const { LL } = useI18nContext();
+
+  return <span
+    onClick={onClick}
+    className={classes(styles.optionalButton)}>
+    {!isVisible ? <ArrowRight /> : <ArrowDropDown />}{LL.modules.musics.edit.optionalProps()}</span>;
+};

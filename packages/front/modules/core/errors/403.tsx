@@ -1,11 +1,14 @@
 import { FullPageContainer } from "app/FullPageContainer";
+import { i18nServerContext } from "#modules/core/i18n/server-locale";
 
-export function Forbidden() {
+export async function Forbidden() {
+  const { LL } = await i18nServerContext();
+
   return (
     <FullPageContainer>
       <div className="error-page">
-        <h1>403 - Acceso Denegado</h1>
-        <p>No tienes permisos para acceder a esta página.</p>
+        <h1>{LL.core.errors.forbidden.title()}</h1>
+        <p>{LL.core.errors.forbidden.message()}</p>
       </div>
     </FullPageContainer>
   );

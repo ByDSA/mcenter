@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { fetchEpisodeForMetadata } from "#modules/utils/server-metadata-fetch";
 import { getMediumCoverUrl } from "#modules/image-covers/Selector/image-cover-utils";
+import { i18nServerContext } from "#modules/core/i18n/server-locale";
 import { ClientPage } from "./ClientPage";
 
 export type Params = {
@@ -16,13 +17,14 @@ interface PageProps {
 const DEFAULT_OG_IMAGE = "/og/series.png";
 
 export async function generateMetadata( { params }: PageProps): Promise<Metadata> {
+  const { LL } = await i18nServerContext();
   const { episodeId } = await params;
   const episode = await fetchEpisodeForMetadata(episodeId);
   const seriesName: string | undefined = episode?.series?.name;
   const description: string = seriesName
     ? `${episode?.episodeKey} · ${seriesName}`
     : (episode?.episodeKey ?? "");
-  const title: string = episode?.title ?? "Episodio no encontrado";
+  const title: string = episode?.title ?? LL.modules.episodes.search.oneNotFound();
   const imageUrl: string = episode?.imageCover
     ? getMediumCoverUrl(episode.imageCover)
     : episode?.series?.imageCover

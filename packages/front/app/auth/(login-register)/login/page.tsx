@@ -8,6 +8,7 @@ import { AuthApi } from "#modules/core/auth/requests";
 import { logger } from "#modules/core/logger";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { HttpErrorUnauthorized } from "#modules/core/errors/custom-errors";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { LoginComponent } from "./Login";
 
 function useLoginGoogle() {
@@ -30,6 +31,7 @@ function useLoginGoogle() {
 export default function LoginPage() {
   const { loginGoogle } = useLoginGoogle();
   const searchParams = useSearchParams();
+  const { LL } = useI18nContext();
   const router = useRouter();
   const handleLocalLogin: Parameters<
   typeof LoginComponent
@@ -47,9 +49,9 @@ export default function LoginPage() {
     window.location.href = redirectUrl ?? "/"; // Se obliga a llamada a backend
   } catch (e) {
     if (e instanceof HttpErrorUnauthorized)
-      logger.error("Login wrong!");
+      logger.error(LL.core.auth.login.wrongLogin());
     else
-      logger.error("Login failed!");
+      logger.error(LL.core.auth.login.errorLogin());
   }
 };
 

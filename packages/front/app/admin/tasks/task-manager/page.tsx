@@ -13,6 +13,7 @@ import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { TasksApi } from "#modules/tasks/requests";
 import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 
 const QUEUE_NAME = "mcenter-tasks-main";
 const N = 10;
@@ -104,6 +105,8 @@ export default function Page() {
       .catch(showError);
   }, []);
 
+  const { LL } = useI18nContext();
+
   return (
     <PageContent>
       {isLoading && <ContentSpinner />}
@@ -111,7 +114,8 @@ export default function Page() {
         return <Task key={t.id} value={t} />;
       } )}
       {
-        sortedTaskStatuses && sortedTaskStatuses.length === 0 && <p>No tasks found.</p>
+        sortedTaskStatuses && sortedTaskStatuses.length === 0
+          && <p>{LL.admin.tasks.noTasksFound()}</p>
       }
     </PageContent>
   );

@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { useWindowWidth } from "#modules/player/browser/MediaPlayer/Bottom/useWindowWidth";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { DaButton } from "../form/input/Button/Button";
 import { useModal } from "./ModalContext";
 
@@ -10,6 +11,7 @@ type Props = Omit<Parameters<typeof DaButton>[0], "children"> & {
 export const DaCloseModalButton = ( { showOnSmallWidth, children, ...props }: Props) => {
   const usingModal = useModal(true);
   const width = useWindowWidth();
+  const { LL } = useI18nContext();
 
   if (width < 500 && !showOnSmallWidth)
     return null;
@@ -23,6 +25,6 @@ export const DaCloseModalButton = ( { showOnSmallWidth, children, ...props }: Pr
       usingModal.closeModal();
     }}
   >
-    {children ?? "Cerrar"}
+    {children ?? LL.uikit.actions.close()}
   </DaButton>;
 };

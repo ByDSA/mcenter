@@ -1,3 +1,4 @@
+import { i18nObject } from "#modules/core/i18n/i18n-util";
 import { BreadcrumbItem } from "./BreadcrumbsView/Breadcrumbs";
 
 export type BreadcrumbResult = {
@@ -13,6 +14,7 @@ export type BreadcrumbResult = {
 type Params = {
   pathname: string;
   segment: string;
+  LL: ReturnType<typeof i18nObject>;
 };
 export type GetBreadcrumb = (params: Params)=> Promise<BreadcrumbResult>;
 

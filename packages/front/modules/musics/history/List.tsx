@@ -7,6 +7,7 @@ import { ResourceList } from "#modules/resources/List/ResourceList";
 import { dayTitle } from "#modules/history/utils";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { EmptyHistory } from "#modules/history/EmptyHistory";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import { useMusic } from "../hooks";
 import { MusicHistoryApi } from "./requests";
 import { MusicHistoryListItem } from "./ListItem";
@@ -24,6 +25,8 @@ export function MusicHistoryList() {
         useMusic.updateCacheWithMerging(entry.resourceId, entry.resource);
     }
   }
+
+  const { LL } = useI18nContext();
 
   return renderFetchedData<ArrayData | null>( {
     data,
@@ -44,6 +47,7 @@ export function MusicHistoryList() {
                 {dayTitle( {
                   currentDateTimestamp: entry.date.timestamp,
                   previousDateTimestamp: i > 0 ? array[i - 1].date.timestamp : undefined,
+                  LL,
                 } )}
                 <LocalDataProvider data={entry}
                   setData={(newEntry: typeof entry) => {

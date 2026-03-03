@@ -5,6 +5,7 @@ import { TabsContainer } from "#modules/ui-kit/layouts/TabsContainer/TabsContain
 import { useUser } from "#modules/core/auth/useUser";
 import { MenuItemData } from "#modules/ui-kit/menus/Sidebar";
 import { PageContent } from "#modules/ui-kit/layouts/PageContainer/PageContent";
+import { useI18nContext } from "#modules/core/i18n/i18n-react";
 import styles from "./Page.module.css";
 import { SearchBar } from "./search/SearchBar";
 
@@ -15,11 +16,12 @@ type Props = {
 export default function MusicLayout( { children }: Props) {
   const data: MenuItemData[] = [];
   const { user } = useUser();
+  const { LL } = useI18nContext();
 
   if (user) {
     data.push(
       {
-        label: "Listas",
+        label: LL.modules.musics.lists.tab(),
         path: PATH_ROUTES.musics.frontend.playlists.path,
         matchPath: {
           customMatch: (p) => {
@@ -31,11 +33,11 @@ export default function MusicLayout( { children }: Props) {
         },
       },
       {
-        label: "Historial",
+        label: LL.modules.resources.history.history(),
         path: PATH_ROUTES.musics.frontend.history.path,
       },
       {
-        label: "Subir",
+        label: LL.modules.musics.upload.tab(),
         path: "/musics/upload",
       },
     );
