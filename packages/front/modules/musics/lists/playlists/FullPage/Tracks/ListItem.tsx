@@ -42,28 +42,66 @@ export const MusicPlaylistItem = ( { playlist,
     data={music}
   >
     <MusicContextMenu />
-    {user?.id === playlist.ownerUserId && <ContextMenuItem
-      label="Quitar de la playlist"
-      theme="danger"
-      onClick={async () => {
-        await api.removeOneTrack( {
-          playlistId: playlist.id,
-          itemId: value.id,
-        } );
+    {user?.id === playlist.ownerUserId && <>
+      {index !== 0 && <ContextMenuItem
+        label="Mover al principio"
+        onClick={() => {
+          const item = playlist.list[index];
+          const newList = [item, ...playlist.list.filter((_, i) => i !== index)];
 
-        setPlaylist(old=> {
-          if (!old)
-            return old;
+          setPlaylist(old => {
+            if (!old)
+              return old;
 
-          const updatedList = old.list.filter((i) => i.id !== value.id);
+            return {
+              ...old,
+              list: newList,
+            };
+          } );
+          api.moveOneTrack(playlist.id, value.id, 1).catch(console.error);
+        }}
+      />}
+      {index !== playlist.list.length - 1 && <ContextMenuItem
+        label="Mover al final"
+        onClick={() => {
+          const item = playlist.list[index];
+          const newList = [...playlist.list.filter((_, i) => i !== index), item];
 
-          return {
-            ...old,
-            list: updatedList,
-          };
-        } );
-      }}
-    />
+          setPlaylist(old => {
+            if (!old)
+              return old;
+
+            return {
+              ...old,
+              list: newList,
+            };
+          } );
+          api.moveOneTrack(playlist.id, value.id, playlist.list.length).catch(console.error);
+        }}
+      />}
+      <ContextMenuItem
+        label="Quitar de la playlist"
+        theme="danger"
+        onClick={async () => {
+          await api.removeOneTrack( {
+            playlistId: playlist.id,
+            itemId: value.id,
+          } );
+
+          setPlaylist(old=> {
+            if (!old)
+              return old;
+
+            const updatedList = old.list.filter((i) => i.id !== value.id);
+
+            return {
+              ...old,
+              list: updatedList,
+            };
+          } );
+        }}
+      />
+    </>
     }
   </LocalDataProvider>;
 
