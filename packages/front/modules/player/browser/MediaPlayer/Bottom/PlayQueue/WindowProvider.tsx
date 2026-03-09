@@ -42,13 +42,17 @@ type WindowContextType = {
     fullscreen?: boolean;
     name?: string;
   } )=> Promise<void>;
-  close: ()=> Promise<void>;
+  close: (options?: CloseOptions)=> Promise<void>;
   isOpen: boolean;
   isFullscreen: boolean;
   currentWindowName?: string;
 };
 
 const WindowContext = createContext<WindowContextType | undefined>(undefined);
+
+type CloseOptions = {
+  keepState?: boolean;
+};
 
 export const WindowProvider = ( { children }: { children: ReactNode } ) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -91,11 +95,13 @@ export const WindowProvider = ( { children }: { children: ReactNode } ) => {
       isFullscreenOpenRef.current = true;
     }
   }, [isOpen, closeImpl]);
-  const close = useCallback(async () => {
+  const close = useCallback(async (options?: CloseOptions) => {
     if (isFullscreenOpenRef.current) {
       // X button: marcamos ref a false ANTES de history.back() para ignorar el popstate.
       isFullscreenOpenRef.current = false;
-      history.back(); // Elimina el entry fullscreen del historial
+
+      if (!options?.keepState)
+        history.back(); // Elimina el entry fullscreen del historial
       // No esperamos a que popstate se despache; closeImpl corre en paralelo.
     }
 

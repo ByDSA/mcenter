@@ -9,12 +9,14 @@ import { MusicContextMenu } from "#modules/musics/musics/SettingsButton/Button";
 import { PlaySmartPlaylistContextMenuItem } from "#modules/musics/lists/smart-playlists/Play/ContextMenuItem";
 import { useBrowserPlayer } from "./BrowserPlayerContext";
 import styles from "./PlayerSettingsButton.module.css";
+import { useWindowContext } from "./Bottom/PlayQueue/WindowProvider";
 
 export const PlayerSettingsButton = () => {
   const { openMenu } = useContextMenuTrigger();
   const currentResource = useBrowserPlayer((s) => s.currentResource);
   const query = useBrowserPlayer((s) => s.query);
   const { data: music } = useMusic(currentResource?.resourceId ?? null);
+  const { close } = useWindowContext();
 
   if (!music)
     return null;
@@ -39,6 +41,9 @@ export const PlayerSettingsButton = () => {
               href={PATH_ROUTES.musics.frontend.playlists.withParams( {
                 playlistId: currentResource.playlistId,
               } )}
+              beforeOnClick={()=>close( {
+                keepState: true,
+              } )}
             />
           )}
 
@@ -52,6 +57,9 @@ export const PlayerSettingsButton = () => {
           <AnchorContextMenuItem
             label="Ir a la música"
             href={PATH_ROUTES.musics.frontend.path + "/" + music.id}
+            beforeOnClick={()=>close( {
+              keepState: true,
+            } )}
           />
 
           <MusicContextMenu />

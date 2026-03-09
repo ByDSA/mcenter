@@ -274,12 +274,18 @@ export const ContextMenuItem = ( { label,
 };
 
 type AnchorContextMenuItemProps = Omit<CreateContextMenuItemProps, "onClick"> &
-  {href: string};
-export const AnchorContextMenuItem = ( { href, ...props }: AnchorContextMenuItemProps) => {
+  {
+    href: string;
+    beforeOnClick?: ()=> void;
+  };
+export const AnchorContextMenuItem = ( { href,
+  beforeOnClick,
+  ...props }: AnchorContextMenuItemProps) => {
   const router = useRouter();
   const onClick = useCallback(() => {
+    beforeOnClick?.();
     router.push(href);
-  }, [href]);
+  }, [router, href, beforeOnClick]);
 
   return <ContextMenuItem
     {...props}
