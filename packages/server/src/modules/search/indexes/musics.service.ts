@@ -3,6 +3,7 @@ import { Index, MeiliSearch, SearchParams, SearchResponse } from "meilisearch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Music, MusicEntity, MusicUserInfoEntity } from "$shared/models/musics";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
+import { WithRequired } from "$shared/utils/objects";
 import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { MusicEvents } from "#musics/crud/repositories/music/events";
 import { DomainEvent, EntityEvent, PatchEvent } from "#core/domain-event-emitter";
@@ -100,7 +101,7 @@ export class MusicsIndexService {
 
       assertFoundServer(docOdm);
 
-      let doc: UserInfoDoc = this.mapUserInfoOdm(docOdm);
+      let doc = this.mapUserInfoOdmToUpdate(docOdm);
 
       await this.updateUserInfo(doc);
     } else if (ev.type === MusicsUsersEvents.Created.TYPE) {
@@ -201,7 +202,9 @@ export class MusicsIndexService {
   async syncAll() {
     const musics = await MusicOdm.Model.find().lean(); // .lean() elimina overhead de Mongoose
     const musicsUsers = await MusicsUsersOdm.Model.find().lean();
-    const privatePlaylists = await MusicPlaylistOdm.Model.find().lean();
+    const privatePlaylists = await MusicPlaylistOdm.Model.find( {
+      visibility: "private",
+    } ).lean();
     const usersIds: (string)[] = await this.getUserIds();
     const playlistsByUser = new Map<string, Map<string, string[]>>();
 
@@ -409,7 +412,7 @@ export class MusicsIndexService {
   }
 
   async updateUserInfo(
-    userInfoDoc: UserInfoDoc,
+    userInfoDoc: WithRequired<Partial<UserInfoDoc>, "musicId" | "userId">,
   ): Promise<void> {
     const id = genId(userInfoDoc);
     const doc = {
@@ -436,15 +439,16 @@ export class MusicsIndexService {
     } satisfies MusicDoc;
   }
 
-  private mapUserInfoOdm(m: MusicsUsersOdm.FullDoc): UserInfoDoc {
+  private mapUserInfoOdmToUpdate(
+    m: MusicsUsersOdm.FullDoc,
+  ): Omit<UserInfoDoc, "privatePlaylistSlugs"> {
     return {
       musicId: m.musicId.toString(),
       userId: m.userId.toString(),
       lastTimePlayedAt: m.lastTimePlayed,
       weight: m.weight,
       tags: m.tags ?? null,
-      privatePlaylistSlugs: [],
-    } satisfies UserInfoDoc;
+    } satisfies Omit<UserInfoDoc, "privatePlaylistSlugs">;
   }
 
   private mapMusicModel(m: MusicEntity): MusicDoc {
@@ -462,7 +466,7 @@ export class MusicsIndexService {
   private mapUserInfoModel(m: MusicUserInfoEntity): UserInfoDoc {
     return {
       userId: m.userId,
-      musicId: m.id,
+      musicId: m.musicId,
       lastTimePlayedAt: m.lastTimePlayed,
       weight: m.weight,
       tags: m.tags ?? null,
