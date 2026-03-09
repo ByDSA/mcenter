@@ -49,6 +49,11 @@ export const PlayerSettingsButton = () => {
             />
           )}
 
+          <AnchorContextMenuItem
+            label="Ir a la música"
+            href={PATH_ROUTES.musics.frontend.path + "/" + music.id}
+          />
+
           <MusicContextMenu />
         </LocalDataProvider>
       ),
