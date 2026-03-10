@@ -24,6 +24,7 @@ type Props = Pick<ResourceEntryProps, "drag"> & {
   contextMenu?: {
     customContent: ReactNode;
   };
+  onDelete?: ()=> void;
   playable?: boolean;
   onClickPlay?: (prevStatus: PlayerStatus)=> Promise<void> | void;
   playlistInfo?: {
@@ -140,7 +141,7 @@ export function MusicEntryElement(
         event: e,
         content: props.contextMenu?.customContent
          ?? <LocalDataProvider data={music}>
-           <MusicContextMenu />
+           <MusicContextMenu onDelete={props.onDelete} />
          </LocalDataProvider>,
       } )
       }

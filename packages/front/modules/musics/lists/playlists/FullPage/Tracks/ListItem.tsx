@@ -38,10 +38,24 @@ export const MusicPlaylistItem = ( { playlist,
   if (!music)
     return <ResourceEntryLoading drag={drag}/>;
 
+  // Quitar TODAS las ocurrencias de la canción de la playlist localmente.
+  // Se filtra por musicId (no por index) porque al borrar la música de la BD
+  // debe desaparecer en todos los puestos donde aparezca.
+  const removeFromPlaylist = () => {
+    setPlaylist(old => {
+      if (!old)
+        return old;
+
+      return {
+        ...old,
+        list: old.list.filter((item) => item.musicId !== value.musicId),
+      };
+    } );
+  };
   const contextMenuContent = <LocalDataProvider
     data={music}
   >
-    <MusicContextMenu />
+    <MusicContextMenu onDelete={removeFromPlaylist} />
     {user?.id === playlist.ownerUserId && <>
       {index !== 0 && <ContextMenuItem
         label="Mover al principio"

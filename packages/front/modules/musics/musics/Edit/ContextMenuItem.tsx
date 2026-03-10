@@ -5,10 +5,14 @@ import { LocalDataProvider, useLocalData } from "#modules/utils/local-data-conte
 import { EditMusicLoader } from "./Loader";
 import styles from "./Modal.module.css";
 
+type Props = {
+  onDelete?: ()=> void;
+};
+
 // Se necesita como hook-wrapper, porque si se pone dentro del ContextMenu,
 // al cerrarse el menú se destruyen los hooks del modal
 // y no se puede actualizar cuando llegan los datos
-export const EditMusicContextMenuItem = () => {
+export const EditMusicContextMenuItem = ( { onDelete }: Props = {} ) => {
   const { openModal } = useModal();
   const { data, setData } = useLocalData<MusicEntity>();
 
@@ -19,7 +23,7 @@ export const EditMusicContextMenuItem = () => {
         title: "Editar música",
         className: styles.modal,
         content: <LocalDataProvider data={data} setData={setData}>
-          <EditMusicLoader />
+          <EditMusicLoader onDelete={onDelete} />
         </LocalDataProvider>,
       } );
     }}

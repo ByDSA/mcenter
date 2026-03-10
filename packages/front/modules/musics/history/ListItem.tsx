@@ -17,7 +17,11 @@ import { isMusicUnavailable } from "../models";
 import { MusicHistoryEntrySettingsButton } from "./SettingsButton/SettingsButton";
 import { MusicHistoryEntryEntity } from "./models";
 
-export const MusicHistoryListItem = React.memo(() =>{
+type Props = {
+  onDeleteMusic: ()=> void;
+};
+
+export const MusicHistoryListItem = React.memo(( { onDeleteMusic }: Props) =>{
   const { data } = useLocalData<MusicHistoryEntryEntity>();
   const { user } = useUser();
   const favoritesPlaylistId = user?.musics.favoritesPlaylistId ?? null;
@@ -65,7 +69,7 @@ export const MusicHistoryListItem = React.memo(() =>{
         <WeightView weight={music.userInfo!.weight} />
       </>
     }
-    settings={<MusicHistoryEntrySettingsButton />}
+    settings={<MusicHistoryEntrySettingsButton onDeleteMusic={onDeleteMusic} />}
     favButton={
       <PlaylistFavButton
         favoritesPlaylistId={favoritesPlaylistId}

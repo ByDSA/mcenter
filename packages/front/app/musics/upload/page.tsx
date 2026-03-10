@@ -109,6 +109,7 @@ export default function Upload() {
               <MusicEntryElement
                 musicId={music.id}
                 playable={true}
+                onDelete={() => setUploaded(old => old.filter(m => m.id !== music.id))}
               />
             </Fragment>,
           )

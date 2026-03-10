@@ -17,7 +17,7 @@ type ArrayData = MusicHistoryEntryEntity[];
 
 export function MusicHistoryList() {
   const { data, isLoading, error,
-    setItem, observerTarget } = useHistoryList();
+    setItem, setData, observerTarget } = useHistoryList();
 
   if (data) {
     for (const entry of data) {
@@ -53,7 +53,12 @@ export function MusicHistoryList() {
                   setData={(newEntry: typeof entry) => {
                     setItem(i, newEntry);
                   }} >
-                  <MusicHistoryListItem />
+                  <MusicHistoryListItem
+                    onDeleteMusic={() => setData(
+                      old => old?.filter(e => e.resourceId !== entry.resourceId) ?? old,
+                    )
+                    }
+                  />
                 </LocalDataProvider>
               </Fragment>;
             },

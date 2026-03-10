@@ -10,7 +10,11 @@ import { MusicLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem"
 import { DeleteHistoryEntryContextMenuItem } from "../Delete/ContextMenuItem";
 import { MusicHistoryEntryEntity } from "../models";
 
-const HistoryEntryContextMenu = () => {
+type ContextMenuProps = {
+  onDeleteMusic: ()=> void;
+};
+
+const HistoryEntryContextMenu = ( { onDeleteMusic }: ContextMenuProps) => {
   const { data } = useLocalData<MusicHistoryEntryEntity>();
   const { user } = useUser();
   const { data: music } = useMusic(data.resourceId);
@@ -21,7 +25,9 @@ const HistoryEntryContextMenu = () => {
         <AddToPlaylistContextMenuItem
           musicId={data.resourceId}
         />
-        <EditMusicContextMenuItem />
+        <EditMusicContextMenuItem
+          onDelete={onDeleteMusic}
+        />
         <MusicLatestViewsContextMenuItem
           music={data.resource}
           musicId={data.resourceId}
@@ -36,7 +42,11 @@ const HistoryEntryContextMenu = () => {
   );
 };
 
-export const MusicHistoryEntrySettingsButton = () => {
+type SettingsButtonProps = {
+  onDeleteMusic: ()=> void;
+};
+
+export const MusicHistoryEntrySettingsButton = ( { onDeleteMusic }: SettingsButtonProps) => {
   const { data, setData } = useLocalData<MusicHistoryEntryEntity>();
   const { openMenu } = useContextMenuTrigger();
 
@@ -49,7 +59,7 @@ export const MusicHistoryEntrySettingsButton = () => {
             <LocalDataProvider
               data={data}
               setData={setData} >
-              <HistoryEntryContextMenu />
+              <HistoryEntryContextMenu onDeleteMusic={onDeleteMusic} />
             </LocalDataProvider>,
       } );
     }}/>;

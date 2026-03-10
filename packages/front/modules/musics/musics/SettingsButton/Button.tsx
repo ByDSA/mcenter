@@ -25,13 +25,17 @@ export const MusicSettingsButton = ( { musicId }: Props) => {
       event: e,
       content: <LocalDataProvider
         data={data}>
-        <MusicContextMenu/
-        ></LocalDataProvider>,
+        <MusicContextMenu/>
+      </LocalDataProvider>,
     } );
   }}/>;
 };
 
-export function MusicContextMenu() {
+type MusicContextMenuProps = {
+  onDelete?: ()=> void;
+};
+
+export function MusicContextMenu( { onDelete }: MusicContextMenuProps = {} ) {
   const { data: music } = useLocalData<MusicEntity>();
   const musicId = music.id;
   const { user } = useUser();
@@ -41,7 +45,7 @@ export function MusicContextMenu() {
       user && <><AddToPlaylistContextMenuItem
         musicId={musicId}
       />
-      <EditMusicContextMenuItem />
+      <EditMusicContextMenuItem onDelete={onDelete} />
       <MusicLatestViewsContextMenuItem
         music={music}
         musicId={musicId}

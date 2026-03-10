@@ -9,7 +9,11 @@ import { useMusic } from "#modules/musics/hooks";
 import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { EditMusicForm } from "./Form";
 
-export function EditMusicLoader() {
+type Props = {
+  onDelete?: ()=> void;
+};
+
+export function EditMusicLoader( { onDelete: onDeleteProp }: Props = {} ) {
   const { data: initialData } = useLocalData<MusicEntity>();
   const { closeModal } = useModal(true);
   const fetchData = useCallback(async () => {
@@ -36,6 +40,9 @@ export function EditMusicLoader() {
         }}
         onDelete={() => {
           closeModal();
+
+          // Notificar a la lista desde la que se llamó para que quite el item visualmente
+          onDeleteProp?.();
 
           // Si la música eliminada es la que está en el player, actuar según el estado
           const player = useBrowserPlayer.getState();
