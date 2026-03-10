@@ -25,12 +25,20 @@ export const usePlaylistPlayer = (value: MusicPlaylistEntity) => {
 
     if (newIndex === -1) {
       // La pista en reproducción fue eliminada de la playlist.
-      // Intentamos reproducir la que queda en esa misma posición (la que "cae" donde estaba).
       const fallbackIndex = Math.min(currentQueueIndex, newQueue.length - 1);
 
-      if (fallbackIndex >= 0)
-        player.playQueueIndex(fallbackIndex).catch(showError);
-      else
+      if (fallbackIndex >= 0) {
+        if (player.status === "paused") {
+          // Estaba pausado: detenemos el player (sin reproducir la siguiente)
+          // pero dejamos el índice actualizado para que si el usuario reanuda,
+          // empiece por la pista que "cayó" en esa posición.
+          player.close();
+          player.setQueueIndex(fallbackIndex);
+        } else {
+          // Estaba reproduciendo: avanzar a la siguiente pista automáticamente
+          player.playQueueIndex(fallbackIndex).catch(showError);
+        }
+      } else
         player.close(); // La playlist quedó vacía
     } else {
       // La pista sigue ahí (reorden u otro cambio): actualizar solo el índice

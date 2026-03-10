@@ -6,6 +6,7 @@ import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { useModal } from "#modules/ui-kit/modal/ModalContext";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { useMusic } from "#modules/musics/hooks";
+import { useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { EditMusicForm } from "./Form";
 
 export function EditMusicLoader() {
@@ -35,6 +36,19 @@ export function EditMusicLoader() {
         }}
         onDelete={() => {
           closeModal();
+
+          // Si la música eliminada es la que está en el player, actuar según el estado
+          const player = useBrowserPlayer.getState();
+          const isPlayingThisMusic = player.currentResource?.resourceId === initialData.id;
+
+          if (isPlayingThisMusic) {
+            if (player.status === "paused")
+              player.close();
+            else {
+              // Estaba reproduciendo: next() la pasará a la siguiente o cerrará si no hay más
+              player.next().catch(() => player.close());
+            }
+          }
         }}
       />
     </AsyncLoader>
