@@ -49,7 +49,7 @@ export function EditMusicLoader( { onDelete: onDeleteProp }: Props = {} ) {
           const isPlayingThisMusic = player.currentResource?.resourceId === initialData.id;
 
           if (isPlayingThisMusic) {
-            if (player.status === "paused")
+            if (player.status === "paused" || !player.hasNext())
               player.close();
             else {
               // Estaba reproduciendo: next() la pasará a la siguiente o cerrará si no hay más
