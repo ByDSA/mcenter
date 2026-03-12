@@ -150,7 +150,7 @@ function merge(oldData: MusicEntity | undefined, newData: Partial<MusicEntity>):
   }
 
   for (const op of OPTIONAL_KEYS) {
-    if (newData[op] === undefined)
+    if (op in newData && newData[op] === undefined)
       delete ret[op];
   }
 
