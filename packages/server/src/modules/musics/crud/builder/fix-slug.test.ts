@@ -132,6 +132,11 @@ describe("fixSlug", () => {
       expected: "fake-space",
       description: "remove fake spaces",
     },
+    {
+      input: "a~a",
+      expected: "a-a",
+      description: "replace ~ by -",
+    },
   ];
 
   testCases.forEach(( { input, expected, description } ) => {
