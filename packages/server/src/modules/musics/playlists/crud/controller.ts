@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Req, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Req, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { mongoDbId } from "$shared/models/resources/partial-schemas";
 import z from "zod";
@@ -9,10 +9,9 @@ import { createSuccessResultResponse } from "$shared/utils/http/responses";
 import { assertIsDefined } from "$shared/utils/validation";
 import { UserPayload } from "$shared/models/auth";
 import { slugSchema } from "$shared/models/utils/schemas/slug";
-import { GetManyCriteria, GetOneCriteria, UserDeleteOne, UserPatchOne, UserPost, UserCreateOne, GetOneById } from "#utils/nestjs/rest";
+import { GetManyCriteria, GetOneCriteria, UserDeleteOne, UserPatchOne, UserCreateOne, GetOneById } from "#utils/nestjs/rest";
 import { ResponseFormat } from "#modules/resources/response-formatter";
 import { assertFoundClient } from "#utils/validation/found";
-import { MusicHistoryRepository } from "#musics/history/crud/repository";
 import { MusicRendererService } from "#musics/renderer/renderer.service";
 import { User } from "#core/auth/users/User.decorator";
 import { Authenticated } from "#core/auth/users/Authenticated.guard";
@@ -20,6 +19,7 @@ import { IdParamDto } from "#utils/validation/dtos";
 import { MusicResponseFormatterService } from "#musics/renderer/formatter.service";
 import { TokenAuth } from "#core/auth/strategies/token/decorator";
 import { RenderMusic } from "#musics/renderer/renderer.interceptor";
+import { ValidateResponseWithZodSchema } from "#utils/validation/zod-nestjs";
 import { MusicPlaylistCrudDtos } from "../models/dto";
 import { musicPlaylistEntitySchema } from "../models";
 import { MusicPlaylistsRepository } from "./repository/repository";
@@ -73,7 +73,7 @@ class GetManyUserPlaylistsBody extends createZodDto(
 
 class AddManyTrackBody extends createZodDto(z.object( {
   musics: z.array(mongoDbId),
-  unique: z.boolean().optional(),
+  allowDuplicates: z.boolean().optional(),
 } )) {}
 class RemoveManyTrackBody extends createZodDto(z.object( {
   tracks: z.array(mongoDbId).optional(),
@@ -91,7 +91,6 @@ export class MusicPlaylistsController {
   constructor(
     private readonly playlistsRepo: MusicPlaylistsRepository,
     private readonly responseFormatter: MusicResponseFormatterService,
-    private readonly musicHistoryRepo: MusicHistoryRepository,
     private readonly musicRenderer: MusicRendererService,
   ) {
   }
@@ -189,8 +188,11 @@ export class MusicPlaylistsController {
     return ret;
   }
 
-  @UserPost("/:id/track", musicPlaylistEntitySchema)
-  async addTracks(
+  @Authenticated()
+  @Post("/:id/track")
+  @ValidateResponseWithZodSchema(MusicPlaylistCrudDtos.AddManyTracks.responseSchema)
+  @HttpCode(HttpStatus.OK)
+  async addManyTracks(
     @Param() params: IdParamDto,
     @User() user: UserPayload,
     @Body() body: AddManyTrackBody,
@@ -203,13 +205,14 @@ export class MusicPlaylistsController {
     return await this.playlistsRepo.addManyTracks( {
       id: playlistId,
       musics,
-      unique: body.unique,
+      allowDuplicates: body.allowDuplicates,
     } );
   }
 
-  @UserDeleteOne(musicPlaylistEntitySchema, {
-    url: "/:id/track",
-  } )
+  @Authenticated()
+  @Delete("/:id/track")
+  @ValidateResponseWithZodSchema(MusicPlaylistCrudDtos.AddManyTracks.responseSchema)
+  @HttpCode(HttpStatus.OK)
   async removeManyTracks(
     @Param() params: IdParamDto,
     @User() user: UserPayload,

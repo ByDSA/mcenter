@@ -10,6 +10,7 @@ import { DaFooterButtons } from "#modules/ui-kit/form/Footer/Buttons/FooterButto
 import { useMusicPlaylistsForUser } from "../../request-all";
 import { MusicPlaylistEntity } from "../../models";
 import { NewPlaylistButton } from "../../New/NewPlaylistButton";
+import { PlayListSelectorIsAddedFn } from "../List";
 import styles from "./Modal.module.css";
 
 type OpenModalProps = Omit<
@@ -21,9 +22,10 @@ type OpenModalProps = Omit<
 type Props = {
   closeOnSelect?: boolean;
   nullable?: boolean;
+  isAdded?: PlayListSelectorIsAddedFn;
 };
-export function usePlaylistSelectorModal(props?: Props) {
-  const { closeOnSelect = true, nullable = false } = props ?? {};
+export function usePlaylistSelectorModal(props: Props) {
+  const { closeOnSelect = true, nullable = false, isAdded } = props;
   const { LL } = useI18nContext();
   const { openModal: _openModal, closeModal, id, isOpen } = useModal();
   const { user } = useUser();
@@ -38,6 +40,7 @@ export function usePlaylistSelectorModal(props?: Props) {
       content: (
         <AddToPlaylistForm
           userId={user.id}
+          isAdded={isAdded}
           nullable={nullable}
           onSelect={async p=>{
             await openModalProps.onSelect(p);
@@ -60,13 +63,18 @@ export function usePlaylistSelectorModal(props?: Props) {
 
 type AddToPlaylistContentProps = {
   userId: string;
+  isAdded?: PlayListSelectorIsAddedFn;
   onSelect: (playlist: MusicPlaylistEntity | null)=> void;
   nullable?: boolean;
 };
-function AddToPlaylistForm( { userId, onSelect, nullable }: AddToPlaylistContentProps) {
+function AddToPlaylistForm( { userId,
+  isAdded,
+  onSelect,
+  nullable }: AddToPlaylistContentProps) {
   const { LL } = useI18nContext();
   const { element, setData, fetchData, isSuccess } = useMusicPlaylistsForUser( {
     userId,
+    isAdded,
     onSelect,
   } );
   const newPlaylistButton = <NewPlaylistButton

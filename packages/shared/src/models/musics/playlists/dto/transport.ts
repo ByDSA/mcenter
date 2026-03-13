@@ -20,6 +20,22 @@ const criteriaConfig = {
 export namespace MusicPlaylistCrudDtos {
   const responseOneSchema = createOneResultResponseSchema(musicPlaylistEntitySchema);
   const responseManySchema = createManyResultResponseSchema(musicPlaylistEntitySchema);
+
+  const skippedDuplicatesWarningSchema = z.object( {
+    code: z.literal("DUPLICATES_SKIPPED"),
+    skippedMusicIds: z.array(mongoDbId),
+  } );
+
+  const tracksNotFoundWarningSchema = z.object( {
+    code: z.literal("TRACKS_NOT_FOUND"),
+    notFoundTrackIds: z.array(mongoDbId),
+  } );
+
+  const musicIdsNotFoundWarningSchema = z.object( {
+    code: z.literal("MUSIC_IDS_NOT_FOUND"),
+    notFoundMusicIds: z.array(mongoDbId),
+  } );
+
   export namespace GetMany {
     export const criteriaSchema = createCriteriaManySchema(criteriaConfig);
     export type Criteria = z.infer<typeof criteriaSchema>;
@@ -56,6 +72,7 @@ export namespace MusicPlaylistCrudDtos {
     export const responseSchema = responseOneSchema;
     export type Response = z.infer<typeof responseSchema>;
   }
+
   export namespace CreateOne {
     export const bodySchema = musicPlaylistSchema
       .omit( {
@@ -69,24 +86,46 @@ export namespace MusicPlaylistCrudDtos {
     export type Response = z.infer<typeof responseSchema>;
   }
 
-  export namespace AddOneTrack {
+  export namespace AddManyTracks {
     export const dataSchema = musicPlaylistEntitySchema;
 
     export type Data = z.infer<typeof dataSchema>;
-
-    export const responseSchema = responseOneSchema;
-    export type Response = z.infer<typeof responseSchema>;
-
     export const bodySchema = z.object( {
       musics: z.array(mongoDbId),
-      unique: z.boolean().optional(),
+      allowDuplicates: z.boolean().optional(),
     } );
 
     export type Body = z.infer<typeof bodySchema>;
-  }
-  export namespace RemoveOneTrack {
-    export const responseSchema = responseOneSchema;
-    export type Response = z.infer<typeof responseSchema>;
+
+    export const warningSchema = skippedDuplicatesWarningSchema;
+    export type Warning = z.infer<typeof warningSchema>;
+
+    export const returnSchema = createOneResultResponseSchema(
+      musicPlaylistEntitySchema,
+      {
+        warningsSchema: warningSchema,
+      },
+    );
+    export const responseSchema = returnSchema;
+    export type Return = z.infer<typeof returnSchema>;
+    export type Response = Return;
+}
+
+  export namespace RemoveManyTracks {
+    export const warningSchema = tracksNotFoundWarningSchema;
+    export type Warning = z.infer<typeof warningSchema>;
+
+    export const returnSchema = createOneResultResponseSchema(
+      musicPlaylistEntitySchema,
+      {
+        warningsSchema: warningSchema,
+      },
+    );
+    export type Return = z.infer<typeof returnSchema>;
+
+    export const responseSchema = returnSchema;
+    export type Response = Return;
+
     export const bodySchema = z.union([
       z.object( {
         tracks: z.array(mongoDbId),
@@ -99,5 +138,18 @@ export namespace MusicPlaylistCrudDtos {
     ]);
 
     export type Body = z.infer<typeof bodySchema>;
-  }
+}
+
+  export namespace RemoveManyMusics {
+    export const warningSchema = musicIdsNotFoundWarningSchema;
+    export type Warning = z.infer<typeof warningSchema>;
+
+    export const returnSchema = createOneResultResponseSchema(
+      musicPlaylistEntitySchema,
+      {
+        warningsSchema: warningSchema,
+      },
+    );
+    export type Return = z.infer<typeof returnSchema>;
+}
 }

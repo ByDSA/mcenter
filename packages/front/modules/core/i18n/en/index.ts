@@ -183,6 +183,9 @@ const en = {
           new: "New playlist",
           select: "Select playlist",
           none: "None",
+          alreadyAdded: "\"{musicTitle}\" was already in \"{playlistName}\" and has not been \
+added.",
+          added: "\"{musicTitle}\" added to \"{playlistName}\"",
         },
         smartPlaylists: {
           oneCreated: "New Smart Playlist created",

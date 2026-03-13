@@ -1,3 +1,4 @@
+import { TurnedIn, TurnedInNot } from "@mui/icons-material";
 import { useImageCover } from "#modules/image-covers/hooks";
 import { MusicPlaylistEntity } from "../models";
 import { MusicImageCover } from "../../../MusicCover";
@@ -5,6 +6,7 @@ import styles from "./Item.module.css";
 
 type Props = {
   data: MusicPlaylistEntity;
+  isAdded?: boolean;
   onClick: ()=> void;
 };
 export const PlaylistSelectorItem = (props: Props) => {
@@ -21,5 +23,10 @@ export const PlaylistSelectorItem = (props: Props) => {
       <div className={styles.name}>{data.name}</div>
       <div className={styles.length}>{data.list.length} músicas</div>
     </section>
+    {props.isAdded !== undefined
+    && <aside>
+      {props.isAdded ? <TurnedIn /> : <TurnedInNot />}
+    </aside>
+    }
   </div>;
 };

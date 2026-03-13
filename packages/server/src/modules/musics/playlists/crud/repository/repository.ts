@@ -49,12 +49,12 @@ type CriteriaMany = MusicPlaylistCrudDtos.GetMany.Criteria;
 type AddOneTrackProps = {
   id: string;
   musicId: string;
-  unique?: boolean;
+  allowDuplicates?: boolean;
 };
 type AddManyTracksProps = {
   id: string;
   musics: string[];
-  unique?: boolean;
+  allowDuplicates?: boolean;
 };
 type RemoveManyTracksProps = {
   id: string;
@@ -157,13 +157,15 @@ playlistId: string;},
     } );
   }
 
-  async addOneTrack( { id, musicId, unique }: AddOneTrackProps): Promise<MusicPlaylistEntity> {
+  async addOneTrack(
+    { id, musicId, allowDuplicates }: AddOneTrackProps,
+  ): Promise<MusicPlaylistEntity> {
     const musicObjectId = new Types.ObjectId(musicId);
     const query: Record<string, any> = {
       _id: id,
     };
 
-    if (unique) {
+    if (!allowDuplicates) {
       query["list.musicId"] = {
         $ne: musicObjectId,
       };
@@ -198,13 +200,16 @@ playlistId: string;},
     return ret;
   }
 
-  async addManyTracks( { id, musics, unique }: AddManyTracksProps): Promise<MusicPlaylistEntity> {
+  async addManyTracks( { id,
+    musics,
+    allowDuplicates }: AddManyTracksProps): Promise<MusicPlaylistCrudDtos.AddManyTracks.Return> {
     const musicPlaylistId = new Types.ObjectId(id);
     let existingPlaylist: MusicPlaylistOdm.FullDoc | null = null;
     let tracksToPush: Array<{ musicId: Types.ObjectId;
 addedAt: Date; }>;
+    const warnings: MusicPlaylistCrudDtos.AddManyTracks.Warning[] = [];
 
-    if (unique) {
+    if (!allowDuplicates) {
       existingPlaylist = await MusicPlaylistOdm.Model.findOne(
         {
           _id: musicPlaylistId,
@@ -214,16 +219,36 @@ addedAt: Date; }>;
       assertFoundClient(existingPlaylist);
 
       const existingMusicIds = new Set(existingPlaylist.list.map(item => item.musicId.toString()));
+      const skippedMusicIds: string[] = [];
 
       tracksToPush = musics
-        .filter(musicId => !existingMusicIds.has(musicId))
+        .filter(musicId => {
+          if (existingMusicIds.has(musicId)) {
+            skippedMusicIds.push(musicId);
+
+            return false;
+          }
+
+          return true;
+        } )
         .map(musicId => ( {
           musicId: new Types.ObjectId(musicId),
           addedAt: new Date(),
         } ));
 
-      if (tracksToPush.length === 0)
-        return MusicPlaylistOdm.toEntity(existingPlaylist);
+      if (skippedMusicIds.length > 0) {
+        warnings.push( {
+          code: "DUPLICATES_SKIPPED",
+          skippedMusicIds,
+        } );
+      }
+
+      if (tracksToPush.length === 0) {
+        return {
+          data: MusicPlaylistOdm.toEntity(existingPlaylist),
+          warnings,
+        };
+      }
     } else {
       // Se añaden todas las canciones de entrada, permitiendo duplicados
       tracksToPush = musics.map(musicId => ( {
@@ -250,26 +275,30 @@ addedAt: Date; }>;
 
     assertFoundClient(updated);
 
-    const ret = MusicPlaylistOdm.toEntity(updated);
+    const data = MusicPlaylistOdm.toEntity(updated);
     const startIndex = existingPlaylist?.list.length ?? 0;
 
     for (let i = startIndex; i < updated.list.length; i++) {
       this.domainEventEmitter.emit(MusicPlayListTrackEvents.Added.TYPE, {
-        playlist: ret,
+        playlist: data,
         trackListPosition: i,
       } as MusicPlayListTrackEvents.Added.Event);
     }
 
-    this.emitPatch(ret);
+    this.emitPatch(data);
 
-    return ret;
+    return {
+      data,
+      warnings: warnings.length > 0 ? warnings : undefined,
+    };
   }
 
   async removeManyTracks(
     { id, tracks }: RemoveManyTracksProps,
-  ): Promise<MusicPlaylistEntity> {
+  ): Promise<MusicPlaylistCrudDtos.RemoveManyTracks.Return> {
     const trackObjectIds = tracks.map(t => new Types.ObjectId(t));
     const tracksToRemoveSet = new Set(tracks.map(t => t.toString()));
+    const warnings: MusicPlaylistCrudDtos.RemoveManyTracks.Warning[] = [];
     const originalDoc = await MusicPlaylistOdm.Model.findOneAndUpdate(
       {
         _id: id,
@@ -289,6 +318,18 @@ addedAt: Date; }>;
     );
 
     assertFoundClient(originalDoc);
+
+    const foundTrackIds = new Set(
+      originalDoc.list.map(t => t._id.toString()),
+    );
+    const notFoundTrackIds = tracks.filter(t => !foundTrackIds.has(t));
+
+    if (notFoundTrackIds.length > 0) {
+      warnings.push( {
+        code: "TRACKS_NOT_FOUND",
+        notFoundTrackIds,
+      } );
+    }
 
     // Procesamiento en Memoria
     // (Mucho más rápido que una segunda query, porque podría ser una lista de >1000 canciones)
@@ -320,7 +361,10 @@ addedAt: Date; }>;
 
     this.emitPatch(newEntity);
 
-    return newEntity;
+    return {
+      data: newEntity,
+      warnings: warnings.length > 0 ? warnings : undefined,
+    };
   }
 
   async removeManyMusics(

@@ -4,13 +4,14 @@ import { FetchApi } from "#modules/fetching/fetch-api";
 import { AsyncLoader } from "#modules/utils/AsyncLoader";
 import { MusicPlaylistsApi } from "./requests";
 import { MusicPlaylistEntity } from "./models";
-import { PlaylistSelector } from "./Selector/List";
+import { PlaylistSelector, PlayListSelectorIsAddedFn } from "./Selector/List";
 
 type Props = {
   userId: string;
+  isAdded?: PlayListSelectorIsAddedFn;
   onSelect: (playlist: MusicPlaylistEntity | null)=> void;
 };
-export function useMusicPlaylistsForUser( { userId, onSelect }: Props) {
+export function useMusicPlaylistsForUser( { userId, isAdded, onSelect }: Props) {
   const [data, setData] = useState<MusicPlaylistEntity[] | null>(null);
   const fetchData = useCallback(async () => {
     const api = FetchApi.get(MusicPlaylistsApi);
@@ -36,7 +37,7 @@ export function useMusicPlaylistsForUser( { userId, onSelect }: Props) {
           }}>No hay playlists disponibles</div>
         )
         : (
-          <PlaylistSelector data={data!} onSelect={onSelect} />
+          <PlaylistSelector data={data!} isAdded={isAdded} onSelect={onSelect} />
         )
     }
   </AsyncLoader>;

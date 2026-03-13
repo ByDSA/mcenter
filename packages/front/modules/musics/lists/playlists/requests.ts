@@ -6,7 +6,7 @@ import { type MusicPlaylistEntity } from "./models";
 import { MusicPlaylistCrudDtos } from "./models/dto";
 
 type AddOneTrackOptions = {
-  unique?: boolean;
+  allowDuplicates?: boolean;
 };
 
 export class MusicPlaylistsApi {
@@ -88,8 +88,8 @@ export class MusicPlaylistsApi {
   ) {
     const fetcher = makeFetcher( {
       method: "POST",
-      requestSchema: MusicPlaylistCrudDtos.AddOneTrack.bodySchema,
-      responseSchema: MusicPlaylistCrudDtos.AddOneTrack.responseSchema,
+      requestSchema: MusicPlaylistCrudDtos.AddManyTracks.bodySchema,
+      responseSchema: MusicPlaylistCrudDtos.AddManyTracks.responseSchema,
     } );
 
     return fetcher( {
@@ -100,7 +100,7 @@ export class MusicPlaylistsApi {
       ),
       body: {
         musics: [musicId],
-        unique: options?.unique,
+        allowDuplicates: options?.allowDuplicates,
       },
     } );
   }
@@ -113,8 +113,8 @@ export class MusicPlaylistsApi {
   ) {
     const fetcher = makeFetcher( {
       method: "DELETE",
-      requestSchema: MusicPlaylistCrudDtos.RemoveOneTrack.bodySchema,
-      responseSchema: MusicPlaylistCrudDtos.RemoveOneTrack.responseSchema,
+      requestSchema: MusicPlaylistCrudDtos.RemoveManyTracks.bodySchema,
+      responseSchema: MusicPlaylistCrudDtos.RemoveManyTracks.responseSchema,
     } );
 
     return fetcher( {
@@ -134,8 +134,8 @@ export class MusicPlaylistsApi {
 musicId: string;} ) {
     const fetcher = makeFetcher( {
       method: "DELETE",
-      requestSchema: MusicPlaylistCrudDtos.RemoveOneTrack.bodySchema,
-      responseSchema: MusicPlaylistCrudDtos.RemoveOneTrack.responseSchema,
+      requestSchema: MusicPlaylistCrudDtos.RemoveManyTracks.bodySchema,
+      responseSchema: MusicPlaylistCrudDtos.RemoveManyTracks.responseSchema,
     } );
 
     return fetcher( {

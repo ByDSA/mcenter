@@ -24,7 +24,7 @@ export const PlaylistFavButton = ( { favoritesPlaylistId,
       const api = FetchApi.get(MusicPlaylistsApi);
 
       await api.addOneTrack(favoritesPlaylistId!, musicId, {
-        unique: true,
+        allowDuplicates: false,
       } );
 
       useMusic.updateCacheWithMerging(musicId, {

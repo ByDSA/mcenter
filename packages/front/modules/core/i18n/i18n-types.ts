@@ -651,6 +651,18 @@ type RootTranslation = {
 					 * N​i​n​g​u​n​a
 					 */
 					none: string
+					/**
+					 * "​{​m​u​s​i​c​T​i​t​l​e​}​"​ ​y​a​ ​e​s​t​a​b​a​ ​e​n​ ​"​{​p​l​a​y​l​i​s​t​N​a​m​e​}​"​ ​y​ ​n​o​ ​s​e​ ​h​a​ ​a​ñ​a​d​i​d​o​.
+					 * @param {string} musicTitle
+					 * @param {string} playlistName
+					 */
+					alreadyAdded: RequiredParams<'musicTitle' | 'playlistName'>
+					/**
+					 * "​{​m​u​s​i​c​T​i​t​l​e​}​"​ ​a​ñ​a​d​i​d​a​ ​a​ ​"​{​p​l​a​y​l​i​s​t​N​a​m​e​}​"
+					 * @param {string} musicTitle
+					 * @param {string} playlistName
+					 */
+					added: RequiredParams<'musicTitle' | 'playlistName'>
 				}
 				smartPlaylists: {
 					/**
@@ -1689,6 +1701,14 @@ export type TranslationFunctions = {
 					 * Ninguna
 					 */
 					none: () => LocalizedString
+					/**
+					 * "{musicTitle}" ya estaba en "{playlistName}" y no se ha añadido.
+					 */
+					alreadyAdded: (arg: { musicTitle: string, playlistName: string }) => LocalizedString
+					/**
+					 * "{musicTitle}" añadida a "{playlistName}"
+					 */
+					added: (arg: { musicTitle: string, playlistName: string }) => LocalizedString
 				}
 				smartPlaylists: {
 					/**
