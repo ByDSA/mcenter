@@ -3,7 +3,6 @@ import type { MusicFileInfoEntity } from "$shared/models/musics/file-info";
 import type { MusicId } from "#musics/models";
 import { PATH_ROUTES } from "$shared/routing";
 import { MusicFileInfoCrudDtos } from "$shared/models/musics/file-info/dto/transport";
-import z from "zod";
 import { makeFetcher } from "#modules/fetching";
 import { backendUrl } from "#modules/requests";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -31,10 +30,10 @@ export class MusicFileInfosApi {
 
   async deleteOneById(
     id: MusicFileInfoEntity["id"],
-  ): Promise<void> {
+  ): Promise<MusicFileInfoCrudDtos.DeleteOne.Response> {
     const fetcher = makeFetcher( {
       method: "DELETE",
-      responseSchema: z.undefined(),
+      responseSchema: MusicFileInfoCrudDtos.DeleteOne.responseSchema,
     } );
 
     return fetcher( {

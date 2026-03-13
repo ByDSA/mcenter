@@ -39,6 +39,11 @@ export namespace MusicFileInfoCrudDtos {
     export type Response = z.infer<typeof responseSchema>;
   }
 
+  export namespace DeleteOne {
+    export const responseSchema = createOneResultResponseSchema(musicFileInfoEntitySchema);
+    export type Response = z.infer<typeof responseSchema>;
+  }
+
   export namespace UploadFile {
     export const requestBodySchema = z.object( {
       metadata: z.object( {

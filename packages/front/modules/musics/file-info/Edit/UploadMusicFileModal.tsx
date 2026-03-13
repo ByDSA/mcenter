@@ -15,6 +15,7 @@ import styles from "./UploadMusicFileModal.module.css";
 
 type OpenModalProps = {
   musicId: string;
+  onUpload?: (musicFileInfo: MusicFileInfoEntity)=> void;
 };
 export const useUploadMusicFileModal = () => {
   const { openModal, ...ret } = useModal();
@@ -44,6 +45,7 @@ export const useUploadMusicFileModal = () => {
               withCredentials
               onCreateMusicFileInfo={musicFileInfo => {
                 add(musicFileInfo);
+                props.onUpload?.(musicFileInfo);
               }}
             />
           </DaInputGroupItem>
@@ -70,7 +72,10 @@ export const useUploadMusicFileModal = () => {
                   options?.setSelectedFiles?.((old) => ([
                     ...old.filter(f => f.id !== fileData.id),
                   ]));
-                  add(parsedResponse.data.fileInfo);
+                  const { fileInfo } = parsedResponse.data;
+
+                  add(fileInfo);
+                  props.onUpload?.(fileInfo);
                 },
               } )}
             />
