@@ -195,7 +195,10 @@ playlistId: string;},
       trackListPosition: ret.list.length - 1,
     } as MusicPlayListTrackEvents.Added.Event);
 
-    this.emitPatch(ret);
+    this.emitPatch( {
+      id: ret.id,
+      list: ret.list,
+    } );
 
     return ret;
   }
@@ -285,7 +288,10 @@ addedAt: Date; }>;
       } as MusicPlayListTrackEvents.Added.Event);
     }
 
-    this.emitPatch(data);
+    this.emitPatch( {
+      id: data.id,
+      list: data.list,
+    } );
 
     return {
       data,
@@ -359,7 +365,10 @@ addedAt: Date; }>;
       } as MusicPlayListTrackEvents.Deleted.Event);
     }
 
-    this.emitPatch(newEntity);
+    this.emitPatch( {
+      id: newEntity.id,
+      list: newEntity.list,
+    } );
 
     return {
       data: newEntity,
@@ -369,9 +378,10 @@ addedAt: Date; }>;
 
   async removeManyMusics(
     { id, musicIds }: RemoveManyMusicsProps,
-  ): Promise<MusicPlaylistEntity> {
+  ): Promise<MusicPlaylistCrudDtos.RemoveManyTracks.Return> {
     const musicObjectIds = musicIds.map(m => new Types.ObjectId(m));
     const musicIdsToRemoveSet = new Set(musicIds.map(m => m.toString()));
+    const warnings: MusicPlaylistCrudDtos.RemoveManyTracks.Warning[] = [];
     const originalDoc = await MusicPlaylistOdm.Model.findOneAndUpdate(
       {
         _id: id,
@@ -391,6 +401,20 @@ addedAt: Date; }>;
     );
 
     assertFoundClient(originalDoc);
+
+    const foundMusicIds = new Set(
+      originalDoc.list
+        .filter(t => t.musicId)
+        .map(t => t.musicId.toString()),
+    );
+    const notFoundMusicIds = musicIds.filter(m => !foundMusicIds.has(m));
+
+    if (notFoundMusicIds.length > 0) {
+      warnings.push( {
+        code: "MUSIC_IDS_NOT_FOUND",
+        notFoundMusicIds,
+      } );
+    }
 
     const oldEntity = MusicPlaylistOdm.toEntity(originalDoc);
     const keptTracks: any[] = [];
@@ -419,9 +443,15 @@ addedAt: Date; }>;
       } as MusicPlayListTrackEvents.Deleted.Event);
     }
 
-    this.emitPatch(newEntity);
+    this.emitPatch( {
+      id: newEntity.id,
+      list: newEntity.list,
+    } );
 
-    return newEntity;
+    return {
+      data: newEntity,
+      warnings: warnings.length > 0 ? warnings : undefined,
+    };
   }
 
   async getOneById(id: string): Promise<Entity | null> {

@@ -41,7 +41,9 @@ class MusicPlaylistsRepositoryMock extends createMockClass(MusicPlaylistsReposit
       data: SAMPLE_PLAYLIST,
     } );
     this.addOneTrack.mockResolvedValue(SAMPLE_PLAYLIST);
-    this.removeManyMusics.mockResolvedValue(SAMPLE_PLAYLIST);
+    this.removeManyMusics.mockResolvedValue( {
+      data: SAMPLE_PLAYLIST,
+    } );
     this.removeManyTracks.mockResolvedValue( {
       data: SAMPLE_PLAYLIST,
     } );

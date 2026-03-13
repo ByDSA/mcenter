@@ -112,7 +112,7 @@ export namespace MusicPlaylistCrudDtos {
 }
 
   export namespace RemoveManyTracks {
-    export const warningSchema = tracksNotFoundWarningSchema;
+    export const warningSchema = tracksNotFoundWarningSchema.or(musicIdsNotFoundWarningSchema);
     export type Warning = z.infer<typeof warningSchema>;
 
     export const returnSchema = createOneResultResponseSchema(
@@ -138,18 +138,5 @@ export namespace MusicPlaylistCrudDtos {
     ]);
 
     export type Body = z.infer<typeof bodySchema>;
-}
-
-  export namespace RemoveManyMusics {
-    export const warningSchema = musicIdsNotFoundWarningSchema;
-    export type Warning = z.infer<typeof warningSchema>;
-
-    export const returnSchema = createOneResultResponseSchema(
-      musicPlaylistEntitySchema,
-      {
-        warningsSchema: warningSchema,
-      },
-    );
-    export type Return = z.infer<typeof returnSchema>;
 }
 }

@@ -211,7 +211,7 @@ export class MusicPlaylistsController {
 
   @Authenticated()
   @Delete("/:id/track")
-  @ValidateResponseWithZodSchema(MusicPlaylistCrudDtos.AddManyTracks.responseSchema)
+  @ValidateResponseWithZodSchema(MusicPlaylistCrudDtos.RemoveManyTracks.responseSchema)
   @HttpCode(HttpStatus.OK)
   async removeManyTracks(
     @Param() params: IdParamDto,
@@ -224,7 +224,7 @@ export class MusicPlaylistsController {
     const playlistId = params.id;
 
     await this.guardEditPlaylist(user, playlistId);
-    let ret;
+    let ret: MusicPlaylistCrudDtos.RemoveManyTracks.Return;
 
     if (tracks) {
       ret = await this.playlistsRepo.removeManyTracks( {
@@ -239,6 +239,8 @@ export class MusicPlaylistsController {
         musicIds,
       } );
     }
+
+    assertFoundClient(ret!);
 
     return ret;
   }
