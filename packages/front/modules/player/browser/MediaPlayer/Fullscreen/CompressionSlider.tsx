@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import styles from "./CompressionSlider.module.css";
 
@@ -12,15 +12,16 @@ export const CompressionSlider = () => {
     // Convertimos el valor visual (0-10) al valor interno (0-1)
     setCompressionValue(visualValue / 10);
   };
+  const id = useId();
 
   return (
     <div className={styles.container}>
-      <label htmlFor="compression-slider" className={styles.label}>
+      <label htmlFor={id} className={styles.label}>
         Compresión:
       </label>
       <div className={styles.sliderWrapper}>
         <input
-          id="compression-slider"
+          id={id}
           type="range"
           min="0"
           max="10"
