@@ -216,7 +216,6 @@ describe("musicPlaylistsController", () => {
   describe("createOnePlaylist (POST)", () => {
     const URL = "/";
     const validPayload = {
-      slug: "slug",
       name: "Test Playlist",
       visibility: "public",
     } satisfies MusicPlaylistCrudDtos.CreateOne.Body;

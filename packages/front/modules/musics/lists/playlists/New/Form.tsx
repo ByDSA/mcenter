@@ -41,7 +41,6 @@ export const NewPlaylistForm = ( { onSuccess }: FormProps) => {
     const api = FetchApi.get(MusicPlaylistsApi);
     const res1 = await api.createOne( {
       name: data.name,
-      slug: data.name,
       visibility: data.visibility,
     } );
     const res = await api.getManyByCriteria( {

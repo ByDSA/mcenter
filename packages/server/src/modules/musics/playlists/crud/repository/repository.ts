@@ -538,6 +538,10 @@ addedAt: Date; }>;
       const userId = params.entity.ownerUserId ?? oldDoc.userId.toString();
 
       assertIsDefined(baseSlug, "Invalid slug");
+
+      if (oldDoc.slug === baseSlug)
+        return MusicPlaylistOdm.toEntity(oldDoc);
+
       assertIsDefined(userId, "User ID is required for slug fix");
       slug = await this.slugService.getAvailable( {
         slug: baseSlug,
@@ -590,7 +594,7 @@ addedAt: Date; }>;
     dto: MusicPlaylistCrudDtos.CreateOne.Body,
     userId: string,
   ): Promise<Entity> {
-    const baseSlug = fixSlug(dto.slug);
+    const baseSlug = fixSlug(dto.name);
 
     assertIsDefined(baseSlug, "Invalid slug");
     const slug = await this.slugService.getAvailable( {

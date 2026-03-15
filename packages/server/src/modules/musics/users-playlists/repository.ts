@@ -26,7 +26,6 @@ export class UsersMusicPlaylistsRepository {
     const userId = ev.payload.entity.id;
     const newPlaylist = await this.playlistRepo.createOneAndGet( {
       name: "Favorites",
-      slug: "favorites",
       visibility: "private",
     }, userId);
 

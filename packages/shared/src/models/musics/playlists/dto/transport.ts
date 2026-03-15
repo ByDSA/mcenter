@@ -62,7 +62,14 @@ export namespace MusicPlaylistCrudDtos {
   }
 
   export namespace Patch {
-    export const bodySchema = generatePatchBodySchema(musicPlaylistEntitySchema);
+    export const bodySchema = generatePatchBodySchema(musicPlaylistEntitySchema
+      // Para que se permita enviar cualquier slug y el backend haga el fixer
+      .omit( {
+        slug: true,
+      } ).extend( {
+        slug: z.string()
+          .min(1),
+      } ));
     export type Body = z.infer<typeof bodySchema>;
     export const responseSchema = responseOneSchema;
     export type Response = z.infer<typeof responseSchema>;
@@ -78,6 +85,7 @@ export namespace MusicPlaylistCrudDtos {
       .omit( {
         createdAt: true,
         list: true,
+        slug: true,
         updatedAt: true,
         ownerUserId: true,
       } );
