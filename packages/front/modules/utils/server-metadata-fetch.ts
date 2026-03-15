@@ -6,10 +6,16 @@ import { EpisodeEntity } from "$shared/models/episodes";
 import { MusicEntity } from "$shared/models/musics";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { PATH_ROUTES } from "$shared/routing";
+import { cookies } from "next/headers";
 import { backendUrl } from "#modules/requests";
 
-function toAbsoluteUrl(path: string): string {
-  return `${backendUrl(path)}`;
+async function getForwardedCookieHeader(): Promise<string> {
+  const cookieStore = await cookies();
+
+  return cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
 }
 
 // ---------------------------------------------------------------------------
@@ -17,10 +23,12 @@ function toAbsoluteUrl(path: string): string {
 // ---------------------------------------------------------------------------
 export async function fetchMusicForMetadata(musicId: string): Promise<MusicEntity | null> {
   try {
-    const res = await fetch(toAbsoluteUrl(PATH_ROUTES.musics.getOne.path), {
+    const cookieHeader = await getForwardedCookieHeader();
+    const res = await fetch(backendUrl(PATH_ROUTES.musics.getOne.path), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Cookie: cookieHeader,
       },
       body: JSON.stringify( {
         filter: {
@@ -56,10 +64,12 @@ export async function fetchPlaylistForMetadata(
   filter: PlaylistFilter,
 ): Promise<MusicPlaylistEntity | null> {
   try {
-    const res = await fetch(toAbsoluteUrl(PATH_ROUTES.musics.playlists.getOne.path), {
+    const cookieHeader = await getForwardedCookieHeader();
+    const res = await fetch(backendUrl(PATH_ROUTES.musics.playlists.getOne.path), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Cookie: cookieHeader,
       },
       body: JSON.stringify( {
         filter,
@@ -86,10 +96,12 @@ export async function fetchPlaylistForMetadata(
 // ---------------------------------------------------------------------------
 export async function fetchSeriesForMetadata(seriesId: string): Promise<SeriesEntity | null> {
   try {
-    const res = await fetch(toAbsoluteUrl(PATH_ROUTES.episodes.series.getMany.path), {
+    const cookieHeader = await getForwardedCookieHeader();
+    const res = await fetch(backendUrl(PATH_ROUTES.episodes.series.getMany.path), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Cookie: cookieHeader,
       },
       body: JSON.stringify( {
         filter: {
@@ -119,10 +131,12 @@ export async function fetchSeriesForMetadata(seriesId: string): Promise<SeriesEn
 // ---------------------------------------------------------------------------
 export async function fetchEpisodeForMetadata(episodeId: string): Promise<EpisodeEntity | null> {
   try {
-    const res = await fetch(toAbsoluteUrl(PATH_ROUTES.episodes.getMany.path), {
+    const cookieHeader = await getForwardedCookieHeader();
+    const res = await fetch(backendUrl(PATH_ROUTES.episodes.getMany.path), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Cookie: cookieHeader,
       },
       body: JSON.stringify( {
         filter: {
