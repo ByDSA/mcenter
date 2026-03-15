@@ -108,7 +108,7 @@ export const uploadFileInterceptorOptions: MulterOptions = {
   } ),
   fileFilter: fileMimeTypeFilter(AUDIO_EXTENSIONS.map(getMime)),
   limits: {
-    fileSize: 100 * 1024 * 1024, // 100MB por archivo
+    fileSize: 150 * 1024 * 1024, // 150MB por archivo
   },
 };
 
