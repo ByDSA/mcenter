@@ -54,7 +54,7 @@ async function readAudioTags(fullPath: string): Promise<AudioTags> {
 
 @Injectable()
 export class MusicBuilderService {
-  fixFields<T extends Partial<Music>>(model: T): T {
+  fixFields<T extends Partial<Omit<Music, "tags">>>(model: T): T {
     const ret = fixTxtFields(model, [
       "title",
       "artist",
@@ -69,14 +69,14 @@ export class MusicBuilderService {
 
   async createMusicFromFile(relativePath: string, userId: string): Promise<Music> {
     const fullPath = getAbsolutePath(relativePath);
-    const tags = await readAudioTags(fullPath);
-    const title = tags.title ?? getTitleFromFilenamePath(fullPath);
-    const artist = tags.artist ?? ARTIST_EMPTY;
+    const fileTags = await readAudioTags(fullPath);
+    const title = fileTags.title ?? getTitleFromFilenamePath(fullPath);
+    const artist = fileTags.artist ?? ARTIST_EMPTY;
     const now = new Date();
     let doc1: Omit<Music, "slug"> = {
       title,
       artist,
-      album: tags.album,
+      album: fileTags.album,
       uploaderUserId: userId,
       createdAt: now,
       updatedAt: now,

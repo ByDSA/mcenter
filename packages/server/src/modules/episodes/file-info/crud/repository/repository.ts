@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { FilterQuery, Types } from "mongoose";
 import { OnEvent } from "@nestjs/event-emitter";
+import { EpisodeFileInfoCrudDtos } from "$shared/models/episodes/file-info/dto/transport";
 import { EpisodeFileInfo, EpisodeFileInfoEntity } from "#episodes/file-info/models";
 import { CanCreateOneAndGet, CanGetAll } from "#utils/layers/repository";
 import { EpisodeEntity } from "#episodes/models";
@@ -153,7 +153,7 @@ CanGetAll<Entity> {
 
   async patchOneByPathAndGet(
     path: Entity["path"],
-    patchParams: PatchOneParams<Partial<Model>>,
+    patchParams: EpisodeFileInfoCrudDtos.Patch.Body,
   ): Promise<EpisodeFileInfoEntity> {
     return await this.#patchOneAndGet( {
       path,
@@ -162,7 +162,7 @@ CanGetAll<Entity> {
 
   async patchOneByIdAndGet(
     id: Entity["id"],
-    patchParams: PatchOneParams<Partial<Model>>,
+    patchParams: EpisodeFileInfoCrudDtos.Patch.Body,
   ): Promise<EpisodeFileInfoEntity> {
     return await this.#patchOneAndGet( {
       _id: id,
@@ -171,7 +171,7 @@ CanGetAll<Entity> {
 
   async #patchOneAndGet(
     query: FilterQuery<Model>,
-    params: PatchOneParams<Model>,
+    params: EpisodeFileInfoCrudDtos.Patch.Body,
   ): Promise<EpisodeFileInfoEntity> {
     const updateQuery = patchParamsToUpdateQuery(params, EpisodeFileInfoOdm.partialToDoc);
     const updateResult = await EpisodeFileInfoOdm.Model.findOneAndUpdate(query, updateQuery, {

@@ -2,13 +2,11 @@
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { PipelineStage, Types } from "mongoose";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { assertIsDefined } from "$shared/utils/validation";
 import { MusicSmartPlaylistCrudDtos } from "$shared/models/musics/smart-playlists/dto/transport";
 import { assertFoundClient } from "#utils/validation/found";
 import { CanDeleteOneByIdAndGet,
-  CanGetOneById,
-  CanPatchOneByIdAndGet } from "#utils/layers/repository";
+  CanGetOneById } from "#utils/layers/repository";
 import { fixSlug } from "#musics/crud/builder/fix-slug";
 import { MongoFilterQuery,
   patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
@@ -24,7 +22,6 @@ import { MusicSmartPlaylistEvents } from "./events";
 import { MusicSmartPlaylistOdm } from "./odm";
 
 type Entity = MusicSmartPlaylistEntity;
-type Model = MusicSmartPlaylistModel;
 
 type SlugProps = {
   slug: string;
@@ -34,7 +31,6 @@ type SlugProps = {
 @Injectable()
 export class MusicSmartPlaylistRepository
 implements
-    CanPatchOneByIdAndGet<Entity, string, Model>,
     CanGetOneById<Entity, string>,
     CanDeleteOneByIdAndGet<Entity, string> {
   constructor(
@@ -220,7 +216,7 @@ implements
 
   async patchOneByIdAndGet(
     id: string,
-    params: PatchOneParams<Partial<Model>>,
+    params: MusicSmartPlaylistCrudDtos.Patch.Body,
   ): Promise<Entity> {
     const oldDoc = await MusicSmartPlaylistOdm.Model.findById(id);
 

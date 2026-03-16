@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types, UpdateQuery } from "mongoose";
 import { assertIsDefined } from "$shared/utils/validation";
 import { WithRequired } from "$shared/utils/objects";
+import { EpisodeInfoCrudDtos } from "$shared/models/episodes/user-info/dto/transport";
 import { assertFoundClient } from "#utils/validation/found";
-import { CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanGetOneById } from "#utils/layers/repository";
 import { EpisodeEntity, EpisodeEntityWithUserInfo } from "#episodes/models";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
@@ -27,7 +27,6 @@ type UserInfoKey = {
 @Injectable()
 export class EpisodesUsersRepository
 implements
-CanPatchOneByIdAndGet<Entity, UserInfoKey>,
 CanGetOneById<Entity, UserInfoKey> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
@@ -134,7 +133,7 @@ CanGetOneById<Entity, UserInfoKey> {
 
   async patchOneByIdAndGet(
     key: UserInfoKey,
-    params: PatchOneParams<Entity>,
+    params: EpisodeInfoCrudDtos.Patch.Body,
   ): Promise<Entity> {
     const { entity } = params;
     const updateQuery: UpdateQuery<EpisodesUsersOdm.Doc> = {

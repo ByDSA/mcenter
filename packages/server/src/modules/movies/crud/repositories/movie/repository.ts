@@ -2,7 +2,6 @@ import { MovieCrudDtos } from "$shared/models/movies/dto/transport";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { MovieEntity } from "$shared/models/movies";
 import { assertFoundClient } from "#utils/validation/found";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
@@ -46,7 +45,7 @@ export class MovieRepository {
 
   async patchOneByIdAndGet(
     id: string,
-    params: PatchOneParams<Partial<MovieEntity>>,
+    params: MovieCrudDtos.Patch.Body,
   ): Promise<MovieEntity> {
     const partial = MovieOdm.partialToDoc(params.entity);
     const result = await MovieOdm.Model.updateOne( {

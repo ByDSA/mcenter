@@ -1,25 +1,23 @@
 import assert from "node:assert";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { SeriesCrudDtos } from "$shared/models/episodes/series/dto/transport";
 import { PaginatedResult } from "$shared/utils/http/responses";
 import { assertFoundClient } from "#utils/validation/found";
-import { CanCreateOneAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanCreateOneAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetOneById } from "#utils/layers/repository";
 import { MongoFilterQuery, MongoUpdateQuery, patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { DomainEvent } from "#core/domain-event-emitter";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
 import { getUniqueString } from "#modules/resources/get-unique-string";
-import { Series, SeriesEntity, SeriesKey } from "../../models";
+import { SeriesEntity, SeriesKey } from "../../models";
 import { FullDocOdm, ModelOdm } from "./odm/odm";
 import { SeriesOdm } from "./odm";
 import { SeriesEvents } from "./events";
 import { getSeriesCriteriaPipeline } from "./odm/criteria-pipeline";
 
 type Entity = SeriesEntity;
-type Model = Series;
 
 export type GetManyCriteria = SeriesCrudDtos.GetMany.Criteria & { requestUserId: string |
   null; };
@@ -32,7 +30,6 @@ implements
 CanCreateOneAndGet<Entity>,
 CanGetAll<Entity>,
 CanGetOneById<Entity, string>,
-CanPatchOneByIdAndGet<Entity, string, Model>,
 CanDeleteOneByIdAndGet<Entity, string> {
   constructor(
     private readonly domainEventEmitter: DomainEventEmitter,
@@ -103,7 +100,7 @@ CanDeleteOneByIdAndGet<Entity, string> {
     } );
   }
 
-  async patchOneByIdAndGet(id: string, params: PatchOneParams<Model>): Promise<Entity> {
+  async patchOneByIdAndGet(id: string, params: SeriesCrudDtos.Patch.Body): Promise<Entity> {
     const { entity: paramEntity } = params;
 
     // Si se está actualizando la key, asegurarse de que es única

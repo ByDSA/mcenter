@@ -3,7 +3,7 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { UpdateQuery } from "mongoose";
 import { assertFoundClient } from "#utils/validation/found";
-import { CanDeleteOneByIdAndGet, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanDeleteOneByIdAndGet, CanGetOneById } from "#utils/layers/repository";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
@@ -18,7 +18,6 @@ type Model = UserRole;
 @Injectable()
 export class UserRolesRepository
 implements
-CanPatchOneByIdAndGet<Entity, Entity["id"], UserRole>,
 CanGetOneById<Entity, Entity["id"]>,
 CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   constructor(

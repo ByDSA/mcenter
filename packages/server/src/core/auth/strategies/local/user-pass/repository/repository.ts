@@ -3,7 +3,7 @@ import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { UserPassEntity, UserPass } from "$shared/models/auth";
 import { assertFoundClient } from "#utils/validation/found";
-import { CanDeleteOneByIdAndGet, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanDeleteOneByIdAndGet, CanGetOneById } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
@@ -18,7 +18,6 @@ type Model = UserPass;
 @Injectable()
 export class UserPassesRepository
 implements
-CanPatchOneByIdAndGet<Entity, Entity["id"], Model>,
 CanGetOneById<Entity, Entity["id"]>,
 CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   constructor(

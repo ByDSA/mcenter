@@ -1,16 +1,14 @@
 import type { AggregationResult } from "./odm/adapters";
 import { forwardRef, Inject, Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { assertIsDefined } from "$shared/utils/validation";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types, UpdateQuery } from "mongoose";
 import { MusicFileInfoEntity, MusicFileInfoOmitMusicId } from "$shared/models/musics/file-info";
 import { WithOptional } from "$shared/utils/objects";
 import { assertFoundClient } from "#utils/validation/found";
-import { CanDeleteOneByIdAndGet, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanDeleteOneByIdAndGet, CanGetOneById } from "#utils/layers/repository";
 import { MusicEntity, Music, MusicId } from "#musics/models";
-import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
 import { DomainEventEmitter } from "#core/domain-event-emitter";
@@ -40,7 +38,6 @@ type GetManyProps = {
 @Injectable()
 export class MusicsRepository
 implements
-CanPatchOneByIdAndGet<MusicEntity, MusicId, Music>,
 CanGetOneById<MusicEntity, MusicId>,
 CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
   constructor(
@@ -108,17 +105,14 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
 
   async patchOneByIdAndGet(
     id: MusicId,
-    params: PatchOneParams<Music>,
+    params: MusicCrudDtos.Patch.Body,
   ): Promise<MusicEntity> {
     const { entity: paramEntity } = params;
-    let { createdAt: _1,
-      updatedAt: _2,
-      addedAt: _3,
-      ...validEntity } = this.musicBuilder.fixFields(paramEntity);
-    const updateQuery = patchParamsToUpdateQuery( {
-      ...params,
+    let validEntity = this.musicBuilder.fixFields(paramEntity);
+    const updateQuery = MusicOdm.toPatchQuery( {
       entity: validEntity,
-    }, MusicOdm.partialToDoc);
+      unset: params.unset,
+    } );
 
     updateQuery.$set = {
       ...updateQuery.$set,
@@ -377,6 +371,55 @@ fileInfo: MusicFileInfoEntity;}> {
     assertFoundClient(docOdm, "Music not found");
 
     return MusicOdm.toEntity(docOdm);
+  }
+
+  async patchManyByIds(
+    ids: string[],
+    params: MusicCrudDtos.Patch.Body,
+  ): Promise<{ data: MusicEntity[];
+warnings: MusicCrudDtos.BulkPatch.Warning[]; }> {
+    const { entity: paramEntity } = params;
+    let validEntity = this.musicBuilder.fixFields(paramEntity);
+    const updateQuery = MusicOdm.toPatchQuery(params);
+    const objectIds = ids.map((id) => new Types.ObjectId(id));
+
+    await MusicOdm.Model.updateMany( {
+      _id: {
+        $in: objectIds,
+      },
+    }, updateQuery);
+
+    const docs = await MusicOdm.Model.find( {
+      _id: {
+        $in: objectIds,
+      },
+    } );
+    const data = docs.map(MusicOdm.toEntity);
+    // Detectar IDs que no se encontraron en la base de datos
+    const foundIds = new Set(data.map((e) => e.id));
+    const notFoundMusicIds = ids.filter((id) => !foundIds.has(id));
+    const warnings: MusicCrudDtos.BulkPatch.Warning[] = [];
+
+    if (notFoundMusicIds.length > 0) {
+      warnings.push( {
+        code: "MUSIC_IDS_NOT_FOUND",
+        notFoundMusicIds,
+      } );
+    }
+
+    // Emitir un evento Patched por música encontrada para que el índice de búsqueda se actualice
+    for (const entity of data) {
+      this.domainEventEmitter.emitPatch(MusicEvents.Patched.TYPE, {
+        partialEntity: validEntity,
+        id: entity.id,
+        unset: params.unset,
+      } );
+    }
+
+    return {
+      data,
+      warnings,
+    };
   }
 }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Query, Req } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Query, Req } from "@nestjs/common";
 import { createZodDto } from "nestjs-zod";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { UserPayload } from "$shared/models/auth";
@@ -14,6 +14,7 @@ import { AdminDeleteOne,
 import { User } from "#core/auth/users/User.decorator";
 import { IdParamDto } from "#utils/validation/dtos";
 import { TokenAuth } from "#core/auth/strategies/token/decorator";
+import { Authenticated } from "#core/auth/users/Authenticated.guard";
 import { MusicFlowService } from "../MusicFlow.service";
 import { RenderMusic } from "../renderer/renderer.interceptor";
 import { MusicsUsersRepository } from "./repositories/user-info/repository";
@@ -33,6 +34,10 @@ class PatchUserInfoBodyDto extends createZodDto(
   MusicInfoCrudDtos.Patch.bodySchema,
 ) {}
 
+class BulkPatchBodyDto extends createZodDto(
+  MusicCrudDtos.BulkPatch.bodySchema,
+) {}
+
 @Controller("/")
 export class MusicCrudController {
   constructor(
@@ -50,6 +55,49 @@ export class MusicCrudController {
       criteria,
       requestingUserId: user?.id,
     } );
+  }
+
+  // Necesario bulk antes del patch normal por visibilidad de urls
+  @Authenticated()
+  @Patch("/bulk")
+  // @ValidateResponseWithZodSchema(MusicCrudDtos.BulkPatch.responseSchema)
+  @HttpCode(HttpStatus.OK)
+  async bulkPatch(
+    @Body() body: BulkPatchBodyDto,
+    @User() user: UserPayload,
+  ): Promise<MusicCrudDtos.BulkPatch.Return> {
+    const { ids, music, userInfo } = body;
+    const results: MusicEntity[] = [];
+    const warnings: MusicCrudDtos.BulkPatch.Warning[] = [];
+
+    if (music) {
+      const { data: patched, warnings: musicWarnings } = await this.musicRepo
+        .patchManyByIds(ids, music);
+
+      results.push(...patched);
+      warnings.push(...musicWarnings);
+    }
+
+    if (userInfo) {
+      const { warnings: userInfoWarnings } = await this.musicsUsersrepo
+        .patchManyByMusicIds(ids, user.id, userInfo);
+
+      warnings.push(...userInfoWarnings);
+
+      // Si no se han devuelto ya las entidades desde music, buscamos las musics
+      if (!music) {
+        const patched = await Promise.all(
+          ids.map((id) => this.musicRepo.getOneById(id)),
+        );
+
+        results.push(...(patched.filter(Boolean) as MusicEntity[]));
+      }
+    }
+
+    return {
+      data: results,
+      warnings: warnings.length > 0 ? warnings : undefined,
+    };
   }
 
   @UserPatchOne(musicEntitySchema)

@@ -1,6 +1,5 @@
 /* eslint-disable import/no-cycle */
 import { Injectable, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { MusicEntity } from "$shared/models/musics";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
@@ -9,7 +8,7 @@ import { Types } from "mongoose";
 import { UserPayload } from "$shared/models/auth";
 import { WithRequired } from "$shared/utils/objects";
 import { assertFoundClient, assertFoundServer } from "#utils/validation/found";
-import { CanDeleteOneByIdAndGet, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanDeleteOneByIdAndGet, CanGetOneById } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
@@ -25,7 +24,6 @@ import { MusicPlayListEvents } from "./events/playlist";
 import { AggregationResult } from "./odm/criteria-pipeline";
 import { MusicPlayListTrackEvents } from "./events/track";
 
-type Model = MusicPlaylist;
 type Entity = MusicPlaylistEntity;
 type Id = Entity["id"];
 
@@ -68,7 +66,6 @@ type RemoveManyMusicsProps = {
 @Injectable()
 export class MusicPlaylistsRepository
 implements
-CanPatchOneByIdAndGet<Entity, Id, Model>,
 CanGetOneById<Entity, Id>,
 CanDeleteOneByIdAndGet<Entity, Entity["id"]> {
   constructor(
@@ -527,7 +524,7 @@ addedAt: Date; }>;
     return ret;
   }
 
-  async patchOneByIdAndGet(id: Id, params: PatchOneParams<Omit<Entity, "list">>): Promise<Entity> {
+  async patchOneByIdAndGet(id: Id, params: MusicPlaylistCrudDtos.Patch.Body): Promise<Entity> {
     let slug;
     const oldDoc = await MusicPlaylistOdm.Model.findById(id);
 

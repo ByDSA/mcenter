@@ -1,13 +1,13 @@
 import assert from "assert";
 import { Injectable } from "@nestjs/common";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { RemotePlayerCrudDtos } from "$shared/models/player/remote-player/dto/transport";
 import { UserEntity } from "$shared/models/auth";
 import { Types } from "mongoose";
 import { assertIsDefined } from "$shared/utils/validation";
+import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { assertFoundClient } from "#utils/validation/found";
-import { CanDeleteOneByIdAndGet, CanGetManyByCriteria, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanDeleteOneByIdAndGet, CanGetManyByCriteria, CanGetOneById } from "#utils/layers/repository";
 import { patchParamsToUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
 import { logDomainEvent } from "#core/logging/log-domain-event";
@@ -25,7 +25,6 @@ type Model = RemotePlayer;
 @Injectable()
 export class RemotePlayersRepository
 implements
-CanPatchOneByIdAndGet<Entity, Entity["id"], Model>,
 CanGetOneById<Entity, Entity["id"]>,
 CanDeleteOneByIdAndGet<Entity, Entity["id"]>,
 CanGetManyByCriteria<Entity, CriteriaMany> {

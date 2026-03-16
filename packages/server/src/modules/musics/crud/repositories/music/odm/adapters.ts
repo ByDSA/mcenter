@@ -1,7 +1,8 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { Types, UpdateQuery } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { PaginatedResult } from "$shared/utils/http/responses";
+import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
 import { MusicFileInfoOdm } from "#musics/file-info/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
 import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
@@ -77,27 +78,42 @@ export function musicEntityToDocOdm(entity: Entity): FullDocOdm {
   };
 }
 
-export function partialToDocOdm(partial: Partial<Model>): Partial<DocOdm> {
-  const ret: Partial<DocOdm> = {
+export function patchDtoToDocOdm(p: MusicCrudDtos.Patch.Body): UpdateQuery<DocOdm> {
+  const partial = p.entity;
+  let ret: Partial<DocOdm> = {
     title: partial.title,
     url: partial.slug,
     artist: partial.artist,
-    tags: partial.tags,
     disabled: partial.disabled,
     album: partial.album,
     country: partial.country,
     game: partial.game,
     year: partial.year,
     spotifyId: partial.spotifyId,
-    uploaderUserId: partial.uploaderUserId ? new Types.ObjectId(partial.uploaderUserId) : undefined,
-    createdAt: partial.createdAt,
-    updatedAt: partial.updatedAt,
-    addedAt: partial.addedAt,
     releasedOn: partial.releasedOn,
     imageCoverId: partial.imageCoverId ? new Types.ObjectId(partial.imageCoverId) : undefined,
-  } satisfies AllKeysOf<Omit<DocOdm, "_id" | "offloaded">>;
+  } satisfies AllKeysOf<Omit<DocOdm, "_id" | "addedAt" | "createdAt" | "offloaded" | "tags" |
+    "updatedAt" | "uploaderUserId">>;
 
-  return ret;
+  ret = removeUndefinedDeep(ret);
+
+  const updateQuery: UpdateQuery<DocOdm> = {};
+
+  if (Object.keys(ret).length > 0)
+    updateQuery.$set = ret as Partial<DocOdm>;
+
+  if (p.unset?.length) {
+    updateQuery.$unset = p.unset.reduce(
+      (acc, path) => {
+        acc[path.join(".")] = 1;
+
+        return acc;
+      },
+         {} as Record<string, 1>,
+    );
+  }
+
+  return updateQuery;
 }
 
 export function aggregationResultToResponse(

@@ -1,10 +1,9 @@
 import { Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
-import { MusicUserList,
-  MusicUserListEntity,
+import { MusicUserListEntity,
   MusicUserListResourceItem } from "$shared/models/musics/users-lists";
+import { MusicUserListsCrudDtos } from "$shared/models/musics/users-lists/dto/transport";
 import { MusicPlayListEvents } from "#musics/playlists/crud/repository/events/playlist";
 import { MusicSmartPlaylistEvents } from "#musics/smart-playlists/crud/repository/events";
 import { MusicPlaylistsRepository } from "#musics/playlists/crud/repository";
@@ -89,13 +88,13 @@ export class MusicUsersListsRepository {
 
   async patchOneByUserIdAndGet(
     userId: string,
-    params: PatchOneParams<MusicUserList>,
+    params: MusicUserListsCrudDtos.PatchMyList.Body,
   ): Promise<Entity> {
     const updateQuery: any = {};
 
     // Al hacer patch de la lista entera, debemos respetar la estructura de subdocumentos
-    if (params.entity.list) {
-      updateQuery.list = params.entity.list.map((item) => ( {
+    if (params.list) {
+      updateQuery.list = params.list.map((item) => ( {
         _id: item.id ? new Types.ObjectId(item.id) : new Types.ObjectId(),
         resourceId: new Types.ObjectId(item.resourceId),
         type: item.type,
@@ -119,7 +118,7 @@ export class MusicUsersListsRepository {
     const entity = MusicUserListOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(MusicUserListEvents.Patched.TYPE, {
-      partialEntity: params.entity,
+      partialEntity: params,
       id: entity.id,
     } );
 

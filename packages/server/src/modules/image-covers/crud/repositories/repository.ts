@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { ImageCoverCrudDtos } from "$shared/models/image-covers/dto/transport";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { OnEvent } from "@nestjs/event-emitter";
 import { ImageCover, ImageCoverEntity } from "$shared/models/image-covers";
 import { Types } from "mongoose";
@@ -65,7 +64,7 @@ export class ImageCoversRepository {
 
   async patchOneByIdAndGet(
     id: string,
-    patchParams: PatchOneParams<Partial<ImageCover>>,
+    patchParams: ImageCoverCrudDtos.Patch.Body,
   ): Promise<ImageCoverEntity> {
     const { entity } = patchParams;
     const partialDocOdm = ImageCoverOdm.partialToDoc(entity);

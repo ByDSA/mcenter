@@ -1,11 +1,10 @@
 import assert from "node:assert";
 import { Injectable } from "@nestjs/common";
-import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EpisodesCrudDtos } from "$shared/models/episodes/dto/transport";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Types } from "mongoose";
 import { PaginatedResult } from "$shared/utils/http/responses";
-import { CanCreateManyAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetOneById, CanPatchOneByIdAndGet } from "#utils/layers/repository";
+import { CanCreateManyAndGet, CanDeleteOneByIdAndGet, CanGetAll, CanGetOneById } from "#utils/layers/repository";
 import { assertFoundClient } from "#utils/validation/found";
 import { MongoFilterQuery, MongoUpdateQuery } from "#utils/layers/db/mongoose";
 import { EmitEntityEvent } from "#core/domain-event-emitter/emit-event";
@@ -40,7 +39,6 @@ export class EpisodesRepository
 implements
 CanCreateManyAndGet<EpisodeEntity>,
 CanGetOneById<EpisodeEntity, EpisodeId>,
-CanPatchOneByIdAndGet<Episode, EpisodeId>,
 CanDeleteOneByIdAndGet<EpisodeEntity, EpisodeId>,
 CanGetAll<EpisodeEntity> {
   constructor(
@@ -150,7 +148,7 @@ CanGetAll<EpisodeEntity> {
 
   async patchOneByIdAndGet(
     id: EpisodeId,
-    patchParams: PatchOneParams<Partial<Episode>>,
+    patchParams: EpisodesCrudDtos.Patch.Body,
   ): Promise<EpisodeEntity> {
     const episode = fixFields(patchParams.entity);
     const partialDocOdm = EpisodeOdm.partialToDoc(episode);
