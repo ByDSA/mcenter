@@ -14,16 +14,16 @@ export type EntityEvent<M extends Entity<any>> = DomainEvent<ModelPayload<M>>;
 
 export type ModelEvent<M extends object> = DomainEvent<ModelPayload<M>>;
 
-type PatchPayload<M extends object, ID extends unknown> = {
+type PatchPayload<P extends object, M extends object, ID extends unknown> = {
   entityId: ID;
   key: keyof M;
   value: M[keyof M];
   oldValue?: M[keyof M];
   hasOld: boolean;
-  partialEntity: M;
+  partialEntity: P;
   newEntity?: M;
   oldEntity?: M;
 };
 
-export type PatchEvent<M extends object, ID extends unknown = string> =
-  DomainEvent<PatchPayload<M, ID>>;
+export type PatchEvent<P extends object, M extends object, ID extends unknown = string> =
+  DomainEvent<PatchPayload<P, M, ID>>;

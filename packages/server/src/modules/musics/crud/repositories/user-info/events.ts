@@ -1,4 +1,5 @@
 import { MusicUserInfoEntity } from "$shared/models/musics";
+import { MusicInfoCrudDtos } from "$shared/models/musics/user-info/dto/transport";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
 
 type Key = {
@@ -14,7 +15,7 @@ export namespace MusicsUsersEvents {
 
   export namespace Patched {
     export const TYPE = `${MAIN_TYPE}.patched`;
-    export type Event = PatchEvent<Entity, Key>;
+    export type Event = PatchEvent<MusicInfoCrudDtos.Patch.Body["entity"], Entity, Key>;
   }
   export namespace Created {
     export const TYPE = `${MAIN_TYPE}.created`;

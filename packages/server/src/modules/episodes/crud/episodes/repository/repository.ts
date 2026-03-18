@@ -151,7 +151,10 @@ CanGetAll<EpisodeEntity> {
     patchParams: EpisodesCrudDtos.Patch.Body,
   ): Promise<EpisodeEntity> {
     const episode = fixFields(patchParams.entity);
-    const partialDocOdm = EpisodeOdm.partialToDoc(episode);
+    const partialDocOdm = EpisodeOdm.toUpdateQuery( {
+      ...patchParams,
+      entity: episode,
+    } );
 
     if (Object.keys(partialDocOdm).length === 0)
       throw new Error("Empty partialDocOdm, nothing to patch");

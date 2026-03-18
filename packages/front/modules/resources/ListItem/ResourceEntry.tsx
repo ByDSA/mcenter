@@ -8,6 +8,7 @@ import { PlayButtonView } from "#modules/player/common/PlayButtonView";
 import { PlayerStatus } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
 import { anchorOnClick } from "#modules/ui-kit/menus/TabsClient";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { useLongPress } from "#modules/utils/useLongPress";
 import { Separator } from "../Separator/Separator";
 import styles from "./ListItem.module.css";
 import { ListItemColumn, ListItemRow } from "./ListItem";
@@ -34,16 +35,20 @@ export type ResourceEntryProps = {
   };
   imageCover?: ImageCover | null;
   imageCoverDefaultIcon?: NonNullable<ComponentProps<typeof MusicImageCover>>["icon"];
+  checkbox?: ReactNode;
+  onLongPress?: ()=> void;
 };
 
 export function ResourceEntry(
   { mainTitle, subtitle, settings, right, favButton, play, drag, imageCover,
-    mainTitleHref, imageCoverDefaultIcon, href, disabled }: ResourceEntryProps,
+    mainTitleHref, imageCoverDefaultIcon, href, disabled,
+    checkbox, onLongPress }: ResourceEntryProps,
 ) {
   const shouldHaveLeftDiv = !!play || imageCover !== undefined;
   const isPlaying = play !== undefined && play.status !== "stopped" && play.status !== "disabled";
   const router = useRouter();
   const isAvailable = !(disabled || play?.status === "disabled");
+  const longPressProps = useLongPress(onLongPress);
 
   return <span
     className={classes(
@@ -53,7 +58,9 @@ export function ResourceEntry(
       play && styles.isPlayable,
       isAvailable && styles.isAvailable,
     )}
+    {...longPressProps}
   >
+    {checkbox}
     {drag?.element}
     {shouldHaveLeftDiv && (
       <div className={styles.leftDiv}>

@@ -6,6 +6,7 @@ import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryL
 import { MusicContextMenu } from "#modules/musics/musics/SettingsButton/Button";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { SetState } from "#modules/utils/react";
+import { BulkSelection } from "#modules/musics/musics/BlukEdit/useBulkSelection";
 import { MusicEntryElement } from "../../../../musics/ListItem/MusicEntry";
 import { useMusic } from "../../../../hooks";
 import { MusicPlaylistsApi } from "../../requests";
@@ -20,12 +21,14 @@ type PlaylistItemProps = NonNullable<Pick<Parameters<typeof MusicEntryElement>[0
   playlist: MusicPlaylistEntity;
   setPlaylist: SetState<MusicPlaylistEntity>;
   index: number;
+  selection: BulkSelection;
 };
 
 export const MusicPlaylistItem = ( { playlist,
   index,
   setPlaylist,
-  drag }: PlaylistItemProps) => {
+  drag,
+  selection }: PlaylistItemProps) => {
   const { user } = useUser();
   const { openMenu: _openMenu } = useContextMenuTrigger();
   const value = playlist.list[index];
@@ -36,11 +39,8 @@ export const MusicPlaylistItem = ( { playlist,
   const api = FetchApi.get(MusicPlaylistsApi);
 
   if (!music)
-    return <ResourceEntryLoading drag={drag}/>;
+    return <ResourceEntryLoading drag={drag} />;
 
-  // Quitar TODAS las ocurrencias de la canción de la playlist localmente.
-  // Se filtra por musicId (no por index) porque al borrar la música de la BD
-  // debe desaparecer en todos los puestos donde aparezca.
   const removeFromPlaylist = () => {
     setPlaylist(old => {
       if (!old)
@@ -52,9 +52,7 @@ export const MusicPlaylistItem = ( { playlist,
       };
     } );
   };
-  const contextMenuContent = <LocalDataProvider
-    data={music}
-  >
+  const contextMenuContent = <LocalDataProvider data={music}>
     <MusicContextMenu onDelete={removeFromPlaylist} />
     {user?.id === playlist.ownerUserId && <>
       {index !== 0 && <ContextMenuItem
@@ -102,7 +100,7 @@ export const MusicPlaylistItem = ( { playlist,
             itemId: value.id,
           } );
 
-          setPlaylist(old=> {
+          setPlaylist(old => {
             if (!old)
               return old;
 
@@ -129,6 +127,18 @@ export const MusicPlaylistItem = ( { playlist,
     drag={drag}
     contextMenu={{
       customContent: contextMenuContent,
+    }}
+    // only render checkbox when bulk mode is active
+    selection={selection.isBulkMode
+      ? {
+        isSelected: selection.isSelected(music.id),
+        onToggle: () => selection.toggle(music.id),
+      }
+      : undefined
+    }
+    onLongPress={() => {
+      selection.activateBulkMode();
+      selection.toggle(music.id);
     }}
   />;
 };

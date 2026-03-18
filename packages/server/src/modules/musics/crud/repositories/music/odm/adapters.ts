@@ -78,39 +78,73 @@ export function musicEntityToDocOdm(entity: Entity): FullDocOdm {
   };
 }
 
-export function patchDtoToDocOdm(p: MusicCrudDtos.Patch.Body): UpdateQuery<DocOdm> {
-  const partial = p.entity;
-  let ret: Partial<DocOdm> = {
-    title: partial.title,
-    url: partial.slug,
-    artist: partial.artist,
-    disabled: partial.disabled,
-    album: partial.album,
-    country: partial.country,
-    game: partial.game,
-    year: partial.year,
-    spotifyId: partial.spotifyId,
-    releasedOn: partial.releasedOn,
-    imageCoverId: partial.imageCoverId ? new Types.ObjectId(partial.imageCoverId) : undefined,
+export function toUpdateQuery(dto: MusicCrudDtos.Patch.Body): UpdateQuery<DocOdm> {
+  const updateQuery: UpdateQuery<DocOdm> = {};
+  const dtoEntity = dto.entity;
+  let $set: NonNullable<UpdateQuery<DocOdm>["$set"]> = {
+    title: dtoEntity.title,
+    url: dtoEntity.slug,
+    artist: dtoEntity.artist,
+    disabled: dtoEntity.disabled,
+    album: dtoEntity.album,
+    country: dtoEntity.country,
+    game: dtoEntity.game,
+    year: dtoEntity.year,
+    spotifyId: dtoEntity.spotifyId,
+    releasedOn: dtoEntity.releasedOn,
+    imageCoverId: dtoEntity.imageCoverId ? new Types.ObjectId(dtoEntity.imageCoverId) : undefined,
   } satisfies AllKeysOf<Omit<DocOdm, "_id" | "addedAt" | "createdAt" | "offloaded" | "tags" |
     "updatedAt" | "uploaderUserId">>;
 
-  ret = removeUndefinedDeep(ret);
+  if (dtoEntity.tags) {
+    const { push, pull, replace } = dtoEntity.tags;
 
-  const updateQuery: UpdateQuery<DocOdm> = {};
+    if (replace) {
+      if (replace.length === 0) {
+        updateQuery.$unset = {
+          ...updateQuery.$unset,
+          tags: true,
+        };
+      } else
+        $set.tags = replace;
+    } else {
+      if (push?.length) {
+        updateQuery.$push = {
+          ...updateQuery.$push,
+          tags: {
+            $each: push,
+          },
+        };
+      }
 
-  if (Object.keys(ret).length > 0)
-    updateQuery.$set = ret as Partial<DocOdm>;
+      if (pull?.length) {
+        updateQuery.$pull = {
+          ...updateQuery.$pull,
+          tags: {
+            $in: pull,
+          },
+        };
+      }
+    }
+  }
 
-  if (p.unset?.length) {
-    updateQuery.$unset = p.unset.reduce(
-      (acc, path) => {
-        acc[path.join(".")] = 1;
+  $set = removeUndefinedDeep($set);
 
-        return acc;
-      },
+  if (Object.keys($set).length > 0)
+    updateQuery.$set = $set;
+
+  if (dto.unset?.length) {
+    updateQuery.$unset = {
+      ...updateQuery.$unset,
+      ...dto.unset.reduce(
+        (acc, path) => {
+          acc[path.join(".")] = 1;
+
+          return acc;
+        },
          {} as Record<string, 1>,
-    );
+      ),
+    };
   }
 
   return updateQuery;

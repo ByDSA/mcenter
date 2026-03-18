@@ -801,6 +801,66 @@ type RootTranslation = {
 				 */
 				game: string
 			}
+			bulkEdit: {
+				/**
+				 * S​e​l​e​c​c​i​ó​n​ ​m​ú​l​t​i​p​l​e
+				 */
+				activate: string
+				/**
+				 * E​d​i​t​a​r​ ​{​c​o​u​n​t​}​ ​{​{​m​ú​s​i​c​a​|​m​ú​s​i​c​a​s​}​}
+				 * @param {number} count
+				 */
+				editCount: RequiredParams<'count'>
+				/**
+				 * {​c​o​u​n​t​}​ ​{​{​s​e​l​e​c​c​i​o​n​a​d​a​|​s​e​l​e​c​c​i​o​n​a​d​a​s​}​}
+				 * @param {number} count
+				 */
+				selectedCount: RequiredParams<'count'>
+				/**
+				 * S​e​l​e​c​c​i​o​n​a​ ​m​ú​s​i​c​a​s
+				 */
+				selectMusics: string
+				/**
+				 * S​a​l​i​r
+				 */
+				exit: string
+				/**
+				 * E​d​i​t​a​r​ ​s​e​l​e​c​c​i​o​n​a​d​a​s
+				 */
+				editSelected: string
+				/**
+				 * G​u​a​r​d​a​n​d​o​…
+				 */
+				saving: string
+				/**
+				 * A​p​l​i​c​a​r​ ​a​ ​{​c​o​u​n​t​}​ ​{​{​s​e​l​e​c​c​i​o​n​a​d​o​|​s​e​l​e​c​c​i​o​n​a​d​o​s​}​}
+				 * @param {number} count
+				 */
+				applyToCount: RequiredParams<'count'>
+				/**
+				 * V​a​l​o​r​e​s​ ​a​c​t​u​a​l​e​s​ ​—​ ​{​f​i​e​l​d​}
+				 * @param {string} field
+				 */
+				currentValuesTitle: RequiredParams<'field'>
+				/**
+				 * S​e​l​e​c​c​i​o​n​a​r​ ​m​ú​s​i​c​a
+				 */
+				selectItem: string
+				tags: {
+					/**
+					 * A​ñ​a​d​i​r
+					 */
+					add: string
+					/**
+					 * R​e​e​m​p​l​a​z​a​r
+					 */
+					replace: string
+					/**
+					 * Q​u​i​t​a​r
+					 */
+					remove: string
+				}
+			}
 		}
 		episodes: {
 			/**
@@ -1844,6 +1904,62 @@ export type TranslationFunctions = {
 				 * Juego
 				 */
 				game: () => LocalizedString
+			}
+			bulkEdit: {
+				/**
+				 * Selección múltiple
+				 */
+				activate: () => LocalizedString
+				/**
+				 * Editar {count} {{música|músicas}}
+				 */
+				editCount: (arg: { count: number }) => LocalizedString
+				/**
+				 * {count} {{seleccionada|seleccionadas}}
+				 */
+				selectedCount: (arg: { count: number }) => LocalizedString
+				/**
+				 * Selecciona músicas
+				 */
+				selectMusics: () => LocalizedString
+				/**
+				 * Salir
+				 */
+				exit: () => LocalizedString
+				/**
+				 * Editar seleccionadas
+				 */
+				editSelected: () => LocalizedString
+				/**
+				 * Guardando…
+				 */
+				saving: () => LocalizedString
+				/**
+				 * Aplicar a {count} {{seleccionado|seleccionados}}
+				 */
+				applyToCount: (arg: { count: number }) => LocalizedString
+				/**
+				 * Valores actuales — {field}
+				 */
+				currentValuesTitle: (arg: { field: string }) => LocalizedString
+				/**
+				 * Seleccionar música
+				 */
+				selectItem: () => LocalizedString
+				tags: {
+					/**
+					 * Añadir
+					 */
+					add: () => LocalizedString
+					/**
+					 * Reemplazar
+					 */
+					replace: () => LocalizedString
+					/**
+					 * Quitar
+					 */
+					remove: () => LocalizedString
+				}
 			}
 		}
 		episodes: {

@@ -25,6 +25,9 @@ export const musicsRoutes = {
   getOne: {
     path: `${MUSICS}/${GET_ONE}`,
   },
+  bulk: {
+    path: `${MUSICS}/bulk`,
+  },
   userInfo: {
     withParams: (musicId: string) => `${MUSICS}/${musicId}/user-info`,
   },

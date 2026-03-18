@@ -4,6 +4,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { DragHandle } from "@mui/icons-material";
 import { classes } from "#modules/utils/styles";
 import { SetState } from "#modules/utils/react";
+import { BulkSelection } from "#modules/musics/musics/BlukEdit/useBulkSelection";
 import { MusicPlaylistEntity } from "../../models";
 import styles from "./SortableListItem.module.css";
 import { MusicPlaylistItem } from "./ListItem";
@@ -18,6 +19,7 @@ interface Props {
   draggable: boolean;
   isDraggingGlobal: boolean;
   scrollMargin: number;
+  selection: BulkSelection;
 }
 
 export const SortablePlaylistItem = memo(( { item,
@@ -28,7 +30,8 @@ export const SortablePlaylistItem = memo(( { item,
   setValue,
   draggable,
   isDraggingGlobal,
-  scrollMargin }: Props) => {
+  scrollMargin,
+  selection }: Props) => {
   const { attributes,
     listeners,
     setNodeRef,
@@ -83,6 +86,7 @@ export const SortablePlaylistItem = memo(( { item,
             }
             : undefined
         }
+        selection={selection}
       />
     </div>
   );

@@ -1,8 +1,12 @@
 import { useMemo } from "react";
+import { MusicEntityWithUserInfo } from "$shared/models/musics";
 import { SetState } from "#modules/utils/react";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
 import { useUser } from "#modules/core/auth/useUser";
 import { ResourceFullPage } from "#modules/resources/FullPage/FullPage/FullPage";
+import { useBulkSelection } from "#modules/musics/musics/BlukEdit/useBulkSelection";
+import { BulkEditBar } from "#modules/musics/musics/BlukEdit/BulkEditBar";
+import { useMusic } from "#modules/musics/hooks";
 import { MusicPlaylistEntity } from "../models";
 import { usePlaylistPlayer } from "./hooks/usePlaylistPlayer";
 import { usePlaylistDragAndDrop } from "./hooks/usePlaylistDragAndDrop";
@@ -37,7 +41,8 @@ export const MusicPlaylistFullPage = ( { value, setValue }: PlaylistProps) => {
   // );
   const totalDuration = 0;
   const totalSongs = useMemo(() => value.list?.length ?? 0, [value.list]);
-  const draggable = useMemo(()=>value.ownerUserId === user?.id, [value.ownerUserId]);
+  const draggable = useMemo(() => value.ownerUserId === user?.id, [value.ownerUserId]);
+  const selection = useBulkSelection();
 
   return <LocalDataProvider data={value} setData={setValue}>
 
@@ -47,6 +52,17 @@ export const MusicPlaylistFullPage = ( { value, setValue }: PlaylistProps) => {
         totalDuration={totalDuration}
         playlistStatus={playlistStatus}
         onPlay={handlePlayPlaylist}
+      />
+
+      <BulkEditBar
+        isBulkMode={selection.isBulkMode}
+        onActivate={selection.activateBulkMode}
+        count={selection.count}
+        onClear={selection.clear}
+        getSelectedMusics={() => [...selection.selectedIds]
+          .map((id) => useMusic.getCache(id))
+          .filter(Boolean) as MusicEntityWithUserInfo[]
+        }
       />
 
       <MusicPlaylistTrackList
@@ -59,6 +75,7 @@ export const MusicPlaylistFullPage = ( { value, setValue }: PlaylistProps) => {
         isDraggingGlobal={isDraggingGlobal}
         activeId={activeId}
         itemIds={itemIds}
+        selection={selection}
       />
     </ResourceFullPage>
   </LocalDataProvider>;

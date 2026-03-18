@@ -92,7 +92,9 @@ export const EditEpisodeForm = ( { initialData, onSuccess }: Props) => {
     }
 
     if (dirtyFields.tags) {
-      episodePatch.tags = formValues.tags;
+      episodePatch.tags = {
+        replace: formValues.tags,
+      };
       hasEpisodeChanges = true;
     }
 

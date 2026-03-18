@@ -4,7 +4,7 @@ import { COLLECTION, DocOdm,
   schemaOdm } from "./odm";
 import { docOdmToEntity,
   musicEntityToDocOdm,
-  modelToDocOdm, patchDtoToDocOdm,
+  modelToDocOdm, toUpdateQuery as _toUpdateQuery,
   aggregationResultToResponse as _aggregationResultToResponse } from "./adapters";
 import { getCriteriaPipeline as _getCriteriaPipeline } from "./criteria-pipeline";
 
@@ -17,7 +17,7 @@ export namespace MusicOdm {
   export const toFullDoc = musicEntityToDocOdm;
   export const toDoc = modelToDocOdm;
   export const getCriteriaPipeline = _getCriteriaPipeline;
-  export const toPatchQuery = patchDtoToDocOdm;
+  export const toUpdateQuery = _toUpdateQuery;
   export const toPaginatedResult = _aggregationResultToResponse;
   export const COLLECTION_NAME = COLLECTION;
 };

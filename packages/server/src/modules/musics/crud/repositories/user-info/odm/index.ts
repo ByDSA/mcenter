@@ -3,7 +3,8 @@ import { COLLECTION, DocOdm,
   ModelOdm,
   schemaOdm } from "./odm";
 import { docOdmToEntity, docOdmToModel,
-  modelToDocOdm } from "./adapters";
+  modelToDocOdm,
+  toUpdateQuery as _toUpdateQuery } from "./adapters";
 
 export namespace MusicsUsersOdm {
   export const Model = ModelOdm;
@@ -14,4 +15,5 @@ export namespace MusicsUsersOdm {
   export const toModel = docOdmToModel;
   export const toDoc = modelToDocOdm;
   export const COLLECTION_NAME = COLLECTION;
+  export const toUpdateQuery = _toUpdateQuery;
 };

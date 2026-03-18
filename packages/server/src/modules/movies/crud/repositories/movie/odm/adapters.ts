@@ -1,10 +1,10 @@
-import { MovieEntity } from "$shared/models/movies";
+import { MovieCrudDtos, MovieEntity } from "$shared/models/movies";
 import mongoose, { Types } from "mongoose";
 import { AllKeysOf } from "$shared/utils/types";
 import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues";
 import { ImageCoverOdm } from "#modules/image-covers/crud/repositories/odm";
-import { DocOdm, FullDocOdm } from "./odm";
 import { MovieFileInfoOdm } from "#modules/movies/file-info/crud/repository/odm";
+import { DocOdm, FullDocOdm } from "./odm";
 
 export function toEntity(doc: FullDocOdm): MovieEntity {
   const entity: MovieEntity = {
@@ -54,24 +54,22 @@ export function toFullDoc(model: MovieEntity): FullDocOdm {
   return removeUndefinedDeep(doc);
 }
 
-export function partialToDoc(partial: Partial<MovieEntity>): Partial<DocOdm> {
+export function toUpdateQuery(param: MovieCrudDtos.Patch.Body): Partial<DocOdm> {
+  const partial = param.entity;
   const ret: Partial<DocOdm> = {
     title: partial.title,
     slug: partial.slug,
     year: partial.year,
-    genre: partial.genre,
+    genre: partial.genre?.replace,
     director: partial.director,
     synopsis: partial.synopsis,
     duration: partial.duration,
     imageCoverId: partial.imageCoverId ? new Types.ObjectId(partial.imageCoverId) : undefined,
-    uploaderUserId: partial.uploaderUserId ? new Types.ObjectId(partial.uploaderUserId) : undefined,
     disabled: partial.disabled,
-    tags: partial.tags,
-    createdAt: partial.createdAt,
-    updatedAt: partial.updatedAt,
-    addedAt: partial.addedAt,
+    tags: partial.tags?.replace,
     releasedOn: partial.releasedOn,
-  } satisfies AllKeysOf<Omit<DocOdm, "_id">>;
+  } satisfies AllKeysOf<Omit<DocOdm, "_id" | "addedAt" | "createdAt" | "updatedAt" |
+    "uploaderUserId">>;
 
   return ret;
 }

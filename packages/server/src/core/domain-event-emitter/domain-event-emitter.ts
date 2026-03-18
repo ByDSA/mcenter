@@ -4,8 +4,8 @@ import { DomainEvent, Entity, EntityEvent, PatchEvent } from "./events";
 
 type Consumer<P> = (event: DomainEvent<P>)=> Promise<void>;
 
-type EmitPatchProps<O> = {
-  partialEntity: O;
+type EmitPatchProps<P, O> = {
+  partialEntity: P;
   newEntity?: O;
   oldEntity?: O;
   id: unknown;
@@ -35,10 +35,10 @@ export class DomainEventEmitter {
     this.emit(queueKey, payload);
   }
 
-  emitPatch<O extends object, ID>(queueKey: string, { partialEntity,
+  emitPatch<P extends object, O extends object, ID>(queueKey: string, { partialEntity,
     oldEntity,
     newEntity,
-    id, unset }: EmitPatchProps<O>) {
+    id, unset }: EmitPatchProps<P, O>) {
     for (const [key, value] of Object.entries(partialEntity)) {
       const payload = {
         entityId: id,
@@ -49,7 +49,7 @@ export class DomainEventEmitter {
         partialEntity: partialEntity,
         newEntity,
         oldEntity,
-      } as PatchEvent<O, ID>["payload"];
+      } as PatchEvent<P, O, ID>["payload"];
 
       this.emit(queueKey, payload);
     }
@@ -60,7 +60,7 @@ export class DomainEventEmitter {
           entityId: id,
           key: p.join("."),
           value: undefined,
-        } as PatchEvent<O, ID>["payload"];
+        } as PatchEvent<P, O, ID>["payload"];
 
         this.emit(queueKey, payload);
       }

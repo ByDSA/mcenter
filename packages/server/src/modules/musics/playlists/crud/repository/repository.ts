@@ -549,7 +549,10 @@ addedAt: Date; }>;
 
     const updateQuery = patchParamsToUpdateQuery( {
       ...params,
-      entity: params.entity,
+      entity: {
+        ...params.entity,
+        list: params.entity.list?.replace,
+      },
     }, MusicPlaylistOdm.partialToUpdateQuery);
 
     updateQuery.$set = {

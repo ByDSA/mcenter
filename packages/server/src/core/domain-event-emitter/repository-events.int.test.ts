@@ -1,5 +1,5 @@
 import { fixtureEpisodes } from "#episodes/tests";
-import { Episode, EpisodeEntity } from "#episodes/models";
+import { EpisodeEntity } from "#episodes/models";
 import { EntityEvent } from "#core/domain-event-emitter";
 import { createTestingAppModuleAndInit, TestingSetup } from "#core/app/tests/app";
 import { DomainEventEmitterModule } from "#core/domain-event-emitter/module";
@@ -36,7 +36,7 @@ it("should emit Patch Event", async () => {
 
   domainEventEmitter.subscribe(EpisodeEvents.Patched.TYPE, fn);
 
-  const partialModel: Partial<Episode> = {
+  const partialModel = {
     title: "new title",
   };
 

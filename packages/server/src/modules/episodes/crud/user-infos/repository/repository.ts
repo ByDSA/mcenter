@@ -145,7 +145,7 @@ CanGetOneById<Entity, UserInfoKey> {
     if (updateQuery.$set?.tags?.length === 0)
       delete updateQuery.$set.tags;
 
-    if (entity.tags?.length === 0) {
+    if (entity.tags?.replace?.length === 0) {
       updateQuery.$unset = {
         ...updateQuery.$unset,
         tags: true,

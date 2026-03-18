@@ -1,3 +1,4 @@
+import { PatchOneParams } from "$shared/models/utils/schemas/patch";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
 import { UserRoleEntity } from "../../models";
 
@@ -8,7 +9,7 @@ export namespace UserRoleEvents {
 
   export namespace Patched {
     export const TYPE = `${MAIN_TYPE}.patched`;
-    export type Event = PatchEvent<Entity, Entity["id"]>;
+    export type Event = PatchEvent<PatchOneParams<Entity>["entity"], Entity, Entity["id"]>;
   }
   export namespace Created {
     export const TYPE = `${MAIN_TYPE}.created`;

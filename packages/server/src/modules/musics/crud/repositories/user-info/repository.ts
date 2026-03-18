@@ -62,25 +62,9 @@ CanGetOneById<Entity, UserInfoKey> {
 
   async patchOneByIdAndGet(
     key: UserInfoKey,
-    params: MusicInfoCrudDtos.Patch.Body,
+    dto: MusicInfoCrudDtos.Patch.Body,
   ): Promise<Entity> {
-    const { entity } = params;
-    const updateQuery: UpdateQuery<MusicsUsersOdm.Doc> = {
-      $set: {
-        ...entity,
-      },
-    };
-
-    if (updateQuery.$set?.tags?.length === 0)
-      delete updateQuery.$set.tags;
-
-    if (entity.tags?.length === 0) {
-      updateQuery.$unset = {
-        ...updateQuery.$unset,
-        tags: true,
-      };
-    }
-
+    const updateQuery: UpdateQuery<MusicsUsersOdm.Doc> = MusicsUsersOdm.toUpdateQuery(dto);
     const doc = await MusicsUsersOdm.Model.findOneAndUpdate(
       {
         musicId: key.musicId,
@@ -104,13 +88,13 @@ CanGetOneById<Entity, UserInfoKey> {
     const ret = MusicsUsersOdm.toEntity(doc);
 
     this.domainEventEmitter.emitPatch(MusicsUsersEvents.Patched.TYPE, {
-      partialEntity: entity,
+      partialEntity: dto.entity,
       id: {
         musicId: key.musicId,
         userId: key.userId,
         _id: ret.id,
       } satisfies MusicsUsersEvents.Patched.Event["payload"]["entityId"],
-      unset: params.unset,
+      unset: dto.unset,
     } );
 
     return ret;
@@ -127,26 +111,10 @@ CanGetOneById<Entity, UserInfoKey> {
   async patchManyByMusicIds(
     musicIds: string[],
     userId: string,
-    params: MusicInfoCrudDtos.Patch.Body,
+    dto: MusicInfoCrudDtos.Patch.Body,
   ): Promise<{ data: MusicUserInfoEntity[];
 warnings: MusicCrudDtos.BulkPatch.Warning[]; }> {
-    const { entity } = params;
-    const updateQuery: UpdateQuery<MusicsUsersOdm.Doc> = {
-      $set: {
-        ...entity,
-      },
-    };
-
-    if (updateQuery.$set?.tags?.length === 0)
-      delete updateQuery.$set.tags;
-
-    if (entity.tags?.length === 0) {
-      updateQuery.$unset = {
-        ...updateQuery.$unset,
-        tags: true,
-      };
-    }
-
+    const updateQuery: UpdateQuery<MusicsUsersOdm.Doc> = MusicsUsersOdm.toUpdateQuery(dto);
     const bulkOps = musicIds.map((musicId) => ( {
       updateOne: {
         filter: {
@@ -187,13 +155,13 @@ warnings: MusicCrudDtos.BulkPatch.Warning[]; }> {
 
     for (const item of data) {
       this.domainEventEmitter.emitPatch(MusicsUsersEvents.Patched.TYPE, {
-        partialEntity: entity,
+        partialEntity: dto.entity,
         id: {
           musicId: item.musicId,
           userId: item.userId,
           _id: item.id,
         } satisfies MusicsUsersEvents.Patched.Event["payload"]["entityId"],
-        unset: params.unset,
+        unset: dto.unset,
       } );
     }
 

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { MusicEntity, MusicEntityWithUserInfo, musicSchema } from "$shared/models/musics";
 import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
+import { MusicInfoCrudDtos } from "$shared/models/musics/user-info/dto/transport";
 import { FetchApi } from "#modules/fetching/fetch-api";
 import { MusicsApi } from "#modules/musics/requests";
 import { MusicUserInfosApi } from "#modules/musics/user-info.requests";
@@ -175,7 +176,9 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
     // Tags de música (empiezan con #)
     if (dirtyFields.tags) {
       hasMusicChanges = true;
-      musicEntity.tags = formValues.tags.filter((t) => t.startsWith("#"));
+      musicEntity.tags = {
+        replace: formValues.tags.filter((t) => t.startsWith("#")),
+      };
     }
 
     // Image Cover
@@ -195,7 +198,7 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
     // --- PATCH USER INFO ---
     let userInfoPromise: Promise<any> = Promise.resolve();
     let hasUserInfoChanges = false;
-    const userInfoEntity: any = {};
+    const userInfoEntity: MusicInfoCrudDtos.Patch.Body["entity"] = {};
 
     if (initialData.userInfo) {
       if (dirtyFields.weight) {
@@ -204,7 +207,9 @@ export const EditMusicForm = ( { initialData: propInitialData, onSuccess, onDele
       }
 
       if (dirtyFields.tags) {
-        userInfoEntity.tags = formValues.tags.filter((t) => !t.startsWith("#"));
+        userInfoEntity.tags = {
+          replace: formValues.tags.filter((t) => !t.startsWith("#")),
+        };
         hasUserInfoChanges = true;
       }
 

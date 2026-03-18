@@ -1,4 +1,4 @@
-import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
+import { EntityEvent } from "#core/domain-event-emitter";
 import { MusicHistoryEntryEntity } from "../../models";
 
 type Entity = MusicHistoryEntryEntity;
@@ -6,10 +6,6 @@ export namespace MusicHistoryEntryEvents {
   const MAIN_TYPE = "music_history";
   export const WILDCARD = `${MAIN_TYPE}.*`;
 
-  export namespace Patched {
-    export const TYPE = `${MAIN_TYPE}.patched`;
-    export type Event = PatchEvent<Entity, Entity["id"]>;
-  }
   export namespace Created {
     export const TYPE = `${MAIN_TYPE}.created`;
     export type Event = EntityEvent<Entity>;

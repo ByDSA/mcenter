@@ -1,3 +1,4 @@
+import { MovieFileInfoCrudDtos } from "$shared/models/movies/file-info/dto/transport";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
 import { MovieFileInfoEntity } from "../../models";
 
@@ -9,7 +10,10 @@ export namespace MovieFileInfoEvents {
 
   export namespace Patched {
     export const TYPE = `${MAIN_TYPE}.patched`;
-    export type Event = PatchEvent<Entity, Entity["id"]>;
+    export type Event = PatchEvent<
+      MovieFileInfoCrudDtos.PatchOne.Body["entity"],
+      Entity, Entity["id"]
+    >;
   }
 
   export namespace Created {

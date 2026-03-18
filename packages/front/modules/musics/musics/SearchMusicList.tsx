@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { showError } from "$shared/utils/errors/showError";
 import { MusicCrudDtos } from "$shared/models/musics/dto/transport";
+import { MusicEntityWithUserInfo } from "$shared/models/musics";
 import { renderFetchedData } from "#modules/fetching";
 import { useCrudDataWithScroll } from "#modules/fetching/index";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -12,6 +13,8 @@ import { useMusic } from "../hooks";
 import { MusicEntryElement } from "./ListItem/MusicEntry";
 import { ArrayData } from "./types";
 import styles from "./SearchMusicList.module.css";
+import { useBulkSelection } from "./BlukEdit/useBulkSelection";
+import { BulkEditBar } from "./BlukEdit/BulkEditBar";
 
 type Props = {
   filters: {
@@ -27,6 +30,7 @@ export function SearchMusicList(props: Props) {
     error,
     observerTarget,
     totalCount } = useSearchMusicList(props);
+  const selection = useBulkSelection();
   const resultNumbers = (
     <span className={styles.resultNumbers}>
       Resultados: {data?.length} de {totalCount}
@@ -46,12 +50,36 @@ export function SearchMusicList(props: Props) {
       <>
         {resultNumbers}
         <br />
+
+        <BulkEditBar
+          isBulkMode={selection.isBulkMode}
+          onActivate={selection.activateBulkMode}
+          count={selection.count}
+          onClear={selection.clear}
+          getSelectedMusics={() => [...selection.selectedIds]
+            .map((id) => useMusic.getCache(id))
+            .filter(Boolean) as MusicEntityWithUserInfo[]
+          }
+        />
+
         <span className={classes(listStyles.list)}>
           {data!.map((music, i) => {
             return <MusicEntryElement
               key={i + ": " + music.id}
               playable
               musicId={music.id}
+              // Fix: only pass selection prop when bulk mode is active
+              selection={selection.isBulkMode
+                ? {
+                  isSelected: selection.isSelected(music.id),
+                  onToggle: () => selection.toggle(music.id),
+                }
+                : undefined
+              }
+              onLongPress={() => {
+                selection.activateBulkMode();
+                selection.toggle(music.id);
+              }}
             />;
           } )}
         </span>

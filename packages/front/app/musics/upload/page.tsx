@@ -18,6 +18,8 @@ import { DaLabel } from "#modules/ui-kit/form/Label/Label";
 import { DaInputGroup } from "#modules/ui-kit/form/InputGroup";
 import { EmptyList, EmptyListTopIconWrap } from "#modules/resources/EmptyList/EmptyList";
 import { useI18nContext } from "#modules/core/i18n/i18n-react";
+import { useBulkSelection } from "#modules/musics/musics/BlukEdit/useBulkSelection";
+import { BulkEditBar } from "#modules/musics/musics/BlukEdit/BulkEditBar";
 import MusicLayout from "../music.layout";
 import styles from "./page.module.css";
 
@@ -41,10 +43,12 @@ export default function Upload() {
   assertIsDefined(user);
   const [uploaded, setUploaded] = useState<MusicEntityWithUserInfo[]>([]);
   const uploadedRef = useRef<MusicEntity[]>(uploaded);
+  const selection = useBulkSelection();
 
   useEffect(() => {
     uploadedRef.current = uploaded;
   }, [uploaded]);
+
   const onUpload = useCallback(genOnUpload( {
     url: backendUrl(PATH_ROUTES.musics.fileInfo.upload.path),
     withCredentials: true,
@@ -53,7 +57,7 @@ export default function Upload() {
       response: unknown,
       fileData: FileData,
       options: OnUploadOptions,
-    )=> {
+    ) => {
       const parsedResponse = MusicFileInfoCrudDtos.UploadFile.responseSchema.parse(response);
       const { music } = parsedResponse.data;
 
@@ -66,17 +70,16 @@ export default function Upload() {
 
       useMusic.updateCacheWithMerging(music.id, music);
 
-      options?.setSelectedFiles?.((old)=> {
-        return old.filter(
-          f2=> f2.id !== fileData.id,
-        );
+      options?.setSelectedFiles?.((old) => {
+        return old.filter(f2 => f2.id !== fileData.id);
       } );
     },
   } ), [setUploaded]);
   const onCreateMusic = (music: MusicEntity) => {
     setUploaded(old => ([
       ...old,
-      injectDefaultUserInfo(music, user.id)]));
+      injectDefaultUserInfo(music, user.id),
+    ]));
     useMusic.updateCacheWithMerging(music.id, music);
   };
   const { LL } = useI18nContext();
@@ -88,32 +91,57 @@ export default function Upload() {
           <DaLabel>{LL.modules.musics.upload.fromYoutube()}</DaLabel>
           <YouTubeUpload
             withCredentials
-            onCreateMusic={onCreateMusic}/>
+            onCreateMusic={onCreateMusic} />
           <DaLabel>{LL.modules.musics.upload.fromLocal()}</DaLabel>
           <FileUpload
-            acceptedTypes={AUDIO_EXTENSIONS.map(s=>`.${s}`)}
+            acceptedTypes={AUDIO_EXTENSIONS.map(s => `.${s}`)}
             multiple={true}
             onUpload={onUpload}
           />
         </DaInputGroup>
-        <hr/>
+        <hr />
         <DaLabel>{LL.modules.musics.upload.sectionTitle()}</DaLabel>
+
+        {/* Fix: bulk selection bar for uploaded list */}
+        {uploaded.length > 0 && (
+          <BulkEditBar
+            isBulkMode={selection.isBulkMode}
+            onActivate={selection.activateBulkMode}
+            count={selection.count}
+            onClear={selection.clear}
+            getSelectedMusics={() => [...selection.selectedIds]
+              .map((id) => useMusic.getCache(id))
+              .filter(Boolean) as MusicEntityWithUserInfo[]
+            }
+          />
+        )}
+
         <ResourceList>
           {uploaded.length === 0 && <EmptyList
             top={<EmptyListTopIconWrap><MusicNote /></EmptyListTopIconWrap>}
             label={LL.modules.musics.upload.noneUploaded()} />
           }
-          {
-          uploaded!.map(
+          {uploaded!.map(
             (music) => <Fragment key={`${music.id}`}>
               <MusicEntryElement
                 musicId={music.id}
                 playable={true}
                 onDelete={() => setUploaded(old => old.filter(m => m.id !== music.id))}
+                // only show checkbox when bulk mode active
+                selection={selection.isBulkMode
+                  ? {
+                    isSelected: selection.isSelected(music.id),
+                    onToggle: () => selection.toggle(music.id),
+                  }
+                  : undefined
+                }
+                onLongPress={() => {
+                  selection.activateBulkMode();
+                  selection.toggle(music.id);
+                }}
               />
             </Fragment>,
-          )
-          }
+          )}
         </ResourceList>
       </div>
     </MusicLayout>

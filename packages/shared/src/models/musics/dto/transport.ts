@@ -1,5 +1,5 @@
 import z from "zod";
-import { createOneResultResponseSchema, createPaginatedResultResponseSchema } from "../../../utils/http/responses";
+import { createOneResultResponseSchema, createPaginatedResultResponseSchema, createManyResultResponseSchema } from "../../../utils/http/responses";
 import { slugSchema } from "../../utils/schemas/slug";
 import { generatePatchBodySchema } from "../../utils/schemas/patch";
 import { musicEntitySchema } from "../music";
@@ -44,6 +44,8 @@ export namespace MusicCrudDtos {
       createdAt: true,
       updatedAt: true,
       addedAt: true,
+      fileInfos: true,
+      userInfo: true,
     } ).extend( {
       slug: z.string(),
     } ));
@@ -59,5 +61,55 @@ export namespace MusicCrudDtos {
   export namespace PickRandom {
     export const responseSchema = responseOneSchema;
     export type Response = z.infer<typeof responseSchema>;
+  }
+
+  export namespace BulkPatch {
+    const musicFieldsSchema = musicEntitySchema.pick( {
+      artist: true,
+      album: true,
+      country: true,
+      game: true,
+      year: true,
+      tags: true,
+    } );
+
+    const userInfoFieldsSchema = z.object( {
+      weight: z.number(),
+      tags: z.array(z.string()).optional(),
+    } );
+
+    export const bodySchema = z
+      .object( {
+        ids: z.array(mongoDbId).min(1),
+        music: generatePatchBodySchema(musicFieldsSchema).optional(),
+        userInfo: generatePatchBodySchema(userInfoFieldsSchema).optional(),
+      } )
+      .refine(
+        (data) => data.music !== undefined || data.userInfo !== undefined,
+        {
+          message: "Se debe especificar al menos music o userInfo",
+        },
+      );
+
+    export type Body = z.infer<typeof bodySchema>;
+
+    const musicIdsNotFoundWarningSchema = z.object( {
+      code: z.literal("MUSIC_IDS_NOT_FOUND"),
+      notFoundMusicIds: z.array(mongoDbId),
+    } );
+
+    const userInfoIdsNotFoundWarningSchema = z.object( {
+      code: z.literal("USER_INFO_IDS_NOT_FOUND"),
+      notFoundMusicIds: z.array(mongoDbId),
+    } );
+
+    export const warningSchema = musicIdsNotFoundWarningSchema.or(userInfoIdsNotFoundWarningSchema);
+    export type Warning = z.infer<typeof warningSchema>;
+
+    export const responseSchema = createManyResultResponseSchema(musicEntitySchema, {
+      warningsSchema: warningSchema,
+    } );
+    export type Response = z.infer<typeof responseSchema>;
+    export type Return = Response;
   }
 }

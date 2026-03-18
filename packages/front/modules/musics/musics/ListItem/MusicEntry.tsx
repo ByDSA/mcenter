@@ -31,13 +31,18 @@ type Props = Pick<ResourceEntryProps, "drag"> & {
     index: number;
     playlist: MusicPlaylistEntity | null; // null = play queue
   };
+  selection?: {
+    isSelected: boolean;
+    onToggle: ()=> void;
+  };
+  onLongPress?: ()=> void;
 };
 export function MusicEntryElement(
   props: Props,
 ) {
   const { user } = useUser();
   const { openMenu } = useContextMenuTrigger();
-  const { musicId } = props;
+  const { musicId, selection } = props;
   const { data: music } = useMusic(musicId, {
     debounce: true,
   } );
@@ -149,6 +154,19 @@ export function MusicEntryElement(
     disabled={isUnavailable}
     play={play}
     drag={props.drag}
+    onLongPress={props.onLongPress}
+    checkbox={
+      selection && (
+        <input
+          type="checkbox"
+          className={styles.checkbox}
+          checked={selection.isSelected}
+          onChange={selection.onToggle}
+          onClick={(e) => e.stopPropagation()}
+          aria-label="Seleccionar música"
+        />
+      )
+    }
   />;
 }
 

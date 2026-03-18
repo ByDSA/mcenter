@@ -1,5 +1,5 @@
 import { DocOdm, FullDocOdm, ModelOdm, schemaOdm } from "./odm";
-import { toEntity as _toEntity, toFullDoc as _toFullDoc, partialToDoc as _partialToDoc } from "./adapters";
+import { toEntity as _toEntity, toFullDoc as _toFullDoc, toUpdateQuery as _toUpdateQuery } from "./adapters";
 
 export namespace MovieOdm {
   export const Model = ModelOdm;
@@ -8,5 +8,5 @@ export namespace MovieOdm {
   export type FullDoc = FullDocOdm;
   export const toEntity = _toEntity;
   export const toFullDoc = _toFullDoc;
-  export const partialToDoc = _partialToDoc;
+  export const toUpdateQuery = _toUpdateQuery;
 };

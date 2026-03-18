@@ -8,6 +8,7 @@ import { classes } from "#modules/utils/styles";
 import { SetState } from "#modules/utils/react";
 import listItemStyles from "#modules/resources/ListItem/ListItem.module.css";
 import { EmptyList, EmptyListTopIconWrap } from "#modules/resources/EmptyList/EmptyList";
+import { BulkSelection } from "#modules/musics/musics/BlukEdit/useBulkSelection";
 import { MusicPlaylistEntity } from "../../models";
 import styles from "./List.module.css";
 import { SortablePlaylistItem } from "./SortableListItem";
@@ -24,6 +25,7 @@ interface PlaylistTracksProps {
   isDraggingGlobal: boolean;
   activeId: string | null;
   itemIds: string[];
+  selection: BulkSelection;
 }
 
 const EmptyPlaylist = memo(()=>{
@@ -41,7 +43,8 @@ export const MusicPlaylistTrackList = ( { value,
   onDragEnd,
   isDraggingGlobal,
   activeId,
-  itemIds }: PlaylistTracksProps) => {
+  itemIds,
+  selection }: PlaylistTracksProps) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const [offsetTop, setOffsetTop] = useState(0);
 
@@ -110,6 +113,7 @@ export const MusicPlaylistTrackList = ( { value,
                     setValue={setValue}
                     value={value}
                     scrollMargin={offsetTop}
+                    selection={selection}
                   />
                 ))
               }
@@ -137,6 +141,7 @@ export const MusicPlaylistTrackList = ( { value,
                         <DragHandle />
                       </div>,
                     }}
+                    selection={selection}
                   />
                 </span>
               )

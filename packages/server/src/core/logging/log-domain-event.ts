@@ -26,8 +26,8 @@ export function logDomainEvent(
 function isEntityEvent<M extends Entity<any>>(event: DomainEvent<any>): event is EntityEvent<M> {
   return "entity" in event.payload;
 }
-function isPatchEvent<M extends object>(
+function isPatchEvent<P extends object, M extends object>(
   event: DomainEvent<any>,
-): event is PatchEvent<M, unknown> {
+): event is PatchEvent<P, M, unknown> {
   return "entityId" in event.payload;
 }

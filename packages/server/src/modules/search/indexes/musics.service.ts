@@ -1,12 +1,12 @@
 import { Injectable, Logger, UnprocessableEntityException } from "@nestjs/common";
 import { Index, MeiliSearch, SearchParams, SearchResponse } from "meilisearch";
 import { OnEvent } from "@nestjs/event-emitter";
-import { Music, MusicEntity, MusicUserInfoEntity } from "$shared/models/musics";
+import { MusicEntity, MusicUserInfoEntity } from "$shared/models/musics";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
 import { WithRequired } from "$shared/utils/objects";
 import { MusicOdm } from "#musics/crud/repositories/music/odm";
 import { MusicEvents } from "#musics/crud/repositories/music/events";
-import { DomainEvent, EntityEvent, PatchEvent } from "#core/domain-event-emitter";
+import { DomainEvent, EntityEvent } from "#core/domain-event-emitter";
 import { assertFoundServer } from "#utils/validation/found";
 import { UserOdm } from "#core/auth/users/crud/repository/odm";
 import { MusicsUsersOdm } from "#musics/crud/repositories/user-info/odm";
@@ -68,7 +68,7 @@ export class MusicsIndexService {
   @OnEvent(MusicEvents.WILDCARD)
   async handleMusicEvents(ev: DomainEvent<unknown>) {
     if (ev.type === MusicEvents.Patched.TYPE) {
-      const typedEv = ev as PatchEvent<Music>;
+      const typedEv = ev as MusicEvents.Patched.Event;
       const id = typedEv.payload.entityId;
       const docOdm = await MusicOdm.Model.findById(id);
 

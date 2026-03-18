@@ -47,7 +47,7 @@ export class MovieRepository {
     id: string,
     params: MovieCrudDtos.Patch.Body,
   ): Promise<MovieEntity> {
-    const partial = MovieOdm.partialToDoc(params.entity);
+    const partial = MovieOdm.toUpdateQuery(params);
     const result = await MovieOdm.Model.updateOne( {
       _id: new Types.ObjectId(id),
     }, partial);

@@ -66,9 +66,17 @@ export namespace MusicPlaylistCrudDtos {
       // Para que se permita enviar cualquier slug y el backend haga el fixer
       .omit( {
         slug: true,
+        list: true,
+        imageCover: true,
+        ownerUser: true,
       } ).extend( {
         slug: z.string()
           .min(1),
+        list: z.array(
+          musicPlaylistEntitySchema.shape.list.element.omit( {
+            music: true,
+          } ),
+        ),
       } ));
     export type Body = z.infer<typeof bodySchema>;
     export const responseSchema = responseOneSchema;

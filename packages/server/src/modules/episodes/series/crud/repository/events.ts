@@ -1,3 +1,4 @@
+import { SeriesCrudDtos } from "$shared/models/episodes/series/dto/transport";
 import { EntityEvent, PatchEvent } from "#core/domain-event-emitter";
 import { SeriesEntity } from "../../models";
 
@@ -8,7 +9,7 @@ export namespace SeriesEvents {
 
   export namespace Patched {
     export const TYPE = `${MAIN_TYPE}.patched`;
-    export type Event = PatchEvent<Entity, Entity["id"]>;
+    export type Event = PatchEvent<SeriesCrudDtos.Patch.Body["entity"], Entity, Entity["id"]>;
   }
   export namespace Created {
     export const TYPE = `${MAIN_TYPE}.created`;

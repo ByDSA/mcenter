@@ -1,0 +1,72 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Label cell: checkbox + label text + inspect icon, all in a row */
+.labelRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 9rem;
+
+  /* Override DaLabel margin so it stays on the same line */
+  span {
+    margin: 0;
+  }
+}
+
+.inspectBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-gray-500);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--color-blue-200);
+  }
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.yearInput {
+  width: 5rem !important;
+}
+
+.weightInput {
+  width: 5rem !important;
+}
+
+/* Tags mode radio buttons */
+.tagsModeRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.tagsModeOption {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--color-label);
+  cursor: pointer;
+  user-select: none;
+
+  input[type="radio"] {
+    accent-color: var(--color-blue-300);
+    cursor: pointer;
+  }
+
+  &:has(input:checked) {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+}

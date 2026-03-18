@@ -109,15 +109,10 @@ CanDeleteOneByIdAndGet<MusicEntity, MusicEntity["id"]> {
   ): Promise<MusicEntity> {
     const { entity: paramEntity } = params;
     let validEntity = this.musicBuilder.fixFields(paramEntity);
-    const updateQuery = MusicOdm.toPatchQuery( {
+    const updateQuery = MusicOdm.toUpdateQuery( {
       entity: validEntity,
       unset: params.unset,
     } );
-
-    updateQuery.$set = {
-      ...updateQuery.$set,
-    };
-
     const doc = await MusicOdm.Model.findByIdAndUpdate(
       id,
       updateQuery,
@@ -380,7 +375,7 @@ fileInfo: MusicFileInfoEntity;}> {
 warnings: MusicCrudDtos.BulkPatch.Warning[]; }> {
     const { entity: paramEntity } = params;
     let validEntity = this.musicBuilder.fixFields(paramEntity);
-    const updateQuery = MusicOdm.toPatchQuery(params);
+    const updateQuery = MusicOdm.toUpdateQuery(params);
     const objectIds = ids.map((id) => new Types.ObjectId(id));
 
     await MusicOdm.Model.updateMany( {

@@ -4,6 +4,7 @@ import { removeUndefinedDeep } from "$shared/utils/objects/removeUndefinedValues
 import { EpisodeFileInfoOdm } from "#episodes/file-info/crud/repository/odm";
 import { SeriesOdm } from "#episodes/series/crud/repository/odm";
 import { MongoUpdateQuery } from "#utils/layers/db/mongoose";
+import { EpisodesCrudDtos } from "#episodes/models/dto";
 import { Episode, EpisodeEntity } from "../../../../models";
 import { EpisodesUsersOdm } from "../../../user-infos/repository/odm";
 import { DocOdm, FullDocOdm } from "./odm";
@@ -80,7 +81,8 @@ export function episodeToDocOdm(model: Episode): DocOdm {
   return removeUndefinedDeep(ret);
 }
 
-export function partialModelToDocOdm(model: Partial<EpisodeEntity>): MongoUpdateQuery<DocOdm> {
+export function toUpdateQuery(patch: EpisodesCrudDtos.Patch.Body): MongoUpdateQuery<DocOdm> {
+  const model = patch.entity;
   const ret: MongoUpdateQuery<DocOdm> = {
     tags: model.tags,
     imageCoverId: model.imageCoverId,

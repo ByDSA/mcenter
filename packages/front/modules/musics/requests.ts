@@ -34,6 +34,27 @@ export class MusicsApi {
     return ret;
   }
 
+  async bulkPatch(
+    body: MusicCrudDtos.BulkPatch.Body,
+  ): Promise<MusicCrudDtos.BulkPatch.Response> {
+    const fetcher = makeFetcher( {
+      method: "PATCH",
+      requestSchema: MusicCrudDtos.BulkPatch.bodySchema,
+      responseSchema: MusicCrudDtos.BulkPatch.responseSchema,
+    } );
+    const ret = await fetcher( {
+      url: backendUrl(PATH_ROUTES.musics.bulk.path),
+      body,
+    } );
+
+    if (ret.data) {
+      for (const m of ret.data)
+        useMusic.updateCacheWithMerging(m.id, m);
+    }
+
+    return ret;
+  }
+
   async getOneByCriteria(
     { skipCache, ...criteria }: MusicCrudDtos.GetOne.Criteria & {
       skipCache?: boolean;
