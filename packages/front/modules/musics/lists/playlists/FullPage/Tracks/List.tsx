@@ -4,15 +4,18 @@ import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { MusicNote, DragHandle } from "@mui/icons-material";
-import { classes } from "#modules/utils/styles";
-import { SetState } from "#modules/utils/react";
-import listItemStyles from "#modules/resources/ListItem/ListItem.module.css";
+import { MusicEntityWithUserInfo } from "$shared/models/musics";
 import { EmptyList, EmptyListTopIconWrap } from "#modules/resources/EmptyList/EmptyList";
-import { BulkSelection } from "#modules/musics/musics/BlukEdit/useBulkSelection";
+import listItemStyles from "#modules/resources/ListItem/ListItem.module.css";
+import { SetState } from "#modules/utils/react";
+import { classes } from "#modules/utils/styles";
+import { useBulkSelection } from "#modules/musics/musics/BlukEdit/useBulkSelection";
+import { BulkEditBar } from "#modules/musics/musics/BlukEdit/BulkEditBar";
+import { useMusic } from "#modules/musics/hooks";
 import { MusicPlaylistEntity } from "../../models";
-import styles from "./List.module.css";
-import { SortablePlaylistItem } from "./SortableListItem";
 import { MusicPlaylistItem } from "./ListItem";
+import { SortablePlaylistItem } from "./SortableListItem";
+import styles from "./List.module.css";
 
 interface PlaylistTracksProps {
   value: MusicPlaylistEntity;
@@ -25,7 +28,6 @@ interface PlaylistTracksProps {
   isDraggingGlobal: boolean;
   activeId: string | null;
   itemIds: string[];
-  selection: BulkSelection;
 }
 
 const EmptyPlaylist = memo(()=>{
@@ -43,8 +45,7 @@ export const MusicPlaylistTrackList = ( { value,
   onDragEnd,
   isDraggingGlobal,
   activeId,
-  itemIds,
-  selection }: PlaylistTracksProps) => {
+  itemIds }: PlaylistTracksProps) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const [offsetTop, setOffsetTop] = useState(0);
 
@@ -67,88 +68,101 @@ export const MusicPlaylistTrackList = ( { value,
     () => (activeId ? value.list.findIndex((i) => i.id === activeId) : -1),
     [activeId, value.list],
   );
+  const selection = useBulkSelection();
 
   return (
-    <div className={classes(styles.playlistItems, draggable && styles.draggable)}>
-      <div className={classes(styles.tracksHeader, listItemStyles.sidePadding)}>
-        {draggable && <div className={styles.headerDrag}></div>}
-        <div className={classes(styles.headerIndex, listItemStyles.leftDiv)}>#</div>
-        <div className={styles.headerTitle}>MÚSICA</div>
-      </div>
+    <>
+      <div className={classes(styles.playlistItems, draggable && styles.draggable)}>
+        <BulkEditBar
+          isBulkMode={selection.isBulkMode}
+          onActivate={selection.activateBulkMode}
+          count={selection.count}
+          onClear={selection.clear}
+          getSelectedMusics={() => [...selection.selectedIds]
+            .map((id) => useMusic.getCache(id))
+            .filter(Boolean) as MusicEntityWithUserInfo[]
+          }
+        />
+        <div className={classes(styles.tracksHeader, listItemStyles.sidePadding)}>
+          {draggable && <div className={styles.headerDrag}></div>}
+          <div className={classes(styles.headerIndex, listItemStyles.leftDiv)}>#</div>
+          <div className={styles.headerTitle}>MÚSICA</div>
+        </div>
 
-      <div ref={parentRef} style={{
-        position: "relative",
-      }}>
-        {value.list.length === 0 && <EmptyPlaylist />}
-        <DndContext
-          sensors={dndSensors}
-          collisionDetection={closestCenter}
-          onDragStart={onDragStart}
-          onDragEnd={onDragEnd}
-          modifiers={[restrictToVerticalAxis]}
-          measuring={{
-            droppable: {
-              strategy: MeasuringStrategy.BeforeDragging,
-            },
-          }}
-        >
-          <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-            <div
-              className={classes(isDraggingGlobal && styles.isDraggingGlobal)}
-              style={{
-                height: `${virtualizer.getTotalSize()}px`,
-                position: "relative",
-              }}
-            >
-              {
-                virtualItems.map((vItem) => (
-                  <SortablePlaylistItem
-                    key={value.list[vItem.index].id}
-                    start={vItem.start}
-                    size={vItem.size}
-                    item={value.list[vItem.index]}
-                    index={vItem.index}
-                    draggable={draggable}
-                    isDraggingGlobal={isDraggingGlobal}
-                    setValue={setValue}
-                    value={value}
-                    scrollMargin={offsetTop}
-                    selection={selection}
-                  />
-                ))
-              }
-            </div>
-          </SortableContext>
+        <div ref={parentRef} style={{
+          position: "relative",
+        }}>
+          {value.list.length === 0 && <EmptyPlaylist />}
+          <DndContext
+            sensors={dndSensors}
+            collisionDetection={closestCenter}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+            modifiers={[restrictToVerticalAxis]}
+            measuring={{
+              droppable: {
+                strategy: MeasuringStrategy.BeforeDragging,
+              },
+            }}
+          >
+            <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+              <div
+                className={classes(isDraggingGlobal && styles.isDraggingGlobal)}
+                style={{
+                  height: `${virtualizer.getTotalSize()}px`,
+                  position: "relative",
+                }}
+              >
+                {
+                  virtualItems.map((vItem) => (
+                    <SortablePlaylistItem
+                      key={value.list[vItem.index].id}
+                      start={vItem.start}
+                      size={vItem.size}
+                      item={value.list[vItem.index]}
+                      index={vItem.index}
+                      draggable={draggable}
+                      isDraggingGlobal={isDraggingGlobal}
+                      setValue={setValue}
+                      value={value}
+                      scrollMargin={offsetTop}
+                      selection={selection}
+                    />
+                  ))
+                }
+              </div>
+            </SortableContext>
 
-          <DragOverlay adjustScale={false}>
-            {activeId && activeIndex !== -1
-              ? (
-                <span
-                  style={{
-                    opacity: 0.8,
-                  }}
-                >
-                  <MusicPlaylistItem
-                    playlist={value}
-                    setPlaylist={setValue}
-                    index={activeIndex}
-                    drag={{
-                      isDragging: true,
-                      isDraggingGlobal: true,
-                      element: <div
-                        className={classes(styles.dragHandle, styles.isDragging)}
-                      >
-                        <DragHandle />
-                      </div>,
+            <DragOverlay adjustScale={false}>
+              {activeId && activeIndex !== -1
+                ? (
+                  <span
+                    style={{
+                      opacity: 0.8,
                     }}
-                    selection={selection}
-                  />
-                </span>
-              )
-              : null}
-          </DragOverlay>
-        </DndContext>
+                  >
+                    <MusicPlaylistItem
+                      playlist={value}
+                      setPlaylist={setValue}
+                      index={activeIndex}
+                      drag={{
+                        isDragging: true,
+                        isDraggingGlobal: true,
+                        element: <div
+                          className={classes(styles.dragHandle, styles.isDragging)}
+                        >
+                          <DragHandle />
+                        </div>,
+                      }}
+                      selection={selection}
+                    />
+                  </span>
+                )
+                : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
       </div>
-    </div>
+    </>
   );
 };

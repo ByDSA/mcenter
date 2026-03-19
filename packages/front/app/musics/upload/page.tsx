@@ -102,21 +102,19 @@ export default function Upload() {
         <hr />
         <DaLabel>{LL.modules.musics.upload.sectionTitle()}</DaLabel>
 
-        {/* Fix: bulk selection bar for uploaded list */}
-        {uploaded.length > 0 && (
-          <BulkEditBar
-            isBulkMode={selection.isBulkMode}
-            onActivate={selection.activateBulkMode}
-            count={selection.count}
-            onClear={selection.clear}
-            getSelectedMusics={() => [...selection.selectedIds]
-              .map((id) => useMusic.getCache(id))
-              .filter(Boolean) as MusicEntityWithUserInfo[]
-            }
-          />
-        )}
-
         <ResourceList>
+          {uploaded.length > 0 && (
+            <BulkEditBar
+              isBulkMode={selection.isBulkMode}
+              onActivate={selection.activateBulkMode}
+              count={selection.count}
+              onClear={selection.clear}
+              getSelectedMusics={() => [...selection.selectedIds]
+                .map((id) => useMusic.getCache(id))
+                .filter(Boolean) as MusicEntityWithUserInfo[]
+              }
+            />
+          )}
           {uploaded.length === 0 && <EmptyList
             top={<EmptyListTopIconWrap><MusicNote /></EmptyListTopIconWrap>}
             label={LL.modules.musics.upload.noneUploaded()} />

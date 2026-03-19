@@ -51,18 +51,17 @@ export function SearchMusicList(props: Props) {
         {resultNumbers}
         <br />
 
-        <BulkEditBar
-          isBulkMode={selection.isBulkMode}
-          onActivate={selection.activateBulkMode}
-          count={selection.count}
-          onClear={selection.clear}
-          getSelectedMusics={() => [...selection.selectedIds]
-            .map((id) => useMusic.getCache(id))
-            .filter(Boolean) as MusicEntityWithUserInfo[]
-          }
-        />
-
         <span className={classes(listStyles.list)}>
+          <BulkEditBar
+            isBulkMode={selection.isBulkMode}
+            onActivate={selection.activateBulkMode}
+            count={selection.count}
+            onClear={selection.clear}
+            getSelectedMusics={() => [...selection.selectedIds]
+              .map((id) => useMusic.getCache(id))
+              .filter(Boolean) as MusicEntityWithUserInfo[]
+            }
+          />
           {data!.map((music, i) => {
             return <MusicEntryElement
               key={i + ": " + music.id}
