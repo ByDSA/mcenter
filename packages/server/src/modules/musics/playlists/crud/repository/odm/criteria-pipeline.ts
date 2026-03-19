@@ -217,11 +217,17 @@ export function getCriteriaPipeline(criteria: Criteria, requestUserId: string | 
       includeFavorite: criteria.expand?.includes("musicsFavorite"),
       // UserInfo (stats del usuario sobre la canción) normalmente no se pide en listas de playlist,
       // pero si lo añadieras al DTO, aquí solo tendrías que poner 'true'.
-      includeUserInfo: false,
+      includeUserInfo: criteria.expand?.includes("musicsUserInfo"),
     };
 
-    // Usamos la función optimizada para arrays
-    dataPipeline.push(...enrichMusicList("list", requestUserId, flags));
+    // Usamos la función optimizada para arrays.
+    // limitMusicExpand restringe la expansión a los primeros N items si está presente.
+    dataPipeline.push(...enrichMusicList(
+      "list",
+      requestUserId,
+      flags,
+      criteria.filter?.limitMusicExpand,
+    ));
   }
 
   if (criteria.expand?.includes("ownerUserPublic")) {

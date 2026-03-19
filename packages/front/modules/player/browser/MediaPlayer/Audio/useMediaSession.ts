@@ -2,7 +2,7 @@ import { showError } from "$shared/utils/errors/showError";
 import { useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useMusic } from "#musics/hooks";
-import { getMediumCoverUrlFromMusic } from "#musics/musics/ListItem/MusicEntry";
+import { useMediumCoverUrlFromMusic } from "#musics/musics/ListItem/MusicEntry";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 
 export function useMediaSession(
@@ -25,7 +25,7 @@ export function useMediaSession(
     if (!navigator.mediaSession || !music || !engine)
       return;
 
-    const coverUrl = getMediumCoverUrlFromMusic(music);
+    const coverUrl = useMediumCoverUrlFromMusic(music);
 
     navigator.mediaSession.metadata = new MediaMetadata( {
       title: music.title,

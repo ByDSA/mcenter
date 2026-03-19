@@ -13,9 +13,10 @@ import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useMusic } from "#modules/musics/hooks";
 import { ResourceEntryLoading } from "#modules/resources/ListItem/ResourceEntryLoading";
 import { PlayerStatus, useBrowserPlayer } from "#modules/player/browser/MediaPlayer/BrowserPlayerContext";
-import { getMediumCoverUrl, getSmallCoverUrl } from "#modules/image-covers/Selector/image-cover-utils";
+import { getMediumCoverUrl } from "#modules/image-covers/Selector/image-cover-utils";
 import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { LocalDataProvider } from "#modules/utils/local-data-context";
+import { useImageCover } from "#modules/image-covers/hooks";
 import { MusicContextMenu } from "../SettingsButton/Button";
 import styles from "./MusicEntry.module.css";
 
@@ -128,13 +129,15 @@ export function MusicEntryElement(
     };
   }
 
+  const { data: imageCover } = useImageCover(music.imageCoverId ?? null);
+
   return <ResourceEntry
     mainTitle={music.title}
     mainTitleHref={PATH_ROUTES.musics.frontend.path + "/" + music.id}
     subtitle={<MusicSubtitle
       music={music}
     />}
-    imageCover={music.imageCover}
+    imageCover={imageCover}
     favButton={ <PlaylistFavButton
       favoritesPlaylistId={favoritesPlaylistId}
       musicId={music.id}
@@ -188,16 +191,11 @@ export const MusicSubtitle = memo(( { music }: MusicSubtitleProps) => {
   ]} />;
 } );
 
-export function getSmallCoverUrlFromMusic(music: MusicEntity) {
-  if (music.imageCover)
-    return getSmallCoverUrl(music.imageCover);
+export function useMediumCoverUrlFromMusic(music: MusicEntity) {
+  const { data: imageCover } = useImageCover(music.imageCoverId ?? null);
 
-  return undefined;
-}
-
-export function getMediumCoverUrlFromMusic(music: MusicEntity) {
-  if (music.imageCover)
-    return getMediumCoverUrl(music.imageCover);
+  if (imageCover)
+    return getMediumCoverUrl(imageCover);
 
   return undefined;
 }

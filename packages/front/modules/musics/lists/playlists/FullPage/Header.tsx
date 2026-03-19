@@ -7,6 +7,7 @@ import { VisibilityTag } from "#modules/resources/FullPage/VisibilityTag";
 import { useLocalData } from "#modules/utils/local-data-context";
 import { DateTag } from "#modules/resources/FullPage/DateTag/DateTag";
 import { HeaderList } from "#modules/resources/FullPage/HeaderList";
+import { useImageCover } from "#modules/image-covers/hooks";
 import { formatDurationHeader } from "../utils";
 import { MusicPlaylistEntity } from "../models";
 import { MusicPlaylistSettingsButton } from "../SettingsButton/Settings";
@@ -33,13 +34,14 @@ export const PlaylistHeader = ( { totalSongs,
     <VisibilityTag key="visibility" isPublic={data.visibility === "public"} />,
     <DateTag key="date" date={data.createdAt} />,
   ];
+  const { data: imageCover } = useImageCover(data.imageCoverId ?? null);
 
   return (
     <HeaderList
       title={data.name}
       cover={<MusicImageCover
         title={data.name}
-        cover={data.imageCover}
+        cover={imageCover}
       />}
       onPlay={onPlay}
       playStatus={playlistStatus}

@@ -2,6 +2,8 @@ import { PATH_ROUTES } from "$shared/routing";
 import { backendUrl } from "#modules/requests";
 import { makeFetcher } from "#modules/fetching/fetcher";
 import { FetchApi } from "#modules/fetching/fetch-api";
+import { useImageCover } from "#modules/image-covers/hooks";
+import { useMusic } from "#musics/hooks";
 import { type MusicPlaylistEntity } from "./models";
 import { MusicPlaylistCrudDtos } from "./models/dto";
 
@@ -14,7 +16,7 @@ export class MusicPlaylistsApi {
     FetchApi.register(MusicPlaylistsApi, new MusicPlaylistsApi());
   }
 
-  getOneByCriteria(
+  async getOneByCriteria(
     criteria: MusicPlaylistCrudDtos.GetOne.Criteria,
   ) {
     const fetcher = makeFetcher( {
@@ -22,14 +24,18 @@ export class MusicPlaylistsApi {
       requestSchema: MusicPlaylistCrudDtos.GetOne.criteriaSchema,
       responseSchema: MusicPlaylistCrudDtos.GetOne.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.playlists.getOne.path),
       body: criteria,
     } );
+
+    if (ret.data)
+      updateCachesForOne(ret.data);
+
+    return ret;
   }
 
-  patchOne(
+  async patchOne(
     playlistId: string,
     props: MusicPlaylistCrudDtos.Patch.Body,
   ) {
@@ -38,14 +44,18 @@ export class MusicPlaylistsApi {
       requestSchema: MusicPlaylistCrudDtos.Patch.bodySchema,
       responseSchema: MusicPlaylistCrudDtos.Patch.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.playlists.withParams(playlistId)),
       body: props,
     } );
+
+    if (ret.data)
+      updateCachesForOne(ret.data);
+
+    return ret;
   }
 
-  createOne(
+  async createOne(
     props: MusicPlaylistCrudDtos.CreateOne.Body,
   ) {
     const fetcher = makeFetcher( {
@@ -53,14 +63,18 @@ export class MusicPlaylistsApi {
       requestSchema: MusicPlaylistCrudDtos.CreateOne.bodySchema,
       responseSchema: MusicPlaylistCrudDtos.CreateOne.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.playlists.path),
       body: props,
     } );
+
+    if (ret.data)
+      updateCachesForOne(ret.data);
+
+    return ret;
   }
 
-  moveOneTrack(
+  async moveOneTrack(
     playlistId: string,
     itemId: string,
     newIndexOneBased: number,
@@ -69,8 +83,7 @@ export class MusicPlaylistsApi {
       method: "GET",
       responseSchema: MusicPlaylistCrudDtos.GetOne.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(
         PATH_ROUTES.musics.playlists.track.move.withParams(
           playlistId,
@@ -79,9 +92,14 @@ export class MusicPlaylistsApi {
         ),
       ),
     } );
+
+    if (ret.data)
+      updateCachesForOne(ret.data);
+
+    return ret;
   }
 
-  addOneTrack(
+  async addOneTrack(
     playlistId: string,
     musicId: string,
     options?: AddOneTrackOptions,
@@ -91,8 +109,7 @@ export class MusicPlaylistsApi {
       requestSchema: MusicPlaylistCrudDtos.AddManyTracks.bodySchema,
       responseSchema: MusicPlaylistCrudDtos.AddManyTracks.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(
         PATH_ROUTES.musics.playlists.track.withParams(
           playlistId,
@@ -103,9 +120,14 @@ export class MusicPlaylistsApi {
         allowDuplicates: options?.allowDuplicates,
       },
     } );
+
+    if (ret.data)
+      updateCachesForOne(ret.data);
+
+    return ret;
   }
 
-  removeOneTrack(
+  async removeOneTrack(
     { itemId, playlistId }: {
     playlistId: string;
     itemId: string;
@@ -116,8 +138,7 @@ export class MusicPlaylistsApi {
       requestSchema: MusicPlaylistCrudDtos.RemoveManyTracks.bodySchema,
       responseSchema: MusicPlaylistCrudDtos.RemoveManyTracks.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(
         PATH_ROUTES.musics.playlists.track.withParams(
           playlistId,
@@ -127,9 +148,14 @@ export class MusicPlaylistsApi {
         tracks: [itemId],
       },
     } );
+
+    if (ret.data)
+      updateCachesForOne(ret.data);
+
+    return ret;
   }
 
-  removeAllTracksByMusicId( { playlistId,
+  async removeAllTracksByMusicId( { playlistId,
     musicId }: {playlistId: string;
 musicId: string;} ) {
     const fetcher = makeFetcher( {
@@ -137,8 +163,7 @@ musicId: string;} ) {
       requestSchema: MusicPlaylistCrudDtos.RemoveManyTracks.bodySchema,
       responseSchema: MusicPlaylistCrudDtos.RemoveManyTracks.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(
         PATH_ROUTES.musics.playlists.track.withParams(
           playlistId,
@@ -148,9 +173,14 @@ musicId: string;} ) {
         musicIds: [musicId],
       },
     } );
+
+    if (ret.data)
+      updateCachesForOne(ret.data);
+
+    return ret;
   }
 
-  getManyByUserCriteria(
+  async getManyByUserCriteria(
     userId: string,
     criteria?: MusicPlaylistCrudDtos.GetMany.Criteria,
   ) {
@@ -168,14 +198,17 @@ musicId: string;} ) {
       requestSchema: MusicPlaylistCrudDtos.GetMany.criteriaSchema,
       responseSchema: MusicPlaylistCrudDtos.GetMany.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.playlists.user.withParams(userId)),
       body,
     } );
+
+    updateCachesForMany(ret.data);
+
+    return ret;
   }
 
-  getManyByCriteria(
+  async getManyByCriteria(
     criteria?: MusicPlaylistCrudDtos.GetMany.Criteria,
   ) {
     const body: MusicPlaylistCrudDtos.GetMany.Criteria = {
@@ -186,11 +219,14 @@ musicId: string;} ) {
       requestSchema: MusicPlaylistCrudDtos.GetMany.criteriaSchema,
       responseSchema: MusicPlaylistCrudDtos.GetMany.responseSchema,
     } );
-
-    return fetcher( {
+    const ret = await fetcher( {
       url: backendUrl(PATH_ROUTES.musics.playlists.getMany.path),
       body,
     } );
+
+    updateCachesForMany(ret.data);
+
+    return ret;
   }
 
   deleteOneById(
@@ -204,5 +240,19 @@ musicId: string;} ) {
     return fetcher( {
       url: backendUrl(PATH_ROUTES.musics.playlists.withParams(id)),
     } );
+  }
+}
+
+function updateCachesForMany(data: MusicPlaylistCrudDtos.GetMany.Response["data"]) {
+  for (const d of data)
+    updateCachesForOne(d);
+}
+function updateCachesForOne(d: MusicPlaylistCrudDtos.GetMany.Response["data"][0]) {
+  if (d.imageCover && d.imageCoverId)
+    useImageCover.updateCache(d.imageCoverId, ()=>d.imageCover!);
+
+  for (const entry of d.list) {
+    if (entry.music)
+      useMusic.updateCache(entry.musicId, ()=>entry.music!);
   }
 }

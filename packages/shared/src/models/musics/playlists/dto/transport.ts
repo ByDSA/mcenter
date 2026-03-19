@@ -12,9 +12,13 @@ const criteriaConfig = {
     slug: slugSchema.optional(),
     ownerUserId: mongoDbId.optional(),
     ownerUserSlug: slugSchema.optional(),
+    limitMusicExpand: z.number().optional(),
   },
   sortKeys: ["added", "updated", "user"] as const,
-  expandKeys: ["musics", "musicsFavorite", "ownerUserPublic", "imageCover"] as const,
+  expandKeys: [
+    "musics", "musicsFavorite", "musicsUserInfo",
+    "ownerUserPublic", "imageCover",
+  ] as const,
 };
 
 export namespace MusicPlaylistCrudDtos {

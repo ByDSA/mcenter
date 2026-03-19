@@ -213,20 +213,31 @@ export function enrichSingleMusic( { localMusicIdField,
  * Estrategia para Arrays de Música (ej: Playlists)
  * Optimizado para no usar $unwind en la lista principal.
  * Asume que existe un campo array (listPath) donde cada elemento tiene { musicId: ObjectId }.
+ *
+ * @param limit - Si se especifica, sólo se expanden los primeros N items del array.
+ *                El resto del array se preserva tal cual, sin el campo `music`.
+ *                Si es undefined, se expanden todos los items (comportamiento por defecto).
  */
 export function enrichMusicList(
   listPath: string, // Ej: "list"
   requestUserId: string | null,
   flags: MusicExpansionFlags,
+  limit?: number,
 ): PipelineStage[] {
   const pipeline: PipelineStage[] = [];
+  // Expresión de los items a expandir: los primeros `limit` o todos si no hay límite
+  const itemsToEnrich = limit !== undefined
+    ? {
+      $slice: [`$${listPath}`, 0, limit],
+    }
+    : `$${listPath}`;
 
-  // 1. Lookup masivo de Musics (Expandir detalles básicos)
+  // 1. Lookup masivo de Musics (sólo los items a expandir)
   pipeline.push( {
     $lookup: {
       from: "musics",
       let: {
-        listItems: `$${listPath}`,
+        listItems: itemsToEnrich,
       },
       pipeline: [
         {
@@ -241,7 +252,42 @@ export function enrichMusicList(
     },
   } );
 
-  // 2. Lookup masivo de FileInfos
+  // 2. Lookup masivo de UserInfos (musics_users)
+  if (flags.includeUserInfo && requestUserId) {
+    pipeline.push( {
+      $lookup: {
+        from: "musics_users",
+        let: {
+          musicIds: {
+            $map: {
+              input: "$temp_musicsExpanded",
+              in: "$$this._id",
+            },
+          },
+          userId: new Types.ObjectId(requestUserId),
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {
+                    $in: ["$musicId", "$$musicIds"],
+                  },
+                  {
+                    $eq: ["$userId", "$$userId"],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        as: "temp_userInfosExpanded",
+      },
+    } );
+  }
+
+  // 3. Lookup masivo de FileInfos
   if (flags.includeFileInfos) {
     pipeline.push( {
       $lookup: {
@@ -268,7 +314,7 @@ export function enrichMusicList(
     } );
   }
 
-  // 3. Preparación de Favoritos (Obtener lista de IDs favoritos del usuario una sola vez)
+  // 4. Preparación de Favoritos (Obtener lista de IDs favoritos del usuario una sola vez)
   if (flags.includeFavorite) {
     if (!requestUserId)
       throw new Error("User ID is required to expand favorites");
@@ -335,7 +381,68 @@ export function enrichMusicList(
     );
   }
 
-  // 4. MAPEO: Cruzar toda la data sin deshacer el array
+  // Expresión de mergeObjects que enriquece un item del array con su `music`
+  const enrichedItem = {
+    $mergeObjects: [
+      "$$this",
+      {
+        music: {
+          $mergeObjects: [
+            // Base Music Data
+            {
+              $getField: {
+                field: {
+                  $toString: "$$this.musicId",
+                },
+                input: "$temp_musicMap",
+              },
+            },
+            // UserInfo
+            (flags.includeUserInfo && requestUserId
+              ? {
+                userInfo: {
+                  $getField: {
+                    field: {
+                      $toString: "$$this.musicId",
+                    },
+                    input: "$temp_userInfoMap",
+                  },
+                },
+              }
+              : {} ),
+            // FileInfos
+            (flags.includeFileInfos
+              ? {
+                fileInfos: {
+                  $ifNull: [
+                    {
+                      $getField: {
+                        field: {
+                          $toString: "$$this.musicId",
+                        },
+                        input: "$temp_fileInfosMap",
+                      },
+                    },
+                    [],
+                  ],
+                },
+              }
+              : {} ),
+            // Favorites
+            (flags.includeFavorite
+              ? {
+                isFav: {
+                  $in: ["$$this.musicId", "$temp_userFavMusicIds"],
+                },
+              }
+              : {} ),
+          ],
+        },
+      },
+    ],
+  };
+
+  // 5. MAPEO: Cruzar toda la data sin deshacer el array
   pipeline.push(
     // A. Crear Mapas para acceso O(1) en el $map
     {
@@ -353,6 +460,21 @@ export function enrichMusicList(
             },
           },
         },
+        ...(flags.includeUserInfo && requestUserId ? {
+          temp_userInfoMap: {
+            $arrayToObject: {
+              $map: {
+                input: "$temp_userInfosExpanded",
+                in: {
+                  k: {
+                    $toString: "$$this.musicId",
+                  },
+                  v: "$$this",
+                },
+              },
+            },
+          },
+        } : {} ),
         ...(flags.includeFileInfos ? {
           temp_fileInfosMap: {
             $arrayToObject: {
@@ -388,66 +510,42 @@ export function enrichMusicList(
         } : {} ),
       },
     },
-    // B. Reconstruir la lista
+    // B. Reconstruir la lista:
+    // - Con límite: los primeros N items se enriquecen, el resto se deja intacto.
+    // - Sin límite: se enriquecen todos.
     {
       $addFields: {
-        [listPath]: {
-          $map: {
-            input: `$${listPath}`,
-            in: {
-              $mergeObjects: [
-                "$$this",
-                {
-                  music: {
-                    $mergeObjects: [
-                      // Base Music Data
-                      {
-                        $getField: {
-                          field: {
-                            $toString: "$$this.musicId",
-                          },
-                          input: "$temp_musicMap",
-                        },
-                      },
-                      // FileInfos
-                      (flags.includeFileInfos
-                        ? {
-                          fileInfos: {
-                            $ifNull: [
-                              {
-                                $getField: {
-                                  field: {
-                                    $toString: "$$this.musicId",
-                                  },
-                                  input: "$temp_fileInfosMap",
-                                },
-                              },
-                              [],
-                            ],
-                          },
-                        }
-                        : {} ),
-                      // Favorites
-                      (flags.includeFavorite
-                        ? {
-                          isFav: {
-                            $in: ["$$this.musicId", "$temp_userFavMusicIds"],
-                          },
-                        }
-                        : {} ),
-                    ],
+        [listPath]: limit !== undefined
+          ? {
+            $concatArrays: [
+              {
+                $map: {
+                  input: {
+                    $slice: [`$${listPath}`, 0, limit],
                   },
+                  in: enrichedItem,
                 },
-              ],
+              },
+              {
+                $slice: [`$${listPath}`, limit, {
+                  $size: `$${listPath}`,
+                }],
+              },
+            ],
+          }
+          : {
+            $map: {
+              input: `$${listPath}`,
+              in: enrichedItem,
             },
           },
-        },
       },
     },
     // C. Limpieza final
     {
       $unset: [
         "temp_musicsExpanded", "temp_musicMap",
+        "temp_userInfosExpanded", "temp_userInfoMap",
         "temp_fileInfosExpanded", "temp_fileInfosMap",
         "temp_userFav", "temp_favList", "temp_userFavMusicIds",
       ],

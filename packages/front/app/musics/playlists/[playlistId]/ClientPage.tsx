@@ -5,6 +5,7 @@ import type { Params } from "./page";
 import { useState } from "react";
 import { assertIsDefined } from "$shared/utils/validation";
 import { MusicPlaylistEntity } from "$shared/models/musics/playlists";
+import { MusicPlaylistCrudDtos } from "$shared/models/musics/playlists/dto/transport";
 import MusicLayout from "app/musics/music.layout";
 import { MusicPlaylistFullPage } from "#modules/musics/lists/playlists/FullPage/Playlist";
 import { FetchApi } from "#modules/fetching/fetch-api";
@@ -19,6 +20,11 @@ import { useOnAutoplay } from "#modules/utils/autoplay/useOnAutoplay";
 interface PageProps {
   params: Promise<Params | SlugPageParams>;
 }
+
+const expand: MusicPlaylistCrudDtos.GetMany.Criteria["expand"] = [
+  "ownerUserPublic", "imageCover",
+  "musics", "musicsFavorite", "musicsUserInfo",
+];
 
 export function ClientPage( { params }: PageProps) {
   const api = FetchApi.get(MusicPlaylistsApi);
@@ -51,8 +57,9 @@ export function ClientPage( { params }: PageProps) {
           filter: {
             slug: playlistSlug,
             ownerUserSlug: userSlug,
+            limitMusicExpand: 5,
           },
-          expand: ["ownerUserPublic", "imageCover"],
+          expand,
         } );
 
         d = response.data as MusicPlaylistEntity;
@@ -66,8 +73,9 @@ export function ClientPage( { params }: PageProps) {
         const response = await api.getOneByCriteria( {
           filter: {
             id: resolvedParams.playlistId,
+            limitMusicExpand: 5,
           },
-          expand: ["ownerUserPublic", "imageCover"],
+          expand,
         } );
 
         d = response.data as MusicPlaylistEntity;
