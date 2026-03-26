@@ -20,12 +20,11 @@ export function useMediaSession(
     hasNext: s.hasNext,
   } )));
   const { data: music } = useMusic(player.currentResource?.resourceId ?? null);
+  const coverUrl = useMediumCoverUrlFromMusic(music);
 
   useEffect(() => {
     if (!navigator.mediaSession || !music || !engine)
       return;
-
-    const coverUrl = useMediumCoverUrlFromMusic(music);
 
     navigator.mediaSession.metadata = new MediaMetadata( {
       title: music.title,

@@ -1,6 +1,7 @@
 import { useMusic } from "#modules/musics/hooks";
 import { PlayerView } from "#modules/player/common/PlayerView";
 import { secsToMmss } from "#modules/utils/dates";
+import { useImageCover } from "#modules/image-covers/hooks";
 import { PlayButton } from "../PlayButton";
 import { PrevButton, NextButton, ShuffleButton, RepeatButton, BackwardButton, ForwardButton, CloseButton } from "../OtherButtons";
 import { ProgressBar } from "../ProgressBar";
@@ -9,6 +10,7 @@ import { useBrowserPlayer } from "../BrowserPlayerContext";
 export const Player = () => {
   const currentResource = useBrowserPlayer(s=>s.currentResource);
   const { data: music } = useMusic(currentResource?.resourceId ?? null);
+  const { data: imageCover } = useImageCover(music?.imageCoverId ?? null);
 
   if (!music)
     return null;
@@ -18,7 +20,7 @@ export const Player = () => {
   return <PlayerView
     artist={artist}
     title={title}
-    cover={music.imageCover}
+    cover={imageCover}
     progressBar={<ProgressBar />}
     currentTime={<CurrentTime />}
     duration={<Duration />}

@@ -237,6 +237,8 @@ type CreateContextMenuItemProps = {
   onClick?: (e: MouseEvent<HTMLParagraphElement>)=> void;
   className?: string;
   disabled?: boolean;
+  icon?: ReactNode;
+  iconPosition?: "left" | "right";
   theme?: "danger" | "default" | "primary" | "success";
 };
 
@@ -244,32 +246,40 @@ export const ContextMenuItem = ( { label,
   onClick: paramOnClick,
   className,
   disabled,
+  icon,
+  iconPosition = "left",
   theme = "default" }: CreateContextMenuItemProps) => {
   const { closeMenu } = useContextMenuTrigger();
 
   return (
-    <p
-      className={classes(
-        styles.menuItem,
-        paramOnClick && styles.pointer,
-        theme === "danger" && !disabled && styles.danger,
-        theme === "primary" && !disabled && styles.primary,
-        theme === "success" && !disabled && styles.success,
-        disabled && styles.disabled,
-        className,
-      )}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    <>
+      <p
+        className={classes(
+          styles.menuItem,
+          paramOnClick && styles.pointer,
+          theme === "danger" && !disabled && styles.danger,
+          theme === "primary" && !disabled && styles.primary,
+          theme === "success" && !disabled && styles.success,
+          disabled && styles.disabled,
+          className,
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
 
-        if (paramOnClick && !disabled) {
-          paramOnClick(e);
-          closeMenu();
-        }
-      }}
-    >
-      {label}
-    </p>
+          if (paramOnClick && !disabled) {
+            paramOnClick(e);
+            closeMenu();
+          }
+        }}
+      >
+        {icon && iconPosition === "left"
+          && <span className={classes(styles.icon, styles.iconLeft)}>{icon}</span>}
+        {label}
+        {icon && iconPosition === "right"
+          && <span className={classes(styles.icon, styles.iconRight)}>{icon}</span>}
+      </p>
+    </>
   );
 };
 

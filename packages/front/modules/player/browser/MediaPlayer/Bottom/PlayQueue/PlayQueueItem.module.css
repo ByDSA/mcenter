@@ -1,0 +1,10 @@
+.item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.priorityItem {
+   background: color-mix(in srgb, var(--color-blue-900) 40%, transparent);
+}

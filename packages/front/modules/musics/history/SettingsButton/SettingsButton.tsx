@@ -4,6 +4,7 @@ import { SettingsButton } from "#modules/ui-kit/SettingsButton/SettingsButton";
 import { useContextMenuTrigger } from "#modules/ui-kit/ContextMenu";
 import { useMusic } from "#modules/musics/hooks";
 import { ShareMusicContextMenuItem } from "#modules/musics/musics/SettingsButton/ShareContextMenuItem";
+import { AddToPriorityQueueMenuItem } from "#modules/musics/musics/SettingsButton/Button";
 import { EditMusicContextMenuItem } from "../../musics/Edit/ContextMenuItem";
 import { AddToPlaylistContextMenuItem } from "../../lists/playlists/AddToPlaylistContextMenuItem";
 import { MusicLatestViewsContextMenuItem } from "../LatestViews/ContextMenuItem";
@@ -21,6 +22,9 @@ const HistoryEntryContextMenu = ( { onDeleteMusic }: ContextMenuProps) => {
 
   return (
     <>
+      <AddToPriorityQueueMenuItem
+        musicId={data.resourceId}
+      />
       <LocalDataProvider data={music}>
         <AddToPlaylistContextMenuItem
           musicId={data.resourceId}

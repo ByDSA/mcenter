@@ -164,6 +164,10 @@ const es = {
       queue: {
         title: "Lista de reproducción",
         empty: "No hay elementos en la lista",
+        priority: {
+          add: "Añadir a cola",
+          remove: "Quitar de la cola",
+        },
       },
       effects: {
         title: "Efectos",

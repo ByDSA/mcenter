@@ -62,6 +62,9 @@ export function playlistToQueue(playlist: MusicPlaylistEntity): PlaylistQueueIte
 export type PlaylistQueueItem = PlayerResourceId & {
   itemId: string | null;
   playlistId: string | null;
+
+  /** Marks this item as originating from the priority queue */
+  fromPriority?: true;
 };
 
 export type NextAction = {
@@ -70,6 +73,9 @@ export type NextAction = {
 } | {
   type: "NEW_MUSIC";
   payload: MusicEntity;
+} | {
+  type: "PRIORITY";
+  payload: PlaylistQueueItem;
 };
 
 type NextResource = {
@@ -88,6 +94,7 @@ interface PlayerState {
   nextResource: NextResource | null;
   queue: PlaylistQueueItem[];
   queueIndex: number;
+  priorityQueue: PlaylistQueueItem[];
   repeatMode: RepeatMode;
   isShuffle: boolean;
   volume: number;
@@ -127,6 +134,11 @@ interface PlayerState {
   forward: (relativeTimeSecs: number)=> void;
   setIsOnline: (newValue: boolean)=> void;
 
+  // Priority queue actions
+  addToPriorityQueue: (musicId: string)=> Promise<void>;
+  removeFromPriorityQueue: (itemId: string)=> void;
+  playPriorityIndex: (i: number)=> Promise<void>;
+
   // Getters (Computados)
   hasPrev: ()=> boolean;
   hasNext: ()=> boolean;
@@ -143,6 +155,7 @@ export const useBrowserPlayer = create<PlayerState>()(
       nextResource: null,
       queue: [],
       queueIndex: -1,
+      priorityQueue: [],
       repeatMode: RepeatMode.Off,
       isShuffle: false,
       volume: 1,
@@ -209,6 +222,12 @@ export const useBrowserPlayer = create<PlayerState>()(
             } ),
           queue: props?.addToEnd ? [...get().queue, resource] : [resource],
           queueIndex: props?.addToEnd ? get().queue.length : 0,
+          // Reset priority queue only when starting a new playback (not addToEnd)
+          ...(props?.addToEnd
+            ? {}
+            : {
+              priorityQueue: [],
+            } ),
         } );
       },
 
@@ -231,6 +250,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           queue,
           query,
           queueIndex: Infinity,
+          priorityQueue: [],
         } );
 
         let index = propsIndex;
@@ -249,7 +269,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           } else {
             const nextAction = await get().getNext();
 
-            if (!nextAction) {
+            if (!nextAction || nextAction.type === "PRIORITY") {
               get().stop();
 
               return;
@@ -305,6 +325,7 @@ export const useBrowserPlayer = create<PlayerState>()(
           queue: [queueItem],
           status: "playing",
           queueIndex: 0,
+          priorityQueue: [],
         } );
       },
       playQueueIndex: async (index) => {
@@ -391,7 +412,17 @@ export const useBrowserPlayer = create<PlayerState>()(
         return "one";
       },
       getNext: async () => {
-        const { queueIndex, queue, repeatMode, isShuffle, query, getPlayingType } = get();
+        const { priorityQueue, queueIndex, queue, repeatMode,
+          isShuffle, query, getPlayingType } = get();
+
+        // Priority queue takes precedence
+        if (priorityQueue.length > 0) {
+          return {
+            type: "PRIORITY" as const,
+            payload: priorityQueue[0],
+          };
+        }
+
         const playingType = getPlayingType();
 
         return await getNextByParams( {
@@ -403,16 +434,87 @@ export const useBrowserPlayer = create<PlayerState>()(
           playingType,
         } );
       },
+
+      // --- Priority queue actions ---
+      addToPriorityQueue: async (musicId) => {
+        const { currentResource, status } = get();
+
+        // No active playback → play directly (no point in queuing)
+        if (status === "stopped" || !currentResource) {
+          await get().playMusic(musicId);
+
+          return;
+        }
+
+        const item: PlaylistQueueItem = {
+          type: "music",
+          resourceId: musicId,
+          itemId: crypto.randomUUID(),
+          playlistId: null,
+          fromPriority: true,
+        };
+
+        set((state) => ( {
+          priorityQueue: [...state.priorityQueue, item],
+        } ));
+      },
+
+      removeFromPriorityQueue: (itemId) => {
+        set((state) => ( {
+          priorityQueue: state.priorityQueue.filter(i => i.itemId !== itemId),
+        } ));
+      },
+
+      playPriorityIndex: async (i) => {
+        const { priorityQueue } = get();
+
+        if (i < 0 || i >= priorityQueue.length)
+          return;
+
+        const item = priorityQueue[i];
+        const music = await useMusic.get(item.resourceId);
+
+        if (!music)
+          return;
+
+        const fileInfo = getFirstAvailableFileInfoOrFirst(music.fileInfos);
+
+        if (isMusicUnavailable(music, {
+          precalcFileInfo: fileInfo,
+        } ))
+          return;
+
+        set( {
+          priorityQueue: priorityQueue.slice(i + 1),
+          currentResource: item,
+          status: "playing",
+          nextResource: null,
+          currentTime: 0,
+          ...(fileInfo
+            ? {
+              duration: fileInfo.mediaInfo.duration ?? undefined,
+            }
+            : {} ),
+        } );
+      },
+
+      // --- Modified next() — consumes priorityQueue first ---
       next: async () => {
         const { getNext, nextResource, queue } = get();
+        // Normal flow
         const { has } = useAudioCache.getState();
-        const isValidNextResourceAction = nextResource?.nextAction
-        && has(
-          nextResource.nextAction.type === "INDEX"
-            ? queue[nextResource.nextAction.payload].resourceId
-            : nextResource.nextAction.payload.id,
-        );
-        const nextAction = isValidNextResourceAction ? nextResource.nextAction : await getNext();
+        let isValidNextResourceAction = false;
+
+        if (nextResource?.nextAction) {
+          if (nextResource.nextAction.type === "INDEX") {
+            isValidNextResourceAction = has(
+              queue[nextResource.nextAction.payload].resourceId,
+            );
+          } else if (nextResource.nextAction.type === "NEW_MUSIC")
+            isValidNextResourceAction = has(nextResource.nextAction.payload.id);
+        }
+
+        const nextAction = isValidNextResourceAction ? nextResource!.nextAction : await getNext();
 
         if (!nextAction) {
           get().stop();
@@ -434,10 +536,22 @@ export const useBrowserPlayer = create<PlayerState>()(
               keepQuery: true,
             } );
             break;
+          case "PRIORITY":
+            await get().playPriorityIndex(0);
+            break;
         }
       },
       prev: async () => {
-        const { queueIndex, queue, repeatMode } = get();
+        const { queueIndex, queue, repeatMode, currentResource } = get();
+
+        // If playing a priority item, return to the frozen queue position
+        if (currentResource?.fromPriority) {
+          await get().playQueueIndex(queueIndex);
+
+          return;
+        }
+
+        // Normal flow
         const prevIndex = await getPrevAvailableIndex(queue, queueIndex, repeatMode);
 
         if (prevIndex === null)
@@ -504,15 +618,21 @@ export const useBrowserPlayer = create<PlayerState>()(
           nextResource: newValue,
         } );
       },
-
-      // Helpers computados
       hasPrev: () => {
-        const { queueIndex, repeatMode } = get();
+        const { queueIndex, repeatMode, currentResource } = get();
+
+        // Always true when playing a priority item (can return to queue[queueIndex])
+        if (currentResource?.fromPriority)
+          return true;
 
         return queueIndex > 0 || repeatMode === RepeatMode.All;
       },
       hasNext: () => {
-        const { queueIndex, queue, repeatMode, isShuffle, getPlayingType } = get();
+        const { queueIndex, queue, repeatMode, isShuffle, getPlayingType, priorityQueue } = get();
+
+        // Priority queue pending items always mean there is a next
+        if (priorityQueue.length > 0)
+          return true;
 
         return queueIndex + 1 < queue.length || (repeatMode === RepeatMode.All && queue.length > 1)
          || (isShuffle && queue.length > 1) || getPlayingType() === "smart-playlist";
@@ -525,6 +645,7 @@ export const useBrowserPlayer = create<PlayerState>()(
         isShuffle: state.isShuffle,
         volume: state.volume,
         compressionValue: state.compressionValue,
+        // priorityQueue is intentionally NOT persisted
       } ),
     },
   ),
@@ -562,7 +683,7 @@ type GetNextProps = {
 export async function getNextByParams(props: GetNextProps): Promise<NextAction | null> {
   const { queueIndex, queue, repeatMode, isShuffle, query, playingType } = props;
 
-  // 1.async  LÓGICA DE ORDEN SECUENCIAL
+  // 1. LÓGICA DE ORDEN SECUENCIAL
   if ((!isShuffle && (playingType === "playlist" || playingType === "one"))
       || (playingType === "smart-playlist" && queueIndex < queue.length - 1)) {
     const nextIndex = await getNextAvailableIndex(queue, queueIndex, repeatMode);

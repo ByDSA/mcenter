@@ -102,11 +102,13 @@ className?: string;
 export const NextButton = ( { className }: NextButtonProps) => {
   const next = useBrowserPlayer(s=>s.next);
   const hasNext = useBrowserPlayer(s=>s.hasNext);
-  // Porque hasNext depende de isShuffle y repeatMode
+  // Porque hasNext depende de isShuffle, repeatMode y priorityQueue
   // eslint-disable-next-line no-underscore-dangle
   const _1 = useBrowserPlayer(s=>s.isShuffle);
   // eslint-disable-next-line no-underscore-dangle
   const _2 = useBrowserPlayer(s=>s.repeatMode);
+  // eslint-disable-next-line no-underscore-dangle
+  const _3 = useBrowserPlayer(s=>s.priorityQueue);
 
   return <NextButtonView
     className={className}

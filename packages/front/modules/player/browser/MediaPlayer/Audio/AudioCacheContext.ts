@@ -28,7 +28,7 @@ export const useAudioCache = create<AudioCacheState>((set, get) => ( {
     return get().cache[resourceId] !== undefined;
   },
   hasNextAction: (nextAction: NextAction) => {
-    const { queue } = useBrowserPlayer.getState();
+    const { queue, priorityQueue } = useBrowserPlayer.getState();
     const { has } = get();
 
     if (nextAction.type === "INDEX") {
@@ -37,6 +37,9 @@ export const useAudioCache = create<AudioCacheState>((set, get) => ( {
 
       return has(queue[nextAction.payload].resourceId);
     }
+
+    if (nextAction.type === "PRIORITY")
+      return priorityQueue.length > 0 && has(nextAction.payload.resourceId);
 
     return has(nextAction.payload.id);
   },

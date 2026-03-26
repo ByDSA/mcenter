@@ -60,9 +60,12 @@ export function usePrefetching() {
         if (!nextAction)
           return;
 
+        // eslint-disable-next-line no-nested-ternary
         const resourceId = nextAction.type === "INDEX"
           ? queue[nextAction.payload].resourceId
-          : nextAction.payload.id;
+          : nextAction.type === "PRIORITY"
+            ? nextAction.payload.resourceId
+            : nextAction.payload.id;
 
         if (has(resourceId))
           return;

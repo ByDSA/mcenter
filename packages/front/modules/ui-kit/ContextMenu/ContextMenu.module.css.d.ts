@@ -3,6 +3,8 @@ export interface ContextMenuStyles {
   contextMenu: string;
   open: string;
   icon: string;
+  iconLeft: string;
+  iconRight: string;
   divider: string;
   menuItem: string;
   danger: string;

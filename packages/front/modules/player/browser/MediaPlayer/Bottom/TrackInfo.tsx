@@ -7,6 +7,7 @@ import { classes } from "#modules/utils/styles";
 import { useMusic } from "#modules/musics/hooks";
 import { ContentSpinner } from "#modules/ui-kit/Spinner/Spinner";
 import { DaAnchor } from "#modules/ui-kit/Anchor/Anchor";
+import { useImageCover } from "#modules/image-covers/hooks";
 import { useBrowserPlayer } from "../BrowserPlayerContext";
 import commonStyles from "../../../common/MediaPlayerCommon.module.css";
 import { CurrentTimeLabel } from "./CurrentTimeLabel";
@@ -20,6 +21,7 @@ export const TrackInfo = memo(
     const router = useRouter();
     const { data: music } = useMusic(resource!.resourceId);
     const width = useWindowWidth();
+    const { data: imageCover } = useImageCover(music?.imageCoverId ?? null);
 
     if (!music)
       return <ContentSpinner size={2}/>;
@@ -32,7 +34,7 @@ export const TrackInfo = memo(
             className: commonStyles.icon,
           }}
           size="small"
-          cover={music.imageCover}
+          cover={imageCover}
         />
         <div className={styles.trackDetails}>
           {width < SMALL_BREAKPOINT

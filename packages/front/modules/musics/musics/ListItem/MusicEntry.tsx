@@ -37,6 +37,8 @@ type Props = Pick<ResourceEntryProps, "drag"> & {
     onToggle: ()=> void;
   };
   onLongPress?: ()=> void;
+  priorityItemId?: string;
+  itemId?: string; // tiene prioridad sobre playlistInfo para el estado de reproducción
 };
 export function MusicEntryElement(
   props: Props,
@@ -79,6 +81,13 @@ export function MusicEntryElement(
       if (fileInfo?.offloaded)
         return "disabled";
 
+      if (props.itemId) {
+        if (props.itemId === player.currentResource?.itemId)
+          return player.status;
+        else
+          return "stopped";
+      }
+
       if (props.playlistInfo) {
         let itemId: string | null;
         const { index } = props.playlistInfo;
@@ -86,7 +95,7 @@ export function MusicEntryElement(
         if (props.playlistInfo.playlist)
           itemId = props.playlistInfo.playlist.list[index].id;
         else
-          itemId = player.queue[index].itemId;
+          itemId = player.queue[index]?.itemId ?? null;
 
         if (itemId === player.currentResource?.itemId)
           return player.status;
@@ -121,10 +130,10 @@ export function MusicEntryElement(
             } );
           } else
             await player.playQueueIndex(index);
-        } else
+        } else if (props.onClickPlay)
+          await props.onClickPlay?.(player.status);
+        else
           await player.playMusic(music.id);
-
-        await props.onClickPlay?.(player.status);
       },
     };
   }
@@ -149,7 +158,10 @@ export function MusicEntryElement(
         event: e,
         content: props.contextMenu?.customContent
          ?? <LocalDataProvider data={music}>
-           <MusicContextMenu onDelete={props.onDelete} />
+           <MusicContextMenu
+             onDelete={props.onDelete}
+             priorityItemId={props.priorityItemId}
+           />
          </LocalDataProvider>,
       } )
       }
@@ -191,8 +203,11 @@ export const MusicSubtitle = memo(( { music }: MusicSubtitleProps) => {
   ]} />;
 } );
 
-export function useMediumCoverUrlFromMusic(music: MusicEntity) {
-  const { data: imageCover } = useImageCover(music.imageCoverId ?? null);
+export function useMediumCoverUrlFromMusic(music: MusicEntity | null | undefined) {
+  if (!music)
+    return undefined;
+
+  const { data: imageCover } = useImageCover(music?.imageCoverId ?? null);
 
   if (imageCover)
     return getMediumCoverUrl(imageCover);

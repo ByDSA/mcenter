@@ -164,6 +164,10 @@ const en = {
       queue: {
         title: "Queue",
         empty: "No items in the queue",
+        priority: {
+          add: "Add to the queue",
+          remove: "Remove from the queue",
+        },
       },
       effects: {
         title: "Effects",

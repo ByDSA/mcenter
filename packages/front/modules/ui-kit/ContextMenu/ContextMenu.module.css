@@ -64,8 +64,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.iconLeft {
+  margin-right: 0.5rem;
+}
+.iconRight {
+  margin-left: 0.5rem;
 }
 
 .divider {

@@ -49,11 +49,6 @@ export const AudioTag = () => {
       if (!audio || !audio.src || audio.src === "")
         return;
 
-      if (audio.currentTime >= audio.duration) {
-        await waitForPrefetching();
-        await onEnded();
-      }
-
       const { status } = useBrowserPlayer.getState();
 
       if (status === "playing") {
@@ -67,6 +62,7 @@ export const AudioTag = () => {
     }
   }, []);
   const setGlobalAudioElement = useBrowserPlayer(s=>s.setAudioElement);
+  const { abort: abortPrefetchingFetch, waitForPrefetching } = usePrefetching();
   const onEnded = useCallback(async () => {
     if (!audioRef.current)
       return;
@@ -137,8 +133,10 @@ export const AudioTag = () => {
       const release = await mutexRef.current.acquire();
 
       try {
-        if (!isNaN(audio.duration) && audio.currentTime >= audio.duration)
+        if (!isNaN(audio.duration) && audio.currentTime >= audio.duration) {
+          await waitForPrefetching();
           await onEnded();
+        }
       } finally {
         release();
       }
@@ -220,10 +218,8 @@ export const AudioTag = () => {
 
       newUrl ??= await getUrlSkipHistory(player.currentResource.resourceId);
 
-      if (audio.src !== newUrl) {
-        audio.src = newUrl;
-        audio.load();
-      }
+      audio.src = newUrl;
+      audio.load();
     };
 
     loadResource()
@@ -304,8 +300,6 @@ export const AudioTag = () => {
 
   if (user)
     useHistoryLogger(audioRef.current);
-
-  const { abort: abortPrefetchingFetch, waitForPrefetching } = usePrefetching();
 
   return null;
 };

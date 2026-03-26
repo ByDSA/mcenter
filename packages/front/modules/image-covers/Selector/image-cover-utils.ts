@@ -1,6 +1,6 @@
 import { PATH_ROUTES } from "$shared/routing";
-import { ImageCover } from "../models";
 import { backendUrl } from "#modules/requests";
+import { ImageCover } from "../models";
 
 export function getLargeCoverUrl(imageCover: ImageCover): string {
   const fieldUrl = imageCover.versions.large

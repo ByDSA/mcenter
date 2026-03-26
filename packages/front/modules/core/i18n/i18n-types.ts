@@ -601,6 +601,16 @@ type RootTranslation = {
 				 * N​o​ ​h​a​y​ ​e​l​e​m​e​n​t​o​s​ ​e​n​ ​l​a​ ​l​i​s​t​a
 				 */
 				empty: string
+				priority: {
+					/**
+					 * A​ñ​a​d​i​r​ ​a​ ​c​o​l​a
+					 */
+					add: string
+					/**
+					 * Q​u​i​t​a​r​ ​d​e​ ​l​a​ ​c​o​l​a
+					 */
+					remove: string
+				}
 			}
 			effects: {
 				/**
@@ -1712,6 +1722,16 @@ export type TranslationFunctions = {
 				 * No hay elementos en la lista
 				 */
 				empty: () => LocalizedString
+				priority: {
+					/**
+					 * Añadir a cola
+					 */
+					add: () => LocalizedString
+					/**
+					 * Quitar de la cola
+					 */
+					remove: () => LocalizedString
+				}
 			}
 			effects: {
 				/**
