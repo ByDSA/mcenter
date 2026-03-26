@@ -11,6 +11,8 @@ type GenQueryOptions = {
   hasUser?: boolean;
 };
 
+const KEY = "music";
+
 function genQueryFn(id: string, options?: GenQueryOptions) {
   return async ()=> {
     const api = FetchApi.get(MusicsApi);
@@ -32,7 +34,7 @@ function genQueryFn(id: string, options?: GenQueryOptions) {
 
 function genQuery(id: string, options?: GenQueryOptions) {
   return {
-    queryKey: ["music", id],
+    queryKey: [KEY, id],
     queryFn: genQueryFn(id, options),
     staleTime: 1_000 * 60 * 5,
     refetchOnMount: (query) => {
@@ -67,7 +69,7 @@ export const useMusic = (id: string | null, options?: Omit<GenQueryOptions, "has
         hasUser: !!user,
       } )
       : {
-        queryKey: ["music", null],
+        queryKey: [KEY, null],
         queryFn: () => null,
       },
   );
@@ -85,7 +87,7 @@ useMusic.get = (id: string, options?: GenQueryOptions) => {
 };
 
 useMusic.getCache = (id: string) => {
-  return getQueryClient().getQueryData<MusicEntity>(["music", id]);
+  return getQueryClient().getQueryData<MusicEntity>([KEY, id]);
 };
 
 useMusic.fetch = (id: string, options?: GenQueryOptions) => {
@@ -109,12 +111,12 @@ useMusic.updateCacheWithMerging = (id: string, entity: Partial<MusicEntity>) => 
 
 type CustomFn = (oldData: MusicEntity | undefined)=> MusicEntity;
 useMusic.updateCache = (id: string, fn: CustomFn) => {
-  getQueryClient().setQueryData(["music", id], fn);
+  getQueryClient().setQueryData([KEY, id], fn);
 };
 
 useMusic.invalidateCache = (id: string) => {
   return getQueryClient().invalidateQueries( {
-    queryKey: ["music", id],
+    queryKey: [KEY, id],
   } );
 };
 

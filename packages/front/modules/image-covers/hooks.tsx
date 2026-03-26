@@ -18,7 +18,7 @@ function genQueryFn(id: string, options?: GenQueryOptions) {
     const api = FetchApi.get(ImageCoversApi);
 
     if (options?.debounce)
-      return fetchMusicDebounced(id, options);
+      return fetchImageCoverDebounced(id, options);
 
     const res = await api.getOneByCriteria( {
       filter: {
@@ -97,7 +97,7 @@ useImageCover.invalidateCache = (id: string) => {
   } );
 };
 
-export const useMusics = (ids: string[]) => {
+export const useImageCovers = (ids: string[]) => {
   return useQueries( {
     queries: ids.map(id => {
       return genQuery(id);
@@ -170,7 +170,10 @@ const flushBatch = async (_options?: GenQueryOptions) => {
     } );
   }
 };
-const fetchMusicDebounced = (id: string, options?: GenQueryOptions): Promise<ImageCoverEntity> => {
+const fetchImageCoverDebounced = (
+  id: string,
+  options?: GenQueryOptions,
+): Promise<ImageCoverEntity> => {
   return new Promise((resolve, reject) => {
     const existingSubscribers = batchQueue.get(id) || [];
 

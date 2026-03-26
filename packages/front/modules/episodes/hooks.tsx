@@ -36,6 +36,15 @@ function genQuery(id: string, options?: GenQueryOptions) {
     queryKey: [KEY, id],
     queryFn: genQueryFn(id, options),
     staleTime: 1_000 * 60 * 5,
+    structuralSharing: (
+      oldData: EpisodeEntity | undefined,
+      newData: Partial<EpisodeEntity>,
+    ) => {
+      if (!oldData)
+        return newData as EpisodeEntity;
+
+      return merge(oldData, newData);
+    },
   };
 }
 
@@ -90,7 +99,7 @@ useEpisode.invalidateCache = (id: string) => {
   } );
 };
 
-export const useManyEpisods = (ids: string[]) => {
+export const useEpisodes = (ids: string[]) => {
   return useQueries( {
     queries: ids.map(id => {
       return genQuery(id);
