@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.32.0](https://github.com/ByDSA/mcenter/compare/v4.31.0...v4.32.0) (2026-04-14)
+
+
+### Features
+
+* add breadcrumbs ([9df55c8](https://github.com/ByDSA/mcenter/commit/9df55c86a2468a89f1ac8d79dcb6f60441dfe9cc))
+* add context menu item to navigate to music ([e44a7ff](https://github.com/ByDSA/mcenter/commit/e44a7fffee35001e9e2cf65266e4b342c417b1df))
+* add i18n ([2e94258](https://github.com/ByDSA/mcenter/commit/2e94258b49f57bdb0543209f0838a8901f001f88))
+* add movies cruds ([4a830ea](https://github.com/ByDSA/mcenter/commit/4a830ea707eab6eef3be539eca5ab4cd67993452))
+* add priority queue ([cedf4d5](https://github.com/ByDSA/mcenter/commit/cedf4d55a6952a6ea31333dc2309688535c61cda))
+* add volume slider for fullscreen ([1d62acd](https://github.com/ByDSA/mcenter/commit/1d62acd8dad4c2fd0b9d3fc43b438193d8b7fa2a))
+* back button in mobile to minimize fullscreen player ([3a54373](https://github.com/ByDSA/mcenter/commit/3a54373d175e4f0757375d4bb8a071ac0cc274bd))
+* **back:** add tasks "update-yt-dlp" and "sync-indexes" ([e21040e](https://github.com/ByDSA/mcenter/commit/e21040e502b630fc96d7876b907637f2d8c40a0b))
+* **front:** add settings button in player ([f8a69be](https://github.com/ByDSA/mcenter/commit/f8a69be2a3242257dd1e8f591bf84f8f9b25c81c))
+* implement audio tag reading for multiple formats using ffprobe ([23d2177](https://github.com/ByDSA/mcenter/commit/23d21779ab01871d4d0222e27b07e9015d6bbde1))
+* move to start or end buttons ([65b13a3](https://github.com/ByDSA/mcenter/commit/65b13a36136326ef6cd33d927bbc0073814bf576))
+* multiple edition music ([91f89d9](https://github.com/ByDSA/mcenter/commit/91f89d905177bd27f075d370b313424c01d7b2f7))
+* playlists duplicates handling ([8ac337e](https://github.com/ByDSA/mcenter/commit/8ac337ea815c132a7064351fd7791181d258ffc2))
+
+
+### Bug Fixes
+
+* add more characters to slug fixing ([5b9b768](https://github.com/ByDSA/mcenter/commit/5b9b76863ae76975e346218690383935ac218650))
+* album losses when fav ([2ca681e](https://github.com/ByDSA/mcenter/commit/2ca681e9ad39642a9968ade14989547a7deb1fd1))
+* breacrumbs ([2c44ea0](https://github.com/ByDSA/mcenter/commit/2c44ea024a8fe917443821f419bdb62cd4c72bab))
+* close player on delete (2) ([7d1ee92](https://github.com/ByDSA/mcenter/commit/7d1ee925d288a0a78945dab4f148789b2cd0ccbb))
+* close player on self delete ([b55ec9a](https://github.com/ByDSA/mcenter/commit/b55ec9ac43a5a997208a91a948a90dfb36a3f706))
+* cookies forward in fetching backend-to-backend ([e14c29e](https://github.com/ByDSA/mcenter/commit/e14c29ebc930968e96646440f5565b969933e96e))
+* efficient request in playlists ([28c2d25](https://github.com/ByDSA/mcenter/commit/28c2d250b3c85d13f184b4bbf17f794e491cc559))
+* events ([1208a7b](https://github.com/ByDSA/mcenter/commit/1208a7bf8c74beabe45f50389301d28b6da248f6))
+* **front:** prev-next button in remote player ([f8f7921](https://github.com/ByDSA/mcenter/commit/f8f7921202da6b5647d30edd928e51afa8e99161))
+* **front:** remove musics in list when delete ([4274841](https://github.com/ByDSA/mcenter/commit/42748411a2866efed0c9d2fd2113165c6c6e4f23))
+* increment file size limit to 150MB ([1c15bc5](https://github.com/ByDSA/mcenter/commit/1c15bc545dc71cc05097afd79be5e08e1305db36))
+* minimize player on page change ([8f60faf](https://github.com/ByDSA/mcenter/commit/8f60fafc7192a83854789e09160a55d4c06c6e29))
+* pagination component ([093aa13](https://github.com/ByDSA/mcenter/commit/093aa13b9d88adbd69f583aef2a6bb044dd9d495))
+* slug fixer in backed (not in frontend) ([9ab830e](https://github.com/ByDSA/mcenter/commit/9ab830e7b8b6fa2ef5b2e36537d0e0d869c6eec3))
+* update file-info list when upload and delete ([0551e37](https://github.com/ByDSA/mcenter/commit/0551e378f54d921fa64fa33df00c02cc769ccb8c))
+* update image realtime when image cover changes ([31f92fc](https://github.com/ByDSA/mcenter/commit/31f92fc543e6c0708d74c4d5b9563bd247289b2d))
+* update user info handling and improve private playlist query ([07d5d37](https://github.com/ByDSA/mcenter/commit/07d5d3733c54a75f5a6b61536f3fee836fbea09a))
+* volume slider ([1528256](https://github.com/ByDSA/mcenter/commit/1528256de43e657b5fce5d22e54c8a79a4031dcf))
+
 ## [4.31.0](https://github.com/ByDSA/mcenter/compare/v4.21.0...v4.31.0) (2026-02-25)
 
 
