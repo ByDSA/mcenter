@@ -12,6 +12,9 @@ testCrudRoutes(PATH_ROUTES.musics.path, [
 testRoute(PATH_ROUTES.musics.userInfo.withParams("id"), {
   method: "PATCH",
 } );
+testRoute(PATH_ROUTES.musics.bulk.path, {
+  method: "PATCH",
+} );
 verifyRoutesCoverage( {
   controller: MusicCrudController,
   controllerRoute: PATH_ROUTES.musics.path,
