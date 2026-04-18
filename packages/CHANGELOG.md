@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.32.1](https://github.com/ByDSA/mcenter/compare/v4.32.0...v4.32.1) (2026-04-18)
+
+
+### Bug Fixes
+
+* **front:** prevent playing previous audio when changing to next audio ([0ddbb13](https://github.com/ByDSA/mcenter/commit/0ddbb1339a6d0e35880e48713724ec030ec31561))
+
 ## [4.32.0](https://github.com/ByDSA/mcenter/compare/v4.31.0...v4.32.0) (2026-04-14)
 
 
