@@ -34,8 +34,11 @@ export const AudioTag = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const syncingRef = useRef(false);
   const mutexRef = useRef(new Mutex());
+  // Bloquea sync() mientras se está cargando un nuevo recurso,
+  // para evitar que se reproduzca el audio anterior durante la transición.
+  const loadingRef = useRef(false);
   const sync = useCallback(async () => {
-    if (syncingRef.current)
+    if (syncingRef.current || loadingRef.current)
       return;
 
     const release = await mutexRef.current.acquire();
@@ -141,7 +144,11 @@ export const AudioTag = () => {
         release();
       }
 
-      await sync();
+      // No llamamos a sync() aquí si onEnded() ha cambiado el recurso,
+      // porque loadResource ya llama a sync() tras cargar la nueva URL.
+      // Si se llamara aquí, sync() podría reproducir el audio anterior
+      // (el browser reinicia desde el segundo 0 un audio en estado "ended").
+      // El efecto de player.currentResource se encarga del sync al terminar.
     };
     const onLoadedData = async () => {
       await sync();
@@ -195,6 +202,10 @@ export const AudioTag = () => {
   }, [setGlobalAudioElement]);
 
   useEffect(() => {
+    // Bloquear sync() desde el inicio de la carga para evitar que reproduzca
+    // el recurso anterior mientras se obtiene la URL del nuevo.
+    loadingRef.current = true;
+
     const loadResource = async () => {
       const audio = audioRef.current;
 
@@ -225,6 +236,9 @@ export const AudioTag = () => {
     loadResource()
       .catch(showError)
       .finally(async ()=> {
+        // Desbloquear sync() solo tras haber establecido la nueva src,
+        // y entonces sí sincronizar (arranca la reproducción de la nueva canción).
+        loadingRef.current = false;
         await sync();
       } );
   }, [player.currentResource]);
